@@ -1,0 +1,183 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.box-holder{
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}
+
+/* Create four equal columns that floats next to each other */
+.column {
+  float: left;
+  width: 200px;
+  height: 150px;
+  padding: 10px;
+  margin: 20px;
+  border: 1px;
+  border-style: solid;
+  border-color: black;
+}
+
+.image-box{
+  text-align: center;
+}
+
+.icon-box{
+  height: 76px;
+  width: 76px;
+  /* align: middle; */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.text-box{
+  text-align: center;
+  margin-top: 30%;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.found-set1{
+  display: inline-block;
+  width: 100%;
+  text-decoration: none;
+  margin: 0;
+}
+
+.found_pc{
+  text-align: center;
+  text-decoration: none;
+}
+
+.found_pc_section{
+  display: block;
+  align-self: center;
+  text-decoration: none;
+}
+
+.found_box1{
+  /* height: 150px; */
+  width: 250px;
+  border: 1px solid black;
+  padding: 5px;
+  margin: 25px;
+  float: left;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.found_box1 img{
+  width: 150px;
+  /* height: 120px; */
+  margin: 0;
+  padding: 0px;
+  text-decoration: none;
+}
+
+.companyfoundlogo img{
+  width: 300px;
+  height: 100px;
+  margin: 0;
+  padding: 0px;
+  text-decoration: none;
+}
+
+.found_text{
+  text-align: center;
+}
+
+.found_button {
+display: inline-block;
+border-radius: 4px;
+/* background-color: #59b4d9; */
+border: none;
+color: #FFFFFF;
+text-align: center;
+/* font-size: 10px; */
+padding-top: 4px;
+padding-bottom: 15px;
+width: 150px;
+transition: all 0.5s;
+cursor: pointer;
+margin: 15px;
+}
+
+.found_button span {
+cursor: pointer;
+display: inline-block;
+position: relative;
+transition: 0.5s;
+}
+
+.found_button span:after {
+content: '\00bb';
+position: absolute;
+opacity: 0;
+top: 0;
+right: -20px;
+transition: 0.5s;
+}
+
+.scroll_up_button a{
+
+}
+
+.research-button{
+  text-align: center;
+}
+
+
+.found_button:hover span {
+padding-right: 25px;
+padding-left: 50%;
+}
+
+.found_button:hover span:after {
+opacity: 1;
+right: 0;
+}
+
+.float-center{
+  width: 85%;
+  margin:0 auto;
+}
+
+.text-holder{
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+#computerResultDiv{
+  display: inline-block;
+  /* width: 100%; */
+  text-decoration: none;
+  margin: 0;
+}
+
+
+/* Responsive layout - makes a two column-layout instead of four columns */
+@media (max-width: 900px) {
+  .column  {
+      width: 50%;
+  }
+}
+
+/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+@media (max-width: 600px) {
+  .column  {
+      width: 100%;
+  }
+}

@@ -28,6 +28,11 @@ def indexpage():
     if request.method == "GET":
         return render_template("index.html")
 
+@app.route("/test", methods = ['GET', 'POST'])
+def test():
+	if request.method == "GET":
+		return render_template("admin-addQandA.html")
+
 @app.route("/demo", methods = ['GET'])
 def aboutpage():
     if request.method == "GET":
@@ -129,7 +134,7 @@ def adminAddQuestion():
 @app.route("/admin/addProduct", methods = ['GET'])
 def adminAddProduct():
     if request.method == "GET":
-        return render_template("admin-form_wizards.html")
+        return render_template("admin-form-wizards.html")
 
 @app.route("/admin/pricing", methods = ['GET'])
 def adminPricing():
@@ -269,3 +274,7 @@ def PrivacyPage():
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

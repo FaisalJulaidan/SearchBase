@@ -231,18 +231,18 @@
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Enter the number of questions <span class="required">*</span>
                         </label>
                         <div class="col-md-1 col-sm-1 col-xs-12">
-                          <input type="text" id="first-name" required="required" class="form-control col-md-1 col-xs-1">
+                          <input type="text" id="number-of-questions" required="required" class="form-control col-md-1 col-xs-1">
                         </div>
                       </div>
                       <div class="ln_solid"></div>
                       <div class="form-group">
                         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-						  <button class="btn btn-primary" type="reset">Reset</button>
-                          <button type="submit" class="btn btn-success">Submit</button>
                         </div>
                       </div>
 
                     </form>
+                    <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
+                    <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
                   </div>
                 </div>
               </div>
@@ -274,22 +274,18 @@
                     <br />
                     <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
                       <div class="form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="last-name">First question <span class="required">*</span>
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" id="last-name" name="last-name" required="required" class="form-control col-md-7 col-xs-12">
+                        <div id="QuestionDiv">
+                          <!-- Question Templates appear here -->
                         </div>
-                        <br />
-                        <br />
                       <div class="ln_solid"></div>
                       <div class="form-group">
                         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-						              <button class="btn btn-primary" type="reset">Reset</button>
-                          <button type="submit" class="btn btn-success">Submit</button>
                         </div>
                       </div>
                     </form>
                   </div>
+                  <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
+                  <button id="QTemplate-SubmitB" class="btn btn-success">Submit</button>
                 </div>
               </div>
             </div>
@@ -341,6 +337,65 @@
     <script src="../static/vendors/starrr/dist/starrr.js"></script>
     <!-- Custom Theme Scripts -->
     <script src="../static/build/js/custom.min.js"></script>
+    <!-- Questions Script -->
+    <script>
+    // set variables
+    var oldNOQ = 0;
+    var maxQuestions = 10;
+
+    // set the question form template
+    var qTemplate1 = "<div class = \"Questions\"><label class=\"control-label col-md-3 col-sm-3 col-xs-12\" for=\"last-name\">"
+    var qTemplate2 = " question <span class=\"required\">*</span></label><div class=\"col-md-6 col-sm-6 col-xs-12\"><input type=\"text\" name=\"last-name\" required=\"required\" class=\"form-control col-md-7 col-xs-12\"></input></div><br /><br /></div>";
+
+    // set event listeners
+    document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
+    document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
+    document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
+    // TODO QTemplate-SubmitB
+
+    // called on NOQ Reset Click
+    function ClearNOQ(){
+      document.getElementById("number-of-questions").value = "";
+      $("#QuestionDiv").empty();
+      oldNOQ = 0;
+    }
+
+    // called on NOQ Submit Click
+    function ChangeNofQuestions(){
+      var noq = parseInt(document.getElementById("number-of-questions").value);
+      if(!Number.isNaN(noq)){
+        if(noq <= maxQuestions){
+          if(noq > oldNOQ){
+            for(i = oldNOQ; i < noq; i++){
+              var number;
+              if(i == 0){ number = "First" }
+              if(i == 1){ number = "Second" }
+              if(i == 2){ number = "Third" }
+              if(i == 3){ number = "Fourth" }
+              if(i == 4){ number = "Fifth" }
+              if(i == 5){ number = "Sixth" }
+              if(i == 6){ number = "Seventh" }
+              if(i == 7){ number = "Eight" }
+              if(i == 8){ number = "Ninth" }
+              if(i == 9){ number = "Tenth" }
+              $("#QuestionDiv").append(qTemplate1 + number + qTemplate2);
+              // add preset question to fill
+            }
+          } else if(noq < oldNOQ) {
+            for(i = oldNOQ; i > noq; i--){
+              // console.log($(".Questions")[$(".Questions").length - 1]);
+              $(".Questions")[$(".Questions").length - 1].remove();
+            }
+          }
+          oldNOQ = noq;
+        }
+      }
+    }
+
+    function ClearQTemplate(){
+      $("#QuestionDiv input").val("");
+    }
+    </script>
 
   </body>
 </html>

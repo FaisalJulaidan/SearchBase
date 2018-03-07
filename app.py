@@ -3,13 +3,14 @@ import sqlite3
 from json import dumps
 from flask_mail import Mail, Message
 from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory
+from flask.ext.bcrypt import Bcrypt
 
 COMPUTERDATABASE = "computers.db"
 DATABASE = "users.db"
 
 app = Flask(__name__)
 mail = Mail(app)
-
+flask_bcrypt = Bcrypt(app)
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
@@ -80,10 +81,10 @@ def loginpage():
         try:
             cur.execute("SELECT Password FROM Users WHERE ContactEmail=?;", [email])
             data = cur.fetchall()
-            if(password == data[0][0]):
+            if(flask_bcrypt.check_password_hash(data[0][0], password)):
                 return render_template("admin-main.html")
             else:
-                print(password, data[0][0])
+                print("Password does not match!")
                 return render_template('Login.html', data = "User name and password does not match!")
         except:
             print("Error in trying to find user")
@@ -107,11 +108,12 @@ def signpage():
         userContactNumber = request.form.get("contactNumber", default="Error")
         userCountry = request.form.get("country", default="Error")
         userPassword = request.form.get("pass", default="Error")
+        pass_hashed = flask_bcrypt.generate_password_hash(userPassword).decode("utf-8")
 
         conn = sqlite3.connect(DATABASE)
         cur = conn.cursor()
         cur.execute("INSERT INTO Users ('Title', 'Firstname', 'Surname', 'CompanyName', 'UserPosition', 'CompanyAddress', 'ContactEmail', 'ContactNumber', 'Country', 'Password')\
-                    VALUES (?,?,?,?,?,?,?,?,?,?)", (userTitle, userFirstname, userSecondname, userCompanyName, userPositionCompany, userCompanyAddress, userEmail, userContactNumber, userCountry, userPassword))
+                    VALUES (?,?,?,?,?,?,?,?,?,?)", (userTitle, userFirstname, userSecondname, userCompanyName, userPositionCompany, userCompanyAddress, userEmail, userContactNumber, userCountry, pass_hashed))
 
         conn.commit()
         print("User details added!")

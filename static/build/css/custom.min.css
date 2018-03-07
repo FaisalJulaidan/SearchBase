@@ -185,7 +185,7 @@ a:hover {
 }
 
 .left_col {
-    background: #7B4FE2
+    background: #6610f2
 }
 
 .nav-sm .container.body .col-md-3.left_col {
@@ -2746,8 +2746,8 @@ a.btn-warning {
 }
 
 .btn-success {
-    background: #26B99A;
-    border: 1px solid #169F85
+    background: #6610f2;
+    border: 1px solid #6610f2
 }
 
 .btn-success.active,
@@ -2759,9 +2759,9 @@ a.btn-warning {
 }
 
 .btn-dark {
-    color: #E9EDEF;
-    background-color: #4B5F71;
-    border-color: #364B5F
+    color: #6610f2;
+    background-color: #6610f2;
+    border-color: #6610f2
 }
 
 .btn-dark.active,
@@ -2770,7 +2770,7 @@ a.btn-warning {
 .btn-dark:hover,
 .open .dropdown-toggle.btn-dark {
     color: #FFF;
-    background-color: #394D5F;
+    background-color: #6610f2;
     border-color: #394D5F
 }
 
@@ -3533,7 +3533,7 @@ ul.project_files li a i {
 }
 
 .pricing .title {
-    background: #1ABB9C;
+    background: #6610f2;
     height: 110px;
     color: #fff;
     padding: 15px 0 0;

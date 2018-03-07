@@ -7,3 +7,5 @@ MarkupSafe==1.0
 virtualenv==15.1.0
 Werkzeug==0.14.1
 Flask-Mail==0.9.1
+bcrypt-3.1.4
+flask-bcrypt-0.7.1

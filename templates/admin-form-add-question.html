@@ -6,9 +6,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="icon" href="images/favicon.ico" type="image/ico" />
 
-    <title>Thesearchbase | Admin Homepage </title>
+    <title>Questions Wizard</title>
 
     <!-- Bootstrap -->
     <link href="../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -18,14 +17,16 @@
     <link href="../static/vendors/nprogress/nprogress.css" rel="stylesheet">
     <!-- iCheck -->
     <link href="../static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
-
-    <!-- bootstrap-progressbar -->
-    <link href="../static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
-    <!-- JQVMap -->
-    <link href="../static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+    <!-- bootstrap-wysiwyg -->
+    <link href="../static/vendors/google-code-prettify/bin/prettify.min.css" rel="stylesheet">
+    <!-- Select2 -->
+    <link href="../static/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
+    <!-- Switchery -->
+    <link href="../static/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
+    <!-- starrr -->
+    <link href="../static/vendors/starrr/dist/starrr.css" rel="stylesheet">
     <!-- bootstrap-daterangepicker -->
     <link href="../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-
     <!-- Custom Theme Style -->
     <link href="../static/build/css/custom.min.css" rel="stylesheet">
   </head>
@@ -36,8 +37,7 @@
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="index.html" class="site_title"> <img src="../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span>Tsb.</span></a>
-              <br />
+              <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Gentelella Alela!</span></a>
             </div>
 
             <div class="clearfix"></div>
@@ -49,7 +49,7 @@
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
-                <h2>Name of user</h2>
+                <h2>username</h2>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -96,7 +96,6 @@
                       <li><a href="/admin/profile">Profile</a></li>
                     </ul>
                   </li>
-
                   <li><a><i class="fa fa-money"></i> Price Plan <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/admin/pricing">Pricing Tables</a></li>
@@ -156,14 +155,13 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../static/images/img.jpg" alt="">Name of user
+                    <img src="../static/images/img.jpg" alt="">John Doe
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
                     <li><a href="javascript:;"> Profile</a></li>
                     <li>
                       <a href="javascript:;">
-                        <span class="badge bg-red pull-right"></span>
                         <span>Settings</span>
                       </a>
                     </li>
@@ -174,6 +172,7 @@
 
                 <li role="presentation" class="dropdown">
                   <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-envelope-o"></i>
                   </a>
                 </li>
               </ul>
@@ -184,72 +183,124 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-          <!-- top tiles -->
-          <div class="row tile_count">
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-user"></i> Total Questions</span>
-              <div class="count">0</div>
-            </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-clock-o"></i> Total Answers</span>
-              <div class="count">0</div>
-            </div>
-          </div>
-          <!-- /top tiles -->
-          <br />
+          <div class="">
+            <div class="page-title">
+              <div class="title_left">
+                <h3>Questions</h3>
+              </div>
 
-            <div class="col-md-4 col-sm-4 col-xs-12">
-              <div class="x_panel tile fixed_height_320">
-                <div class="x_title">
-                  <h2>Quick Settings</h2>
-                  <ul class="nav navbar-right panel_toolbox">
-                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                    </li>
-                    <li class="dropdown">
-
-                      <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">Settings 1</a>
-                        </li>
-                        <li><a href="#">Settings 2</a>
-                        </li>
-                      </ul>
-                    </li>
-                    </li>
-                  </ul>
-                  <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                  <div class="dashboard-widget-content">
-                    <ul class="quick-list">
-                      <li><i class="fa fa-calendar-o"></i><a href="#">Settings</a>
-                      </li>
-                      <li><i class="fa fa-bars"></i><a href="#">Subscription</a>
-                      </li>
-                      <li><i class="fa fa-bar-chart"></i><a href="#">Auto Renewal</a> </li>
-                      <li><i class="fa fa-line-chart"></i><a href="#">Achievements</a>
-                      </li>
-                      <li><i class="fa fa-bar-chart"></i><a href="#">Auto Renewal</a> </li>
-                      <li><i class="fa fa-line-chart"></i><a href="#">Achievements</a>
-                      </li>
-                      <li><i class="fa fa-area-chart"></i><a href="#">Logout</a>
-                      </li>
-                    </ul>
+              <div class="title_right">
+                <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                  <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search for...">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="button">Go!</button>
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+            <div class="clearfix"></div>
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Enter the number of questions your assistant will have <small>Tip: it's best to keep the number of questions to no more than 6 for a better assistant</small></h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                      <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                        <ul class="dropdown-menu" role="menu">
+                          <li><a href="#">Settings 1</a>
+                          </li>
+                          <li><a href="#">Settings 2</a>
+                          </li>
+                        </ul>
+                      </li>
+                      <li><a class="close-link"><i class="fa fa-close"></i></a>
+                      </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <br />
+                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Enter the number of questions <span class="required">*</span>
+                        </label>
+                        <div class="col-md-1 col-sm-1 col-xs-12">
+                          <input type="text" id="number-of-questions" required="required" class="form-control col-md-1 col-xs-1">
+                        </div>
+                      </div>
+                      <div class="ln_solid"></div>
+                      <div class="form-group">
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                        </div>
+                      </div>
+
+                    </form>
+                    <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
+                    <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Enter the your questions below <small>Tip: Keep your questions as simple as possible to keep your assistant universal</small></h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                      <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                        <ul class="dropdown-menu" role="menu">
+                          <li><a href="#">Settings 1</a>
+                          </li>
+                          <li><a href="#">Settings 2</a>
+                          </li>
+                        </ul>
+                      </li>
+                      <li><a class="close-link"><i class="fa fa-close"></i></a>
+                      </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <br />
+                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+                      <div class="form-group">
+                        <div id="QuestionDiv">
+                          <!-- Question Templates appear here -->
+                        </div>
+                      <div class="ln_solid"></div>
+                      <div class="form-group">
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                  <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
+                  <button id="QTemplate-SubmitB" class="btn btn-success">Submit</button>
+                </div>
+              </div>
+            </div>
 
 
         <!-- footer content -->
         <footer>
           <div class="pull-right">
-            TheSearchbase 2018 All Rights Reserved.</a>
+            </a>
           </div>
           <div class="clearfix"></div>
         </footer>
         <!-- /footer content -->
       </div>
+    </div>
 
     <!-- jQuery -->
     <script src="../static/vendors/jquery/dist/jquery.min.js"></script>
@@ -259,38 +310,92 @@
     <script src="../static/vendors/fastclick/lib/fastclick.js"></script>
     <!-- NProgress -->
     <script src="../static/vendors/nprogress/nprogress.js"></script>
-    <!-- Chart.js -->
-    <script src="../static/vendors/Chart.js/dist/Chart.min.js"></script>
-    <!-- gauge.js -->
-    <script src="../static/vendors/gauge.js/dist/gauge.min.js"></script>
     <!-- bootstrap-progressbar -->
     <script src="../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
     <!-- iCheck -->
     <script src="../static/vendors/iCheck/icheck.min.js"></script>
-    <!-- Skycons -->
-    <script src="../static/vendors/skycons/skycons.js"></script>
-    <!-- Flot -->
-    <script src="../static/vendors/Flot/jquery.flot.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.pie.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.time.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.stack.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.resize.js"></script>
-    <!-- Flot plugins -->
-    <script src="../static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
-    <script src="../static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
-    <script src="../static/vendors/flot.curvedlines/curvedLines.js"></script>
-    <!-- DateJS -->
-    <script src="../static/vendors/DateJS/build/date.js"></script>
-    <!-- JQVMap -->
-    <script src="../static/vendors/jqvmap/dist/jquery.vmap.js"></script>
-    <script src="../static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
-    <script src="../static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
     <!-- bootstrap-daterangepicker -->
     <script src="../static/vendors/moment/min/moment.min.js"></script>
     <script src="../static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
-
+    <!-- bootstrap-wysiwyg -->
+    <script src="../static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
+    <script src="../static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
+    <script src="../static/vendors/google-code-prettify/src/prettify.js"></script>
+    <!-- jQuery Tags Input -->
+    <script src="../static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
+    <!-- Switchery -->
+    <script src="../static/vendors/switchery/dist/switchery.min.js"></script>
+    <!-- Select2 -->
+    <script src="../static/vendors/select2/dist/js/select2.full.min.js"></script>
+    <!-- Parsley -->
+    <script src="../static/vendors/parsleyjs/dist/parsley.min.js"></script>
+    <!-- Autosize -->
+    <script src="../static/vendors/autosize/dist/autosize.min.js"></script>
+    <!-- jQuery autocomplete -->
+    <script src="../static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
+    <!-- starrr -->
+    <script src="../static/vendors/starrr/dist/starrr.js"></script>
     <!-- Custom Theme Scripts -->
     <script src="../static/build/js/custom.min.js"></script>
+    <!-- Questions Script -->
+    <script>
+    // set variables
+    var oldNOQ = 0;
+    var maxQuestions = 10;
+
+    // set the question form template
+    var qTemplate1 = "<div class = \"Questions\"><label class=\"control-label col-md-3 col-sm-3 col-xs-12\" for=\"last-name\">"
+    var qTemplate2 = " question <span class=\"required\">*</span></label><div class=\"col-md-6 col-sm-6 col-xs-12\"><input type=\"text\" name=\"last-name\" required=\"required\" class=\"form-control col-md-7 col-xs-12\"></input></div><br /><br /></div>";
+
+    // set event listeners
+    document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
+    document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
+    document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
+    // TODO QTemplate-SubmitB
+
+    // called on NOQ Reset Click
+    function ClearNOQ(){
+      document.getElementById("number-of-questions").value = "";
+      $("#QuestionDiv").empty();
+      oldNOQ = 0;
+    }
+
+    // called on NOQ Submit Click
+    function ChangeNofQuestions(){
+      var noq = parseInt(document.getElementById("number-of-questions").value);
+      if(!Number.isNaN(noq)){
+        if(noq <= maxQuestions){
+          if(noq > oldNOQ){
+            for(i = oldNOQ; i < noq; i++){
+              var number;
+              if(i == 0){ number = "First" }
+              if(i == 1){ number = "Second" }
+              if(i == 2){ number = "Third" }
+              if(i == 3){ number = "Fourth" }
+              if(i == 4){ number = "Fifth" }
+              if(i == 5){ number = "Sixth" }
+              if(i == 6){ number = "Seventh" }
+              if(i == 7){ number = "Eight" }
+              if(i == 8){ number = "Ninth" }
+              if(i == 9){ number = "Tenth" }
+              $("#QuestionDiv").append(qTemplate1 + number + qTemplate2);
+              // add preset question to fill
+            }
+          } else if(noq < oldNOQ) {
+            for(i = oldNOQ; i > noq; i--){
+              // console.log($(".Questions")[$(".Questions").length - 1]);
+              $(".Questions")[$(".Questions").length - 1].remove();
+            }
+          }
+          oldNOQ = noq;
+        }
+      }
+    }
+
+    function ClearQTemplate(){
+      $("#QuestionDiv input").val("");
+    }
+    </script>
 
   </body>
 </html>

@@ -128,15 +128,48 @@ def adminHomePage():
     if request.method == "GET":
         return render_template("admin-main.html")
 
-@app.route("/admin/addQuestion", methods = ['GET'])
+@app.route("/admin/add/question", methods = ['GET'])
 def adminAddQuestion():
     if request.method == "GET":
-        return render_template("admin-form.html")
+        return render_template("admin-form-add-question.html")
 
-@app.route("/admin/addProduct", methods = ['GET'])
+@app.route("/admin/edit/question", methods = ['GET'])
+def adminEditQuestion():
+    if request.method == "GET":
+        return render_template("admin-form-edit-question.html")
+
+@app.route("/admin/delete/question", methods = ['GET'])
+def adminDeleteQuestion():
+    if request.method == "GET":
+        return render_template("admin-form-delete-question.html")
+
+@app.route("/admin/add/product", methods = ['GET'])
 def adminAddProduct():
     if request.method == "GET":
+        return render_template("admin-form-add-product.html.html")
+
+@app.route("/admin/edit/product", methods = ['GET'])
+def adminEditProduct():
+    if request.method == "GET":
         return render_template("admin-form-wizards.html")
+
+@app.route("/admin/delete/product", methods = ['GET'])
+def adminDeleteProduct():
+    if request.method == "GET":
+        return render_template("admin-form-delete-product.html")
+
+
+@app.route("/admin/display/questions", methods = ['GET'])
+def adminDisplayQuestions():
+    if request.method == "GET":
+        return render_template("admin-table-questions.html")
+
+@app.route("/admin/display/answers", methods = ['GET'])
+def adminDisplayAnswers():
+    if request.method == "GET":
+        return render_template("admin-table-answers.html")
+
+
 
 @app.route("/admin/pricing", methods = ['GET'])
 def adminPricing():
@@ -148,11 +181,31 @@ def adminProfile():
     if request.method == "GET":
         return render_template("admin-profile.html")
 
-@app.route("/admin/indexAll", methods = ['GET'])
-def adminDisplayAll():
-    if request.method == "GET":
-        return render_template("admin-tables.html")
 
+@app.route("/admin/support/general", methods = ['GET'])
+def adminGeneralSupport():
+    if request.method == "GET":
+        return render_template("admin-general-support.html")
+
+@app.route("/admin/support/docs", methods = ['GET'])
+def adminDocsSupport():
+    if request.method == "GET":
+        return render_template("admin-docs.html")
+
+@app.route("/admin/support/setup", methods = ['GET'])
+def adminSetupSupport():
+    if request.method == "GET":
+        return render_template("admin-getting-setup.html")
+
+@app.route("/admin/support/intergartion", methods = ['GET'])
+def adminIntergrationSupport():
+    if request.method == "GET":
+        return render_template("admin-intergation-tutorial.html")
+
+@app.route("/admin/support/billing", methods = ['GET'])
+def adminBillingSupport():
+    if request.method == "GET":
+        return render_template("admin-billing-support.html")
 
 
 

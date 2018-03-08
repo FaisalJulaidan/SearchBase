@@ -3,14 +3,12 @@ import sqlite3
 from json import dumps
 from flask_mail import Mail, Message
 from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory
-from flask.ext.bcrypt import Bcrypt
 
 COMPUTERDATABASE = "computers.db"
 DATABASE = "users.db"
 
 app = Flask(__name__)
 mail = Mail(app)
-flask_bcrypt = Bcrypt(app)
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
@@ -81,10 +79,10 @@ def loginpage():
         try:
             cur.execute("SELECT Password FROM Users WHERE ContactEmail=?;", [email])
             data = cur.fetchall()
-            if(flask_bcrypt.check_password_hash(data[0][0], password)):
+            if(password == data[0][0]):
                 return render_template("admin-main.html")
             else:
-                print("Password does not match!")
+                print(password, data[0][0])
                 return render_template('Login.html', data = "User name and password does not match!")
         except:
             print("Error in trying to find user")
@@ -330,6 +328,3 @@ def PrivacyPage():
 def page_not_found(e):
     return render_template('404.html'), 404
 
-
-if __name__ == "__main__":
-    app.run(debug=True)

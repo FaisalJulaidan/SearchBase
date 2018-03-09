@@ -414,6 +414,15 @@ p {
     background-size: cover;
 }
 
+.wellcome_area3 {
+    background-image: url(img/bg-img/other_pages.png);
+    height: 758px;
+    position: relative;
+    z-index: 1;
+    background-position: bottom center;
+    background-size: cover;
+}
+
 .wellcome_area:after {
     position: absolute;
     width: 100%;

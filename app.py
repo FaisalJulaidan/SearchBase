@@ -126,43 +126,43 @@ def adminHomePage():
     if request.method == "GET":
         return render_template("admin-main.html")
 
-@app.route("/admin/add/question", methods = ['GET'])
+@app.route("/admin/addquestion", methods = ['GET'])
 def adminAddQuestion():
     if request.method == "GET":
         return render_template("admin-form-add-question.html")
 
-@app.route("/admin/edit/question", methods = ['GET'])
+@app.route("/admin/editQquestion", methods = ['GET'])
 def adminEditQuestion():
     if request.method == "GET":
         return render_template("admin-form-edit-question.html")
 
-@app.route("/admin/delete/question", methods = ['GET'])
+@app.route("/admin/deleteQuestion", methods = ['GET'])
 def adminDeleteQuestion():
     if request.method == "GET":
         return render_template("admin-form-delete-question.html")
 
-@app.route("/admin/add/product", methods = ['GET'])
+@app.route("/admin/addproduct", methods = ['GET'])
 def adminAddProduct():
     if request.method == "GET":
-        return render_template("admin-form-add-product.html.html")
+        return render_template("admin-form-add-product.html")
 
-@app.route("/admin/edit/product", methods = ['GET'])
+@app.route("/admin/editProduct", methods = ['GET'])
 def adminEditProduct():
     if request.method == "GET":
         return render_template("admin-form-wizards.html")
 
-@app.route("/admin/delete/product", methods = ['GET'])
+@app.route("/admin/deleteProduct", methods = ['GET'])
 def adminDeleteProduct():
     if request.method == "GET":
         return render_template("admin-form-delete-product.html")
 
 
-@app.route("/admin/display/questions", methods = ['GET'])
+@app.route("/admin/displayQuestions", methods = ['GET'])
 def adminDisplayQuestions():
     if request.method == "GET":
         return render_template("admin-table-questions.html")
 
-@app.route("/admin/display/answers", methods = ['GET'])
+@app.route("/admin/displayAnswers", methods = ['GET'])
 def adminDisplayAnswers():
     if request.method == "GET":
         return render_template("admin-table-answers.html")
@@ -180,27 +180,27 @@ def adminProfile():
         return render_template("admin-profile.html")
 
 
-@app.route("/admin/support/general", methods = ['GET'])
+@app.route("/admin/supportGeneral", methods = ['GET'])
 def adminGeneralSupport():
     if request.method == "GET":
         return render_template("admin-general-support.html")
 
-@app.route("/admin/support/docs", methods = ['GET'])
+@app.route("/admin/supportDocs", methods = ['GET'])
 def adminDocsSupport():
     if request.method == "GET":
         return render_template("admin-docs.html")
 
-@app.route("/admin/support/setup", methods = ['GET'])
+@app.route("/admin/supportSetup", methods = ['GET'])
 def adminSetupSupport():
     if request.method == "GET":
         return render_template("admin-getting-setup.html")
 
-@app.route("/admin/support/intergartion", methods = ['GET'])
+@app.route("/admin/supportIntergartion", methods = ['GET'])
 def adminIntergrationSupport():
     if request.method == "GET":
         return render_template("admin-intergation-tutorial.html")
 
-@app.route("/admin/support/billing", methods = ['GET'])
+@app.route("/admin/supportBilling", methods = ['GET'])
 def adminBillingSupport():
     if request.method == "GET":
         return render_template("admin-billing-support.html")
@@ -328,5 +328,5 @@ def PrivacyPage():
 def page_not_found(e):
     return render_template('404.html'), 404
 
-# if __name__ == "__main__":
-# 	app.run(debug=True)
+if __name__ == "__main__":
+	app.run(debug=True)

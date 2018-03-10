@@ -126,12 +126,12 @@ def adminHomePage():
     if request.method == "GET":
         return render_template("admin-main.html")
 
-@app.route("/admin/addquestion", methods = ['GET'])
+@app.route("/admin/addQuestion", methods = ['GET'])
 def adminAddQuestion():
     if request.method == "GET":
         return render_template("admin-form-add-question.html")
 
-@app.route("/admin/editQquestion", methods = ['GET'])
+@app.route("/admin/editQuestion", methods = ['GET'])
 def adminEditQuestion():
     if request.method == "GET":
         return render_template("admin-form-edit-question.html")
@@ -141,7 +141,7 @@ def adminDeleteQuestion():
     if request.method == "GET":
         return render_template("admin-form-delete-question.html")
 
-@app.route("/admin/addproduct", methods = ['GET'])
+@app.route("/admin/addProduct", methods = ['GET'])
 def adminAddProduct():
     if request.method == "GET":
         return render_template("admin-form-add-product.html")
@@ -328,5 +328,5 @@ def PrivacyPage():
 def page_not_found(e):
     return render_template('404.html'), 404
 
-if __name__ == "__main__":
-	app.run(debug=True)
+# if __name__ == "__main__":
+# 	app.run(debug=True)

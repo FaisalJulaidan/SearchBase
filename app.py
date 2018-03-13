@@ -3,6 +3,7 @@ import sqlite3
 from json import dumps
 from flask_mail import Mail, Message
 from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory
+from flask_scrypt import generate_random_salt, generate_password_hash, check_password_hash
 
 COMPUTERDATABASE = "computers.db"
 DATABASE = "users.db"
@@ -12,6 +13,7 @@ mail = Mail(app)
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
+salt = generate_random_salt(15)
 
 app.config.update(
 	MAIL_SERVER='smtp.gmail.com',
@@ -79,7 +81,7 @@ def loginpage():
         try:
             cur.execute("SELECT Password FROM Users WHERE ContactEmail=?;", [email])
             data = cur.fetchall()
-            if(password == data[0][0]):
+            if(check_password_hash(password, data[0][0], salt)):
                 return render_template("admin-main.html")
             else:
                 print(password, data[0][0])
@@ -106,7 +108,7 @@ def signpage():
         userContactNumber = request.form.get("contactNumber", default="Error")
         userCountry = request.form.get("country", default="Error")
         userPassword = request.form.get("pass", default="Error")
-        pass_hashed = flask_bcrypt.generate_password_hash(userPassword).decode("utf-8")
+        pass_hashed = generate_password_hash(userPassword, salt)
 
         conn = sqlite3.connect(DATABASE)
         cur = conn.cursor()

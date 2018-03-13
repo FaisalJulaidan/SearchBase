@@ -7,21 +7,21 @@ from flask import Flask, redirect, request,render_template, jsonify, make_respon
 from flask_scrypt import generate_random_salt, generate_password_hash, check_password_hash
 
 
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-PRODUCT_IMAGES = os.path.join(APP_ROOT,'static/file_uploads/product_images')
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
-
 COMPUTERDATABASE = "computers.db"
 USERDATABASE = "users.db"
 QUESTIONDATABASE = "questions.db"
 
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+PRODUCT_IMAGES = os.path.join(APP_ROOT,'static/file_uploads/product_images')
 
-app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
+
+
 
 
 app = Flask(__name__)
 mail = Mail(app)
 
+app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 salt = generate_random_salt()
@@ -143,11 +143,7 @@ def adminHomePage():
     if request.method == "GET":
         return render_template("admin-main.html")
 
-<<<<<<< HEAD
-@app.route("/admin/addQuestion", methods = ['GET'])
-=======
 @app.route("/admin/addQuestion", methods = ['GET', 'POST'])
->>>>>>> a83260bf7f4f6a95d466815ce7183437452dadb8
 def adminAddQuestion():
     if request.method == "GET":
         return render_template("admin-form-add-question.html")
@@ -391,5 +387,5 @@ def PrivacyPage():
 def page_not_found(e):
     return render_template('404.html'), 404
 
-# if __name__ == "__main__":
-# 	app.run(debug=True)
+if __name__ == "__main__":
+	app.run(debug=True)

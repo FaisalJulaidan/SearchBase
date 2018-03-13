@@ -11,6 +11,8 @@ var qTemplate3 = "\" required=\"required\" class=\"form-control col-md-7 col-xs-
 document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
 document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
 document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
+document.getElementById("QTemplate-SubmitB").addEventListener("click", ClearQTemplate);
+
 // TODO QTemplate-SubmitB
 
 // called on NOQ Reset Click

@@ -6,7 +6,9 @@ from flask import Flask, redirect, request,render_template, jsonify, make_respon
 from flask_scrypt import generate_random_salt, generate_password_hash, check_password_hash
 
 COMPUTERDATABASE = "computers.db"
-DATABASE = "users.db"
+USERDATABASE = "users.db"
+QUESTIONDATABASE = "questions.db"
+
 
 app = Flask(__name__)
 mail = Mail(app)
@@ -66,7 +68,7 @@ def loginpage():
     if request.method == 'POST':
         email = request.form.get("email", default="Error")
         password = request.form.get("pass", default="Error")
-        conn = sqlite3.connect(DATABASE)
+        conn = sqlite3.connect(USERDATABASE)
         cur = conn.cursor()
         cur.execute("SELECT ContactEmail FROM Users;")
         data = cur.fetchall()
@@ -114,7 +116,7 @@ def signpage():
         userPassword = request.form.get("pass", default="Error")
         pass_hashed = generate_password_hash(userPassword, salt)
 
-        conn = sqlite3.connect(DATABASE)
+        conn = sqlite3.connect(USERDATABASE)
         cur = conn.cursor()
         cur.execute("INSERT INTO Users ('Title', 'Firstname', 'Surname', 'CompanyName', 'UserPosition', 'CompanyAddress', 'ContactEmail', 'ContactNumber', 'Country', 'Password', 'PSalt')\
                     VALUES (?,?,?,?,?,?,?,?,?,?,?)", (userTitle, userFirstname, userSecondname, userCompanyName, userPositionCompany, userCompanyAddress, userEmail, userContactNumber, userCountry, pass_hashed, salt))
@@ -122,7 +124,7 @@ def signpage():
         conn.commit()
         print("User details added!")
         conn.close()
-    return render_template("index.html")
+        return render_template("Login.html")
 
 
 # Admin pages
@@ -132,10 +134,21 @@ def adminHomePage():
     if request.method == "GET":
         return render_template("admin-main.html")
 
-@app.route("/admin/addquestion", methods = ['GET'])
+@app.route("/admin/addQuestion", methods = ['GET', 'POST'])
 def adminAddQuestion():
     if request.method == "GET":
         return render_template("admin-form-add-question.html")
+    if request.method == "POST":
+        print("DSDASDSADASDSA")
+        questions= []
+        try:
+            for i in range(1, 11):
+                questions.append(request.form.get("question" + i))
+        except:
+            print("Questions taken")
+        print(questions[i])
+        print("RRRREEEEEEEEEEEE")
+        return render_template("index.html", msg="Questions have been saved")
 
 @app.route("/admin/editQquestion", methods = ['GET'])
 def adminEditQuestion():

@@ -13,7 +13,7 @@ mail = Mail(app)
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
-salt = generate_random_salt(15)
+salt = generate_random_salt()
 
 app.config.update(
 	MAIL_SERVER='smtp.gmail.com',
@@ -81,7 +81,11 @@ def loginpage():
         try:
             cur.execute("SELECT Password FROM Users WHERE ContactEmail=?;", [email])
             data = cur.fetchall()
-            if(check_password_hash(password, data[0][0], salt)):
+            datapass = data[0][0]
+            cur.execute("SELECT PSalt FROM Users WHERE ContactEmail=?;", [email])
+            data = cur.fetchall()
+            datasalt = data[0][0]
+            if(check_password_hash(password, datapass, datasalt)):
                 return render_template("admin-main.html")
             else:
                 print(password, data[0][0])
@@ -112,8 +116,8 @@ def signpage():
 
         conn = sqlite3.connect(DATABASE)
         cur = conn.cursor()
-        cur.execute("INSERT INTO Users ('Title', 'Firstname', 'Surname', 'CompanyName', 'UserPosition', 'CompanyAddress', 'ContactEmail', 'ContactNumber', 'Country', 'Password')\
-                    VALUES (?,?,?,?,?,?,?,?,?,?)", (userTitle, userFirstname, userSecondname, userCompanyName, userPositionCompany, userCompanyAddress, userEmail, userContactNumber, userCountry, pass_hashed))
+        cur.execute("INSERT INTO Users ('Title', 'Firstname', 'Surname', 'CompanyName', 'UserPosition', 'CompanyAddress', 'ContactEmail', 'ContactNumber', 'Country', 'Password', 'PSalt')\
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?)", (userTitle, userFirstname, userSecondname, userCompanyName, userPositionCompany, userCompanyAddress, userEmail, userContactNumber, userCountry, pass_hashed, salt))
 
         conn.commit()
         print("User details added!")

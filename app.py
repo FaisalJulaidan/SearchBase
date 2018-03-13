@@ -2,16 +2,29 @@ import os
 import sqlite3
 from json import dumps
 from flask_mail import Mail, Message
-from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory
+from werkzeug.utils import secure_filename
+from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory, send_file
+from flask_scrypt import generate_random_salt, generate_password_hash, check_password_hash
+
+
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+PRODUCT_IMAGES = os.path.join(APP_ROOT,'static/file_uploads/product_images')
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 COMPUTERDATABASE = "computers.db"
-DATABASE = "users.db"
+USERDATABASE = "users.db"
+QUESTIONDATABASE = "questions.db"
+
+
+app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
+
 
 app = Flask(__name__)
 mail = Mail(app)
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
+salt = generate_random_salt()
 
 app.config.update(
 	MAIL_SERVER='smtp.gmail.com',
@@ -64,7 +77,7 @@ def loginpage():
     if request.method == 'POST':
         email = request.form.get("email", default="Error")
         password = request.form.get("pass", default="Error")
-        conn = sqlite3.connect(DATABASE)
+        conn = sqlite3.connect(USERDATABASE)
         cur = conn.cursor()
         cur.execute("SELECT ContactEmail FROM Users;")
         data = cur.fetchall()
@@ -79,7 +92,11 @@ def loginpage():
         try:
             cur.execute("SELECT Password FROM Users WHERE ContactEmail=?;", [email])
             data = cur.fetchall()
-            if(password == data[0][0]):
+            datapass = data[0][0]
+            cur.execute("SELECT PSalt FROM Users WHERE ContactEmail=?;", [email])
+            data = cur.fetchall()
+            datasalt = data[0][0]
+            if(check_password_hash(password, datapass, datasalt)):
                 return render_template("admin-main.html")
             else:
                 print(password, data[0][0])
@@ -106,17 +123,17 @@ def signpage():
         userContactNumber = request.form.get("contactNumber", default="Error")
         userCountry = request.form.get("country", default="Error")
         userPassword = request.form.get("pass", default="Error")
-        pass_hashed = flask_bcrypt.generate_password_hash(userPassword).decode("utf-8")
+        pass_hashed = generate_password_hash(userPassword, salt)
 
-        conn = sqlite3.connect(DATABASE)
+        conn = sqlite3.connect(USERDATABASE)
         cur = conn.cursor()
-        cur.execute("INSERT INTO Users ('Title', 'Firstname', 'Surname', 'CompanyName', 'UserPosition', 'CompanyAddress', 'ContactEmail', 'ContactNumber', 'Country', 'Password')\
-                    VALUES (?,?,?,?,?,?,?,?,?,?)", (userTitle, userFirstname, userSecondname, userCompanyName, userPositionCompany, userCompanyAddress, userEmail, userContactNumber, userCountry, pass_hashed))
+        cur.execute("INSERT INTO Users ('Title', 'Firstname', 'Surname', 'CompanyName', 'UserPosition', 'CompanyAddress', 'ContactEmail', 'ContactNumber', 'Country', 'Password', 'PSalt')\
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?)", (userTitle, userFirstname, userSecondname, userCompanyName, userPositionCompany, userCompanyAddress, userEmail, userContactNumber, userCountry, pass_hashed, salt))
 
         conn.commit()
         print("User details added!")
         conn.close()
-    return render_template("index.html")
+        return render_template("Login.html")
 
 
 # Admin pages
@@ -126,10 +143,25 @@ def adminHomePage():
     if request.method == "GET":
         return render_template("admin-main.html")
 
+<<<<<<< HEAD
 @app.route("/admin/addQuestion", methods = ['GET'])
+=======
+@app.route("/admin/addQuestion", methods = ['GET', 'POST'])
+>>>>>>> a83260bf7f4f6a95d466815ce7183437452dadb8
 def adminAddQuestion():
     if request.method == "GET":
         return render_template("admin-form-add-question.html")
+    if request.method == "POST":
+        print("DSDASDSADASDSA")
+        questions= []
+        try:
+            for i in range(1, 11):
+                questions.append(request.form.get("question" + i))
+        except:
+            print("Questions taken")
+        print(questions[i])
+        print("RRRREEEEEEEEEEEE")
+        return render_template("index.html", msg="Questions have been saved")
 
 @app.route("/admin/editQuestion", methods = ['GET'])
 def adminEditQuestion():
@@ -141,10 +173,30 @@ def adminDeleteQuestion():
     if request.method == "GET":
         return render_template("admin-form-delete-question.html")
 
-@app.route("/admin/addProduct", methods = ['GET'])
+@app.route("/admin/addProduct", methods = ['GET', 'POST'])
 def adminAddProduct():
     if request.method == "GET":
         return render_template("admin-form-add-product.html")
+    if request.method == 'POST':
+        def allowed_file(filename):
+            ext = filename.rsplit('.',1)[1]
+            print(ext)
+            return '.' in filename and ext in ALLOWED_EXTENSIONS
+        filePath = 'no file upload so far'
+        msg = ''
+        if request.method == 'POST':
+            if 'file' not in request.files:
+                msg = 'no file given'
+            else:
+                file = request.files['product_image']
+                if file.filename == '':
+                    msg = 'No file name'
+                elif file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
+                file.save(filePath)
+                msg1 = filePath
+
 
 @app.route("/admin/editProduct", methods = ['GET'])
 def adminEditProduct():
@@ -227,7 +279,18 @@ def sendEmail():
 		return render_template("index.html")
 
 
-
+@app.route("/send/mailtop", methods=['GET', 'POST'])
+def sendMarketingEmail():
+	if request.method == "GET":
+		return render_template("index.html")
+	if request.method == "POST":
+		userEmail = request.form.get("user_email", default="Error")
+		msg = Message(userEmail + " Has sent you mail!",
+		sender=userEmail,
+		recipients=["thesearchbase@gmail.com"])
+		msg.body = userEmail + " Has registerd their Interest for your product"
+		mail.send(msg)
+		return render_template("index.html")
 
 
 

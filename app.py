@@ -136,19 +136,19 @@ def adminHomePage():
 
 @app.route("/admin/addQuestion", methods = ['GET', 'POST'])
 def adminAddQuestion():
-    if request.method == "GET":
-        return render_template("admin-form-add-question.html")
-    if request.method == "POST":
-        print("DSDASDSADASDSA")
-        questions= []
-        try:
-            for i in range(1, 11):
-                questions.append(request.form.get("question" + i))
-        except:
-            print("Questions taken")
-        print(questions[i])
-        print("RRRREEEEEEEEEEEE")
-        return render_template("index.html", msg="Questions have been saved")
+	if request.method == "GET":
+		return render_template("admin-form-add-question.html")
+	if request.method == "POST":
+		questions= []
+		for i in range(1, 11):
+			if(request.form.get("question" + str(i)) != None):
+				questions.append(request.form.get("question" + str(i)))
+		conn = sqlite3.connect(QUESTIONDATABASE)
+		cur = conn.cursor()
+		for q in questions:
+			cur.execute("INSERT INTO test('Question') VALUES (?)", (q,))
+			conn.commit()
+		return render_template("index.html", msg="Questions have been saved")
 
 @app.route("/admin/editQquestion", methods = ['GET'])
 def adminEditQuestion():

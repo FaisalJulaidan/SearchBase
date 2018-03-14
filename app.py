@@ -15,9 +15,6 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 PRODUCT_IMAGES = os.path.join(APP_ROOT,'static/file_uploads/product_images')
 
 
-
-
-
 app = Flask(__name__)
 mail = Mail(app)
 

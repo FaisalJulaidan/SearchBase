@@ -35,6 +35,30 @@ app.config.update(
 	)
 mail = Mail(app)
 
+#code to ensure user is loged in
+# @app.before_request
+# def before_request():
+#     theurl = str(request.url_rule)
+#     if ("static" in theurl) or ("js" in theurl) or ("userlogin" in theurl):
+#         print("Ignore before request for: ", theurl)
+#         return None
+#     if(request.cookies.get("UserName") == None):
+#         return redirect("/userlogin", code=302)
+#     print("Before request checking: ", theurl, " ep: ", request.endpoint)
+#     if(request.cookies.get("UserName") == 'None') and request.endpoint != 'userlogin':
+#         return render_template("userlogin.html", msg = "Please log in first!")
+#     if isitaGuest:
+#         if(request.cookies.get("UserType") == 'Guest' or request.cookies.get("UserType") == None) and (request.endpoint == 'userlogin' or request.endpoint == 'showevents' or request.endpoint == 'noAccess' or request.endpoint == 'showTournaments'):
+#             print("Guest access allowed")
+#         else:
+#             print("Guest access denied")
+#             return render_template("noAccess.html", msg=request.cookies.get("UserType"))
+#     if ("admin" in theurl):
+#         perm = request.cookies.get('UserType')
+#         if(perm != "Admin"):
+#             return render_template("noAccess.html", msg=request.cookies.get("UserType"))
+#     return None
+
 @app.route("/", methods = ['GET'])
 def indexpage():
     if request.method == "GET":
@@ -97,7 +121,7 @@ def loginpage():
             data = cur.fetchall()
             datasalt = data[0][0]
             if(check_password_hash(password, datapass, datasalt)):
-                return render_template("admin-main.html")
+                return render_template("admin-main.html", msg= email)
             else:
                 print(password, data[0][0])
                 return render_template('Login.html', data = "User name and password does not match!")

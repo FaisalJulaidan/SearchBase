@@ -292,5 +292,12 @@
     <!-- Custom Theme Scripts -->
     <script src="../static/build/js/custom.min.js"></script>
 
+
+	<script src="../static/js/cookies.js"></script>
+    <script>
+    makeCookie("UserEmail", "{{msg}}", 1);
+    console.log(getCookie("UserEmail"));
+    </script>
+
   </body>
 </html>

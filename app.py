@@ -35,6 +35,30 @@ app.config.update(
 	)
 mail = Mail(app)
 
+#code to ensure user is loged in
+# @app.before_request
+# def before_request():
+#     theurl = str(request.url_rule)
+#     if ("static" in theurl) or ("js" in theurl) or ("userlogin" in theurl):
+#         print("Ignore before request for: ", theurl)
+#         return None
+#     if(request.cookies.get("UserName") == None):
+#         return redirect("/userlogin", code=302)
+#     print("Before request checking: ", theurl, " ep: ", request.endpoint)
+#     if(request.cookies.get("UserName") == 'None') and request.endpoint != 'userlogin':
+#         return render_template("userlogin.html", msg = "Please log in first!")
+#     if isitaGuest:
+#         if(request.cookies.get("UserType") == 'Guest' or request.cookies.get("UserType") == None) and (request.endpoint == 'userlogin' or request.endpoint == 'showevents' or request.endpoint == 'noAccess' or request.endpoint == 'showTournaments'):
+#             print("Guest access allowed")
+#         else:
+#             print("Guest access denied")
+#             return render_template("noAccess.html", msg=request.cookies.get("UserType"))
+#     if ("admin" in theurl):
+#         perm = request.cookies.get('UserType')
+#         if(perm != "Admin"):
+#             return render_template("noAccess.html", msg=request.cookies.get("UserType"))
+#     return None
+
 @app.route("/", methods = ['GET'])
 def indexpage():
     if request.method == "GET":
@@ -97,7 +121,7 @@ def loginpage():
             data = cur.fetchall()
             datasalt = data[0][0]
             if(check_password_hash(password, datapass, datasalt)):
-                return render_template("admin-main.html")
+                return render_template("admin-main.html", msg= email)
             else:
                 print(password, data[0][0])
                 return render_template('Login.html', data = "User name and password does not match!")
@@ -110,30 +134,33 @@ def loginpage():
 
 @app.route("/signupform", methods = ['GET', 'POST'])
 def signpage():
-    if request.method == "GET":
-        return render_template("Signup.html")
-    if request.method == 'POST':
-        userTitle = request.form.get("title", default="Error")
-        userFirstname = request.form.get("firstname", default="Error")
-        userSecondname = request.form.get("surname", default="Error")
-        userCompanyName = request.form.get("companyName", default="Error")
-        userPositionCompany = request.form.get("userPosition", default="Error")
-        userCompanyAddress = request.form.get("companyAddress", default="Error")
-        userEmail = request.form.get("contactEmail", default="Error")
-        userContactNumber = request.form.get("contactNumber", default="Error")
-        userCountry = request.form.get("country", default="Error")
-        userPassword = request.form.get("pass", default="Error")
-        pass_hashed = generate_password_hash(userPassword, salt)
+	if request.method == "GET":
+		return render_template("Signup.html")
+	if request.method == 'POST':
+		userTitle = request.form.get("title", default="Error")
+		userFirstname = request.form.get("firstname", default="Error")
+		userSecondname = request.form.get("surname", default="Error")
+		userCompanyName = request.form.get("companyName", default="Error")
+		userPositionCompany = request.form.get("userPosition", default="Error")
+		userCompanyAddress = request.form.get("companyAddress", default="Error")
+		userEmail = request.form.get("contactEmail", default="Error")
+		userContactNumber = request.form.get("contactNumber", default="Error")
+		userCountry = request.form.get("country", default="Error")
+		userPassword = request.form.get("pass", default="Error")
+		pass_hashed = generate_password_hash(userPassword, salt)
 
-        conn = sqlite3.connect(USERDATABASE)
-        cur = conn.cursor()
-        cur.execute("INSERT INTO Users ('Title', 'Firstname', 'Surname', 'CompanyName', 'UserPosition', 'CompanyAddress', 'ContactEmail', 'ContactNumber', 'Country', 'Password', 'PSalt')\
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?)", (userTitle, userFirstname, userSecondname, userCompanyName, userPositionCompany, userCompanyAddress, userEmail, userContactNumber, userCountry, pass_hashed, salt))
-
-        conn.commit()
-        print("User details added!")
-        conn.close()
-        return render_template("Login.html")
+		conn = sqlite3.connect(USERDATABASE)
+		cur = conn.cursor()
+		cur.execute("SELECT ContactEmail FROM Users WHERE ContactEmail=?", [userEmail])
+		demail = cur.fetchall()
+		if demail:
+			return render_template("Signup.html", msg="Email already exists")
+		cur.execute("INSERT INTO Users ('Title', 'Firstname', 'Surname', 'CompanyName', 'UserPosition', 'CompanyAddress', 'ContactEmail', 'ContactNumber', 'Country', 'Password', 'PSalt')\
+						VALUES (?,?,?,?,?,?,?,?,?,?,?)", (userTitle, userFirstname, userSecondname, userCompanyName, userPositionCompany, userCompanyAddress, userEmail, userContactNumber, userCountry, pass_hashed, salt))
+		conn.commit()
+		print("User details added!")
+		conn.close()
+		return render_template("Login.html")
 
 
 # Admin pages
@@ -145,19 +172,19 @@ def adminHomePage():
 
 @app.route("/admin/addQuestion", methods = ['GET', 'POST'])
 def adminAddQuestion():
-    if request.method == "GET":
-        return render_template("admin-form-add-question.html")
-    if request.method == "POST":
-        print("DSDASDSADASDSA")
-        questions= []
-        try:
-            for i in range(1, 11):
-                questions.append(request.form.get("question" + i))
-        except:
-            print("Questions taken")
-        print(questions[i])
-        print("RRRREEEEEEEEEEEE")
-        return render_template("index.html", msg="Questions have been saved")
+	if request.method == "GET":
+		return render_template("admin-form-add-question.html")
+	if request.method == "POST":
+		questions= []
+		for i in range(1, 11):
+			if(request.form.get("question" + str(i)) != None):
+				questions.append(request.form.get("question" + str(i)))
+		conn = sqlite3.connect(QUESTIONDATABASE)
+		cur = conn.cursor()
+		for q in questions:
+			cur.execute("INSERT INTO test('Question') VALUES (?)", (q,))
+			conn.commit()
+		return render_template("index.html", msg="Questions have been saved")
 
 @app.route("/admin/editQuestion", methods = ['GET'])
 def adminEditQuestion():

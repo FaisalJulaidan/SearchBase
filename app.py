@@ -134,30 +134,33 @@ def loginpage():
 
 @app.route("/signupform", methods = ['GET', 'POST'])
 def signpage():
-    if request.method == "GET":
-        return render_template("Signup.html")
-    if request.method == 'POST':
-        userTitle = request.form.get("title", default="Error")
-        userFirstname = request.form.get("firstname", default="Error")
-        userSecondname = request.form.get("surname", default="Error")
-        userCompanyName = request.form.get("companyName", default="Error")
-        userPositionCompany = request.form.get("userPosition", default="Error")
-        userCompanyAddress = request.form.get("companyAddress", default="Error")
-        userEmail = request.form.get("contactEmail", default="Error")
-        userContactNumber = request.form.get("contactNumber", default="Error")
-        userCountry = request.form.get("country", default="Error")
-        userPassword = request.form.get("pass", default="Error")
-        pass_hashed = generate_password_hash(userPassword, salt)
+	if request.method == "GET":
+		return render_template("Signup.html")
+	if request.method == 'POST':
+		userTitle = request.form.get("title", default="Error")
+		userFirstname = request.form.get("firstname", default="Error")
+		userSecondname = request.form.get("surname", default="Error")
+		userCompanyName = request.form.get("companyName", default="Error")
+		userPositionCompany = request.form.get("userPosition", default="Error")
+		userCompanyAddress = request.form.get("companyAddress", default="Error")
+		userEmail = request.form.get("contactEmail", default="Error")
+		userContactNumber = request.form.get("contactNumber", default="Error")
+		userCountry = request.form.get("country", default="Error")
+		userPassword = request.form.get("pass", default="Error")
+		pass_hashed = generate_password_hash(userPassword, salt)
 
-        conn = sqlite3.connect(USERDATABASE)
-        cur = conn.cursor()
-        cur.execute("INSERT INTO Users ('Title', 'Firstname', 'Surname', 'CompanyName', 'UserPosition', 'CompanyAddress', 'ContactEmail', 'ContactNumber', 'Country', 'Password', 'PSalt')\
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?)", (userTitle, userFirstname, userSecondname, userCompanyName, userPositionCompany, userCompanyAddress, userEmail, userContactNumber, userCountry, pass_hashed, salt))
-
-        conn.commit()
-        print("User details added!")
-        conn.close()
-        return render_template("Login.html")
+		conn = sqlite3.connect(USERDATABASE)
+		cur = conn.cursor()
+		cur.execute("SELECT ContactEmail FROM Users WHERE ContactEmail=?", [userEmail])
+		demail = cur.fetchall()
+		if demail:
+			return render_template("Signup.html", msg="Email already exists")
+		cur.execute("INSERT INTO Users ('Title', 'Firstname', 'Surname', 'CompanyName', 'UserPosition', 'CompanyAddress', 'ContactEmail', 'ContactNumber', 'Country', 'Password', 'PSalt')\
+						VALUES (?,?,?,?,?,?,?,?,?,?,?)", (userTitle, userFirstname, userSecondname, userCompanyName, userPositionCompany, userCompanyAddress, userEmail, userContactNumber, userCountry, pass_hashed, salt))
+		conn.commit()
+		print("User details added!")
+		conn.close()
+		return render_template("Login.html")
 
 
 # Admin pages

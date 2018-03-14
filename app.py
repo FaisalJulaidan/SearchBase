@@ -2,17 +2,26 @@ import os
 import sqlite3
 from json import dumps
 from flask_mail import Mail, Message
-from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory
+from werkzeug.utils import secure_filename
+from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory, send_file
 from flask_scrypt import generate_random_salt, generate_password_hash, check_password_hash
+
 
 COMPUTERDATABASE = "computers.db"
 USERDATABASE = "users.db"
 QUESTIONDATABASE = "questions.db"
 
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+PRODUCT_IMAGES = os.path.join(APP_ROOT,'static/file_uploads/product_images')
+
+
+
+
 
 app = Flask(__name__)
 mail = Mail(app)
 
+app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 salt = generate_random_salt()
@@ -150,7 +159,7 @@ def adminAddQuestion():
 			conn.commit()
 		return render_template("index.html", msg="Questions have been saved")
 
-@app.route("/admin/editQquestion", methods = ['GET'])
+@app.route("/admin/editQuestion", methods = ['GET'])
 def adminEditQuestion():
     if request.method == "GET":
         return render_template("admin-form-edit-question.html")
@@ -160,10 +169,30 @@ def adminDeleteQuestion():
     if request.method == "GET":
         return render_template("admin-form-delete-question.html")
 
-@app.route("/admin/addproduct", methods = ['GET'])
+@app.route("/admin/addProduct", methods = ['GET', 'POST'])
 def adminAddProduct():
     if request.method == "GET":
         return render_template("admin-form-add-product.html")
+    if request.method == 'POST':
+        def allowed_file(filename):
+            ext = filename.rsplit('.',1)[1]
+            print(ext)
+            return '.' in filename and ext in ALLOWED_EXTENSIONS
+        filePath = 'no file upload so far'
+        msg = ''
+        if request.method == 'POST':
+            if 'file' not in request.files:
+                msg = 'no file given'
+            else:
+                file = request.files['product_image']
+                if file.filename == '':
+                    msg = 'No file name'
+                elif file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
+                file.save(filePath)
+                msg1 = filePath
+
 
 @app.route("/admin/editProduct", methods = ['GET'])
 def adminEditProduct():
@@ -246,7 +275,18 @@ def sendEmail():
 		return render_template("index.html")
 
 
-
+@app.route("/send/mailtop", methods=['GET', 'POST'])
+def sendMarketingEmail():
+	if request.method == "GET":
+		return render_template("index.html")
+	if request.method == "POST":
+		userEmail = request.form.get("user_email", default="Error")
+		msg = Message(userEmail + " Has sent you mail!",
+		sender=userEmail,
+		recipients=["thesearchbase@gmail.com"])
+		msg.body = userEmail + " Has registerd their Interest for your product"
+		mail.send(msg)
+		return render_template("index.html")
 
 
 

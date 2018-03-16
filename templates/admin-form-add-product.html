@@ -202,80 +202,35 @@
                                 <p class="text-muted font-13 m-b-30">
                                    Database 1 - All of the products are listed below
                                 </p>
-                                <table action="" method="POST" enctype="multipart/form-data" id="datatable" class="table table-striped table-bordered">
-                                  <thead>
-                                    <tr>
-                                      <th>ID</th>
-                                      <th>Name</th>
-                                      <th>Brand</th>
-                                      <th>Model</th>
-                                      <th>Price</th>
-                                      <th>Keyword/Use</th>
-                                      <th>Filter/Features</th>
-                                      <th>Discount</th>
-                                      <th>URL</th>
-                                      <th>Image</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    <tr>
-                                      <td id="product_id" type="text" name="product_ID">1</td>
-                                      <td id="" type="text" name="">Mac</td>
-                                      <td id="" type="text" name="">Apple</td>
-                                      <td id="" type="text" name="">MacBook Pro</td>
-                                      <td id="" type="text" name="">£1489.99</td>
-                                      <td id="" type="text" name="">Study, Business, Programming, VideoEditing</td>
-                                      <td id="" type="text" name="">BatteryLife, CustomerSupport, Display, batteryLife</td>
-                                      <td id="" type="text" name="">5%</td>
-                                      <td id="" type="text" name="">https://www.apple.com/uk/shop/buy-mac/macbook-pro/13-inch</td>
-                                      <td id="" type="text" name=""><input type="file" name="product_image" value="Upload"><td>
-                                    </tr>
-                                    <tr>
-                                      <td>2</td>
-                                      <td>XPS</td>
-                                      <td>DELL</td>
-                                      <td>XPS 15</td>
-                                      <td>£1500</td>
-                                      <td>Gaming, Business, Programming, VideoEditing</td>
-                                      <td>Performance, BuilQuality, Display, batteryLife</td>
-                                      <td>0%</td>
-                                      <td>http://www.dell.com/en-uk/shop/laptops-notebooks-and-2-in-1-laptops/xps-15/spd/xps-15-9560-laptop/cnx95606</td>
-                                      <td>dell_xps.png<td>
-                                    </tr>
-                                    <tr>
-                                      <td>3</td>
-                                      <td>ROG</td>
-                                      <td>ASUS</td>
-                                      <td>ROG STRIX</td>
-                                      <td>£1300</td>
-                                      <td>Gaming, VideoEditing, Programming</td>
-                                      <td>Performance, Reliability</td>
-                                      <td>0%</td>
-                                      <td>https://www.amazon.com/Gaming-i7-7700HQ-Processor-Keyboard-GL503VD/dp/B0753NHZY7</td>
-                                      <td>asus.png<td>
-                                    </tr>
-                                    <tr>
-                                      <td><input style="width: 60px;" padding="3px" margin="3px" type="text" name="product_ID"></td>
-                                      <td><input style="width: 110px;" type="text" name="product_Name"></td>
-                                      <td><input style="width: 110px;" type="text" name="product_Brand"></td>
-                                      <td><input style="width: 130px;" type="text" name="product_Model"></td>
-                                      <td><input style="width: 60px;" type="text" name="product_Price"></td>
-                                      <td><input style="width: 250px;" type="text" name="product_Features"></td>
-                                      <td><input style="width: 250px;" type="text" name="product_Keywords"></td>
-                                      <td><input style="width: 60px;" type="text" name="product_Discount"></td>
-                                      <td><input style="width: 200px;" type="text" name="product_URL"></td>
-                                      <td><input style="width: 250px;" type="file" name="product_image" value="Upload"><td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                                <button type="submit" class="btn btn-success" value="Send">Save Updates</button>
-                                <button type="submit" class="btn btn-success" value="Send">Add Row</button>
+                                <form action="/admin/addProduct" method="post" enctype="multipart/form-data">
+                                    <table id="datatable" class="table table-striped table-bordered">
+                                      <thead>
+                                        <tr>
+                                          <th>ID</th>
+                                          <th>Name</th>
+                                          <th>Brand</th>
+                                          <th>Model</th>
+                                          <th>Price</th>
+                                          <th>Keyword/Use</th>
+                                          <th>Filter/Features</th>
+                                          <th>Discount</th>
+                                          <th>URL</th>
+                                          <th>Image</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody id ="tbody">
+                                        <!-- Row get inserted here -->
+                                      </tbody>
+                                    </table>
+                                    <button type="submit" class="btn btn-success" value="Send">Save Updates</button>
+                                </form>
+                                <button type="submit" class="btn btn-success" id="addRow" value="Send">Add Row</button>
                                 <button type="submit" class="btn btn-success" value="Send">Delete Row</button>
                               </div>
                             </div>
                           </div>
 
-                          <div class="col-md-12 col-sm-12 col-xs-12">
+                          <!-- <div class="col-md-12 col-sm-12 col-xs-12">
                             <div class="x_panel">
                               <div class="x_content">
                                 <p class="text-muted font-13 m-b-30">
@@ -328,7 +283,7 @@
                               <button type="submit" class="btn btn-success" value="Send">Add Row</button>
                               <button type="submit" class="btn btn-success" value="Send">Delete Row</button>
                             </div>
-                          </div>
+                          </div> -->
                         </div>
                       </div>
                     </div>
@@ -395,6 +350,26 @@
     <script src="../static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
     <!-- starrr -->
     <script src="../static/vendors/starrr/dist/starrr.js"></script>
+
+    <script>
+    var i = 0;
+    function AddRow(){
+        i++;
+        $("#tbody").append("<tr>\
+          <td><input style=\"width: 60px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID"+String(i)+"\"></td>\
+          <td><input style=\"width: 110px;\" type=\"text\" name=\"product_Name"+String(i)+"\"></td>\
+          <td><input style=\"width: 110px;\" type=\"text\" name=\"product_Brand"+String(i)+"\"></td>\
+          <td><input style=\"width: 130px;\" type=\"text\" name=\"product_Model"+String(i)+"\"></td>\
+          <td><input style=\"width: 60px;\" type=\"text\" name=\"product_Price"+String(i)+"\"></td>\
+          <td><input style=\"width: 250px;\" type=\"text\" name=\"product_Features"+String(i)+"\"></td>\
+          <td><input style=\"width: 250px;\" type=\"text\" name=\"product_Keywords"+String(i)+"\"></td>\
+          <td><input style=\"width: 60px;\" type=\"text\" name=\"product_Discount"+String(i)+"\"></td>\
+          <td><input style=\"width: 200px;\" type=\"text\" name=\"product_URL"+String(i)+"\"></td>\
+          <td><input style=\"width: 250px;\" type=\"file\" name=\"product_image"+String(i)+"\" value=\"Upload\"><td>\
+        </tr>");
+    }
+    document.getElementById("addRow").addEventListener("click", AddRow);
+    </script>
 
 
 

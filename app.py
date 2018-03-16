@@ -10,6 +10,7 @@ from flask_scrypt import generate_random_salt, generate_password_hash, check_pas
 COMPUTERDATABASE = "computers.db"
 USERDATABASE = "users.db"
 QUESTIONDATABASE = "questions.db"
+PRODUCTDATABASE = "products.db"
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 PRODUCT_IMAGES = os.path.join(APP_ROOT,'static/file_uploads/product_images')
@@ -19,7 +20,7 @@ app = Flask(__name__)
 mail = Mail(app)
 
 app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 salt = generate_random_salt()
 
@@ -175,44 +176,74 @@ def adminAddQuestion():
 		 'Answer5' text, 'Answer6' text, 'Answer7' text, 'Answer8' text, 'Answer9' text, 'Answer10' text,\
 		  'Answer11' text, 'Answer12' text)")
 		conn.commit()
+		cur.execute("DELETE FROM \'" + umail + "\'")
 		for q in questions:
 			cur.execute("INSERT INTO \'" + umail + "\'('Question') VALUES (?)", (q,))
 			conn.commit()
 		return render_template("index.html", msg="Questions have been saved")
 
-@app.route("/admin/editQuestion", methods = ['GET'])
-def adminEditQuestion():
-    if request.method == "GET":
-        return render_template("admin-form-edit-question.html")
-
-@app.route("/admin/deleteQuestion", methods = ['GET'])
-def adminDeleteQuestion():
-    if request.method == "GET":
-        return render_template("admin-form-delete-question.html")
-
 @app.route("/admin/addProduct", methods = ['GET', 'POST'])
 def adminAddProduct():
-    if request.method == "GET":
-        return render_template("admin-form-add-product.html")
-    if request.method == 'POST':
-        def allowed_file(filename):
-            ext = filename.rsplit('.',1)[1]
-            print(ext)
-            return '.' in filename and ext in ALLOWED_EXTENSIONS
-        filePath = 'no file upload so far'
-        msg = ''
-        if request.method == 'POST':
-            if 'file' not in request.files:
-                msg = 'no file given'
-            else:
-                file = request.files['product_image']
-                if file.filename == '':
-                    msg = 'No file name'
-                elif file and allowed_file(file.filename):
-                    filename = secure_filename(file.filename)
-                    filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
-                file.save(filePath)
-                msg1 = filePath
+	if request.method == "GET":
+		return render_template("admin-form-add-product.html")
+	if request.method == 'POST':
+		def allowed_file(filename):
+			ext = filename.rsplit('.',1)[1]
+			print(ext)
+			return '.' in filename and ext in ALLOWED_EXTENSIONS
+		filePath = 'no file upload so far'
+		msg = ''
+		if request.method == 'POST':
+			i = 0;
+			pid = []
+			name = []
+			brand = []
+			model = []
+			price = []
+			features = []
+			keywords = []
+			discount = []
+			url = []
+			fp = []
+			try:
+				while(True):
+					i+=1
+					pid.append(request.form.get("product_ID"+str(i), default="Error"))
+					name.append(request.form.get("product_Name"+str(i), default="Error"))
+					brand.append(request.form.get("product_Brand"+str(i), default="Error"))
+					model.append(request.form.get("product_Model"+str(i), default="Error"))
+					price.append(request.form.get("product_Price"+str(i), default="Error"))
+					features.append(request.form.get("product_Features"+str(i), default="Error"))
+					keywords.append(request.form.get("product_Keywords"+str(i), default="Error"))
+					discount.append(request.form.get("product_Discount"+str(i), default="Error"))
+					url.append(request.form.get("product_URL"+str(i), default="Error"))
+					if 'file' not in request.files:
+						msg = 'no file given'
+					else:
+						file = request.files['product_image'+str(i)]
+						if file.filename == '':
+							msg = 'No file name'
+						elif file and allowed_file(file.filename):
+							filename = secure_filename(file.filename)
+							filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
+						file.save(filePath)
+						fp.append(filePath)
+			except:
+				print("Error in Products Taken - Assume its ok")
+			conn = sqlite3.connect(PRODUCTDATABASE)
+			cur = conn.cursor()
+			umail = request.cookies.get("UserEmail")
+			cur.execute("CREATE TABLE IF NOT EXISTS \'" + umail + "\' (\
+			ProductID text, ProductName text, ProductBrand text, ProductModel text, ProductPrice text\
+			ProductFeatures text, ProductKeywords text, ProductDiscount text, ProductURL text, ProductImage text)")
+			conn.commit()
+			cur.execute("DELETE FROM \'" + umail + "\'")
+			for q in range(1, i+1):
+				cur.execute("INSERT INTO \'" + umail + "\'('ProductID', 'ProductName', 'ProductBrand', 'ProductModel', \
+				'ProductPrice', 'ProductFeatures', 'ProductKeywords', 'ProductDiscount', 'ProductURL', 'ProductImage') \
+				VALUES (?,?,?,?,?,?,?,?,?,?)", (pid[q],name[q],brand[q],model[q],price[q],features[q],keywords[q],discount[q],url[q],fp[q],))
+				conn.commit()
+			return render_template("index.html", msg="Questions have been saved")
 
 
 @app.route("/admin/editProduct", methods = ['GET'])
@@ -408,5 +439,5 @@ def PrivacyPage():
 def page_not_found(e):
     return render_template('404.html'), 404
 
-# if __name__ == "__main__":
-# 	app.run(debug=True)
+if __name__ == "__main__":
+	app.run(debug=True)

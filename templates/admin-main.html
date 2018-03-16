@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="icon" href="images/favicon.ico" type="image/ico" />
 
-    <title>Thesearchbase | Admin Homepage </title>
+    <title>Admin Homepage </title>
 
     <!-- Bootstrap -->
     <link href="../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -49,7 +49,7 @@
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
-                <h2>Name of user</h2>
+                <h2>{{user}}</h2>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -61,29 +61,19 @@
               <div class="menu_section">
                 <h3>General</h3>
                 <ul class="nav side-menu">
-                  <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="index.html">Dashboard</a></li>
-                    </ul>
+                  <li><a><i class="fa fa-home"></i> Dashboard</a>
                   </li>
-                  <li><a><i class="fa fa-edit"></i> Questions <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/admin/add/question">Add Question</a></li>
-                      <li><a href="/admin/edit/question">Edit Question</a></li>
-                      <li><a href="/admin/delete/question">Delete Question</a></li>
-                    </ul>
+                  <li><a><i class="fa fa-edit" href="/admin/add/question"></i> Questions</a>
                   </li>
-                  <li><a><i class="fa fa-edit"></i> Products <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/admin/add/product">Add Product</a></li>
-                      <li><a href="/admin/edit/product">Edit Product</a></li>
-                      <li><a href="/admin/delete/product">Delete Product</a></li>
-                    </ul>
+                  <li><a><i class="fa fa-edit" href="/admin/add/question"></i> Answers</a>
                   </li>
-                  <li><a><i class="fa fa-table"></i> Products & Questions <span class="fa fa-chevron-down"></span></a>
+                  <li><a><i class="fa fa-edit" href="/admin/add/question"></i> Products</a>
+                  </li>
+                  <li><a><i class="fa fa-table"></i> Tables <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="/admin/display/questions">All Questions</a></li>
-                      <li><a href="/admin/display/answers">All Products</a></li>
+                      <li><a href="/admin/display/questions">Questions</a></li>
+                      <li><a href="/admin/display/questions">Answers</a></li>
+                      <li><a href="/admin/display/answers">Products</a></li>
                     </ul>
                   </li>
                 </ul>
@@ -96,7 +86,6 @@
                       <li><a href="/admin/profile">Profile</a></li>
                     </ul>
                   </li>
-
                   <li><a><i class="fa fa-money"></i> Price Plan <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/admin/pricing">Pricing Tables</a></li>
@@ -125,23 +114,6 @@
               </div>
             </div>
             <!-- /sidebar menu -->
-
-            <!-- /menu footer buttons -->
-            <div class="sidebar-footer hidden-small">
-              <a data-toggle="tooltip" data-placement="top" title="Settings">
-                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="FullScreen">
-                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="Lock">
-                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
-                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
-              </a>
-            </div>
-            <!-- /menu footer buttons -->
           </div>
         </div>
 
@@ -156,7 +128,7 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../static/images/img.jpg" alt="">Name of user
+                    <img src="../static/images/img.jpg" alt="">{{User}}
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -197,49 +169,7 @@
           </div>
           <!-- /top tiles -->
           <br />
-
-            <div class="col-md-4 col-sm-4 col-xs-12">
-              <div class="x_panel tile fixed_height_320">
-                <div class="x_title">
-                  <h2>Quick Settings</h2>
-                  <ul class="nav navbar-right panel_toolbox">
-                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                    </li>
-                    <li class="dropdown">
-
-                      <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">Settings 1</a>
-                        </li>
-                        <li><a href="#">Settings 2</a>
-                        </li>
-                      </ul>
-                    </li>
-                    </li>
-                  </ul>
-                  <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                  <div class="dashboard-widget-content">
-                    <ul class="quick-list">
-                      <li><i class="fa fa-calendar-o"></i><a href="#">Settings</a>
-                      </li>
-                      <li><i class="fa fa-bars"></i><a href="#">Subscription</a>
-                      </li>
-                      <li><i class="fa fa-bar-chart"></i><a href="#">Auto Renewal</a> </li>
-                      <li><i class="fa fa-line-chart"></i><a href="#">Achievements</a>
-                      </li>
-                      <li><i class="fa fa-bar-chart"></i><a href="#">Auto Renewal</a> </li>
-                      <li><i class="fa fa-line-chart"></i><a href="#">Achievements</a>
-                      </li>
-                      <li><i class="fa fa-area-chart"></i><a href="#">Logout</a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
+        </div>
 
         <!-- footer content -->
         <footer>

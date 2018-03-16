@@ -305,11 +305,6 @@ def adminBillingSupport():
     if request.method == "GET":
         return render_template("admin-billing-support.html")
 
-
-
-
-
-
 @app.route("/send/mail", methods=['GET', 'POST'])
 def sendEmail():
 	if request.method == "GET":

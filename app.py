@@ -36,28 +36,19 @@ app.config.update(
 mail = Mail(app)
 
 #code to ensure user is loged in
-# @app.before_request
-# def before_request():
-#     theurl = str(request.url_rule)
-#     if ("static" in theurl) or ("js" in theurl) or ("userlogin" in theurl):
-#         print("Ignore before request for: ", theurl)
-#         return None
-#     if(request.cookies.get("UserName") == None):
-#         return redirect("/userlogin", code=302)
-#     print("Before request checking: ", theurl, " ep: ", request.endpoint)
-#     if(request.cookies.get("UserName") == 'None') and request.endpoint != 'userlogin':
-#         return render_template("userlogin.html", msg = "Please log in first!")
-#     if isitaGuest:
-#         if(request.cookies.get("UserType") == 'Guest' or request.cookies.get("UserType") == None) and (request.endpoint == 'userlogin' or request.endpoint == 'showevents' or request.endpoint == 'noAccess' or request.endpoint == 'showTournaments'):
-#             print("Guest access allowed")
-#         else:
-#             print("Guest access denied")
-#             return render_template("noAccess.html", msg=request.cookies.get("UserType"))
-#     if ("admin" in theurl):
-#         perm = request.cookies.get('UserType')
-#         if(perm != "Admin"):
-#             return render_template("noAccess.html", msg=request.cookies.get("UserType"))
-#     return None
+@app.before_request
+def before_request():
+	theurl = str(request.url_rule)
+	if ("admin" not in theurl):
+		print("Ignore before request for: ", theurl)
+		return None
+	if(request.cookies.get("UserEmail") == None):
+		print("User not logged in")
+		return redirect("/login", code=302)
+	print("Before request checking: ", theurl, " ep: ", request.endpoint)
+	if(request.cookies.get("UserEmail") == 'None') and request.endpoint != 'login':
+		return render_template("userlogin.html", msg = "Please log in first!")
+	return None
 
 @app.route("/", methods = ['GET'])
 def indexpage():
@@ -181,8 +172,14 @@ def adminAddQuestion():
 				questions.append(request.form.get("question" + str(i)))
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
+		umail = request.cookies.get("UserEmail")
+		cur.execute("CREATE TABLE IF NOT EXISTS \'" + umail + "\' (\
+		Question text NOT NULL, 'Answer1' text, 'Answer2' text, 'Answer3' text, 'Answer4' text,\
+		 'Answer5' text, 'Answer6' text, 'Answer7' text, 'Answer8' text, 'Answer9' text, 'Answer10' text,\
+		  'Answer11' text, 'Answer12' text)")
+		conn.commit()
 		for q in questions:
-			cur.execute("INSERT INTO test('Question') VALUES (?)", (q,))
+			cur.execute("INSERT INTO \'" + umail + "\'('Question') VALUES (?)", (q,))
 			conn.commit()
 		return render_template("index.html", msg="Questions have been saved")
 

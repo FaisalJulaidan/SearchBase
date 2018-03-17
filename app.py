@@ -46,6 +46,7 @@ def before_request():
 	print("Before request checking: ", theurl, " ep: ", request.endpoint)
 	if(request.cookies.get("UserEmail") == 'None') and request.endpoint != 'login':
 		return render_template("userlogin.html", msg = "Please log in first!")
+	print("Before Request checks out")
 	return None
 
 @app.route("/", methods = ['GET'])
@@ -85,40 +86,40 @@ def contactpage():
 
 @app.route("/login", methods = ['GET', 'POST'])
 def loginpage():
-    if request.method == "GET":
-        return render_template("Login.html")
-    if request.method == 'POST':
-        email = request.form.get("email", default="Error")
-        password = request.form.get("pass", default="Error")
-        conn = sqlite3.connect(USERDATABASE)
-        cur = conn.cursor()
-        cur.execute("SELECT ContactEmail FROM Users;")
-        data = cur.fetchall()
-        i = 0
-        for c in data:
-            i += 1
-            if(email == c[0]):
-                break
-            else:
-                if(i == len(data)):
-                    return render_template('login.html', data = "User not found!")
-        try:
-            cur.execute("SELECT Password FROM Users WHERE ContactEmail=?;", [email])
-            data = cur.fetchall()
-            datapass = data[0][0]
-            cur.execute("SELECT PSalt FROM Users WHERE ContactEmail=?;", [email])
-            data = cur.fetchall()
-            datasalt = data[0][0]
-            if(check_password_hash(password, datapass, datasalt)):
-                return render_template("admin-main.html", msg= email)
-            else:
-                print(password, data[0][0])
-                return render_template('Login.html', data = "User name and password does not match!")
-        except:
-            print("Error in trying to find user")
-            conn.rollback()
-        finally:
-            conn.close()
+	if request.method == "GET":
+		return render_template("Login.html")
+	if request.method == 'POST':
+		email = request.form.get("email", default="Error")
+		password = request.form.get("pass", default="Error")
+		conn = sqlite3.connect(USERDATABASE)
+		cur = conn.cursor()
+		cur.execute("SELECT ContactEmail FROM Users;")
+		data = cur.fetchall()
+		i = 0
+		for c in data:
+			i += 1
+			if(email == c[0]):
+				break
+			else:
+				if(i == len(data)):
+					return render_template('login.html', data = "User not found!")
+		try:
+			cur.execute("SELECT Password FROM Users WHERE ContactEmail=?;", [email])
+			data = cur.fetchall()
+			datapass = data[0][0]
+			cur.execute("SELECT PSalt FROM Users WHERE ContactEmail=?;", [email])
+			data = cur.fetchall()
+			datasalt = data[0][0]
+			if(check_password_hash(password, datapass, datasalt)):
+				return render_template("admin-main.html", msg= email)
+			else:
+				print(password, data[0][0])
+				return render_template('Login.html', data = "User name and password does not match!")
+		except:
+			print("Error in trying to find user")
+			conn.rollback()
+		finally:
+			conn.close()
 
 
 @app.route("/signupform", methods = ['GET', 'POST'])
@@ -200,49 +201,50 @@ def adminAddProduct():
 			brand = []
 			model = []
 			price = []
-			features = []
 			keywords = []
 			discount = []
 			url = []
 			fp = []
+			while(True):
+				i+=1
+				if(request.form.get("product_ID"+str(i), default="Error") == "Error"):
+					break
+				pid.append(request.form.get("product_ID"+str(i), default="Error"))
+				name.append(request.form.get("product_Name"+str(i), default="Error"))
+				brand.append(request.form.get("product_Brand"+str(i), default="Error"))
+				model.append(request.form.get("product_Model"+str(i), default="Error"))
+				price.append(request.form.get("product_Price"+str(i), default="Error"))
+				keywords.append(request.form.get("product_Keywords"+str(i), default="Error"))
+				discount.append(request.form.get("product_Discount"+str(i), default="Error"))
+				url.append(request.form.get("product_URL"+str(i), default="Error"))
+				if (request.files['product_image'+str(i)].filename == ""):
+					print('no file given')
+				else:
+					file = request.files['product_image'+str(i)]
+					if file.filename == '':
+						print('No file name')
+					elif file and allowed_file(file.filename):
+						filename = secure_filename(file.filename)
+						filePath = os.path.join(app.config['static/file_uploads/product_images'], filename)
+					file.save(filePath)
+					fp.append(filePath)
 			try:
-				while(True):
-					i+=1
-					pid.append(request.form.get("product_ID"+str(i), default="Error"))
-					name.append(request.form.get("product_Name"+str(i), default="Error"))
-					brand.append(request.form.get("product_Brand"+str(i), default="Error"))
-					model.append(request.form.get("product_Model"+str(i), default="Error"))
-					price.append(request.form.get("product_Price"+str(i), default="Error"))
-					features.append(request.form.get("product_Features"+str(i), default="Error"))
-					keywords.append(request.form.get("product_Keywords"+str(i), default="Error"))
-					discount.append(request.form.get("product_Discount"+str(i), default="Error"))
-					url.append(request.form.get("product_URL"+str(i), default="Error"))
-					if 'file' not in request.files:
-						msg = 'no file given'
-					else:
-						file = request.files['product_image'+str(i)]
-						if file.filename == '':
-							msg = 'No file name'
-						elif file and allowed_file(file.filename):
-							filename = secure_filename(file.filename)
-							filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
-						file.save(filePath)
-						fp.append(filePath)
+				conn = sqlite3.connect(PRODUCTDATABASE)
+				cur = conn.cursor()
+				umail = request.cookies.get("UserEmail")
+				cur.execute("CREATE TABLE IF NOT EXISTS \'" + umail + "\' (\
+				ProductID text, ProductName text, ProductBrand text, ProductModel text, ProductPrice text\
+				ProductKeywords text, ProductDiscount text, ProductURL text, ProductImage text)")
+				cur.execute("DELETE FROM \'" + umail + "\'")
+				for q in range(0, i-1):
+					cur.execute("INSERT INTO \'" + umail + "\'('ProductID', 'ProductName', 'ProductBrand', 'ProductModel', \
+					'ProductPrice', 'ProductKeywords', 'ProductDiscount', 'ProductURL', 'ProductImage') \
+					VALUES (?,?,?,?,?,?,?,?,?)", (pid[q],name[q],brand[q],model[q],price[q],keywords[q],discount[q],url[q],fp[q],))
+					conn.commit()
 			except:
-				print("Error in Products Taken - Assume its ok")
-			conn = sqlite3.connect(PRODUCTDATABASE)
-			cur = conn.cursor()
-			umail = request.cookies.get("UserEmail")
-			cur.execute("CREATE TABLE IF NOT EXISTS \'" + umail + "\' (\
-			ProductID text, ProductName text, ProductBrand text, ProductModel text, ProductPrice text\
-			ProductFeatures text, ProductKeywords text, ProductDiscount text, ProductURL text, ProductImage text)")
-			conn.commit()
-			cur.execute("DELETE FROM \'" + umail + "\'")
-			for q in range(1, i+1):
-				cur.execute("INSERT INTO \'" + umail + "\'('ProductID', 'ProductName', 'ProductBrand', 'ProductModel', \
-				'ProductPrice', 'ProductFeatures', 'ProductKeywords', 'ProductDiscount', 'ProductURL', 'ProductImage') \
-				VALUES (?,?,?,?,?,?,?,?,?,?)", (pid[q],name[q],brand[q],model[q],price[q],features[q],keywords[q],discount[q],url[q],fp[q],))
-				conn.commit()
+				print("Error in edditing the database")
+				conn.rollback()
+				conn.close()
 			return render_template("index.html", msg="Questions have been saved")
 
 

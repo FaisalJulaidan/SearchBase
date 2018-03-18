@@ -54,6 +54,18 @@ def indexpage():
     if request.method == "GET":
         return render_template("index.html")
 
+conn = sqlite3.connect(USERDATABASE)
+cur = conn.cursor()
+cur.execute("SELECT CompanyName FROM Users;")
+cns = cur.fetchall()
+
+for cn in cns:
+	@app.route("/" + cn[0], methods = ['GET'])
+	def loadTemplate():
+		if request.method == "GET":
+			
+			return render_template("Template.html")
+
 @app.route("/test", methods = ['GET', 'POST'])
 def test():
 	if request.method == "GET":
@@ -151,6 +163,8 @@ def signpage():
 		print("User details added!")
 		conn.close()
 		return render_template("Login.html")
+
+
 
 
 # Admin pages
@@ -269,8 +283,6 @@ def adminDisplayQuestions():
 def adminDisplayAnswers():
     if request.method == "GET":
         return render_template("admin-table-answers.html")
-
-
 
 @app.route("/admin/pricing", methods = ['GET'])
 def adminPricing():

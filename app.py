@@ -249,17 +249,6 @@ def adminAddProduct():
 			return render_template("index.html", msg="Questions have been saved")
 
 
-@app.route("/admin/editProduct", methods = ['GET'])
-def adminEditProduct():
-    if request.method == "GET":
-        return render_template("admin-form-wizards.html")
-
-@app.route("/admin/deleteProduct", methods = ['GET'])
-def adminDeleteProduct():
-    if request.method == "GET":
-        return render_template("admin-form-delete-product.html")
-
-
 @app.route("/admin/displayQuestions", methods = ['GET'])
 def adminDisplayQuestions():
     if request.method == "GET":
@@ -269,8 +258,6 @@ def adminDisplayQuestions():
 def adminDisplayAnswers():
     if request.method == "GET":
         return render_template("admin-table-answers.html")
-
-
 
 @app.route("/admin/pricing", methods = ['GET'])
 def adminPricing():

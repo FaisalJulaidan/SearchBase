@@ -40,7 +40,7 @@
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
-                <h2>username</h2>
+                <h2>{{user}}</h2>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -52,29 +52,19 @@
               <div class="menu_section">
                 <h3>General</h3>
                 <ul class="nav side-menu">
-                  <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="index.html">Dashboard</a></li>
-                    </ul>
+                  <li><a href="/admin/homepage"><i class="fa fa-home"></i> Dashboard</a>
                   </li>
-                  <li><a><i class="fa fa-edit"></i> Questions <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/admin/add/question">Add Question</a></li>
-                      <li><a href="/admin/edit/question">Edit Question</a></li>
-                      <li><a href="/admin/delete/question">Delete Question</a></li>
-                    </ul>
+                  <li><a href="/admin/addQuestion"><i class="fa fa-edit"></i> Questions<span class="fa fa-arrow-right"></span></a>
                   </li>
-                  <li><a><i class="fa fa-edit"></i> Products <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/admin/add/product">Add Product</a></li>
-                      <li><a href="/admin/edit/product">Edit Product</a></li>
-                      <li><a href="/admin/delete/product">Delete Product</a></li>
-                    </ul>
+                  <li><a href="/admin/add/question"><i class="fa fa-edit"></i> Answers<span class="fa fa-arrow-right"></span></a>
                   </li>
-                  <li><a><i class="fa fa-table"></i> Products & Questions <span class="fa fa-chevron-down"></span></a>
+                  <li><a href="/admin/addProduct"><i class="fa fa-database"></i> Product Database<span class="fa fa-arrow-right"></span></a>
+                  </li>
+                  <li><a><i class="fa fa-table"></i> Tables <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="/admin/display/questions">All Questions</a></li>
-                      <li><a href="/admin/display/answers">All Products</a></li>
+                      <li><a href="/admin/displayQuestions">Questions</a></li>
+                      <li><a href="/admin/displayAnswers">Answers</a></li>
+                      <li><a href="/admin/displayProducts">Products</a></li>
                     </ul>
                   </li>
                 </ul>
@@ -98,15 +88,15 @@
                         <li><a href="#level1_1">Genral Support</a>
                         <li><a>Technical Support<span class="fa fa-chevron-down"></span></a>
                           <ul class="nav child_menu">
-                            <li class="sub_menu"><a href="/admin/support/docs">Docs</a>
+                            <li class="sub_menu"><a href="/admin/supportDocs">Docs</a>
                             </li>
-                            <li><a href="/admin/support/setup">Getting setup</a>
+                            <li><a href="/admin/supportSetup">Getting setup</a>
                             </li>
-                            <li><a href="/admin/support/intergartion">Intergration with your site</a>
+                            <li><a href="/admin/supportIntergartion">Intergration with your site</a>
                             </li>
                           </ul>
                         </li>
-                        <li><a href="/admin/support/billing">Billing support</a>
+                        <li><a href="/admin/supportBilling">Billing support</a>
                         </li>
                     </ul>
                   </li>
@@ -115,24 +105,6 @@
               </div>
             </div>
             <!-- /sidebar menu -->
-
-            
-            <!-- /menu footer buttons -->
-            <div class="sidebar-footer hidden-small">
-              <a data-toggle="tooltip" data-placement="top" title="Settings">
-                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="FullScreen">
-                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="Lock">
-                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
-                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
-              </a>
-            </div>
-            <!-- /menu footer buttons -->
           </div>
         </div>
 
@@ -147,14 +119,14 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="images/img.jpg" alt="">John Doe
+                    <img src="../static/images/img.jpg" alt="">{{User}}
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
                     <li><a href="javascript:;"> Profile</a></li>
                     <li>
                       <a href="javascript:;">
-                        <span class="badge bg-red pull-right">50%</span>
+                        <span class="badge bg-red pull-right"></span>
                         <span>Settings</span>
                       </a>
                     </li>
@@ -165,67 +137,7 @@
 
                 <li role="presentation" class="dropdown">
                   <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
-                    <i class="fa fa-envelope-o"></i>
-                    <span class="badge bg-green">6</span>
                   </a>
-                  <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
-                    <li>
-                      <a>
-                        <span class="image"><img src="../static/images/img.jpg" alt="Profile Image" /></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                      </a>
-                    </li>
-                    <li>
-                      <a>
-                        <span class="image"><img src="../static/images/img.jpg" alt="Profile Image" /></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                      </a>
-                    </li>
-                    <li>
-                      <a>
-                        <span class="image"><img src="../static/images/img.jpg" alt="Profile Image" /></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                      </a>
-                    </li>
-                    <li>
-                      <a>
-                        <span class="image"><img src="../static/images/img.jpg" alt="Profile Image" /></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                      </a>
-                    </li>
-                    <li>
-                      <div class="text-center">
-                        <a>
-                          <strong>See All Alerts</strong>
-                          <i class="fa fa-angle-right"></i>
-                        </a>
-                      </div>
-                    </li>
-                  </ul>
                 </li>
               </ul>
             </nav>

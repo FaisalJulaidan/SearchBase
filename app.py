@@ -2,7 +2,7 @@ import os
 import sqlite3
 from json import dumps
 from flask_mail import Mail, Message
-from werkzeug.utils import secure_filename
+from werkzeug import secure_filename
 from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory, send_file
 from flask_scrypt import generate_random_salt, generate_password_hash, check_password_hash
 
@@ -20,7 +20,7 @@ app = Flask(__name__)
 mail = Mail(app)
 
 app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG'])
 
 salt = generate_random_salt()
 
@@ -221,11 +221,12 @@ def adminAddProduct():
 					print('no file given')
 				else:
 					file = request.files['product_image'+str(i)]
+					print(allowed_file(file.filename))
 					if file.filename == '':
 						print('No file name')
 					elif file and allowed_file(file.filename):
 						filename = secure_filename(file.filename)
-						filePath = os.path.join(app.config['static/file_uploads/product_images'], filename)
+						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
 					file.save(filePath)
 					fp.append(filePath)
 			try:

@@ -588,9 +588,15 @@ body .container.body .right_col {
 }
 
 .container {
-    width: 130%;
+    width: 100%;
     padding: 0
 }
+
+/*
+.container {
+    width: 130%;
+    padding: 0
+} */
 
 .top_nav .nav .open>a,
 .top_nav .nav .open>a:focus,
@@ -608,7 +614,7 @@ body {
     line-height: 1.471
 }
 
-.main_container .top_nav {
+.main_container_products .top_nav {
     display: block;
     margin-left: 230px
 }

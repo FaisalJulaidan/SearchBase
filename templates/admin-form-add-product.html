@@ -331,6 +331,7 @@
     function AddRow(){
         i++;
         $("#tbody").append("<tr>\
+          <td><input style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete"+String(i)+"\"></td>\
           <td><input style=\"width: 30px;\" type=\"text\" name=\"product_Edit"+String(i)+"\"></td>\
           <td><input style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID"+String(i)+"\"></td>\
           <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Name"+String(i)+"\"></td>\

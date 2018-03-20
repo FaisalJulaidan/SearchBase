@@ -331,7 +331,7 @@
     function AddRow(){
         i++;
         $("#tbody").append("<tr id=\"tr"+String(i)+"\">\
-          <td><input style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete"+String(i)+"\"></td>\
+          <td><input id=\"cb"+String(i)+"\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete"+String(i)+"\"></td>\
           <td><input style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID"+String(i)+"\"></td>\
           <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Name"+String(i)+"\"></td>\
           <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Brand"+String(i)+"\"></td>\
@@ -344,8 +344,18 @@
         </tr>");
     }
     function RemoveRow(){
-        $("#tr"+String(i)).remove();
-        i--;
+        console.log("Begin");
+        for(var c = 1; c <= i; c++){
+            console.log(String(c) + "--" + String(i));
+            try{
+                if(document.getElementById("cb"+String(c)).checked){
+                    console.log("Delete");
+                    document.getElementById("tr"+String(c)).remove();
+                }
+            } catch(exx) {
+                console.log("Skip " + String(c));
+            }
+        }
     }
     document.getElementById("addRow").addEventListener("click", AddRow);
     document.getElementById("removeRow").addEventListener("click", RemoveRow);

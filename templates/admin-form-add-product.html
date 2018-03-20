@@ -344,12 +344,9 @@
         </tr>");
     }
     function RemoveRow(){
-        console.log("Begin");
         for(var c = 1; c <= i; c++){
-            console.log(String(c) + "--" + String(i));
             try{
                 if(document.getElementById("cb"+String(c)).checked){
-                    console.log("Delete");
                     document.getElementById("tr"+String(c)).remove();
                 }
             } catch(exx) {

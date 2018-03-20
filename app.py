@@ -63,7 +63,7 @@ for cn in cns:
 	@app.route("/" + cn[0], methods = ['GET'])
 	def loadTemplate():
 		if request.method == "GET":
-			
+
 			return render_template("Template.html")
 
 @app.route("/test", methods = ['GET', 'POST'])
@@ -195,7 +195,21 @@ def adminAddQuestion():
 		for q in questions:
 			cur.execute("INSERT INTO \'" + umail + "\'('Question') VALUES (?)", (q,))
 			conn.commit()
+		conn.close()
 		return render_template("index.html", msg="Questions have been saved")
+
+@app.route("/admin/Answers", methods = ['GET', 'POST'])
+def adminAnswers():
+	if request.method == "GET":
+		conn = sqlite3.connect(QUESTIONDATABASE)
+		cur = conn.cursor()
+		umail = request.cookies.get("UserEmail")
+		cur.execute("SELECT * FROM \""+umail+"\"")
+		mes = cur.fetchall()
+		conn.close()
+		return render_template("admin-form-add-answer.html", msg=mes)
+	if request.method == "POST":
+		return "hi"
 
 @app.route("/admin/addProduct", methods = ['GET', 'POST'])
 def adminAddProduct():

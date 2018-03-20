@@ -183,10 +183,9 @@
                                 <p class="text-muted font-13 m-b-30">Select a question to add answers for</p>
                                 <div>
                                    <select>
-                                     <option value="volvo">Select question</option>
-                                     <option value="saab">Q1</option>
-                                     <option value="opel">Q2</option>
-                                     <option value="audi">Q3</option>
+                                     {% for row in msg%}
+                                     <option value="{{row[0]}}">{{row[0]}}</option>
+                                     {%endfor%}
                                    </select>
                                    <p class="text-muted font-13 m-b-30">How many answers will your question have?</p>
                                    <div class="form-group">
@@ -200,26 +199,31 @@
                                  <br />
                                  <br />
                                  <br />
-                                 <button class="btn btn-success">Submit</button>
+                                 <button id="snoa" class="btn btn-success">Submit</button>
                                 <div>
                                   <br />
                                   <br />
                                   <br />
+
+
                                   <div id ="q1" class="">
                                     <div class="box-holder">
                                       <form style="text-align:center">
                                       <div class="row">
-                                        <div class="column" onclick="SetComputerUse('Business')">
+                                        <div class="column">
                                           <input style="width: 100px;" type="text" required="required">
                                           <br />
                                           <br />
                                           <br />
                                           <br />
-                                          <input name="myFile" type="file">                                        </div>
+                                          <input name="myFile" type="file">
+                                      </div>
                                       </div>
                                     </form>
                                     </div>
                                   </div>
+
+
                                 </div>
                               </div>
                             </div>
@@ -282,35 +286,11 @@
     <script src="../static/vendors/starrr/dist/starrr.js"></script>
 
     <script>
-    var i = 0;
-    function AddRow(){
-        i++;
-        $("#tbody").append("<tr id=\"tr"+String(i)+"\">\
-          <td><input id=\"cb"+String(i)+"\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete"+String(i)+"\"></td>\
-          <td><input style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID"+String(i)+"\"></td>\
-          <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Name"+String(i)+"\"></td>\
-          <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Brand"+String(i)+"\"></td>\
-          <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Model"+String(i)+"\"></td>\
-          <td><input style=\"width: 60px;\" type=\"text\" name=\"product_Price"+String(i)+"\"></td>\
-          <td><input style=\"width: 250px;\" type=\"text\" name=\"product_Keywords"+String(i)+"\"></td>\
-          <td><input style=\"width: 60px;\" type=\"text\" name=\"product_Discount"+String(i)+"\"></td>\
-          <td><input style=\"width: 200px;\" type=\"text\" name=\"product_URL"+String(i)+"\"></td>\
-          <td><input style=\"width: 250px;\" type=\"file\" name=\"product_image"+String(i)+"\" value=\"Upload\"><td>\
-        </tr>");
+    document.getElementById("snoa").addEventListener("click", ChangeNofQuestions);
+    // https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript/966938#966938
+    function ChangeNofQuestions(){
+
     }
-    function RemoveRow(){
-        for(var c = 1; c <= i; c++){
-            try{
-                if(document.getElementById("cb"+String(c)).checked){
-                    document.getElementById("tr"+String(c)).remove();
-                }
-            } catch(exx) {
-                console.log("Skip " + String(c));
-            }
-        }
-    }
-    document.getElementById("addRow").addEventListener("click", AddRow);
-    document.getElementById("removeRow").addEventListener("click", RemoveRow);
     </script>
 
 

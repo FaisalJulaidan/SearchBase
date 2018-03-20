@@ -181,7 +181,7 @@
                                     <table id="datatable" class="table table-striped table-bordered">
                                       <thead>
                                         <tr>
-                                          <th>Edit/Delete</th>
+                                          <th>Delete</th>
                                           <th>ID</th>
                                           <th>Name</th>
                                           <th>Brand</th>
@@ -200,7 +200,7 @@
                                 </form>
                                 <button type="submit" class="btn btn-success" value="Send">Save Updates</button>
                                 <button type="submit" class="btn btn-success" id="addRow" value="Send">Add Row</button>
-                                <button type="submit" class="btn btn-success" value="Send">Delete Row</button>
+                                <button type="submit" class="btn btn-success" id="removeRow" value="Send">Delete Row</button>
                               </div>
                             </div>
                           </div>
@@ -330,9 +330,8 @@
     var i = 0;
     function AddRow(){
         i++;
-        $("#tbody").append("<tr>\
+        $("#tbody").append("<tr id=\"tr"+String(i)+"\">\
           <td><input style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete"+String(i)+"\"></td>\
-          <td><input style=\"width: 30px;\" type=\"text\" name=\"product_Edit"+String(i)+"\"></td>\
           <td><input style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID"+String(i)+"\"></td>\
           <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Name"+String(i)+"\"></td>\
           <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Brand"+String(i)+"\"></td>\
@@ -344,7 +343,12 @@
           <td><input style=\"width: 250px;\" type=\"file\" name=\"product_image"+String(i)+"\" value=\"Upload\"><td>\
         </tr>");
     }
+    function RemoveRow(){
+        $("#tr"+String(i)).remove();
+        i--;
+    }
     document.getElementById("addRow").addEventListener("click", AddRow);
+    document.getElementById("removeRow").addEventListener("click", RemoveRow);
     </script>
 
 

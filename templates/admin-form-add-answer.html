@@ -182,7 +182,7 @@
                               <div class="x_content">
                                 <p class="text-muted font-13 m-b-30">Select a question to add answers for</p>
                                 <div>
-                                   <select>
+                                   <select id="question-select">
                                      {% for row in msg%}
                                      <option value="{{row[0]}}">{{row[0]}}</option>
                                      {%endfor%}
@@ -207,20 +207,12 @@
                                   <div id ="q1" class="">
                                     <div class="box-holder">
                                       <form style="text-align:center">
-                                        <div class="column">
-                                          <p> Enter the keyword </p>
-                                          <input style="width: 100px;" type="text" required="required">
-                                          <br />
-                                          <p> Product name</p>
-                                          <input style="width: 100px;" type="text" required="required">
-                                          <br />
-                                          <br />
-                                          <input name="myFile" type="file">
-                                      </div>
-                                      </div>
-                                    </form>
+                                          <div id="pasteForm">
+                                          </div>
+                                          <button id="snoa" class="btn btn-success">Save answers</button>
+                                      </form>
+                                    </div>
                                   </div>
-                                  <button id="snoa" class="btn btn-success">Save answers</button>
                                 </div>
                                </div>
                               </div>
@@ -285,10 +277,83 @@
 
     <script>
     document.getElementById("snoa").addEventListener("click", ChangeNofQuestions);
-    // https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript/966938#966938
-    function ChangeNofQuestions(){
-
+    var NoQ = 0;
+    {%for item in msg%}
+    NoQ++;
+    {%endfor%}
+    var data = createArray(NoQ);
+    var i = 0;
+    {%for item in msg%}
+    {%for answer in item%}
+    {%if answer != None%}
+    data[i].push("{{answer}}");
+    {%endif%}
+    {%endfor%}
+    i++;
+    {%endfor%}
+    var NoA = 0;
+    for(var j = 0;j < data.length;j++){
+        if(data[j][0] == document.getElementById("question-select").options[document.getElementById("question-select").selectedIndex].text){
+            $("#number-of-questions").val(data[j].length - 1);
+            for(var b = 1; b < data[j].length+1;b++){
+                if(b==data[j].length){break;}
+                $("#pasteForm").append("\
+                    <div class=\"column\">\
+                      <p> Enter the keyword </p>\
+                      <input id=\"keywords"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
+                      <br />\
+                      <p> Product name</p>\
+                      <input id=\"pname"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
+                      <br />\
+                      <br />\
+                      <input id=\"file"+String(b)+"\" name=\"myFile\" type=\"file\">\
+                    </div>")
+                NoA++;
+            }
+        }
     }
+    function ChangeNofQuestions(){
+        var nv = document.getElementById("number-of-questions").value;
+        if(nv > NoA){
+            for(var b = NoA; b < nv;b++){
+                $("#pasteForm").append("\
+                    <div class=\"column\">\
+                      <p> Enter the keyword </p>\
+                      <input id=\"keywords"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
+                      <br />\
+                      <p> Product name</p>\
+                      <input id=\"pname"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
+                      <br />\
+                      <br />\
+                      <input id=\"file"+String(b)+"\" name=\"myFile\" type=\"file\">\
+                    </div>")
+                NoA++;
+            }
+        } else if(nv < NoA) {
+            for(b = NoA; b > nv; b--){
+              $(".column")[$(".column").length - 1].remove();
+            }
+        }
+    }
+    function createArray(rows) {
+        var arr = [];
+      for (var i=0;i<rows;i++) {
+         arr[i] = [];
+      }
+      return arr;
+    }
+    // for 3+ D arrays
+    // function createArray(length) {
+    //     var arr = new Array(length || 0),
+    //         i = length;
+    //
+    //     if (arguments.length > 1) {
+    //         var args = Array.prototype.slice.call(arguments, 1);
+    //         while(i--) arr[length-1 - i] = createArray.apply(this, args);
+    //     }
+    //
+    //     return arr;
+    // }
     </script>
 
 

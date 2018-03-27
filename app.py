@@ -209,7 +209,34 @@ def adminAnswers():
 		conn.close()
 		return render_template("admin-form-add-answer.html", msg=mes)
 	if request.method == "POST":
-		return "hi"
+		answers= []
+		for i in range(1, 13):
+			if(request.form.get("pname" + str(i)) != None):
+				if (request.files['file'+str(i)].filename == ""):
+					print('no file given')
+				else:
+					file = request.files['file'+str(i)]
+					if file.filename == '':
+						print('No file name')
+					elif file and allowed_file(file.filename):
+						filename = secure_filename(file.filename)
+						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
+					file.save(filePath)
+				answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+filePath)
+		conn = sqlite3.connect(QUESTIONDATABASE)
+		cur = conn.cursor()
+		umail = request.cookies.get("UserEmail")
+		cur.execute("SELECT Question FROM \""+umail+"\"")
+		questions = cur.fetchall()
+		# use UPDATE sqlite function
+		# cur.execute("DELETE FROM \'" + umail + "\'")
+		for a in answers:
+			cur.execute("INSERT INTO \'" + umail + "\'('Question', 'Answer1', 'Answer2', \
+			'Answer3', 'Answer4', 'Answer5', 'Answer6', 'Answer7', 'Answer8', 'Answer9', \
+			'Answer10', 'Answer11', 'Answer12') VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", ())
+			conn.commit()
+		conn.close()
+		return render_template("admin-form-add-answer.html", msg=mes)
 
 @app.route("/admin/addProduct", methods = ['GET', 'POST'])
 def adminAddProduct():
@@ -249,7 +276,6 @@ def adminAddProduct():
 					print('no file given')
 				else:
 					file = request.files['product_image'+str(i)]
-					print(allowed_file(file.filename))
 					if file.filename == '':
 						print('No file name')
 					elif file and allowed_file(file.filename):

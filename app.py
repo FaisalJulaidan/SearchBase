@@ -210,6 +210,7 @@ def adminAnswers():
 		return render_template("admin-form-add-answer.html", msg=mes)
 	if request.method == "POST":
 		answers= []
+		selQuestion = request.form.get("question")
 		for i in range(1, 13):
 			if(request.form.get("pname" + str(i)) != None):
 				if (request.files['file'+str(i)].filename == ""):
@@ -226,14 +227,14 @@ def adminAnswers():
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
 		umail = request.cookies.get("UserEmail")
-		cur.execute("SELECT Question FROM \""+umail+"\"")
-		questions = cur.fetchall()
+		# cur.execute("SELECT Question FROM \""+umail+"\"")
+		# questions = cur.fetchall()
 		# use UPDATE sqlite function
 		# cur.execute("DELETE FROM \'" + umail + "\'")
+		c=0
 		for a in answers:
-			cur.execute("INSERT INTO \'" + umail + "\'('Question', 'Answer1', 'Answer2', \
-			'Answer3', 'Answer4', 'Answer5', 'Answer6', 'Answer7', 'Answer8', 'Answer9', \
-			'Answer10', 'Answer11', 'Answer12') VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", ())
+			c+=1
+			cur.execute("UPDATE \""+umail+"\" SET Answer"+str(c)+" = \""+a+"\" WHERE Question = \""+selQuestion+"\"")
 			conn.commit()
 		conn.close()
 		return render_template("admin-form-add-answer.html", msg=mes)

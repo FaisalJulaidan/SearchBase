@@ -181,7 +181,7 @@
                               <div class="x_content">
                                 <p class="text-muted font-13 m-b-30">Select a question to add answers for</p>
                                 <div>
-                                   <select id="question-select">
+                                   <select id="question-select" onchange="changeQuestion()">
                                      {% for row in msg%}
                                      <option value="{{row[0]}}">{{row[0]}}</option>
                                      {%endfor%}
@@ -208,6 +208,7 @@
                                       <form style="text-align:center">
                                           <div id="pasteForm">
                                           </div>
+                                          <input hidden name="question" id="question_inform"></input>
                                           <button id="snoa" class="btn btn-success">Save answers</button>
                                       </form>
                                     </div>
@@ -342,6 +343,13 @@
       }
       return arr;
     }
+    function changeQuestion(){
+
+        var e = document.getElementById("question-select");
+        var squestion = e.options[e.selectedIndex].value;
+        $("#question_inform").val(squestion);
+    }
+    changeQuestion();
     // for 3+ D arrays
     // function createArray(length) {
     //     var arr = new Array(length || 0),

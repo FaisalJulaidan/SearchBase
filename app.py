@@ -63,7 +63,6 @@ for cn in cns:
 	@app.route("/" + cn[0], methods = ['GET'])
 	def loadTemplate():
 		if request.method == "GET":
-
 			return render_template("Template.html")
 
 @app.route("/test", methods = ['GET', 'POST'])
@@ -163,17 +162,17 @@ def signpage():
 		print("User details added!")
 		conn.close()
 
-		msg = Message("Thank you for registering, " + userFirstname,
-		sender="thesearchbase@gmail.com",
-		recipients=[userEmail])
-		msg.body = "We appriciate you registering with TheSaerchBase. A whole new world of possibilities is ahead of you."
-		mail.send(msg)
-
-		msg = Message("A new user has signed up!",
-		sender="thesearchbase@gmail.com",
-		recipients=["thesearchbase@gmail.com"])
-		msg.body = "Title: " + userTitle + "Name: " + userFirstname + userSecondname + "Email: " + userEmail + "Number: " + userContactNumber
-		mail.send(msg)
+		# msg = Message("Thank you for registering, " + userFirstname,
+		# sender="thesearchbase@gmail.com",
+		# recipients=[userEmail])
+		# msg.body = "We appriciate you registering with TheSaerchBase. A whole new world of possibilities is ahead of you."
+		# mail.send(msg)
+		#
+		# msg = Message("A new user has signed up!",
+		# sender="thesearchbase@gmail.com",
+		# recipients=["thesearchbase@gmail.com"])
+		# msg.body = "Title: " + userTitle + "Name: " + userFirstname + userSecondname + "Email: " + userEmail + "Number: " + userContactNumber
+		# mail.send(msg)
 
 
 		return render_template("Login.html")

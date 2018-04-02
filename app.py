@@ -174,6 +174,11 @@ def adminHomePage():
     if request.method == "GET":
         return render_template("admin-main.html")
 
+def allowed_file(filename):
+	ext = filename.rsplit('.',1)[1]
+	print(ext)
+	return '.' in filename and ext in ALLOWED_EXTENSIONS
+
 @app.route("/admin/addQuestion", methods = ['GET', 'POST'])
 def adminAddQuestion():
 	if request.method == "GET":
@@ -212,6 +217,8 @@ def adminAnswers():
 		answers= []
 		selQuestion = request.form.get("question")
 		for i in range(1, 13):
+			print(i)
+			print("pname" + str(i))
 			if(request.form.get("pname" + str(i)) != None):
 				if (request.files['file'+str(i)].filename == ""):
 					print('no file given')
@@ -223,6 +230,7 @@ def adminAnswers():
 						filename = secure_filename(file.filename)
 						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
 					file.save(filePath)
+				print(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+filePath)
 				answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+filePath)
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
@@ -232,22 +240,20 @@ def adminAnswers():
 		# use UPDATE sqlite function
 		# cur.execute("DELETE FROM \'" + umail + "\'")
 		c=0
+		print(answers)
 		for a in answers:
 			c+=1
+			print(selQuestion + " ; " + a)
 			cur.execute("UPDATE \""+umail+"\" SET Answer"+str(c)+" = \""+a+"\" WHERE Question = \""+selQuestion+"\"")
 			conn.commit()
 		conn.close()
-		return render_template("admin-form-add-answer.html", msg=mes)
+		return render_template("admin-form-add-answer.html")
 
 @app.route("/admin/addProduct", methods = ['GET', 'POST'])
 def adminAddProduct():
 	if request.method == "GET":
 		return render_template("admin-form-add-product.html")
 	if request.method == 'POST':
-		def allowed_file(filename):
-			ext = filename.rsplit('.',1)[1]
-			print(ext)
-			return '.' in filename and ext in ALLOWED_EXTENSIONS
 		filePath = 'no file upload so far'
 		msg = ''
 		if request.method == 'POST':

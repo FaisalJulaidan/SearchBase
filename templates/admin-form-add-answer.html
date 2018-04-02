@@ -205,8 +205,9 @@
                                   <br />
                                   <div id ="q1" class="">
                                     <div class="box-holder">
-                                      <form style="text-align:center">
+                                      <form enctype="multipart/form-data" style="text-align:center" action="/admin/Answers" method="post">
                                           <div id="pasteForm">
+                                              <!-- Answer Forms get inserted here -->
                                           </div>
                                           <input hidden name="question" id="question_inform"></input>
                                           <button id="snoa" class="btn btn-success">Save answers</button>
@@ -320,13 +321,13 @@
                 $("#pasteForm").append("\
                     <div class=\"column\">\
                       <p> Product name</p>\
-                      <input id=\"pname"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
+                      <input name=\"pname"+String(b+1)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
                       <br />\
                       <p> Enter the keyword </p>\
-                      <input id=\"keywords"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
+                      <input name=\"keywords"+String(b+1)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
                       <br />\
                       <br />\
-                      <input id=\"file"+String(b)+"\" name=\"myFile\" type=\"file\">\
+                      <input name=\"file"+String(b+1)+"\" name=\"myFile\" value=\"Upload\" type=\"file\">\
                     </div>")
                 NoA++;
             }

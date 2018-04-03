@@ -1701,3 +1701,13 @@ right: 0;
   text-decoration: none;
   margin: 0;
 }
+
+.policies h4, ul{
+  color: #525056;
+}
+
+.Policy_list{
+  color: #726a84;
+  list-style-type: circle;
+  /* display:list-item; */
+}

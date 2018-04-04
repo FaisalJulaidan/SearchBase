@@ -229,10 +229,10 @@ def adminAnswers():
 	if request.method == "POST":
 		answers= []
 		selQuestion = request.form.get("question")
-		print("SQ: " + selQuestion)
 		for i in range(1, 13):
 			print(i)
 			print("pname" + str(i))
+			print(request.form.get("pname" + str(i)))
 			if(request.form.get("pname" + str(i)) != None):
 				if (request.files['file'+str(i)].filename == ""):
 					print('no file given')
@@ -257,7 +257,6 @@ def adminAnswers():
 		print(answers)
 		for a in answers:
 			c+=1
-			print(selQuestion + " ; " + a)
 			cur.execute("UPDATE \""+umail+"\" SET Answer"+str(c)+" = \""+a+"\" WHERE Question = \""+selQuestion+"\"")
 			conn.commit()
 		for b in range(c+1, 13):

@@ -293,12 +293,13 @@
     i++;
     {%endfor%}
     var NoA = 0;
+    console.log("NOA: " + NoA)
     for(var j = 0;j < data.length;j++){
         if(data[j][0] == document.getElementById("question-select").options[document.getElementById("question-select").selectedIndex].text){
-            $("#number-of-questions").val(data[j].length - 1);
             for(var b = 1; b < data[j].length+1;b++){
                 if(b==data[j].length){break;}
-                parts = data[j].split(";")
+                if(data[j][b] == ""){break;}
+                parts = data[j][b].split(";")
                 $("#pasteForm").append("\
                     <div class=\"column\">\
                       <p> Product name</p>\
@@ -312,6 +313,7 @@
                     </div>")
                 NoA++;
             }
+            $("#number-of-questions").val(NoA);
         }
     }
     function ChangeNofQuestions(){

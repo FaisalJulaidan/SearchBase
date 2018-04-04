@@ -1701,3 +1701,44 @@ right: 0;
   text-decoration: none;
   margin: 0;
 }
+
+.policies h4, ul{
+  color: #525056;
+}
+
+.Policy_list{
+  color: #726a84;
+  list-style-type: circle;
+  /* display:list-item; */
+}
+
+.terms h4, p{
+  padding-left: 15%;
+  color: #726a84;
+}
+
+.terms_paragraph_main p {
+  padding-top: 30px;
+  width: 70%;
+  /* padding-left: 10px; */
+}
+
+.term_1{
+  padding-top: 30px;
+  padding: 20px;
+}
+
+.term_2{
+  padding-top: 30px;
+  padding: 20px;
+}
+
+.term_3{
+  padding-top: 30px;
+  padding: 20px;
+}
+
+.term_4{
+  padding-top: 30px;
+  padding: 20px;
+}

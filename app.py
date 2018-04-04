@@ -229,6 +229,7 @@ def adminAnswers():
 	if request.method == "POST":
 		answers= []
 		selQuestion = request.form.get("question")
+		print("SQ: " + selQuestion)
 		for i in range(1, 13):
 			print(i)
 			print("pname" + str(i))
@@ -259,8 +260,11 @@ def adminAnswers():
 			print(selQuestion + " ; " + a)
 			cur.execute("UPDATE \""+umail+"\" SET Answer"+str(c)+" = \""+a+"\" WHERE Question = \""+selQuestion+"\"")
 			conn.commit()
+		for b in range(c+1, 13):
+			cur.execute("UPDATE \""+umail+"\" SET Answer"+str(b)+" = \"\" WHERE Question = \""+selQuestion+"\"")
+			conn.commit()
 		conn.close()
-		return render_template("admin-form-add-answer.html")
+		return redirect("/admin/Answers", code=302)
 
 @app.route("/admin/addProduct", methods = ['GET', 'POST'])
 def adminAddProduct():

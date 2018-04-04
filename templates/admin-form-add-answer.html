@@ -209,7 +209,7 @@
                                           <div id="pasteForm">
                                               <!-- Answer Forms get inserted here -->
                                           </div>
-                                          <input hidden name="question" id="question_inform"></input>
+                                          <input hidden name="question" id="question_inform"></input><br>
                                           <button id="snoa" class="btn btn-success">Save answers</button>
                                       </form>
                                     </div>
@@ -336,6 +336,7 @@
               $(".column")[$(".column").length - 1].remove();
             }
         }
+        changeQuestion();
     }
     function createArray(rows) {
         var arr = [];
@@ -350,7 +351,6 @@
         var squestion = e.options[e.selectedIndex].value;
         $("#question_inform").val(squestion);
     }
-    changeQuestion();
     // for 3+ D arrays
     // function createArray(length) {
     //     var arr = new Array(length || 0),

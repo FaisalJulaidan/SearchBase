@@ -303,18 +303,20 @@
                 $("#pasteForm").append("\
                     <div class=\"column\">\
                       <p> Product name</p>\
-                      <input id=\"pname"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[0]+"\">"+parts[0]+"\
+                      <input name=\"pname"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[0]+"\">"+parts[0]+"\
                       <br />\
                       <p> Enter the keywords </p>\
-                      <input id=\"keywords"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[1]+"\">"+parts[1]+"\
+                      <input name=\"keywords"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[1]+"\">"+parts[1]+"\
                       <br />\
                       <br />\
-                      <input id=\"file"+String(b)+"\" name=\"myFile\" type=\"file\">\
+                      <input name=\"file"+String(b)+"\" name=\"myFile\" type=\"file\">\
                     </div>")
+                    // "+parts[2].split("/")[parts[2].split("/").length-1]+"
                 NoA++;
             }
             $("#number-of-questions").val(NoA);
         }
+        changeQuestion();
     }
     function ChangeNofQuestions(){
         var nv = document.getElementById("number-of-questions").value;
@@ -348,7 +350,6 @@
       return arr;
     }
     function changeQuestion(){
-
         var e = document.getElementById("question-select");
         var squestion = e.options[e.selectedIndex].value;
         $("#question_inform").val(squestion);

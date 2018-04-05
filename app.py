@@ -232,7 +232,6 @@ def adminAnswers():
 		for i in range(1, 13):
 			print(i)
 			print("pname" + str(i))
-			print(request.form.get("pname" + str(i)))
 			if(request.form.get("pname" + str(i)) != None):
 				if (request.files['file'+str(i)].filename == ""):
 					print('no file given')
@@ -244,8 +243,8 @@ def adminAnswers():
 						filename = secure_filename(file.filename)
 						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
 					file.save(filePath)
-				print(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+filePath)
-				answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+filePath)
+					print(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+filePath)
+					answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+filePath)
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
 		umail = request.cookies.get("UserEmail")
@@ -254,7 +253,7 @@ def adminAnswers():
 		# use UPDATE sqlite function
 		# cur.execute("DELETE FROM \'" + umail + "\'")
 		c=0
-		print(answers)
+		print(selQuestion," : ", answers)
 		for a in answers:
 			c+=1
 			cur.execute("UPDATE \""+umail+"\" SET Answer"+str(c)+" = \""+a+"\" WHERE Question = \""+selQuestion+"\"")

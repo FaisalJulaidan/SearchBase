@@ -195,7 +195,13 @@ def allowed_file(filename):
 @app.route("/admin/addQuestion", methods = ['GET', 'POST'])
 def adminAddQuestion():
 	if request.method == "GET":
-		return render_template("admin-form-add-question.html")
+		conn = sqlite3.connect(QUESTIONDATABASE)
+		cur = conn.cursor()
+		umail = request.cookies.get("UserEmail")
+		cur.execute("SELECT * FROM \""+umail+"\"")
+		mes = cur.fetchall()
+		conn.close()
+		return render_template("admin-form-add-question.html", data=mes)
 	if request.method == "POST":
 		questions= []
 		for i in range(1, 11):

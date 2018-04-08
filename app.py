@@ -3,7 +3,7 @@ import sqlite3
 from json import dumps
 from flask_mail import Mail, Message
 from werkzeug import secure_filename
-from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory, send_file
+from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory, send_file, flash, session
 from flask_scrypt import generate_random_salt, generate_password_hash, check_password_hash
 
 
@@ -113,6 +113,7 @@ def loginpage():
 				break
 			else:
 				if(i == len(data)):
+					# need to do the try catch here.
 					return render_template('login.html', data = "User not found!")
 		try:
 			cur.execute("SELECT Password FROM Users WHERE ContactEmail=?;", [email])
@@ -125,6 +126,7 @@ def loginpage():
 				return render_template("admin-main.html", msg= email)
 			else:
 				print(password, data[0][0])
+				# Do the flask message here.
 				return render_template('Login.html', data = "User name and password does not match!")
 		except:
 			print("Error in trying to find user")

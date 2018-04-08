@@ -192,6 +192,9 @@ def allowed_file(filename):
 	print(ext)
 	return '.' in filename and ext in ALLOWED_EXTENSIONS
 
+tempData = []
+global tempData
+
 @app.route("/admin/addQuestion", methods = ['GET', 'POST'])
 def adminAddQuestion():
 	if request.method == "GET":
@@ -200,6 +203,7 @@ def adminAddQuestion():
 		umail = request.cookies.get("UserEmail")
 		cur.execute("SELECT * FROM \""+umail+"\"")
 		mes = cur.fetchall()
+		tempData = mes
 		conn.close()
 		return render_template("admin-form-add-question.html", data=mes)
 	if request.method == "POST":
@@ -215,10 +219,21 @@ def adminAddQuestion():
 		 'Answer5' text, 'Answer6' text, 'Answer7' text, 'Answer8' text, 'Answer9' text, 'Answer10' text,\
 		  'Answer11' text, 'Answer12' text)")
 		conn.commit()
-		cur.execute("DELETE FROM \'" + umail + "\'")
+		i = -1
 		for q in questions:
-			cur.execute("INSERT INTO \'" + umail + "\'('Question') VALUES (?)", (q,))
+			i+= 1
+			global tempData
+			try:
+				if(tempData[i][0] != None):
+					cur.execute("UPDATE \""+umail+"\" SET Question = \""+q+"\" WHERE Question = \""+tempData[i][0]+"\"")
+			except:
+				cur.execute("INSERT INTO \'" + umail + "\'('Question') VALUES (?)", (q,))
 			conn.commit()
+		if(i + 1 < len(tempData)+1):
+			for b in range(i+1,len(tempData)+1):
+				# cur.execute("UPDATE \""+umail+"\" SET Question = \"\" WHERE Question = \""+tempData[i+1][0]+"\"")
+				cur.execute("DELETE FROM \""+umail+"\" WHERE Question = \""+tempData[i+1][0]+"\"")
+		conn.commit()
 		conn.close()
 		return render_template("index.html", msg="Questions have been saved")
 

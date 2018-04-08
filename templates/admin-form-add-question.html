@@ -338,7 +338,7 @@
     // var data = {{data}};
     var data = [];
     {%for item in data%}
-    data.push({{item[0]}})
+    data.push("{{item[0]}}")
     {%endfor%}
       var noq = data.length;
       if(!Number.isNaN(noq)){

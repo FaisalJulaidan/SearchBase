@@ -47,7 +47,7 @@
 	</script>
 
 </head>
-<body>
+<body background="../static/img/bg-img/welcome-bg-signup.png">
 
 	<div class="limiter">
 		<div class="container-login100">
@@ -67,7 +67,7 @@
 
 					<div class="wrap-input100 validate-input" data-validate="Please enter your name">
 						<input class="input100" type="text" name="firstname"/>
-						<span class="focus-input100" data-placeholder="firstname"></span>
+						<span class="focus-input100" data-placeholder="Firstname"></span>
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate="Please enter your surname">
@@ -77,17 +77,17 @@
 
 					<div class="wrap-input100 validate-input" data-validate="Please enter your company name">
 						<input class="input100" type="text" name="companyName"/>
-						<span class="focus-input100" data-placeholder="Your company name"></span>
+						<span class="focus-input100" data-placeholder="Company name"></span>
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate="Please enter your position">
 						<input class="input100" type="text" name="userPosition"/>
-						<span class="focus-input100" data-placeholder="Your position at the company"></span>
+						<span class="focus-input100" data-placeholder="Position at the company"></span>
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate="Please enter your address">
 						<input class="input100" id="address" type="text" name="companyAddress" onchange="doGeocode()"/>
-						<span class="focus-input100" data-placeholder="Your company address"></span>
+						<span class="focus-input100" data-placeholder="Company address"></span>
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate = "Valid email is: a@b.c">
@@ -122,15 +122,29 @@
 						</div>
 					</div>
 
-					<!-- <div class="text-center p-t-115">
+					<div class="text-center p-t-115">
 						<span class="txt1">
-							Don’t have an account?
-						</span> -->
-						<!-- <a class="txt2" href="#">
-							Sign Up
-						</a> -->
-					<!-- </div> -->
+							Already have an account?
+						</span>
+						 <a class="txt2" href="/login">
+							Sign in
+						</a>
+					</div>
 
+					<div class="text-center p-t-115">
+						<span class="txt1">
+							By signing up, you are agreeing to our
+						</span>
+						 <a class="txt2" href="/termsandconditions"><b>
+							terms
+						</b></a>
+						<span class="txt1">
+							and
+						</span>
+						<a class="txt2" href="/privacy"><b>
+						 Privacy Policy
+					 </b></a>
+					</div>
 				</form>
 			</div>
 		</div>

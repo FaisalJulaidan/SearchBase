@@ -1712,8 +1712,8 @@ right: 0;
   /* display:list-item; */
 }
 
-.terms h4, p{
-  padding-left: 15%;
+.terms h4{
+  /* padding-left: 15%; */
   color: #726a84;
 }
 

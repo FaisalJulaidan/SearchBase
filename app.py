@@ -195,7 +195,7 @@ def allowed_file(filename):
 	return '.' in filename and ext in ALLOWED_EXTENSIONS
 
 tempData = []
-global tempData
+# global tempData
 
 @app.route("/admin/addQuestion", methods = ['GET', 'POST'])
 def adminAddQuestion():
@@ -224,7 +224,7 @@ def adminAddQuestion():
 		i = -1
 		for q in questions:
 			i+= 1
-			global tempData
+			# global tempData
 			try:
 				if(tempData[i][0] != None):
 					cur.execute("UPDATE \""+umail+"\" SET Question = \""+q+"\" WHERE Question = \""+tempData[i][0]+"\"")

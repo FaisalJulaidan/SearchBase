@@ -1702,7 +1702,11 @@ right: 0;
   margin: 0;
 }
 
-.policies h4, ul{
+.policies ul{
+  margin: 15px;
+}
+
+.policies ul{
   color: #525056;
 }
 
@@ -1710,6 +1714,11 @@ right: 0;
   color: #726a84;
   list-style-type: circle;
   /* display:list-item; */
+}
+
+.policy_list_margin{
+  margin: 10px;
+  list-style-type: circle;
 }
 
 .terms h4{

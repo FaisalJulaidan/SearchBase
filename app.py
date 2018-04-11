@@ -193,7 +193,6 @@ def allowed_file(filename):
 	return '.' in filename and ext in ALLOWED_EXTENSIONS
 
 tempData = []
-global tempData
 
 @app.route("/admin/addQuestion", methods = ['GET', 'POST'])
 def adminAddQuestion():
@@ -222,7 +221,6 @@ def adminAddQuestion():
 		i = -1
 		for q in questions:
 			i+= 1
-			global tempData
 			try:
 				if(tempData[i][0] != None):
 					cur.execute("UPDATE \""+umail+"\" SET Question = \""+q+"\" WHERE Question = \""+tempData[i][0]+"\"")
@@ -245,13 +243,11 @@ def adminAnswers():
 		cur.execute("SELECT * FROM \""+umail+"\"")
 		mes = cur.fetchall()
 		conn.close()
-		print(mes)
 		return render_template("admin-form-add-answer.html", msg=mes)
 	if request.method == "POST":
 		answers= []
 		selQuestion = request.form.get("question")
 		for i in range(1, 13):
-			print(i)
 			print("pname" + str(i))
 			if(request.form.get("pname" + str(i)) != None):
 				if (request.files['file'+str(i)].filename == ""):
@@ -265,14 +261,13 @@ def adminAnswers():
 						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
 					file.save(filePath)
 					filePath = filePath.split("TheSearchBase\\")[len(filePath.split("TheSearchBase\\")) - 1]
-					print(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+filePath)
-					answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+filePath)
-					print(answers)
+					tempString = filePath.split("\\")
+					filePath = tempString[0] + "/" + tempString[1]
+					answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";../"+filePath)
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
 		umail = request.cookies.get("UserEmail")
 		c=0
-		print(selQuestion," : ", answers)
 		for a in answers:
 			c+=1
 			cur.execute("UPDATE \""+umail+"\" SET Answer"+str(c)+" = \""+a+"\" WHERE Question = \""+selQuestion+"\"")

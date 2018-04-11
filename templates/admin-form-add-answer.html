@@ -293,13 +293,12 @@
     i++;
     {%endfor%}
     var NoA = 0;
-    console.log("NOA: " + NoA)
     for(var j = 0;j < data.length;j++){
         if(data[j][0] == document.getElementById("question-select").options[document.getElementById("question-select").selectedIndex].text){
             for(var b = 1; b < data[j].length+1;b++){
                 if(b==data[j].length){break;}
                 if(data[j][b] == ""){break;}
-                parts = data[j][b].split(";")
+                parts = data[j][b].split(";");
                 $("#pasteForm").append("\
                     <div class=\"column\">\
                       <p> Product name</p>\
@@ -310,7 +309,7 @@
                       <br />\
                       <br />\
                       <input name=\"file"+String(b)+"\" name=\"myFile\" value=\"Upload\" type=\"file\">\
-                      <img src=\""+parts[2]+"\"> \
+                      <img src=\""+String(parts[2])+"\"> \
                     </div>");
                     // "+parts[2].split("/")[parts[2].split("/").length-1]+"
                 NoA++;

@@ -3,7 +3,7 @@ import sqlite3
 from json import dumps
 from flask_mail import Mail, Message
 from werkzeug import secure_filename
-from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory, send_file, flash, session
+from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory, send_file
 from flask_scrypt import generate_random_salt, generate_password_hash, check_password_hash
 
 
@@ -113,7 +113,6 @@ def loginpage():
 				break
 			else:
 				if(i == len(data)):
-					# need to do the try catch here.
 					return render_template('login.html', data = "User not found!")
 		try:
 			cur.execute("SELECT Password FROM Users WHERE ContactEmail=?;", [email])
@@ -126,7 +125,6 @@ def loginpage():
 				return render_template("admin-main.html", msg= email)
 			else:
 				print(password, data[0][0])
-				# Do the flask message here.
 				return render_template('Login.html', data = "User name and password does not match!")
 		except:
 			print("Error in trying to find user")
@@ -195,7 +193,7 @@ def allowed_file(filename):
 	return '.' in filename and ext in ALLOWED_EXTENSIONS
 
 tempData = []
-# global tempData
+global tempData
 
 @app.route("/admin/addQuestion", methods = ['GET', 'POST'])
 def adminAddQuestion():
@@ -224,7 +222,7 @@ def adminAddQuestion():
 		i = -1
 		for q in questions:
 			i+= 1
-			# global tempData
+			global tempData
 			try:
 				if(tempData[i][0] != None):
 					cur.execute("UPDATE \""+umail+"\" SET Question = \""+q+"\" WHERE Question = \""+tempData[i][0]+"\"")
@@ -233,7 +231,6 @@ def adminAddQuestion():
 			conn.commit()
 		if(i + 1 < len(tempData)+1):
 			for b in range(i+1,len(tempData)+1):
-				# cur.execute("UPDATE \""+umail+"\" SET Question = \"\" WHERE Question = \""+tempData[i+1][0]+"\"")
 				cur.execute("DELETE FROM \""+umail+"\" WHERE Question = \""+tempData[i+1][0]+"\"")
 		conn.commit()
 		conn.close()
@@ -248,6 +245,7 @@ def adminAnswers():
 		cur.execute("SELECT * FROM \""+umail+"\"")
 		mes = cur.fetchall()
 		conn.close()
+		print(mes)
 		return render_template("admin-form-add-answer.html", msg=mes)
 	if request.method == "POST":
 		answers= []
@@ -266,15 +264,13 @@ def adminAnswers():
 						filename = secure_filename(file.filename)
 						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
 					file.save(filePath)
+					filePath = filePath.split("TheSearchBase\\")[len(filePath.split("TheSearchBase\\")) - 1]
 					print(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+filePath)
 					answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+filePath)
+					print(answers)
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
 		umail = request.cookies.get("UserEmail")
-		# cur.execute("SELECT Question FROM \""+umail+"\"")
-		# questions = cur.fetchall()
-		# use UPDATE sqlite function
-		# cur.execute("DELETE FROM \'" + umail + "\'")
 		c=0
 		print(selQuestion," : ", answers)
 		for a in answers:

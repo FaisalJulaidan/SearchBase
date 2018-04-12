@@ -245,13 +245,20 @@ def adminAnswers():
 		conn.close()
 		return render_template("admin-form-add-answer.html", msg=mes)
 	if request.method == "POST":
+		conn = sqlite3.connect(QUESTIONDATABASE)
+		cur = conn.cursor()
 		answers= []
 		selQuestion = request.form.get("question")
+		umail = request.cookies.get("UserEmail")
 		for i in range(1, 13):
 			print("pname" + str(i))
 			if(request.form.get("pname" + str(i)) != None):
 				if (request.files['file'+str(i)].filename == ""):
 					print('no file given')
+					cur.execute("SELECT Answer"+str(i)+" FROM \""+umail+"\" WHERE Question=\""+selQuestion+"\"")
+					data = cur.fetchall()
+					link = data[0][0].split(";")[2]
+					answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+link)
 				else:
 					file = request.files['file'+str(i)]
 					if file.filename == '':
@@ -264,9 +271,6 @@ def adminAnswers():
 					tempString = filePath.split("\\")
 					filePath = tempString[0] + "/" + tempString[1]
 					answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";../"+filePath)
-		conn = sqlite3.connect(QUESTIONDATABASE)
-		cur = conn.cursor()
-		umail = request.cookies.get("UserEmail")
 		c=0
 		for a in answers:
 			c+=1

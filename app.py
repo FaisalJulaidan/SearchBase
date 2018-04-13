@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import stripe
 from json import dumps
 from flask_mail import Mail, Message
 from werkzeug import secure_filename
@@ -15,6 +16,12 @@ PRODUCTDATABASE = "products.db"
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 PRODUCT_IMAGES = os.path.join(APP_ROOT,'static/file_uploads/product_images')
 
+# stripe_keys = {
+#   'secret_key': os.environ['SECRET_KEY'],
+#   'publishable_key': os.environ['PUBLISHABLE_KEY']
+# }
+
+# stripe.api_key = stripe_keys['secret_key']
 
 app = Flask(__name__, static_folder='static')
 mail = Mail(app)
@@ -357,6 +364,30 @@ def adminDisplayAnswers():
 def adminPricing():
     if request.method == "GET":
         return render_template("admin-pricing-tables.html")
+
+@app.route("/admin/charge", methods = ['GET', 'POST'])
+def chargeUser():
+
+	# amount in cents
+	amount = 500;
+
+
+	# Customer details
+	customer = stripe.Customer.create(
+		email='customer@email.com',
+		source=request.form['stripeToken']
+	)
+
+	#
+	charge = stripe.Charge.create(
+        customer=customer.id,
+        amount=amount,
+        currency='gbp',
+        description='Flask Charge'
+    )
+
+	return render_template('charge.html', amount=amount)
+
 
 @app.route("/admin/profile", methods = ['GET'])
 def adminProfile():

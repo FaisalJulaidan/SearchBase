@@ -235,7 +235,23 @@
                                 </div>
                               </div>
                               <div class="pricing_footer">
-                                <a href="javascript:void(0);" class="btn btn-success btn-block" role="button">Upgrade <span> </span></a>
+
+                                        <!-- Stripe checkout start -->
+
+                                        <form action="{{ url_for('charge')}}" method="POST">
+                                        <script
+                                          src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                                          data-key="{{ pub-key }}"
+                                          data-amount="1000"
+                                          data-name="TheSearchbase"
+                                          data-description="Widget"
+                                          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                          data-locale="auto"
+                                          data-currency="gbp">
+                                        </script>
+                                      </form>
+
+                                      <!-- Stripe checkout end -->
                               </div>
                             </div>
                           </div>
@@ -265,7 +281,23 @@
                                 </div>
                               </div>
                               <div class="pricing_footer">
-                                <a href="javascript:void(0);" class="btn btn-success btn-block" role="button">Upgrade <span> </span></a>
+
+                                        <!-- Stripe checkout start -->
+
+                                        <form action="{{ url_for('charge')}}" method="POST">
+                                        <script
+                                          src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                                          data-key="{{ pub-key }}"
+                                          data-amount="1000"
+                                          data-name="TheSearchbase"
+                                          data-description="Widget"
+                                          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                          data-locale="auto"
+                                          data-currency="gbp">
+                                        </script>
+                                      </form>
+
+                                      <!-- Stripe checkout end -->
                               </div>
                             </div>
                           </div>
@@ -295,7 +327,23 @@
                                 </div>
                               </div>
                               <div class="pricing_footer">
-                                <a href="javascript:void(0);" class="btn btn-success btn-block" role="button">Upgrade <span> </span></a>
+
+                                        <!-- Stripe checkout start -->
+
+                                        <form action="{{ url_for('charge')}}" method="POST">
+                                        <script
+                                          src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                                          data-key="{{ pub-key }}"
+                                          data-amount="1000"
+                                          data-name="TheSearchbase"
+                                          data-description="Widget"
+                                          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                          data-locale="auto"
+                                          data-currency="gbp">
+                                        </script>
+                                      </form>
+
+                                      <!-- Stripe checkout end -->
                               </div>
                             </div>
                           </div>
@@ -310,6 +358,8 @@
           </div>
         </div>
         <!-- /page content -->
+
+
 
         <!-- footer content -->
         <footer>

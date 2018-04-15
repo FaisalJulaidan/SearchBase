@@ -16,6 +16,11 @@ PRODUCTDATABASE = "products.db"
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 PRODUCT_IMAGES = os.path.join(APP_ROOT,'static/file_uploads/product_images')
 
+pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
+secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
+
+stripe.api_key = secret_key
+
 # stripe_keys = {
 #   'secret_key': os.environ['SECRET_KEY'],
 #   'publishable_key': os.environ['PUBLISHABLE_KEY']
@@ -66,11 +71,6 @@ cur = conn.cursor()
 cur.execute("SELECT CompanyName FROM Users;")
 cns = cur.fetchall()
 
-# for cn in cns:
-# 	@app.route("/" + cn[0], methods = ['GET'])
-# 	def loadTemplate():
-# 		if request.method == "GET":
-# 			return render_template("Template.html")
 
 @app.route("/test", methods = ['GET', 'POST'])
 def test():
@@ -360,33 +360,35 @@ def adminDisplayAnswers():
     if request.method == "GET":
         return render_template("admin-table-answers.html")
 
-@app.route("/admin/pricing", methods = ['GET'])
+@app.route("/admin/pricing")
 def adminPricing():
-    if request.method == "GET":
-        return render_template("admin-pricing-tables.html")
+	return render_template("admin-pricing-tables.html", pub_key=pub_key)
 
-@app.route("/admin/charge", methods = ['GET', 'POST'])
+@app.route('/admin/thanks')
+def thanks():
+    return render_template('thanks.html')
+
+
+
+@app.route("/admin/charge", methods = ['POST'])
 def chargeUser():
+	print(request.form)
 
-	# amount in cents
-	amount = 500;
-
-
-	# Customer details
-	customer = stripe.Customer.create(
-		email='customer@email.com',
+		# Customer details
+		customer = stripe.Customer.create(
+		email=request.form['stripeEmail'],
 		source=request.form['stripeToken']
-	)
+		)
 
-	#
-	charge = stripe.Charge.create(
-        customer=customer.id,
-        amount=amount,
-        currency='gbp',
-        description='Flask Charge'
-    )
+		# charge details
+		charge = stripe.Charge.create(
+		customer=customer.id,
+		amount=9900,
+		currency='gbp',
+		description='plan 1'
+		)
 
-	return render_template('charge.html', amount=amount)
+	return redirect(url_for('admin/thanks'))
 
 
 @app.route("/admin/profile", methods = ['GET'])

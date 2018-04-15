@@ -4,7 +4,7 @@ import stripe
 from json import dumps
 from flask_mail import Mail, Message
 from werkzeug import secure_filename
-from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory, send_file
+from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory, send_file, url_for
 from flask_scrypt import generate_random_salt, generate_password_hash, check_password_hash
 
 
@@ -366,29 +366,27 @@ def adminPricing():
 
 @app.route('/admin/thanks')
 def thanks():
-    return render_template('thanks.html')
+    return render_template('admin-thank-you.html')
 
-
-
-@app.route("/admin/charge", methods = ['POST'])
+@app.route("/pay", methods=['POST'])
 def chargeUser():
 	print(request.form)
 
-		# Customer details
-		customer = stripe.Customer.create(
-		email=request.form['stripeEmail'],
-		source=request.form['stripeToken']
-		)
+	# Customer details
+	customer = stripe.Customer.create(
+	email=request.form['stripeEmail'],
+	source=request.form['stripeToken']
+	)
 
-		# charge details
-		charge = stripe.Charge.create(
-		customer=customer.id,
-		amount=9900,
-		currency='gbp',
-		description='plan 1'
-		)
+	# charge details
+	charge = stripe.Charge.create(
+	customer=customer.id,
+	amount=9900,
+	currency='gbp',
+	description='plan 1'
+	)
 
-	return redirect(url_for('admin/thanks'))
+	return redirect(url_for('thanks'))
 
 
 @app.route("/admin/profile", methods = ['GET'])

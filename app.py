@@ -114,6 +114,7 @@ def loginpage():
 		cur.execute("SELECT ContactEmail FROM Users;")
 		data = cur.fetchall()
 		i = 0
+		# Checking to see if the email exists in the database
 		for c in data:
 			i += 1
 			if(email == c[0]):
@@ -122,15 +123,19 @@ def loginpage():
 				if(i == len(data)):
 					return render_template('login.html', data = "User not found!")
 		try:
+			# selecting the password from the database
 			cur.execute("SELECT Password FROM Users WHERE ContactEmail=?;", [email])
 			data = cur.fetchall()
 			datapass = data[0][0]
+			# loading the salt from the database
 			cur.execute("SELECT PSalt FROM Users WHERE ContactEmail=?;", [email])
 			data = cur.fetchall()
 			datasalt = data[0][0]
+			# checking if the password and the salt match
 			if(check_password_hash(password, datapass, datasalt)):
 				return render_template("admin-main.html", msg= email)
 			else:
+				# else denying the login
 				print(password, data[0][0])
 				return render_template('Login.html', data = "User name and password does not match!")
 		except:
@@ -145,6 +150,8 @@ def signpage():
 	if request.method == "GET":
 		return render_template("Signup.html")
 	if request.method == 'POST':
+
+		# collecting the text data from the front end
 		userTitle = request.form.get("title", default="Error")
 		userFirstname = request.form.get("firstname", default="Error")
 		userSecondname = request.form.get("surname", default="Error")
@@ -157,6 +164,7 @@ def signpage():
 		userPassword = request.form.get("pass", default="Error")
 		pass_hashed = generate_password_hash(userPassword, salt)
 
+		# injecting the text data into the database
 		conn = sqlite3.connect(USERDATABASE)
 		cur = conn.cursor()
 		cur.execute("SELECT ContactEmail FROM Users WHERE ContactEmail=?", [userEmail])
@@ -169,18 +177,19 @@ def signpage():
 		print("User details added!")
 		conn.close()
 
+		# sending registration confirmation email to the user.
 		msg = Message("Thank you for registering, " + userFirstname,
 		sender="thesearchbase@gmail.com",
 		recipients=[userEmail])
 		msg.body = "We appriciate you registering with TheSaerchBase. A whole new world of possibilities is ahead of you."
 		mail.send(msg)
 
+		# sending the regstration confirmation email to us
 		msg = Message("A new user has signed up!",
 		sender="thesearchbase@gmail.com",
 		recipients=["thesearchbase@gmail.com"])
 		msg.body = "Title: " + userTitle + "Name: " + userFirstname + userSecondname + "Email: " + userEmail + "Number: " + userContactNumber
 		mail.send(msg)
-
 
 		return render_template("Login.html")
 
@@ -206,8 +215,8 @@ def adminAddQuestion():
 	if request.method == "GET":
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
-		umail = request.cookies.get("UserEmail")
-		cur.execute("SELECT * FROM \""+umail+"\"")
+		user_mail = request.cookies.get("UserEmail")
+		cur.execute("SELECT * FROM \""+user_mail+"\"")
 		mes = cur.fetchall()
 		tempData = mes
 		conn.close()
@@ -219,8 +228,8 @@ def adminAddQuestion():
 				questions.append(request.form.get("question" + str(i)))
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
-		umail = request.cookies.get("UserEmail")
-		cur.execute("CREATE TABLE IF NOT EXISTS \'" + umail + "\' (\
+		user_mail = request.cookies.get("UserEmail")
+		cur.execute("CREATE TABLE IF NOT EXISTS \'" + user_mail + "\' (\
 		Question text NOT NULL, 'Answer1' text, 'Answer2' text, 'Answer3' text, 'Answer4' text,\
 		 'Answer5' text, 'Answer6' text, 'Answer7' text, 'Answer8' text, 'Answer9' text, 'Answer10' text,\
 		  'Answer11' text, 'Answer12' text)")
@@ -230,13 +239,13 @@ def adminAddQuestion():
 			i+= 1
 			try:
 				if(tempData[i][0] != None):
-					cur.execute("UPDATE \""+umail+"\" SET Question = \""+q+"\" WHERE Question = \""+tempData[i][0]+"\"")
+					cur.execute("UPDATE \""+user_mail+"\" SET Question = \""+q+"\" WHERE Question = \""+tempData[i][0]+"\"")
 			except:
-				cur.execute("INSERT INTO \'" + umail + "\'('Question') VALUES (?)", (q,))
+				cur.execute("INSERT INTO \'" + user_mail + "\'('Question') VALUES (?)", (q,))
 			conn.commit()
 		if(i + 1 < len(tempData)+1):
 			for b in range(i+1,len(tempData)+1):
-				cur.execute("DELETE FROM \""+umail+"\" WHERE Question = \""+tempData[i+1][0]+"\"")
+				cur.execute("DELETE FROM \""+user_mail+"\" WHERE Question = \""+tempData[i+1][0]+"\"")
 		conn.commit()
 		conn.close()
 		return render_template("index.html", msg="Questions have been saved")
@@ -246,8 +255,8 @@ def adminAnswers():
 	if request.method == "GET":
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
-		umail = request.cookies.get("UserEmail")
-		cur.execute("SELECT * FROM \""+umail+"\"")
+		user_mail = request.cookies.get("UserEmail")
+		cur.execute("SELECT * FROM \""+user_mail+"\"")
 		mes = cur.fetchall()
 		conn.close()
 		return render_template("admin-form-add-answer.html", msg=mes)
@@ -255,18 +264,22 @@ def adminAnswers():
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
 		answers= []
-		selQuestion = request.form.get("question")
-		umail = request.cookies.get("UserEmail")
+		selected_question = request.form.get("question")
+		user_mail = request.cookies.get("UserEmail")
 		for i in range(1, 13):
 			print("pname" + str(i))
 			if(request.form.get("pname" + str(i)) != None):
 				if (request.files['file'+str(i)].filename == ""):
 					print('no file given')
-					cur.execute("SELECT Answer"+str(i)+" FROM \""+umail+"\" WHERE Question=\""+selQuestion+"\"")
+					cur.execute("SELECT Answer"+str(i)+" FROM \""+user_mail+"\" WHERE Question=\""+selected_question+"\"")
 					data = cur.fetchall()
 					link = data[0][0].split(";")[2]
 					answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+link)
+
+
 				else:
+
+
 					file = request.files['file'+str(i)]
 					if file.filename == '':
 						print('No file name')
@@ -274,17 +287,20 @@ def adminAnswers():
 						filename = secure_filename(file.filename)
 						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
 					file.save(filePath)
+
+
 					filePath = filePath.split("TheSearchBase\\")[len(filePath.split("TheSearchBase\\")) - 1]
+					# temporay string
 					tempString = filePath.split("\\")
 					filePath = tempString[0] + "/" + tempString[1]
 					answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";../"+filePath)
 		c=0
 		for a in answers:
 			c+=1
-			cur.execute("UPDATE \""+umail+"\" SET Answer"+str(c)+" = \""+a+"\" WHERE Question = \""+selQuestion+"\"")
+			cur.execute("UPDATE \""+user_mail+"\" SET Answer"+str(c)+" = \""+a+"\" WHERE Question = \""+selected_question+"\"")
 			conn.commit()
 		for b in range(c+1, 13):
-			cur.execute("UPDATE \""+umail+"\" SET Answer"+str(b)+" = \"\" WHERE Question = \""+selQuestion+"\"")
+			cur.execute("UPDATE \""+user_mail+"\" SET Answer"+str(b)+" = \"\" WHERE Question = \""+selected_question+"\"")
 			conn.commit()
 		conn.close()
 		return redirect("/admin/Answers", code=302)
@@ -298,7 +314,7 @@ def adminAddProduct():
 		msg = ''
 		if request.method == 'POST':
 			i = 0;
-			pid = []
+			product_id = []
 			name = []
 			brand = []
 			model = []
@@ -306,12 +322,12 @@ def adminAddProduct():
 			keywords = []
 			discount = []
 			url = []
-			fp = []
+			file_path = []
 			while(True):
 				i+=1
 				if(request.form.get("product_ID"+str(i), default="Error") == "Error"):
 					break
-				pid.append(request.form.get("product_ID"+str(i), default="Error"))
+				product_id.append(request.form.get("product_ID"+str(i), default="Error"))
 				name.append(request.form.get("product_Name"+str(i), default="Error"))
 				brand.append(request.form.get("product_Brand"+str(i), default="Error"))
 				model.append(request.form.get("product_Model"+str(i), default="Error"))
@@ -329,22 +345,24 @@ def adminAddProduct():
 						filename = secure_filename(file.filename)
 						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
 					file.save(filePath)
-					fp.append(filePath)
+					file_path.append(filePath)
 			try:
 				conn = sqlite3.connect(PRODUCTDATABASE)
 				cur = conn.cursor()
-				umail = request.cookies.get("UserEmail")
-				cur.execute("CREATE TABLE IF NOT EXISTS \'" + umail + "\' (\
+				user_mail = request.cookies.get("UserEmail")
+				cur.execute("CREATE TABLE IF NOT EXISTS \'" + user_mail + "\' (\
 				ProductID text, ProductName text, ProductBrand text, ProductModel text, ProductPrice text\
 				ProductKeywords text, ProductDiscount text, ProductURL text, ProductImage text)")
-				cur.execute("DELETE FROM \'" + umail + "\'")
+				cur.execute("DELETE FROM \'" + user_mail + "\'")
 				for q in range(0, i-1):
-					cur.execute("INSERT INTO \'" + umail + "\'('ProductID', 'ProductName', 'ProductBrand', 'ProductModel', \
+
+					# injecting database with sql with product
+					cur.execute("INSERT INTO \'" + user_mail + "\'('ProductID', 'ProductName', 'ProductBrand', 'ProductModel', \
 					'ProductPrice', 'ProductKeywords', 'ProductDiscount', 'ProductURL', 'ProductImage') \
-					VALUES (?,?,?,?,?,?,?,?,?)", (pid[q],name[q],brand[q],model[q],price[q],keywords[q],discount[q],url[q],fp[q],))
+					VALUES (?,?,?,?,?,?,?,?,?)", (product_id[q],name[q],brand[q],model[q],price[q],keywords[q],discount[q],url[q],file_path[q],))
 					conn.commit()
 			except:
-				print("Error in edditing the database")
+				print("Error in editing the database")
 				conn.rollback()
 				conn.close()
 			return render_template("index.html", msg="Questions have been saved")
@@ -384,6 +402,13 @@ def chargeUser():
 	amount=9900,
 	currency='gbp',
 	description='plan 1'
+	)
+
+	subscription = stripe.Subscription.create(
+  	customer=customer.id,
+  	items=[{'plan1': 'plan_CBb6IXqvTLXp3f'}],
+  	billing_cycle_anchor=1525093822,
+	description='Basic Plan'
 	)
 
 	return redirect(url_for('thanks'))
@@ -549,6 +574,11 @@ def PrivacyPage():
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
+
 
 if __name__ == "__main__":
 	app.run(debug=True)

@@ -181,7 +181,7 @@
                               <div class="x_content">
                                 <p class="text-muted font-13 m-b-30">Select a question to add answers for</p>
                                 <div>
-                                   <select id="question-select" onchange="changeQuestion()">
+                                   <select id="question-select">
                                      {% for row in msg%}
                                      <option value="{{row[0]}}">{{row[0]}}</option>
                                      {%endfor%}
@@ -209,9 +209,9 @@
                                           <div id="pasteForm">
                                               <!-- Answer Forms get inserted here -->
                                           </div>
-                                      </form>
                                       <input hidden name="question" id="question_inform"></input><br>
                                       <button id="snoa" class="btn btn-success">Save answers</button>
+                                      </form>
                                     </div>
                                   </div>
                                 </div>
@@ -277,7 +277,7 @@
     <script src="../static/vendors/starrayRowr/dist/starrayRowr.js"></script>
 
     <script>
-    document.getElementById("snoa").addEventListener("click", ChangeNofQuestions);
+    document.getElementById("snoa").addEventListener("click", changeQuestion);
     var numberOfQuestions = 0;
     {%for item in msg%}
     numberOfQuestions++;
@@ -292,35 +292,48 @@
     {%endfor%}
     i++;
     {%endfor%}
+    var e = document.getElementById("question-select");
+    var questionPos = e.selectedIndex;
+    var squestion = e.options[e.selectedIndex].value;
+    $("#question_inform").val(squestion);
     var numberOfAnswers = 0;
-    for(var j = 0;j < data.length;j++){
-        if(data[j][0] == document.getElementById("question-select").options[document.getElementById("question-select").selectedIndex].text){
-            for(var b = 1; b < data[j].length+1;b++){
-                if(b==data[j].length){break;}
-                if(data[j][b] == ""){break;}
-                parts = data[j][b].split(";");
-                $("#pasteForm").append("\
-                    <div class=\"column\">\
-                      <p> Product name</p>\
-                      <input name=\"pname"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[0]+"\">\
-                      <p> Enter the keyword </p>\
-                      <input name=\"keywords"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[1]+"\">\
-                      <br />\
-                      <br />\
-                      <input name=\"file"+String(b)+"\" name=\"myFile\" value=\"Upload\" type=\"file\">\
-                      <button style=\"margin-top: 10px\" + href=\"admin/main\"> Delete Icon </button>\
-                      <br />\
-                      <img src=\""+String(parts[2])+"\" style=\"width: 75px; height: 75px; margin-top: 10px;\">\
-                    </div>");
-                    // "+parts[2].split("/")[parts[2].split("/").length-1]+"
-                numberOfAnswers++;
+    getDatabaseData();
+    function getDatabaseData(){
+        numberOfAnswers = 0;
+        console.log("Fetching other question data");
+        for(var j = 0;j < data.length;j++){
+            if(data[j][0] == document.getElementById("question-select").options[document.getElementById("question-select").selectedIndex].text){
+                for(var b = 1; b < data[j].length+1;b++){
+                    if(b==data[j].length){break;}
+                    if(data[j][b] == ""){break;}
+                    parts = data[j][b].split(";");
+                    $("#pasteForm").append("\
+                        <div class=\"column\">\
+                          <p> Product name</p>\
+                          <input name=\"pname"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[0]+"\">\
+                          <p> Enter the keyword </p>\
+                          <input name=\"keywords"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[1]+"\">\
+                          <br />\
+                          <input name=\"delPic"+String(b)+"\" id=\"delPic"+String(b)+"\" hidden type=\"text\">\
+                          <input name=\"file"+String(b)+"\" name=\"myFile\" value=\"Upload\" type=\"file\">\
+                          <button type=\"button\" id=\"button"+String(b)+"\" class=\"answerButtonDelPic\" style=\"margin-top: 10px\"> Delete Icon </button>\
+                          <br />\
+                          <img src=\""+String(parts[2])+"\" style=\"width: 75px; height: 75px; margin-top: 10px;\">\
+                        </div>");
+                    numberOfAnswers++;
+                }
+                $("#number-of-questions").val(numberOfAnswers);
             }
-            $("#number-of-questions").val(numberOfAnswers);
         }
-        changeQuestion();
+        var buttons = document.getElementsByClassName("answerButtonDelPic");
+        for(var i = 0; i <= buttons.length - 1; i++){
+            buttons[i].addEventListener("click", DeletePicture);
+        }
     }
     function ChangeNofQuestions(){
         var nv = document.getElementById("number-of-questions").value;
+        if(nv > 12){ nv = 12; $("#number-of-questions").val(12);}
+        if(nv < 0){ nv = 0; $("#number-of-questions").val(0);}
         if(nv > numberOfAnswers){
             for(var b = numberOfAnswers; b < nv;b++){
                 $("#pasteForm").append("\
@@ -331,17 +344,25 @@
                       <p> Enter the keyword </p>\
                       <input name=\"keywords"+String(b+1)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
                       <br />\
-                      <br />\
+                      <input name=\"delPic"+String(b+1)+"\" id=\"delPic"+String(b+1)+"\" hidden type=\"text\">\
                       <input name=\"file"+String(b+1)+"\" name=\"myFile\" value=\"Upload\" type=\"file\">\
+                      <button type=\"button\" id=\"button"+String(b)+"\" class=\"answerButtonDelPic\" style=\"margin-top: 10px\"> Delete Icon </button>\
                     </div>")
                 numberOfAnswers++;
             }
         } else if(nv < numberOfAnswers) {
             for(b = numberOfAnswers; b > nv; b--){
               $(".column")[$(".column").length - 1].remove();
+              numberOfAnswers--;
             }
         }
-        changeQuestion();
+        var buttons = document.getElementsByClassName("answerButtonDelPic");
+        for(var i = 0; i <= buttons.length - 1; i++){
+            buttons[i].addEventListener("click", DeletePicture);
+        }
+    }
+    function DeletePicture(){
+        document.getElementById("delPic" + this.id.split("")[this.id.split("").length-1]).value = "yes";
     }
     function createArray(rows) {
         var arrayRow = [];
@@ -350,10 +371,19 @@
       }
       return arrayRow;
     }
+    var lastQuestion = document.getElementById("question-select").value;
     function changeQuestion(){
         var e = document.getElementById("question-select");
+        var questionPos = e.selectedIndex;
         var squestion = e.options[e.selectedIndex].value;
-        $("#question_inform").val(squestion);
+        if(lastQuestion != squestion){
+            console.log(lastQuestion + " --- " + squestion);
+            $("#question_inform").val(squestion);
+            $("#pasteForm").empty();
+            lastQuestion = squestion;
+            getDatabaseData();
+        }
+        ChangeNofQuestions();
     }
     // for 3+ D arrayRoways
     // function createArray(length) {

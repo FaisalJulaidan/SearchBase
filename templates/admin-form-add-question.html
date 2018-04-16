@@ -327,7 +327,6 @@
     document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
     document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
     document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
-    // TODO QTemplate-SubmitB
 
     // called on NOQ Reset Click
     function ClearNOQ(){
@@ -387,7 +386,6 @@
               if(i == 7){ number = "Eight" }
               if(i == 8){ number = "Ninth" }
               if(i == 9){ number = "Tenth" }
-              console.log(i + " JEREE");
               $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + qTemplate3);
               // add preset question to fill
             }

@@ -271,15 +271,15 @@ def adminAnswers():
 			if(request.form.get("pname" + str(i)) != None):
 				if (request.files['file'+str(i)].filename == ""):
 					print('no file given')
-					cur.execute("SELECT Answer"+str(i)+" FROM \""+user_mail+"\" WHERE Question=\""+selected_question+"\"")
-					data = cur.fetchall()
-					link = data[0][0].split(";")[2]
-					answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+link)
-
-
+					if(request.form.get("delPic" + str(i)) != "yes"):
+						cur.execute("SELECT Answer"+str(i)+" FROM \""+user_mail+"\" WHERE Question=\""+selected_question+"\"")
+						data = cur.fetchall()
+						print(data, user_mail, selected_question)
+						link = data[0][0].split(";")[2]
+						answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+link)
+					else:
+						answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";../static/img/core-img/android-icon-72x72.png")
 				else:
-
-
 					file = request.files['file'+str(i)]
 					if file.filename == '':
 						print('No file name')
@@ -287,8 +287,6 @@ def adminAnswers():
 						filename = secure_filename(file.filename)
 						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
 					file.save(filePath)
-
-
 					filePath = filePath.split("TheSearchBase\\")[len(filePath.split("TheSearchBase\\")) - 1]
 					# temporay string
 					tempString = filePath.split("\\")

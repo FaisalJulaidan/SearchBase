@@ -326,7 +326,36 @@
     <script src="../static/vendors/starrr/dist/starrr.js"></script>
 
     <script>
+    var numberOfProducts = 0;
+    {%for item in data%}
+    numberOfProducts++;
+    {%endfor%}
+    var data = createArray(numberOfProducts);
     var i = 0;
+    {%for item in data%}
+    {%for product in item%}
+    {%if product != None%}
+    data[i].push("{{product}}");
+    {%endif%}
+    {%endfor%}
+    i++;
+    {%endfor%}
+    i=0;
+    for(var c = 0; c < data.length; c++){
+        i++;
+        $("#tbody").append("<tr id=\"tr"+String(i)+"\">\
+          <td><input id=\"cb"+String(i)+"\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete"+String(i)+"\"></td>\
+          <td><input value=\""+data[c][0]+"\" style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID"+String(i)+"\"></td>\
+          <td><input value=\""+data[c][1]+"\" style=\"width: 90px;\" type=\"text\" name=\"product_Name"+String(i)+"\"></td>\
+          <td><input value=\""+data[c][2]+"\" style=\"width: 90px;\" type=\"text\" name=\"product_Brand"+String(i)+"\"></td>\
+          <td><input value=\""+data[c][3]+"\" style=\"width: 90px;\" type=\"text\" name=\"product_Model"+String(i)+"\"></td>\
+          <td><input value=\""+data[c][4]+"\" style=\"width: 60px;\" type=\"text\" name=\"product_Price"+String(i)+"\"></td>\
+          <td><input value=\""+data[c][5]+"\" style=\"width: 250px;\" type=\"text\" name=\"product_Keywords"+String(i)+"\"></td>\
+          <td><input value=\""+data[c][6]+"\" style=\"width: 60px;\" type=\"text\" name=\"product_Discount"+String(i)+"\"></td>\
+          <td><input value=\""+data[c][7]+"\" style=\"width: 200px;\" type=\"text\" name=\"product_URL"+String(i)+"\"></td>\
+          <td><input style=\"width: 250px;\" type=\"file\" name=\"product_image"+String(i)+"\" value=\"Upload\"><td>\
+        </tr>");
+    }
     function AddRow(){
         i++;
         $("#tbody").append("<tr id=\"tr"+String(i)+"\">\
@@ -371,6 +400,13 @@
     }
     document.getElementById("addRow").addEventListener("click", AddRow);
     document.getElementById("removeRow").addEventListener("click", RemoveRow);
+    function createArray(rows) {
+        var arrayRow = [];
+      for (var i=0;i<rows;i++) {
+         arrayRow[i] = [];
+      }
+      return arrayRow;
+    }
     </script>
 
 

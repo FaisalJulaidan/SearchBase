@@ -306,7 +306,13 @@ def adminAnswers():
 @app.route("/admin/addProduct", methods = ['GET', 'POST'])
 def adminAddProduct():
 	if request.method == "GET":
-		return render_template("admin-form-add-product.html")
+		conn = sqlite3.connect(PRODUCTDATABASE)
+		cur = conn.cursor()
+		user_mail = request.cookies.get("UserEmail")
+		cur.execute("SELECT * FROM \""+user_mail+"\"")
+		mes = cur.fetchall()
+		conn.close()
+		return render_template("admin-form-add-product.html", data=mes)
 	if request.method == 'POST':
 		filePath = 'no file upload so far'
 		msg = ''
@@ -343,6 +349,7 @@ def adminAddProduct():
 						filename = secure_filename(file.filename)
 						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
 					file.save(filePath)
+					filePath = filePath.split("TheSearchBase\\")[len(filePath.split("TheSearchBase\\")) - 1]
 					file_path.append(filePath)
 			try:
 				conn = sqlite3.connect(PRODUCTDATABASE)

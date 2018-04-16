@@ -180,6 +180,7 @@
                             <div class="x_panel">
                               <div class="x_content">
                                 <p class="text-muted font-13 m-b-30">Select a question to add answers for</p>
+                                <p class="text-muted font-13 m-b-30"><strong>Note: If you change the question you wish to target, make sure to press submit.</strong></p>
                                 <div>
                                    <select id="question-select">
                                      {% for row in msg%}
@@ -209,11 +210,11 @@
                                           <div id="pasteForm">
                                               <!-- Answer Forms get inserted here -->
                                           </div>
-                                      <input hidden name="question" id="question_inform"></input><br>
-                                      <button id="snoa" class="btn btn-success">Save answers</button>
                                       </form>
                                     </div>
                                   </div>
+                                  <input hidden name="question" id="question_inform"></input>
+                                  <button id="snoa" class="btn btn-success">Save answers</button>
                                 </div>
                                </div>
                               </div>

@@ -391,32 +391,10 @@ def adminPricing():
 def thanks():
     return render_template('admin-thank-you.html')
 
-@app.route("/pay", methods=['POST'])
+@app.route("/admin/pay", methods=['GET','POST'])
 def chargeUser():
-	print(request.form)
-
-	# Customer details
-	customer = stripe.Customer.create(
-	email=request.form['stripeEmail'],
-	source=request.form['stripeToken']
-	)
-
-	# charge details
-	charge = stripe.Charge.create(
-	customer=customer.id,
-	amount=9900,
-	currency='gbp',
-	description='plan 1'
-	)
-
-	subscription = stripe.Subscription.create(
-  	customer=customer.id,
-  	items=[{'plan1': 'plan_CBb6IXqvTLXp3f'}],
-  	billing_cycle_anchor=1525093822,
-	description='Basic Plan'
-	)
-
-	return redirect(url_for('thanks'))
+	if request.method == 'GET':
+		return render_template("admin-pay.html")
 
 
 @app.route("/admin/profile", methods = ['GET'])

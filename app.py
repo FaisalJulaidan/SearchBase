@@ -459,10 +459,10 @@ def sendEmail():
 		mailUserEmail = request.form.get("sendingEmail", default="Error")
 		mailUserMessage = request.form.get("sendMessage", default="Error")
 
-		msg = Message(mailFirstname,
+		msg = Message(mailFirstname + " from " + mailUserEmail + " has sent you a message.",
 		sender=mailUserEmail,
 		recipients=["thesearchbase@gmail.com"])
-		msg.body = mailUserMessage
+		msg.body = mailFirstname + " said: " + mailUserMessage + " their email is: " + mailUserEmail 
 		mail.send(msg)
 		return render_template("index.html")
 

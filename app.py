@@ -69,14 +69,20 @@ def indexpage():
 
 conn = sqlite3.connect(USERDATABASE)
 cur = conn.cursor()
-cur.execute("SELECT CompanyName FROM Users;")
+cur.execute("SELECT * FROM Users;")
 cns = cur.fetchall()
+@app.route("/<route>")
+def getTemplate(route):
+	for record in cns:
+		if route == record[4]:
+			conn = sqlite3.connect(QUESTIONDATABASE)
+			cur = conn.cursor()
+			user_mail = request.cookies.get("UserEmail")
+			cur.execute("SELECT * FROM \""+record[7]+"\"")
+			data = cur.fetchall()
+			conn.close()
+			return render_template("dynamic-template.html", data=data)
 
-
-@app.route("/test", methods = ['GET', 'POST'])
-def test():
-	if request.method == "GET":
-		return render_template("admin-addQandA.html")
 
 @app.route("/demo", methods = ['GET'])
 def aboutpage():

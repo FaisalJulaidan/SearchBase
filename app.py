@@ -287,11 +287,18 @@ def adminAnswers():
 						filename = secure_filename(file.filename)
 						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
 					file.save(filePath)
-					filePath = filePath.split("TheSearchBase\\")[len(filePath.split("TheSearchBase\\")) - 1]
+					filePath = filePath.split("TheSearchBase")[len(filePath.split("TheSearchBase")) - 1]
 					# temporay string
-					tempString = filePath.split("\\")
-					filePath = tempString[0] + "/" + tempString[1]
-					answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";../"+filePath)
+					tempList = list(filePath)
+					tempString = ""
+					for char in tempList:
+						if(char == "\\"):
+							char = "/"
+						tempString += char
+					filePath = tempString
+					# tempString = filePath.split("\\")
+					# filePath = tempString[0] + "/" + tempString[1]
+					answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";.."+filePath)
 		c=0
 		for a in answers:
 			c+=1

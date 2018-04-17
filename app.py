@@ -48,6 +48,7 @@ mail = Mail(app)
 #code to ensure user is loged in
 @app.before_request
 def before_request():
+	print(request.cookies.get("UserEmail"))
 	theurl = str(request.url_rule)
 	if ("admin" not in theurl):
 		print("Ignore before request for: ", theurl)
@@ -356,7 +357,15 @@ def adminAddProduct():
 						filename = secure_filename(file.filename)
 						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
 					file.save(filePath)
-					filePath = filePath.split("TheSearchBase\\")[len(filePath.split("TheSearchBase\\")) - 1]
+					filePath = filePath.split("TheSearchBase")[len(filePath.split("TheSearchBase")) - 1]
+					tempList = list(filePath)
+					tempString = ""
+					for char in tempList:
+						if(char == "\\"):
+							char = "/"
+						tempString += char
+					filePath = tempString
+					filePath = ".." + filePath
 					file_path.append(filePath)
 			try:
 				conn = sqlite3.connect(PRODUCTDATABASE)

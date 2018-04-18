@@ -85,7 +85,7 @@ def getTemplate(route):
 
 
 @app.route("/demo", methods = ['GET'])
-def aboutpage():
+def demopage():
     if request.method == "GET":
         return render_template("demo.html")
 

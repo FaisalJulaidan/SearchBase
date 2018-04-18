@@ -10,7 +10,7 @@
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Title -->
-    <title>Demo</title>
+    <title>Technology</title>
 
     <!-- Chrome, Firefox OS and Opera -->
     <meta name="theme-color" content="#884BDF">
@@ -154,38 +154,37 @@
              <h2 style="text-align:center;">Select which industry maybe most relevant to you</h2>
               <p style="text-align:center;">Please select one option.</p>
               <div class="row">
-
-                <a href="/demo/education">
+                <a href="/">
                 <div class="column">
                   <p class="image-box">Education</p>
                   <img class="icon-box" src="../static/img/icon-images/demo_images/books.png">
                 </div>
               </a>
-              <a href="/demo/pharmaceutical">
+              <a href="">
                 <div class="column">
                   <p class="image-box">Pharmaceutical</p>
                   <img class="icon-box" src="../static/img/icon-images/demo_images/pills.png">
                 </div>
               </a>
-              <a href="/demo/construction">
+              <a href="">
                 <div class="column">
                   <p class="image-box">Construction</p>
                   <img class="icon-box" src="../static/img/icon-images/demo_images/laborers.png">
                 </div>
               </a>
-              <a href="/demo/technology">
+              <a href="">
                 <div class="column">
                   <p class="image-box">Technology</p>
                   <img class="icon-box" src="../static/img/icon-images/demo_images/laptop.png">
                 </div>
               </a>
-              <a href="/demo/fashion">
+              <a href="">
                 <div class="column">
                   <p class="image-box">Fashion</p>
                   <img class="icon-box" src="../static/img/icon-images/demo_images/dress.png">
                 </div>
               </a>
-              <a href="/demo/industrial">
+              <a href="">
                 <div class="column">
                   <p class="image-box">Industrial</p>
                   <img class="icon-box" src="../static/img/icon-images/demo_images/factory.png">
@@ -196,19 +195,188 @@
         </div>
 
 
+				 <div id ="q1" class="">
+           <div class="box-holder">
+              <h2 style="text-align:center;">What will you use your computer for?</h2>
+               <p style="text-align:center;">Please select one option.</p>
+               <div class="row">
+                 <div class="column" onclick="SetComputerUse('Business')">
+                   <p class="image-box">Business</p>
+                   <img class="icon-box" src="../static/img/icon-images/laptop.png">
+                 </div>
+                 <div class="column" onclick="SetComputerUse('Everyday')">
+                   <p class="image-box">Everyday Use</p>
+                   <img class="icon-box" src="../static/img/icon-images/imac.png">
+                 </div>
+                 <div class="column" onclick="SetComputerUse('VideoEditing')">
+                   <p class="image-box">Graphic Design</p>
+                   <img class="icon-box" src="../static/img/icon-images/editor.png">
+                 </div>
+                 <div class="column" onclick="SetComputerUse('Gaming')">
+                   <p class="image-box">Gaming</p>
+                   <img class="icon-box" src="../static/img/icon-images/computer.png">
+                 </div>
+                 <div class="column" onclick="SetComputerUse('Programming')">
+                   <p class="image-box">Programming</p>
+                   <img class="icon-box" src="../static/img/icon-images/computing.png">
+                 </div>
+                 <div class="column" onclick="SetComputerUse('Study')">
+                   <p class="image-box">Studying</p>
+                   <img class="icon-box" src="../static/img/icon-images/ebook.png">
+                 </div>
+                 <div class="column" onclick="SetComputerUse('Family')">
+                   <p class="image-box">Family Computer</p>
+                   <img class="icon-box" src="../static/img/icon-images/family.png">
+                 </div>
+                 <div class="column" onclick="SetComputerUse('')">
+                   <p class="image-box">I don't know</p>
+                   <img class="icon-box" src="../static/img/icon-images/question.png">
+                 </div>
+               </div>
+            </div>
+         </div>
+
+				 <!-- Second set of questions -->
+				<div id ="q2" class="">
+          <div class="box-holder">
+             <h2 style="text-align:center;">What is your budget?</h2>
+              <p style="text-align:center;">Please select one option.</p>
+             <div class="row">
+               <div class="column" onclick="SetComputerBudget(0, 500)">
+                 <p class="text-box">Less than £500</p>
+               </div>
+               <div class="column" onclick="SetComputerBudget(500, 1000)">
+                 <p class="text-box">Between £500 and £1000</p>
+               </div>
+               <div class="column" onclick="SetComputerBudget(1000, 1500)">
+                 <p class="text-box">Between £1000 and £1500</p>
+               </div>
+               <div class="column" onclick="SetComputerBudget(1500, 20000)">
+                 <p class="text-box">More than £1500</p>
+               </div>
+             </div>
+           </div>
+				</div>
+
+					<!-- Third set of questions -->
+					<div id ="q3" class="">
+            <div class="box-holder">
+               <h2 style="text-align:center;">What do you prefer?</h2>
+                <p style="text-align:center;">Please select one option.</p>
+               <div class="row">
+                 <div class="column" onclick="SetComputerPortable('Laptop')">
+                   <p class="text-box">Laptop</p>
+                 </div>
+                 <div class="column" onclick="SetComputerPortable('Desktop')">
+                   <p class="text-box">Desktop</p>
+                 </div>
+                 <div class="column" onclick="SetComputerPortable(null)">
+                   <p class="text-box">I don't mind</p>
+                 </div>
+               </div>
+             </div>
+				  </div>
+
+					 <!-- Fourth set of questions -->
+					 <div id ="q4" class="">
+             <div class="box-holder">
+                <h2 style="text-align:center;">From the options, what is most important to you?</h2>
+                 <p style="text-align:center;">Please select one option.</p>
+                <div class="row">
+
+                  <div class="column" onclick="SetComputerKeyFeature('BatteryLife')">
+                    <p class="image-box">Good battery life</p>
+                    <img class="icon-box" src="../static/img/icon-images/battery.png">
+                  </div>
+                  <div class="column" onclick="SetComputerKeyFeature('Performance')">
+                    <p class="image-box">Performance</p>
+                    <img class="icon-box" src="../static/img/icon-images/startup.png">
+                  </div>
+                  <div class="column" onclick="SetComputerKeyFeature('Display')">
+                    <p class="image-box">Display Quality</p>
+                    <img class="icon-box" src="../static/img/icon-images/analytics.png">
+                  </div>
+                  <div class="column" onclick="SetComputerKeyFeature('ValueForMoney')">
+                    <p class="image-box">Value for money</p>
+                    <img class="icon-box" src="../static/img/icon-images/piggy-bank.png">
+                  </div>
+                  <div class="column" onclick="SetComputerKeyFeature('UserFriendly')">
+                    <p class="image-box">User Friendly</p>
+                    <img class="icon-box" src="../static/img/icon-images/add-user.png">
+                  </div>
+                  <div class="column" onclick="SetComputerKeyFeature('Durability')">
+                    <p class="image-box">Durability</p>
+                    <img class="icon-box" src="../static/img/icon-images/spanner.png">
+                  </div>
+                  <div class="column" onclick="SetComputerKeyFeature('BuildQuality')">
+                    <p class="image-box">High Build Quality</p>
+                    <img class="icon-box" src="../static/img/icon-images/gear.png">
+                  </div>
+                  <div class="column" onclick="SetComputerKeyFeature('Multipurpose')">
+                    <p class="image-box">Multipurpose</p>
+                    <img class="icon-box" src="../static/img/icon-images/swiss-army-knife.png">
+                  </div>
+                  <div class="column" onclick="SetComputerKeyFeature('Futureproof')">
+                    <p class="image-box">Futureproof</p>
+                    <img class="icon-box" src="../static/img/icon-images/oculus-rift.png">
+                  </div>
+                  <div class="column" onclick="SetComputerKeyFeature('4k')">
+                    <p class="image-box">4K Display</p>
+                    <img class="icon-box" src="../static/img/icon-images/4k.png">
+                  </div>
+                  <div class="column" onclick="SetComputerKeyFeature('CustomerSupport')">
+                    <p class="image-box">Customer Support</p>
+                    <img class="icon-box" src="../static/img/icon-images/support.png">
+                  </div>
+                  <div class="column" onclick="SetComputerKeyFeature('Touchscreen')">
+                    <p class="image-box">Touchscreen</p>
+                    <img class="icon-box" src="../static/img/icon-images/touchscreen.png">
+                  </div>
+                </div>
+              </div>
+				    </div>
+				   </div>
+          </section>
+
+		<!-- Found devices. These will have to be dynamic and the deivces that we retrive from the database. -->
+			<div class="found-set1">
+        <div class="text-holder">
+				 <div id="a1" class="question_set1">
+				    <div class="found_pc_section">
+				 	   <h2 style="text-align:center" >These are the computers we found you</h2>
+				 		<div id="computerResultDiv">
+		 			 </div>
+		 			</div>
+          </div>
+					 <div class="research-butto">
+           <div class="text-holder">
+					 <a href="#q1">Search Again</a>
+           <br />
+           <br />
+           <br />
+           <br />
+           <br />
+				  </div>
+          </div>
+			   </div>
+			  </div>
+        <br />
+
+        <!-- End of found devices area -->
+
         <!-- ***** CTA Area Start ***** -->
         <section class="our-monthly-membership section_padding_50 clearfix">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <div class="membership-description">
-                            <h2>Intrested in signing up?</h2>
+                            <h2>Like what you found?</h2>
                             <p>Make an assistant for your own customers</p>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="get-started-button wow bounceInDown" data-wow-delay="0.5s">
-                            <a href="/signupform">Get Started Now</a>
+                            <a href="/signupform">Get Started</a>
                         </div>
                     </div>
                 </div>

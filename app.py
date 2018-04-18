@@ -89,8 +89,40 @@ def aboutpage():
     if request.method == "GET":
         return render_template("demo.html")
 
+@app.route("/demo/construction", methods = ['GET'])
+def demopageconstruction():
+    if request.method == "GET":
+        return render_template("demo-construction.html")
+
+@app.route("/demo/education", methods = ['GET'])
+def demopageeducation():
+    if request.method == "GET":
+        return render_template("demo-education.html")
+
+@app.route("/demo/fashion", methods = ['GET'])
+def demopagefashion():
+    if request.method == "GET":
+        return render_template("demo-fashion.html")
+
+@app.route("/demo/industrial", methods = ['GET'])
+def demopageIndustrial():
+    if request.method == "GET":
+        return render_template("demo-industrial.html")
+
+@app.route("/demo/pharmaceutical", methods = ['GET'])
+def demopagepharmaceutical():
+    if request.method == "GET":
+        return render_template("demo-pharmaceutical.html")
+
+@app.route("/demo/technology", methods = ['GET'])
+def demopagetechnology():
+    if request.method == "GET":
+        return render_template("demo-technology.html")
+
+
+
 @app.route("/about", methods = ['GET'])
-def demopage():
+def aboutpage():
     if request.method == "GET":
         return render_template("about.html")
 
@@ -462,7 +494,7 @@ def sendEmail():
 		msg = Message(mailFirstname + " from " + mailUserEmail + " has sent you a message.",
 		sender=mailUserEmail,
 		recipients=["thesearchbase@gmail.com"])
-		msg.body = mailFirstname + " said: " + mailUserMessage + " their email is: " + mailUserEmail 
+		msg.body = mailFirstname + " said: " + mailUserMessage + " their email is: " + mailUserEmail
 		mail.send(msg)
 		return render_template("index.html")
 

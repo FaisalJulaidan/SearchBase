@@ -106,6 +106,9 @@
 				    <div class="found_pc_section">
 				 	   <h2 style="text-align:center" >These are the results we found for you</h2>
 				 		<div id="ResultDiv">
+
+
+
 		 			 </div>
 		 			</div>
           </div>
@@ -243,9 +246,8 @@
         					delete resultdic[(temparray.length - 1).toString()];
         					for(var i = 0; i< temparray.length-1; i++){
         						console.log(resultdic[i]);
-                                cRD.append("<p>Yo Mehdi! I need a new template which to fit the products! Want to discuss it?</p>");
-        						// cRD.append("<div onclick='BuyProduct(resultdic["+i+"][18])' class='found_box1'><img src=\""+resultdic[i][19]+"\"><br><lable>"+resultdic[i][2]+" "+resultdic[i][3]+"</lable><br /><lable>"+"Battery life(Hrs): "+resultdic[i][4]+"</lable><br /><lable>"+"Screen size(Inch): "+resultdic[i][5]+"</lable><br /><lable>"+"Weight(Kg): "+resultdic[i][7]+"</lable><br /><lable>"
-        						// +"now £"+resultdic[i][6]+"</lable><br /> <button class=found_button style=vertical-align:middle><span>Buy </span></button><br /><lable>With</lable><br /> <img class=companyfoundlogo src=\""+resultdic[i][20]+"\"></div>");
+                                cRD.append("<p>Done it BOSS!</p>");
+        						cRD.append("<div onclick='BuyProduct(resultdic["+i+"][18])' class='found_box1'><img src=\""+resultdic[i][19]+"\"><br><lable>"+resultdic[i][2]+" "+resultdic[i][3]+"</lable><br>"+"<button class=found_button style=vertical-align:middle><span>View </span></button></div>");
         					}
         					// <div onclick='BuyProduct(resultdic["+i+"][14])' class='found_box1'><img src=\""+resultdic[i][15]+"\"><br><a>"+resultdic[i][2]+" "+resultdic[i][3]+"</a><br /><a>Screen size(Inch): "+resultdic[i][5]+"</a><br /><a>Battery life(Hrs):"+resultdic[i][4]+"</a><br /><a> Weight(Kg): "resultdic[i][7]+"</a><br /><a>"+resultdic[i][13]+"% off now £"
         					// +resultdic[i][6]+"</a><br /> <button class=found_button style=vertical-align:middle><span>Buy </span></button></div>");

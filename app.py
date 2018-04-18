@@ -459,6 +459,11 @@ def adminDisplayAnswers():
     if request.method == "GET":
         return render_template("admin-table-answers.html")
 
+@app.route("/admin/connect")
+def connectionCode():
+	return render_template("admin-connect.html")
+
+
 @app.route("/admin/pricing")
 def adminPricing():
 	return render_template("admin-pricing-tables.html", pub_key=pub_key)

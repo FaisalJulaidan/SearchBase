@@ -76,7 +76,7 @@
                       <li><a href="/admin/displayProducts">Products</a></li>
                     </ul>
                   </li>
-                  <li><a href="/admin/connect"><i class="fa fa-plug"></i> Connection<span class="fa"></span></a>
+                  <li><a href="/admin/connect"><i class="fa fa-database"></i> Connection<span class="fa fa-arrow-right"></span></a>
                   </li>
                 </ul>
               </div>
@@ -87,8 +87,6 @@
                     <ul class="nav child_menu">
                       <li><a href="/admin/profile">Profile</a></li>
                     </ul>
-                  </li>
-                  <li><a href="/admin/analytics"><i class="fa fa-bar-chart"></i> Analytics<span class="fa"></span></a>
                   </li>
                   <li><a><i class="fa fa-money"></i> Price Plan <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
@@ -117,13 +115,6 @@
                 </ul>
               </div>
             </div>
-
-
-
-
-
-
-
             <!-- /sidebar menu -->
           </div>
         </div>
@@ -162,32 +153,34 @@
         <!-- page content -->
         <div class="right_col" role="main">
           <!-- top tiles -->
-          <div class="row tile_count">
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-user"></i> Total clicks on your assistant</span>
-              <div class="count">0</div>
-            </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-clock-o"></i> Total Answers loaded</span>
-              <div class="count">0</div>
-            </div>
-          </div>
 
           <div class="row">
             <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel" style="height:600px;">
                 <div class="col-md-12">
-                  <div class="jumbotron text-xs-center">
-                    <h1 class="display-3">Welcome!</h1>
-                      <p class="lead"><strong>Use your side navigation</strong> to navigate the website.</p>
-                      <hr>
-                      <p>
-                        Need help getting setup? <a href="">Contact our team, we'll setup a personal session with you.</a>
-                      </p>
-                      <p class="lead">
-                        <a class="btn btn-primary btn-sm" href="/admin/addQuestion" role="button">Build my questions</a>
-                      </p>
+                  <h3> Connecting your assistant. </h3>
+                  <p> To Connect your assistant, you must paste the pre-made code into any part of your HTML scource code. </p>
+                  <xmp>
+                    <a href="#" onclick="document.getElementById('contents1').style.cssText = ''">link1</a>
+
+                    <div id="contents1" style="display:none;">
+                        <h2>Contents of link1</h2>
+                        <iframe src="http://www.thesearchbase.com/nameofyourcompany" width="500" height="400"></iframe>
                     </div>
+                  </xmp>
+                  <p> Once you have pasted this, into the html page that you wish to use your assistant on, you're live.</p>
+                  <br />
+                  <h4> CSS (Optional) </h4>
+                  <p> If you would like to have control the appearance of your assistant, you can also paste some extra code into your CSS and make changes</p>
+                  <xmp>
+                    CSS will then go here
+                  </xmp>
+                  <br />
+                  <h4> Javascript (Optional) </h4>
+                  <p> If you would like to optimal control over your assistant and make big changes, you you can download our <strong><a href="">Js</a></strong> file or paste it as a script in your website.</p>
+                  <xmp>
+                    Javascript will finally then go here
+                  </xmp>
                   </div>
                 </div>
               </div>

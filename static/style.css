@@ -36,7 +36,7 @@ h6 {
 
 .section_padding_100 {
     padding-top: 100px;
-    padding-bottom: 100px;
+    /* padding-bottom: 100px; */
 }
 
 .section_padding_100_50 {
@@ -448,7 +448,7 @@ p {
 }
 
 .wellcome-heading > h2 {
-    font-size: 100px;
+    font-size: 80px;
     color: #ffffff;
     font-weight: 700;
     position: relative;

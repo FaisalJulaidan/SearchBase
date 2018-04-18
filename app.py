@@ -71,17 +71,39 @@ conn = sqlite3.connect(USERDATABASE)
 cur = conn.cursor()
 cur.execute("SELECT * FROM Users;")
 cns = cur.fetchall()
-@app.route("/<route>")
+@app.route("/<route>", methods=['GET', 'POST'])
 def getTemplate(route):
-	for record in cns:
-		if route == record[4]:
-			conn = sqlite3.connect(QUESTIONDATABASE)
-			cur = conn.cursor()
-			user_mail = request.cookies.get("UserEmail")
-			cur.execute("SELECT * FROM \""+record[7]+"\"")
-			data = cur.fetchall()
-			conn.close()
-			return render_template("dynamic-template.html", data=data)
+	if request.method == "GET":
+		for record in cns:
+			if route == record[4]:
+				conn = sqlite3.connect(QUESTIONDATABASE)
+				cur = conn.cursor()
+				cur.execute("SELECT * FROM \""+record[7]+"\"")
+				data = cur.fetchall()
+				conn.close()
+				return render_template("dynamic-template.html", data=data, user=route)
+	if request.method == "POST":
+		for record in cns:
+			if route == record[4]:
+				conn = sqlite3.connect(PRODUCTDATABASE)
+				cur = conn.cursor()
+				cur.execute("SELECT * FROM \""+record[7]+"\"")
+				data = cur.fetchall()
+				conn.close()
+				keywords = []
+				for i in range(1, int(request.form["numberOfKeywords"])):
+					keywords.append(request.form["keyword" + str(i)])
+					print(keywords)
+				if not data:
+					return "We could not find anything that matched your seach criteria. Please try different filter options."
+				datastring = ""
+				for i in data:
+					for c in i:
+						datastring+=str(c) + "|||"
+					datastring = datastring[:-1]
+					datastring += "&&&"
+				print(datastring)
+				return jsonify(datastring)
 
 
 @app.route("/demo", methods = ['GET'])

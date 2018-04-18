@@ -164,7 +164,7 @@
 				 <div id="a1" class="question_set1">
 				    <div class="found_pc_section">
 				 	   <h2 style="text-align:center" >These are the results we found for you</h2>
-				 		<div id="computerResultDiv">
+				 		<div id="ResultDiv">
 		 			 </div>
 		 			</div>
           </div>
@@ -286,20 +286,20 @@
 		    });
 
 
-//             "<div id =\"q1\" class=\"\">\
-//                <div class=\"box-holder\">\
-//                   <h2 style=\"text-align:center;\">What will you use your computer for?</h2>\
-//                    <p style=\"text-align:center;\">Please select one option.</p>\
-//                    <div class=\"row\">\
+            // "<div id =\"q1\" class=\"\">\
+            //    <div class=\"box-holder\">\
+            //       <h2 style=\"text-align:center;\">What will you use your computer for?</h2>\
+            //        <p style=\"text-align:center;\">Please select one option.</p>\
+            //        <div class=\"row\">\
 // \
 //                      <div class=\"column\" onclick=\"SetComputerUse('Business')\">\
 //                        <p class=\"image-box\">Business</p>\
 //                        <img class=\"icon-box\" src=\"../static/img/icon-images/laptop.png\">\
 //                      </div>\
 // \
-//                    </div>\
-//                 </div>\
-//              </div>"
+             //       </div>\
+             //    </div>\
+             // </div>"
             var numberOfQuestions = 0;
             {%for item in data%}
             numberOfQuestions++;
@@ -316,72 +316,98 @@
             {%endfor%}
             i++;
             {%endfor%}
-            console.log(data);
-
+            var question = "";
+            var answers = "";
+            var questionNumber = 0;
+            getDatabaseData();
             function getDatabaseData(){
-                for(var q = 0; q < data.length-1; q++){
-                    var answers = "";
-                    for(var a = 1; a < q.length-1; a++){
+                for(var q = 0; q <= data.length-1; q++){
+                    question = "";
+                    answers = "";
+                    questionNumber += 1;
+                    for(var a = 1; a <= data[q].length-1; a++){
                         parts = data[q][a].split(";");
-                        answers += "<div class=\"column\">\
+                        answers += "<div onclick=\"getKeyWord(\'"+parts[1]+"\',\'q"+questionNumber.toString()+"\')\" class=\"column\">\
                                        <p class=\"image-box\">"+parts[0]+"</p>\
                                        <img class=\"icon-box\" src=\""+parts[2]+"\">\
                                      </div>\
                                      "
-                         // parts[1] is keyword to be added to the search criteria by function
                     }
+                    question = "<div id=q"+questionNumber.toString()+" class=\"questionDiv\">\
+                                   <div class=\"box-holder\">\
+                                      <h2 style=\"text-align:center;\">\""+data[q][0]+"\"</h2>\
+                                       <p style=\"text-align:center;\">Please select one option.</p>\
+                                       <div class=\"row\">\
+                                       "
+                    for(var a = 0; a <= answers.length-1; a++){
+                        question += answers[a];
+                    }
+                    question += "</div>\
+                             </div>\
+                          </div>"
+                    $("#questionsInsert").append(question);
                 }
             }
-
-	        // params = 'compuse='+cu+'&minbudget='+minb+'&maxbudget='+maxb+'&portable='+portable+'&battery='+battery+'&keyfeatures='+keyfeatures;
-	        // var xhttp = new XMLHttpRequest();
-	        // xhttp.open("POST", '/GetComputers', true);
-	        // xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	        // xhttp.onreadystatechange = function() {
-	        //   if (xhttp.readyState === 4) {
-	        //     if (xhttp.status === 200) {
-	        //       var data = xhttp.responseText;
-			// 					console.log(data);
-            //     // [17] is link; [18] is image
-			// 					cRD = $("#computerResultDiv");
-			// 					cRD.empty();
-			// 					if(data == "We could not find Computers that matched your seach. Please try different filter options."){
-			// 						cRD.append("<br><h3>"+data+"</h3>");
-			// 					} else {
-			// 						compdic = {};
-			// 						var temparray = data.split(",");
-			// 						for(var i = 0; i < temparray.length; i++){
-			// 							compdic[i] = temparray[i].split("|");
-			// 						}
-			// 						delete compdic[(temparray.length - 1).toString()];
-			// 						for(var i = 0; i< temparray.length-1; i++){
-			// 							console.log(compdic[i]);
-			// 							cRD.append("<div onclick='BuyComputer(compdic["+i+"][18])' class='found_box1'><img src=\""+compdic[i][19]+"\"><br><lable>"+compdic[i][2]+" "+compdic[i][3]+"</lable><br /><lable>"+"Battery life(Hrs): "+compdic[i][4]+"</lable><br /><lable>"+"Screen size(Inch): "+compdic[i][5]+"</lable><br /><lable>"+"Weight(Kg): "+compdic[i][7]+"</lable><br /><lable>"
-			// 							+"now £"+compdic[i][6]+"</lable><br /> <button class=found_button style=vertical-align:middle><span>Buy </span></button><br /><lable>With</lable><br /> <img class=companyfoundlogo src=\""+compdic[i][20]+"\"></div>");
-			// 						}
-			// 						// <div onclick='BuyComputer(compdic["+i+"][14])' class='found_box1'><img src=\""+compdic[i][15]+"\"><br><a>"+compdic[i][2]+" "+compdic[i][3]+"</a><br /><a>Screen size(Inch): "+compdic[i][5]+"</a><br /><a>Battery life(Hrs):"+compdic[i][4]+"</a><br /><a> Weight(Kg): "compdic[i][7]+"</a><br /><a>"+compdic[i][13]+"% off now £"
-			// 						// +compdic[i][6]+"</a><br /> <button class=found_button style=vertical-align:middle><span>Buy </span></button></div>");
-			// 					}
-			// 					// <div class="box1">
-			// 	 				// 	<a>Dell XPS 13</a><br />
-			// 					// 	<a>£1300</a><br />
-			// 	 				// </div>
-            //     // computerResultDiv
-	        //     } else {
-	        //       console.error(xhttp.statusText);
-	        //     }
-	        //   }
-	        // };
-	        // xhttp.send(params);
-	        // return false;
-			// 	}
-			// 	function scrollTo(id){
-			// 		id = "#" + id
-			// 		$('html, body').animate({
-			// 			scrollTop: ($(id).offset().top)
-			// 		}, 1000);
-			// 	}
-			// 	function BuyComputer(comp){
+            questionDivs = document.getElementsByClassName("questionDiv");
+            questionDivs[questionDivs.length-1].addEventListener("click", sendData);
+            var keywords = [];
+            function getKeyWord(word, id){
+                for(var i = 0; i <= keywords.length-1; i++){
+                    if(word == keywords[i]){
+                        keywords.splice(i, 1);
+                        return 0;
+                    }
+                }
+                keywords.push(word);
+                scrollTo(id)
+            }
+            function sendData(){
+                params = "numberOfKeywords=" + keywords.length.toString();
+                for(var i = 0; i <= keywords.length-1; i++){
+                    params+="&";
+                    params+='keyword'+(i+1).toString()+"="+keywords[i];
+                }
+                var xhttp = new XMLHttpRequest();
+    	        xhttp.open("POST", '/'+"{{user}}", true);
+    	        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    	        xhttp.onreadystatechange = function() {
+    	          if (xhttp.readyState === 4) {
+    	            if (xhttp.status === 200) {
+                        var data = xhttp.responseText;
+        				cRD = $("#ResultDiv");
+        				cRD.empty();
+        				if(data == "We could not find anything that matched your seach criteria. Please try different filter options."){
+        					cRD.append("<br><h3>"+data+"</h3>");
+        				} else {
+        					resultdic = {};
+        					var temparray = data.split("&&&");
+        					for(var i = 0; i < temparray.length; i++){
+        						resultdic[i] = temparray[i].split("|||");
+        					}
+        					delete resultdic[(temparray.length - 1).toString()];
+        					for(var i = 0; i< temparray.length-1; i++){
+        						console.log(resultdic[i]);
+                                cRD.append("<p>Yo Mehdi! I need a new template which to fit the products! Want to discuss it?</p>");
+        						// cRD.append("<div onclick='BuyProduct(resultdic["+i+"][18])' class='found_box1'><img src=\""+resultdic[i][19]+"\"><br><lable>"+resultdic[i][2]+" "+resultdic[i][3]+"</lable><br /><lable>"+"Battery life(Hrs): "+resultdic[i][4]+"</lable><br /><lable>"+"Screen size(Inch): "+resultdic[i][5]+"</lable><br /><lable>"+"Weight(Kg): "+resultdic[i][7]+"</lable><br /><lable>"
+        						// +"now £"+resultdic[i][6]+"</lable><br /> <button class=found_button style=vertical-align:middle><span>Buy </span></button><br /><lable>With</lable><br /> <img class=companyfoundlogo src=\""+resultdic[i][20]+"\"></div>");
+        					}
+        					// <div onclick='BuyProduct(resultdic["+i+"][14])' class='found_box1'><img src=\""+resultdic[i][15]+"\"><br><a>"+resultdic[i][2]+" "+resultdic[i][3]+"</a><br /><a>Screen size(Inch): "+resultdic[i][5]+"</a><br /><a>Battery life(Hrs):"+resultdic[i][4]+"</a><br /><a> Weight(Kg): "resultdic[i][7]+"</a><br /><a>"+resultdic[i][13]+"% off now £"
+        					// +resultdic[i][6]+"</a><br /> <button class=found_button style=vertical-align:middle><span>Buy </span></button></div>");
+        				}
+    	            } else {
+    	              console.error(xhttp.statusText);
+    	            }
+    	          }
+    	        };
+    	        xhttp.send(params);
+            }
+			function scrollTo(id){
+				id = "#" + id
+				$('html, body').animate({
+					scrollTop: ($(id).offset().top)
+				}, 1000);
+			}
+			// 	function BuyProduct(comp){
 			// 		window.open(comp.toString());
 			// 	}
             function createArray(rows) {

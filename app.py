@@ -91,16 +91,41 @@ def getTemplate(route):
 				data = cur.fetchall()
 				conn.close()
 				keywords = []
-				for i in range(1, int(request.form["numberOfKeywords"])):
+				for i in range(1, int(request.form["numberOfKeywords"])+1):
 					keywords.append(request.form["keyword" + str(i)])
-					print(keywords)
+				keywordsmatch = []
+				i = -1
+				for item in data:
+					keywordsmatch.append(0)
+					i += 1
+					datakwords = item[5].split(",")
+					for word in keywords:
+						for dw in datakwords:
+							if(word == dw):
+								keywordsmatch[i] += 1
+				exitatlength = 0
+				while(True):
+					for p in range(0, len(keywordsmatch)-1):
+						if(keywordsmatch[p] < keywordsmatch[p+1]):
+							keywordsmatch.insert(p,keywordsmatch.pop(p+1))
+							data.insert(p,data.pop(p+1))
+							exitatlength = 0
+							break
+					exitatlength += 1
+					if(exitatlength == 5):
+						break
+				for p in range(0, len(keywordsmatch)):
+					if(keywordsmatch[p] == 0):
+						data.pop(p)
+				while(len(data) > 9):
+					data.pop()
 				if not data:
 					return "We could not find anything that matched your seach criteria. Please try different filter options."
 				datastring = ""
 				for i in data:
 					for c in i:
 						datastring+=str(c) + "|||"
-					datastring = datastring[:-1]
+					datastring = datastring[:-3]
 					datastring += "&&&"
 				print(datastring)
 				return jsonify(datastring)
@@ -271,9 +296,10 @@ def allowed_file(filename):
 
 tempData = []
 
-@app.route("/admin/addQuestion", methods = ['GET', 'POST'])
+@app.route("/admin/Questions", methods = ['GET', 'POST'])
 def adminAddQuestion():
 	if request.method == "GET":
+		print(request.cookies.get("UserEmail"))
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
 		user_mail = request.cookies.get("UserEmail")
@@ -371,7 +397,7 @@ def adminAnswers():
 		conn.close()
 		return redirect("/admin/Answers", code=302)
 
-@app.route("/admin/addProduct", methods = ['GET', 'POST'])
+@app.route("/admin/Products", methods = ['GET', 'POST'])
 def adminAddProduct():
 	if request.method == "GET":
 		conn = sqlite3.connect(PRODUCTDATABASE)

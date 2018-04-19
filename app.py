@@ -103,16 +103,16 @@ def getTemplate(route):
 						for dw in datakwords:
 							if(word == dw):
 								keywordsmatch[i] += 1
-				exitatlength = 0
+				exitAtLength = 0
 				while(True):
 					for p in range(0, len(keywordsmatch)-1):
 						if(keywordsmatch[p] < keywordsmatch[p+1]):
 							keywordsmatch.insert(p,keywordsmatch.pop(p+1))
 							data.insert(p,data.pop(p+1))
-							exitatlength = 0
+							exitAtLength = 0
 							break
-					exitatlength += 1
-					if(exitatlength == 5):
+					exitAtLength += 1
+					if(exitAtLength == 5):
 						break
 				for p in range(0, len(keywordsmatch)):
 					if(keywordsmatch[p] == 0):

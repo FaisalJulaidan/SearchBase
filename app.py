@@ -188,6 +188,7 @@ def contactpage():
     if request.method == "GET":
         return render_template("contact.html")
 
+email = ""
 @app.route("/login", methods = ['GET', 'POST'])
 def loginpage():
 	if request.method == "GET":

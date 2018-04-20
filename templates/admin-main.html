@@ -251,7 +251,10 @@
 
 	<script src="../static/js/cookies.js"></script>
     <script>
-    makeCookie("UserEmail", "{{msg}}", 1);
+    console.log("{{msg}}");
+    if("{{msg}}" != ""){
+        makeCookie("UserEmail", "{{msg}}", 1);
+    }
     console.log(getCookie("UserEmail"));
     </script>
 

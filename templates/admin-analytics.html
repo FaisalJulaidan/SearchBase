@@ -6,10 +6,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
 	<link rel="icon" href="images/favicon.ico" type="image/ico" />
 
-    <title>Admin Homepage </title>
+    <title>Admin analytics </title>
 
     <!-- Bootstrap -->
     <link href="../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -118,13 +117,6 @@
                 </ul>
               </div>
             </div>
-
-
-
-
-
-
-
             <!-- /sidebar menu -->
           </div>
         </div>
@@ -162,37 +154,69 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-          <!-- top tiles -->
-          <div class="row tile_count">
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-user"></i> Total clicks on your assistant</span>
-              <div class="count">0</div>
+          <div class="">
+            <div class="page-title">
+              <div class="title_left">
+                <h3>Analytics <small>Here are the statistics of your assistant</small></h3>
+              </div>
             </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-clock-o"></i> Total Answers loaded</span>
-              <div class="count">0</div>
-            </div>
-          </div>
+            <div class="clearfix"></div>
+            <div class="row">
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Number of visitors<small>Sessions</small></h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <canvas id="lineChart"></canvas>
+                  </div>
+                </div>
+              </div>
 
-          <div class="row">
-            <div class="col-md-12 col-sm-12 col-xs-12">
-              <div class="x_panel" style="height:600px;">
-                <div class="col-md-12">
-                  <div class="jumbotron text-xs-center">
-                    <h1 class="display-3">Welcome!</h1>
-                      <p class="lead"><strong>Use your side navigation</strong> to navigate the website.</p>
-                      <hr>
-                      <p>
-                        Need help getting setup? <a href="">Contact our team, we'll setup a personal session with you.</a>
-                      </p>
-                      <p class="lead">
-                        <a class="btn btn-primary btn-sm" href="/admin/Questions" role="button">Build my questions</a>
-                      </p>
-                    </div>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Most results retuned</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                      </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <canvas id="mybarChart"></canvas>
                   </div>
                 </div>
               </div>
             </div>
+            <div class="clearfix"></div>
+            <div class="row">
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Category Of Products</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <canvas id="canvasDoughnut"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+        <!-- page content -->
           <!-- /top tiles -->
           <br />
         </div>
@@ -252,10 +276,7 @@
 
 	<script src="../static/js/cookies.js"></script>
     <script>
-    console.log("{{msg}}");
-    if("{{msg}}" != ""){
-        makeCookie("UserEmail", "{{msg}}", 1);
-    }
+    makeCookie("UserEmail", "{{msg}}", 1);
     console.log(getCookie("UserEmail"));
     </script>
 

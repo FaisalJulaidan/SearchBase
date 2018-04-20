@@ -509,6 +509,12 @@ def adminProfile():
     if request.method == "GET":
         return render_template("admin-profile.html")
 
+@app.route("/admin/analytics", methods = ['GET'])
+def adminAnalytics():
+    if request.method == "GET":
+        return render_template("admin-analytics.html")
+
+
 
 @app.route("/admin/supportGeneral", methods = ['GET'])
 def adminGeneralSupport():

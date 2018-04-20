@@ -48,7 +48,7 @@ mail = Mail(app)
 #code to ensure user is loged in
 @app.before_request
 def before_request():
-	print(request.cookies.get("UserEmail"))
+	print("USER EMAIL: " + str(request.cookies.get("UserEmail")))
 	theurl = str(request.url_rule)
 	if ("admin" not in theurl):
 		print("Ignore before request for: ", theurl)
@@ -114,9 +114,11 @@ def getTemplate(route):
 					exitAtLength += 1
 					if(exitAtLength == 5):
 						break
+				substract = 0
 				for p in range(0, len(keywordsmatch)):
 					if(keywordsmatch[p] == 0):
-						data.pop(p)
+						data.pop(p - substract)
+						substract += 1
 				while(len(data) > 9):
 					data.pop()
 				if not data:
@@ -127,7 +129,6 @@ def getTemplate(route):
 						datastring+=str(c) + "|||"
 					datastring = datastring[:-3]
 					datastring += "&&&"
-				print(datastring)
 				return jsonify(datastring)
 
 
@@ -223,7 +224,6 @@ def loginpage():
 				return render_template("admin-main.html", msg= email)
 			else:
 				# else denying the login
-				print(password, data[0][0])
 				return render_template('Login.html', data = "User name and password does not match!")
 		except:
 			print("Error in trying to find user")
@@ -292,21 +292,16 @@ def adminHomePage():
 
 def allowed_file(filename):
 	ext = filename.rsplit('.',1)[1]
-	print(ext)
 	return '.' in filename and ext in ALLOWED_EXTENSIONS
-
-tempData = []
 
 @app.route("/admin/Questions", methods = ['GET', 'POST'])
 def adminAddQuestion():
 	if request.method == "GET":
-		print(request.cookies.get("UserEmail"))
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
 		user_mail = request.cookies.get("UserEmail")
 		cur.execute("SELECT * FROM \""+user_mail+"\"")
 		mes = cur.fetchall()
-		tempData = mes
 		conn.close()
 		return render_template("admin-form-add-question.html", data=mes)
 	if request.method == "POST":
@@ -316,27 +311,33 @@ def adminAddQuestion():
 				questions.append(request.form.get("question" + str(i)))
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
+		print(questions)
 		user_mail = request.cookies.get("UserEmail")
+		cur.execute("SELECT * FROM \""+user_mail+"\"")
+		tempData = cur.fetchall()
 		cur.execute("CREATE TABLE IF NOT EXISTS \'" + user_mail + "\' (\
 		Question text NOT NULL, 'Answer1' text, 'Answer2' text, 'Answer3' text, 'Answer4' text,\
 		 'Answer5' text, 'Answer6' text, 'Answer7' text, 'Answer8' text, 'Answer9' text, 'Answer10' text,\
 		  'Answer11' text, 'Answer12' text)")
 		conn.commit()
 		i = -1
+		print(tempData)
+		if(len(questions) + 1 < len(tempData)+1):
+			for b in range(len(questions) + 1,len(tempData)+1):
+				print("DELETING: ", tempData[i][0])
+				cur.execute("DELETE FROM \""+user_mail+"\" WHERE Question = \""+tempData[i][0]+"\"")
 		for q in questions:
 			i+= 1
 			try:
 				if(tempData[i][0] != None):
+					print("UPDATING: ", tempData[i][0], " TO ", q)
 					cur.execute("UPDATE \""+user_mail+"\" SET Question = \""+q+"\" WHERE Question = \""+tempData[i][0]+"\"")
 			except:
+				print("INSERTING NEW: ", q)
 				cur.execute("INSERT INTO \'" + user_mail + "\'('Question') VALUES (?)", (q,))
-			conn.commit()
-		if(i + 1 < len(tempData)+1):
-			for b in range(i+1,len(tempData)+1):
-				cur.execute("DELETE FROM \""+user_mail+"\" WHERE Question = \""+tempData[i+1][0]+"\"")
 		conn.commit()
 		conn.close()
-		return render_template("index.html", msg="Questions have been saved")
+		return redirect("/admin/Questions", code=302)
 
 @app.route("/admin/Answers", methods = ['GET', 'POST'])
 def adminAnswers():
@@ -355,14 +356,12 @@ def adminAnswers():
 		selected_question = request.form.get("question")
 		user_mail = request.cookies.get("UserEmail")
 		for i in range(1, 13):
-			print("pname" + str(i))
 			if(request.form.get("pname" + str(i)) != None):
 				if (request.files['file'+str(i)].filename == ""):
 					print('no file given')
 					if(request.form.get("delPic" + str(i)) != "yes"):
 						cur.execute("SELECT Answer"+str(i)+" FROM \""+user_mail+"\" WHERE Question=\""+selected_question+"\"")
 						data = cur.fetchall()
-						print(data, user_mail, selected_question)
 						link = data[0][0].split(";")[2]
 						answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+link)
 					else:
@@ -473,7 +472,7 @@ def adminAddProduct():
 				print("Error in editing the database")
 				conn.rollback()
 				conn.close()
-			return render_template("index.html", msg="Questions have been saved")
+			return redirect("/admin/Products", code=302)
 
 
 @app.route("/admin/displayQuestions", methods = ['GET'])
@@ -585,10 +584,8 @@ def getcomputers():
         portable = request.form["portable"]
         battery = request.form["battery"]
         keyfeatures = request.form["keyfeatures"]
-        print(portable)
         conn = sqlite3.connect(COMPUTERDATABASE)
         cur = conn.cursor()
-        print(keyfeatures)
         print("Looking for: ", computerUse, " ", minBudget, " ", maxBudget, " ", portable, " ", battery, " ", keyfeatures)
         try:
             if (portable=="null"):
@@ -602,7 +599,6 @@ def getcomputers():
                 AND Price>=? AND Price<=? AND Type=? AND BatteryLife>=? \
                 ", [computerUse, computerUse, minBudget, maxBudget, portable, battery])
             data = cur.fetchall()
-            print(data)
         except:
             print("ERROR IN RETRIEVING COMPUTERS")
         finally:

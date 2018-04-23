@@ -101,11 +101,11 @@
                   </li>
                   <li><a href="/admin/analytics"><i class="fa fa-bar-chart"></i> Analytics<span class="fa"></span></a>
                   </li>
-                  <li><a><i class="fa fa-money"></i> Price Plan <span class="fa fa-chevron-down"></span></a>
+                  <!-- <li><a><i class="fa fa-money"></i> Price Plan <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/admin/pricing">Pricing Tables</a></li>
                     </ul>
-                  </li>
+                  </li> -->
 
                   <li><a><i class="fa fa-life-saver"></i> Support <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
@@ -315,7 +315,7 @@
                     if(data[j][b] == ""){break;}
                     parts = data[j][b].split(";");
                     $("#pasteForm").append("\
-                        <div class=\"column\">\
+                        <div class=\"columnA\">\
                           <p> Answer text</p>\
                           <input name=\"pname"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[0]+"\">\
                           <p> Answer Keyword </p>\
@@ -344,7 +344,7 @@
         if(nv > numberOfAnswers){
             for(var b = numberOfAnswers; b < nv;b++){
                 $("#pasteForm").append("\
-                    <div class=\"column\">\
+                    <div class=\"columnA\">\
                       <p> Product name</p>\
                       <input name=\"pname"+String(b+1)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
                       <br />\
@@ -359,7 +359,7 @@
             }
         } else if(nv < numberOfAnswers) {
             for(b = numberOfAnswers; b > nv; b--){
-              $(".column")[$(".column").length - 1].remove();
+              $(".columnA")[$(".columnA").length - 1].remove();
               numberOfAnswers--;
             }
         }

@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Questions</title>
+    <title>Questions Wizard</title>
 
     <!-- Bootstrap -->
     <link href="../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -40,11 +40,8 @@
       <div class="main_container">
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
-
-
             <div class="navbar nav_title" style="border: 0;">
-              <a href="/admin/homepage" class="site_title"> <img src="../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
-              <br />
+              <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Gentelella Alela!</span></a>
             </div>
 
             <div class="clearfix"></div>
@@ -56,7 +53,7 @@
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
-                <h2>user</h2>
+                <h2>username</h2>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -68,22 +65,30 @@
               <div class="menu_section">
                 <h3>General</h3>
                 <ul class="nav side-menu">
-                  <li><a href="/admin/homepage"><i class="fa fa-home"></i> Dashboard</a>
-                  </li>
-                  <li><a href="/admin/Questions"><i class="fa fa-edit"></i> Questions<span class="fa fa-arrow-right"></span></a>
-                  </li>
-                  <li><a href="/admin/Answers"><i class="fa fa-edit"></i> Answers<span class="fa fa-arrow-right"></span></a>
-                  </li>
-                  <li><a href="/admin/Products"><i class="fa fa-database"></i> Product Database<span class="fa fa-arrow-right"></span></a>
-                  </li>
-                  <li><a><i class="fa fa-table"></i> Tables <span class="fa fa-chevron-down"></span></a>
+                  <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="/admin/displayQuestions">Questions</a></li>
-                      <li><a href="/admin/displayAnswers">Answers</a></li>
-                      <li><a href="/admin/displayProducts">Products</a></li>
+                      <li><a href="index.html">Dashboard</a></li>
                     </ul>
                   </li>
-                  <li><a href="/admin/connect"><i class="fa fa-plug"></i> Connection<span class="fa"></span></a>
+                  <li><a><i class="fa fa-edit"></i> Questions <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/admin/add/question">Add Question</a></li>
+                      <li><a href="/admin/edit/question">Edit Question</a></li>
+                      <li><a href="/admin/delete/question">Delete Question</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-edit"></i> Products <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/admin/add/product">Add Product</a></li>
+                      <li><a href="/admin/edit/product">Edit Product</a></li>
+                      <li><a href="/admin/delete/product">Delete Product</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-table"></i> Products & Questions <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/admin/display/questions">All Questions</a></li>
+                      <li><a href="/admin/display/answers">All Products</a></li>
+                    </ul>
                   </li>
                 </ul>
               </div>
@@ -95,28 +100,26 @@
                       <li><a href="/admin/profile">Profile</a></li>
                     </ul>
                   </li>
-                  <li><a href="/admin/analytics"><i class="fa fa-bar-chart"></i> Analytics<span class="fa"></span></a>
-                  </li>
-                  <!-- <li><a><i class="fa fa-money"></i> Price Plan <span class="fa fa-chevron-down"></span></a>
+                  <li><a><i class="fa fa-money"></i> Price Plan <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/admin/pricing">Pricing Tables</a></li>
                     </ul>
-                  </li> -->
+                  </li>
 
                   <li><a><i class="fa fa-life-saver"></i> Support <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                        <li><a href="/admin/supportGeneral">General Support</a>
+                        <li><a href="#level1_1">Genral Support</a>
                         <li><a>Technical Support<span class="fa fa-chevron-down"></span></a>
                           <ul class="nav child_menu">
-                            <li class="sub_menu"><a href="/admin/supportDocs">Documentation</a>
+                            <li class="sub_menu"><a href="/admin/support/docs">Docs</a>
                             </li>
-                            <li><a href="/admin/supportSetup">Getting setup</a>
+                            <li><a href="/admin/support/setup">Getting setup</a>
                             </li>
-                            <li><a href="/admin/supportIntergartion">Intergration with your site</a>
+                            <li><a href="/admin/support/intergartion">Intergration with your site</a>
                             </li>
                           </ul>
                         </li>
-                        <li><a href="/admin/supportBilling">Billing support</a>
+                        <li><a href="/admin/support/billing">Billing support</a>
                         </li>
                     </ul>
                   </li>
@@ -124,8 +127,24 @@
                 </ul>
               </div>
             </div>
+            <!-- /sidebar menu -->
 
-
+            <!-- /menu footer buttons -->
+            <div class="sidebar-footer hidden-small">
+              <a data-toggle="tooltip" data-placement="top" title="Settings">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="Lock">
+                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+            </div>
+            <!-- /menu footer buttons -->
           </div>
         </div>
 
@@ -140,18 +159,24 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../static/images/img.jpg" alt="">User
+                    <img src="../static/images/img.jpg" alt="">John Doe
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
-                    <li><a href="/admin/profile"> Profile</a></li>
-                    <li><a href="/admin/supportGeneral">Help</a></li>
-                    <li><a href="/login"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                    <li><a href="javascript:;"> Profile</a></li>
+                    <li>
+                      <a href="javascript:;">
+                        <span>Settings</span>
+                      </a>
+                    </li>
+                    <li><a href="javascript:;">Help</a></li>
+                    <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                   </ul>
                 </li>
 
                 <li role="presentation" class="dropdown">
                   <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-envelope-o"></i>
                   </a>
                 </li>
               </ul>
@@ -220,8 +245,8 @@
                       </div>
 
                     </form>
-                    <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
                     <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
+                    <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
                   </div>
                 </div>
               </div>
@@ -251,20 +276,20 @@
                   </div>
                   <div class="x_content">
                     <br />
-                    <div class="form-group">
-                      <form id="QuestionForm" action="/admin/Questions" method="post">
+                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+                      <div class="form-group">
                         <div id="QuestionDiv">
                           <!-- Question Templates appear here -->
                         </div>
+                      <div class="ln_solid"></div>
+                      <div class="form-group">
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                        </div>
                       </div>
-                      <button type="submit" id="QTemplate-SubmitB" class="btn btn-success">Submit</button>
-                      </form>
-                      <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
-                    <div class="ln_solid"></div>
-                    <div class="form-group">
-                      <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                      </div>
-                    </div>
+                    </form>
+                  </div>
+                  <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
+                  <button id="QTemplate-SubmitB" class="btn btn-success">Submit</button>
                 </div>
               </div>
             </div>
@@ -317,96 +342,7 @@
     <!-- Custom Theme Scripts -->
     <script src="../static/build/js/custom.min.js"></script>
     <!-- Questions Script -->
-    <script>
-    // set variables
-    var oldNOQ = 0;
-    var maxQuestions = 10;
-
-    // set the question form template
-    var qTemplate1 = "<div class = \"Questions\"><label class=\"control-label col-md-3 col-sm-3 col-xs-12\" for=\"last-name\">"
-    var qTemplate2 = " question <span class=\"required\">*</span></label><div class=\"col-md-6 col-sm-6 col-xs-12\"><input type=\"text\" name=\""
-    var qTemplate3 = "\" required=\"required\" class=\"form-control col-md-7 col-xs-12\"></input></div><br /><br /></div>";
-
-    // set event listeners
-    document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
-    document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
-    document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
-
-    // called on NOQ Reset Click
-    function ClearNOQ(){
-      document.getElementById("number-of-questions").value = "";
-      $("#QuestionDiv").empty();
-      oldNOQ = 0;
-    }
-    // var data = {{data}};
-    var data = [];
-    {%for item in data%}
-    data.push("{{item[0]}}")
-    {%endfor%}
-      var noq = data.length;
-      if(!Number.isNaN(noq)){
-        if(noq <= maxQuestions){
-          if(noq > oldNOQ){
-            for(i = oldNOQ; i < noq; i++){
-              var number;
-              if(i == 0){ number = "First" }
-              if(i == 1){ number = "Second" }
-              if(i == 2){ number = "Third" }
-              if(i == 3){ number = "Fourth" }
-              if(i == 4){ number = "Fifth" }
-              if(i == 5){ number = "Sixth" }
-              if(i == 6){ number = "Seventh" }
-              if(i == 7){ number = "Eight" }
-              if(i == 8){ number = "Ninth" }
-              if(i == 9){ number = "Tenth" }
-              $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + "\" \
-              required=\"required\" value= \""+data[i]+"\" class=\"form-control col-md-7 col-xs-12\"></input></div><br /><br /></div>");
-              $("#number-of-questions").val(noq);
-            }
-          } else if(noq < oldNOQ) {
-            for(i = oldNOQ; i > noq; i--){
-              $(".Questions")[$(".Questions").length - 1].remove();
-            }
-          }
-          oldNOQ = noq;
-        }
-      }
-
-    // called on NOQ Submit Click
-    function ChangeNofQuestions(){
-      var noq = parseInt(document.getElementById("number-of-questions").value);
-      if(!Number.isNaN(noq)){
-        if(noq <= maxQuestions){
-          if(noq > oldNOQ){
-            for(i = oldNOQ; i < noq; i++){
-              var number;
-              if(i == 0){ number = "First" }
-              if(i == 1){ number = "Second" }
-              if(i == 2){ number = "Third" }
-              if(i == 3){ number = "Fourth" }
-              if(i == 4){ number = "Fifth" }
-              if(i == 5){ number = "Sixth" }
-              if(i == 6){ number = "Seventh" }
-              if(i == 7){ number = "Eight" }
-              if(i == 8){ number = "Ninth" }
-              if(i == 9){ number = "Tenth" }
-              $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + qTemplate3);
-              // add preset question to fill
-            }
-          } else if(noq < oldNOQ) {
-            for(i = oldNOQ; i > noq; i--){
-              $(".Questions")[$(".Questions").length - 1].remove();
-            }
-          }
-          oldNOQ = noq;
-        }
-      }
-    }
-
-    function ClearQTemplate(){
-      $("#QuestionDiv input").val("");
-    }
-    </script>
+    <script src="../static/js/questions.js"> </script>
 
   </body>
 </html>

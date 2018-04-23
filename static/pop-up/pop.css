@@ -1,0 +1,32 @@
+ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul li{
+  display:inline-block;
+  clear: both;
+  padding: 20px;
+  border-radius: 30px;
+  margin-bottom: 2px;
+  font-family: Helvetica, Arial, sans-serif;
+  color: white;
+}
+
+.him{
+  background: #6610f2;
+  float: left;
+}
+
+.him{
+  border-bottom-left-radius: 5px;
+}
+
+.bottom_left{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  margin: 20px;
+  margin-left: 10px;
+}

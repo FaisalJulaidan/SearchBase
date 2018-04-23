@@ -164,22 +164,56 @@
                   <h3> Connecting your assistant. </h3>
                   <p> To Connect your assistant, you must paste the pre-made code into any part of your HTML scource code. </p>
                   <xmp>
-                    <a href="#" onclick="document.getElementById('contents1').style.cssText = ''">link1</a>
+                    <!-- Importing CSS file -->
+                    <link href="../static/pop-up/pop.css" rel="stylesheet">
 
-                    <div id="contents1" style="display:none;">
-                        <h2>Contents of link1</h2>
-                        <iframe src="http://www.thesearchbase.com/nameofyourcompany" width="500" height="400"></iframe>
+                    <div class="bottom_left">
+                      <ul>
+                        <li class="him">Launch Assistant</li>
+                      </ul>
                     </div>
+
                   </xmp>
                   <p> Once you have pasted this, into the html page that you wish to use your assistant on, you're live.</p>
                   <br />
-                  <h4> CSS (Optional) </h4>
+                  <h4> CSS </h4>
                   <p> If you would like to have control the appearance of your assistant, you can also paste some extra code into your CSS and make changes</p>
                   <xmp>
-                    CSS will then go here
+                    ul{
+                      list-style: none;
+                      margin: 0;
+                      padding: 0;
+                    }
+
+                    ul li{
+                      display:inline-block;
+                      clear: both;
+                      padding: 20px;
+                      border-radius: 30px;
+                      margin-bottom: 2px;
+                      font-family: Helvetica, Arial, sans-serif;
+                      color: white;
+                    }
+
+                    .him{
+                      background: #6610f2;
+                      float: left;
+                    }
+
+                    .him{
+                      border-bottom-left-radius: 5px;
+                    }
+
+                    .bottom_left{
+                      position: fixed;
+                      bottom: 0;
+                      left: 0;
+                      margin: 20px;
+                      margin-left: 10px;
+                    }
                   </xmp>
                   <br />
-                  <h4> Javascript (Optional) </h4>
+                  <h4> Javascript (This is used for analytics) </h4>
                   <p> If you would like to optimal control over your assistant and make big changes, you you can download our <strong><a href="">Js</a></strong> file or paste it as a script in your website.</p>
                   <xmp>
                     Javascript will finally then go here

@@ -137,6 +137,11 @@ def demopage():
     if request.method == "GET":
         return render_template("demo.html")
 
+@app.route("/popup", methods = ['GET'])
+def popup():
+    if request.method == "GET":
+        return render_template("pop-test.html")
+
 @app.route("/demo/construction", methods = ['GET'])
 def demopageconstruction():
     if request.method == "GET":

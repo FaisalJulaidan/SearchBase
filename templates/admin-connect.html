@@ -167,12 +167,16 @@
                     <!-- Importing CSS file -->
                     <link href="../static/pop-up/pop.css" rel="stylesheet">
 
-                    <div class="bottom_left">
+                    <div class="bottom_left" id="contents1">
                       <ul>
-                        <li class="him">Launch Assistant</li>
+                        <li class="him" href="#" onclick="document.getElementById('contents1').style.cssText = ''">Launch Assistant</li>
                       </ul>
+                      <div id="contents1" style="display:none;">
+                          <h2>Contents of link1</h2>
+                          <iframe src="http://www.thesearchbase.com/nameofyourcompany" width="500" height="400"></iframe>
+                      </div>
                     </div>
-
+                    
                   </xmp>
                   <p> Once you have pasted this, into the html page that you wish to use your assistant on, you're live.</p>
                   <br />

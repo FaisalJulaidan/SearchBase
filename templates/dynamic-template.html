@@ -189,7 +189,7 @@
                     questionNumber += 1;
                     for(var a = 1; a <= data[q].length-1; a++){
                         parts = data[q][a].split(";");
-                        answers += "<div onclick=\"getKeyWord(\'"+parts[1]+"\',\'q"+questionNumber.toString()+"\')\" class=\"column\">\
+                        answers += "<div onclick=\"getKeyWord(\'"+parts[1]+"\',\'q"+(questionNumber+1).toString()+"\')\" class=\"column\">\
                                        <p class=\"image-box\">"+parts[0]+"</p>\
                                        <img class=\"icon-box\" src=\""+parts[2]+"\">\
                                      </div>\

@@ -6,12 +6,14 @@ from flask_mail import Mail, Message
 from werkzeug import secure_filename
 from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory, send_file, url_for
 from flask_scrypt import generate_random_salt, generate_password_hash, check_password_hash
+from datetime import datetime
 
 
 COMPUTERDATABASE = "computers.db"
 USERDATABASE = "users.db"
 QUESTIONDATABASE = "questions.db"
 PRODUCTDATABASE = "products.db"
+STATISTICSDATABASE = "statistics.db"
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 PRODUCT_IMAGES = os.path.join(APP_ROOT,'static/file_uploads/product_images')
@@ -48,11 +50,11 @@ mail = Mail(app)
 #code to ensure user is loged in
 @app.before_request
 def before_request():
-	print("USER EMAIL: " + str(request.cookies.get("UserEmail")))
 	theurl = str(request.url_rule)
 	if ("admin" not in theurl):
 		print("Ignore before request for: ", theurl)
 		return None
+	print("USER EMAIL: " + str(request.cookies.get("UserEmail")))
 	if(request.cookies.get("UserEmail") == None):
 		print("User not logged in")
 		return redirect("/login", code=302)
@@ -80,6 +82,19 @@ def getTemplate(route):
 				cur = conn.cursor()
 				cur.execute("SELECT * FROM \""+record[7]+"\"")
 				data = cur.fetchall()
+				conn.close()
+				date = datetime.now().strftime("%Y-%m-%d")
+				conn = sqlite3.connect(STATISTICSDATABASE)
+				cur = conn.cursor()
+				cur.execute("SELECT * FROM \""+route+"\" WHERE Date=?;", [date])
+				stats = cur.fetchall()
+				if not stats:
+					print(stats)
+					cur.execute("INSERT INTO \""+route+"\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
+									VALUES (?,?,?,?)", (date, "1", "0", "0"))
+				else:
+					cur.execute("UPDATE \""+route+"\" SET AssistantOpened = \""+str(int(stats[0][1]) + 1)+"\" WHERE Date = \""+date+"\"")
+				conn.commit()
 				conn.close()
 				return render_template("dynamic-template.html", data=data, user=route)
 	if request.method == "POST":
@@ -129,6 +144,26 @@ def getTemplate(route):
 						datastring+=str(c) + "|||"
 					datastring = datastring[:-3]
 					datastring += "&&&"
+				conn.close()
+				date = datetime.now().strftime("%Y-%m-%d")
+				conn = sqlite3.connect(STATISTICSDATABASE)
+				cur = conn.cursor()
+				cur.execute("SELECT * FROM \""+route+"\" WHERE Date=?;", [date])
+				stats = cur.fetchall()
+				print(stats)
+				questionsAnswered = request.form["questionsAnswered"]
+				if not stats:
+					cur.execute("INSERT INTO \""+route+"\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
+									VALUES (?,?,?,?)", (date, "0", questionsAnswered, len(data)))
+				else:
+					print(len(data))
+					cur.execute("UPDATE \""+route+"\" SET ProductsReturned = \""+str(int(stats[0][3]) + len(data))+"\" WHERE Date = \""+date+"\"")
+					cur.execute("UPDATE \""+route+"\" SET QuestionsAnswered = \""+str(int(stats[0][2]) + int(questionsAnswered))+"\" WHERE Date = \""+date+"\"")
+				conn.commit()
+				cur.execute("SELECT * FROM \""+route+"\" WHERE Date=?;", [date])
+				stats = cur.fetchall()
+				print(stats)
+				conn.close()
 				return jsonify(datastring)
 
 

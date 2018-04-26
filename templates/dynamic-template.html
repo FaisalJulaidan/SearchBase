@@ -102,7 +102,7 @@
 		<!-- Found devices. These will have to be dynamic and the deivces that we retrive from the database. -->
 			<div class="found-set1">
         <div class="text-holder">
-				 <div id="a1" class="question_set1">
+				 <div id="C" class="question_set1">
 				    <div class="found_pc_section">
 				 	   <h2 style="text-align:center" >These are the results we found for you</h2>
                        <div id="computerResultDiv">
@@ -139,7 +139,7 @@
 
     			<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 
-    <script type="text/javascript">
+    <script>
 		    $(document).on('ready', function() {
 		      $(".lazy").slick({
 		        lazyLoad: 'ondemand', // ondemand progressive anticipated
@@ -193,33 +193,39 @@
                                        <p class=\"image-box\">"+parts[0]+"</p>\
                                        <img class=\"icon-box\" src=\""+parts[2]+"\">\
                                      </div>\
-                                     "
+                                     ";
                     }
                     question = "<div id=q"+questionNumber.toString()+" class=\"questionDiv\">\
                                    <div class=\"box-holder\">\
                                       <h2 style=\"text-align:center;\">"+data[q][0]+"</h2>\
                                        <p style=\"text-align:center;\">Please select one option.</p>\
                                        <div class=\"row\">\
-                                       "
+                                       ";
                     for(var a = 0; a <= answers.length-1; a++){
                         question += answers[a];
                     }
                     question += "</div>\
                              </div>\
-                          </div>"
+                          </div>";
+                    // $("#ResultDiv").setAttribute('id','HELLO');
+                    console.log($("#C"));
+                    document.getElementById("C").id = "HELLO";
                     $("#questionsInsert").append(question);
                 }
             }
             questionDivs = document.getElementsByClassName("questionDiv");
             questionDivs[questionDivs.length-1].addEventListener("click", sendData);
             var keywords = [];
+            var questionsAnswered = 0;
             function getKeyWord(word, id){
                 for(var i = 0; i <= keywords.length-1; i++){
                     if(word == keywords[i]){
                         keywords.splice(i, 1);
+                        scrollTo(id)
                         return 0;
                     }
                 }
+                questionsAnswered++;
                 keywords.push(word);
                 scrollTo(id)
             }
@@ -229,6 +235,8 @@
                     params+="&";
                     params+='keyword'+(i+1).toString()+"="+keywords[i];
                 }
+                params+="&questionsAnswered="+questionsAnswered.toString();
+                questionsAnswered = 0;
                 var xhttp = new XMLHttpRequest();
     	        xhttp.open("POST", '/'+"{{user}}", true);
     	        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");

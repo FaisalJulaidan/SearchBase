@@ -151,7 +151,7 @@
             </nav>
           </div>
         </div>
-        <!-- /top navigation -->
+        <!-- /top navigation -->    
 
         <!-- page content -->
         <div class="right_col" role="main">
@@ -168,15 +168,15 @@
                     <link href="../static/pop-up/pop.css" rel="stylesheet">
 
                     <div class="bottom_left" id="contents1">
+                    <div id="contents1" style="display:none;">
+                        <h2>Contents of link1</h2>
+                        <iframe src="http://www.thesearchbase.com/nameofyourcompany" width="500" height="400"></iframe>
+                    </div>
                       <ul>
                         <li class="him" href="#" onclick="document.getElementById('contents1').style.cssText = ''">Launch Assistant</li>
                       </ul>
-                      <div id="contents1" style="display:none;">
-                          <h2>Contents of link1</h2>
-                          <iframe src="http://www.thesearchbase.com/nameofyourcompany" width="500" height="400"></iframe>
-                      </div>
                     </div>
-                    
+
                   </xmp>
                   <p> Once you have pasted this, into the html page that you wish to use your assistant on, you're live.</p>
                   <br />
@@ -281,13 +281,5 @@
 
     <!-- Custom Theme Scripts -->
     <script src="../static/build/js/custom.min.js"></script>
-
-
-	<script src="../static/js/cookies.js"></script>
-    <script>
-    makeCookie("UserEmail", "{{msg}}", 1);
-    console.log(getCookie("UserEmail"));
-    </script>
-
   </body>
 </html>

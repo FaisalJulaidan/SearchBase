@@ -151,7 +151,7 @@
             </nav>
           </div>
         </div>
-        <!-- /top navigation -->    
+        <!-- /top navigation -->
 
         <!-- page content -->
         <div class="right_col" role="main">
@@ -169,8 +169,7 @@
 
                     <div class="bottom_left" id="contents1">
                     <div id="contents1" style="display:none;">
-                        <h2>Contents of link1</h2>
-                        <iframe src="http://www.thesearchbase.com/nameofyourcompany" width="500" height="400"></iframe>
+                        <iframe src="http://www.thesearchbase.com/nameofyourcompany" width="350" height="350"></iframe>
                     </div>
                       <ul>
                         <li class="him" href="#" onclick="document.getElementById('contents1').style.cssText = ''">Launch Assistant</li>
@@ -202,10 +201,12 @@
                     .him{
                       background: #6610f2;
                       float: left;
+                      z-index: 1000;
                     }
 
                     .him{
                       border-bottom-left-radius: 5px;
+                      z-index: 1000;
                     }
 
                     .bottom_left{
@@ -214,13 +215,29 @@
                       left: 0;
                       margin: 20px;
                       margin-left: 10px;
+                      z-index: 1000;
                     }
                   </xmp>
                   <br />
                   <h4> Javascript (This is used for analytics) </h4>
                   <p> If you would like to optimal control over your assistant and make big changes, you you can download our <strong><a href="">Js</a></strong> file or paste it as a script in your website.</p>
                   <xmp>
-                    Javascript will finally then go here
+
+                    <script>
+                    var opened = false;
+                    var frame = document.getElementById("iframediv");
+                    frame.style = "display:none";
+                    document.getElementById("launch_button").addEventListener("click", function(){
+                        if(!opened){
+                            frame.style = "display:block";
+                            opened=true;
+                        }else{
+                            frame.style = "display:none";
+                            opened=false;
+                        }
+                    });
+                    </script>
+
                   </xmp>
                   </div>
                 </div>

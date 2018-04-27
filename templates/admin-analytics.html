@@ -213,6 +213,10 @@
                 </div>
               </div>
             </div>
+
+            <canvas id="putcharthere1" width="600" height="400"></canvas>
+            <canvas id="putcharthere2" width="600" height="400"></canvas>
+            <canvas id="putcharthere3" width="600" height="400"></canvas>
             <div class="clearfix"></div>
           </div>
         </div>
@@ -275,6 +279,132 @@
 
 
 	<script src="../static/js/cookies.js"></script>
+    <!-- <script src='../static/js/Chart.min.js'></script> -->
+    <script src="https://cdn.anychart.com/releases/8.0.0/js/anychart-base.min.js"></script>
+    <script>
+    // var dates = [];
+    // {%for item in data%}
+    // dates.push("{{item[0]}}");
+    // {%endfor%}
+    // var assisopened = [];
+    // {%for item in data%}
+    // assisopened.push("{{item[1]}}");
+    // {%endfor%}
+    // var datarows = [];
+    // for(var i = 0; i <= dates.length-1; i++){
+    //     datarows.push([dates[i], assisopened[i]])
+    // }
+    // var data = {
+    //   header: ["Dates", "Assistant Opened"],
+    //   rows: datarows
+    //   }
+    //   var chart = anychart.bar();
+    //
+    //   // add the data
+    //   chart.data(data);
+    var chartData = {
+    labels : [{% for item in data%}
+              "{{item[0]}}",
+             {% endfor %}],
+    datasets : [{
+       label: 'Assistant Used',
+       fill: true,
+       lineTension: 0.1,
+       backgroundColor: "rgba(255,255,153,0.4)",
+       borderColor: "rgba(255,255,0,1)",
+       borderCapStyle: 'butt',
+       borderDash: [],
+       borderDashOffset: 0.0,
+       borderJoinStyle: 'miter',
+       pointBorderColor: "rgba(75,192,192,1)",
+       pointBackgroundColor: "#fff",
+       pointBorderWidth: 1,
+       pointHoverRadius: 5,
+       pointHoverBackgroundColor: "rgba(75,192,192,1)",
+       pointHoverBorderColor: "rgba(220,220,220,1)",
+       pointHoverBorderWidth: 2,
+       pointRadius: 1,
+       pointHitRadius: 10,
+       data : [{% for item in data %}
+                {{item[1]}}
+               {% endfor %}],
+       spanGaps: false
+    }]
+    }
+    var chartdiv = document.getElementById("putcharthere1").getContext("2d");
+    new Chart(chartdiv, {
+    data: chartData,
+    type: 'bar',
+    });
+    var chartData = {
+    labels : [{% for item in data%}
+              "{{item[0]}}",
+             {% endfor %}],
+    datasets : [{
+       label: 'Questions Answered',
+       fill: true,
+       lineTension: 0.1,
+       backgroundColor: "rgba(255,255,153,0.4)",
+       borderColor: "rgba(255,255,0,1)",
+       borderCapStyle: 'butt',
+       borderDash: [],
+       borderDashOffset: 0.0,
+       borderJoinStyle: 'miter',
+       pointBorderColor: "rgba(75,192,192,1)",
+       pointBackgroundColor: "#fff",
+       pointBorderWidth: 1,
+       pointHoverRadius: 5,
+       pointHoverBackgroundColor: "rgba(75,192,192,1)",
+       pointHoverBorderColor: "rgba(220,220,220,1)",
+       pointHoverBorderWidth: 2,
+       pointRadius: 1,
+       pointHitRadius: 10,
+       data : [{% for item in data %}
+                {{item[2]}}
+               {% endfor %}],
+       spanGaps: false
+    }]
+    }
+    var chartdiv = document.getElementById("putcharthere2").getContext("2d");
+    new Chart(chartdiv, {
+    data: chartData,
+    type: 'bar',
+    });
+    var chartData = {
+    labels : [{% for item in data%}
+              "{{item[0]}}",
+             {% endfor %}],
+    datasets : [{
+       label: 'Products Returned',
+       fill: true,
+       lineTension: 0.1,
+       backgroundColor: "rgba(255,255,153,0.4)",
+       borderColor: "rgba(255,255,0,1)",
+       borderCapStyle: 'butt',
+       borderDash: [],
+       borderDashOffset: 0.0,
+       borderJoinStyle: 'miter',
+       pointBorderColor: "rgba(75,192,192,1)",
+       pointBackgroundColor: "#fff",
+       pointBorderWidth: 1,
+       pointHoverRadius: 5,
+       pointHoverBackgroundColor: "rgba(75,192,192,1)",
+       pointHoverBorderColor: "rgba(220,220,220,1)",
+       pointHoverBorderWidth: 2,
+       pointRadius: 1,
+       pointHitRadius: 10,
+       data : [{% for item in data %}
+                {{item[3]}}
+               {% endfor %}],
+       spanGaps: false
+    }]
+    }
+    var chartdiv = document.getElementById("putcharthere3").getContext("2d");
+    new Chart(chartdiv, {
+    data: chartData,
+    type: 'bar',
+    });
+    </script>
 
   </body>
 </html>

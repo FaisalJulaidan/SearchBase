@@ -83,7 +83,7 @@ def getTemplate(route):
 				cur.execute("SELECT * FROM \""+record[7]+"\"")
 				data = cur.fetchall()
 				conn.close()
-				date = datetime.now().strftime("%Y-%m-%d")
+				date = datetime.now().strftime("%Y-%m")
 				conn = sqlite3.connect(STATISTICSDATABASE)
 				cur = conn.cursor()
 				cur.execute("SELECT * FROM \""+route+"\" WHERE Date=?;", [date])
@@ -145,7 +145,7 @@ def getTemplate(route):
 					datastring = datastring[:-3]
 					datastring += "&&&"
 				conn.close()
-				date = datetime.now().strftime("%Y-%m-%d")
+				date = datetime.now().strftime("%Y-%m")
 				conn = sqlite3.connect(STATISTICSDATABASE)
 				cur = conn.cursor()
 				cur.execute("SELECT * FROM \""+route+"\" WHERE Date=?;", [date])
@@ -551,8 +551,20 @@ def adminProfile():
 
 @app.route("/admin/analytics", methods = ['GET'])
 def adminAnalytics():
-    if request.method == "GET":
-        return render_template("admin-analytics.html")
+	if request.method == "GET":
+		conn = sqlite3.connect(USERDATABASE)
+		cur = conn.cursor()
+		user_mail = request.cookies.get("UserEmail")
+		cur.execute("SELECT * FROM Users WHERE ContactEmail=\"" + user_mail + "\"")
+		mes = cur.fetchall()
+		companyName = mes[0][4]
+		conn.close()
+		conn = sqlite3.connect(STATISTICSDATABASE)
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM \""+companyName+"\"")
+		stats = cur.fetchall()
+		conn.close()
+		return render_template("admin-analytics.html", data = stats)
 
 
 

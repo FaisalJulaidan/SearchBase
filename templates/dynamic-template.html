@@ -105,6 +105,7 @@
 				 <div id="C" class="question_set1">
 				    <div class="found_pc_section">
 				 	   <h2 style="text-align:center" >These are the results we found for you</h2>
+                       <div id="change"></div>
                        <div id="computerResultDiv">
                         <div id="ResultDiv">
 
@@ -194,6 +195,8 @@
                                        <img class=\"icon-box\" src=\""+parts[2]+"\">\
                                      </div>\
                                      ";
+                         cRD = $("#change");
+                         cRD.attr("id", "q"+(data.length+1).toString());
                     }
                     question = "<div id=q"+questionNumber.toString()+" class=\"questionDiv\">\
                                    <div class=\"box-holder\">\
@@ -208,8 +211,6 @@
                              </div>\
                           </div>";
                     // $("#ResultDiv").setAttribute('id','HELLO');
-                    console.log($("#C"));
-                    document.getElementById("C").id = "HELLO";
                     $("#questionsInsert").append(question);
                 }
             }

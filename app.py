@@ -559,7 +559,7 @@ def adminAddProduct():
 					user_mail = request.cookies.get("UserEmail")
 					cur.execute("SELECT * FROM \""+user_mail+"\" WHERE ProductID="+product_id[len(product_id) - 1])
 					mes = cur.fetchall()
-					filePath =
+					filePath = mes[8]
 					conn.close()
 				file_path.append(filePath)
 			try:

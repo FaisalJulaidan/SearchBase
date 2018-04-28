@@ -479,7 +479,7 @@ def adminAnswers():
 						# filePath = tempString[0] + "/" + tempString[1]
 						answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";.."+filePath)
 				except:
-					print("file upload failed")
+					answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";../static/img/core-img/android-icon-72x72.png")
 		c=0
 		for a in answers:
 			c+=1

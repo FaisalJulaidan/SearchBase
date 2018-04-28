@@ -380,9 +380,8 @@
             try{
                 if(document.getElementById("cb"+String(c)).checked){
                     document.getElementById("tr"+String(c)).remove();
-                    console.log(String(c) + "--" + String(i));
+                    c--;
                     for(var v = c; v<=i; v++){
-                        console.log("here");
                         document.getElementsByName("product_Delete"+String(v + 1))[0].setAttribute("name", "product_Delete"+String(v))
                         document.getElementsByName("product_ID"+String(v + 1))[0].setAttribute("name", "product_ID"+String(v))
                         document.getElementsByName("product_Name"+String(v + 1))[0].setAttribute("name", "product_Name"+String(v))

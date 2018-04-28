@@ -129,7 +129,7 @@
 			   </div>
 			  </div>
         <br />
-
+        <div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
         <!-- End of found devices area -->
 
     <!-- ***** Footer Area Start ***** -->
@@ -256,8 +256,8 @@
         					}
         					delete resultdic[(temparray.length - 1).toString()];
         					for(var i = 0; i< temparray.length-1; i++){
-        						console.log(resultdic[i]);
-        						cRD.append("<div onclick='BuyProduct(resultdic["+i+"][7])' class='found_box1'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][2]+" "+resultdic[i][1]+"</lable><br>"+"<button class=found_button style=vertical-align:middle><span>View </span></button></div>");
+                                resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
+        						cRD.append("<div onclick='BuyProduct(resultdic["+i+"][7])' class='found_box1'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][2]+" "+resultdic[i][1]+"</lable><br><br><label>"+resultdic[i][4]+"</label><br>"+"<button class=found_button style=vertical-align:middle><span>View </span></button></div>");
         					}
         					// <div onclick='BuyProduct(resultdic["+i+"][14])' class='found_box1'><img src=\""+resultdic[i][15]+"\"><br><a>"+resultdic[i][2]+" "+resultdic[i][3]+"</a><br /><a>Screen size(Inch): "+resultdic[i][5]+"</a><br /><a>Battery life(Hrs):"+resultdic[i][4]+"</a><br /><a> Weight(Kg): "resultdic[i][7]+"</a><br /><a>"+resultdic[i][13]+"% off now £"
         					// +resultdic[i][6]+"</a><br /> <button class=found_button style=vertical-align:middle><span>Buy </span></button></div>");

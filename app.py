@@ -7,6 +7,7 @@ from werkzeug import secure_filename
 from flask import Flask, redirect, request,render_template, jsonify, make_response, send_from_directory, send_file, url_for
 from flask_scrypt import generate_random_salt, generate_password_hash, check_password_hash
 from datetime import datetime
+import string
 
 
 COMPUTERDATABASE = "computers.db"
@@ -14,6 +15,7 @@ USERDATABASE = "users.db"
 QUESTIONDATABASE = "questions.db"
 PRODUCTDATABASE = "products.db"
 STATISTICSDATABASE = "statistics.db"
+# USERPREFERENCES = "userpreferences.db"
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 PRODUCT_IMAGES = os.path.join(APP_ROOT,'static/file_uploads/product_images')
@@ -69,6 +71,12 @@ def indexpage():
     if request.method == "GET":
         return render_template("index.html")
 
+class Del:
+  def __init__(self, keep=string.digits):
+    self.comp = dict((ord(c),c) for c in keep)
+  def __getitem__(self, k):
+    return self.comp.get(k)
+
 conn = sqlite3.connect(USERDATABASE)
 cur = conn.cursor()
 cur.execute("SELECT * FROM Users;")
@@ -106,8 +114,12 @@ def getTemplate(route):
 				data = cur.fetchall()
 				conn.close()
 				keywords = []
+				budget = []
 				for i in range(1, int(request.form["numberOfKeywords"])+1):
-					keywords.append(request.form["keyword" + str(i)])
+					if "-" in request.form["keyword" + str(i)]:
+						budget = request.form["keyword" + str(i)].split("-")
+					else:
+						keywords.append(request.form["keyword" + str(i)])
 				keywordsmatch = []
 				i = -1
 				for item in data:
@@ -134,6 +146,11 @@ def getTemplate(route):
 					if(keywordsmatch[p] == 0):
 						data.pop(p - substract)
 						substract += 1
+				DD = Del()
+				for item in data:
+					itemprice = item[4].translate(DD)
+					if (int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1])):
+						data.pop(data.index(item))
 				while(len(data) > 9):
 					data.pop()
 				if not data:
@@ -298,11 +315,38 @@ def signpage():
 		demail = cur.fetchall()
 		if demail:
 			return render_template("Signup.html", msg="Email already exists")
+		cur.execute("SELECT CompanyName FROM Users WHERE ContactEmail=?", [userEmail])
+		demail = cur.fetchall()
+		if demail:
+			return render_template("Signup.html", msg="Company already exists")
 		cur.execute("INSERT INTO Users ('Title', 'Firstname', 'Surname', 'CompanyName', 'UserPosition', 'CompanyAddress', 'ContactEmail', 'ContactNumber', 'Country', 'Password', 'PSalt')\
 						VALUES (?,?,?,?,?,?,?,?,?,?,?)", (userTitle, userFirstname, userSecondname, userCompanyName, userPositionCompany, userCompanyAddress, userEmail, userContactNumber, userCountry, pass_hashed, salt))
 		conn.commit()
 		print("User details added!")
 		conn.close()
+
+		# creating user's tables in databases
+		conn = sqlite3.connect(QUESTIONDATABASE)
+		cur = conn.cursor()
+		cur.execute("CREATE TABLE \""+userEmail+"\" ( Question text NOT NULL, 'Answer1' text, 'Answer2' text, 'Answer3' text, 'Answer4' text, 'Answer5' text, 'Answer6' text, 'Answer7' text, 'Answer8' text, 'Answer9' text, 'Answer10' text, 'Answer11' text, 'Answer12' text)")
+		conn.commit()
+		conn.close()
+		conn = sqlite3.connect(PRODUCTDATABASE)
+		cur = conn.cursor()
+		cur.execute("CREATE TABLE \""+userEmail+"\" ( ProductID text, ProductName text, ProductBrand text, ProductModel text, ProductPrice text ProductFeatures text, ProductKeywords text, ProductDiscount text, ProductURL text, ProductImage text)")
+		conn.commit()
+		conn.close()
+		conn = sqlite3.connect(STATISTICSDATABASE)
+		cur = conn.cursor()
+		cur.execute("CREATE TABLE \""+userCompanyName+"\" ( `Date` TEXT, `AssistantOpened` TEXT, `QuestionsAnswered` TEXT, `ProductsReturned` TEXT )")
+		conn.commit()
+		conn.close()
+		# conn = sqlite3.connect(USERPREFERENCES)
+		# cur = conn.cursor()
+		# cur.execute("CREATE TABLE \""+userEmail+"\" ( `Date` TEXT, `AssistantOpened` TEXT, `QuestionsAnswered` TEXT, `ProductsReturned` TEXT )")
+		# cur.execute("INSERT INTO \""+userEmail+"\" ('PricingQuestion') VALUES (?)", ("0"))
+		# conn.commit()
+		# conn.close()
 
 		# sending registration confirmation email to the user.
 		msg = Message("Thank you for registering, " + userFirstname,
@@ -349,6 +393,13 @@ def adminAddQuestion():
 		for i in range(1, 11):
 			if(request.form.get("question" + str(i)) != None):
 				questions.append(request.form.get("question" + str(i)))
+
+		# conn = sqlite3.connect(USERPREFERENCES)
+		# cur = conn.cursor()
+		# cur.execute("UPDATE \""+user_mail+"\" SET PricingQuestion = " + request.form.get("pricing-question"))
+		# conn.commit()
+		# conn.close()
+
 		conn = sqlite3.connect(QUESTIONDATABASE)
 		cur = conn.cursor()
 		print(questions)

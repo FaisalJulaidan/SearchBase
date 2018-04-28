@@ -316,7 +316,7 @@
                     parts = data[j][b].split(";");
                     $("#pasteForm").append("\
                         <div class=\"columnA\">\
-                          <p> Answer text</p>\
+                          <p> Answer Text</p>\
                           <input name=\"pname"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[0]+"\">\
                           <p> Answer Keyword </p>\
                           <input name=\"keywords"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[1]+"\">\
@@ -345,10 +345,10 @@
             for(var b = numberOfAnswers; b < nv;b++){
                 $("#pasteForm").append("\
                     <div class=\"columnA\">\
-                      <p> Product name</p>\
+                      <p> Answer Text</p>\
                       <input name=\"pname"+String(b+1)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
                       <br />\
-                      <p> Enter the keyword </p>\
+                      <p> Answer Keyword </p>\
                       <input name=\"keywords"+String(b+1)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
                       <br />\
                       <input name=\"delPic"+String(b+1)+"\" id=\"delPic"+String(b+1)+"\" hidden type=\"text\">\

@@ -557,7 +557,7 @@ def adminAddProduct():
 					conn = sqlite3.connect(PRODUCTDATABASE)
 					cur = conn.cursor()
 					user_mail = request.cookies.get("UserEmail")
-					cur.execute("SELECT * FROM \""+user_mail+"\" WHERE ProductID=\""+product_id[len(product_id) - 1]"\"")
+					cur.execute("SELECT * FROM \""+user_mail+"\" WHERE ProductID=\""+product_id[len(product_id) - 1]+"\"")
 					mes = cur.fetchall()
 					filePath = mes[8]
 					conn.close()

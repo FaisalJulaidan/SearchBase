@@ -378,7 +378,7 @@ def allowed_file(filename):
 	ext = filename.rsplit('.',1)[1]
 	return '.' in filename and ext in ALLOWED_EXTENSIONS
 
-@app.route("/admin/profile", methods = ['GET', 'POST')
+@app.route("/admin/profile", methods = ['GET', 'POST'])
 def profilePage():
 	if request.method == "GET":
 		conn = sqlite3.connect(USERDATABASE)
@@ -387,7 +387,7 @@ def profilePage():
 		cur.execute("SELECT * FROM Users WHERE ContactEmail = \""+user_mail+"\"")
 		data = cur.fetchall()
 		conn.close()
-		return render_template()
+		return render_template("admin-profile.html", data=data)
 
 @app.route("/admin/Questions", methods = ['GET', 'POST'])
 def adminAddQuestion():

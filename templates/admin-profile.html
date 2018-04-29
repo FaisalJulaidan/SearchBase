@@ -174,19 +174,19 @@
                           <img class="img-responsive avatar-view" src="../static/images/img.jpg" alt="Avatar" title="Change the avatar">
                         </div>
                       </div>
-                      <h3>User name</h3>
+                      <h3>{{data[0][2]}} {{data[0][3]}}</h3>
 
                       <ul class="list-unstyled user_data">
-                        <li><i class="fa fa-map-marker user-profile-icon"></i> Address
+                        <li><i class="fa fa-map-marker user-profile-icon"></i> {{data[0][6]}}
                         </li>
 
                         <li>
-                          <i class="fa fa-briefcase user-profile-icon"></i> Company name
+                          <i class="fa fa-briefcase user-profile-icon"></i> {{data[0][4]}}
                         </li>
 
                         <li class="m-top-xs">
                           <i class="fa fa-external-link user-profile-icon"></i>
-                          <a href="http://www.thesearchbase.com/" target="_blank">www.companydomain.com</a>
+                          <a href="http://www.thesearchbase.com/{{data[0][4]}}" target="_blank">Assistant</a>
                         </li>
                       </ul>
                       <a class="btn btn-success"><i class="fa fa-edit m-right-xs"></i>Edit Profile</a>

@@ -388,6 +388,23 @@ def profilePage():
 		data = cur.fetchall()
 		conn.close()
 		return render_template("admin-profile.html", data=data)
+	if request.method == "POST":
+		names = request.form.get("names");
+		address = request.form.get("address");
+		compN = request.form.get("compN");
+		cID = request.form.get("cID");
+		names = names.split(" ")
+		conn = sqlite3.connect(USERDATABASE)
+		cur = conn.cursor()
+		user_mail = request.cookies.get("UserEmail")
+		# cur.execute("UPDATE table SET ProductsReturned = new value WHERE Date = \""+date+"\"")
+		cur.execute("UPDATE Users SET Firstname = \""+names[0]+"\" WHERE CompanyID = \""+cID+"\"")
+		cur.execute("UPDATE Users SET Surname = \""+names[1]+"\" WHERE CompanyID = \""+cID+"\"")
+		cur.execute("UPDATE Users SET CompanyAddress = \""+address+"\" WHERE CompanyID = \""+cID+"\"")
+		cur.execute("UPDATE Users SET CompanyName = \""+compN+"\" WHERE CompanyID = \""+cID+"\"")
+		conn.commit()
+		conn.close()
+		return redirect("/admin/profile", code=302)
 
 @app.route("/admin/Questions", methods = ['GET', 'POST'])
 def adminAddQuestion():

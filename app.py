@@ -459,8 +459,37 @@ def adminAnswers():
 		user_mail = request.cookies.get("UserEmail")
 		for i in range(1, 13):
 			if(request.form.get("pname" + str(i)) != None):
-				if (request.files['file'+str(i)].filename == ""):
-					print('no file given')
+				try:
+					if (request.files['file'+str(i)].filename == ""):
+						print('no file given')
+						if(request.form.get("delPic" + str(i)) != "yes"):
+							cur.execute("SELECT Answer"+str(i)+" FROM \""+user_mail+"\" WHERE Question=\""+selected_question+"\"")
+							data = cur.fetchall()
+							link = data[0][0].split(";")[2]
+							answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+link)
+						else:
+							answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";../static/img/core-img/android-icon-72x72.png")
+					else:
+						file = request.files['file'+str(i)]
+						if file.filename == '':
+							print('No file name')
+						elif file and allowed_file(file.filename):
+							filename = secure_filename(file.filename)
+							filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
+						file.save(filePath)
+						filePath = filePath.split("TheSearchBase")[len(filePath.split("TheSearchBase")) - 1]
+						# temporay string
+						tempList = list(filePath)
+						tempString = ""
+						for char in tempList:
+							if(char == "\\"):
+								char = "/"
+							tempString += char
+						filePath = tempString
+						# tempString = filePath.split("\\")
+						# filePath = tempString[0] + "/" + tempString[1]
+						answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";.."+filePath)
+				except:
 					if(request.form.get("delPic" + str(i)) != "yes"):
 						cur.execute("SELECT Answer"+str(i)+" FROM \""+user_mail+"\" WHERE Question=\""+selected_question+"\"")
 						data = cur.fetchall()
@@ -468,26 +497,6 @@ def adminAnswers():
 						answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+link)
 					else:
 						answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";../static/img/core-img/android-icon-72x72.png")
-				else:
-					file = request.files['file'+str(i)]
-					if file.filename == '':
-						print('No file name')
-					elif file and allowed_file(file.filename):
-						filename = secure_filename(file.filename)
-						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
-					file.save(filePath)
-					filePath = filePath.split("TheSearchBase")[len(filePath.split("TheSearchBase")) - 1]
-					# temporay string
-					tempList = list(filePath)
-					tempString = ""
-					for char in tempList:
-						if(char == "\\"):
-							char = "/"
-						tempString += char
-					filePath = tempString
-					# tempString = filePath.split("\\")
-					# filePath = tempString[0] + "/" + tempString[1]
-					answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";.."+filePath)
 		c=0
 		for a in answers:
 			c+=1
@@ -535,26 +544,35 @@ def adminAddProduct():
 				keywords.append(request.form.get("product_Keywords"+str(i), default="Error"))
 				discount.append(request.form.get("product_Discount"+str(i), default="Error"))
 				url.append(request.form.get("product_URL"+str(i), default="Error"))
-				if (request.files['product_image'+str(i)].filename == ""):
-					print('no file given')
-				else:
-					file = request.files['product_image'+str(i)]
-					if file.filename == '':
-						print('No file name')
-					elif file and allowed_file(file.filename):
-						filename = secure_filename(file.filename)
-						filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
-					file.save(filePath)
-					filePath = filePath.split("TheSearchBase")[len(filePath.split("TheSearchBase")) - 1]
-					tempList = list(filePath)
-					tempString = ""
-					for char in tempList:
-						if(char == "\\"):
-							char = "/"
-						tempString += char
-					filePath = tempString
-					filePath = ".." + filePath
-					file_path.append(filePath)
+				try:
+					if (request.files['product_image'+str(i)].filename == ""):
+						print('no file given')
+					else:
+						file = request.files['product_image'+str(i)]
+						if file.filename == '':
+							print('No file name')
+						elif file and allowed_file(file.filename):
+							filename = secure_filename(file.filename)
+							filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
+						file.save(filePath)
+						filePath = filePath.split("TheSearchBase")[len(filePath.split("TheSearchBase")) - 1]
+						tempList = list(filePath)
+						tempString = ""
+						for char in tempList:
+							if(char == "\\"):
+								char = "/"
+							tempString += char
+						filePath = tempString
+						filePath = ".." + filePath
+				except:
+					conn = sqlite3.connect(PRODUCTDATABASE)
+					cur = conn.cursor()
+					user_mail = request.cookies.get("UserEmail")
+					cur.execute("SELECT * FROM \""+user_mail+"\" WHERE ProductID=\""+product_id[len(product_id) - 1]+"\"")
+					mes = cur.fetchall()
+					filePath = mes[0][8]
+					conn.close()
+				file_path.append(filePath)
 			try:
 				conn = sqlite3.connect(PRODUCTDATABASE)
 				cur = conn.cursor()

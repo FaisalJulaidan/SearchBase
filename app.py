@@ -77,13 +77,13 @@ class Del:
   def __getitem__(self, k):
     return self.comp.get(k)
 
-conn = sqlite3.connect(USERDATABASE)
-cur = conn.cursor()
-cur.execute("SELECT * FROM Users;")
-cns = cur.fetchall()
 @app.route("/<route>", methods=['GET', 'POST'])
 def getTemplate(route):
 	if request.method == "GET":
+		conn = sqlite3.connect(USERDATABASE)
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM Users;")
+		cns = cur.fetchall()
 		for record in cns:
 			if route == record[4]:
 				conn = sqlite3.connect(QUESTIONDATABASE)
@@ -106,6 +106,10 @@ def getTemplate(route):
 				conn.close()
 				return render_template("dynamic-template.html", data=data, user=route)
 	if request.method == "POST":
+		conn = sqlite3.connect(USERDATABASE)
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM Users;")
+		cns = cur.fetchall()
 		for record in cns:
 			if route == record[4]:
 				conn = sqlite3.connect(PRODUCTDATABASE)
@@ -147,10 +151,23 @@ def getTemplate(route):
 						data.pop(p - substract)
 						substract += 1
 				DD = Del()
-				for item in data:
+				dl = len(data) - 1
+				i=0
+				while(i <= dl):
+					print(dl, " ", i, " ", len(data))
+					item = data[i]
 					itemprice = item[4].translate(DD)
-					if (int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1])):
-						data.pop(data.index(item))
+					print(budget)
+					print(itemprice)
+					print((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1])))
+					if ((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1]))):
+						print(item)
+						print(data.index(item))
+						print(data.pop(data.index(item)))
+						print(data)
+						i-= 1
+						dl-=1
+					i+=1
 				while(len(data) > 9):
 					data.pop()
 				if not data:
@@ -278,13 +295,17 @@ def loginpage():
 			datasalt = data[0][0]
 			# checking if the password and the salt match
 			if(check_password_hash(password, datapass, datasalt)):
-				return render_template("admin-main.html", msg= email)
+				cur.execute("SELECT * FROM Users WHERE ContactEmail=?;", [email])
+				user = cur.fetchall()
+				user = user[0][1] + " " + user[0][3]
+				return render_template("admin-main.html", msg= email, user=user)
 			else:
 				# else denying the login
 				return render_template('Login.html', data = "User name and password does not match!")
 		except:
 			print("Error in trying to find user")
 			conn.rollback()
+			return render_template('Login.html', data = "Did not manage to retrieve details.")
 		finally:
 			conn.close()
 

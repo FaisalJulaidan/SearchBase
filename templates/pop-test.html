@@ -98,13 +98,16 @@
     <script>
     var opened = false;
     var frame = document.getElementById("iframediv");
+    var but = document.getElementById("launch_button");
     frame.style = "display:none";
-    document.getElementById("launch_button").addEventListener("click", function(){
+    but.addEventListener("click", function(){
         if(!opened){
             frame.style = "display:block";
+            but.value= "Close Assistant";
             opened=true;
         }else{
             frame.style = "display:none";
+            but.value= "Launch Assistant";
             opened=false;
         }
     });

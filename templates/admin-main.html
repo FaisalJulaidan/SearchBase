@@ -50,7 +50,7 @@
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
-                <h2>user</h2>
+                <h2 id="welcomeh2"></h2>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -252,11 +252,13 @@
 
 	<script src="../static/js/cookies.js"></script>
     <script>
-    console.log("{{msg}}");
     if("{{msg}}" != ""){
         makeCookie("UserEmail", "{{msg}}", 1);
     }
-    console.log(getCookie("UserEmail"));
+    if("{{user}}" != ""){
+        makeCookie("User Official", "{{user}}", 1);
+    }
+    document.getElementById("welcomeh2").innerHTML = getCookie("User Official");
     </script>
 
   </body>

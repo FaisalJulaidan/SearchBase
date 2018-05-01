@@ -254,7 +254,7 @@
         					delete resultdic[(temparray.length - 1).toString()];
         					for(var i = 0; i< temparray.length-1; i++){
                                 resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
-        						cRD.append("<div onclick='BuyProduct(resultdic["+i+"][7])' class='found_box1'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][2]+" "+resultdic[i][1]+"</lable><br><br><label>"+resultdic[i][4]+"</label><br>"+"<button class=found_button style=vertical-align:middle><span>View </span></button></div>");
+        						cRD.append("<div class='found_box1'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class=found_button style=vertical-align:middle><span>View </span></button></div>");
         					}
         					// <div onclick='BuyProduct(resultdic["+i+"][14])' class='found_box1'><img src=\""+resultdic[i][15]+"\"><br><a>"+resultdic[i][2]+" "+resultdic[i][3]+"</a><br /><a>Screen size(Inch): "+resultdic[i][5]+"</a><br /><a>Battery life(Hrs):"+resultdic[i][4]+"</a><br /><a> Weight(Kg): "resultdic[i][7]+"</a><br /><a>"+resultdic[i][13]+"% off now £"
         					// +resultdic[i][6]+"</a><br /> <button class=found_button style=vertical-align:middle><span>Buy </span></button></div>");
@@ -273,7 +273,7 @@
 				}, 1000);
 			}
 			function BuyProduct(link){
-				window.open(link.toString());
+				window.open(link);
 			}
             function createArray(rows) {
                 var arrayRow = [];

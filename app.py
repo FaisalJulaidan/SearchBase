@@ -531,8 +531,11 @@ def adminAnswers():
 					if(request.form.get("delPic" + str(i)) != "yes"):
 						cur.execute("SELECT Answer"+str(i)+" FROM \""+user_mail+"\" WHERE Question=\""+selected_question+"\"")
 						data = cur.fetchall()
-						link = data[0][0].split(";")[2]
-						answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+link)
+						if data == []:
+							answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";../static/img/core-img/android-icon-72x72.png")
+						else:
+							link = data[0][0].split(";")[2]
+							answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";"+link)
 					else:
 						answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";../static/img/core-img/android-icon-72x72.png")
 		c=0
@@ -608,7 +611,10 @@ def adminAddProduct():
 					user_mail = request.cookies.get("UserEmail")
 					cur.execute("SELECT * FROM \""+user_mail+"\" WHERE ProductID=\""+product_id[len(product_id) - 1]+"\"")
 					mes = cur.fetchall()
-					filePath = mes[0][8]
+					if mes == []:
+						filePath = "../static/img/core-img/android-icon-72x72.png"
+					else:
+						filePath = mes[0][8]
 					conn.close()
 				file_path.append(filePath)
 			try:

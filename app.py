@@ -531,7 +531,8 @@ def adminAnswers():
 					if(request.form.get("delPic" + str(i)) != "yes"):
 						cur.execute("SELECT Answer"+str(i)+" FROM \""+user_mail+"\" WHERE Question=\""+selected_question+"\"")
 						data = cur.fetchall()
-						if data == []:
+						print(data)
+						if data == [(None,)]:
 							answers.append(request.form.get("pname" + str(i))+";"+request.form.get("keywords" + str(i))+";../static/img/core-img/android-icon-72x72.png")
 						else:
 							link = data[0][0].split(";")[2]

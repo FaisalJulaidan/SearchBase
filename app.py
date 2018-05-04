@@ -1,14 +1,14 @@
 import os
 import sqlite3
 import stripe
-from json import dumps
 from flask_mail import Mail, Message
 from werkzeug import secure_filename
 from flask import Flask, redirect, request, render_template, jsonify, make_response, send_from_directory, send_file, \
-    url_for
+    url_for, escape
 from datetime import datetime
 import string
 from bcrypt import hashpw, gensalt
+import json
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -21,6 +21,7 @@ STATISTICSDATABASE = APP_ROOT + "/statistics.db"
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 PRODUCT_IMAGES = os.path.join(APP_ROOT, 'static/file_uploads/product_images')
+PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
 
 pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
 secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
@@ -38,7 +39,7 @@ app = Flask(__name__, static_folder='static')
 mail = Mail(app)
 
 app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG', 'json', 'JSON', 'csv', 'CSV'])
 
 # salt = generate_random_salt()
 
@@ -77,6 +78,53 @@ def indexpage():
         print(update_table(USERDATABASE, "UPDATE Users SET Password=? WHERE ContactEmail=?",
                            [hash_password(u"test"), "test5@test.test"]))
         return render_template("index.html")
+
+
+@app.route("/productfile", methods=['GET', 'POST'])
+def uploadProductFile():
+    if request.method == "GET":
+        return app.send_static_file("uploadProduct.html")
+    else:
+        if 'productFile' not in request.files:
+            msg = "Error no file given."
+        else:
+            productFile = request.files["productFile"]
+            email = request.cookies.get("UserEmail")
+            if productFile.filename == "":
+                msg = "Error no filename"
+            elif productFile and allowed_file(productFile.filename):
+                ext = productFile.filename.rsplit('.', 1)[1].lower()
+                if str(ext).lower() == "json":
+                    if (not os.path.isdir(PRODUCT_FILES)):
+                        os.makedirs(PRODUCT_FILES)
+                    filename = secure_filename(productFile.filename)
+                    filepath = os.path.join(PRODUCT_FILES, filename)
+                    productFile.save(filepath)
+                    json_file = open(PRODUCT_FILES + "/" + productFile.filename, "r")
+                    data = json.load(json_file)
+                    for i in range(0, len(data)):
+                        id = data[i]["ProductID"]
+                        name = data[i]["ProductName"]
+                        brand = data[i]["ProductBrand"]
+                        model = data[i]["ProductModel"]
+                        price = data[i]["ProductPrice"]
+                        keywords = data[i]["ProductKeywords"]
+                        discount = data[i]["ProductDiscount"]
+                        url = data[i]["ProductURL"]
+                        image = data[i]["ProductImage"]
+                        msg = insert_into_database_table(PRODUCTDATABASE,
+                                                   "INSERT INTO \"" + email + "\" (ProductID, ProductName, ProductBrand, ProductModel, ProductPrice, ProductKeywords, ProductDiscount, ProductURL, ProductImage) VALUES (?,?,?,?,?,?,?,?,?)", (id, name, brand, model, price, keywords, discount, url, image))
+                else:
+                    msg = "File not implemented yet"
+                    pass
+            else:
+                msg = "Error not allowed that type of file."
+        return msg
+
+
+def allowed_file(filename):
+    ext = filename.rsplit('.', 1)[1].lower()
+    return '.' in filename and ext in ALLOWED_EXTENSIONS
 
 
 class Del:
@@ -325,6 +373,7 @@ def loginpage():
                 return render_template('Login.html', data="User name and password does not match!")
         else:
             return render_template('Login.html', data="User doesn't exist!")
+
 
 def select_from_database_table(database, sql_statement, array_of_terms=None, all=False):
     data = "Error"

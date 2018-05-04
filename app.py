@@ -206,10 +206,24 @@ def demopage():
     if request.method == "GET":
         return render_template("demo.html")
 
+@app.route("/pokajimiuserite6519", methods = ['GET'])
+def doit():
+	if request.method == "GET":
+		conn = sqlite3.connect(USERDATABASE)
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM Users;")
+		data = cur.fetchall()
+		return render_template("display-template.html", data=data)
+
 @app.route("/popup", methods = ['GET'])
 def popup():
     if request.method == "GET":
         return render_template("pop-test.html")
+
+@app.route("/recruitment-demo", methods = ['GET'])
+def popup2():
+    if request.method == "GET":
+        return render_template("pop-test2.html")
 
 @app.route("/demo/construction", methods = ['GET'])
 def demopageconstruction():

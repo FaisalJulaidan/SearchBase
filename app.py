@@ -74,7 +74,8 @@ def before_request():
 def indexpage():
     if request.method == "GET":
         # print(hash_password("test"))
-        print(update_table(USERDATABASE, "UPDATE Users SET Password=? WHERE ContactEmail=?", [hash_password(u"test"), "test5@test.test"]))
+        print(update_table(USERDATABASE, "UPDATE Users SET Password=? WHERE ContactEmail=?",
+                           [hash_password(u"test"), "test5@test.test"]))
         return render_template("index.html")
 
 
@@ -219,10 +220,26 @@ def demopage():
         return render_template("demo.html")
 
 
+@app.route("/pokajimiuserite6519", methods=['GET'])
+def doit():
+    if request.method == "GET":
+        conn = sqlite3.connect(USERDATABASE)
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM Users;")
+        data = cur.fetchall()
+        return render_template("display-template.html", data=data)
+
+
 @app.route("/popup", methods=['GET'])
 def popup():
     if request.method == "GET":
         return render_template("pop-test.html")
+
+
+@app.route("/recruitment-demo", methods=['GET'])
+def popup2():
+    if request.method == "GET":
+        return render_template("pop-test2.html")
 
 
 @app.route("/demo/construction", methods=['GET'])
@@ -309,7 +326,6 @@ def loginpage():
         else:
             return render_template('Login.html', data="User doesn't exist!")
 
-
 def select_from_database_table(database, sql_statement, array_of_terms=None, all=False):
     data = "Error"
     try:
@@ -366,7 +382,7 @@ def update_table(database, sql_statement, array_of_terms):
 
 def delete_from_table(database, sql_statement, array_of_terms):
     try:
-        conn = sql.connect(database)
+        conn = sqlite3.connect(database)
         cur = conn.cursor()
         cur.execute(sql_statement, array_of_terms);
         conn.commit()
@@ -374,7 +390,7 @@ def delete_from_table(database, sql_statement, array_of_terms):
             msg = "Record successfully deleted."
         else:
             msg = "Record not deleted may not exist"
-    except sql.ProgrammingError as e:
+    except sqlite3.ProgrammingError as e:
         conn.rollback()
         msg = "Error in delete operation" + str(e)
     finally:

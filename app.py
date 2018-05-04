@@ -283,7 +283,7 @@ def loginpage():
 				break
 			else:
 				if(i == len(data)):
-					return render_template('login.html', data = "User not found!")
+					return render_template('Login.html', data = "User not found!")
 		try:
 			# selecting the password from the database
 			cur.execute("SELECT Password FROM Users WHERE ContactEmail=?;", [email])

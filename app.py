@@ -130,6 +130,7 @@ def uploadProductFile():
                 else:
                     msg = "File not implemented yet"
                     pass
+                os.remove(PRODUCT_FILES + "/" + productFile.filename)
             else:
                 msg = "Error not allowed that type of file."
         return msg

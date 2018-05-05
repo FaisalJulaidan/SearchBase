@@ -9,6 +9,7 @@ from datetime import datetime
 import string
 from bcrypt import hashpw, gensalt
 import json
+from xml.dom import minidom
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -39,7 +40,7 @@ app = Flask(__name__, static_folder='static')
 mail = Mail(app)
 
 app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG', 'json', 'JSON', 'csv', 'CSV'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG', 'json', 'JSON', 'csv', 'CSV', 'xml', 'xml'])
 
 # salt = generate_random_salt()
 
@@ -94,26 +95,38 @@ def uploadProductFile():
                 msg = "Error no filename"
             elif productFile and allowed_file(productFile.filename):
                 ext = productFile.filename.rsplit('.', 1)[1].lower()
+                if (not os.path.isdir(PRODUCT_FILES)):
+                    os.makedirs(PRODUCT_FILES)
+                filename = secure_filename(productFile.filename)
+                filepath = os.path.join(PRODUCT_FILES, filename)
+                productFile.save(filepath)
+
                 if str(ext).lower() == "json":
-                    if (not os.path.isdir(PRODUCT_FILES)):
-                        os.makedirs(PRODUCT_FILES)
-                    filename = secure_filename(productFile.filename)
-                    filepath = os.path.join(PRODUCT_FILES, filename)
-                    productFile.save(filepath)
                     json_file = open(PRODUCT_FILES + "/" + productFile.filename, "r")
                     data = json.load(json_file)
                     for i in range(0, len(data)):
-                        id = data[i]["ProductID"]
-                        name = data[i]["ProductName"]
-                        brand = data[i]["ProductBrand"]
-                        model = data[i]["ProductModel"]
-                        price = data[i]["ProductPrice"]
-                        keywords = data[i]["ProductKeywords"]
-                        discount = data[i]["ProductDiscount"]
-                        url = data[i]["ProductURL"]
-                        image = data[i]["ProductImage"]
-                        msg = insert_into_database_table(PRODUCTDATABASE,
-                                                   "INSERT INTO \"" + email + "\" (ProductID, ProductName, ProductBrand, ProductModel, ProductPrice, ProductKeywords, ProductDiscount, ProductURL, ProductImage) VALUES (?,?,?,?,?,?,?,?,?)", (id, name, brand, model, price, keywords, discount, url, image))
+                        msg = productIntoDatabase(email, data[i]["ProductID"], data[i]["ProductName"], data[i]["ProductBrand"], data[i]["ProductModel"], data[i]["ProductPrice"], data[i]["ProductKeywords"], data[i]["ProductDiscount"], data[i]["ProductURL"], data[i]["ProductImage"])
+                elif str(ext).lower() == "xml":
+                    xmldoc = minidom.parse(PRODUCT_FILES + "/" + productFile.filename)
+                    productList = xmldoc.getElementsByTagName("product")
+                    for product in productList:
+                        try:
+                            id = product.getElementsByTagName("ProductID")[0].childNodes[0].data
+                            name = product.getElementsByTagName("ProductName")[0].childNodes[0].data
+                            brand = product.getElementsByTagName("ProductBrand")[0].childNodes[0].data
+                            model = product.getElementsByTagName("ProductModel")[0].childNodes[0].data
+                            price = product.getElementsByTagName("ProductPrice")[0].childNodes[0].data
+                            keywords = product.getElementsByTagName("ProductKeywords")[0].childNodes[0].data
+                            discount = product.getElementsByTagName("ProductDiscount")[0].childNodes[0].data
+                            url = product.getElementsByTagName("ProductURL")[0].childNodes[0].data
+                            try:
+                                image = product.getElementsByTagName("ProductImage")[0].childNodes[0].data
+                                msg = productIntoDatabase(email, id, name, brand, model, price, keywords, discount, url, image)
+                            except IndexError:
+                                msg = productIntoDatabase(email, id, name, brand, model, price, keywords, discount, url)
+                        except IndexError:
+                            msg = "Invalid xml file"
+                            print(msg)
                 else:
                     msg = "File not implemented yet"
                     pass
@@ -121,6 +134,10 @@ def uploadProductFile():
                 msg = "Error not allowed that type of file."
         return msg
 
+def productIntoDatabase(email, id="", name="", brand="", model="", price="", keywords="",discount="", url="", image=""):
+    msg = insert_into_database_table(PRODUCTDATABASE, "INSERT INTO \"" + email + "\" (ProductID, ProductName, ProductBrand, ProductModel, ProductPrice, ProductKeywords, ProductDiscount, ProductURL, ProductImage) VALUES (?,?,?,?,?,?,?,?,?)",
+                                     (id, name, brand, model, price, keywords, discount, url, image))
+    return msg
 
 def allowed_file(filename):
     ext = filename.rsplit('.', 1)[1].lower()

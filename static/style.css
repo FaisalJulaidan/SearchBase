@@ -1778,52 +1778,93 @@ right: 0;
     color: #eaeaea;
 }
 
-/* Chat containers */
-.container {
-    border: 2px solid #dedede;
-    background-color: #f1f1f1;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 10px 0;
+#messagesContainer{
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-/* Darker chat container */
-.darker {
-    border-color: #ccc;
-    background-color: #ddd;
+#messagesContainer li{
+  display:inline-block;
+  clear: both;
+  padding: 10px 20px 10px 20px;
+  border-radius: 30px;
+  margin-bottom: 2px;
+  font-family: Helvetica, Arial, sans-serif;
 }
 
-/* Clear floats */
-.container::after {
-    content: "";
-    clear: both;
-    display: table;
+.TSBbot{
+  background: #eee;
+  float: left;
 }
 
-/* Style images */
-.container img {
-    float: left;
-    max-width: 60px;
+.userChat{
+  float: right;
+  background: #0084ff;
+  color: #fff;
+}
+
+.TSBbot + .userChat{
+  border-bottom-right-radius: 5px;
+}
+
+.userChat + .userChat{
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.userChat:last-of-type {
+  border-bottom-right-radius: 30px;
+}
+
+#bottomContainer{
+      margin-top:5%;
+      float:left;
+      width: 100%;
+}
+
+#bottomContainer input{
+    width: 80%;
+    margin-right: 3%;
+}
+
+#bottomContainer a{
+    width: 14%;
+}
+
+#optionsDiv{
     width: 100%;
-    margin-right: 20px;
-    border-radius: 50%;
+    margin-bottom: 5%;
 }
 
-/* Style the right image */
-.container img.right {
-    float: right;
-    margin-left: 20px;
-    margin-right:0;
+.chatProducts{
+    float:left;
 }
 
-/* Style time text */
-.time-right {
-    float: right;
-    color: #aaa;
+.answerOptions{
+    border-color: black;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 0.5px;
+    padding: 8px;
+    margin: 4px;
+    /* white-space: nowrap;  */
+    word-break: keep-all;
 }
 
-/* Style time text */
-.time-left {
-    float: left;
-    color: #999;
+.answerOptions{
+  color: black;
+  padding: 5px 11px;
+  border: 1px solid #5a827f;
+  border-radius: 500px;
+  margin: 5px;
+}
+
+.answerOptions:hover{
+  color: #ffffff;
+  background: grey;
+}
+
+.answerOptions{
+  text-align: center;
 }

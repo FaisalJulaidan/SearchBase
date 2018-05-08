@@ -116,8 +116,8 @@ def getTemplate(route):
                 conn.commit()
                 conn.close()
                 return render_template("dynamic-template.html", data=data, user="dynamic/"+route)
-		return redirect("/pagenotfound", code=302)
-	if request.method == "POST":
+        return redirect("/pagenotfound", code=302)
+    if request.method == "POST":
         conn = sqlite3.connect(USERDATABASE)
         cur = conn.cursor()
         cur.execute("SELECT * FROM Users;")

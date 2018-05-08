@@ -37,6 +37,13 @@
     <meta name="msapplication-TileImage" content="../static/img/core-img/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
 
+
+    <!-- Pop-up Stylesheet -->
+    <!-- <link href="../static/pop-up/pop.css" rel="stylesheet"> -->
+
+    <!-- Responsive CSS -->
+    <link href="../static/css/responsive.css" rel="stylesheet">
+
     <!-- Core Stylesheet -->
     <link href="../static/style.css" rel="stylesheet">
     <!-- <link href="../static/css/main.css" rel="stylesheet"> -->
@@ -56,7 +63,7 @@
     <!-- Footer Reveal JS -->
     <script src="../static/js/footer-reveal.min.js"></script>
     <!-- Active JS -->
-    <script src="../static/js/active.js"></script>
+    <!-- <script src="../static/js/active.js"></script> -->
 
 
 </head>
@@ -65,15 +72,16 @@
     <!-- <div class="chat-box">
         <div class="open">Open
             <div class="box"> -->
-            <div id="messagesContainer">
+            <ul id="messagesContainer">
                 <!-- paste here the yeyo -->
-            </div>
-            <div id="ResultDiv">
-                <!-- paste here the result of the yeyo -->
-            </div>
-                <div class="bottom_left">
-                    <input id="textMessage"><button onclick="submitMessage('')" id="submitMessage">Submit</button>
+            </ul>
+            <div id="bottomContainer">
+                <div id="optionsDiv">
                 </div>
+                <!-- <ul> -->
+                <input onkeypress="handleEnter(event)" id="textMessage"><a id="messageSubmitB" class="btn btn-success" onclick="submitMessage('')" id="submitMessage"> > </a>
+                <!-- </ul> -->
+            </div>
 
             <!-- </div>
         </div>
@@ -96,23 +104,18 @@
    {%endfor%}
    i++;
    {%endfor%}
-   var question = "";
-   var answers = "";
    var questionNumber = 0;
    var questionN = -1;
     // document.getElementById("submitMessage").addEventListener("click", );
 
+    $("#messagesContainer").append("<li class='TSBbot'>Hello. I am "+"{{user}}".split("/")[1]+"\'s little assistant, here to help you make the best choice. Please answer the following questions to help you find the best choice.</li>");
     getNextQuestion();
 
     function submitMessage(message){
         if(message==""){
             message = document.getElementById("textMessage").value;
         }
-        $("#messagesContainer").append("\
-        <div class=\"container darker\">\
-          <!-- <img src=\"/w3images/bandmember.jpg\" alt=\"Avatar\"> -->\
-          <p>"+message+"</p>\
-        </div>");
+        $("#messagesContainer").append("<li class='userChat'>"+message+"</li>");
         for(var i=0; i<data[questionN].length; i++){
             if(data[questionN][i].split(";")[0] == message){
                 getKeyWord(data[questionN][i].split(";")[1]);
@@ -120,11 +123,14 @@
                 return null;
             }
         }
-        $("#messagesContainer").append("\
-        <div class=\"container darker\">\
-          <!-- <img src=\"/w3images/bandmember.jpg\" alt=\"Avatar\"> -->\
-          <p>I am sorry but I need an answer from the showed ones in order to get you the best match.</p>\
-        </div>");
+        $("#messagesContainer").append("<li class='TSBbot'>I apologise but I need an answer from the showed ones in order to get you the best match</li>");
+        // $(this).css('height', 'auto');
+        // console.log(document.body.scrollHeight);
+        // // window.scrollTo(0,document.body.scrollHeight);
+        // $("a[href='#bottom']").click(function() {
+        //   $("html, body").animate({ scrollTop: $(document).height() }, "slow");
+        //   return false;
+        // });
     }
 
     function getNextQuestion(){
@@ -132,35 +138,49 @@
         $("#qAnswers").remove();
         if(data[questionN] == undefined){
             sendData();
+            SetRepeat();
+            // console.log(document.body.scrollHeight);
+            // window.scrollTo(0,document.body.scrollHeight);
             return 0;
         }
-        var answers = "";
+        var answers = "<div id='qAnswers'>";
         for(var i=1; i<data[questionN].length; i++){
-            answers+="<a onclick=\"submitMessage('"+data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0]+"</a> | "
+            answers+="<a class='answerOptions' onclick=\"submitMessage('"+data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0]+"</a>"
         }
-        $("#messagesContainer").append("\
-        <div class=\"container darker\">\
-          <!-- <img src=\"/w3images/bandmember.jpg\" alt=\"Avatar\"> -->\
-          <p>"+data[questionN][0]+"</p>\
-        </div><br>"+answers);
+        answers+="</div>"
+        $("#messagesContainer").append("<li class='TSBbot'>"+data[questionN][0]+"</li>");
+        $("#optionsDiv").append(answers);
+        // console.log(document.body.scrollHeight);
+        // window.scrollTo(0,document.body.scrollHeight);
     }
 
-        //
-        // <div class="container">
-        //   <!-- <img src="/w3images/bandmember.jpg" alt="Avatar"> -->
-        //   <p>Hello. How are you today?</p>
-        //   <span class="time-right">11:00</span>
-        // </div>
-        //
-        // <div class="container darker">
-        //   <!-- <img src="/w3images/avatar_g2.jpg" alt="Avatar" class="right"> -->
-        //   <p>Hey! I'm fine. Thanks for asking!</p>
-        //   <span class="time-left">11:01</span>
-        // </div>
+    function SetRepeat(){
+        $("#optionsDiv").append("<div class='answerOptions' id='qAnswers'><a onclick=\"Reset()\">Search Again</a></div>");
+    }
 
+    function Reset(){
+        keywords = [];
+        questionsAnswered = 0;
+        questionNumber = 0;
+        questionN = -1;
+        getNextQuestion();
+    }
 
+    function handleEnter(e){
+        var keycode = (e.keyCode ? e.keyCode : e.which);
+        if (keycode == '13') {
+            submitMessage('');
+        }
+    }
 
-
+    jQuery.expr.filters.offscreen = function(el) {
+      var rect = el.getBoundingClientRect();
+      return (
+               (rect.x + rect.width) < 0
+                 || (rect.y + rect.height) < 0
+                 || (rect.x > window.innerWidth || rect.y > window.innerHeight)
+             );
+    };
 
     $(document).on('ready', function() {
       $(".lazy").slick({
@@ -169,54 +189,6 @@
       });
     });
 
-
-    // "<div id =\"q1\" class=\"\">\
-    //    <div class=\"box-holder\">\
-    //       <h2 style=\"text-align:center;\">What will you use your computer for?</h2>\
-    //        <p style=\"text-align:center;\">Please select one option.</p>\
-    //        <div class=\"row\">\
-// \
-//                      <div class=\"column\" onclick=\"SetComputerUse('Business')\">\
-//                        <p class=\"image-box\">Business</p>\
-//                        <img class=\"icon-box\" src=\"../static/img/icon-images/laptop.png\">\
-//                      </div>\
-// \
-     //       </div>\
-     //    </div>\
-     // </div>"
-    // getDatabaseData();
-    // function getDatabaseData(){
-    //     for(var q = 0; q <= data.length-1; q++){
-    //         question = "";
-    //         answers = "";
-    //         questionNumber += 1;
-    //         for(var a = 1; a <= data[q].length-1; a++){
-    //             parts = data[q][a].split(";");
-    //             answers += "<div onclick=\"getKeyWord(\'"+parts[1]+"\',\'q"+(questionNumber+1).toString()+"\')\" class=\"column\">\
-    //                            <p class=\"image-box\">"+parts[0]+"</p>\
-    //                            <img class=\"icon-box\" src=\""+parts[2]+"\">\
-    //                          </div>\
-    //                          ";
-    //              cRD = $("#change");
-    //              cRD.attr("id", "q"+(data.length+1).toString());
-    //         }
-    //         question = "<div id=q"+questionNumber.toString()+" class=\"questionDiv\">\
-    //                        <div class=\"box-holder\">\
-    //                           <h2 style=\"text-align:center;\">"+data[q][0]+"</h2>\
-    //                            <p style=\"text-align:center;\">Please select one option.</p>\
-    //                            <div class=\"row\">\
-    //                            ";
-    //         for(var a = 0; a <= answers.length-1; a++){
-    //             question += answers[a];
-    //         }
-    //         question += "</div>\
-    //                  </div>\
-    //               </div>";
-    //         // $("#questionsInsert").append(question);
-    //     }
-    // }
-    // questionDivs = document.getElementsByClassName("questionDiv");
-    // questionDivs[questionDivs.length-1].addEventListener("click", sendData);
     var keywords = [];
     var questionsAnswered = 0;
     function getKeyWord(word){
@@ -244,10 +216,9 @@
           if (xhttp.readyState === 4) {
             if (xhttp.status === 200) {
                 var data = xhttp.responseText;
-                cRD = $("#ResultDiv");
-                cRD.empty();
+                cRD = $("#messagesContainer");
                 if(data == "We could not find anything that matched your seach criteria. Please try different filter options."){
-                    cRD.append("<br><h3>"+data+"</h3>");
+                    cRD.append("<br><h3 class='chatProducts'>"+data+"</h3><br>");
                 } else {
                     resultdic = {};
                     var temparray = data.split("&&&");
@@ -257,10 +228,8 @@
                     delete resultdic[(temparray.length - 1).toString()];
                     for(var i = 0; i< temparray.length-1; i++){
                         resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
-                        cRD.append("<div class='found_box1'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class=found_button style=vertical-align:middle><span>View </span></button></div>");
+                        cRD.append("<div class='chatProducts' class='found_box1'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='found_button' style='vertical-align:middle'><span>View </span></button></div><br>");
                     }
-                    // <div onclick='BuyProduct(resultdic["+i+"][14])' class='found_box1'><img src=\""+resultdic[i][15]+"\"><br><a>"+resultdic[i][2]+" "+resultdic[i][3]+"</a><br /><a>Screen size(Inch): "+resultdic[i][5]+"</a><br /><a>Battery life(Hrs):"+resultdic[i][4]+"</a><br /><a> Weight(Kg): "resultdic[i][7]+"</a><br /><a>"+resultdic[i][13]+"% off now £"
-                    // +resultdic[i][6]+"</a><br /> <button class=found_button style=vertical-align:middle><span>Buy </span></button></div>");
                 }
             } else {
               console.error(xhttp.statusText);

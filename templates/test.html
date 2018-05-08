@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <!-- Title -->
+    <title>404</title>
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#884BDF">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#884BDF">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="#884BDF">
+
+    <!-- Icon images -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../static/img/core-img/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../static/img/core-img/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../static/img/core-img/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../static/img/core-img/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../static/img/core-img/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../static/img/core-img/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../static/img/core-img/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../static/img/core-img/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../static/img/core-img/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="../static/img/core-img/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../static/img/core-img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../static/img/core-img/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../static/img/core-img/favicon-16x16.png">
+    <link rel="manifest" href="../static/img/core-img/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="../static/img/core-img/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Core Stylesheet -->
+    <link href="../static/style.css" rel="stylesheet">
+    <!-- <link href="../static/css/main.css" rel="stylesheet"> -->
+
+    <!-- Responsive CSS -->
+    <link href="../static/css/responsive.css" rel="stylesheet">
+    <!-- Jquery-2.2.4 JS -->
+    <script src="../static/js/jquery-2.2.4.min.js"></script>
+    <!-- Popper js -->
+    <script src="../static/js/popper.min.js"></script>
+    <!-- Bootstrap-4 Beta JS -->
+    <script src="../static/js/bootstrap.min.js"></script>
+    <!-- All Plugins JS -->
+    <script src="../static/js/plugins.js"></script>
+    <!-- Slick Slider Js-->
+    <script src="../static/js/slick.min.js"></script>
+    <!-- Footer Reveal JS -->
+    <script src="../static/js/footer-reveal.min.js"></script>
+    <!-- Active JS -->
+    <script src="../static/js/active.js"></script>
+
+
+</head>
+
+<body>
+    <!-- <div class="chat-box">
+        <div class="open">Open
+            <div class="box"> -->
+            <div id="messagesContainer">
+                <!-- paste here the yeyo -->
+            </div>
+            <div id="ResultDiv">
+                <!-- paste here the result of the yeyo -->
+            </div>
+                <div class="bottom_left">
+                    <input id="textMessage"><button onclick="submitMessage('')" id="submitMessage">Submit</button>
+                </div>
+
+            <!-- </div>
+        </div>
+    </div> -->
+
+    <script>
+   var numberOfQuestions = 0;
+   {%for item in data%}
+   numberOfQuestions++;
+   {%endfor%}
+   var data = createArray(numberOfQuestions);
+   var i = 0;
+   {%for item in data%}
+   {%for answer in item%}
+   {%if answer != None%}
+   {%if answer != ""%}
+   data[i].push("{{answer}}");
+   {%endif%}
+   {%endif%}
+   {%endfor%}
+   i++;
+   {%endfor%}
+   var question = "";
+   var answers = "";
+   var questionNumber = 0;
+   var questionN = -1;
+    // document.getElementById("submitMessage").addEventListener("click", );
+
+    getNextQuestion();
+
+    function submitMessage(message){
+        if(message==""){
+            message = document.getElementById("textMessage").value;
+        }
+        $("#messagesContainer").append("\
+        <div class=\"container darker\">\
+          <!-- <img src=\"/w3images/bandmember.jpg\" alt=\"Avatar\"> -->\
+          <p>"+message+"</p>\
+        </div>");
+        for(var i=0; i<data[questionN].length; i++){
+            if(data[questionN][i].split(";")[0] == message){
+                getKeyWord(data[questionN][i].split(";")[1]);
+                getNextQuestion();
+                return null;
+            }
+        }
+        $("#messagesContainer").append("\
+        <div class=\"container darker\">\
+          <!-- <img src=\"/w3images/bandmember.jpg\" alt=\"Avatar\"> -->\
+          <p>I am sorry but I need an answer from the showed ones in order to get you the best match.</p>\
+        </div>");
+    }
+
+    function getNextQuestion(){
+        questionN += 1;
+        $("#qAnswers").remove();
+        if(data[questionN] == undefined){
+            sendData();
+            return 0;
+        }
+        var answers = "";
+        for(var i=1; i<data[questionN].length; i++){
+            answers+="<a onclick=\"submitMessage('"+data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0]+"</a> | "
+        }
+        $("#messagesContainer").append("\
+        <div class=\"container darker\">\
+          <!-- <img src=\"/w3images/bandmember.jpg\" alt=\"Avatar\"> -->\
+          <p>"+data[questionN][0]+"</p>\
+        </div><br>"+answers);
+    }
+
+        //
+        // <div class="container">
+        //   <!-- <img src="/w3images/bandmember.jpg" alt="Avatar"> -->
+        //   <p>Hello. How are you today?</p>
+        //   <span class="time-right">11:00</span>
+        // </div>
+        //
+        // <div class="container darker">
+        //   <!-- <img src="/w3images/avatar_g2.jpg" alt="Avatar" class="right"> -->
+        //   <p>Hey! I'm fine. Thanks for asking!</p>
+        //   <span class="time-left">11:01</span>
+        // </div>
+
+
+
+
+
+    $(document).on('ready', function() {
+      $(".lazy").slick({
+        lazyLoad: 'ondemand', // ondemand progressive anticipated
+        infinite: true
+      });
+    });
+
+
+    // "<div id =\"q1\" class=\"\">\
+    //    <div class=\"box-holder\">\
+    //       <h2 style=\"text-align:center;\">What will you use your computer for?</h2>\
+    //        <p style=\"text-align:center;\">Please select one option.</p>\
+    //        <div class=\"row\">\
+// \
+//                      <div class=\"column\" onclick=\"SetComputerUse('Business')\">\
+//                        <p class=\"image-box\">Business</p>\
+//                        <img class=\"icon-box\" src=\"../static/img/icon-images/laptop.png\">\
+//                      </div>\
+// \
+     //       </div>\
+     //    </div>\
+     // </div>"
+    // getDatabaseData();
+    // function getDatabaseData(){
+    //     for(var q = 0; q <= data.length-1; q++){
+    //         question = "";
+    //         answers = "";
+    //         questionNumber += 1;
+    //         for(var a = 1; a <= data[q].length-1; a++){
+    //             parts = data[q][a].split(";");
+    //             answers += "<div onclick=\"getKeyWord(\'"+parts[1]+"\',\'q"+(questionNumber+1).toString()+"\')\" class=\"column\">\
+    //                            <p class=\"image-box\">"+parts[0]+"</p>\
+    //                            <img class=\"icon-box\" src=\""+parts[2]+"\">\
+    //                          </div>\
+    //                          ";
+    //              cRD = $("#change");
+    //              cRD.attr("id", "q"+(data.length+1).toString());
+    //         }
+    //         question = "<div id=q"+questionNumber.toString()+" class=\"questionDiv\">\
+    //                        <div class=\"box-holder\">\
+    //                           <h2 style=\"text-align:center;\">"+data[q][0]+"</h2>\
+    //                            <p style=\"text-align:center;\">Please select one option.</p>\
+    //                            <div class=\"row\">\
+    //                            ";
+    //         for(var a = 0; a <= answers.length-1; a++){
+    //             question += answers[a];
+    //         }
+    //         question += "</div>\
+    //                  </div>\
+    //               </div>";
+    //         // $("#questionsInsert").append(question);
+    //     }
+    // }
+    // questionDivs = document.getElementsByClassName("questionDiv");
+    // questionDivs[questionDivs.length-1].addEventListener("click", sendData);
+    var keywords = [];
+    var questionsAnswered = 0;
+    function getKeyWord(word){
+        for(var i = 0; i <= keywords.length-1; i++){
+            if(word == keywords[i]){
+                keywords.splice(i, 1);
+                return 0;
+            }
+        }
+        questionsAnswered++;
+        keywords.push(word);
+    }
+    function sendData(){
+        params = "numberOfKeywords=" + keywords.length.toString();
+        for(var i = 0; i <= keywords.length-1; i++){
+            params+="&";
+            params+='keyword'+(i+1).toString()+"="+keywords[i];
+        }
+        params+="&questionsAnswered="+questionsAnswered.toString();
+        questionsAnswered = 0;
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", '/'+"{{user}}", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState === 4) {
+            if (xhttp.status === 200) {
+                var data = xhttp.responseText;
+                cRD = $("#ResultDiv");
+                cRD.empty();
+                if(data == "We could not find anything that matched your seach criteria. Please try different filter options."){
+                    cRD.append("<br><h3>"+data+"</h3>");
+                } else {
+                    resultdic = {};
+                    var temparray = data.split("&&&");
+                    for(var i = 0; i < temparray.length; i++){
+                        resultdic[i] = temparray[i].split("|||");
+                    }
+                    delete resultdic[(temparray.length - 1).toString()];
+                    for(var i = 0; i< temparray.length-1; i++){
+                        resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
+                        cRD.append("<div class='found_box1'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class=found_button style=vertical-align:middle><span>View </span></button></div>");
+                    }
+                    // <div onclick='BuyProduct(resultdic["+i+"][14])' class='found_box1'><img src=\""+resultdic[i][15]+"\"><br><a>"+resultdic[i][2]+" "+resultdic[i][3]+"</a><br /><a>Screen size(Inch): "+resultdic[i][5]+"</a><br /><a>Battery life(Hrs):"+resultdic[i][4]+"</a><br /><a> Weight(Kg): "resultdic[i][7]+"</a><br /><a>"+resultdic[i][13]+"% off now £"
+                    // +resultdic[i][6]+"</a><br /> <button class=found_button style=vertical-align:middle><span>Buy </span></button></div>");
+                }
+            } else {
+              console.error(xhttp.statusText);
+            }
+          }
+        };
+        xhttp.send(params);
+    }
+    // function scrollTo(id){
+    //     id = "#" + id
+    //     $('html, body').animate({
+    //         scrollTop: ($(id).offset().top)
+    //     }, 1000);
+    // }
+    function BuyProduct(link){
+        window.open(link);
+    }
+    function createArray(rows) {
+        var arrayRow = [];
+      for (var i=0;i<rows;i++) {
+         arrayRow[i] = [];
+      }
+      return arrayRow;
+    }
+    </script>
+</body>
+
+</html>

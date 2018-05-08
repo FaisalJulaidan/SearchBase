@@ -87,7 +87,7 @@ class Del:
         return self.comp.get(k)
 
 
-@app.route("/<route>", methods=['GET', 'POST'])
+@app.route("/dynamic/<route>", methods=['GET', 'POST'])
 def getTemplate(route):
     if request.method == "GET":
         conn = sqlite3.connect(USERDATABASE)
@@ -115,8 +115,9 @@ def getTemplate(route):
                         int(stats[0][1]) + 1) + "\" WHERE Date = \"" + date + "\"")
                 conn.commit()
                 conn.close()
-                return render_template("dynamic-template.html", data=data, user=route)
-    if request.method == "POST":
+                return render_template("dynamic-template.html", data=data, user="dynamic/"+route)
+		return redirect("/pagenotfound", code=302)
+	if request.method == "POST":
         conn = sqlite3.connect(USERDATABASE)
         cur = conn.cursor()
         cur.execute("SELECT * FROM Users;")
@@ -219,6 +220,39 @@ def demopage():
     if request.method == "GET":
         return render_template("demo.html")
 
+@app.route("/test", methods=['GET'])
+def test():
+	if request.method == "GET":
+		conn = sqlite3.connect(USERDATABASE)
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM Users;")
+		cns = cur.fetchall()
+		conn.close()
+		route = "Royal Properties LTD"
+		for record in cns:
+			if route == record[4]:
+				conn = sqlite3.connect(QUESTIONDATABASE)
+				cur = conn.cursor()
+				cur.execute("SELECT * FROM \"" + record[7] + "\"")
+				data = cur.fetchall()
+				conn.close()
+				date = datetime.now().strftime("%Y-%m")
+				conn = sqlite3.connect(STATISTICSDATABASE)
+				cur = conn.cursor()
+				cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
+				stats = cur.fetchall()
+				if not stats:
+					print(stats)
+					cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
+									VALUES (?,?,?,?)", (date, "1", "0", "0"))
+				else:
+					cur.execute("UPDATE \"" + route + "\" SET AssistantOpened = \"" + str(
+                        int(stats[0][1]) + 1) + "\" WHERE Date = \"" + date + "\"")
+				conn.commit()
+				conn.close()
+				return render_template("test.html", data=data, user="dynamic/"+route)
+		return redirect("/pagenotfound", code=302)
+		# return render_template("test.html")
 
 @app.route("/pokajimiuserite6519", methods=['GET'])
 def doit():

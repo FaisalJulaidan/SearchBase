@@ -161,8 +161,11 @@
               </div>
             </div>
             <div class="clearfix"></div>
-            <div class="row">
-
+            <div id="pasteDiv" class="row">
+            <li> Export to Excel</li><br>
+            <button id="btnExport" onclick="fnExcelReport();"> EXPORT </button><br>
+            <iframe id="txtArea1" style="display:none"></iframe>
+            <br><br>
             <canvas id="putcharthere1" width="600" height="400"></canvas>
             <canvas id="putcharthere2" width="600" height="400"></canvas>
             <canvas id="putcharthere3" width="600" height="400"></canvas>
@@ -352,7 +355,49 @@
     new Chart(chartdiv, {
     data: chartData,
     type: 'bar',
-    });
+    });//Create table for Excel export
+    var tableString = "<table><tr><th>Date</th><th>Assistant Opened</th><th>Questions Answered</th><th>Products Returned</th></tr>";
+    {% for item in data %}
+    tableString+= "<tr>"
+    {%for value in item%}
+    tableString+="<td>{{value}}</td>"
+    {%endfor%}
+    tableString+="</tr>"
+    {%endfor%}
+    function fnExcelReport()
+    {
+        // var tab_text="<table border='2px'><tr bgcolor='#87AFC6'>";
+        // var textRange; var j=0;
+        // tab = document.getElementById('headerTable'); // id of table
+        //
+        // for(j = 0 ; j < tab.rows.length ; j++)
+        // {
+        //     tab_text=tab_text+tab.rows[j].innerHTML+"</tr>";
+        //     //tab_text=tab_text+"</tr>";
+        // }
+        //
+        // tab_text=tab_text+"</table>";
+        tab_text = tableString;
+        tab_text= tab_text.replace(/<A[^>]*>|<\/A>/g, "");//comment if u want links in your table
+        tab_text= tab_text.replace(/<img[^>]*>/gi,""); // comment if u want images in your table
+        tab_text= tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // comment if you want input params
+
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf("MSIE ");
+
+        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
+        {
+            txtArea1.document.open("txt/html","replace");
+            txtArea1.document.write(tab_text);
+            txtArea1.document.close();
+            txtArea1.focus();
+            sa=txtArea1.document.execCommand("SaveAs",true,"Say Thanks to Sumit.xls");
+        }
+        else                 //other browser not tested on IE 11
+            sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
+
+        return (sa);
+    }
     </script>
 
   </body>

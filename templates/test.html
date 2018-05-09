@@ -75,13 +75,15 @@
             <ul id="messagesContainer">
                 <!-- paste here the yeyo -->
             </ul>
-            <div id="bottomContainer">
-                <div id="optionsDiv">
+            <footer>
+                <div id="bottomContainer">
+                    <div id="optionsDiv">
+                    </div>
+                    <!-- <ul> -->
+                    <input onkeypress="handleEnter(event)" id="textMessage"><a id="messageSubmitB" class="btn btn-success" onclick="submitMessage('')" id="submitMessage"> > </a>
+                    <!-- </ul> -->
                 </div>
-                <!-- <ul> -->
-                <input onkeypress="handleEnter(event)" id="textMessage"><a id="messageSubmitB" class="btn btn-success" onclick="submitMessage('')" id="submitMessage"> > </a>
-                <!-- </ul> -->
-            </div>
+            </footer>
 
             <!-- </div>
         </div>
@@ -111,11 +113,22 @@
     $("#messagesContainer").append("<li class='TSBbot'>Hello. I am "+"{{user}}".split("/")[1]+"\'s little assistant, here to help you make the best choice. Please answer the following questions to help you find the best choice.</li>");
     getNextQuestion();
 
-    function submitMessage(message){
+    async function submitMessage(message){
         if(message==""){
             message = document.getElementById("textMessage").value;
         }
-        $("#messagesContainer").append("<li class='userChat'>"+message+"</li>");
+        $("#messagesContainer").append("<li id='newMessage' class='userChat'>"+message+"</li>");
+        $("#newMessage").animate({
+            marginTop: "-=35px"
+        }, "slow");
+        document.getElementById('newMessage').id = 'oldMessage';
+        await sleep(500);
+        $("#messagesContainer").append("<li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li>")
+        $("#thinkingGif").animate({
+            marginTop: "-=35px"
+        }, "slow");
+        await sleep(1500);
+        $("#thinkingGif").remove();
         for(var i=0; i<data[questionN].length; i++){
             if(data[questionN][i].split(";")[0] == message){
                 getKeyWord(data[questionN][i].split(";")[1]);
@@ -123,7 +136,11 @@
                 return null;
             }
         }
-        $("#messagesContainer").append("<li class='TSBbot'>I apologise but I need an answer from the showed ones in order to get you the best match</li>");
+        $("#messagesContainer").append("<li id='newMessage' class='TSBbot'>I apologise but I need an answer from the showed ones in order to get you the best match</li>");
+        $("#newMessage").animate({
+            marginTop: "-=35px"
+        }, "slow");
+        document.getElementById('newMessage').id = 'oldMessage';
         // $(this).css('height', 'auto');
         // console.log(document.body.scrollHeight);
         // // window.scrollTo(0,document.body.scrollHeight);
@@ -148,7 +165,11 @@
             answers+="<a class='answerOptions' onclick=\"submitMessage('"+data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0]+"</a>"
         }
         answers+="</div>"
-        $("#messagesContainer").append("<li class='TSBbot'>"+data[questionN][0]+"</li>");
+        $("#messagesContainer").append("<li id='newMessage' class='TSBbot'>"+data[questionN][0]+"</li>");
+        $("#newMessage").animate({
+            marginTop: "-=35px"
+        }, "slow");
+        document.getElementById('newMessage').id = 'oldMessage';
         $("#optionsDiv").append(answers);
         // console.log(document.body.scrollHeight);
         // window.scrollTo(0,document.body.scrollHeight);
@@ -253,6 +274,9 @@
          arrayRow[i] = [];
       }
       return arrayRow;
+    }
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
     </script>
 </body>

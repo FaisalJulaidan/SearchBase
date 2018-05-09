@@ -1796,12 +1796,20 @@ right: 0;
 .TSBbot{
   background: #eee;
   float: left;
+  margin-top: 35px;
 }
 
 .userChat{
   float: right;
   background: #0084ff;
   color: #fff;
+  margin-top: 35px;
+}
+
+#thinkingGif{
+    background: white;
+    width:160px;
+    height:85px;
 }
 
 .TSBbot + .userChat{
@@ -1841,16 +1849,16 @@ right: 0;
     float:left;
 }
 
-.answerOptions{
+/* .answerOptions{
     border-color: black;
     border-radius: 10px;
     border-style: solid;
     border-width: 0.5px;
     padding: 8px;
     margin: 4px;
-    /* white-space: nowrap;  */
+    white-space: nowrap;
     word-break: keep-all;
-}
+} */
 
 .answerOptions{
   color: black;
@@ -1867,4 +1875,10 @@ right: 0;
 
 .answerOptions{
   text-align: center;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }

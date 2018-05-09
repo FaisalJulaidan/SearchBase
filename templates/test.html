@@ -223,6 +223,10 @@
         keywords.push(word);
     }
     function sendData(){
+        $("#messagesContainer").append("<li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li>")
+        $("#thinkingGif").animate({
+            marginTop: "-=35px"
+        }, "slow");
         params = "numberOfKeywords=" + keywords.length.toString();
         for(var i = 0; i <= keywords.length-1; i++){
             params+="&";
@@ -236,6 +240,7 @@
         xhttp.onreadystatechange = function() {
           if (xhttp.readyState === 4) {
             if (xhttp.status === 200) {
+                $("#thinkingGif").remove();
                 var data = xhttp.responseText;
                 cRD = $("#messagesContainer");
                 if(data == "We could not find anything that matched your seach criteria. Please try different filter options."){

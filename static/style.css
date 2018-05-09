@@ -1866,6 +1866,7 @@ right: 0;
   border: 1px solid #5a827f;
   border-radius: 500px;
   margin: 5px;
+  background: white;
 }
 
 .answerOptions:hover{

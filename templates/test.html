@@ -72,9 +72,16 @@
     <!-- <div class="chat-box">
         <div class="open">Open
             <div class="box"> -->
-            <ul id="messagesContainer">
+            <center><ul id="messagesContainer">
                 <!-- paste here the yeyo -->
-            </ul>
+            </ul></center>
+            <div id="separator">
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+            </div>
             <footer>
                 <div id="bottomContainer">
                     <div id="optionsDiv">
@@ -117,13 +124,13 @@
         if(message==""){
             message = document.getElementById("textMessage").value;
         }
-        $("#messagesContainer").append("<li id='newMessage' class='userChat'>"+message+"</li>");
+        $("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>"+message+"</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"
         }, "slow");
         document.getElementById('newMessage').id = 'oldMessage';
         await sleep(500);
-        $("#messagesContainer").append("<li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li>")
+        $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
         $("#thinkingGif").animate({
             marginTop: "-=35px"
         }, "slow");
@@ -136,7 +143,7 @@
                 return null;
             }
         }
-        $("#messagesContainer").append("<li id='newMessage' class='TSBbot'>I apologise but I need an answer from the showed ones in order to get you the best match</li>");
+        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>I apologise but I need an answer from the showed ones in order to get you the best match</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"
         }, "slow");
@@ -165,7 +172,7 @@
             answers+="<a class='answerOptions' onclick=\"submitMessage('"+data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0]+"</a>"
         }
         answers+="</div>"
-        $("#messagesContainer").append("<li id='newMessage' class='TSBbot'>"+data[questionN][0]+"</li>");
+        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>"+data[questionN][0]+"</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"
         }, "slow");
@@ -244,7 +251,7 @@
                 var data = xhttp.responseText;
                 cRD = $("#messagesContainer");
                 if(data == "We could not find anything that matched your seach criteria. Please try different filter options."){
-                    cRD.append("<br><h3 class='chatProducts'>"+data+"</h3><br>");
+                    cRD.append("<br><br><br><lable class='chatProducts'>We could not find<br>anything that matched your seach criteria. Please try different filter options.</lable><br><br><br>");
                 } else {
                     resultdic = {};
                     var temparray = data.split("&&&");
@@ -254,7 +261,8 @@
                     delete resultdic[(temparray.length - 1).toString()];
                     for(var i = 0; i< temparray.length-1; i++){
                         resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
-                        cRD.append("<div class='chatProducts' class='found_box1'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='found_button' style='vertical-align:middle'><span>View </span></button></div><br>");
+                        // cRD.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
+                        cRD.append("<center><div class='chatProducts'><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
                     }
                 }
             } else {

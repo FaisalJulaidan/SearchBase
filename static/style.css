@@ -1782,6 +1782,7 @@ right: 0;
   list-style: none;
   margin: 0;
   padding: 0;
+  text-align: center;
 }
 
 #messagesContainer li{
@@ -1793,14 +1794,24 @@ right: 0;
   font-family: Helvetica, Arial, sans-serif;
 }
 
+.ucDiv{
+    text-align: right;
+}
+
+.tsbDiv{
+    text-align: left;
+}
+
 .TSBbot{
   background: #eee;
-  float: left;
+  text-align: left;
+  /* float: left; */
   margin-top: 35px;
 }
 
 .userChat{
-  float: right;
+  /* float: right; */
+  text-align: right;
   background: #0084ff;
   color: #fff;
   margin-top: 35px;
@@ -1827,7 +1838,7 @@ right: 0;
 
 #bottomContainer{
       margin-top:5%;
-      float:left;
+      /* float:left; */
       width: 100%;
 }
 
@@ -1846,7 +1857,26 @@ right: 0;
 }
 
 .chatProducts{
-    float:left;
+    /* float:left; */
+    /* height: 150px; */
+    width: 230px;
+    border: 1px solid black;
+    border-radius: 50px;
+    padding: 1px;
+    margin: 25px;
+    font-family: Helvetica, Arial, sans-serif;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+}
+
+.chatProducts img{
+    width: 150px;
+    /* height: 120px; */
+    border-radius: 50px;
+    margin: 0;
+    padding: 0px;
+    text-decoration: none;
 }
 
 /* .answerOptions{
@@ -1882,4 +1912,52 @@ footer {
   position: fixed;
   bottom: 0;
   width: 100%;
+}
+
+#separator{
+    height: 40%;
+    width: 100%;
+    float:left;
+}
+
+.chatProducts_button {
+display: inline-block;
+border-radius: 40px;
+background-color: #59b4d9;
+border: none;
+color: #FFFFFF;
+text-align: center;
+/* font-size: 10px; */
+padding-top: 4px;
+padding-bottom: 15px;
+width: 150px;
+transition: all 0.5s;
+cursor: pointer;
+margin: 15px;
+}
+
+.chatProducts_button span {
+cursor: pointer;
+display: inline-block;
+position: relative;
+transition: 0.5s;
+}
+
+.chatProducts_button span:after {
+content: '\00bb';
+position: absolute;
+opacity: 0;
+top: 0;
+right: -20px;
+transition: 0.5s;
+}
+
+
+.chatProducts_button:hover span {
+padding-right: 25px;
+}
+
+.chatProducts_button:hover span:after {
+opacity: 1;
+right: 0;
 }

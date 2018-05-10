@@ -129,6 +129,7 @@
             marginTop: "-=35px"
         }, "slow");
         document.getElementById('newMessage').id = 'oldMessage';
+        $("#qAnswers").remove();
         await sleep(500);
         $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
         $("#thinkingGif").animate({
@@ -148,6 +149,12 @@
             marginTop: "-=35px"
         }, "slow");
         document.getElementById('newMessage').id = 'oldMessage';
+        var answers = "<div id='qAnswers'>";
+        for(var i=1; i<data[questionN].length; i++){
+            answers+="<a class='answerOptions' onclick=\"submitMessage('"+data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0]+"</a>"
+        }
+        answers+="</div>"
+        $("#optionsDiv").append(answers);
         // $(this).css('height', 'auto');
         // console.log(document.body.scrollHeight);
         // // window.scrollTo(0,document.body.scrollHeight);

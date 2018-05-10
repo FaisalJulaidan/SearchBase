@@ -427,7 +427,7 @@ def popup():
         return render_template("pop-test.html")
 
 
-@app.route("/recruitment-demo", methods=['GET'])
+@app.route("/popup2", methods=['GET'])
 def popup2():
     if request.method == "GET":
         return render_template("pop-test2.html")

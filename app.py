@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import os
 import sqlite3
 import stripe
@@ -42,8 +43,6 @@ mail = Mail(app)
 app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG', 'json', 'JSON', 'csv', 'CSV', 'xml', 'xml'])
 
-# salt = generate_random_salt()
-
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=465,
@@ -75,9 +74,6 @@ def before_request():
 @app.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
-        # print(hash_password("test"))
-        print(update_table(USERDATABASE, "UPDATE Users SET Password=? WHERE ContactEmail=?",
-                           [hash_password(u"test"), "test5@test.test"]))
         return render_template("index.html")
 
 
@@ -544,7 +540,7 @@ def signpage():
         msg.body = "Title: " + userTitle + "Name: " + userFirstname + userSecondname + "Email: " + userEmail + "Number: " + userContactNumber
         mail.send(msg)
 
-        return render_template("Login.html")
+        return redirect("/login")
 
 
 def hash_password(password, salt=gensalt()):

@@ -1,14 +1,16 @@
+#!/usr/bin/python3
 import os
 import sqlite3
 import stripe
-from json import dumps
 from flask_mail import Mail, Message
 from werkzeug import secure_filename
 from flask import Flask, redirect, request, render_template, jsonify, make_response, send_from_directory, send_file, \
-    url_for
+    url_for, escape
 from datetime import datetime
 import string
 from bcrypt import hashpw, gensalt
+import json
+from xml.dom import minidom
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -21,6 +23,7 @@ STATISTICSDATABASE = APP_ROOT + "/statistics.db"
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 PRODUCT_IMAGES = os.path.join(APP_ROOT, 'static/file_uploads/product_images')
+PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
 
 pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
 secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
@@ -38,9 +41,7 @@ app = Flask(__name__, static_folder='static')
 mail = Mail(app)
 
 app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG'])
-
-# salt = generate_random_salt()
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG', 'json', 'JSON', 'csv', 'CSV', 'xml', 'xml'])
 
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
@@ -73,10 +74,71 @@ def before_request():
 @app.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
-        # print(hash_password("test"))
-        print(update_table(USERDATABASE, "UPDATE Users SET Password=? WHERE ContactEmail=?",
-                           [hash_password(u"test"), "test5@test.test"]))
         return render_template("index.html")
+
+
+@app.route("/productfile", methods=['GET', 'POST'])
+def uploadProductFile():
+    if request.method == "GET":
+        return app.send_static_file("uploadProduct.html")
+    else:
+        if 'productFile' not in request.files:
+            msg = "Error no file given."
+        else:
+            productFile = request.files["productFile"]
+            email = request.cookies.get("UserEmail")
+            if productFile.filename == "":
+                msg = "Error no filename"
+            elif productFile and allowed_file(productFile.filename):
+                ext = productFile.filename.rsplit('.', 1)[1].lower()
+                if (not os.path.isdir(PRODUCT_FILES)):
+                    os.makedirs(PRODUCT_FILES)
+                filename = secure_filename(productFile.filename)
+                filepath = os.path.join(PRODUCT_FILES, filename)
+                productFile.save(filepath)
+
+                if str(ext).lower() == "json":
+                    json_file = open(PRODUCT_FILES + "/" + productFile.filename, "r")
+                    data = json.load(json_file)
+                    for i in range(0, len(data)):
+                        msg = productIntoDatabase(email, data[i]["ProductID"], data[i]["ProductName"], data[i]["ProductBrand"], data[i]["ProductModel"], data[i]["ProductPrice"], data[i]["ProductKeywords"], data[i]["ProductDiscount"], data[i]["ProductURL"], data[i]["ProductImage"])
+                elif str(ext).lower() == "xml":
+                    xmldoc = minidom.parse(PRODUCT_FILES + "/" + productFile.filename)
+                    productList = xmldoc.getElementsByTagName("product")
+                    for product in productList:
+                        try:
+                            id = product.getElementsByTagName("ProductID")[0].childNodes[0].data
+                            name = product.getElementsByTagName("ProductName")[0].childNodes[0].data
+                            brand = product.getElementsByTagName("ProductBrand")[0].childNodes[0].data
+                            model = product.getElementsByTagName("ProductModel")[0].childNodes[0].data
+                            price = product.getElementsByTagName("ProductPrice")[0].childNodes[0].data
+                            keywords = product.getElementsByTagName("ProductKeywords")[0].childNodes[0].data
+                            discount = product.getElementsByTagName("ProductDiscount")[0].childNodes[0].data
+                            url = product.getElementsByTagName("ProductURL")[0].childNodes[0].data
+                            try:
+                                image = product.getElementsByTagName("ProductImage")[0].childNodes[0].data
+                                msg = productIntoDatabase(email, id, name, brand, model, price, keywords, discount, url, image)
+                            except IndexError:
+                                msg = productIntoDatabase(email, id, name, brand, model, price, keywords, discount, url)
+                        except IndexError:
+                            msg = "Invalid xml file"
+                            print(msg)
+                else:
+                    msg = "File not implemented yet"
+                    pass
+                os.remove(PRODUCT_FILES + "/" + productFile.filename)
+            else:
+                msg = "Error not allowed that type of file."
+        return msg
+
+def productIntoDatabase(email, id="", name="", brand="", model="", price="", keywords="",discount="", url="", image=""):
+    msg = insert_into_database_table(PRODUCTDATABASE, "INSERT INTO \"" + email + "\" (ProductID, ProductName, ProductBrand, ProductModel, ProductPrice, ProductKeywords, ProductDiscount, ProductURL, ProductImage) VALUES (?,?,?,?,?,?,?,?,?)",
+                                     (id, name, brand, model, price, keywords, discount, url, image))
+    return msg
+
+def allowed_file(filename):
+    ext = filename.rsplit('.', 1)[1].lower()
+    return '.' in filename and ext in ALLOWED_EXTENSIONS
 
 
 class Del:
@@ -455,6 +517,7 @@ def loginpage():
         else:
             return render_template('Login.html', data="User doesn't exist!")
 
+
 def select_from_database_table(database, sql_statement, array_of_terms=None, all=False):
     data = "Error"
     try:
@@ -606,7 +669,7 @@ def signpage():
         msg.body = "Title: " + userTitle + "Name: " + userFirstname + userSecondname + "Email: " + userEmail + "Number: " + userContactNumber
         mail.send(msg)
 
-        return render_template("Login.html")
+        return redirect("/login")
 
 
 def hash_password(password, salt=gensalt()):

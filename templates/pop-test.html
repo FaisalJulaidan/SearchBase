@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -7,7 +7,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-
     <!-- Title -->
     <title>Launch Assistant</title>
 
@@ -25,6 +24,9 @@
     <link href="../static/style.css" rel="stylesheet">
 
     <!-- Pop-up Stylesheet -->
+    <link href="../static/css/box.css" rel="stylesheet">
+
+    <!-- iframe Stylesheet -->
     <link href="../static/pop-up/pop.css" rel="stylesheet">
 
     <!-- Responsive CSS -->
@@ -33,11 +35,11 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-70419779-2"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-      gtag('config', 'UA-70419779-2');
+        gtag('config', 'UA-70419779-2');
     </script>
 
     <!-- Icon images -->
@@ -50,7 +52,7 @@
     <link rel="apple-touch-icon" sizes="144x144" href="../static/img/core-img/apple-icon-144x144.png">
     <link rel="apple-touch-icon" sizes="152x152" href="../static/img/core-img/apple-icon-152x152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="../static/img/core-img/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="../static/img/core-img/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../static/img/core-img/android-icon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../static/img/core-img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="../static/img/core-img/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../static/img/core-img/favicon-16x16.png">
@@ -66,7 +68,7 @@
     <div class="bottom_left" id="contents1">
       <ul>
         <div id="iframediv">
-            <iframe src="http://www.thesearchbase.com/Royal Properties LTD" width="350" height="350"></iframe>
+            <iframe class="bot_iframe" src="http://www.thesearchbase.com/Royal Properties LTD" frameBorder="0"></iframe>
         </div>
         <li id="launch_button" class="him" href="#">Launch Assistant</li>
       </ul>

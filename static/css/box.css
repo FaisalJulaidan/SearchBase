@@ -178,10 +178,17 @@ right: 0;
   margin: 0;
 }
 
+.bot_iframe {
+    width: 350px;
+    height: 350px;
+    /*border-radius: 30px;*/
+    /*overflow: hidden;*/
+}
+
 
 /* Responsive layout - makes a two column-layout instead of four columns */
 @media (max-width: 900px) {
-  .column  {
+    .column  {
       width: 50%;
   }
 }

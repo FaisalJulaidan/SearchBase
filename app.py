@@ -220,39 +220,134 @@ def demopage():
     if request.method == "GET":
         return render_template("demo.html")
 
-@app.route("/test", methods=['GET'])
-def test():
-	if request.method == "GET":
-		conn = sqlite3.connect(USERDATABASE)
-		cur = conn.cursor()
-		cur.execute("SELECT * FROM Users;")
-		cns = cur.fetchall()
-		conn.close()
-		route = "Royal Properties LTD"
-		for record in cns:
-			if route == record[4]:
-				conn = sqlite3.connect(QUESTIONDATABASE)
-				cur = conn.cursor()
-				cur.execute("SELECT * FROM \"" + record[7] + "\"")
-				data = cur.fetchall()
-				conn.close()
-				date = datetime.now().strftime("%Y-%m")
-				conn = sqlite3.connect(STATISTICSDATABASE)
-				cur = conn.cursor()
-				cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-				stats = cur.fetchall()
-				if not stats:
-					print(stats)
-					cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
+@app.route("/chatbot/<route>", methods=['GET', 'POST'])
+def test(route):
+    if request.method == "GET":
+        conn = sqlite3.connect(USERDATABASE)
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM Users;")
+        cns = cur.fetchall()
+        conn.close()
+        for record in cns:
+           if route == record[4]:
+                conn = sqlite3.connect(QUESTIONDATABASE)
+                cur = conn.cursor()
+                cur.execute("SELECT * FROM \"" + record[7] + "\"")
+                data = cur.fetchall()
+                conn.close()
+                date = datetime.now().strftime("%Y-%m")
+                conn = sqlite3.connect(STATISTICSDATABASE)
+                cur = conn.cursor()
+                cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
+                stats = cur.fetchall()
+                if not stats:
+                     print(stats)
+                     cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
 									VALUES (?,?,?,?)", (date, "1", "0", "0"))
-				else:
-					cur.execute("UPDATE \"" + route + "\" SET AssistantOpened = \"" + str(
+                else:
+                     cur.execute("UPDATE \"" + route + "\" SET AssistantOpened = \"" + str(
                         int(stats[0][1]) + 1) + "\" WHERE Date = \"" + date + "\"")
-				conn.commit()
-				conn.close()
-				return render_template("test.html", data=data, user="dynamic/"+route)
-		return redirect("/pagenotfound", code=302)
-		# return render_template("test.html")
+                conn.commit()
+                conn.close()
+                return render_template("test.html", data=data, user="chatbot/"+route)
+        return redirect("/pagenotfound", code=302)
+        # return render_template("test.html")
+    if request.method == "POST":
+        conn = sqlite3.connect(USERDATABASE)
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM Users;")
+        cns = cur.fetchall()
+        for record in cns:
+            if route == record[4]:
+                conn = sqlite3.connect(PRODUCTDATABASE)
+                cur = conn.cursor()
+                cur.execute("SELECT * FROM \"" + record[7] + "\"")
+                data = cur.fetchall()
+                conn.close()
+                keywords = []
+                budget = []
+                for i in range(1, int(request.form["numberOfKeywords"]) + 1):
+                    if "-" in request.form["keyword" + str(i)]:
+                        budget = request.form["keyword" + str(i)].split("-")
+                    else:
+                        keywords.append(request.form["keyword" + str(i)])
+                keywordsmatch = []
+                i = -1
+                for item in data:
+                    keywordsmatch.append(0)
+                    i += 1
+                    datakwords = item[5].split(",")
+                    for word in keywords:
+                        for dw in datakwords:
+                            if (word == dw):
+                                keywordsmatch[i] += 1
+                exitAtLength = 0
+                while (True):
+                    for p in range(0, len(keywordsmatch) - 1):
+                        if (keywordsmatch[p] < keywordsmatch[p + 1]):
+                            keywordsmatch.insert(p, keywordsmatch.pop(p + 1))
+                            data.insert(p, data.pop(p + 1))
+                            exitAtLength = 0
+                            break
+                    exitAtLength += 1
+                    if (exitAtLength == 5):
+                        break
+                substract = 0
+                for p in range(0, len(keywordsmatch)):
+                    if (keywordsmatch[p] == 0):
+                        data.pop(p - substract)
+                        substract += 1
+                DD = Del()
+                dl = len(data) - 1
+                i = 0
+                while (i <= dl):
+                    print(dl, " ", i, " ", len(data))
+                    item = data[i]
+                    itemprice = item[4].translate(DD)
+                    print(budget)
+                    print(itemprice)
+                    print((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1])))
+                    if ((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1]))):
+                        print(item)
+                        print(data.index(item))
+                        print(data.pop(data.index(item)))
+                        print(data)
+                        i -= 1
+                        dl -= 1
+                    i += 1
+                while (len(data) > 9):
+                    data.pop()
+                if not data:
+                    return "We could not find anything that matched your seach criteria. Please try different filter options."
+                datastring = ""
+                for i in data:
+                    for c in i:
+                        datastring += str(c) + "|||"
+                    datastring = datastring[:-3]
+                    datastring += "&&&"
+                conn.close()
+                date = datetime.now().strftime("%Y-%m")
+                conn = sqlite3.connect(STATISTICSDATABASE)
+                cur = conn.cursor()
+                cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
+                stats = cur.fetchall()
+                print(stats)
+                questionsAnswered = request.form["questionsAnswered"]
+                if not stats:
+                    cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
+									VALUES (?,?,?,?)", (date, "0", questionsAnswered, len(data)))
+                else:
+                    print(len(data))
+                    cur.execute("UPDATE \"" + route + "\" SET ProductsReturned = \"" + str(
+                        int(stats[0][3]) + len(data)) + "\" WHERE Date = \"" + date + "\"")
+                    cur.execute("UPDATE \"" + route + "\" SET QuestionsAnswered = \"" + str(
+                        int(stats[0][2]) + int(questionsAnswered)) + "\" WHERE Date = \"" + date + "\"")
+                conn.commit()
+                cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
+                stats = cur.fetchall()
+                print(stats)
+                conn.close()
+                return jsonify(datastring)
 
 @app.route("/pokajimiuserite6519", methods=['GET'])
 def doit():

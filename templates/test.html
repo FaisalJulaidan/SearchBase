@@ -230,7 +230,7 @@
         keywords.push(word);
     }
     function sendData(){
-        $("#messagesContainer").append("<li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li>")
+        $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
         $("#thinkingGif").animate({
             marginTop: "-=35px"
         }, "slow");

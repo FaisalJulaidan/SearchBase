@@ -1854,6 +1854,8 @@ right: 0;
 #optionsDiv{
     width: 100%;
     margin-bottom: 5%;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .chatProducts{
@@ -1867,7 +1869,6 @@ right: 0;
     font-family: Helvetica, Arial, sans-serif;
     display: inline-block;
     text-decoration: none;
-    text-align: center;
 }
 
 .chatProducts img{
@@ -1897,6 +1898,7 @@ right: 0;
   border-radius: 500px;
   margin: 5px;
   background: white;
+  text-align: center;
 }
 
 .answerOptions:hover{
@@ -1904,11 +1906,7 @@ right: 0;
   background: grey;
 }
 
-.answerOptions{
-  text-align: center;
-}
-
-footer {
+#chatFooter {
   position: fixed;
   bottom: 0;
   width: 100%;

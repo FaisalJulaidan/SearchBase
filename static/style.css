@@ -1289,7 +1289,7 @@ p {
 /* Was question box 1 */
 
 .question_box1{
-    display: block; */
+    display: block;
     align-self: center;
     /* border-style: solid;
     /* margin:0; */
@@ -1790,7 +1790,9 @@ right: 0;
   clear: both;
   padding: 10px 20px 10px 20px;
   border-radius: 30px;
-  margin-bottom: 2px;
+  margin-bottom: 30px;
+    margin-right: 10px;
+    margin-left: 10px;
   font-family: Helvetica, Arial, sans-serif;
 }
 

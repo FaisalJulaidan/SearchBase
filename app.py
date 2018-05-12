@@ -428,12 +428,13 @@ def emojiConterter():
 # def popup():
 #     if request.method == "GET":
 #         return render_template("pop-test.html")
-#
-#
+
+
 # @app.route("/popup2", methods=['GET'])
-# def popup2():
-#     if request.method == "GET":
-#         return render_template("pop-test2.html")
+@app.route("/popup", methods=['GET'])
+def popup2():
+    if request.method == "GET":
+        return render_template("pop-test2.html")
 #
 # @app.route("/popup3", methods=['GET'])
 # def popup3():

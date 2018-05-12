@@ -71,6 +71,7 @@
     <!-- to use -> emojione.toImage(input) -> input = :emojiname: -> example -> emojione.toImage(:smile:) -->
     <!-- phone emojis also work -->
     <!-- :P :) or such are not suported -->
+    <!-- https://demos.emojione.com/latest/jstoshort.html to look at their :emoji: name -->
 
 </head>
 
@@ -145,7 +146,7 @@
    var questionN = -1;
     // document.getElementById("submitMessage").addEventListener("click", );
 
-    $("#messagesContainer").append("<li class='TSBbot'>Hello. I am "+"{{user}}".split("/")[1]+"\'s little assistant, here to help you make the best choice "+emojione.toImage("😇")+". Please answer the following questions to help you find the best choice.</li>");
+    $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot'>Hello. I am "+"{{user}}".split("/")[1]+"\'s little assistant, here to help you make the best choice "+emojione.toImage("😇")+". Please answer the following questions to help you find the best choice.</li></div>");
     getNextQuestion();
 
     async function submitMessage(message){
@@ -189,7 +190,7 @@
         document.getElementById('newMessage').id = 'oldMessage';
         var answers = "<div id='qAnswers'>";
         for(var i=1; i<data[questionN].length; i++){
-            answers+="<a class='answerOptions' id='option"+i+"' onclick=\"submitMessage('"+data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0]+"</a>"
+            answers+="<a class='answerOptions' id='option"+i+"' onclick=\"submitMessage('"+emojione.toImage(data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0])+"</a>"
         }
         answers+="</div>"
         $("#optionsDiv").append(answers);
@@ -211,10 +212,10 @@
         }
         var answers = "<div id='qAnswers'>";
         for(var i=1; i<data[questionN].length; i++){
-            answers+="<a class='answerOptions' id='option"+i+"' onclick=\"submitMessage('"+data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0]+"</a>"
+            answers+="<a class='answerOptions' id='option"+i+"' onclick=\"submitMessage('"+emojione.toImage(data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0])+"</a>"
         }
         answers+="</div>"
-        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>"+data[questionN][0]+"</li></div>");
+        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>"+emojione.toImage(data[questionN][0])+"</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"
         }, "slow");
@@ -331,6 +332,7 @@
         for(var z = 0; z < offScreenElements.length; z++){
             var elementID = offScreenElements[z].outerHTML.split("id=\"")[1].split("\"")[0];
             $( "<br><br>" ).insertBefore("#" + elementID);
+            checkOutsideElements();
             return 0;
         }
     }

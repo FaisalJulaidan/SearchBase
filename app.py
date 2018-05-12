@@ -283,7 +283,7 @@ def demopage():
         return render_template("demo.html")
 
 @app.route("/chatbot/<route>", methods=['GET', 'POST'])
-def test(route):
+def dynamicChatbot(route):
     if request.method == "GET":
         conn = sqlite3.connect(USERDATABASE)
         cur = conn.cursor()
@@ -311,9 +311,8 @@ def test(route):
                         int(stats[0][1]) + 1) + "\" WHERE Date = \"" + date + "\"")
                 conn.commit()
                 conn.close()
-                return render_template("test.html", data=data, user="chatbot/"+route)
+                return render_template("dynamic-chatbot.html", data=data, user="chatbot/"+route)
         return redirect("/pagenotfound", code=302)
-        # return render_template("test.html")
     if request.method == "POST":
         conn = sqlite3.connect(USERDATABASE)
         cur = conn.cursor()
@@ -431,6 +430,11 @@ def popup():
 def popup2():
     if request.method == "GET":
         return render_template("pop-test2.html")
+
+@app.route("/popup3", methods=['GET'])
+def popup3():
+    if request.method == "GET":
+        return render_template("pop-test3.html")
 
 
 @app.route("/demo/construction", methods=['GET'])

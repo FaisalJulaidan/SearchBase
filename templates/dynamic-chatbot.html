@@ -65,6 +65,13 @@
     <!-- Active JS -->
     <!-- <script src="../static/js/active.js"></script> -->
 
+    <!-- Emoji JS and CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css"/>
+    <!-- to use -> emojione.toImage(input) -> input = :emojiname: -> example -> emojione.toImage(:smile:) -->
+    <!-- phone emojis also work -->
+    <!-- :P :) or such are not suported -->
+    <!-- https://demos.emojione.com/latest/jstoshort.html to look at their :emoji: name -->
 
 </head>
 
@@ -81,8 +88,11 @@
                 <br>
                 <br>
                 <br>
+                <br>
+                <br>
+                <div id="chatBottom"></div>
             </div>
-            <footer>
+            <footer id="chatFooter">
                 <div id="bottomContainer">
                     <div id="optionsDiv">
                     </div>
@@ -96,7 +106,26 @@
         </div>
     </div> -->
 
-    <script>
+    <script type="text/javascript">
+    var oldPos = 0;
+    var newPos = 0;
+    var cancelScroll = false;
+    $(window).scroll(function() {
+        newPos = $(window).scrollTop();
+        if(newPos + 3 < oldPos){
+            $('html, body').stop();
+            cancelScroll = true;
+        }
+        oldPos = newPos;
+    });
+
+    jQuery.expr.filters.offscreen = function(el) {
+      var rect = el.getBoundingClientRect();
+      return (
+               (rect.x + rect.width) > window.innerWidth
+             );
+    };
+
    var numberOfQuestions = 0;
    {%for item in data%}
    numberOfQuestions++;
@@ -117,17 +146,21 @@
    var questionN = -1;
     // document.getElementById("submitMessage").addEventListener("click", );
 
-    $("#messagesContainer").append("<li class='TSBbot'>Hello. I am "+"{{user}}".split("/")[1]+"\'s little assistant, here to help you make the best choice. Please answer the following questions to help you find the best choice.</li>");
+    $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot'>Hello. I am "+"{{user}}".split("/")[1]+"\'s little assistant, here to help you make the best choice "+emojione.toImage("😇")+". Please answer the following questions to help you find the best choice.</li></div>");
     getNextQuestion();
 
     async function submitMessage(message){
+        cancelScroll = false;
         if(message==""){
             message = document.getElementById("textMessage").value;
         }
-        $("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>"+message+"</li></div>");
+        $("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>"+emojione.toImage(message)+"</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"
         }, "slow");
+        if(!cancelScroll){
+            scrollTo("chatBottom");
+        }
         document.getElementById('newMessage').id = 'oldMessage';
         $("#qAnswers").remove();
         await sleep(500);
@@ -135,7 +168,10 @@
         $("#thinkingGif").animate({
             marginTop: "-=35px"
         }, "slow");
-        await sleep(1500);
+        if(!cancelScroll){
+            scrollTo("chatBottom");
+        }
+        await sleep(400 + Math.floor(Math.random() * 1100));
         $("#thinkingGif").remove();
         for(var i=0; i<data[questionN].length; i++){
             if(data[questionN][i].split(";")[0] == message){
@@ -148,52 +184,57 @@
         $("#newMessage").animate({
             marginTop: "-=35px"
         }, "slow");
+        if(!cancelScroll){
+            scrollTo("chatBottom");
+        }
         document.getElementById('newMessage').id = 'oldMessage';
         var answers = "<div id='qAnswers'>";
         for(var i=1; i<data[questionN].length; i++){
-            answers+="<a class='answerOptions' onclick=\"submitMessage('"+data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0]+"</a>"
+            answers+="<a class='answerOptions' id='option"+i+"' onclick=\"submitMessage('"+emojione.toImage(data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0])+"</a>"
         }
         answers+="</div>"
         $("#optionsDiv").append(answers);
-        // $(this).css('height', 'auto');
-        // console.log(document.body.scrollHeight);
-        // // window.scrollTo(0,document.body.scrollHeight);
-        // $("a[href='#bottom']").click(function() {
-        //   $("html, body").animate({ scrollTop: $(document).height() }, "slow");
-        //   return false;
-        // });
+        checkOutsideElements();
+        if(!cancelScroll){
+            scrollTo("chatBottom");
+        }
     }
 
     function getNextQuestion(){
         questionN += 1;
-        $("#qAnswers").remove();
         if(data[questionN] == undefined){
             sendData();
             SetRepeat();
-            // console.log(document.body.scrollHeight);
-            // window.scrollTo(0,document.body.scrollHeight);
+            if(!cancelScroll){
+                scrollTo("chatBottom");
+            }
             return 0;
         }
         var answers = "<div id='qAnswers'>";
         for(var i=1; i<data[questionN].length; i++){
-            answers+="<a class='answerOptions' onclick=\"submitMessage('"+data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0]+"</a>"
+            answers+="<a class='answerOptions' id='option"+i+"' onclick=\"submitMessage('"+emojione.toImage(data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0])+"</a>"
         }
         answers+="</div>"
-        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>"+data[questionN][0]+"</li></div>");
+        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>"+emojione.toImage(data[questionN][0])+"</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"
         }, "slow");
         document.getElementById('newMessage').id = 'oldMessage';
         $("#optionsDiv").append(answers);
-        // console.log(document.body.scrollHeight);
-        // window.scrollTo(0,document.body.scrollHeight);
+        checkOutsideElements();
+        if(!cancelScroll){
+            scrollTo("chatBottom");
+        }
     }
 
     function SetRepeat(){
         $("#optionsDiv").append("<div class='answerOptions' id='qAnswers'><a onclick=\"Reset()\">Search Again</a></div>");
+        checkOutsideElements();
     }
 
     function Reset(){
+        cancelScroll = false;
+        $("#qAnswers").remove();
         keywords = [];
         questionsAnswered = 0;
         questionNumber = 0;
@@ -279,12 +320,22 @@
         };
         xhttp.send(params);
     }
-    // function scrollTo(id){
-    //     id = "#" + id
-    //     $('html, body').animate({
-    //         scrollTop: ($(id).offset().top)
-    //     }, 1000);
-    // }
+    function scrollTo(id){
+        $('html, body').stop();
+        id = "#" + id
+        $('html, body').animate({
+            scrollTop: ($(id).offset().top)
+        }, 2000);
+    }
+    function checkOutsideElements(){
+        var offScreenElements = $(':offscreen');
+        for(var z = 0; z < offScreenElements.length; z++){
+            var elementID = offScreenElements[z].outerHTML.split("id=\"")[1].split("\"")[0];
+            $( "<br><br>" ).insertBefore("#" + elementID);
+            checkOutsideElements();
+            return 0;
+        }
+    }
     function BuyProduct(link){
         window.open(link);
     }
@@ -298,6 +349,15 @@
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
+    // ORIGINAL
+    // jQuery.expr.filters.offscreen = function(el) {
+    //   var rect = el.getBoundingClientRect();
+    //   return (
+    //            (rect.x + rect.width) < 0
+    //              || (rect.y + rect.height) < 0
+    //              || (rect.x > window.innerWidth || rect.y > window.innerHeight)
+    //          );
+    // };
     </script>
 </body>
 

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link href="../static/style.css" rel="stylesheet">
+
+    <!-- Emoji JS and CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css"/>
+    <!-- to use -> emojione.toImage(input) -> input = :emojiname: -> example -> emojione.toImage(:smile:) -->
+    <!-- phone emojis also work -->
+    <!-- :P :) or such are not suported -->
+    <!-- https://demos.emojione.com/latest/jstoshort.html to look at their :emoji: name -->
+</head>
+
+<body>
+
+<input type="text" id="emoji_input"> <button id="emoji_convert" onclick="convert()" class="btn btn-success">Convert</button> <label id="emoji_output"></label>
+<script>
+function convert() {
+	var input = document.getElementById('emoji_input').value;
+	var output = emojione.toShort(input);
+	document.getElementById('emoji_output').innerHTML = output;
+}
+</script>
+
+<!-- Jquery-2.2.4 JS -->
+<script src="../static/js/jquery-2.2.4.min.js"></script>
+<!-- Popper js -->
+<script src="../static/js/popper.min.js"></script>
+<!-- Bootstrap-4 Beta JS -->
+<script src="../static/js/bootstrap.min.js"></script>
+<!-- All Plugins JS -->
+<script src="../static/js/plugins.js"></script>
+<!-- Slick Slider Js-->
+<script src="../static/js/slick.min.js"></script>
+<!-- Footer Reveal JS -->
+<script src="../static/js/footer-reveal.min.js"></script>
+<!-- Active JS -->
+<script src="../static/js/active.js"></script>
+</body>
+
+</html>

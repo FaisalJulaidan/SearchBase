@@ -277,10 +277,10 @@ def getTemplate(route):
                 return jsonify(datastring)
 
 
-@app.route("/demo", methods=['GET'])
-def demopage():
-    if request.method == "GET":
-        return render_template("demo.html")
+# @app.route("/demo", methods=['GET'])
+# def demopage():
+#     if request.method == "GET":
+#         return render_template("demo.html")
 
 @app.route("/chatbot/<route>", methods=['GET', 'POST'])
 def dynamicChatbot(route):
@@ -431,47 +431,47 @@ def popup2():
     if request.method == "GET":
         return render_template("pop-test2.html")
 
-@app.route("/popup3", methods=['GET'])
-def popup3():
-    if request.method == "GET":
-        return render_template("pop-test3.html")
+# @app.route("/popup3", methods=['GET'])
+# def popup3():
+#     if request.method == "GET":
+#         return render_template("pop-test3.html")
 
 
-@app.route("/demo/construction", methods=['GET'])
-def demopageconstruction():
-    if request.method == "GET":
-        return render_template("demo-construction.html")
-
-
-@app.route("/demo/education", methods=['GET'])
-def demopageeducation():
-    if request.method == "GET":
-        return render_template("demo-education.html")
-
-
-@app.route("/demo/fashion", methods=['GET'])
-def demopagefashion():
-    if request.method == "GET":
-        return render_template("demo-fashion.html")
-
-
-@app.route("/demo/industrial", methods=['GET'])
-def demopageIndustrial():
-    if request.method == "GET":
-        return render_template("demo-industrial.html")
-
-
-@app.route("/demo/pharmaceutical", methods=['GET'])
-def demopagepharmaceutical():
-    if request.method == "GET":
-        return render_template("demo-pharmaceutical.html")
-
-
-@app.route("/demo/technology", methods=['GET'])
-def demopagetechnology():
-    if request.method == "GET":
-        return render_template("demo-technology.html")
-
+# @app.route("/demo/construction", methods=['GET'])
+# def demopageconstruction():
+#     if request.method == "GET":
+#         return render_template("demo-construction.html")
+#
+#
+# @app.route("/demo/education", methods=['GET'])
+# def demopageeducation():
+#     if request.method == "GET":
+#         return render_template("demo-education.html")
+#
+#
+# @app.route("/demo/fashion", methods=['GET'])
+# def demopagefashion():
+#     if request.method == "GET":
+#         return render_template("demo-fashion.html")
+#
+#
+# @app.route("/demo/industrial", methods=['GET'])
+# def demopageIndustrial():
+#     if request.method == "GET":
+#         return render_template("demo-industrial.html")
+#
+#
+# @app.route("/demo/pharmaceutical", methods=['GET'])
+# def demopagepharmaceutical():
+#     if request.method == "GET":
+#         return render_template("demo-pharmaceutical.html")
+#
+#
+# @app.route("/demo/technology", methods=['GET'])
+# def demopagetechnology():
+#     if request.method == "GET":
+#         return render_template("demo-technology.html")
+#
 
 @app.route("/about", methods=['GET'])
 def aboutpage():

@@ -298,19 +298,20 @@ def dynamicChatbot(route):
                 data = cur.fetchall()
                 conn.close()
                 date = datetime.now().strftime("%Y-%m")
-                conn = sqlite3.connect(STATISTICSDATABASE)
-                cur = conn.cursor()
-                cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-                stats = cur.fetchall()
-                if not stats:
-                     print(stats)
-                     cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
-									VALUES (?,?,?,?)", (date, "1", "0", "0"))
-                else:
-                     cur.execute("UPDATE \"" + route + "\" SET AssistantOpened = \"" + str(
-                        int(stats[0][1]) + 1) + "\" WHERE Date = \"" + date + "\"")
-                conn.commit()
-                conn.close()
+                if (not app.debug):
+                    conn = sqlite3.connect(STATISTICSDATABASE)
+                    cur = conn.cursor()
+                    cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
+                    stats = cur.fetchall()
+                    if not stats:
+                         print(stats)
+                         cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
+                                        VALUES (?,?,?,?)", (date, "1", "0", "0"))
+                    else:
+                         cur.execute("UPDATE \"" + route + "\" SET AssistantOpened = \"" + str(
+                            int(stats[0][1]) + 1) + "\" WHERE Date = \"" + date + "\"")
+                    conn.commit()
+                    conn.close()
                 return render_template("dynamic-chatbot.html", data=data, user="chatbot/"+route)
         return redirect("/pagenotfound", code=302)
     if request.method == "POST":
@@ -428,12 +429,13 @@ def emojiConterter():
 # def popup():
 #     if request.method == "GET":
 #         return render_template("pop-test.html")
-#
-#
+
+
 # @app.route("/popup2", methods=['GET'])
-# def popup2():
-#     if request.method == "GET":
-#         return render_template("pop-test2.html")
+@app.route("/popup", methods=['GET'])
+def popup2():
+    if request.method == "GET":
+        return render_template("pop-test2.html")
 #
 @app.route("/popup3", methods=['GET'])
 def popup3():

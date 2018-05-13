@@ -435,10 +435,10 @@ def emojiConterter():
 #     if request.method == "GET":
 #         return render_template("pop-test2.html")
 #
-# @app.route("/popup3", methods=['GET'])
-# def popup3():
-#     if request.method == "GET":
-#         return render_template("pop-test3.html")
+@app.route("/popup3", methods=['GET'])
+def popup3():
+    if request.method == "GET":
+        return render_template("pop-test3.html")
 
 
 # @app.route("/demo/construction", methods=['GET'])

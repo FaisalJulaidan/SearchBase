@@ -1966,3 +1966,31 @@ right: 0;
 #emoji_output{
     
 }
+
+
+ul li a.dropdown {
+    display: block;
+    /*padding: 8px 25px;*/
+    color: #333;
+    text-decoration: none;
+    color:deeppink;
+}
+
+ul li ul.dropdown {
+    min-width: 30px; /* Set width of the dropdown */
+    padding: 8px 25px;
+    background: #f2f2f2;
+    display: none;
+    position: absolute;
+    color: deeppink;
+    z-index: 999;
+    /*left: 1px;*/
+}
+
+ul li:hover ul.dropdown {
+    display: block; /* Display the dropdown */
+}
+
+ul li ul.dropdown li {
+    display: block;
+}

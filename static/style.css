@@ -36,7 +36,7 @@ h6 {
 
 .section_padding_100 {
     padding-top: 100px;
-    /* padding-bottom: 100px; */
+    padding-bottom: 100px;
 }
 
 .section_padding_100_50 {
@@ -191,6 +191,8 @@ a:active {
 
 li {
     list-style: none;
+    text-align:center;
+
 }
 
 p {

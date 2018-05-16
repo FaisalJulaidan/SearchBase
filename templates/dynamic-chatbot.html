@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -97,7 +97,9 @@
                     <div id="optionsDiv">
                     </div>
                     <!-- <ul> -->
-                    <input onkeypress="handleEnter(event)" id="textMessage"><a id="messageSubmitB" class="btn btn-success" onclick="submitMessage('')" id="submitMessage"> > </a>
+                    <div id="ChatInputDiv">
+                        <input onkeypress="handleEnter(event)" id="textMessage"><a id="messageSubmitB" class="btn btn-success" onclick="submitMessage('')" id="submitMessage"> > </a>
+                    </div>
                     <!-- </ul> -->
                 </div>
             </footer>
@@ -109,7 +111,8 @@
     <script type="text/javascript">
     var oldPos = 0;
     var newPos = 0;
-    var cancelScroll = false;
+        var cancelScroll = false;
+        var showChatBox = true;
     $(window).scroll(function() {
         newPos = $(window).scrollTop();
         if(newPos + 3 < oldPos){
@@ -200,7 +203,8 @@
         }
     }
 
-    function getNextQuestion(){
+        function getNextQuestion() {
+        showChatBox = true;
         questionN += 1;
         if(data[questionN] == undefined){
             sendData();
@@ -212,9 +216,16 @@
         }
         var answers = "<div id='qAnswers'>";
         for(var i=1; i<data[questionN].length; i++){
-            answers+="<a class='answerOptions' id='option"+i+"' onclick=\"submitMessage('"+emojione.toImage(data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0])+"</a>"
+            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"submitMessage('" + emojione.toImage(data[questionN][i].split(";")[0] + "')\">" + data[questionN][i].split(";")[0]) + "</a>"
+            showChatBox = false;
         }
-        answers+="</div>"
+            answers += "</div>"
+            var chatInputDov = document.getElementById("ChatInputDiv");
+            if (showChatBox) {
+                chatInputDov.style = "display:block";
+            } else {
+                chatInputDov.style = "display:none";
+            }
         $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>"+emojione.toImage(data[questionN][0])+"</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"

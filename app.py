@@ -1151,6 +1151,12 @@ def PrivacyPage():
     if request.method == "GET":
         return render_template("privacy-policy.html")
 
+# Affiliate page route
+@app.route("/affiliate", methods=['GET'])
+def AffiliatePage():
+    if request.method == "GET":
+        return render_template("affiliate.html")
+
 
 @app.errorhandler(404)
 def page_not_found(e):

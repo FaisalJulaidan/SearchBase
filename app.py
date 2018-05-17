@@ -776,6 +776,8 @@ def adminAddQuestion():
                     cur.execute(
                         "UPDATE \"" + user_mail + "\" SET Question = \"" + q + "\" WHERE Question = \"" + tempData[i][
                             0] + "\"")
+                if(request.form.get("qType" + str(q)) == "userInfoRetrieval"):
+                    cur.execute("UPDATE \"" + user_mail + "\" SET Answer1 = \"<>userInfoRetrieval<>\" WHERE Question = \"" + selected_question + "\"")
             except:
                 print("INSERTING NEW: ", q)
                 cur.execute("INSERT INTO \'" + user_mail + "\'('Question') VALUES (?)", (q,))

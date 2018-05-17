@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -286,18 +286,22 @@
     <script>
     document.getElementById("snoa").addEventListener("click", changeQuestion);
     var numberOfQuestions = 0;
-    {%for item in msg%}
-    numberOfQuestions++;
+        {%for item in msg %}
+        {%if item[1] != "<>userInfoRetrieval<>"%}
+        numberOfQuestions++;
+        {%endif%}
     {%endfor%}
     var data = createArray(numberOfQuestions);
     var i = 0;
-    {%for item in msg%}
+        {%for item in msg %}
+        {%if item[1] != "<>userInfoRetrieval<>"%}
     {%for answer in item%}
-    {%if answer != None%}
+    {%if answer != None %}
     data[i].push("{{answer}}");
     {%endif%}
     {%endfor%}
-    i++;
+        i++;
+        {%endif%}
     {%endfor%}
     var e = document.getElementById("question-select");
     var questionPos = e.selectedIndex;

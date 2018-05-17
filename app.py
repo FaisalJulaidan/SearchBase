@@ -460,7 +460,7 @@ def featurespage():
 @app.route("/dataRetrival", methods=['GET'])
 def dataRetrivalPage():
     if request.method == "GET":
-        return render_template("retrival.html")
+        return render_template("retrieval.html")
 
 @app.route("/dataCollection", methods=['GET'])
 def dataCollectionPage():

@@ -443,42 +443,6 @@ def popup3():
         return render_template("pop-test3.html")
 
 
-# @app.route("/demo/construction", methods=['GET'])
-# def demopageconstruction():
-#     if request.method == "GET":
-#         return render_template("demo-construction.html")
-#
-#
-# @app.route("/demo/education", methods=['GET'])
-# def demopageeducation():
-#     if request.method == "GET":
-#         return render_template("demo-education.html")
-#
-#
-# @app.route("/demo/fashion", methods=['GET'])
-# def demopagefashion():
-#     if request.method == "GET":
-#         return render_template("demo-fashion.html")
-#
-#
-# @app.route("/demo/industrial", methods=['GET'])
-# def demopageIndustrial():
-#     if request.method == "GET":
-#         return render_template("demo-industrial.html")
-#
-#
-# @app.route("/demo/pharmaceutical", methods=['GET'])
-# def demopagepharmaceutical():
-#     if request.method == "GET":
-#         return render_template("demo-pharmaceutical.html")
-#
-#
-# @app.route("/demo/technology", methods=['GET'])
-# def demopagetechnology():
-#     if request.method == "GET":
-#         return render_template("demo-technology.html")
-#
-
 @app.route("/about", methods=['GET'])
 def aboutpage():
     if request.method == "GET":
@@ -489,6 +453,23 @@ def aboutpage():
 def featurespage():
     if request.method == "GET":
         return render_template("features.html")
+
+
+# drop down routes.
+
+@app.route("/dataRetrival", methods=['GET'])
+def dataRetrivalPage():
+    if request.method == "GET":
+        return render_template("retrival.html")
+
+@app.route("/dataCollection", methods=['GET'])
+def dataCollectionPage():
+    if request.method == "GET":
+        return render_template("collection.html")
+
+
+
+
 
 
 @app.route("/pricing", methods=['GET'])
@@ -504,7 +485,6 @@ def contactpage():
 
 
 email = ""
-
 
 @app.route("/login", methods=['GET', 'POST'])
 def loginpage():

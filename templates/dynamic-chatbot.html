@@ -110,6 +110,8 @@
     var oldPos = 0;
     var newPos = 0;
     var cancelScroll = false;
+    var keywords = [];
+    var questionsAnswered = 0;
     $(window).scroll(function() {
         newPos = $(window).scrollTop();
         if(newPos + 3 < oldPos){
@@ -265,8 +267,6 @@
       });
     });
 
-    var keywords = [];
-    var questionsAnswered = 0;
     function getKeyWord(word){
         for(var i = 0; i <= keywords.length-1; i++){
             if(word == keywords[i]){

@@ -195,6 +195,7 @@
             answers+="<a class='answerOptions' id='option"+i+"' onclick=\"submitMessage('"+emojione.toImage(data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0])+"</a>"
         }
         answers+="</div>"
+        $("#qAnswers").remove();
         $("#optionsDiv").append(answers);
         checkOutsideElements();
         if(!cancelScroll){
@@ -222,6 +223,7 @@
             marginTop: "-=35px"
         }, "slow");
         document.getElementById('newMessage').id = 'oldMessage';
+        $("#qAnswers").remove();
         $("#optionsDiv").append(answers);
         checkOutsideElements();
         if(!cancelScroll){

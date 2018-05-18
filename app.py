@@ -19,6 +19,7 @@ USERDATABASE = APP_ROOT + "/users.db"
 QUESTIONDATABASE = APP_ROOT + "/questions.db"
 PRODUCTDATABASE = APP_ROOT + "/products.db"
 STATISTICSDATABASE = APP_ROOT + "/statistics.db"
+USERINPUTDATABASE = APP_ROOT + "/userInput.db"
 # USERPREFERENCES = APP_ROOT + "/userpreferences.db"
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -328,6 +329,24 @@ def dynamicChatbot(route):
                 conn.close()
                 keywords = []
                 budget = []
+                collectedInformation = request.form.get("collectedInformation").split("||")
+                date = datetime.now().strftime("%Y-%m")
+                conn = sqlite3.connect(USERINPUTDATABASE)
+                cur = conn.cursor()
+                try:
+                    cur.execute("INSERT INTO \"" + record[7] + "\" ('Date', 'Question1Info', 'Question2Info', 'Question3Info', 'Question4Info', 'Question5Info', \
+                    'Question6Info', 'Question7Info', 'Question8Info', 'Question9Info', 'Question10Info', 'Question11Info', 'Question12Info', 'Question13Info', 'Question14Info', \
+                    'Question15Info' ) VALUES ('"+date+"', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')")
+                    print(collectedInformation)
+                    for c in range(0, 15):
+                        if(collectedInformation[c].split(";")[0] == str(c + 1)):
+                            print(collectedInformation[c].split(";")[1])
+                            cur.execute("UPDATE \"" + record[7] + "\" SET Question"+str(c+1)+"Info = \"" + collectedInformation[c].split(";")[1] + "\" WHERE DataID = (SELECT MAX(DataID) FROM \"" + record[7] + "\"")
+                    conn.commit()
+                    conn.close()
+                except:
+                    conn.commit()
+                    conn.close()
                 for i in range(1, int(request.form["numberOfKeywords"]) + 1):
                     if "-" in request.form["keyword" + str(i)]:
                         budget = request.form["keyword" + str(i)].split("-")
@@ -363,24 +382,16 @@ def dynamicChatbot(route):
                 dl = len(data) - 1
                 i = 0
                 while (i <= dl):
-                    print(dl, " ", i, " ", len(data))
                     item = data[i]
                     itemprice = item[4].translate(DD)
-                    print(budget)
-                    print(itemprice)
-                    print((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1])))
                     if ((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1]))):
-                        print(item)
-                        print(data.index(item))
-                        print(data.pop(data.index(item)))
-                        print(data)
                         i -= 1
                         dl -= 1
                     i += 1
                 while (len(data) > 9):
                     data.pop()
                 if not data:
-                    return "We could not find anything that matched your seach criteria. Please try different filter options."
+                    return "We could not find anything that matched your search criteria. Please try different filter options."
                 datastring = ""
                 for i in data:
                     for c in i:
@@ -393,13 +404,11 @@ def dynamicChatbot(route):
                 cur = conn.cursor()
                 cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
                 stats = cur.fetchall()
-                print(stats)
                 questionsAnswered = request.form["questionsAnswered"]
                 if not stats:
                     cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
 									VALUES (?,?,?,?)", (date, "0", questionsAnswered, len(data)))
                 else:
-                    print(len(data))
                     cur.execute("UPDATE \"" + route + "\" SET ProductsReturned = \"" + str(
                         int(stats[0][3]) + len(data)) + "\" WHERE Date = \"" + date + "\"")
                     cur.execute("UPDATE \"" + route + "\" SET QuestionsAnswered = \"" + str(
@@ -407,7 +416,6 @@ def dynamicChatbot(route):
                 conn.commit()
                 cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
                 stats = cur.fetchall()
-                print(stats)
                 conn.close()
                 return jsonify(datastring)
 
@@ -658,6 +666,12 @@ def signpage():
             "CREATE TABLE \"" + userCompanyName + "\" ( `Date` TEXT, `AssistantOpened` TEXT, `QuestionsAnswered` TEXT, `ProductsReturned` TEXT )")
         conn.commit()
         conn.close()
+        conn = sqlite3.connect(USERINPUTDATABASE)
+        cur = conn.cursor()
+        cur.execute(
+            "CREATE TABLE \"" + userEmail + "\" (`DataID` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `Date` TEXT, `Question1Info` TEXT, `Question2Info` TEXT, `Question3Info` TEXT, `Question4Info` TEXT, `Question5Info` TEXT, `Question6Info` TEXT, `Question7Info` TEXT, `Question8Info` TEXT, `Question9Info` TEXT, `Question10Info` TEXT, `Question11Info` TEXT, `Question12Info` TEXT, `Question13Info` TEXT, `Question14Info` TEXT, `Question15Info` TEXT)")
+        conn.commit()
+        conn.close()
         # conn = sqlite3.connect(USERPREFERENCES)
         # cur = conn.cursor()
         # cur.execute("CREATE TABLE \""+userEmail+"\" ( `Date` TEXT, `AssistantOpened` TEXT, `QuestionsAnswered` TEXT, `ProductsReturned` TEXT )")
@@ -669,10 +683,10 @@ def signpage():
         msg = Message("Thank you for registering, " + userFirstname,
                       sender="thesearchbase@gmail.com",
                       recipients=[userEmail])
-        msg.body = "We appriciate you registering with TheSaerchBase. A whole new world of possibilities is ahead of you."
+        msg.body = "We appreciate you registering with TheSaerchBase. A whole new world of possibilities is ahead of you."
         mail.send(msg)
 
-        # sending the regstration confirmation email to us
+        # sending the registration confirmation email to us
         msg = Message("A new user has signed up!",
                       sender="thesearchbase@gmail.com",
                       recipients=["thesearchbase@gmail.com"])
@@ -774,10 +788,14 @@ def adminAddQuestion():
                 if (tempData[i][0] != None):
                     print("UPDATING: ", tempData[i][0], " TO ", q)
                     cur.execute(
-                        "UPDATE \"" + user_mail + "\" SET Question = \"" + q + "\" WHERE Question = \"" + tempData[i][
-                            0] + "\"")
-                if(request.form.get("qType" + str(q)) == "userInfoRetrieval"):
-                    cur.execute("UPDATE \"" + user_mail + "\" SET Answer1 = \"<>userInfoRetrieval<>\" WHERE Question = \"" + selected_question + "\"")
+                        "UPDATE \"" + user_mail + "\" SET Question = \"" + q + "\" WHERE Question = \"" + tempData[i][0] + "\"")
+                if(request.form.get("qType" + str(i)) == "userInfoRetrieval"):
+                    cur.execute("UPDATE \"" + user_mail + "\" SET Answer1 = \"BT9123532322780\" WHERE Question = \"" + tempData[i][0] + "\"")
+                    for c in range(2,11):
+                        cur.execute("UPDATE \"" + user_mail + "\" SET Answer"+str(c)+" = \"\" WHERE Question = \"" + tempData[i][0] + "\"")
+                elif(tempData[i][1] == "BT9123532322780"):
+                    for c in range(1,12):
+                        cur.execute("UPDATE \"" + user_mail + "\" SET Answer"+str(c)+" = \"\" WHERE Question = \"" + tempData[i][0] + "\"")
             except:
                 print("INSERTING NEW: ", q)
                 cur.execute("INSERT INTO \'" + user_mail + "\'('Question') VALUES (?)", (q,))
@@ -794,6 +812,9 @@ def adminAnswers():
         user_mail = request.cookies.get("UserEmail")
         cur.execute("SELECT * FROM \"" + user_mail + "\"")
         mes = cur.fetchall()
+        for item in mes:
+            if(item[1] == "BT9123532322780"):
+                mes.remove(item)
         conn.close()
         return render_template("admin-form-add-answer.html", msg=mes)
     if request.method == "POST":
@@ -844,7 +865,7 @@ def adminAnswers():
                             i) + " FROM \"" + user_mail + "\" WHERE Question=\"" + selected_question + "\"")
                         data = cur.fetchall()
                         print(data)
-                        if data == [(None,)]:
+                        if data == [(None,)] or data == [("",)]:
                             answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
                                 "keywords" + str(i)) + ";../static/img/core-img/android-icon-72x72.png")
                         else:

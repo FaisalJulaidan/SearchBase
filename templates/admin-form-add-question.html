@@ -343,9 +343,11 @@
       oldNOQ = 0;
     }
     // var data = {{data}};
-    var data = [];
+        var data = [];
+        var typeCheck = [];
     {%for item in data%}
-    data.push("{{item[0]}}")
+        data.push("{{item[0]}}");
+        typeCheck.push("{{item[1]}}");
     {%endfor%}
       var noq = data.length;
       if(!Number.isNaN(noq)){
@@ -368,6 +370,10 @@
               <input onclick=\"CheckTypeBox('db"+ i +"')\" id='dbB"+ i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"dbRetrieval\" checked>Data Base Retrieval\
               <input onclick=\"CheckTypeBox('ui"+ i +"')\" id='uiB" + i + "' type=\"checkbox\" name=\"qType" + i +"\" value=\"userInfoRetrieval\">User Input Retrieval\
               </div><br /><br /></div>");
+                if (typeCheck[i] == "BT9123532322780") {
+                    $("#dbB" + i).prop('checked', false);
+                    $("#uiB" + i).prop('checked', true);
+                }
               $("#number-of-questions").val(noq);
             }
           } else if(noq < oldNOQ) {
@@ -416,11 +422,9 @@
 
         function CheckTypeBox(tBox) {
             if (tBox.replace(/[0-9]/g, '') == "db") {
-                console.log("#ui" + tBox.replace(/\D/g, ''));
                 $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
             }
             if (tBox.replace(/[0-9]/g, '') == "ui") {
-                console.log("#db" + tBox.replace(/\D/g, ''));
                 $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
             }
         }

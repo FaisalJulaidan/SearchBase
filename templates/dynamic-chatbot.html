@@ -337,6 +337,7 @@
             } else {
                 params += "&collectedInformation=None"
             }
+            collectedInformation = [];
             questionsAnswered = 0;
             var xhttp = new XMLHttpRequest();
             xhttp.open("POST", '/'+"{{user}}", true);

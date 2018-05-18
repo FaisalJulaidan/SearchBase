@@ -54,7 +54,7 @@ app.config.update(
 mail = Mail(app)
 
 
-# code to ensure user is loged in
+# code to ensure user is logged in
 @app.before_request
 def before_request():
     theurl = str(request.url_rule)
@@ -341,7 +341,7 @@ def dynamicChatbot(route):
                     for c in range(0, 15):
                         if(collectedInformation[c].split(";")[0] == str(c + 1)):
                             print(collectedInformation[c].split(";")[1])
-                            cur.execute("UPDATE \"" + record[7] + "\" SET Question"+str(c+1)+"Info = \"" + collectedInformation[c].split(";")[1] + "\" WHERE DataID = (SELECT MAX(DataID) FROM \"" + record[7] + "\"")
+                            cur.execute("UPDATE \"" + record[7] + "\" SET Question"+str(c+1)+"Info = \"" + collectedInformation[c].split(";")[1] + "\" WHERE DataID = (SELECT MAX(DataID) FROM \"" + record[7] + "\")")
                     conn.commit()
                     conn.close()
                 except:
@@ -815,6 +815,19 @@ def adminAnswers():
         for item in mes:
             if(item[1] == "BT9123532322780"):
                 mes.remove(item)
+        n = 0
+        maxN = len(mes)
+        while (n < maxN):
+            print(mes)
+            if(len(mes) > 0):
+                if(mes[n][1] == "BT9123532322780"):
+                    mes.remove(mes[n])
+                    n -= 1
+                    maxN -= 1
+                else:
+                    n += 1
+            else:
+                break
         conn.close()
         return render_template("admin-form-add-answer.html", msg=mes)
     if request.method == "POST":

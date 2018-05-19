@@ -1849,9 +1849,11 @@ right: 0;
     margin-right: 3%;
 }
 
-#bottomContainer a{
-    width: 14%;
-}
+    #bottomContainer a {
+        width: 14%;
+        background-color: #0084ff;
+        border-color: #006eff;
+    }
 
 #optionsDiv{
     width: 100%;

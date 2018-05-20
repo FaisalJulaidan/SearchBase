@@ -1804,11 +1804,11 @@ right: 0;
     text-align: left;
 }
 
-.TSBbot{
-  background: #eee;
-  text-align: left;
-  /* float: left; */
-  margin-top: 35px;
+.TSBbot {
+    background: #eee;
+    text-align: left;
+    /* float: left; */
+    margin-top: 35px;
 }
 
 .userChat{
@@ -1850,7 +1850,7 @@ right: 0;
 }
 
 #bottomContainer a{
-    width: 14%;
+    width: 14.5%;
 }
 
 #optionsDiv{
@@ -1962,7 +1962,6 @@ opacity: 1;
 right: 0;
 }
 
-/* emoji converter page  */
-#emoji_output{
-    
+#chatbotBody{
+    overflow:hidden;
 }

@@ -1851,7 +1851,7 @@ right: 0;
     margin-right: 3%;
 }
 
-#bottomContainer a {
+#messageSubmitB {
     width: 14%;
     background-color: #0084ff;
     border-color: #006eff;
@@ -1896,16 +1896,6 @@ right: 0;
     white-space: nowrap;
     word-break: keep-all;
 } */
-
-.answerOptions{
-  color: black;
-  padding: 5px 11px;
-  border: 1px solid #5a827f;
-  border-radius: 500px;
-  margin: 5px;
-  background: white;
-  text-align: center;
-}
 
 .answerOptions:hover{
   color: #ffffff;
@@ -2018,4 +2008,14 @@ ul li ul.dropdown li {
 
 .button4 {
     border-radius: 12px;
+}
+
+.answerOptions {
+    color: black;
+    padding: 5px 11px;
+    border: 1px solid #ddd;
+    border-radius: 500px;
+    margin: 5px;
+    background-color: #eeeeee;
+    text-align: center;
 }

@@ -347,11 +347,12 @@ def dynamicChatbot(route):
                 except:
                     conn.commit()
                     conn.close()
-                for i in range(1, int(request.form["numberOfKeywords"]) + 1):
-                    if "-" in request.form["keyword" + str(i)]:
-                        budget = request.form["keyword" + str(i)].split("-")
+                for i in range(1, int(request.form.get("numberOfKeywords")) + 1):
+                    print(i)
+                    if "-" in request.form.get("keyword" + str(i)):
+                        budget = request.form.get("keyword" + str(i)).split("-")
                     else:
-                        keywords.append(request.form["keyword" + str(i)])
+                        keywords.append(request.form.get("keyword" + str(i)))
                 keywordsmatch = []
                 i = -1
                 for item in data:

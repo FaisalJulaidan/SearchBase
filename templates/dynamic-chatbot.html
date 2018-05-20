@@ -116,6 +116,8 @@
     var newPos = 0;
     var cancelScroll = false;
     var showChatBox = false;
+    var params = "";
+    var questionsAnswered = 0;
     var collectedInformation = [];
     $(window).scroll(function ()
     {
@@ -343,9 +345,9 @@
                 keywords.splice(i, 1);
                 return 0;
             }
-            questionsAnswered++;
-            keywords.push(word);
         }
+        questionsAnswered++;
+        keywords.push(word);
     }
 
     function sendData()
@@ -354,9 +356,9 @@
         $("#thinkingGif").animate({
             marginTop: "-=35px"
         }, "slow");
+        params = "numberOfKeywords=" + keywords.length.toString();
         if (keywords.length > 0)
         {
-            params = "numberOfKeywords=" + keywords.length.toString();
             for (var i = 0; i <= keywords.length - 1; i++)
             {
                 params += "&";

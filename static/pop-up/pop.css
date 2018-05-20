@@ -41,3 +41,28 @@ ul li{
     /* color: white; */
     background: #ffffff;
 }
+
+
+/*iFrame styling*/
+#chatbotIframe {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-color: #ffffff;
+    overflow: hidden;
+}
+
+#overChatbotIframe {
+    background-color: #da0cfb;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+#overChatbotIframeImg {
+    margin-left: 10px;
+}
+
+#overChatbotIframeHeading {
+    margin-left: 12px;
+    margin-top: 20px;
+    font-size: 30px;
+}

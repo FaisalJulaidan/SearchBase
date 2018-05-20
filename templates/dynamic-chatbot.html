@@ -9,7 +9,7 @@
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Title -->
-    <title>404</title>
+    <title>Bot</title>
 
     <!-- Chrome, Firefox OS and Opera -->
     <meta name="theme-color" content="#884BDF">
@@ -75,7 +75,7 @@
 
 </head>
 
-<body>
+<body id="chatbotBody">
     <!-- <div class="chat-box">
         <div class="open">Open
             <div class="box"> -->
@@ -304,18 +304,16 @@
           });
         });
 
-        var keywords = [];
-        var questionsAnswered = 0;
-        function getKeyWord(word){
-            for(var i = 0; i <= keywords.length-1; i++){
-                if(word == keywords[i]){
-                    keywords.splice(i, 1);
-                    return 0;
-                }
+    function getKeyWord(word){
+        for(var i = 0; i <= keywords.length-1; i++){
+            if(word == keywords[i]){
+                keywords.splice(i, 1);
+                return 0;
             }
             questionsAnswered++;
             keywords.push(word);
         }
+        
         function sendData(){
             $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
             $("#thinkingGif").animate({

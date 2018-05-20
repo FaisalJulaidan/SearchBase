@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -98,7 +98,7 @@
                 <div class="menu_area">
                     <nav class="navbar navbar-expand-lg navbar-light">
                         <!-- Logo -->
-                        <a class="navbar-brand" href="/">TheSearchBase.</a>
+                        <a class="navbar-brand" href="/">TheSearchBase</a>
                         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ca-navbar"
                                 aria-controls="ca-navbar" aria-expanded="false" aria-label="Toggle navigation"><span
                                 class="navbar-toggler-icon"></span></button>
@@ -106,9 +106,19 @@
                         <div class="collapse navbar-collapse" id="ca-navbar">
                             <ul class="navbar-nav ml-auto" id="nav">
                                 <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                                <!-- <li class="nav-item"><a class="nav-link" href="/demo">Demo</a></li> -->
-                                <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
                                 <li class="nav-item"><a class="nav-link" href="/features">Features</a></li>
+                                <li class="nav-item">
+                                <!-- start of the drop down menu -->
+                                <li class="dropdown">
+                                    <a class="nav-link" data-toggle="dropdown" href="#">Uses</a>
+                                    <span class="caret"></span>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/dataRetrival" style="color:#5f27a6;">Data Retrieval</a></li>
+                                        <li><a href="/dataCollection" style="color:#5f27a6;">Data Collection</a></li>
+                                        <!--<li><a href="/dataConsultant" style="color:#5f27a6;">Consultant Connection</a></li>-->
+                                    </ul>
+                                </li>
+                                <!-- End of the drop down menu-->
                                 <li class="nav-item"><a class="nav-link" href="/pricing">Pricing</a></li>
                                 <li class="nav-item"><a class="nav-link" href="/login">Log in</a></li>
                             </ul>
@@ -118,6 +128,7 @@
                                 <a href="/signupform">Sign up</a>
                             </div>
                         </div>
+                        <!-- End of Menu-->
                     </nav>
                 </div>
             </div>
@@ -134,13 +145,13 @@
 </header>
 <!-- ***** Header Area End ***** -->
 
-<!-- ***** Wellcome Area Start ***** -->
+<!-- ***** Welcome Area Start ***** -->
 <section class="wellcome_area clearfix" id="home">
     <div class="container h-100">
         <div class="row h-100 align-items-center">
             <div class="col-12 col-md">
                 <div class="wellcome-heading">
-                    <h2>Convert, Sell and Grow</h2>
+                    <h2>Convert, Direct and Grow</h2>
                     <p>Build And Deploy Your virtual Assistant in minutes</p>
                 </div>
                 <div class="get-start-area">
@@ -160,7 +171,7 @@
         <img src="../static/img/bg-img/final2.png" alt="">
     </div>
 </section>
-<!-- ***** Wellcome Area End ***** -->
+<!-- ***** Welcome Area End ***** -->
 
 <!-- ***** Special Area Start ***** -->
 <section class="special-area bg-white section_padding_100" id="about">
@@ -205,7 +216,7 @@
                         <i class="ti-settings" aria-hidden="true"></i>
                     </div>
                     <h4>Customizability</h4>
-                    <p>Have total control on your assistant and customise it with any formula that you like. Add your
+                    <p>Have total control on your assistant and customize it with any formula that you like. Add your
                         own original content.</p>
                 </div>
             </div>
@@ -223,20 +234,21 @@
                 <div class="col-lg-6 col-xl-5 ml-xl-auto">
                     <div class="special_description_content">
                         <h2>Make sales, in seconds</h2>
-                        <p>By intergating a virtual assistant into your website, you are powering your visitors with
-                            endless posibilities. With direct interaction between you and the visitors, your business
+                        <p>By integrating a virtual assistant into your website, you are powering your visitors with
+                            endless possibilities. With direct interaction between you and the visitors, your business
                             can make sales in seconds with less than 5 clicks.</p>
                         <div class="app-download-area">
                             <div class="app-download-btn wow fadeInUp" data-wow-delay="0.2s">
                                 <!-- Google Store Btn -->
-                                <a href="/demo">
+                                <!-- Add the demo link here -->
+                                <!--<a href="#">
                                     <p class="mb-0"><span></span>Show me an example</p>
-                                </a>
+                                </a>-->
                             </div>
                             <div class="app-download-btn wow fadeInDown" data-wow-delay="0.4s">
                                 <!-- Apple Store Btn -->
                                 <a href="/features">
-                                    <p class="mb-0"><span></span> Why will it benfit my business?</p>
+                                    <p class="mb-0"><span></span> Why will it benefit my business?</p>
                                 </a>
                             </div>
                         </div>
@@ -267,7 +279,7 @@
                 <div class="single-feature">
                     <i class="ti-user" aria-hidden="true"></i>
                     <h5>Awesome Experience</h5>
-                    <p>Create a live sales enviroment and drive your visitors to any goal that you have.</p>
+                    <p>Create a live sales environment and drive your visitors to any goal that you have.</p>
                 </div>
             </div>
             <!-- Single Feature Start -->
@@ -301,7 +313,7 @@
                 <div class="single-feature">
                     <i class="ti-crown" aria-hidden="true"></i>
                     <h5>Ahead of competition</h5>
-                    <p>Get light years ahead of your competition with an increased number of sales using artificial
+                    <p>Get light years ahead of your competition with an increased number of leads using artificial
                         intelligence.</p>
                 </div>
             </div>
@@ -309,7 +321,7 @@
             <div class="col-12 col-sm-6 col-lg-4">
                 <div class="single-feature">
                     <i class="ti-headphone" aria-hidden="true"></i>
-                    <h5>Online Support</h5>
+                    <h5>On line Support</h5>
                     <p>If you have any questions or need support setting up your assistant, email us and well show you a
                         demo and help you get set up.</p>
                 </div>
@@ -347,7 +359,7 @@
             <div class="col-12 col-md-3 col-lg-3">
                 <div class="single-cool-fact d-flex justify-content-center wow fadeInUp" data-wow-delay="0.2s">
                     <div class="counter-area">
-                        <h3><span class="counter">11</span></h3>
+                        <h3><span class="counter">34</span></h3>
                     </div>
                     <div class="cool-facts-content">
                         <i class="ion-arrow-down-a"></i>
@@ -359,7 +371,7 @@
             <div class="col-12 col-md-3 col-lg-3">
                 <div class="single-cool-fact d-flex justify-content-center wow fadeInUp" data-wow-delay="0.4s">
                     <div class="counter-area">
-                        <h3><span class="counter">5</span></h3>
+                        <h3><span class="counter">26</span></h3>
                     </div>
                     <div class="cool-facts-content">
                         <i class="ion-happy-outline"></i>
@@ -371,7 +383,7 @@
             <div class="col-12 col-md-3 col-lg-3">
                 <div class="single-cool-fact d-flex justify-content-center wow fadeInUp" data-wow-delay="0.6s">
                     <div class="counter-area">
-                        <h3><span class="counter">5</span></h3>
+                        <h3><span class="counter">19</span></h3>
                     </div>
                     <div class="cool-facts-content">
                         <i class="ion-person"></i>
@@ -383,7 +395,7 @@
             <div class="col-12 col-md-3 col-lg-3">
                 <div class="single-cool-fact d-flex justify-content-center wow fadeInUp" data-wow-delay="0.8s">
                     <div class="counter-area">
-                        <h3><span class="counter">8</span></h3>
+                        <h3><span class="counter">22</span></h3>
                     </div>
                     <div class="cool-facts-content">
                         <i class="ion-ios-star-outline"></i>
@@ -399,7 +411,7 @@
 <!-- ***** Special Area Start ***** -->
 <section class="special-area bg-white section_padding_100" id="about">
     <!-- Special Description Area -->
-    <div class="special_description_area mt-150">
+    <div class="special_description_area">
         <div class="container">
             <div class="row">
                 <div class="col-lg-6">
@@ -411,7 +423,7 @@
                     <div class="special_description_content">
                         <h2>Assist your visitors, <br / > build logic</h2>
                         <p> Whatever your business goals are, you can steer users in any direction and build logic that
-                            works for you - The possibilties are infinite.</p>
+                            works for you - The possibilities are infinite.</p>
                         <div class="app-download-area">
                             <div class="app-download-btn wow fadeInUp" data-wow-delay="0.2s">
                                 <!-- Google Store Btn -->
@@ -471,10 +483,10 @@
                     <p><span>Address:</span> Clydesmuir Rd, Cardiff CF24 2QS</p>
                 </div>
                 <div class="phone-text">
-                    <p><span>Phone:</span> 029 0842 9032</p>
+                    <!--<p><span>Phone:</span> 029 0842 9032</p>-->
                 </div>
                 <div class="email-text">
-                    <p><span>Email:</span> contact@thesearchbase.com</p>
+                    <p><span>Email:</span> thesearchbase@gmail.com</p>
                 </div>
             </div>
             <div class="col-md-6">
@@ -533,6 +545,8 @@
             <li><a href="/termsandconditions">Terms & Conditions</a></li>
             |
             <li><a href="/privacy">Privacy Policy</a></li>
+            |
+            <li><a href="/affiliate">Affiliate</a></li>
             |
             <li><a href="https://www.trustpilot.com/evaluate/thesearchbase.com">Trustpilot</a></li>
         </ul>

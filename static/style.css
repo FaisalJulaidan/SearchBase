@@ -36,7 +36,7 @@ h6 {
 
 .section_padding_100 {
     padding-top: 100px;
-    /* padding-bottom: 100px; */
+    padding-bottom: 100px;
 }
 
 .section_padding_100_50 {
@@ -191,6 +191,8 @@ a:active {
 
 li {
     list-style: none;
+    text-align:center;
+
 }
 
 p {
@@ -1964,4 +1966,54 @@ right: 0;
 
 #chatbotBody{
     overflow:hidden;
+}
+
+
+ul li a.dropdown {
+    display: block;
+    /*padding: 8px 25px;*/
+    color: #333;
+    text-decoration: none;
+    color:deeppink;
+}
+
+ul li ul.dropdown {
+    min-width: 30px; /* Set width of the dropdown */
+    padding: 8px 25px;
+    background: #f2f2f2;
+    display: none;
+    position: absolute;
+    color: deeppink;
+    z-index: 999;
+    /*left: 1px;*/
+}
+
+ul li:hover ul.dropdown {
+    display: block; /* Display the dropdown */
+}
+
+ul li ul.dropdown li {
+    display: block;
+}
+
+.signup {
+    margin: 0 auto;
+}
+
+.button {
+    background-color: #9049dd; /* Purple */
+    border: none;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    width: 200px;
+}
+
+.button4 {
+    border-radius: 12px;
 }

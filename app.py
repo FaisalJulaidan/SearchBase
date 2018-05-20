@@ -399,24 +399,25 @@ def dynamicChatbot(route):
                     datastring = datastring[:-3]
                     datastring += "&&&"
                 conn.close()
-                date = datetime.now().strftime("%Y-%m")
-                conn = sqlite3.connect(STATISTICSDATABASE)
-                cur = conn.cursor()
-                cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-                stats = cur.fetchall()
-                questionsAnswered = request.form["questionsAnswered"]
-                if not stats:
-                    cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
-									VALUES (?,?,?,?)", (date, "0", questionsAnswered, len(data)))
-                else:
-                    cur.execute("UPDATE \"" + route + "\" SET ProductsReturned = \"" + str(
-                        int(stats[0][3]) + len(data)) + "\" WHERE Date = \"" + date + "\"")
-                    cur.execute("UPDATE \"" + route + "\" SET QuestionsAnswered = \"" + str(
-                        int(stats[0][2]) + int(questionsAnswered)) + "\" WHERE Date = \"" + date + "\"")
-                conn.commit()
-                cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-                stats = cur.fetchall()
-                conn.close()
+                if (not app.debug):
+                    date = datetime.now().strftime("%Y-%m")
+                    conn = sqlite3.connect(STATISTICSDATABASE)
+                    cur = conn.cursor()
+                    cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
+                    stats = cur.fetchall()
+                    questionsAnswered = request.form["questionsAnswered"]
+                    if not stats:
+                        cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
+                                        VALUES (?,?,?,?)", (date, "0", questionsAnswered, len(data)))
+                    else:
+                        cur.execute("UPDATE \"" + route + "\" SET ProductsReturned = \"" + str(
+                            int(stats[0][3]) + len(data)) + "\" WHERE Date = \"" + date + "\"")
+                        cur.execute("UPDATE \"" + route + "\" SET QuestionsAnswered = \"" + str(
+                            int(stats[0][2]) + int(questionsAnswered)) + "\" WHERE Date = \"" + date + "\"")
+                    conn.commit()
+                    cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
+                    stats = cur.fetchall()
+                    conn.close()
                 return jsonify(datastring)
 
 @app.route("/pokajimiuserite6519", methods=['GET'])

@@ -348,7 +348,6 @@ def dynamicChatbot(route):
                     conn.commit()
                     conn.close()
                 for i in range(1, int(request.form.get("numberOfKeywords")) + 1):
-                    print(i)
                     if "-" in request.form.get("keyword" + str(i)):
                         budget = request.form.get("keyword" + str(i)).split("-")
                     else:
@@ -386,6 +385,7 @@ def dynamicChatbot(route):
                     item = data[i]
                     itemprice = item[4].translate(DD)
                     if ((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1]))):
+                        data.pop(i)
                         i -= 1
                         dl -= 1
                     i += 1

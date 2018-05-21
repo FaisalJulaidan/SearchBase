@@ -330,7 +330,7 @@ def dynamicChatbot(route):
                 keywords = []
                 budget = []
                 collectedInformation = request.form.get("collectedInformation").split("||")
-                date = datetime.now().strftime("%Y-%m")
+                date = datetime.now().strftime("%Y-%m-%d")
                 conn = sqlite3.connect(USERINPUTDATABASE)
                 cur = conn.cursor()
                 try:
@@ -975,10 +975,17 @@ def adminAddProduct():
 
 
 # Route for the data storage
-@app.route("/admin/userinput", methods=['GET'])
+@app.route("/admin/userinput", methods=['GET', 'POST'])
 def adminDataStorage():
     if request.method == "GET":
-        return render_template("admin-data-storage.html")
+        conn = sqlite3.connect(USERINPUTDATABASE)
+        cur = conn.cursor()
+        user_mail = request.cookies.get("UserEmail")
+        cur.execute("SELECT * FROM \"" + user_mail + "\"")
+        data = cur.fetchall()
+        return render_template("admin-data-storage.html", data=data)
+    if request.method == "POST":
+        return redirect("/admin/userinput", code=302)
 
 
 @app.route("/admin/connect")

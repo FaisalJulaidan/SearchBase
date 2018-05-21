@@ -155,8 +155,8 @@
                       <table class="table table-striped jambo_table bulk_action">
                         <thead>
                             <!-- Beginning of data -->
-                            <tr class="headings">
-                                <th class="column-title">Storage ID</th>
+                            <tr id="tableHeadingUIn" class="headings">
+                                <!--<th class="column-title">Storage ID</th>
                                 <th class="column-title">Date Stored </th>
                                 <th class="column-title">Name </th>
                                 <th class="column-title">Email </th>
@@ -167,25 +167,22 @@
                                 </th>
                                 <th class="bulk-actions" colspan="7">
                                     <a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
-                                </th>
+                                </th>-->
                             </tr>
                             <!-- End of data -->
                         </thead>
 
-                        <tbody>
+                        <tbody id="tBodyUIn">
                             <!-- Start -->
-                          <tr class="even pointer">
+                          <!--<tr class="even pointer">
                             <td class=" ">00001</td>
                             <td class=" ">May 23, 2018 11:47:56 PM </td>
                             <td class=" ">Mehdi Este</td>
                             <td class=" ">contact@thesearchbase.com</td>
                             <td class=" ">072364262</td>
-                              <!-- Link for the candidate profile -->
                             <td class=" "><a href="#">File Here</a></td>
-                              <!-- Add the link to the user's CV here -->
-                            <td class=" last"><a href="#">View</a>
-                            </td>
-                          </tr>
+                            <td class=" last"><a href="#">View</a></td>
+                          </tr>-->
                             <!-- End -->
                         </tbody>
                       </table>
@@ -222,5 +219,33 @@
 
     <!-- Custom Theme Scripts -->
     <script src="../static/build/js/custom.min.js"></script>
+
+      <script>
+          var tableHeading = $("#tableHeadingUIn");
+          var i = 0;
+          tableHeading.append("<th class=\"column-title\">Record ID</th>");
+          tableHeading.append("<th class=\"column-title\">Date</th>");
+          {%for item in data[0]%}
+          i++;
+          if (i < 16) {
+              tableHeading.append("<th class=\"column-title\">Info " + i + "</th>");
+          }
+          {%endfor%}
+          var tableBody = $("#tBodyUIn");
+          var i = 0;
+          var ii = 0;
+          var appendString = "";
+          {%for item in data %}
+          i++;
+            appendString += "<tr id=\"" + i + "\" class=\"even pointer\">";
+          {%for record in item %}
+          ii++;
+                appendString += "<td id=\"" + i + "_" + ii + "\" class=\" \" >{{record}}</td >";
+            {%endfor%}
+            appendString += "</tr>";
+            tableBody.append(appendString);
+            appendString = "";
+          {%endfor%}
+      </script>
   </body>
 </html>

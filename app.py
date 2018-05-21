@@ -974,16 +974,11 @@ def adminAddProduct():
             return redirect("/admin/Products", code=302)
 
 
-@app.route("/admin/displayQuestions", methods=['GET'])
-def adminDisplayQuestions():
+# Route for the data storage
+@app.route("/admin/userinput", methods=['GET'])
+def adminDataStorage():
     if request.method == "GET":
-        return render_template("admin-table-questions.html")
-
-
-@app.route("/admin/displayAnswers", methods=['GET'])
-def adminDisplayAnswers():
-    if request.method == "GET":
-        return render_template("admin-table-answers.html")
+        return render_template("admin-data-storage.html")
 
 
 @app.route("/admin/connect")

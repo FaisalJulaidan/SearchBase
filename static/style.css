@@ -1956,10 +1956,6 @@ opacity: 1;
 right: 0;
 }
 
-#chatbotBody{
-    overflow:hidden;
-}
-
 
 ul li a.dropdown {
     display: block;

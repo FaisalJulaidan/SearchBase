@@ -2019,3 +2019,20 @@ ul li ul.dropdown li {
     background-color: #eeeeee;
     text-align: center;
 }
+
+#outerContainer {
+    border: 5px solid purple;
+    position: relative;
+    overflow: hidden;
+}
+
+#innerContainer {
+    position: absolute;
+    left: 0;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+#innerContainer::-webkit-scrollbar {
+    display: none;
+}

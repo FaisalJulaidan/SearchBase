@@ -222,29 +222,41 @@
 
       <script>
           var tableHeading = $("#tableHeadingUIn");
-          var i = 0;
           tableHeading.append("<th class=\"column-title\">Record ID</th>");
           tableHeading.append("<th class=\"column-title\">Date</th>");
-          {%for item in data[0]%}
-          i++;
-          if (i < 16) {
-              tableHeading.append("<th class=\"column-title\">Info " + i + "</th>");
+          var numberOfHeaders = 0;
+          var curNOH = 0;
+          {%for item in data %}
+          if ("{{item[3]}}" != "") {
+              {%for record in item %}
+              if ("{{record}}" != "") {
+                  curNOH++;
+              }
+              {% endfor %}
+              if (curNOH > numberOfHeaders) { numberOfHeaders = curNOH; }
+              curNOH = 0;
           }
-          {%endfor%}
+          {% endfor %}
+          for (var i = 1; i <= numberOfHeaders - 2; i++) {
+              tableHeading.append("<th class=\"column-title\">Data " + i + "</th>");
+          }
           var tableBody = $("#tBodyUIn");
           var i = 0;
           var ii = 0;
           var appendString = "";
           {%for item in data %}
           i++;
+          ii = 0;
             appendString += "<tr id=\"" + i + "\" class=\"even pointer\">";
           {%for record in item %}
           ii++;
-                appendString += "<td id=\"" + i + "_" + ii + "\" class=\" \" >{{record}}</td >";
-            {%endfor%}
-            appendString += "</tr>";
-            tableBody.append(appendString);
-            appendString = "";
+          if (ii <= numberOfHeaders) {
+              appendString += "<td id=\"" + i + "_" + ii + "\" class=\" \" >{{record}}</td >";
+          }
+          {%endfor%}
+          appendString += "</tr>";
+          tableBody.append(appendString);
+          appendString = "";
           {%endfor%}
       </script>
   </body>

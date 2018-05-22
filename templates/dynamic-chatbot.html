@@ -76,37 +76,43 @@
 </head>
 
 <body id="chatbotBody">
-<!-- <div class="chat-box">
-    <div class="open">Open
-        <div class="box"> -->
-<center>
-    <ul id="messagesContainer">
-        <!-- paste here the yeyo -->
-    </ul>
-</center>
-<div id="separator">
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <div id="chatBottom"></div>
-</div>
-<footer id="chatFooter">
-    <div id="bottomContainer">
-        <div id="optionsDiv">
+    <div class="outerContainer">
+        <div class="innerContainer">
+            <div class="element">
+                <!-- <div class="chat-box">
+            <div class="open">Open
+                <div class="box"> -->
+                <center>
+                    <ul id="messagesContainer">
+                        <!-- paste here the yeyo -->
+                    </ul>
+                </center>
+                <div id="separator">
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <div id="chatBottom"></div>
+                </div>
+                <footer id="chatFooter">
+                    <div id="bottomContainer">
+                        <div id="optionsDiv">
+                        </div>
+                        <!-- <ul> -->
+                        <div id="ChatInputDiv">
+                            <input onkeypress="handleEnter(event)" id="textMessage"><a id="messageSubmitB" class="btn btn-success" onclick="submitMessage('')">
+                                Enter
+                            </a>
+                        </div>
+                        <!-- </ul> -->
+                    </div>
+                </footer>
+            </div>
         </div>
-        <!-- <ul> -->
-        <div id="ChatInputDiv">
-            <input onkeypress="handleEnter(event)" id="textMessage"><a id="messageSubmitB" class="btn btn-success" onclick="submitMessage('')">
-            Enter </a>
-        </div>
-        <!-- </ul> -->
     </div>
-</footer>
-
 <!-- </div>
 </div>
 </div> -->
@@ -294,7 +300,7 @@
 
     function SetRepeat()
     {
-        $("#optionsDiv").append("<div class='answerOptions' id='qAnswers'><a onclick=\"Reset()\">Search Again</a></div>");
+        $("#optionsDiv").append("<div onclick=\"Reset()\" class='answerOptions' id='qAnswers'><a>Search Again</a></div>");
         checkOutsideElements();
     }
 

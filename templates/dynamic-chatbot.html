@@ -78,7 +78,7 @@
 <body id="chatbotBody">
 
     <div class="top_right">
-        <img style="width:20px; height: 20px; margin: 10px; top: 0px; right: 0px; position: absolute;" src="../static/img/bg-img/Icons8-Windows-8-Computer-Hardware-Restart.ico" onclick="Reset()">
+        <img style="width:20px; height: 20px; margin: 10px; top: 0px; right: 0px; position: fixed;" src="../static/img/bg-img/Icons8-Windows-8-Computer-Hardware-Restart.ico" onclick="Reset()">
     </div>
 
     <div class="outerContainer">
@@ -264,6 +264,7 @@
         {
             sendData();
             SetRepeat();
+            chatInputDov.style = "display:none";
             if (!cancelScroll)
             {
                 scrollTo("chatBottom");
@@ -283,17 +284,17 @@
             answers += "<a class='answerOptions' id='option" + i + "' onclick=\"submitMessage('" + emojione.toImage(data[questionN][i].split(";")[0] + "')\">" + data[questionN][i].split(";")[0]) + "</a>";
             showChatBox = false;
         }
-        if (questionN == 1) {
+        if (questionN == 2) {
             answers += "<a class='answerOptions' id='option" + i + "' onclick=\"getNextQuestion()\">Skip Question</a>";
         }
         answers += "</div>"
+        $("#optionsDiv").append(answers);
         if (showChatBox)
         {
             chatInputDov.style = "display:block";
         }
         else
         {
-            $("#optionsDiv").append(answers);
             chatInputDov.style = "display:none";
         }
         $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + emojione.toImage(data[questionN][0].split(";")[0]) + "</li></div>");
@@ -310,7 +311,7 @@
 
     function SetRepeat()
     {
-        $("#optionsDiv").append("<div onclick=\"Reset()\" class='answerOptions' id='qAnswers'><a>Search Again</a></div>");
+        $("#optionsDiv").append("<div style='text-align: center;' onclick=\"Reset()\" id='qAnswers'><a class='answerOptions' style='width:400px;'>Search Again</a></div>");
         checkOutsideElements();
     }
 

@@ -2032,3 +2032,21 @@ ul li ul.dropdown li {
 #innerContainer::-webkit-scrollbar {
     display: none;
 }
+
+/*.top_right {
+    position: relative;
+}
+
+.top_right img {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin: 10px;
+}
+
+#reset_button {
+    background-color: #808080;
+    color: black;
+    top: 0px;
+    right: 0px;
+}*/

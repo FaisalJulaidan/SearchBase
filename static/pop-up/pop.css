@@ -31,28 +31,10 @@ ul li{
   margin-left: 10px;
 }
 
-.top_right {
-    position: relative;
-}
-
-.top_right img {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    margin: 10px;
-}
-
 #launch_button{
     background-color: #002d62;
     color: white;
 
-}
-
-#reset_button {
-    background-color: #808080;
-    color: black;
-    top: 0px;
-    right: 0px;
 }
 
 #launch_button3{

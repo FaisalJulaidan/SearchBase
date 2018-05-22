@@ -125,6 +125,7 @@
     var params = "";
     var questionsAnswered = 0;
     var collectedInformation = [];
+    var qType = "";
     $(window).scroll(function ()
     {
         newPos = $(window).scrollTop();
@@ -196,8 +197,29 @@
         {
             scrollTo("chatBottom");
         }
-        await sleep(400 + Math.floor(Math.random() * 1100));
+        await sleep(400 + Math.floor(Math.random() * 900));
         $("#thinkingGif").remove();
+        if (data[questionN][0].split(";")[1] == "both" || data[questionN][0].split(";")[1] == "userInfoRetrieval") {
+            collectedInformation.push((questionN + 1) + ";" + message);
+            $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>Thanks " + emojione.toImage("😁") + "</li></div>");
+            $("#newMessage").animate({
+                marginTop: "-=35px"
+            }, "slow");
+            if (!cancelScroll) {
+                scrollTo("chatBottom");
+            }
+            document.getElementById('newMessage').id = 'oldMessage';
+            await sleep(300);
+            $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
+            $("#thinkingGif").animate({
+                marginTop: "-=35px"
+            }, "slow");
+            if (!cancelScroll) {
+                scrollTo("chatBottom");
+            }
+            await sleep(400 + Math.floor(Math.random() * 500));
+            $("#thinkingGif").remove();
+        }
         if (!showChatBox)
         {
             for (var i = 0; i < data[questionN].length; i++)
@@ -205,32 +227,9 @@
                 if (data[questionN][i].split(";")[0] == message)
                 {
                     getKeyWord(data[questionN][i].split(";")[1]);
-                    getNextQuestion();
-                    return null;
                 }
             }
         }
-        collectedInformation.push((questionN + 1) + ";" + message);
-        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>Thanks " + emojione.toImage("😁") + "</li></div>");
-        $("#newMessage").animate({
-            marginTop: "-=35px"
-        }, "slow");
-        if (!cancelScroll)
-        {
-            scrollTo("chatBottom");
-        }
-        document.getElementById('newMessage').id = 'oldMessage';
-        await sleep(300);
-        $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
-        $("#thinkingGif").animate({
-            marginTop: "-=35px"
-        }, "slow");
-        if (!cancelScroll)
-        {
-            scrollTo("chatBottom");
-        }
-        await sleep(400 + Math.floor(Math.random() * 600));
-        $("#thinkingGif").remove();
         getNextQuestion();
         /*$("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>I apologise but I need an answer from the showed ones in order to get you the best match</li></div>");
         $("#newMessage").animate({
@@ -265,12 +264,14 @@
             }
             return 0;
         }
+        qType = data[questionN][0].split(";")[1];
         var answers = "<div id='qAnswers'>";
+        if (data[questionN][0].split(";")[1] == "userInfoRetrieval") {
+            showChatBox = true;
+        }
         for (var i = 1; i < data[questionN].length; i++)
         {
-            if (data[questionN][i] == "BT9123532322780")
-            {
-                showChatBox = true;
+            if (showChatBox) {
                 break;
             }
             answers += "<a class='answerOptions' id='option" + i + "' onclick=\"submitMessage('" + emojione.toImage(data[questionN][i].split(";")[0] + "')\">" + data[questionN][i].split(";")[0]) + "</a>"
@@ -286,7 +287,7 @@
             $("#optionsDiv").append(answers);
             chatInputDov.style = "display:none";
         }
-        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + emojione.toImage(data[questionN][0]) + "</li></div>");
+        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + emojione.toImage(data[questionN][0].split(";")[0]) + "</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"
         }, "slow");

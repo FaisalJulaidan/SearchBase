@@ -189,7 +189,7 @@
                                 <div>
                                    <select id="question-select">
                                      {% for row in msg%}
-                                     <option value="{{row[0]}}">{{row[0]}}</option>
+                                       <option value="{{row[0]}}">{{row[0].split(";")[0]}}</option>
                                      {%endfor%}
                                    </select>
                                    <p class="text-muted font-13 m-b-30">How many answers will your question have?</p>
@@ -286,22 +286,18 @@
     <script>
     document.getElementById("snoa").addEventListener("click", changeQuestion);
     var numberOfQuestions = 0;
-        {%for item in msg %}
-        {%if item[1] != "<>userInfoRetrieval<>"%}
-        numberOfQuestions++;
-        {%endif%}
+    {%for item in msg %}
+    numberOfQuestions++;
     {%endfor%}
     var data = createArray(numberOfQuestions);
     var i = 0;
-        {%for item in msg %}
-        {%if item[1] != "<>userInfoRetrieval<>"%}
+    {%for item in msg %}
     {%for answer in item%}
     {%if answer != None %}
     data[i].push("{{answer}}");
     {%endif%}
     {%endfor%}
-        i++;
-        {%endif%}
+    i++;
     {%endfor%}
     var e = document.getElementById("question-select");
     var questionPos = e.selectedIndex;
@@ -311,9 +307,8 @@
     getDatabaseData();
     function getDatabaseData(){
         numberOfAnswers = 0;
-        console.log("Fetching other question data");
         for(var j = 0;j < data.length;j++){
-            if(data[j][0] == document.getElementById("question-select").options[document.getElementById("question-select").selectedIndex].text){
+            if(data[j][0] == document.getElementById("question-select").options[document.getElementById("question-select").selectedIndex].value){
                 for(var b = 1; b < data[j].length+1;b++){
                     if(b==data[j].length){break;}
                     if(data[j][b] == ""){break;}

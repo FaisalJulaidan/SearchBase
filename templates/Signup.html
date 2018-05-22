@@ -4,146 +4,149 @@
 	<title>Sign up</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="icon" type="image/png" href="../static/images/icons/favicon.ico"/>
+	<link rel="icon" type="image/png" href="../static/SL/Login/images/icons/favicon.ico"/>
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/vendor/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/vendor/animate/animate.css">
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/vendor/css-hamburgers/hamburgers.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/vendor/select2/select2.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/css/util.css">
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/css/main.css">
 
-	<link rel="stylesheet" type="text/css" href="../static/vendor/bootstrap/css/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="../static/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
-	<link rel="stylesheet" type="text/css" href="../static/fonts/iconic/css/material-design-iconic-font.min.css">
-	<link rel="stylesheet" type="text/css" href="../static/vendor/animate/animate.css">
-	<link rel="stylesheet" type="text/css" href="../static/vendor/css-hamburgers/hamburgers.min.css">
-	<link rel="stylesheet" type="text/css" href="../static/vendor/animsition/css/animsition.min.css">
-	<link rel="stylesheet" type="text/css" href="../static/vendor/select2/select2.min.css">
-	<link rel="stylesheet" type="text/css" href="../static/vendor/daterangepicker/daterangepicker.css">
-	<link rel="stylesheet" type="text/css" href="../static/css/util.css">
-	<link rel="stylesheet" type="text/css" href="../static/css/main.css">
 
-	<!-- Icon images -->
-	<link rel="apple-touch-icon" sizes="57x57" href="../static/img/core-img/apple-icon-57x57.png">
-	<link rel="apple-touch-icon" sizes="60x60" href="../static/img/core-img/apple-icon-60x60.png">
-	<link rel="apple-touch-icon" sizes="72x72" href="../static/img/core-img/apple-icon-72x72.png">
-	<link rel="apple-touch-icon" sizes="76x76" href="../static/img/core-img/apple-icon-76x76.png">
-	<link rel="apple-touch-icon" sizes="114x114" href="../static/img/core-img/apple-icon-114x114.png">
-	<link rel="apple-touch-icon" sizes="120x120" href="../static/img/core-img/apple-icon-120x120.png">
-	<link rel="apple-touch-icon" sizes="144x144" href="../static/img/core-img/apple-icon-144x144.png">
-	<link rel="apple-touch-icon" sizes="152x152" href="../static/img/core-img/apple-icon-152x152.png">
-	<link rel="apple-touch-icon" sizes="180x180" href="../static/img/core-img/apple-icon-180x180.png">
-	<link rel="icon" type="image/png" sizes="192x192"  href="../static/img/core-img/android-icon-192x192.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="../static/img/core-img/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="96x96" href="../static/img/core-img/favicon-96x96.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="../static/img/core-img/favicon-16x16.png">
-	<link rel="manifest" href="../static/img/core-img/manifest.json">
-	<meta name="msapplication-TileColor" content="#ffffff">
-	<meta name="msapplication-TileImage" content="../static/img/core-img/ms-icon-144x144.png">
-	<meta name="theme-color" content="#ffffff">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-70419779-2"></script>
+<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
 
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-70419779-2"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag(){dataLayer.push(arguments);}
-		gtag('js', new Date());
+	gtag('config', 'UA-70419779-2');
+</script>
 
-		gtag('config', 'UA-70419779-2');
-	</script>
+<!-- Icon images -->
+<link rel="apple-touch-icon" sizes="57x57" href="../static/img/core-img/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="../static/img/core-img/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="../static/img/core-img/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="../static/img/core-img/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="../static/img/core-img/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="../static/img/core-img/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="../static/img/core-img/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="../static/img/core-img/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../static/img/core-img/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="../static/img/core-img/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../static/img/core-img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="../static/img/core-img/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../static/img/core-img/favicon-16x16.png">
+<link rel="manifest" href="../static/img/core-img/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="../static/img/core-img/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
 
 </head>
-<body background="../static/img/bg-img/welcome-bg-signup.png">
+<body>
 
 	<div class="limiter">
 		<div class="container-login100">
 			<div class="wrap-login100">
+				<div class="login100-pic">
+					<img src="../static/img/gifs/rocket-icon.gif" alt="GIF">
+					<br />
+					<br />
+					<br />
+					<h2> Launch your business into the future. </h2>
+				</div>
+
 				<form class="login100-form validate-form" action="/signupform" method="POST" enctype="multipart/form-data">
-					<span class="login100-form-title p-b-26">
-						Sign up<br />
-						TheSearchbase
-					</span>
-					<span class="login100-form-title p-b-48">
+					<span class="login100-form-title">
+						Sign up
 					</span>
 
-					<div class="wrap-input100 validate-input" data-validate="Please enter your title">
-						<input class="input100" type="text" name="title"/>
-						<span class="focus-input100" data-placeholder="Title"></span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate="Please enter your name">
-						<input class="input100" type="text" name="firstname"/>
-						<span class="focus-input100" data-placeholder="Firstname"></span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate="Please enter your surname">
-						<input class="input100" type="text" name="surname"/>
-						<span class="focus-input100" data-placeholder="Surname"></span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate="Please enter your company name">
-						<input class="input100" type="text" name="companyName"/>
-						<span class="focus-input100" data-placeholder="Company name"></span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate="Please enter your position">
-						<input class="input100" type="text" name="userPosition"/>
-						<span class="focus-input100" data-placeholder="Position at the company"></span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate="Please enter your address">
-						<input class="input100" id="address" type="text" name="companyAddress" onchange="doGeocode()"/>
-						<span class="focus-input100" data-placeholder="Company address"></span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate = "Valid email is: a@b.c">
-						<input class="input100" type="text" name="contactEmail"/>
-						<span class="focus-input100" data-placeholder="Email"></span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate="Please enter your contact number">
-						<input class="input100" type="text" name="contactNumber"/>
-						<span class="focus-input100" data-placeholder="Contact number"></span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate="Please enter your country">
-						<input class="input100" type="text" name="country"/>
-						<span class="focus-input100" data-placeholder="Country"></span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate="Enter password">
-						<span class="btn-show-pass">
-							<i class="zmdi zmdi-eye"></i>
+					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+						<input class="input100" type="text" name="fullname" placeholder="Full Name">
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-address-card-o" aria-hidden="true"></i>
 						</span>
-						<input class="input100" type="password" name="pass"/>
-						<span class="focus-input100" data-placeholder="Password"></span>
+					</div>
+
+					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+						<input class="input100" type="text" name="contactEmail" placeholder="Email">
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-envelope" aria-hidden="true"></i>
+						</span>
+					</div>
+
+					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+						<input class="input100" type="text" name="websiteURL" placeholder="Website URL">
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-globe" aria-hidden="true"></i>
+						</span>
+					</div>
+
+					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+						<input class="input100" type="text" name="companyName" placeholder="Name of Company">
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-briefcase" aria-hidden="true"></i>
+						</span>
+					</div>
+
+					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+						<input class="input100" type="text" name="userPosition" placeholder="Position at Company">
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-user" aria-hidden="true"></i>
+						</span>
+					</div>
+
+					<div class="wrap-input100 validate-input" data-validate = "Password is required">
+						<input class="input100" type="password" name="pass" placeholder="Password">
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-lock" aria-hidden="true"></i>
+						</span>
+					</div>
+
+					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+						<select id="inputState" class="form-control">
+							<option selected>Choose Plan</option>
+							<option> 3 Month Trail</option>
+							<option> Basic Plan</option>
+							<option> Advanced Plan</option>
+							<option> Ultimate Plan</option>
+						</select>
+						<span class="focus-input100"></span>
 					</div>
 
 					<div class="container-login100-form-btn">
-						<div class="wrap-login100-form-btn">
-							<div class="login100-form-bgbtn"></div>
-							<button class="login100-form-btn">
-								Sign up
-							</button>
-						</div>
+						<button class="login100-form-btn">
+							Sign up
+						</button>
 					</div>
 
-					<div class="text-center p-t-115">
+					<div class="text-center p-t-12">
 						<span class="txt1">
-							Already have an account?
+							By Signing up you agree to our
 						</span>
-						 <a class="txt2" href="/login">
-							Sign in
+						<a class="txt2" href="/termsandconditions">
+							<strong>Terms</strong>
+						</a>
+						<span class="text1">
+							&
+						</span>
+						<a class="text2" href="/privacy">
+							<strong>Privacy Policy</strong>
 						</a>
 					</div>
 
-					<div class="text-center p-t-115">
-						<span class="txt1">
-							By signing up, you are agreeing to our
-						</span>
-						 <a class="txt2" href="/termsandconditions"><b>
-							terms
-						</b></a>
-						<span class="txt1">
-							and
-						</span>
-						<a class="txt2" href="/privacy"><b>
-						 Privacy Policy
-					 </b></a>
+					<div class="text-center p-t-136">
+						<a class="txt2" href="/login">
+							Already have an Account?
+							<i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
+						</a>
 					</div>
 				</form>
 			</div>
@@ -151,39 +154,19 @@
 	</div>
 
 
-	<div id="dropDownSelect1"></div>
 
-	<script src="../static/vendor/jquery/jquery-3.2.1.min.js"></script>
-	<script src="../static/vendor/animsition/js/animsition.min.js"></script>
-	<script src="../static/vendor/bootstrap/js/popper.js"></script>
-	<script src="../static/vendor/bootstrap/js/bootstrap.min.js"></script>
-	<script src="../static/vendor/select2/select2.min.js"></script>
-	<script src="../static/vendor/daterangepicker/moment.min.js"></script>
-	<script src="../static/vendor/daterangepicker/daterangepicker.js"></script>
-	<script src="../static/vendor/countdowntime/countdowntime.js"></script>
-	<script src="../static/js/main.js"></script>
 
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk&callback=initMap"></script>
-		<script>
-			function doGeocode() {
-				var addr = document.getElementById("address");
-				// Get geocoder instance
-				var geocoder = new google.maps.Geocoder();
-
-				// Geocode the address
-				geocoder.geocode({
-					'address': addr.value
-				}, function(results, status) {
-					if (status === google.maps.GeocoderStatus.OK && results.length > 0) {
-
-						// set it to the correct, formatted address if it's valid
-						addr.value = results[0].formatted_address;;
-
-						// show an error if it's not
-					} else alert("Invalid address");
-				});
-			};
+	<script src="../static/SL/Login/vendor/jquery/jquery-3.2.1.min.js"></script>
+	<script src="../static/SL/Login/vendor/bootstrap/js/popper.js"></script>
+	<script src="../static/SL/Login/vendor/bootstrap/js/bootstrap.min.js"></script>
+	<script src="../static/SL/Login/vendor/select2/select2.min.js"></script>
+	<script src="../static/SL/Login/vendor/tilt/tilt.jquery.min.js"></script>
+	<script >
+		$('.js-tilt').tilt({
+			scale: 1.1
+		})
 	</script>
+	<script src="../static/SL/Login/js/main.js"></script>
 
 </body>
 </html>

@@ -258,6 +258,7 @@
 
     function getNextQuestion()
     {
+        $("#qAnswers").remove();
         questionN += 1;
         if (data[questionN] == undefined)
         {
@@ -279,8 +280,11 @@
             if (showChatBox) {
                 break;
             }
-            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"submitMessage('" + emojione.toImage(data[questionN][i].split(";")[0] + "')\">" + data[questionN][i].split(";")[0]) + "</a>"
+            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"submitMessage('" + emojione.toImage(data[questionN][i].split(";")[0] + "')\">" + data[questionN][i].split(";")[0]) + "</a>";
             showChatBox = false;
+        }
+        if (questionN == 1) {
+            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"getNextQuestion()\">Skip Question</a>";
         }
         answers += "</div>"
         if (showChatBox)

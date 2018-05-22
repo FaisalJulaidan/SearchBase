@@ -68,11 +68,8 @@ ul li{
 
 
 /*iFrame styling*/
-#chatbotIframe {
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    border-color: #ffffff;
-    overflow: hidden;
+#chatbotIframe, #overChatbotIframe {
+    box-shadow: 3px 3px 5px grey;
 }
 
 #overChatbotIframe {

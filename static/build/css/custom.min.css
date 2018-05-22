@@ -2547,7 +2547,8 @@ span.section {
 
 .form-control {
     border-radius: 0;
-    width: 100%
+    width: 50%;
+
 }
 
 .form-horizontal .control-label {

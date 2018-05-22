@@ -1810,7 +1810,7 @@ right: 0;
     background: #eee;
     text-align: left;
     /* float: left; */
-    margin-top: 35px;
+    margin-top: 45px;
 }
 
 .userChat{
@@ -1956,10 +1956,6 @@ opacity: 1;
 right: 0;
 }
 
-#chatbotBody{
-    overflow:hidden;
-}
-
 
 ul li a.dropdown {
     display: block;
@@ -2019,3 +2015,38 @@ ul li ul.dropdown li {
     background-color: #eeeeee;
     text-align: center;
 }
+
+#outerContainer {
+    border: 5px solid purple;
+    position: relative;
+    overflow: hidden;
+}
+
+#innerContainer {
+    position: absolute;
+    left: 0;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+#innerContainer::-webkit-scrollbar {
+    display: none;
+}
+
+/*.top_right {
+    position: relative;
+}
+
+.top_right img {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin: 10px;
+}
+
+#reset_button {
+    background-color: #808080;
+    color: black;
+    top: 0px;
+    right: 0px;
+}*/

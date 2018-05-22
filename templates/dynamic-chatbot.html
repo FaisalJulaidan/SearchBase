@@ -76,37 +76,48 @@
 </head>
 
 <body id="chatbotBody">
-<!-- <div class="chat-box">
-    <div class="open">Open
-        <div class="box"> -->
-<center>
-    <ul id="messagesContainer">
-        <!-- paste here the yeyo -->
-    </ul>
-</center>
-<div id="separator">
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <div id="chatBottom"></div>
-</div>
-<footer id="chatFooter">
-    <div id="bottomContainer">
-        <div id="optionsDiv">
-        </div>
-        <!-- <ul> -->
-        <div id="ChatInputDiv">
-            <input onkeypress="handleEnter(event)" id="textMessage"><a id="messageSubmitB" class="btn btn-success" onclick="submitMessage('')">
-            Enter </a>
-        </div>
-        <!-- </ul> -->
-    </div>
-</footer>
 
+    <div class="top_right">
+        <img style="width:20px; height: 20px; margin: 10px; top: 0px; right: 0px; position: fixed;" src="../static/img/bg-img/Icons8-Windows-8-Computer-Hardware-Restart.ico" onclick="Reset()">
+    </div>
+
+    <div class="outerContainer">
+        <div class="innerContainer">
+            <div class="element">
+                <!-- <div class="chat-box">
+            <div class="open">Open
+                <div class="box"> -->
+                <center>
+                    <ul id="messagesContainer">
+                        <!-- paste here the yeyo -->
+                    </ul>
+                </center>
+                <div id="separator">
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <div id="chatBottom"></div>
+                </div>
+                <footer id="chatFooter">
+                    <div id="bottomContainer">
+                        <div id="optionsDiv">
+                        </div>
+                        <!-- <ul> -->
+                        <div id="ChatInputDiv">
+                            <input onkeypress="handleEnter(event)" id="textMessage"><a id="messageSubmitB" class="btn btn-success" onclick="submitMessage('')">
+                                Enter
+                            </a>
+                        </div>
+                        <!-- </ul> -->
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
 <!-- </div>
 </div>
 </div> -->
@@ -119,6 +130,7 @@
     var params = "";
     var questionsAnswered = 0;
     var collectedInformation = [];
+    var qType = "";
     $(window).scroll(function ()
     {
         newPos = $(window).scrollTop();
@@ -190,8 +202,29 @@
         {
             scrollTo("chatBottom");
         }
-        await sleep(400 + Math.floor(Math.random() * 1100));
+        await sleep(400 + Math.floor(Math.random() * 900));
         $("#thinkingGif").remove();
+        if (data[questionN][0].split(";")[1] == "both" || data[questionN][0].split(";")[1] == "userInfoRetrieval") {
+            collectedInformation.push((questionN + 1) + ";" + message);
+            $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>Thanks " + emojione.toImage("😁") + "</li></div>");
+            $("#newMessage").animate({
+                marginTop: "-=35px"
+            }, "slow");
+            if (!cancelScroll) {
+                scrollTo("chatBottom");
+            }
+            document.getElementById('newMessage').id = 'oldMessage';
+            await sleep(300);
+            $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
+            $("#thinkingGif").animate({
+                marginTop: "-=35px"
+            }, "slow");
+            if (!cancelScroll) {
+                scrollTo("chatBottom");
+            }
+            await sleep(400 + Math.floor(Math.random() * 500));
+            $("#thinkingGif").remove();
+        }
         if (!showChatBox)
         {
             for (var i = 0; i < data[questionN].length; i++)
@@ -199,32 +232,9 @@
                 if (data[questionN][i].split(";")[0] == message)
                 {
                     getKeyWord(data[questionN][i].split(";")[1]);
-                    getNextQuestion();
-                    return null;
                 }
             }
         }
-        collectedInformation.push((questionN + 1) + ";" + message);
-        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>Thanks " + emojione.toImage("😁") + "</li></div>");
-        $("#newMessage").animate({
-            marginTop: "-=35px"
-        }, "slow");
-        if (!cancelScroll)
-        {
-            scrollTo("chatBottom");
-        }
-        document.getElementById('newMessage').id = 'oldMessage';
-        await sleep(300);
-        $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
-        $("#thinkingGif").animate({
-            marginTop: "-=35px"
-        }, "slow");
-        if (!cancelScroll)
-        {
-            scrollTo("chatBottom");
-        }
-        await sleep(400 + Math.floor(Math.random() * 600));
-        $("#thinkingGif").remove();
         getNextQuestion();
         /*$("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>I apologise but I need an answer from the showed ones in order to get you the best match</li></div>");
         $("#newMessage").animate({
@@ -248,39 +258,46 @@
 
     function getNextQuestion()
     {
+        $("#qAnswers").remove();
         questionN += 1;
         if (data[questionN] == undefined)
         {
             sendData();
             SetRepeat();
+            chatInputDov.style = "display:none";
             if (!cancelScroll)
             {
                 scrollTo("chatBottom");
             }
             return 0;
         }
+        qType = data[questionN][0].split(";")[1];
         var answers = "<div id='qAnswers'>";
+        if (data[questionN][0].split(";")[1] == "userInfoRetrieval") {
+            showChatBox = true;
+        }
         for (var i = 1; i < data[questionN].length; i++)
         {
-            if (data[questionN][i] == "BT9123532322780")
-            {
-                showChatBox = true;
+            if (showChatBox) {
                 break;
             }
-            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"submitMessage('" + emojione.toImage(data[questionN][i].split(";")[0] + "')\">" + data[questionN][i].split(";")[0]) + "</a>"
+            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"submitMessage('" + emojione.toImage(data[questionN][i].split(";")[0] + "')\">" + data[questionN][i].split(";")[0]) + "</a>";
             showChatBox = false;
         }
+        if (questionN == 2) {
+            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"getNextQuestion()\">Skip Question</a>";
+        }
         answers += "</div>"
+        $("#optionsDiv").append(answers);
         if (showChatBox)
         {
             chatInputDov.style = "display:block";
         }
         else
         {
-            $("#optionsDiv").append(answers);
             chatInputDov.style = "display:none";
         }
-        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + emojione.toImage(data[questionN][0]) + "</li></div>");
+        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + emojione.toImage(data[questionN][0].split(";")[0]) + "</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"
         }, "slow");
@@ -294,15 +311,17 @@
 
     function SetRepeat()
     {
-        $("#optionsDiv").append("<div class='answerOptions' id='qAnswers'><a onclick=\"Reset()\">Search Again</a></div>");
+        $("#optionsDiv").append("<div style='text-align: center;' onclick=\"Reset()\" id='qAnswers'><a class='answerOptions' style='width:400px;'>Search Again</a></div>");
         checkOutsideElements();
     }
 
     function Reset()
     {
         cancelScroll = false;
+        showChatBox = false;
         $("#qAnswers").remove();
         keywords = [];
+        collectedInformation = [];
         questionsAnswered = 0;
         questionNumber = 0;
         questionN = -1;

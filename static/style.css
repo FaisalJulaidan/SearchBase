@@ -2016,6 +2016,10 @@ ul li ul.dropdown li {
     text-align: center;
 }
 
+#chatbotBody::-webkit-scrollbar {
+    display:none;
+}
+
 #outerContainer {
     border: 5px solid purple;
     position: relative;

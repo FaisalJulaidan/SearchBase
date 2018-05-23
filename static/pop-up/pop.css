@@ -48,6 +48,9 @@ ul li{
     background: #ffffff;
 }
 
+#chatbotIframe{
+    overflow:hidden;
+}
 
 /*iFrame styling*/
 #chatbotIframe, #overChatbotIframe {

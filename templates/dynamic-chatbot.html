@@ -275,6 +275,8 @@
         var answers = "<div id='qAnswers'>";
         if (data[questionN][0].split(";")[1] == "userInfoRetrieval") {
             showChatBox = true;
+        } else {
+            showChatBox = false;
         }
         for (var i = 1; i < data[questionN].length; i++)
         {

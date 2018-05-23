@@ -226,16 +226,20 @@
           tableHeading.append("<th class=\"column-title\">Date</th>");
           var numberOfHeaders = 0;
           var curNOH = 0;
+          var emptyPlaces = 0;
           {%for item in data %}
-          if ("{{item[3]}}" != "") {
-              {%for record in item %}
-              if ("{{record}}" != "") {
-                  curNOH++;
-              }
-              {% endfor %}
-              if (curNOH > numberOfHeaders) { numberOfHeaders = curNOH; }
-              curNOH = 0;
-          }
+            {%for record in item %}
+            if ("{{record}}" != "") {
+                curNOH++;
+                curNOH += emptyPlaces;
+                emptyPlaces = 0;
+            } else {
+                emptyPlaces++;
+            }
+            {% endfor %}
+            if (curNOH > numberOfHeaders) { numberOfHeaders = curNOH; }
+            curNOH = 0;
+            emptyPlaces = 0;
           {% endfor %}
           for (var i = 1; i <= numberOfHeaders - 2; i++) {
               tableHeading.append("<th class=\"column-title\">Data " + i + "</th>");

@@ -4896,3 +4896,7 @@ ul.notifications {
 .dataTables_wrapper>.row {
     overflow: auto!important
 }
+
+.analytics_line {
+    display: flex;
+}

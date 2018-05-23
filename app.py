@@ -463,6 +463,11 @@ def popup2():
     if request.method == "GET":
         return render_template("pop-test2.html")
 #
+@app.route("/dynamic-popup/<route>", methods=['GET'])
+def dynamicPopup(route):
+    if request.method == "GET":
+        return render_template("dynamic-popup.html", msg=route)
+
 @app.route("/popup3", methods=['GET'])
 def popup3():
     if request.method == "GET":

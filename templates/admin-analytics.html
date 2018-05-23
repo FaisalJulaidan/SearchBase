@@ -162,15 +162,29 @@
             </div>
             <div class="clearfix"></div>
             <div id="pasteDiv" class="row">
-            <li> Export to Excel</li><br>
-            <button id="btnExport" onclick="fnExcelReport();"> EXPORT </button><br>
-            <iframe id="txtArea1" style="display:none"></iframe>
-            <br><br>
-            <canvas id="putcharthere1" width="600" height="400"></canvas>
-            <canvas id="putcharthere2" width="600" height="400"></canvas>
-            <canvas id="putcharthere3" width="600" height="400"></canvas>
-            <div class="clearfix"></div>
-          </div>
+                <li> Export to Excel</li>
+                <br />
+                <button id="btnExport" onclick="fnExcelReport();"> EXPORT </button><br>
+                <iframe id="txtArea1" style="display:none"></iframe>
+                <br />
+                <br />
+
+                <!-- First chart -->
+                <div style="width:350px; height:360px;">
+                    <canvas id="putcharthere1" style="width:350px; height:360px;"></canvas>
+                </div>
+
+                <!-- Second chart -->
+                <div style="width:350px; height:360px;">
+                    <canvas id="putcharthere2" style="width:350px; height:360px;"></canvas>
+                </div>
+
+                <!-- Third chart -->
+                <div style="width:350px; height:360px;">
+                    <canvas id="putcharthere3" style="width:350px; height:360px;"></canvas>
+                </div>
+                <div class="clearfix"></div>
+            </div>
         </div>
         <!-- page content -->
           <!-- /top tiles -->
@@ -262,8 +276,8 @@
        label: 'Assistant Used',
        fill: true,
        lineTension: 0.1,
-       backgroundColor: "rgba(255,255,153,0.4)",
-       borderColor: "rgba(255,255,0,1)",
+        backgroundColor: "rgb(138,43,226)",
+        borderColor: "rgb(138,43,226)",
        borderCapStyle: 'butt',
        borderDash: [],
        borderDashOffset: 0.0,
@@ -296,8 +310,8 @@
        label: 'Questions Answered',
        fill: true,
        lineTension: 0.1,
-       backgroundColor: "rgba(255,255,153,0.4)",
-       borderColor: "rgba(255,255,0,1)",
+        backgroundColor: "rgb(138,43,226)",
+        borderColor: "rgb(138,43,226)",
        borderCapStyle: 'butt',
        borderDash: [],
        borderDashOffset: 0.0,
@@ -330,8 +344,8 @@
        label: 'Products Returned',
        fill: true,
        lineTension: 0.1,
-       backgroundColor: "rgba(255,255,153,0.4)",
-       borderColor: "rgba(255,255,0,1)",
+        backgroundColor: "rgb(138,43,226)",
+        borderColor: "rgb(138,43,226)",
        borderCapStyle: 'butt',
        borderDash: [],
        borderDashOffset: 0.0,

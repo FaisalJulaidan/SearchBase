@@ -806,10 +806,17 @@ def adminAnswers():
         maxN = len(mes)
         while (n < maxN):
             if(len(mes) > 0):
+                print(n, "   ", maxN)
+                try:
+                    print(mes[n])
+                except:
+                    break;
                 if(mes[n][0].split(";")[1] == "userInfoRetrieval"):
                     mes.remove(mes[n])
                     n -= 1
                     maxN -= 1
+                    if n < 0:
+                        n = 0
                 else:
                     n += 1
             else:

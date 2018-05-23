@@ -371,7 +371,7 @@
               <input onclick=\"CheckTypeBox('db"+ i +"')\" id='dbB"+ i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"dbRetrieval\" checked>Data Base Retrieval\
               <input onclick=\"CheckTypeBox('ui"+ i +"')\" id='uiB" + i + "' type=\"checkbox\" name=\"qType" + i +"\" value=\"userInfoRetrieval\">User Input Retrieval\
               </div><br /><br /></div>");
-                if (typeCheck[i] == "dbRetrieval") {
+                if (typeCheck[i] == "userInfoRetrieval") {
                     $("#dbB" + i).prop('checked', false);
                     $("#uiB" + i).prop('checked', true);
                 } else if (typeCheck[i] == "both") {

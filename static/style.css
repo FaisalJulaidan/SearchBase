@@ -1790,7 +1790,7 @@ right: 0;
 #messagesContainer li{
   display:inline-block;
   clear: both;
-  padding: 10px 20px 10px 20px;
+  padding: 2px 20px 2px 20px;
   border-radius: 30px;
   margin-bottom: 30px;
     margin-right: 10px;

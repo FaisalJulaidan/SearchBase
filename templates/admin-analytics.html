@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -69,13 +69,13 @@
                   </li>
                   <li><a href="/admin/Products"><i class="fa fa-database"></i> Product Database<span class="fa fa-arrow-right"></span></a>
                   </li>
-                  <li><a><i class="fa fa-table"></i> Tables <span class="fa fa-chevron-down"></span></a>
+                    <!-- User Data Storage -->
+                  <li><a><i class="fa fa-cloud"></i> Data Storage <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="/admin/displayQuestions">Questions</a></li>
-                      <li><a href="/admin/displayAnswers">Answers</a></li>
-                      <li><a href="/admin/displayProducts">Products</a></li>
+                      <li><a href="/admin/userinput">User Input</a></li>
                     </ul>
                   </li>
+                    <!-- End of user Data Storage -->
                   <li><a href="/admin/connect"><i class="fa fa-plug"></i> Connection<span class="fa"></span></a>
                   </li>
                 </ul>
@@ -162,15 +162,31 @@
             </div>
             <div class="clearfix"></div>
             <div id="pasteDiv" class="row">
-            <li> Export to Excel</li><br>
-            <button id="btnExport" onclick="fnExcelReport();"> EXPORT </button><br>
-            <iframe id="txtArea1" style="display:none"></iframe>
-            <br><br>
-            <canvas id="putcharthere1" width="600" height="400"></canvas>
-            <canvas id="putcharthere2" width="600" height="400"></canvas>
-            <canvas id="putcharthere3" width="600" height="400"></canvas>
-            <div class="clearfix"></div>
-          </div>
+                <li> Export to Excel</li>
+                <br />
+                <button id="btnExport" onclick="fnExcelReport();"> EXPORT </button><br>
+                <iframe id="txtArea1" style="display:none"></iframe>
+                <br />
+                <br />
+
+              <div class="analytics_line">
+                <!-- First chart -->
+                <div style="width:350px; height:200px;">
+                    <canvas id="putcharthere1" style="width:350px; height:0px;"></canvas>
+                </div>
+
+                <!-- Second chart -->
+                <div style="width:350px; height:200px;">
+                    <canvas id="putcharthere2" style="width:350px; height:0px;"></canvas>
+                </div>
+
+                <!-- Third chart -->
+                <div style="width:350px; height:200px;">
+                    <canvas id="putcharthere3" style="width:350px; height:0px"></canvas>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            </div>
         </div>
         <!-- page content -->
           <!-- /top tiles -->
@@ -262,8 +278,8 @@
        label: 'Assistant Used',
        fill: true,
        lineTension: 0.1,
-       backgroundColor: "rgba(255,255,153,0.4)",
-       borderColor: "rgba(255,255,0,1)",
+        backgroundColor: "rgb(138,43,226)",
+        borderColor: "rgb(138,43,226)",
        borderCapStyle: 'butt',
        borderDash: [],
        borderDashOffset: 0.0,
@@ -296,8 +312,8 @@
        label: 'Questions Answered',
        fill: true,
        lineTension: 0.1,
-       backgroundColor: "rgba(255,255,153,0.4)",
-       borderColor: "rgba(255,255,0,1)",
+        backgroundColor: "rgb(138,43,226)",
+        borderColor: "rgb(138,43,226)",
        borderCapStyle: 'butt',
        borderDash: [],
        borderDashOffset: 0.0,
@@ -330,8 +346,8 @@
        label: 'Products Returned',
        fill: true,
        lineTension: 0.1,
-       backgroundColor: "rgba(255,255,153,0.4)",
-       borderColor: "rgba(255,255,0,1)",
+        backgroundColor: "rgb(138,43,226)",
+        borderColor: "rgb(138,43,226)",
        borderCapStyle: 'butt',
        borderDash: [],
        borderDashOffset: 0.0,

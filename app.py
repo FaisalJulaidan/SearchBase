@@ -19,6 +19,7 @@ USERDATABASE = APP_ROOT + "/users.db"
 QUESTIONDATABASE = APP_ROOT + "/questions.db"
 PRODUCTDATABASE = APP_ROOT + "/products.db"
 STATISTICSDATABASE = APP_ROOT + "/statistics.db"
+USERINPUTDATABASE = APP_ROOT + "/userInput.db"
 # USERPREFERENCES = APP_ROOT + "/userpreferences.db"
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -53,7 +54,7 @@ app.config.update(
 mail = Mail(app)
 
 
-# code to ensure user is loged in
+# code to ensure user is logged in
 @app.before_request
 def before_request():
     theurl = str(request.url_rule)
@@ -321,6 +322,7 @@ def dynamicChatbot(route):
         cns = cur.fetchall()
         for record in cns:
             if route == record[4]:
+                print(1)
                 conn = sqlite3.connect(PRODUCTDATABASE)
                 cur = conn.cursor()
                 cur.execute("SELECT * FROM \"" + record[7] + "\"")
@@ -328,12 +330,42 @@ def dynamicChatbot(route):
                 conn.close()
                 keywords = []
                 budget = []
-                for i in range(1, int(request.form["numberOfKeywords"]) + 1):
-                    if "-" in request.form["keyword" + str(i)]:
-                        budget = request.form["keyword" + str(i)].split("-")
+                print(2)
+                collectedInformation = request.form.get("collectedInformation").split("||")
+                date = datetime.now().strftime("%d-%m-%Y")
+                conn = sqlite3.connect(USERINPUTDATABASE)
+                cur = conn.cursor()
+                i = 0
+                b = 0
+                print(3)
+                try:
+                    cur.execute("INSERT INTO \"" + record[7] + "\" ('Date', 'Question1Info', 'Question2Info', 'Question3Info', 'Question4Info', 'Question5Info', \
+                    'Question6Info', 'Question7Info', 'Question8Info', 'Question9Info', 'Question10Info', 'Question11Info', 'Question12Info', 'Question13Info', 'Question14Info', \
+                    'Question15Info' ) VALUES ('"+date+"', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')")
+                    for c in range(0, 15):
+                        print(c + 1, "   ", collectedInformation[c - b].split(";")[0])
+                        if(collectedInformation[c - b].split(";")[0] == str(c + 1)):
+                            print(collectedInformation[c - b].split(";")[1])
+                            cur.execute("UPDATE \"" + record[7] + "\" SET Question"+str(c+1)+"Info = \"" + str(collectedInformation[c - b].split(";")[1]) + "\" WHERE DataID = (SELECT MAX(DataID) FROM \"" + record[7] + "\")")
+                        else:
+                            b+=1
+                            cur.execute("UPDATE \"" + record[7] + "\" SET Question"+str(c+1)+"Info = \"\" WHERE DataID = (SELECT MAX(DataID) FROM \"" + record[7] + "\")")
+                        i = c
+                    conn.commit()
+                    conn.close()
+                except:
+                    for c in range(i + 1, 15):
+                        cur.execute("UPDATE \"" + record[7] + "\" SET Question"+str(c+1)+"Info = \"\" WHERE DataID = (SELECT MAX(DataID) FROM \"" + record[7] + "\")")
+                    conn.commit()
+                    conn.close()
+                    print(4)
+                for i in range(1, int(request.form.get("numberOfKeywords")) + 1):
+                    if "-" in request.form.get("keyword" + str(i)):
+                        budget = request.form.get("keyword" + str(i)).split("-")
                     else:
-                        keywords.append(request.form["keyword" + str(i)])
+                        keywords.append(request.form.get("keyword" + str(i)))
                 keywordsmatch = []
+                print(5)
                 i = -1
                 for item in data:
                     keywordsmatch.append(0)
@@ -355,60 +387,56 @@ def dynamicChatbot(route):
                     if (exitAtLength == 5):
                         break
                 substract = 0
+                print(6)
                 for p in range(0, len(keywordsmatch)):
                     if (keywordsmatch[p] == 0):
                         data.pop(p - substract)
                         substract += 1
-                DD = Del()
-                dl = len(data) - 1
-                i = 0
-                while (i <= dl):
-                    print(dl, " ", i, " ", len(data))
-                    item = data[i]
-                    itemprice = item[4].translate(DD)
-                    print(budget)
-                    print(itemprice)
-                    print((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1])))
-                    if ((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1]))):
-                        print(item)
-                        print(data.index(item))
-                        print(data.pop(data.index(item)))
-                        print(data)
-                        i -= 1
-                        dl -= 1
-                    i += 1
+                if budget:
+                    DD = Del()
+                    dl = len(data) - 1
+                    i = 0
+                    while (i <= dl):
+                        item = data[i]
+                        itemprice = item[4].translate(DD)
+                        if ((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1]))):
+                            data.pop(i)
+                            i -= 1
+                            dl -= 1
+                        i += 1
                 while (len(data) > 9):
                     data.pop()
                 if not data:
-                    return "We could not find anything that matched your seach criteria. Please try different filter options."
+                    return "We could not find anything that matched your search criteria. Please try different filter options."
                 datastring = ""
+                print(7)
                 for i in data:
                     for c in i:
                         datastring += str(c) + "|||"
                     datastring = datastring[:-3]
                     datastring += "&&&"
                 conn.close()
-                date = datetime.now().strftime("%Y-%m")
-                conn = sqlite3.connect(STATISTICSDATABASE)
-                cur = conn.cursor()
-                cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-                stats = cur.fetchall()
-                print(stats)
-                questionsAnswered = request.form["questionsAnswered"]
-                if not stats:
-                    cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
-									VALUES (?,?,?,?)", (date, "0", questionsAnswered, len(data)))
-                else:
-                    print(len(data))
-                    cur.execute("UPDATE \"" + route + "\" SET ProductsReturned = \"" + str(
-                        int(stats[0][3]) + len(data)) + "\" WHERE Date = \"" + date + "\"")
-                    cur.execute("UPDATE \"" + route + "\" SET QuestionsAnswered = \"" + str(
-                        int(stats[0][2]) + int(questionsAnswered)) + "\" WHERE Date = \"" + date + "\"")
-                conn.commit()
-                cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-                stats = cur.fetchall()
-                print(stats)
-                conn.close()
+                print(8)
+                if (not app.debug):
+                    date = datetime.now().strftime("%Y-%m")
+                    conn = sqlite3.connect(STATISTICSDATABASE)
+                    cur = conn.cursor()
+                    cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
+                    stats = cur.fetchall()
+                    questionsAnswered = request.form["questionsAnswered"]
+                    if not stats:
+                        cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
+                                        VALUES (?,?,?,?)", (date, "0", questionsAnswered, len(data)))
+                    else:
+                        cur.execute("UPDATE \"" + route + "\" SET ProductsReturned = \"" + str(
+                            int(stats[0][3]) + len(data)) + "\" WHERE Date = \"" + date + "\"")
+                        cur.execute("UPDATE \"" + route + "\" SET QuestionsAnswered = \"" + str(
+                            int(stats[0][2]) + int(questionsAnswered)) + "\" WHERE Date = \"" + date + "\"")
+                    conn.commit()
+                    cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
+                    stats = cur.fetchall()
+                    conn.close()
+                print(9)
                 return jsonify(datastring)
 
 @app.route("/pokajimiuserite6519", methods=['GET'])
@@ -425,59 +453,26 @@ def emojiConterter():
     if request.method == "GET":
         return render_template("emoji-converter.html")
 
-# @app.route("/popup", methods=['GET'])
-# def popup():
-#     if request.method == "GET":
-#         return render_template("pop-test.html")
+@app.route("/popup2", methods=['GET'])
+def popup():
+    if request.method == "GET":
+        return render_template("pop-test.html")
 
-
-# @app.route("/popup2", methods=['GET'])
 @app.route("/popup", methods=['GET'])
 def popup2():
     if request.method == "GET":
         return render_template("pop-test2.html")
 #
+@app.route("/dynamic-popup/<route>", methods=['GET'])
+def dynamicPopup(route):
+    if request.method == "GET":
+        return render_template("dynamic-popup.html", msg=route)
+
 @app.route("/popup3", methods=['GET'])
 def popup3():
     if request.method == "GET":
         return render_template("pop-test3.html")
 
-
-# @app.route("/demo/construction", methods=['GET'])
-# def demopageconstruction():
-#     if request.method == "GET":
-#         return render_template("demo-construction.html")
-#
-#
-# @app.route("/demo/education", methods=['GET'])
-# def demopageeducation():
-#     if request.method == "GET":
-#         return render_template("demo-education.html")
-#
-#
-# @app.route("/demo/fashion", methods=['GET'])
-# def demopagefashion():
-#     if request.method == "GET":
-#         return render_template("demo-fashion.html")
-#
-#
-# @app.route("/demo/industrial", methods=['GET'])
-# def demopageIndustrial():
-#     if request.method == "GET":
-#         return render_template("demo-industrial.html")
-#
-#
-# @app.route("/demo/pharmaceutical", methods=['GET'])
-# def demopagepharmaceutical():
-#     if request.method == "GET":
-#         return render_template("demo-pharmaceutical.html")
-#
-#
-# @app.route("/demo/technology", methods=['GET'])
-# def demopagetechnology():
-#     if request.method == "GET":
-#         return render_template("demo-technology.html")
-#
 
 @app.route("/about", methods=['GET'])
 def aboutpage():
@@ -489,6 +484,23 @@ def aboutpage():
 def featurespage():
     if request.method == "GET":
         return render_template("features.html")
+
+
+# drop down routes.
+
+@app.route("/dataRetrival", methods=['GET'])
+def dataRetrivalPage():
+    if request.method == "GET":
+        return render_template("retrieval.html")
+
+@app.route("/dataCollection", methods=['GET'])
+def dataCollectionPage():
+    if request.method == "GET":
+        return render_template("collection.html")
+
+
+
+
 
 
 @app.route("/pricing", methods=['GET'])
@@ -504,7 +516,6 @@ def contactpage():
 
 
 email = ""
-
 
 @app.route("/login", methods=['GET', 'POST'])
 def loginpage():
@@ -658,6 +669,12 @@ def signpage():
             "CREATE TABLE \"" + userCompanyName + "\" ( `Date` TEXT, `AssistantOpened` TEXT, `QuestionsAnswered` TEXT, `ProductsReturned` TEXT )")
         conn.commit()
         conn.close()
+        conn = sqlite3.connect(USERINPUTDATABASE)
+        cur = conn.cursor()
+        cur.execute(
+            "CREATE TABLE \"" + userEmail + "\" (`DataID` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `Date` TEXT, `Question1Info` TEXT, `Question2Info` TEXT, `Question3Info` TEXT, `Question4Info` TEXT, `Question5Info` TEXT, `Question6Info` TEXT, `Question7Info` TEXT, `Question8Info` TEXT, `Question9Info` TEXT, `Question10Info` TEXT, `Question11Info` TEXT, `Question12Info` TEXT, `Question13Info` TEXT, `Question14Info` TEXT, `Question15Info` TEXT)")
+        conn.commit()
+        conn.close()
         # conn = sqlite3.connect(USERPREFERENCES)
         # cur = conn.cursor()
         # cur.execute("CREATE TABLE \""+userEmail+"\" ( `Date` TEXT, `AssistantOpened` TEXT, `QuestionsAnswered` TEXT, `ProductsReturned` TEXT )")
@@ -669,10 +686,10 @@ def signpage():
         msg = Message("Thank you for registering, " + userFirstname,
                       sender="thesearchbase@gmail.com",
                       recipients=[userEmail])
-        msg.body = "We appriciate you registering with TheSaerchBase. A whole new world of possibilities is ahead of you."
+        msg.body = "We appreciate you registering with TheSaerchBase. A whole new world of possibilities is ahead of you."
         mail.send(msg)
 
-        # sending the regstration confirmation email to us
+        # sending the registration confirmation email to us
         msg = Message("A new user has signed up!",
                       sender="thesearchbase@gmail.com",
                       recipients=["thesearchbase@gmail.com"])
@@ -753,7 +770,6 @@ def adminAddQuestion():
 
         conn = sqlite3.connect(QUESTIONDATABASE)
         cur = conn.cursor()
-        print(questions)
         user_mail = request.cookies.get("UserEmail")
         cur.execute("SELECT * FROM \"" + user_mail + "\"")
         tempData = cur.fetchall()
@@ -770,15 +786,14 @@ def adminAddQuestion():
                 cur.execute("DELETE FROM \"" + user_mail + "\" WHERE Question = \"" + tempData[i][0] + "\"")
         for q in questions:
             i += 1
+            qType = request.form.get("qType" + str(i))
             try:
-                if (tempData[i][0] != None):
-                    print("UPDATING: ", tempData[i][0], " TO ", q)
-                    cur.execute(
-                        "UPDATE \"" + user_mail + "\" SET Question = \"" + q + "\" WHERE Question = \"" + tempData[i][
-                            0] + "\"")
+                print(tempData[i][0] != None) #IMPORTANT DO NOT REMOVE
+                print("UPDATING: ", tempData[i][0], " TO ", q + ";" + qType)
+                cur.execute("UPDATE \"" + user_mail + "\" SET Question = \"" + q + ";" + qType + "\" WHERE Question = \"" + tempData[i][0] + "\"")
             except:
-                print("INSERTING NEW: ", q)
-                cur.execute("INSERT INTO \'" + user_mail + "\'('Question') VALUES (?)", (q,))
+                print("INSERTING NEW: ", q + ";" + qType)
+                cur.execute("INSERT INTO \'" + user_mail + "\'('Question') VALUES (?)", (q + ";" + qType,))
         conn.commit()
         conn.close()
         return redirect("/admin/Questions", code=302)
@@ -792,6 +807,25 @@ def adminAnswers():
         user_mail = request.cookies.get("UserEmail")
         cur.execute("SELECT * FROM \"" + user_mail + "\"")
         mes = cur.fetchall()
+        n = 0
+        maxN = len(mes)
+        while (n < maxN):
+            if(len(mes) > 0):
+                print(n, "   ", maxN)
+                try:
+                    print(mes[n])
+                except:
+                    break;
+                if(mes[n][0].split(";")[1] == "userInfoRetrieval"):
+                    mes.remove(mes[n])
+                    n -= 1
+                    maxN -= 1
+                    if n < 0:
+                        n = 0
+                else:
+                    n += 1
+            else:
+                break
         conn.close()
         return render_template("admin-form-add-answer.html", msg=mes)
     if request.method == "POST":
@@ -841,11 +875,11 @@ def adminAnswers():
                         cur.execute("SELECT Answer" + str(
                             i) + " FROM \"" + user_mail + "\" WHERE Question=\"" + selected_question + "\"")
                         data = cur.fetchall()
-                        print(data)
-                        if data == [(None,)]:
+                        if data == [(None,)] or data == [("",)] or data==[]:
                             answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
                                 "keywords" + str(i)) + ";../static/img/core-img/android-icon-72x72.png")
                         else:
+                            print(data)
                             link = data[0][0].split(";")[2]
                             answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
                                 "keywords" + str(i)) + ";" + link)
@@ -958,16 +992,18 @@ def adminAddProduct():
             return redirect("/admin/Products", code=302)
 
 
-@app.route("/admin/displayQuestions", methods=['GET'])
-def adminDisplayQuestions():
+# Route for the data storage
+@app.route("/admin/userinput", methods=['GET', 'POST'])
+def adminDataStorage():
     if request.method == "GET":
-        return render_template("admin-table-questions.html")
-
-
-@app.route("/admin/displayAnswers", methods=['GET'])
-def adminDisplayAnswers():
-    if request.method == "GET":
-        return render_template("admin-table-answers.html")
+        conn = sqlite3.connect(USERINPUTDATABASE)
+        cur = conn.cursor()
+        user_mail = request.cookies.get("UserEmail")
+        cur.execute("SELECT * FROM \"" + user_mail + "\"")
+        data = cur.fetchall()
+        return render_template("admin-data-storage.html", data=data)
+    if request.method == "POST":
+        return redirect("/admin/userinput", code=302)
 
 
 @app.route("/admin/connect")
@@ -1170,6 +1206,12 @@ def termsPage():
 def PrivacyPage():
     if request.method == "GET":
         return render_template("privacy-policy.html")
+
+# Affiliate page route
+@app.route("/affiliate", methods=['GET'])
+def AffiliatePage():
+    if request.method == "GET":
+        return render_template("affiliate.html")
 
 
 @app.errorhandler(404)

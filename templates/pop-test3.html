@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -61,14 +61,17 @@
 
 </head>
 
-<body background="../static/images/Rent.PNG" height="42" width="42">
+<body background="../static/images/rec_cps.PNG" height="42" width="42">
 
     <div class="bottom_left" id="contents1">
       <ul>
         <div id="iframediv">
-            <iframe src="https://thesearchbase.com/chatbot/University%20Cribs" width="500" height="500"></iframe>
+            <div id="overChatbotIframe">
+                <img id="overChatbotIframeImg" src="../static/img/core-img/android-icon-72x72.png" /><a id="overChatbotIframeHeading">TheSearchBase</a>
+            </div>
+            <iframe frameBorder="0" id="chatbotIframe" src="https://www.thesearchbase.com/chatbot/Digital%20Recruiter" width="500" height="500"></iframe>
         </div>
-        <li id="launch_button3" class="him" href="#">Launch Assistant</li>
+        <li id="launch_button" class="him" href="#">Launch Assistant</li>
       </ul>
     </div>
 
@@ -98,7 +101,7 @@
     <script>
     var opened = false;
     var frame = document.getElementById("iframediv");
-    var but = document.getElementById("launch_button3");
+    var but = document.getElementById("launch_button");
     frame.style = "display:none";
     but.addEventListener("click", function(){
         if(!opened){

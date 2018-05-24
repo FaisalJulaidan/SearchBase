@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -70,15 +70,25 @@
                     <div class="menu_area">
                         <nav class="navbar navbar-expand-lg navbar-light">
                             <!-- Logo -->
-                            <a class="navbar-brand" href="/">TheSearchbase.</a>
+                            <a class="navbar-brand" href="/">TheSearchBase</a>
                             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ca-navbar" aria-controls="ca-navbar" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                             <!-- Menu Area -->
                             <div class="collapse navbar-collapse" id="ca-navbar">
                                 <ul class="navbar-nav ml-auto" id="nav">
                                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                                    <!-- <li class="nav-item"><a class="nav-link" href="/demo">Demo</a></li> -->
-                                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
                                     <li class="nav-item"><a class="nav-link" href="/features">Features</a></li>
+                                    <li class="nav-item">
+                                        <!-- start of the drop down menu -->
+                                    <li class="dropdown">
+                                        <a class="nav-link" data-toggle="dropdown" href="#">Uses</a>
+                                        <span class="caret"></span>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="/dataRetrival" style="color:#5f27a6;">Data Retrieval</a></li>
+                                            <li><a href="/dataCollection" style="color:#5f27a6;">Data Collection</a></li>
+                                            <!--<li><a href="/dataConsultant" style="color:#5f27a6;">Consultant Connection</a></li>-->
+                                        </ul>
+                                    </li>
+                                    <!-- End of the drop down menu-->
                                     <li class="nav-item"><a class="nav-link" href="/pricing">Pricing</a></li>
                                     <li class="nav-item"><a class="nav-link" href="/login">Log in</a></li>
                                 </ul>
@@ -88,6 +98,7 @@
                                     <a href="/signupform">Sign up</a>
                                 </div>
                             </div>
+                            <!-- End of Menu-->
                         </nav>
                     </div>
                 </div>
@@ -104,7 +115,7 @@
     </header>
     <!-- ***** Header Area End ***** -->
 
-    <!-- ***** Wellcome Area Start ***** -->
+    <!-- ***** Welcome Area Start ***** -->
     <section class="wellcome_area2 clearfix" id="home">
         <div class="container h-100">
             <div class="row h-100 align-items-center">
@@ -118,7 +129,7 @@
             </div>
         </div>
     </section>
-    <!-- ***** Wellcome Area End ***** -->
+    <!-- ***** Welcome Area End ***** -->
 
     <div class="section-heading text-center">
         <br />
@@ -139,9 +150,9 @@
                     <div class="col-lg-6 col-xl-5 ml-xl-auto">
                         <div class="special_description_content">
                             <h2>A wide range of plans</h2>
-                            <p>Whatever your goals are, we have a plan for you. We offer a personal service that will accurately look for a product that meets your needs.
-
-                              We're not about profit. If you use our services to find yourself the right computer, then we have done our job. If you buy through us, you help the team.</p>
+                            <p>Whatever your goals are, we have a plan for you. We offer a three month trail which gives you the opportunity to test your assistant.
+                                We provide you with analytics which allows you to see how many users are using your assistant and exactly what they are looking for.
+                            </p>
                             <div class="app-download-area">
                                 <div class="app-download-btn wow fadeInUp" data-wow-delay="0.2s">
                                     <!-- Google Store Btn -->
@@ -180,17 +191,18 @@
                     <div class="single-price-plan active text-center">
                         <!-- Package Text  -->
                         <div class="package-plan">
-                            <h5>Starter Plan</h5>
+                            <h5>Trail Plan</h5>
                             <div class="ca-price d-flex justify-content-center">
                                 <span></span>
-                                <h4>Free</h4>
+                                <h4>3 Month Trail</h4>
                             </div>
                         </div>
                         <div class="package-description">
                             <p>Up to 1 Database</p>
-                            <p>50 Questions</p>
-                            <p>Free host &amp; domain</p>
-                            <p>99% up-time</p>
+                            <p>Number of Bots 1</p>
+                            <p>Up to 200 Products</p>
+                            <p>Encrypted domain</p>
+                            <p>Branding at the bottom</p>
                             <p>No Credit Card needed</p>
                         </div>
                         <!-- Plan Button  -->
@@ -212,9 +224,11 @@
                         </div>
                         <div class="package-description">
                             <p>Up to 2 Databases</p>
-                            <p>150 Questions</p>
-                            <p>Free host &amp; domain</p>
-                            <p>99% up-time</p>
+                            <p>Number of bots 2</p>
+                            <p>Up to 600 Products</p>
+                            <p>Encrypted domain</p>
+                            <p>Data Storage</p>
+                            <p>Branding at the bottom</p>
                             <p>Setup support</p>
                         </div>
                         <!-- Plan Button  -->
@@ -235,11 +249,14 @@
                             </div>
                         </div>
                         <div class="package-description">
-                          <p>Up to 3 Databases</p>
-                          <p>300 Questions</p>
-                          <p>Free host &amp; domain</p>
-                          <p>Focused questions</p>
-                          <p>Setup support</p>
+                            <p>Up to 3 Databases</p>
+                            <p>Number of bots 4</p>
+                            <p>Up to 1500 Products</p>
+                            <p>Encrypted domain</p>
+                            <p>Data Storage</p>
+                            <p>Branding at the bottom</p>
+                            <p>Logical Questions </p>
+                            <p>Extended Setup support</p>
                         </div>
                         <!-- Plan Button  -->
                         <div class="plan-button">
@@ -259,11 +276,15 @@
                             </div>
                         </div>
                         <div class="package-description">
-                          <p>Up to 4 Databases</p>
-                          <p>Unlimited Questions</p>
-                          <p>Free host &amp; domain</p>
-                          <p>Extended Logic</p>
-                          <p>Setup support</p>
+                            <p>Up to 4 Databases</p>
+                            <p>Number of bots Unlimited</p>
+                            <p>Unlimited Products</p>
+                            <p>Encrypted domain</p>
+                            <p>Data Storage</p>
+                            <p>Database Import & Automatic scan </p>
+                            <p>Branding at the bottom</p>
+                            <p>Extended Logic</p>
+                            <p>Full Setup support</p>
                         </div>
                         <!-- Plan Button  -->
                         <div class="plan-button">
@@ -313,7 +334,7 @@
                    <div class="single-feature">
                        <i class="" aria-hidden="true"></i>
                        <h5>Price freeze</h5>
-                       <p>Prixe freeze means that the price set above will not change. The amount you see above is what you pay.</p>
+                       <p>Prize freeze means that the price set above will not change. The amount you see above is what you pay.</p>
                    </div>
                </div>
                <!-- Single Feature Start -->
@@ -329,7 +350,7 @@
                    <div class="single-feature">
                        <i class="" aria-hidden="true"></i>
                        <h5>Flexibility</h5>
-                       <p>If you need somthing that is unique to your business, then we are happy to help. We can create somthing for you that best fits you.</p>
+                       <p>If you need something that is unique to your business, then we are happy to help. We can create something for you that best fits you.</p>
                    </div>
                </div>
                <!-- Single Feature Start -->
@@ -361,11 +382,11 @@
                     <div class="address-text">
                         <p><span>Address:</span> Clydesmuir Rd, Cardiff CF24 2QS</p>
                     </div>
-                    <div class="phone-text">
+                    <!--<div class="phone-text">
                         <p><span>Phone:</span> 029 0842 9032</p>
-                    </div>
+                    </div>-->
                     <div class="email-text">
-                        <p><span>Email:</span> contact@thesearchbase.com</p>
+                        <p><span>Email:</span> thesearchbase@gmail.com</p>
                     </div>
                 </div>
                 <div class="col-md-6">

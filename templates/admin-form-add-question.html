@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -76,13 +76,13 @@
                   </li>
                   <li><a href="/admin/Products"><i class="fa fa-database"></i> Product Database<span class="fa fa-arrow-right"></span></a>
                   </li>
-                  <li><a><i class="fa fa-table"></i> Tables <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/admin/displayQuestions">Questions</a></li>
-                      <li><a href="/admin/displayAnswers">Answers</a></li>
-                      <li><a href="/admin/displayProducts">Products</a></li>
-                    </ul>
-                  </li>
+                  <!-- User Data Storage -->
+                <li><a><i class="fa fa-cloud"></i> Data Storage <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="/admin/userinput">User Input</a></li>
+                  </ul>
+                </li>
+                  <!-- End of user Data Storage -->
                   <li><a href="/admin/connect"><i class="fa fa-plug"></i> Connection<span class="fa"></span></a>
                   </li>
                 </ul>
@@ -330,7 +330,6 @@
     // set the question form template
     var qTemplate1 = "<div class = \"Questions\"><label class=\"control-label col-md-3 col-sm-3 col-xs-12\" for=\"last-name\">"
     var qTemplate2 = " question <span class=\"required\">*</span></label><div class=\"col-md-6 col-sm-6 col-xs-12\"><input type=\"text\" name=\""
-    var qTemplate3 = "\" required=\"required\" class=\"form-control col-md-7 col-xs-12\"></input></div><br /><br /></div>";
 
     // set event listeners
     document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
@@ -344,9 +343,11 @@
       oldNOQ = 0;
     }
     // var data = {{data}};
-    var data = [];
+        var data = [];
+        var typeCheck = [];
     {%for item in data%}
-    data.push("{{item[0]}}")
+        data.push("{{item[0]}}");
+        typeCheck.push("{{item[0].split(';')[1]}}");
     {%endfor%}
       var noq = data.length;
       if(!Number.isNaN(noq)){
@@ -365,7 +366,18 @@
               if(i == 8){ number = "Ninth" }
               if(i == 9){ number = "Tenth" }
               $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + "\" \
-              required=\"required\" value= \""+data[i]+"\" class=\"form-control col-md-7 col-xs-12\"></input></div><br /><br /></div>");
+              required=\"required\" value= \""+ data[i].split(";")[0] + "\" class=\"form-control col-md-7 col-xs-12\">\
+              <input onclick=\"CheckTypeBox('both"+ i + "')\" id='bothB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"both\">Both\
+              <input onclick=\"CheckTypeBox('db"+ i +"')\" id='dbB"+ i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"dbRetrieval\" checked>Data Base Retrieval\
+              <input onclick=\"CheckTypeBox('ui"+ i +"')\" id='uiB" + i + "' type=\"checkbox\" name=\"qType" + i +"\" value=\"userInfoRetrieval\">User Input Retrieval\
+              </div><br /><br /></div>");
+                if (typeCheck[i] == "userInfoRetrieval") {
+                    $("#dbB" + i).prop('checked', false);
+                    $("#uiB" + i).prop('checked', true);
+                } else if (typeCheck[i] == "both") {
+                    $("#dbB" + i).prop('checked', false);
+                    $("#bothB" + i).prop('checked', true);
+                }
               $("#number-of-questions").val(noq);
             }
           } else if(noq < oldNOQ) {
@@ -395,7 +407,12 @@
               if(i == 7){ number = "Eight" }
               if(i == 8){ number = "Ninth" }
               if(i == 9){ number = "Tenth" }
-              $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + qTemplate3);
+                $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + "\" \
+                required=\"required\" class=\"form-control col-md-7 col-xs-12\">\
+              <input onclick=\"CheckTypeBox('both"+ i + "')\" id='bothB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"both\">Both\
+                <input onclick=\"CheckTypeBox('db"+ i + "')\" id='dbB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"dbRetrieval\" checked>Data Base Retrieval\
+                <input onclick=\"CheckTypeBox('ui" + i + "')\" id='uiB" + i + "' type=\"checkbox\" name=\"qType" + i +"\" value=\"userInfoRetrieval\">User Input Retrieval\
+                </div><br /><br /></div>");
               // add preset question to fill
             }
           } else if(noq < oldNOQ) {
@@ -407,6 +424,21 @@
         }
       }
     }
+
+        function CheckTypeBox(tBox) {
+            if (tBox.replace(/[0-9]/g, '') == "both") {
+                $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
+                $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
+            }
+            if (tBox.replace(/[0-9]/g, '') == "db") {
+                $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
+                $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
+            }
+            if (tBox.replace(/[0-9]/g, '') == "ui") {
+                $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
+                $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
+            }
+        }
 
     function ClearQTemplate(){
       $("#QuestionDiv input").val("");

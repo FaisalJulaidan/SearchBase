@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -9,7 +9,7 @@
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Title -->
-    <title>404</title>
+    <title>Bot</title>
 
     <!-- Chrome, Firefox OS and Opera -->
     <meta name="theme-color" content="#884BDF">
@@ -28,7 +28,7 @@
     <link rel="apple-touch-icon" sizes="144x144" href="../static/img/core-img/apple-icon-144x144.png">
     <link rel="apple-touch-icon" sizes="152x152" href="../static/img/core-img/apple-icon-152x152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="../static/img/core-img/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="../static/img/core-img/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../static/img/core-img/android-icon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../static/img/core-img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="../static/img/core-img/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../static/img/core-img/favicon-16x16.png">
@@ -75,114 +75,168 @@
 
 </head>
 
-<body>
-    <!-- <div class="chat-box">
-        <div class="open">Open
-            <div class="box"> -->
-            <center><ul id="messagesContainer">
-                <!-- paste here the yeyo -->
-            </ul></center>
-            <div id="separator">
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <div id="chatBottom"></div>
-            </div>
-            <footer id="chatFooter">
-                <div id="bottomContainer">
-                    <div id="optionsDiv">
-                    </div>
-                    <!-- <ul> -->
-                    <input onkeypress="handleEnter(event)" id="textMessage"><a id="messageSubmitB" class="btn btn-success" onclick="submitMessage('')" id="submitMessage"> > </a>
-                    <!-- </ul> -->
+<body id="chatbotBody">
+
+    <div class="top_right">
+        <img style="width:20px; height: 20px; margin: 10px; top: 0px; right: 0px; position: fixed;" src="../static/img/bg-img/Icons8-Windows-8-Computer-Hardware-Restart.ico" onclick="Reset()">
+    </div>
+
+    <div class="outerContainer">
+        <div class="innerContainer">
+            <div class="element">
+                <!-- <div class="chat-box">
+            <div class="open">Open
+                <div class="box"> -->
+                <center>
+                    <ul id="messagesContainer">
+                        <!-- paste here the yeyo -->
+                    </ul>
+                </center>
+                <div id="separator">
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <div id="chatBottom"></div>
                 </div>
-            </footer>
-
-            <!-- </div>
+                <footer id="chatFooter">
+                    <div id="bottomContainer">
+                        <div id="optionsDiv">
+                        </div>
+                        <!-- <ul> -->
+                        <div id="ChatInputDiv">
+                            <input onkeypress="handleEnter(event)" id="textMessage"><a id="messageSubmitB" class="btn btn-success" onclick="submitMessage('')">
+                                Enter
+                            </a>
+                        </div>
+                        <!-- </ul> -->
+                    </div>
+                </footer>
+            </div>
         </div>
-    </div> -->
+    </div>
+<!-- </div>
+</div>
+</div> -->
 
-    <script type="text/javascript">
+<script type="text/javascript">
     var oldPos = 0;
     var newPos = 0;
     var cancelScroll = false;
-    var keywords = [];
+    var showChatBox = false;
+    var params = "";
     var questionsAnswered = 0;
-    $(window).scroll(function() {
+    var collectedInformation = [];
+    var qType = "";
+    $(window).scroll(function ()
+    {
         newPos = $(window).scrollTop();
-        if(newPos + 3 < oldPos){
+        if (newPos + 3 < oldPos)
+        {
             $('html, body').stop();
             cancelScroll = true;
         }
         oldPos = newPos;
     });
 
-    jQuery.expr.filters.offscreen = function(el) {
-      var rect = el.getBoundingClientRect();
-      return (
-               (rect.x + rect.width) > window.innerWidth
-             );
+    jQuery.expr.filters.offscreen = function (el)
+    {
+        var rect = el.getBoundingClientRect();
+        return (
+            (rect.x + rect.width) > window.innerWidth
+        );
     };
 
-   var numberOfQuestions = 0;
-   {%for item in data%}
-   numberOfQuestions++;
-   {%endfor%}
-   var data = createArray(numberOfQuestions);
-   var i = 0;
-   {%for item in data%}
-   {%for answer in item%}
-   {%if answer != None%}
-   {%if answer != ""%}
-   data[i].push("{{answer}}");
-   {%endif%}
-   {%endif%}
-   {%endfor%}
-   i++;
-   {%endfor%}
-   var questionNumber = 0;
-   var questionN = -1;
+    var numberOfQuestions = 0;
+    var chatInputDov = document.getElementById("ChatInputDiv");
+    {%for item in data%}
+        numberOfQuestions++;
+    {%endfor%}
+    var data = createArray(numberOfQuestions);
+    var i = 0;
+    {%for item in data%}
+        {%for answer in item%}
+            {%if answer != None%}
+                {%if answer != ""%}
+                    data[i].push("{{answer}}");
+                {%endif%}
+            {%endif%}
+        {%endfor%}
+        i++;
+    {%endfor%}
+    var questionNumber = 0;
+    var questionN = -1;
     // document.getElementById("submitMessage").addEventListener("click", );
 
-    $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot'>Hello. I am "+"{{user}}".split("/")[1]+"\'s little assistant, here to help you make the best choice "+emojione.toImage("😇")+". Please answer the following questions to help you find the best choice.</li></div>");
+    $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot'>Hello. I am " + "{{user}}".split("/")[1] + "\'s little assistant, here to help you make the best choice " + emojione.toImage("😇") + ". Please answer the following questions to help you find the best choice.</li></div>");
     getNextQuestion();
 
-    async function submitMessage(message){
+    async function submitMessage(message)
+    {
         cancelScroll = false;
-        if(message==""){
+        if (message == "")
+        {
             message = document.getElementById("textMessage").value;
+            $('#textMessage').val("");
         }
-        $("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>"+emojione.toImage(message)+"</li></div>");
+        $("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>" + emojione.toImage(message) + "</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"
         }, "slow");
-        if(!cancelScroll){
+        if (!cancelScroll)
+        {
             scrollTo("chatBottom");
         }
         document.getElementById('newMessage').id = 'oldMessage';
         $("#qAnswers").remove();
+        chatInputDov.style = "display:none";
         await sleep(500);
         $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
         $("#thinkingGif").animate({
             marginTop: "-=35px"
         }, "slow");
-        if(!cancelScroll){
+        if (!cancelScroll)
+        {
             scrollTo("chatBottom");
         }
-        await sleep(400 + Math.floor(Math.random() * 1100));
+        await sleep(400 + Math.floor(Math.random() * 900));
         $("#thinkingGif").remove();
-        for(var i=0; i<data[questionN].length; i++){
-            if(data[questionN][i].split(";")[0] == message){
-                getKeyWord(data[questionN][i].split(";")[1]);
-                getNextQuestion();
-                return null;
+        if (data[questionN][0].split(";")[1] == "both" || data[questionN][0].split(";")[1] == "userInfoRetrieval") {
+            collectedInformation.push((questionN + 1) + ";" + message);
+            $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>Thanks " + emojione.toImage("😁") + "</li></div>");
+            $("#newMessage").animate({
+                marginTop: "-=35px"
+            }, "slow");
+            if (!cancelScroll) {
+                scrollTo("chatBottom");
+            }
+            document.getElementById('newMessage').id = 'oldMessage';
+            await sleep(300);
+            $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
+            $("#thinkingGif").animate({
+                marginTop: "-=35px"
+            }, "slow");
+            if (!cancelScroll) {
+                scrollTo("chatBottom");
+            }
+            await sleep(400 + Math.floor(Math.random() * 500));
+            $("#thinkingGif").remove();
+        }
+        if (!showChatBox)
+        {
+            for (var i = 0; i < data[questionN].length; i++)
+            {
+                if (data[questionN][i].split(";")[0] == message)
+                {
+                    getKeyWord(data[questionN][i].split(";")[1]);
+                }
             }
         }
-        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>I apologise but I need an answer from the showed ones in order to get you the best match</li></div>");
+        getNextQuestion();
+        /*$("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>I apologise but I need an answer from the showed ones in order to get you the best match</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"
         }, "slow");
@@ -195,83 +249,120 @@
             answers+="<a class='answerOptions' id='option"+i+"' onclick=\"submitMessage('"+emojione.toImage(data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0])+"</a>"
         }
         answers+="</div>"
-        $("#qAnswers").remove();
         $("#optionsDiv").append(answers);
         checkOutsideElements();
         if(!cancelScroll){
             scrollTo("chatBottom");
-        }
+        }*/
     }
 
-    function getNextQuestion(){
+    function getNextQuestion()
+    {
+        $("#qAnswers").remove();
         questionN += 1;
-        if(data[questionN] == undefined){
+        if (data[questionN] == undefined)
+        {
             sendData();
             SetRepeat();
-            if(!cancelScroll){
+            chatInputDov.style = "display:none";
+            if (!cancelScroll)
+            {
                 scrollTo("chatBottom");
             }
             return 0;
         }
+        qType = data[questionN][0].split(";")[1];
         var answers = "<div id='qAnswers'>";
-        for(var i=1; i<data[questionN].length; i++){
-            answers+="<a class='answerOptions' id='option"+i+"' onclick=\"submitMessage('"+emojione.toImage(data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0])+"</a>"
+        if (data[questionN][0].split(";")[1] == "userInfoRetrieval") {
+            showChatBox = true;
+        } else {
+            showChatBox = false;
         }
-        answers+="</div>"
-        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>"+emojione.toImage(data[questionN][0])+"</li></div>");
+        for (var i = 1; i < data[questionN].length; i++)
+        {
+            if (showChatBox) {
+                break;
+            }
+            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"submitMessage('" + emojione.toImage(data[questionN][i].split(";")[0]) + "')\">" + emojione.toImage(data[questionN][i].split(";")[0]) + "</a>";
+            showChatBox = false;
+        }
+        if (questionN == 2) {
+            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"getNextQuestion()\">Skip Question</a>";
+        }
+        answers += "</div>"
+        $("#optionsDiv").append(answers);
+        if (showChatBox)
+        {
+            chatInputDov.style = "display:block";
+        }
+        else
+        {
+            chatInputDov.style = "display:none";
+        }
+        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + emojione.toImage(data[questionN][0].split(";")[0]) + "</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"
         }, "slow");
         document.getElementById('newMessage').id = 'oldMessage';
-        $("#qAnswers").remove();
-        $("#optionsDiv").append(answers);
         checkOutsideElements();
-        if(!cancelScroll){
+        if (!cancelScroll)
+        {
             scrollTo("chatBottom");
         }
     }
 
-    function SetRepeat(){
-        $("#optionsDiv").append("<div class='answerOptions' id='qAnswers'><a onclick=\"Reset()\">Search Again</a></div>");
+    function SetRepeat()
+    {
+        $("#optionsDiv").append("<div style='text-align: center;' onclick=\"Reset()\" id='qAnswers'><a class='answerOptions' style='width:400px;'>Search Again</a></div>");
         checkOutsideElements();
     }
 
-    function Reset(){
+    function Reset()
+    {
         cancelScroll = false;
+        showChatBox = false;
         $("#qAnswers").remove();
         keywords = [];
+        collectedInformation = [];
         questionsAnswered = 0;
         questionNumber = 0;
         questionN = -1;
         getNextQuestion();
     }
 
-    function handleEnter(e){
+    function handleEnter(e)
+    {
         var keycode = (e.keyCode ? e.keyCode : e.which);
-        if (keycode == '13') {
+        if (keycode == '13')
+        {
             submitMessage('');
         }
     }
 
-    jQuery.expr.filters.offscreen = function(el) {
-      var rect = el.getBoundingClientRect();
-      return (
-               (rect.x + rect.width) < 0
-                 || (rect.y + rect.height) < 0
-                 || (rect.x > window.innerWidth || rect.y > window.innerHeight)
-             );
+    jQuery.expr.filters.offscreen = function (el)
+    {
+        var rect = el.getBoundingClientRect();
+        return (
+            (rect.x + rect.width) < 0
+            || (rect.y + rect.height) < 0
+            || (rect.x > window.innerWidth || rect.y > window.innerHeight)
+        );
     };
 
-    $(document).on('ready', function() {
-      $(".lazy").slick({
-        lazyLoad: 'ondemand', // ondemand progressive anticipated
-        infinite: true
-      });
+    $(document).on('ready', function ()
+    {
+        $(".lazy").slick({
+            lazyLoad: 'ondemand', // ondemand progressive anticipated
+            infinite: true
+        });
     });
-
-    function getKeyWord(word){
-        for(var i = 0; i <= keywords.length-1; i++){
-            if(word == keywords[i]){
+    keywords = []
+    function getKeyWord(word)
+    {
+        for (var i = 0; i <= keywords.length - 1; i++)
+        {
+            if (word == keywords[i])
+            {
                 keywords.splice(i, 1);
                 return 0;
             }
@@ -279,78 +370,120 @@
         questionsAnswered++;
         keywords.push(word);
     }
-    function sendData(){
+
+    function sendData()
+    {
         $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
         $("#thinkingGif").animate({
             marginTop: "-=35px"
         }, "slow");
         params = "numberOfKeywords=" + keywords.length.toString();
-        for(var i = 0; i <= keywords.length-1; i++){
-            params+="&";
-            params+='keyword'+(i+1).toString()+"="+keywords[i];
+        if (keywords.length > 0)
+        {
+            for (var i = 0; i <= keywords.length - 1; i++)
+            {
+                params += "&";
+                params += 'keyword' + (i + 1).toString() + "=" + keywords[i];
+            }
         }
-        params+="&questionsAnswered="+questionsAnswered.toString();
+        params += "&questionsAnswered=" + questionsAnswered.toString();
+        if (collectedInformation.length > 0)
+        {
+            params += "&collectedInformation=" + collectedInformation[0]
+            for (var i = 1; i <= collectedInformation.length - 1; i++)
+            {
+                params += "||" + collectedInformation[i];
+            }
+        }
+        else
+        {
+            params += "&collectedInformation=None"
+        }
+        collectedInformation = [];
         questionsAnswered = 0;
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", '/'+"{{user}}", true);
+        xhttp.open("POST", '/' + "{{user}}", true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xhttp.onreadystatechange = function() {
-          if (xhttp.readyState === 4) {
-            if (xhttp.status === 200) {
-                $("#thinkingGif").remove();
-                var data = xhttp.responseText;
-                cRD = $("#messagesContainer");
-                if(data == "We could not find anything that matched your seach criteria. Please try different filter options."){
-                    cRD.append("<br><br><br><lable class='chatProducts'>We could not find<br>anything that matched your seach criteria. Please try different filter options.</lable><br><br><br>");
-                } else {
-                    resultdic = {};
-                    var temparray = data.split("&&&");
-                    for(var i = 0; i < temparray.length; i++){
-                        resultdic[i] = temparray[i].split("|||");
+        xhttp.onreadystatechange = function ()
+        {
+            if (xhttp.readyState === 4)
+            {
+                if (xhttp.status === 200)
+                {
+                    $("#thinkingGif").remove();
+                    var data = xhttp.responseText;
+                    cRD = $("#messagesContainer");
+                    if (data == "We could not find anything that matched your seach criteria. Please try different filter options.")
+                    {
+                        cRD.append("<br><br><br><lable class='chatProducts'>We could not find<br>anything that matched your seach criteria. Please try different filter options.</lable><br><br><br>");
                     }
-                    delete resultdic[(temparray.length - 1).toString()];
-                    for(var i = 0; i< temparray.length-1; i++){
-                        resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
-                        // cRD.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
-                        cRD.append("<center><div class='chatProducts'><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
+                    else
+                    {
+                        resultdic = {};
+                        var temparray = data.split("&&&");
+                        for (var i = 0; i < temparray.length; i++)
+                        {
+                            resultdic[i] = temparray[i].split("|||");
+                        }
+                        delete resultdic[(temparray.length - 1).toString()];
+                        for (var i = 0; i < temparray.length - 1; i++)
+                        {
+                            resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
+                            // cRD.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
+                            cRD.append("<center><div class='chatProducts'><lable>" + resultdic[i][1] + "</lable><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + " Square feet</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
+                        }
                     }
                 }
-            } else {
-              console.error(xhttp.statusText);
+                else
+                {
+                    console.error(xhttp.statusText);
+                }
             }
-          }
         };
         xhttp.send(params);
     }
-    function scrollTo(id){
+
+    function scrollTo(id)
+    {
         $('html, body').stop();
         id = "#" + id
         $('html, body').animate({
             scrollTop: ($(id).offset().top)
         }, 2000);
     }
-    function checkOutsideElements(){
+
+    function checkOutsideElements()
+    {
         var offScreenElements = $(':offscreen');
-        for(var z = 0; z < offScreenElements.length; z++){
+        for (var z = 0; z < offScreenElements.length; z++)
+        {
             var elementID = offScreenElements[z].outerHTML.split("id=\"")[1].split("\"")[0];
-            $( "<br><br>" ).insertBefore("#" + elementID);
+            $("<br><br>").insertBefore("#" + elementID);
             checkOutsideElements();
             return 0;
         }
     }
-    function BuyProduct(link){
+
+    function BuyProduct(link)
+    {
         window.open(link);
     }
-    function createArray(rows) {
+
+    function createArray(rows)
+    {
         var arrayRow = [];
-      for (var i=0;i<rows;i++) {
-         arrayRow[i] = [];
-      }
-      return arrayRow;
+        for (var i = 0; i < rows; i++)
+        {
+            arrayRow[i] = [];
+        }
+        return arrayRow;
     }
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+
+    function sleep(ms)
+    {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
+
     // ORIGINAL
     // jQuery.expr.filters.offscreen = function(el) {
     //   var rect = el.getBoundingClientRect();
@@ -360,7 +493,7 @@
     //              || (rect.x > window.innerWidth || rect.y > window.innerHeight)
     //          );
     // };
-    </script>
+</script>
 </body>
 
 </html>

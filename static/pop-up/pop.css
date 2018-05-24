@@ -31,6 +31,12 @@ ul li{
   margin-left: 10px;
 }
 
+#launch_button{
+    background-color: #002d62;
+    color: white;
+
+}
+
 #launch_button3{
     display:inline-block;
     clear: both;
@@ -40,4 +46,29 @@ ul li{
     font-family: Helvetica, Arial, sans-serif;
     /* color: white; */
     background: #ffffff;
+}
+
+#chatbotIframe{
+    overflow:hidden;
+}
+
+/*iFrame styling*/
+#chatbotIframe, #overChatbotIframe {
+    box-shadow: 3px 3px 5px grey;
+}
+
+#overChatbotIframe {
+    background-color: #e9ecef;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+#overChatbotIframeImg {
+    margin-left: 10px;
+}
+
+#overChatbotIframeHeading {
+    margin-left: 12px;
+    margin-top: 20px;
+    font-size: 30px;
 }

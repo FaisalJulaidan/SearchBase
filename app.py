@@ -161,6 +161,7 @@ def delete_from_table(database, sql_statement, array_of_terms):
         print(msg)
         return msg
 
+
 def hash_password(password, salt=gensalt()):
     hashed = hashpw(bytes(password, 'utf-8'), salt)
     return hashed
@@ -198,9 +199,9 @@ def login():
 
 @app.route("/signupform", methods=['GET', 'POST'])
 def signup():
-    # if request.method == "GET":
-    #     return render_template("signup.html")
     if request.method == "GET":
+        return render_template("signup.html")
+    elif request.method == "POST":
         companyName = request.form.get("companyName", default="Error")
         companySize = request.form.get("companySize", default="Error")
         companyPhoneNumber = request.form.get("companyPhoneNumber")
@@ -233,8 +234,7 @@ def signup():
 
                 insertUserResponse = insert_into_database_table(DATABASE,
                                                                 "INSERT INTO Users ('CompanyID', 'Title', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password') VALUES (?,?,?,?,?,?,?)",
-                                                                (companyID, title, firstname, surname, accessLevel, email,
-                                                                 hashed_password))
+                                                                (companyID, title, firstname, surname, accessLevel, email, hashed_password))
                 if "added" not in insertUserResponse:
                     if "UNIQUE constraint" in insertUserResponse:
                         delete_from_table(DATABASE, "DELETE FROM Company WHERE Name=?", [companyName])
@@ -254,7 +254,8 @@ def signup():
                         msg = Message("A new company has signed up!",
                                       sender="thesearchbase@gmail.com",
                                       recipients=["thesearchbase@gmail.com"])
-                        msg.body = "Company name: {} has signed up the admin's details are. Title: {}, Name: {} {}, Email: {}, ".format(companyName, title, firstname, surname, email)
+                        msg.body = "Company name: {} has signed up the admin's details are. Title: {}, Name: {} {}, Email: {}, ".format(
+                            companyName, title, firstname, surname, email)
                         mail.send(msg)
                     return redirect("/login")
 
@@ -512,7 +513,7 @@ def dynamicChatbot(route):
         cns = cur.fetchall()
         for record in cns:
             if route == record[4]:
-                #print(1)
+                # print(1)
                 conn = sqlite3.connect(PRODUCTDATABASE)
                 cur = conn.cursor()
                 cur.execute("SELECT * FROM \"" + record[7] + "\"")
@@ -520,23 +521,25 @@ def dynamicChatbot(route):
                 conn.close()
                 keywords = []
                 budget = []
-                #print(2)
+                # print(2)
                 collectedInformation = request.form.get("collectedInformation").split("||")
                 date = datetime.now().strftime("%d-%m-%Y")
                 conn = sqlite3.connect(USERINPUTDATABASE)
                 cur = conn.cursor()
                 i = 0
                 b = 0
-                #print(data)
+                # print(data)
                 try:
                     cur.execute("INSERT INTO \"" + record[7] + "\" ('Date', 'Question1Info', 'Question2Info', 'Question3Info', 'Question4Info', 'Question5Info', \
                     'Question6Info', 'Question7Info', 'Question8Info', 'Question9Info', 'Question10Info', 'Question11Info', 'Question12Info', 'Question13Info', 'Question14Info', \
                     'Question15Info' ) VALUES ('" + date + "', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')")
                     for c in range(0, 15):
                         print(c + 1, "   ", collectedInformation[c - b].split(";")[0])
-                        if(collectedInformation[c - b].split(";")[0] == str(c + 1)):
-                            #print(collectedInformation[c - b].split(";")[1])
-                            cur.execute("UPDATE \"" + record[7] + "\" SET Question"+str(c+1)+"Info = \"" + str(collectedInformation[c - b].split(";")[1]) + "\" WHERE DataID = (SELECT MAX(DataID) FROM \"" + record[7] + "\")")
+                        if (collectedInformation[c - b].split(";")[0] == str(c + 1)):
+                            # print(collectedInformation[c - b].split(";")[1])
+                            cur.execute("UPDATE \"" + record[7] + "\" SET Question" + str(c + 1) + "Info = \"" + str(
+                                collectedInformation[c - b].split(";")[
+                                    1]) + "\" WHERE DataID = (SELECT MAX(DataID) FROM \"" + record[7] + "\")")
                         else:
                             b += 1
                             cur.execute("UPDATE \"" + record[7] + "\" SET Question" + str(
@@ -550,14 +553,14 @@ def dynamicChatbot(route):
                             c + 1) + "Info = \"\" WHERE DataID = (SELECT MAX(DataID) FROM \"" + record[7] + "\")")
                     conn.commit()
                     conn.close()
-                    #print(data)
+                    # print(data)
                 for i in range(1, int(request.form.get("numberOfKeywords")) + 1):
                     if "-" in request.form.get("keyword" + str(i)):
                         budget = request.form.get("keyword" + str(i)).split("-")
                     else:
                         keywords.append(request.form.get("keyword" + str(i)))
                 keywordsmatch = []
-                #print(data)
+                # print(data)
                 i = -1
                 for item in data:
                     keywordsmatch.append(0)
@@ -579,7 +582,7 @@ def dynamicChatbot(route):
                     if (exitAtLength == 5):
                         break
                 substract = 0
-                #print(data)
+                # print(data)
                 for p in range(0, len(keywordsmatch)):
                     if (keywordsmatch[p] == 0):
                         data.pop(p - substract)
@@ -601,14 +604,14 @@ def dynamicChatbot(route):
                 if not data:
                     return "We could not find anything that matched your search criteria. Please try different filter options."
                 datastring = ""
-                #print(data)
+                # print(data)
                 for i in data:
                     for c in i:
                         datastring += str(c) + "|||"
                     datastring = datastring[:-3]
                     datastring += "&&&"
                 conn.close()
-                #print(data)
+                # print(data)
                 if (not app.debug):
                     date = datetime.now().strftime("%Y-%m")
                     conn = sqlite3.connect(STATISTICSDATABASE)
@@ -628,7 +631,7 @@ def dynamicChatbot(route):
                     cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
                     stats = cur.fetchall()
                     conn.close()
-                #print(datastring)
+                # print(datastring)
                 return jsonify(datastring)
 
 
@@ -722,17 +725,17 @@ email = ""
 #         email = request.form.get("email", default="Error")
 #         password = request.form.get("pass", default="Error")
 #
-        # data = select_from_database_table(USERDATABASE, "SELECT * FROM Users WHERE ContactEmail=?", [email])
-        # if data is not None:
-        #     datapass = data[10]
-        #     print(datapass)
-        #     if hash_password(password, datapass) == datapass:
-        #         user = data[1] + " " + data[3]
-        #         return render_template("admin-main.html", msg=email, user=user)
-        #     else:
-        #         return render_template('login.html', data="User name and password does not match!")
-        # else:
-        #     return render_template('login.html', data="User doesn't exist!")
+# data = select_from_database_table(USERDATABASE, "SELECT * FROM Users WHERE ContactEmail=?", [email])
+# if data is not None:
+#     datapass = data[10]
+#     print(datapass)
+#     if hash_password(password, datapass) == datapass:
+#         user = data[1] + " " + data[3]
+#         return render_template("admin-main.html", msg=email, user=user)
+#     else:
+#         return render_template('login.html', data="User name and password does not match!")
+# else:
+#     return render_template('login.html', data="User doesn't exist!")
 
 
 # @app.route("/signupform", methods=['GET', 'POST'])

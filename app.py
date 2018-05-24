@@ -179,17 +179,17 @@ def login():
         return render_template("login.html")
     elif request.method == "POST":
         email = request.form.get("email", default="Error")
-        password_to_check = request.form.get("pass", default="Error")
+        password_to_check = request.form.get("password", default="Error")
         if email == "Error" or password_to_check == "Error":
-            print("Invalid request")
-            return "Email or password not received", status.HTTP_400_BAD_REQUEST
+            print("Invalid request: Email or password not received!")
+            return render_template('login.html', data="Email or password not received!"), status.HTTP_400_BAD_REQUEST
         else:
             data = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
             if data is not None:
-                password = data[7]
+                password = data[6]
                 print(password_to_check)
                 if hash_password(password_to_check, password) == password:
-                    user = data[2] + " " + data[4]
+                    user = data[2] + " " + data[3]
                     return render_template("admin-main.html", msg=email, user=user)
                 else:
                     return render_template('login.html', data="User name and password does not match!")
@@ -197,54 +197,57 @@ def login():
                 return render_template('login.html', data="User doesn't exist!")
 
 
-@app.route("/signupform", methods=['GET', 'POST'])
+@app.route("/signup", methods=['GET', 'POST'])
 def signup():
     if request.method == "GET":
-        return render_template("signup.html")
+        return render_template("signup.html", debug=app.debug)
     elif request.method == "POST":
+        print(request.form)
         companyName = request.form.get("companyName", default="Error")
-        companySize = request.form.get("companySize", default="Error")
-        companyPhoneNumber = request.form.get("companyPhoneNumber")
+        companySize = request.form.get("companySize")
         subscription = request.form.get("subscription", default="Error")
-        if companyName == "Error" or companySize == "Error" or companyPhoneNumber == "Error" or subscription == "Error":
+        websiteURL = request.form.get("websiteURL", default="Error")
+
+        if companyName == "Error" or subscription == "Error" or websiteURL == "Error":
             print("Invalid request")
-            return "Invalid request", status.HTTP_400_BAD_REQUEST
+            render_template("signup.html", msg="Invalid request", debug=app.debug), status.HTTP_400_BAD_REQUEST
 
         insertCompanyResponse = insert_into_database_table(DATABASE,
-                                                           "INSERT INTO Company ('Name', 'Size', 'PhoneNumber', 'Subscription') VALUES (?,?,?,?)",
-                                                           (companyName, companySize, companyPhoneNumber, subscription))
+                                                           "INSERT INTO Company ('Name', 'Size', 'URL', 'Subscription') VALUES (?,?,?,?)",
+                                                           (companyName, companySize, websiteURL, subscription))
         if "added" not in insertCompanyResponse:
             if "UNIQUE constraint" in insertCompanyResponse:
-                return render_template("signup.html", msg=companyName + " already has an account.")
+                return render_template("signup.html", msg=companyName + " already has an account.", debug=app.debug)
             else:
                 return internal_server_error(insertCompanyResponse)
         else:
             companyID = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE Name=?", [companyName])[0]
-            title = request.form.get("title", default="Error")
-            firstname = request.form.get("firstname", default="Error")
-            surname = request.form.get("surname", default="Error")
+            fullname = request.form.get("fullname", default="Error")
             accessLevel = "Admin"
             email = request.form.get("email", default="Error")
             password = request.form.get("password", default="Error")
-            if title == "Error" or firstname == "Error" or surname == "Error" or accessLevel == "Error" or email == "Error" or password == "Error":
+            if fullname == "Error" or accessLevel == "Error" or email == "Error" or password == "Error":
                 print("Invalid request")
-                return "Invalid request", status.HTTP_400_BAD_REQUEST
+                render_template("signup.html", msg="Invalid request", debug=app.debug), status.HTTP_400_BAD_REQUEST
             else:
+                firstname = fullname.split(" ")[0]
+                surname = fullname.split(" ")[1]
                 hashed_password = hash_password(password)
 
                 insertUserResponse = insert_into_database_table(DATABASE,
-                                                                "INSERT INTO Users ('CompanyID', 'Title', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password') VALUES (?,?,?,?,?,?,?)",
-                                                                (companyID, title, firstname, surname, accessLevel, email, hashed_password))
+                                                                "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password') VALUES (?,?,?,?,?,?)",
+                                                                (companyID, firstname, surname, accessLevel, email,
+                                                                 hashed_password))
                 if "added" not in insertUserResponse:
                     if "UNIQUE constraint" in insertUserResponse:
                         delete_from_table(DATABASE, "DELETE FROM Company WHERE Name=?", [companyName])
-                        return render_template("signup.html", msg=email + " already in use.")
+                        return render_template("signup.html", msg=email + " already in use.", debug=app.debug)
                     else:
                         return internal_server_error(insertUserResponse)
                 else:
                     if not app.debug:
                         # sending registration confirmation email to the user.
-                        msg = Message("Thank you for registering, {} {}".format(title, surname),
+                        msg = Message("Thank you for registering, {} {}".format(firstname, surname),
                                       sender="thesearchbase@gmail.com",
                                       recipients=[email])
                         msg.body = "We appreciate you registering with TheSearchBase. A whole new world of possibilities is ahead of you."
@@ -254,8 +257,8 @@ def signup():
                         msg = Message("A new company has signed up!",
                                       sender="thesearchbase@gmail.com",
                                       recipients=["thesearchbase@gmail.com"])
-                        msg.body = "Company name: {} has signed up the admin's details are. Title: {}, Name: {} {}, Email: {}, ".format(
-                            companyName, title, firstname, surname, email)
+                        msg.body = "Company name: {} has signed up the admin's details are. Name: {}, Email: {}, ".format(
+                            companyName, fullname, email)
                         mail.send(msg)
                     return redirect("/login")
 
@@ -1345,13 +1348,21 @@ def AffiliatePage():
 
 
 @app.errorhandler(404)
-def page_not_found(e):
+def page_not_found():
     return render_template('404.html'), 404
 
 
+@app.errorhandler(418)
+def im_a_teapot():
+    return render_template('418.html'), 404
+
+@app.route("/cykablyat", methods=["GET"])
+def teapot():
+    return im_a_teapot();
+
 @app.errorhandler(500)
 def internal_server_error(e):
-    return render_template('500.html'), 500
+    return render_template('500.html', error=e), 500
 
 
 if __name__ == "__main__":

@@ -337,7 +337,7 @@ def dynamicChatbot(route):
                 cur = conn.cursor()
                 i = 0
                 b = 0
-                print(3)
+                print(data)
                 try:
                     cur.execute("INSERT INTO \"" + record[7] + "\" ('Date', 'Question1Info', 'Question2Info', 'Question3Info', 'Question4Info', 'Question5Info', \
                     'Question6Info', 'Question7Info', 'Question8Info', 'Question9Info', 'Question10Info', 'Question11Info', 'Question12Info', 'Question13Info', 'Question14Info', \
@@ -358,14 +358,14 @@ def dynamicChatbot(route):
                         cur.execute("UPDATE \"" + record[7] + "\" SET Question"+str(c+1)+"Info = \"\" WHERE DataID = (SELECT MAX(DataID) FROM \"" + record[7] + "\")")
                     conn.commit()
                     conn.close()
-                    print(4)
+                    print(data)
                 for i in range(1, int(request.form.get("numberOfKeywords")) + 1):
                     if "-" in request.form.get("keyword" + str(i)):
                         budget = request.form.get("keyword" + str(i)).split("-")
                     else:
                         keywords.append(request.form.get("keyword" + str(i)))
                 keywordsmatch = []
-                print(5)
+                print(data)
                 i = -1
                 for item in data:
                     keywordsmatch.append(0)
@@ -387,7 +387,7 @@ def dynamicChatbot(route):
                     if (exitAtLength == 5):
                         break
                 substract = 0
-                print(6)
+                print(data)
                 for p in range(0, len(keywordsmatch)):
                     if (keywordsmatch[p] == 0):
                         data.pop(p - substract)
@@ -409,14 +409,14 @@ def dynamicChatbot(route):
                 if not data:
                     return "We could not find anything that matched your search criteria. Please try different filter options."
                 datastring = ""
-                print(7)
+                print(data)
                 for i in data:
                     for c in i:
                         datastring += str(c) + "|||"
                     datastring = datastring[:-3]
                     datastring += "&&&"
                 conn.close()
-                print(8)
+                print(data)
                 if (not app.debug):
                     date = datetime.now().strftime("%Y-%m")
                     conn = sqlite3.connect(STATISTICSDATABASE)
@@ -436,7 +436,7 @@ def dynamicChatbot(route):
                     cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
                     stats = cur.fetchall()
                     conn.close()
-                print(9)
+                print(datastring)
                 return jsonify(datastring)
 
 @app.route("/pokajimiuserite6519", methods=['GET'])

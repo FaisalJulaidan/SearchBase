@@ -262,7 +262,370 @@ def signup():
                         mail.send(msg)
                     return redirect("/login")
 
+# Admin pages
 
+@app.route("/admin/homepage", methods=['GET'])
+def adminHomePage():
+    if request.method == "GET":
+        return render_template("admin-main.html")
+
+@app.route("/admin/profile", methods=['GET', 'POST'])
+def profilePage():
+    if request.method == "GET":
+        email = request.cookies.get("UserEmail")
+        user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
+        #TODO check database output for errors
+        companyName = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[0]])
+        return render_template("admin-profile.html", user=user, companyName=companyName[1])
+    else:
+        return render_template("admin-profile.html"), status.HTTP_501_NOT_IMPLEMENTED
+
+##OLD CODE
+@app.route("/admin/Questions", methods=['GET', 'POST'])
+def adminAddQuestion():
+    if request.method == "GET":
+        conn = sqlite3.connect(QUESTIONDATABASE)
+        cur = conn.cursor()
+        user_mail = request.cookies.get("UserEmail")
+        cur.execute("SELECT * FROM \"" + user_mail + "\"")
+        mes = cur.fetchall()
+        conn.close()
+        return render_template("admin-form-add-question.html", data=mes)
+    if request.method == "POST":
+        questions = []
+        for i in range(1, 11):
+            if (request.form.get("question" + str(i)) != None):
+                questions.append(request.form.get("question" + str(i)))
+
+        # conn = sqlite3.connect(USERPREFERENCES)
+        # cur = conn.cursor()
+        # cur.execute("UPDATE \""+user_mail+"\" SET PricingQuestion = " + request.form.get("pricing-question"))
+        # conn.commit()
+        # conn.close()
+
+        conn = sqlite3.connect(QUESTIONDATABASE)
+        cur = conn.cursor()
+        user_mail = request.cookies.get("UserEmail")
+        cur.execute("SELECT * FROM \"" + user_mail + "\"")
+        tempData = cur.fetchall()
+        cur.execute("CREATE TABLE IF NOT EXISTS \'" + user_mail + "\' (\
+		Question text NOT NULL, 'Answer1' text, 'Answer2' text, 'Answer3' text, 'Answer4' text,\
+		 'Answer5' text, 'Answer6' text, 'Answer7' text, 'Answer8' text, 'Answer9' text, 'Answer10' text,\
+		  'Answer11' text, 'Answer12' text)")
+        conn.commit()
+        i = -1
+        print(tempData)
+        if (len(questions) + 1 < len(tempData) + 1):
+            for b in range(len(questions) + 1, len(tempData) + 1):
+                print("DELETING: ", tempData[i][0])
+                cur.execute("DELETE FROM \"" + user_mail + "\" WHERE Question = \"" + tempData[i][0] + "\"")
+        for q in questions:
+            i += 1
+            qType = request.form.get("qType" + str(i))
+            try:
+                print(tempData[i][0] != None)  # IMPORTANT DO NOT REMOVE
+                print("UPDATING: ", tempData[i][0], " TO ", q + ";" + qType)
+                cur.execute(
+                    "UPDATE \"" + user_mail + "\" SET Question = \"" + q + ";" + qType + "\" WHERE Question = \"" +
+                    tempData[i][0] + "\"")
+            except:
+                print("INSERTING NEW: ", q + ";" + qType)
+                cur.execute("INSERT INTO \'" + user_mail + "\'('Question') VALUES (?)", (q + ";" + qType,))
+        conn.commit()
+        conn.close()
+        return redirect("/admin/Questions", code=302)
+
+
+@app.route("/admin/Answers", methods=['GET', 'POST'])
+def adminAnswers():
+    if request.method == "GET":
+        conn = sqlite3.connect(QUESTIONDATABASE)
+        cur = conn.cursor()
+        user_mail = request.cookies.get("UserEmail")
+        cur.execute("SELECT * FROM \"" + user_mail + "\"")
+        mes = cur.fetchall()
+        n = 0
+        maxN = len(mes)
+        while (n < maxN):
+            if (len(mes) > 0):
+                print(n, "   ", maxN)
+                try:
+                    print(mes[n])
+                except:
+                    break;
+                if (mes[n][0].split(";")[1] == "userInfoRetrieval"):
+                    mes.remove(mes[n])
+                    n -= 1
+                    maxN -= 1
+                    if n < 0:
+                        n = 0
+                else:
+                    n += 1
+            else:
+                break
+        conn.close()
+        return render_template("admin-form-add-answer.html", msg=mes)
+    if request.method == "POST":
+        conn = sqlite3.connect(QUESTIONDATABASE)
+        cur = conn.cursor()
+        answers = []
+        selected_question = request.form.get("question")
+        user_mail = request.cookies.get("UserEmail")
+        for i in range(1, 13):
+            if (request.form.get("pname" + str(i)) != None):
+                try:
+                    if (request.files['file' + str(i)].filename == ""):
+                        print('no file given')
+                        if (request.form.get("delPic" + str(i)) != "yes"):
+                            cur.execute("SELECT Answer" + str(
+                                i) + " FROM \"" + user_mail + "\" WHERE Question=\"" + selected_question + "\"")
+                            data = cur.fetchall()
+                            link = data[0][0].split(";")[2]
+                            answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
+                                "keywords" + str(i)) + ";" + link)
+                        else:
+                            answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
+                                "keywords" + str(i)) + ";../static/img/core-img/android-icon-72x72.png")
+                    else:
+                        file = request.files['file' + str(i)]
+                        if file.filename == '':
+                            print('No file name')
+                        elif file and allowed_file(file.filename):
+                            filename = secure_filename(file.filename)
+                            filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
+                        file.save(filePath)
+                        filePath = filePath.split("TheSearchBase")[len(filePath.split("TheSearchBase")) - 1]
+                        # temporay string
+                        tempList = list(filePath)
+                        tempString = ""
+                        for char in tempList:
+                            if (char == "\\"):
+                                char = "/"
+                            tempString += char
+                        filePath = tempString
+                        # tempString = filePath.split("\\")
+                        # filePath = tempString[0] + "/" + tempString[1]
+                        answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
+                            "keywords" + str(i)) + ";.." + filePath)
+                except:
+                    if (request.form.get("delPic" + str(i)) != "yes"):
+                        cur.execute("SELECT Answer" + str(
+                            i) + " FROM \"" + user_mail + "\" WHERE Question=\"" + selected_question + "\"")
+                        data = cur.fetchall()
+                        if data == [(None,)] or data == [("",)] or data == []:
+                            answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
+                                "keywords" + str(i)) + ";../static/img/core-img/android-icon-72x72.png")
+                        else:
+                            print(data)
+                            link = data[0][0].split(";")[2]
+                            answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
+                                "keywords" + str(i)) + ";" + link)
+                    else:
+                        answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
+                            "keywords" + str(i)) + ";../static/img/core-img/android-icon-72x72.png")
+        c = 0
+        for a in answers:
+            c += 1
+            cur.execute("UPDATE \"" + user_mail + "\" SET Answer" + str(
+                c) + " = \"" + a + "\" WHERE Question = \"" + selected_question + "\"")
+            conn.commit()
+        for b in range(c + 1, 13):
+            cur.execute("UPDATE \"" + user_mail + "\" SET Answer" + str(
+                b) + " = \"\" WHERE Question = \"" + selected_question + "\"")
+            conn.commit()
+        conn.close()
+        return redirect("/admin/Answers", code=302)
+
+
+@app.route("/admin/Templates", methods=['GET', 'POST'])
+def adminTemplates():
+    if request.method == "GET":
+        return render_template("admin-convo-template.html")
+
+
+@app.route("/admin/Products", methods=['GET', 'POST'])
+def adminAddProduct():
+    if request.method == "GET":
+        conn = sqlite3.connect(PRODUCTDATABASE)
+        cur = conn.cursor()
+        user_mail = request.cookies.get("UserEmail")
+        cur.execute("SELECT * FROM \"" + user_mail + "\"")
+        mes = cur.fetchall()
+        conn.close()
+        return render_template("admin-form-add-product.html", data=mes)
+    if request.method == 'POST':
+        filePath = 'no file upload so far'
+        msg = ''
+        if request.method == 'POST':
+            i = 0;
+            product_id = []
+            name = []
+            brand = []
+            model = []
+            price = []
+            keywords = []
+            discount = []
+            url = []
+            file_path = []
+            while (True):
+                i += 1
+                if (request.form.get("product_ID" + str(i), default="Error") == "Error"):
+                    break
+                product_id.append(request.form.get("product_ID" + str(i), default="Error"))
+                name.append(request.form.get("product_Name" + str(i), default="Error"))
+                brand.append(request.form.get("product_Brand" + str(i), default="Error"))
+                model.append(request.form.get("product_Model" + str(i), default="Error"))
+                price.append(request.form.get("product_Price" + str(i), default="Error"))
+                keywords.append(request.form.get("product_Keywords" + str(i), default="Error"))
+                discount.append(request.form.get("product_Discount" + str(i), default="Error"))
+                url.append(request.form.get("product_URL" + str(i), default="Error"))
+                try:
+                    if (request.files['product_image' + str(i)].filename == ""):
+                        print('no file given')
+                    else:
+                        file = request.files['product_image' + str(i)]
+                        if file.filename == '':
+                            print('No file name')
+                        elif file and allowed_file(file.filename):
+                            filename = secure_filename(file.filename)
+                            filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
+                        file.save(filePath)
+                        filePath = filePath.split("TheSearchBase")[len(filePath.split("TheSearchBase")) - 1]
+                        tempList = list(filePath)
+                        tempString = ""
+                        for char in tempList:
+                            if (char == "\\"):
+                                char = "/"
+                            tempString += char
+                        filePath = tempString
+                        filePath = ".." + filePath
+                except:
+                    conn = sqlite3.connect(PRODUCTDATABASE)
+                    cur = conn.cursor()
+                    user_mail = request.cookies.get("UserEmail")
+                    cur.execute("SELECT * FROM \"" + user_mail + "\" WHERE ProductID=\"" + product_id[
+                        len(product_id) - 1] + "\"")
+                    mes = cur.fetchall()
+                    if mes == []:
+                        filePath = "../static/img/core-img/android-icon-72x72.png"
+                    else:
+                        filePath = mes[0][8]
+                    conn.close()
+                file_path.append(filePath)
+            try:
+                conn = sqlite3.connect(PRODUCTDATABASE)
+                cur = conn.cursor()
+                user_mail = request.cookies.get("UserEmail")
+                cur.execute("CREATE TABLE IF NOT EXISTS \'" + user_mail + "\' (\
+				ProductID text, ProductName text, ProductBrand text, ProductModel text, ProductPrice text\
+				ProductKeywords text, ProductDiscount text, ProductURL text, ProductImage text)")
+                cur.execute("DELETE FROM \'" + user_mail + "\'")
+                for q in range(0, i - 1):
+                    # injecting database with sql with product
+                    cur.execute("INSERT INTO \'" + user_mail + "\'('ProductID', 'ProductName', 'ProductBrand', 'ProductModel', \
+					'ProductPrice', 'ProductKeywords', 'ProductDiscount', 'ProductURL', 'ProductImage') \
+					VALUES (?,?,?,?,?,?,?,?,?)", (
+                        product_id[q], name[q], brand[q], model[q], price[q], keywords[q], discount[q], url[q],
+                        file_path[q],))
+                    conn.commit()
+            except:
+                print("Error in editing the database")
+                conn.rollback()
+                conn.close()
+            return redirect("/admin/Products", code=302)
+
+
+# Route for the data storage
+@app.route("/admin/userinput", methods=['GET', 'POST'])
+def adminDataStorage():
+    if request.method == "GET":
+        conn = sqlite3.connect(USERINPUTDATABASE)
+        cur = conn.cursor()
+        user_mail = request.cookies.get("UserEmail")
+        cur.execute("SELECT * FROM \"" + user_mail + "\"")
+        data = cur.fetchall()
+        return render_template("admin-data-storage.html", data=data)
+    if request.method == "POST":
+        return redirect("/admin/userinput", code=302)
+
+
+@app.route("/admin/connect")
+def connectionCode():
+    return render_template("admin-connect.html")
+
+
+@app.route("/admin/pricing")
+def adminPricing():
+    return render_template("admin-pricing-tables.html", pub_key=pub_key)
+
+
+@app.route('/admin/thanks')
+def thanks():
+    return render_template('admin-thank-you.html')
+
+
+@app.route("/admin/pay", methods=['GET', 'POST'])
+def chargeUser():
+    if request.method == 'GET':
+        return render_template("admin-pay.html")
+
+
+@app.route("/admin/profile", methods=['GET'])
+def adminProfile():
+    if request.method == "GET":
+        return render_template("admin-profile.html")
+
+
+@app.route("/admin/analytics", methods=['GET'])
+def adminAnalytics():
+    if request.method == "GET":
+        conn = sqlite3.connect(USERDATABASE)
+        cur = conn.cursor()
+        user_mail = request.cookies.get("UserEmail")
+        cur.execute("SELECT * FROM Users WHERE ContactEmail=\"" + user_mail + "\"")
+        mes = cur.fetchall()
+        companyName = mes[0][4]
+        conn.close()
+        conn = sqlite3.connect(STATISTICSDATABASE)
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM \"" + companyName + "\"")
+        stats = cur.fetchall()
+        conn.close()
+        return render_template("admin-analytics.html", data=stats)
+
+
+@app.route("/admin/supportGeneral", methods=['GET'])
+def adminGeneralSupport():
+    if request.method == "GET":
+        return render_template("admin-general-support.html")
+
+
+@app.route("/admin/supportDocs", methods=['GET'])
+def adminDocsSupport():
+    if request.method == "GET":
+        return render_template("admin-docs.html")
+
+
+@app.route("/admin/supportSetup", methods=['GET'])
+def adminSetupSupport():
+    if request.method == "GET":
+        return render_template("admin-getting-setup.html")
+
+
+@app.route("/admin/supportIntergartion", methods=['GET'])
+def adminIntergrationSupport():
+    if request.method == "GET":
+        return render_template("admin-intergation-tutorial.html")
+
+
+@app.route("/admin/supportBilling", methods=['GET'])
+def adminBillingSupport():
+    if request.method == "GET":
+        return render_template("admin-billing-support.html")
+
+
+
+##OLD CODE
 @app.route("/productfile", methods=['GET', 'POST'])
 def uploadProductFile():
     if request.method == "GET":
@@ -638,16 +1001,6 @@ def dynamicChatbot(route):
                 return jsonify(datastring)
 
 
-@app.route("/pokajimiuserite6519", methods=['GET'])
-def doit():
-    if request.method == "GET":
-        conn = sqlite3.connect(USERDATABASE)
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM Users;")
-        data = cur.fetchall()
-        return render_template("display-template.html", data=data)
-
-
 @app.route("/emoji-converter", methods=['GET'])
 def emojiConterter():
     if request.method == "GET":
@@ -717,501 +1070,9 @@ def contactpage():
         return render_template("contact.html")
 
 
-email = ""
-
-
-# @app.route("/login", methods=['GET', 'POST'])
-# def loginpage():
-#     if request.method == "GET":
-#         return render_template("login.html")
-#     elif request.method == 'POST':
-#         email = request.form.get("email", default="Error")
-#         password = request.form.get("pass", default="Error")
-#
-# data = select_from_database_table(USERDATABASE, "SELECT * FROM Users WHERE ContactEmail=?", [email])
-# if data is not None:
-#     datapass = data[10]
-#     print(datapass)
-#     if hash_password(password, datapass) == datapass:
-#         user = data[1] + " " + data[3]
-#         return render_template("admin-main.html", msg=email, user=user)
-#     else:
-#         return render_template('login.html', data="User name and password does not match!")
-# else:
-#     return render_template('login.html', data="User doesn't exist!")
-
-
-# @app.route("/signupform", methods=['GET', 'POST'])
-# def signpage():
-#     if request.method == "GET":
-#         return render_template("signup.html")
-#     if request.method == 'POST':
-# 
-#         # collecting the text data from the front end
-#         userTitle = request.form.get("title", default="Error")
-#         userFirstname = request.form.get("firstname", default="Error")
-#         userSecondname = request.form.get("surname", default="Error")
-#         userCompanyName = request.form.get("companyName", default="Error")
-#         userPositionCompany = request.form.get("userPosition", default="Error")
-#         userCompanyAddress = request.form.get("companyAddress", default="Error")
-#         userEmail = request.form.get("contactEmail", default="Error")
-#         userContactNumber = request.form.get("contactNumber", default="Error")
-#         userCountry = request.form.get("country", default="Error")
-#         userPassword = request.form.get("pass", default="Error")
-#         pass_hashed = hash_password(userPassword)
-# 
-#         # injecting the text data into the database
-#         conn = sqlite3.connect(USERDATABASE)
-#         cur = conn.cursor()
-#         cur.execute("SELECT ContactEmail FROM Users WHERE ContactEmail=?", [userEmail])
-#         demail = cur.fetchall()
-#         if demail:
-#             return render_template("signup.html", msg="Email already exists")
-#         cur.execute("SELECT CompanyName FROM Users WHERE ContactEmail=?", [userEmail])
-#         demail = cur.fetchall()
-#         if demail:
-#             return render_template("signup.html", msg="Company already exists")
-#         cur.execute("INSERT INTO Users ('Title', 'Firstname', 'Surname', 'CompanyName', 'UserPosition', 'CompanyAddress', 'ContactEmail', 'ContactNumber', 'Country', 'Password')\
-# 						VALUES (?,?,?,?,?,?,?,?,?,?)", (
-#             userTitle, userFirstname, userSecondname, userCompanyName, userPositionCompany, userCompanyAddress,
-#             userEmail,
-#             userContactNumber, userCountry, pass_hashed))
-#         conn.commit()
-#         print("User details added!")
-#         conn.close()
-# 
-#         # creating user's tables in databases
-#         conn = sqlite3.connect(QUESTIONDATABASE)
-#         cur = conn.cursor()
-#         cur.execute(
-#             "CREATE TABLE \"" + userEmail + "\" ( Question text NOT NULL, 'Answer1' text, 'Answer2' text, 'Answer3' text, 'Answer4' text, 'Answer5' text, 'Answer6' text, 'Answer7' text, 'Answer8' text, 'Answer9' text, 'Answer10' text, 'Answer11' text, 'Answer12' text)")
-#         conn.commit()
-#         conn.close()
-#         conn = sqlite3.connect(PRODUCTDATABASE)
-#         cur = conn.cursor()
-#         cur.execute(
-#             "CREATE TABLE \"" + userEmail + "\" ( ProductID text, ProductName text, ProductBrand text, ProductModel text, ProductPrice text ProductFeatures text, ProductKeywords text, ProductDiscount text, ProductURL text, ProductImage text)")
-#         conn.commit()
-#         conn.close()
-#         conn = sqlite3.connect(STATISTICSDATABASE)
-#         cur = conn.cursor()
-#         cur.execute(
-#             "CREATE TABLE \"" + userCompanyName + "\" ( `Date` TEXT, `AssistantOpened` TEXT, `QuestionsAnswered` TEXT, `ProductsReturned` TEXT )")
-#         conn.commit()
-#         conn.close()
-#         conn = sqlite3.connect(USERINPUTDATABASE)
-#         cur = conn.cursor()
-#         cur.execute(
-#             "CREATE TABLE \"" + userEmail + "\" (`DataID` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `Date` TEXT, `Question1Info` TEXT, `Question2Info` TEXT, `Question3Info` TEXT, `Question4Info` TEXT, `Question5Info` TEXT, `Question6Info` TEXT, `Question7Info` TEXT, `Question8Info` TEXT, `Question9Info` TEXT, `Question10Info` TEXT, `Question11Info` TEXT, `Question12Info` TEXT, `Question13Info` TEXT, `Question14Info` TEXT, `Question15Info` TEXT)")
-#         conn.commit()
-#         conn.close()
-#         # conn = sqlite3.connect(USERPREFERENCES)
-#         # cur = conn.cursor()
-#         # cur.execute("CREATE TABLE \""+userEmail+"\" ( `Date` TEXT, `AssistantOpened` TEXT, `QuestionsAnswered` TEXT, `ProductsReturned` TEXT )")
-#         # cur.execute("INSERT INTO \""+userEmail+"\" ('PricingQuestion') VALUES (?)", ("0"))
-#         # conn.commit()
-#         # conn.close()
-# 
-#         # sending registration confirmation email to the user.
-#         msg = Message("Thank you for registering, " + userFirstname,
-#                       sender="thesearchbase@gmail.com",
-#                       recipients=[userEmail])
-#         msg.body = "We appreciate you registering with TheSaerchBase. A whole new world of possibilities is ahead of you."
-#         mail.send(msg)
-# 
-#         # sending the registration confirmation email to us
-#         msg = Message("A new user has signed up!",
-#                       sender="thesearchbase@gmail.com",
-#                       recipients=["thesearchbase@gmail.com"])
-#         msg.body = "Title: " + userTitle + "Name: " + userFirstname + userSecondname + "Email: " + userEmail + "Number: " + userContactNumber
-#         mail.send(msg)
-# 
-#         return redirect("/login")
-
-# Admin pages
-
-@app.route("/admin/homepage", methods=['GET'])
-def adminHomePage():
-    if request.method == "GET":
-        return render_template("admin-main.html")
-
-
 def allowed_file(filename):
     ext = filename.rsplit('.', 1)[1]
     return '.' in filename and ext in ALLOWED_EXTENSIONS
-
-
-@app.route("/admin/profile", methods=['GET', 'POST'])
-def profilePage():
-    if request.method == "GET":
-        conn = sqlite3.connect(USERDATABASE)
-        cur = conn.cursor()
-        user_mail = request.cookies.get("UserEmail")
-        cur.execute("SELECT * FROM Users WHERE ContactEmail = \"" + user_mail + "\"")
-        data = cur.fetchall()
-        conn.close()
-        return render_template("admin-profile.html", data=data)
-    if request.method == "POST":
-        names = request.form.get("names");
-        address = request.form.get("address");
-        compN = request.form.get("compN");
-        cID = request.form.get("cID");
-        names = names.split(" ")
-        conn = sqlite3.connect(USERDATABASE)
-        cur = conn.cursor()
-        user_mail = request.cookies.get("UserEmail")
-        # cur.execute("UPDATE table SET ProductsReturned = new value WHERE Date = \""+date+"\"")
-        cur.execute("UPDATE Users SET Firstname = \"" + names[0] + "\" WHERE CompanyID = \"" + cID + "\"")
-        cur.execute("UPDATE Users SET Surname = \"" + names[1] + "\" WHERE CompanyID = \"" + cID + "\"")
-        cur.execute("UPDATE Users SET CompanyAddress = \"" + address + "\" WHERE CompanyID = \"" + cID + "\"")
-        cur.execute("UPDATE Users SET CompanyName = \"" + compN + "\" WHERE CompanyID = \"" + cID + "\"")
-        conn.commit()
-        conn.close()
-        return redirect("/admin/profile", code=302)
-
-
-@app.route("/admin/Questions", methods=['GET', 'POST'])
-def adminAddQuestion():
-    if request.method == "GET":
-        conn = sqlite3.connect(QUESTIONDATABASE)
-        cur = conn.cursor()
-        user_mail = request.cookies.get("UserEmail")
-        cur.execute("SELECT * FROM \"" + user_mail + "\"")
-        mes = cur.fetchall()
-        conn.close()
-        return render_template("admin-form-add-question.html", data=mes)
-    if request.method == "POST":
-        questions = []
-        for i in range(1, 11):
-            if (request.form.get("question" + str(i)) != None):
-                questions.append(request.form.get("question" + str(i)))
-
-        # conn = sqlite3.connect(USERPREFERENCES)
-        # cur = conn.cursor()
-        # cur.execute("UPDATE \""+user_mail+"\" SET PricingQuestion = " + request.form.get("pricing-question"))
-        # conn.commit()
-        # conn.close()
-
-        conn = sqlite3.connect(QUESTIONDATABASE)
-        cur = conn.cursor()
-        user_mail = request.cookies.get("UserEmail")
-        cur.execute("SELECT * FROM \"" + user_mail + "\"")
-        tempData = cur.fetchall()
-        cur.execute("CREATE TABLE IF NOT EXISTS \'" + user_mail + "\' (\
-		Question text NOT NULL, 'Answer1' text, 'Answer2' text, 'Answer3' text, 'Answer4' text,\
-		 'Answer5' text, 'Answer6' text, 'Answer7' text, 'Answer8' text, 'Answer9' text, 'Answer10' text,\
-		  'Answer11' text, 'Answer12' text)")
-        conn.commit()
-        i = -1
-        print(tempData)
-        if (len(questions) + 1 < len(tempData) + 1):
-            for b in range(len(questions) + 1, len(tempData) + 1):
-                print("DELETING: ", tempData[i][0])
-                cur.execute("DELETE FROM \"" + user_mail + "\" WHERE Question = \"" + tempData[i][0] + "\"")
-        for q in questions:
-            i += 1
-            qType = request.form.get("qType" + str(i))
-            try:
-                print(tempData[i][0] != None)  # IMPORTANT DO NOT REMOVE
-                print("UPDATING: ", tempData[i][0], " TO ", q + ";" + qType)
-                cur.execute(
-                    "UPDATE \"" + user_mail + "\" SET Question = \"" + q + ";" + qType + "\" WHERE Question = \"" +
-                    tempData[i][0] + "\"")
-            except:
-                print("INSERTING NEW: ", q + ";" + qType)
-                cur.execute("INSERT INTO \'" + user_mail + "\'('Question') VALUES (?)", (q + ";" + qType,))
-        conn.commit()
-        conn.close()
-        return redirect("/admin/Questions", code=302)
-
-
-@app.route("/admin/Answers", methods=['GET', 'POST'])
-def adminAnswers():
-    if request.method == "GET":
-        conn = sqlite3.connect(QUESTIONDATABASE)
-        cur = conn.cursor()
-        user_mail = request.cookies.get("UserEmail")
-        cur.execute("SELECT * FROM \"" + user_mail + "\"")
-        mes = cur.fetchall()
-        n = 0
-        maxN = len(mes)
-        while (n < maxN):
-            if (len(mes) > 0):
-                print(n, "   ", maxN)
-                try:
-                    print(mes[n])
-                except:
-                    break;
-                if (mes[n][0].split(";")[1] == "userInfoRetrieval"):
-                    mes.remove(mes[n])
-                    n -= 1
-                    maxN -= 1
-                    if n < 0:
-                        n = 0
-                else:
-                    n += 1
-            else:
-                break
-        conn.close()
-        return render_template("admin-form-add-answer.html", msg=mes)
-    if request.method == "POST":
-        conn = sqlite3.connect(QUESTIONDATABASE)
-        cur = conn.cursor()
-        answers = []
-        selected_question = request.form.get("question")
-        user_mail = request.cookies.get("UserEmail")
-        for i in range(1, 13):
-            if (request.form.get("pname" + str(i)) != None):
-                try:
-                    if (request.files['file' + str(i)].filename == ""):
-                        print('no file given')
-                        if (request.form.get("delPic" + str(i)) != "yes"):
-                            cur.execute("SELECT Answer" + str(
-                                i) + " FROM \"" + user_mail + "\" WHERE Question=\"" + selected_question + "\"")
-                            data = cur.fetchall()
-                            link = data[0][0].split(";")[2]
-                            answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
-                                "keywords" + str(i)) + ";" + link)
-                        else:
-                            answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
-                                "keywords" + str(i)) + ";../static/img/core-img/android-icon-72x72.png")
-                    else:
-                        file = request.files['file' + str(i)]
-                        if file.filename == '':
-                            print('No file name')
-                        elif file and allowed_file(file.filename):
-                            filename = secure_filename(file.filename)
-                            filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
-                        file.save(filePath)
-                        filePath = filePath.split("TheSearchBase")[len(filePath.split("TheSearchBase")) - 1]
-                        # temporay string
-                        tempList = list(filePath)
-                        tempString = ""
-                        for char in tempList:
-                            if (char == "\\"):
-                                char = "/"
-                            tempString += char
-                        filePath = tempString
-                        # tempString = filePath.split("\\")
-                        # filePath = tempString[0] + "/" + tempString[1]
-                        answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
-                            "keywords" + str(i)) + ";.." + filePath)
-                except:
-                    if (request.form.get("delPic" + str(i)) != "yes"):
-                        cur.execute("SELECT Answer" + str(
-                            i) + " FROM \"" + user_mail + "\" WHERE Question=\"" + selected_question + "\"")
-                        data = cur.fetchall()
-                        if data == [(None,)] or data == [("",)] or data == []:
-                            answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
-                                "keywords" + str(i)) + ";../static/img/core-img/android-icon-72x72.png")
-                        else:
-                            print(data)
-                            link = data[0][0].split(";")[2]
-                            answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
-                                "keywords" + str(i)) + ";" + link)
-                    else:
-                        answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
-                            "keywords" + str(i)) + ";../static/img/core-img/android-icon-72x72.png")
-        c = 0
-        for a in answers:
-            c += 1
-            cur.execute("UPDATE \"" + user_mail + "\" SET Answer" + str(
-                c) + " = \"" + a + "\" WHERE Question = \"" + selected_question + "\"")
-            conn.commit()
-        for b in range(c + 1, 13):
-            cur.execute("UPDATE \"" + user_mail + "\" SET Answer" + str(
-                b) + " = \"\" WHERE Question = \"" + selected_question + "\"")
-            conn.commit()
-        conn.close()
-        return redirect("/admin/Answers", code=302)
-
-
-@app.route("/admin/Templates", methods=['GET', 'POST'])
-def adminTemplates():
-    if request.method == "GET":
-        return render_template("admin-convo-template.html")
-
-
-@app.route("/admin/Products", methods=['GET', 'POST'])
-def adminAddProduct():
-    if request.method == "GET":
-        conn = sqlite3.connect(PRODUCTDATABASE)
-        cur = conn.cursor()
-        user_mail = request.cookies.get("UserEmail")
-        cur.execute("SELECT * FROM \"" + user_mail + "\"")
-        mes = cur.fetchall()
-        conn.close()
-        return render_template("admin-form-add-product.html", data=mes)
-    if request.method == 'POST':
-        filePath = 'no file upload so far'
-        msg = ''
-        if request.method == 'POST':
-            i = 0;
-            product_id = []
-            name = []
-            brand = []
-            model = []
-            price = []
-            keywords = []
-            discount = []
-            url = []
-            file_path = []
-            while (True):
-                i += 1
-                if (request.form.get("product_ID" + str(i), default="Error") == "Error"):
-                    break
-                product_id.append(request.form.get("product_ID" + str(i), default="Error"))
-                name.append(request.form.get("product_Name" + str(i), default="Error"))
-                brand.append(request.form.get("product_Brand" + str(i), default="Error"))
-                model.append(request.form.get("product_Model" + str(i), default="Error"))
-                price.append(request.form.get("product_Price" + str(i), default="Error"))
-                keywords.append(request.form.get("product_Keywords" + str(i), default="Error"))
-                discount.append(request.form.get("product_Discount" + str(i), default="Error"))
-                url.append(request.form.get("product_URL" + str(i), default="Error"))
-                try:
-                    if (request.files['product_image' + str(i)].filename == ""):
-                        print('no file given')
-                    else:
-                        file = request.files['product_image' + str(i)]
-                        if file.filename == '':
-                            print('No file name')
-                        elif file and allowed_file(file.filename):
-                            filename = secure_filename(file.filename)
-                            filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
-                        file.save(filePath)
-                        filePath = filePath.split("TheSearchBase")[len(filePath.split("TheSearchBase")) - 1]
-                        tempList = list(filePath)
-                        tempString = ""
-                        for char in tempList:
-                            if (char == "\\"):
-                                char = "/"
-                            tempString += char
-                        filePath = tempString
-                        filePath = ".." + filePath
-                except:
-                    conn = sqlite3.connect(PRODUCTDATABASE)
-                    cur = conn.cursor()
-                    user_mail = request.cookies.get("UserEmail")
-                    cur.execute("SELECT * FROM \"" + user_mail + "\" WHERE ProductID=\"" + product_id[
-                        len(product_id) - 1] + "\"")
-                    mes = cur.fetchall()
-                    if mes == []:
-                        filePath = "../static/img/core-img/android-icon-72x72.png"
-                    else:
-                        filePath = mes[0][8]
-                    conn.close()
-                file_path.append(filePath)
-            try:
-                conn = sqlite3.connect(PRODUCTDATABASE)
-                cur = conn.cursor()
-                user_mail = request.cookies.get("UserEmail")
-                cur.execute("CREATE TABLE IF NOT EXISTS \'" + user_mail + "\' (\
-				ProductID text, ProductName text, ProductBrand text, ProductModel text, ProductPrice text\
-				ProductKeywords text, ProductDiscount text, ProductURL text, ProductImage text)")
-                cur.execute("DELETE FROM \'" + user_mail + "\'")
-                for q in range(0, i - 1):
-                    # injecting database with sql with product
-                    cur.execute("INSERT INTO \'" + user_mail + "\'('ProductID', 'ProductName', 'ProductBrand', 'ProductModel', \
-					'ProductPrice', 'ProductKeywords', 'ProductDiscount', 'ProductURL', 'ProductImage') \
-					VALUES (?,?,?,?,?,?,?,?,?)", (
-                        product_id[q], name[q], brand[q], model[q], price[q], keywords[q], discount[q], url[q],
-                        file_path[q],))
-                    conn.commit()
-            except:
-                print("Error in editing the database")
-                conn.rollback()
-                conn.close()
-            return redirect("/admin/Products", code=302)
-
-
-# Route for the data storage
-@app.route("/admin/userinput", methods=['GET', 'POST'])
-def adminDataStorage():
-    if request.method == "GET":
-        conn = sqlite3.connect(USERINPUTDATABASE)
-        cur = conn.cursor()
-        user_mail = request.cookies.get("UserEmail")
-        cur.execute("SELECT * FROM \"" + user_mail + "\"")
-        data = cur.fetchall()
-        return render_template("admin-data-storage.html", data=data)
-    if request.method == "POST":
-        return redirect("/admin/userinput", code=302)
-
-
-@app.route("/admin/connect")
-def connectionCode():
-    return render_template("admin-connect.html")
-
-
-@app.route("/admin/pricing")
-def adminPricing():
-    return render_template("admin-pricing-tables.html", pub_key=pub_key)
-
-
-@app.route('/admin/thanks')
-def thanks():
-    return render_template('admin-thank-you.html')
-
-
-@app.route("/admin/pay", methods=['GET', 'POST'])
-def chargeUser():
-    if request.method == 'GET':
-        return render_template("admin-pay.html")
-
-
-@app.route("/admin/profile", methods=['GET'])
-def adminProfile():
-    if request.method == "GET":
-        return render_template("admin-profile.html")
-
-
-@app.route("/admin/analytics", methods=['GET'])
-def adminAnalytics():
-    if request.method == "GET":
-        conn = sqlite3.connect(USERDATABASE)
-        cur = conn.cursor()
-        user_mail = request.cookies.get("UserEmail")
-        cur.execute("SELECT * FROM Users WHERE ContactEmail=\"" + user_mail + "\"")
-        mes = cur.fetchall()
-        companyName = mes[0][4]
-        conn.close()
-        conn = sqlite3.connect(STATISTICSDATABASE)
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM \"" + companyName + "\"")
-        stats = cur.fetchall()
-        conn.close()
-        return render_template("admin-analytics.html", data=stats)
-
-
-@app.route("/admin/supportGeneral", methods=['GET'])
-def adminGeneralSupport():
-    if request.method == "GET":
-        return render_template("admin-general-support.html")
-
-
-@app.route("/admin/supportDocs", methods=['GET'])
-def adminDocsSupport():
-    if request.method == "GET":
-        return render_template("admin-docs.html")
-
-
-@app.route("/admin/supportSetup", methods=['GET'])
-def adminSetupSupport():
-    if request.method == "GET":
-        return render_template("admin-getting-setup.html")
-
-
-@app.route("/admin/supportIntergartion", methods=['GET'])
-def adminIntergrationSupport():
-    if request.method == "GET":
-        return render_template("admin-intergation-tutorial.html")
-
-
-@app.route("/admin/supportBilling", methods=['GET'])
-def adminBillingSupport():
-    if request.method == "GET":
-        return render_template("admin-billing-support.html")
-
 
 @app.route("/send/mail", methods=['GET', 'POST'])
 def sendEmail():
@@ -1348,12 +1209,12 @@ def AffiliatePage():
 
 
 @app.errorhandler(404)
-def page_not_found():
+def page_not_found(e):
     return render_template('404.html'), 404
 
 
 @app.errorhandler(418)
-def im_a_teapot():
+def im_a_teapot(e):
     return render_template('418.html'), 404
 
 @app.route("/cykablyat", methods=["GET"])

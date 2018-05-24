@@ -190,47 +190,19 @@
                         </div>
                       </div>
                       <div id="outputDiv">
-                          <h3>{{data[0][2]}} {{data[0][3]}}</h3>
+                          <h3>{{user[2]}} {{user[3]}}</h3>
 
                           <ul class="list-unstyled user_data">
-                            <li><i class="fa fa-map-marker user-profile-icon"></i> {{data[0][6]}}
-                            </li>
-
                             <li>
-                              <i class="fa fa-briefcase user-profile-icon"></i> {{data[0][4]}}
+                              <i class="fa fa-briefcase user-profile-icon"></i> {{companyName}}
                             </li>
 
                             <li class="m-top-xs">
                               <i class="fa fa-external-link user-profile-icon"></i>
-                              <a href="http://www.thesearchbase.com/{{data[0][4]}}" target="_blank">Assistant</a>
+                              <a href="https://www.thesearchbase.com/chatbot/{{companyName}}" target="_blank">Assistant</a>
                             </li>
                           </ul>
                       </div>
-                      <div style="display:none" id="inputDiv">
-                          <form id="form" action="/admin/profile" method="post">
-                              <input name = "names" value ="{{data[0][2]}} {{data[0][3]}}"></input>
-
-                              <ul class="list-unstyled user_data">
-                                <li><i class="fa fa-map-marker user-profile-icon"></i> <input id="address" name= "address" onchange="doGeocode()" value="{{data[0][6]}}"></input>
-                                </li>
-
-                                <li>
-                                  <i class="fa fa-briefcase user-profile-icon"></i> <input name="compN" value="{{data[0][4]}}"></input>
-                                </li>
-
-                                <li class="m-top-xs">
-                                  <i class="fa fa-external-link user-profile-icon"></i>
-                                  <a href="http://www.thesearchbase.com/{{data[0][4]}}" target="_blank">Assistant</a>
-                                </li>
-                              </ul>
-                              <input name="cID" hidden value="{{data[0][0]}}"/>
-                              <a id="submit" class="btn btn-success">Save</a>
-                              <a class="btn btn-success" type="button" id = "cancelB">Cancel</a>
-                          </form>
-                      </div>
-                      <a id= "EditB" class="btn btn-success"><i class="fa fa-edit m-right-xs"></i>Edit Profile</a>
-                      <br />
-                    </div>
                     <div class="col-md-9 col-sm-9 col-xs-12">
                     </div>
                   </div>

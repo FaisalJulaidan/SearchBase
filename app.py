@@ -451,7 +451,7 @@ def doit():
 @app.route("/emoji-converter", methods=['GET'])
 def emojiConterter():
     if request.method == "GET":
-        return render_template("emoji-converter.html")
+        return render_template("admin-emoji.html")
 
 @app.route("/popup2", methods=['GET'])
 def popup():
@@ -898,6 +898,12 @@ def adminAnswers():
             conn.commit()
         conn.close()
         return redirect("/admin/Answers", code=302)
+
+
+@app.route("/admin/Templates", methods=['GET', 'POST'])
+def adminTemplates():
+    if request.method == "GET":
+        return render_template("admin-convo-template.html")
 
 
 @app.route("/admin/Products", methods=['GET', 'POST'])

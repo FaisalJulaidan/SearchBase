@@ -451,7 +451,7 @@ def doit():
 @app.route("/emoji-converter", methods=['GET'])
 def emojiConterter():
     if request.method == "GET":
-        return render_template("emoji-converter.html")
+        return render_template("admin-emoji.html")
 
 @app.route("/popup2", methods=['GET'])
 def popup():

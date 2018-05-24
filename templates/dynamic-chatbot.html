@@ -414,9 +414,8 @@
                     var data = xhttp.responseText;
                     console.log(data);
                     cRD = $("#messagesContainer");
-                    if (data == "We could not find anything that matched your seach criteria. Please try different filter options.")
+                    if (data == "We could not find anything that matched your search criteria. Please try different filter options.")
                     {
-                        console.log("didnt find anything");
                         cRD.append("<br><br><br><lable class='chatProducts'>We could not find<br>anything that matched your seach criteria. Please try different filter options.</lable><br><br><br>");
                     }
                     else
@@ -431,11 +430,9 @@
                         for (var i = 0; i < temparray.length - 1; i++)
                         {
                             resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
-                            console.log(resultdic[i][4]);
                             // cRD.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
                             cRD.append("<center><div class='chatProducts'><lable>" + resultdic[i][1] + "</lable><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + " Square feet</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
                         }
-                        console.log(resultdic);
                     }
                 }
                 else

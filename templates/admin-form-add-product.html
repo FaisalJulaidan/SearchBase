@@ -187,40 +187,64 @@
                                     <p class="text-muted font-13 m-b-30">
                                         Database 1 - All of the products are listed below
                                     </p>
-                                    <form id="productFileForm" name="productFileForm" enctype="multipart/form-data"
-                                          onsubmit="return uploadProductFile()">
-                                        <h2> Upload a product file </h2>
-                                        <div>
-                                            <label for="productFile">Choose file to upload</label><br>
-                                            <input type="file" id="productFile" name="productFile">
+
+                                    <!-- Start of welcome message -->
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <div class="x_panel">
+                                                <div class="x_title">
+                                                    <h2>Upload an exisitng database that you have <small>File Types: XML, JSON, SQL</small></h2>
+                                                    <ul class="nav navbar-right panel_toolbox"></ul>
+                                                    <div class="clearfix"></div>
+                                                </div>
+                                                <div class="x_content">
+                                                    <br />
+                                                    <form id="productFileForm" name="productFileForm" enctype="multipart/form-data" onsubmit="return uploadProductFile()">
+
+                                                        <div class="form-group">
+                                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="">
+                                                                Upload your existing database <span class="required">*</span>
+                                                            </label>
+                                                            <br />
+                                                            <br />
+                                                            <div>
+                                                                <label for="productFile">Choose file to upload</label><br>
+                                                                <input type="file" id="productFile" name="productFile">
+                                                            </div>
+                                                            <br />
+                                                    <button id="NOQ-SubmitB" class="btn btn-success" type="submit" value="submit">Upload Database</button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <br>
-                                        <button type="submit" value="submit">Submit form</button>
-                                    </form>
+                                    </div>
+                                    <!-- End of welcome message -->
+
                                     <form action="/admin/Products" method="post" enctype="multipart/form-data">
                                         <table id="datatable" class="table table-striped table-bordered">
                                             <thead>
-                                            <tr>
-                                                <th>Delete</th>
-                                                <th>ID</th>
-                                                <th>Name</th>
-                                                <th>Brand</th>
-                                                <th>Model</th>
-                                                <th>Price</th>
-                                                <th>Keyword/Use</th>
-                                                <th>Discount</th>
-                                                <th>URL</th>
-                                                <th>Image</th>
-                                            </tr>
+                                                <tr>
+                                                    <th>Delete</th>
+                                                    <th>ID</th>
+                                                    <th>Name</th>
+                                                    <th>Brand</th>
+                                                    <th>Model</th>
+                                                    <th>Price</th>
+                                                    <th>Keyword/Use</th>
+                                                    <th>Discount</th>
+                                                    <th>URL</th>
+                                                    <th>Image</th>
+                                                </tr>
                                             </thead>
                                             <tbody id="tbody">
-                                            <!-- Row get inserted here -->
+                                                <!-- Row get inserted here -->
                                             </tbody>
                                         </table>
                                         <button type="submit" class="btn btn-success" value="Send">Save Updates</button>
-                                        <button type="button" class="btn btn-success" id="addRow" value="Send">Add Row
+                                        <button type="button" class="btn btn-success" id="addRow" value="Send">
+                                            Add Row
                                         </button>
-                                        <button type="button" class="btn btn-success" id="removeRow" value="Send">Delete
+                                        <button type="button" class="btn btn-success" id="removeRow" value="Send">
+                                            Delete
                                             Row
                                         </button>
                                     </form>

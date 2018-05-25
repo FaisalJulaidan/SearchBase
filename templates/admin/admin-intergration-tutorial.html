@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -6,29 +6,28 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
 	<link rel="icon" href="images/favicon.ico" type="image/ico" />
 
-    <title>Admin Homepage </title>
+    <title>Intergration</title>
 
     <!-- Bootstrap -->
-    <link href="../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
-    <link href="../static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <link href="../../static/vendors/nprogress/nprogress.css" rel="stylesheet">
     <!-- iCheck -->
-    <link href="../static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+    <link href="../../static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
 
     <!-- bootstrap-progressbar -->
-    <link href="../static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <link href="../../static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
     <!-- JQVMap -->
-    <link href="../static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+    <link href="../../static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
     <!-- bootstrap-daterangepicker -->
-    <link href="../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
 
     <!-- Custom Theme Style -->
-    <link href="../static/build/css/custom.min.css" rel="stylesheet">
+    <link href="../../static/build/css/custom.min.css" rel="stylesheet">
   </head>
 
   <body class="nav-md">
@@ -37,7 +36,7 @@
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="/admin/homepage" class="site_title"> <img src="../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
+              <a href="/admin/homepage" class="site_title"> <img src="../../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
               <br />
             </div>
 
@@ -46,11 +45,11 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic">
-                <img src="../static/images/img.jpg" alt="..." class="img-circle profile_img">
+                <img src="../../static/images/img.jpg" alt="..." class="img-circle profile_img">
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
-                <h2 id="welcomeh2"></h2>
+                <h2>user</h2>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -134,8 +133,6 @@
             </div>
             <!-- /sidebar menu -->
 
-
-
           </div>
         </div>
 
@@ -150,7 +147,7 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../static/images/img.jpg" alt="">User
+                    <img src="../../static/images/img.jpg" alt="">User
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -172,40 +169,45 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-          <!-- top tiles -->
-          <div class="row tile_count">
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-user"></i> Total clicks on your assistant</span>
-              <div class="count">0</div>
+          <div class="">
+            <div class="page-title">
+              <div class="title_left">
+                <h3>Intergration with your website</h3>
+              </div>
             </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-clock-o"></i> Total Answers loaded</span>
-              <div class="count">0</div>
-            </div>
-          </div>
 
-          <div class="row">
-            <div class="col-md-12 col-sm-12 col-xs-12">
-              <div class="x_panel" style="height:600px;">
-                <div class="col-md-12">
-                  <div class="jumbotron text-xs-center">
-                    <h1 class="display-3">Welcome!</h1>
-                      <p class="lead"><strong>Use your side navigation</strong> to navigate the website.</p>
-                      <hr>
-                      <p>
-                        Need help getting setup? <a href="">Contact our team, we'll setup a personal session with you.</a>
-                      </p>
-                      <p class="lead">
-                        <a class="btn btn-primary btn-sm" href="/admin/Questions" role="button">Build my questions</a>
-                      </p>
-                    </div>
+            <div class="clearfix"></div>
+
+            <div class="row">
+
+              <!-- Copy this and paste it for more drop down options -->
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Deploying your assistant</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                    </ul>
+                    <br />
+                    <br />
+
+                    <p> In the side menu on the left of your screen, you should first open the 'Connection' page. </p>
+                    <p> This page will have some pre-made HTMl, CSS and Javascript code made for you. You must paste the lines of your code into your
+                      HTML page. If you wish to deploy your assistant on a certian page, the paste the code on the relevant page.</p>
+                      <p> Where is says 'nameofyourcompany' after our domain, you must enter your company name. Else you can visit your profile page and click on 'Assistant'
+                        which will load your assistant on full screen.</p>
+                      <p> You can the copy that URL and replace it with the line starting with 'www.thesearchbase.com/nameofyourcompany'
+                    <br />
+                    <div class="clearfix"></div>
                   </div>
                 </div>
               </div>
             </div>
-          <!-- /top tiles -->
-          <br />
+          </div>
         </div>
+        <!-- /page content -->
+
 
         <!-- footer content -->
         <footer>
@@ -216,60 +218,47 @@
         </footer>
         <!-- /footer content -->
       </div>
-    </div>
 
     <!-- jQuery -->
-    <script src="../static/vendors/jquery/dist/jquery.min.js"></script>
+    <script src="../../static/vendors/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap -->
-    <script src="../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- FastClick -->
-    <script src="../static/vendors/fastclick/lib/fastclick.js"></script>
+    <script src="../../static/vendors/fastclick/lib/fastclick.js"></script>
     <!-- NProgress -->
-    <script src="../static/vendors/nprogress/nprogress.js"></script>
+    <script src="../../static/vendors/nprogress/nprogress.js"></script>
     <!-- Chart.js -->
-    <script src="../static/vendors/Chart.js/dist/Chart.min.js"></script>
+    <script src="../../static/vendors/Chart.js/dist/Chart.min.js"></script>
     <!-- gauge.js -->
-    <script src="../static/vendors/gauge.js/dist/gauge.min.js"></script>
+    <script src="../../static/vendors/gauge.js/dist/gauge.min.js"></script>
     <!-- bootstrap-progressbar -->
-    <script src="../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <script src="../../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
     <!-- iCheck -->
-    <script src="../static/vendors/iCheck/icheck.min.js"></script>
+    <script src="../../static/vendors/iCheck/icheck.min.js"></script>
     <!-- Skycons -->
-    <script src="../static/vendors/skycons/skycons.js"></script>
+    <script src="../../static/vendors/skycons/skycons.js"></script>
     <!-- Flot -->
-    <script src="../static/vendors/Flot/jquery.flot.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.pie.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.time.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.stack.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.resize.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.pie.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.time.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.stack.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.resize.js"></script>
     <!-- Flot plugins -->
-    <script src="../static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
-    <script src="../static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
-    <script src="../static/vendors/flot.curvedlines/curvedLines.js"></script>
+    <script src="../../static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+    <script src="../../static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+    <script src="../../static/vendors/flot.curvedlines/curvedLines.js"></script>
     <!-- DateJS -->
-    <script src="../static/vendors/DateJS/build/date.js"></script>
+    <script src="../../static/vendors/DateJS/build/date.js"></script>
     <!-- JQVMap -->
-    <script src="../static/vendors/jqvmap/dist/jquery.vmap.js"></script>
-    <script src="../static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
-    <script src="../static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+    <script src="../../static/vendors/jqvmap/dist/jquery.vmap.js"></script>
+    <script src="../../static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+    <script src="../../static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
     <!-- bootstrap-daterangepicker -->
-    <script src="../static/vendors/moment/min/moment.min.js"></script>
-    <script src="../static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="../../static/vendors/moment/min/moment.min.js"></script>
+    <script src="../../static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
 
     <!-- Custom Theme Scripts -->
-    <script src="../static/build/js/custom.min.js"></script>
-
-
-	<script src="../static/js/cookies.js"></script>
-    <script>
-    if("{{msg}}" != ""){
-        makeCookie("UserEmail", "{{msg}}", 1);
-    }
-    if("{{user}}" != ""){
-        makeCookie("User Official", "{{user}}", 1);
-    }
-    document.getElementById("welcomeh2").innerHTML = getCookie("User Official");
-    </script>
+    <script src="../../static/build/js/custom.min.js"></script>
 
   </body>
 </html>

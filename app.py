@@ -15,16 +15,10 @@ from xml.dom import minidom
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 COMPUTERDATABASE = APP_ROOT + "/computers.db"
-USERDATABASE = APP_ROOT + "/users.db"
-QUESTIONDATABASE = APP_ROOT + "/questions.db"
-PRODUCTDATABASE = APP_ROOT + "/products.db"
-STATISTICSDATABASE = APP_ROOT + "/statistics.db"
 USERINPUTDATABASE = APP_ROOT + "/userInput.db"
-# USERPREFERENCES = APP_ROOT + "/userpreferences.db"
 
 DATABASE = APP_ROOT + "/database.db"
 
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 PRODUCT_IMAGES = os.path.join(APP_ROOT, 'static/file_uploads/product_images')
 PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
 
@@ -59,16 +53,17 @@ app.config.update(
 @app.before_request
 def before_request():
     theurl = str(request.url_rule)
-    if ("admin" not in theurl):
+    if "admin" not in theurl:
         print("Ignore before request for: ", theurl)
         return None
-    print("USER EMAIL: " + str(request.cookies.get("UserEmail")))
-    if (request.cookies.get("UserEmail") == None):
+    email = request.cookies.get("UserEmail")
+    print("USER EMAIL: " + str(email))
+    if email is None:
         print("User not logged in")
-        return redirect("/login", code=302)
+        return redirect("/login")
     print("Before request checking: ", theurl, " ep: ", request.endpoint)
-    if (request.cookies.get("UserEmail") == 'None') and request.endpoint != 'login':
-        return render_template("userlogin.html", msg="Please log in first!")
+    if email == 'None' and request.endpoint != 'login':
+        return render_template("login.html", msg="Please log in first!")
     print("Before Request checks out")
     return None
 
@@ -181,7 +176,6 @@ def dynamic_popup(route):
 
 
 # drop down routes.
-
 @app.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
@@ -209,7 +203,7 @@ def data_collection():
 @app.route("/pricing", methods=['GET'])
 def pricing():
     if request.method == "GET":
-        return render_template("Pricing.html")
+        return render_template("pricing.html")
 
 
 @app.route("/about", methods=['GET'])
@@ -241,7 +235,7 @@ def login():
                 print(password_to_check)
                 if hash_password(password_to_check, password) == password:
                     user = data[2] + " " + data[3]
-                    return render_template("admin-main.html", msg=email, user=user)
+                    return render_template("admin/admin-main.html", msg=email, user=user)
                 else:
                     return render_template('login.html', data="User name and password does not match!")
             else:
@@ -315,11 +309,10 @@ def signup():
 
 
 # Admin pages
-
 @app.route("/admin/homepage", methods=['GET'])
 def adminHomePage():
     if request.method == "GET":
-        return render_template("admin-main.html")
+        return render_template("admin/admin-main.html")
 
 
 @app.route("/admin/profile", methods=['GET', 'POST'])
@@ -329,7 +322,7 @@ def profilePage():
         user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
         # TODO check database output for errors
         companyName = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[1]])
-        return render_template("admin-profile.html", user=user, companyName=companyName[1])
+        return render_template("admin/admin-profile.html", user=user, companyName=companyName[1])
     elif request.method == "POST":
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
@@ -338,56 +331,93 @@ def profilePage():
 def admin_questions():
     if request.method == "GET":
         email = request.cookies.get("UserEmail")
-        user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
-        # TODO check user for errors
-        company = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[1]])
-        # TODO check company for errors
-        assistants = select_from_database_table(DATABASE, "SELECT * FROM Assistant WHERE CompanyID=?", [company[0]],
-                                                True)
-        # TODO check assistants for errors
+        assistants = get_assistants(email)
+        #TODO check assistants for errors
         assistantIndex = 0  # TODO change this
         questions = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
-                                               [assistants[assistantIndex][2]], True)
+                                               [assistants[assistantIndex][0]], True)
         # TODO check questions for errors
-        return render_template("admin-form-add-question.html", data=questions)
+        return render_template("admin/admin-form-add-question.html", data=questions)
     elif request.method == "POST":
-        questions = []
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        assistantIndex = 0  # TODO change this
+        currentQuestions = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
+                                                      [assistants[assistantIndex][0]], True)
+        # TODO check currentQuestions for errors
+
+        updatedQuestions = []
         noq = request.form.get("noq-hidden", default="Error")
         for i in range(1, (noq + 1)):
             question = request.form.get("question" + str(i), default="Error")
-            if (question != "Error"):
-                questions.append(question)
+            if question != "Error":
+                updatedQuestions.append(question)
             else:
-                # TODO handle this
-                pass
+                return render_template("admin/admin-form-add-question.html", data=currentQuestions), status.HTTP_400_BAD_REQUEST
 
-        # TODO implement this
+        # TODO implement this, need to work out how to store the retrieved answers
         abort(status.HTTP_501_NOT_IMPLEMENTED)
+
+def get_assistants(email):
+    user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
+    # TODO check user for errors
+    company = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[1]])
+    # TODO check company for errors
+    assistants = select_from_database_table(DATABASE, "SELECT * FROM Assistant WHERE CompanyID=?", [company[0]],
+                                            True)
+    # TODO check assistants for errors
+    return assistants
 
 
 @app.route("/admin/answers", methods=['GET', 'POST'])
 def admin_answers():
     if request.method == "GET":
         email = request.cookies.get("UserEmail")
-        user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
-        # TODO check user for errors
-        company = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[1]])
-        # TODO check company for errors
-        assistants = select_from_database_table(DATABASE, "SELECT * FROM Assistant WHERE CompanyID=?", [company[0]],
-                                                True)
+        assistants = get_assistants(email)
         # TODO check assistants for errors
         assistantIndex = 0  # TODO change this
-        questions = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
-                                               [assistants[assistantIndex][2]], True)
-        # TODO check questions for errors
-        for i in range(0, len(questions)):
-            answers = select_from_database_table(DATABASE, "SELECT * FROM Answers WHERE QuestionID=?",
-                                                 [questions[i][0]], True)
-            # TODO Check answers for errors
-            for j in range(0, len(answers)):
-                # TODO implement this
-                pass
+        questionsTuple = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
+                                               [assistants[assistantIndex][0]], True)
+        # TODO check questionstuple for errors
+        questions = []
+        for i in range (0, len(questionsTuple)):
+            questions.append(questionsTuple[i][2])
 
+        allAnswers = {}
+        for i in range(0, len(questions)):
+            answersTuple = select_from_database_table(DATABASE, "SELECT * FROM Answers WHERE QuestionID=?",
+                                                 [questionsTuple[i][0]], True)
+            # TODO Check answerstuple for errors
+            answers = []
+            for i in range(0, len(answersTuple)):
+                answers.append(answersTuple[i][2] + ";" + answersTuple[i][3])
+
+            allAnswers[i] = answers #dictionary, Key: index of question in question array, value: array of answers
+
+        # number = 0
+        # maxNumber = len(questions)
+        # while (number < maxNumber):
+        #     if (len(questions) > 0):
+        #         print(number, "   ", maxNumber)
+        #         try:
+        #             print(questions[number])
+        #         except:
+        #             break
+        #         if (questions[number][0].split(";")[1] == "userInfoRetrieval"):
+        #             questions.remove(questions[number])
+        #             number -= 1
+        #             maxNumber -= 1
+        #             if number < 0:
+        #                 n = 0
+        #         else:
+        #             number += 1
+        #     else:
+        #         break
+        # return render_template("admin/admin-form-add-answer.html", msg=questions)
+
+        abort(status.HTTP_501_NOT_IMPLEMENTED)
+    elif request.method == "POST":
+        #TODO not even looked at yet
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
@@ -395,18 +425,13 @@ def admin_answers():
 def admin_products():
     if request.method == "GET":
         email = request.cookies.get("UserEmail")
-        user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
-        # TODO check user for errors
-        company = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[1]])
-        # TODO check company for errors
-        assistants = select_from_database_table(DATABASE, "SELECT * FROM Assistant WHERE CompanyID=?", [company[0]],
-                                                True)
+        assistants = get_assistants(email)
         # TODO check assistants for errors
         assistantIndex = 0  # TODO change this
         products = select_from_database_table(DATABASE, "SELECT * FROM Products WHERE AssistantID=?",
-                                              [assistants[assistantIndex][2]], True)
+                                              [assistants[assistantIndex][0]], True)
         # TODO check products for errors
-        return render_template("admin-form-add-product.html", data=products)
+        return render_template("admin/admin-form-add-product.html", data=products)
     elif request.method == 'POST':
         # TODO implement this
         abort(status.HTTP_501_NOT_IMPLEMENTED)
@@ -415,30 +440,30 @@ def admin_products():
 @app.route("/admin/templates", methods=['GET', 'POST'])
 def admin_templates():
     if request.method == "GET":
-        return render_template("admin-convo-template.html")
+        return render_template("admin/admin-convo-template.html")
     elif request.method == "POST":
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
 @app.route("/admin/connect")
 def admin_connect():
-    return render_template("admin-connect.html")
+    return render_template("admin/admin-connect.html")
 
 
 @app.route("/admin/pricing")
 def admin_pricing():
-    return render_template("admin-pricing-tables.html", pub_key=pub_key)
+    return render_template("admin/admin-pricing-tables.html", pub_key=pub_key)
 
 
 @app.route('/admin/thanks')
 def admin_thanks():
-    return render_template('admin-thank-you.html')
+    return render_template('admin/admin-thank-you.html')
 
 
 @app.route("/admin/pay", methods=['GET', 'POST'])
 def admin_pay():
     if request.method == 'GET':
-        return render_template("admin-pay.html")
+        return render_template("admin/admin-pay.html")
 
 
 @app.route("/admin/analytics", methods=['GET'])
@@ -455,44 +480,44 @@ def admin_analytics():
         assistantIndex = 0  # TODO change this
         stats = select_from_database_table(DATABASE, "SELECT * FROM Statistics WHERE AssistantID=?",
                                            [assistants[assistantIndex][2]], True)
-        return render_template("admin-analytics.html", data=stats)
+        return render_template("admin/admin-analytics.html", data=stats)
 
 
 @app.route("/admin/support/general", methods=['GET'])
 def admin_general_support():
     if request.method == "GET":
-        return render_template("admin-general-support.html")
+        return render_template("admin/admin-general-support.html")
 
 
 @app.route("/admin/support/docs", methods=['GET'])
 def admin_support_docs():
     if request.method == "GET":
-        return render_template("admin-docs.html")
+        return render_template("admin/admin-docs.html")
 
 
 @app.route("/admin/support/setup", methods=['GET'])
 def admin_support_setup():
     if request.method == "GET":
-        return render_template("admin-getting-setup.html")
+        return render_template("admin/admin-getting-setup.html")
 
 
 @app.route("/admin/support/intergration", methods=['GET'])
 def admin_support_intergration():
     if request.method == "GET":
-        return render_template("admin-intergration-tutorial.html")
+        return render_template("admin/admin-intergration-tutorial.html")
 
 
 @app.route("/admin/support/billing", methods=['GET'])
 def admin_support_billing():
     if request.method == "GET":
-        return render_template("admin-billing-support.html")
+        return render_template("admin/admin-billing-support.html")
 
 
 @app.route("/emoji-converter", methods=['GET'])
 def admin_emoji():
     if request.method == "GET":
-        return render_template("admin-emoji.html")
-    
+        return render_template("admin/admin-emoji.html")
+
 
 # Sitemap route
 @app.route('/robots.txt')
@@ -607,15 +632,47 @@ def redirect_data_collection():
         return redirect("/data/collection")
 
 
+
+@app.route("/send/mail", methods=['GET', 'POST'])
+def sendEmail():
+    if request.method == "GET":
+        return render_template("index.html")
+    if request.method == "POST":
+        mailFirstname = request.form.get("sendingName", default="Error")
+        mailUserEmail = request.form.get("sendingEmail", default="Error")
+        mailUserMessage = request.form.get("sendMessage", default="Error")
+
+        msg = Message(mailFirstname + " from " + mailUserEmail + " has sent you a message.",
+                      sender=mailUserEmail,
+                      recipients=["thesearchbase@gmail.com"])
+        msg.body = mailFirstname + " said: " + mailUserMessage + " their email is: " + mailUserEmail
+        mail.send(msg)
+        return render_template("index.html")
+
+
+@app.route("/send/mailtop", methods=['GET', 'POST'])
+def sendMarketingEmail():
+    if request.method == "GET":
+        return render_template("index.html")
+    if request.method == "POST":
+        userEmail = request.form.get("user_email", default="Error")
+        msg = Message(userEmail + " Has sent you mail!",
+                      sender=userEmail,
+                      recipients=["thesearchbase@gmail.com"])
+        msg.body = userEmail + " Has registerd their Interest for your product"
+        mail.send(msg)
+        return render_template("index.html")
+
+
 ## Error Handlers ##
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
-    return render_template('404.html', error=e), status.HTTP_404_NOT_FOUND
+    return render_template('errors/404.html', error=e), status.HTTP_404_NOT_FOUND
 
 
 @app.errorhandler(418)
 def im_a_teapot(e):
-    return render_template('418.html', error=e), 418
+    return render_template('errors/418.html', error=e), 418
 
 
 @app.route("/teapot", methods=["GET"])
@@ -624,12 +681,12 @@ def teapot():
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(e):
-    return render_template('500.html', error=e, debug=app.debug), status.HTTP_500_INTERNAL_SERVER_ERROR
+    return render_template('errors/500.html', error=e, debug=app.debug), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
 def not_implemented(e):
-    return render_template('501.html', error=e, debug=app.debug), status.HTTP_501_NOT_IMPLEMENTED
+    return render_template('errors/501.html', error=e, debug=app.debug), status.HTTP_501_NOT_IMPLEMENTED
 
 
 if __name__ == "__main__":
@@ -713,7 +770,7 @@ def adminAnswers():
             else:
                 break
         conn.close()
-        return render_template("admin-form-add-answer.html", msg=mes)
+        return render_template("admin/admin-form-add-answer.html", msg=mes)
     if request.method == "POST":
         conn = sqlite3.connect(QUESTIONDATABASE)
         cur = conn.cursor()
@@ -794,7 +851,7 @@ def adminAddProduct():
         cur.execute("SELECT * FROM \"" + user_mail + "\"")
         mes = cur.fetchall()
         conn.close()
-        return render_template("admin-form-add-product.html", data=mes)
+        return render_template("admin/admin-form-add-product.html", data=mes)
     if request.method == 'POST':
         filePath = 'no file upload so far'
         msg = ''
@@ -886,7 +943,7 @@ def adminDataStorage():
         user_mail = request.cookies.get("UserEmail")
         cur.execute("SELECT * FROM \"" + user_mail + "\"")
         data = cur.fetchall()
-        return render_template("admin-data-storage.html", data=data)
+        return render_template("admin/admin-data-storage.html", data=data)
     if request.method == "POST":
         return redirect("/admin/userinput", code=302)
 
@@ -1137,37 +1194,6 @@ def dynamicChatbot(route):
 def allowed_file(filename):
     ext = filename.rsplit('.', 1)[1]
     return '.' in filename and ext in ALLOWED_EXTENSIONS
-
-
-@app.route("/send/mail", methods=['GET', 'POST'])
-def sendEmail():
-    if request.method == "GET":
-        return render_template("index.html")
-    if request.method == "POST":
-        mailFirstname = request.form.get("sendingName", default="Error")
-        mailUserEmail = request.form.get("sendingEmail", default="Error")
-        mailUserMessage = request.form.get("sendMessage", default="Error")
-
-        msg = Message(mailFirstname + " from " + mailUserEmail + " has sent you a message.",
-                      sender=mailUserEmail,
-                      recipients=["thesearchbase@gmail.com"])
-        msg.body = mailFirstname + " said: " + mailUserMessage + " their email is: " + mailUserEmail
-        mail.send(msg)
-        return render_template("index.html")
-
-
-@app.route("/send/mailtop", methods=['GET', 'POST'])
-def sendMarketingEmail():
-    if request.method == "GET":
-        return render_template("index.html")
-    if request.method == "POST":
-        userEmail = request.form.get("user_email", default="Error")
-        msg = Message(userEmail + " Has sent you mail!",
-                      sender=userEmail,
-                      recipients=["thesearchbase@gmail.com"])
-        msg.body = userEmail + " Has registerd their Interest for your product"
-        mail.send(msg)
-        return render_template("index.html")
 
 
 # Route for the computer search

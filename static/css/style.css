@@ -1,12 +1,12 @@
 @import url('https://fonts.googleapis.com/css?family=Cabin:400,500,700|Montserrat:400,500,700');
-@import 'css/bootstrap.min.css';
-@import 'css/animate.css';
-@import 'css/magnific-popup.css';
-@import 'css/owl.carousel.min.css';
-@import 'css/slick.css';
-@import 'css/font-awesome.min.css';
-@import 'css/themify-icons.css';
-@import 'css/ionicons.min.css';
+@import 'bootstrap.min.css';
+@import 'animate.css';
+@import 'magnific-popup.css';
+@import 'owl.carousel.min.css';
+@import 'slick.css';
+@import 'font-awesome.min.css';
+@import 'themify-icons.css';
+@import 'ionicons.min.css';
 
 /* --------------------------
 :: 1.0 Base CSS Start
@@ -399,7 +399,7 @@ p {
 -------------------------- */
 
 .wellcome_area {
-    background-image: url(img/bg-img/welcome-bg.png);
+    background-image: url(../img/bg-img/welcome-bg.png);
     height: 900px;
     position: relative;
     z-index: 1;
@@ -408,7 +408,7 @@ p {
 }
 
 .wellcome_area2 {
-    background-image: url(img/bg-img/other_pages.png);
+    background-image: url(../img/bg-img/other_pages.png);
     height: 450px;
     position: relative;
     z-index: 1;
@@ -417,7 +417,7 @@ p {
 }
 
 .wellcome_area3 {
-    background-image: url(img/bg-img/other_pages.png);
+    background-image: url(../img/bg-img/other_pages.png);
     height: 758px;
     position: relative;
     z-index: 1;

@@ -8,26 +8,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="icon" href="images/favicon.ico" type="image/ico" />
 
-    <title>Billing support </title>
+    <title>Admin Homepage </title>
 
     <!-- Bootstrap -->
-    <link href="../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
-    <link href="../static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <link href="../../static/vendors/nprogress/nprogress.css" rel="stylesheet">
     <!-- iCheck -->
-    <link href="../static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+    <link href="../../static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
 
     <!-- bootstrap-progressbar -->
-    <link href="../static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <link href="../../static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
     <!-- JQVMap -->
-    <link href="../static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+    <link href="../../static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
     <!-- bootstrap-daterangepicker -->
-    <link href="../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
 
     <!-- Custom Theme Style -->
-    <link href="../static/build/css/custom.min.css" rel="stylesheet">
+    <link href="../../static/build/css/custom.min.css" rel="stylesheet">
   </head>
 
   <body class="nav-md">
@@ -35,10 +35,8 @@
       <div class="main_container">
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
-
-
             <div class="navbar nav_title" style="border: 0;">
-              <a href="/admin/homepage" class="site_title"> <img src="../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
+              <a href="/admin/homepage" class="site_title"> <img src="../../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
               <br />
             </div>
 
@@ -47,7 +45,7 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic">
-                <img src="../static/images/img.jpg" alt="..." class="img-circle profile_img">
+                <img src="../../static/images/img.jpg" alt="..." class="img-circle profile_img">
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
@@ -135,7 +133,7 @@
             </div>
             <!-- /sidebar menu -->
 
-
+            <!-- /sidebar menu -->
           </div>
         </div>
 
@@ -150,7 +148,7 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../static/images/img.jpg" alt="">User
+                    <img src="../../static/images/img.jpg" alt="">User
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -172,43 +170,97 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-          <div class="">
-            <div class="page-title">
-              <div class="title_left">
-              </div>
-            </div>
+          <!-- top tiles -->
 
-            <div class="clearfix"></div>
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel" style="height:600px;">
+                <div class="col-md-12">
+                  <h3> Connecting your assistant. </h3>
+                  <p> To Connect your assistant, you must paste the pre-made code into any part of your HTML scource code. </p>
+                  <xmp>
+                    <!-- Importing CSS file -->
+                    <link href="../../static/pop-up/pop.css" rel="stylesheet">
 
-            <div class="row">
+                    <div class="bottom_left" id="contents1">
+                    <div id="contents1" style="display:none;">
+                        <iframe src="http://www.thesearchbase.com/chatbot/nameofyourcompany" width="350" height="350"></iframe>
+                    </div>
+                      <ul>
+                        <li class="him" href="#" onclick="document.getElementById('contents1').style.cssText = ''">Launch Assistant</li>
+                      </ul>
+                    </div>
 
-              <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel">
-                  <div class="x_title">
-                    <h2  style="font-size:25px">Billing support</h2>
-                    <ul class="nav navbar-right panel_toolbox">
-                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                      </li>
-                    </ul>
-                    <div class="clearfix"></div>
-                  </div>
-                  <p style="font-size:17px">Monthly Payments</p>
-                  <p>We charge your account every 28 days. If you cancel your subscription, you will be able to use the services until the end of the month. Your account will not be deleted
-                  unless you request for your account to be deleted however your acess will be downgraded to the Free version of the software.</p>
-                  <p>The database(s) and products that you have added, will not be deleted in case you wish to upgrade again</p>
+                  </xmp>
+                  <p> Once you have pasted this, into the html page that you wish to use your assistant on, you're live.</p>
                   <br />
-                  <h2  style="font-size:17px">Your Data</h2>
-                  <p>In order to process your payemnts with our payment service provider <a href="https://support.stripe.com/"><Strong>(Stripe)</Strong></a> we will need basic forms of payments
-                    information to process your payment. We will not store this information as our payment service provider will retain this information for recuring payments.</p>
-                  <h2  style="font-size:17px">Anything else?</h2>
-                  <p>hello</p>
+                  <h4> CSS </h4>
+                  <p> If you would like to have control the appearance of your assistant, you can also paste some extra code into your CSS and make changes</p>
+                  <xmp>
+                    ul{
+                      list-style: none;
+                      margin: 0;
+                      padding: 0;
+                    }
+
+                    ul li{
+                      display:inline-block;
+                      clear: both;
+                      padding: 20px;
+                      border-radius: 30px;
+                      margin-bottom: 2px;
+                      font-family: Helvetica, Arial, sans-serif;
+                      color: white;
+                    }
+
+                    .him{
+                      background: #6610f2;
+                      float: left;
+                      z-index: 1000;
+                    }
+
+                    .him{
+                      border-bottom-left-radius: 5px;
+                      z-index: 1000;
+                    }
+
+                    .bottom_left{
+                      position: fixed;
+                      bottom: 0;
+                      left: 0;
+                      margin: 20px;
+                      margin-left: 10px;
+                      z-index: 1000;
+                    }
+                  </xmp>
+                  <br />
+                  <h4> Javascript (This is used for analytics) </h4>
+                  <p> If you would like to optimal control over your assistant and make big changes, you you can download our <strong><a href="">Js</a></strong> file or paste it as a script in your website.</p>
+                  <xmp>
+
+                    <script>
+                    var opened = false;
+                    var frame = document.getElementById("iframediv");
+                    frame.style = "display:none";
+                    document.getElementById("launch_button").addEventListener("click", function(){
+                        if(!opened){
+                            frame.style = "display:block";
+                            opened=true;
+                        }else{
+                            frame.style = "display:none";
+                            opened=false;
+                        }
+                    });
+                    </script>
+
+                  </xmp>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          <!-- /top tiles -->
+          <br />
         </div>
-        <!-- /page content -->
-
 
         <!-- footer content -->
         <footer>
@@ -219,47 +271,47 @@
         </footer>
         <!-- /footer content -->
       </div>
+    </div>
 
     <!-- jQuery -->
-    <script src="../static/vendors/jquery/dist/jquery.min.js"></script>
+    <script src="../../static/vendors/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap -->
-    <script src="../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- FastClick -->
-    <script src="../static/vendors/fastclick/lib/fastclick.js"></script>
+    <script src="../../static/vendors/fastclick/lib/fastclick.js"></script>
     <!-- NProgress -->
-    <script src="../static/vendors/nprogress/nprogress.js"></script>
+    <script src="../../static/vendors/nprogress/nprogress.js"></script>
     <!-- Chart.js -->
-    <script src="../static/vendors/Chart.js/dist/Chart.min.js"></script>
+    <script src="../../static/vendors/Chart.js/dist/Chart.min.js"></script>
     <!-- gauge.js -->
-    <script src="../static/vendors/gauge.js/dist/gauge.min.js"></script>
+    <script src="../../static/vendors/gauge.js/dist/gauge.min.js"></script>
     <!-- bootstrap-progressbar -->
-    <script src="../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <script src="../../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
     <!-- iCheck -->
-    <script src="../static/vendors/iCheck/icheck.min.js"></script>
+    <script src="../../static/vendors/iCheck/icheck.min.js"></script>
     <!-- Skycons -->
-    <script src="../static/vendors/skycons/skycons.js"></script>
+    <script src="../../static/vendors/skycons/skycons.js"></script>
     <!-- Flot -->
-    <script src="../static/vendors/Flot/jquery.flot.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.pie.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.time.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.stack.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.resize.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.pie.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.time.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.stack.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.resize.js"></script>
     <!-- Flot plugins -->
-    <script src="../static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
-    <script src="../static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
-    <script src="../static/vendors/flot.curvedlines/curvedLines.js"></script>
+    <script src="../../static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+    <script src="../../static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+    <script src="../../static/vendors/flot.curvedlines/curvedLines.js"></script>
     <!-- DateJS -->
-    <script src="../static/vendors/DateJS/build/date.js"></script>
+    <script src="../../static/vendors/DateJS/build/date.js"></script>
     <!-- JQVMap -->
-    <script src="../static/vendors/jqvmap/dist/jquery.vmap.js"></script>
-    <script src="../static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
-    <script src="../static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+    <script src="../../static/vendors/jqvmap/dist/jquery.vmap.js"></script>
+    <script src="../../static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+    <script src="../../static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
     <!-- bootstrap-daterangepicker -->
-    <script src="../static/vendors/moment/min/moment.min.js"></script>
-    <script src="../static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="../../static/vendors/moment/min/moment.min.js"></script>
+    <script src="../../static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
 
     <!-- Custom Theme Scripts -->
-    <script src="../static/build/js/custom.min.js"></script>
-
+    <script src="../../static/build/js/custom.min.js"></script>
   </body>
 </html>

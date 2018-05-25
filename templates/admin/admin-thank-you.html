@@ -6,28 +6,18 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="icon" href="images/favicon.ico" type="image/ico" />
 
-    <title>Intergration</title>
+    <title>Payment Succesful</title>
 
     <!-- Bootstrap -->
-    <link href="../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
-    <link href="../static/vendors/nprogress/nprogress.css" rel="stylesheet">
-    <!-- iCheck -->
-    <link href="../static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
-
-    <!-- bootstrap-progressbar -->
-    <link href="../static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
-    <!-- JQVMap -->
-    <link href="../static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
-    <!-- bootstrap-daterangepicker -->
-    <link href="../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <link href="../../static/vendors/nprogress/nprogress.css" rel="stylesheet">
 
     <!-- Custom Theme Style -->
-    <link href="../static/build/css/custom.min.css" rel="stylesheet">
+    <link href="../../static/build/css/custom.min.css" rel="stylesheet">
   </head>
 
   <body class="nav-md">
@@ -36,7 +26,7 @@
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="/admin/homepage" class="site_title"> <img src="../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
+              <a href="/admin/homepage" class="site_title"> <img src="../../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
               <br />
             </div>
 
@@ -45,7 +35,7 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic">
-                <img src="../static/images/img.jpg" alt="..." class="img-circle profile_img">
+                <img src="../../static/images/img.jpg" alt="..." class="img-circle profile_img">
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
@@ -147,7 +137,7 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../static/images/img.jpg" alt="">User
+                    <img src="../../static/images/img.jpg" alt="">User
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -172,93 +162,74 @@
           <div class="">
             <div class="page-title">
               <div class="title_left">
-                <h3>Intergration with your website</h3>
+                <h3>Payment Succesful</h3>
               </div>
             </div>
 
             <div class="clearfix"></div>
 
             <div class="row">
-
-              <!-- Copy this and paste it for more drop down options -->
               <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel">
-                  <div class="x_title">
-                    <h2>Deploying your assistant</h2>
-                    <ul class="nav navbar-right panel_toolbox">
-                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                      </li>
-                    </ul>
-                    <br />
-                    <br />
-
-                    <p> In the side menu on the left of your screen, you should first open the 'Connection' page. </p>
-                    <p> This page will have some pre-made HTMl, CSS and Javascript code made for you. You must paste the lines of your code into your
-                      HTML page. If you wish to deploy your assistant on a certian page, the paste the code on the relevant page.</p>
-                      <p> Where is says 'nameofyourcompany' after our domain, you must enter your company name. Else you can visit your profile page and click on 'Assistant'
-                        which will load your assistant on full screen.</p>
-                      <p> You can the copy that URL and replace it with the line starting with 'www.thesearchbase.com/nameofyourcompany'
-                    <br />
-                    <div class="clearfix"></div>
+                <div class="x_panel" style="height:600px;">
+                  <div class="col-md-12">
+                    <div class="jumbotron text-xs-center">
+                      <h1 class="display-3">Thank You!</h1>
+                        <p class="lead"><strong>Please check your email</strong> for your receipt and other important information.</p>
+                        <hr>
+                        <p>
+                          Having trouble? <a href="">Contact us</a>
+                        </p>
+                        <p class="lead">
+                          <a class="btn btn-primary btn-sm" href="/admin/homepage" role="button">Continue to homepage</a>
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
         <!-- /page content -->
+
+        <!-- Stripe checkout start -->
+
+        <form action="{{ url_for('charge')}}" method="POST">
+        <script
+          src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+          data-key="{{ pub-key }}"
+          data-amount="1000"
+          data-name="TheSearchbase"
+          data-description="Widget"
+          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+          data-locale="auto"
+          data-currency="gbp">
+        </script>
+      </form>
+
+      <!-- Stripe checkout end -->
 
 
         <!-- footer content -->
         <footer>
           <div class="pull-right">
-            TheSearchbase 2018 All Rights Reserved.</a>
+            Gentelella - Bootstrap Admin Template by <a href="https://colorlib.com">Colorlib</a>
           </div>
           <div class="clearfix"></div>
         </footer>
         <!-- /footer content -->
       </div>
+    </div>
 
     <!-- jQuery -->
-    <script src="../static/vendors/jquery/dist/jquery.min.js"></script>
+    <script src="../../static/vendors/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap -->
-    <script src="../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- FastClick -->
-    <script src="../static/vendors/fastclick/lib/fastclick.js"></script>
+    <script src="../../static/vendors/fastclick/lib/fastclick.js"></script>
     <!-- NProgress -->
-    <script src="../static/vendors/nprogress/nprogress.js"></script>
-    <!-- Chart.js -->
-    <script src="../static/vendors/Chart.js/dist/Chart.min.js"></script>
-    <!-- gauge.js -->
-    <script src="../static/vendors/gauge.js/dist/gauge.min.js"></script>
-    <!-- bootstrap-progressbar -->
-    <script src="../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-    <!-- iCheck -->
-    <script src="../static/vendors/iCheck/icheck.min.js"></script>
-    <!-- Skycons -->
-    <script src="../static/vendors/skycons/skycons.js"></script>
-    <!-- Flot -->
-    <script src="../static/vendors/Flot/jquery.flot.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.pie.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.time.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.stack.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.resize.js"></script>
-    <!-- Flot plugins -->
-    <script src="../static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
-    <script src="../static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
-    <script src="../static/vendors/flot.curvedlines/curvedLines.js"></script>
-    <!-- DateJS -->
-    <script src="../static/vendors/DateJS/build/date.js"></script>
-    <!-- JQVMap -->
-    <script src="../static/vendors/jqvmap/dist/jquery.vmap.js"></script>
-    <script src="../static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
-    <script src="../static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
-    <!-- bootstrap-daterangepicker -->
-    <script src="../static/vendors/moment/min/moment.min.js"></script>
-    <script src="../static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="../../static/vendors/nprogress/nprogress.js"></script>
 
     <!-- Custom Theme Scripts -->
-    <script src="../static/build/js/custom.min.js"></script>
-
+    <script src="../../static/build/js/custom.min.js"></script>
   </body>
 </html>

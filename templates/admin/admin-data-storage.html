@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -7,17 +7,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Payment Succesful</title>
+    <title>Admin Table </title>
 
     <!-- Bootstrap -->
-    <link href="../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
-    <link href="../static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <link href="../../static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+   <link href="../../static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
 
     <!-- Custom Theme Style -->
-    <link href="../static/build/css/custom.min.css" rel="stylesheet">
+    <link href="../../static/build/css/custom.min.css" rel="stylesheet">
   </head>
 
   <body class="nav-md">
@@ -26,7 +28,7 @@
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="/admin/homepage" class="site_title"> <img src="../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
+              <a href="/admin/homepage" class="site_title"> <img src="../../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
               <br />
             </div>
 
@@ -35,7 +37,7 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic">
-                <img src="../static/images/img.jpg" alt="..." class="img-circle profile_img">
+                <img src="../../static/images/img.jpg" alt="..." class="img-circle profile_img">
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
@@ -137,7 +139,7 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../static/images/img.jpg" alt="">User
+                    <img src="../../static/images/img.jpg" alt="">User
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -159,55 +161,54 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-          <div class="">
-            <div class="page-title">
-              <div class="title_left">
-                <h3>Payment Succesful</h3>
-              </div>
-            </div>
 
-            <div class="clearfix"></div>
+                  <div class="x_content">
 
-            <div class="row">
-              <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel" style="height:600px;">
-                  <div class="col-md-12">
-                    <div class="jumbotron text-xs-center">
-                      <h1 class="display-3">Thank You!</h1>
-                        <p class="lead"><strong>Please check your email</strong> for your receipt and other important information.</p>
-                        <hr>
-                        <p>
-                          Having trouble? <a href="">Contact us</a>
-                        </p>
-                        <p class="lead">
-                          <a class="btn btn-primary btn-sm" href="/admin/homepage" role="button">Continue to homepage</a>
-                        </p>
-                      </div>
+                    <p>All of the Data Collected</p>
+
+                    <div class="table-responsive">
+                      <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                            <!-- Beginning of data -->
+                            <tr id="tableHeadingUIn" class="headings">
+                                <!--<th class="column-title">Storage ID</th>
+                                <th class="column-title">Date Stored </th>
+                                <th class="column-title">Name </th>
+                                <th class="column-title">Email </th>
+                                <th class="column-title">Telephone </th>
+                                <th class="column-title">CV </th>
+                                <th class="column-title no-link last">
+                                    <span class="nobr">Action</span>
+                                </th>
+                                <th class="bulk-actions" colspan="7">
+                                    <a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
+                                </th>-->
+                            </tr>
+                            <!-- End of data -->
+                        </thead>
+
+                        <tbody id="tBodyUIn">
+                            <!-- Start -->
+                          <!--<tr class="even pointer">
+                            <td class=" ">00001</td>
+                            <td class=" ">May 23, 2018 11:47:56 PM </td>
+                            <td class=" ">Mehdi Este</td>
+                            <td class=" ">contact@thesearchbase.com</td>
+                            <td class=" ">072364262</td>
+                            <td class=" "><a href="#">File Here</a></td>
+                            <td class=" last"><a href="#">View</a></td>
+                          </tr>-->
+                            <!-- End -->
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
         <!-- /page content -->
-
-        <!-- Stripe checkout start -->
-
-        <form action="{{ url_for('charge')}}" method="POST">
-        <script
-          src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-          data-key="{{ pub-key }}"
-          data-amount="1000"
-          data-name="TheSearchbase"
-          data-description="Widget"
-          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-          data-locale="auto"
-          data-currency="gbp">
-        </script>
-      </form>
-
-      <!-- Stripe checkout end -->
-
 
         <!-- footer content -->
         <footer>
@@ -221,15 +222,61 @@
     </div>
 
     <!-- jQuery -->
-    <script src="../static/vendors/jquery/dist/jquery.min.js"></script>
+    <script src="../../static/vendors/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap -->
-    <script src="../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- FastClick -->
-    <script src="../static/vendors/fastclick/lib/fastclick.js"></script>
+    <script src="../../static/vendors/fastclick/lib/fastclick.js"></script>
     <!-- NProgress -->
-    <script src="../static/vendors/nprogress/nprogress.js"></script>
+    <script src="../../static/vendors/nprogress/nprogress.js"></script>
+    <!-- iCheck -->
+    <script src="../../static/vendors/iCheck/icheck.min.js"></script>
 
     <!-- Custom Theme Scripts -->
-    <script src="../static/build/js/custom.min.js"></script>
+    <script src="../../static/build/js/custom.min.js"></script>
+
+      <script>
+          var tableHeading = $("#tableHeadingUIn");
+          tableHeading.append("<th class=\"column-title\">Record ID</th>");
+          tableHeading.append("<th class=\"column-title\">Date</th>");
+          var numberOfHeaders = 0;
+          var curNOH = 0;
+          var emptyPlaces = 0;
+          {%for item in data %}
+            {%for record in item %}
+            if ("{{record}}" != "") {
+                curNOH++;
+                curNOH += emptyPlaces;
+                emptyPlaces = 0;
+            } else {
+                emptyPlaces++;
+            }
+            {% endfor %}
+            if (curNOH > numberOfHeaders) { numberOfHeaders = curNOH; }
+            curNOH = 0;
+            emptyPlaces = 0;
+          {% endfor %}
+          for (var i = 1; i <= numberOfHeaders - 2; i++) {
+              tableHeading.append("<th class=\"column-title\">Data " + i + "</th>");
+          }
+          var tableBody = $("#tBodyUIn");
+          var i = 0;
+          var ii = 0;
+          var appendString = "";
+          {%for item in data %}
+          i++;
+          ii = 0;
+            appendString += "<tr id=\"" + i + "\" class=\"even pointer\">";
+          {%for record in item %}
+          ii++;
+          if (ii <= numberOfHeaders) {
+              appendString += "<td id=\"" + i + "_" + ii + "\" class=\" \" >{{record}}</td >";
+          }
+          {%endfor%}
+          appendString += "</tr>";
+          tableBody.append(appendString);
+          appendString = "";
+          {%endfor%}
+      </script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -6,28 +6,29 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
 	<link rel="icon" href="images/favicon.ico" type="image/ico" />
 
-    <title>Support </title>
+    <title>Admin Homepage </title>
 
     <!-- Bootstrap -->
-    <link href="../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
-    <link href="../static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <link href="../../static/vendors/nprogress/nprogress.css" rel="stylesheet">
     <!-- iCheck -->
-    <link href="../static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+    <link href="../../static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
 
     <!-- bootstrap-progressbar -->
-    <link href="../static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <link href="../../static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
     <!-- JQVMap -->
-    <link href="../static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+    <link href="../../static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
     <!-- bootstrap-daterangepicker -->
-    <link href="../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
 
     <!-- Custom Theme Style -->
-    <link href="../static/build/css/custom.min.css" rel="stylesheet">
+    <link href="../../static/build/css/custom.min.css" rel="stylesheet">
   </head>
 
   <body class="nav-md">
@@ -36,7 +37,7 @@
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="/admin/homepage" class="site_title"> <img src="../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
+              <a href="/admin/homepage" class="site_title"> <img src="../../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
               <br />
             </div>
 
@@ -45,11 +46,11 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic">
-                <img src="../static/images/img.jpg" alt="..." class="img-circle profile_img">
+                <img src="../../static/images/img.jpg" alt="..." class="img-circle profile_img">
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
-                <h2>user</h2>
+                <h2 id="welcomeh2"></h2>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -132,6 +133,9 @@
               </div>
             </div>
             <!-- /sidebar menu -->
+
+
+
           </div>
         </div>
 
@@ -146,7 +150,7 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../static/images/img.jpg" alt="">User
+                    <img src="../../static/images/img.jpg" alt="">User
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -168,46 +172,40 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-          <div class="">
-            <div class="page-title">
-              <div class="title_left">
-                <h3>FAQ</h3>
-              </div>
-
-              <div class="title_right">
-                <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
-                </div>
-              </div>
+          <!-- top tiles -->
+          <div class="row tile_count">
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-user"></i> Total clicks on your assistant</span>
+              <div class="count">0</div>
             </div>
-            <div class="clearfix"></div>
-            <div class="row">
-              <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel">
-                  <div class="x_title">
-                    <h4>A few questions you may have</h4>
-                  </div>
-                  <div class="x_content">
-                    <p style="font-size:14px;">How does my hosting work?</p>
-                    <p>We host all of your data on our servers. All of the the information that is sensetive will be encrypted to ensure it cannot be accessed</p>
-                    <p style="font-size:14px;">Can others access my assistant?</p>
-                    <p>No, we encrypt all of your data so others cannot access your assistant</p>
-                    <p style="font-size:14px;">Can I export my analytics?</p>
-                    <p>Yes, you can do this by clicking the 'Export' button on the top left of your analytics page </p>
-                    <p style="font-size:14px;">Can I change the design of my assistant?</p>
-                    <p>Yes, you will have to let us know as we currently are working on technologies to enable this process for users to make changes directly.</p>
-                    <p style="font-size:14px;">I want certian features for my assistant?</p>
-                    <p>We are looking for valuable feedback. You can contact our team and set the subject line to 'R&D' and we will ook at making the feature availble to you as soon as possible.</p>
-                  </div>
-                </div>
-              </div>
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-clock-o"></i> Total Answers loaded</span>
+              <div class="count">0</div>
             </div>
           </div>
+
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel" style="height:600px;">
+                <div class="col-md-12">
+                  <div class="jumbotron text-xs-center">
+                    <h1 class="display-3">Welcome!</h1>
+                      <p class="lead"><strong>Use your side navigation</strong> to navigate the website.</p>
+                      <hr>
+                      <p>
+                        Need help getting setup? <a href="">Contact our team, we'll setup a personal session with you.</a>
+                      </p>
+                      <p class="lead">
+                        <a class="btn btn-primary btn-sm" href="/admin/Questions" role="button">Build my questions</a>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <!-- /top tiles -->
+          <br />
         </div>
-
-
-
-
-
 
         <!-- footer content -->
         <footer>
@@ -218,47 +216,60 @@
         </footer>
         <!-- /footer content -->
       </div>
+    </div>
 
     <!-- jQuery -->
-    <script src="../static/vendors/jquery/dist/jquery.min.js"></script>
+    <script src="../../static/vendors/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap -->
-    <script src="../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- FastClick -->
-    <script src="../static/vendors/fastclick/lib/fastclick.js"></script>
+    <script src="../../static/vendors/fastclick/lib/fastclick.js"></script>
     <!-- NProgress -->
-    <script src="../static/vendors/nprogress/nprogress.js"></script>
+    <script src="../../static/vendors/nprogress/nprogress.js"></script>
     <!-- Chart.js -->
-    <script src="../static/vendors/Chart.js/dist/Chart.min.js"></script>
+    <script src="../../static/vendors/Chart.js/dist/Chart.min.js"></script>
     <!-- gauge.js -->
-    <script src="../static/vendors/gauge.js/dist/gauge.min.js"></script>
+    <script src="../../static/vendors/gauge.js/dist/gauge.min.js"></script>
     <!-- bootstrap-progressbar -->
-    <script src="../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <script src="../../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
     <!-- iCheck -->
-    <script src="../static/vendors/iCheck/icheck.min.js"></script>
+    <script src="../../static/vendors/iCheck/icheck.min.js"></script>
     <!-- Skycons -->
-    <script src="../static/vendors/skycons/skycons.js"></script>
+    <script src="../../static/vendors/skycons/skycons.js"></script>
     <!-- Flot -->
-    <script src="../static/vendors/Flot/jquery.flot.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.pie.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.time.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.stack.js"></script>
-    <script src="../static/vendors/Flot/jquery.flot.resize.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.pie.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.time.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.stack.js"></script>
+    <script src="../../static/vendors/Flot/jquery.flot.resize.js"></script>
     <!-- Flot plugins -->
-    <script src="../static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
-    <script src="../static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
-    <script src="../static/vendors/flot.curvedlines/curvedLines.js"></script>
+    <script src="../../static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+    <script src="../../static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+    <script src="../../static/vendors/flot.curvedlines/curvedLines.js"></script>
     <!-- DateJS -->
-    <script src="../static/vendors/DateJS/build/date.js"></script>
+    <script src="../../static/vendors/DateJS/build/date.js"></script>
     <!-- JQVMap -->
-    <script src="../static/vendors/jqvmap/dist/jquery.vmap.js"></script>
-    <script src="../static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
-    <script src="../static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+    <script src="../../static/vendors/jqvmap/dist/jquery.vmap.js"></script>
+    <script src="../../static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+    <script src="../../static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
     <!-- bootstrap-daterangepicker -->
-    <script src="../static/vendors/moment/min/moment.min.js"></script>
-    <script src="../static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="../../static/vendors/moment/min/moment.min.js"></script>
+    <script src="../../static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
 
     <!-- Custom Theme Scripts -->
-    <script src="../static/build/js/custom.min.js"></script>
+    <script src="../../static/build/js/custom.min.js"></script>
+
+
+	<script src="../../static/js/cookies.js"></script>
+    <script>
+    if("{{msg}}" != ""){
+        makeCookie("UserEmail", "{{msg}}", 1);
+    }
+    if("{{user}}" != ""){
+        makeCookie("User Official", "{{user}}", 1);
+    }
+    document.getElementById("welcomeh2").innerHTML = getCookie("User Official");
+    </script>
 
   </body>
 </html>

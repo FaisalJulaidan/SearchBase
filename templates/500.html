@@ -90,6 +90,9 @@
                         <h2>500</h2>
                         <h3></h3>
                         <p>Internal server error. Please contact thesearchbase@gmail.com and let them know what happened.</p>
+                        {% if debug == True %}
+                            <p>{{ error }}</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>

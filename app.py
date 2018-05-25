@@ -4,7 +4,7 @@ import sqlite3
 import stripe
 from flask_mail import Mail, Message
 from werkzeug import secure_filename
-from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort
+from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape
 from flask_api import status
 from datetime import datetime
 import string
@@ -167,10 +167,61 @@ def hash_password(password, salt=gensalt()):
     return hashed
 
 
+# TODO jackassify it
+@app.route("/demo/<route>", methods=['GET'])
+def dynamic_popup(route):
+    if request.method == "GET":
+        url = "http://www.example.com/"
+        company = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE Name=?", [escape(route)])
+        if (company is not None and "Debug" in company[4]):
+            url = company[3]
+            if "http" not in url:
+                url = "http://" + url
+        return render_template("dynamic-popup.html", msg=route, url=url)
+
+
+# drop down routes.
+
 @app.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
         return render_template("index.html")
+
+
+@app.route("/features", methods=['GET'])
+def features():
+    if request.method == "GET":
+        return render_template("features.html")
+
+
+@app.route("/data/retrieval", methods=['GET'])
+def data_retrieval():
+    if request.method == "GET":
+        return render_template("retrieval.html")
+
+
+@app.route("/data/collection", methods=['GET'])
+def data_collection():
+    if request.method == "GET":
+        return render_template("collection.html")
+
+
+@app.route("/pricing", methods=['GET'])
+def pricing():
+    if request.method == "GET":
+        return render_template("Pricing.html")
+
+
+@app.route("/about", methods=['GET'])
+def about():
+    if request.method == "GET":
+        return render_template("about.html")
+
+
+@app.route("/contact", methods=['GET'])
+def contactpage():
+    if request.method == "GET":
+        return render_template("contact.html")
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -354,7 +405,7 @@ def admin_products():
         assistantIndex = 0  # TODO change this
         products = select_from_database_table(DATABASE, "SELECT * FROM Products WHERE AssistantID=?",
                                               [assistants[assistantIndex][2]], True)
-        #TODO check products for errors
+        # TODO check products for errors
         return render_template("admin-form-add-product.html", data=products)
     elif request.method == 'POST':
         # TODO implement this
@@ -370,22 +421,22 @@ def admin_templates():
 
 
 @app.route("/admin/connect")
-def connectionCode():
+def admin_connect():
     return render_template("admin-connect.html")
 
 
 @app.route("/admin/pricing")
-def adminPricing():
+def admin_pricing():
     return render_template("admin-pricing-tables.html", pub_key=pub_key)
 
 
 @app.route('/admin/thanks')
-def thanks():
+def admin_thanks():
     return render_template('admin-thank-you.html')
 
 
 @app.route("/admin/pay", methods=['GET', 'POST'])
-def chargeUser():
+def admin_pay():
     if request.method == 'GET':
         return render_template("admin-pay.html")
 
@@ -403,7 +454,7 @@ def admin_analytics():
         # TODO check assistants for errors
         assistantIndex = 0  # TODO change this
         stats = select_from_database_table(DATABASE, "SELECT * FROM Statistics WHERE AssistantID=?",
-                                              [assistants[assistantIndex][2]], True)
+                                           [assistants[assistantIndex][2]], True)
         return render_template("admin-analytics.html", data=stats)
 
 
@@ -437,11 +488,46 @@ def admin_support_billing():
         return render_template("admin-billing-support.html")
 
 
-# Redirects
+@app.route("/emoji-converter", methods=['GET'])
+def admin_emoji():
+    if request.method == "GET":
+        return render_template("admin-emoji.html")
+    
+
+# Sitemap route
+@app.route('/robots.txt')
+@app.route('/sitemap.xml')
+def static_from_root():
+    return send_from_directory(app.static_folder, request.path[1:])
+
+
+# Terms and conditions page route
+@app.route("/termsandconditions", methods=['GET'])
+def terms_and_conditions():
+    if request.method == "GET":
+        return render_template("terms.html")
+
+
+@app.route("/privacy", methods=['GET'])
+def privacy():
+    if request.method == "GET":
+        return render_template("privacy-policy.html")
+
+
+# Affiliate page route
+@app.route("/affiliate", methods=['GET'])
+def affiliate():
+    if request.method == "GET":
+        abort(404)
+        # return render_template("affiliate.html")
+
+
+### Redirects ###
 @app.route("/Admin/<route>", methods=["GET"])
 def redirect_admin(route):
     if request.method == "GET":
-        redirect("/admin/" + route)
+        return redirect("/admin/" + route)
+
 
 @app.route("/admin/Questions", methods=['GET'])
 def redirect_admin_questions():
@@ -464,46 +550,93 @@ def redirect_admin_products():
 @app.route("/admin/Templates", methods=['GET'])
 def redirect_admin_templates():
     if request.method == "GET":
-        redirect("/admin/templates")
+        return redirect("/admin/templates")
 
 
-@app.route("/admin/Setup/<route>", methods=["GET"])
-def redirect_admin(route):
+@app.route("/admin/Support/<route>", methods=["GET"])
+def redirect_admin_support(route):
     if request.method == "GET":
-        redirect("/admin/setup/" + route)
+        return redirect("/admin/support/" + route)
 
 
 @app.route("/admin/supportGeneral", methods=['GET'])
 def redirect_admin_general_support():
     if request.method == "GET":
-        redirect("/admin/support/general")
+        return redirect("/admin/support/general")
 
 
 @app.route("/admin/supportDocs", methods=['GET'])
 def redirect_admin_support_docs():
     if request.method == "GET":
-        redirect("/admin/support/docs")
+        return redirect("/admin/support/docs")
 
 
 @app.route("/admin/supportSetup", methods=['GET'])
 def redirect_admin_support_setup():
     if request.method == "GET":
-        redirect("/admin/support/setup")
+        return redirect("/admin/support/setup")
 
 
 @app.route("/admin/supportIntergartion", methods=['GET'])
 def redirect_admin_support_intergration():
     if request.method == "GET":
-        redirect("/admin/support/intergration")
+        return redirect("/admin/support/intergration")
 
 
 @app.route("/admin/supportBilling", methods=['GET'])
 def redirect_admin_support_billing():
     if request.method == "GET":
-        redirect("/admin/support/billing")
+        return redirect("/admin/support/billing")
 
 
-# OLD CODE
+@app.route("/Data/<route>", methods=['GET'])
+def redirect_data_route(route):
+    if request.method == "GET":
+        return redirect("/data/" + route)
+
+
+@app.route("/dataRetrival", methods=['GET'])
+def redirect_data_retrieval():
+    if request.method == "GET":
+        return redirect("/data/retrieval")
+
+
+@app.route("/dataCollection", methods=['GET'])
+def redirect_data_collection():
+    if request.method == "GET":
+        return redirect("/data/collection")
+
+
+## Error Handlers ##
+@app.errorhandler(status.HTTP_404_NOT_FOUND)
+def page_not_found(e):
+    return render_template('404.html', error=e), status.HTTP_404_NOT_FOUND
+
+
+@app.errorhandler(418)
+def im_a_teapot(e):
+    return render_template('418.html', error=e), 418
+
+
+@app.route("/teapot", methods=["GET"])
+def teapot():
+    abort(418)
+
+@app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
+def internal_server_error(e):
+    return render_template('500.html', error=e, debug=app.debug), status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+@app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
+def not_implemented(e):
+    return render_template('501.html', error=e, debug=app.debug), status.HTTP_501_NOT_IMPLEMENTED
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
+########################## OLD CODE ##########################
 def adminAddQuestion():
     if request.method == "POST":
         questions = []
@@ -840,139 +973,6 @@ class Del:
         return self.comp.get(k)
 
 
-@app.route("/dynamic/<route>", methods=['GET', 'POST'])
-def getTemplate(route):
-    if request.method == "GET":
-        conn = sqlite3.connect(USERDATABASE)
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM Users;")
-        cns = cur.fetchall()
-        for record in cns:
-            if route == record[4]:
-                conn = sqlite3.connect(QUESTIONDATABASE)
-                cur = conn.cursor()
-                cur.execute("SELECT * FROM \"" + record[7] + "\"")
-                data = cur.fetchall()
-                conn.close()
-                date = datetime.now().strftime("%Y-%m")
-                conn = sqlite3.connect(STATISTICSDATABASE)
-                cur = conn.cursor()
-                cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-                stats = cur.fetchall()
-                if not stats:
-                    print(stats)
-                    cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
-									VALUES (?,?,?,?)", (date, "1", "0", "0"))
-                else:
-                    cur.execute("UPDATE \"" + route + "\" SET AssistantOpened = \"" + str(
-                        int(stats[0][1]) + 1) + "\" WHERE Date = \"" + date + "\"")
-                conn.commit()
-                conn.close()
-                return render_template("dynamic-template.html", data=data, user="dynamic/" + route)
-        return redirect("/pagenotfound", code=302)
-    if request.method == "POST":
-        conn = sqlite3.connect(USERDATABASE)
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM Users;")
-        cns = cur.fetchall()
-        for record in cns:
-            if route == record[4]:
-                conn = sqlite3.connect(PRODUCTDATABASE)
-                cur = conn.cursor()
-                cur.execute("SELECT * FROM \"" + record[7] + "\"")
-                data = cur.fetchall()
-                conn.close()
-                keywords = []
-                budget = []
-                for i in range(1, int(request.form["numberOfKeywords"]) + 1):
-                    if "-" in request.form["keyword" + str(i)]:
-                        budget = request.form["keyword" + str(i)].split("-")
-                    else:
-                        keywords.append(request.form["keyword" + str(i)])
-                keywordsmatch = []
-                i = -1
-                for item in data:
-                    keywordsmatch.append(0)
-                    i += 1
-                    datakwords = item[5].split(",")
-                    for word in keywords:
-                        for dw in datakwords:
-                            if (word == dw):
-                                keywordsmatch[i] += 1
-                exitAtLength = 0
-                while (True):
-                    for p in range(0, len(keywordsmatch) - 1):
-                        if (keywordsmatch[p] < keywordsmatch[p + 1]):
-                            keywordsmatch.insert(p, keywordsmatch.pop(p + 1))
-                            data.insert(p, data.pop(p + 1))
-                            exitAtLength = 0
-                            break
-                    exitAtLength += 1
-                    if (exitAtLength == 5):
-                        break
-                substract = 0
-                for p in range(0, len(keywordsmatch)):
-                    if (keywordsmatch[p] == 0):
-                        data.pop(p - substract)
-                        substract += 1
-                DD = Del()
-                dl = len(data) - 1
-                i = 0
-                while (i <= dl):
-                    print(dl, " ", i, " ", len(data))
-                    item = data[i]
-                    itemprice = item[4].translate(DD)
-                    print(budget)
-                    print(itemprice)
-                    print((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1])))
-                    if ((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1]))):
-                        print(item)
-                        print(data.index(item))
-                        print(data.pop(data.index(item)))
-                        print(data)
-                        i -= 1
-                        dl -= 1
-                    i += 1
-                while (len(data) > 9):
-                    data.pop()
-                if not data:
-                    return "We could not find anything that matched your seach criteria. Please try different filter options."
-                datastring = ""
-                for i in data:
-                    for c in i:
-                        datastring += str(c) + "|||"
-                    datastring = datastring[:-3]
-                    datastring += "&&&"
-                conn.close()
-                date = datetime.now().strftime("%Y-%m")
-                conn = sqlite3.connect(STATISTICSDATABASE)
-                cur = conn.cursor()
-                cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-                stats = cur.fetchall()
-                print(stats)
-                questionsAnswered = request.form["questionsAnswered"]
-                if not stats:
-                    cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
-									VALUES (?,?,?,?)", (date, "0", questionsAnswered, len(data)))
-                else:
-                    print(len(data))
-                    cur.execute("UPDATE \"" + route + "\" SET ProductsReturned = \"" + str(
-                        int(stats[0][3]) + len(data)) + "\" WHERE Date = \"" + date + "\"")
-                    cur.execute("UPDATE \"" + route + "\" SET QuestionsAnswered = \"" + str(
-                        int(stats[0][2]) + int(questionsAnswered)) + "\" WHERE Date = \"" + date + "\"")
-                conn.commit()
-                cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-                stats = cur.fetchall()
-                print(stats)
-                conn.close()
-                return jsonify(datastring)
-
-
-# @app.route("/demo", methods=['GET'])
-# def demopage():
-#     if request.method == "GET":
-#         return render_template("demo.html")
-
 @app.route("/chatbot/<route>", methods=['GET', 'POST'])
 def dynamicChatbot(route):
     if request.method == "GET":
@@ -1134,75 +1134,6 @@ def dynamicChatbot(route):
                 return jsonify(datastring)
 
 
-@app.route("/emoji-converter", methods=['GET'])
-def emojiConterter():
-    if request.method == "GET":
-        return render_template("admin-emoji.html")
-
-
-@app.route("/popup2", methods=['GET'])
-def popup():
-    if request.method == "GET":
-        return render_template("pop-test.html")
-
-
-@app.route("/popup", methods=['GET'])
-def popup2():
-    if request.method == "GET":
-        return render_template("pop-test2.html")
-
-
-#
-@app.route("/dynamic-popup/<route>", methods=['GET'])
-def dynamicPopup(route):
-    if request.method == "GET":
-        return render_template("dynamic-popup.html", msg=route)
-
-
-@app.route("/popup3", methods=['GET'])
-def popup3():
-    if request.method == "GET":
-        return render_template("pop-test3.html")
-
-
-@app.route("/about", methods=['GET'])
-def aboutpage():
-    if request.method == "GET":
-        return render_template("about.html")
-
-
-@app.route("/features", methods=['GET'])
-def featurespage():
-    if request.method == "GET":
-        return render_template("features.html")
-
-
-# drop down routes.
-
-@app.route("/dataRetrival", methods=['GET'])
-def dataRetrivalPage():
-    if request.method == "GET":
-        return render_template("retrieval.html")
-
-
-@app.route("/dataCollection", methods=['GET'])
-def dataCollectionPage():
-    if request.method == "GET":
-        return render_template("collection.html")
-
-
-@app.route("/pricing", methods=['GET'])
-def pricingpage():
-    if request.method == "GET":
-        return render_template("Pricing.html")
-
-
-@app.route("/contact", methods=['GET'])
-def contactpage():
-    if request.method == "GET":
-        return render_template("contact.html")
-
-
 def allowed_file(filename):
     ext = filename.rsplit('.', 1)[1]
     return '.' in filename and ext in ALLOWED_EXTENSIONS
@@ -1311,61 +1242,3 @@ def getcomputers():
             datastring += ","
         print(datastring)
         return jsonify(datastring)
-
-
-# Sitemap route
-
-@app.route('/robots.txt')
-@app.route('/sitemap.xml')
-def static_from_root():
-    return send_from_directory(app.static_folder, request.path[1:])
-
-
-# Terms and conditions page route
-@app.route("/termsandconditions", methods=['GET'])
-def termsPage():
-    if request.method == "GET":
-        return render_template("terms.html")
-
-
-# Terms and conditions page route
-@app.route("/privacy", methods=['GET'])
-def PrivacyPage():
-    if request.method == "GET":
-        return render_template("privacy-policy.html")
-
-
-# Affiliate page route
-@app.route("/affiliate", methods=['GET'])
-def AffiliatePage():
-    if request.method == "GET":
-        return render_template("affiliate.html")
-
-
-@app.route("/cykablyat", methods=["GET"])
-def teapot():
-    abort(418)
-
-
-@app.errorhandler(status.HTTP_404_NOT_FOUND)
-def page_not_found(e):
-    return render_template('404.html', error=e), status.HTTP_404_NOT_FOUND
-
-
-@app.errorhandler(418)
-def im_a_teapot(e):
-    return render_template('418.html', error=e), 418
-
-
-@app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
-def internal_server_error(e):
-    return render_template('500.html', error=e), status.HTTP_500_INTERNAL_SERVER_ERROR
-
-
-@app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
-def not_implemented(e):
-    return render_template('501.html', error=e), status.HTTP_501_NOT_IMPLEMENTED
-
-
-if __name__ == "__main__":
-    app.run(debug=True)

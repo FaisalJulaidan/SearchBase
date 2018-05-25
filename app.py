@@ -4,7 +4,7 @@ import sqlite3
 import stripe
 from flask_mail import Mail, Message
 from werkzeug import secure_filename
-from flask import Flask, redirect, request, render_template, jsonify, send_from_directory
+from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort
 from flask_api import status
 from datetime import datetime
 import string
@@ -219,7 +219,7 @@ def signup():
             if "UNIQUE constraint" in insertCompanyResponse:
                 return render_template("signup.html", msg=companyName + " already has an account.", debug=app.debug)
             else:
-                return internal_server_error(insertCompanyResponse)
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             companyID = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE Name=?", [companyName])[0]
             fullname = request.form.get("fullname", default="Error")
@@ -243,7 +243,7 @@ def signup():
                         delete_from_table(DATABASE, "DELETE FROM Company WHERE Name=?", [companyName])
                         return render_template("signup.html", msg=email + " already in use.", debug=app.debug)
                     else:
-                        return internal_server_error(insertUserResponse)
+                        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
                 else:
                     if not app.debug:
                         # sending registration confirmation email to the user.
@@ -275,28 +275,79 @@ def profilePage():
         email = request.cookies.get("UserEmail")
         user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
         #TODO check database output for errors
-        companyName = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[0]])
+        companyName = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[1]])
         return render_template("admin-profile.html", user=user, companyName=companyName[1])
-    else:
+    elif request.method == "POST":
         return render_template("admin-profile.html"), status.HTTP_501_NOT_IMPLEMENTED
 
-##OLD CODE
-@app.route("/admin/Questions", methods=['GET', 'POST'])
-def adminAddQuestion():
+@app.route("/admin/questions", methods=['GET', 'POST'])
+def admin_questions():
     if request.method == "GET":
-        conn = sqlite3.connect(QUESTIONDATABASE)
-        cur = conn.cursor()
-        user_mail = request.cookies.get("UserEmail")
-        cur.execute("SELECT * FROM \"" + user_mail + "\"")
-        mes = cur.fetchall()
-        conn.close()
-        return render_template("admin-form-add-question.html", data=mes)
+        email = request.cookies.get("UserEmail")
+        user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
+        #TODO check user for errors
+        company = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[1]])
+        #TODO check company for errors
+        assistants = select_from_database_table(DATABASE, "SELECT * FROM Assistant WHERE CompanyID=?", [company[0]], True)
+        #TODO check assistants for errors
+        assistantIndex = 0 #TODO change this
+        questions = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?", [assistants[assistantIndex][2]], True)
+        #TODO check questions for errors
+        return render_template("admin-form-add-question.html", data=questions)
+    elif request.method == "POST":
+        questions = []
+        noq = request.form.get("noq-hidden", default="Error")
+        for i in range(1, (noq + 1)):
+            question = request.form.get("question" + str(i), default="Error")
+            if (question != "Error"):
+                questions.append(question)
+            else:
+                #TODO handle this
+                pass
+
+        #TODO implement this
+        abort(status.HTTP_501_NOT_IMPLEMENTED)
+
+@app.route("/admin/answers", methods=['GET', 'POST'])
+def admin_answers():
+    if request.method == "GET":
+        # email = request.cookies.get("UserEmail")
+        # user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
+        # # TODO check user for errors
+        # company = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[1]])
+        # # TODO check company for errors
+        # assistants = select_from_database_table(DATABASE, "SELECT * FROM Assistant WHERE CompanyID=?", [company[0]],
+        #                                         True)
+        # # TODO check assistants for errors
+        # assistantIndex = 0  # TODO change this
+        # questions = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
+        #                                        [assistants[assistantIndex][2]], True)
+        abort(status.HTTP_501_NOT_IMPLEMENTED)
+
+
+#Redirects
+@app.route("/admin/Answers", methods=['GET'])
+def redirect_admin_answers():
+    if request.method == "GET":
+        return redirect("/admin/answers")
+
+
+@app.route("/admin/Questions", methods=['GET'])
+def redirect_admin_questions():
+    if request.method == "GET":
+        return redirect("/admin/questions")
+
+
+#OLD CODE
+def adminAddQuestion():
     if request.method == "POST":
         questions = []
-        for i in range(1, 11):
+        noq = request.form.get("noq-hidden", default="Error")
+        for i in range(1, (noq + 1)):
             if (request.form.get("question" + str(i)) != None):
                 questions.append(request.form.get("question" + str(i)))
 
+        ##OLD CODE
         # conn = sqlite3.connect(USERPREFERENCES)
         # cur = conn.cursor()
         # cur.execute("UPDATE \""+user_mail+"\" SET PricingQuestion = " + request.form.get("pricing-question"))
@@ -336,6 +387,7 @@ def adminAddQuestion():
         return redirect("/admin/Questions", code=302)
 
 
+##OLD CODE
 @app.route("/admin/Answers", methods=['GET', 'POST'])
 def adminAnswers():
     if request.method == "GET":
@@ -1207,24 +1259,25 @@ def AffiliatePage():
     if request.method == "GET":
         return render_template("affiliate.html")
 
+@app.route("/cykablyat", methods=["GET"])
+def teapot():
+    abort(418)
 
-@app.errorhandler(404)
+@app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
-    return render_template('404.html'), 404
-
+    return render_template('404.html', error=e), status.HTTP_404_NOT_FOUND
 
 @app.errorhandler(418)
 def im_a_teapot(e):
-    return render_template('418.html'), 404
+    return render_template('418.html', error=e), 418
 
-@app.route("/cykablyat", methods=["GET"])
-def teapot():
-    return im_a_teapot();
-
-@app.errorhandler(500)
+@app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(e):
-    return render_template('500.html', error=e), 500
+    return render_template('500.html', error=e), status.HTTP_500_INTERNAL_SERVER_ERROR
 
+@app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
+def not_implemented(e):
+    return render_template('501.html', error=e), status.HTTP_501_NOT_IMPLEMENTED
 
 if __name__ == "__main__":
     app.run(debug=True)

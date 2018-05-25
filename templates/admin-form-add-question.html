@@ -272,11 +272,12 @@
                   <div class="x_content">
                     <br />
                     <div class="form-group">
-                      <form id="QuestionForm" action="/admin/Questions" method="post">
+                      <form id="QuestionForm" action="/admin/questions" method="post">
                         <div id="QuestionDiv">
                           <!-- Question Templates appear here -->
                         </div>
                       </div>
+                      <input type="hidden" id="noq-hidden" name="noq-hidden" value="">
                       <button type="submit" id="QTemplate-SubmitB" class="btn btn-success">Submit</button>
                       </form>
                       <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
@@ -401,6 +402,7 @@
             }
           }
           oldNOQ = noq;
+          document.getElementById("noq-hidden").value = String(noq);
         }
       }
 
@@ -436,6 +438,7 @@
             }
           }
           oldNOQ = noq;
+          document.getElementById("noq-hidden").value = String(noq);
         }
       }
     }

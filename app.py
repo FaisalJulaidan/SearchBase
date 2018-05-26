@@ -310,7 +310,7 @@ def signup():
 
 # Admin pages
 @app.route("/admin/homepage", methods=['GET'])
-def adminHomePage():
+def admin_home():
     if request.method == "GET":
         return render_template("admin/admin-main.html")
 
@@ -327,17 +327,76 @@ def profilePage():
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
+def get_assistants(email):
+    user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
+    # TODO check user for errors
+    company = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[1]])
+    # TODO check company for errors
+    assistants = select_from_database_table(DATABASE, "SELECT * FROM Assistant WHERE CompanyID=?", [company[0]],
+                                            True)
+    # TODO check assistants for errors
+    return assistants
+
+
 @app.route("/admin/questions", methods=['GET', 'POST'])
 def admin_questions():
     if request.method == "GET":
         email = request.cookies.get("UserEmail")
         assistants = get_assistants(email)
-        #TODO check assistants for errors
+        # TODO check assistants for errors
         assistantIndex = 0  # TODO change this
-        questions = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
-                                               [assistants[assistantIndex][0]], True)
-        # TODO check questions for errors
-        return render_template("admin/admin-form-add-question.html", data=questions)
+        questionsTuple = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
+                                                    [assistants[assistantIndex][0]], True)
+        # TODO check questionstuple for errors
+        questions = []
+        for i in range(0, len(questionsTuple)):
+            questions.append(questionsTuple[i][2])
+
+        allAnswers = {}
+        for i in range(0, len(questions)):
+            answersTuple = select_from_database_table(DATABASE, "SELECT * FROM Answers WHERE QuestionID=?",
+                                                      [questionsTuple[i][0]], True)
+            # TODO Check answerstuple for errors
+            answers = []
+            for j in range(0, len(answersTuple)):
+                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3])
+
+            allAnswers[
+                questions[i]] = answers  # dictionary, Key: index of question in question array, value: array of answers
+
+        number = 0
+        maxNumber = len(questions)
+        while (number < maxNumber):
+            if (len(questions) > 0):
+                print(number, " ", maxNumber)
+                try:
+                    print(questions[number])
+                except:
+                    break
+                if (questions[number].split(";")[1] == "userInfoRetrieval"):
+                    questions.remove(questions[number])
+                    allAnswers[questions[number]] = None
+                    number -= 1
+                    maxNumber -= 1
+                    if number < 0:
+                        number = 0
+                else:
+                    number += 1
+            else:
+                break
+
+        questionsAndAnswers = []
+        for i in range(0, len(questions)):
+            question = []
+            question.append(questions[i])
+            merge = tuple(question)
+            answers = allAnswers[questions[i]]
+            for j in range(0, len(answers)):
+                answer = []
+                answer.append(answers[j])
+                merge = merge + tuple(answer)
+            questionsAndAnswers.append(merge)
+        return render_template("admin/admin-form-add-question.html", data=questionsAndAnswers)
     elif request.method == "POST":
         email = request.cookies.get("UserEmail")
         assistants = get_assistants(email)
@@ -355,18 +414,9 @@ def admin_questions():
             else:
                 return render_template("admin/admin-form-add-question.html", data=currentQuestions), status.HTTP_400_BAD_REQUEST
 
+
         # TODO implement this, need to work out how to store the retrieved answers
         abort(status.HTTP_501_NOT_IMPLEMENTED)
-
-def get_assistants(email):
-    user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
-    # TODO check user for errors
-    company = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[1]])
-    # TODO check company for errors
-    assistants = select_from_database_table(DATABASE, "SELECT * FROM Assistant WHERE CompanyID=?", [company[0]],
-                                            True)
-    # TODO check assistants for errors
-    return assistants
 
 
 @app.route("/admin/answers", methods=['GET', 'POST'])
@@ -389,33 +439,45 @@ def admin_answers():
                                                  [questionsTuple[i][0]], True)
             # TODO Check answerstuple for errors
             answers = []
-            for i in range(0, len(answersTuple)):
-                answers.append(answersTuple[i][2] + ";" + answersTuple[i][3])
+            for j in range(0, len(answersTuple)):
+                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3])
 
-            allAnswers[i] = answers #dictionary, Key: index of question in question array, value: array of answers
+            allAnswers[questions[i]] = answers #dictionary, Key: index of question in question array, value: array of answers
 
-        # number = 0
-        # maxNumber = len(questions)
-        # while (number < maxNumber):
-        #     if (len(questions) > 0):
-        #         print(number, "   ", maxNumber)
-        #         try:
-        #             print(questions[number])
-        #         except:
-        #             break
-        #         if (questions[number][0].split(";")[1] == "userInfoRetrieval"):
-        #             questions.remove(questions[number])
-        #             number -= 1
-        #             maxNumber -= 1
-        #             if number < 0:
-        #                 n = 0
-        #         else:
-        #             number += 1
-        #     else:
-        #         break
-        # return render_template("admin/admin-form-add-answer.html", msg=questions)
+        number = 0
+        maxNumber = len(questions)
+        while (number < maxNumber):
+            if (len(questions) > 0):
+                print(number, " ", maxNumber)
+                try:
+                    print(questions[number])
+                except:
+                    break
+                if (questions[number].split(";")[1] == "userInfoRetrieval"):
+                    questions.remove(questions[number])
+                    allAnswers[questions[number]] = None
+                    number -= 1
+                    maxNumber -= 1
+                    if number < 0:
+                        number = 0
+                else:
+                    number += 1
+            else:
+                break
 
-        abort(status.HTTP_501_NOT_IMPLEMENTED)
+        questionsAndAnswers = []
+        for i in range(0, len(questions)):
+            question = []
+            question.append(questions[i])
+            merge = tuple(question)
+            answers = allAnswers[questions[i]]
+            for j in range(0, len(answers)):
+                answer = []
+                answer.append(answers[j])
+                merge = merge + tuple(answer)
+            questionsAndAnswers.append(merge)
+        print(questionsAndAnswers)
+        return render_template("admin/admin-form-add-answer.html", msg=questionsAndAnswers)
     elif request.method == "POST":
         #TODO not even looked at yet
         abort(status.HTTP_501_NOT_IMPLEMENTED)

@@ -64,15 +64,13 @@
 <body background="../static/images/property.PNG" height="42" width="42">
 
     <div class="bottom_left" id="contents1">
-      <ul>
         <div id="iframediv">
             <div id="overChatbotIframe">
-                <img id="overChatbotIframeImg" src="../static/img/core-img/android-icon-72x72.png" /><a id="overChatbotIframeHeading">TheSearchBase</a>
+                <img id="overChatbotIframeImg" src="../static/img/core-img/android-icon-72x72.png" /><a id="overChatbotIframeHeading">TheSearchBase</a><a id="overChatbotIframeCloseButton">V</a>
             </div>
             <iframe frameBorder="0" id="chatbotIframe" src="https://thesearchbase.com/chatbot/Royal Properties LTD" width="500" height="500"></iframe>
         </div>
-        <li id="launch_button" class="him" href="#">Launch Assistant</li>
-      </ul>
+        <div id="launch_button"></div>
     </div>
 
     <!-- ***** Contact Us Area End ***** -->
@@ -103,15 +101,28 @@
     var frame = document.getElementById("iframediv");
     var but = document.getElementById("launch_button");
     frame.style = "display:none";
-    but.addEventListener("click", function(){
+    but.addEventListener("click", async function(){
         if(!opened){
             frame.style = "display:block";
-            but.innerHTML= "Close Assistant";
+            //$("#iframediv").fadeIn("slow", function () {
+            //    // Animation complete
+            //});
+            $("#iframediv").animate({
+                marginBottom: "+=35px",
+                opacity: 1
+            }, 400);
+            but.style = "display:none";
             opened=true;
-        }else{
-            frame.style = "display:none";
-            but.innerHTML= "Launch Assistant";
-            opened=false;
+        } else {
+            $("#iframediv").animate({
+                marginBottom: "-=35px",
+                opacity: 0
+            }, 400);
+            setTimeout(function () {
+                frame.style = "display:none";
+                but.style = "display:block";
+                opened = false;
+            }, 400);
         }
     });
     </script>

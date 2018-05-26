@@ -31,10 +31,17 @@ ul li{
   margin-left: 10px;
 }
 
-#launch_button{
-    background-color: #002d62;
-    color: white;
+#launch_button {
+    background-image: url('../img/core-img/open-assistant.png');
+    /*color: white;*/
+    width: 186px;
+    height: 63px;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
 
+#launch_button:hover {
+    background-image: url('../img/core-img/open-assistant-hover.png');
 }
 
 #launch_button3{
@@ -45,14 +52,30 @@ ul li{
     margin-bottom: 2px;
     font-family: Helvetica, Arial, sans-serif;
     /* color: white; */
-    background: #ffffff;
+    background: none;
 }
 
-#chatbotIframe{
-    overflow:hidden;
+#chatbotIframe {
+    overflow: hidden;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 /*iFrame styling*/
+#iframediv {
+    opacity: 0;
+}
+
+#overChatbotIframeCloseButton {
+    float: right;
+    width: 28px;
+    height: 28px;
+    background-color: white;
+    text-align:center;
+    padding:30px;
+    font-size: 50px;
+}
+
 #chatbotIframe, #overChatbotIframe {
     box-shadow: 3px 3px 5px grey;
 }

@@ -204,7 +204,31 @@
         $("#thinkingGif").remove();
         if (data[questionN][0].split(";")[1] == "both" || data[questionN][0].split(";")[1] == "userInfoRetrieval") {
             collectedInformation.push((questionN + 1) + ";" + message);
-            $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>Thanks " + emojione.toImage("😁") + "</li></div>");
+            var thanks = "";
+            switch (Math.round(Math.random() * 7)) {
+                case 0:
+                    thanks = "Thanks 😁";
+                    break;
+                case 1:
+                    thanks = "Thank you 😃";
+                    break;
+                case 2:
+                    thanks = "I'll remember that 😉";
+                    break;
+                case 3:
+                    thanks = "Just one of the things that make you cool 😎";
+                    break;
+                case 4:
+                    thanks = "Let me just write it down ✍️😊";
+                    break;
+                case 5:
+                    thanks = "Give me a second to operate that information 😷";
+                    break;
+                case 6:
+                    thanks = "Thanks 👊";
+                    break;
+            }
+            $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + emojione.toImage(thanks) + "</li></div>");
             $("#newMessage").animate({
                 marginTop: "-=35px"
             }, "slow");

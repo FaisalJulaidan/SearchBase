@@ -40,9 +40,10 @@ ul li{
     background-size: cover;
 }
 
-#launch_button:hover {
-    background-image: url('../img/core-img/open-assistant-hover.png');
-}
+    #launch_button:hover {
+        background-image: url('../img/core-img/open-assistant-hover.png');
+        cursor: pointer;
+    }
 
 #launch_button3{
     display:inline-block;
@@ -67,14 +68,29 @@ ul li{
 }
 
 #overChatbotIframeCloseButton {
-    float: right;
-    width: 28px;
-    height: 28px;
-    background-color: white;
-    text-align:center;
-    padding:30px;
-    font-size: 50px;
+    width: 70px;
+    height: 62px;
+    position: absolute;
+    right: 0.5px;
+    background-color: #9023dc;
+    padding: 30px;
+    font-size: 25px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 0px;
+    border-top-right-radius: 10px;
+    color: white;
 }
+
+    #overChatbotIframeCloseButton:hover {
+        color: #9023dc;
+        background-color: white;
+        font-weight: bold;
+        cursor: pointer;
+        /*border-style: solid;
+        border-width: 2px;
+        border-color: #9948e6;*/
+    }
 
 #chatbotIframe, #overChatbotIframe {
     box-shadow: 3px 3px 5px grey;
@@ -84,10 +100,14 @@ ul li{
     background-color: #e9ecef;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+    background-color: #9023dc;
+    color:white;
+    font-weight:bold;
 }
 
 #overChatbotIframeImg {
     margin-left: 10px;
+    width:62px;
 }
 
 #overChatbotIframeHeading {

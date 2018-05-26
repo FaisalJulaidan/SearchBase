@@ -337,7 +337,7 @@ def get_assistants(email):
     # TODO check assistants for errors
     return assistants
 
-
+#TODO rewrite
 @app.route("/admin/questions", methods=['GET', 'POST'])
 def admin_questions():
     if request.method == "GET":
@@ -407,18 +407,40 @@ def admin_questions():
 
         updatedQuestions = []
         noq = request.form.get("noq-hidden", default="Error")
-        for i in range(1, (noq + 1)):
+        for i in range(1, int(noq) + 1):
             question = request.form.get("question" + str(i), default="Error")
             if question != "Error":
                 updatedQuestions.append(question)
             else:
                 return render_template("admin/admin-form-add-question.html", data=currentQuestions), status.HTTP_400_BAD_REQUEST
 
+        i = -1
+        print(currentQuestions)
+        if (len(updatedQuestions) + 1 < len(currentQuestions) + 1):
+            for b in range(len(updatedQuestions) + 1, len(currentQuestions) + 1):
+                questionID = currentQuestions[i][0]
+                question = currentQuestions[i][2]
 
-        # TODO implement this, need to work out how to store the retrieved answers
-        abort(status.HTTP_501_NOT_IMPLEMENTED)
+                print("DELETING: ", question)
+                deleteQuestion = delete_from_table(DATABASE, "DELETE FROM Questions WHERE Question=?", [escape(question)])
+                #TODO check deleteQuestion for errors
+                deleteAnswers = delete_from_table(DATABASE, "DELETE FROM Answers WHERE QuestionID=?", [questionID])
+                #TODO check deleteAnswers for errors
+        for q in updatedQuestions:
+            i += 1
+            qType = request.form.get("qType" + str(i))
+            try:
+                print(currentQuestions[i][2] != None)  # IMPORTANT DO NOT REMOVE
+                print("UPDATING: ", currentQuestions[i][2], " TO ", q + ";" + qType)
+                updateQuestion = update_table(DATABASE, "UPDATE Questions SET Question=? WHERE Question=?", [escape(q + ";" + qType), currentQuestions[i][2]])
+                #TODO check updateQuestion for errors
+            except:
+                print("INSERTING NEW: ", q + ";" + qType)
+                insertQuestion = insert_into_database_table(DATABASE, "INSERT INTO Questions ('AssistantID', 'Question') VALUES (?,?)", (assistants[assistantIndex][0], q + ";" + qType))
+                # TODO check insertQuestion for errors
+        return redirect("/admin/questions")
 
-
+#TODO rewrite
 @app.route("/admin/answers", methods=['GET', 'POST'])
 def admin_answers():
     if request.method == "GET":
@@ -759,17 +781,9 @@ if __name__ == "__main__":
 def adminAddQuestion():
     if request.method == "POST":
         questions = []
-        noq = request.form.get("noq-hidden", default="Error")
-        for i in range(1, (noq + 1)):
+        for i in range(1, 11):
             if (request.form.get("question" + str(i)) != None):
                 questions.append(request.form.get("question" + str(i)))
-
-        ##OLD CODE
-        # conn = sqlite3.connect(USERPREFERENCES)
-        # cur = conn.cursor()
-        # cur.execute("UPDATE \""+user_mail+"\" SET PricingQuestion = " + request.form.get("pricing-question"))
-        # conn.commit()
-        # conn.close()
 
         conn = sqlite3.connect(QUESTIONDATABASE)
         cur = conn.cursor()
@@ -781,6 +795,7 @@ def adminAddQuestion():
 		 'Answer5' text, 'Answer6' text, 'Answer7' text, 'Answer8' text, 'Answer9' text, 'Answer10' text,\
 		  'Answer11' text, 'Answer12' text)")
         conn.commit()
+
         i = -1
         print(tempData)
         if (len(questions) + 1 < len(tempData) + 1):

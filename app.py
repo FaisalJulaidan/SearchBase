@@ -743,9 +743,10 @@ def chatbot(route):
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened) VALUES (?, ?, ?);",
                     (assistantID, date, 1))
-                #TODO check newStats for errors
+                # TODO check newStats for errors
             else:
-                updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;", [currentStats[3], assistantID, date])
+                updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
+                                            [currentStats[3], assistantID, date])
                 # TODO check new stats for errors
         return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route)
     else:
@@ -757,10 +758,10 @@ def chatbot(route):
         assistantID = assistants[assistantIndex][0]
 
         questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?", [assistantID], True)
-        #TODO check questions for errors
+        # TODO check questions for errors
 
         products = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?;", [assistantID], True)
-        #TODO check products for errors
+        # TODO check products for errors
 
         collectedInformation = request.form.get("collectedInformation").split("||")
         date = datetime.now().strftime("%d-%m-%Y")
@@ -768,8 +769,9 @@ def chatbot(route):
             questionIndex = int(collectedInformation[i].split(";")[0]) - 1
             input = collectedInformation[i].split(";")[1]
             questionID = int(questions[questionIndex][0])
-            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input) VALUES (?,?,?)", (questionID, date, input))
-            #TODO check insertInput for errors
+            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input) VALUES (?,?,?)",
+                                                     (questionID, date, input))
+            # TODO check insertInput for errors
         print(request.form)
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")
@@ -779,7 +781,7 @@ def chatbot(route):
             keywords = []
             budget = []
 
-            #TODO work out this
+            # TODO work out this
             for i in range(1, int(nok) + 1):
                 keyword = request.form.get("keyword" + str(i), default="Error")
                 print(keyword is "Error")
@@ -839,7 +841,7 @@ def chatbot(route):
 
             if not app.debug:
                 pass
-                #TODO statistics stuff
+                # TODO statistics stuff
 
             datastring = ""
             for product in products:
@@ -1076,6 +1078,14 @@ def not_implemented(e):
     return render_template('errors/501.html', error=e, debug=app.debug), status.HTTP_501_NOT_IMPLEMENTED
 
 
+class Del:
+    def __init__(self, keep=string.digits):
+        self.comp = dict((ord(c), c) for c in keep)
+
+    def __getitem__(self, k):
+        return self.comp.get(k)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
@@ -1095,213 +1105,23 @@ def adminDataStorage():
         return redirect("/admin/userinput", code=302)
 
 
-class Del:
-    def __init__(self, keep=string.digits):
-        self.comp = dict((ord(c), c) for c in keep)
-
-    def __getitem__(self, k):
-        return self.comp.get(k)
-
-
 def dynamicChatbot(route):
-    if request.method == "POST":
-        conn = sqlite3.connect(APP_ROOT + "/userInput.db")
+    if (not app.debug):
+        date = datetime.now().strftime("%Y-%m")
+        conn = sqlite3.connect(STATISTICSDATABASE)
         cur = conn.cursor()
-        cur.execute("SELECT * FROM Users;")
-        cns = cur.fetchall()
-        for record in cns:
-            if route == record[4]:
-                # print(1)
-                conn = sqlite3.connect(APP_ROOT + "/products.db")
-                cur = conn.cursor()
-                cur.execute("SELECT * FROM \"" + record[7] + "\"")
-                data = cur.fetchall()
-                conn.close()
-                keywords = []
-                budget = []
-                # print(2)
-                collectedInformation = request.form.get("collectedInformation").split("||")
-                date = datetime.now().strftime("%d-%m-%Y")
-                conn = sqlite3.connect(USERINPUTDATABASE)
-                cur = conn.cursor()
-                i = 0
-                b = 0
-                # print(data)
-                try:
-                    cur.execute("INSERT INTO \"" + record[7] + "\" ('Date', 'Question1Info', 'Question2Info', 'Question3Info', 'Question4Info', 'Question5Info', \
-                    'Question6Info', 'Question7Info', 'Question8Info', 'Question9Info', 'Question10Info', 'Question11Info', 'Question12Info', 'Question13Info', 'Question14Info', \
-                    'Question15Info' ) VALUES ('" + date + "', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')")
-                    for c in range(0, 15):
-                        print(c + 1, "   ", collectedInformation[c - b].split(";")[0])
-                        if (collectedInformation[c - b].split(";")[0] == str(c + 1)):
-                            # print(collectedInformation[c - b].split(";")[1])
-                            cur.execute("UPDATE \"" + record[7] + "\" SET Question" + str(c + 1) + "Info = \"" + str(
-                                collectedInformation[c - b].split(";")[
-                                    1]) + "\" WHERE DataID = (SELECT MAX(DataID) FROM \"" + record[7] + "\")")
-                        else:
-                            b += 1
-                            cur.execute("UPDATE \"" + record[7] + "\" SET Question" + str(
-                                c + 1) + "Info = \"\" WHERE DataID = (SELECT MAX(DataID) FROM \"" + record[7] + "\")")
-                        i = c
-                    conn.commit()
-                    conn.close()
-                except:
-                    for c in range(i + 1, 15):
-                        cur.execute("UPDATE \"" + record[7] + "\" SET Question" + str(
-                            c + 1) + "Info = \"\" WHERE DataID = (SELECT MAX(DataID) FROM \"" + record[7] + "\")")
-                    conn.commit()
-                    conn.close()
-                    # print(data)
-                for i in range(1, int(request.form.get("numberOfKeywords")) + 1):
-                    if "-" in request.form.get("keyword" + str(i)):
-                        budget = request.form.get("keyword" + str(i)).split("-")
-                    else:
-                        keywords.append(request.form.get("keyword" + str(i)))
-                keywordsmatch = []
-                # print(data)
-                i = -1
-                for item in data:
-                    keywordsmatch.append(0)
-                    i += 1
-                    datakwords = item[5].split(",")
-                    for word in keywords:
-                        for dw in datakwords:
-                            if (word == dw):
-                                keywordsmatch[i] += 1
-                exitAtLength = 0
-                while (True):
-                    for p in range(0, len(keywordsmatch) - 1):
-                        if (keywordsmatch[p] < keywordsmatch[p + 1]):
-                            keywordsmatch.insert(p, keywordsmatch.pop(p + 1))
-                            data.insert(p, data.pop(p + 1))
-                            exitAtLength = 0
-                            break
-                    exitAtLength += 1
-                    if (exitAtLength == 5):
-                        break
-                substract = 0
-                # print(data)
-                for p in range(0, len(keywordsmatch)):
-                    if (keywordsmatch[p] == 0):
-                        data.pop(p - substract)
-                        substract += 1
-                if budget:
-                    DD = Del()
-                    dl = len(data) - 1
-                    i = 0
-                    while (i <= dl):
-                        item = data[i]
-                        itemprice = item[4].translate(DD)
-                        if ((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1]))):
-                            data.pop(i)
-                            i -= 1
-                            dl -= 1
-                        i += 1
-                while (len(data) > 9):
-                    data.pop()
-                if not data:
-                    return "We could not find anything that matched your search criteria. Please try different filter options."
-                datastring = ""
-                # print(data)
-                for i in data:
-                    for c in i:
-                        datastring += str(c) + "|||"
-                    datastring = datastring[:-3]
-                    datastring += "&&&"
-                conn.close()
-                # print(data)
-                if (not app.debug):
-                    date = datetime.now().strftime("%Y-%m")
-                    conn = sqlite3.connect(STATISTICSDATABASE)
-                    cur = conn.cursor()
-                    cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-                    stats = cur.fetchall()
-                    questionsAnswered = request.form["questionsAnswered"]
-                    if not stats:
-                        cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
+        cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
+        stats = cur.fetchall()
+        questionsAnswered = request.form["questionsAnswered"]
+        if not stats:
+            cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
                                         VALUES (?,?,?,?)", (date, "0", questionsAnswered, len(data)))
-                    else:
-                        cur.execute("UPDATE \"" + route + "\" SET ProductsReturned = \"" + str(
-                            int(stats[0][3]) + len(data)) + "\" WHERE Date = \"" + date + "\"")
-                        cur.execute("UPDATE \"" + route + "\" SET QuestionsAnswered = \"" + str(
-                            int(stats[0][2]) + int(questionsAnswered)) + "\" WHERE Date = \"" + date + "\"")
-                    conn.commit()
-                    cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-                    stats = cur.fetchall()
-                    conn.close()
-                # print(datastring)
-                return jsonify(datastring)
-
-
-# Route for the computer search
-
-@app.route("/GetComputers", methods=['POST'])
-def getcomputers():
-    if request.method == 'POST':
-        computerUse = request.form["compuse"]
-        minBudget = request.form["minbudget"]
-        maxBudget = request.form["maxbudget"]
-        portable = request.form["portable"]
-        battery = request.form["battery"]
-        keyfeatures = request.form["keyfeatures"]
-        conn = sqlite3.connect(COMPUTERDATABASE)
-        cur = conn.cursor()
-        print("Looking for: ", computerUse, " ", minBudget, " ", maxBudget, " ", portable, " ", battery, " ",
-              keyfeatures)
-        try:
-            if (portable == "null"):
-                print("Search without portable setting")
-                cur.execute("SELECT * FROM computers WHERE (Use1=? OR Use2=?) \
-                AND Price>=? AND Price<=? AND BatteryLife>=? \
-                ", [computerUse, computerUse, minBudget, maxBudget, battery])
-            else:
-                print("Search for ", portable)
-                cur.execute("SELECT * FROM computers WHERE (Use1=? OR Use2=?) \
-                AND Price>=? AND Price<=? AND Type=? AND BatteryLife>=? \
-                ", [computerUse, computerUse, minBudget, maxBudget, portable, battery])
-            data = cur.fetchall()
-        except:
-            print("ERROR IN RETRIEVING COMPUTERS")
-        finally:
-            conn.close()
-        # filter for keyfeatures
-        if (keyfeatures != ""):
-            print("before keyfeatures: ", data)
-            print(type(keyfeatures))
-            if (keyfeatures is not list):
-                print("Convert keyfeatures to list")
-                keyfeatures = [keyfeatures]
-            print(type(keyfeatures))
-            print(keyfeatures)
-            for t in keyfeatures:
-                for c in data:
-                    print(len(data))
-                    print("Checking :", c)
-                    init = False
-                    for i in c:
-                        if i == t:
-                            init = True
-                    if init == False:
-                        data.remove(c)
-                        print(t, " ", c, "removed")
-                for c in data:
-                    print(len(data))
-                    print("Checking :", c)
-                    init = False
-                    for i in c:
-                        if i == t:
-                            init = True
-                    if init == False:
-                        data.remove(c)
-                        print(t, " ", c, "removed")
-            print("after keyfeatures: ", data)
-        if not data:
-            return "We could not find Computers that matched your seach. Please try different filter options."
-        datastring = ""
-        for i in data:
-            for c in i:
-                datastring += str(c) + "|"
-            datastring = datastring[:-1]
-            datastring += ","
-        print(datastring)
-        return jsonify(datastring)
+        else:
+            cur.execute("UPDATE \"" + route + "\" SET ProductsReturned = \"" + str(
+                int(stats[0][3]) + len(data)) + "\" WHERE Date = \"" + date + "\"")
+            cur.execute("UPDATE \"" + route + "\" SET QuestionsAnswered = \"" + str(
+                int(stats[0][2]) + int(questionsAnswered)) + "\" WHERE Date = \"" + date + "\"")
+        conn.commit()
+        cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
+        stats = cur.fetchall()
+        conn.close()

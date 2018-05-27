@@ -764,29 +764,91 @@ def chatbot(route):
 
         collectedInformation = request.form.get("collectedInformation").split("||")
         date = datetime.now().strftime("%d-%m-%Y")
-        print(collectedInformation)
         for i in range(0, len(collectedInformation)):
-            questionIndex = int(collectedInformation[i].split(";")[0])
+            questionIndex = int(collectedInformation[i].split(";")[0]) - 1
             input = collectedInformation[i].split(";")[1]
-            questionID = questions[questionIndex][0]
+            questionID = int(questions[questionIndex][0])
             insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input) VALUES (?,?,?)", (questionID, date, input))
-            #TODO check insertInput for errors
+        #     #TODO check insertInput for errors
+        print(request.form)
+        # TODO work out wtf this is actually doing
+        nok = request.form.get("numberOfKeywords", default="Error")
+        if nok is "Error":
+            abort(status.HTTP_501_NOT_IMPLEMENTED, "Number of keywords invalid")
+        else:
+            keywords = []
+            budget = []
 
-        nok = int(request.form.get("numberOfKeywords"))
-        keywords = []
-        budget = []
+            #TODO work out this
+            for i in range(1, int(nok) + 1):
+                keyword = request.form.get("keyword" + str(i), default="Error")
+                print(keyword)
+                if keyword is "Error":
+                    if "-" in keyword:
+                        budget = keyword.split("-")
+                    else:
+                        keywords.append(keyword)
+                else:
+                    abort(status.HTTP_400_BAD_REQUEST)
 
-        for i in range(0, nok + 1):
-            keyword = request.form.get("keyword" + str(i))
-            if "-" in keyword:
-                budget = request.form.get("keyword" + str(i)).split("-")
-            else:
-                keywords.append(keyword)
+            keywordsmatch = []
+            i = -1
+            for product in products:
+                keywordsmatch.append(0)
+                i += 1
+                productKeywords = product[7].split(",")
+                for keyword in keywords:
+                    for productKeyword in productKeywords:
+                        if productKeyword == keyword:
+                            keywordsmatch[i] += 1
 
-        keywordsmatch = []
-        
+            exitAtLength = 0
+            while (True):
+                for i in range(0, len(keywordsmatch) - 1):
+                    if (keywordsmatch[i] < keywordsmatch.pop(i + 1)):
+                        keywordsmatch.insert(i, keywordsmatch.pop(i + 1))
+                        products.insert(i, products.pop(i + 1))
+                        exitAtLength = 0
+                        break
+                exitAtLength += 1
+                if exitAtLength == 5:
+                    break
+            subtract = 0
+            for i in range(0, len(keywordsmatch)):
+                if (keywordsmatch[i] == 0):
+                    products.pop(i - subtract)
+                    subtract += 1
+            if budget:
+                DD = Del()
+                dl = len(products) - 1
+                i = 0
+                while (i <= dl):
+                    product = products[i]
+                    itemprice = product[6].translate(DD)
+                    if ((int(itemprice) < int(budget[0])) or (int(itemprice) > int(budget[1]))):
+                        products.pop(i)
+                        i -= 1
+                        dl -= 1
+                    i += 1
 
-        abort(status.HTTP_501_NOT_IMPLEMENTED)
+            print(products)
+            while (len(products) > 9):
+                products.pop()
+            if products is None or products == []:
+                return "We could not find anything that matched your search criteria. Please try different filter options."
+
+            if not app.debug:
+                pass
+                #TODO statistics stuff
+
+            datastring = ""
+            for product in products:
+                for i in range(2, len(product)):
+                    datastring += str(product[i]) + "|||"
+                datastring = datastring[:-3]
+                datastring += "&&&"
+            print(datastring)
+            return jsonify(datastring)
 
 
 # TODO implement this

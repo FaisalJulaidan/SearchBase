@@ -182,26 +182,12 @@
                                     <li>
                                         <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                     </li>
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <li>
-                                                <a href="#">Settings 1</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Settings 2</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <a class="close-link"><i class="fa fa-close"></i></a>
-                                    </li>
                                 </ul>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content">
                                 <br />
-                                <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+                                <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" onsubmit="return validate();">
 
                                     <div class="form-group">
                                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
@@ -236,7 +222,7 @@
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="x_panel">
                             <div class="x_title">
-                                <h2>Enter the welcome message for your assistant <small>Tip: it's best to introduce what your bot will do and introduce your company.</small></h2>
+                                <h2>Enter the welcome message for your assistant <small>Tip: it's best to introduce what your assistant will do and introduce your company.</small></h2>
                                 <ul class="nav navbar-right panel_toolbox">
                                 </ul>
                                 <div class="clearfix"></div>
@@ -485,10 +471,35 @@
             }
         }
 
+        // Start of validation
+
+
+
+
     function ClearQTemplate(){
       $("#QuestionDiv input").val("");
     }
     </script>
+    
+    <script>
+    function validate() {
+       // check if input is bigger than 3
+        var value = document.getElementById('number-of-questions').value;
+        if (value.length < 20) {
+            mesg = "You have entered " + value.length + " character(s)\n"
+            mesg = mesg + "Please re-enter your question(s).\n"
+            mesg = mesg + "Read documentation for futher help or contact support."
+            alert(mesg);
+
+            return false; // keep form from submitting
+        }
+
+        return true;
+
+    }</script>
+
+
+
 
   </body>
 </html>

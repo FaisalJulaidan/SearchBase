@@ -38,7 +38,8 @@ app = Flask(__name__, static_folder='static')
 mail = Mail(app)
 
 app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG', 'json', 'JSON', 'csv', 'CSV', 'xml', 'xml'])
+ALLOWED_IMAGE_EXTENSION = set(['png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'])
+ALLOWED_PRODUCT_FILE_EXTENSIONS = set(['json', 'JSON', 'csv', 'CSV', 'xml', 'xml'])
 
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
@@ -48,6 +49,8 @@ app.config.update(
     MAIL_PASSWORD='pilbvnczzdgxkyzy'
 )
 
+
+#TODO just overall better validation
 
 # code to ensure user is logged in
 @app.before_request
@@ -162,6 +165,16 @@ def hash_password(password, salt=gensalt()):
     return hashed
 
 
+def allowed_product_file(filename):
+    ext = filename.rsplit('.', 1)[1]
+    return '.' in filename and ext in ALLOWED_PRODUCT_FILE_EXTENSIONS
+
+
+def allowed_image_file(filename):
+    ext = filename.rsplit('.', 1)[1]
+    return '.' in filename and ext in ALLOWED_IMAGE_EXTENSION
+
+
 # TODO jackassify it
 @app.route("/demo/<route>", methods=['GET'])
 def dynamic_popup(route):
@@ -229,6 +242,7 @@ def login():
             print("Invalid request: Email or password not received!")
             return render_template('login.html', data="Email or password not received!"), status.HTTP_400_BAD_REQUEST
         else:
+            email = email.lower()
             data = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
             if data is not None:
                 password = data[6]
@@ -270,6 +284,7 @@ def signup():
             fullname = request.form.get("fullname", default="Error")
             accessLevel = "Admin"
             email = request.form.get("email", default="Error")
+            email = email.lower()
             password = request.form.get("password", default="Error")
             if fullname == "Error" or accessLevel == "Error" or email == "Error" or password == "Error":
                 print("Invalid request")
@@ -498,10 +513,30 @@ def admin_answers():
                 answer.append(answers[j])
                 merge = merge + tuple(answer)
             questionsAndAnswers.append(merge)
-        print(questionsAndAnswers)
         return render_template("admin/admin-form-add-answer.html", msg=questionsAndAnswers)
     elif request.method == "POST":
-        #TODO not even looked at yet
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        # TODO check assistants for errors
+        assistantIndex = 0  # TODO change this
+
+        answers = []
+        selected_question = request.form.get("question") #question_text;question_type
+
+        noa = 0
+        for key in request.form:
+            if "pname" in key:
+                noa += 1
+
+        for i in range(1, noa):
+            file = request.files['file' + str(i)]
+            if file.filename == "":
+                pass
+            else:
+                pass
+
+
+        #TODO finish this
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
@@ -512,14 +547,67 @@ def admin_products():
         assistants = get_assistants(email)
         # TODO check assistants for errors
         assistantIndex = 0  # TODO change this
-        products = select_from_database_table(DATABASE, "SELECT * FROM Products WHERE AssistantID=?",
+        products = select_from_database_table(DATABASE, "SELECT ProductID, Name, Brand, Model, Price, Keywords, Discount, URL FROM Products WHERE AssistantID=?",
                                               [assistants[assistantIndex][0]], True)
         # TODO check products for errors
         return render_template("admin/admin-form-add-product.html", data=products)
     elif request.method == 'POST':
-        # TODO implement this
-        abort(status.HTTP_501_NOT_IMPLEMENTED)
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        # TODO check assistants for errors
+        assistantIndex = 0  # TODO change this
 
+        currentProducts = select_from_database_table(DATABASE, "SELECT * FROM Products WHERE AssistantID=?",
+                                              [assistants[assistantIndex][0]], True)
+        if "Error" in currentProducts:
+            #TODO handle errors with currentProducts
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Retrieving current products: " + currentProducts)
+        elif currentProducts != [] and currentProducts is not None:
+            deleteCurrentProducts = delete_from_table(DATABASE, "DELETE FROM Products WHERE AssistantID=?", [assistants[assistantIndex][0]])
+            if "Error" in deleteCurrentProducts:
+                # TODO handle errors with deleteCurrentProducts
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Deleting current products: " + deleteCurrentProducts)
+            else:
+                pass
+
+        nop = 1
+        for key in request.form:
+            if "product_ID" in key:
+                nop += 1
+
+        for i in range(1, nop):
+            #TODO add more info to these error messages
+            id = request.form.get("product_ID" + str(i), default="Error")
+            if id is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product ID")
+            name = request.form.get("product_Name" + str(i), default="Error")
+            if name is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product name")
+            brand = request.form.get("product_Brand" + str(i), default="Error")
+            if brand is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product brand")
+            model = request.form.get("product_Model" + str(i), default="Error")
+            if model is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product model")
+            price = request.form.get("product_Price" + str(i), default="Error")
+            if price is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product price")
+            keywords = request.form.get("product_Keywords" + str(i), default="Error")
+            if keywords is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product keywords")
+            discount = request.form.get("product_Discount" + str(i), default="Error")
+            if discount is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product discount")
+            url = request.form.get("product_URL" + str(i), default="Error")
+            if url is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product url")
+
+            insertProduct = insert_into_database_table(DATABASE, "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) "
+                                                                 "VALUES (?,?,?,?,?,?,?,?,?)", (assistants[assistantIndex][0], id, name, brand, model, price, keywords, discount, url))
+            if insertProduct is "Error":
+                # TODO try to recover by re-adding old data
+                pass
+        return redirect("/admin/products")
 
 @app.route("/admin/templates", methods=['GET', 'POST'])
 def admin_templates():
@@ -749,19 +837,24 @@ def sendMarketingEmail():
 
 
 ## Error Handlers ##
+@app.errorhandler(status.HTTP_400_BAD_REQUEST)
+def unsupported_media(e):
+    return render_template('errors/400.html', error=e, debug=app.debug), status.HTTP_400_BAD_REQUEST
+
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
-    return render_template('errors/404.html', error=e), status.HTTP_404_NOT_FOUND
+    return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
+
+
+@app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+def unsupported_media(e):
+    return render_template('errors/415.html', error=e), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 
 @app.errorhandler(418)
 def im_a_teapot(e):
-    return render_template('errors/418.html', error=e), 418
+    return render_template('errors/418.html', error=e, debug=app.debug), 418
 
-
-@app.route("/teapot", methods=["GET"])
-def teapot():
-    abort(418)
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(e):
@@ -778,76 +871,7 @@ if __name__ == "__main__":
 
 
 ########################## OLD CODE ##########################
-def adminAddQuestion():
-    if request.method == "POST":
-        questions = []
-        for i in range(1, 11):
-            if (request.form.get("question" + str(i)) != None):
-                questions.append(request.form.get("question" + str(i)))
-
-        conn = sqlite3.connect(QUESTIONDATABASE)
-        cur = conn.cursor()
-        user_mail = request.cookies.get("UserEmail")
-        cur.execute("SELECT * FROM \"" + user_mail + "\"")
-        tempData = cur.fetchall()
-        cur.execute("CREATE TABLE IF NOT EXISTS \'" + user_mail + "\' (\
-		Question text NOT NULL, 'Answer1' text, 'Answer2' text, 'Answer3' text, 'Answer4' text,\
-		 'Answer5' text, 'Answer6' text, 'Answer7' text, 'Answer8' text, 'Answer9' text, 'Answer10' text,\
-		  'Answer11' text, 'Answer12' text)")
-        conn.commit()
-
-        i = -1
-        print(tempData)
-        if (len(questions) + 1 < len(tempData) + 1):
-            for b in range(len(questions) + 1, len(tempData) + 1):
-                print("DELETING: ", tempData[i][0])
-                cur.execute("DELETE FROM \"" + user_mail + "\" WHERE Question = \"" + tempData[i][0] + "\"")
-        for q in questions:
-            i += 1
-            qType = request.form.get("qType" + str(i))
-            try:
-                print(tempData[i][0] != None)  # IMPORTANT DO NOT REMOVE
-                print("UPDATING: ", tempData[i][0], " TO ", q + ";" + qType)
-                cur.execute(
-                    "UPDATE \"" + user_mail + "\" SET Question = \"" + q + ";" + qType + "\" WHERE Question = \"" +
-                    tempData[i][0] + "\"")
-            except:
-                print("INSERTING NEW: ", q + ";" + qType)
-                cur.execute("INSERT INTO \'" + user_mail + "\'('Question') VALUES (?)", (q + ";" + qType,))
-        conn.commit()
-        conn.close()
-        return redirect("/admin/Questions", code=302)
-
-
-##OLD CODE
 def adminAnswers():
-    if request.method == "GET":
-        conn = sqlite3.connect(QUESTIONDATABASE)
-        cur = conn.cursor()
-        user_mail = request.cookies.get("UserEmail")
-        cur.execute("SELECT * FROM \"" + user_mail + "\"")
-        mes = cur.fetchall()
-        n = 0
-        maxN = len(mes)
-        while (n < maxN):
-            if (len(mes) > 0):
-                print(n, "   ", maxN)
-                try:
-                    print(mes[n])
-                except:
-                    break
-                if (mes[n][0].split(";")[1] == "userInfoRetrieval"):
-                    mes.remove(mes[n])
-                    n -= 1
-                    maxN -= 1
-                    if n < 0:
-                        n = 0
-                else:
-                    n += 1
-            else:
-                break
-        conn.close()
-        return render_template("admin/admin-form-add-answer.html", msg=mes)
     if request.method == "POST":
         conn = sqlite3.connect(QUESTIONDATABASE)
         cur = conn.cursor()
@@ -1266,11 +1290,6 @@ def dynamicChatbot(route):
                     conn.close()
                 # print(datastring)
                 return jsonify(datastring)
-
-
-def allowed_file(filename):
-    ext = filename.rsplit('.', 1)[1]
-    return '.' in filename and ext in ALLOWED_EXTENSIONS
 
 
 # Route for the computer search

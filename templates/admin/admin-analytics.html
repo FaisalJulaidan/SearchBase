@@ -182,24 +182,34 @@
                 <iframe id="txtArea1" style="display:none"></iframe>
                 <br />
                 <br />
+                <h2>General Data</h2>
+                <br />
+                <div class="analytics_line">
+                    <!-- First chart -->
+                    <div style="width:350px; height:200px;">
+                        <canvas id="putcharthere1" style="width:350px; height:0px;"></canvas>
+                    </div>
 
-              <div class="analytics_line">
-                <!-- First chart -->
-                <div style="width:350px; height:200px;">
-                    <canvas id="putcharthere1" style="width:350px; height:0px;"></canvas>
-                </div>
+                    <!-- Second chart -->
+                    <div style="width:350px; height:200px;">
+                        <canvas id="putcharthere2" style="width:350px; height:0px;"></canvas>
+                    </div>
 
-                <!-- Second chart -->
-                <div style="width:350px; height:200px;">
-                    <canvas id="putcharthere2" style="width:350px; height:0px;"></canvas>
+                    <!-- Third chart -->
+                    <div style="width:350px; height:200px;">
+                        <canvas id="putcharthere3" style="width:350px; height:0px"></canvas>
+                    </div>
+                    <div class="clearfix"></div>
                 </div>
-
-                <!-- Third chart -->
-                <div style="width:350px; height:200px;">
-                    <canvas id="putcharthere3" style="width:350px; height:0px"></canvas>
+                <h2>Users over time</h2>
+                <br />
+                <div class="analytics_line">
+                    <!-- First chart -->
+                    <div style="width:700px; height:300px;">
+                        <canvas id="putcharthere4" style="width:350px; height:0px;"></canvas>
+                    </div>
+                    <div class="clearfix"></div>
                 </div>
-                <div class="clearfix"></div>
-            </div>
             </div>
         </div>
         <!-- page content -->
@@ -264,26 +274,9 @@
     <!-- <script src='../static/js/Chart.min.js'></script> -->
     <script src="https://cdn.anychart.com/releases/8.0.0/js/anychart-base.min.js"></script>
     <script>
-    // var dates = [];
-    // {%for item in data%}
-    // dates.push("{{item[0]}}");
-    // {%endfor%}
-    // var assisopened = [];
-    // {%for item in data%}
-    // assisopened.push("{{item[1]}}");
-    // {%endfor%}
-    // var datarows = [];
-    // for(var i = 0; i <= dates.length-1; i++){
-    //     datarows.push([dates[i], assisopened[i]])
-    // }
-    // var data = {
-    //   header: ["Dates", "Assistant Opened"],
-    //   rows: datarows
-    //   }
-    //   var chart = anychart.bar();
-    //
-    //   // add the data
-    //   chart.data(data);
+
+
+    //  Start of the chart code
     var chartData = {
     labels : [{% for item in data%}
               "{{item[0]}}",
@@ -292,8 +285,8 @@
        label: 'Assistant Used',
        fill: true,
        lineTension: 0.1,
-        backgroundColor: "rgb(138,43,226)",
-        borderColor: "rgb(138,43,226)",
+        backgroundColor: "rgb(255,0,0)",
+        borderColor: "rgb(255,0,0)",
        borderCapStyle: 'butt',
        borderDash: [],
        borderDashOffset: 0.0,
@@ -317,7 +310,13 @@
     new Chart(chartdiv, {
     data: chartData,
     type: 'bar',
-    });
+        });
+
+    //  End of the chart code
+
+
+
+
     var chartData = {
     labels : [{% for item in data%}
               "{{item[0]}}",
@@ -326,8 +325,8 @@
        label: 'Questions Answered',
        fill: true,
        lineTension: 0.1,
-        backgroundColor: "rgb(138,43,226)",
-        borderColor: "rgb(138,43,226)",
+        backgroundColor: "rgb(0,191,255)",
+        borderColor: "rgb(0,191,255)",
        borderCapStyle: 'butt',
        borderDash: [],
        borderDashOffset: 0.0,
@@ -351,7 +350,10 @@
     new Chart(chartdiv, {
     data: chartData,
     type: 'bar',
-    });
+        });
+
+
+
     var chartData = {
     labels : [{% for item in data%}
               "{{item[0]}}",
@@ -360,8 +362,8 @@
        label: 'Products Returned',
        fill: true,
        lineTension: 0.1,
-        backgroundColor: "rgb(138,43,226)",
-        borderColor: "rgb(138,43,226)",
+        backgroundColor: "rgb(255,255,0)",
+        borderColor: "rgb(255,255,0)",
        borderCapStyle: 'butt',
        borderDash: [],
        borderDashOffset: 0.0,
@@ -385,7 +387,87 @@
     new Chart(chartdiv, {
     data: chartData,
     type: 'bar',
-    });//Create table for Excel export
+        });
+
+
+        //  Start of the chart code
+    var chartData = {
+    labels : [{% for item in data%}
+              "{{item[0]}}",
+             {% endfor %}],
+    datasets : [{
+       label: 'Assistant Used',
+       fill: true,
+       lineTension: 0.1,
+        backgroundColor: "rgb(255,0,0)",
+        borderColor: "rgb(255,0,0)",
+       borderCapStyle: 'butt',
+       borderDash: [],
+       borderDashOffset: 0.0,
+       borderJoinStyle: 'miter',
+       pointBorderColor: "rgba(75,192,192,1)",
+       pointBackgroundColor: "#fff",
+       pointBorderWidth: 1,
+       pointHoverRadius: 5,
+       pointHoverBackgroundColor: "rgba(75,192,192,1)",
+       pointHoverBorderColor: "rgba(220,220,220,1)",
+       pointHoverBorderWidth: 2,
+       pointRadius: 1,
+       pointHitRadius: 10,
+       data : [{% for item in data %}
+                {{item[1]}},
+               {% endfor %}],
+       spanGaps: false
+    }]
+    }
+    var chartdiv = document.getElementById("putcharthere1").getContext("2d");
+    new Chart(chartdiv, {
+    data: chartData,
+    type: 'bar',
+        });
+
+    //  End of the chart code
+
+        //  Start of the chart code
+        var chartData = {
+            labels: [{% for item in data %}
+        "{{item[0]}}",
+            {% endfor %}],
+        datasets: [{
+            label: 'Assistant Used',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: "rgb(50,205,50)",
+            borderColor: "rgb(50,205,50)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(75,192,192,1)",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: [{% for item in data %}
+                {{ item[1] }},
+        {% endfor %}],
+            spanGaps: false
+    }]
+    }
+        var chartdiv = document.getElementById("putcharthere4").getContext("2d");
+        new Chart(chartdiv, {
+            data: chartData,
+            type: 'line',
+        });
+
+    //  End of the chart code
+
+
+    //Create table for Excel export
     var tableString = "<table><tr><th>Date</th><th>Assistant Opened</th><th>Questions Answered</th><th>Products Returned</th></tr>";
     {% for item in data %}
     tableString+= "<tr>"

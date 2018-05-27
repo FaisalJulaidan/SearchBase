@@ -769,7 +769,7 @@ def chatbot(route):
             input = collectedInformation[i].split(";")[1]
             questionID = int(questions[questionIndex][0])
             insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input) VALUES (?,?,?)", (questionID, date, input))
-        #     #TODO check insertInput for errors
+            #TODO check insertInput for errors
         print(request.form)
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")
@@ -782,8 +782,8 @@ def chatbot(route):
             #TODO work out this
             for i in range(1, int(nok) + 1):
                 keyword = request.form.get("keyword" + str(i), default="Error")
-                print(keyword)
-                if keyword is "Error":
+                print(keyword is "Error")
+                if keyword is not "Error":
                     if "-" in keyword:
                         budget = keyword.split("-")
                     else:

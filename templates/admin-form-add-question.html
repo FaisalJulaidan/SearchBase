@@ -187,7 +187,7 @@
                             </div>
                             <div class="x_content">
                                 <br />
-                                <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" onsubmit="return validate();">
+                                <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" onsubmit="return validation();">
 
                                     <div class="form-group">
                                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
@@ -196,11 +196,8 @@
                                         <div class="col-md-1 col-sm-1 col-xs-12">
                                             <input type="text" id="number-of-questions" required="required" class="form-control col-md-1 col-xs-1">
                                         </div>
-                                        <!-- <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Enter the number of the question that will handle the pricing
-                            </label>
-                            <div class="col-md-1 col-sm-1 col-xs-12">
-                              <input type="text" id="pricing-question" required="required" value="0" class="form-control col-md-1 col-xs-1">
-                            </div> -->
+
+
                                     </div>
                                     <div class="ln_solid"></div>
                                     <div class="form-group">
@@ -208,9 +205,11 @@
                                         </div>
                                     </div>
 
+                                    <button type="submit" value="Send" id="NOQ-SubmitB" class="btn btn-success">Submit</button>
+                                    <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
+
                                 </form>
-                                <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
-                                <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
+
                             </div>
                         </div>
                     </div>
@@ -236,13 +235,9 @@
                                             Enter your welcome message <span class="required">*</span>
                                         </label>
                                         <div class="col-md-9 col-sm-9 col-xs-12">
-                                            <input type="text" id="" required="required" class="form-control col-md-5 col-xs-10">
+                                            <input type="text" id="welcome-message" required="required" class="form-control col-md-5 col-xs-10" placeholder="You can leave this empty is you wish.">
                                         </div>
-                                        <!-- <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Enter the number of the question that will handle the pricing
-                            </label>
-                            <div class="col-md-1 col-sm-1 col-xs-12">
-                              <input type="text" id="pricing-question" required="required" value="0" class="form-control col-md-1 col-xs-1">
-                            </div> -->
+
                                     </div>
                                     <div class="ln_solid"></div>
                                     <div class="form-group">
@@ -250,9 +245,11 @@
                                         </div>
                                     </div>
 
+                                    <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
+                                    <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
+
                                 </form>
-                                <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
-                                <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
+                                
                             </div>
                         </div>
                     </div>
@@ -482,24 +479,55 @@
     </script>
     
     <script>
-    function validate() {
-       // check if input is bigger than 3
-        var value = document.getElementById('number-of-questions').value;
-        if (value.length < 20) {
-            mesg = "You have entered " + value.length + " character(s)\n"
-            mesg = mesg + "Please re-enter your question(s).\n"
-            mesg = mesg + "Read documentation for futher help or contact support."
-            alert(mesg);
+    function validation() {
+       // check if input is bigger than 10
+        var boxNumberOfQuestions = document.getElementById('number-of-questions').value;
+        var boxWelcomeMessage = document.getElementById('welcome-message').value;
 
-            return false; // keep form from submitting
+
+        // General validation
+
+        if (boxNumberOfQuestions == "")
+         {
+            document.getElementById("number-of-questions").style.borderStyle = "solid";
+            document.getElementById("number-of-questions").style.borderColor = "red";
+            alert("Please enter the amount of numbers you would like to ask users.")
+           return false;
         }
+
+        // Checking the lrngth of the input
+
+        if (boxNumberOfQuestions > 10) {
+            mesg = "You have entered too mnany questions."
+            mesg = mesg + "Please re-enter the number of question(s).\n"
+            mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
+            alert(mesg);
+            return false;
+        }
+
+        // Change colour of the border of the box
+
+
+
+        if (boxWelcomeMessage.length > 20) {
+            mesg = "The length of the welcome message is too long."
+            mesg = mesg + "Please re-enter the welcome message.\n"
+            mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
+            alert(mesg);
+            return false;
+        }
+
+        // Change colour of the border of the box
+
+
+
+        // Validation for the dynmaicaly loaded boxes
+
+
 
         return true;
 
     }</script>
-
-
-
 
   </body>
 </html>

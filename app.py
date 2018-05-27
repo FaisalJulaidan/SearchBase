@@ -665,25 +665,94 @@ def admin_templates():
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
-@app.route("/admin/connect")
+@app.route("/admin/connect", methods=['GET'])
 def admin_connect():
     return render_template("admin/admin-connect.html")
 
 
-@app.route("/admin/pricing")
+@app.route("/admin/pricing", methods=['GET'])
 def admin_pricing():
     return render_template("admin/admin-pricing-tables.html", pub_key=pub_key)
 
 
-@app.route('/admin/thanks')
+@app.route('/admin/thanks', methods=['GET'])
 def admin_thanks():
     return render_template('admin/admin-thank-you.html')
 
 
-@app.route("/admin/pay", methods=['GET', 'POST'])
+@app.route("/admin/pay", methods=['GET'])
 def admin_pay():
     if request.method == 'GET':
         return render_template("admin/admin-pay.html")
+
+@app.route("/chatbot/<route>", methods=['GET', 'POST'])
+def chatbot(route):
+    if request.method == "GET":
+        company = select_from_database_table("SELECT * FROM Company WHERE Name=?", [escape(route)])
+        # TODO check company for errors
+        assistants = select_from_database_table("SELECT * FROM Assistant WHERE CompanyID=?", [company[0]], True)
+        # TODO check assistant for errors
+        assistantIndex = 0 #TODO implement this properly
+        assistantID = assistants[assistantIndex][0]
+
+        questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?",
+                                                    [assistantID], True)
+        # TODO check questionstuple for errors
+        questions = []
+        for i in range(0, len(questionsTuple)):
+            questions.append(questionsTuple[i][2] + ";" + questionsTuple[i][3])
+
+        allAnswers = {}
+        for i in range(0, len(questions)):
+            answersTuple = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?",
+                                                      [questionsTuple[i][0]], True)
+            # TODO Check answerstuple for errors
+            answers = []
+            for j in range(0, len(answersTuple)):
+                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3])
+
+            allAnswers[questions[i]] = answers
+
+        number = 0
+        maxNumber = len(questions)
+        while (number < maxNumber):
+            if (len(questions) > 0):
+                if (number >= len(questions)):
+                    break
+                else:
+                    if (questions[number].split(";")[1] == "userInfoRetrieval"):
+                        allAnswers[questions[number]] = None
+                        questions.remove(questions[number])
+                        number -= 1
+                        maxNumber -= 1
+                        if number < 0:
+                            number = 0
+                    else:
+                        number += 1
+            else:
+                break
+
+        questionsAndAnswers = []
+        for i in range(0, len(questions)):
+            question = []
+            question.append(questions[i])
+            merge = tuple(question)
+            answers = allAnswers[questions[i]]
+            for j in range(0, len(answers)):
+                answer = []
+                answer.append(answers[j])
+                merge = merge + tuple(answer)
+            questionsAndAnswers.append(merge)
+
+        date = datetime.now().strftime("%Y-%m")
+        print(questionsAndAnswers)
+
+        if (not app.debug):
+            #TODO implement statistics
+            pass
+        return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route)
+    else:
+        abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
 #TODO implement this
@@ -930,67 +999,6 @@ def adminDataStorage():
         return redirect("/admin/userinput", code=302)
 
 
-##OLD CODE
-@app.route("/productfile", methods=['GET', 'POST'])
-def uploadProductFile():
-    if request.method == "GET":
-        return app.send_static_file("uploadProduct.html")
-    else:
-        if 'productFile' not in request.files:
-            msg = "Error no file given."
-        else:
-            productFile = request.files["productFile"]
-            email = request.cookies.get("UserEmail")
-            if productFile.filename == "":
-                msg = "Error no filename"
-            elif productFile and allowed_file(productFile.filename):
-                ext = productFile.filename.rsplit('.', 1)[1].lower()
-                if (not os.path.isdir(PRODUCT_FILES)):
-                    os.makedirs(PRODUCT_FILES)
-                filename = secure_filename(productFile.filename)
-                filepath = os.path.join(PRODUCT_FILES, filename)
-                productFile.save(filepath)
-
-                if str(ext).lower() == "json":
-                    json_file = open(PRODUCT_FILES + "/" + productFile.filename, "r")
-                    data = json.load(json_file)
-                    for i in range(0, len(data)):
-                        msg = productIntoDatabase(email, data[i]["ProductID"], data[i]["ProductName"],
-                                                  data[i]["ProductBrand"], data[i]["ProductModel"],
-                                                  data[i]["ProductPrice"], data[i]["ProductKeywords"],
-                                                  data[i]["ProductDiscount"], data[i]["ProductURL"],
-                                                  data[i]["ProductImage"])
-                elif str(ext).lower() == "xml":
-                    xmldoc = minidom.parse(PRODUCT_FILES + "/" + productFile.filename)
-                    productList = xmldoc.getElementsByTagName("product")
-                    for product in productList:
-                        try:
-                            id = product.getElementsByTagName("ProductID")[0].childNodes[0].data
-                            name = product.getElementsByTagName("ProductName")[0].childNodes[0].data
-                            brand = product.getElementsByTagName("ProductBrand")[0].childNodes[0].data
-                            model = product.getElementsByTagName("ProductModel")[0].childNodes[0].data
-                            price = product.getElementsByTagName("ProductPrice")[0].childNodes[0].data
-                            keywords = product.getElementsByTagName("ProductKeywords")[0].childNodes[0].data
-                            discount = product.getElementsByTagName("ProductDiscount")[0].childNodes[0].data
-                            url = product.getElementsByTagName("ProductURL")[0].childNodes[0].data
-                            try:
-                                image = product.getElementsByTagName("ProductImage")[0].childNodes[0].data
-                                msg = productIntoDatabase(email, id, name, brand, model, price, keywords, discount, url,
-                                                          image)
-                            except IndexError:
-                                msg = productIntoDatabase(email, id, name, brand, model, price, keywords, discount, url)
-                        except IndexError:
-                            msg = "Invalid xml file"
-                            print(msg)
-                else:
-                    msg = "File not implemented yet"
-                    pass
-                os.remove(PRODUCT_FILES + "/" + productFile.filename)
-            else:
-                msg = "Error not allowed that type of file."
-        return msg
-
-
 class Del:
     def __init__(self, keep=string.digits):
         self.comp = dict((ord(c), c) for c in keep)
@@ -999,7 +1007,6 @@ class Del:
         return self.comp.get(k)
 
 
-@app.route("/chatbot/<route>", methods=['GET', 'POST'])
 def dynamicChatbot(route):
     if request.method == "GET":
         conn = sqlite3.connect(USERDATABASE)

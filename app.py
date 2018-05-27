@@ -608,7 +608,6 @@ def admin_products_file_upload():
             assistantID = assistants[assistantIndex][0]
 
             productFile = request.files["productFile"]
-            email = request.cookies.get("UserEmail")
             if productFile.filename == "":
                 msg = "Error no filename"
             elif productFile and allowed_product_file(productFile.filename):
@@ -724,25 +723,6 @@ def chatbot(route):
 
             allAnswers[questions[i]] = answers
 
-        number = 0
-        maxNumber = len(questions)
-        while (number < maxNumber):
-            if (len(questions) > 0):
-                if (number >= len(questions)):
-                    break
-                else:
-                    if (questions[number].split(";")[1] == "userInfoRetrieval"):
-                        allAnswers[questions[number]] = None
-                        questions.remove(questions[number])
-                        number -= 1
-                        maxNumber -= 1
-                        if number < 0:
-                            number = 0
-                    else:
-                        number += 1
-            else:
-                break
-
         questionsAndAnswers = []
         for i in range(0, len(questions)):
             question = []
@@ -756,7 +736,6 @@ def chatbot(route):
             questionsAndAnswers.append(merge)
 
         date = datetime.now().strftime("%Y-%m")
-        print(questionsAndAnswers)
 
         if (not app.debug):
             currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", date)
@@ -770,6 +749,43 @@ def chatbot(route):
                 # TODO check new stats for errors
         return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route)
     else:
+        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
+        # TODO check company for errors
+        assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
+        # TODO check assistant for errors
+        assistantIndex = 0  # TODO implement this properly
+        assistantID = assistants[assistantIndex][0]
+
+        questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?", [assistantID], True)
+        #TODO check questions for errors
+
+        products = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?;", [assistantID], True)
+        #TODO check products for errors
+
+        collectedInformation = request.form.get("collectedInformation").split("||")
+        date = datetime.now().strftime("%d-%m-%Y")
+        print(collectedInformation)
+        for i in range(0, len(collectedInformation)):
+            questionIndex = int(collectedInformation[i].split(";")[0])
+            input = collectedInformation[i].split(";")[1]
+            questionID = questions[questionIndex][0]
+            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input) VALUES (?,?,?)", (questionID, date, input))
+            #TODO check insertInput for errors
+
+        nok = int(request.form.get("numberOfKeywords"))
+        keywords = []
+        budget = []
+
+        for i in range(0, nok + 1):
+            keyword = request.form.get("keyword" + str(i))
+            if "-" in keyword:
+                budget = request.form.get("keyword" + str(i)).split("-")
+            else:
+                keywords.append(keyword)
+
+        keywordsmatch = []
+        
+
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
@@ -1026,45 +1042,15 @@ class Del:
 
 
 def dynamicChatbot(route):
-    if request.method == "GET":
-        conn = sqlite3.connect(USERDATABASE)
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM Users;")
-        cns = cur.fetchall()
-        conn.close()
-        for record in cns:
-            if route == record[4]:
-                conn = sqlite3.connect(QUESTIONDATABASE)
-                cur = conn.cursor()
-                cur.execute("SELECT * FROM \"" + record[7] + "\"")
-                data = cur.fetchall()
-                conn.close()
-                date = datetime.now().strftime("%Y-%m")
-                if (not app.debug):
-                    conn = sqlite3.connect(STATISTICSDATABASE)
-                    cur = conn.cursor()
-                    cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-                    stats = cur.fetchall()
-                    if not stats:
-                        print(stats)
-                        cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
-                                        VALUES (?,?,?,?)", (date, "1", "0", "0"))
-                    else:
-                        cur.execute("UPDATE \"" + route + "\" SET AssistantOpened = \"" + str(
-                            int(stats[0][1]) + 1) + "\" WHERE Date = \"" + date + "\"")
-                    conn.commit()
-                    conn.close()
-                return render_template("dynamic-chatbot.html", data=data, user="chatbot/" + route)
-        return redirect("/pagenotfound", code=302)
     if request.method == "POST":
-        conn = sqlite3.connect(USERDATABASE)
+        conn = sqlite3.connect(APP_ROOT + "/userInput.db")
         cur = conn.cursor()
         cur.execute("SELECT * FROM Users;")
         cns = cur.fetchall()
         for record in cns:
             if route == record[4]:
                 # print(1)
-                conn = sqlite3.connect(PRODUCTDATABASE)
+                conn = sqlite3.connect(APP_ROOT + "/products.db")
                 cur = conn.cursor()
                 cur.execute("SELECT * FROM \"" + record[7] + "\"")
                 data = cur.fetchall()

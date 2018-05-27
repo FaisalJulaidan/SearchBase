@@ -39,7 +39,7 @@ mail = Mail(app)
 
 app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
 ALLOWED_IMAGE_EXTENSION = set(['png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'])
-ALLOWED_PRODUCT_FILE_EXTENSIONS = set(['json', 'JSON', 'csv', 'CSV', 'xml', 'xml'])
+ALLOWED_PRODUCT_FILE_EXTENSIONS = set(['json', 'JSON', 'xml', 'xml'])
 
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
@@ -48,7 +48,6 @@ app.config.update(
     MAIL_USERNAME='thesearchbase@gmail.com',
     MAIL_PASSWORD='pilbvnczzdgxkyzy'
 )
-
 
 # TODO just overall better validation
 
@@ -487,13 +486,13 @@ def admin_answers():
 
         question = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=? AND Question=?",
                                               [assistantID, selected_question.split(";")[0]])
-        #TODO Check question for errors
+        # TODO Check question for errors
         questionID = question[0]
         currentAnswers = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?", [questionID])
-        #TODO check currentAnswers for errors
+        # TODO check currentAnswers for errors
         if (currentAnswers is not None):
             delete_from_table("DELETE FROM Answers WHERE QuestionID=?", [questionID])
-            #TODO check delete from table for errors
+            # TODO check delete from table for errors
 
         noa = 1
         for key in request.form:
@@ -505,10 +504,12 @@ def admin_answers():
             # TODO check answer for errors
             keyword = request.form.get("keywords" + str(i), default="Error")
             # TODO check keywords for errors
-            insertAnswer = insert_into_database_table("INSERT INTO Answers (QuestionID, Answer, Keyword) VALUES (?,?,?)", (questionID, answer, keyword))
+            insertAnswer = insert_into_database_table(
+                "INSERT INTO Answers (QuestionID, Answer, Keyword) VALUES (?,?,?)", (questionID, answer, keyword))
             # TODO check insertAnswer
 
         return redirect("/admin/answers")
+
 
 @app.route("/admin/products", methods=['GET', 'POST'])
 def admin_products():
@@ -533,7 +534,7 @@ def admin_products():
         if "Error" in currentProducts:
             # TODO handle errors with currentProducts
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Retrieving current products: " + currentProducts)
-        elif currentProducts != [] and currentProducts is not None:
+        elif currentProducts is not None and currentProducts != []:
             deleteCurrentProducts = delete_from_table("DELETE FROM Products WHERE AssistantID=?", [assistantID])
             if "Error" in deleteCurrentProducts:
                 # TODO handle errors with deleteCurrentProducts
@@ -578,10 +579,82 @@ def admin_products():
                 "VALUES (?,?,?,?,?,?,?,?,?)", (
                     assistants[assistantIndex][0], id, name, brand, model, price,
                     keywords, discount, url))
-            if insertProduct is "Error":
-                # TODO try to recover by re-adding old data
-                pass
+            # TODO try to recover by re-adding old data if insertProduct fails
         return redirect("/admin/products")
+
+
+#TODO improve
+@app.route("/admin/products/file", methods=['POST'])
+def admin_products_file_upload():
+    if request.method == "POST":
+        msg = ""
+        if 'productFile' not in request.files:
+            msg = "Error no file given."
+        else:
+            email = request.cookies.get("UserEmail")
+            assistants = get_assistants(email)
+            # TODO check assistants for errors
+            assistantIndex = 0  # TODO change this
+            assistantID = assistants[assistantIndex][0]
+
+            productFile = request.files["productFile"]
+            email = request.cookies.get("UserEmail")
+            if productFile.filename == "":
+                msg = "Error no filename"
+            elif productFile and allowed_product_file(productFile.filename):
+                ext = productFile.filename.rsplit('.', 1)[1].lower()
+                if not os.path.isdir(PRODUCT_FILES):
+                    os.makedirs(PRODUCT_FILES)
+                filename = secure_filename(productFile.filename)
+                filepath = os.path.join(PRODUCT_FILES, filename)
+                productFile.save(filepath)
+
+                if str(ext).lower() == "json":
+                    json_file = open(PRODUCT_FILES + "/" + productFile.filename, "r")
+                    data = json.load(json_file)
+                    print(len(data))
+                    print(data[0])
+                    for i in range(0, len(data)):
+                        id = data[i]["ProductID"]
+                        name = data[i]["ProductName"]
+                        brand = data[i]["ProductBrand"]
+                        model = data[i]["ProductModel"]
+                        price = data[i]["ProductPrice"]
+                        keywords = data[i]["ProductKeywords"]
+                        discount = data[i]["ProductDiscount"]
+                        url = data[i]["ProductURL"]
+                        insertProduct = insert_into_database_table(
+                            "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) VALUES (?,?,?,?,?,?,?,?,?)",
+                            (assistantID, id, name, brand, model, price, keywords, discount, url))
+                        # TODO check insertProduct for errors
+                elif str(ext).lower() == "xml":
+                    xmldoc = minidom.parse(PRODUCT_FILES + "/" + productFile.filename)
+                    productList = xmldoc.getElementsByTagName("product")
+                    for product in productList:
+                        try:
+                            id = product.getElementsByTagName("ProductID")[0].childNodes[0].data
+                            name = product.getElementsByTagName("ProductName")[0].childNodes[0].data
+                            brand = product.getElementsByTagName("ProductBrand")[0].childNodes[0].data
+                            model = product.getElementsByTagName("ProductModel")[0].childNodes[0].data
+                            price = product.getElementsByTagName("ProductPrice")[0].childNodes[0].data
+                            keywords = product.getElementsByTagName("ProductKeywords")[0].childNodes[0].data
+                            discount = product.getElementsByTagName("ProductDiscount")[0].childNodes[0].data
+                            url = product.getElementsByTagName("ProductURL")[0].childNodes[0].data
+                            insertProduct = insert_into_database_table(
+                                "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) VALUES (?,?,?,?,?,?,?,?,?)",
+                                (assistantID, id, name, brand, model, price, keywords, discount, url))
+                            #TODO check insertProduct for errors
+                        except IndexError:
+                            msg = "Invalid xml file"
+                            print(msg)
+                else:
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                os.remove(PRODUCT_FILES + "/" + productFile.filename)
+            else:
+                msg = "Error not allowed that type of file."
+                print(msg)
+        return msg
 
 
 @app.route("/admin/templates", methods=['GET', 'POST'])
@@ -613,16 +686,18 @@ def admin_pay():
         return render_template("admin/admin-pay.html")
 
 
+#TODO implement this
 @app.route("/admin/analytics", methods=['GET'])
 def admin_analytics():
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        # TODO check assistants for errors
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
-        stats = select_from_database_table("SELECT * FROM Statistics WHERE AssistantID=?", [assistantID], True)
-        return render_template("admin/admin-analytics.html", data=stats)
+        # email = request.cookies.get("UserEmail")
+        # assistants = get_assistants(email)
+        # # TODO check assistants for errors
+        # assistantIndex = 0  # TODO change this
+        # assistantID = assistants[assistantIndex][0]
+        # stats = select_from_database_table("SELECT * FROM Statistics WHERE AssistantID=?", [assistantID], True)
+        # return render_template("admin/admin-analytics.html", data=stats)
+        abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
 @app.route("/admin/support/general", methods=['GET'])
@@ -841,170 +916,6 @@ if __name__ == "__main__":
 
 
 ########################## OLD CODE ##########################
-def adminAnswers():
-    if request.method == "POST":
-        conn = sqlite3.connect(QUESTIONDATABASE)
-        cur = conn.cursor()
-        answers = []
-        selected_question = request.form.get("question")
-        user_mail = request.cookies.get("UserEmail")
-        for i in range(1, 13):
-            if (request.form.get("pname" + str(i)) != None):
-                try:
-                    if (request.files['file' + str(i)].filename == ""):
-                        print('no file given')
-                        if (request.form.get("delPic" + str(i)) != "yes"):
-                            cur.execute("SELECT Answer" + str(
-                                i) + " FROM \"" + user_mail + "\" WHERE Question=\"" + selected_question + "\"")
-                            data = cur.fetchall()
-                            link = data[0][0].split(";")[2]
-                            answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
-                                "keywords" + str(i)) + ";" + link)
-                        else:
-                            answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
-                                "keywords" + str(i)) + ";../static/img/core-img/android-icon-72x72.png")
-                    else:
-                        file = request.files['file' + str(i)]
-                        if file.filename == '':
-                            print('No file name')
-                        elif file and allowed_file(file.filename):
-                            filename = secure_filename(file.filename)
-                            filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
-                        file.save(filePath)
-                        filePath = filePath.split("TheSearchBase")[len(filePath.split("TheSearchBase")) - 1]
-                        # temporay string
-                        tempList = list(filePath)
-                        tempString = ""
-                        for char in tempList:
-                            if (char == "\\"):
-                                char = "/"
-                            tempString += char
-                        filePath = tempString
-                        # tempString = filePath.split("\\")
-                        # filePath = tempString[0] + "/" + tempString[1]
-                        answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
-                            "keywords" + str(i)) + ";.." + filePath)
-                except:
-                    if (request.form.get("delPic" + str(i)) != "yes"):
-                        cur.execute("SELECT Answer" + str(
-                            i) + " FROM \"" + user_mail + "\" WHERE Question=\"" + selected_question + "\"")
-                        data = cur.fetchall()
-                        if data == [(None,)] or data == [("",)] or data == []:
-                            answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
-                                "keywords" + str(i)) + ";../static/img/core-img/android-icon-72x72.png")
-                        else:
-                            print(data)
-                            link = data[0][0].split(";")[2]
-                            answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
-                                "keywords" + str(i)) + ";" + link)
-                    else:
-                        answers.append(request.form.get("pname" + str(i)) + ";" + request.form.get(
-                            "keywords" + str(i)) + ";../static/img/core-img/android-icon-72x72.png")
-        c = 0
-        for a in answers:
-            c += 1
-            cur.execute("UPDATE \"" + user_mail + "\" SET Answer" + str(
-                c) + " = \"" + a + "\" WHERE Question = \"" + selected_question + "\"")
-            conn.commit()
-        for b in range(c + 1, 13):
-            cur.execute("UPDATE \"" + user_mail + "\" SET Answer" + str(
-                b) + " = \"\" WHERE Question = \"" + selected_question + "\"")
-            conn.commit()
-        conn.close()
-        return redirect("/admin/Answers", code=302)
-
-
-def adminAddProduct():
-    if request.method == "GET":
-        conn = sqlite3.connect(PRODUCTDATABASE)
-        cur = conn.cursor()
-        user_mail = request.cookies.get("UserEmail")
-        cur.execute("SELECT * FROM \"" + user_mail + "\"")
-        mes = cur.fetchall()
-        conn.close()
-        return render_template("admin/admin-form-add-product.html", data=mes)
-    if request.method == 'POST':
-        filePath = 'no file upload so far'
-        msg = ''
-        if request.method == 'POST':
-            i = 0;
-            product_id = []
-            name = []
-            brand = []
-            model = []
-            price = []
-            keywords = []
-            discount = []
-            url = []
-            file_path = []
-            while (True):
-                i += 1
-                if (request.form.get("product_ID" + str(i), default="Error") == "Error"):
-                    break
-                product_id.append(request.form.get("product_ID" + str(i), default="Error"))
-                name.append(request.form.get("product_Name" + str(i), default="Error"))
-                brand.append(request.form.get("product_Brand" + str(i), default="Error"))
-                model.append(request.form.get("product_Model" + str(i), default="Error"))
-                price.append(request.form.get("product_Price" + str(i), default="Error"))
-                keywords.append(request.form.get("product_Keywords" + str(i), default="Error"))
-                discount.append(request.form.get("product_Discount" + str(i), default="Error"))
-                url.append(request.form.get("product_URL" + str(i), default="Error"))
-                try:
-                    if (request.files['product_image' + str(i)].filename == ""):
-                        print('no file given')
-                    else:
-                        file = request.files['product_image' + str(i)]
-                        if file.filename == '':
-                            print('No file name')
-                        elif file and allowed_file(file.filename):
-                            filename = secure_filename(file.filename)
-                            filePath = os.path.join(app.config['PRODUCT_IMAGES'], filename)
-                        file.save(filePath)
-                        filePath = filePath.split("TheSearchBase")[len(filePath.split("TheSearchBase")) - 1]
-                        tempList = list(filePath)
-                        tempString = ""
-                        for char in tempList:
-                            if (char == "\\"):
-                                char = "/"
-                            tempString += char
-                        filePath = tempString
-                        filePath = ".." + filePath
-                except:
-                    conn = sqlite3.connect(PRODUCTDATABASE)
-                    cur = conn.cursor()
-                    user_mail = request.cookies.get("UserEmail")
-                    cur.execute("SELECT * FROM \"" + user_mail + "\" WHERE ProductID=\"" + product_id[
-                        len(product_id) - 1] + "\"")
-                    mes = cur.fetchall()
-                    if mes == []:
-                        filePath = "../static/img/core-img/android-icon-72x72.png"
-                    else:
-                        filePath = mes[0][8]
-                    conn.close()
-                file_path.append(filePath)
-            try:
-                conn = sqlite3.connect(PRODUCTDATABASE)
-                cur = conn.cursor()
-                user_mail = request.cookies.get("UserEmail")
-                cur.execute("CREATE TABLE IF NOT EXISTS \'" + user_mail + "\' (\
-				ProductID text, ProductName text, ProductBrand text, ProductModel text, ProductPrice text\
-				ProductKeywords text, ProductDiscount text, ProductURL text, ProductImage text)")
-                cur.execute("DELETE FROM \'" + user_mail + "\'")
-                for q in range(0, i - 1):
-                    # injecting database with sql with product
-                    cur.execute("INSERT INTO \'" + user_mail + "\'('ProductID', 'ProductName', 'ProductBrand', 'ProductModel', \
-					'ProductPrice', 'ProductKeywords', 'ProductDiscount', 'ProductURL', 'ProductImage') \
-					VALUES (?,?,?,?,?,?,?,?,?)", (
-                        product_id[q], name[q], brand[q], model[q], price[q], keywords[q], discount[q], url[q],
-                        file_path[q],))
-                    conn.commit()
-            except:
-                print("Error in editing the database")
-                conn.rollback()
-                conn.close()
-            return redirect("/admin/Products", code=302)
-
-
 # Route for the data storage
 @app.route("/admin/userinput", methods=['GET', 'POST'])
 def adminDataStorage():
@@ -1078,19 +989,6 @@ def uploadProductFile():
             else:
                 msg = "Error not allowed that type of file."
         return msg
-
-
-def productIntoDatabase(email, id="", name="", brand="", model="", price="", keywords="", discount="", url="",
-                        image=""):
-    msg = insert_into_database_table(PRODUCTDATABASE,
-                                     "INSERT INTO \"" + email + "\" (ProductID, ProductName, ProductBrand, ProductModel, ProductPrice, ProductKeywords, ProductDiscount, ProductURL, ProductImage) VALUES (?,?,?,?,?,?,?,?,?)",
-                                     (id, name, brand, model, price, keywords, discount, url, image))
-    return msg
-
-
-def allowed_file(filename):
-    ext = filename.rsplit('.', 1)[1].lower()
-    return '.' in filename and ext in ALLOWED_EXTENSIONS
 
 
 class Del:

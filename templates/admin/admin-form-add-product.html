@@ -386,7 +386,6 @@
           <td><input value=\"" + data[c][5] + "\" style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\"></td>\
           <td><input value=\"" + data[c][6] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\"></td>\
           <td><input value=\"" + data[c][7] + "\" style=\"width: 200px;\" type=\"text\" name=\"product_URL" + String(i) + "\"></td>\
-          <td><input style=\"width: 250px;\" type=\"file\" name=\"product_image" + String(i) + "\" value=\"Upload\"><td>\
         </tr>");
     }
 
@@ -459,7 +458,7 @@
 
         var xhttp = new XMLHttpRequest();
         var msg = "";
-        xhttp.open("POST", "/productfile", true); // true is asynchronous
+        xhttp.open("POST", "/admin/products/file", true); // true is asynchronous
         xhttp.onreadystatechange = function ()
         {
             if (xhttp.readyState === 4)

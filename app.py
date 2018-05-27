@@ -71,7 +71,7 @@ def before_request():
     return None
 
 
-def select_from_database_table(database, sql_statement, array_of_terms=None, all=False):
+def select_from_database_table(sql_statement, array_of_terms=None, all=False, database=DATABASE):
     data = "Error"
     conn = None
     try:
@@ -92,7 +92,7 @@ def select_from_database_table(database, sql_statement, array_of_terms=None, all
         return data
 
 
-def insert_into_database_table(database, sql_statement, tuple_of_terms):
+def insert_into_database_table(sql_statement, tuple_of_terms, database=DATABASE):
     msg = "Error"
     conn = None
     try:
@@ -115,7 +115,7 @@ def insert_into_database_table(database, sql_statement, tuple_of_terms):
         return msg
 
 
-def update_table(database, sql_statement, array_of_terms):
+def update_table(sql_statement, array_of_terms, database=DATABASE):
     msg = "Error"
     conn = None
     try:
@@ -136,7 +136,7 @@ def update_table(database, sql_statement, array_of_terms):
         return msg
 
 
-def delete_from_table(database, sql_statement, array_of_terms):
+def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
     msg = "Error"
     conn = None
     try:
@@ -180,7 +180,7 @@ def allowed_image_file(filename):
 def dynamic_popup(route):
     if request.method == "GET":
         url = "http://www.example.com/"
-        company = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE Name=?", [escape(route)])
+        company = select_from_database_table("SELECT * FROM Company WHERE Name=?", [escape(route)])
         if (company is not None and "Debug" in company[4]):
             url = company[3]
             if "http" not in url:
@@ -243,7 +243,7 @@ def login():
             return render_template('login.html', data="Email or password not received!"), status.HTTP_400_BAD_REQUEST
         else:
             email = email.lower()
-            data = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
+            data = select_from_database_table("SELECT * FROM Users WHERE Email=?", [email])
             if data is not None:
                 password = data[6]
                 print(password_to_check)
@@ -256,6 +256,7 @@ def login():
                 return render_template('login.html', data="User doesn't exist!")
 
 
+# TODO add verification
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
     if request.method == "GET":
@@ -271,16 +272,18 @@ def signup():
             print("Invalid request")
             render_template("signup.html", msg="Invalid request", debug=app.debug), status.HTTP_400_BAD_REQUEST
 
-        insertCompanyResponse = insert_into_database_table(DATABASE,
-                                                           "INSERT INTO Company ('Name', 'Size', 'URL', 'Subscription') VALUES (?,?,?,?)",
-                                                           (companyName, companySize, websiteURL, subscription))
+        insertCompanyResponse = insert_into_database_table(
+            "INSERT INTO Company ('Name', 'Size', 'URL', 'Subscription') VALUES (?,?,?,?)",
+            (companyName, companySize, websiteURL, subscription))
         if "added" not in insertCompanyResponse:
             if "UNIQUE constraint" in insertCompanyResponse:
                 return render_template("signup.html", msg=companyName + " already has an account.", debug=app.debug)
             else:
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            companyID = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE Name=?", [companyName])[0]
+            company = select_from_database_table("SELECT * FROM Company WHERE Name=?", [companyName])
+            # TODO check company for errors
+            companyID = company[0]
             fullname = request.form.get("fullname", default="Error")
             accessLevel = "Admin"
             email = request.form.get("email", default="Error")
@@ -294,13 +297,12 @@ def signup():
                 surname = fullname.split(" ")[1]
                 hashed_password = hash_password(password)
 
-                insertUserResponse = insert_into_database_table(DATABASE,
-                                                                "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password') VALUES (?,?,?,?,?,?)",
-                                                                (companyID, firstname, surname, accessLevel, email,
-                                                                 hashed_password))
+                insertUserResponse = insert_into_database_table(
+                    "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password') VALUES (?,?,?,?,?,?)",
+                    (companyID, firstname, surname, accessLevel, email, hashed_password))
                 if "added" not in insertUserResponse:
                     if "UNIQUE constraint" in insertUserResponse:
-                        delete_from_table(DATABASE, "DELETE FROM Company WHERE Name=?", [companyName])
+                        delete_from_table("DELETE FROM Company WHERE Name=?", [companyName])
                         return render_template("signup.html", msg=email + " already in use.", debug=app.debug)
                     else:
                         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -334,20 +336,20 @@ def admin_home():
 def profilePage():
     if request.method == "GET":
         email = request.cookies.get("UserEmail")
-        user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
+        user = select_from_database_table("SELECT * FROM Users WHERE Email=?", [email])
         # TODO check database output for errors
-        companyName = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[1]])
+        companyName = select_from_database_table("SELECT * FROM Company WHERE ID=?", [user[1]])
         return render_template("admin/admin-profile.html", user=user, companyName=companyName[1])
     elif request.method == "POST":
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
 def get_assistants(email):
-    user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
+    user = select_from_database_table("SELECT * FROM Users WHERE Email=?", [email])
     # TODO check user for errors
-    company = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[1]])
+    company = select_from_database_table("SELECT * FROM Company WHERE ID=?", [user[1]])
     # TODO check company for errors
-    assistants = select_from_database_table(DATABASE, "SELECT * FROM Assistant WHERE CompanyID=?", [company[0]],
+    assistants = select_from_database_table("SELECT * FROM Assistant WHERE CompanyID=?", [company[0]],
                                             True)
     # TODO check assistants for errors
     return assistants
@@ -361,7 +363,7 @@ def admin_questions():
         assistants = get_assistants(email)
         # TODO check assistants for errors
         assistantIndex = 0  # TODO change this
-        questionsTuple = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
+        questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?",
                                                     [assistants[assistantIndex][0]], True)
         # TODO check questionstuple for errors
         questions = []
@@ -373,8 +375,9 @@ def admin_questions():
         email = request.cookies.get("UserEmail")
         assistants = get_assistants(email)
         assistantIndex = 0  # TODO change this
-        currentQuestions = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
-                                                      [assistants[assistantIndex][0]], True)
+        assistantID = assistants[assistantIndex][0]
+        currentQuestions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?",
+                                                      [assistantID], True)
         # TODO check currentQuestions for errors
 
         updatedQuestions = []
@@ -394,8 +397,8 @@ def admin_questions():
                 question = currentQuestions[i][2]
 
                 # print("DELETING: ", question)
-                deleteQuestion = delete_from_table(DATABASE, "DELETE FROM Questions WHERE AssistantID=? AND Question=?",
-                                                   [assistants[assistantIndex][0], escape(question)])
+                deleteQuestion = delete_from_table("DELETE FROM Questions WHERE AssistantID=? AND Question=?",
+                                                   [assistantID, escape(question)])
                 # TODO check deleteQuestion for errors
                 deleteAnswers = delete_from_table(DATABASE, "DELETE FROM Answers WHERE QuestionID=?", [questionID])
                 # TODO check deleteAnswers for errors
@@ -403,12 +406,11 @@ def admin_questions():
             i += 1
             qType = request.form.get("qType" + str(i))
             if i >= len(currentQuestions):
-                insertQuestion = insert_into_database_table(DATABASE,
-                                                            "INSERT INTO Questions ('AssistantID', 'Question', 'Type') VALUES (?,?,?)",
-                                                            (assistants[assistantIndex][0], q, qType))
+                insertQuestion = insert_into_database_table("INSERT INTO Questions ('AssistantID', 'Question', 'Type')"
+                                                            "VALUES (?,?,?)", (assistantID, q, qType))
                 # TODO check insertQuestion for errors
             else:
-                updateQuestion = update_table(DATABASE, "UPDATE Questions SET Question=?, Type=? WHERE Question=?",
+                updateQuestion = update_table("UPDATE Questions SET Question=?, Type=? WHERE Question=?",
                                               [escape(q), qType, currentQuestions[i][2]])
                 # TODO check updateQuestion for errors
 
@@ -423,43 +425,41 @@ def admin_answers():
         assistants = get_assistants(email)
         # TODO check assistants for errors
         assistantIndex = 0  # TODO change this
-        questionsTuple = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
-                                                    [assistants[assistantIndex][0]], True)
+        assistantID = assistants[assistantIndex][0]
+        questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?",
+                                                    [assistantID], True)
         # TODO check questionstuple for errors
         questions = []
         for i in range(0, len(questionsTuple)):
-            questions.append(questionsTuple[i][2])
+            questions.append(questionsTuple[i][2] + ";" + questionsTuple[i][3])
 
         allAnswers = {}
         for i in range(0, len(questions)):
-            answersTuple = select_from_database_table(DATABASE, "SELECT * FROM Answers WHERE QuestionID=?",
+            answersTuple = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?",
                                                       [questionsTuple[i][0]], True)
             # TODO Check answerstuple for errors
             answers = []
             for j in range(0, len(answersTuple)):
-                answers.append(answersTuple[j][2])
+                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3])
 
-            allAnswers[
-                questions[i]] = answers  # dictionary, Key: index of question in question array, value: array of answers
+            allAnswers[questions[i]] = answers
 
         number = 0
         maxNumber = len(questions)
         while (number < maxNumber):
             if (len(questions) > 0):
-                print(number, " ", maxNumber)
-                try:
-                    print(questions[number])
-                except:
+                if (number >= len(questions)):
                     break
-                if (questions[number].split(";")[1] == "userInfoRetrieval"):
-                    questions.remove(questions[number])
-                    allAnswers[questions[number]] = None
-                    number -= 1
-                    maxNumber -= 1
-                    if number < 0:
-                        number = 0
                 else:
-                    number += 1
+                    if (questions[number].split(";")[1] == "userInfoRetrieval"):
+                        allAnswers[questions[number]] = None
+                        questions.remove(questions[number])
+                        number -= 1
+                        maxNumber -= 1
+                        if number < 0:
+                            number = 0
+                    else:
+                        number += 1
             else:
                 break
 
@@ -480,25 +480,35 @@ def admin_answers():
         assistants = get_assistants(email)
         # TODO check assistants for errors
         assistantIndex = 0  # TODO change this
+        assistantID = assistants[assistantIndex][0]
 
-        answers = []
-        selected_question = request.form.get("question")  # question_text;question_type
+        selected_question = request.form.get("question", default="Error")  # question_text;question_type
+        # TODO check selected_question for errors
 
-        noa = 0
+        question = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=? AND Question=?",
+                                              [assistantID, selected_question.split(";")[0]])
+        #TODO Check question for errors
+        questionID = question[0]
+        currentAnswers = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?", [questionID])
+        #TODO check currentAnswers for errors
+        if (currentAnswers is not None):
+            delete_from_table("DELETE FROM Answers WHERE QuestionID=?", [questionID])
+            #TODO check delete from table for errors
+
+        noa = 1
         for key in request.form:
             if "pname" in key:
                 noa += 1
 
         for i in range(1, noa):
-            file = request.files['file' + str(i)]
-            if file.filename == "":
-                pass
-            else:
-                pass
+            answer = request.form.get("pname" + str(i), default="Error")
+            # TODO check answer for errors
+            keyword = request.form.get("keywords" + str(i), default="Error")
+            # TODO check keywords for errors
+            insertAnswer = insert_into_database_table("INSERT INTO Answers (QuestionID, Answer, Keyword) VALUES (?,?,?)", (questionID, answer, keyword))
+            # TODO check insertAnswer
 
-        # TODO finish this
-        abort(status.HTTP_501_NOT_IMPLEMENTED)
-
+        return redirect("/admin/answers")
 
 @app.route("/admin/products", methods=['GET', 'POST'])
 def admin_products():
@@ -507,9 +517,9 @@ def admin_products():
         assistants = get_assistants(email)
         # TODO check assistants for errors
         assistantIndex = 0  # TODO change this
-        products = select_from_database_table(DATABASE,
-                                              "SELECT ProductID, Name, Brand, Model, Price, Keywords, Discount, URL FROM Products WHERE AssistantID=?",
-                                              [assistants[assistantIndex][0]], True)
+        assistantID = assistants[assistantIndex][0]
+        products = select_from_database_table("SELECT ProductID, Name, Brand, Model, Price, Keywords, Discount, URL "
+                                              "FROM Products WHERE AssistantID=?", [assistantID], True)
         # TODO check products for errors
         return render_template("admin/admin-form-add-product.html", data=products)
     elif request.method == 'POST':
@@ -517,15 +527,14 @@ def admin_products():
         assistants = get_assistants(email)
         # TODO check assistants for errors
         assistantIndex = 0  # TODO change this
-
-        currentProducts = select_from_database_table(DATABASE, "SELECT * FROM Products WHERE AssistantID=?",
-                                                     [assistants[assistantIndex][0]], True)
+        assistantID = assistants[assistantIndex][0]
+        currentProducts = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?",
+                                                     [assistantID], True)
         if "Error" in currentProducts:
             # TODO handle errors with currentProducts
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Retrieving current products: " + currentProducts)
         elif currentProducts != [] and currentProducts is not None:
-            deleteCurrentProducts = delete_from_table(DATABASE, "DELETE FROM Products WHERE AssistantID=?",
-                                                      [assistants[assistantIndex][0]])
+            deleteCurrentProducts = delete_from_table("DELETE FROM Products WHERE AssistantID=?", [assistantID])
             if "Error" in deleteCurrentProducts:
                 # TODO handle errors with deleteCurrentProducts
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Deleting current products: " + deleteCurrentProducts)
@@ -564,11 +573,11 @@ def admin_products():
             if url is "Error":
                 abort(status.HTTP_400_BAD_REQUEST, "Error with product url")
 
-            insertProduct = insert_into_database_table(DATABASE,
-                                                       "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) "
-                                                       "VALUES (?,?,?,?,?,?,?,?,?)", (
-                                                       assistants[assistantIndex][0], id, name, brand, model, price,
-                                                       keywords, discount, url))
+            insertProduct = insert_into_database_table(
+                "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) "
+                "VALUES (?,?,?,?,?,?,?,?,?)", (
+                    assistants[assistantIndex][0], id, name, brand, model, price,
+                    keywords, discount, url))
             if insertProduct is "Error":
                 # TODO try to recover by re-adding old data
                 pass
@@ -608,16 +617,11 @@ def admin_pay():
 def admin_analytics():
     if request.method == "GET":
         email = request.cookies.get("UserEmail")
-        user = select_from_database_table(DATABASE, "SELECT * FROM Users WHERE Email=?", [email])
-        # TODO check user for errors
-        company = select_from_database_table(DATABASE, "SELECT * FROM Company WHERE ID=?", [user[1]])
-        # TODO check company for errors
-        assistants = select_from_database_table(DATABASE, "SELECT * FROM Assistant WHERE CompanyID=?", [company[0]],
-                                                True)
+        assistants = get_assistants(email)
         # TODO check assistants for errors
         assistantIndex = 0  # TODO change this
-        stats = select_from_database_table(DATABASE, "SELECT * FROM Statistics WHERE AssistantID=?",
-                                           [assistants[assistantIndex][2]], True)
+        assistantID = assistants[assistantIndex][0]
+        stats = select_from_database_table("SELECT * FROM Statistics WHERE AssistantID=?", [assistantID], True)
         return render_template("admin/admin-analytics.html", data=stats)
 
 

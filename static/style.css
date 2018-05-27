@@ -1846,11 +1846,11 @@ right: 0;
 }
 
 #bottomContainer input {
-    width: 79%;
+    width: 85%;
     margin-right: 3%;
-    margin-left: 2%;
+    margin-left: 4%;
     border-style: none;
-    margin-top: 3.5px;  
+    margin-top: 4.5px;
 }
 
 #bottomContainer input:focus {
@@ -1865,11 +1865,15 @@ right: 0;
 }
 
 #messageSubmitB {
-    width: 29px;
+    width: 26px;
     right: 4px;
-    margin-right: 4px;
-    margin-top: 4px;
+    margin-right: 7px;
+    margin-top: 6px;
     position: absolute;
+}
+
+#messageSubmitB {
+    cursor: pointer;
 }
 
 #optionsDiv{
@@ -1899,22 +1903,6 @@ right: 0;
     margin: 0;
     padding: 0px;
     text-decoration: none;
-}
-
-/* .answerOptions{
-    border-color: black;
-    border-radius: 10px;
-    border-style: solid;
-    border-width: 0.5px;
-    padding: 8px;
-    margin: 4px;
-    white-space: nowrap;
-    word-break: keep-all;
-} */
-
-.answerOptions:hover{
-  color: #ffffff;
-  background: grey;
 }
 
 #chatFooter {
@@ -2031,9 +2019,22 @@ ul li ul.dropdown li {
     text-align: center;
 }
 
-    .answerOptions:hover {
-        cursor: pointer;
-    }
+    /* .answerOptions{
+    border-color: black;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 0.5px;
+    padding: 8px;
+    margin: 4px;
+    white-space: nowrap;
+    word-break: keep-all;
+} */
+
+.answerOptions:hover {
+    color: #ffffff;
+    background: grey;
+    cursor: pointer;
+}
 
 #chatbotBody::-webkit-scrollbar {
     display:none;

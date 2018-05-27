@@ -66,11 +66,11 @@
     <div class="bottom_left" id="contents1">
         <div id="iframediv">
             <div id="overChatbotIframe">
-                <img id="overChatbotIframeImg" src="../static/img/core-img/android-icon-72x72.png" /><a id="overChatbotIframeHeading">TheSearchBase</a><a id="overChatbotIframeCloseButton">V</a>
+                <a id="overChatbotIframeHeading">TheSearchBase</a><a id="overChatbotIframeCloseButton">V</a>
             </div>
-            <iframe frameBorder="0" id="chatbotIframe" src="https://thesearchbase.com/chatbot/Royal Properties LTD" width="500" height="500"></iframe>
+            <iframe frameBorder="0" id="chatbotIframe" src="http://127.0.0.1:5000/chatbot/Royal Properties LTD" width="500" height="500"></iframe>
         </div>
-        <div id="launch_button"></div>
+        <div onmouseleave="OpenButtonHoverEnd()" onmouseover="OpenButtonHover()"><div id="launch_button"></div><div id="launch_button_appendix"></div></div>
     </div>
 
     <!-- ***** Contact Us Area End ***** -->
@@ -100,9 +100,13 @@
         var opened = false;
         var frame = document.getElementById("iframediv");
         var but = document.getElementById("launch_button");
+        var butAp = document.getElementById("launch_button_appendix");
         var closeBut = document.getElementById("overChatbotIframeCloseButton");
+        var hoovered = false; 
         frame.style = "display:none";
-        but.addEventListener("click", function(){
+        but.addEventListener("click", openAssistant);
+        butAp.addEventListener("click", openAssistant);
+        function openAssistant() {
             frame.style = "display:block";
             //$("#iframediv").fadeIn("slow", function () {
             //    // Animation complete
@@ -112,8 +116,9 @@
                 opacity: 1
             }, 400);
             but.style = "display:none";
-            opened=true;
-        });
+            butAp.style = "display:none";
+            opened = true;
+        }
         closeBut.addEventListener("click", function () {
             $("#iframediv").animate({
                 marginBottom: "-=35px",
@@ -121,10 +126,41 @@
             }, 400);
             setTimeout(function () {
                 frame.style = "display:none";
-                but.style = "display:block";
+                but.style = "display:inline-block";
+                butAp.style = "display:inline-block";
                 opened = false;
             }, 400);
         });
+        function OpenButtonHover() {
+            if (!hoovered) {
+                $("#launch_button_appendix").animate({
+                    marginLeft: "+=20px",
+                    marginBottom: "+=76px",
+                    opacity: 1,
+
+                }, 400);
+                hoovered = true;
+            }
+        }
+        function OpenButtonHoverEnd() {
+            if (hoovered) {
+                $("#launch_button_appendix").animate({
+                    marginLeft: "-=20px",
+                    marginBottom: "-=76px",
+                    opacity: 0,
+                }, 400);
+                hoovered = false;
+            }
+        }
+        /*
+            30 deg
+             margin-left: -36px;
+            margin-bottom: -76px;
+            TO:
+            0 deg
+             margin-left: -14px;
+            margin-bottom: 0px;
+        */
     </script>
 </body>
 

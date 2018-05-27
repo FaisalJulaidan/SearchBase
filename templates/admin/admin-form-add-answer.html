@@ -78,13 +78,13 @@
                     <li>
                         <a><i class="fa fa-comments-o"></i> Conversations <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
-                            <li><a href="/admin/Questions">Questions</a></li>
-                            <li><a href="/admin/Answers">Answers</a></li>
-                            <li><a href="/admin/Templates">Templates</a></li>
+                            <li><a href="/admin/questions">Questions</a></li>
+                            <li><a href="/admin/answers">Answers</a></li>
+                            <li><a href="/admin/templates">Templates</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="/admin/Products"><i class="fa fa-database"></i> Product Database<span></span></a>
+                        <a href="/admin/products"><i class="fa fa-database"></i> Product Database<span></span></a>
                     </li>
                     <!-- User Data Storage -->
                     <li>
@@ -334,12 +334,6 @@
                           <input name=\"pname"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[0]+"\">\
                           <p> Answer Keyword </p>\
                           <input name=\"keywords"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[1]+"\">\
-                          <br />\
-                          <input name=\"delPic"+String(b)+"\" id=\"delPic"+String(b)+"\" hidden type=\"text\">\
-                          <input name=\"file"+String(b)+"\" name=\"myFile\" value=\"Upload\" type=\"file\">\
-                          <button type=\"button\" id=\"button"+String(b)+"\" class=\"answerButtonDelPic\" style=\"margin-top: 10px\"> Delete Icon </button>\
-                          <br />\
-                          <img src=\""+String(parts[2])+"\" style=\"width: 75px; height: 75px; margin-top: 10px;\">\
                         </div>");
                     numberOfAnswers++;
                 }
@@ -364,10 +358,6 @@
                       <br />\
                       <p> Answer Keyword </p>\
                       <input name=\"keywords"+String(b+1)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
-                      <br />\
-                      <input name=\"delPic"+String(b+1)+"\" id=\"delPic"+String(b+1)+"\" hidden type=\"text\">\
-                      <input name=\"file"+String(b+1)+"\" name=\"myFile\" value=\"Upload\" type=\"file\">\
-                      <button type=\"button\" id=\"button"+String(b)+"\" class=\"answerButtonDelPic\" style=\"margin-top: 10px\"> Delete Icon </button>\
                     </div>")
                 numberOfAnswers++;
             }
@@ -382,9 +372,7 @@
             buttons[i].addEventListener("click", DeletePicture);
         }
     }
-    function DeletePicture(){
-        document.getElementById("delPic" + this.id.split("")[this.id.split("").length-1]).value = "yes";
-    }
+
     function createArray(rows) {
         var arrayRow = [];
       for (var i=0;i<rows;i++) {

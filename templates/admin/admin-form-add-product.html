@@ -220,7 +220,6 @@
                                                 <th>Keyword/Use</th>
                                                 <th>Discount</th>
                                                 <th>URL</th>
-                                                <th>Image</th>
                                             </tr>
                                             </thead>
                                             <tbody id="tbody">
@@ -404,7 +403,6 @@
           <td><input style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\"></td>\
           <td><input style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\"></td>\
           <td><input style=\"width: 200px;\" type=\"text\" name=\"product_URL" + String(i) + "\"></td>\
-          <td><input style=\"width: 250px;\" type=\"file\" name=\"product_image" + String(i) + "\" value=\"Upload\"><td>\
         </tr>");
     }
 
@@ -420,16 +418,15 @@
                     c--;
                     for (var v = c; v <= i; v++)
                     {
-                        document.getElementsByName("product_Delete" + String(v + 1))[0].setAttribute("name", "product_Delete" + String(v))
-                        document.getElementsByName("product_ID" + String(v + 1))[0].setAttribute("name", "product_ID" + String(v))
-                        document.getElementsByName("product_Name" + String(v + 1))[0].setAttribute("name", "product_Name" + String(v))
-                        document.getElementsByName("product_Brand" + String(v + 1))[0].setAttribute("name", "product_Brand" + String(v))
-                        document.getElementsByName("product_Model" + String(v + 1))[0].setAttribute("name", "product_Model" + String(v))
-                        document.getElementsByName("product_Price" + String(v + 1))[0].setAttribute("name", "product_Price" + String(v))
-                        document.getElementsByName("product_Keywords" + String(v + 1))[0].setAttribute("name", "product_Keywords" + String(v))
-                        document.getElementsByName("product_Discount" + String(v + 1))[0].setAttribute("name", "product_Discount" + String(v))
-                        document.getElementsByName("product_URL" + String(v + 1))[0].setAttribute("name", "product_URL" + String(v))
-                        document.getElementsByName("product_image" + String(v + 1))[0].setAttribute("name", "product_image" + String(v))
+                        document.getElementsByName("product_Delete" + String(v + 1))[0].setAttribute("name", "product_Delete" + String(v));
+                        document.getElementsByName("product_ID" + String(v + 1))[0].setAttribute("name", "product_ID" + String(v));
+                        document.getElementsByName("product_Name" + String(v + 1))[0].setAttribute("name", "product_Name" + String(v));
+                        document.getElementsByName("product_Brand" + String(v + 1))[0].setAttribute("name", "product_Brand" + String(v));
+                        document.getElementsByName("product_Model" + String(v + 1))[0].setAttribute("name", "product_Model" + String(v));
+                        document.getElementsByName("product_Price" + String(v + 1))[0].setAttribute("name", "product_Price" + String(v));
+                        document.getElementsByName("product_Keywords" + String(v + 1))[0].setAttribute("name", "product_Keywords" + String(v));
+                        document.getElementsByName("product_Discount" + String(v + 1))[0].setAttribute("name", "product_Discount" + String(v));
+                        document.getElementsByName("product_URL" + String(v + 1))[0].setAttribute("name", "product_URL" + String(v));
                         i--;
                     }
                 }

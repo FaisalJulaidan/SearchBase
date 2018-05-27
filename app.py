@@ -50,7 +50,7 @@ app.config.update(
 )
 
 
-#TODO just overall better validation
+# TODO just overall better validation
 
 # code to ensure user is logged in
 @app.before_request
@@ -352,9 +352,72 @@ def get_assistants(email):
     # TODO check assistants for errors
     return assistants
 
-#TODO rewrite
+
+# TODO rewrite
 @app.route("/admin/questions", methods=['GET', 'POST'])
 def admin_questions():
+    if request.method == "GET":
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        # TODO check assistants for errors
+        assistantIndex = 0  # TODO change this
+        questionsTuple = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
+                                                    [assistants[assistantIndex][0]], True)
+        # TODO check questionstuple for errors
+        questions = []
+        for i in range(0, len(questionsTuple)):
+            question = [questionsTuple[i][2] + ";" + questionsTuple[i][3]]
+            questions.append(tuple(question))
+        return render_template("admin/admin-form-add-question.html", data=questions)
+    elif request.method == "POST":
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        assistantIndex = 0  # TODO change this
+        currentQuestions = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
+                                                      [assistants[assistantIndex][0]], True)
+        # TODO check currentQuestions for errors
+
+        updatedQuestions = []
+        noq = request.form.get("noq-hidden", default="Error")
+        for i in range(1, int(noq) + 1):
+            question = request.form.get("question" + str(i), default="Error")
+            if question != "Error":
+                updatedQuestions.append(question)
+            else:
+                return render_template("admin/admin-form-add-question.html",
+                                       data=currentQuestions), status.HTTP_400_BAD_REQUEST
+
+        i = -1
+        if (len(updatedQuestions) + 1 < len(currentQuestions) + 1):
+            for b in range(len(updatedQuestions) + 1, len(currentQuestions) + 1):
+                questionID = currentQuestions[i][0]
+                question = currentQuestions[i][2]
+
+                # print("DELETING: ", question)
+                deleteQuestion = delete_from_table(DATABASE, "DELETE FROM Questions WHERE AssistantID=? AND Question=?",
+                                                   [assistants[assistantIndex][0], escape(question)])
+                # TODO check deleteQuestion for errors
+                deleteAnswers = delete_from_table(DATABASE, "DELETE FROM Answers WHERE QuestionID=?", [questionID])
+                # TODO check deleteAnswers for errors
+        for q in updatedQuestions:
+            i += 1
+            qType = request.form.get("qType" + str(i))
+            if i >= len(currentQuestions):
+                insertQuestion = insert_into_database_table(DATABASE,
+                                                            "INSERT INTO Questions ('AssistantID', 'Question', 'Type') VALUES (?,?,?)",
+                                                            (assistants[assistantIndex][0], q, qType))
+                # TODO check insertQuestion for errors
+            else:
+                updateQuestion = update_table(DATABASE, "UPDATE Questions SET Question=?, Type=? WHERE Question=?",
+                                              [escape(q), qType, currentQuestions[i][2]])
+                # TODO check updateQuestion for errors
+
+        return redirect("/admin/questions")
+
+
+# TODO rewrite
+@app.route("/admin/answers", methods=['GET', 'POST'])
+def admin_answers():
     if request.method == "GET":
         email = request.cookies.get("UserEmail")
         assistants = get_assistants(email)
@@ -374,112 +437,10 @@ def admin_questions():
             # TODO Check answerstuple for errors
             answers = []
             for j in range(0, len(answersTuple)):
-                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3])
+                answers.append(answersTuple[j][2])
 
             allAnswers[
                 questions[i]] = answers  # dictionary, Key: index of question in question array, value: array of answers
-
-        number = 0
-        maxNumber = len(questions)
-        while (number < maxNumber):
-            if (len(questions) > 0):
-                print(number, " ", maxNumber)
-                try:
-                    print(questions[number])
-                except:
-                    break
-                if (questions[number].split(";")[1] == "userInfoRetrieval"):
-                    questions.remove(questions[number])
-                    allAnswers[questions[number]] = None
-                    number -= 1
-                    maxNumber -= 1
-                    if number < 0:
-                        number = 0
-                else:
-                    number += 1
-            else:
-                break
-
-        questionsAndAnswers = []
-        for i in range(0, len(questions)):
-            question = []
-            question.append(questions[i])
-            merge = tuple(question)
-            answers = allAnswers[questions[i]]
-            for j in range(0, len(answers)):
-                answer = []
-                answer.append(answers[j])
-                merge = merge + tuple(answer)
-            questionsAndAnswers.append(merge)
-        return render_template("admin/admin-form-add-question.html", data=questionsAndAnswers)
-    elif request.method == "POST":
-        email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        assistantIndex = 0  # TODO change this
-        currentQuestions = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
-                                                      [assistants[assistantIndex][0]], True)
-        # TODO check currentQuestions for errors
-
-        updatedQuestions = []
-        noq = request.form.get("noq-hidden", default="Error")
-        for i in range(1, int(noq) + 1):
-            question = request.form.get("question" + str(i), default="Error")
-            if question != "Error":
-                updatedQuestions.append(question)
-            else:
-                return render_template("admin/admin-form-add-question.html", data=currentQuestions), status.HTTP_400_BAD_REQUEST
-
-        i = -1
-        print(currentQuestions)
-        if (len(updatedQuestions) + 1 < len(currentQuestions) + 1):
-            for b in range(len(updatedQuestions) + 1, len(currentQuestions) + 1):
-                questionID = currentQuestions[i][0]
-                question = currentQuestions[i][2]
-
-                print("DELETING: ", question)
-                deleteQuestion = delete_from_table(DATABASE, "DELETE FROM Questions WHERE Question=?", [escape(question)])
-                #TODO check deleteQuestion for errors
-                deleteAnswers = delete_from_table(DATABASE, "DELETE FROM Answers WHERE QuestionID=?", [questionID])
-                #TODO check deleteAnswers for errors
-        for q in updatedQuestions:
-            i += 1
-            qType = request.form.get("qType" + str(i))
-            try:
-                print(currentQuestions[i][2] != None)  # IMPORTANT DO NOT REMOVE
-                print("UPDATING: ", currentQuestions[i][2], " TO ", q + ";" + qType)
-                updateQuestion = update_table(DATABASE, "UPDATE Questions SET Question=? WHERE Question=?", [escape(q + ";" + qType), currentQuestions[i][2]])
-                #TODO check updateQuestion for errors
-            except:
-                print("INSERTING NEW: ", q + ";" + qType)
-                insertQuestion = insert_into_database_table(DATABASE, "INSERT INTO Questions ('AssistantID', 'Question') VALUES (?,?)", (assistants[assistantIndex][0], q + ";" + qType))
-                # TODO check insertQuestion for errors
-        return redirect("/admin/questions")
-
-#TODO rewrite
-@app.route("/admin/answers", methods=['GET', 'POST'])
-def admin_answers():
-    if request.method == "GET":
-        email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        # TODO check assistants for errors
-        assistantIndex = 0  # TODO change this
-        questionsTuple = select_from_database_table(DATABASE, "SELECT * FROM Questions WHERE AssistantID=?",
-                                               [assistants[assistantIndex][0]], True)
-        # TODO check questionstuple for errors
-        questions = []
-        for i in range (0, len(questionsTuple)):
-            questions.append(questionsTuple[i][2])
-
-        allAnswers = {}
-        for i in range(0, len(questions)):
-            answersTuple = select_from_database_table(DATABASE, "SELECT * FROM Answers WHERE QuestionID=?",
-                                                 [questionsTuple[i][0]], True)
-            # TODO Check answerstuple for errors
-            answers = []
-            for j in range(0, len(answersTuple)):
-                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3])
-
-            allAnswers[questions[i]] = answers #dictionary, Key: index of question in question array, value: array of answers
 
         number = 0
         maxNumber = len(questions)
@@ -521,7 +482,7 @@ def admin_answers():
         assistantIndex = 0  # TODO change this
 
         answers = []
-        selected_question = request.form.get("question") #question_text;question_type
+        selected_question = request.form.get("question")  # question_text;question_type
 
         noa = 0
         for key in request.form:
@@ -535,8 +496,7 @@ def admin_answers():
             else:
                 pass
 
-
-        #TODO finish this
+        # TODO finish this
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
@@ -547,7 +507,8 @@ def admin_products():
         assistants = get_assistants(email)
         # TODO check assistants for errors
         assistantIndex = 0  # TODO change this
-        products = select_from_database_table(DATABASE, "SELECT ProductID, Name, Brand, Model, Price, Keywords, Discount, URL FROM Products WHERE AssistantID=?",
+        products = select_from_database_table(DATABASE,
+                                              "SELECT ProductID, Name, Brand, Model, Price, Keywords, Discount, URL FROM Products WHERE AssistantID=?",
                                               [assistants[assistantIndex][0]], True)
         # TODO check products for errors
         return render_template("admin/admin-form-add-product.html", data=products)
@@ -558,12 +519,13 @@ def admin_products():
         assistantIndex = 0  # TODO change this
 
         currentProducts = select_from_database_table(DATABASE, "SELECT * FROM Products WHERE AssistantID=?",
-                                              [assistants[assistantIndex][0]], True)
+                                                     [assistants[assistantIndex][0]], True)
         if "Error" in currentProducts:
-            #TODO handle errors with currentProducts
+            # TODO handle errors with currentProducts
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Retrieving current products: " + currentProducts)
         elif currentProducts != [] and currentProducts is not None:
-            deleteCurrentProducts = delete_from_table(DATABASE, "DELETE FROM Products WHERE AssistantID=?", [assistants[assistantIndex][0]])
+            deleteCurrentProducts = delete_from_table(DATABASE, "DELETE FROM Products WHERE AssistantID=?",
+                                                      [assistants[assistantIndex][0]])
             if "Error" in deleteCurrentProducts:
                 # TODO handle errors with deleteCurrentProducts
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Deleting current products: " + deleteCurrentProducts)
@@ -576,7 +538,7 @@ def admin_products():
                 nop += 1
 
         for i in range(1, nop):
-            #TODO add more info to these error messages
+            # TODO add more info to these error messages
             id = request.form.get("product_ID" + str(i), default="Error")
             if id is "Error":
                 abort(status.HTTP_400_BAD_REQUEST, "Error with product ID")
@@ -602,12 +564,16 @@ def admin_products():
             if url is "Error":
                 abort(status.HTTP_400_BAD_REQUEST, "Error with product url")
 
-            insertProduct = insert_into_database_table(DATABASE, "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) "
-                                                                 "VALUES (?,?,?,?,?,?,?,?,?)", (assistants[assistantIndex][0], id, name, brand, model, price, keywords, discount, url))
+            insertProduct = insert_into_database_table(DATABASE,
+                                                       "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) "
+                                                       "VALUES (?,?,?,?,?,?,?,?,?)", (
+                                                       assistants[assistantIndex][0], id, name, brand, model, price,
+                                                       keywords, discount, url))
             if insertProduct is "Error":
                 # TODO try to recover by re-adding old data
                 pass
         return redirect("/admin/products")
+
 
 @app.route("/admin/templates", methods=['GET', 'POST'])
 def admin_templates():
@@ -804,7 +770,6 @@ def redirect_data_collection():
         return redirect("/data/collection")
 
 
-
 @app.route("/send/mail", methods=['GET', 'POST'])
 def sendEmail():
     if request.method == "GET":
@@ -840,6 +805,7 @@ def sendMarketingEmail():
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)
 def unsupported_media(e):
     return render_template('errors/400.html', error=e, debug=app.debug), status.HTTP_400_BAD_REQUEST
+
 
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):

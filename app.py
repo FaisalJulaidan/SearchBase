@@ -5,7 +5,7 @@ import stripe
 from flask_mail import Mail, Message
 from werkzeug import secure_filename
 from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape
-from flask_api import status
+#from flask_api import status
 from datetime import datetime
 import string
 from bcrypt import hashpw, gensalt
@@ -1048,34 +1048,34 @@ def sendMarketingEmail():
 
 
 ## Error Handlers ##
-@app.errorhandler(status.HTTP_400_BAD_REQUEST)
-def unsupported_media(e):
-    return render_template('errors/400.html', error=e, debug=app.debug), status.HTTP_400_BAD_REQUEST
+#@app.errorhandler(status.HTTP_400_BAD_REQUEST)
+#def unsupported_media(e):
+#    return render_template('errors/400.html', error=e, debug=app.debug), status.HTTP_400_BAD_REQUEST
 
 
-@app.errorhandler(status.HTTP_404_NOT_FOUND)
-def page_not_found(e):
-    return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
+#@app.errorhandler(status.HTTP_404_NOT_FOUND)
+#def page_not_found(e):
+#    return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
 
 
-@app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-def unsupported_media(e):
-    return render_template('errors/415.html', error=e), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+#@app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+#def unsupported_media(e):
+#    return render_template('errors/415.html', error=e), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 
-@app.errorhandler(418)
-def im_a_teapot(e):
-    return render_template('errors/418.html', error=e, debug=app.debug), 418
+#@app.errorhandler(418)
+#def im_a_teapot(e):
+#    return render_template('errors/418.html', error=e, debug=app.debug), 418
 
 
-@app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
-def internal_server_error(e):
-    return render_template('errors/500.html', error=e, debug=app.debug), status.HTTP_500_INTERNAL_SERVER_ERROR
+#@app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
+#def internal_server_error(e):
+#    return render_template('errors/500.html', error=e, debug=app.debug), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
-@app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
-def not_implemented(e):
-    return render_template('errors/501.html', error=e, debug=app.debug), status.HTTP_501_NOT_IMPLEMENTED
+#@app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
+#def not_implemented(e):
+#    return render_template('errors/501.html', error=e, debug=app.debug), status.HTTP_501_NOT_IMPLEMENTED
 
 
 class Del:

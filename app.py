@@ -695,6 +695,29 @@ def admin_pay():
         return render_template("admin/admin-pay.html")
 
 
+@app.route("/admin/userinput", methods=["GET"])
+def admin_user_input():
+    if request.method == "GET":
+        # email = request.cookies.get("UserEmail")
+        # assistants = get_assistants(email)
+        # # TODO check assistants for errors
+        # assistantIndex = 0  # TODO change this
+        # assistantID = assistants[assistantIndex][0]
+        # questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
+        #                                             [assistantID], True)
+        # data = []
+        # for i in range(0, len(questions)):
+        #     question = questions[i]
+        #     questionID = question[0]
+        #     userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
+        #     #TODO check userInput for errors
+        #     if len(userInput) > 0:
+        #         data.append(userInput)
+        # print(data)
+        # return render_template("admin/admin-data-storage.html", data=data)
+        abort(status.HTTP_501_NOT_IMPLEMENTED, "Coming soon")
+
+
 @app.route("/chatbot/<route>", methods=['GET', 'POST'])
 def chatbot(route):
     if request.method == "GET":
@@ -737,17 +760,15 @@ def chatbot(route):
 
         date = datetime.now().strftime("%Y-%m")
 
-        if (not app.debug):
-            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", date)
-            if currentStats is None:
-                newStats = insert_into_database_table(
-                    "INSERT INTO Statistics (AssistantID, Date, Opened) VALUES (?, ?, ?);",
-                    (assistantID, date, 1))
-                # TODO check newStats for errors
-            else:
-                updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
-                                            [currentStats[3], assistantID, date])
-                # TODO check new stats for errors
+        currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
+        if currentStats is None:
+            newStats = insert_into_database_table(
+                "INSERT INTO Statistics (AssistantID, Date, Opened) VALUES (?, ?, ?);",
+                (assistantID, date, 1))
+            # TODO check newStats for errors
+        else:
+            updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
+                                        [currentStats[3] + 1, assistantID, date])
         return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route)
     else:
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
@@ -772,7 +793,7 @@ def chatbot(route):
             insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input) VALUES (?,?,?)",
                                                      (questionID, date, input))
             # TODO check insertInput for errors
-        print(request.form)
+
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")
         if nok is "Error":
@@ -784,7 +805,6 @@ def chatbot(route):
             # TODO work out this
             for i in range(1, int(nok) + 1):
                 keyword = request.form.get("keyword" + str(i), default="Error")
-                print(keyword is "Error")
                 if keyword is not "Error":
                     if "-" in keyword:
                         budget = keyword.split("-")
@@ -833,15 +853,29 @@ def chatbot(route):
                         dl -= 1
                     i += 1
 
-            print(products)
             while (len(products) > 9):
                 products.pop()
             if products is None or products == []:
                 return "We could not find anything that matched your search criteria. Please try different filter options."
 
-            if not app.debug:
-                pass
-                # TODO statistics stuff
+            date = datetime.now().strftime("%Y-%m")
+            questionsAnswered = request.form.get("questionsAnswered", default="Error")
+            # TODO check questionsAnswered for errors
+            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
+            if currentStats is None:
+                newStats = insert_into_database_table(
+                    "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
+                    (assistantID, date, 1, questionsAnswered, len(products)))
+                # TODO check newStats for errors
+            else:
+                currentQuestionAnswerd = currentStats[4]
+                currentProductsReturned = currentStats[5]
+                questionsAnswered += currentQuestionAnswerd
+                productsReturned = len(products) + currentProductsReturned
+                updatedStats = update_table(
+                    "UPDATE Statistics SET QuestionsAnswered=?, ProductsReturned=? WHERE AssistantID=? AND Date=?;",
+                    [questionAnswerd, productsReturned, assistantID, date])
+                # TODO check updatedStats for errors
 
             datastring = ""
             for product in products:
@@ -857,14 +891,13 @@ def chatbot(route):
 @app.route("/admin/analytics", methods=['GET'])
 def admin_analytics():
     if request.method == "GET":
-        # email = request.cookies.get("UserEmail")
-        # assistants = get_assistants(email)
-        # # TODO check assistants for errors
-        # assistantIndex = 0  # TODO change this
-        # assistantID = assistants[assistantIndex][0]
-        # stats = select_from_database_table("SELECT * FROM Statistics WHERE AssistantID=?", [assistantID], True)
-        # return render_template("admin/admin-analytics.html", data=stats)
-        abort(status.HTTP_501_NOT_IMPLEMENTED)
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        # TODO check assistants for errors
+        assistantIndex = 0  # TODO change this
+        assistantID = assistants[assistantIndex][0]
+        stats = select_from_database_table("SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?", [assistantID], True)
+        return render_template("admin/admin-analytics.html", data=stats)
 
 
 @app.route("/admin/support/general", methods=['GET'])
@@ -927,7 +960,7 @@ def privacy():
 @app.route("/affiliate", methods=['GET'])
 def affiliate():
     if request.method == "GET":
-        abort(404)
+        abort(status.HTTP_501_NOT_IMPLEMENTED, "Affiliate program coming soon")
         # return render_template("affiliate.html")
 
 
@@ -1089,39 +1122,16 @@ class Del:
 if __name__ == "__main__":
     app.run(debug=True)
 
-
 ########################## OLD CODE ##########################
 # Route for the data storage
-@app.route("/admin/userinput", methods=['GET', 'POST'])
-def adminDataStorage():
-    if request.method == "GET":
-        conn = sqlite3.connect(USERINPUTDATABASE)
-        cur = conn.cursor()
-        user_mail = request.cookies.get("UserEmail")
-        cur.execute("SELECT * FROM \"" + user_mail + "\"")
-        data = cur.fetchall()
-        return render_template("admin/admin-data-storage.html", data=data)
-    if request.method == "POST":
-        return redirect("/admin/userinput", code=302)
-
-
-def dynamicChatbot(route):
-    if (not app.debug):
-        date = datetime.now().strftime("%Y-%m")
-        conn = sqlite3.connect(STATISTICSDATABASE)
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-        stats = cur.fetchall()
-        questionsAnswered = request.form["questionsAnswered"]
-        if not stats:
-            cur.execute("INSERT INTO \"" + route + "\" ('Date', 'AssistantOpened', 'QuestionsAnswered', 'ProductsReturned')\
-                                        VALUES (?,?,?,?)", (date, "0", questionsAnswered, len(data)))
-        else:
-            cur.execute("UPDATE \"" + route + "\" SET ProductsReturned = \"" + str(
-                int(stats[0][3]) + len(data)) + "\" WHERE Date = \"" + date + "\"")
-            cur.execute("UPDATE \"" + route + "\" SET QuestionsAnswered = \"" + str(
-                int(stats[0][2]) + int(questionsAnswered)) + "\" WHERE Date = \"" + date + "\"")
-        conn.commit()
-        cur.execute("SELECT * FROM \"" + route + "\" WHERE Date=?;", [date])
-        stats = cur.fetchall()
-        conn.close()
+# @app.route("/admin/userinput", methods=['GET', 'POST'])
+# def adminDataStorage():
+#     if request.method == "GET":
+#         conn = sqlite3.connect(USERINPUTDATABASE)
+#         cur = conn.cursor()
+#         user_mail = request.cookies.get("UserEmail")
+#         cur.execute("SELECT * FROM \"" + user_mail + "\"")
+#         data = cur.fetchall()
+#         return render_template("admin/admin-data-storage.html", data=data)
+#     if request.method == "POST":
+#         return redirect("/admin/userinput", code=302)

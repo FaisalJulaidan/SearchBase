@@ -212,13 +212,13 @@
                             </div>
                             <div class="x_content">
                                 <br />
-                                <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+                                <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" action="/admin/submitWelcomeMessage" method="post">
                                     <div class="form-group">
                                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="">
                                             Enter your welcome message <span class="required">*</span>
                                         </label>
                                         <div class="col-md-9 col-sm-9 col-xs-12">
-                                            <input type="text" id="welcome-message" required="required" class="form-control col-md-5 col-xs-10" placeholder="You can leave this empty is you wish.">
+                                            <input value="{{message}}" name="welcome-message" type="text" id="welcome-message" required="required" class="form-control col-md-5 col-xs-10" placeholder="You can leave this empty is you wish.">
                                         </div>
                                     </div>
                                     <div class="ln_solid"></div>
@@ -227,7 +227,6 @@
                                         </div>
                                     </div>
                                     <button id="WelcomeMessage-SubmitB" class="btn btn-success">Submit</button>
-                                    <button id="WelcomeMessage-ResetB" class="btn btn-primary">Reset</button>
                                 </form>
                             </div>
                         </div>
@@ -411,8 +410,6 @@
                 document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
                 document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions); 
                 document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
-                document.getElementById("WelcomeMessage-SubmitB").addEventListener("click", SubmitWelcomeMessage);
-                document.getElementById("WelcomeMessage-ResetB").addEventListener("click", ResetWelcomeMessage);
 
                 // called on NOQ Reset Click
                 function ClearNOQ()
@@ -603,15 +600,6 @@
                     // Change colour of the border of the box
                     // Validation for the dynmaicaly loaded boxes
                     return true;
-                }
-
-                // Welcome Message
-                function SubmitWelcomeMessage() {
-
-                }
-
-                function ResetWelcomeMessage() {
-
                 }
             </script>
 

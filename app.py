@@ -352,6 +352,12 @@ def profilePage():
     elif request.method == "POST":
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
+def get_company(email):
+    user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
+    # TODO check user for errors
+    company = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
+    # TODO check company for errors
+    return company
 
 def get_assistants(email):
     user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
@@ -363,6 +369,13 @@ def get_assistants(email):
     # TODO check assistants for errors
     return assistants
 
+@app.route("/admin/submitWelcomeMessage", methods=['POST'])
+def welcomeWM():
+    if request.method == "POST":
+        message = request.form.get("welcome-message")
+        # update Message
+        updateMessage = update_table("UPDATE Assistants SET Message=? WHERE CompanyID=?;", [message,get_company(request.cookies.get("UserEmail"))[0]])
+        return redirect("/admin/questions", code=302)
 
 # TODO rewrite
 @app.route("/admin/questions", methods=['GET', 'POST'])
@@ -374,12 +387,17 @@ def admin_questions():
         assistantIndex = 0  # TODO change this
         questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
                                                     [assistants[assistantIndex][0]], True)
+        message = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(email)[0]], True)
+        if(message[0][3] is None):
+            message = ""
+        else:
+            message=message[0][3]
         # TODO check questionstuple for errors
         questions = []
         for i in range(0, len(questionsTuple)):
             question = [questionsTuple[i][2] + ";" + questionsTuple[i][3]]
             questions.append(tuple(question))
-        return render_template("admin/admin-form-add-question.html", data=questions)
+        return render_template("admin/admin-form-add-question.html", data=questions, message=message)
     elif request.method == "POST":
         email = request.cookies.get("UserEmail")
         assistants = get_assistants(email)
@@ -735,6 +753,11 @@ def chatbot(route):
                 merge = merge + tuple(answer)
             questionsAndAnswers.append(merge)
 
+        message = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(request.cookies.get("UserEmail"))[0]], True)
+        if(message[0][3] is None):
+            message = ""
+        else:
+            message=message[0][3]
         date = datetime.now().strftime("%Y-%m")
 
         if (not app.debug):
@@ -748,7 +771,7 @@ def chatbot(route):
                 updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
                                             [currentStats[3], assistantID, date])
                 # TODO check new stats for errors
-        return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route)
+        return render_template("dynamic-chatbot.html", data=questionsAndAnswers, message=message)
     else:
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
         # TODO check company for errors

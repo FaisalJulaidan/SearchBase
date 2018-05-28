@@ -369,13 +369,19 @@ def get_assistants(email):
     # TODO check assistants for errors
     return assistants
 
-@app.route("/admin/submitWelcomeMessage", methods=['POST'])
-def welcomeWM():
+@app.route("/admin/welcomemsg", methods=['POST'])
+def adming_welcome_message():
     if request.method == "POST":
-        message = request.form.get("welcome-message")
-        # update Message
-        updateMessage = update_table("UPDATE Assistants SET Message=? WHERE CompanyID=?;", [message,get_company(request.cookies.get("UserEmail"))[0]])
-        return redirect("/admin/questions", code=302)
+        message = request.form.get("welcome-message", default="Error")
+        if message is "Error":
+            abort(status.HTTP_400_BAD_REQUEST)
+
+        email = request.cookies.get("UserEmail")
+        company = get_company(email)
+        #TODO check company for error
+        updateMessage = update_table("UPDATE Assistants SET Message=? WHERE CompanyID=?;", [escape(message), company[0]])
+        #TODO check updateMessage for error
+        return redirect("/admin/questions")
 
 # TODO rewrite
 @app.route("/admin/questions", methods=['GET', 'POST'])
@@ -387,12 +393,9 @@ def admin_questions():
         assistantIndex = 0  # TODO change this
         questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
                                                     [assistants[assistantIndex][0]], True)
-        message = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(email)[0]], True)
-        if(message[0][3] is None):
-            message = ""
-        else:
-            message=message[0][3]
         # TODO check questionstuple for errors
+        message = assistants[assistantIndex][3]
+
         questions = []
         for i in range(0, len(questionsTuple)):
             question = [questionsTuple[i][2] + ";" + questionsTuple[i][3]]
@@ -776,23 +779,19 @@ def chatbot(route):
                 merge = merge + tuple(answer)
             questionsAndAnswers.append(merge)
 
-        message = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(request.cookies.get("UserEmail"))[0]], True)
-        if(message[0][3] is None):
-            message = ""
-        else:
-            message=message[0][3]
+        message = assistants[assistantIndex][3]
         date = datetime.now().strftime("%Y-%m")
 
         currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
         if currentStats is None:
             newStats = insert_into_database_table(
-                "INSERT INTO Statistics (AssistantID, Date, Opened) VALUES (?, ?, ?);",
-                (assistantID, date, 1))
+                "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
+                (assistantID, date, 1, 0, 0))
             # TODO check newStats for errors
         else:
             updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
                                         [currentStats[3] + 1, assistantID, date])
-        return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route)
+        return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route, message=message)
     else:
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
         # TODO check company for errors

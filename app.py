@@ -352,6 +352,12 @@ def profilePage():
     elif request.method == "POST":
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
+def get_company(email):
+    user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
+    # TODO check user for errors
+    company = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
+    # TODO check company for errors
+    return company
 
 def get_assistants(email):
     user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
@@ -363,6 +369,13 @@ def get_assistants(email):
     # TODO check assistants for errors
     return assistants
 
+@app.route("/admin/submitWelcomeMessage", methods=['POST'])
+def welcomeWM():
+    if request.method == "POST":
+        message = request.form.get("welcome-message")
+        # update Message
+        updateMessage = update_table("UPDATE Assistants SET Message=? WHERE CompanyID=?;", [message,get_company(request.cookies.get("UserEmail"))[0]])
+        return redirect("/admin/questions", code=302)
 
 # TODO rewrite
 @app.route("/admin/questions", methods=['GET', 'POST'])
@@ -374,12 +387,17 @@ def admin_questions():
         assistantIndex = 0  # TODO change this
         questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
                                                     [assistants[assistantIndex][0]], True)
+        message = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(email)[0]], True)
+        if(message[0][3] is None):
+            message = ""
+        else:
+            message=message[0][3]
         # TODO check questionstuple for errors
         questions = []
         for i in range(0, len(questionsTuple)):
             question = [questionsTuple[i][2] + ";" + questionsTuple[i][3]]
             questions.append(tuple(question))
-        return render_template("admin/admin-form-add-question.html", data=questions)
+        return render_template("admin/admin-form-add-question.html", data=questions, message=message)
     elif request.method == "POST":
         email = request.cookies.get("UserEmail")
         assistants = get_assistants(email)
@@ -758,6 +776,11 @@ def chatbot(route):
                 merge = merge + tuple(answer)
             questionsAndAnswers.append(merge)
 
+        message = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(request.cookies.get("UserEmail"))[0]], True)
+        if(message[0][3] is None):
+            message = ""
+        else:
+            message=message[0][3]
         date = datetime.now().strftime("%Y-%m")
 
         currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
@@ -1081,34 +1104,34 @@ def sendMarketingEmail():
 
 
 ## Error Handlers ##
-@app.errorhandler(status.HTTP_400_BAD_REQUEST)
-def unsupported_media(e):
-    return render_template('errors/400.html', error=e, debug=app.debug), status.HTTP_400_BAD_REQUEST
+#@app.errorhandler(status.HTTP_400_BAD_REQUEST)
+#def unsupported_media(e):
+#    return render_template('errors/400.html', error=e, debug=app.debug), status.HTTP_400_BAD_REQUEST
 
 
-@app.errorhandler(status.HTTP_404_NOT_FOUND)
-def page_not_found(e):
-    return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
+#@app.errorhandler(status.HTTP_404_NOT_FOUND)
+#def page_not_found(e):
+#    return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
 
 
-@app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-def unsupported_media(e):
-    return render_template('errors/415.html', error=e), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+#@app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+#def unsupported_media(e):
+#    return render_template('errors/415.html', error=e), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 
-@app.errorhandler(418)
-def im_a_teapot(e):
-    return render_template('errors/418.html', error=e, debug=app.debug), 418
+#@app.errorhandler(418)
+#def im_a_teapot(e):
+#    return render_template('errors/418.html', error=e, debug=app.debug), 418
 
 
-@app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
-def internal_server_error(e):
-    return render_template('errors/500.html', error=e, debug=app.debug), status.HTTP_500_INTERNAL_SERVER_ERROR
+#@app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
+#def internal_server_error(e):
+#    return render_template('errors/500.html', error=e, debug=app.debug), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
-@app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
-def not_implemented(e):
-    return render_template('errors/501.html', error=e, debug=app.debug), status.HTTP_501_NOT_IMPLEMENTED
+#@app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
+#def not_implemented(e):
+#    return render_template('errors/501.html', error=e, debug=app.debug), status.HTTP_501_NOT_IMPLEMENTED
 
 
 class Del:

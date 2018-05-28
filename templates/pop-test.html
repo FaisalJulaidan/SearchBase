@@ -61,19 +61,24 @@
 
 </head>
 
-<body background="../static/images/property.PNG" height="42" width="42">
+<body>
 
-    <div class="bottom_left" id="contents1">
-        <div id="iframediv">
-            <div id="overChatbotIframe">
-                <a id="overChatbotIframeHeading">TheSearchBase</a><a id="overChatbotIframeCloseButton">V</a>
+    <div class="main_wrapper">
+        <div class="bottom_left" id="contents1">
+            <div id="iframediv">
+                <div id="overChatbotIframe">
+                    <a id="overChatbotIframeHeading">TheSearchBase</a>
+                    <a id="overChatbotIframeCloseButton">X</a>
+                </div>
+                <iframe frameBorder="0" id="chatbotIframe" src="http://127.0.0.1:5000/chatbot/Royal Properties LTD"></iframe>
             </div>
-            <iframe frameBorder="0" id="chatbotIframe" src="http://127.0.0.1:5000/chatbot/Royal Properties LTD" width="500" height="500"></iframe>
+            <div class="launch_btn_holder">
+                <div id="launch_button"></div>
+                <div id="launch_button_appendix"></div>
+            </div>
         </div>
-        <div onmouseleave="OpenButtonHoverEnd()" onmouseover="OpenButtonHover()"><div id="launch_button"></div><div id="launch_button_appendix"></div></div>
     </div>
 
-    <!-- ***** Contact Us Area End ***** -->
 
     <!-- ***** Footer Area Start ***** -->
     <footer class="">
@@ -82,7 +87,8 @@
     <!-- ***** Footer Area end ***** -->
 
     <!-- Jquery-2.2.4 JS -->
-    <script src="../static/js/jquery-2.2.4.min.js"></script>
+    <script src="../static/js/jquery-2.2.4.min.js"></script> 
+
     <!-- Popper js -->
     <script src="../static/js/popper.min.js"></script>
     <!-- Bootstrap-4 Beta JS -->
@@ -93,19 +99,51 @@
     <script src="../static/js/slick.min.js"></script>
     <!-- Footer Reveal JS -->
     <script src="../static/js/footer-reveal.min.js"></script>
+    <script src="../static/js/jQueryRotate.js"></script>
     <!-- Active JS -->
     <script src="../static/js/active.js"></script>
 
     <script>
+
+        var angle = 0;
+        var degreeInRadians = 2*Math.PI/360;
+        var realX = 0; 
+        var realY = 0;
         var opened = false;
         var frame = document.getElementById("iframediv");
         var but = document.getElementById("launch_button");
         var butAp = document.getElementById("launch_button_appendix");
         var closeBut = document.getElementById("overChatbotIframeCloseButton");
         var hoovered = false; 
-        frame.style = "display:none";
-        but.addEventListener("click", openAssistant);
-        butAp.addEventListener("click", openAssistant);
+        var btn_text = $("#launch_button_appendix");
+
+        $(document).ready(function(){
+            frame.style = "display:none";
+            but.addEventListener("click", openAssistant);
+            butAp.addEventListener("click", openAssistant);
+            closeBut.addEventListener("click", function () {
+                $("#iframediv").animate({
+                    marginBottom: "-=35px",
+                    opacity: 0
+                }, 400);
+                setTimeout(function () {
+                    frame.style = "display:none";
+                    but.style = "display:inline-block";
+                    butAp.style = "display:inline-block";
+                    opened = false;
+                }, 400);
+            });
+
+            $(document).on( "mouseover", ".launch_btn_holder", function(){
+                OpenButtonHover();
+            });
+
+            $( document ).on( "mouseleave", ".launch_btn_holder", function(){
+                OpenButtonHoverEnd();
+            });
+        });
+
+
         function openAssistant() {
             frame.style = "display:block";
             //$("#iframediv").fadeIn("slow", function () {
@@ -119,36 +157,34 @@
             butAp.style = "display:none";
             opened = true;
         }
-        closeBut.addEventListener("click", function () {
-            $("#iframediv").animate({
-                marginBottom: "-=35px",
-                opacity: 0
-            }, 400);
-            setTimeout(function () {
-                frame.style = "display:none";
-                but.style = "display:inline-block";
-                butAp.style = "display:inline-block";
-                opened = false;
-            }, 400);
-        });
+
         function OpenButtonHover() {
             if (!hoovered) {
                 $("#launch_button_appendix").animate({
-                    marginLeft: "+=20px",
-                    marginBottom: "+=76px",
+                    // marginLeft: "+=20px",
+                    // marginBottom: "+=76px",
+                    marginLeft: "-20px",
+                    marginBottom: "0px",
                     opacity: 1,
 
-                }, 400);
+                }, 600);
+                $("#launch_button_appendix").rotate({
+                    animateTo:0,
+                })
                 hoovered = true;
+
             }
         }
         function OpenButtonHoverEnd() {
             if (hoovered) {
                 $("#launch_button_appendix").animate({
-                    marginLeft: "-=20px",
-                    marginBottom: "-=76px",
+                    marginLeft: "-177px",
+                    marginBottom: "-147px",
                     opacity: 0,
-                }, 400);
+                }, 600);
+                $("#launch_button_appendix").rotate({
+                    animateTo:90,
+                })
                 hoovered = false;
             }
         }

@@ -110,6 +110,22 @@
     }
 }
 
+@media(max-width: 767px) {
+
+    #iframediv{
+        margin: 0px;
+    }
+
+    .bottom_left, #iframediv, #overChatbotIframe, #chatbotIframe{
+        width:100%;
+
+    }
+
+    #chatbotIframe {
+        height: 450px;
+    }
+}
+
 @media (min-width: 320px) and (max-width: 767px) {
     .header_area {
         padding: 0;

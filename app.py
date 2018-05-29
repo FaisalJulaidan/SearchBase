@@ -262,7 +262,6 @@ def signup():
     if request.method == "GET":
         return render_template("signup.html", debug=app.debug)
     elif request.method == "POST":
-        print(request.form)
         companyName = request.form.get("companyName", default="Error")
         companySize = request.form.get("companySize")
         subscription = request.form.get("subscription", default="Error")
@@ -326,7 +325,7 @@ def signup():
                     # TODO remove this once assitants are implemented properly
 
                     createAssistant = insert_into_database_table("INSERT INTO Assistants (CompanyID) VALUES (?);",
-                                                                 (companyID))
+                                                                 (int(companyID)))
                     # TODO check createAssistant for errors
 
                     ####################
@@ -716,27 +715,41 @@ def admin_pay():
         return render_template("admin/admin-pay.html")
 
 
+#TODO improve
 @app.route("/admin/userinput", methods=["GET"])
 def admin_user_input():
     if request.method == "GET":
-        # email = request.cookies.get("UserEmail")
-        # assistants = get_assistants(email)
-        # # TODO check assistants for errors
-        # assistantIndex = 0  # TODO change this
-        # assistantID = assistants[assistantIndex][0]
-        # questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-        #                                             [assistantID], True)
-        # data = []
-        # for i in range(0, len(questions)):
-        #     question = questions[i]
-        #     questionID = question[0]
-        #     userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
-        #     #TODO check userInput for errors
-        #     if len(userInput) > 0:
-        #         data.append(userInput)
-        # print(data)
-        # return render_template("admin/admin-data-storage.html", data=data)
-        abort(status.HTTP_501_NOT_IMPLEMENTED, "Coming soon")
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        # TODO check assistants for errors
+        assistantIndex = 0  # TODO change this
+        assistantID = assistants[assistantIndex][0]
+        questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
+                                                    [assistantID], True)
+        data = []
+        dataTuple = tuple(["Null"])
+        for i in range(0, len(questions)):
+            question = questions[i]
+            questionID = question[0]
+            userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
+            #TODO check userInput for errors
+            inputTuple = ()
+            for inputData in userInput:
+                input = inputData[3]
+                inputDate = inputData[2]
+                if len(inputTuple) == 0:
+                    inputTuple = tuple([inputDate])
+                elif inputTuple[0] != inputDate:
+                    dataTuple = dataTuple + inputTuple
+                    data.append(dataTuple)
+                    dataTuple = tuple(["Null"])
+                    inputTuple = tuple([inputDate])
+                inputTuple = inputTuple + tuple([input])
+            if len(userInput) > 0:
+                dataTuple = dataTuple + inputTuple
+                data.append(dataTuple)
+                dataTuple = tuple(["Null"])
+        return render_template("admin/admin-data-storage.html", data=data)
 
 
 @app.route("/chatbot/<route>", methods=['GET', 'POST'])

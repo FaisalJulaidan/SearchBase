@@ -325,7 +325,7 @@ def signup():
                     # TODO remove this once assitants are implemented properly
 
                     createAssistant = insert_into_database_table("INSERT INTO Assistants (CompanyID) VALUES (?);",
-                                                                 (int(companyID)))
+                                                                 (companyID,))
                     # TODO check createAssistant for errors
 
                     ####################

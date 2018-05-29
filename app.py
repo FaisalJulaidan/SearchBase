@@ -905,11 +905,11 @@ def chatbot(route):
             else:
                 currentQuestionAnswerd = currentStats[4]
                 currentProductsReturned = currentStats[5]
-                questionsAnswered += currentQuestionAnswerd
-                productsReturned = len(products) + currentProductsReturned
+                questionsAnswered = int(questionsAnswered) + int(currentQuestionAnswerd)
+                productsReturned = len(products) + int(currentProductsReturned)
                 updatedStats = update_table(
                     "UPDATE Statistics SET QuestionsAnswered=?, ProductsReturned=? WHERE AssistantID=? AND Date=?;",
-                    [questionAnswerd, productsReturned, assistantID, date])
+                    [questionsAnswered, productsReturned, assistantID, date])
                 # TODO check updatedStats for errors
 
             datastring = ""

@@ -273,7 +273,7 @@ def signup():
             render_template("signup.html", msg="Invalid request", debug=app.debug), status.HTTP_400_BAD_REQUEST
 
         insertCompanyResponse = insert_into_database_table(
-            "INSERT INTO Company ('Name', 'Size', 'URL', 'Subscription') VALUES (?,?,?,?);",
+            "INSERT INTO Companies ('Name', 'Size', 'URL', 'Subscription') VALUES (?,?,?,?);",
             (companyName, companySize, websiteURL, subscription))
         if "added" not in insertCompanyResponse:
             if "UNIQUE constraint" in insertCompanyResponse:

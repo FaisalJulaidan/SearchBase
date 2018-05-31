@@ -45,7 +45,7 @@
     <link href="../static/css/responsive.css" rel="stylesheet">
 
     <!-- Core Stylesheet -->
-    <link href="../static/style.css" rel="stylesheet">
+    <link href="../static/css/style.css" rel="stylesheet">
     <!-- <link href="../static/css/main.css" rel="stylesheet"> -->
 
     <!-- Responsive CSS -->
@@ -169,7 +169,7 @@
     var questionN = -1;
     // document.getElementById("submitMessage").addEventListener("click", );
 
-    $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot'>Hello. I am " + "{{user}}".split("/")[1] + "\'s little assistant, here to help you make the best choice " + emojione.toImage("😇") + ". Please answer the following questions to help you find the best choice.</li></div>");
+    $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot'>" + emojione.toImage("{{message}}") + "</li></div>");
     getNextQuestion();
 
     async function submitMessage(message)

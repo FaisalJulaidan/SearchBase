@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Login</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->
+	<link rel="icon" type="image/png" href="../static/SL/Login/images/icons/favicon.ico"/>
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/vendor/bootstrap/css/bootstrap.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/vendor/animate/animate.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/vendor/css-hamburgers/hamburgers.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/vendor/select2/select2.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/css/util.css">
+	<link rel="stylesheet" type="text/css" href="../static/SL/Login/css/main.css">
+<!--===============================================================================================-->
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-70419779-2"></script>
+<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'UA-70419779-2');
+</script>
+
+<!-- Icon images -->
+<link rel="apple-touch-icon" sizes="57x57" href="../static/img/core-img/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="../static/img/core-img/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="../static/img/core-img/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="../static/img/core-img/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="../static/img/core-img/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="../static/img/core-img/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="../static/img/core-img/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="../static/img/core-img/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../static/img/core-img/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="../static/img/core-img/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../static/img/core-img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="../static/img/core-img/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../static/img/core-img/favicon-16x16.png">
+<link rel="manifest" href="../static/img/core-img/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="../static/img/core-img/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+</head>
+<body>
+
+	<div class="limiter">
+		<div class="container-login100">
+			<div class="wrap-login100">
+				<div class="login100-pic js-tilt" data-tilt>
+					<img src="../static/SL/Login/images/img-01.png" alt="IMG">
+				</div>
+
+				<form class="login100-form validate-form" action="/login" method="post">
+					<span class="login100-form-title">
+						Member Login
+					</span>
+
+					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+						<input class="input100" type="text" name="email" autocomplete="email" placeholder="Email">
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-envelope" aria-hidden="true"></i>
+						</span>
+					</div>
+
+					<div class="wrap-input100 validate-input" data-validate = "Password is required">
+						<input class="input100" type="password" name="password" autocomplete="current-password" placeholder="Password">
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-lock" aria-hidden="true"></i>
+						</span>
+					</div>
+
+					<div class="container-login100-form-btn">
+						<button class="login100-form-btn">
+							Login
+						</button>
+					</div>
+
+					<!--div class="text-center p-t-12">
+						<span class="txt1">
+							Forgot
+						</span>
+						<a class="txt2" href="/resetdetails">
+							Username / Password?
+						</a>
+					</div-->
+
+					<div class="text-center p-t-136">
+						<a class="txt2" href="/signup">
+							Create your Account
+							<i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
+						</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+
+
+<!--===============================================================================================-->
+	<script src="../static/SL/Login/vendor/jquery/jquery-3.2.1.min.js"></script>
+<!--===============================================================================================-->
+	<script src="../static/SL/Login/vendor/bootstrap/js/popper.js"></script>
+	<script src="../static/SL/Login/vendor/bootstrap/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+	<script src="../static/SL/Login/vendor/select2/select2.min.js"></script>
+<!--===============================================================================================-->
+	<script src="../static/SL/Login/vendor/tilt/tilt.jquery.min.js"></script>
+	<script >
+		$('.js-tilt').tilt({
+			scale: 1.1
+		})
+	</script>
+<!--===============================================================================================-->
+	<script src="../static/SL/Login/js/main.js"></script>
+
+</body>
+</html>

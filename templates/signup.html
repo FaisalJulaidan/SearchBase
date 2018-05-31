@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Sign up</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="../static/SL/Login/images/icons/favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../static/SL/Login/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/SL/Login/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/SL/Login/vendor/animate/animate.css">
+    <link rel="stylesheet" type="text/css" href="../static/SL/Login/vendor/css-hamburgers/hamburgers.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/SL/Login/vendor/select2/select2.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/SL/Login/css/util.css">
+    <link rel="stylesheet" type="text/css" href="../static/SL/Login/css/main.css">
+
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-70419779-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag()
+        {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'UA-70419779-2');
+    </script>
+
+    <!-- Icon images -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../static/img/core-img/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../static/img/core-img/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../static/img/core-img/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../static/img/core-img/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../static/img/core-img/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../static/img/core-img/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../static/img/core-img/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../static/img/core-img/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../static/img/core-img/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../static/img/core-img/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../static/img/core-img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../static/img/core-img/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../static/img/core-img/favicon-16x16.png">
+    <link rel="manifest" href="../static/img/core-img/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="../static/img/core-img/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+</head>
+<body onload="console.log('{{ msg }}');">
+
+<div class="limiter">
+    <div class="container-login100">
+        <div class="wrap-login100">
+            <div class="login100-pic">
+                <img src="../static/img/gifs/rocket-icon.gif" alt="GIF">
+                <br/>
+                <br/>
+                <br/>
+                <h2> Launch your business into the future. </h2>
+            </div>
+
+            <form name="signupForm" id="signupForm" class="login100-form validate-form" action="/signup" method="post" onsubmit="return submitForm()">
+					<span class="login100-form-title">
+						Sign up
+					</span>
+
+                <div class="wrap-input100 validate-input" data-validate="Required">
+                    <input class="input100" type="text" name="companyName" placeholder="Company Name">
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+							<i class="fa fa-briefcase" aria-hidden="true"></i>
+						</span>
+                </div>
+
+                <div class="wrap-input100 validate-input" data-validate="Required: example.com">
+                    <input class="input100" type="text" name="websiteURL" placeholder="Website URL">
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+							<i class="fa fa-globe" aria-hidden="true"></i>
+						</span>
+                </div>
+
+                <div class="wrap-input100 validate-input" data-validate="Required: Forname Surname">
+                    <input class="input100" type="text" name="fullname" placeholder="Full Name">
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+							<i class="fa fa-address-card-o" aria-hidden="true"></i>
+						</span>
+                </div>
+
+                <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
+                    <input class="input100" type="email" id="email" name="email" placeholder="Email" autocomplete="off"
+                           onkeyup="checkboxesMatch('email')">
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+							<i class="fa fa-envelope" aria-hidden="true"></i>
+						</span>
+                </div>
+
+                <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
+                    <input class="input100" type="email" id="confirmemail" name="confirmEmail"
+                           placeholder="Confirm email" autocomplete="off" onkeyup="checkboxesMatch('email')">
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+							<i class="fa fa-envelope" aria-hidden="true"></i>
+						</span>
+                </div>
+
+                <div class="wrap-input100 validate-input" data-validate="Required">
+                    <input class="input100" type="password" id="password" name="password" autocomplete="new-password"
+                           placeholder="Password" onkeyup="checkboxesMatch('password')">
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+							<i class="fa fa-lock" aria-hidden="true"></i>
+						</span>
+                </div>
+
+                <div class="wrap-input100 validate-input" data-validate="Required">
+                    <input class="input100" type="password" id="confirmpassword" name="confirmPassword"
+                           autocomplete="off" placeholder="Confirm password" onkeyup="checkboxesMatch('password')">
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+							<i class="fa fa-lock" aria-hidden="true"></i>
+						</span>
+                </div>
+
+                <div class="wrap-input100 validate-input" data-validate="Required">
+                    <p>Choose Plan</p>
+                    <select name="subscription" id="inputState" class="form-control" form="signupForm" title="Choose Plan" required>
+                        <option value="Trial">3 Month Trail</option>
+                        <option value="Basic">Basic Plan</option>
+                        <option value="Advanced">Advanced Plan</option>
+                        <option value="Ultimate">Ultimate Plan</option>
+                        {% if debug == True %}
+                            <option value="Debug"> Debug</option>
+                        {% endif %}
+                    </select>
+                    <span class="focus-input100"></span>
+                </div>
+
+                <div class="container-login100-form-btn">
+                    <button class="login100-form-btn-disabled" id="submit" disabled>
+                        Sign up
+                    </button>
+                </div>
+
+                <div class="text-center p-t-12">
+                    <a class="txt2" href="/login">
+                        Already have an Account?
+                        <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
+                    </a>
+                </div>
+
+                <div class="text-center p-t-12">
+						<span class="txt1">
+							By Signing up you agree to our
+						</span>
+                    <a class="txt2" href="/termsandconditions">
+                        <strong>Terms</strong>
+                    </a>
+                    <span class="text1">
+							&
+						</span>
+                    <a class="text2" href="/privacy">
+                        <strong>Privacy Policy</strong>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script src="../static/SL/Login/vendor/jquery/jquery-3.2.1.min.js"></script>
+<script src="../static/SL/Login/vendor/bootstrap/js/popper.js"></script>
+<script src="../static/SL/Login/vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="../static/SL/Login/vendor/select2/select2.min.js"></script>
+<script src="../static/SL/Login/vendor/tilt/tilt.jquery.min.js"></script>
+<script>
+    $('.js-tilt').tilt({
+        scale: 1.1
+    })
+</script>
+<script src="../static/SL/Login/js/main.js"></script>
+<script>
+    function submitForm()
+    {
+        var form = document.forms["signupForm"];
+        var companyName = form["companyName"].value;
+        var websiteURL = form["websiteURL"].value;
+        var fullname = form["fullname"].value;
+        var email = form["email"].value;
+        var password = form["password"].value;
+        if (!validatePassword(password))
+        {
+            return false;
+        }
+
+        var subscription = document.getElementById("inputState").value;
+        if (subscription === "None")
+        {
+            subscription.setError("Please select one");
+            return false;
+        }
+        return true;
+    }
+
+    function checkboxesMatch(boxID)
+    {
+        if (document.getElementById(boxID).value === document.getElementById('confirm' + boxID).value &&
+            document.getElementById(boxID).value !== "")
+        {
+            document.getElementById('confirm' + boxID).style.border = "None";
+            document.getElementById('submit').disabled = false;
+            document.getElementById("submit").classList.remove('login100-form-btn-disabled');
+            document.getElementById("submit").classList.add('login100-form-btn');
+        }
+        else
+        {
+            document.getElementById('confirm' + boxID).style.border = "2px solid red";
+            document.getElementById('submit').disabled = true;
+            document.getElementById("submit").classList.add('login100-form-btn-disabled');
+            document.getElementById("submit").classList.remove('login100-form-btn');
+        }
+        if (boxID === "email") checkboxesMatch("password")
+    }
+
+    function validatePassword(password)
+    {
+        if (password.length >= 8)
+        {
+            if (password.match(/^(?=.*[a-z|A-Z])(?=.*[A-Z])(?=.*\d).+$/) != null)
+            {
+                return true;
+            }
+            else alert("Passwords must contain at least 1 lower and upper case letter. And 1 number.");
+            return false;
+        }
+        else alert("Passwords must be at least 8 Characters long.");
+        return false;
+    }
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Sign up</title>
@@ -84,7 +84,8 @@
                 </div>
 
                 <div class="wrap-input100 validate-input" data-validate="Required: Forname Surname">
-                    <input class="input100" type="text" name="fullname" placeholder="Full Name">
+                    <!-- The onChange is what is calling the js function -->
+                    <input class="input100" type="text" name="fullname" placeholder="Full Name" onchange="validateName()">
                     <span class="focus-input100"></span>
                     <span class="symbol-input100">
 							<i class="fa fa-address-card-o" aria-hidden="true"></i>
@@ -242,6 +243,27 @@
         else alert("Passwords must be at least 8 Characters long.");
         return false;
     }
+
+    function validateName(fullname)
+    {
+        if (fullname.indexOf(' ') >= 0)
+        {
+            return alert("Please enter your full name or leave a space between your first and last name.");
+        }
+        return false;
+    }
+
+
+    // Validation for the website URL
+    function validateURL(websiteURL)
+    {
+        var URLRegex = /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/;
+        websiteURL.map(x => console.log(x + " => " + URLRegex.test(x)));
+    }
+
+
+
+
 </script>
 </body>
 </html>

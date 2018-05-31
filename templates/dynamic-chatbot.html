@@ -256,12 +256,19 @@
         }*/
     }
 
+    function SkipQuestion() {
+        questionsAnswered--;
+        getNextQuestion();
+    }
+
     function getNextQuestion()
     {
+        questionsAnswered++;
         $("#qAnswers").remove();
         questionN += 1;
         if (data[questionN] == undefined)
         {
+            questionsAnswered--;
             sendData();
             SetRepeat();
             chatInputDov.style = "display:none";
@@ -287,7 +294,7 @@
             showChatBox = false;
         }
         if (questionN == 2) {
-            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"getNextQuestion()\">Skip Question</a>";
+            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"SkipQuestion()\">Skip Question</a>";
         }
         answers += "</div>"
         $("#optionsDiv").append(answers);
@@ -367,7 +374,6 @@
                 return 0;
             }
         }
-        questionsAnswered++;
         keywords.push(word);
     }
 

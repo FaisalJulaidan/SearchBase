@@ -249,8 +249,9 @@ def login():
                 print(password_to_check)
                 if hash_password(password_to_check, password) == password:
                     user = data[2] + " " + data[3]
-                    assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(email)[0]])
-                    statistics = select_from_database_table("SELECT * FROM Statistics WHERE AssistantID=?;", [assistant[0]])
+                    statistics = []
+                    statistics.append(get_total_statistics(3, email))
+                    statistics.append(get_total_statistics(5, email))
                     return render_template("admin/admin-main.html", msg=email, user=user, stats=statistics)
                 else:
                     return render_template('login.html', data="User name and password does not match!")
@@ -339,8 +340,9 @@ def signup():
 @app.route("/admin/homepage", methods=['GET'])
 def admin_home():
     if request.method == "GET":
-        assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(request.cookies.get("UserEmail"))[0]])
-        statistics = select_from_database_table("SELECT * FROM Statistics WHERE AssistantID=?;", [assistant[0]])
+        statistics = []
+        statistics.append(get_total_statistics(3, request.cookies.get("UserEmail")))
+        statistics.append(get_total_statistics(5, request.cookies.get("UserEmail")))
         return render_template("admin/admin-main.html", stats=statistics)
 
 
@@ -355,6 +357,7 @@ def profilePage():
     elif request.method == "POST":
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
+# Data retrieval functions
 def get_company(email):
     user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
     # TODO check user for errors
@@ -371,6 +374,21 @@ def get_assistants(email):
                                             True)
     # TODO check assistants for errors
     return assistants
+
+def get_total_statistics(num, email):
+    try:
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(email)[0]])
+        statistics = select_from_database_table("SELECT * FROM Statistics WHERE AssistantID=?;", [assistant[0]])
+        total = 0
+        print(statistics)
+        try:
+            for c in statistics[num]:
+                total+= int(c)
+        except:
+            total = statistics[num]
+    except:
+        total=0
+    return total
 
 @app.route("/admin/welcomemsg", methods=['POST'])
 def adming_welcome_message():
@@ -797,8 +815,8 @@ def chatbot(route):
             questionsAndAnswers.append(merge)
 
         message = assistants[assistantIndex][3]
+        #MONTHLY UPDATE
         date = datetime.now().strftime("%Y-%m")
-
         currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
         if currentStats is None:
             newStats = insert_into_database_table(
@@ -808,6 +826,20 @@ def chatbot(route):
         else:
             updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
                                         [currentStats[3] + 1, assistantID, date])
+            
+        #WEEKLY UPDATE
+        dateParts = datetime.now().strftime("%Y-%m-%d").split("-")
+        date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
+        currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
+        if currentStats is None:
+            newStats = insert_into_database_table(
+                "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
+                (assistantID, date, 1, 0, 0))
+            # TODO check newStats for errors
+        else:
+            updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
+                                        [currentStats[3] + 1, assistantID, date])
+
         return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route, message=message)
     else:
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
@@ -897,7 +929,28 @@ def chatbot(route):
             if products is None or products == []:
                 return "We could not find anything that matched your search criteria. Please try different filter options."
 
+            #UPDATE MONTHLY
             date = datetime.now().strftime("%Y-%m")
+            questionsAnswered = request.form.get("questionsAnswered", default="Error")
+            # TODO check questionsAnswered for errors
+            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
+            if currentStats is None:
+                newStats = insert_into_database_table(
+                    "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
+                    (assistantID, date, 1, questionsAnswered, len(products)))
+                # TODO check newStats for errors
+            else:
+                currentQuestionAnswerd = currentStats[4]
+                currentProductsReturned = currentStats[5]
+                questionsAnswered = int(questionsAnswered) + int(currentQuestionAnswerd)
+                productsReturned = len(products) + int(currentProductsReturned)
+                updatedStats = update_table(
+                    "UPDATE Statistics SET QuestionsAnswered=?, ProductsReturned=? WHERE AssistantID=? AND Date=?;",
+                    [questionsAnswered, productsReturned, assistantID, date])
+                # TODO check updatedStats for errors
+            
+            #UPDATE WEEKLY
+            date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
             currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])

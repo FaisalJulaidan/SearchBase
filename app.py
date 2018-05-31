@@ -249,7 +249,9 @@ def login():
                 print(password_to_check)
                 if hash_password(password_to_check, password) == password:
                     user = data[2] + " " + data[3]
-                    return render_template("admin/admin-main.html", msg=email, user=user)
+                    assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(email)[0]])
+                    statistics = select_from_database_table("SELECT * FROM Statistics WHERE AssistantID=?;", [assistant[0]])
+                    return render_template("admin/admin-main.html", msg=email, user=user, stats=statistics)
                 else:
                     return render_template('login.html', data="User name and password does not match!")
             else:
@@ -337,7 +339,9 @@ def signup():
 @app.route("/admin/homepage", methods=['GET'])
 def admin_home():
     if request.method == "GET":
-        return render_template("admin/admin-main.html")
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(request.cookies.get("UserEmail"))[0]])
+        statistics = select_from_database_table("SELECT * FROM Statistics WHERE AssistantID=?;", [assistant[0]])
+        return render_template("admin/admin-main.html", stats=statistics)
 
 
 @app.route("/admin/profile", methods=['GET', 'POST'])

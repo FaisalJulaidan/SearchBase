@@ -2056,6 +2056,6 @@ ul li ul.dropdown li {
 }*/
 
 /*index page --------------------*/
-#introVideo{
-
+#introVideo {
+    box-shadow: 3px 3px 5px grey;
 }

@@ -2054,3 +2054,8 @@ ul li ul.dropdown li {
     top: 0px;
     right: 0px;
 }*/
+
+/*index page --------------------*/
+#introVideo {
+    box-shadow: 3px 3px 5px grey;
+}

@@ -583,6 +583,18 @@
 
 <script>
     document.getElementById('introVideo').play();
+    var promise = document.querySelector('video').play();
+
+    if (promise !== undefined) {
+        promise.then(_ => {
+            // Autoplay started!
+            console.log("PLAYING");
+        }).catch(error => {
+            // Autoplay was prevented.
+            // Show a "Play" button so that user can start playback.
+            console.log("NOT PLAYING");
+        });
+    }
 </script>
 
 

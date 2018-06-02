@@ -250,33 +250,30 @@
         // Validation for the website URL
         function validateURL(websiteURL) {
             var URLRegex = /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/;
-            var url = $("#" + websiteURL).val();
 
-            if (URLRegex.test(url))
-            {
+            var userURL = document.getElementById('websiteURL').value;
 
+            if (!userURL.match(URLRegex)) {
+                document.getElementById("websiteURL").style.borderStyle = "solid";
+                document.getElementById("websiteURL").style.borderColor = "red";
+                alert("Please enter your website URL correctly.")
+                return false;
             }
-
-            return ;
-            
         }
 
         // Validation for the user email address
         function validateUserEmail(emai)
         {
             var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            var userEmail = document.getElementById('email').value;
 
-            if (!candidateEmail.match(emailRegex)) {
+            if (!userEmail.match(emailRegex)) {
                 document.getElementById("email").style.borderStyle = "solid";
                 document.getElementById("email").style.borderColor = "red";
                 alert("Please enter your email address correctly.")
                 return false;
             }
-
         }
-
-
-
 
     </script>
 </body>

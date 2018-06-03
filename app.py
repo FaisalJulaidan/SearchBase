@@ -1080,15 +1080,16 @@ def admin_users():
                     # TODO handle this better
             else:
                 # sending email to the new user.
-                # TODO this needs improving BIG TIME
+                # TODO this needs improving
                 msg = Message("Account verification, {} {}".format(firstname, surname),
                               sender="thesearchbase@gmail.com",
                               recipients=[email])
-                link = "www.thesearchbase.com/account/resetpassword"  # TODO fix this
+                link = "www.thesearchbase.com/account/changepassword"
                 msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
                            "If you feel this is a mistake please contact {}. \n" \
                            "Your temporary password is: {}\n" \
-                           "Please visit <a href='{}'>this link</a> to set password for account.".format(email, password, link)
+                           "Please visit <a href='{}'>this link</a> to set password for account.".format(email,
+                                                                                                         password, link)
                 mail.send(msg)
 
                 return redirect("/admin/users")
@@ -1161,8 +1162,53 @@ def verify_account(payload):
 @app.route("/account/resetpassword", methods=["GET", "POST"])
 def reset_password():
     if request.method == "GET":
-        # TODO return html file
+        return render_template("/accounts/resetpassword.html")
+    else:
         abort(status.HTTP_501_NOT_IMPLEMENTED)
+
+        # email = request.form.get("email", default="Error")
+        # # TODO check this
+        #
+        # user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
+        # # TODO check user
+        #
+        # if user is None:
+        #     # TODO hadnle this better
+        #     abort(status.HTTP_400_BAD_REQUEST, "User doesn't exist")
+        # elif "Error" in user:
+        #     # TODO handle this better
+        #     abort(status.HTTP_500_INTERNAL_SERVER_ERROR, user)
+        # else:
+        #     company = get_company(email)
+        #     if company is None or "Error" in company:
+        #         # TODO handle this better
+        #         abort(status.HTTP_500_INTERNAL_SERVER_ERROR, company)
+        #     else:
+        #         password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
+        #         # Generates a random password
+        #
+        #         updateUser = update_table("UPDATE Users SET Password=?, Verified=? WHERE Email=?;",
+        #                                   [hash_password(password), "False"])
+        #         # TODO check updateUser for errors
+        #
+        #         # TODO this needs improving
+        #         msg = Message("Password reset",
+        #                       sender="thesearchbase@gmail.com",
+        #                       recipients=[email])
+        #
+        #         payload = email + ";" + company[1]
+        #         link = "www.thesearchbase.com/account/verify/{}".format(verificationSigner.dumps(payload))
+        #         msg.body = "Your password has been reset as per your request.\n" \
+        #                    "Please visit <a href='{}'>this link</a> to verify your account.".format(email, link)
+        #         mail.send(msg)
+        #
+        #         return
+
+
+@app.route("/account/changepassword", methods=["GET", "POST"])
+def change_password():
+    if request.method == "GET":
+        return render_template("/accounts/changepassword.html")
     else:
         email = request.form.get("email", default="Error")
         currentPassword = request.form.get("currentPassword", default="Error")
@@ -1178,11 +1224,9 @@ def reset_password():
                 updatePassword = "UPDATE Users SET Password=? WHERE Email=?;", [hashedNewPassword, email]
                 # TODO check updatePassword
 
-                # TODO return html file with message
-                abort(status.HTTP_501_NOT_IMPLEMENTED)
+                return render_template("/accounts/changepassword.html", "Success")
             else:
-                # TODO return html file with message
-                abort(status.HTTP_501_NOT_IMPLEMENTED)
+                return render_template("/accounts/changepassword.html", "Email and password don't match!")
         else:
             return render_template('errors/verification.html',
                                    msg="Account not verified, please check your email and follow instructions")

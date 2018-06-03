@@ -12,7 +12,8 @@ import os
 import sqlite3
 import stripe
 import string
-import random
+
+verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -183,7 +184,10 @@ def dynamic_popup(route):
     if request.method == "GET":
         url = "http://www.example.com/"
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
-        if (company is not None and "Debug" in company[4]):
+        if company is None:
+            # TODO handle this
+            abort(status.HTTP_400_BAD_REQUEST)
+        elif "Debug" in company[4]:
             url = company[3]
             if "http" not in url:
                 url = "http://" + url
@@ -248,20 +252,23 @@ def login():
             data = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
             if data is not None:
                 password = data[6]
-                print(password_to_check)
                 if hash_password(password_to_check, password) == password:
-                    user = data[2] + " " + data[3]
-                    statistics = []
-                    statistics.append(get_total_statistics(3, email))
-                    statistics.append(get_total_statistics(5, email))
-                    return render_template("admin/admin-main.html", msg=email, user=user, stats=statistics)
+                    verified = data[7]
+                    if verified == "True":
+                        statistics = []
+                        statistics.append(get_total_statistics(3, email))
+                        statistics.append(get_total_statistics(5, email))
+                        return redirect("/admin/homepage")
+                    else:
+                        return render_template('errors/verification.html',
+                                               msg="Account not verified please check your inbox")
                 else:
                     return render_template('login.html', data="User name and password does not match!")
             else:
                 return render_template('login.html', data="User doesn't exist!")
 
 
-# TODO add verification
+# TODO improve verification
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
     if request.method == "GET":
@@ -316,23 +323,26 @@ def signup():
                     else:
                         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
                 else:
-                    if not app.debug:
-                        # sending registration confirmation email to the user.
-                        msg = Message("Thank you for registering, {} {}".format(firstname, surname),
-                                      sender="thesearchbase@gmail.com",
-                                      recipients=[email])
-                        msg.body = "We appreciate you registering with TheSearchBase. A whole new world of possibilities is ahead of you."
-                        mail.send(msg)
+                    # TODO this needs improving
+                    msg = Message("Account verification",
+                                  sender="thesearchbase@gmail.com",
+                                  recipients=[email])
 
-                        # sending the registration confirmation email to us
-                        msg = Message("A new company has signed up!",
-                                      sender="thesearchbase@gmail.com",
-                                      recipients=["thesearchbase@gmail.com"])
-                        msg.body = "Company name: {} has signed up the admin's details are. Name: {}, Email: {}, ".format(
-                            companyName, fullname, email)
-                        mail.send(msg)
+                    payload = email + ";" + companyName
+                    link = "www.thesearchbase.com/account/verify/{}".format(verificationSigner.dumps(payload))
+                    msg.body = "You have registered with TheSearchBase.\n" \
+                               "Please visit <a href='{}'>this link</a> to verify your account.".format(email, link)
+                    mail.send(msg)
 
-                    # TODO remove this once assitants are implemented properly
+                    # sending the registration confirmation email to us
+                    msg = Message("A new company has signed up!",
+                                  sender="thesearchbase@gmail.com",
+                                  recipients=["thesearchbase@gmail.com"])
+                    msg.body = "Company name: {} has signed up the admin's details are. Name: {}, Email: {}, ".format(
+                        companyName, fullname, email)
+                    mail.send(msg)
+
+                    # TODO remove this once assistants are implemented properly
 
                     createAssistant = insert_into_database_table("INSERT INTO Assistants (CompanyID) VALUES (?);",
                                                                  (companyID,))
@@ -340,7 +350,8 @@ def signup():
 
                     ####################
 
-                    return redirect("/login")
+                    return render_template('errors/verification.html',
+                                           msg="Please check your email and follow instructions to verify account and get started.")
 
 
 # Admin pages
@@ -364,6 +375,7 @@ def profilePage():
     elif request.method == "POST":
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
+
 # Data retrieval functions
 def get_company(email):
     user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
@@ -371,6 +383,7 @@ def get_company(email):
     company = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
     # TODO check company for errors
     return company
+
 
 def get_assistants(email):
     user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
@@ -382,6 +395,7 @@ def get_assistants(email):
     # TODO check assistants for errors
     return assistants
 
+
 def get_total_statistics(num, email):
     try:
         assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(email)[0]])
@@ -390,12 +404,13 @@ def get_total_statistics(num, email):
         print(statistics)
         try:
             for c in statistics[num]:
-                total+= int(c)
+                total += int(c)
         except:
             total = statistics[num]
     except:
-        total=0
+        total = 0
     return total
+
 
 @app.route("/admin/welcomemsg", methods=['POST'])
 def adming_welcome_message():
@@ -406,10 +421,12 @@ def adming_welcome_message():
 
         email = request.cookies.get("UserEmail")
         company = get_company(email)
-        #TODO check company for error
-        updateMessage = update_table("UPDATE Assistants SET Message=? WHERE CompanyID=?;", [escape(message), company[0]])
-        #TODO check updateMessage for error
+        # TODO check company for error
+        updateMessage = update_table("UPDATE Assistants SET Message=? WHERE CompanyID=?;",
+                                     [escape(message), company[0]])
+        # TODO check updateMessage for error
         return redirect("/admin/questions")
+
 
 # TODO rewrite
 @app.route("/admin/questions", methods=['GET', 'POST'])
@@ -744,7 +761,7 @@ def admin_pay():
         return render_template("admin/admin-pay.html")
 
 
-#TODO improve
+# TODO improve
 @app.route("/admin/userinput", methods=["GET"])
 def admin_user_input():
     if request.method == "GET":
@@ -754,14 +771,14 @@ def admin_user_input():
         assistantIndex = 0  # TODO change this
         assistantID = assistants[assistantIndex][0]
         questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                                    [assistantID], True)
+                                               [assistantID], True)
         data = []
         dataTuple = tuple(["Null"])
         for i in range(0, len(questions)):
             question = questions[i]
             questionID = question[0]
             userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
-            #TODO check userInput for errors
+            # TODO check userInput for errors
             inputTuple = ()
             for inputData in userInput:
                 input = inputData[3]
@@ -822,7 +839,7 @@ def chatbot(route):
             questionsAndAnswers.append(merge)
 
         message = assistants[assistantIndex][3]
-        #MONTHLY UPDATE
+        # MONTHLY UPDATE
         date = datetime.now().strftime("%Y-%m")
         currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
         if currentStats is None:
@@ -833,8 +850,8 @@ def chatbot(route):
         else:
             updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
                                         [currentStats[3] + 1, assistantID, date])
-            
-        #WEEKLY UPDATE
+
+        # WEEKLY UPDATE
         dateParts = datetime.now().strftime("%Y-%m-%d").split("-")
         date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
         currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
@@ -847,7 +864,8 @@ def chatbot(route):
             updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
                                         [currentStats[3] + 1, assistantID, date])
 
-        return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route, message=message)
+        return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route,
+                               message=message)
     else:
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
         # TODO check company for errors
@@ -936,7 +954,7 @@ def chatbot(route):
             if products is None or products == []:
                 return "We could not find anything that matched your search criteria. Please try different filter options."
 
-            #UPDATE MONTHLY
+            # UPDATE MONTHLY
             date = datetime.now().strftime("%Y-%m")
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
@@ -955,8 +973,8 @@ def chatbot(route):
                     "UPDATE Statistics SET QuestionsAnswered=?, ProductsReturned=? WHERE AssistantID=? AND Date=?;",
                     [questionsAnswered, productsReturned, assistantID, date])
                 # TODO check updatedStats for errors
-            
-            #UPDATE WEEKLY
+
+            # UPDATE WEEKLY
             date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
@@ -995,7 +1013,9 @@ def admin_analytics():
         # TODO check assistants for errors
         assistantIndex = 0  # TODO change this
         assistantID = assistants[assistantIndex][0]
-        stats = select_from_database_table("SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?", [assistantID], True)
+        stats = select_from_database_table(
+            "SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?",
+            [assistantID], True)
         return render_template("admin/admin-analytics.html", data=stats)
 
 
@@ -1011,21 +1031,21 @@ def admin_users():
         userLevel = select_from_database_table("SELECT AccessLevel FROM Users WHERE Email=?", [email])
         if userLevel is None:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            #TODO better handle
+            # TODO better handle
         elif "Error" in userLevel:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            #TODO better handle this
+            # TODO better handle this
         else:
             if userLevel is not "Admin":
                 return redirect("/admin/homepage")
             else:
-                #TODO improve this
+                # TODO improve this
                 users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
                 return render_template("admin/admin-users.html", users=users)
     elif request.method == "POST":
         email = request.cookies.get("UserEmail")
         company = get_company(email)
-        #todo check company
+        # todo check company
         companyID = company[0]
         fullname = request.form.get("fullname", default="Error")
         accessLevel = request.form.get("accessLevel", default="Error")
@@ -1052,27 +1072,92 @@ def admin_users():
             if "added" not in insertUserResponse:
                 if "UNIQUE constraint" in insertUserResponse:
                     deleteCompany = delete_from_table("DELETE FROM Companies WHERE ID=?;", [companyID])
-                    #TODO check deleteCompany
+                    # TODO check deleteCompany
                     return render_template("signup.html", msg=newEmail + " already in use.", debug=app.debug)
                 else:
                     abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-                    #TODO handle this better
+                    # TODO handle this better
             else:
-                if not app.debug:
-                    # sending email to the new user.
-                    #TODO this needs improving BIG TIME
-                    msg = Message("Account verification, {} {}".format(firstname, surname),
-                                  sender="thesearchbase@gmail.com",
-                                  recipients=[email])
-                    link = "thesearchbase.com"
-                    # link += <The route to verify account>
-                    msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
-                               "If you feel this is a mistake please contact {}. \n" \
-                               "Your temporary password is: {}\n" \
-                               "Please visit <a href='{}'>this link</a> to verify account".format(email, password, link)
-                    mail.send(msg)
+                # if not app.debug:
+                #     # sending email to the new user.
+                #     #TODO this needs improving BIG TIME
+                #     msg = Message("Account verification, {} {}".format(firstname, surname),
+                #                   sender="thesearchbase@gmail.com",
+                #                   recipients=[email])
+                #     payload = "" #TODO implement this
+                #     link = "www.thesearchbase.com/" #TODO fix this
+                #     msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
+                #                "If you feel this is a mistake please contact {}. \n" \
+                #                "Your temporary password is: {}\n" \
+                #                "Please visit <a href='{}'>this link</a> to verify account".format(email, password, link)
+                #     mail.send(msg)
 
                 return redirect("/admin/users")
+
+
+@app.route("/account/verify/<payload>", methods=['GET'])
+def verify_account(payload):
+    if request.method == "GET":
+        email = request.cookies.get("UserEmail")
+        if email is None or email is "None":
+            data = ""
+            try:
+                data = verificationSigner.loads(payload)
+                try:
+                    email = data.split(";")[0]
+                    companyName = data.split(";")[1]
+
+                    company = get_company(email)
+                    # TODO check company
+                    if company is None:
+                        # TODO handle better
+                        print("Verification failed due to invalid payload.")
+                        abort(status.HTTP_400_BAD_REQUEST)
+                    elif "Error" in company:
+                        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    else:
+                        if company[1] != companyName:
+                            # TODO handle this
+                            abort(status.HTTP_400_BAD_REQUEST, "Company data doesn't match")
+                        else:
+                            updateUser = update_table("UPDATE Users SET Verified=? WHERE Email=?;", ["True", email])
+                            # TODO check updateUser
+
+                            user = select_from_database_table("SELECT * FROM Users WHERE Email=?", [email])
+                            # TODO check user
+
+                            # sending registration confirmation email to the user.
+                            msg = Message("Thank you for registering, {} {}".format(user[2], user[3]),
+                                          sender="thesearchbase@gmail.com",
+                                          recipients=[email])
+                            msg.body = "We appreciate you registering with TheSearchBase. A whole new world of possibilities is ahead of you."
+                            mail.send(msg)
+
+                            return redirect("/login")
+
+                except IndexError:
+                    # TODO handle better
+                    print("Verification failed due to invalid payload.")
+                    abort(status.HTTP_400_BAD_REQUEST)
+            except BadSignature as e:
+                encodedData = e.payload
+                if encodedData is None:
+                    msg = "Verification failed due to payload containing no data."
+                    print(msg)
+                    abort(status.HTTP_400_BAD_REQUEST, msg)
+                else:
+                    msg = ""
+                    try:
+                        verificationSigner.load_payload(encodedData)
+                        msg = "Verification failed, bad signature"
+                    except:
+                        msg = "Verification failed"
+                    finally:
+                        print(msg)
+                        abort(status.HTTP_400_BAD_REQUEST, msg)
+
+        else:
+            return redirect("/admin/homepage")
 
 
 # Method for the billing
@@ -1265,32 +1350,32 @@ def sendMarketingEmail():
 ## Error Handlers ##
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)
 def unsupported_media(e):
-   return render_template('errors/400.html', error=e, debug=app.debug), status.HTTP_400_BAD_REQUEST
+    return render_template('errors/400.html', error=e, debug=app.debug), status.HTTP_400_BAD_REQUEST
 
 
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
-   return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
+    return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
 
 
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 def unsupported_media(e):
-   return render_template('errors/415.html', error=e), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+    return render_template('errors/415.html', error=e), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 
 @app.errorhandler(418)
 def im_a_teapot(e):
-   return render_template('errors/418.html', error=e, debug=app.debug), 418
+    return render_template('errors/418.html', error=e, debug=app.debug), 418
 
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(e):
-   return render_template('errors/500.html', error=e, debug=app.debug), status.HTTP_500_INTERNAL_SERVER_ERROR
+    return render_template('errors/500.html', error=e, debug=app.debug), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
 def not_implemented(e):
-   return render_template('errors/501.html', error=e, debug=app.debug), status.HTTP_501_NOT_IMPLEMENTED
+    return render_template('errors/501.html', error=e, debug=app.debug), status.HTTP_501_NOT_IMPLEMENTED
 
 
 class Del:

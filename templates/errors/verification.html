@@ -9,7 +9,7 @@
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Title -->
-    <title>400 Bad Request</title>
+    <title>Verification</title>
 
     <!-- Chrome, Firefox OS and Opera -->
     <meta name="theme-color" content="#884BDF">
@@ -87,12 +87,9 @@
             <div class="row h-100 align-items-center">
                 <div class="col-12 col-md">
                     <div class="wellcome-heading">
-                        <h2>400</h2>
+                        <h2>Account verification</h2>
                         <h3></h3>
-                        <p>Bad request. Please contact thesearchbase@gmail.com and let them know what happened.</p>
-                        {% if debug == True %}
-                        <p>{{ error }}</p>
-                        {% endif %}
+                        <p>{{ msg }}</p>
                     </div>
                 </div>
             </div>

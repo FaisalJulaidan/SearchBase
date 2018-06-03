@@ -12,6 +12,7 @@ import os
 import sqlite3
 import stripe
 import string
+import random
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
@@ -261,7 +262,7 @@ def login():
                         return redirect("/admin/homepage")
                     else:
                         return render_template('errors/verification.html',
-                                               msg="Account not verified please check your inbox")
+                                               msg="Account not verified, please check your email and follow instructions")
                 else:
                     return render_template('login.html', data="User name and password does not match!")
             else:
@@ -1050,14 +1051,14 @@ def admin_users():
         fullname = request.form.get("fullname", default="Error")
         accessLevel = request.form.get("accessLevel", default="Error")
         newEmail = request.form.get("email", default="Error")
-        newEmail = newEmail.lower()
         password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
         # Generates a random password
 
-        if fullname == "Error" or accessLevel == "Error" or email == "Error":
+        if fullname == "Error" or accessLevel == "Error" or newEmail == "Error":
             print("Invalid request")
             abort(status.HTTP_400_BAD_REQUEST)
         else:
+            newEmail = newEmail.lower()
             try:
                 firstname = fullname.split(" ")[0]
                 surname = fullname.split(" ")[1]
@@ -1067,8 +1068,8 @@ def admin_users():
             hashed_password = hash_password(password)
 
             insertUserResponse = insert_into_database_table(
-                "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password') VALUES (?,?,?,?,?,?);",
-                (companyID, firstname, surname, accessLevel, newEmail, hashed_password))
+                "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
+                (companyID, firstname, surname, accessLevel, newEmail, hashed_password, "True"))
             if "added" not in insertUserResponse:
                 if "UNIQUE constraint" in insertUserResponse:
                     deleteCompany = delete_from_table("DELETE FROM Companies WHERE ID=?;", [companyID])
@@ -1078,19 +1079,17 @@ def admin_users():
                     abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
                     # TODO handle this better
             else:
-                # if not app.debug:
-                #     # sending email to the new user.
-                #     #TODO this needs improving BIG TIME
-                #     msg = Message("Account verification, {} {}".format(firstname, surname),
-                #                   sender="thesearchbase@gmail.com",
-                #                   recipients=[email])
-                #     payload = "" #TODO implement this
-                #     link = "www.thesearchbase.com/" #TODO fix this
-                #     msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
-                #                "If you feel this is a mistake please contact {}. \n" \
-                #                "Your temporary password is: {}\n" \
-                #                "Please visit <a href='{}'>this link</a> to verify account".format(email, password, link)
-                #     mail.send(msg)
+                # sending email to the new user.
+                # TODO this needs improving BIG TIME
+                msg = Message("Account verification, {} {}".format(firstname, surname),
+                              sender="thesearchbase@gmail.com",
+                              recipients=[email])
+                link = "www.thesearchbase.com/account/resetpassword"  # TODO fix this
+                msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
+                           "If you feel this is a mistake please contact {}. \n" \
+                           "Your temporary password is: {}\n" \
+                           "Please visit <a href='{}'>this link</a> to set password for account.".format(email, password, link)
+                mail.send(msg)
 
                 return redirect("/admin/users")
 
@@ -1155,9 +1154,38 @@ def verify_account(payload):
                     finally:
                         print(msg)
                         abort(status.HTTP_400_BAD_REQUEST, msg)
-
         else:
             return redirect("/admin/homepage")
+
+
+@app.route("/account/resetpassword", methods=["GET", "POST"])
+def reset_password():
+    if request.method == "GET":
+        # TODO return html file
+        abort(status.HTTP_501_NOT_IMPLEMENTED)
+    else:
+        email = request.form.get("email", default="Error")
+        currentPassword = request.form.get("currentPassword", default="Error")
+        newPassword = request.form.get("newPassword", defaul="Error")
+        # TODO check these
+
+        user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
+        # TODO check user
+        if user[7] == "True":
+            password = user[6]
+            if hash_password(currentPassword, password) == password:
+                hashedNewPassword = hash_password(newPassword)
+                updatePassword = "UPDATE Users SET Password=? WHERE Email=?;", [hashedNewPassword, email]
+                # TODO check updatePassword
+
+                # TODO return html file with message
+                abort(status.HTTP_501_NOT_IMPLEMENTED)
+            else:
+                # TODO return html file with message
+                abort(status.HTTP_501_NOT_IMPLEMENTED)
+        else:
+            return render_template('errors/verification.html',
+                                   msg="Account not verified, please check your email and follow instructions")
 
 
 # Method for the billing
@@ -1388,17 +1416,3 @@ class Del:
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-########################## OLD CODE ##########################
-# Route for the data storage
-# @app.route("/admin/userinput", methods=['GET', 'POST'])
-# def adminDataStorage():
-#     if request.method == "GET":
-#         conn = sqlite3.connect(USERINPUTDATABASE)
-#         cur = conn.cursor()
-#         user_mail = request.cookies.get("UserEmail")
-#         cur.execute("SELECT * FROM \"" + user_mail + "\"")
-#         data = cur.fetchall()
-#         return render_template("admin/admin-data-storage.html", data=data)
-#     if request.method == "POST":
-#         return redirect("/admin/userinput", code=302)

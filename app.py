@@ -1,16 +1,18 @@
 #!/usr/bin/python3
-import os
-import sqlite3
-import stripe
 from flask_mail import Mail, Message
 from werkzeug import secure_filename
 from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape
 from flask_api import status
 from datetime import datetime
-import string
 from bcrypt import hashpw, gensalt
-import json
+from itsdangerous import URLSafeTimedSerializer, BadSignature, BadData
 from xml.dom import minidom
+import json
+import os
+import sqlite3
+import stripe
+import string
+import random
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -295,8 +297,12 @@ def signup():
                 print("Invalid request")
                 render_template("signup.html", msg="Invalid request", debug=app.debug), status.HTTP_400_BAD_REQUEST
             else:
-                firstname = fullname.split(" ")[0]
-                surname = fullname.split(" ")[1]
+                try:
+                    firstname = fullname.split(" ")[0]
+                    surname = fullname.split(" ")[1]
+                except IndexError as e:
+                    abort(status.HTTP_400_BAD_REQUEST)
+                    # TODO handle much better
                 hashed_password = hash_password(password)
 
                 insertUserResponse = insert_into_database_table(
@@ -304,7 +310,8 @@ def signup():
                     (companyID, firstname, surname, accessLevel, email, hashed_password))
                 if "added" not in insertUserResponse:
                     if "UNIQUE constraint" in insertUserResponse:
-                        delete_from_table("DELETE FROM Companies WHERE Name=?;", [companyName])
+                        deleteCompany = delete_from_table("DELETE FROM Companies WHERE Name=?;", [companyName])
+                        # TODO check deleteCompany
                         return render_template("signup.html", msg=email + " already in use.", debug=app.debug)
                     else:
                         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -991,18 +998,88 @@ def admin_analytics():
         stats = select_from_database_table("SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?", [assistantID], True)
         return render_template("admin/admin-analytics.html", data=stats)
 
+
 # Method for the users
 @app.route("/admin/users", methods=['GET'])
 def admin_users():
     if request.method == "GET":
-        return render_template("admin/admin-users.html")
+        email = request.cookies.get("UserEmail")
+        company = get_company(email)
+        # todo check company
+        companyID = company[0]
+
+        userLevel = select_from_database_table("SELECT AccessLevel FROM Users WHERE Email=?", [email])
+        if userLevel is None:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            #TODO better handle
+        elif "Error" in userLevel:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            #TODO better handle this
+        else:
+            if userLevel is not "Admin":
+                return redirect("/admin/homepage")
+            else:
+                #TODO improve this
+                users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
+                return render_template("admin/admin-users.html", users=users)
+    elif request.method == "POST":
+        email = request.cookies.get("UserEmail")
+        company = get_company(email)
+        #todo check company
+        companyID = company[0]
+        fullname = request.form.get("fullname", default="Error")
+        accessLevel = request.form.get("accessLevel", default="Error")
+        newEmail = request.form.get("email", default="Error")
+        newEmail = newEmail.lower()
+        password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
+        # Generates a random password
+
+        if fullname == "Error" or accessLevel == "Error" or email == "Error":
+            print("Invalid request")
+            abort(status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                firstname = fullname.split(" ")[0]
+                surname = fullname.split(" ")[1]
+            except IndexError as e:
+                abort(status.HTTP_400_BAD_REQUEST)
+                # TODO handle much better
+            hashed_password = hash_password(password)
+
+            insertUserResponse = insert_into_database_table(
+                "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password') VALUES (?,?,?,?,?,?);",
+                (companyID, firstname, surname, accessLevel, newEmail, hashed_password))
+            if "added" not in insertUserResponse:
+                if "UNIQUE constraint" in insertUserResponse:
+                    deleteCompany = delete_from_table("DELETE FROM Companies WHERE ID=?;", [companyID])
+                    #TODO check deleteCompany
+                    return render_template("signup.html", msg=newEmail + " already in use.", debug=app.debug)
+                else:
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    #TODO handle this better
+            else:
+                if not app.debug:
+                    # sending email to the new user.
+                    #TODO this needs improving BIG TIME
+                    msg = Message("Account verification, {} {}".format(firstname, surname),
+                                  sender="thesearchbase@gmail.com",
+                                  recipients=[email])
+                    link = "thesearchbase.com"
+                    # link += <The route to verify account>
+                    msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
+                               "If you feel this is a mistake please contact {}. \n" \
+                               "Your temporary password is: {}\n" \
+                               "Please visit <a href='{}'>this link</a> to verify account".format(email, password, link)
+                    mail.send(msg)
+
+                return redirect("/admin/users")
+
 
 # Method for the billing
 @app.route("/admin/billing", methods=['GET'])
 def admin_billing():
     if request.method == "GET":
         return render_template("admin/admin-billing.html")
-
 
 
 @app.route("/admin/support/general", methods=['GET'])

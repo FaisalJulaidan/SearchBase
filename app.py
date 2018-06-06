@@ -798,7 +798,7 @@ def chatbot(route):
             # TODO Check answerstuple for errors
             answers = []
             for j in range(0, len(answersTuple)):
-                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3])
+                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][6])
 
             allAnswers[questions[i]] = answers
 
@@ -839,6 +839,7 @@ def chatbot(route):
         else:
             updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
                                         [currentStats[3] + 1, assistantID, date])
+        print(questionsAndAnswers)
 
         return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route, message=message)
     else:

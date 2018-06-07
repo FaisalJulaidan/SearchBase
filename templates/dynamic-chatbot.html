@@ -292,9 +292,9 @@
         $("#qAnswers").remove();
         if (question == undefined) {
             question = data[0];
-        } else if (action.includes("Go to:")) {
+        } else if (action.includes("Go to: ")) {
             for (var i = 0; i < data.length; i++) {
-                if (action.split(":")[1] == data[i][0].split(";")[0]) {
+                if (action.split(": ")[1] == data[i][0].split(";")[0]) {
                     question = data[i];
                     questionN = i;
                 }

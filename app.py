@@ -491,28 +491,29 @@ def admin_answers():
             # TODO Check answerstuple for errors
             answers = []
             for j in range(0, len(answersTuple)):
-                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3])
+                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][6])
 
             allAnswers[questions[i]] = answers
 
-        number = 0
-        maxNumber = len(questions)
-        while (number < maxNumber):
-            if (len(questions) > 0):
-                if (number >= len(questions)):
-                    break
-                else:
-                    if (questions[number].split(";")[1] == "userInfoRetrieval"):
-                        allAnswers[questions[number]] = None
-                        questions.remove(questions[number])
-                        number -= 1
-                        maxNumber -= 1
-                        if number < 0:
-                            number = 0
-                    else:
-                        number += 1
-            else:
-                break
+        #remove userInfoRetrieval questions
+        #number = 0
+        #maxNumber = len(questions)
+        #while (number < maxNumber):
+        #    if (len(questions) > 0):
+        #        if (number >= len(questions)):
+        #            break
+        #        else:
+        #            if (questions[number].split(";")[1] == "userInfoRetrieval"):
+        #                allAnswers[questions[number]] = None
+        #                questions.remove(questions[number])
+        #                number -= 1
+        #                maxNumber -= 1
+        #                if number < 0:
+        #                    number = 0
+        #            else:
+        #                number += 1
+        #    else:
+        #        break
 
         questionsAndAnswers = []
         for i in range(0, len(questions)):
@@ -556,8 +557,10 @@ def admin_answers():
             # TODO check answer for errors
             keyword = request.form.get("keywords" + str(i), default="Error")
             # TODO check keywords for errors
+            action = request.form.get("action" + str(i), default="None")
+            # TODO check action for errors
             insertAnswer = insert_into_database_table(
-                "INSERT INTO Answers (QuestionID, Answer, Keyword) VALUES (?,?,?);", (questionID, answer, keyword))
+                "INSERT INTO Answers (QuestionID, Answer, Keyword, Action) VALUES (?,?,?,?);", (questionID, answer, keyword, action))
             # TODO check insertAnswer
 
         return redirect("/admin/answers")
@@ -798,7 +801,7 @@ def chatbot(route):
             # TODO Check answerstuple for errors
             answers = []
             for j in range(0, len(answersTuple)):
-                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3])
+                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][6])
 
             allAnswers[questions[i]] = answers
 
@@ -839,6 +842,7 @@ def chatbot(route):
         else:
             updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
                                         [currentStats[3] + 1, assistantID, date])
+        print(questionsAndAnswers)
 
         return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route, message=message)
     else:

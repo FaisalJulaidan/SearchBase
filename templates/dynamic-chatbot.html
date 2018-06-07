@@ -129,6 +129,7 @@
     var questionsAnswered = 0;
     var collectedInformation = [];
     var qType = "";
+    var question = undefined;
     $(window).scroll(function ()
     {
         newPos = $(window).scrollTop();
@@ -164,13 +165,13 @@
             {%endif%}
         {%endfor%}
         i++;
-    {%endfor%}
+    {% endfor %}
     var questionNumber = 0;
     var questionN = -1;
     // document.getElementById("submitMessage").addEventListener("click", );
 
     $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot'>" + emojione.toImage("{{message}}") + "</li></div>");
-    getNextQuestion();
+    getNextQuestion("Next Question by Order");
 
     async function submitMessage(message)
     {
@@ -202,7 +203,7 @@
         }
         await sleep(400 + Math.floor(Math.random() * 900));
         $("#thinkingGif").remove();
-        if (data[questionN][0].split(";")[1] == "both" || data[questionN][0].split(";")[1] == "userInfoRetrieval") {
+        if (question[0].split(";")[1] == "both" || question[0].split(";")[1] == "userInfoRetrieval") {
             collectedInformation.push((questionN + 1) + ";" + message);
             var thanks = "";
             switch (Math.round(Math.random() * 6)) {
@@ -249,15 +250,17 @@
         }
         if (!showChatBox)
         {
-            for (var i = 0; i < data[questionN].length; i++)
+            for (var i = 0; i < question.length; i++)
             {
-                if (data[questionN][i].split(";")[0] == message)
+                if (question[i].split(";")[0] == message)
                 {
-                    getKeyWord(data[questionN][i].split(";")[1]);
+                    getKeyWord(question[i].split(";")[1]);
+                    getNextQuestion(question[i].split(";")[2])
+                    return 0;
                 }
             }
         }
-        getNextQuestion();
+        getNextQuestion("Next Question by Order");
         /*$("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>I apologise but I need an answer from the showed ones in order to get you the best match</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"
@@ -280,16 +283,23 @@
 
     function SkipQuestion() {
         questionsAnswered--;
-        getNextQuestion();
+        getNextQuestion("Next Question by Order");
     }
 
-    function getNextQuestion()
+    function getNextQuestion(action)
     {
         questionsAnswered++;
         $("#qAnswers").remove();
-        questionN += 1;
-        if (data[questionN] == undefined)
-        {
+        if (question == undefined) {
+            question = data[0];
+        } else if (action.includes("Go to: ")) {
+            for (var i = 0; i < data.length; i++) {
+                if (action.split(": ")[1] == data[i][0].split(";")[0]) {
+                    question = data[i];
+                    questionN = i;
+                }
+            }
+        } else if (action == "Get Solutions") {
             questionsAnswered--;
             sendData();
             SetRepeat();
@@ -299,20 +309,39 @@
                 scrollTo("chatBottom");
             }
             return 0;
+        } else if (action == "Next Question by Order") {
+            for (var i = 0; i < data.length; i++) {
+                if (question == data[i]) {
+                    question = data[i + 1];
+                    if (question == undefined) {
+                        questionsAnswered--;
+                        sendData();
+                        SetRepeat();
+                        chatInputDov.style = "display:none";
+                        if (!cancelScroll) {
+                            scrollTo("chatBottom");
+                        }
+                        return 0;
+                    }
+                    break;
+                }
+            }
+        } else if (action == "None") {
+            return 0;
         }
-        qType = data[questionN][0].split(";")[1];
+        qType = question[0].split(";")[1];
         var answers = "<div id='qAnswers'>";
-        if (data[questionN][0].split(";")[1] == "userInfoRetrieval") {
+        if (question[0].split(";")[1] == "userInfoRetrieval") {
             showChatBox = true;
         } else {
             showChatBox = false;
         }
-        for (var i = 1; i < data[questionN].length; i++)
+        for (var i = 1; i < question.length; i++)
         {
             if (showChatBox) {
                 break;
             }
-            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"submitMessage('" + emojione.toImage(data[questionN][i].split(";")[0]) + "')\">" + emojione.toImage(data[questionN][i].split(";")[0]) + "</a>";
+            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"submitMessage('" + emojione.toImage(question[i].split(";")[0]) + "')\">" + emojione.toImage(question[i].split(";")[0]) + "</a>";
             showChatBox = false;
         }
         if (questionN == 2) {
@@ -328,7 +357,7 @@
         {
             chatInputDov.style = "display:none";
         }
-        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + emojione.toImage(data[questionN][0].split(";")[0]) + "</li></div>");
+        $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + emojione.toImage(question[0].split(";")[0]) + "</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"
         }, "slow");
@@ -356,7 +385,8 @@
         questionsAnswered = 0;
         questionNumber = 0;
         questionN = -1;
-        getNextQuestion();
+        question = undefined;
+        getNextQuestion("Next Question by Order");
     }
 
     function handleEnter(e)
@@ -440,7 +470,6 @@
                 {
                     $("#thinkingGif").remove();
                     var data = xhttp.responseText;
-                    console.log(data);
                     cRD = $("#messagesContainer");
                     if (data == "We could not find anything that matched your search criteria. Please try different filter options.")
                     {

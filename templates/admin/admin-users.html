@@ -209,11 +209,41 @@
                                                 <td class=" "><strong><a href="">Delete</a></strong></td>
                                             </tr>
                                             <!-- End -->
-                                            </tbody>
-                                          </table>
-                                       </div>
-                               <!-- Content should go here -->
-                           </div>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <p>Enter the details of the additional user</p>
+                                <!-- Content should go here -->
+
+                                <form action="admin/adduser" method="POST" enctype="multipart/form-data">
+
+                                    <!-- User's details -->
+                                    <input class="form-control col-md-5 col-xs-10" id="user_fullname" type="text" name="name" placeholder="Name *">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <input class="form-control col-md-3 col-xs-10" id="user-email" type="text" name="email" placeholder="Email *">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <!-- Options for the user to select roles. -->
+                                    <select id="user_role" name="user-role" required>
+                                        <br />
+                                        <option value="Select">Please Select</option>
+                                        <option value="adminstrator">Administrator</option>
+                                    </select>
+
+                                    <br />
+                                    <br />
+
+                                    <!-- Submit button -->
+                                    <input class="btn btn-success" type="submit" value="Save" />
+
+                                </form>
+
+                                <!-- Content should go here -->
+                            </div>
                         </div>
                     </div>
                 </div>

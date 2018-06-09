@@ -181,46 +181,38 @@
                     <div class="row">
                         <div class="col-md-12 col-sm-12 col-xs-12">
                             <div class="x_panel">
-
-                                <p>Enter the new users data </p>
-
                                 <div class="x_content">
                                     <br />
-                                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" action="/admin/addusers" method="post">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="">
-                                                Name <span class="required">*</span>
-                                            </label>
-                                            <div class="col-md-9 col-sm-9 col-xs-12">
-                                                <input value="{{message}}" name="welcome-message" type="text" id="welcome-message" required="required" class="form-control col-md-5 col-xs-10" placeholder="You can leave this empty is you wish.">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="">
-                                                Email <span class="required">*</span>
-                                            </label>
-                                            <div class="col-md-9 col-sm-9 col-xs-12">
-                                                <input value="{{message}}" name="welcome-message" type="text" id="welcome-message" required="required" class="form-control col-md-5 col-xs-10" placeholder="You can leave this empty is you wish.">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="">
-                                                Access level <span class="required">*</span>
-                                            </label>
-                                            <div class="col-md-9 col-sm-9 col-xs-12">
-                                                <input value="{{message}}" name="welcome-message" type="text" id="welcome-message" required="required" class="form-control col-md-5 col-xs-10" placeholder="You can leave this empty is you wish.">
-                                            </div>
-                                        </div>
-                                        <div class="ln_solid"></div>
-                                        <div class="form-group">
-                                            <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                                            </div>
-                                        </div>
-                                        <button id="WelcomeMessage-SubmitB" class="btn btn-success">Submit</button>
-                                    </form>
                                 </div>
-
+                                <p>Enter the details of the additional user</p>
                                 <!-- Content should go here -->
+
+                                <form action="admin/adduser" method="POST" enctype="multipart/form-data">
+
+                                    <!-- User's details -->
+                                    <input class="form-control col-md-5 col-xs-10" id="user_fullname" type="text" name="name" placeholder="Name *">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <input class="form-control col-md-3 col-xs-10" id="user-email" type="text" name="email" placeholder="Email *">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <!-- Options for the user to select roles. -->
+                                    <select id="user_role" name="user-role" required>
+                                        <br />
+                                        <option value="Select">Please Select</option>
+                                        <option value="adminstrator">Administrator</option>
+                                    </select>
+
+                                    <br />
+                                    <br />
+
+                                    <!-- Submit button -->
+                                    <input class="btn btn-success" type="submit" value="Save" />
+
+                                </form>
+
                             </div>
                         </div>
                     </div>

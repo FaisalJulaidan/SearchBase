@@ -174,45 +174,43 @@
 
             <div class="row">
               <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel">
-                  <div class="x_title">
-                    <h2>User Report <small>Activity report</small></h2>
-                    <ul class="nav navbar-right panel_toolbox">
-                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                      </li>
-                    </ul>
-                    <div class="clearfix"></div>
-                  </div>
-                  <div class="x_content">
-                    <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
-                      <div class="profile_img">
-                        <div id="crop-avatar">
-                          <!-- Current avatar -->
-                          <img class="img-responsive avatar-view" src="../../static/images/img.jpg" alt="Avatar" title="Change the avatar">
-                        </div>
-                      </div>
-                      <div id="outputDiv">
-                          <h3>{{user[2]}} {{user[3]}}</h3>
-
-                          <ul class="list-unstyled user_data">
-                            <li>
-                              <i class="fa fa-briefcase user-profile-icon"></i> {{companyName}}
-                            </li>
-
-                            <li class="m-top-xs">
-                              <i class="fa fa-external-link user-profile-icon"></i>
-                              <a href="https://www.thesearchbase.com/chatbot/{{companyName}}" target="_blank">Assistant</a>
-                            </li>
+                  <div class="x_panel">
+                      <div class="x_title">
+                          <h2>User Report <small>Activity report</small></h2>
+                          <ul class="nav navbar-right panel_toolbox">
+                              <li>
+                                  <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                              </li>
                           </ul>
+                          <div class="clearfix"></div>
                       </div>
-                      <div class="col-md-9 col-sm-9 col-xs-12">
-                          <input class="btn btn-success" type="submit" value="Change Password" />
-                          <input class="btn btn-success" type="submit" value="Reset Password" />
+                      <div class="x_content">
+                          <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
+                              <div class="profile_img">
+                                  <div id="crop-avatar">
+                                      <!-- Current avatar -->
+                                      <img class="img-responsive avatar-view" src="../../static/images/img.jpg" alt="Avatar" title="Change the avatar">
+                                  </div>
+                              </div>
+                              <div id="outputDiv">
+                                  <h3>{{user[2]}} {{user[3]}}</h3>
 
+                                  <ul class="list-unstyled user_data">
+                                      <li>
+                                          <i class="fa fa-briefcase user-profile-icon"></i> {{companyName}}
+                                      </li>
+
+                                      <li class="m-top-xs">
+                                          <i class="fa fa-external-link user-profile-icon"></i>
+                                          <a href="https://www.thesearchbase.com/chatbot/{{companyName}}" target="_blank">Assistant</a>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
                       </div>
+                      <button href="/account/changepassword" class="btn btn-success">Change Password</button>
+                      <button href="/" class="btn btn-success">Reset Password</button>
                   </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

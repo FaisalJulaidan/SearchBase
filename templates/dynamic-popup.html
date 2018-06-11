@@ -120,6 +120,8 @@
             animateTo: 90,
         });
 
+        setTimeout(openAssistant, 6000);
+
         $(document).ready(function () {
             frame.style = "display:none";
             but.addEventListener("click", openAssistant);
@@ -144,6 +146,7 @@
             $(document).on("mouseleave", ".launch_btn_holder", function () {
                 OpenButtonHoverEnd();
             });
+
         });
 
 

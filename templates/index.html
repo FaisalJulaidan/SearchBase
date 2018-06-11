@@ -168,7 +168,13 @@
     </div>
     <!-- Welcome thumb -->
     <div class="welcome-thumb wow fadeInDown" data-wow-delay="0.5s">
-        <img src="../static/img/bg-img/final2.png" alt="">
+        <!-- Video for the intro goes here-->
+        <video loop="loop" autoplay="autoplay" width="430" height="490" id="introVideo" media="all and (max-width:430px)">
+            <source src="../static/images/demo2.mp4" type="video/mp4">
+        </video>
+        <br />
+        <br />
+        <br />
     </div>
 </section>
 <!-- ***** Welcome Area End ***** -->
@@ -194,8 +200,7 @@
                         <i class="ti-mobile" aria-hidden="true"></i>
                     </div>
                     <h4>Boost customer interaction</h4>
-                    <p>Having a tool that interacts with your customers, makes them more likely to make a purchase on
-                        your website.</p>
+                    <p>Having a tool that interacts with your customers, makes them more likely to take action with your ideas or business.</p>
                 </div>
             </div>
             <!-- Single Special Area -->
@@ -574,6 +579,25 @@
 <script src="../static/js/footer-reveal.min.js"></script>
 <!-- Active JS -->
 <script src="../static/js/active.js"></script>
+
+<script>
+    document.getElementById('introVideo').play();
+    var promise = document.querySelector('video').play();
+
+    if (promise !== undefined) {
+        promise.then(_ => {
+            // Autoplay started!
+            console.log("PLAYING");
+        }).catch(error => {
+            // Autoplay was prevented.
+            // Show a "Play" button so that user can start playback.
+            console.log("NOT PLAYING");
+            document.getElementById("introVideo").controls = true;
+        });
+    }
+</script>
+
+
 </body>
 
 </html>

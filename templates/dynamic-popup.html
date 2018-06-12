@@ -126,18 +126,7 @@
             frame.style = "display:none";
             but.addEventListener("click", openAssistant);
             butAp.addEventListener("click", openAssistant);
-            closeBut.addEventListener("click", function () {
-                $("#iframediv").animate({
-                    marginBottom: "-=35px",
-                    opacity: 0
-                }, 400);
-                setTimeout(function () {
-                    frame.style = "display:none";
-                    but.style = "display:inline-block";
-                    butAp.style = "display:inline-block";
-                    opened = false;
-                }, 400);
-            });
+            closeBut.addEventListener("click", closeAssistant);
 
             $(document).on("mouseover", ".launch_btn_holder", function () {
                 OpenButtonHover();
@@ -151,42 +140,60 @@
 
 
         function openAssistant() {
-            frame.style = "display:block";
-            //$("#iframediv").fadeIn("slow", function () {
-            //    // Animation complete
-            //});
-            $("#iframediv").animate({
-                marginBottom: "+=35px",
-                opacity: 1
-            }, 400);
-            but.style = "display:none";
-            butAp.style = "display:none";
-            opened = true;
+            if (!opened) {
+                frame.style = "display:block";
+                //$("#iframediv").fadeIn("slow", function () {
+                //    // Animation complete
+                //});
+                $("#iframediv").animate({
+                    marginBottom: "+=35px",
+                    opacity: 1
+                }, 400);
+                but.style = "display:none";
+                butAp.style = "display:none";
+                opened = true;
+            }
+        }
+
+        function closeAssistant() {
+            if (opened) {
+                $("#iframediv").animate({
+                    marginBottom: "-=35px",
+                    opacity: 0
+                }, 400);
+                setTimeout(function () {
+                    frame.style = "display:none";
+                    but.style = "display:inline-block";
+                    butAp.style = "display:inline-block";
+                    opened = false;
+                }, 400);
+            }
         }
 
         function OpenButtonHover() {
             if (!hoovered) {
+                hoovered = true;
+                $("#launch_button_appendix").stop();
                 $("#launch_button_appendix").animate({
                     // marginLeft: "+=20px",
                     // marginBottom: "+=76px",
-                    marginLeft: "-20px",
-                    marginBottom: "0px",
+                    marginLeft: "-16px",
+                    marginBottom: "11px",
                     opacity: 1,
 
                 }, 600);
                 $("#launch_button_appendix").rotate({
                     animateTo: 0,
                 })
-                hoovered = true;
-
             }
         }
 
         function OpenButtonHoverEnd() {
             if (hoovered) {
+                $("#launch_button_appendix").stop();
                 $("#launch_button_appendix").animate({
-                    marginLeft: "-177px",
-                    marginBottom: "-147px",
+                    marginLeft: "-133px",
+                    marginBottom: "-130px",
                     opacity: 0,
                 }, 600);
                 $("#launch_button_appendix").rotate({

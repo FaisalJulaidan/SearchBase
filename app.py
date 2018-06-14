@@ -995,6 +995,13 @@ def admin_analytics():
         stats = select_from_database_table("SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?", [assistantID], True)
         return render_template("admin/admin-analytics.html", data=stats)
 
+@app.route("/admin/settings", methods=['GET'])
+def admin_settings():
+    if request.method == "GET":
+        return render_template("admin/admin-settings.html")
+
+    
+
 
 @app.route("/admin/support/general", methods=['GET'])
 def admin_general_support():

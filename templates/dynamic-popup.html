@@ -202,6 +202,24 @@
                 hoovered = false;
             }
         }
+
+        function GetSecondsUntillPopup() {
+            params = "";
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", '/' + "{{user}}", true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.onreadystatechange = function () {
+                if (xhttp.readyState === 4) {
+                    if (xhttp.status === 200) {
+
+                    }
+                    else {
+                        console.error(xhttp.statusText);
+                    }
+                }
+            };
+            xhttp.send(params);
+        }
     </script>
 </body>
 

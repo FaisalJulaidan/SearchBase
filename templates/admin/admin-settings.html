@@ -1,15 +1,14 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- Meta, title, CSS, favicons, etc. -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="images/favicon.ico" type="image/ico" />
 
-	<link rel="icon" href="images/favicon.ico" type="image/ico" />
-
-    <title>Homepage </title>
+    <title>Settings </title>
 
     <!-- Bootstrap -->
     <link href="../../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -23,13 +22,16 @@
     <!-- bootstrap-progressbar -->
     <link href="../../static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
     <!-- JQVMap -->
-    <link href="../../static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+    <link href="../../static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet" />
     <!-- bootstrap-daterangepicker -->
     <link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <!-- Switchery -->
+    <link href="../../static/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
+    <link href="../static/css/switch.css" rel="stylesheet">
 
     <!-- Custom Theme Style -->
     <link href="../../static/build/css/custom.min.css" rel="stylesheet">
-  </head>
+</head>
 
   <body class="nav-md">
     <div class="container body">
@@ -50,7 +52,7 @@
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
-                <h2 id="welcomeh2"></h2>
+                <h2>user</h2>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -96,14 +98,15 @@
                 </ul>
               </div>
               <div class="menu_section">
+
                   <h3>Settings</h3>
                   <ul class="nav side-menu">
-                  <li>
-                      <a><i class="fa fa-gears"></i> Bot <span class="fa fa-chevron-down"></span></a>
-                      <ul class="nav child_menu">
-                          <li><a href="/admin/profile">Main Settings</a></li>
-                      </ul>
-                  </li>
+                      <li>
+                          <a><i class="fa fa-gears"></i> Bot <span class="fa fa-chevron-down"></span></a>
+                          <ul class="nav child_menu">
+                              <li><a href="/admin/settings">Main Settings</a></li>
+                          </ul>
+                      </li>
                   </ul>
 
                   <h3>Account</h3>
@@ -152,10 +155,12 @@
             </div>
             <!-- /sidebar menu -->
 
-
-
           </div>
         </div>
+
+
+
+
 
         <!-- top navigation -->
         <div class="top_nav">
@@ -190,40 +195,49 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-          <!-- top tiles -->
-          <div class="row tile_count">
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-user"></i> Total clicks on your assistant</span>
-              <div class="count">{{stats[0]}}</div>
+          <div class="">
+            <div class="page-title">
+              <div class="title_left">
+                <h3> Controlling your bot</h3>
+              </div>
             </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-clock-o"></i> Total Solutions loaded</span>
-              <div class="count">{{stats[1]}}</div>
-            </div>
-          </div>
+            <div class="clearfix"></div>
+            <div class="row">
+              <!-- Copy this and paste it for more drop down options -->
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h1>Settings</h1>
+                        <ul class="nav navbar-right panel_toolbox"></ul>
+                        <div class="clearfix"></div>
+                        <br />
+                        <form action="/admin/settings" method="POST" enctype="multipart/form-data">
+                            <!-- User's details -->
+                            <h4>Would you like the chat bot to automatically open for the user?</h4>
+                            <label class="switch">
+                                <input id="switch-autopop" name="switch-autopop" type="checkbox" {%if autopop != 'Off'%} checked {%endif%}>
+                                <span class="slider round"></span>
+                            </label>
+                            <br />
+                            <br />
+                            <h4> How long should the chat bot wait before opening?<small>   *Time in Seconds</small> </h4>
+                            <input name="timeto-autopop" style="width:50px" class="form-control col-md-5 col-xs-10" id="bot_time" type="text" placeholder="6" {%if autopop != 'Off'%} value="{{autopop}}" {%endif%}>
+                            <br />
+                            <br />
+                            <br />
+                            <br />
 
-          <div class="row">
-            <div class="col-md-12 col-sm-12 col-xs-12">
-              <div class="x_panel" style="height:600px;">
-                <div class="col-md-12">
-                  <div class="jumbotron text-xs-center">
-                    <h1 class="display-3">Welcome!</h1>
-                      <p class="lead"><strong>Use your side navigation</strong> to navigate the website.</p>
-                      <hr>
-                      <p>
-                        Need help getting setup? <a href="">Contact our team, we'll setup a personal session with you.</a>
-                      </p>
-                      <p class="lead">
-                        <a class="btn btn-primary btn-sm" href="/admin/Questions" role="button">Build my questions</a>
-                      </p>
+                            <!-- Submit button -->
+                            <button class="btn btn-success">Submit</button>
+                        </form>
                     </div>
-                  </div>
                 </div>
               </div>
             </div>
-          <!-- /top tiles -->
-          <br />
+          </div>
         </div>
+        <!-- /page content -->
+
 
         <!-- footer content -->
         <footer>
@@ -234,7 +248,6 @@
         </footer>
         <!-- /footer content -->
       </div>
-    </div>
 
     <!-- jQuery -->
     <script src="../../static/vendors/jquery/dist/jquery.min.js"></script>
@@ -276,18 +289,6 @@
 
     <!-- Custom Theme Scripts -->
     <script src="../../static/build/js/custom.min.js"></script>
-
-
-	<script src="../../static/js/cookies.js"></script>
-    <script>
-    if("{{msg}}" != ""){
-        makeCookie("UserEmail", "{{msg}}", 1);
-    }
-    if("{{user}}" != ""){
-        makeCookie("User Official", "{{user}}", 1);
-    }
-    document.getElementById("welcomeh2").innerHTML = getCookie("User Official");
-    </script>
 
   </body>
 </html>

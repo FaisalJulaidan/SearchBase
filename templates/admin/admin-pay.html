@@ -207,17 +207,17 @@
                                   <div class="row" data-locale-reversible>
                                       <div class="field half-width">
                                           <input id="example2-city" data-tid="elements_examples.form.city_placeholder" class="input empty" type="text" placeholder="San Francisco" required="" autocomplete="address-level2">
-                                          <label for="example2-city" data-tid="elements_examples.form.city_label">City</label>
+                                          <label for="example2-city" data-tid="elements_examples.form.city_label">City/Town</label>
                                           <div class="baseline"></div>
                                       </div>
                                       <div class="field quarter-width">
                                           <input id="example2-state" data-tid="elements_examples.form.state_placeholder" class="input empty" type="text" placeholder="CA" required="" autocomplete="address-level1">
-                                          <label for="example2-state" data-tid="elements_examples.form.state_label">State</label>
+                                          <label for="example2-state" data-tid="elements_examples.form.state_label">County</label>
                                           <div class="baseline"></div>
                                       </div>
                                       <div class="field quarter-width">
                                           <input id="example2-zip" data-tid="elements_examples.form.postal_code_placeholder" class="input empty" type="text" placeholder="94107" required="" autocomplete="postal-code">
-                                          <label for="example2-zip" data-tid="elements_examples.form.postal_code_label">ZIP</label>
+                                          <label for="example2-zip" data-tid="elements_examples.form.postal_code_label">PostCode</label>
                                           <div class="baseline"></div>
                                       </div>
                                   </div>
@@ -225,6 +225,7 @@
                               <div class="row">
                                   <div class="field">
                                       <div id="example2-card-number" class="input empty"></div>
+                                      <input id="example2-zip" data-tid="elements_examples.form.card_number_placeholder" class="input empty" type="text" placeholder="2968-2347-9768-7345" required="" autocomplete="postal-code">
                                       <label for="example2-card-number" data-tid="elements_examples.form.card_number_label">Card number</label>
                                       <div class="baseline"></div>
                                   </div>
@@ -232,16 +233,18 @@
                               <div class="row">
                                   <div class="field half-width">
                                       <div id="example2-card-expiry" class="input empty"></div>
+                                      <input id="example2-zip" data-tid="elements_examples.form.expiry_placeholder" class="input empty" type="text" placeholder="04/20" required="" autocomplete="postal-code">
                                       <label for="example2-card-expiry" data-tid="elements_examples.form.card_expiry_label">Expiration</label>
                                       <div class="baseline"></div>
                                   </div>
                                   <div class="field half-width">
                                       <div id="example2-card-cvc" class="input empty"></div>
+                                      <input id="example2-cvc" data-tid="elements_examples.form.cvc_placeholder" class="input empty" type="text" placeholder="212" required="" autocomplete="on">
                                       <label for="example2-card-cvc" data-tid="elements_examples.form.card_cvc_label">CVC</label>
                                       <div class="baseline"></div>
                                   </div>
                               </div>
-                              <button type="submit" data-tid="elements_examples.form.pay_button">Pay $25</button>
+                              <button type="submit" data-tid="elements_examples.form.pay_button">Pay {Amount}</button>
                               <!--<div class="error" role="alert">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
                                       <path class="base" fill="#000" d="M8.5,17 C3.80557963,17 0,13.1944204 0,8.5 C0,3.80557963 3.80557963,0 8.5,0 C13.1944204,0 17,3.80557963 17,8.5 C17,13.1944204 13.1944204,17 8.5,17 Z"></path>

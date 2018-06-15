@@ -114,7 +114,7 @@
             }
 
             .example.example2 .input.focused + label {
-                color: #24b47e;
+                color: #6610f2;
             }
 
         .example.example2 .input.invalid + label {
@@ -122,7 +122,7 @@
         }
 
         .example.example2 .input.focused + label + .baseline {
-            background-color: #24b47e;
+            background-color: #6610f2;
         }
 
         .example.example2 .input.focused.invalid + label + .baseline {
@@ -156,7 +156,7 @@
         width: calc(100% - 30px);
         height: 40px;
         margin: 40px 15px 0;
-        background-color: #24b47e;
+        background-color: #6610f2;
         border-radius: 4px;
         color: #fff;
         text-transform: uppercase;
@@ -189,7 +189,7 @@
     }
 
     .example.example2 .success .icon .checkmark {
-        stroke: #24b47e;
+        stroke: #6610f2;
     }
 
     .example.example2 .success .title {
@@ -203,5 +203,5 @@
     }
 
     .example.example2 .success .reset path {
-        fill: #24b47e;
+        fill: #6610f2;
     }

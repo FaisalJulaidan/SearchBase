@@ -27,6 +27,7 @@
     <link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
     <!-- Switchery -->
     <link href="../../static/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
+    <link href="../static/css/switch.css" rel="stylesheet">
 
     <!-- Custom Theme Style -->
     <link href="../../static/build/css/custom.min.css" rel="stylesheet">
@@ -210,23 +211,24 @@
                         <ul class="nav navbar-right panel_toolbox"></ul>
                         <div class="clearfix"></div>
                         <br />
-                        <form action="/account/settings" method="POST" enctype="multipart/form-data">
+                        <form action="/admin/settings" method="POST" enctype="multipart/form-data">
                             <!-- User's details -->
                             <h4>Would you like the chat bot to automatically open for the user?</h4>
-                            <span class="switchery switchery-default" style="box-shadow: rgb(38, 185, 154) 0px 0px 0px 11px inset; border-color: rgb(38, 185, 154); background-color: rgb(38, 185, 154); transition: border 0.4s, box-shadow 0.4s, background-color 1.2s;">
-                                <small style="left: 12px; transition: background-color 0.4s, left 0.2s; background-color: rgb(255, 255, 255);"></small>
-                            </span>
+                            <label class="switch">
+                                <input id="switch-autopop" name="switch-autopop" type="checkbox" {%if autopop != 'Off'%} checked {%endif%}>
+                                <span class="slider round"></span>
+                            </label>
                             <br />
                             <br />
                             <h4> How long should the chat bot wait before opening?<small>   *Time in Seconds</small> </h4>
-                            <input style="width:50px" class="form-control col-md-5 col-xs-10" id="bot_time" type="text" name="user-time-input" placeholder="6">
+                            <input name="timeto-autopop" style="width:50px" class="form-control col-md-5 col-xs-10" id="bot_time" type="text" placeholder="6" {%if autopop != 'Off'%} value="{{autopop}}" {%endif%}>
                             <br />
                             <br />
                             <br />
                             <br />
 
                             <!-- Submit button -->
-                            <input class="btn btn-success" type="submit" value="Submit" />
+                            <button class="btn btn-success">Submit</button>
                         </form>
                     </div>
                 </div>

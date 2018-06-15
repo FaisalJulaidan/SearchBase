@@ -995,13 +995,51 @@ def admin_analytics():
         stats = select_from_database_table("SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?", [assistantID], True)
         return render_template("admin/admin-analytics.html", data=stats)
 
-@app.route("/admin/settings", methods=['GET'])
+@app.route("/admin/settings", methods=['GET', 'POST'])
 def admin_settings():
     if request.method == "GET":
-        return render_template("admin/admin-settings.html")
-
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        assistantIndex = 0  # TODO change this
+        assistantID = assistants[assistantIndex][0]
+        autoPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE ID=?", [assistantID], True)
+        return render_template("admin/admin-settings.html", autopop=autoPop[0][0])
+    elif request.method == "POST":
+        autopopOn = request.form.get("switch-autopop", default="off")
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        assistantIndex = 0  # TODO change this
+        assistantID = assistants[assistantIndex][0]
+        if autopopOn == "off":
+            updatedPop = update_table("UPDATE Assistants SET SecondsUntilPopup='Off' WHERE ID=?", [assistantID])
+        elif autopopOn == "on":
+            secsuntilPop = request.form.get("timeto-autopop", default="Error")
+            if secsuntilPop != "Error":
+                if secsuntilPop == "":
+                    updatedPop = update_table("UPDATE Assistants SET SecondsUntilPopup=?;", ["6"])
+                else:
+                    updatedPop = update_table("UPDATE Assistants SET SecondsUntilPopup=?;", [secsuntilPop])
+        return redirect("/admin/settings", code=302)
     
-
+@app.route("/getPopSettings", methods=['POST'])
+def get_pop_settings():
+    if request.method == "POST":
+        url = request.form.get("URL", default="Error")
+        print(url)
+        if(url != "Error"):
+            if "127.0.0.1:5000" in url or "thesearchbase.com" in url:
+                #its on test route
+                companyName = url.split("/")[len(url.split("/"))-1]
+                print(companyName)
+                companyID = select_from_database_table("SELECT ID FROM Companies WHERE Name=?", [companyName], True)
+                print(companyID)
+            else:
+                #its on client route
+                companyID = select_from_database_table("SELECT ID FROM Companies WHERE URL=?", [url], True)
+            secsUntilPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE CompanyID=?", [companyID[0][0]], True)
+            datastring = secsUntilPop[0][0]
+            print(datastring)
+            return jsonify(datastring)
 
 @app.route("/admin/support/general", methods=['GET'])
 def admin_general_support():

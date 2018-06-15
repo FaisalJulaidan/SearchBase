@@ -115,12 +115,12 @@
         var closeBut = document.getElementById("overChatbotIframeCloseButton");
         var hoovered = false;
         var btn_text = $("#launch_button_appendix");
-        
+        var autoPop = "";
+
         $("#launch_button_appendix").rotate({
             animateTo: 90,
         });
 
-        setTimeout(openAssistant, 6000);
 
         $(document).ready(function () {
             frame.style = "display:none";
@@ -135,7 +135,7 @@
             $(document).on("mouseleave", ".launch_btn_holder", function () {
                 OpenButtonHoverEnd();
             });
-
+            GetPopSettings();
         });
 
 
@@ -203,15 +203,21 @@
             }
         }
 
-        function GetSecondsUntillPopup() {
-            params = "";
+        function GetPopSettings() {
+            var url = window.location.href;
+            params = "URL=" + url;
             var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", '/' + "{{user}}", true);
+            xhttp.open("POST", "/getPopSettings", true);
             xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             xhttp.onreadystatechange = function () {
                 if (xhttp.readyState === 4) {
                     if (xhttp.status === 200) {
-
+                        var data = xhttp.responseText;
+                        autoPop = data;
+                        autoPop = autoPop.replace("\"", "");
+                        if (autoPop != "Off") {
+                            setTimeout(openAssistant, parseInt(autoPop) * 1000);
+                        }
                     }
                     else {
                         console.error(xhttp.statusText);

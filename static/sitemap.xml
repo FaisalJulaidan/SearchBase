@@ -8,53 +8,58 @@
 
 
 <url>
-  <loc>http://www.thesearchbase.com/</loc>
-  <lastmod>2018-04-04T00:19:43+00:00</lastmod>
+  <loc>https://www.thesearchbase.com/</loc>
+  <lastmod>2018-05-31T12:31:31+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>http://www.thesearchbase.com/demo</loc>
-  <lastmod>2018-04-04T00:19:43+00:00</lastmod>
+  <loc>https://www.thesearchbase.com/features</loc>
+  <lastmod>2018-05-31T12:31:31+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>http://www.thesearchbase.com/about</loc>
-  <lastmod>2018-04-04T00:19:43+00:00</lastmod>
+  <loc>https://www.thesearchbase.com/dataRetrival</loc>
+  <lastmod>2018-05-31T12:31:31+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>http://www.thesearchbase.com/features</loc>
-  <lastmod>2018-04-04T00:19:43+00:00</lastmod>
+  <loc>https://www.thesearchbase.com/dataCollection</loc>
+  <lastmod>2018-05-31T12:31:31+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>http://www.thesearchbase.com/pricing</loc>
-  <lastmod>2018-04-04T00:19:43+00:00</lastmod>
+  <loc>https://www.thesearchbase.com/pricing</loc>
+  <lastmod>2018-05-31T12:31:31+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>http://www.thesearchbase.com/signupform</loc>
-  <lastmod>2018-04-04T00:19:43+00:00</lastmod>
+  <loc>https://www.thesearchbase.com/login</loc>
+  <lastmod>2018-05-31T12:31:31+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://www.thesearchbase.com/signupform</loc>
+  <lastmod>2018-05-31T12:31:31+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://www.thesearchbase.com/about</loc>
+  <lastmod>2018-05-31T12:31:31+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>http://www.thesearchbase.com/contact</loc>
-  <lastmod>2018-04-04T00:19:43+00:00</lastmod>
+  <loc>https://www.thesearchbase.com/termsandconditions</loc>
+  <lastmod>2018-05-31T12:31:31+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>http://www.thesearchbase.com/login</loc>
-  <lastmod>2018-04-04T00:19:43+00:00</lastmod>
+  <loc>https://www.thesearchbase.com/privacy</loc>
+  <lastmod>2018-05-31T12:31:31+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>http://www.thesearchbase.com/termsandconditions</loc>
-  <lastmod>2018-04-04T00:19:43+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>http://www.thesearchbase.com/privacy</loc>
-  <lastmod>2018-04-04T00:19:43+00:00</lastmod>
+  <loc>https://www.thesearchbase.com/affiliate</loc>
+  <lastmod>2018-05-31T12:31:31+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 

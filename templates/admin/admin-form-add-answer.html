@@ -106,42 +106,58 @@
                 </ul>
               </div>
               <div class="menu_section">
-                <h3>Account</h3>
-                <ul class="nav side-menu">
-                  <li><a><i class="fa fa-gears"></i> Account Details  <span class="fa fa-chevron-down"></span></a>
-                      <ul class="nav child_menu">
-                          <li><a href="/admin/profile">Profile</a></li>
-                          <li><a href="/admin/users">Users</a></li>
-                          <li><a href="/admin/billing">Billing</a></li>
-                      </ul>
-                  </li>
-                  <li><a href="/admin/analytics"><i class="fa fa-bar-chart"></i> Analytics<span class="fa"></span></a>
-                  </li>
-                  <!-- <li><a><i class="fa fa-money"></i> Price Plan <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/admin/pricing">Pricing Tables</a></li>
-                    </ul>
-                  </li> -->
-
-                  <li><a><i class="fa fa-life-saver"></i> Support <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                        <li><a href="/admin/supportGeneral">General Support</a>
-                        <li><a>Technical Support<span class="fa fa-chevron-down"></span></a>
+                  <h3>Settings</h3>
+                  <ul class="nav side-menu">
+                      <li>
+                          <a><i class="fa fa-gears"></i> Bot <span class="fa fa-chevron-down"></span></a>
                           <ul class="nav child_menu">
-                            <li class="sub_menu"><a href="/admin/supportDocs">Documentation</a>
-                            </li>
-                            <li><a href="/admin/supportSetup">Getting setup</a>
-                            </li>
-                            <li><a href="/admin/supportIntergartion">Intergration with your site</a>
-                            </li>
+                              <li><a href="/admin/settings">Main Settings</a></li>
                           </ul>
-                        </li>
-                        <li><a href="/admin/supportBilling">Billing support</a>
-                        </li>
-                    </ul>
-                  </li>
-                </li>
-                </ul>
+                      </li>
+                  </ul>
+
+                  <h3>Account</h3>
+                  <ul class="nav side-menu">
+                      <li>
+                          <a><i class="fa fa-gears"></i> Account Details  <span class="fa fa-chevron-down"></span></a>
+                          <ul class="nav child_menu">
+                              <li><a href="/admin/profile">Profile</a></li>
+                          </ul>
+                      </li>
+                      <li>
+                          <a href="/admin/analytics"><i class="fa fa-bar-chart"></i> Analytics<span class="fa"></span></a>
+                      </li>
+                      <!-- <li><a><i class="fa fa-money"></i> Price Plan <span class="fa fa-chevron-down"></span></a>
+          <ul class="nav child_menu">
+            <li><a href="/admin/pricing">Pricing Tables</a></li>
+          </ul>
+        </li> -->
+
+                      <li>
+                          <a><i class="fa fa-life-saver"></i> Support <span class="fa fa-chevron-down"></span></a>
+                          <ul class="nav child_menu">
+                              <li><a href="/admin/supportGeneral">General Support</a>
+                              <li>
+                                  <a>Technical Support<span class="fa fa-chevron-down"></span></a>
+                                  <ul class="nav child_menu">
+                                      <li class="sub_menu">
+                                          <a href="/admin/supportDocs">Documentation</a>
+                                      </li>
+                                      <li>
+                                          <a href="/admin/supportSetup">Getting setup</a>
+                                      </li>
+                                      <li>
+                                          <a href="/admin/supportIntergartion">Intergration with your site</a>
+                                      </li>
+                                  </ul>
+                              </li>
+                              <li>
+                                  <a href="/admin/supportBilling">Billing support</a>
+                              </li>
+                          </ul>
+                      </li>
+                      </li>
+                  </ul>
               </div>
             </div>
             <!-- /sidebar menu -->
@@ -204,11 +220,13 @@
                                 <p class="text-muted font-13 m-b-30">Select a question to add answers for</p>
                                 <p class="text-muted font-13 m-b-30"><strong>Note: If you change the question you wish to target, make sure to press submit.</strong></p>
                                 <div>
-                                   <select id="question-select">
-                                     {% for row in msg%}
-                                       <option value="{{row[0]}}">{{row[0].split(";")[0]}}</option>
-                                     {%endfor%}
-                                   </select>
+                                    <select id="question-select">
+                                        {% for row in msg%}
+                                        {%if row[0].split(";")[1] != "userInfoRetrieval"%}
+                                        <option value="{{row[0]}}">{{row[0].split(";")[0]}}</option>
+                                        {%endif%}
+                                        {%endfor%}
+                                    </select>
                                    <p class="text-muted font-13 m-b-30">How many answers will your question have?</p>
                                    <div class="form-group">
                                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">How many answers will your question have? <span class="required"></span>
@@ -304,7 +322,7 @@
     document.getElementById("snoa").addEventListener("click", changeQuestion);
     var numberOfQuestions = 0;
     {%for item in msg %}
-    numberOfQuestions++;
+        numberOfQuestions++;
     {%endfor%}
     var data = createArray(numberOfQuestions);
     var i = 0;
@@ -321,11 +339,11 @@
     var squestion = e.options[e.selectedIndex].value;
     $("#question_inform").val(squestion);
     var numberOfAnswers = 0;
-    getDatabaseData();
+    getDatabaseData(); 
     function getDatabaseData(){
         numberOfAnswers = 0;
         for(var j = 0;j < data.length;j++){
-            if(data[j][0] == document.getElementById("question-select").options[document.getElementById("question-select").selectedIndex].value){
+            if (data[j][0] == document.getElementById("question-select").options[document.getElementById("question-select").selectedIndex].value && data[j][0].split(";")[1] != "userInfoRetrieval"){
                 for(var b = 1; b < data[j].length+1;b++){
                     if(b==data[j].length){break;}
                     if(data[j][b] == ""){break;}
@@ -333,10 +351,24 @@
                     $("#pasteForm").append("\
                         <div class=\"columnA\">\
                           <p> Answer Text</p>\
-                          <input name=\"pname"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[0]+"\">\
+                          <input name=\"pname"+ String(b) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\"" + parts[0] +"\">\
+                          <br>\
                           <p> Answer Keyword </p>\
-                          <input name=\"keywords"+String(b)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\""+parts[1]+"\">\
-                        </div>");
+                          <input name=\"keywords"+ String(b) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\"" + parts[1] + "\">\
+                          <br>\
+                          <p> Answer Action </p>\
+                          <select id=\"newSelect\" name=\"action"+ String(b) + "\">\
+                          <option value =\"Next Question by Order\">Next Question by Order</option>" +
+                          {%for item in msg %}
+                          "<option value=\"Go to: " + "{{item[0]}}".split(";")[0] + "\">Go to: " + "{{item[0]}}".split(";")[0] + "</option>" +
+                          {% endfor %}
+                          "<option value=\"Get Solutions\">Get Solutions</option>\
+                          </div>");
+                          //$('#newSelect option').filter(function (i, e) { return $(e).text() == parts[2] })
+                            $('[id=newSelect] option').filter(function () {
+                                return ($(this).text() == parts[2]);
+                            }).prop('selected', true);
+                          document.getElementById('newSelect').id = 'oldSelect';
                     numberOfAnswers++;
                 }
                 $("#number-of-questions").val(numberOfAnswers);
@@ -359,7 +391,15 @@
                       <input name=\"pname"+String(b+1)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
                       <br />\
                       <p> Answer Keyword </p>\
-                      <input name=\"keywords"+String(b+1)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
+                      <input name=\"keywords"+ String(b + 1) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
+                      <br>\
+                      <p> Answer Action </p>\
+                      <select name=\"action"+ String(b+1) + "\">\
+                      <option value =\"Next Question by Order\">Next Question by Order</option>" +
+                      {%for item in msg %}
+                      "<option value=\"Go to: " + "{{item[0]}}".split(";")[0] + "\">Go to: " + "{{item[0]}}".split(";")[0] + "</option>" +
+                      {% endfor %}
+                      "<option value=\"Get Solutions\">Get Solutions</option>\
                     </div>")
                 numberOfAnswers++;
             }

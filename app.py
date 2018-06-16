@@ -31,10 +31,10 @@ secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
 
 stripe.api_key = secret_key
 
-# stripe_keys = {
-#   'secret_key': os.environ['SECRET_KEY'],
-#   'publishable_key': os.environ['PUBLISHABLE_KEY']
-# }
+stripe_keys = {
+  'secret_key': os.environ['SECRET_KEY'],
+  'publishable_key': os.environ['PUBLISHABLE_KEY']
+}
 
 # stripe.api_key = stripe_keys['secret_key']
 
@@ -323,6 +323,7 @@ def signup():
                     else:
                         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
                 else:
+                    stripe.
                     if not app.debug:
                         # TODO this needs improving
                         msg = Message("Account verification",
@@ -532,28 +533,29 @@ def admin_answers():
             # TODO Check answerstuple for errors
             answers = []
             for j in range(0, len(answersTuple)):
-                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3])
+                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][6])
 
             allAnswers[questions[i]] = answers
 
-        number = 0
-        maxNumber = len(questions)
-        while (number < maxNumber):
-            if (len(questions) > 0):
-                if (number >= len(questions)):
-                    break
-                else:
-                    if (questions[number].split(";")[1] == "userInfoRetrieval"):
-                        allAnswers[questions[number]] = None
-                        questions.remove(questions[number])
-                        number -= 1
-                        maxNumber -= 1
-                        if number < 0:
-                            number = 0
-                    else:
-                        number += 1
-            else:
-                break
+        #remove userInfoRetrieval questions
+        #number = 0
+        #maxNumber = len(questions)
+        #while (number < maxNumber):
+        #    if (len(questions) > 0):
+        #        if (number >= len(questions)):
+        #            break
+        #        else:
+        #            if (questions[number].split(";")[1] == "userInfoRetrieval"):
+        #                allAnswers[questions[number]] = None
+        #                questions.remove(questions[number])
+        #                number -= 1
+        #                maxNumber -= 1
+        #                if number < 0:
+        #                    number = 0
+        #            else:
+        #                number += 1
+        #    else:
+        #        break
 
         questionsAndAnswers = []
         for i in range(0, len(questions)):
@@ -597,8 +599,10 @@ def admin_answers():
             # TODO check answer for errors
             keyword = request.form.get("keywords" + str(i), default="Error")
             # TODO check keywords for errors
+            action = request.form.get("action" + str(i), default="None")
+            # TODO check action for errors
             insertAnswer = insert_into_database_table(
-                "INSERT INTO Answers (QuestionID, Answer, Keyword) VALUES (?,?,?);", (questionID, answer, keyword))
+                "INSERT INTO Answers (QuestionID, Answer, Keyword, Action) VALUES (?,?,?,?);", (questionID, answer, keyword, action))
             # TODO check insertAnswer
 
         return redirect("/admin/answers")
@@ -772,10 +776,12 @@ def admin_thanks():
     return render_template('admin/admin-thank-you.html')
 
 
-@app.route("/admin/pay", methods=['GET'])
+@app.route("/admin/pay", methods=['GET', 'POST'])
 def admin_pay():
     if request.method == 'GET':
         return render_template("admin/admin-pay.html")
+    
+
 
 
 # TODO improve
@@ -839,7 +845,7 @@ def chatbot(route):
             # TODO Check answerstuple for errors
             answers = []
             for j in range(0, len(answersTuple)):
-                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3])
+                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][6])
 
             allAnswers[questions[i]] = answers
 
@@ -880,6 +886,7 @@ def chatbot(route):
         else:
             updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
                                         [currentStats[3] + 1, assistantID, date])
+        print(questionsAndAnswers)
 
         return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route,
                                message=message)
@@ -1035,6 +1042,51 @@ def admin_analytics():
             [assistantID], True)
         return render_template("admin/admin-analytics.html", data=stats)
 
+@app.route("/admin/settings", methods=['GET', 'POST'])
+def admin_settings():
+    if request.method == "GET":
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        assistantIndex = 0  # TODO change this
+        assistantID = assistants[assistantIndex][0]
+        autoPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE ID=?", [assistantID], True)
+        return render_template("admin/admin-settings.html", autopop=autoPop[0][0])
+    elif request.method == "POST":
+        autopopOn = request.form.get("switch-autopop", default="off")
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        assistantIndex = 0  # TODO change this
+        assistantID = assistants[assistantIndex][0]
+        if autopopOn == "off":
+            updatedPop = update_table("UPDATE Assistants SET SecondsUntilPopup='Off' WHERE ID=?", [assistantID])
+        elif autopopOn == "on":
+            secsuntilPop = request.form.get("timeto-autopop", default="Error")
+            if secsuntilPop != "Error":
+                if secsuntilPop == "":
+                    updatedPop = update_table("UPDATE Assistants SET SecondsUntilPopup=?;", ["6"])
+                else:
+                    updatedPop = update_table("UPDATE Assistants SET SecondsUntilPopup=?;", [secsuntilPop])
+        return redirect("/admin/settings", code=302)
+    
+@app.route("/getPopSettings", methods=['POST'])
+def get_pop_settings():
+    if request.method == "POST":
+        url = request.form.get("URL", default="Error")
+        print(url)
+        if(url != "Error"):
+            if "127.0.0.1:5000" in url or "thesearchbase.com" in url:
+                #its on test route
+                companyName = url.split("/")[len(url.split("/"))-1]
+                print(companyName)
+                companyID = select_from_database_table("SELECT ID FROM Companies WHERE Name=?", [companyName], True)
+                print(companyID)
+            else:
+                #its on client route
+                companyID = select_from_database_table("SELECT ID FROM Companies WHERE URL=?", [url], True)
+            secsUntilPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE CompanyID=?", [companyID[0][0]], True)
+            datastring = secsUntilPop[0][0]
+            print(datastring)
+            return jsonify(datastring)
 
 # Method for the users
 @app.route("/admin/users", methods=['GET', 'POST'])

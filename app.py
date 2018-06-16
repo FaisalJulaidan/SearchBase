@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from flask_mail import Mail, Message
 from werkzeug import secure_filename
-from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape
+from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for
 from flask_api import status
 from datetime import datetime
 from bcrypt import hashpw, gensalt
@@ -42,8 +42,8 @@ app = Flask(__name__, static_folder='static')
 mail = Mail(app)
 
 app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
-ALLOWED_IMAGE_EXTENSION = set(['png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'])
-ALLOWED_PRODUCT_FILE_EXTENSIONS = set(['json', 'JSON', 'xml', 'xml'])
+ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
+ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
 
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
@@ -60,7 +60,7 @@ app.config.update(
 @app.before_request
 def before_request():
     theurl = str(request.url_rule)
-    if "admin" not in theurl:
+    if "admin" not in theurl or "admin/homepage":
         print("Ignore before request for: ", theurl)
         return None
     email = request.cookies.get("UserEmail")
@@ -255,14 +255,13 @@ def login():
                 password = data[6]
                 if hash_password(password_to_check, password) == password:
                     verified = data[7]
+                    print(verified == "True")
                     if verified == "True":
-                        statistics = []
-                        statistics.append(get_total_statistics(3, email))
-                        statistics.append(get_total_statistics(5, email))
-                        return redirect("/admin/homepage")
+                        messages = json.dumps({"email": escape(email)})
+                        return redirect(url_for(".admin_home", messages=messages))
                     else:
                         return render_template('errors/verification.html',
-                                               msg="Account not verified, please check your email and follow instructions")
+                                               data="Account not verified, please check your email and follow instructions")
                 else:
                     return render_template('login.html', data="User name and password does not match!")
             else:
@@ -324,24 +323,25 @@ def signup():
                     else:
                         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
                 else:
-                    # TODO this needs improving
-                    msg = Message("Account verification",
-                                  sender="thesearchbase@gmail.com",
-                                  recipients=[email])
+                    if not app.debug:
+                        # TODO this needs improving
+                        msg = Message("Account verification",
+                                      sender="thesearchbase@gmail.com",
+                                      recipients=[email])
 
-                    payload = email + ";" + companyName
-                    link = "www.thesearchbase.com/account/verify/{}".format(verificationSigner.dumps(payload))
-                    msg.body = "You have registered with TheSearchBase.\n" \
-                               "Please visit <a href='{}'>this link</a> to verify your account.".format(email, link)
-                    mail.send(msg)
+                        payload = email + ";" + companyName
+                        link = "www.thesearchbase.com/account/verify/{}".format(verificationSigner.dumps(payload))
+                        msg.body = "You have registered with TheSearchBase.\n" \
+                                   "Please visit <a href='{}'>this link</a> to verify your account.".format(email, link)
+                        mail.send(msg)
 
-                    # sending the registration confirmation email to us
-                    msg = Message("A new company has signed up!",
-                                  sender="thesearchbase@gmail.com",
-                                  recipients=["thesearchbase@gmail.com"])
-                    msg.body = "Company name: {} has signed up the admin's details are. Name: {}, Email: {}, ".format(
-                        companyName, fullname, email)
-                    mail.send(msg)
+                        # sending the registration confirmation email to us
+                        msg = Message("A new company has signed up!",
+                                      sender="thesearchbase@gmail.com",
+                                      recipients=["thesearchbase@gmail.com"])
+                        msg.body = "Company name: {} has signed up the admin's details are. Name: {}, Email: {}, ".format(
+                            companyName, fullname, email)
+                        mail.send(msg)
 
                     # TODO remove this once assistants are implemented properly
 
@@ -359,15 +359,32 @@ def signup():
 @app.route("/admin/homepage", methods=['GET'])
 def admin_home():
     if request.method == "GET":
+        sendEmail = False
+        args = request.args
+        if len(args) > 0:
+            messages = args['messages']
+            if messages is not None:
+                email = json.loads(messages)['email']
+                if email is None or email == "None":
+                    return redirect("/login")
+                sendEmail = True
+            else:
+                abort(status.HTTP_400_BAD_REQUEST)
+        else:
+            email = request.cookies.get("UserEmail")
         statistics = []
-        statistics.append(get_total_statistics(3, request.cookies.get("UserEmail")))
-        statistics.append(get_total_statistics(5, request.cookies.get("UserEmail")))
-        return render_template("admin/admin-main.html", stats=statistics)
+        statistics.append(get_total_statistics(3, email))
+        statistics.append(get_total_statistics(5, email))
+        if sendEmail:
+            return render_template("admin/admin-main.html", stats=statistics, email=email)
+        else:
+            return render_template("admin/admin-main.html", stats=statistics)
 
 
 @app.route("/admin/profile", methods=['GET', 'POST'])
 def profilePage():
     if request.method == "GET":
+        print(request.cookies)
         email = request.cookies.get("UserEmail")
         user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
         # TODO check database output for errors
@@ -402,7 +419,6 @@ def get_total_statistics(num, email):
         assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(email)[0]])
         statistics = select_from_database_table("SELECT * FROM Statistics WHERE AssistantID=?;", [assistant[0]])
         total = 0
-        print(statistics)
         try:
             for c in statistics[num]:
                 total += int(c)
@@ -1021,15 +1037,22 @@ def admin_analytics():
 
 
 # Method for the users
-@app.route("/admin/users", methods=['GET'])
+@app.route("/admin/users", methods=['GET', 'POST'])
 def admin_users():
     if request.method == "GET":
+        print("TEST")
         email = request.cookies.get("UserEmail")
+        print("TEST1")
+        print(email)
         company = get_company(email)
+        print("TEST2")
         # todo check company
         companyID = company[0]
+        print("TEST3")
 
-        userLevel = select_from_database_table("SELECT AccessLevel FROM Users WHERE Email=?", [email])
+        userLevel = select_from_database_table("SELECT AccessLevel FROM Users WHERE Email=?", [email])[0]
+        print("TEST4")
+        print(userLevel)
         if userLevel is None:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             # TODO better handle
@@ -1037,7 +1060,9 @@ def admin_users():
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             # TODO better handle this
         else:
-            if userLevel is not "Admin":
+            print("TEST5")
+            if userLevel != "Admin":
+                print(userLevel)
                 return redirect("/admin/homepage")
             else:
                 # TODO improve this
@@ -1421,7 +1446,7 @@ def sendMarketingEmail():
 
 ## Error Handlers ##
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)
-def unsupported_media(e):
+def bad_request(e):
     return render_template('errors/400.html', error=e, debug=app.debug), status.HTTP_400_BAD_REQUEST
 
 

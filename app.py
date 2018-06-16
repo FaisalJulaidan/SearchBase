@@ -1,13 +1,12 @@
 #!/usr/bin/python3
 from flask_mail import Mail, Message
-from werkzeug import secure_filename
 from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for
 from flask_api import status
 from datetime import datetime
 from bcrypt import hashpw, gensalt
 from itsdangerous import URLSafeTimedSerializer, BadSignature, BadData
 from xml.dom import minidom
-import json
+from json import dumps, loads
 import os
 import sqlite3
 import stripe
@@ -18,12 +17,7 @@ verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-COMPUTERDATABASE = APP_ROOT + "/computers.db"
-USERINPUTDATABASE = APP_ROOT + "/userInput.db"
-
 DATABASE = APP_ROOT + "/database.db"
-
-PRODUCT_IMAGES = os.path.join(APP_ROOT, 'static/file_uploads/product_images')
 PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
 
 pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
@@ -32,8 +26,8 @@ secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
 stripe.api_key = secret_key
 
 stripe_keys = {
-  'secret_key': os.environ['SECRET_KEY'],
-  'publishable_key': os.environ['PUBLISHABLE_KEY']
+    'secret_key': secret_key,
+    'publishable_key': pub_key
 }
 
 # stripe.api_key = stripe_keys['secret_key']
@@ -41,7 +35,6 @@ stripe_keys = {
 app = Flask(__name__, static_folder='static')
 mail = Mail(app)
 
-app.config['PRODUCT_IMAGES'] = PRODUCT_IMAGES
 ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
 ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
 
@@ -52,27 +45,6 @@ app.config.update(
     MAIL_USERNAME='thesearchbase@gmail.com',
     MAIL_PASSWORD='pilbvnczzdgxkyzy'
 )
-
-
-# TODO just overall better validation
-
-# code to ensure user is logged in
-@app.before_request
-def before_request():
-    theurl = str(request.url_rule)
-    if "admin" not in theurl or "admin/homepage":
-        print("Ignore before request for: ", theurl)
-        return None
-    email = request.cookies.get("UserEmail")
-    print("USER EMAIL: " + str(email))
-    if email is None:
-        print("User not logged in")
-        return redirect("/login")
-    print("Before request checking: ", theurl, " ep: ", request.endpoint)
-    if email == 'None' and request.endpoint != 'login':
-        return render_template("login.html", msg="Please log in first!")
-    print("Before Request checks out")
-    return None
 
 
 def select_from_database_table(sql_statement, array_of_terms=None, all=False, database=DATABASE):
@@ -179,6 +151,60 @@ def allowed_image_file(filename):
     return '.' in filename and ext in ALLOWED_IMAGE_EXTENSION
 
 
+# TODO just overall better validation
+
+if __name__ == "__main__":
+    app.run(debug=True)
+conn = None
+try:
+    conn = sqlite3.connect(DATABASE)
+    cur = conn.cursor()
+    devseed = open('devseed.sql', 'r').read()
+    create_db = open('createdb.sql', 'r').read()
+    if app.debug:
+        print("Applying devseed file")
+        cur.executescript(create_db)
+        cur.executescript(devseed)
+        conn.commit()
+        print("Applied devseed file")
+    elif not os.path.exists(DATABASE):
+        print("Creating database structure")
+        cur.executescript(create_db)
+        conn.commit()
+        print("Created database structure")
+    cur.close()
+except Exception as e:
+    conn.rollback()
+    print(e)
+    exit(1)
+finally:
+    if conn is not None:
+        conn.close()
+
+# Janky way to seed password
+if app.debug:
+    update_table("UPDATE Users SET Password=? WHERE ID=?", [hash_password("test"), 1])
+
+
+# code to ensure user is logged in
+@app.before_request
+def before_request():
+    theurl = str(request.url_rule)
+    if "admin" not in theurl or "admin/homepage":
+        print("Ignore before request for: ", theurl)
+        return None
+    email = request.cookies.get("UserEmail")
+    print("USER EMAIL: " + str(email))
+    if email is None:
+        print("User not logged in")
+        return redirect("/login")
+    print("Before request checking: ", theurl, " ep: ", request.endpoint)
+    if email == 'None' and request.endpoint != 'login':
+        return render_template("login.html", msg="Please log in first!")
+    print("Before Request checks out")
+    return None
+
+
 # TODO jackassify it
 @app.route("/demo/<route>", methods=['GET'])
 def dynamic_popup(route):
@@ -257,7 +283,7 @@ def login():
                     verified = data[7]
                     print(verified == "True")
                     if verified == "True":
-                        messages = json.dumps({"email": escape(email)})
+                        messages = dumps({"email": escape(email)})
                         return redirect(url_for(".admin_home", messages=messages))
                     else:
                         return render_template('errors/verification.html',
@@ -323,7 +349,6 @@ def signup():
                     else:
                         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
                 else:
-                    stripe.
                     if not app.debug:
                         # TODO this needs improving
                         msg = Message("Account verification",
@@ -365,7 +390,7 @@ def admin_home():
         if len(args) > 0:
             messages = args['messages']
             if messages is not None:
-                email = json.loads(messages)['email']
+                email = loads(messages)['email']
                 if email is None or email == "None":
                     return redirect("/login")
                 sendEmail = True
@@ -537,10 +562,10 @@ def admin_answers():
 
             allAnswers[questions[i]] = answers
 
-        #remove userInfoRetrieval questions
-        #number = 0
-        #maxNumber = len(questions)
-        #while (number < maxNumber):
+        # remove userInfoRetrieval questions
+        # number = 0
+        # maxNumber = len(questions)
+        # while (number < maxNumber):
         #    if (len(questions) > 0):
         #        if (number >= len(questions)):
         #            break
@@ -602,7 +627,8 @@ def admin_answers():
             action = request.form.get("action" + str(i), default="None")
             # TODO check action for errors
             insertAnswer = insert_into_database_table(
-                "INSERT INTO Answers (QuestionID, Answer, Keyword, Action) VALUES (?,?,?,?);", (questionID, answer, keyword, action))
+                "INSERT INTO Answers (QuestionID, Answer, Keyword, Action) VALUES (?,?,?,?);",
+                (questionID, answer, keyword, action))
             # TODO check insertAnswer
 
         return redirect("/admin/answers")
@@ -780,8 +806,30 @@ def admin_thanks():
 def admin_pay():
     if request.method == 'GET':
         return render_template("admin/admin-pay.html")
-    
+    elif request.method == 'POST':
+        email = request.cookies.get("UserEmail")
+        company = get_company(email)
+        if company is None or "Error" in company:
+            # TODO handle this better, as it's payments so is very important we don't charge the customer etc
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            token = request.form.get("stripeToken", default="Error")
+            if token is "Error":
+                # TODO improve this
+                abort(status.HTTP_400_BAD_REQUEST)
+            else:
+                customer = stripe.Customer.create(
+                    source=token,
+                    email=email,
+                    description=company[1]
+                )
 
+                updateCompany = update_table("UPDATE Companies SET StripeID=? WHERE ID=?", [customer['id'], company[0]])
+                if "Error" in updateCompany:
+                    # TODO handle this better
+                    customer.delete()
+                else:
+                    pass
 
 
 # TODO improve
@@ -1042,6 +1090,7 @@ def admin_analytics():
             [assistantID], True)
         return render_template("admin/admin-analytics.html", data=stats)
 
+
 @app.route("/admin/settings", methods=['GET', 'POST'])
 def admin_settings():
     if request.method == "GET":
@@ -1067,26 +1116,29 @@ def admin_settings():
                 else:
                     updatedPop = update_table("UPDATE Assistants SET SecondsUntilPopup=?;", [secsuntilPop])
         return redirect("/admin/settings", code=302)
-    
+
+
 @app.route("/getPopSettings", methods=['POST'])
 def get_pop_settings():
     if request.method == "POST":
         url = request.form.get("URL", default="Error")
         print(url)
-        if(url != "Error"):
+        if (url != "Error"):
             if "127.0.0.1:5000" in url or "thesearchbase.com" in url:
-                #its on test route
-                companyName = url.split("/")[len(url.split("/"))-1]
+                # its on test route
+                companyName = url.split("/")[len(url.split("/")) - 1]
                 print(companyName)
                 companyID = select_from_database_table("SELECT ID FROM Companies WHERE Name=?", [companyName], True)
                 print(companyID)
             else:
-                #its on client route
+                # its on client route
                 companyID = select_from_database_table("SELECT ID FROM Companies WHERE URL=?", [url], True)
-            secsUntilPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE CompanyID=?", [companyID[0][0]], True)
+            secsUntilPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE CompanyID=?",
+                                                      [companyID[0][0]], True)
             datastring = secsUntilPop[0][0]
             print(datastring)
             return jsonify(datastring)
+
 
 # Method for the users
 @app.route("/admin/users", methods=['GET', 'POST'])
@@ -1533,7 +1585,3 @@ class Del:
 
     def __getitem__(self, k):
         return self.comp.get(k)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)

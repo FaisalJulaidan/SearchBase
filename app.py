@@ -159,16 +159,14 @@ conn = None
 try:
     conn = sqlite3.connect(DATABASE)
     cur = conn.cursor()
-    devseed = open('devseed.sql', 'r').read()
-    create_db = open('createdb.sql', 'r').read()
+    devseed = open('sql/devseed.sql', 'r').read()
+    create_db = open('sql/createdb.sql', 'r').read()
     if app.debug:
-        print("Applying devseed file")
         cur.executescript(create_db)
         cur.executescript(devseed)
         conn.commit()
         print("Applied devseed file")
     elif not os.path.exists(DATABASE):
-        print("Creating database structure")
         cur.executescript(create_db)
         conn.commit()
         print("Created database structure")
@@ -470,7 +468,7 @@ def adming_welcome_message():
         return redirect("/admin/questions")
 
 
-@app.route("/admin/assistant", methods=['GET', 'POST'])
+@app.route("/admin/assistants", methods=['GET', 'POST'])
 def admin_assistant():
     if request.method == "GET":
         email = request.cookies.get("UserEmail")
@@ -511,9 +509,9 @@ def admin_assistant():
         return redirect("/admin/assistant")
 
 
-@app.route("/getPopSettings", methods=['POST'])
+@app.route("/popupsettings", methods=['GET'])
 def get_pop_settings():
-    if request.method == "POST":
+    if request.method == "GET":
         url = request.form.get("URL", default="Error")
         print(url)
         if (url != "Error"):

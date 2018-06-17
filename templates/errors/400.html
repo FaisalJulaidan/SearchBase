@@ -1,125 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "errors/base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="description" content="">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-
-    <!-- Title -->
+{% block title %}
     <title>400 Bad Request</title>
+{% endblock %}
 
-    <!-- Chrome, Firefox OS and Opera -->
-    <meta name="theme-color" content="#884BDF">
-    <!-- Windows Phone -->
-    <meta name="msapplication-navbutton-color" content="#884BDF">
-    <!-- iOS Safari -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="#884BDF">
-
-    <!-- Icon images -->
-    <link rel="apple-touch-icon" sizes="57x57" href="../../static/img/core-img/apple-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="../../static/img/core-img/apple-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="../../static/img/core-img/apple-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="../../static/img/core-img/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="../../static/img/core-img/apple-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="../../static/img/core-img/apple-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="../../static/img/core-img/apple-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="../../static/img/core-img/apple-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="../../static/img/core-img/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="../../static/img/core-img/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="../../static/img/core-img/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="../../static/img/core-img/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="../../static/img/core-img/favicon-16x16.png">
-    <link rel="manifest" href="../../static/img/core-img/manifest.json">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="../static/img/core-img/ms-icon-144x144.png">
-    <meta name="theme-color" content="#ffffff">
-
-    <!-- Core Stylesheet -->
-    <link href="../../static/css/style.css" rel="stylesheet">
-
-    <!-- Responsive CSS -->
-    <link href="../../static/css/responsive.css" rel="stylesheet">
-
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-70419779-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-70419779-2');
-    </script>
-
-
-</head>
-
-<body>
-    <!-- Preloader Start -->
-    <div id="preloader">
-        <div class="colorlib-load"></div>
-    </div>
-
-    <!-- ***** Header Area Start ***** -->
-    <header class="header_area animated">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <!-- Menu Area Start -->
-                <div class="col-12 col-lg-10">
-                    <div class="menu_area">
-                        <nav class="navbar navbar-expand-lg navbar-light">
-                            <!-- Logo -->
-                            <a class="navbar-brand" href="/">Tsb.</a>
-                                                        <!-- Menu Area -->
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-    <!-- ***** Header Area End ***** -->
-
-    <!-- ***** Wellcome Area Start ***** -->
-    <section class="wellcome_area3 clearfix" id="home">
-        <div class="container h-100">
-            <div class="row h-100 align-items-center">
-                <div class="col-12 col-md">
-                    <div class="wellcome-heading">
-                        <h2>400</h2>
-                        <h3></h3>
-                        <p>Bad request. Please contact thesearchbase@gmail.com and let them know what happened.</p>
-                        {% if debug == True %}
-                        <p>{{ error }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- ***** Wellcome Area End ***** -->
-
-    <!-- ***** Footer Area Start ***** -->
-    <footer class="">
-
-    </footer>
-    <!-- ***** Footer Area end ***** -->
-
-    <!-- Jquery-2.2.4 JS -->
-    <script src="../../static/js/jquery-2.2.4.min.js"></script>
-    <!-- Popper js -->
-    <script src="../../static/js/popper.min.js"></script>
-    <!-- Bootstrap-4 Beta JS -->
-    <script src="../../static/js/bootstrap.min.js"></script>
-    <!-- All Plugins JS -->
-    <script src="../../static/js/plugins.js"></script>
-    <!-- Slick Slider Js-->
-    <script src="../../static/js/slick.min.js"></script>
-    <!-- Footer Reveal JS -->
-    <script src="../../static/js/footer-reveal.min.js"></script>
-    <!-- Active JS -->
-    <script src="../../static/js/active.js"></script>
-</body>
-
-</html>
+{% block content %}
+    <h2>400</h2>
+    <h3></h3>
+    <p>Bad request. Please contact thesearchbase@gmail.com and let them know what happened.</p>
+    {% if debug == True %}
+        <p>{{ error }}</p>
+    {% endif %}
+{% endblock %}

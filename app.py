@@ -401,9 +401,9 @@ def admin_home():
         statistics.append(get_total_statistics(3, email))
         statistics.append(get_total_statistics(5, email))
         if sendEmail:
-            return render_template("admin/admin-main.html", stats=statistics, email=email)
+            return render_template("admin/main.html", stats=statistics, email=email)
         else:
-            return render_template("admin/admin-main.html", stats=statistics)
+            return render_template("admin/main.html", stats=statistics)
 
 
 @app.route("/admin/profile", methods=['GET', 'POST'])
@@ -414,7 +414,7 @@ def profilePage():
         user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
         # TODO check database output for errors
         companyName = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
-        return render_template("admin/admin-profile.html", user=user, companyName=companyName[1])
+        return render_template("admin/profile.html", user=user, companyName=companyName[1])
     elif request.method == "POST":
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
@@ -487,7 +487,7 @@ def admin_questions():
         for i in range(0, len(questionsTuple)):
             question = [questionsTuple[i][2] + ";" + questionsTuple[i][3]]
             questions.append(tuple(question))
-        return render_template("admin/admin-form-add-question.html", data=questions, message=message)
+        return render_template("admin/questions.html", data=questions, message=message)
     elif request.method == "POST":
         email = request.cookies.get("UserEmail")
         assistants = get_assistants(email)
@@ -504,7 +504,7 @@ def admin_questions():
             if question != "Error":
                 updatedQuestions.append(question)
             else:
-                return render_template("admin/admin-form-add-question.html",
+                return render_template("admin/questions.html",
                                        data=currentQuestions), status.HTTP_400_BAD_REQUEST
 
         i = -1
@@ -592,7 +592,7 @@ def admin_answers():
                 answer.append(answers[j])
                 merge = merge + tuple(answer)
             questionsAndAnswers.append(merge)
-        return render_template("admin/admin-form-add-answer.html", msg=questionsAndAnswers)
+        return render_template("admin/answers.html", msg=questionsAndAnswers)
     elif request.method == "POST":
         email = request.cookies.get("UserEmail")
         assistants = get_assistants(email)
@@ -644,7 +644,7 @@ def admin_products():
         products = select_from_database_table("SELECT ProductID, Name, Brand, Model, Price, Keywords, Discount, URL "
                                               "FROM Products WHERE AssistantID=?;", [assistantID], True)
         # TODO check products for errors
-        return render_template("admin/admin-form-add-product.html", data=products)
+        return render_template("admin/products.html", data=products)
     elif request.method == 'POST':
         email = request.cookies.get("UserEmail")
         assistants = get_assistants(email)
@@ -781,30 +781,30 @@ def admin_products_file_upload():
 @app.route("/admin/templates", methods=['GET', 'POST'])
 def admin_templates():
     if request.method == "GET":
-        return render_template("admin/admin-convo-template.html")
+        return render_template("admin/convo-template.html")
     elif request.method == "POST":
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
 @app.route("/admin/connect", methods=['GET'])
 def admin_connect():
-    return render_template("admin/admin-connect.html")
+    return render_template("admin/connect.html")
 
 
 @app.route("/admin/pricing", methods=['GET'])
 def admin_pricing():
-    return render_template("admin/admin-pricing-tables.html", pub_key=pub_key)
+    return render_template("admin/pricing-tables.html", pub_key=pub_key)
 
 
 @app.route('/admin/thanks', methods=['GET'])
 def admin_thanks():
-    return render_template('admin/admin-thank-you.html')
+    return render_template('admin/thank-you.html')
 
 
 @app.route("/admin/pay", methods=['GET', 'POST'])
 def admin_pay():
     if request.method == 'GET':
-        return render_template("admin/admin-pay.html")
+        return render_template("admin/pay.html")
     elif request.method == 'POST':
         email = request.cookies.get("UserEmail")
         company = get_company(email)
@@ -911,7 +911,7 @@ def admin_user_input():
                 dataTuple = dataTuple + inputTuple
                 data.append(dataTuple)
                 dataTuple = tuple(["Null"])
-        return render_template("admin/admin-data-storage.html", data=data)
+        return render_template("admin/data-storage.html", data=data)
 
 
 @app.route("/chatbot/<route>", methods=['GET', 'POST'])
@@ -1139,7 +1139,7 @@ def admin_analytics():
         stats = select_from_database_table(
             "SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?",
             [assistantID], True)
-        return render_template("admin/admin-analytics.html", data=stats)
+        return render_template("admin/analytics.html", data=stats)
 
 
 @app.route("/admin/settings", methods=['GET', 'POST'])
@@ -1150,7 +1150,7 @@ def admin_settings():
         assistantIndex = 0  # TODO change this
         assistantID = assistants[assistantIndex][0]
         autoPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE ID=?", [assistantID], True)
-        return render_template("admin/admin-settings.html", autopop=autoPop[0][0])
+        return render_template("admin/settings.html", autopop=autoPop[0][0])
     elif request.method == "POST":
         autopopOn = request.form.get("switch-autopop", default="off")
         email = request.cookies.get("UserEmail")
@@ -1222,7 +1222,7 @@ def admin_users():
             else:
                 # TODO improve this
                 users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
-                return render_template("admin/admin-users.html", users=users)
+                return render_template("admin/users.html", users=users)
     elif request.method == "POST":
         email = request.cookies.get("UserEmail")
         company = get_company(email)
@@ -1416,43 +1416,43 @@ def change_password():
 @app.route("/admin/billing", methods=['GET'])
 def admin_billing():
     if request.method == "GET":
-        return render_template("admin/admin-billing.html")
+        return render_template("admin/billing.html")
 
 
 @app.route("/admin/support/general", methods=['GET'])
 def admin_general_support():
     if request.method == "GET":
-        return render_template("admin/admin-general-support.html")
+        return render_template("admin/support/general.html")
 
 
 @app.route("/admin/support/docs", methods=['GET'])
 def admin_support_docs():
     if request.method == "GET":
-        return render_template("admin/admin-docs.html")
+        return render_template("admin/docs.html")
 
 
 @app.route("/admin/support/setup", methods=['GET'])
 def admin_support_setup():
     if request.method == "GET":
-        return render_template("admin/admin-getting-setup.html")
+        return render_template("admin/support/getting-setup.html")
 
 
 @app.route("/admin/support/intergration", methods=['GET'])
 def admin_support_intergration():
     if request.method == "GET":
-        return render_template("admin/admin-intergration-tutorial.html")
+        return render_template("admin/support/intergration.html")
 
 
 @app.route("/admin/support/billing", methods=['GET'])
 def admin_support_billing():
     if request.method == "GET":
-        return render_template("admin/admin-billing-support.html")
+        return render_template("admin/support/billing.html")
 
 
 @app.route("/emoji-converter", methods=['GET'])
 def admin_emoji():
     if request.method == "GET":
-        return render_template("admin/admin-emoji.html")
+        return render_template("admin/emoji.html")
 
 
 # Sitemap route

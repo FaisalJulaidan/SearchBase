@@ -1,12 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+﻿{% extends "admin/base.html" %}
 
+{% block headlinks %}
     <title>Price Plans </title>
 
     <!-- Bootstrap -->
@@ -18,386 +12,258 @@
 
     <!-- Custom Theme Style -->
     <link href="../../static/build/css/custom.min.css" rel="stylesheet">
-  </head>
+{% endblock %}
 
-  <body class="nav-md">
-    <div class="container body">
-      <div class="main_container">
-        <div class="col-md-3 left_col">
-          <div class="left_col scroll-view">
-            <div class="navbar nav_title" style="border: 0;">
-              <a href="/admin/homepage" class="site_title"> <img src="../../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
-              <br />
-            </div>
-
-            <div class="clearfix"></div>
-
-            <!-- menu profile quick info -->
-            <div class="profile clearfix">
-              <div class="profile_pic">
-                <img src="../../static/images/img.jpg" alt="..." class="img-circle profile_img">
-              </div>
-              <div class="profile_info">
-                <span>Welcome,</span>
-                <h2>user</h2>
-              </div>
-            </div>
-            <!-- /menu profile quick info -->
-
-            <br />
-
-            <!-- sidebar menu -->
-            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-              <div class="menu_section">
-                <h3>General</h3>
-                <ul class="nav side-menu">
-                    <li>
-                        <a href="/admin/homepage"><i class="fa fa-home"></i> Dashboard</a>
-                    </li>
-                    <li>
-                        <a><i class="fa fa-comments-o"></i> Conversations <span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                            <li><a href="/admin/Questions">Questions</a></li>
-                            <li><a href="/admin/Answers">Answers</a></li>
-                            <li><a href="/admin/Templates">Templates</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="/admin/Products"><i class="fa fa-database"></i> Product Database<span></span></a>
-                    </li>
-                    <!-- User Data Storage -->
-                    <li>
-                        <a><i class="fa fa-cloud"></i> Data Storage <span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                            <li><a href="/admin/userinput">User Input</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a><i class="fa fa-wrench"></i> Tools <span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                            <li><a href="/emoji-converter">Emoji Converter</a></li>
-                        </ul>
-                    </li>
-                    <!-- End of user Data Storage -->
-                    <li>
-                        <a href="/admin/connect"><i class="fa fa-plug"></i> Connection<span class="fa"></span></a>
-                    </li>
-                </ul>
-              </div>
-              <div class="menu_section">
-
-                  <h3>Settings</h3>
-                  <ul class="nav side-menu">
-                      <li>
-                          <a><i class="fa fa-gears"></i> Bot <span class="fa fa-chevron-down"></span></a>
-                          <ul class="nav child_menu">
-                              <li><a href="/admin/settings">Main Settings</a></li>
-                          </ul>
-                      </li>
-                  </ul>
-
-                  <h3>Account</h3>
-                  <ul class="nav side-menu">
-                      <li>
-                          <a><i class="fa fa-gears"></i> Account Details  <span class="fa fa-chevron-down"></span></a>
-                          <ul class="nav child_menu">
-                              <li><a href="/admin/profile">Profile</a></li>
-                          </ul>
-                      </li>
-                      <li>
-                          <a href="/admin/analytics"><i class="fa fa-bar-chart"></i> Analytics<span class="fa"></span></a>
-                      </li>
-                      <!-- <li><a><i class="fa fa-money"></i> Price Plan <span class="fa fa-chevron-down"></span></a>
-          <ul class="nav child_menu">
-            <li><a href="/admin/pricing">Pricing Tables</a></li>
-          </ul>
-        </li> -->
-
-                      <li>
-                          <a><i class="fa fa-life-saver"></i> Support <span class="fa fa-chevron-down"></span></a>
-                          <ul class="nav child_menu">
-                              <li><a href="/admin/supportGeneral">General Support</a>
-                              <li>
-                                  <a>Technical Support<span class="fa fa-chevron-down"></span></a>
-                                  <ul class="nav child_menu">
-                                      <li class="sub_menu">
-                                          <a href="/admin/supportDocs">Documentation</a>
-                                      </li>
-                                      <li>
-                                          <a href="/admin/supportSetup">Getting setup</a>
-                                      </li>
-                                      <li>
-                                          <a href="/admin/supportIntergartion">Intergration with your site</a>
-                                      </li>
-                                  </ul>
-                              </li>
-                              <li>
-                                  <a href="/admin/supportBilling">Billing support</a>
-                              </li>
-                          </ul>
-                      </li>
-                      </li>
-                  </ul>
-              </div>
-            </div>
-            <!-- /sidebar menu -->
-          </div>
-        </div>
-
-        <!-- top navigation -->
-        <div class="top_nav">
-          <div class="nav_menu">
-            <nav>
-              <div class="nav toggle">
-                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
-              </div>
-
-              <ul class="nav navbar-nav navbar-right">
-                <li class="">
-                  <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../../static/images/img.jpg" alt="">User
-                    <span class=" fa fa-angle-down"></span>
-                  </a>
-                  <ul class="dropdown-menu dropdown-usermenu pull-right">
-                    <li><a href="/admin/profile"> Profile</a></li>
-                    <li><a href="/admin/supportGeneral">Help</a></li>
-                    <li><a href="/login"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
-                  </ul>
-                </li>
-
-                <li role="presentation" class="dropdown">
-                  <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-        <!-- /top navigation -->
-
-        <!-- page content -->
-        <div class="right_col" role="main">
-          <div class="">
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
             <div class="page-title">
-              <div class="title_left">
-              </div>
+                <div class="title_left">
+                </div>
             </div>
 
             <div class="clearfix"></div>
 
             <div class="row">
-              <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel" style="height:600px;">
-                  <div class="x_title">
-                    <h2>Pricing Tables</h2>
-                    <ul class="nav navbar-right panel_toolbox">
-                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
-                    </ul>
-                    <div class="clearfix"></div>
-                  </div>
-
-                  <div class="x_content">
-                    <div class="row">
-
-                      <div class="col-md-12">
-
-                        <!-- price element -->
-                        <div class="col-md-3 col-sm-6 col-xs-12">
-                          <div class="pricing">
-                            <div class="title">
-                              <h2>Starter Plan</h2>
-                              <h1>free</h1>
-                            </div>
-                            <div class="x_content">
-                              <div class="">
-                                <div class="pricing_features">
-                                  <ul class="list-unstyled text-left">
-                                    <li><i class="fa fa-check text-success"></i> Free <strong> Forever</strong></li>
-                                    <li><i class="fa fa-check text-success"></i> <strong>Unlimited</strong> Time</li>
-                                    <li><i class="fa fa-check text-success"></i> No <strong>credit Card needed</strong></li>
-                                    <li><i class="fa fa-check text-success"></i> Setup <strong> Support</strong></li>
-                                    <li><i class="fa fa-check text-success"></i> <strong>99.9%</strong> up-time</li>
-                                    <li><i class="fa fa-check text-success"></i> <strong>Free </strong> Hosting & License</li>
-                                    <li><i class="fa fa-times text-danger"></i> Limited <strong> number of products</strong></li>
-                                  </ul>
-                                </div>
-                              </div>
-                              <div class="pricing_footer">
-                                <a class="btn btn-success btn-block" role="button">Current <span> plan</span></a>
-                              </div>
-                            </div>
-                          </div>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel" style="height:600px;">
+                        <div class="x_title">
+                            <h2>Pricing Tables</h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                            </ul>
+                            <div class="clearfix"></div>
                         </div>
-                        <!-- price element -->
 
-                        <!-- price element -->
-                        <div class="col-md-3 col-sm-6 col-xs-12">
-                          <div class="pricing ui-ribbon-container">
-                            <div class="ui-ribbon-wrapper">
+                        <div class="x_content">
+                            <div class="row">
 
-                              <!-- Discount code - uncomment if needed -->
-                              <!-- <div class="ui-ribbon">
-                                5% Off
-                              </div> -->
+                                <div class="col-md-12">
 
-                            </div>
-                            <div class="title">
-                              <h2>Basic plan</h2>
-                              <h1>£50</h1>
-                              <span>Per Month</span>
-                            </div>
-                            <div class="x_content">
-                              <div class="">
-                                <div class="pricing_features">
-                                  <ul class="list-unstyled text-left">
-                                    <li><i class="fa fa-check text-success"></i> 150 <strong> Products</strong></li>
-                                    <li><i class="fa fa-check text-success"></i> 2 <strong> Databases</strong></li>
-                                    <li><i class="fa fa-check text-success"></i> Setup <strong> Support</strong></li>
-                                    <li><i class="fa fa-check text-success"></i> <strong>99.9%</strong> up-time</li>
-                                    <li><i class="fa fa-check text-success"></i> <strong>Free </strong> Hosting & License</li>
-                                    <li><i class="fa fa-check text-success"></i> <strong>Commercial </strong>  License</li>
-                                    <li><i class="fa fa-check text-success"></i> Cancel <strong> Anytime</strong> </li>
-                                  </ul>
+                                    <!-- price element -->
+                                    <div class="col-md-3 col-sm-6 col-xs-12">
+                                        <div class="pricing">
+                                            <div class="title">
+                                                <h2>Starter Plan</h2>
+                                                <h1>free</h1>
+                                            </div>
+                                            <div class="x_content">
+                                                <div class="">
+                                                    <div class="pricing_features">
+                                                        <ul class="list-unstyled text-left">
+                                                            <li><i class="fa fa-check text-success"></i> Free <strong>
+                                                                Forever</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i> <strong>Unlimited</strong>
+                                                                Time
+                                                            </li>
+                                                            <li><i class="fa fa-check text-success"></i> No <strong>credit
+                                                                Card needed</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i> Setup <strong>
+                                                                Support</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i>
+                                                                <strong>99.9%</strong> up-time
+                                                            </li>
+                                                            <li><i class="fa fa-check text-success"></i>
+                                                                <strong>Free </strong> Hosting & License
+                                                            </li>
+                                                            <li><i class="fa fa-times text-danger"></i> Limited <strong>
+                                                                number of products</strong></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing_footer">
+                                                    <a class="btn btn-success btn-block" role="button">Current <span> plan</span></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- price element -->
+
+                                    <!-- price element -->
+                                    <div class="col-md-3 col-sm-6 col-xs-12">
+                                        <div class="pricing ui-ribbon-container">
+                                            <div class="ui-ribbon-wrapper">
+
+                                                <!-- Discount code - uncomment if needed -->
+                                                <!-- <div class="ui-ribbon">
+                                                  5% Off
+                                                </div> -->
+
+                                            </div>
+                                            <div class="title">
+                                                <h2>Basic plan</h2>
+                                                <h1>£50</h1>
+                                                <span>Per Month</span>
+                                            </div>
+                                            <div class="x_content">
+                                                <div class="">
+                                                    <div class="pricing_features">
+                                                        <ul class="list-unstyled text-left">
+                                                            <li><i class="fa fa-check text-success"></i> 150 <strong>
+                                                                Products</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i> 2 <strong>
+                                                                Databases</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i> Setup <strong>
+                                                                Support</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i>
+                                                                <strong>99.9%</strong> up-time
+                                                            </li>
+                                                            <li><i class="fa fa-check text-success"></i>
+                                                                <strong>Free </strong> Hosting & License
+                                                            </li>
+                                                            <li><i class="fa fa-check text-success"></i> <strong>Commercial </strong>
+                                                                License
+                                                            </li>
+                                                            <li><i class="fa fa-check text-success"></i> Cancel <strong>
+                                                                Anytime</strong></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing_footer">
+
+                                                    <!-- Stripe checkout start -->
+
+                                                    <form action="/admin/pay" method="POST">
+                                                        <script
+                                                                src="https://checkout.stripe.com/checkout.js"
+                                                                class="stripe-button"
+                                                                data-key="{{ pub_key }}"
+                                                                data-amount="5000"
+                                                                data-name="TheSearchbase"
+                                                                data-description="Widget"
+                                                                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                                                data-locale="auto"
+                                                                data-currency="gbp">
+                                                        </script>
+                                                    </form>
+
+                                                    <!-- Stripe checkout end -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- price element -->
+
+                                    <!-- price element -->
+                                    <div class="col-md-3 col-sm-6 col-xs-12">
+                                        <div class="pricing">
+                                            <div class="title">
+                                                <h2>Advanced Plan</h2>
+                                                <h1>£199</h1>
+                                                <span>Per Month</span>
+                                            </div>
+                                            <div class="x_content">
+                                                <div class="">
+                                                    <div class="pricing_features">
+                                                        <ul class="list-unstyled text-left">
+                                                            <li><i class="fa fa-check text-success"></i> 300 <strong>
+                                                                Products</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i> 3 <strong>
+                                                                Databases</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i> Setup <strong>
+                                                                Support</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i>
+                                                                <strong>99.9%</strong> up-time
+                                                            </li>
+                                                            <li><i class="fa fa-check text-success"></i>
+                                                                <strong>Free </strong> Hosting & License
+                                                            </li>
+                                                            <li><i class="fa fa-check text-success"></i> <strong>Commercial </strong>
+                                                                License
+                                                            </li>
+                                                            <li><i class="fa fa-check text-success"></i> Cancel <strong>
+                                                                Anytime</strong></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing_footer">
+
+                                                    <form action="/admin/pay" method="POST">
+                                                        <script
+                                                                src="https://checkout.stripe.com/checkout.js"
+                                                                class="stripe-button"
+                                                                data-key="{{ pub_key }}"
+                                                                data-amount="19900"
+                                                                data-name="TheSearchbase"
+                                                                data-description="Widget"
+                                                                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                                                data-locale="auto"
+                                                                data-currency="gbp">
+                                                        </script>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- price element -->
+
+                                    <!-- price element -->
+                                    <div class="col-md-3 col-sm-6 col-xs-12">
+                                        <div class="pricing">
+                                            <div class="title">
+                                                <h2>Ultimate plan</h2>
+                                                <h1>£399</h1>
+                                                <span>Per Month</span>
+                                            </div>
+                                            <div class="x_content">
+                                                <div class="">
+                                                    <div class="pricing_features">
+                                                        <ul class="list-unstyled text-left">
+                                                            <li><i class="fa fa-check text-success"></i> Unlimited
+                                                                <strong> Products</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i> 4 <strong>
+                                                                Databases</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i> Setup <strong>
+                                                                Support</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i>
+                                                                <strong>99.9%</strong> up-time
+                                                            </li>
+                                                            <li><i class="fa fa-check text-success"></i>
+                                                                <strong>Free </strong> Hosting & License
+                                                            </li>
+                                                            <li><i class="fa fa-check text-success"></i> <strong>Commercial </strong>
+                                                                License
+                                                            </li>
+                                                            <li><i class="fa fa-check text-success"></i> Cancel <strong>
+                                                                Anytime</strong></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing_footer">
+
+                                                    <!-- Stripe checkout start -->
+
+                                                    <form action="/admin/pay" method="POST">
+                                                        <script
+                                                                src="https://checkout.stripe.com/checkout.js"
+                                                                class="stripe-button"
+                                                                data-key="{{ pub_key }}"
+                                                                data-amount="39900"
+                                                                data-name="TheSearchbase"
+                                                                data-description="Widget"
+                                                                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                                                data-locale="auto"
+                                                                data-currency="gbp">
+                                                        </script>
+                                                    </form>
+
+                                                    <!-- Stripe checkout end -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- price element -->
                                 </div>
-                              </div>
-                              <div class="pricing_footer">
-
-                                        <!-- Stripe checkout start -->
-
-                                        <form action="{{ url_for('adminPricing') }}" method="POST">
-                                        <script
-                                          src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                                          data-key="{{ pub_key }}"
-                                          data-amount="5000"
-                                          data-name="TheSearchbase"
-                                          data-description="Widget"
-                                          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-                                          data-locale="auto"
-                                          data-currency="gbp">
-                                        </script>
-                                      </form>
-
-                                      <!-- Stripe checkout end -->
-                              </div>
                             </div>
-                          </div>
                         </div>
-                        <!-- price element -->
-
-                        <!-- price element -->
-                        <div class="col-md-3 col-sm-6 col-xs-12">
-                          <div class="pricing">
-                            <div class="title">
-                              <h2>Advanced Plan</h2>
-                              <h1>£199</h1>
-                              <span>Per Month</span>
-                            </div>
-                            <div class="x_content">
-                              <div class="">
-                                <div class="pricing_features">
-                                  <ul class="list-unstyled text-left">
-                                    <li><i class="fa fa-check text-success"></i> 300 <strong> Products</strong></li>
-                                    <li><i class="fa fa-check text-success"></i> 3 <strong> Databases</strong></li>
-                                    <li><i class="fa fa-check text-success"></i> Setup <strong> Support</strong></li>
-                                    <li><i class="fa fa-check text-success"></i> <strong>99.9%</strong> up-time</li>
-                                    <li><i class="fa fa-check text-success"></i> <strong>Free </strong> Hosting & License</li>
-                                    <li><i class="fa fa-check text-success"></i> <strong>Commercial </strong>  License</li>
-                                    <li><i class="fa fa-check text-success"></i> Cancel <strong> Anytime</strong> </li>
-                                  </ul>
-                                </div>
-                              </div>
-                              <div class="pricing_footer">
-
-                                        <!-- Stripe checkout start -->
-
-                                        <form action="{{ url_for('chargeUser') }}" method="POST">
-                                        <script
-                                          src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                                          data-key="{{ pub_key }}"
-                                          data-amount="19900"
-                                          data-name="TheSearchbase"
-                                          data-description="Widget"
-                                          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-                                          data-locale="auto"
-                                          data-currency="gbp">
-                                        </script>
-                                      </form>
-
-                                      <!-- Stripe checkout end -->
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <!-- price element -->
-
-                        <!-- price element -->
-                        <div class="col-md-3 col-sm-6 col-xs-12">
-                          <div class="pricing">
-                            <div class="title">
-                              <h2>Ultimate plan</h2>
-                              <h1>£399</h1>
-                              <span>Per Month</span>
-                            </div>
-                            <div class="x_content">
-                              <div class="">
-                                <div class="pricing_features">
-                                  <ul class="list-unstyled text-left">
-                                    <li><i class="fa fa-check text-success"></i> Unlimited <strong> Products</strong></li>
-                                    <li><i class="fa fa-check text-success"></i> 4 <strong> Databases</strong></li>
-                                    <li><i class="fa fa-check text-success"></i> Setup <strong> Support</strong></li>
-                                    <li><i class="fa fa-check text-success"></i> <strong>99.9%</strong> up-time</li>
-                                    <li><i class="fa fa-check text-success"></i> <strong>Free </strong> Hosting & License</li>
-                                    <li><i class="fa fa-check text-success"></i> <strong>Commercial </strong>  License</li>
-                                    <li><i class="fa fa-check text-success"></i> Cancel <strong> Anytime</strong> </li>
-                                  </ul>
-                                </div>
-                              </div>
-                              <div class="pricing_footer">
-
-                                        <!-- Stripe checkout start -->
-
-                                        <form action="{{ url_for('chargeUser') }}" method="POST">
-                                        <script
-                                          src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                                          data-key="{{ pub_key }}"
-                                          data-amount="39900"
-                                          data-name="TheSearchbase"
-                                          data-description="Widget"
-                                          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-                                          data-locale="auto"
-                                          data-currency="gbp">
-                                        </script>
-                                      </form>
-
-                                      <!-- Stripe checkout end -->
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <!-- price element -->
-                      </div>
                     </div>
-                  </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-        <!-- /page content -->
-
-
-
-        <!-- footer content -->
-        <footer>
-          <div class="pull-right">
-            Gentelella - Bootstrap Admin Template by <a href="https://colorlib.com">Colorlib</a>
-          </div>
-          <div class="clearfix"></div>
-        </footer>
-        <!-- /footer content -->
-      </div>
     </div>
+{% endblock %}
 
+{% block javascript %}
     <!-- jQuery -->
     <script src="../../static/vendors/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap -->
@@ -409,5 +275,4 @@
 
     <!-- Custom Theme Scripts -->
     <script src="../../static/build/js/custom.min.js"></script>
-  </body>
-</html>
+{% endblock %}

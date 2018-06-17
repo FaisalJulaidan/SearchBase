@@ -1442,7 +1442,7 @@ def admin_general_support():
 @app.route("/admin/support/docs", methods=['GET'])
 def admin_support_docs():
     if request.method == "GET":
-        return render_template("admin/docs.html")
+        return render_template("admin/support/docs.html")
 
 
 @app.route("/admin/support/setup", methods=['GET'])
@@ -1451,10 +1451,10 @@ def admin_support_setup():
         return render_template("admin/support/getting-setup.html")
 
 
-@app.route("/admin/support/intergration", methods=['GET'])
-def admin_support_intergration():
+@app.route("/admin/support/integration", methods=['GET'])
+def admin_support_integration():
     if request.method == "GET":
-        return render_template("admin/support/intergration.html")
+        return render_template("admin/support/integration.html")
 
 
 @app.route("/admin/support/billing", methods=['GET'])
@@ -1495,91 +1495,6 @@ def affiliate():
     if request.method == "GET":
         abort(status.HTTP_501_NOT_IMPLEMENTED, "Affiliate program coming soon")
         # return render_template("affiliate.html")
-
-
-### Redirects ###
-@app.route("/Admin/<route>", methods=["GET"])
-def redirect_admin(route):
-    if request.method == "GET":
-        return redirect("/admin/" + route)
-
-
-@app.route("/admin/Questions", methods=['GET'])
-def redirect_admin_questions():
-    if request.method == "GET":
-        return redirect("/admin/questions")
-
-
-@app.route("/admin/Answers", methods=['GET'])
-def redirect_admin_answers():
-    if request.method == "GET":
-        return redirect("/admin/answers")
-
-
-@app.route("/admin/Products", methods=['GET'])
-def redirect_admin_products():
-    if request.method == "GET":
-        return redirect("/admin/products")
-
-
-@app.route("/admin/Templates", methods=['GET'])
-def redirect_admin_templates():
-    if request.method == "GET":
-        return redirect("/admin/templates")
-
-
-@app.route("/admin/Support/<route>", methods=["GET"])
-def redirect_admin_support(route):
-    if request.method == "GET":
-        return redirect("/admin/support/" + route)
-
-
-@app.route("/admin/supportGeneral", methods=['GET'])
-def redirect_admin_general_support():
-    if request.method == "GET":
-        return redirect("/admin/support/general")
-
-
-@app.route("/admin/supportDocs", methods=['GET'])
-def redirect_admin_support_docs():
-    if request.method == "GET":
-        return redirect("/admin/support/docs")
-
-
-@app.route("/admin/supportSetup", methods=['GET'])
-def redirect_admin_support_setup():
-    if request.method == "GET":
-        return redirect("/admin/support/setup")
-
-
-@app.route("/admin/supportIntergartion", methods=['GET'])
-def redirect_admin_support_intergration():
-    if request.method == "GET":
-        return redirect("/admin/support/intergration")
-
-
-@app.route("/admin/supportBilling", methods=['GET'])
-def redirect_admin_support_billing():
-    if request.method == "GET":
-        return redirect("/admin/support/billing")
-
-
-@app.route("/Data/<route>", methods=['GET'])
-def redirect_data_route(route):
-    if request.method == "GET":
-        return redirect("/data/" + route)
-
-
-@app.route("/dataRetrival", methods=['GET'])
-def redirect_data_retrieval():
-    if request.method == "GET":
-        return redirect("/data/retrieval")
-
-
-@app.route("/dataCollection", methods=['GET'])
-def redirect_data_collection():
-    if request.method == "GET":
-        return redirect("/data/collection")
 
 
 @app.route("/send/mail", methods=['GET', 'POST'])

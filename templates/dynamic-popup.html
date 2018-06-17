@@ -61,7 +61,6 @@
 </head>
 
 <body>
-    <!--http://127.0.0.1:5000/chatbot/TestCorp-->
     <iframe style="position: absolute; width: 100%; height: 100%; border: none" src="{{url}}"></iframe>
 
     <div class="main_wrapper">
@@ -72,7 +71,11 @@
                     <a id="overChatbotIframeCloseButton">X</a>
                 </div>
                 <!-- Will change this after the demo -->
-                <iframe frameBorder="0" id="chatbotIframe" src="https://thesearchbase.com/chatbot/{{msg}}"></iframe>
+                {% if debug == 'True' %}
+                    <iframe frameBorder="0" id="chatbotIframe" src="https://thesearchbase.com/chatbot/{{route}}"></iframe>
+                {% else %}
+                    <iframe frameBorder="0" id="chatbotIframe" src="http://127.0.0.1:5000/chatbot/{{route}}"></iframe>
+                {% endif %}
             </div>
             <div class="launch_btn_holder">
                 <div id="launch_button"></div>

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 from flask_mail import Mail, Message
-from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for
+from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, make_response
 from flask_api import status
 from datetime import datetime
 from bcrypt import hashpw, gensalt
@@ -212,13 +212,12 @@ def dynamic_popup(route):
         url = "http://www.example.com/"
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
         if company is None:
-            # TODO handle this
-            abort(status.HTTP_400_BAD_REQUEST)
+            abort(status.HTTP_404_NOT_FOUND)
         elif "Debug" in company[4]:
             url = company[3]
             if "http" not in url:
-                url = "http://" + url
-        return render_template("dynamic-popup.html", msg=route, url=url)
+                url = "https://" + url
+        return render_template("dynamic-popup.html", route=route, url=url, debug=app.debug)
 
 
 # drop down routes.
@@ -818,6 +817,7 @@ def admin_pay():
                 # TODO improve this
                 abort(status.HTTP_400_BAD_REQUEST)
             else:
+                #TODO surround with try except and catch any errors
                 customer = stripe.Customer.create(
                     source=token,
                     email=email,
@@ -829,8 +829,53 @@ def admin_pay():
                     # TODO handle this better
                     customer.delete()
                 else:
-                    pass
+                    planid = ""
+                    subscription = company[4].lower()
+                    if subscription == "basic":
+                        planid = "plan_D3lp2yVtTotk2f"
+                    elif subscription == "advanced":
+                        planid = "plan_D3lp9R7ombKmSO"
+                    elif subscription == "ultimate":
+                        planid = "plan_D3lpeLZ3EV8IfA"
+                    elif subscription == "debug":
+                        planid = "plan_D48N4wxwAWEMOH"
+                    elif subscription == "trial":
+                        abort(status.HTTP_501_NOT_IMPLEMENTED)
+                    else:
+                        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+                    try:
+                        subscription = stripe.Subscription.create(
+                            customer=customer['id'],
+                            items=[
+                                {
+                                    "plan": planid,
+                                },
+                            ]
+                        )
+                        # if everything is ok
+                        #TODO activate assistants
+
+                    except Exception as e:
+                        print(e)
+                        # TODO check subscription for errors https://stripe.com/docs/api#errors
+                        # TODO this is important todo properly
+
+
+# Stripe Webhooks
+@app.route("/api/stripe/subscription-cancelled", methods=["POST"])
+def webhook_subscription_cancelled():
+    if request.method == "POST":
+        event_json = request.get_json(force=True)
+        customerID = event_json['data']['object']['customer']
+        print(customerID)
+        company = select_from_database_table("SELECT * FROM Companies WHERE StripeID=?", [customerID])
+        #TODO check company for errors
+        assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", [company[0]], True)
+        for assistant in assistants:
+            updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
+            #TODO check update assistant for errors
+        return '', status.HTTP_200_OK
 
 # TODO improve
 @app.route("/admin/userinput", methods=["GET"])
@@ -879,66 +924,72 @@ def chatbot(route):
         assistantIndex = 0  # TODO implement this properly
         assistantID = assistants[assistantIndex][0]
 
-        questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                                    [assistantID], True)
-        # TODO check questionstuple for errors
-        questions = []
-        for i in range(0, len(questionsTuple)):
-            questions.append(questionsTuple[i][2] + ";" + questionsTuple[i][3])
+        assistantActive = assistants[assistantIndex][5]
 
-        allAnswers = {}
-        for i in range(0, len(questions)):
-            answersTuple = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;",
-                                                      [questionsTuple[i][0]], True)
-            # TODO Check answerstuple for errors
-            answers = []
-            for j in range(0, len(answersTuple)):
-                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][6])
-
-            allAnswers[questions[i]] = answers
-
-        questionsAndAnswers = []
-        for i in range(0, len(questions)):
-            question = []
-            question.append(questions[i])
-            merge = tuple(question)
-            answers = allAnswers[questions[i]]
-            for j in range(0, len(answers)):
-                answer = []
-                answer.append(answers[j])
-                merge = merge + tuple(answer)
-            questionsAndAnswers.append(merge)
-
-        message = assistants[assistantIndex][3]
-        # MONTHLY UPDATE
-        date = datetime.now().strftime("%Y-%m")
-        currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
-        if currentStats is None:
-            newStats = insert_into_database_table(
-                "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
-                (assistantID, date, 1, 0, 0))
-            # TODO check newStats for errors
+        if assistantActive != "True":
+            abort(status.HTTP_404_NOT_FOUND, "Assistant not active.")
         else:
-            updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
-                                        [currentStats[3] + 1, assistantID, date])
+            questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
+                                                        [assistantID], True)
+            # TODO check questionstuple for errors
+            questions = []
+            for i in range(0, len(questionsTuple)):
+                questions.append(questionsTuple[i][2] + ";" + questionsTuple[i][3])
 
-        # WEEKLY UPDATE
-        dateParts = datetime.now().strftime("%Y-%m-%d").split("-")
-        date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
-        currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
-        if currentStats is None:
-            newStats = insert_into_database_table(
-                "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
-                (assistantID, date, 1, 0, 0))
-            # TODO check newStats for errors
-        else:
-            updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
-                                        [currentStats[3] + 1, assistantID, date])
-        print(questionsAndAnswers)
+            allAnswers = {}
+            for i in range(0, len(questions)):
+                answersTuple = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;",
+                                                          [questionsTuple[i][0]], True)
+                print(answersTuple)
+                # TODO Check answerstuple for errors
+                answers = []
+                for j in range(0, len(answersTuple)):
+                    answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][5])
 
-        return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route,
-                               message=message)
-    else:
+                allAnswers[questions[i]] = answers
+
+            questionsAndAnswers = []
+            for i in range(0, len(questions)):
+                question = []
+                question.append(questions[i])
+                merge = tuple(question)
+                answers = allAnswers[questions[i]]
+                for j in range(0, len(answers)):
+                    answer = []
+                    answer.append(answers[j])
+                    merge = merge + tuple(answer)
+                questionsAndAnswers.append(merge)
+
+            message = assistants[assistantIndex][3]
+            # MONTHLY UPDATE
+            date = datetime.now().strftime("%Y-%m")
+            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
+            if currentStats is None:
+                newStats = insert_into_database_table(
+                    "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
+                    (assistantID, date, 1, 0, 0))
+                # TODO check newStats for errors
+            else:
+                updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
+                                            [currentStats[3] + 1, assistantID, date])
+
+            # WEEKLY UPDATE
+            dateParts = datetime.now().strftime("%Y-%m-%d").split("-")
+            date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
+            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
+            if currentStats is None:
+                newStats = insert_into_database_table(
+                    "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
+                    (assistantID, date, 1, 0, 0))
+                # TODO check newStats for errors
+            else:
+                updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
+                                            [currentStats[3] + 1, assistantID, date])
+            print(questionsAndAnswers)
+
+            return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route,
+                                   message=message)
+    elif request.method == "POST":
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
         # TODO check company for errors
         assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)

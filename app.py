@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 from flask_mail import Mail, Message
-from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, make_response
+from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, \
+    make_response
 from flask_api import status
 from datetime import datetime
 from bcrypt import hashpw, gensalt
@@ -215,7 +216,7 @@ def dynamic_popup(route):
             url = company[3]
             if "http" not in url:
                 url = "https://" + url
-        return render_template("dynamic-popup.html", route=route, url=url, debug=app.debug)
+        return render("dynamic-popup.html", route=route, url=url)
 
 
 # drop down routes.
@@ -378,45 +379,6 @@ def signup():
                                            msg="Please check your email and follow instructions to verify account and get started.")
 
 
-# Admin pages
-@app.route("/admin/homepage", methods=['GET'])
-def admin_home():
-    if request.method == "GET":
-        sendEmail = False
-        args = request.args
-        if len(args) > 0:
-            messages = args['messages']
-            if messages is not None:
-                email = loads(messages)['email']
-                if email is None or email == "None":
-                    return redirect("/login")
-                sendEmail = True
-            else:
-                abort(status.HTTP_400_BAD_REQUEST)
-        else:
-            email = request.cookies.get("UserEmail")
-        statistics = []
-        statistics.append(get_total_statistics(3, email))
-        statistics.append(get_total_statistics(5, email))
-        if sendEmail:
-            return render_template("admin/main.html", stats=statistics, email=email)
-        else:
-            return render_template("admin/main.html", stats=statistics)
-
-
-@app.route("/admin/profile", methods=['GET', 'POST'])
-def profilePage():
-    if request.method == "GET":
-        print(request.cookies)
-        email = request.cookies.get("UserEmail")
-        user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
-        # TODO check database output for errors
-        companyName = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
-        return render_template("admin/profile.html", user=user, companyName=companyName[1])
-    elif request.method == "POST":
-        abort(status.HTTP_501_NOT_IMPLEMENTED)
-
-
 # Data retrieval functions
 def get_company(email):
     user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
@@ -452,61 +414,46 @@ def get_total_statistics(num, email):
     return total
 
 
-@app.route("/admin/welcomemsg", methods=['POST'])
-def adming_welcome_message():
-    if request.method == "POST":
-        message = request.form.get("welcome-message", default="Error")
-        if message is "Error":
-            abort(status.HTTP_400_BAD_REQUEST)
-
-        email = request.cookies.get("UserEmail")
-        company = get_company(email)
-        # TODO check company for error
-        updateMessage = update_table("UPDATE Assistants SET Message=? WHERE CompanyID=?;",
-                                     [escape(message), company[0]])
-        # TODO check updateMessage for error
-        return redirect("/admin/questions")
-
-
-@app.route("/admin/assistants", methods=['GET', 'POST'])
-def admin_assistant():
+# Admin pages
+@app.route("/admin/homepage", methods=['GET'])
+def admin_home():
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        #TODO Check for errors
-        assistantIndex = 0  # TODO change this
-        message = assistants[assistantIndex][3]
-
-        autoPop = assistants[assistantIndex][4] #TODO change index to 5 when I merge into products update branch
-
-        #TODO check for errors
-        return render_template("admin/assistant.html", autopop=autoPop, message=message)
-    elif request.method == "POST":
-        print(request.form)
-        message = request.form.get("welcome-message", default="Error")
-        if message is "Error":
-            abort(status.HTTP_400_BAD_REQUEST)
-
-        autopopup = request.form.get("switch-autopop", default="off")
-        email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
-
-        updateMessage = update_table("UPDATE Assistants SET Message=? WHERE ID=?", [message, assistantID])
-        #TODO check updateMessage for errors
-
-        if autopopup == "off":
-            updatedPopupTime = update_table("UPDATE Assistants SET SecondsUntilPopup='Off' WHERE ID=?", [assistantID])
-            #TODO check updatedPopupTime
-        elif autopopup == "on":
-            popuptime = request.form.get("timeto-autopop", default="Error")
-            if popuptime != "Error":
-                updatedPopupTime = update_table("UPDATE Assistants SET SecondsUntilPopup=?;", [popuptime])
-                # TODO check updatedPopupTime
+        sendEmail = False
+        args = request.args
+        if len(args) > 0:
+            messages = args['messages']
+            if messages is not None:
+                email = loads(messages)['email']
+                if email is None or email == "None":
+                    return redirect("/login")
+                sendEmail = True
             else:
                 abort(status.HTTP_400_BAD_REQUEST)
-        return redirect("/admin/assistant")
+        else:
+            email = request.cookies.get("UserEmail")
+        statistics = [get_total_statistics(3, email), get_total_statistics(5, email)]
+        if sendEmail:
+            assistants = get_assistants(email)
+            # TODO check assistants for errors
+            assistantIDs = []
+            for assistant in assistants:
+                assistantIDs.append(assistant[0])
+            return render_template("admin/main.html", stats=statistics, email=email, assistantIDs=assistantIDs)
+        else:
+            return render("admin/main.html", stats=statistics)
+
+
+@app.route("/admin/profile", methods=['GET', 'POST'])
+def profilePage():
+    if request.method == "GET":
+        print(request.cookies)
+        email = request.cookies.get("UserEmail")
+        user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
+        # TODO check database output for errors
+        companyName = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
+        return render("admin/profile.html", user=user, companyName=companyName[1])
+    elif request.method == "POST":
+        abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
 @app.route("/popupsettings", methods=['GET'])
@@ -514,7 +461,7 @@ def get_pop_settings():
     if request.method == "GET":
         url = request.form.get("URL", default="Error")
         print(url)
-        if (url != "Error"):
+        if url != "Error":
             if "127.0.0.1:5000" in url or "thesearchbase.com" in url:
                 # its on test route
                 companyName = url.split("/")[len(url.split("/")) - 1]
@@ -531,342 +478,467 @@ def get_pop_settings():
             return jsonify(datastring)
 
 
-# TODO rewrite
-@app.route("/admin/questions", methods=['GET', 'POST'])
-def admin_questions():
+@app.route("/admin/assistant/<assistantID>/settings", methods=['GET', 'POST'])
+def admin_assistant(assistantID):
     if request.method == "GET":
         email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        # TODO check assistants for errors
-        assistantIndex = 0  # TODO change this
-        questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                                    [assistants[assistantIndex][0]], True)
-        # TODO check questionstuple for errors
-        message = assistants[assistantIndex][3]
+        company = get_company(email)
+        if company is None or "Error" in company:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # TODO handle this better
+        else:
+            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
+                                                   [assistantID, company[0]])
+            if assistant is None:
+                abort(status.HTTP_404_NOT_FOUND)
+            elif "Error" in assistant:
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                message = assistant[3]
+                autoPop = assistant[4]  # TODO change index to 5 when I merge into products update branch
 
-        questions = []
-        for i in range(0, len(questionsTuple)):
-            question = [questionsTuple[i][2] + ";" + questionsTuple[i][3]]
-            questions.append(tuple(question))
-        return render_template("admin/questions.html", data=questions, message=message)
+                # TODO check for errors
+                return render("admin/assistant.html", autopop=autoPop, message=message, id=assistantID)
     elif request.method == "POST":
         email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
-        currentQuestions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                                      [assistantID], True)
-        # TODO check currentQuestions for errors
-
-        updatedQuestions = []
-        noq = request.form.get("noq-hidden", default="Error")
-        for i in range(1, int(noq) + 1):
-            question = request.form.get("question" + str(i), default="Error")
-            if question != "Error":
-                updatedQuestions.append(question)
+        company = get_company(email)
+        if company is None or "Error" in company:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # TODO handle this better
+        else:
+            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
+                                                   [assistantID, company[0]])
+            if assistant is None:
+                abort(status.HTTP_400_BAD_REQUEST)
+            elif "Error" in assistant:
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
-                return render_template("admin/questions.html",
-                                       data=currentQuestions), status.HTTP_400_BAD_REQUEST
+                message = request.form.get("welcome-message", default="Error")
+                if message is "Error":
+                    abort(status.HTTP_400_BAD_REQUEST)
 
-        i = -1
-        if (len(updatedQuestions) + 1 < len(currentQuestions) + 1):
-            for b in range(len(updatedQuestions) + 1, len(currentQuestions) + 1):
-                questionID = currentQuestions[i][0]
-                question = currentQuestions[i][2]
+                autopopup = request.form.get("switch-autopop", default="off")
+                email = request.cookies.get("UserEmail")
 
-                # print("DELETING: ", question)
-                deleteQuestion = delete_from_table("DELETE FROM Questions WHERE AssistantID=? AND Question=?;",
-                                                   [assistantID, escape(question)])
-                # TODO check deleteQuestion for errors
-                deleteAnswers = delete_from_table(DATABASE, "DELETE FROM Answers WHERE QuestionID=?;", [questionID])
-                # TODO check deleteAnswers for errors
-        for q in updatedQuestions:
-            i += 1
-            qType = request.form.get("qType" + str(i))
-            if i >= len(currentQuestions):
-                insertQuestion = insert_into_database_table("INSERT INTO Questions ('AssistantID', 'Question', 'Type')"
-                                                            "VALUES (?,?,?);", (assistantID, q, qType))
-                # TODO check insertQuestion for errors
-            else:
-                updateQuestion = update_table("UPDATE Questions SET Question=?, Type=? WHERE Question=?;",
-                                              [escape(q), qType, currentQuestions[i][2]])
-                # TODO check updateQuestion for errors
+                updateMessage = update_table("UPDATE Assistants SET Message=? WHERE ID=?", [message, assistantID])
+                # TODO check updateMessage for errors
 
-        return redirect("/admin/questions")
+                if autopopup == "off":
+                    updatedPopupTime = update_table("UPDATE Assistants SET SecondsUntilPopup='Off' WHERE ID=?",
+                                                    [assistantID])
+                    # TODO check updatedPopupTime
+                elif autopopup == "on":
+                    popuptime = request.form.get("timeto-autopop", default="Error")
+                    if popuptime != "Error":
+                        updatedPopupTime = update_table("UPDATE Assistants SET SecondsUntilPopup=?;", [popuptime])
+                        # TODO check updatedPopupTime
+                    else:
+                        abort(status.HTTP_400_BAD_REQUEST)
+                return redirect("/admin/assistant/{}/settings".format(assistantID))
 
 
 # TODO rewrite
-@app.route("/admin/answers", methods=['GET', 'POST'])
-def admin_answers():
+@app.route("/admin/assistant/<assistantID>/questions", methods=['GET', 'POST'])
+def admin_questions(assistantID):
     if request.method == "GET":
         email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        # TODO check assistants for errors
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
-        questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                                    [assistantID], True)
-        # TODO check questionstuple for errors
-        questions = []
-        for i in range(0, len(questionsTuple)):
-            questions.append(questionsTuple[i][2] + ";" + questionsTuple[i][3])
+        company = get_company(email)
+        if company is None or "Error" in company:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # TODO handle this better
+        else:
+            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
+                                                   [assistantID, company[0]])
+            if assistant is None:
+                abort(status.HTTP_404_NOT_FOUND)
+            elif "Error" in assistant:
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
+                                                            [assistant[0]], True)
+                # TODO check questionstuple for errors
+                message = assistant[3]
 
-        allAnswers = {}
-        for i in range(0, len(questions)):
-            answersTuple = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;",
-                                                      [questionsTuple[i][0]], True)
-            # TODO Check answerstuple for errors
-            answers = []
-            for j in range(0, len(answersTuple)):
-                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][5])
-
-            allAnswers[questions[i]] = answers
-
-        # remove userInfoRetrieval questions
-        # number = 0
-        # maxNumber = len(questions)
-        # while (number < maxNumber):
-        #    if (len(questions) > 0):
-        #        if (number >= len(questions)):
-        #            break
-        #        else:
-        #            if (questions[number].split(";")[1] == "userInfoRetrieval"):
-        #                allAnswers[questions[number]] = None
-        #                questions.remove(questions[number])
-        #                number -= 1
-        #                maxNumber -= 1
-        #                if number < 0:
-        #                    number = 0
-        #            else:
-        #                number += 1
-        #    else:
-        #        break
-
-        questionsAndAnswers = []
-        for i in range(0, len(questions)):
-            question = []
-            question.append(questions[i])
-            merge = tuple(question)
-            answers = allAnswers[questions[i]]
-            for j in range(0, len(answers)):
-                answer = []
-                answer.append(answers[j])
-                merge = merge + tuple(answer)
-            questionsAndAnswers.append(merge)
-        return render_template("admin/answers.html", msg=questionsAndAnswers)
+                questions = []
+                for i in range(0, len(questionsTuple)):
+                    question = [questionsTuple[i][2] + ";" + questionsTuple[i][3]]
+                    questions.append(tuple(question))
+                return render("admin/questions.html", data=questions, message=message, id=assistantID)
     elif request.method == "POST":
         email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        # TODO check assistants for errors
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
+        company = get_company(email)
+        if company is None or "Error" in company:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # TODO handle this better
+        else:
+            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
+                                                   [assistantID, company[0]])
+            if assistant is None:
+                abort(status.HTTP_404_NOT_FOUND)
+            elif "Error" in assistant:
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                currentQuestions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
+                                                              [assistantID], True)
+                # TODO check currentQuestions for errors
 
-        selected_question = request.form.get("question", default="Error")  # question_text;question_type
-        # TODO check selected_question for errors
+                updatedQuestions = []
+                noq = request.form.get("noq-hidden", default="Error")
+                for i in range(1, int(noq) + 1):
+                    question = request.form.get("question" + str(i), default="Error")
+                    if question != "Error":
+                        updatedQuestions.append(question)
+                    else:
+                        return render_template("admin/questions.html",
+                                               data=currentQuestions), status.HTTP_400_BAD_REQUEST
 
-        question = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=? AND Question=?;",
-                                              [assistantID, selected_question.split(";")[0]])
-        # TODO Check question for errors
-        questionID = question[0]
-        currentAnswers = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;", [questionID])
-        # TODO check currentAnswers for errors
-        if (currentAnswers is not None):
-            delete_from_table("DELETE FROM Answers WHERE QuestionID=?;", [questionID])
-            # TODO check delete from table for errors
+                i = -1
+                if (len(updatedQuestions) + 1 < len(currentQuestions) + 1):
+                    for b in range(len(updatedQuestions) + 1, len(currentQuestions) + 1):
+                        questionID = currentQuestions[i][0]
+                        question = currentQuestions[i][2]
 
-        noa = 1
-        for key in request.form:
-            if "pname" in key:
-                noa += 1
+                        # print("DELETING: ", question)
+                        deleteQuestion = delete_from_table("DELETE FROM Questions WHERE AssistantID=? AND Question=?;",
+                                                           [assistantID, escape(question)])
+                        # TODO check deleteQuestion for errors
+                        deleteAnswers = delete_from_table(DATABASE, "DELETE FROM Answers WHERE QuestionID=?;",
+                                                          [questionID])
+                        # TODO check deleteAnswers for errors
+                for q in updatedQuestions:
+                    i += 1
+                    qType = request.form.get("qType" + str(i))
+                    if i >= len(currentQuestions):
+                        insertQuestion = insert_into_database_table(
+                            "INSERT INTO Questions ('AssistantID', 'Question', 'Type')"
+                            "VALUES (?,?,?);", (assistantID, q, qType))
+                        # TODO check insertQuestion for errors
+                    else:
+                        updateQuestion = update_table("UPDATE Questions SET Question=?, Type=? WHERE Question=?;",
+                                                      [escape(q), qType, currentQuestions[i][2]])
+                        # TODO check updateQuestion for errors
 
-        for i in range(1, noa):
-            answer = request.form.get("pname" + str(i), default="Error")
-            # TODO check answer for errors
-            keyword = request.form.get("keywords" + str(i), default="Error")
-            # TODO check keywords for errors
-            action = request.form.get("action" + str(i), default="None")
-            # TODO check action for errors
-            insertAnswer = insert_into_database_table(
-                "INSERT INTO Answers (QuestionID, Answer, Keyword, Action) VALUES (?,?,?,?);",
-                (questionID, answer, keyword, action))
-            # TODO check insertAnswer
-
-        return redirect("/admin/answers")
+                return redirect("/admin/assistant/{}/questions".format(assistantID))
 
 
-@app.route("/admin/products", methods=['GET', 'POST'])
-def admin_products():
+# TODO rewrite
+@app.route("/admin/assistant/<assistantID>/answers", methods=['GET', 'POST'])
+def admin_answers(assistantID):
     if request.method == "GET":
         email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        # TODO check assistants for errors
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
-        products = select_from_database_table("SELECT ProductID, Name, Brand, Model, Price, Keywords, Discount, URL "
-                                              "FROM Products WHERE AssistantID=?;", [assistantID], True)
-        # TODO check products for errors
-        return render_template("admin/products.html", data=products)
+        company = get_company(email)
+        if company is None or "Error" in company:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # TODO handle this better
+        else:
+            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
+                                                   [assistantID, company[0]])
+            if assistant is None:
+                abort(status.HTTP_404_NOT_FOUND)
+            elif "Error" in assistant:
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
+                                                            [assistantID], True)
+                # TODO check questionstuple for errors
+                questions = []
+                for i in range(0, len(questionsTuple)):
+                    questions.append(questionsTuple[i][2] + ";" + questionsTuple[i][3])
+
+                allAnswers = {}
+                for i in range(0, len(questions)):
+                    answersTuple = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;",
+                                                              [questionsTuple[i][0]], True)
+                    # TODO Check answerstuple for errors
+                    answers = []
+                    for j in range(0, len(answersTuple)):
+                        answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][5])
+
+                    allAnswers[questions[i]] = answers
+
+                # remove userInfoRetrieval questions
+                # number = 0
+                # maxNumber = len(questions)
+                # while (number < maxNumber):
+                #    if (len(questions) > 0):
+                #        if (number >= len(questions)):
+                #            break
+                #        else:
+                #            if (questions[number].split(";")[1] == "userInfoRetrieval"):
+                #                allAnswers[questions[number]] = None
+                #                questions.remove(questions[number])
+                #                number -= 1
+                #                maxNumber -= 1
+                #                if number < 0:
+                #                    number = 0
+                #            else:
+                #                number += 1
+                #    else:
+                #        break
+
+                questionsAndAnswers = []
+                for i in range(0, len(questions)):
+                    question = []
+                    question.append(questions[i])
+                    merge = tuple(question)
+                    answers = allAnswers[questions[i]]
+                    for j in range(0, len(answers)):
+                        answer = []
+                        answer.append(answers[j])
+                        merge = merge + tuple(answer)
+                    questionsAndAnswers.append(merge)
+                return render("admin/answers.html", msg=questionsAndAnswers, id=assistantID)
+    elif request.method == "POST":
+        email = request.cookies.get("UserEmail")
+        company = get_company(email)
+        if company is None or "Error" in company:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # TODO handle this better
+        else:
+            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
+                                                   [assistantID, company[0]])
+            if assistant is None:
+                abort(status.HTTP_404_NOT_FOUND)
+            elif "Error" in assistant:
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                selected_question = request.form.get("question", default="Error")  # question_text;question_type
+                # TODO check selected_question for errors
+
+                question = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=? AND Question=?;",
+                                                      [assistantID, selected_question.split(";")[0]])
+                # TODO Check question for errors
+                questionID = question[0]
+                currentAnswers = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;", [questionID])
+                # TODO check currentAnswers for errors
+                if (currentAnswers is not None):
+                    delete_from_table("DELETE FROM Answers WHERE QuestionID=?;", [questionID])
+                    # TODO check delete from table for errors
+
+                noa = 1
+                for key in request.form:
+                    if "pname" in key:
+                        noa += 1
+
+                for i in range(1, noa):
+                    answer = request.form.get("pname" + str(i), default="Error")
+                    # TODO check answer for errors
+                    keyword = request.form.get("keywords" + str(i), default="Error")
+                    # TODO check keywords for errors
+                    action = request.form.get("action" + str(i), default="None")
+                    # TODO check action for errors
+                    insertAnswer = insert_into_database_table(
+                        "INSERT INTO Answers (QuestionID, Answer, Keyword, Action) VALUES (?,?,?,?);",
+                        (questionID, answer, keyword, action))
+                    # TODO check insertAnswer
+
+                return redirect("/admin/assistant/{}/answers".format(assistantID))
+
+
+@app.route("/admin/assistant/<assistantID>/products", methods=['GET', 'POST'])
+def admin_products(assistantID):
+    if request.method == "GET":
+        email = request.cookies.get("UserEmail")
+        company = get_company(email)
+        if company is None or "Error" in company:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # TODO handle this better
+        else:
+            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
+                                                   [assistantID, company[0]])
+            if assistant is None:
+                abort(status.HTTP_404_NOT_FOUND)
+            elif "Error" in assistant:
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                products = select_from_database_table(
+                    "SELECT ProductID, Name, Brand, Model, Price, Keywords, Discount, URL "
+                    "FROM Products WHERE AssistantID=?;", [assistantID], True)
+                # TODO check products for errors
+                return render("admin/products.html", data=products, id=assistantID)
     elif request.method == 'POST':
         email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        # TODO check assistants for errors
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
-        currentProducts = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?;",
-                                                     [assistantID], True)
-        if "Error" in currentProducts:
-            # TODO handle errors with currentProducts
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Retrieving current products: " + currentProducts)
-        elif currentProducts is not None and currentProducts != []:
-            deleteCurrentProducts = delete_from_table("DELETE FROM Products WHERE AssistantID=?;", [assistantID])
-            if "Error" in deleteCurrentProducts:
-                # TODO handle errors with deleteCurrentProducts
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Deleting current products: " + deleteCurrentProducts)
+        company = get_company(email)
+        if company is None or "Error" in company:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # TODO handle this better
+        else:
+            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
+                                                   [assistantID, company[0]])
+            if assistant is None:
+                abort(status.HTTP_404_NOT_FOUND)
+            elif "Error" in assistant:
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
-                pass
+                currentProducts = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?;",
+                                                             [assistantID], True)
+                if "Error" in currentProducts:
+                    # TODO handle errors with currentProducts
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Retrieving current products: " + currentProducts)
+                elif currentProducts is not None and currentProducts != []:
+                    deleteCurrentProducts = delete_from_table("DELETE FROM Products WHERE AssistantID=?;",
+                                                              [assistantID])
+                    if "Error" in deleteCurrentProducts:
+                        # TODO handle errors with deleteCurrentProducts
+                        abort(status.HTTP_500_INTERNAL_SERVER_ERROR,
+                              "Deleting current products: " + deleteCurrentProducts)
+                    else:
+                        pass
 
-        nop = 1
-        for key in request.form:
-            if "product_ID" in key:
-                nop += 1
+                nop = 1
+                for key in request.form:
+                    if "product_ID" in key:
+                        nop += 1
 
-        for i in range(1, nop):
-            # TODO add more info to these error messages
-            id = request.form.get("product_ID" + str(i), default="Error")
-            if id is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product ID")
-            name = request.form.get("product_Name" + str(i), default="Error")
-            if name is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product name")
-            brand = request.form.get("product_Brand" + str(i), default="Error")
-            if brand is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product brand")
-            model = request.form.get("product_Model" + str(i), default="Error")
-            if model is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product model")
-            price = request.form.get("product_Price" + str(i), default="Error")
-            if price is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product price")
-            keywords = request.form.get("product_Keywords" + str(i), default="Error")
-            if keywords is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product keywords")
-            discount = request.form.get("product_Discount" + str(i), default="Error")
-            if discount is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product discount")
-            url = request.form.get("product_URL" + str(i), default="Error")
-            if url is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product url")
+                for i in range(1, nop):
+                    # TODO add more info to these error messages
+                    id = request.form.get("product_ID" + str(i), default="Error")
+                    if id is "Error":
+                        abort(status.HTTP_400_BAD_REQUEST, "Error with product ID")
+                    name = request.form.get("product_Name" + str(i), default="Error")
+                    if name is "Error":
+                        abort(status.HTTP_400_BAD_REQUEST, "Error with product name")
+                    brand = request.form.get("product_Brand" + str(i), default="Error")
+                    if brand is "Error":
+                        abort(status.HTTP_400_BAD_REQUEST, "Error with product brand")
+                    model = request.form.get("product_Model" + str(i), default="Error")
+                    if model is "Error":
+                        abort(status.HTTP_400_BAD_REQUEST, "Error with product model")
+                    price = request.form.get("product_Price" + str(i), default="Error")
+                    if price is "Error":
+                        abort(status.HTTP_400_BAD_REQUEST, "Error with product price")
+                    keywords = request.form.get("product_Keywords" + str(i), default="Error")
+                    if keywords is "Error":
+                        abort(status.HTTP_400_BAD_REQUEST, "Error with product keywords")
+                    discount = request.form.get("product_Discount" + str(i), default="Error")
+                    if discount is "Error":
+                        abort(status.HTTP_400_BAD_REQUEST, "Error with product discount")
+                    url = request.form.get("product_URL" + str(i), default="Error")
+                    if url is "Error":
+                        abort(status.HTTP_400_BAD_REQUEST, "Error with product url")
 
-            insertProduct = insert_into_database_table(
-                "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) "
-                "VALUES (?,?,?,?,?,?,?,?,?);", (
-                    assistants[assistantIndex][0], id, name, brand, model, price,
-                    keywords, discount, url))
-            # TODO try to recover by re-adding old data if insertProduct fails
-        return redirect("/admin/products")
+                    insertProduct = insert_into_database_table(
+                        "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) "
+                        "VALUES (?,?,?,?,?,?,?,?,?);", (
+                            assistantID, id, name, brand, model, price,
+                            keywords, discount, url))
+                    # TODO try to recover by re-adding old data if insertProduct fails
+                return redirect("/admin/assistant/{}/products".format(assistantID))
 
 
 # TODO improve
-@app.route("/admin/products/file", methods=['POST'])
-def admin_products_file_upload():
+@app.route("/admin/assistant/<assistantID>/products/file", methods=['POST'])
+def admin_products_file_upload(assistantID):
     if request.method == "POST":
         msg = ""
         if 'productFile' not in request.files:
             msg = "Error no file given."
         else:
             email = request.cookies.get("UserEmail")
-            assistants = get_assistants(email)
-            # TODO check assistants for errors
-            assistantIndex = 0  # TODO change this
-            assistantID = assistants[assistantIndex][0]
-
-            productFile = request.files["productFile"]
-            if productFile.filename == "":
-                msg = "Error no filename"
-            elif productFile and allowed_product_file(productFile.filename):
-                ext = productFile.filename.rsplit('.', 1)[1].lower()
-                if not os.path.isdir(PRODUCT_FILES):
-                    os.makedirs(PRODUCT_FILES)
-                filename = secure_filename(productFile.filename)
-                filepath = os.path.join(PRODUCT_FILES, filename)
-                productFile.save(filepath)
-
-                if str(ext).lower() == "json":
-                    json_file = open(PRODUCT_FILES + "/" + productFile.filename, "r")
-                    data = json.load(json_file)
-                    print(len(data))
-                    print(data[0])
-                    for i in range(0, len(data)):
-                        id = data[i]["ProductID"]
-                        name = data[i]["ProductName"]
-                        brand = data[i]["ProductBrand"]
-                        model = data[i]["ProductModel"]
-                        price = data[i]["ProductPrice"]
-                        keywords = data[i]["ProductKeywords"]
-                        discount = data[i]["ProductDiscount"]
-                        url = data[i]["ProductURL"]
-                        insertProduct = insert_into_database_table(
-                            "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) VALUES (?,?,?,?,?,?,?,?,?);",
-                            (assistantID, id, name, brand, model, price, keywords, discount, url))
-                        # TODO check insertProduct for errors
-                elif str(ext).lower() == "xml":
-                    xmldoc = minidom.parse(PRODUCT_FILES + "/" + productFile.filename)
-                    productList = xmldoc.getElementsByTagName("product")
-                    for product in productList:
-                        try:
-                            id = product.getElementsByTagName("ProductID")[0].childNodes[0].data
-                            name = product.getElementsByTagName("ProductName")[0].childNodes[0].data
-                            brand = product.getElementsByTagName("ProductBrand")[0].childNodes[0].data
-                            model = product.getElementsByTagName("ProductModel")[0].childNodes[0].data
-                            price = product.getElementsByTagName("ProductPrice")[0].childNodes[0].data
-                            keywords = product.getElementsByTagName("ProductKeywords")[0].childNodes[0].data
-                            discount = product.getElementsByTagName("ProductDiscount")[0].childNodes[0].data
-                            url = product.getElementsByTagName("ProductURL")[0].childNodes[0].data
-                            insertProduct = insert_into_database_table(
-                                "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) VALUES (?,?,?,?,?,?,?,?,?);",
-                                (assistantID, id, name, brand, model, price, keywords, discount, url))
-                            # TODO check insertProduct for errors
-                        except IndexError:
-                            msg = "Invalid xml file"
-                            print(msg)
-                else:
-                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-                os.remove(PRODUCT_FILES + "/" + productFile.filename)
+            company = get_company(email)
+            if company is None or "Error" in company:
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                # TODO handle this better
             else:
-                msg = "Error not allowed that type of file."
-                print(msg)
-        return msg
+                assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
+                                                       assistantID,
+                                                       company[0])
+                if assistant is None:
+                    abort(status.HTTP_404_NOT_FOUND)
+                elif "Error" in assistant:
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                else:
+                    productFile = request.files["productFile"]
+                    if productFile.filename == "":
+                        msg = "Error no filename"
+                    elif productFile and allowed_product_file(productFile.filename):
+                        ext = productFile.filename.rsplit('.', 1)[1].lower()
+                        if not os.path.isdir(PRODUCT_FILES):
+                            os.makedirs(PRODUCT_FILES)
+                        filename = secure_filename(productFile.filename)
+                        filepath = os.path.join(PRODUCT_FILES, filename)
+                        productFile.save(filepath)
+
+                        if str(ext).lower() == "json":
+                            json_file = open(PRODUCT_FILES + "/" + productFile.filename, "r")
+                            data = json.load(json_file)
+                            print(len(data))
+                            print(data[0])
+                            for i in range(0, len(data)):
+                                id = data[i]["ProductID"]
+                                name = data[i]["ProductName"]
+                                brand = data[i]["ProductBrand"]
+                                model = data[i]["ProductModel"]
+                                price = data[i]["ProductPrice"]
+                                keywords = data[i]["ProductKeywords"]
+                                discount = data[i]["ProductDiscount"]
+                                url = data[i]["ProductURL"]
+                                insertProduct = insert_into_database_table(
+                                    "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) VALUES (?,?,?,?,?,?,?,?,?);",
+                                    (assistantID, id, name, brand, model, price, keywords, discount, url))
+                                # TODO check insertProduct for errors
+                        elif str(ext).lower() == "xml":
+                            xmldoc = minidom.parse(PRODUCT_FILES + "/" + productFile.filename)
+                            productList = xmldoc.getElementsByTagName("product")
+                            for product in productList:
+                                try:
+                                    id = product.getElementsByTagName("ProductID")[0].childNodes[0].data
+                                    name = product.getElementsByTagName("ProductName")[0].childNodes[0].data
+                                    brand = product.getElementsByTagName("ProductBrand")[0].childNodes[0].data
+                                    model = product.getElementsByTagName("ProductModel")[0].childNodes[0].data
+                                    price = product.getElementsByTagName("ProductPrice")[0].childNodes[0].data
+                                    keywords = product.getElementsByTagName("ProductKeywords")[0].childNodes[0].data
+                                    discount = product.getElementsByTagName("ProductDiscount")[0].childNodes[0].data
+                                    url = product.getElementsByTagName("ProductURL")[0].childNodes[0].data
+                                    insertProduct = insert_into_database_table(
+                                        "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) VALUES (?,?,?,?,?,?,?,?,?);",
+                                        (assistantID, id, name, brand, model, price, keywords, discount, url))
+                                    # TODO check insertProduct for errors
+                                except IndexError:
+                                    msg = "Invalid xml file"
+                                    print(msg)
+                        else:
+                            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                        os.remove(PRODUCT_FILES + "/" + productFile.filename)
+                    else:
+                        msg = "Error not allowed that type of file."
+                        print(msg)
+                return msg
 
 
 @app.route("/admin/templates", methods=['GET', 'POST'])
 def admin_templates():
     if request.method == "GET":
-        return render_template("admin/convo-template.html")
+        return render("admin/convo-template.html")
     elif request.method == "POST":
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
 @app.route("/admin/connect", methods=['GET'])
 def admin_connect():
-    return render_template("admin/connect.html")
+    return render("admin/connect.html")
 
 
 @app.route("/admin/pricing", methods=['GET'])
 def admin_pricing():
-    return render_template("admin/pricing-tables.html", pub_key=pub_key)
+    return render("admin/pricing-tables.html", pub_key=pub_key)
 
 
 @app.route('/admin/thanks', methods=['GET'])
 def admin_thanks():
-    return render_template('admin/thank-you.html')
+    return render('admin/thank-you.html')
 
 
 @app.route("/admin/pay", methods=['GET', 'POST'])
 def admin_pay():
     if request.method == 'GET':
-        return render_template("admin/pay.html")
+        return render("admin/pay.html")
     elif request.method == 'POST':
+        token = request.form.get("stripeToken", default="Error")
+        print(token)
+        abort(status.HTTP_501_NOT_IMPLEMENTED)
+
         email = request.cookies.get("UserEmail")
         company = get_company(email)
         if company is None or "Error" in company:
@@ -878,7 +950,7 @@ def admin_pay():
                 # TODO improve this
                 abort(status.HTTP_400_BAD_REQUEST)
             else:
-                #TODO surround with try except and catch any errors
+                # TODO surround with try except and catch any errors
                 customer = stripe.Customer.create(
                     source=token,
                     email=email,
@@ -915,7 +987,7 @@ def admin_pay():
                             ]
                         )
                         # if everything is ok
-                        #TODO activate assistants
+                        # TODO activate assistants
 
                     except Exception as e:
                         print(e)
@@ -931,12 +1003,13 @@ def webhook_subscription_cancelled():
         customerID = event_json['data']['object']['customer']
         print(customerID)
         company = select_from_database_table("SELECT * FROM Companies WHERE StripeID=?", [customerID])
-        #TODO check company for errors
+        # TODO check company for errors
         assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", [company[0]], True)
         for assistant in assistants:
             updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
-            #TODO check update assistant for errors
+            # TODO check update assistant for errors
         return '', status.HTTP_200_OK
+
 
 # TODO improve
 @app.route("/admin/userinput", methods=["GET"])
@@ -972,7 +1045,149 @@ def admin_user_input():
                 dataTuple = dataTuple + inputTuple
                 data.append(dataTuple)
                 dataTuple = tuple(["Null"])
-        return render_template("admin/data-storage.html", data=data)
+        return render("admin/data-storage.html", data=data)
+
+
+# TODO implement this
+@app.route("/admin/analytics", methods=['GET'])
+def admin_analytics():
+    if request.method == "GET":
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        # TODO check assistants for errors
+        assistantIndex = 0  # TODO change this
+        assistantID = assistants[assistantIndex][0]
+        stats = select_from_database_table(
+            "SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?",
+            [assistantID], True)
+        return render("admin/analytics.html", data=stats)
+
+
+# Method for the users
+@app.route("/admin/users", methods=['GET', 'POST'])
+def admin_users():
+    if request.method == "GET":
+        print("TEST")
+        email = request.cookies.get("UserEmail")
+        print("TEST1")
+        print(email)
+        company = get_company(email)
+        print("TEST2")
+        # todo check company
+        companyID = company[0]
+        print("TEST3")
+
+        userLevel = select_from_database_table("SELECT AccessLevel FROM Users WHERE Email=?", [email])[0]
+        print("TEST4")
+        print(userLevel)
+        if userLevel is None:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # TODO better handle
+        elif "Error" in userLevel:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # TODO better handle this
+        else:
+            print("TEST5")
+            if userLevel != "Admin":
+                print(userLevel)
+                return redirect("/admin/homepage")
+            else:
+                # TODO improve this
+                users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
+                return render("admin/users.html", users=users)
+    elif request.method == "POST":
+        email = request.cookies.get("UserEmail")
+        company = get_company(email)
+        # todo check company
+        companyID = company[0]
+        fullname = request.form.get("fullname", default="Error")
+        accessLevel = request.form.get("accessLevel", default="Error")
+        newEmail = request.form.get("email", default="Error")
+        password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
+        # Generates a random password
+
+        if fullname == "Error" or accessLevel == "Error" or newEmail == "Error":
+            print("Invalid request")
+            abort(status.HTTP_400_BAD_REQUEST)
+        else:
+            newEmail = newEmail.lower()
+            try:
+                firstname = fullname.split(" ")[0]
+                surname = fullname.split(" ")[1]
+            except IndexError as e:
+                abort(status.HTTP_400_BAD_REQUEST)
+                # TODO handle much better
+            hashed_password = hash_password(password)
+
+            insertUserResponse = insert_into_database_table(
+                "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
+                (companyID, firstname, surname, accessLevel, newEmail, hashed_password, "True"))
+            if "added" not in insertUserResponse:
+                if "UNIQUE constraint" in insertUserResponse:
+                    deleteCompany = delete_from_table("DELETE FROM Companies WHERE ID=?;", [companyID])
+                    # TODO check deleteCompany
+                    return render_template("signup.html", msg=newEmail + " already in use.", debug=app.debug)
+                else:
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    # TODO handle this better
+            else:
+                # sending email to the new user.
+                # TODO this needs improving
+                msg = Message("Account verification, {} {}".format(firstname, surname),
+                              sender="thesearchbase@gmail.com",
+                              recipients=[email])
+                link = "www.thesearchbase.com/account/changepassword"
+                msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
+                           "If you feel this is a mistake please contact {}. \n" \
+                           "Your temporary password is: {}\n" \
+                           "Please visit <a href='{}'>this link</a> to set password for account.".format(email,
+                                                                                                         password, link)
+                mail.send(msg)
+
+                return redirect("/admin/users")
+
+
+# Method for the billing
+@app.route("/admin/billing", methods=['GET'])
+def admin_billing():
+    if request.method == "GET":
+        return render("admin/billing.html")
+
+
+@app.route("/admin/support/general", methods=['GET'])
+def admin_general_support():
+    if request.method == "GET":
+        return render("admin/support/general.html")
+
+
+@app.route("/admin/support/docs", methods=['GET'])
+def admin_support_docs():
+    if request.method == "GET":
+        return render("admin/support/docs.html")
+
+
+@app.route("/admin/support/setup", methods=['GET'])
+def admin_support_setup():
+    if request.method == "GET":
+        return render("admin/support/getting-setup.html")
+
+
+@app.route("/admin/support/integration", methods=['GET'])
+def admin_support_integration():
+    if request.method == "GET":
+        return render("admin/support/integration.html")
+
+
+@app.route("/admin/support/billing", methods=['GET'])
+def admin_support_billing():
+    if request.method == "GET":
+        return render("admin/support/billing.html")
+
+
+@app.route("/admin/emoji-converter", methods=['GET'])
+def admin_emoji():
+    if request.method == "GET":
+        return render("admin/emoji.html")
 
 
 @app.route("/chatbot/<route>", methods=['GET', 'POST'])
@@ -1188,105 +1403,6 @@ def chatbot(route):
             return jsonify(datastring)
 
 
-# TODO implement this
-@app.route("/admin/analytics", methods=['GET'])
-def admin_analytics():
-    if request.method == "GET":
-        email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        # TODO check assistants for errors
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
-        stats = select_from_database_table(
-            "SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?",
-            [assistantID], True)
-        return render_template("admin/analytics.html", data=stats)
-
-
-# Method for the users
-@app.route("/admin/users", methods=['GET', 'POST'])
-def admin_users():
-    if request.method == "GET":
-        print("TEST")
-        email = request.cookies.get("UserEmail")
-        print("TEST1")
-        print(email)
-        company = get_company(email)
-        print("TEST2")
-        # todo check company
-        companyID = company[0]
-        print("TEST3")
-
-        userLevel = select_from_database_table("SELECT AccessLevel FROM Users WHERE Email=?", [email])[0]
-        print("TEST4")
-        print(userLevel)
-        if userLevel is None:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO better handle
-        elif "Error" in userLevel:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO better handle this
-        else:
-            print("TEST5")
-            if userLevel != "Admin":
-                print(userLevel)
-                return redirect("/admin/homepage")
-            else:
-                # TODO improve this
-                users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
-                return render_template("admin/users.html", users=users)
-    elif request.method == "POST":
-        email = request.cookies.get("UserEmail")
-        company = get_company(email)
-        # todo check company
-        companyID = company[0]
-        fullname = request.form.get("fullname", default="Error")
-        accessLevel = request.form.get("accessLevel", default="Error")
-        newEmail = request.form.get("email", default="Error")
-        password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
-        # Generates a random password
-
-        if fullname == "Error" or accessLevel == "Error" or newEmail == "Error":
-            print("Invalid request")
-            abort(status.HTTP_400_BAD_REQUEST)
-        else:
-            newEmail = newEmail.lower()
-            try:
-                firstname = fullname.split(" ")[0]
-                surname = fullname.split(" ")[1]
-            except IndexError as e:
-                abort(status.HTTP_400_BAD_REQUEST)
-                # TODO handle much better
-            hashed_password = hash_password(password)
-
-            insertUserResponse = insert_into_database_table(
-                "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
-                (companyID, firstname, surname, accessLevel, newEmail, hashed_password, "True"))
-            if "added" not in insertUserResponse:
-                if "UNIQUE constraint" in insertUserResponse:
-                    deleteCompany = delete_from_table("DELETE FROM Companies WHERE ID=?;", [companyID])
-                    # TODO check deleteCompany
-                    return render_template("signup.html", msg=newEmail + " already in use.", debug=app.debug)
-                else:
-                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-                    # TODO handle this better
-            else:
-                # sending email to the new user.
-                # TODO this needs improving
-                msg = Message("Account verification, {} {}".format(firstname, surname),
-                              sender="thesearchbase@gmail.com",
-                              recipients=[email])
-                link = "www.thesearchbase.com/account/changepassword"
-                msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
-                           "If you feel this is a mistake please contact {}. \n" \
-                           "Your temporary password is: {}\n" \
-                           "Please visit <a href='{}'>this link</a> to set password for account.".format(email,
-                                                                                                         password, link)
-                mail.send(msg)
-
-                return redirect("/admin/users")
-
-
 @app.route("/account/verify/<payload>", methods=['GET'])
 def verify_account(payload):
     if request.method == "GET":
@@ -1424,49 +1540,6 @@ def change_password():
                                    msg="Account not verified, please check your email and follow instructions")
 
 
-# Method for the billing
-@app.route("/admin/billing", methods=['GET'])
-def admin_billing():
-    if request.method == "GET":
-        return render_template("admin/billing.html")
-
-
-@app.route("/admin/support/general", methods=['GET'])
-def admin_general_support():
-    if request.method == "GET":
-        return render_template("admin/support/general.html")
-
-
-@app.route("/admin/support/docs", methods=['GET'])
-def admin_support_docs():
-    if request.method == "GET":
-        return render_template("admin/support/docs.html")
-
-
-@app.route("/admin/support/setup", methods=['GET'])
-def admin_support_setup():
-    if request.method == "GET":
-        return render_template("admin/support/getting-setup.html")
-
-
-@app.route("/admin/support/integration", methods=['GET'])
-def admin_support_integration():
-    if request.method == "GET":
-        return render_template("admin/support/integration.html")
-
-
-@app.route("/admin/support/billing", methods=['GET'])
-def admin_support_billing():
-    if request.method == "GET":
-        return render_template("admin/support/billing.html")
-
-
-@app.route("/emoji-converter", methods=['GET'])
-def admin_emoji():
-    if request.method == "GET":
-        return render_template("admin/emoji.html")
-
-
 # Sitemap route
 @app.route('/robots.txt')
 @app.route('/sitemap.xml')
@@ -1529,32 +1602,48 @@ def sendMarketingEmail():
 ## Error Handlers ##
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)
 def bad_request(e):
-    return render_template('errors/400.html', error=e, debug=app.debug), status.HTTP_400_BAD_REQUEST
+    return render('errors/400.html', error=e), status.HTTP_400_BAD_REQUEST
 
 
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
-    return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
+    return render('errors/404.html'), status.HTTP_404_NOT_FOUND
 
 
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 def unsupported_media(e):
-    return render_template('errors/415.html', error=e), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+    return render('errors/415.html', error=e), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 
 @app.errorhandler(418)
 def im_a_teapot(e):
-    return render_template('errors/418.html', error=e, debug=app.debug), 418
+    return render('errors/418.html', error=e), 418
 
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(e):
-    return render_template('errors/500.html', error=e, debug=app.debug), status.HTTP_500_INTERNAL_SERVER_ERROR
+    return render('errors/500.html', error=e), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
 def not_implemented(e):
-    return render_template('errors/501.html', error=e, debug=app.debug), status.HTTP_501_NOT_IMPLEMENTED
+    return render('errors/501.html', error=e), status.HTTP_501_NOT_IMPLEMENTED
+
+
+# Used to passthrough variables without repeating it in each method call
+# IE assistant information
+def render(template, **context):
+    email = request.cookies.get("UserEmail")
+    if email is not None:
+        assistants = get_assistants(email)
+        # TODO check assistants for errors
+        assistantIDs = []
+        for assistant in assistants:
+            assistantIDs.append(assistant[0])
+
+        return render_template(template, debug=app.debug, assistantIDs=assistantIDs, **context)
+    else:
+        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class Del:

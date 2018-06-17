@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="images/favicon.ico" type="image/ico"/>
+    <link rel="icon" href="/images/favicon.ico" type="image/ico"/>
 
     {% block headlinks %}
     {% endblock %}
@@ -19,7 +19,7 @@
             <div class="left_col scroll-view">
                 <div class="navbar nav_title" style="border: 0;">
                     <a href="/admin/homepage" class="site_title"> <img
-                            src="../../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchBase</span></a>
+                            src="/static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchBase</span></a>
                     <br/>
                 </div>
 
@@ -28,7 +28,7 @@
                 <!-- menu profile quick info -->
                 <div class="profile clearfix">
                     <div class="profile_pic">
-                        <img src="../../static/images/img.jpg" alt="..." class="img-circle profile_img">
+                        <img src="/static/images/img.jpg" alt="..." class="img-circle profile_img">
                     </div>
                     <div class="profile_info">
                         <span>Welcome,</span>
@@ -52,18 +52,21 @@
                                     <a><i class="fa fa-comments-o"></i> Assistants <span
                                             class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
-                                        <li><a>Assistant 1<span class="fa fa-chevron-down"></span></a>
-                                            <ul class="nav child_menu">
-                                                <li><a href="/admin/assistants">Settings</a></li>
-                                                <li><a href="/admin/questions">Questions</a></li>
-                                                <li><a href="/admin/answers">Answers</a></li>
-                                                <li><a href="/admin/templates">Templates</a></li>
-                                                <li>
-                                                    <a href="/admin/products"><i class="fa fa-database"></i>Products</a>
+                                        {% if assistantIDs != null %}
+                                            {% for id in assistantIDs %}
+                                                <li><a>Assistant {{ loop.index }}<span class="fa fa-chevron-down"></span></a>
+                                                    <ul class="nav child_menu">
+                                                        <li><a href="/admin/assistant/{{ id }}/settings">Settings</a></li>
+                                                        <li><a href="/admin/assistant/{{ id }}/questions">Questions</a></li>
+                                                        <li><a href="/admin/assistant/{{ id }}/answers">Answers</a></li>
+                                                        <li><a href="/admin/templates">Templates</a></li>
+                                                        <li>
+                                                            <a href="/admin/assistant/{{ id }}/products"><i class="fa fa-database"></i>Products</a>
+                                                        </li>
+                                                    </ul>
                                                 </li>
-                                            </ul>
-                                        </li>
-
+                                            {% endfor %}
+                                        {% endif %}
                                     </ul>
                                 </li>
 
@@ -77,7 +80,7 @@
                                 <li>
                                     <a><i class="fa fa-wrench"></i> Tools <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
-                                        <li><a href="/emoji-converter">Emoji Converter</a></li>
+                                        <li><a href="/admin/emoji-converter">Emoji Converter</a></li>
                                     </ul>
                                 </li>
                                 <!-- End of user Data Storage -->
@@ -155,7 +158,7 @@
                             <li class="">
                                 <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
                                    aria-expanded="false">
-                                    <img src="../../static/images/img.jpg" alt="">User
+                                    <img src="/static/images/img.jpg" alt="">User
                                     <span class=" fa fa-angle-down"></span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-usermenu pull-right">

@@ -4,30 +4,30 @@
     <title>Answers</title>
 
     <!-- Bootstrap -->
-    <link href="../../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="../../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
-    <link href="../../static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
     <!-- iCheck -->
-    <link href="../../static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+    <link href="/static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
     <!-- bootstrap-wysiwyg -->
-    <link href="../../static/vendors/google-code-prettify/bin/prettify.min.css" rel="stylesheet">
+    <link href="/static/vendors/google-code-prettify/bin/prettify.min.css" rel="stylesheet">
     <!-- Select2 -->
-    <link href="../../static/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
+    <link href="/static/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
     <!-- Switchery -->
-    <link href="../../static/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
+    <link href="/static/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
     <!-- starrayRowr -->
-    <link href="../../static/vendors/starrayRowr/dist/starrayRowr.css" rel="stylesheet">
+    <link href="/static/vendors/starrayRowr/dist/starrayRowr.css" rel="stylesheet">
     <!-- bootstrap-daterangepicker -->
-    <link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
     <!-- Custom Theme Style -->
-    <link href="../../static/build/css/custom.min.css" rel="stylesheet">
+    <link href="/static/build/css/custom.min.css" rel="stylesheet">
 
     <!-- Core Stylesheet -->
     <!-- <link href="../static/style.css" rel="stylesheet"> -->
     <!-- Box stylesheets -->
-    <link href="../../static/css/box.css" rel="stylesheet">
+    <link href="/static/css/box.css" rel="stylesheet">
     <!-- Responsive CSS -->
     <!-- <link href="../static/css/responsive.css" rel="stylesheet"> -->
 {% endblock %}
@@ -83,7 +83,7 @@
                                     <div id="q1" class="">
                                         <div class="box-holder">
                                             <form enctype="multipart/form-data" style="text-align:center"
-                                                  action="/admin/answers" method="post">
+                                                  action="/admin/assistant/{{ id }}/answers" method="post">
                                                 <div id="pasteForm">
                                                     <!-- Answer Forms get inserted here -->
                                                 </div>
@@ -105,44 +105,44 @@
 
 {% block javascript %}
     <!-- jQuery -->
-<script src="../../static/vendors/jquery/dist/jquery.min.js"></script>
+<script src="/static/vendors/jquery/dist/jquery.min.js"></script>
 <!-- Bootstrap -->
-<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- FastClick -->
-<script src="../../static/vendors/fastclick/lib/fastclick.js"></script>
+<script src="/static/vendors/fastclick/lib/fastclick.js"></script>
 <!-- NProgress -->
-<script src="../../static/vendors/nprogress/nprogress.js"></script>
+<script src="/static/vendors/nprogress/nprogress.js"></script>
 <!-- jQuery Smart Wizard -->
-<script src="../../static/vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js"></script>
+<script src="/static/vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js"></script>
 <!-- Custom Theme Scripts -->
-<script src="../../static/build/js/custom.min.js"></script>
+<script src="/static/build/js/custom.min.js"></script>
 
 
 <!-- bootstrap-progressbar -->
-<script src="../../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+<script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
 <!-- iCheck -->
-<script src="../../static/vendors/iCheck/icheck.min.js"></script>
+<script src="/static/vendors/iCheck/icheck.min.js"></script>
 <!-- bootstrap-daterangepicker -->
-<script src="../../static/vendors/moment/min/moment.min.js"></script>
-<script src="../../static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+<script src="/static/vendors/moment/min/moment.min.js"></script>
+<script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
 <!-- bootstrap-wysiwyg -->
-<script src="../../static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
-<script src="../../static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
-<script src="../../static/vendors/google-code-prettify/src/prettify.js"></script>
+<script src="/static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
+<script src="/static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
+<script src="/static/vendors/google-code-prettify/src/prettify.js"></script>
 <!-- jQuery Tags Input -->
-<script src="../../static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
+<script src="/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
 <!-- Switchery -->
-<script src="../../static/vendors/switchery/dist/switchery.min.js"></script>
+<script src="/static/vendors/switchery/dist/switchery.min.js"></script>
 <!-- Select2 -->
-<script src="../../static/vendors/select2/dist/js/select2.full.min.js"></script>
+<script src="/static/vendors/select2/dist/js/select2.full.min.js"></script>
 <!-- Parsley -->
-<script src="../../static/vendors/parsleyjs/dist/parsley.min.js"></script>
+<script src="/static/vendors/parsleyjs/dist/parsley.min.js"></script>
 <!-- Autosize -->
-<script src="../../static/vendors/autosize/dist/autosize.min.js"></script>
+<script src="/static/vendors/autosize/dist/autosize.min.js"></script>
 <!-- jQuery autocomplete -->
-<script src="../../static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
+<script src="/static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
 <!-- starrayRowr -->
-<script src="../../static/vendors/starrayRowr/dist/starrayRowr.js"></script>
+<script src="/static/vendors/starrayRowr/dist/starrayRowr.js"></script>
 
 <script>
     document.getElementById("snoa").addEventListener("click", changeQuestion);

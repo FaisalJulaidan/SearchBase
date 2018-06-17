@@ -1,4 +1,400 @@
-﻿<!DOCTYPE html>
+﻿{% extends "admin/base.html" %}
+
+{% block headlinks %}
+    <title>Questions</title>
+    <!-- Bootstrap -->
+    <link href="../../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="../../static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="../../static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+    <!-- bootstrap-wysiwyg -->
+    <link href="../../static/vendors/google-code-prettify/bin/prettify.min.css" rel="stylesheet">
+    <!-- Select2 -->
+    <link href="../../static/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
+    <!-- Switchery -->
+    <link href="../../static/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
+    <!-- starrr -->
+    <link href="../../static/vendors/starrr/dist/starrr.css" rel="stylesheet">
+    <!-- bootstrap-daterangepicker -->
+    <link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <!-- Custom Theme Style -->
+    <link href="../../static/build/css/custom.min.css" rel="stylesheet">
+    <!-- bootstrap-progressbar -->
+    <link href="../../static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <!-- JQVMap -->
+    <link href="../../static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+    <div class="right_col" role="main">
+    <div class="">
+    <div class="page-title">
+        <div class="title_left">
+            <h3>Questions</h3>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>
+                        Enter the number of questions your assistant will have
+                        <small>
+                            Tip: it's best to keep the number of questions to no more than 6 for a better
+                            assistant
+                        </small>
+                    </h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li>
+                            <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="#">Settings 1</a>
+                                </li>
+                                <li>
+                                    <a href="#">Settings 2</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a class="close-link"><i class="fa fa-close"></i></a>
+                        </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <br/>
+                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
+                                Enter
+                                the number of questions <span class="required">*</span>
+                            </label>
+                            <div class="col-md-1 col-sm-1 col-xs-12">
+                                <input type="text" id="number-of-questions" required="required"
+                                       class="form-control col-md-1 col-xs-1">
+                            </div>
+                        </div>
+                        <div class="ln_solid"></div>
+                        <div class="form-group">
+                            <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                            </div>
+                        </div>
+
+                    </form>
+                    <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
+                    <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>
+                    Enter your questions below
+                    <small>
+                        Tip: Keep your questions as simple as possible to keep your assistant
+                        universal
+                    </small>
+                </h2>
+                <ul class="nav navbar-right panel_toolbox">
+                    <li>
+                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                           aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a href="#">Settings 1</a>
+                            </li>
+                            <li>
+                                <a href="#">Settings 2</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                </ul>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <br/>
+                <div class="form-group">
+                    <form id="QuestionForm" action="/admin/questions" method="post">
+                        <div id="QuestionDiv">
+                            <!-- Question Templates appear here -->
+                        </div>
+                        <input type="hidden" id="noq-hidden" name="noq-hidden" value="">
+                        <button type="submit" id="QTemplate-SubmitB" class="btn btn-success">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+                <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
+                <div class="ln_solid"></div>
+                <div class="form-group">
+                    <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="../../static/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="../../static/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="../../static/vendors/nprogress/nprogress.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="../../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- iCheck -->
+    <script src="../../static/vendors/iCheck/icheck.min.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="../../static/vendors/moment/min/moment.min.js"></script>
+    <script src="../../static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <!-- bootstrap-wysiwyg -->
+    <script src="../../static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
+    <script src="../../static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
+    <script src="../../static/vendors/google-code-prettify/src/prettify.js"></script>
+    <!-- jQuery Tags Input -->
+    <script src="../../static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
+    <!-- Switchery -->
+    <script src="../../static/vendors/switchery/dist/switchery.min.js"></script>
+    <!-- Select2 -->
+    <script src="../../static/vendors/select2/dist/js/select2.full.min.js"></script>
+    <!-- Parsley -->
+    <script src="../../static/vendors/parsleyjs/dist/parsley.min.js"></script>
+    <!-- Autosize -->
+    <script src="../../static/vendors/autosize/dist/autosize.min.js"></script>
+    <!-- jQuery autocomplete -->
+    <script src="../../static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
+    <!-- starrr -->
+    <script src="../../static/vendors/starrr/dist/starrr.js"></script>
+    <!-- Custom Theme Scripts -->
+    <script src="../../static/build/js/custom.min.js"></script>
+    <!-- Questions Script -->
+    <script>
+        // set variables
+        var oldNOQ = 0;
+        var maxQuestions = 10;
+        // set the question form template
+        var qTemplate1 = "<div class = \"Questions\"><label class=\"control-label col-md-3 col-sm-3 col-xs-12\" for=\"last-name\">"
+        var qTemplate2 = " question <span class=\"required\">*</span></label><div class=\"col-md-6 col-sm-6 col-xs-12\"><input type=\"text\" name=\""
+        // set event listeners
+        document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
+        document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
+        document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
+
+        // called on NOQ Reset Click
+        function ClearNOQ() {
+            document.getElementById("number-of-questions").value = "";
+            $("#QuestionDiv").empty();
+            oldNOQ = 0;
+        }
+
+        // var data = {{data}};
+        var data = [];
+        var typeCheck = [];
+        {%for item in data%}
+            data.push("{{item[0]}}");
+            typeCheck.push("{{item[0].split(';')[1]}}");
+        {%endfor%}
+        var noq = data.length;
+        if (!Number.isNaN(noq)) {
+            if (noq <= maxQuestions) {
+                if (noq > oldNOQ) {
+                    for (i = oldNOQ; i < noq; i++) {
+                        var number;
+                        if (i == 0) {
+                            number = "First"
+                        }
+                        if (i == 1) {
+                            number = "Second"
+                        }
+                        if (i == 2) {
+                            number = "Third"
+                        }
+                        if (i == 3) {
+                            number = "Fourth"
+                        }
+                        if (i == 4) {
+                            number = "Fifth"
+                        }
+                        if (i == 5) {
+                            number = "Sixth"
+                        }
+                        if (i == 6) {
+                            number = "Seventh"
+                        }
+                        if (i == 7) {
+                            number = "Eight"
+                        }
+                        if (i == 8) {
+                            number = "Ninth"
+                        }
+                        if (i == 9) {
+                            number = "Tenth"
+                        }
+                        $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + "\" \
+              required=\"required\" value= \"" + data[i].split(";")[0] + "\" class=\"form-control col-md-7 col-xs-12\">\
+              <input onclick=\"CheckTypeBox('both" + i + "')\" id='bothB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"both\">Both\
+              <input onclick=\"CheckTypeBox('db" + i + "')\" id='dbB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"dbRetrieval\" checked>Data Base Retrieval\
+              <input onclick=\"CheckTypeBox('ui" + i + "')\" id='uiB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"userInfoRetrieval\">User Input Retrieval\
+              </div><br /><br /></div>");
+                        if (typeCheck[i] == "userInfoRetrieval") {
+                            $("#dbB" + i).prop('checked', false);
+                            $("#uiB" + i).prop('checked', true);
+                        }
+                        else if (typeCheck[i] == "both") {
+                            $("#dbB" + i).prop('checked', false);
+                            $("#bothB" + i).prop('checked', true);
+                        }
+                        $("#number-of-questions").val(noq);
+                    }
+                }
+                else if (noq < oldNOQ) {
+                    for (i = oldNOQ; i > noq; i--) {
+                        $(".Questions")[$(".Questions").length - 1].remove();
+                    }
+                }
+                oldNOQ = noq;
+                document.getElementById("noq-hidden").value = String(noq);
+            }
+        }
+
+        // called on NOQ Submit Click
+        function ChangeNofQuestions() {
+            var noq = parseInt(document.getElementById("number-of-questions").value);
+            if (!Number.isNaN(noq)) {
+                if (noq <= maxQuestions) {
+                    if (noq > oldNOQ) {
+                        for (i = oldNOQ; i < noq; i++) {
+                            var number;
+                            if (i == 0) {
+                                number = "First"
+                            }
+                            if (i == 1) {
+                                number = "Second"
+                            }
+                            if (i == 2) {
+                                number = "Third"
+                            }
+                            if (i == 3) {
+                                number = "Fourth"
+                            }
+                            if (i == 4) {
+                                number = "Fifth"
+                            }
+                            if (i == 5) {
+                                number = "Sixth"
+                            }
+                            if (i == 6) {
+                                number = "Seventh"
+                            }
+                            if (i == 7) {
+                                number = "Eight"
+                            }
+                            if (i == 8) {
+                                number = "Ninth"
+                            }
+                            if (i == 9) {
+                                number = "Tenth"
+                            }
+                            $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + "\" \
+                required=\"required\" class=\"form-control col-md-7 col-xs-12\">\
+              <input onclick=\"CheckTypeBox('both" + i + "')\" id='bothB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"both\">Both\
+                <input onclick=\"CheckTypeBox('db" + i + "')\" id='dbB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"dbRetrieval\" checked>Data Base Retrieval\
+                <input onclick=\"CheckTypeBox('ui" + i + "')\" id='uiB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"userInfoRetrieval\">User Input Retrieval\
+                </div><br /><br /></div>");
+                            // add preset question to fill
+                        }
+                    }
+                    else if (noq < oldNOQ) {
+                        for (i = oldNOQ; i > noq; i--) {
+                            $(".Questions")[$(".Questions").length - 1].remove();
+                        }
+                    }
+                    oldNOQ = noq;
+                    document.getElementById("noq-hidden").value = String(noq);
+                }
+            }
+        }
+
+        function CheckTypeBox(tBox) {
+            if (tBox.replace(/[0-9]/g, '') == "both") {
+                $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
+                $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
+            }
+            if (tBox.replace(/[0-9]/g, '') == "db") {
+                $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
+                $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
+            }
+            if (tBox.replace(/[0-9]/g, '') == "ui") {
+                $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
+                $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
+            }
+        }
+
+        function ClearQTemplate() {
+            $("#QuestionDiv input").val("");
+        }
+
+        function validation() {
+            // check if input is bigger than 10
+            var boxNumberOfQuestions = document.getElementById('number-of-questions').value;
+            var boxWelcomeMessage = document.getElementById('welcome-message').value;
+            // General validation
+            if (boxNumberOfQuestions == "") {
+                document.getElementById("number-of-questions").style.borderStyle = "solid";
+                document.getElementById("number-of-questions").style.borderColor = "red";
+                alert("Please enter the amount of numbers you would like to ask users.")
+                return false;
+            }
+            // Checking the lrngth of the input
+            if (boxNumberOfQuestions > 10) {
+                mesg = "You have entered too mnany questions."
+                mesg = mesg + "Please re-enter the number of question(s).\n"
+                mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
+                alert(mesg);
+                return false;
+            }
+            // Change colour of the border of the box
+            if (boxWelcomeMessage.length > 20) {
+                mesg = "The length of the welcome message is too long."
+                mesg = mesg + "Please re-enter the welcome message.\n"
+                mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
+                alert(mesg);
+                return false;
+            }
+            // Change colour of the border of the box
+            // Validation for the dynmaicaly loaded boxes
+            return true;
+        }
+    </script>
+{% endblock %}
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -217,19 +613,27 @@
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="x_panel">
                             <div class="x_title">
-                                <h2>Enter the welcome message for your assistant <small>Tip: it's best to introduce what your assistant will do and introduce your company.</small></h2>
+                                <h2>Enter the welcome message for your assistant
+                                    <small>Tip: it's best to introduce what your assistant will do and introduce your
+                                        company.
+                                    </small>
+                                </h2>
                                 <ul class="nav navbar-right panel_toolbox"></ul>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content">
-                                <br />
-                                <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" action="/admin/welcomemsg" method="post">
+                                <br/>
+                                <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
+                                      action="/admin/welcomemsg" method="post">
                                     <div class="form-group">
                                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="">
                                             Enter your welcome message <span class="required">*</span>
                                         </label>
                                         <div class="col-md-9 col-sm-9 col-xs-12">
-                                            <input value="{{message}}" name="welcome-message" type="text" id="welcome-message" required="required" class="form-control col-md-5 col-xs-10" placeholder="You can leave this empty is you wish.">
+                                            <input value="{{ message }}" name="welcome-message" type="text"
+                                                   id="welcome-message" required="required"
+                                                   class="form-control col-md-5 col-xs-10"
+                                                   placeholder="You can leave this empty is you wish.">
                                         </div>
                                     </div>
                                     <div class="ln_solid"></div>
@@ -279,7 +683,7 @@
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content">
-                                <br />
+                                <br/>
                                 <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
 
                                     <div class="form-group">
@@ -340,7 +744,7 @@
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content">
-                                <br />
+                                <br/>
                                 <div class="form-group">
                                     <form id="QuestionForm" action="/admin/questions" method="post">
                                         <div id="QuestionDiv">
@@ -419,12 +823,11 @@
                 var qTemplate2 = " question <span class=\"required\">*</span></label><div class=\"col-md-6 col-sm-6 col-xs-12\"><input type=\"text\" name=\""
                 // set event listeners
                 document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
-                document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions); 
+                document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
                 document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
 
                 // called on NOQ Reset Click
-                function ClearNOQ()
-                {
+                function ClearNOQ() {
                     document.getElementById("number-of-questions").value = "";
                     $("#QuestionDiv").empty();
                     oldNOQ = 0;
@@ -438,58 +841,60 @@
                     typeCheck.push("{{item[0].split(';')[1]}}");
                 {%endfor%}
                 var noq = data.length;
-                if (!Number.isNaN(noq))
-                {
-                    if (noq <= maxQuestions)
-                    {
-                        if (noq > oldNOQ)
-                        {
-                            for (i = oldNOQ; i < noq; i++)
-                            {
+                if (!Number.isNaN(noq)) {
+                    if (noq <= maxQuestions) {
+                        if (noq > oldNOQ) {
+                            for (i = oldNOQ; i < noq; i++) {
                                 var number;
-                                if (i == 0)
-                                { number = "First" }
-                                if (i == 1)
-                                { number = "Second" }
-                                if (i == 2)
-                                { number = "Third" }
-                                if (i == 3)
-                                { number = "Fourth" }
-                                if (i == 4)
-                                { number = "Fifth" }
-                                if (i == 5)
-                                { number = "Sixth" }
-                                if (i == 6)
-                                { number = "Seventh" }
-                                if (i == 7)
-                                { number = "Eight" }
-                                if (i == 8)
-                                { number = "Ninth" }
-                                if (i == 9)
-                                { number = "Tenth" }
+                                if (i == 0) {
+                                    number = "First"
+                                }
+                                if (i == 1) {
+                                    number = "Second"
+                                }
+                                if (i == 2) {
+                                    number = "Third"
+                                }
+                                if (i == 3) {
+                                    number = "Fourth"
+                                }
+                                if (i == 4) {
+                                    number = "Fifth"
+                                }
+                                if (i == 5) {
+                                    number = "Sixth"
+                                }
+                                if (i == 6) {
+                                    number = "Seventh"
+                                }
+                                if (i == 7) {
+                                    number = "Eight"
+                                }
+                                if (i == 8) {
+                                    number = "Ninth"
+                                }
+                                if (i == 9) {
+                                    number = "Tenth"
+                                }
                                 $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + "\" \
               required=\"required\" value= \"" + data[i].split(";")[0] + "\" class=\"form-control col-md-7 col-xs-12\">\
               <input onclick=\"CheckTypeBox('both" + i + "')\" id='bothB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"both\">Both\
               <input onclick=\"CheckTypeBox('db" + i + "')\" id='dbB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"dbRetrieval\" checked>Data Base Retrieval\
               <input onclick=\"CheckTypeBox('ui" + i + "')\" id='uiB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"userInfoRetrieval\">User Input Retrieval\
               </div><br /><br /></div>");
-                                if (typeCheck[i] == "userInfoRetrieval")
-                                {
+                                if (typeCheck[i] == "userInfoRetrieval") {
                                     $("#dbB" + i).prop('checked', false);
                                     $("#uiB" + i).prop('checked', true);
                                 }
-                                else if (typeCheck[i] == "both")
-                                {
+                                else if (typeCheck[i] == "both") {
                                     $("#dbB" + i).prop('checked', false);
                                     $("#bothB" + i).prop('checked', true);
                                 }
                                 $("#number-of-questions").val(noq);
                             }
                         }
-                        else if (noq < oldNOQ)
-                        {
-                            for (i = oldNOQ; i > noq; i--)
-                            {
+                        else if (noq < oldNOQ) {
+                            for (i = oldNOQ; i > noq; i--) {
                                 $(".Questions")[$(".Questions").length - 1].remove();
                             }
                         }
@@ -499,38 +904,43 @@
                 }
 
                 // called on NOQ Submit Click
-                function ChangeNofQuestions()
-                {
+                function ChangeNofQuestions() {
                     var noq = parseInt(document.getElementById("number-of-questions").value);
-                    if (!Number.isNaN(noq))
-                    {
-                        if (noq <= maxQuestions)
-                        {
-                            if (noq > oldNOQ)
-                            {
-                                for (i = oldNOQ; i < noq; i++)
-                                {
+                    if (!Number.isNaN(noq)) {
+                        if (noq <= maxQuestions) {
+                            if (noq > oldNOQ) {
+                                for (i = oldNOQ; i < noq; i++) {
                                     var number;
-                                    if (i == 0)
-                                    { number = "First" }
-                                    if (i == 1)
-                                    { number = "Second" }
-                                    if (i == 2)
-                                    { number = "Third" }
-                                    if (i == 3)
-                                    { number = "Fourth" }
-                                    if (i == 4)
-                                    { number = "Fifth" }
-                                    if (i == 5)
-                                    { number = "Sixth" }
-                                    if (i == 6)
-                                    { number = "Seventh" }
-                                    if (i == 7)
-                                    { number = "Eight" }
-                                    if (i == 8)
-                                    { number = "Ninth" }
-                                    if (i == 9)
-                                    { number = "Tenth" }
+                                    if (i == 0) {
+                                        number = "First"
+                                    }
+                                    if (i == 1) {
+                                        number = "Second"
+                                    }
+                                    if (i == 2) {
+                                        number = "Third"
+                                    }
+                                    if (i == 3) {
+                                        number = "Fourth"
+                                    }
+                                    if (i == 4) {
+                                        number = "Fifth"
+                                    }
+                                    if (i == 5) {
+                                        number = "Sixth"
+                                    }
+                                    if (i == 6) {
+                                        number = "Seventh"
+                                    }
+                                    if (i == 7) {
+                                        number = "Eight"
+                                    }
+                                    if (i == 8) {
+                                        number = "Ninth"
+                                    }
+                                    if (i == 9) {
+                                        number = "Tenth"
+                                    }
                                     $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + "\" \
                 required=\"required\" class=\"form-control col-md-7 col-xs-12\">\
               <input onclick=\"CheckTypeBox('both" + i + "')\" id='bothB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"both\">Both\
@@ -540,10 +950,8 @@
                                     // add preset question to fill
                                 }
                             }
-                            else if (noq < oldNOQ)
-                            {
-                                for (i = oldNOQ; i > noq; i--)
-                                {
+                            else if (noq < oldNOQ) {
+                                for (i = oldNOQ; i > noq; i--) {
                                     $(".Questions")[$(".Questions").length - 1].remove();
                                 }
                             }
@@ -553,46 +961,38 @@
                     }
                 }
 
-                function CheckTypeBox(tBox)
-                {
-                    if (tBox.replace(/[0-9]/g, '') == "both")
-                    {
+                function CheckTypeBox(tBox) {
+                    if (tBox.replace(/[0-9]/g, '') == "both") {
                         $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
                         $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
                     }
-                    if (tBox.replace(/[0-9]/g, '') == "db")
-                    {
+                    if (tBox.replace(/[0-9]/g, '') == "db") {
                         $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
                         $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
                     }
-                    if (tBox.replace(/[0-9]/g, '') == "ui")
-                    {
+                    if (tBox.replace(/[0-9]/g, '') == "ui") {
                         $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
                         $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
                     }
                 }
 
-                function ClearQTemplate()
-                {
+                function ClearQTemplate() {
                     $("#QuestionDiv input").val("");
                 }
 
-                function validation()
-                {
+                function validation() {
                     // check if input is bigger than 10
                     var boxNumberOfQuestions = document.getElementById('number-of-questions').value;
                     var boxWelcomeMessage = document.getElementById('welcome-message').value;
                     // General validation
-                    if (boxNumberOfQuestions == "")
-                    {
+                    if (boxNumberOfQuestions == "") {
                         document.getElementById("number-of-questions").style.borderStyle = "solid";
                         document.getElementById("number-of-questions").style.borderColor = "red";
                         alert("Please enter the amount of numbers you would like to ask users.")
                         return false;
                     }
                     // Checking the lrngth of the input
-                    if (boxNumberOfQuestions > 10)
-                    {
+                    if (boxNumberOfQuestions > 10) {
                         mesg = "You have entered too mnany questions."
                         mesg = mesg + "Please re-enter the number of question(s).\n"
                         mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
@@ -600,8 +1000,7 @@
                         return false;
                     }
                     // Change colour of the border of the box
-                    if (boxWelcomeMessage.length > 20)
-                    {
+                    if (boxWelcomeMessage.length > 20) {
                         mesg = "The length of the welcome message is too long."
                         mesg = mesg + "Please re-enter the welcome message.\n"
                         mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."

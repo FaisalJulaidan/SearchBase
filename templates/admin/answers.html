@@ -1,12 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+﻿{% extends "admin/base.html" %}
 
+{% block headlinks %}
     <title>Answers</title>
 
     <!-- Bootstrap -->
@@ -24,7 +18,7 @@
     <!-- Switchery -->
     <link href="../../static/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
     <!-- starrayRowr -->
-    <link href="../static/vendors/starrayRowr/dist/starrayRowr.css" rel="stylesheet">
+    <link href="../../static/vendors/starrayRowr/dist/starrayRowr.css" rel="stylesheet">
     <!-- bootstrap-daterangepicker -->
     <link href="../../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
     <!-- Custom Theme Style -->
@@ -36,289 +30,121 @@
     <link href="../../static/css/box.css" rel="stylesheet">
     <!-- Responsive CSS -->
     <!-- <link href="../static/css/responsive.css" rel="stylesheet"> -->
+{% endblock %}
 
-  </head>
-
-  <body class="nav-md">
-    <div class="container body">
-      <div class="main_container">
-        <div class="col-md-3 left_col">
-          <div class="left_col scroll-view">
-
-
-            <div class="navbar nav_title" style="border: 0;">
-              <a href="/admin/homepage" class="site_title"> <img src="../../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
-              <br />
-            </div>
-
-            <div class="clearfix"></div>
-
-            <!-- menu profile quick info -->
-            <div class="profile clearfix">
-              <div class="profile_pic">
-                <img src="../../static/images/img.jpg" alt="..." class="img-circle profile_img">
-              </div>
-              <div class="profile_info">
-                <span>Welcome,</span>
-                <h2>user</h2>
-              </div>
-            </div>
-            <!-- /menu profile quick info -->
-
-            <br />
-
-            <!-- sidebar menu -->
-            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-              <div class="menu_section">
-                <h3>General</h3>
-                <ul class="nav side-menu">
-                    <li>
-                        <a href="/admin/homepage"><i class="fa fa-home"></i> Dashboard</a>
-                    </li>
-                    <li>
-                        <a><i class="fa fa-comments-o"></i> Conversations <span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                            <li><a href="/admin/questions">Questions</a></li>
-                            <li><a href="/admin/answers">Answers</a></li>
-                            <li><a href="/admin/templates">Templates</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="/admin/products"><i class="fa fa-database"></i> Product Database<span></span></a>
-                    </li>
-                    <!-- User Data Storage -->
-                    <li>
-                        <a><i class="fa fa-cloud"></i> Data Storage <span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                            <li><a href="/admin/userinput">User Input</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a><i class="fa fa-wrench"></i> Tools <span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                            <li><a href="/emoji-converter">Emoji Converter</a></li>
-                        </ul>
-                    </li>
-                    <!-- End of user Data Storage -->
-                    <li>
-                        <a href="/admin/connect"><i class="fa fa-plug"></i> Connection<span class="fa"></span></a>
-                    </li>
-                </ul>
-              </div>
-              <div class="menu_section">
-                  <h3>Settings</h3>
-                  <ul class="nav side-menu">
-                      <li>
-                          <a><i class="fa fa-gears"></i> Bot <span class="fa fa-chevron-down"></span></a>
-                          <ul class="nav child_menu">
-                              <li><a href="/admin/settings">Main Settings</a></li>
-                          </ul>
-                      </li>
-                  </ul>
-
-                  <h3>Account</h3>
-                  <ul class="nav side-menu">
-                      <li>
-                          <a><i class="fa fa-gears"></i> Account Details  <span class="fa fa-chevron-down"></span></a>
-                          <ul class="nav child_menu">
-                              <li><a href="/admin/profile">Profile</a></li>
-                          </ul>
-                      </li>
-                      <li>
-                          <a href="/admin/analytics"><i class="fa fa-bar-chart"></i> Analytics<span class="fa"></span></a>
-                      </li>
-                      <!-- <li><a><i class="fa fa-money"></i> Price Plan <span class="fa fa-chevron-down"></span></a>
-          <ul class="nav child_menu">
-            <li><a href="/admin/pricing">Pricing Tables</a></li>
-          </ul>
-        </li> -->
-
-                      <li>
-                          <a><i class="fa fa-life-saver"></i> Support <span class="fa fa-chevron-down"></span></a>
-                          <ul class="nav child_menu">
-                              <li><a href="/admin/supportGeneral">General Support</a>
-                              <li>
-                                  <a>Technical Support<span class="fa fa-chevron-down"></span></a>
-                                  <ul class="nav child_menu">
-                                      <li class="sub_menu">
-                                          <a href="/admin/supportDocs">Documentation</a>
-                                      </li>
-                                      <li>
-                                          <a href="/admin/supportSetup">Getting setup</a>
-                                      </li>
-                                      <li>
-                                          <a href="/admin/supportIntergartion">Intergration with your site</a>
-                                      </li>
-                                  </ul>
-                              </li>
-                              <li>
-                                  <a href="/admin/supportBilling">Billing support</a>
-                              </li>
-                          </ul>
-                      </li>
-                      </li>
-                  </ul>
-              </div>
-            </div>
-            <!-- /sidebar menu -->
-
-
-
-
-          </div>
-        </div>
-
-        <!-- top navigation -->
-        <div class="top_nav">
-          <div class="nav_menu">
-            <nav>
-              <div class="nav toggle">
-                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
-              </div>
-
-              <ul class="nav navbar-nav navbar-right">
-                <li class="">
-                  <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../../static/images/img.jpg" alt="">User
-                    <span class=" fa fa-angle-down"></span>
-                  </a>
-                  <ul class="dropdown-menu dropdown-usermenu pull-right">
-                    <li><a href="/admin/profile"> Profile</a></li>
-                    <li><a href="/admin/supportGeneral">Help</a></li>
-                    <li><a href="/login"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
-                  </ul>
-                </li>
-
-                <li role="presentation" class="dropdown">
-                  <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-        <!-- /top navigation -->
-
-        <!-- page content -->
-        <div class="right_col" role="main">
-          <div class="">
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
             <div class="page-title">
-              <div class="title_left">
-                <h3>Linking answers to your questions</h3>
-              </div>
+                <div class="title_left">
+                    <h3>Linking answers to your questions</h3>
+                </div>
             </div>
             <div class="clearfix"></div>
             <div class="row">
-            <div class="clearfix"></div>
-                  </div>
-                  <div class="x_content">
-                        <div class="clearfix"></div>
-                        <div class="row">
-                          <div class="col-md-12 col-sm-12 col-xs-12">
-                            <div class="x_panel">
-                              <div class="x_content">
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="clearfix"></div>
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="x_panel">
+                            <div class="x_content">
                                 <p class="text-muted font-13 m-b-30">Select a question to add answers for</p>
-                                <p class="text-muted font-13 m-b-30"><strong>Note: If you change the question you wish to target, make sure to press submit.</strong></p>
+                                <p class="text-muted font-13 m-b-30"><strong>Note: If you change the question you wish
+                                    to target, make sure to press submit.</strong></p>
                                 <div>
                                     <select id="question-select">
-                                        {% for row in msg%}
-                                        {%if row[0].split(";")[1] != "userInfoRetrieval"%}
-                                        <option value="{{row[0]}}">{{row[0].split(";")[0]}}</option>
-                                        {%endif%}
-                                        {%endfor%}
+                                        {% for row in msg %}
+                                            {% if row[0].split(";")[1] != "userInfoRetrieval" %}
+                                                <option value="{{ row[0] }}">{{ row[0].split(";")[0] }}</option>
+                                            {% endif %}
+                                        {% endfor %}
                                     </select>
-                                   <p class="text-muted font-13 m-b-30">How many answers will your question have?</p>
-                                   <div class="form-group">
-                                     <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">How many answers will your question have? <span class="required"></span>
-                                     </label>
-                                     <div class="col-md-1 col-sm-1 col-xs-12">
-                                       <input type="text" id="number-of-questions" required="required" class="form-control col-md-1 col-xs-1">
-                                     </div>
-                                   </div>
-                                 </div>
-                                 <br />
-                                 <br />
-                                 <br />
-                                 <button id="snoa" class="btn btn-success">Submit</button>
-                                <div>
-                                  <br />
-                                  <br />
-                                  <br />
-                                  <div id ="q1" class="">
-                                    <div class="box-holder">
-                                      <form enctype="multipart/form-data" style="text-align:center" action="/admin/answers" method="post">
-                                          <div id="pasteForm">
-                                              <!-- Answer Forms get inserted here -->
-                                          </div>
-                                          <br>
-                                          <input hidden name="question" id="question_inform"></input>
-                                          <button id="snoa" class="btn btn-success">Save answers</button>
-                                      </form>
+                                    <p class="text-muted font-13 m-b-30">How many answers will your question have?</p>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">How
+                                            many answers will your question have? <span class="required"></span>
+                                        </label>
+                                        <div class="col-md-1 col-sm-1 col-xs-12">
+                                            <input type="text" id="number-of-questions" required="required"
+                                                   class="form-control col-md-1 col-xs-1">
+                                        </div>
                                     </div>
-                                  </div>
                                 </div>
-                               </div>
-                              </div>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <button id="snoa" class="btn btn-success">Submit</button>
+                                <div>
+                                    <br/>
+                                    <br/>
+                                    <br/>
+                                    <div id="q1" class="">
+                                        <div class="box-holder">
+                                            <form enctype="multipart/form-data" style="text-align:center"
+                                                  action="/admin/answers" method="post">
+                                                <div id="pasteForm">
+                                                    <!-- Answer Forms get inserted here -->
+                                                </div>
+                                                <br>
+                                                <input hidden name="question" id="question_inform"></input>
+                                                <button id="snoa" class="btn btn-success">Save answers</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                          </div>
                         </div>
-                      </div>
                     </div>
-                  </div>
-        <!-- /page content -->
-
-        <!-- footer content -->
-        <footer>
-          <div class="pull-right">
-            Gentelella - Bootstrap Admin Template by <a href="https://colorlib.com">Colorlib</a>
-          </div>
-          <div class="clearfix"></div>
-        </footer>
-        <!-- /footer content -->
-      </div>
+                </div>
+            </div>
+        </div>
     </div>
+{% endblock %}
 
+{% block javascript %}
     <!-- jQuery -->
-    <script src="../../static/vendors/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-    <!-- FastClick -->
-    <script src="../../static/vendors/fastclick/lib/fastclick.js"></script>
-    <!-- NProgress -->
-    <script src="../../static/vendors/nprogress/nprogress.js"></script>
-    <!-- jQuery Smart Wizard -->
-    <script src="../../static/vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js"></script>
-    <!-- Custom Theme Scripts -->
-    <script src="../../static/build/js/custom.min.js"></script>
+<script src="../../static/vendors/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="../../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="../../static/vendors/fastclick/lib/fastclick.js"></script>
+<!-- NProgress -->
+<script src="../../static/vendors/nprogress/nprogress.js"></script>
+<!-- jQuery Smart Wizard -->
+<script src="../../static/vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js"></script>
+<!-- Custom Theme Scripts -->
+<script src="../../static/build/js/custom.min.js"></script>
 
 
-    <!-- bootstrap-progressbar -->
-    <script src="../../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-    <!-- iCheck -->
-    <script src="../../static/vendors/iCheck/icheck.min.js"></script>
-    <!-- bootstrap-daterangepicker -->
-    <script src="../../static/vendors/moment/min/moment.min.js"></script>
-    <script src="../../static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
-    <!-- bootstrap-wysiwyg -->
-    <script src="../../static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
-    <script src="../../static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
-    <script src="../../static/vendors/google-code-prettify/src/prettify.js"></script>
-    <!-- jQuery Tags Input -->
-    <script src="../../static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
-    <!-- Switchery -->
-    <script src="../../static/vendors/switchery/dist/switchery.min.js"></script>
-    <!-- Select2 -->
-    <script src="../../static/vendors/select2/dist/js/select2.full.min.js"></script>
-    <!-- Parsley -->
-    <script src="../../static/vendors/parsleyjs/dist/parsley.min.js"></script>
-    <!-- Autosize -->
-    <script src="../../static/vendors/autosize/dist/autosize.min.js"></script>
-    <!-- jQuery autocomplete -->
-    <script src="../../static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
-    <!-- starrayRowr -->
-    <script src="../static/vendors/starrayRowr/dist/starrayRowr.js"></script>
+<!-- bootstrap-progressbar -->
+<script src="../../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+<!-- iCheck -->
+<script src="../../static/vendors/iCheck/icheck.min.js"></script>
+<!-- bootstrap-daterangepicker -->
+<script src="../../static/vendors/moment/min/moment.min.js"></script>
+<script src="../../static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+<!-- bootstrap-wysiwyg -->
+<script src="../../static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
+<script src="../../static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
+<script src="../../static/vendors/google-code-prettify/src/prettify.js"></script>
+<!-- jQuery Tags Input -->
+<script src="../../static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
+<!-- Switchery -->
+<script src="../../static/vendors/switchery/dist/switchery.min.js"></script>
+<!-- Select2 -->
+<script src="../../static/vendors/select2/dist/js/select2.full.min.js"></script>
+<!-- Parsley -->
+<script src="../../static/vendors/parsleyjs/dist/parsley.min.js"></script>
+<!-- Autosize -->
+<script src="../../static/vendors/autosize/dist/autosize.min.js"></script>
+<!-- jQuery autocomplete -->
+<script src="../../static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
+<!-- starrayRowr -->
+<script src="../../static/vendors/starrayRowr/dist/starrayRowr.js"></script>
 
-    <script>
+<script>
     document.getElementById("snoa").addEventListener("click", changeQuestion);
     var numberOfQuestions = 0;
     {%for item in msg %}
@@ -327,107 +153,123 @@
     var data = createArray(numberOfQuestions);
     var i = 0;
     {%for item in msg %}
-    {%for answer in item%}
-    {%if answer != None %}
-    data[i].push("{{answer}}");
-    {%endif%}
-    {%endfor%}
-    i++;
+        {%for answer in item%}
+            {%if answer != None %}
+                data[i].push("{{answer}}");
+            {%endif%}
+        {%endfor%}
+        i++;
     {%endfor%}
     var e = document.getElementById("question-select");
     var questionPos = e.selectedIndex;
     var squestion = e.options[e.selectedIndex].value;
     $("#question_inform").val(squestion);
     var numberOfAnswers = 0;
-    getDatabaseData(); 
-    function getDatabaseData(){
+    getDatabaseData();
+
+    function getDatabaseData() {
         numberOfAnswers = 0;
-        for(var j = 0;j < data.length;j++){
-            if (data[j][0] == document.getElementById("question-select").options[document.getElementById("question-select").selectedIndex].value && data[j][0].split(";")[1] != "userInfoRetrieval"){
-                for(var b = 1; b < data[j].length+1;b++){
-                    if(b==data[j].length){break;}
-                    if(data[j][b] == ""){break;}
+        for (var j = 0; j < data.length; j++) {
+            if (data[j][0] == document.getElementById("question-select").options[document.getElementById("question-select").selectedIndex].value && data[j][0].split(";")[1] != "userInfoRetrieval") {
+                for (var b = 1; b < data[j].length + 1; b++) {
+                    if (b == data[j].length) {
+                        break;
+                    }
+                    if (data[j][b] == "") {
+                        break;
+                    }
                     parts = data[j][b].split(";");
                     $("#pasteForm").append("\
                         <div class=\"columnA\">\
                           <p> Answer Text</p>\
-                          <input name=\"pname"+ String(b) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\"" + parts[0] +"\">\
+                          <input name=\"pname" + String(b) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\"" + parts[0] + "\">\
                           <br>\
                           <p> Answer Keyword </p>\
-                          <input name=\"keywords"+ String(b) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\"" + parts[1] + "\">\
+                          <input name=\"keywords" + String(b) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\"" + parts[1] + "\">\
                           <br>\
                           <p> Answer Action </p>\
-                          <select id=\"newSelect\" name=\"action"+ String(b) + "\">\
+                          <select id=\"newSelect\" name=\"action" + String(b) + "\">\
                           <option value =\"Next Question by Order\">Next Question by Order</option>" +
-                          {%for item in msg %}
-                          "<option value=\"Go to: " + "{{item[0]}}".split(";")[0] + "\">Go to: " + "{{item[0]}}".split(";")[0] + "</option>" +
-                          {% endfor %}
-                          "<option value=\"Get Solutions\">Get Solutions</option>\
-                          </div>");
-                          //$('#newSelect option').filter(function (i, e) { return $(e).text() == parts[2] })
-                            $('[id=newSelect] option').filter(function () {
-                                return ($(this).text() == parts[2]);
-                            }).prop('selected', true);
-                          document.getElementById('newSelect').id = 'oldSelect';
+                        {%for item in msg %}
+                            "<option value=\"Go to: " + "{{item[0]}}".split(";")[0] + "\">Go to: "
+                            + "{{item[0]}}".split(";")[0] + "</option>" +
+                        {% endfor %}
+                        "<option value=\"Get Solutions\">Get Solutions</option>\
+                        </div>");
+                    //$('#newSelect option').filter(function (i, e) { return $(e).text() == parts[2] })
+                    $('[id=newSelect] option').filter(function () {
+                        return ($(this).text() == parts[2]);
+                    }).prop('selected', true);
+                    document.getElementById('newSelect').id = 'oldSelect';
                     numberOfAnswers++;
                 }
                 $("#number-of-questions").val(numberOfAnswers);
             }
         }
         var buttons = document.getElementsByClassName("answerButtonDelPic");
-        for(var i = 0; i <= buttons.length - 1; i++){
+        for (var i = 0; i <= buttons.length - 1; i++) {
             buttons[i].addEventListener("click", DeletePicture);
         }
     }
-    function ChangeNofQuestions(){
+
+    function ChangeNofQuestions() {
         var nv = document.getElementById("number-of-questions").value;
-        if(nv > 12){ nv = 12; $("#number-of-questions").val(12);}
-        if(nv < 0){ nv = 0; $("#number-of-questions").val(0);}
-        if(nv > numberOfAnswers){
-            for(var b = numberOfAnswers; b < nv;b++){
+        if (nv > 12) {
+            nv = 12;
+            $("#number-of-questions").val(12);
+        }
+        if (nv < 0) {
+            nv = 0;
+            $("#number-of-questions").val(0);
+        }
+        if (nv > numberOfAnswers) {
+            for (var b = numberOfAnswers; b < nv; b++) {
                 $("#pasteForm").append("\
                     <div class=\"columnA\">\
                       <p> Answer Text</p>\
-                      <input name=\"pname"+String(b+1)+"\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
+                      <input name=\"pname" + String(b + 1) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
                       <br />\
                       <p> Answer Keyword </p>\
-                      <input name=\"keywords"+ String(b + 1) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
+                      <input name=\"keywords" + String(b + 1) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
                       <br>\
                       <p> Answer Action </p>\
-                      <select name=\"action"+ String(b+1) + "\">\
+                      <select name=\"action" + String(b + 1) + "\">\
                       <option value =\"Next Question by Order\">Next Question by Order</option>" +
-                      {%for item in msg %}
-                      "<option value=\"Go to: " + "{{item[0]}}".split(";")[0] + "\">Go to: " + "{{item[0]}}".split(";")[0] + "</option>" +
-                      {% endfor %}
-                      "<option value=\"Get Solutions\">Get Solutions</option>\
-                    </div>")
+                    {%for item in msg %}
+                        "<option value=\"Go to: " + "{{item[0]}}".split(";")[0] + "\">Go to: "
+                        + "{{item[0]}}".split(";")[0] + "</option>" +
+                    {% endfor %}
+                    "<option value=\"Get Solutions\">Get Solutions</option>\
+                  </div>")
                 numberOfAnswers++;
             }
-        } else if(nv < numberOfAnswers) {
-            for(b = numberOfAnswers; b > nv; b--){
-              $(".columnA")[$(".columnA").length - 1].remove();
-              numberOfAnswers--;
+        } else if (nv < numberOfAnswers) {
+            for (b = numberOfAnswers; b > nv; b--) {
+                $(".columnA")[$(".columnA").length - 1].remove();
+                numberOfAnswers--;
             }
         }
         var buttons = document.getElementsByClassName("answerButtonDelPic");
-        for(var i = 0; i <= buttons.length - 1; i++){
+        for (var i = 0; i <= buttons.length - 1; i++) {
             buttons[i].addEventListener("click", DeletePicture);
         }
     }
 
     function createArray(rows) {
         var arrayRow = [];
-      for (var i=0;i<rows;i++) {
-         arrayRow[i] = [];
-      }
-      return arrayRow;
+        for (var i = 0; i < rows; i++) {
+            arrayRow[i] = [];
+        }
+        return arrayRow;
     }
+
     var lastQuestion = document.getElementById("question-select").value;
-    function changeQuestion(){
+
+    function changeQuestion() {
         var e = document.getElementById("question-select");
         var questionPos = e.selectedIndex;
         var squestion = e.options[e.selectedIndex].value;
-        if(lastQuestion != squestion){
+        if (lastQuestion != squestion) {
             console.log(lastQuestion + " --- " + squestion);
             $("#question_inform").val(squestion);
             $("#pasteForm").empty();
@@ -436,6 +278,7 @@
         }
         ChangeNofQuestions();
     }
+
     // for 3+ D arrayRoways
     // function createArray(length) {
     //     var arrayRow = new Array(length || 0),
@@ -450,9 +293,5 @@
 
 
     // }
-    </script>
-
-
-
-  </body>
-</html>
+</script>
+{% endblock %}

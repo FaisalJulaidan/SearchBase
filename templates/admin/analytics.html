@@ -1,13 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="icon" href="images/favicon.ico" type="image/ico" />
+﻿{% extends "admin/base.html" %}
 
+{% block headlinks %}
     <title>Analytics </title>
 
     <!-- Bootstrap -->
@@ -28,224 +21,60 @@
 
     <!-- Custom Theme Style -->
     <link href="../../static/build/css/custom.min.css" rel="stylesheet">
-  </head>
+{% endblock %}
 
-  <body class="nav-md">
-    <div class="container body">
-      <div class="main_container">
-        <div class="col-md-3 left_col">
-          <div class="left_col scroll-view">
-            <div class="navbar nav_title" style="border: 0;">
-              <a href="/admin/homepage" class="site_title"> <img src="../../static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
-              <br />
+{% block content %}
+    <div class="right_col" role="main">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3>Analytics
+                    <small>Here are the statistics of your assistant</small>
+                </h3>
             </div>
-
-            <div class="clearfix"></div>
-
-            <!-- menu profile quick info -->
-            <div class="profile clearfix">
-              <div class="profile_pic">
-                <img src="../../static/images/img.jpg" alt="..." class="img-circle profile_img">
-              </div>
-              <div class="profile_info">
-                <span>Welcome,</span>
-                <h2>user</h2>
-              </div>
-            </div>
-            <!-- /menu profile quick info -->
-
-            <br />
-
-            <!-- sidebar menu -->
-            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-              <div class="menu_section">
-                <h3>General</h3>
-                <ul class="nav side-menu">
-                    <li>
-                        <a href="/admin/homepage"><i class="fa fa-home"></i> Dashboard</a>
-                    </li>
-                    <li>
-                        <a><i class="fa fa-comments-o"></i> Conversations <span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                            <li><a href="/admin/Questions">Questions</a></li>
-                            <li><a href="/admin/Answers">Answers</a></li>
-                            <li><a href="/admin/Templates">Templates</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="/admin/Products"><i class="fa fa-database"></i> Product Database<span></span></a>
-                    </li>
-                    <!-- User Data Storage -->
-                    <li>
-                        <a><i class="fa fa-cloud"></i> Data Storage <span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                            <li><a href="/admin/userinput">User Input</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a><i class="fa fa-wrench"></i> Tools <span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                            <li><a href="/emoji-converter">Emoji Converter</a></li>
-                        </ul>
-                    </li>
-                    <!-- End of user Data Storage -->
-                    <li>
-                        <a href="/admin/connect"><i class="fa fa-plug"></i> Connection<span class="fa"></span></a>
-                    </li>
-                </ul>
-              </div>
-              <div class="menu_section">
-                  <h3>Settings</h3>
-                  <ul class="nav side-menu">
-                      <li>
-                          <a><i class="fa fa-gears"></i> Bot <span class="fa fa-chevron-down"></span></a>
-                          <ul class="nav child_menu">
-                              <li><a href="/admin/settings">Main Settings</a></li>
-                          </ul>
-                      </li>
-                  </ul>
-
-                  <h3>Account</h3>
-                  <ul class="nav side-menu">
-                      <li>
-                          <a><i class="fa fa-gears"></i> Account Details  <span class="fa fa-chevron-down"></span></a>
-                          <ul class="nav child_menu">
-                              <li><a href="/admin/profile">Profile</a></li>
-                          </ul>
-                      </li>
-                      <li>
-                          <a href="/admin/analytics"><i class="fa fa-bar-chart"></i> Analytics<span class="fa"></span></a>
-                      </li>
-                      <!-- <li><a><i class="fa fa-money"></i> Price Plan <span class="fa fa-chevron-down"></span></a>
-          <ul class="nav child_menu">
-            <li><a href="/admin/pricing">Pricing Tables</a></li>
-          </ul>
-        </li> -->
-
-                      <li>
-                          <a><i class="fa fa-life-saver"></i> Support <span class="fa fa-chevron-down"></span></a>
-                          <ul class="nav child_menu">
-                              <li><a href="/admin/supportGeneral">General Support</a>
-                              <li>
-                                  <a>Technical Support<span class="fa fa-chevron-down"></span></a>
-                                  <ul class="nav child_menu">
-                                      <li class="sub_menu">
-                                          <a href="/admin/supportDocs">Documentation</a>
-                                      </li>
-                                      <li>
-                                          <a href="/admin/supportSetup">Getting setup</a>
-                                      </li>
-                                      <li>
-                                          <a href="/admin/supportIntergartion">Integration with your site</a>
-                                      </li>
-                                  </ul>
-                              </li>
-                              <li>
-                                  <a href="/admin/supportBilling">Billing support</a>
-                              </li>
-                          </ul>
-                      </li>
-                      </li>
-                  </ul>
-              </div>
-            </div>
-            <!-- /sidebar menu -->
-          </div>
         </div>
-
-        <!-- top navigation -->
-        <div class="top_nav">
-          <div class="nav_menu">
-            <nav>
-              <div class="nav toggle">
-                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
-              </div>
-
-              <ul class="nav navbar-nav navbar-right">
-                <li class="">
-                  <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../../static/images/img.jpg" alt="">User
-                    <span class=" fa fa-angle-down"></span>
-                  </a>
-                  <ul class="dropdown-menu dropdown-usermenu pull-right">
-                    <li><a href="/admin/profile"> Profile</a></li>
-                    <li><a href="/admin/supportGeneral">Help</a></li>
-                    <li><a href="/login"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
-                  </ul>
-                </li>
-
-                <li role="presentation" class="dropdown">
-                  <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-        <!-- /top navigation -->
-
-        <!-- page content -->
-        <div class="right_col" role="main">
-          <div class="">
-            <div class="page-title">
-              <div class="title_left">
-                <h3>Analytics <small>Here are the statistics of your assistant</small></h3>
-              </div>
-            </div>
-            <div class="clearfix"></div>
-            <div id="pasteDiv" class="row">
-                <li> Export to Excel</li>
-                <br />
-                <button id="btnExport" onclick="fnExcelReport();"> EXPORT </button><br>
-                <iframe id="txtArea1" style="display:none"></iframe>
-                <br />
-                <br />
-                <h2>General Data</h2>
-                <br />
-                <div class="analytics_line">
-                    <!-- First chart -->
-                    <div style="width:350px; height:200px;">
-                        <canvas id="putcharthere1" style="width:350px; height:0px;"></canvas>
-                    </div>
-
-                    <!-- Second chart -->
-                    <div style="width:350px; height:200px;">
-                        <canvas id="putcharthere2" style="width:350px; height:0px;"></canvas>
-                    </div>
-
-                    <!-- Third chart -->
-                    <div style="width:350px; height:200px;">
-                        <canvas id="putcharthere3" style="width:350px; height:0px"></canvas>
-                    </div>
-                    <div class="clearfix"></div>
+        <div class="clearfix"></div>
+        <div id="pasteDiv" class="row">
+            <li> Export to Excel</li>
+            <br/>
+            <button id="btnExport" onclick="fnExcelReport();"> EXPORT</button>
+            <br>
+            <iframe id="txtArea1" style="display:none"></iframe>
+            <br/>
+            <br/>
+            <h2>General Data</h2>
+            <br/>
+            <div class="analytics_line">
+                <!-- First chart -->
+                <div style="width:350px; height:200px;">
+                    <canvas id="putcharthere1" style="width:350px; height:0px;"></canvas>
                 </div>
-                <h2>Users over time</h2>
-                <br />
-                <div class="analytics_line">
-                    <!-- First chart -->
-                    <div style="width:700px; height:300px;">
-                        <canvas id="putcharthere4" style="width:350px; height:0px;"></canvas>
-                    </div>
-                    <div class="clearfix"></div>
+
+                <!-- Second chart -->
+                <div style="width:350px; height:200px;">
+                    <canvas id="putcharthere2" style="width:350px; height:0px;"></canvas>
                 </div>
+
+                <!-- Third chart -->
+                <div style="width:350px; height:200px;">
+                    <canvas id="putcharthere3" style="width:350px; height:0px"></canvas>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <h2>Users over time</h2>
+            <br/>
+            <div class="analytics_line">
+                <!-- First chart -->
+                <div style="width:700px; height:300px;">
+                    <canvas id="putcharthere4" style="width:350px; height:0px;"></canvas>
+                </div>
+                <div class="clearfix"></div>
             </div>
         </div>
-        <!-- page content -->
-          <!-- /top tiles -->
-          <br />
-        </div>
-
-        <!-- footer content -->
-        <footer>
-          <div class="pull-right">
-            TheSearchbase 2018 All Rights Reserved.</a>
-          </div>
-          <div class="clearfix"></div>
-        </footer>
-        <!-- /footer content -->
-      </div>
     </div>
+{% endblock %}
 
+{% block javascript %}
     <!-- jQuery -->
     <script src="../../static/vendors/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap -->
@@ -288,7 +117,7 @@
     <script src="../../static/build/js/custom.min.js"></script>
 
 
-	<script src="../../static/js/cookies.js"></script>
+    <script src="../../static/js/cookies.js"></script>
     <!-- <script src='../static/js/Chart.min.js'></script> -->
     <script src="https://cdn.anychart.com/releases/8.0.0/js/anychart-base.min.js"></script>
     <script>
@@ -296,213 +125,209 @@
         //  Start of the chart code
         var chartData = {
             labels: [{% for item in data %}
-        {%if ";" not in item[0] %}
-        "{{item[0]}}",
-            {% endif %}
-        {% endfor %}],
-        datasets: [{
-            label: 'Assistant Used',
-            fill: true,
-            lineTension: 0.1,
-            backgroundColor: "rgb(255,0,0)",
-            borderColor: "rgb(255,0,0)",
-            borderCapStyle: 'butt',
-            borderDash: [],
-            borderDashOffset: 0.0,
-            borderJoinStyle: 'miter',
-            pointBorderColor: "rgba(75,192,192,1)",
-            pointBackgroundColor: "#fff",
-            pointBorderWidth: 1,
-            pointHoverRadius: 5,
-            pointHoverBackgroundColor: "rgba(75,192,192,1)",
-            pointHoverBorderColor: "rgba(220,220,220,1)",
-            pointHoverBorderWidth: 2,
-            pointRadius: 1,
-            pointHitRadius: 10,
-            data: [{% for item in data %}
+                {%if ";" not in item[0] %}
+                    "{{item[0]}}",
+                {% endif %}
+            {% endfor %}],
+            datasets: [{
+                label: 'Assistant Used',
+                fill: true,
+                lineTension: 0.1,
+                backgroundColor: "rgb(255,0,0)",
+                borderColor: "rgb(255,0,0)",
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgba(75,192,192,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 1,
+                pointHitRadius: 10,
+                data: [{% for item in data %}
                     {%if ";" not in item[0] %}
-                    {{item[1]}},
+                        {{item[1]}},
                     {% endif %}
-                    {% endfor %}],
-        spanGaps: false
-    }]
-    }
+                {% endfor %}],
+                spanGaps: false
+            }]
+        }
         var chartdiv = document.getElementById("putcharthere1").getContext("2d");
         new Chart(chartdiv, {
             data: chartData,
             type: 'bar',
         });
 
-    //  End of the chart code
+        //  End of the chart code
 
-    var chartData = {
+        var chartData = {
             labels: [{% for item in data %}
-                    {%if ";" not in item[0] %}
-                    "{{item[0]}}",
-                    {% endif %}
-                    {% endfor %}],
-    datasets : [{
-       label: 'Questions Answered',
-       fill: true,
-       lineTension: 0.1,
-        backgroundColor: "rgb(0,191,255)",
-        borderColor: "rgb(0,191,255)",
-       borderCapStyle: 'butt',
-       borderDash: [],
-       borderDashOffset: 0.0,
-       borderJoinStyle: 'miter',
-       pointBorderColor: "rgba(75,192,192,1)",
-       pointBackgroundColor: "#fff",
-       pointBorderWidth: 1,
-       pointHoverRadius: 5,
-       pointHoverBackgroundColor: "rgba(75,192,192,1)",
-       pointHoverBorderColor: "rgba(220,220,220,1)",
-       pointHoverBorderWidth: 2,
-       pointRadius: 1,
-            pointHitRadius: 10,
-            data: [{% for item in data %}
                 {%if ";" not in item[0] %}
-                {{item[2]}},
+                    "{{item[0]}}",
                 {% endif %}
+            {% endfor %}],
+            datasets: [{
+                label: 'Questions Answered',
+                fill: true,
+                lineTension: 0.1,
+                backgroundColor: "rgb(0,191,255)",
+                borderColor: "rgb(0,191,255)",
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgba(75,192,192,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 1,
+                pointHitRadius: 10,
+                data: [{% for item in data %}
+                    {%if ";" not in item[0] %}
+                        {{item[2]}},
+                    {% endif %}
                 {% endfor %}],
-       spanGaps: false
-    }]
-    }
-    var chartdiv = document.getElementById("putcharthere2").getContext("2d");
-    new Chart(chartdiv, {
-    data: chartData,
-    type: 'bar',
+                spanGaps: false
+            }]
+        }
+        var chartdiv = document.getElementById("putcharthere2").getContext("2d");
+        new Chart(chartdiv, {
+            data: chartData,
+            type: 'bar',
         });
 
 
-
-    var chartData = {
+        var chartData = {
             labels: [{% for item in data %}
-                    {%if ";" not in item[0] %}
+                {%if ";" not in item[0] %}
                     "{{item[0]}}",
-                    {% endif %}
-                    {% endfor %}],
-    datasets : [{
-       label: 'Products Returned',
-       fill: true,
-       lineTension: 0.1,
-        backgroundColor: "rgb(255,255,0)",
-        borderColor: "rgb(255,255,0)",
-       borderCapStyle: 'butt',
-       borderDash: [],
-       borderDashOffset: 0.0,
-       borderJoinStyle: 'miter',
-       pointBorderColor: "rgba(75,192,192,1)",
-       pointBackgroundColor: "#fff",
-       pointBorderWidth: 1,
-       pointHoverRadius: 5,
-       pointHoverBackgroundColor: "rgba(75,192,192,1)",
-       pointHoverBorderColor: "rgba(220,220,220,1)",
-       pointHoverBorderWidth: 2,
-       pointRadius: 1,
-            pointHitRadius: 10,
-            data: [{% for item in data %}
+                {% endif %}
+            {% endfor %}],
+            datasets: [{
+                label: 'Products Returned',
+                fill: true,
+                lineTension: 0.1,
+                backgroundColor: "rgb(255,255,0)",
+                borderColor: "rgb(255,255,0)",
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgba(75,192,192,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 1,
+                pointHitRadius: 10,
+                data: [{% for item in data %}
                     {%if ";" not in item[0] %}
-                    {{item[3]}},
+                        {{item[3]}},
                     {% endif %}
-                    {% endfor %}],
-       spanGaps: false
-    }]
-    }
-    var chartdiv = document.getElementById("putcharthere3").getContext("2d");
-    new Chart(chartdiv, {
-    data: chartData,
-    type: 'bar',
+                {% endfor %}],
+                spanGaps: false
+            }]
+        }
+        var chartdiv = document.getElementById("putcharthere3").getContext("2d");
+        new Chart(chartdiv, {
+            data: chartData,
+            type: 'bar',
         });
 
 
         //  Start of the chart code
         var chartData = {
             labels: [{% for item in data %}
-                    {%if ";" in item[0] %}
-                    "Week " + "{{item[0]}}".split(";")[1] + " of " + "{{item[0]}}".split(";")[0],
-                    {% endif %}
-                    {% endfor %}],
-        datasets: [{
-            label: 'Assistant Used',
-            fill: false,
-            lineTension: 0.1,
-            backgroundColor: "rgb(50,205,50)",
-            borderColor: "rgb(50,205,50)",
-            borderCapStyle: 'butt',
-            borderDash: [],
-            borderDashOffset: 0.0,
-            borderJoinStyle: 'miter',
-            pointBorderColor: "rgba(75,192,192,1)",
-            pointBackgroundColor: "#fff",
-            pointBorderWidth: 1,
-            pointHoverRadius: 5,
-            pointHoverBackgroundColor: "rgba(75,192,192,1)",
-            pointHoverBorderColor: "rgba(220,220,220,1)",
-            pointHoverBorderWidth: 2,
-            pointRadius: 1,
-            pointHitRadius: 10,
-            data: [{% for item in data %}
                 {%if ";" in item[0] %}
-                {{item[1]}},
+                    "Week " + "{{item[0]}}".split(";")[1] + " of " + "{{item[0]}}".split(";")[0],
                 {% endif %}
+            {% endfor %}],
+            datasets: [{
+                label: 'Assistant Used',
+                fill: false,
+                lineTension: 0.1,
+                backgroundColor: "rgb(50,205,50)",
+                borderColor: "rgb(50,205,50)",
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgba(75,192,192,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 1,
+                pointHitRadius: 10,
+                data: [{% for item in data %}
+                    {%if ";" in item[0] %}
+                        {{item[1]}},
+                    {% endif %}
                 {% endfor %}],
-            spanGaps: false
-    }]
-    }
+                spanGaps: false
+            }]
+        }
         var chartdiv = document.getElementById("putcharthere4").getContext("2d");
         new Chart(chartdiv, {
             data: chartData,
             type: 'line',
         });
 
-    //  End of the chart code
+        //  End of the chart code
 
 
-    //Create table for Excel export
-    var tableString = "<table><tr><th>Date</th><th>Assistant Opened</th><th>Questions Answered</th><th>Products Returned</th></tr>";
-    {% for item in data %}
-    tableString+= "<tr>"
-    {%for value in item%}
-    tableString+="<td>{{value}}</td>"
-    {%endfor%}
-    tableString+="</tr>"
-    {%endfor%}
-    function fnExcelReport()
-    {
-        // var tab_text="<table border='2px'><tr bgcolor='#87AFC6'>";
-        // var textRange; var j=0;
-        // tab = document.getElementById('headerTable'); // id of table
-        //
-        // for(j = 0 ; j < tab.rows.length ; j++)
-        // {
-        //     tab_text=tab_text+tab.rows[j].innerHTML+"</tr>";
-        //     //tab_text=tab_text+"</tr>";
-        // }
-        //
-        // tab_text=tab_text+"</table>";
-        tab_text = tableString;
-        tab_text= tab_text.replace(/<A[^>]*>|<\/A>/g, "");//comment if u want links in your table
-        tab_text= tab_text.replace(/<img[^>]*>/gi,""); // comment if u want images in your table
-        tab_text= tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // comment if you want input params
+        //Create table for Excel export
+        var tableString = "<table><tr><th>Date</th><th>Assistant Opened</th><th>Questions Answered</th><th>Products Returned</th></tr>";
+        {% for item in data %}
+            tableString += "<tr>"
+            {%for value in item%}
+                tableString += "<td>{{value}}</td>"
+            {%endfor%}
+            tableString += "</tr>"
+        {%endfor%}
+        function fnExcelReport() {
+            // var tab_text="<table border='2px'><tr bgcolor='#87AFC6'>";
+            // var textRange; var j=0;
+            // tab = document.getElementById('headerTable'); // id of table
+            //
+            // for(j = 0 ; j < tab.rows.length ; j++)
+            // {
+            //     tab_text=tab_text+tab.rows[j].innerHTML+"</tr>";
+            //     //tab_text=tab_text+"</tr>";
+            // }
+            //
+            // tab_text=tab_text+"</table>";
+            tab_text = tableString;
+            tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//comment if u want links in your table
+            tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // comment if u want images in your table
+            tab_text = tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // comment if you want input params
 
-        var ua = window.navigator.userAgent;
-        var msie = ua.indexOf("MSIE ");
+            var ua = window.navigator.userAgent;
+            var msie = ua.indexOf("MSIE ");
 
-        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
-        {
-            txtArea1.document.open("txt/html","replace");
-            txtArea1.document.write(tab_text);
-            txtArea1.document.close();
-            txtArea1.focus();
-            sa=txtArea1.document.execCommand("SaveAs",true,"Say Thanks to Sumit.xls");
+            if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
+            {
+                txtArea1.document.open("txt/html", "replace");
+                txtArea1.document.write(tab_text);
+                txtArea1.document.close();
+                txtArea1.focus();
+                sa = txtArea1.document.execCommand("SaveAs", true, "Say Thanks to Sumit.xls");
+            }
+            else                 //other browser not tested on IE 11
+                sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
+
+            return (sa);
         }
-        else                 //other browser not tested on IE 11
-            sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
-
-        return (sa);
-    }
     </script>
-
-  </body>
-</html>
+{% endblock %}

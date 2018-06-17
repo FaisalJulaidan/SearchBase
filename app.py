@@ -470,6 +470,69 @@ def adming_welcome_message():
         return redirect("/admin/questions")
 
 
+@app.route("/admin/assistant", methods=['GET', 'POST'])
+def admin_assistant():
+    if request.method == "GET":
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        #TODO Check for errors
+        assistantIndex = 0  # TODO change this
+        message = assistants[assistantIndex][3]
+
+        autoPop = assistants[assistantIndex][4] #TODO change index to 5 when I merge into products update branch
+
+        #TODO check for errors
+        return render_template("admin/assistant.html", autopop=autoPop, message=message)
+    elif request.method == "POST":
+        print(request.form)
+        message = request.form.get("welcome-message", default="Error")
+        if message is "Error":
+            abort(status.HTTP_400_BAD_REQUEST)
+
+        autopopup = request.form.get("switch-autopop", default="off")
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        assistantIndex = 0  # TODO change this
+        assistantID = assistants[assistantIndex][0]
+
+        updateMessage = update_table("UPDATE Assistants SET Message=? WHERE ID=?", [message, assistantID])
+        #TODO check updateMessage for errors
+
+        if autopopup == "off":
+            updatedPopupTime = update_table("UPDATE Assistants SET SecondsUntilPopup='Off' WHERE ID=?", [assistantID])
+            #TODO check updatedPopupTime
+        elif autopopup == "on":
+            popuptime = request.form.get("timeto-autopop", default="Error")
+            if popuptime != "Error":
+                updatedPopupTime = update_table("UPDATE Assistants SET SecondsUntilPopup=?;", [popuptime])
+                # TODO check updatedPopupTime
+            else:
+                abort(status.HTTP_400_BAD_REQUEST)
+        return redirect("/admin/assistant")
+
+
+@app.route("/getPopSettings", methods=['POST'])
+def get_pop_settings():
+    if request.method == "POST":
+        url = request.form.get("URL", default="Error")
+        print(url)
+        if (url != "Error"):
+            if "127.0.0.1:5000" in url or "thesearchbase.com" in url:
+                # its on test route
+                companyName = url.split("/")[len(url.split("/")) - 1]
+                print(companyName)
+                companyID = select_from_database_table("SELECT ID FROM Companies WHERE Name=?", [companyName], True)
+                print(companyID)
+            else:
+                # its on client route
+                companyID = select_from_database_table("SELECT ID FROM Companies WHERE URL=?", [url], True)
+            secsUntilPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE CompanyID=?",
+                                                      [companyID[0][0]], True)
+            datastring = secsUntilPop[0][0]
+            print(datastring)
+            return jsonify(datastring)
+
+
 # TODO rewrite
 @app.route("/admin/questions", methods=['GET', 'POST'])
 def admin_questions():
@@ -557,7 +620,7 @@ def admin_answers():
             # TODO Check answerstuple for errors
             answers = []
             for j in range(0, len(answersTuple)):
-                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][6])
+                answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][5])
 
             allAnswers[questions[i]] = answers
 
@@ -1140,55 +1203,6 @@ def admin_analytics():
             "SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?",
             [assistantID], True)
         return render_template("admin/analytics.html", data=stats)
-
-
-@app.route("/admin/settings", methods=['GET', 'POST'])
-def admin_settings():
-    if request.method == "GET":
-        email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
-        autoPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE ID=?", [assistantID], True)
-        return render_template("admin/settings.html", autopop=autoPop[0][0])
-    elif request.method == "POST":
-        autopopOn = request.form.get("switch-autopop", default="off")
-        email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
-        if autopopOn == "off":
-            updatedPop = update_table("UPDATE Assistants SET SecondsUntilPopup='Off' WHERE ID=?", [assistantID])
-        elif autopopOn == "on":
-            secsuntilPop = request.form.get("timeto-autopop", default="Error")
-            if secsuntilPop != "Error":
-                if secsuntilPop == "":
-                    updatedPop = update_table("UPDATE Assistants SET SecondsUntilPopup=?;", ["6"])
-                else:
-                    updatedPop = update_table("UPDATE Assistants SET SecondsUntilPopup=?;", [secsuntilPop])
-        return redirect("/admin/settings", code=302)
-
-
-@app.route("/getPopSettings", methods=['POST'])
-def get_pop_settings():
-    if request.method == "POST":
-        url = request.form.get("URL", default="Error")
-        print(url)
-        if (url != "Error"):
-            if "127.0.0.1:5000" in url or "thesearchbase.com" in url:
-                # its on test route
-                companyName = url.split("/")[len(url.split("/")) - 1]
-                print(companyName)
-                companyID = select_from_database_table("SELECT ID FROM Companies WHERE Name=?", [companyName], True)
-                print(companyID)
-            else:
-                # its on client route
-                companyID = select_from_database_table("SELECT ID FROM Companies WHERE URL=?", [url], True)
-            secsUntilPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE CompanyID=?",
-                                                      [companyID[0][0]], True)
-            datastring = secsUntilPop[0][0]
-            print(datastring)
-            return jsonify(datastring)
 
 
 # Method for the users

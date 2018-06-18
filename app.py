@@ -306,9 +306,11 @@ def signup():
                     # TODO handle much better
                 hashed_password = hash_password(password)
 
+                verified = app.debug
+
                 insertUserResponse = insert_into_database_table(
-                    "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password') VALUES (?,?,?,?,?,?);",
-                    (companyID, firstname, surname, accessLevel, email, hashed_password))
+                    "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
+                    (companyID, firstname, surname, accessLevel, email, hashed_password, str(verified)))
                 if "added" not in insertUserResponse:
                     if "UNIQUE constraint" in insertUserResponse:
                         deleteCompany = delete_from_table("DELETE FROM Companies WHERE Name=?;", [companyName])

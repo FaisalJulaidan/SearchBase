@@ -13,7 +13,7 @@ CREATE TABLE 'Companies' (
 	'Size'	TEXT,
 	'URL'	TEXT NOT NULL,
 	'Subscription'	TEXT NOT NULL,
-	'StripeID'	TEXT NOT NULL UNIQUE
+	'StripeID'	TEXT UNIQUE
 );
 
 CREATE TABLE 'Users' (

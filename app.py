@@ -2,12 +2,13 @@
 from flask_mail import Mail, Message
 from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, \
     make_response
+from werkzeug.utils import secure_filename
 from flask_api import status
 from datetime import datetime
 from bcrypt import hashpw, gensalt
 from itsdangerous import URLSafeTimedSerializer, BadSignature, BadData
 from xml.dom import minidom
-from json import dumps, loads
+from json import dumps, loads, load, dump
 import os
 import sqlite3
 import stripe
@@ -119,7 +120,7 @@ def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
     try:
         conn = sqlite3.connect(database)
         cur = conn.cursor()
-        cur.execute(sql_statement, array_of_terms);
+        cur.execute(sql_statement, array_of_terms)
         conn.commit()
         if cur.rowcount == 1:
             msg = "Record successfully deleted."
@@ -153,37 +154,6 @@ def allowed_image_file(filename):
 
 
 # TODO just overall better validation
-
-if __name__ == "__main__":
-    app.run(debug=True)
-conn = None
-try:
-    conn = sqlite3.connect(DATABASE)
-    cur = conn.cursor()
-    devseed = open('sql/devseed.sql', 'r').read()
-    create_db = open('sql/createdb.sql', 'r').read()
-    if app.debug:
-        cur.executescript(create_db)
-        cur.executescript(devseed)
-        conn.commit()
-        print("Applied devseed file")
-    elif not os.path.exists(DATABASE):
-        cur.executescript(create_db)
-        conn.commit()
-        print("Created database structure")
-    cur.close()
-except Exception as e:
-    conn.rollback()
-    print(e)
-    exit(1)
-finally:
-    if conn is not None:
-        conn.close()
-
-# Janky way to seed password
-if app.debug:
-    update_table("UPDATE Users SET Password=? WHERE ID=?", [hash_password("test"), 1])
-
 
 # code to ensure user is logged in
 @app.before_request
@@ -861,7 +831,7 @@ def admin_products_file_upload(assistantID):
 
                         if str(ext).lower() == "json":
                             json_file = open(PRODUCT_FILES + "/" + productFile.filename, "r")
-                            data = json.load(json_file)
+                            data = load(json_file)
                             print(len(data))
                             print(data[0])
                             for i in range(0, len(data)):
@@ -1652,3 +1622,33 @@ class Del:
 
     def __getitem__(self, k):
         return self.comp.get(k)
+
+if __name__ == "__main__":
+    app.run(debug=True)
+conn = None
+try:
+    conn = sqlite3.connect(DATABASE)
+    cur = conn.cursor()
+    devseed = open(APP_ROOT + '/sql/devseed.sql', 'r').read()
+    create_db = open(APP_ROOT + '/sql/createdb.sql', 'r').read()
+    if app.debug:
+        cur.executescript(create_db)
+        cur.executescript(devseed)
+        conn.commit()
+        print("Applied devseed file")
+    elif not os.path.exists(DATABASE):
+        cur.executescript(create_db)
+        conn.commit()
+        print("Created database structure")
+    cur.close()
+except Exception as e:
+    conn.rollback()
+    print(e)
+    exit(1)
+finally:
+    if conn is not None:
+        conn.close()
+
+# Janky way to seed password
+if app.debug:
+    update_table("UPDATE Users SET Password=? WHERE ID=?", [hash_password("test"), 1])

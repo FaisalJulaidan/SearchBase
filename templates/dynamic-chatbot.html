@@ -170,7 +170,7 @@
     var questionN = -1;
     // document.getElementById("submitMessage").addEventListener("click", );
 
-    $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot'>" + emojione.toImage("{{message}}") + "</li></div>");
+    $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot'>" + emojione.toImage("{{message}}") + "</li></div><br><br>");
     getNextQuestion("Next Question by Order");
 
     async function submitMessage(message)
@@ -195,7 +195,7 @@
         await sleep(500);
         $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
         $("#thinkingGif").animate({
-            marginTop: "-=35px"
+            marginTop: "-=25px"
         }, "slow");
         if (!cancelScroll)
         {
@@ -240,7 +240,7 @@
             await sleep(300);
             $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
             $("#thinkingGif").animate({
-                marginTop: "-=35px"
+                marginTop: "-=25px"
             }, "slow");
             if (!cancelScroll) {
                 scrollTo("chatBottom");
@@ -433,7 +433,7 @@
     {
         $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='../static/images/typing.gif'></li></div>")
         $("#thinkingGif").animate({
-            marginTop: "-=35px"
+            marginTop: "-=25px"
         }, "slow");
         params = "numberOfKeywords=" + keywords.length.toString();
         if (keywords.length > 0)

@@ -1,0 +1,79 @@
+﻿{% extends "admin/base.html" %}
+
+{% block headlinks %}
+    <title>Conversations Templates </title>
+
+    <!-- Bootstrap -->
+    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="/static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="/static/build/css/custom.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="right_col" role="main">
+
+        <div class="x_content">
+
+            <p>All of the Data Collected</p>
+
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table bulk_action">
+                    <thead>
+                    <!-- Beginning of data -->
+                    <tr id="tableHeadingUIn" class="headings">
+                        <th class="column-title">Template ID</th>
+                        <th class="column-title">Use</th>
+                        <th class="column-title">Template Name</th>
+                        <th class="column-title">Template Size</th>
+                        <th class="column-title">Download</th>
+                        <th class="column-title no-link last">
+                            <span class="nobr">Install</span>
+                        </th>
+                        <th class="bulk-actions" colspan="7">
+                            <a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span
+                                    class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
+                        </th>
+                    </tr>
+                    <!-- End of data -->
+                    </thead>
+
+                    <tbody id="tBodyUIn">
+                    <!-- Start -->
+                    <tr class="even pointer">
+                        <td class=" ">00001</td>
+                        <td class=" ">Recruitment</td>
+                        <td class=" ">Data Collection</td>
+                        <td class=" ">23.4 MB</td>
+                        <td class=" "><strong><a href="https://www.thesearchbase.com">Download</a></strong></td>
+                        <td class=" last"><a href="#">View Conversation</a></td>
+                    </tr>
+                    <!-- End -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="/static/vendors/nprogress/nprogress.js"></script>
+    <!-- iCheck -->
+    <script src="/static/vendors/iCheck/icheck.min.js"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="/static/build/js/custom.min.js"></script>
+{% endblock %}

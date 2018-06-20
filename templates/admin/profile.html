@@ -1,0 +1,123 @@
+﻿{% extends "admin/base.html" %}
+{% block headlinks %}
+    <title>Profile </title>
+
+    <!-- Bootstrap -->
+    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- bootstrap-daterangepicker -->
+    <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="/static/build/css/custom.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="right_col" role="main">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3>User Profile</h3>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>User Report
+                            <small>Activity report</small>
+                        </h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li>
+                                <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
+                            <div class="profile_img">
+                                <div id="crop-avatar">
+                                    <!-- Current avatar -->
+                                    <img class="img-responsive avatar-view" src="/static/images/img.jpg"
+                                         alt="Avatar" title="Change the avatar">
+                                </div>
+                            </div>
+                            <div id="outputDiv">
+                                <h3>{{ user[2] }} {{ user[3] }}</h3>
+
+                                <ul class="list-unstyled user_data">
+                                    <li>
+                                        <i class="fa fa-briefcase user-profile-icon"></i> {{ companyName }}
+                                    </li>
+
+                                    <li class="m-top-xs">
+                                        <i class="fa fa-external-link user-profile-icon"></i>
+                                        <a href="https://www.thesearchbase.com/chatbot/{{ companyName }}"
+                                           target="_blank">Assistant</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <button href="/account/changepassword" class="btn btn-success">Change Password</button>
+                    <button href="/" class="btn btn-success">Reset Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="/static/vendors/nprogress/nprogress.js"></script>
+    <!-- morris.js -->
+    <script src="/static/vendors/raphael/raphael.min.js"></script>
+    <script src="/static/vendors/morris.js/morris.min.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="/static/vendors/moment/min/moment.min.js"></script>
+    <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="/static/build/js/custom.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk&callback=initMap"></script>
+
+    <script>
+        inputD = document.getElementById("inputDiv");
+        outputD = document.getElementById("outputDiv");
+        editB = document.getElementById("EditB");
+        editB.addEventListener("click", openForm);
+        document.getElementById("cancelB").addEventListener("click", closeForm);
+        document.getElementById("submit").onclick = function () {
+            document.getElementById("form").submit();
+        };
+
+        inputDiv.style = "display:none";
+
+        function openForm() {
+            outputD.style = "display:none";
+            editB.style = "display:none";
+            inputD.style = "display:block";
+        }
+
+        function closeForm() {
+            outputD.style = "display:block";
+            editB.style = "display:block";
+            inputD.style = "display:none";
+        }
+    </script>
+{% endblock %}

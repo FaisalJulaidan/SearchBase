@@ -1,0 +1,77 @@
+﻿{% extends "admin/base.html" %}
+{% block headlinks %}
+    <title>Payment Successful</title>
+
+    <!-- Bootstrap -->
+    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="/static/build/css/custom.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>Payment Succesful</h3>
+                </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel" style="height:600px;">
+                        <div class="col-md-12">
+                            <div class="jumbotron text-xs-center">
+                                <h1 class="display-3">Thank You!</h1>
+                                <p class="lead"><strong>Please check your email</strong> for your receipt and other
+                                    important information.</p>
+                                <hr>
+                                <p>
+                                    Having trouble? <a href="">Contact us</a>
+                                </p>
+                                <p class="lead">
+                                    <a class="btn btn-primary btn-sm" href="/admin/homepage" role="button">Continue to
+                                        homepage</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form action="{{ url_for('charge') }}" method="POST">
+        <script
+                src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                data-key="{{ pub-key }}"
+                data-amount="1000"
+                data-name="TheSearchbase"
+                data-description="Widget"
+                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                data-locale="auto"
+                data-currency="gbp">
+        </script>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="/static/vendors/nprogress/nprogress.js"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="/static/build/js/custom.min.js"></script>
+{% endblock %}

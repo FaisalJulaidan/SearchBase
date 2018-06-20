@@ -1,0 +1,109 @@
+﻿{% extends "admin/base.html" %}
+{% block headlinks %}
+    <title>Support </title>
+
+    <!-- Bootstrap -->
+    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="/static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+
+    <!-- bootstrap-progressbar -->
+    <link href="/static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <!-- JQVMap -->
+    <link href="/static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+    <!-- bootstrap-daterangepicker -->
+    <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="/static/build/css/custom.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>FAQ</h3>
+                </div>
+
+                <div class="title_right">
+                    <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h4>A few questions you may have</h4>
+                        </div>
+                        <div class="x_content">
+                            <p style="font-size:14px;">How does my hosting work?</p>
+                            <p>We host all of your data on our servers. All of the the information that is sensetive
+                                will be encrypted to ensure it cannot be accessed</p>
+                            <p style="font-size:14px;">Can others access my assistant?</p>
+                            <p>No, we encrypt all of your data so others cannot access your assistant</p>
+                            <p style="font-size:14px;">Can I export my analytics?</p>
+                            <p>Yes, you can do this by clicking the 'Export' button on the top left of your analytics
+                                page </p>
+                            <p style="font-size:14px;">Can I change the design of my assistant?</p>
+                            <p>Yes, you will have to let us know as we currently are working on technologies to enable
+                                this process for users to make changes directly.</p>
+                            <p style="font-size:14px;">I want certian features for my assistant?</p>
+                            <p>We are looking for valuable feedback. You can contact our team and set the subject line
+                                to 'R&D' and we will ook at making the feature availble to you as soon as possible.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="/static/vendors/nprogress/nprogress.js"></script>
+    <!-- Chart.js -->
+    <script src="/static/vendors/Chart.js/dist/Chart.min.js"></script>
+    <!-- gauge.js -->
+    <script src="/static/vendors/gauge.js/dist/gauge.min.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- iCheck -->
+    <script src="/static/vendors/iCheck/icheck.min.js"></script>
+    <!-- Skycons -->
+    <script src="/static/vendors/skycons/skycons.js"></script>
+    <!-- Flot -->
+    <script src="/static/vendors/Flot/jquery.flot.js"></script>
+    <script src="/static/vendors/Flot/jquery.flot.pie.js"></script>
+    <script src="/static/vendors/Flot/jquery.flot.time.js"></script>
+    <script src="/static/vendors/Flot/jquery.flot.stack.js"></script>
+    <script src="/static/vendors/Flot/jquery.flot.resize.js"></script>
+    <!-- Flot plugins -->
+    <script src="/static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+    <script src="/static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+    <script src="/static/vendors/flot.curvedlines/curvedLines.js"></script>
+    <!-- DateJS -->
+    <script src="/static/vendors/DateJS/build/date.js"></script>
+    <!-- JQVMap -->
+    <script src="/static/vendors/jqvmap/dist/jquery.vmap.js"></script>
+    <script src="/static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+    <script src="/static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="/static/vendors/moment/min/moment.min.js"></script>
+    <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="/static/build/js/custom.min.js"></script>
+{% endblock %}

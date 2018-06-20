@@ -1,0 +1,378 @@
+﻿{% extends "admin/base.html" %}
+
+{% block headlinks %}
+    <title>Price Plans </title>
+
+    <!-- Bootstrap -->
+    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="/static/build/css/custom.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel" style="height:700px;">
+                        <div class="x_title">
+                            <h2>Pricing Tables</h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+
+                        <div class="x_content">
+                            <div class="row">
+
+                                <div class="col-md-12">
+
+                                    <!-- price element -->
+                                    <div class="col-md-3 col-sm-6 col-xs-12">
+                                        <div class="pricing">
+                                            <div class="title">
+                                                <h2>Starter Plan</h2>
+                                                <h1>free</h1>
+                                            </div>
+                                            <div class="x_content">
+                                                <div class="">
+                                                    <div class="pricing_features">
+                                                        <ul class="list-unstyled text-left">
+                                                            <li><i class="fa fa-check text-success"></i> Free <strong>
+                                                                Forever</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i> <strong>Unlimited</strong>
+                                                                Time
+                                                            </li>
+                                                            <li><i class="fa fa-check text-success"></i> No <strong>credit
+                                                                Card needed</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i> Setup <strong>
+                                                                Support</strong></li>
+                                                            <li><i class="fa fa-check text-success"></i>
+                                                                <strong>99.9%</strong> up-time
+                                                            </li>
+                                                            <li><i class="fa fa-check text-success"></i>
+                                                                <strong>Free </strong> Hosting & License
+                                                            </li>
+                                                            <li><i class="fa fa-times text-danger"></i> Limited <strong>
+                                                                number of products</strong></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing_footer">
+                                                    <a class="btn btn-success btn-block" role="button">Current <span> plan</span></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- price element -->
+
+                                    <!-- price element -->
+                                    <div class="col-md-3 col-sm-6 col-xs-12">
+                                        <div class="pricing ui-ribbon-container">
+                                            <div class="ui-ribbon-wrapper">
+
+                                                <!-- Discount code - uncomment if needed -->
+                                                <!-- <div class="ui-ribbon">
+                                                  5% Off
+                                                </div> -->
+
+                                            </div>
+                                            <div class="title">
+                                                <h2>Basic plan</h2>
+                                                <h1>£50</h1>
+                                                <span>Per Month</span>
+                                            </div>
+                                            <div class="x_content">
+                                                <div class="">
+                                                    <div class="pricing_features">
+                                                        <ul class="list-unstyled text-left">
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> 600 <strong>
+                                                                    Solutions
+                                                                </strong>
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> 2 <strong>
+                                                                    Databases
+                                                                </strong>
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> Number of bots: <strong>
+                                                                    2
+                                                                </strong>
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> Setup <strong>
+                                                                    Support
+                                                                </strong>
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i>
+                                                                <strong>99.9%</strong> up-time
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> <strong>Encrypted </strong>
+                                                                domain
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i>
+                                                                <strong>Free </strong> Hosting & License
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> <strong>Commercial </strong>
+                                                                License
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> Cancel <strong>
+                                                                    Anytime
+                                                                </strong>
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-times text-danger"></i>
+                                                                <strong>Branding </strong> at the bottom
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing_footer">
+
+                                                    <!-- Stripe checkout start -->
+
+                                                    <form action="/admin/pay" method="POST">
+                                                        <script
+                                                                src="https://checkout.stripe.com/checkout.js"
+                                                                class="stripe-button"
+                                                                data-key="{{ pub_key }}"
+                                                                data-amount="5000"
+                                                                data-name="TheSearchbase"
+                                                                data-description="Widget"
+                                                                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                                                data-locale="auto"
+                                                                data-currency="gbp">
+                                                        </script>
+                                                    </form>
+
+                                                    <!-- Stripe checkout end -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- price element -->
+
+                                    <!-- price element -->
+                                    <div class="col-md-3 col-sm-6 col-xs-12">
+                                        <div class="pricing">
+                                            <div class="title">
+                                                <h2>Advanced Plan</h2>
+                                                <h1>£199</h1>
+                                                <span>Per Month</span>
+                                            </div>
+                                            <div class="x_content">
+                                                <div class="">
+                                                    <div class="pricing_features">
+                                                        <ul class="list-unstyled text-left">
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> 1500 <strong>
+                                                                    Solutions
+                                                                </strong>
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> 3 <strong>
+                                                                    Databases
+                                                                </strong>
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> Number of bots: <strong>
+                                                                    4
+                                                                </strong>
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> Guided Setup <strong>
+                                                                    Support
+                                                                </strong>
+                                                            </li>
+
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i>
+                                                                <strong>99.9%</strong> up-time
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> <strong>Encrypted </strong>
+                                                                domain
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i>
+                                                                <strong>Free </strong> Hosting & License
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> <strong>Commercial </strong>
+                                                                License
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> Cancel <strong>
+                                                                    Anytime
+                                                                </strong>
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i>
+                                                                <strong>No Branding </strong> at the bottom
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-times text-danger"></i>
+                                                                <strong>Extended </strong> Logic
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing_footer">
+
+                                                    <form action="/admin/pay" method="POST">
+                                                        <script
+                                                                src="https://checkout.stripe.com/checkout.js"
+                                                                class="stripe-button"
+                                                                data-key="{{ pub_key }}"
+                                                                data-amount="19900"
+                                                                data-name="TheSearchbase"
+                                                                data-description="Widget"
+                                                                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                                                data-locale="auto"
+                                                                data-currency="gbp">
+                                                        </script>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- price element -->
+
+                                    <!-- price element -->
+                                    <div class="col-md-3 col-sm-6 col-xs-12">
+                                        <div class="pricing">
+                                            <div class="title">
+                                                <h2>Ultimate plan</h2>
+                                                <h1>£399</h1>
+                                                <span>Per Month</span>
+                                            </div>
+                                            <div class="x_content">
+                                                <div class="">
+                                                    <div class="pricing_features">
+                                                        <ul class="list-unstyled text-left">
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> <strong>
+                                                                    Unlimited
+
+                                                                </strong>
+                                                                solutions
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> 4 <strong>
+                                                                    Databases
+                                                                </strong>
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> Number of bots: <strong>
+                                                                    4
+                                                                </strong>
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> Full Setup <strong>
+                                                                    Support
+                                                                </strong>
+                                                            </li>
+
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i>
+                                                                <strong>99.9%</strong> up-time
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> <strong>Encrypted </strong>
+                                                                domain
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i>
+                                                                <strong>Free </strong> Hosting & License
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> <strong>Commercial </strong>
+                                                                License
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i> Cancel <strong>
+                                                                    Anytime
+                                                                </strong>
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i>
+                                                                <strong>No Branding </strong> at the bottom
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i>
+                                                                <strong>Extended </strong> Logic
+                                                            </li>
+                                                            <li>
+                                                                <i class="fa fa-check text-success"></i>
+                                                                <strong>Database </strong> import & <strong> Automatic </strong>scan.
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing_footer">
+
+                                                    <!-- Stripe checkout start -->
+
+                                                    <form action="/admin/pay" method="POST">
+                                                        <script
+                                                                src="https://checkout.stripe.com/checkout.js"
+                                                                class="stripe-button"
+                                                                data-key="{{ pub_key }}"
+                                                                data-amount="39900"
+                                                                data-name="TheSearchbase"
+                                                                data-description="Widget"
+                                                                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                                                data-locale="auto"
+                                                                data-currency="gbp">
+                                                        </script>
+                                                    </form>
+
+                                                    <!-- Stripe checkout end -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- price element -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="/static/vendors/nprogress/nprogress.js"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="/static/build/js/custom.min.js"></script>
+{% endblock %}

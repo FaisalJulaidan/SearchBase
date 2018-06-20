@@ -1,0 +1,176 @@
+﻿{% extends "admin/base.html" %}
+
+{% block headlinks %}
+    <title>Connection </title>
+
+    <!-- Bootstrap -->
+    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="/static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+
+    <!-- bootstrap-progressbar -->
+    <link href="/static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <!-- JQVMap -->
+    <link href="/static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+    <!-- bootstrap-daterangepicker -->
+    <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="/static/build/css/custom.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="right_col" role="main">
+        <!-- top tiles -->
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel" style="height:1800px;">
+                    <div class="col-md-12">
+                        <h3> Connecting your assistant. </h3>
+                        <p> To Connect your assistant, you must paste the pre-made code into any part of your HTML
+                            source code between the
+                            <xmp>
+                                <body>
+                            </xmp>
+                            element.
+                        </p>
+                        <xmp>
+                            <!-- Importing CSS file -->
+                            <link href="/static/pop-up/pop.css" rel="stylesheet">
+
+                            <div class="bottom_left" id="contents1">
+                                <div id="contents1" style="display:none;">
+                                    <iframe src="http://www.thesearchbase.com/chatbot/nameofyourcompany" width="350"
+                                            height="350"></iframe>
+                                </div>
+                                <ul>
+                                    <li class="him" href="#"
+                                        onclick="document.getElementById('contents1').style.cssText = ''">Launch
+                                        Assistant
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </xmp>
+                        <p> Once you have pasted this, into the html page that you wish to use your assistant on, you're
+                            live.</p>
+                        <br/>
+                        <h4> CSS </h4>
+                        <p> If you would like to have control the appearance of your assistant, you can also paste some
+                            extra code into your CSS and make changes</p>
+                        <xmp>
+                            ul{
+                            list-style: none;
+                            margin: 0;
+                            padding: 0;
+                            }
+
+                            ul li{
+                            display:inline-block;
+                            clear: both;
+                            padding: 20px;
+                            border-radius: 30px;
+                            margin-bottom: 2px;
+                            font-family: Helvetica, Arial, sans-serif;
+                            color: white;
+                            }
+
+                            .him{
+                            background: #6610f2;
+                            float: left;
+                            z-index: 1000;
+                            }
+
+                            .him{
+                            border-bottom-left-radius: 5px;
+                            z-index: 1000;
+                            }
+
+                            .bottom_left{
+                            position: fixed;
+                            bottom: 0;
+                            left: 0;
+                            margin: 20px;
+                            margin-left: 10px;
+                            z-index: 1000;
+                            }
+                        </xmp>
+                        <br/>
+                        <h4> Javascript (This is used for analytics) </h4>
+                        <p> If you would like to optimal control over your assistant and make big changes, you you can
+                            download our <strong><a href="">Js</a></strong> file or paste it as a script in your
+                            website.</p>
+                        <xmp>
+
+                            <script>
+                                var opened = false;
+                                var frame = document.getElementById("iframediv");
+                                frame.style = "display:none";
+                                document.getElementById("launch_button").addEventListener("click", function () {
+                                    if (!opened) {
+                                        frame.style = "display:block";
+                                        opened = true;
+                                    } else {
+                                        frame.style = "display:none";
+                                        opened = false;
+                                    }
+                                });
+                            </script>
+
+                        </xmp>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /top tiles -->
+        <br/>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <!-- jQuery -->
+<script src="/static/vendors/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="/static/vendors/fastclick/lib/fastclick.js"></script>
+<!-- NProgress -->
+<script src="/static/vendors/nprogress/nprogress.js"></script>
+<!-- Chart.js -->
+<script src="/static/vendors/Chart.js/dist/Chart.min.js"></script>
+<!-- gauge.js -->
+<script src="/static/vendors/gauge.js/dist/gauge.min.js"></script>
+<!-- bootstrap-progressbar -->
+<script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+<!-- iCheck -->
+<script src="/static/vendors/iCheck/icheck.min.js"></script>
+<!-- Skycons -->
+<script src="/static/vendors/skycons/skycons.js"></script>
+<!-- Flot -->
+<script src="/static/vendors/Flot/jquery.flot.js"></script>
+<script src="/static/vendors/Flot/jquery.flot.pie.js"></script>
+<script src="/static/vendors/Flot/jquery.flot.time.js"></script>
+<script src="/static/vendors/Flot/jquery.flot.stack.js"></script>
+<script src="/static/vendors/Flot/jquery.flot.resize.js"></script>
+<!-- Flot plugins -->
+<script src="/static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+<script src="/static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+<script src="/static/vendors/flot.curvedlines/curvedLines.js"></script>
+<!-- DateJS -->
+<script src="/static/vendors/DateJS/build/date.js"></script>
+<!-- JQVMap -->
+<script src="/static/vendors/jqvmap/dist/jquery.vmap.js"></script>
+<script src="/static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+<script src="/static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+<!-- bootstrap-daterangepicker -->
+<script src="/static/vendors/moment/min/moment.min.js"></script>
+<script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+<!-- Custom Theme Scripts -->
+<script src="/static/build/js/custom.min.js"></script>
+{% endblock %}

@@ -13,7 +13,7 @@ CREATE TABLE 'Companies' (
 	'Size'	TEXT,
 	'URL'	TEXT NOT NULL,
 	'Subscription'	TEXT NOT NULL,
-	'StripeID'	TEXT NOT NULL UNIQUE
+	'StripeID'	TEXT UNIQUE
 );
 
 CREATE TABLE 'Users' (
@@ -23,7 +23,7 @@ CREATE TABLE 'Users' (
 	'Surname'	TEXT NOT NULL,
 	'AccessLevel'	TEXT NOT NULL,
 	'Email'	TEXT NOT NULL,
-	'Password'	TEXT NOT NULL,
+	'Password'	BLOB NOT NULL,
 	'Verified'	TEXT DEFAULT 'False',
 	FOREIGN KEY('CompanyID') REFERENCES 'Companies'('ID')
 );
@@ -31,10 +31,11 @@ CREATE TABLE 'Users' (
 CREATE TABLE 'Assistants' (
 	'ID'	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	'CompanyID'	INTEGER NOT NULL,
-	'Route'	TEXT NOT NULL UNIQUE,
-	'Message'	TEXT NOT NULL UNIQUE,
+	'Route'	TEXT UNIQUE,
+	'Message'	TEXT NOT NULL,
 	'SecondsUntilPopup'	TEXT NOT NULL DEFAULT 'Off',
-	'Active' TEXT NOT NULL DEFAULT 'True'
+	'Active' TEXT NOT NULL DEFAULT 'True',
+	'Nickname' TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE 'Products' (
@@ -57,14 +58,14 @@ CREATE TABLE 'Statistics' (
 	'Date'	TEXT NOT NULL,
 	'Opened'	INTEGER NOT NULL DEFAULT 0,
 	'QuestionsAnswered'	INTEGER NOT NULL DEFAULT 0,
-	'ProductReturned'	INTEGER NOT NULL DEFAULT 0
+	'ProductsReturned'	INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE 'Questions' (
 	'ID'	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	'AssistantID'	INTEGER NOT NULL,
 	'Question'	TEXT NOT NULL,
-	'QuestionType'	TEXT NOT NULL,
+	'Type'	TEXT NOT NULL,
 	FOREIGN KEY('AssistantID') REFERENCES 'Assistants'('ID')
 );
 

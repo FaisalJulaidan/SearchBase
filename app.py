@@ -202,13 +202,13 @@ def features():
         return render_template("features.html")
 
 
-@app.route("/data/retrieval", methods=['GET'])
+@app.route("/dataRetrieval", methods=['GET'])
 def data_retrieval():
     if request.method == "GET":
         return render_template("retrieval.html")
 
 
-@app.route("/data/collection", methods=['GET'])
+@app.route("/dataCollection", methods=['GET'])
 def data_collection():
     if request.method == "GET":
         return render_template("collection.html")

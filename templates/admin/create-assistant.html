@@ -28,27 +28,31 @@
 {% block content %}
     <div class="right_col" role="main">
         <div class="">
-            <div class="page-title">
-                <div class="title_left">
-                    <h3> Controlling your bot</h3>
-                </div>
-            </div>
             <div class="clearfix"></div>
             <div class="row">
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_panel">
                         <div class="x_title">
-                            <h1>Settings</h1>
+                            <h1>Create your new assistant</h1>
                             <ul class="nav navbar-right panel_toolbox"></ul>
                             <div class="clearfix"></div>
                             <br>
-                            <form action="/admin/assistant/{{ id }}/settings" method="POST" enctype="multipart/form-data">
+                            <form action="/admin/assistant/create" method="POST" enctype="multipart/form-data">
+                                <h4>Enter a nickname for your assistant to easily identify it in the dashboard. Must be
+                                    unique.<span class="required">*</span></h4>
+                                <div class="col-md-9 col-sm-9 col-xs-12">
+                                    <input name="nickname" type="text"
+                                           id="nickname"
+                                           required="required" class="form-control col-md-5 col-xs-10">
+                                </div>
+                                <br>
+                                <br>
+                                <br>
                                 <h4>Enter your welcome message <span class="required">*</span></h4>
                                 <div class="col-md-9 col-sm-9 col-xs-12">
-                                    <input value="{{ message }}" name="welcome-message" type="text"
+                                    <input name="welcome-message" type="text"
                                            id="welcome-message"
-                                           required="required" class="form-control col-md-5 col-xs-10"
-                                           placeholder="You can leave this empty is you wish.">
+                                           required="required" class="form-control col-md-5 col-xs-10">
                                 </div>
                                 <br>
                                 <br>
@@ -63,30 +67,26 @@
                                 <br>
                                 <br>-->
 
-                                <h4>Would you like the chat bot to automatically open for the user?</h4>
+                                <h4>Would you like the assistant to automatically open for the user?</h4>
                                 <label class="switch">
                                     <input id="switch-autopop" name="switch-autopop" type="checkbox"
-                                           onclick="switchchecked()"
-                                            {% if autopop != 'Off' %} checked {% endif %}>
+                                           onclick="switchchecked()">
                                     <span class="slider round"></span>
                                 </label>
                                 <br>
                                 <br>
-                                <div id="popup-time"
-                                        {% if autopop == 'Off' %}
-                                     hidden
-                                        {% endif %}>
+                                <div id="popup-time" hidden>
                                     <h4> How long should the chat bot wait before opening?
                                         <small> *Time in Seconds</small>
                                     </h4>
                                     <input name="timeto-autopop" style="width:50px"
                                            class="form-control col-md-5 col-xs-10"
                                            id="bot_time" type="text"
-                                           {% if autopop != 'Off' %}
+                                            {% if autopop != 'Off' %}
                                            value="{{ autopop }}"
-                                           {% else %}
+                                            {% else %}
                                            value="6"
-                                           {% endif %}>
+                                            {% endif %}>
                                     <br>
                                     <br>
                                     <br>
@@ -146,8 +146,7 @@
     <script src="/static/build/js/custom.min.js"></script>
 
     <script>
-        function switchchecked()
-        {
+        function switchchecked() {
             show = document.getElementById("switch-autopop").checked;
             document.getElementById("popup-time").hidden = !show;
         }

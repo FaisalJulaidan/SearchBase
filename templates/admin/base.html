@@ -52,29 +52,32 @@
                                     <a><i class="fa fa-comments-o"></i> Assistants <span
                                             class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
-                                        {% if assistantIDs != null %}
-                                            {% for id in assistantIDs %}
-                                                <li><a>Assistant {{ loop.index }}<span class="fa fa-chevron-down"></span></a>
+                                        {% if assistantDetails|length > 0 %}
+                                            {% for id, name in assistantDetails %}
+                                                <li><a>{{ name }}<span
+                                                        class="fa fa-chevron-down"></span></a>
                                                     <ul class="nav child_menu">
-                                                        <li><a href="/admin/assistant/{{ id }}/settings">Settings</a></li>
-                                                        <li><a href="/admin/assistant/{{ id }}/questions">Questions</a></li>
+                                                        <li><a href="/admin/assistant/{{ id }}/settings">Settings</a>
+                                                        </li>
+                                                        <li><a href="/admin/assistant/{{ id }}/questions">Questions</a>
+                                                        </li>
                                                         <li><a href="/admin/assistant/{{ id }}/answers">Answers</a></li>
                                                         <li><a href="/admin/templates">Templates</a></li>
                                                         <li>
-                                                            <a href="/admin/assistant/{{ id }}/products"><i class="fa fa-database"></i>Products</a>
+                                                            <a href="/admin/assistant/{{ id }}/products"><i
+                                                                    class="fa fa-database"></i>Products</a>
                                                         </li>
+                                                        <li><a href="/admin/assistant/{{ id }}/userinput"><i
+                                                                class="fa fa-cloud"></i>User Input</a></li>
                                                     </ul>
                                                 </li>
                                             {% endfor %}
+                                            {% if assistantDetails|length < 4 %}
+                                                <li><a href="/admin/assistant/create">Create another assistant</a></li>
+                                            {% endif %}
+                                        {% else %}
+                                            <li><a href="/admin/assistant/create">Create assistant</a></li>
                                         {% endif %}
-                                    </ul>
-                                </li>
-
-                                <!-- User Data Storage -->
-                                <li>
-                                    <a><i class="fa fa-cloud"></i> Data Storage <span class="fa fa-chevron-down"></span></a>
-                                    <ul class="nav child_menu">
-                                        <li><a href="/admin/userinput">User Input</a></li>
                                     </ul>
                                 </li>
                                 <li>

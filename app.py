@@ -339,14 +339,6 @@ def signup():
                             companyName, fullname, email)
                         mail.send(msg)
 
-                    # TODO remove this once assistants are implemented properly
-
-                    createAssistant = insert_into_database_table("INSERT INTO Assistants (CompanyID) VALUES (?);",
-                                                                 (companyID,))
-                    # TODO check createAssistant for errors
-
-                    ####################
-
                     return render_template('errors/verification.html',
                                            msg="Please check your email and follow instructions to verify account and get started.")
 
@@ -450,8 +442,58 @@ def get_pop_settings():
             return jsonify(datastring)
 
 
+@app.route("/admin/assistant/create", methods=['GET', 'POST'])
+def admin_assistant_create():
+    if request.method == "GET":
+        email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        if assistants is None or len(assistants) < 4:
+            return render("admin/create-assistant.html", autopop="Off")
+        elif "Error" in assistants:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            abort(status.HTTP_404_NOT_FOUND)
+    elif request.method == "POST":
+        email = request.cookies.get("UserEmail")
+        company = get_company(email)
+        if company is None or "Error" in company:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # TODO handle this better
+        else:
+            nickname = request.form.get("nickname", default="Error")
+            message = request.form.get("welcome-message", default="Error")
+            autopopup = request.form.get("switch-autopop", default="off")
+            popuptime = request.form.get("timeto-autopop", default="Error")
+
+            if message is "Error" or nickname is "Error" or (popuptime is "Error" and autopopup is not "off"):
+                abort(status.HTTP_400_BAD_REQUEST)
+            else:
+                if autopopup == "off":
+                    secondsUntilPopup = "Off"
+                else:
+                    secondsUntilPopup = popuptime
+                createAssistant = insert_into_database_table(
+                    "INSERT INTO Assistants (CompanyID, Message, SecondsUntilPopup, Nickname) VALUES (?,?,?,?);",
+                    (company[0], message, secondsUntilPopup, nickname))
+
+                if "Error" in createAssistant:
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                else:
+                    assistant = select_from_database_table(
+                        "SELECT ID FROM Assistants WHERE CompanyID=? AND Nickname=?",
+                        [company[0], nickname])
+                    if assistant is None or "Error" in assistant:
+                        if "UNIQUE" in assistant:
+                            #TODO handle this better
+                            abort(status.HTTP_409_CONFLICT)
+                        else:
+                            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    else:
+                        return redirect("/admin/assistant/{}/settings".format(assistant[0]))
+
+
 @app.route("/admin/assistant/<assistantID>/settings", methods=['GET', 'POST'])
-def admin_assistant(assistantID):
+def admin_assistant_edit(assistantID):
     if request.method == "GET":
         email = request.cookies.get("UserEmail")
         company = get_company(email)
@@ -467,10 +509,10 @@ def admin_assistant(assistantID):
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 message = assistant[3]
-                autoPop = assistant[4]  # TODO change index to 5 when I merge into products update branch
+                autoPop = assistant[4]
+                nickname = assistant[6]
 
-                # TODO check for errors
-                return render("admin/assistant.html", autopop=autoPop, message=message, id=assistantID)
+                return render("admin/edit-assistant.html", autopop=autoPop, message=message, id=assistantID, nickname=nickname)
     elif request.method == "POST":
         email = request.cookies.get("UserEmail")
         company = get_company(email)
@@ -485,28 +527,25 @@ def admin_assistant(assistantID):
             elif "Error" in assistant:
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
+                nickname = request.form.get("nickname", default="Error")
                 message = request.form.get("welcome-message", default="Error")
-                if message is "Error":
-                    abort(status.HTTP_400_BAD_REQUEST)
-
+                popuptime = request.form.get("timeto-autopop", default="Error")
                 autopopup = request.form.get("switch-autopop", default="off")
-                email = request.cookies.get("UserEmail")
 
-                updateMessage = update_table("UPDATE Assistants SET Message=? WHERE ID=?", [message, assistantID])
-                # TODO check updateMessage for errors
-
-                if autopopup == "off":
-                    updatedPopupTime = update_table("UPDATE Assistants SET SecondsUntilPopup='Off' WHERE ID=?",
-                                                    [assistantID])
-                    # TODO check updatedPopupTime
-                elif autopopup == "on":
-                    popuptime = request.form.get("timeto-autopop", default="Error")
-                    if popuptime != "Error":
-                        updatedPopupTime = update_table("UPDATE Assistants SET SecondsUntilPopup=?;", [popuptime])
-                        # TODO check updatedPopupTime
+                if message is "Error" or nickname is "Error" or (popuptime is "Error" and autopopup is not "off"):
+                    abort(status.HTTP_400_BAD_REQUEST)
+                else:
+                    if autopopup == "off":
+                        secondsUntilPopup = "Off"
                     else:
-                        abort(status.HTTP_400_BAD_REQUEST)
-                return redirect("/admin/assistant/{}/settings".format(assistantID))
+                        secondsUntilPopup = popuptime
+                    updateAssistant = update_table("UPDATE Assistants SET Message=?, SecondsUntilPopup=?, Nickname=? WHERE ID=? AND CompanyID=?",
+                        [message, secondsUntilPopup, nickname, assistantID, company[0]])
+
+                    if "Error" in updateAssistant:
+                        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    else:
+                        return redirect("/admin/assistant/{}/settings".format(assistantID))
 
 
 # TODO rewrite
@@ -813,8 +852,7 @@ def admin_products_file_upload(assistantID):
                 # TODO handle this better
             else:
                 assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-                                                       assistantID,
-                                                       company[0])
+                                                       [assistantID, company[0]])
                 if assistant is None:
                     abort(status.HTTP_404_NOT_FOUND)
                 elif "Error" in assistant:
@@ -877,6 +915,52 @@ def admin_products_file_upload(assistantID):
                         msg = "Error not allowed that type of file."
                         print(msg)
                 return msg
+
+
+# TODO improve
+@app.route("/admin/assistant/<assistantID>/userinput", methods=["GET"])
+def admin_user_input(assistantID):
+    if request.method == "GET":
+        email = request.cookies.get("UserEmail")
+        company = get_company(email)
+        if company is None or "Error" in company:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # TODO handle this better
+        else:
+            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?", [assistantID,
+                                                                                                           company[0]])
+            if assistant is None:
+                abort(status.HTTP_404_NOT_FOUND)
+            elif "Error" in assistant:
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
+                                                       [assistantID], True)
+                data = []
+                dataTuple = tuple(["Null"])
+                for i in range(0, len(questions)):
+                    question = questions[i]
+                    questionID = question[0]
+                    userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID],
+                                                           True)
+                    # TODO check userInput for errors
+                    inputTuple = ()
+                    for inputData in userInput:
+                        input = inputData[3]
+                        inputDate = inputData[2]
+                        if len(inputTuple) == 0:
+                            inputTuple = tuple([inputDate])
+                        elif inputTuple[0] != inputDate:
+                            dataTuple = dataTuple + inputTuple
+                            data.append(dataTuple)
+                            dataTuple = tuple(["Null"])
+                            inputTuple = tuple([inputDate])
+                        inputTuple = inputTuple + tuple([input])
+                    if len(userInput) > 0:
+                        dataTuple = dataTuple + inputTuple
+                        data.append(dataTuple)
+                        dataTuple = tuple(["Null"])
+                return render("admin/data-storage.html", data=data)
 
 
 @app.route("/admin/templates", methods=['GET', 'POST'])
@@ -981,43 +1065,6 @@ def webhook_subscription_cancelled():
             updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
             # TODO check update assistant for errors
         return '', status.HTTP_200_OK
-
-
-# TODO improve
-@app.route("/admin/userinput", methods=["GET"])
-def admin_user_input():
-    if request.method == "GET":
-        email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        # TODO check assistants for errors
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
-        questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                               [assistantID], True)
-        data = []
-        dataTuple = tuple(["Null"])
-        for i in range(0, len(questions)):
-            question = questions[i]
-            questionID = question[0]
-            userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
-            # TODO check userInput for errors
-            inputTuple = ()
-            for inputData in userInput:
-                input = inputData[3]
-                inputDate = inputData[2]
-                if len(inputTuple) == 0:
-                    inputTuple = tuple([inputDate])
-                elif inputTuple[0] != inputDate:
-                    dataTuple = dataTuple + inputTuple
-                    data.append(dataTuple)
-                    dataTuple = tuple(["Null"])
-                    inputTuple = tuple([inputDate])
-                inputTuple = inputTuple + tuple([input])
-            if len(userInput) > 0:
-                dataTuple = dataTuple + inputTuple
-                data.append(dataTuple)
-                dataTuple = tuple(["Null"])
-        return render("admin/data-storage.html", data=data)
 
 
 # TODO implement this
@@ -1608,12 +1655,15 @@ def render(template, **context):
     email = request.cookies.get("UserEmail")
     if email is not None:
         assistants = get_assistants(email)
-        # TODO check assistants for errors
-        assistantIDs = []
-        for assistant in assistants:
-            assistantIDs.append(assistant[0])
+        if assistants is not None:
+            if "Error" in assistants:
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return render_template(template, debug=app.debug, assistantIDs=assistantIDs, **context)
+        assistantDetails = []
+        for assistant in assistants:
+            assistantDetails.append((assistant[0], assistant[6]))
+
+        return render_template(template, debug=app.debug, assistantDetails=assistantDetails, **context)
     else:
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -1624,6 +1674,7 @@ class Del:
 
     def __getitem__(self, k):
         return self.comp.get(k)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
@@ -1653,4 +1704,5 @@ finally:
 
 # Janky way to seed password
 if app.debug:
-    update_table("UPDATE Users SET Password=? WHERE ID=?", [hash_password("test"), 1])
+    hash = hash_password("test")
+    update_table("UPDATE Users SET Password=? WHERE ID=?", [hash, 1])

@@ -23,7 +23,7 @@ CREATE TABLE 'Users' (
 	'Surname'	TEXT NOT NULL,
 	'AccessLevel'	TEXT NOT NULL,
 	'Email'	TEXT NOT NULL,
-	'Password'	TEXT NOT NULL,
+	'Password'	BLOB NOT NULL,
 	'Verified'	TEXT DEFAULT 'False',
 	FOREIGN KEY('CompanyID') REFERENCES 'Companies'('ID')
 );
@@ -34,7 +34,8 @@ CREATE TABLE 'Assistants' (
 	'Route'	TEXT UNIQUE,
 	'Message'	TEXT NOT NULL,
 	'SecondsUntilPopup'	TEXT NOT NULL DEFAULT 'Off',
-	'Active' TEXT NOT NULL DEFAULT 'True'
+	'Active' TEXT NOT NULL DEFAULT 'True',
+	'Nickname' TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE 'Products' (

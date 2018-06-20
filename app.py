@@ -159,7 +159,7 @@ def allowed_image_file(filename):
 @app.before_request
 def before_request():
     theurl = str(request.url_rule)
-    if "admin" not in theurl or "admin/homepage":
+    if "admin" not in theurl or "admin/homepage" in theurl:
         print("Ignore before request for: ", theurl)
         return None
     email = request.cookies.get("UserEmail")
@@ -418,14 +418,34 @@ def admin_home():
 @app.route("/admin/profile", methods=['GET', 'POST'])
 def profilePage():
     if request.method == "GET":
-        print(request.cookies)
-        email = request.cookies.get("UserEmail")
+        args = request.args
+        if len(args) > 0:
+            messages = args['messages']
+            if messages is not None:
+                email = loads(messages)['email']
+                if email is None or email == "None":
+                    email = request.cookies.get("UserEmail")
+                sendEmail = True
+            else:
+                email = request.cookies.get("UserEmail")
+        else:
+            email = request.cookies.get("UserEmail")
         user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
         # TODO check database output for errors
         companyName = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
-        return render("admin/profile.html", user=user, companyName=companyName[1])
+        return render("admin/profile.html", user=user, companyName=companyName[1], email=email)
     elif request.method == "POST":
-        abort(status.HTTP_501_NOT_IMPLEMENTED)
+        curEmail = request.cookies.get("UserEmail")
+        names = request.form.get("names", default="Error")
+        newEmail = request.form.get("email", default="error").lower()
+        if names != "Error" and email != "error":
+            names = names.split(" ")
+            name1 = names[0]
+            name2 = names[1]
+            updateQuestion = update_table("UPDATE Users SET Firstname=?, Surname, Email=? WHERE Email=?;", [name1,name2,newEmail,curEmail])
+            messages = dumps({"email": escape(email)})
+            return redirect(url_for(".profilePage", messages=messages))
+        return redirect("/admin/profile", code=302)
 
 
 @app.route("/popupsettings", methods=['GET'])

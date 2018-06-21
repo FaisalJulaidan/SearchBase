@@ -1,6 +1,6 @@
 ﻿{% extends "admin/base.html" %}
 {% block headlinks %}
-<title>Users </title>
+    <title>Users </title>
 
     <!-- Bootstrap -->
     <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -16,91 +16,91 @@
 {% endblock %}
 
 {% block content %}
-<div class="right_col" role="main">
-                <div class="">
-                    <div class="page-title">
-                        <div class="title_left">
-                            <h3>Users</h3>
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>Users</h3>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+
+                        <p>A list of all of the users with access to your account </p>
+                        <div class="table-responsive">
+                            <table class="table table-striped jambo_table bulk_action">
+                                <thead>
+                                <!-- Beginning of data -->
+                                <tr id="tableHeadingUIn" class="headings">
+                                    <th class="column-title">Name</th>
+                                    <th class="column-title">Email</th>
+                                    <th class="column-title">Access Level</th>
+                                    {#                                                <th class="column-title no-link last">#}
+                                    {#                                                    <span class="nobr">Delete</span>#}
+                                    {#                                                </th>#}
+                                </tr>
+                                <!-- End of data -->
+                                </thead>
+
+                                <tbody id="tBodyUIn">
+                                <!-- Start -->
+                                {% for user in users %}
+                                    <tr class="even pointer">
+                                        <td class=" ">{{ user[2] }} {{ user[3] }}</td>
+                                        <td class=" ">{{ user[5] }}</td>
+                                        <td class=" ">{{ user[4] }}</td>
+                                        {#                                                <td class=" "><strong><a href="">Delete</a></strong></td>#}
+                                    </tr>
+                                {% endfor %}
+                                <!-- End -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="clearfix"></div>
-                    <div class="row">
-                        <div class="col-md-12 col-sm-12 col-xs-12">
-                            <div class="x_panel">
 
-                                <p>A list of all of the users with access to your account </p>
-                                <div class="table-responsive">
-                                    <table class="table table-striped jambo_table bulk_action">
-                                        <thead>
-                                            <!-- Beginning of data -->
-                                            <tr id="tableHeadingUIn" class="headings">
-                                                <th class="column-title">User ID</th>
-                                                <th class="column-title">Name </th>
-                                                <th class="column-title">Last Access </th>
-                                                <th class="column-title">Permission Level </th>
-                                                <th class="column-title no-link last">
-                                                    <span class="nobr">Acess</span>
-                                                </th>
-                                            </tr>
-                                            <!-- End of data -->
-                                        </thead>
+                    <div class="x_panel">
 
-                                        <tbody id="tBodyUIn">
-                                            <!-- Start -->
-                                            <tr class="even pointer">
-                                                <td class=" ">1</td>
-                                                <td class=" ">Test Name </td>
-                                                <td class=" ">208/06/2018 12:56 AM</td>
-                                                <td class=" ">Admin</td>
-                                                <td class=" "><strong><a href="">Delete</a></strong></td>
-                                            </tr>
-                                            <!-- End -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                        <p>Enter the details of the additional user</p>
+                        <!-- Content should go here -->
 
-                            <div class="x_panel">
+                        <form action="/admin/users/add" method="POST" enctype="multipart/form-data">
 
-                                <p>Enter the details of the additional user</p>
-                                <!-- Content should go here -->
+                            <!-- User's details -->
+                            <input class="form-control col-md-5 col-xs-10" id="fullname" type="text" name="fullname"
+                                   placeholder="Name *">
+                            <br/>
+                            <br/>
+                            <br/>
+                            <input class="form-control col-md-3 col-xs-10" id="email" type="text" name="email"
+                                   placeholder="Email *">
+                            <br/>
+                            <br/>
+                            <br/>
+                            <!-- Options for the user to select roles. -->
+                            <select id="accessLevel" name="accessLevel" required>
+                                <br/>
+                                <option value="Select">Please Select</option>
+                                <option value="Admin">Administrator</option>
+                            </select>
 
-                                <form action="admin/adduser" method="POST" enctype="multipart/form-data">
+                            <br/>
+                            <br/>
 
-                                    <!-- User's details -->
-                                    <input class="form-control col-md-5 col-xs-10" id="user_fullname" type="text" name="name" placeholder="Name *">
-                                    <br />
-                                    <br />
-                                    <br />
-                                    <input class="form-control col-md-3 col-xs-10" id="user-email" type="text" name="email" placeholder="Email *">
-                                    <br />
-                                    <br />
-                                    <br />
-                                    <!-- Options for the user to select roles. -->
-                                    <select id="user_role" name="user-role" required>
-                                        <br />
-                                        <option value="Select">Please Select</option>
-                                        <option value="adminstrator">Administrator</option>
-                                    </select>
+                            <!-- Submit button -->
+                            <input class="btn btn-success" type="submit" value="Save"/>
 
-                                    <br />
-                                    <br />
-
-                                    <!-- Submit button -->
-                                    <input class="btn btn-success" type="submit" value="Save" />
-
-                                </form>
-
-                                <!-- Content should go here -->
-                            </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block javascript %}
-<!-- jQuery -->
+    <!-- jQuery -->
     <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap -->
     <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -119,28 +119,4 @@
 
     <!-- Custom Theme Scripts -->
     <script src="/static/build/js/custom.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk&callback=initMap"></script>
-
-    <script>
-    inputD = document.getElementById("inputDiv");
-    outputD = document.getElementById("outputDiv");
-    editB = document.getElementById("EditB");
-    editB.addEventListener("click", openForm);
-    document.getElementById("cancelB").addEventListener("click", closeForm);
-    document.getElementById("submit").onclick = function() {
-        document.getElementById("form").submit();
-    };
-
-    inputDiv.style = "display:none";
-    function openForm(){
-        outputD.style = "display:none";
-        editB.style = "display:none";
-        inputD.style = "display:block";
-    }
-    function closeForm(){
-        outputD.style = "display:block";
-        editB.style = "display:block";
-        inputD.style = "display:none";
-    }
-    </script>
 {% endblock %}

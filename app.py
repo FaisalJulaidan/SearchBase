@@ -1083,22 +1083,15 @@ def admin_analytics():
 
 
 # Method for the users
-@app.route("/admin/users", methods=['GET', 'POST'])
+@app.route("/admin/users", methods=['GET'])
 def admin_users():
     if request.method == "GET":
-        print("TEST")
         email = request.cookies.get("UserEmail")
-        print("TEST1")
-        print(email)
         company = get_company(email)
-        print("TEST2")
         # todo check company
         companyID = company[0]
-        print("TEST3")
 
         userLevel = select_from_database_table("SELECT AccessLevel FROM Users WHERE Email=?", [email])[0]
-        print("TEST4")
-        print(userLevel)
         if userLevel is None:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             # TODO better handle
@@ -1106,15 +1099,17 @@ def admin_users():
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             # TODO better handle this
         else:
-            print("TEST5")
             if userLevel != "Admin":
-                print(userLevel)
                 return redirect("/admin/homepage")
             else:
                 # TODO improve this
                 users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
                 return render("admin/users.html", users=users)
-    elif request.method == "POST":
+
+
+@app.route("/admin/users/add", methods=['POST'])
+def admin_add_users():
+    if request.method == "POST":
         email = request.cookies.get("UserEmail")
         company = get_company(email)
         # todo check company
@@ -1143,27 +1138,27 @@ def admin_users():
                 (companyID, firstname, surname, accessLevel, newEmail, hashed_password, "True"))
             if "added" not in insertUserResponse:
                 if "UNIQUE constraint" in insertUserResponse:
-                    deleteCompany = delete_from_table("DELETE FROM Companies WHERE ID=?;", [companyID])
-                    # TODO check deleteCompany
-                    return render_template("signup.html", msg=newEmail + " already in use.", debug=app.debug)
+                    abort(status.HTTP_409_CONFLICT)
                 else:
                     abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
                     # TODO handle this better
             else:
-                # sending email to the new user.
-                # TODO this needs improving
-                msg = Message("Account verification, {} {}".format(firstname, surname),
-                              sender="thesearchbase@gmail.com",
-                              recipients=[email])
-                link = "www.thesearchbase.com/account/changepassword"
-                msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
-                           "If you feel this is a mistake please contact {}. \n" \
-                           "Your temporary password is: {}\n" \
-                           "Please visit <a href='{}'>this link</a> to set password for account.".format(email,
-                                                                                                         password, link)
-                mail.send(msg)
+                if not app.debug:
+                    # sending email to the new user.
+                    # TODO this needs improving
+                    msg = Message("Account verification, {} {}".format(firstname, surname),
+                                  sender="thesearchbase@gmail.com",
+                                  recipients=[email])
+                    link = "www.thesearchbase.com/account/changepassword"
+                    msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
+                               "If you feel this is a mistake please contact {}. \n" \
+                               "Your temporary password is: {}\n" \
+                               "Please visit <a href='{}'>this link</a> to set password for account.".format(email,
+                                                                                                             password, link)
+                    mail.send(msg)
 
                 return redirect("/admin/users")
+
 
 
 # Method for the billing

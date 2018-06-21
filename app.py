@@ -1660,7 +1660,7 @@ def render(template, **context):
 
         return render_template(template, debug=app.debug, assistantDetails=assistantDetails, **context)
     else:
-        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return redirect("/login")
 
 
 class Del:

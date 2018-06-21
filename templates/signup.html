@@ -49,7 +49,7 @@
     <meta name="theme-color" content="#ffffff">
 
 </head>
-<body onload="console.log('{{ msg }}');">
+<body>
 
     <div class="limiter">
         <div class="container-login100">
@@ -68,7 +68,7 @@
                     </span>
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
-                        <input class="input100" type="text" name="companyName" placeholder="Company Name" onchange="return this.style.boxShadow='0 0 9px 0px rgba(100, 185, 110, 1)'">
+                        <input class="input100" type="text" name="companyName" placeholder="Company Name" onchange="inputs.company = true; return this.style.boxShadow='0 0 9px 0px rgba(100, 185, 110, 1)'">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-briefcase" aria-hidden="true"></i>
@@ -103,8 +103,9 @@
                     </div>
 
                     <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
-                        <input class="input100" type="email" id="confirmemail" name="confirmEmail"
-                               placeholder="Confirm email" autocomplete="off" onchange="checkboxesMatch('email')">
+                        <input class="input100 btn" type="email" id="confirmemail" name="confirmEmail"
+                               placeholder="Confirm email" autocomplete="off" onchange="checkboxesMatch('email')" disabled
+                               style="cursor:not-allowed;text-align: -webkit-auto;">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-envelope" aria-hidden="true"></i>
@@ -121,8 +122,9 @@
                     </div>
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
-                        <input class="input100" type="password" id="confirmpassword" name="confirmPassword"
-                               autocomplete="off" placeholder="Confirm password" onchange="checkboxesMatch('password')">
+                        <input class="input100 btn" type="password" id="confirmpassword" name="confirmPassword"
+                               placeholder="Confirm password" onchange="checkboxesMatch('password')" disabled
+                               style="cursor:not-allowed;text-align: -webkit-auto;">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-lock" aria-hidden="true"></i>
@@ -209,70 +211,104 @@
     </script>
     <script src="../static/SL/Login/js/main.js"></script>
     <script>
-        // to avoid caching
+        // to cache refrences
         var errTitle = $("#errorTitle")
         var errText = $("#errorText")
         var errShow = $("#showError")
+
+        // show errors messages from server
+        var msg = '{{ msg }}'
+        if (msg) {
+          alertError('Server Error',msg)
+        }
+
+        var inputs ={
+          company:false,
+          url:false,
+          name:false,
+          email:false,
+          emailConf:false,
+          password:false,
+          passwordConf:false
+        }
+
         // Password popover init
         $('#password').popover({ trigger: 'focus', title: 'Password Constrains 🔑', content: "At least 8 characters long & upper and lower case letters and numbers",placement:'top' })
         $('#email').popover({ trigger: 'focus', title: 'Valid Email 📮', content: "Valid email is required: example@abc.com",placement:'top' })
 
         function submitForm() {
-            var form = document.forms["signupForm"];
-            var companyName = form["companyName"].value;
-            var websiteURL = form["websiteURL"].value;
-            var fullname = form["fullname"].value;
-            var email = form["email"].value;
-            var password = form["password"].value;
+          var form = document.forms["signupForm"];
+          var companyName = form["companyName"].value;
+          var websiteURL = form["websiteURL"].value;
+          var fullname = form["fullname"].value;
+          var email = form["email"].value;
+          var password = form["password"].value;
 
-            var subscription = document.getElementById("inputState").value;
-            if (subscription === "None") {
-                subscription.setError("Please select one");
-                return false;
-            }
-            return true;
+          var subscription = document.getElementById("inputState").value;
+          if (subscription === "None") {
+              subscription.setError("Please select one");
+              return false;
+          }
+          return true;
         }
 
         function checkboxesMatch(boxID) {
-            if (   document.getElementById(boxID).value === document.getElementById('confirm' + boxID).value
-                && document.getElementById(boxID).value !== "") {
-                document.getElementById('confirm' + boxID).style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+          if (   document.getElementById(boxID).value === document.getElementById('confirm' + boxID).value
+              && document.getElementById(boxID).value !== "") {
+            document.getElementById('confirm' + boxID).style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+            // if all inputs are satisfied
+            for (var input of Object.entries(inputs)){
+              if (input[1] != true)
                 document.getElementById('submit').disabled = false;
-                if (boxID=='password'){
-                  document.getElementById("submit").classList.remove('login100-form-btn-disabled');
-                  document.getElementById("submit").classList.add('login100-form-btn');
-                }
             }
-            else {
-                if (boxID=='email')
-                  alertError('Email Matching Error','Please confirm your email as the above one')
-                if (boxID=='password')
-                  alertError('Password Matching Error','Please match your passwords')
 
-                document.getElementById('confirm' + boxID).style.boxShadow="0 0 9px 0px #f44336"
-                document.getElementById('submit').disabled = true;
-                document.getElementById("submit").classList.add('login100-form-btn-disabled');
-                document.getElementById("submit").classList.remove('login100-form-btn');
+            if (boxID=='password'){
+              document.getElementById("submit").classList.remove('login100-form-btn-disabled');
+              document.getElementById("submit").classList.add('login100-form-btn');
+              inputs.passwordConf = true
             }
+            if (boxID=='email')
+              inputs.emailConf = true
+          }
+          else {
+            if (boxID=='email'){
+              alertError('Email Matching Error','Please confirm your email as the above one')
+              inputs.emailConf = false
+            }
+            if (boxID=='password'){
+              alertError('Password Matching Error','Please match your passwords')
+              inputs.passwordConf = false
+            }
+            document.getElementById('confirm' + boxID).style.boxShadow="0 0 9px 0px #f44336"
+            document.getElementById('submit').disabled = true;
+            document.getElementById("submit").classList.add('login100-form-btn-disabled');
+            document.getElementById("submit").classList.remove('login100-form-btn');
+          }
         }
 
         function validatePassword(passwordElement) {
           var password = passwordElement.value
+
           if (password.length >= 8) {
-              if (password.match(/^(?=.*[a-z|A-Z])(?=.*[A-Z])(?=.*\d).+$/) != null) {
-                passwordElement.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
-                return true;
-              }
-              else{
-                passwordElement.style.boxShadow="0 0 9px 0px #f44336"
-                alertError('Password Error','Passwords must contain at least 1 lower and upper case letter. And 1 number.')
-                return false;
-              }
+            if (password.match(/^(?=.*[a-z|A-Z])(?=.*[A-Z])(?=.*\d).+$/) != null) {
+              // sucess
+              passwordElement.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+              //give ability to confirm password
+              $("#confirmpassword").removeAttr('disabled','')
+              $("#confirmpassword").css('cursor','')
+              $("#confirmpassword").removeClass('btn')
+              return inputs.password = true;
+            }
+            else{
+              passwordElement.style.boxShadow="0 0 9px 0px #f44336"
+              alertError('Password Error','Passwords must contain at least 1 lower and upper case letter. And 1 number.')
+              return inputs.password = false
+            }
           }
           else{
             passwordElement.style.boxShadow="0 0 9px 0px #f44336"
             alertError('Password Error','Passwords must be at least 8 characters long.')
-            return false;
+            return inputs.password = false
           }
         }
 
@@ -281,12 +317,14 @@
         function validateName(fullname) {
             var nameSelector = document.getElementById(fullname)
             var name = nameSelector.value
+
             if (name.indexOf(' ') <= 0) {
               nameSelector.style.boxShadow="0 0 9px 0px #f44336"
               alertError('Name Error','Please enter your full name or leave a space between your first and last name.')
+              return inputs.name = false;
             }else {
               nameSelector.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
-              return false;
+              return inputs.name = true;
             }
         }
 
@@ -299,9 +337,10 @@
             if (!userURL.match(URLRegex)) {
               document.getElementById("websiteURL").style.boxShadow="0 0 9px 0px #f44336"
               alertError('URL Error',"Please enter your website URL correctly.")
-              return false;
+              return inputs.url = false;
             }else {
               document.getElementById("websiteURL").style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+              return inputs.url = true;
             }
         }
 
@@ -312,11 +351,17 @@
             var userEmail = document.getElementById(email).value;
 
             if (!userEmail.match(emailRegex)) {
-                document.getElementById("email").style.boxShadow="0 0 9px 0px #f44336"
-                alertError('Email Error',"Please enter your email address correctly.  example@abc.com")
-                return false;
+              document.getElementById("email").style.boxShadow="0 0 9px 0px #f44336"
+              alertError('Email Error',"Please enter your email address correctly.  example@abc.com")
+              return inputs.email = false;
             }else {
-                document.getElementById("email").style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+              //success
+              document.getElementById("email").style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+              // give ability to confirm email
+              $("#confirmemail").removeAttr('disabled','')
+              $("#confirmemail").css('cursor','')
+              $("#confirmemail").removeClass('btn')
+              return inputs.email = true;
             }
 
         }

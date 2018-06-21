@@ -1656,7 +1656,7 @@ def render(template, **context):
 
         assistantDetails = []
         for assistant in assistants:
-            assistantDetails.append((assistant[0], assistant[5]))
+            assistantDetails.append((assistant[0], assistant[6]))
 
         return render_template(template, debug=app.debug, assistantDetails=assistantDetails, **context)
     else:

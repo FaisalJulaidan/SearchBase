@@ -510,7 +510,7 @@ def admin_assistant_edit(assistantID):
             else:
                 message = assistant[3]
                 autoPop = assistant[4]
-                nickname = assistant[6]
+                nickname = assistant[5]
 
                 return render("admin/edit-assistant.html", autopop=autoPop, message=message, id=assistantID, nickname=nickname)
     elif request.method == "POST":
@@ -1661,7 +1661,7 @@ def render(template, **context):
 
         assistantDetails = []
         for assistant in assistants:
-            assistantDetails.append((assistant[0], assistant[6]))
+            assistantDetails.append((assistant[0], assistant[5]))
 
         return render_template(template, debug=app.debug, assistantDetails=assistantDetails, **context)
     else:

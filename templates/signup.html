@@ -49,7 +49,7 @@
     <meta name="theme-color" content="#ffffff">
 
 </head>
-<body onload="console.log('{{ msg }}');">
+<body>
 
     <div class="limiter">
         <div class="container-login100">
@@ -68,7 +68,7 @@
                     </span>
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
-                        <input class="input100" type="text" name="companyName" placeholder="Company Name">
+                        <input class="input100" type="text" name="companyName" placeholder="Company Name" onchange="inputs.company = true; return this.style.boxShadow='0 0 9px 0px rgba(100, 185, 110, 1)'">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-briefcase" aria-hidden="true"></i>
@@ -94,7 +94,8 @@
 
                     <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
                         <input class="input100" type="email" id="email" name="email" placeholder="Email" autocomplete="off"
-                               onkeyup="checkboxesMatch('email')">
+                        onchange="validateUserEmail('email')">
+                        <!-- onkeyup="checkboxesMatch('email')" -->
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-envelope" aria-hidden="true"></i>
@@ -102,8 +103,9 @@
                     </div>
 
                     <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
-                        <input class="input100" type="email" id="confirmemail" name="confirmEmail"
-                               placeholder="Confirm email" autocomplete="off" onkeyup="checkboxesMatch('email')">
+                        <input class="input100 btn" type="email" id="confirmemail" name="confirmEmail"
+                               placeholder="Confirm email" autocomplete="off" onchange="checkboxesMatch('email')" disabled
+                               style="cursor:not-allowed;text-align: -webkit-auto;">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-envelope" aria-hidden="true"></i>
@@ -112,7 +114,7 @@
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
                         <input class="input100" type="password" id="password" name="password" autocomplete="new-password"
-                               placeholder="Password" onkeyup="checkboxesMatch('password')">
+                               placeholder="Password" onchange="validatePassword(this)">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-lock" aria-hidden="true"></i>
@@ -120,8 +122,9 @@
                     </div>
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
-                        <input class="input100" type="password" id="confirmpassword" name="confirmPassword"
-                               autocomplete="off" placeholder="Confirm password" onkeyup="checkboxesMatch('password')">
+                        <input class="input100 btn" type="password" id="confirmpassword" name="confirmPassword"
+                               placeholder="Confirm password" onchange="checkboxesMatch('password')" disabled
+                               style="cursor:not-allowed;text-align: -webkit-auto;">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-lock" aria-hidden="true"></i>
@@ -130,15 +133,15 @@
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
                         <p>Choose Plan</p>
-                        <select name="subscription" id="inputState" class="form-control" form="signupForm" title="Choose Plan" required>
-                            <option value="Trial">3 Month Trail</option>
-                            <option value="Basic">Basic Plan</option>
-                            <option value="Advanced">Advanced Plan</option>
-                            <option value="Ultimate">Ultimate Plan</option>
-                            {% if debug == True %}
-                            <option value="Debug"> Debug</option>
-                            {% endif %}
-                        </select>
+                         <select name="subscription" id="inputState" class="form-control" form="signupForm" title="Choose Plan" required>
+                          <option value="Trial">3 Month Trial</option>
+                          <option value="Basic">Basic Plan</option>
+                          <option value="Advanced">Advanced Plan</option>
+                          <option value="Ultimate">Ultimate Plan</option>
+                          {% if debug == True %}
+                          <option value="Debug"> Debug</option>
+                          {% endif %}
+                      </select>
                         <span class="focus-input100"></span>
                     </div>
 
@@ -174,6 +177,26 @@
         </div>
     </div>
 
+    <!-- Button trigger modal -->
+    <button type="button" data-toggle="modal" data-target="#exampleModal" hidden id="showError"></button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="errorTitle"></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="errorText"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Okay</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="../static/SL/Login/vendor/jquery/jquery-3.2.1.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -188,93 +211,170 @@
     </script>
     <script src="../static/SL/Login/js/main.js"></script>
     <script>
-        function submitForm() {
-            var form = document.forms["signupForm"];
-            var companyName = form["companyName"].value;
-            var websiteURL = form["websiteURL"].value;
-            var fullname = form["fullname"].value;
-            var email = form["email"].value;
-            var password = form["password"].value;
-            if (!validatePassword(password)) {
-                return false;
-            }
+        // to cache refrences
+        var errTitle = $("#errorTitle")
+        var errText = $("#errorText")
+        var errShow = $("#showError")
 
-            var subscription = document.getElementById("inputState").value;
-            if (subscription === "None") {
-                subscription.setError("Please select one");
-                return false;
-            }
-            return true;
+        // show errors messages from server
+        var msg = '{{ msg }}'
+        if (msg) {
+          alertError('Server Error',msg)
+        }
+
+        var inputs ={
+          company:false,
+          url:false,
+          name:false,
+          email:false,
+          emailConf:false,
+          password:false,
+          passwordConf:false
+        }
+
+        // Password popover init
+        $('#password').popover({ trigger: 'focus', title: 'Password Constrains 🔑', content: "At least 8 characters long & upper and lower case letters and numbers",placement:'top' })
+        $('#email').popover({ trigger: 'focus', title: 'Valid Email 📮', content: "Valid email is required: example@abc.com",placement:'top' })
+
+        function submitForm() {
+          var form = document.forms["signupForm"];
+          var companyName = form["companyName"].value;
+          var websiteURL = form["websiteURL"].value;
+          var fullname = form["fullname"].value;
+          var email = form["email"].value;
+          var password = form["password"].value;
+
+          var subscription = document.getElementById("inputState").value;
+          if (subscription === "None") {
+              subscription.setError("Please select one");
+              return false;
+          }
+          return true;
         }
 
         function checkboxesMatch(boxID) {
-            if (document.getElementById(boxID).value === document.getElementById('confirm' + boxID).value &&
-                document.getElementById(boxID).value !== "") {
-                document.getElementById('confirm' + boxID).style.border = "None";
+          if (   document.getElementById(boxID).value === document.getElementById('confirm' + boxID).value
+              && document.getElementById(boxID).value !== "") {
+            document.getElementById('confirm' + boxID).style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+            // if all inputs are satisfied
+            for (var input of Object.entries(inputs)){
+              if (input[1] != true)
                 document.getElementById('submit').disabled = false;
-                document.getElementById("submit").classList.remove('login100-form-btn-disabled');
-                document.getElementById("submit").classList.add('login100-form-btn');
             }
-            else {
-                document.getElementById('confirm' + boxID).style.border = "2px solid red";
-                document.getElementById('submit').disabled = true;
-                document.getElementById("submit").classList.add('login100-form-btn-disabled');
-                document.getElementById("submit").classList.remove('login100-form-btn');
+
+            if (boxID=='password'){
+              document.getElementById("submit").classList.remove('login100-form-btn-disabled');
+              document.getElementById("submit").classList.add('login100-form-btn');
+              inputs.passwordConf = true
             }
-            if (boxID === "email") checkboxesMatch("password")
+            if (boxID=='email')
+              inputs.emailConf = true
+          }
+          else {
+            if (boxID=='email'){
+              alertError('Email Matching Error','Please confirm your email as the above one')
+              inputs.emailConf = false
+            }
+            if (boxID=='password'){
+              alertError('Password Matching Error','Please match your passwords')
+              inputs.passwordConf = false
+            }
+            document.getElementById('confirm' + boxID).style.boxShadow="0 0 9px 0px #f44336"
+            document.getElementById('submit').disabled = true;
+            document.getElementById("submit").classList.add('login100-form-btn-disabled');
+            document.getElementById("submit").classList.remove('login100-form-btn');
+          }
         }
 
-        function validatePassword(password) {
-            if (password.length >= 8) {
-                if (password.match(/^(?=.*[a-z|A-Z])(?=.*[A-Z])(?=.*\d).+$/) != null) {
-                    return true;
-                }
-                else alert("Passwords must contain at least 1 lower and upper case letter. And 1 number.");
-                return false;
+        function validatePassword(passwordElement) {
+          var password = passwordElement.value
+
+          if (password.length >= 8) {
+            if (password.match(/^(?=.*[a-z|A-Z])(?=.*[A-Z])(?=.*\d).+$/) != null) {
+              // sucess
+              passwordElement.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+              //give ability to confirm password
+              $("#confirmpassword").removeAttr('disabled','')
+              $("#confirmpassword").css('cursor','')
+              $("#confirmpassword").removeClass('btn')
+              return inputs.password = true;
             }
-            else alert("Passwords must be at least 8 Characters long.");
-            return false;
+            else{
+              passwordElement.style.boxShadow="0 0 9px 0px #f44336"
+              alertError('Password Error','Passwords must contain at least 1 lower and upper case letter. And 1 number.')
+              return inputs.password = false
+            }
+          }
+          else{
+            passwordElement.style.boxShadow="0 0 9px 0px #f44336"
+            alertError('Password Error','Passwords must be at least 8 characters long.')
+            return inputs.password = false
+          }
         }
 
 
         // Validation for the name of the user
         function validateName(fullname) {
-            var name = $("#" + fullname).val();
+            var nameSelector = document.getElementById(fullname)
+            var name = nameSelector.value
+
             if (name.indexOf(' ') <= 0) {
-                return alert("Please enter your full name or leave a space between your first and last name.");
+              nameSelector.style.boxShadow="0 0 9px 0px #f44336"
+              alertError('Name Error','Please enter your full name or leave a space between your first and last name.')
+              return inputs.name = false;
+            }else {
+              nameSelector.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+              return inputs.name = true;
             }
-            return false;
         }
 
 
         // Validation for the website URL
         function validateURL(websiteURL) {
             var URLRegex = /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/;
-
             var userURL = document.getElementById('websiteURL').value;
 
             if (!userURL.match(URLRegex)) {
-                document.getElementById("websiteURL").style.borderStyle = "solid";
-                document.getElementById("websiteURL").style.borderColor = "red";
-                alert("Please enter your website URL correctly.")
-                return false;
+              document.getElementById("websiteURL").style.boxShadow="0 0 9px 0px #f44336"
+              alertError('URL Error',"Please enter your website URL correctly.")
+              return inputs.url = false;
+            }else {
+              document.getElementById("websiteURL").style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+              return inputs.url = true;
             }
         }
 
         // Validation for the user email address
-        function validateUserEmail(emai)
+        function validateUserEmail(email)
         {
             var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            var userEmail = document.getElementById('email').value;
+            var userEmail = document.getElementById(email).value;
 
             if (!userEmail.match(emailRegex)) {
-                document.getElementById("email").style.borderStyle = "solid";
-                document.getElementById("email").style.borderColor = "red";
-                alert("Please enter your email address correctly.")
-                return false;
+              document.getElementById("email").style.boxShadow="0 0 9px 0px #f44336"
+              alertError('Email Error',"Please enter your email address correctly.  example@abc.com")
+              return inputs.email = false;
+            }else {
+              //success
+              document.getElementById("email").style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+              // give ability to confirm email
+              $("#confirmemail").removeAttr('disabled','')
+              $("#confirmemail").css('cursor','')
+              $("#confirmemail").removeClass('btn')
+              return inputs.email = true;
             }
+
         }
 
+        function alertError(name,text) {
+          // clear previous error message
+          errShow.text('')
+          errText.text('')
+
+          errTitle.text(name)
+          errText.text(text)
+          errShow.click()
+        }
     </script>
 </body>
 </html>

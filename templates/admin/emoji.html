@@ -1,6 +1,6 @@
 ﻿{% extends "admin/base.html" %}
 
-{% block headlinks %}
+{% block title %}Emoji Converter{% endblock %}
     <!-- Emoji JS and CSS -->
     <script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css"/>
@@ -8,28 +8,6 @@
     <!-- phone emojis also work -->
     <!-- :P :) or such are not suported -->
     <!-- https://demos.emojione.com/latest/jstoshort.html to look at their :emoji: name -->
-
-    <title>Emoji Converter </title>
-
-    <!-- Bootstrap -->
-    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
-    <!-- iCheck -->
-    <link href="/static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
-
-    <!-- bootstrap-progressbar -->
-    <link href="/static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
-    <!-- JQVMap -->
-    <link href="/static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
-    <!-- bootstrap-daterangepicker -->
-    <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-
-    <!-- Custom Theme Style -->
-    <link href="/static/build/css/custom.min.css" rel="stylesheet">
-{% endblock %}
 
 {% block content %}
     <div class="right_col" role="main">
@@ -61,69 +39,28 @@
     </div>
 {% endblock %}
 
-{% block javascript %}
-    <!-- jQuery -->
-    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-    <!-- FastClick -->
-    <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
-    <!-- NProgress -->
-    <script src="/static/vendors/nprogress/nprogress.js"></script>
-    <!-- Chart.js -->
-    <script src="/static/vendors/Chart.js/dist/Chart.min.js"></script>
-    <!-- gauge.js -->
-    <script src="/static/vendors/gauge.js/dist/gauge.min.js"></script>
-    <!-- bootstrap-progressbar -->
-    <script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-    <!-- iCheck -->
-    <script src="/static/vendors/iCheck/icheck.min.js"></script>
-    <!-- Skycons -->
-    <script src="/static/vendors/skycons/skycons.js"></script>
-    <!-- Flot -->
-    <script src="/static/vendors/Flot/jquery.flot.js"></script>
-    <script src="/static/vendors/Flot/jquery.flot.pie.js"></script>
-    <script src="/static/vendors/Flot/jquery.flot.time.js"></script>
-    <script src="/static/vendors/Flot/jquery.flot.stack.js"></script>
-    <script src="/static/vendors/Flot/jquery.flot.resize.js"></script>
-    <!-- Flot plugins -->
-    <script src="/static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
-    <script src="/static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
-    <script src="/static/vendors/flot.curvedlines/curvedLines.js"></script>
-    <!-- DateJS -->
-    <script src="/static/vendors/DateJS/build/date.js"></script>
-    <!-- JQVMap -->
-    <script src="/static/vendors/jqvmap/dist/jquery.vmap.js"></script>
-    <script src="/static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
-    <script src="/static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
-    <!-- bootstrap-daterangepicker -->
-    <script src="/static/vendors/moment/min/moment.min.js"></script>
-    <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+{% block customJS %}
+  <script>
+      function convert() {
+          var input = document.getElementById('emoji_input').value;
+          var output = emojione.toShort(input);
+          document.getElementById('emoji_output').innerHTML = output;
+      }
+  </script>
 
-    <!-- Custom Theme Scripts -->
-    <script src="/static/build/js/custom.min.js"></script>
-
-    <script>
-        function convert() {
-            var input = document.getElementById('emoji_input').value;
-            var output = emojione.toShort(input);
-            document.getElementById('emoji_output').innerHTML = output;
-        }
-    </script>
-
-    <!-- Jquery-2.2.4 JS -->
-    <script src="/static/js/jquery-2.2.4.min.js"></script>
-    <!-- Popper js -->
-    <script src="/static/js/popper.min.js"></script>
-    <!-- Bootstrap-4 Beta JS -->
-    <script src="/static/js/bootstrap.min.js"></script>
-    <!-- All Plugins JS -->
-    <script src="/static/js/plugins.js"></script>
-    <!-- Slick Slider Js-->
-    <script src="/static/js/slick.min.js"></script>
-    <!-- Footer Reveal JS -->
-    <script src="/static/js/footer-reveal.min.js"></script>
-    <!-- Active JS -->
-    <script src="/static/js/active.js"></script>
+  <!-- Jquery-2.2.4 JS -->
+  <script src="/static/js/jquery-2.2.4.min.js"></script>
+  <!-- Popper js -->
+  <script src="/static/js/popper.min.js"></script>
+  <!-- Bootstrap-4 Beta JS -->
+  <script src="/static/js/bootstrap.min.js"></script>
+  <!-- All Plugins JS -->
+  <script src="/static/js/plugins.js"></script>
+  <!-- Slick Slider Js-->
+  <script src="/static/js/slick.min.js"></script>
+  <!-- Footer Reveal JS -->
+  <script src="/static/js/footer-reveal.min.js"></script>
+  <!-- Active JS -->
+  <script src="/static/js/active.js"></script>
 
 {% endblock %}

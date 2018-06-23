@@ -1,28 +1,6 @@
 ﻿{% extends "admin/base.html" %}
-{% block headlinks %}
-    <title>Products</title>
 
-    <!-- Bootstrap -->
-    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
-    <!-- iCheck -->
-    <link href="/static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
-    <!-- bootstrap-wysiwyg -->
-    <link href="/static/vendors/google-code-prettify/bin/prettify.min.css" rel="stylesheet">
-    <!-- Select2 -->
-    <link href="/static/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
-    <!-- Switchery -->
-    <link href="/static/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
-    <!-- starrr -->
-    <link href="/static/vendors/starrr/dist/starrr.css" rel="stylesheet">
-    <!-- bootstrap-daterangepicker -->
-    <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-    <!-- Custom Theme Style -->
-    <link href="/static/build/css/custom.min.css" rel="stylesheet">
-{% endblock %}
+{% block title %}Products{% endblock %}
 
 {% block content %}
     <div class="right_col" role="main">
@@ -124,153 +102,113 @@
     </div>
 {% endblock %}
 
-{% block javascript %}
-    <!-- jQuery -->
-    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-    <!-- FastClick -->
-    <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
-    <!-- NProgress -->
-    <script src="/static/vendors/nprogress/nprogress.js"></script>
-    <!-- jQuery Smart Wizard -->
-    <script src="/static/vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js"></script>
-    <!-- Custom Theme Scripts -->
-    <script src="/static/build/js/custom.min.js"></script>
-
-
-    <!-- bootstrap-progressbar -->
-    <script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-    <!-- iCheck -->
-    <script src="/static/vendors/iCheck/icheck.min.js"></script>
-    <!-- bootstrap-daterangepicker -->
-    <script src="/static/vendors/moment/min/moment.min.js"></script>
-    <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
-    <!-- bootstrap-wysiwyg -->
-    <script src="/static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
-    <script src="/static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
-    <script src="/static/vendors/google-code-prettify/src/prettify.js"></script>
-    <!-- jQuery Tags Input -->
-    <script src="/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
-    <!-- Switchery -->
-    <script src="/static/vendors/switchery/dist/switchery.min.js"></script>
-    <!-- Select2 -->
-    <script src="/static/vendors/select2/dist/js/select2.full.min.js"></script>
-    <!-- Parsley -->
-    <script src="/static/vendors/parsleyjs/dist/parsley.min.js"></script>
-    <!-- Autosize -->
-    <script src="/static/vendors/autosize/dist/autosize.min.js"></script>
-    <!-- jQuery autocomplete -->
-    <script src="/static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
-    <!-- starrr -->
-    <script src="/static/vendors/starrr/dist/starrr.js"></script>
-
-    <script>
-        var numberOfProducts = 0;
-        {%for item in data%}
-            numberOfProducts++;
+{% block customJS %}
+<script>
+    var numberOfProducts = 0;
+    {%for item in data%}
+        numberOfProducts++;
+    {%endfor%}
+    var data = createArray(numberOfProducts);
+    var i = 0;
+    {%for item in data%}
+        {%for product in item%}
+            {%if product != None%}
+                data[i].push("{{product}}");
+            {%endif%}
         {%endfor%}
-        var data = createArray(numberOfProducts);
-        var i = 0;
-        {%for item in data%}
-            {%for product in item%}
-                {%if product != None%}
-                    data[i].push("{{product}}");
-                {%endif%}
-            {%endfor%}
-            i++;
-        {%endfor%}
-        i = 0;
-        for (var c = 0; c < data.length; c++) {
-            i++;
-            $("#tbody").append("<tr id=\"tr" + String(i) + "\">\
-          <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\
-          <td><input value=\"" + data[c][0] + "\" style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\
-          <td><input value=\"" + data[c][1] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\"></td>\
-          <td><input value=\"" + data[c][2] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\"></td>\
-          <td><input value=\"" + data[c][3] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\"></td>\
-          <td><input value=\"" + data[c][4] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\"></td>\
-          <td><input value=\"" + data[c][5] + "\" style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\"></td>\
-          <td><input value=\"" + data[c][6] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\"></td>\
-          <td><input value=\"" + data[c][7] + "\" style=\"width: 200px;\" type=\"text\" name=\"product_URL" + String(i) + "\"></td>\
-        </tr>");
-        }
+        i++;
+    {%endfor%}
+    i = 0;
+    for (var c = 0; c < data.length; c++) {
+        i++;
+        $("#tbody").append("<tr id=\"tr" + String(i) + "\">\
+      <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\
+      <td><input value=\"" + data[c][0] + "\" style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\
+      <td><input value=\"" + data[c][1] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\"></td>\
+      <td><input value=\"" + data[c][2] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\"></td>\
+      <td><input value=\"" + data[c][3] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\"></td>\
+      <td><input value=\"" + data[c][4] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\"></td>\
+      <td><input value=\"" + data[c][5] + "\" style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\"></td>\
+      <td><input value=\"" + data[c][6] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\"></td>\
+      <td><input value=\"" + data[c][7] + "\" style=\"width: 200px;\" type=\"text\" name=\"product_URL" + String(i) + "\"></td>\
+    </tr>");
+    }
 
-        function AddRow() {
-            i++;
-            $("#tbody").append("<tr id=\"tr" + String(i) + "\">\
-          <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\
-          <td><input style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\
-          <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\"></td>\
-          <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\"></td>\
-          <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\"></td>\
-          <td><input style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\"></td>\
-          <td><input style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\"></td>\
-          <td><input style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\"></td>\
-          <td><input style=\"width: 200px;\" type=\"text\" name=\"product_URL" + String(i) + "\"></td>\
-        </tr>");
-        }
+    function AddRow() {
+        i++;
+        $("#tbody").append("<tr id=\"tr" + String(i) + "\">\
+      <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\
+      <td><input style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\
+      <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\"></td>\
+      <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\"></td>\
+      <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\"></td>\
+      <td><input style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\"></td>\
+      <td><input style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\"></td>\
+      <td><input style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\"></td>\
+      <td><input style=\"width: 200px;\" type=\"text\" name=\"product_URL" + String(i) + "\"></td>\
+    </tr>");
+    }
 
-        function RemoveRow() {
-            for (var c = 1; c <= i; c++) {
-                try {
-                    if (document.getElementById("cb" + String(c)).checked) {
-                        document.getElementById("tr" + String(c)).remove();
-                        c--;
-                        for (var v = c; v <= i; v++) {
-                            document.getElementsByName("product_Delete" + String(v + 1))[0].setAttribute("name", "product_Delete" + String(v));
-                            document.getElementsByName("product_ID" + String(v + 1))[0].setAttribute("name", "product_ID" + String(v));
-                            document.getElementsByName("product_Name" + String(v + 1))[0].setAttribute("name", "product_Name" + String(v));
-                            document.getElementsByName("product_Brand" + String(v + 1))[0].setAttribute("name", "product_Brand" + String(v));
-                            document.getElementsByName("product_Model" + String(v + 1))[0].setAttribute("name", "product_Model" + String(v));
-                            document.getElementsByName("product_Price" + String(v + 1))[0].setAttribute("name", "product_Price" + String(v));
-                            document.getElementsByName("product_Keywords" + String(v + 1))[0].setAttribute("name", "product_Keywords" + String(v));
-                            document.getElementsByName("product_Discount" + String(v + 1))[0].setAttribute("name", "product_Discount" + String(v));
-                            document.getElementsByName("product_URL" + String(v + 1))[0].setAttribute("name", "product_URL" + String(v));
-                            i--;
-                        }
+    function RemoveRow() {
+        for (var c = 1; c <= i; c++) {
+            try {
+                if (document.getElementById("cb" + String(c)).checked) {
+                    document.getElementById("tr" + String(c)).remove();
+                    c--;
+                    for (var v = c; v <= i; v++) {
+                        document.getElementsByName("product_Delete" + String(v + 1))[0].setAttribute("name", "product_Delete" + String(v));
+                        document.getElementsByName("product_ID" + String(v + 1))[0].setAttribute("name", "product_ID" + String(v));
+                        document.getElementsByName("product_Name" + String(v + 1))[0].setAttribute("name", "product_Name" + String(v));
+                        document.getElementsByName("product_Brand" + String(v + 1))[0].setAttribute("name", "product_Brand" + String(v));
+                        document.getElementsByName("product_Model" + String(v + 1))[0].setAttribute("name", "product_Model" + String(v));
+                        document.getElementsByName("product_Price" + String(v + 1))[0].setAttribute("name", "product_Price" + String(v));
+                        document.getElementsByName("product_Keywords" + String(v + 1))[0].setAttribute("name", "product_Keywords" + String(v));
+                        document.getElementsByName("product_Discount" + String(v + 1))[0].setAttribute("name", "product_Discount" + String(v));
+                        document.getElementsByName("product_URL" + String(v + 1))[0].setAttribute("name", "product_URL" + String(v));
+                        i--;
                     }
-                }
-                catch (exx) {
-                    // console.log("Skip " + String(c));
-                    console.log(exx);
                 }
             }
-        }
-
-        document.getElementById("addRow").addEventListener("click", AddRow);
-        document.getElementById("removeRow").addEventListener("click", RemoveRow);
-
-        function createArray(rows) {
-            var arrayRow = [];
-            for (var i = 0; i < rows; i++) {
-                arrayRow[i] = [];
+            catch (exx) {
+                // console.log("Skip " + String(c));
+                console.log(exx);
             }
-            return arrayRow;
         }
+    }
 
-        function uploadProductFile() {
-            var form = document.forms.namedItem("productFileForm");
-            formData = new FormData(form);
+    document.getElementById("addRow").addEventListener("click", AddRow);
+    document.getElementById("removeRow").addEventListener("click", RemoveRow);
 
-            var xhttp = new XMLHttpRequest();
-            var msg = "";
-            xhttp.open("POST", "/admin/assistant/{{ id }}/products/file", true); // true is asynchronous
-            xhttp.onreadystatechange = function () {
-                if (xhttp.readyState === 4) {
-                    if (xhttp.status === 200) {
-                        msg = xhttp.responseText;
-                        window.location.reload();
-                    }
-                    else {
-                        console.error(xhttp.statusText);
-                        msg = "Error: other wierd response " + xhttp.status;
-                    }
-                    console.log(msg);
+    function createArray(rows) {
+        var arrayRow = [];
+        for (var i = 0; i < rows; i++) {
+            arrayRow[i] = [];
+        }
+        return arrayRow;
+    }
+
+    function uploadProductFile() {
+        var form = document.forms.namedItem("productFileForm");
+        formData = new FormData(form);
+
+        var xhttp = new XMLHttpRequest();
+        var msg = "";
+        xhttp.open("POST", "/admin/assistant/{{ id }}/products/file", true); // true is asynchronous
+        xhttp.onreadystatechange = function () {
+            if (xhttp.readyState === 4) {
+                if (xhttp.status === 200) {
+                    msg = xhttp.responseText;
+                    window.location.reload();
                 }
-            };
-            xhttp.send(formData);
-            return false;
-        }
-    </script>
+                else {
+                    console.error(xhttp.statusText);
+                    msg = "Error: other wierd response " + xhttp.status;
+                }
+                console.log(msg);
+            }
+        };
+        xhttp.send(formData);
+        return false;
+    }
+</script>
 {% endblock %}

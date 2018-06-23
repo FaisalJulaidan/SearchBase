@@ -62,9 +62,9 @@
                         </div>
                       </div>
                       <div class="ln_solid"></div>
-                      <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
-                      <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
                     </form>
+                    <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
+                    <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
                 </div>
             </div>
         </div>
@@ -303,53 +303,48 @@
       function ChangeNofQuestions() {
           var noq = parseInt(document.getElementById("number-of-questions").value);
           if (!Number.isNaN(noq)) {
-              if (noq <= maxQuestions) {
-                  if (noq > oldNOQ) {
-                      for (i = oldNOQ; i < noq; i++) {
-                          var number;
-                          if (i == 0) {
-                              number = "First"
-                          }
-                          if (i == 1) {
-                              number = "Second"
-                          }
-                          if (i == 2) {
-                              number = "Third"
-                          }
-                          if (i == 3) {
-                              number = "Fourth"
-                          }
-                          if (i == 4) {
-                              number = "Fifth"
-                          }
-                          if (i == 5) {
-                              number = "Sixth"
-                          }
-                          if (i == 6) {
-                              number = "Seventh"
-                          }
-                          if (i == 7) {
-                              number = "Eight"
-                          }
-                          if (i == 8) {
-                              number = "Ninth"
-                          }
-                          if (i == 9) {
-                              number = "Tenth"
-                          }
-                          // TODO:
-                          // $("#QuestionDiv").append(cookUpQuestionElement)
-                          // add preset question to fill
-                      }
+            if (noq <= maxQuestions) {
+              if (noq > oldNOQ) {
+                for (i = oldNOQ; i < noq; i++) {
+                  var textNumber;
+                  switch (i) {
+                    case 0: textNumber="First"
+                      break;
+                    case 1: textNumber="Second"
+                      break;
+                    case 2: textNumber="Third"
+                      break;
+                    case 3: textNumber="Fourth"
+                      break;
+                    case 4: textNumber="Fifth"
+                      break;
+                    case 5: textNumber="Sixth"
+                      break;
+                    case 6: textNumber="Seventh"
+                      break;
+                    case 7: textNumber="Eighth"
+                      break;
+                    case 8: textNumber="Ninth"
+                      break;
+                    case 9: textNumber="Tenth"
+                      break;
+                    case 10: textNumber="Eleventh"
+                      break;
+                    case 11: textNumber="Twelveth"
+                      break;
                   }
-                  else if (noq < oldNOQ) {
-                      for (i = oldNOQ; i > noq; i--) {
-                          $(".Questions")[$(".Questions").length - 1].remove();
-                      }
-                  }
-                  oldNOQ = noq;
-                  document.getElementById("noq-hidden").value = String(noq);
+                  var questionData = data[i].split(";")[0]
+                  $("#QuestionDiv").append(cookUpQuestionElement(textNumber,questionData,i))
+                }
               }
+              else if (noq < oldNOQ) {
+                for (i = oldNOQ; i > noq; i--) {
+                  $("#QuestionDiv>.row")[$("#QuestionDiv>.row").length - 1].remove();
+                }
+              }
+              oldNOQ = noq;
+              document.getElementById("noq-hidden").value = String(noq);
+            }
           }
       }
 

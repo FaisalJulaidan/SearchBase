@@ -23,41 +23,41 @@
 
             <p>All of the Data Collected</p>
 
+            <button onclick="fnExcelReport()">Export Excel</button>
+
             <div class="table-responsive">
-                <table class="table table-striped jambo_table bulk_action">
+                <table id="dataTable" class="table table-striped jambo_table bulk_action">
                     <thead>
-                    <!-- Beginning of data -->
-                    <tr id="tableHeadingUIn" class="headings">
-                        <!--<th class="column-title">Storage ID</th>
-                        <th class="column-title">Date Stored </th>
-                        <th class="column-title">Name </th>
-                        <th class="column-title">Email </th>
-                        <th class="column-title">Telephone </th>
-                        <th class="column-title">CV </th>
-                        <th class="column-title no-link last">
-                            <span class="nobr">Action</span>
-                        </th>
-                        <th class="bulk-actions" colspan="7">
-                            <a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
-                        </th>-->
-                    </tr>
-                    <!-- End of data -->
+                        <!-- Beginning of data -->
+                        <tr id="tableHeadingUIn" class="headings"></tr>
+                        <!-- End of data -->
                     </thead>
 
-                    <tbody id="tBodyUIn">
-                    <!-- Start -->
-                    <!--<tr class="even pointer">
-                      <td class=" ">00001</td>
-                      <td class=" ">May 23, 2018 11:47:56 PM </td>
-                      <td class=" ">Mehdi Este</td>
-                      <td class=" ">contact@thesearchbase.com</td>
-                      <td class=" ">072364262</td>
-                      <td class=" "><a href="#">File Here</a></td>
-                      <td class=" last"><a href="#">View</a></td>
-                    </tr>-->
-                    <!-- End -->
-                    </tbody>
+                    <tbody id="tBodyUIn"></tbody>
                 </table>
+                <!--<th class="column-title">Storage ID</th>
+    <th class="column-title">Date Stored </th>
+    <th class="column-title">Name </th>
+    <th class="column-title">Email </th>
+    <th class="column-title">Telephone </th>
+    <th class="column-title">CV </th>
+    <th class="column-title no-link last">
+        <span class="nobr">Action</span>
+    </th>
+    <th class="bulk-actions" colspan="7">
+        <a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
+    </th>-->
+                <!-- Start -->
+                <!--<tr class="even pointer">
+      <td class=" ">00001</td>
+      <td class=" ">May 23, 2018 11:47:56 PM </td>
+      <td class=" ">Mehdi Este</td>
+      <td class=" ">contact@thesearchbase.com</td>
+      <td class=" ">072364262</td>
+      <td class=" "><a href="#">File Here</a></td>
+      <td class=" last"><a href="#">View</a></td>
+    </tr>-->
+                <!-- End -->
             </div>
         </div>
     </div>
@@ -80,6 +80,7 @@
 
 <script>
     var tableHeading = $("#tableHeadingUIn");
+    var tableString = "<table><tr><th>Record ID</th><th>Date</th>";
     tableHeading.append("<th class=\"column-title\">Record ID</th>");
     tableHeading.append("<th class=\"column-title\">Date</th>");
     var numberOfHeaders = 0;
@@ -103,7 +104,9 @@
     {% endfor %}
     for (var i = 1; i <= numberOfHeaders - 2; i++) {
         tableHeading.append("<th class=\"column-title\">Data " + i + "</th>");
+        tableString+="<th>Data"+i+"</th>"
     }
+    tableString+="</tr>"
     var tableBody = $("#tBodyUIn");
     var i = 0;
     var ii = 0;
@@ -112,15 +115,44 @@
         i++;
         ii = 0;
         appendString += "<tr id=\"" + i + "\" class=\"even pointer\">";
+        tableString+="<tr>"
         {%for record in item %}
             ii++;
             if (ii <= numberOfHeaders) {
                 appendString += "<td id=\"" + i + "_" + ii + "\" class=\" \" >{{record}}</td >";
+                tableString+="<td>{{record}}</td>"
             }
         {%endfor%}
         appendString += "</tr>";
+        tableString+= "</tr>"
         tableBody.append(appendString);
         appendString = "";
-    {%endfor%}
+    {% endfor %}
+    tableString+="</table>"
+
+    //var tableString = $("#dataTable").html();
+
+    function fnExcelReport() {
+        tab_text = tableString;
+        tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//comment if u want links in your table
+        tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // comment if u want images in your table
+        tab_text = tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // comment if you want input params
+
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf("MSIE ");
+
+        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
+        {
+            txtArea1.document.open("txt/html", "replace");
+            txtArea1.document.write(tab_text);
+            txtArea1.document.close();
+            txtArea1.focus();
+            sa = txtArea1.document.execCommand("SaveAs", true, "Say Thanks to Sumit.xls");
+        }
+        else                 //other browser not tested on IE 11
+            sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
+
+        return (sa);
+    }
 </script>
 {% endblock %}

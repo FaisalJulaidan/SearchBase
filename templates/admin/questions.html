@@ -1,39 +1,13 @@
 ﻿{% extends "admin/base.html" %}
 
-{% block headlinks %}
-    <title>Questions</title>
-    <!-- Bootstrap -->
-    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
-    <!-- iCheck -->
-    <link href="/static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
-    <!-- bootstrap-wysiwyg -->
-    <link href="/static/vendors/google-code-prettify/bin/prettify.min.css" rel="stylesheet">
-    <!-- Select2 -->
-    <link href="/static/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
-    <!-- Switchery -->
-    <link href="/static/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
-    <!-- starrr -->
-    <link href="/static/vendors/starrr/dist/starrr.css" rel="stylesheet">
-    <!-- bootstrap-daterangepicker -->
-    <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-    <!-- Custom Theme Style -->
-    <link href="/static/build/css/custom.min.css" rel="stylesheet">
-    <!-- bootstrap-progressbar -->
-    <link href="/static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
-    <!-- JQVMap -->
-    <link href="/static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
-{% endblock %}
+{% block title %}Questions{% endblock %}
 
 {% block content %}
     <div class="right_col" role="main">
     <div class="">
     <div class="page-title">
         <div class="title_left">
-            <h3>Questions</h3>
+          <h3>Questions</h3>
         </div>
     </div>
     <div class="clearfix"></div>
@@ -73,27 +47,24 @@
                 </div>
                 <div class="x_content">
                     <br/>
+                    <style media="screen">
+                    .form-control {
+                      border-radius: 4px;
+                      width: 50%;
+                    }
+                    </style>
                     <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
-
-                        <div class="form-group">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
-                                Enter
-                                the number of questions <span class="required">*</span>
-                            </label>
-                            <div class="col-md-1 col-sm-1 col-xs-12">
-                                <input type="text" id="number-of-questions" required="required"
-                                       class="form-control col-md-1 col-xs-1">
-                            </div>
+                      <div class="form-group">
+                        <h2>Please Enter The Desired Number Of Questions:</h2>
+                        <div class="input-group" style="width:250px;margin:10px 0 0 10px">
+                          <span class="input-group-addon" id="basic-addon1">Number of questions<span class="required">*</span></span>
+                          <input id="number-of-questions" type="number" class="form-control" required placeholder="Number Of Questions" aria-describedby="basic-addon1">
                         </div>
-                        <div class="ln_solid"></div>
-                        <div class="form-group">
-                            <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                            </div>
-                        </div>
-
+                      </div>
+                      <div class="ln_solid"></div>
+                      <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
+                      <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
                     </form>
-                    <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
-                    <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
                 </div>
             </div>
         </div>
@@ -136,20 +107,18 @@
                 <br/>
                 <div class="form-group">
                     <form id="QuestionForm" action="/admin/assistant/{{ id }}/questions" method="post">
-                        <div id="QuestionDiv">
-                            <!-- Question Templates appear here -->
-                        </div>
-                        <input type="hidden" id="noq-hidden" name="noq-hidden" value="">
-                        <button type="submit" id="QTemplate-SubmitB" class="btn btn-success">
-                            Submit
-                        </button>
+                      <input type="hidden" id="noq-hidden" name="noq-hidden" value="">
+                      <div id="QuestionDiv">
+                        <!-- Question Templates appear here -->
+
+                      </div>
                     </form>
-                </div>
-                <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
-                <div class="ln_solid"></div>
-                <div class="form-group">
-                    <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                    </div>
+
+                    <!-- <div class="ln_solid"></div> -->
+                    <button type="submit" id="QTemplate-SubmitB" class="btn btn-success">
+                      Submit
+                    </button>
+                    <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
                 </div>
             </div>
         </div>
@@ -194,824 +163,245 @@
     <script src="/static/build/js/custom.min.js"></script>
     <!-- Questions Script -->
     <script>
-        // set variables
-        var oldNOQ = 0;
-        var maxQuestions = 10;
-        // set the question form template
-        var qTemplate1 = "<div class = \"Questions\"><label class=\"control-label col-md-3 col-sm-3 col-xs-12\" for=\"last-name\">"
-        var qTemplate2 = " question <span class=\"required\">*</span></label><div class=\"col-md-6 col-sm-6 col-xs-12\"><input type=\"text\" name=\""
-        // set event listeners
-        document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
-        document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
-        document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
+      // set variables
+      var oldNOQ = 0;
+      var maxQuestions = 10;
+      // set the question form template
+      var qTemplate1 = "<div class = \"Questions\"><label class=\"control-label col-md-3 col-sm-3 col-xs-12\" for=\"last-name\">"
+      var qTemplate2 = " question <span class=\"required\">*</span></label><div class=\"col-md-6 col-sm-6 col-xs-12\"><input type=\"text\" name=\""
+      // set event listeners
+      document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
+      document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
+      document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
 
-        // called on NOQ Reset Click
-        function ClearNOQ() {
-            document.getElementById("number-of-questions").value = "";
-            $("#QuestionDiv").empty();
-            oldNOQ = 0;
-        }
+      // called on NOQ Reset Click
+      function ClearNOQ() {
+        document.getElementById("number-of-questions").value = "";
+        $("#QuestionDiv").empty();
+        oldNOQ = 0;
+      }
+      // var data = {{data}};
+      var data = [];
+      var typeCheck = [];
 
-        // var data = {{data}};
-        var data = [];
-        var typeCheck = [];
-        {%for item in data%}
-            data.push("{{item[0]}}");
-            typeCheck.push("{{item[0].split(';')[1]}}");
-        {%endfor%}
-        var noq = data.length;
-        if (!Number.isNaN(noq)) {
-            if (noq <= maxQuestions) {
-                if (noq > oldNOQ) {
-                    for (i = oldNOQ; i < noq; i++) {
-                        var number;
-                        if (i == 0) {
-                            number = "First"
-                        }
-                        if (i == 1) {
-                            number = "Second"
-                        }
-                        if (i == 2) {
-                            number = "Third"
-                        }
-                        if (i == 3) {
-                            number = "Fourth"
-                        }
-                        if (i == 4) {
-                            number = "Fifth"
-                        }
-                        if (i == 5) {
-                            number = "Sixth"
-                        }
-                        if (i == 6) {
-                            number = "Seventh"
-                        }
-                        if (i == 7) {
-                            number = "Eight"
-                        }
-                        if (i == 8) {
-                            number = "Ninth"
-                        }
-                        if (i == 9) {
-                            number = "Tenth"
-                        }
-                        $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + "\" \
-              required=\"required\" value= \"" + data[i].split(";")[0] + "\" class=\"form-control col-md-7 col-xs-12\">\
-              <input onclick=\"CheckTypeBox('both" + i + "')\" id='bothB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"both\">Both\
-              <input onclick=\"CheckTypeBox('db" + i + "')\" id='dbB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"dbRetrieval\" checked>Data Base Retrieval\
-              <input onclick=\"CheckTypeBox('ui" + i + "')\" id='uiB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"userInfoRetrieval\">User Input Retrieval\
-              </div><br /><br /></div>");
-                        if (typeCheck[i] == "userInfoRetrieval") {
-                            $("#dbB" + i).prop('checked', false);
-                            $("#uiB" + i).prop('checked', true);
-                        }
-                        else if (typeCheck[i] == "both") {
-                            $("#dbB" + i).prop('checked', false);
-                            $("#bothB" + i).prop('checked', true);
-                        }
-                        $("#number-of-questions").val(noq);
-                    }
-                }
-                else if (noq < oldNOQ) {
-                    for (i = oldNOQ; i > noq; i--) {
-                        $(".Questions")[$(".Questions").length - 1].remove();
-                    }
-                }
-                oldNOQ = noq;
-                document.getElementById("noq-hidden").value = String(noq);
-            }
-        }
+      {%for item in data%}
+        data.push("{{item[0]}}");
+        typeCheck.push("{{item[0].split(';')[1]}}");
+      {%endfor%}
+      var noq = data.length;
+      if (!Number.isNaN(noq)) {
+        if (noq <= maxQuestions) {
+          if (noq > oldNOQ) {
+            for (i = oldNOQ; i < noq; i++) {
+              var textNumber;
+              switch (i) {
+                case 0: textNumber="First"
+                  break;
+                case 1: textNumber="Second"
+                  break;
+                case 2: textNumber="Third"
+                  break;
+                case 3: textNumber="Fourth"
+                  break;
+                case 4: textNumber="Fifth"
+                  break;
+                case 5: textNumber="Sixth"
+                  break;
+                case 6: textNumber="Seventh"
+                  break;
+                case 7: textNumber="Eighth"
+                  break;
+                case 8: textNumber="Ninth"
+                  break;
+                case 9: textNumber="Tenth"
+                  break;
+                case 10: textNumber="Eleventh"
+                  break;
+                case 11: textNumber="Twelveth"
+                  break;
+              }
 
-        // called on NOQ Submit Click
-        function ChangeNofQuestions() {
-            var noq = parseInt(document.getElementById("number-of-questions").value);
-            if (!Number.isNaN(noq)) {
-                if (noq <= maxQuestions) {
-                    if (noq > oldNOQ) {
-                        for (i = oldNOQ; i < noq; i++) {
-                            var number;
-                            if (i == 0) {
-                                number = "First"
-                            }
-                            if (i == 1) {
-                                number = "Second"
-                            }
-                            if (i == 2) {
-                                number = "Third"
-                            }
-                            if (i == 3) {
-                                number = "Fourth"
-                            }
-                            if (i == 4) {
-                                number = "Fifth"
-                            }
-                            if (i == 5) {
-                                number = "Sixth"
-                            }
-                            if (i == 6) {
-                                number = "Seventh"
-                            }
-                            if (i == 7) {
-                                number = "Eight"
-                            }
-                            if (i == 8) {
-                                number = "Ninth"
-                            }
-                            if (i == 9) {
-                                number = "Tenth"
-                            }
-                            $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + "\" \
-                required=\"required\" class=\"form-control col-md-7 col-xs-12\">\
-              <input onclick=\"CheckTypeBox('both" + i + "')\" id='bothB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"both\">Both\
-                <input onclick=\"CheckTypeBox('db" + i + "')\" id='dbB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"dbRetrieval\" checked>Data Base Retrieval\
-                <input onclick=\"CheckTypeBox('ui" + i + "')\" id='uiB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"userInfoRetrieval\">User Input Retrieval\
-                </div><br /><br /></div>");
-                            // add preset question to fill
-                        }
-                    }
-                    else if (noq < oldNOQ) {
-                        for (i = oldNOQ; i > noq; i--) {
-                            $(".Questions")[$(".Questions").length - 1].remove();
-                        }
-                    }
-                    oldNOQ = noq;
-                    document.getElementById("noq-hidden").value = String(noq);
-                }
-            }
-        }
+              var questionData = data[i].split(";")[0]
+              $("#QuestionDiv").append(cookUpQuestionElement(textNumber,questionData,i))
+              // needs to be checked
+              // not sure of the business logic below
 
-        function CheckTypeBox(tBox) {
-            if (tBox.replace(/[0-9]/g, '') == "both") {
-                $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
-                $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
-            }
-            if (tBox.replace(/[0-9]/g, '') == "db") {
-                $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
-                $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
-            }
-            if (tBox.replace(/[0-9]/g, '') == "ui") {
-                $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
-                $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
-            }
-        }
+              if (typeCheck[i] == "userInfoRetrieval") {
+                $("#bothB" + i).prop('checked', false);
+                $("#dbB" + i).prop('checked',   false);
+                $("#uiB" + i).prop('checked',   true);
+              }
+              else if (typeCheck[i] == "dbRetrieval") {
+                $("#bothB" + i).prop('checked', false);
+                $("#dbB" + i).prop('checked',   true);
+                $("#uiB" + i).prop('checked',   false);
+              }else {
+                $("#bothB" + i).prop('checked', true);
+                $("#dbB" + i).prop('checked',   false);
+                $("#uiB" + i).prop('checked',   false);
+              }
+              $("#number-of-questions").val(noq);
 
-        function ClearQTemplate() {
-            $("#QuestionDiv input").val("");
+            } // end of loop
+          }
+          else if (noq < oldNOQ) {
+            for (i = oldNOQ; i > noq; i--) {
+              $(".Questions")[$(".Questions").length - 1].remove();
+            }
+          }
+          oldNOQ = noq;
+          document.getElementById("noq-hidden").value = String(noq);
         }
+      }
 
-        function validation() {
-            // check if input is bigger than 10
-            var boxNumberOfQuestions = document.getElementById('number-of-questions').value;
-            var boxWelcomeMessage = document.getElementById('welcome-message').value;
-            // General validation
-            if (boxNumberOfQuestions == "") {
-                document.getElementById("number-of-questions").style.borderStyle = "solid";
-                document.getElementById("number-of-questions").style.borderColor = "red";
-                alert("Please enter the amount of numbers you would like to ask users.")
-                return false;
-            }
-            // Checking the lrngth of the input
-            if (boxNumberOfQuestions > 10) {
-                mesg = "You have entered too mnany questions."
-                mesg = mesg + "Please re-enter the number of question(s).\n"
-                mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
-                alert(mesg);
-                return false;
-            }
-            // Change colour of the border of the box
-            if (boxWelcomeMessage.length > 20) {
-                mesg = "The length of the welcome message is too long."
-                mesg = mesg + "Please re-enter the welcome message.\n"
-                mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
-                alert(mesg);
-                return false;
-            }
-            // Change colour of the border of the box
-            // Validation for the dynmaicaly loaded boxes
-            return true;
-        }
+
+      function cookUpQuestionElement(textNumber,questionData,i) {
+      return  "<div class='row'>" +
+              "  <div class='col-xs-12'>" +
+              "    <div class='input-group'>" +
+              "      <span class='input-group-addon' id='basic-addon1'>"+textNumber+" Question<span class='required'>*</span></span>" +
+              "      <input type='text' name='question1'" +
+              "             value='"+questionData+"' class='form-control' required" +
+              "             placeholder='Type your question here'>" +
+              "    </div>" +
+
+              "    <div class='col-xs-12 col-sm-4'>" +
+              "      <div class='input-group'>" +
+              "        <span class='input-group-addon'>" +
+              "          <input type='radio' name='qType"+i+"' value='both' onchange='CheckTypeBox(both"+i+")' id='bothB"+i+"'>" +
+              "        </span>" +
+              "        <input class='form-control' value='Both' readonly style='background-color:#fff; cursor: pointer;' "+
+              "               onclick='return this.parentElement.children[0].children[0].checked=true; CheckTypeBox(both"+i+")'>" +
+              "      </div>" +
+              "    </div> <!-- end of grid -->" +
+
+              "    <div class='col-xs-12 col-sm-4'>" +
+              "      <div class='input-group'>" +
+              "        <span class='input-group-addon'>" +
+              "          <input type='radio' name='qType"+i+"' value='dbRetrieval' onchange='CheckTypeBox(db"+i+")' id='dbB"+i+"'>" +
+              "        </span>" +
+              "        <input class='form-control' value='Data Base Retrieval' readonly style='background-color:#fff; cursor: pointer;' "+
+              "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(db"+i+") >" +
+              "      </div>" +
+              "    </div> <!-- end of grid -->" +
+
+              "    <div class='col-xs-12 col-sm-4'>" +
+              "      <div class='input-group'>" +
+              "        <span class='input-group-addon'>" +
+              "          <input type='radio' name='qType"+i+"' value='userInfoRetrieval' onchange='CheckTypeBox(ui"+i+")' id='uiB"+i+"'>" +
+              "        </span>" +
+              "        <input class='form-control' value='User Input Retrieval' readonly style='background-color:#fff; cursor: pointer;'"+
+              "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(ui"+i+")>" +
+              "      </div>" +
+              "    </div> <!-- end of grid -->" +
+
+              "  </div>"+
+              " </div>"+
+              "<div class='ln_solid'></div>"
+      }
+      // called on NOQ Submit Click
+      function ChangeNofQuestions() {
+          var noq = parseInt(document.getElementById("number-of-questions").value);
+          if (!Number.isNaN(noq)) {
+              if (noq <= maxQuestions) {
+                  if (noq > oldNOQ) {
+                      for (i = oldNOQ; i < noq; i++) {
+                          var number;
+                          if (i == 0) {
+                              number = "First"
+                          }
+                          if (i == 1) {
+                              number = "Second"
+                          }
+                          if (i == 2) {
+                              number = "Third"
+                          }
+                          if (i == 3) {
+                              number = "Fourth"
+                          }
+                          if (i == 4) {
+                              number = "Fifth"
+                          }
+                          if (i == 5) {
+                              number = "Sixth"
+                          }
+                          if (i == 6) {
+                              number = "Seventh"
+                          }
+                          if (i == 7) {
+                              number = "Eight"
+                          }
+                          if (i == 8) {
+                              number = "Ninth"
+                          }
+                          if (i == 9) {
+                              number = "Tenth"
+                          }
+                          // TODO:
+                          // $("#QuestionDiv").append(cookUpQuestionElement)
+                          // add preset question to fill
+                      }
+                  }
+                  else if (noq < oldNOQ) {
+                      for (i = oldNOQ; i > noq; i--) {
+                          $(".Questions")[$(".Questions").length - 1].remove();
+                      }
+                  }
+                  oldNOQ = noq;
+                  document.getElementById("noq-hidden").value = String(noq);
+              }
+          }
+      }
+
+      function CheckTypeBox(tBox) {
+          if (tBox.replace(/[0-9]/g, '') == "both") {
+              $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
+              $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
+          }
+          if (tBox.replace(/[0-9]/g, '') == "db") {
+              $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
+              $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
+          }
+          if (tBox.replace(/[0-9]/g, '') == "ui") {
+              $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
+              $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
+          }
+      }
+
+      function ClearQTemplate() {
+          $("#QuestionDiv input").val("");
+      }
+
+      function validation() {
+          // check if input is bigger than 10
+          var boxNumberOfQuestions = document.getElementById('number-of-questions').value;
+          var boxWelcomeMessage = document.getElementById('welcome-message').value;
+          // General validation
+          if (boxNumberOfQuestions == "") {
+              document.getElementById("number-of-questions").style.borderStyle = "solid";
+              document.getElementById("number-of-questions").style.borderColor = "red";
+              alert("Please enter the amount of numbers you would like to ask users.")
+              return false;
+          }
+          // Checking the lrngth of the input
+          if (boxNumberOfQuestions > 10) {
+              mesg = "You have entered too mnany questions."
+              mesg = mesg + "Please re-enter the number of question(s).\n"
+              mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
+              alert(mesg);
+              return false;
+          }
+          // Change colour of the border of the box
+          if (boxWelcomeMessage.length > 20) {
+              mesg = "The length of the welcome message is too long."
+              mesg = mesg + "Please re-enter the welcome message.\n"
+              mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
+              alert(mesg);
+              return false;
+          }
+          // Change colour of the border of the box
+          // Validation for the dynmaicaly loaded boxes
+          return true;
+      }
     </script>
 {% endblock %}
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Questions</title>
-
-    <!-- Bootstrap -->
-    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
-    <!-- iCheck -->
-    <link href="/static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
-    <!-- bootstrap-wysiwyg -->
-    <link href="/static/vendors/google-code-prettify/bin/prettify.min.css" rel="stylesheet">
-    <!-- Select2 -->
-    <link href="/static/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
-    <!-- Switchery -->
-    <link href="/static/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
-    <!-- starrr -->
-    <link href="/static/vendors/starrr/dist/starrr.css" rel="stylesheet">
-    <!-- bootstrap-daterangepicker -->
-    <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-    <!-- Custom Theme Style -->
-    <link href="/static/build/css/custom.min.css" rel="stylesheet">
-    <!-- bootstrap-progressbar -->
-    <link href="/static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
-    <!-- JQVMap -->
-    <link href="/static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
-</head>
-
-<body class="nav-md">
-<div class="container body">
-    <div class="main_container">
-        <div class="col-md-3 left_col">
-            <div class="left_col scroll-view">
-
-
-                <div class="navbar nav_title" style="border: 0;">
-                    <a href="/admin/homepage" class="site_title"> <img
-                            src="/static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchbase</span></a>
-                    <br/>
-                </div>
-
-                <div class="clearfix"></div>
-
-                <!-- menu profile quick info -->
-                <div class="profile clearfix">
-                    <div class="profile_pic">
-                        <img src="/static/images/img.jpg" alt="..." class="img-circle profile_img">
-                    </div>
-                    <div class="profile_info">
-                        <span>Welcome,</span>
-                        <h2>user</h2>
-                    </div>
-                </div>
-                <!-- /menu profile quick info -->
-
-                <br/>
-
-                <!-- sidebar menu -->
-                <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-                    <div class="menu_section">
-                        <h3>General</h3>
-                        <ul class="nav side-menu">
-                            <li>
-                                <a href="/admin/homepage"><i class="fa fa-home"></i> Dashboard</a>
-                            </li>
-                            <li>
-                                <a><i class="fa fa-comments-o"></i> Conversations <span
-                                        class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="/admin/Questions">Questions</a></li>
-                                    <li><a href="/admin/Answers">Answers</a></li>
-                                    <li><a href="/admin/Templates">Templates</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="/admin/Products"><i class="fa fa-database"></i> Product
-                                    Database<span></span></a>
-                            </li>
-                            <!-- User Data Storage -->
-                            <li>
-                                <a><i class="fa fa-cloud"></i> Data Storage <span class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="/admin/userinput">User Input</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a><i class="fa fa-wrench"></i> Tools <span class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="/emoji-converter">Emoji Converter</a></li>
-                                </ul>
-                            </li>
-                            <!-- End of user Data Storage -->
-                            <li>
-                                <a href="/admin/connect"><i class="fa fa-plug"></i> Connection<span
-                                        class="fa"></span></a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="menu_section">
-
-                        <h3>Settings</h3>
-                        <ul class="nav side-menu">
-                            <li>
-                                <a><i class="fa fa-gears"></i> Bot <span class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="/admin/settings">Main Settings</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-
-                        <h3>Account</h3>
-                        <ul class="nav side-menu">
-                            <li>
-                                <a><i class="fa fa-gears"></i> Account Details <span class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="/admin/profile">Profile</a></li>
-                                    <li><a href="/admin/users">Users</a></li>
-                                    <li><a href="/admin/billing">Billing</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="/admin/analytics">
-                                    <i class="fa fa-bar-chart"></i> Analytics<span class="fa"></span>
-                                </a>
-                            </li>
-                            <!-- <li><a><i class="fa fa-money"></i> Price Plan <span class="fa fa-chevron-down"></span></a>
-          <ul class="nav child_menu">
-            <li><a href="/admin/pricing">Pricing Tables</a></li>
-          </ul>
-        </li> -->
-
-                            <li>
-                                <a><i class="fa fa-life-saver"></i> Support <span class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="/admin/support/general">General Support</a>
-                                    <li>
-                                        <a>Technical Support<span class="fa fa-chevron-down"></span></a>
-                                        <ul class="nav child_menu">
-                                            <li class="sub_menu">
-                                                <a href="/admin/support/docs">Documentation</a>
-                                            </li>
-                                            <li>
-                                                <a href="/admin/support/setup">Getting setup</a>
-                                            </li>
-                                            <li>
-                                                <a href="/admin/support/intergration">Intergration with your site</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <a href="/admin/support/billing">Billing support</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /sidebar menu -->
-            </div>
-        </div>
-
-        <!-- top navigation -->
-        <div class="top_nav">
-            <div class="nav_menu">
-                <nav>
-                    <div class="nav toggle">
-                        <a id="menu_toggle"><i class="fa fa-bars"></i></a>
-                    </div>
-
-                    <ul class="nav navbar-nav navbar-right">
-                        <li class="">
-                            <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
-                               aria-expanded="false">
-                                <img src="/static/images/img.jpg" alt="">User
-                                <span class=" fa fa-angle-down"></span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-usermenu pull-right">
-                                <li><a href="/admin/profile"> Profile</a></li>
-                                <li><a href="/admin/support/general">Help</a></li>
-                                <li><a href="/login"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
-                            </ul>
-                        </li>
-
-                        <li role="presentation" class="dropdown">
-                            <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown"
-                               aria-expanded="false">
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-        <!-- /top navigation -->
-
-        <!-- page content -->
-        <div class="right_col" role="main">
-            <div class="">
-                <div class="page-title">
-                    <div class="title_left">
-                        <h3>Questions</h3>
-                    </div>
-                </div>
-                <div class="clearfix"></div>
-
-                <!-- Start of welcome message -->
-                <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <div class="x_panel">
-                            <div class="x_title">
-                                <h2>Enter the welcome message for your assistant
-                                    <small>Tip: it's best to introduce what your assistant will do and introduce your
-                                        company.
-                                    </small>
-                                </h2>
-                                <ul class="nav navbar-right panel_toolbox"></ul>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <br/>
-                                <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
-                                      action="/admin/welcomemsg" method="post">
-                                    <div class="form-group">
-                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="">
-                                            Enter your welcome message <span class="required">*</span>
-                                        </label>
-                                        <div class="col-md-9 col-sm-9 col-xs-12">
-                                            <input value="{{ message }}" name="welcome-message" type="text"
-                                                   id="welcome-message" required="required"
-                                                   class="form-control col-md-5 col-xs-10"
-                                                   placeholder="You can leave this empty is you wish.">
-                                        </div>
-                                    </div>
-                                    <div class="ln_solid"></div>
-                                    <div class="form-group">
-                                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                                        </div>
-                                    </div>
-                                    <button id="WelcomeMessage-SubmitB" class="btn btn-success">Submit</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- End of welcome message -->
-
-                <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <div class="x_panel">
-                            <div class="x_title">
-                                <h2>
-                                    Enter the number of questions your assistant will have
-                                    <small>
-                                        Tip: it's best to keep the number of questions to no more than 6 for a better
-                                        assistant
-                                    </small>
-                                </h2>
-                                <ul class="nav navbar-right panel_toolbox">
-                                    <li>
-                                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                           aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <li>
-                                                <a href="#">Settings 1</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Settings 2</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <a class="close-link"><i class="fa fa-close"></i></a>
-                                    </li>
-                                </ul>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <br/>
-                                <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
-
-                                    <div class="form-group">
-                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">
-                                            Enter
-                                            the number of questions <span class="required">*</span>
-                                        </label>
-                                        <div class="col-md-1 col-sm-1 col-xs-12">
-                                            <input type="text" id="number-of-questions" required="required"
-                                                   class="form-control col-md-1 col-xs-1">
-                                        </div>
-                                    </div>
-                                    <div class="ln_solid"></div>
-                                    <div class="form-group">
-                                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                                        </div>
-                                    </div>
-
-                                </form>
-                                <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
-                                <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <div class="x_panel">
-                            <div class="x_title">
-                                <h2>
-                                    Enter your questions below
-                                    <small>
-                                        Tip: Keep your questions as simple as possible to keep your assistant
-                                        universal
-                                    </small>
-                                </h2>
-                                <ul class="nav navbar-right panel_toolbox">
-                                    <li>
-                                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                           aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <li>
-                                                <a href="#">Settings 1</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Settings 2</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <a class="close-link"><i class="fa fa-close"></i></a>
-                                    </li>
-                                </ul>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <br/>
-                                <div class="form-group">
-                                    <form id="QuestionForm" action="/admin/questions" method="post">
-                                        <div id="QuestionDiv">
-                                            <!-- Question Templates appear here -->
-                                        </div>
-                                        <input type="hidden" id="noq-hidden" name="noq-hidden" value="">
-                                        <button type="submit" id="QTemplate-SubmitB" class="btn btn-success">
-                                            Submit
-                                        </button>
-                                    </form>
-                                </div>
-                                <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
-                                <div class="ln_solid"></div>
-                                <div class="form-group">
-                                    <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <!-- footer content -->
-                    <footer>
-                        <div class="pull-right">
-                            </a>
-                        </div>
-                        <div class="clearfix"></div>
-                    </footer>
-                    <!-- /footer content -->
-                </div>
-            </div>
-
-            <!-- jQuery -->
-            <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
-            <!-- Bootstrap -->
-            <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-            <!-- FastClick -->
-            <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
-            <!-- NProgress -->
-            <script src="/static/vendors/nprogress/nprogress.js"></script>
-            <!-- bootstrap-progressbar -->
-            <script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-            <!-- iCheck -->
-            <script src="/static/vendors/iCheck/icheck.min.js"></script>
-            <!-- bootstrap-daterangepicker -->
-            <script src="/static/vendors/moment/min/moment.min.js"></script>
-            <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
-            <!-- bootstrap-wysiwyg -->
-            <script src="/static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
-            <script src="/static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
-            <script src="/static/vendors/google-code-prettify/src/prettify.js"></script>
-            <!-- jQuery Tags Input -->
-            <script src="/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
-            <!-- Switchery -->
-            <script src="/static/vendors/switchery/dist/switchery.min.js"></script>
-            <!-- Select2 -->
-            <script src="/static/vendors/select2/dist/js/select2.full.min.js"></script>
-            <!-- Parsley -->
-            <script src="/static/vendors/parsleyjs/dist/parsley.min.js"></script>
-            <!-- Autosize -->
-            <script src="/static/vendors/autosize/dist/autosize.min.js"></script>
-            <!-- jQuery autocomplete -->
-            <script src="/static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
-            <!-- starrr -->
-            <script src="/static/vendors/starrr/dist/starrr.js"></script>
-            <!-- Custom Theme Scripts -->
-            <script src="/static/build/js/custom.min.js"></script>
-            <!-- Questions Script -->
-            <script>
-                // set variables
-                var oldNOQ = 0;
-                var maxQuestions = 10;
-                // set the question form template
-                var qTemplate1 = "<div class = \"Questions\"><label class=\"control-label col-md-3 col-sm-3 col-xs-12\" for=\"last-name\">"
-                var qTemplate2 = " question <span class=\"required\">*</span></label><div class=\"col-md-6 col-sm-6 col-xs-12\"><input type=\"text\" name=\""
-                // set event listeners
-                document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
-                document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
-                document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
-
-                // called on NOQ Reset Click
-                function ClearNOQ() {
-                    document.getElementById("number-of-questions").value = "";
-                    $("#QuestionDiv").empty();
-                    oldNOQ = 0;
-                }
-
-                // var data = {{data}};
-                var data = [];
-                var typeCheck = [];
-                {%for item in data%}
-                    data.push("{{item[0]}}");
-                    typeCheck.push("{{item[0].split(';')[1]}}");
-                {%endfor%}
-                var noq = data.length;
-                if (!Number.isNaN(noq)) {
-                    if (noq <= maxQuestions) {
-                        if (noq > oldNOQ) {
-                            for (i = oldNOQ; i < noq; i++) {
-                                var number;
-                                if (i == 0) {
-                                    number = "First"
-                                }
-                                if (i == 1) {
-                                    number = "Second"
-                                }
-                                if (i == 2) {
-                                    number = "Third"
-                                }
-                                if (i == 3) {
-                                    number = "Fourth"
-                                }
-                                if (i == 4) {
-                                    number = "Fifth"
-                                }
-                                if (i == 5) {
-                                    number = "Sixth"
-                                }
-                                if (i == 6) {
-                                    number = "Seventh"
-                                }
-                                if (i == 7) {
-                                    number = "Eight"
-                                }
-                                if (i == 8) {
-                                    number = "Ninth"
-                                }
-                                if (i == 9) {
-                                    number = "Tenth"
-                                }
-                                $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + "\" \
-              required=\"required\" value= \"" + data[i].split(";")[0] + "\" class=\"form-control col-md-7 col-xs-12\">\
-              <input onclick=\"CheckTypeBox('both" + i + "')\" id='bothB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"both\">Both\
-              <input onclick=\"CheckTypeBox('db" + i + "')\" id='dbB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"dbRetrieval\" checked>Data Base Retrieval\
-              <input onclick=\"CheckTypeBox('ui" + i + "')\" id='uiB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"userInfoRetrieval\">User Input Retrieval\
-              </div><br /><br /></div>");
-                                if (typeCheck[i] == "userInfoRetrieval") {
-                                    $("#dbB" + i).prop('checked', false);
-                                    $("#uiB" + i).prop('checked', true);
-                                }
-                                else if (typeCheck[i] == "both") {
-                                    $("#dbB" + i).prop('checked', false);
-                                    $("#bothB" + i).prop('checked', true);
-                                }
-                                $("#number-of-questions").val(noq);
-                            }
-                        }
-                        else if (noq < oldNOQ) {
-                            for (i = oldNOQ; i > noq; i--) {
-                                $(".Questions")[$(".Questions").length - 1].remove();
-                            }
-                        }
-                        oldNOQ = noq;
-                        document.getElementById("noq-hidden").value = String(noq);
-                    }
-                }
-
-                // called on NOQ Submit Click
-                function ChangeNofQuestions() {
-                    var noq = parseInt(document.getElementById("number-of-questions").value);
-                    if (!Number.isNaN(noq)) {
-                        if (noq <= maxQuestions) {
-                            if (noq > oldNOQ) {
-                                for (i = oldNOQ; i < noq; i++) {
-                                    var number;
-                                    if (i == 0) {
-                                        number = "First"
-                                    }
-                                    if (i == 1) {
-                                        number = "Second"
-                                    }
-                                    if (i == 2) {
-                                        number = "Third"
-                                    }
-                                    if (i == 3) {
-                                        number = "Fourth"
-                                    }
-                                    if (i == 4) {
-                                        number = "Fifth"
-                                    }
-                                    if (i == 5) {
-                                        number = "Sixth"
-                                    }
-                                    if (i == 6) {
-                                        number = "Seventh"
-                                    }
-                                    if (i == 7) {
-                                        number = "Eight"
-                                    }
-                                    if (i == 8) {
-                                        number = "Ninth"
-                                    }
-                                    if (i == 9) {
-                                        number = "Tenth"
-                                    }
-                                    $("#QuestionDiv").append(qTemplate1 + number + qTemplate2 + "question" + (i + 1) + "\" \
-                required=\"required\" class=\"form-control col-md-7 col-xs-12\">\
-              <input onclick=\"CheckTypeBox('both" + i + "')\" id='bothB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"both\">Both\
-                <input onclick=\"CheckTypeBox('db" + i + "')\" id='dbB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"dbRetrieval\" checked>Data Base Retrieval\
-                <input onclick=\"CheckTypeBox('ui" + i + "')\" id='uiB" + i + "' type=\"checkbox\" name=\"qType" + i + "\" value=\"userInfoRetrieval\">User Input Retrieval\
-                </div><br /><br /></div>");
-                                    // add preset question to fill
-                                }
-                            }
-                            else if (noq < oldNOQ) {
-                                for (i = oldNOQ; i > noq; i--) {
-                                    $(".Questions")[$(".Questions").length - 1].remove();
-                                }
-                            }
-                            oldNOQ = noq;
-                            document.getElementById("noq-hidden").value = String(noq);
-                        }
-                    }
-                }
-
-                function CheckTypeBox(tBox) {
-                    if (tBox.replace(/[0-9]/g, '') == "both") {
-                        $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
-                        $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
-                    }
-                    if (tBox.replace(/[0-9]/g, '') == "db") {
-                        $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
-                        $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
-                    }
-                    if (tBox.replace(/[0-9]/g, '') == "ui") {
-                        $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
-                        $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
-                    }
-                }
-
-                function ClearQTemplate() {
-                    $("#QuestionDiv input").val("");
-                }
-
-                function validation() {
-                    // check if input is bigger than 10
-                    var boxNumberOfQuestions = document.getElementById('number-of-questions').value;
-                    var boxWelcomeMessage = document.getElementById('welcome-message').value;
-                    // General validation
-                    if (boxNumberOfQuestions == "") {
-                        document.getElementById("number-of-questions").style.borderStyle = "solid";
-                        document.getElementById("number-of-questions").style.borderColor = "red";
-                        alert("Please enter the amount of numbers you would like to ask users.")
-                        return false;
-                    }
-                    // Checking the lrngth of the input
-                    if (boxNumberOfQuestions > 10) {
-                        mesg = "You have entered too mnany questions."
-                        mesg = mesg + "Please re-enter the number of question(s).\n"
-                        mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
-                        alert(mesg);
-                        return false;
-                    }
-                    // Change colour of the border of the box
-                    if (boxWelcomeMessage.length > 20) {
-                        mesg = "The length of the welcome message is too long."
-                        mesg = mesg + "Please re-enter the welcome message.\n"
-                        mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
-                        alert(mesg);
-                        return false;
-                    }
-                    // Change colour of the border of the box
-                    // Validation for the dynmaicaly loaded boxes
-                    return true;
-                }
-            </script>
-
-</body>
-</html>

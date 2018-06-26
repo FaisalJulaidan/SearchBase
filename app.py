@@ -268,31 +268,64 @@ def signup():
     if request.method == "GET":
         return render_template("signup.html", debug=app.debug)
     elif request.method == "POST":
+
+        email = request.form.get("email", default="Error")
+        email = email.lower()
+
         companyName = request.form.get("companyName", default="Error")
         companySize = request.form.get("companySize")
+
+        # TODO should be the Stripe subscription ID
         subscription = request.form.get("subscription", default="Error")
+
         websiteURL = request.form.get("websiteURL", default="Error")
 
-        if companyName == "Error" or subscription == "Error" or websiteURL == "Error":
+        if email == "Error" or companyName == "Error" or subscription == "Error" or websiteURL == "Error":
             print("Invalid request")
             render_template("signup.html", msg="Invalid request", debug=app.debug), status.HTTP_400_BAD_REQUEST
 
+
+
+        # TODO subscribe the company using Stripe API then retrieve the subscription ID and store it in DB
+        # Make sure the payment succeeds
         insertCompanyResponse = insert_into_database_table(
-            "INSERT INTO Companies ('Name', 'Size', 'URL', 'Subscription') VALUES (?,?,?,?);",
-            (companyName, companySize, websiteURL, subscription))
+            "INSERT INTO Companies ('Name', 'Size', 'URL') VALUES (?,?,?);",
+            (companyName, companySize, websiteURL))
+
+
+
         if "added" not in insertCompanyResponse:
             if "UNIQUE constraint" in insertCompanyResponse:
                 return render_template("signup.html", msg=companyName + " already has an account.", debug=app.debug)
             else:
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # if the company has been created successfully
         else:
+
+            # Create a Stripe customer for the new company.
+            new_customer = stripe.Customer.create(
+                email=email
+            )
+            print(new_customer)
+
+            # update company for with stripe details
+            update_table("UPDATE Companies SET SubscriptionID=?, StripeID=? WHERE Name=?",
+                         ['SubTest', new_customer['id'], companyName])
+
+            # TODO this need to removed in production
+            # remove the Stripe customer when not in production to kepp Stripe clean when testing
+            # if app.debug:
+            #     new_customer.delete()
+
+
             company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [companyName])
             # TODO check company for errors
             companyID = company[0]
             fullname = request.form.get("fullname", default="Error")
             accessLevel = "Admin"
-            email = request.form.get("email", default="Error")
-            email = email.lower()
+
+
             password = request.form.get("password", default="Error")
             if fullname == "Error" or accessLevel == "Error" or email == "Error" or password == "Error":
                 print("Invalid request")

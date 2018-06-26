@@ -734,8 +734,11 @@ def admin_answers(assistantID):
                 for i in range(1, noa):
                     answer = request.form.get("pname" + str(i), default="Error")
                     # TODO check answer for errors
-                    keyword = request.form.get("keywords" + str(i), default="Error")
+                    # keyword = request.form.get("keywords" + str(i), default="Error")
+                    keyword = request.form.getlist("keywords" + str(i))
+                    keyword = ','.join(keyword)
                     # TODO check keywords for errors
+                    # print(request.form.getlist("keywords" + str(i)))
                     action = request.form.get("action" + str(i), default="None")
                     # TODO check action for errors
                     insertAnswer = insert_into_database_table(

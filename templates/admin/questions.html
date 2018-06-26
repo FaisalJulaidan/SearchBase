@@ -112,13 +112,13 @@
                         <!-- Question Templates appear here -->
 
                       </div>
+                      <button type="submit" id="QTemplate-SubmitB" class="btn btn-success">
+                        Submit
+                      </button>
+                      <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
                     </form>
 
                     <!-- <div class="ln_solid"></div> -->
-                    <button type="submit" id="QTemplate-SubmitB" class="btn btn-success">
-                      Submit
-                    </button>
-                    <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
                 </div>
             </div>
         </div>
@@ -148,6 +148,7 @@
 
             setTimeout(function () {
               $("#number-of-questions").parent()[0].style.boxShadow=""
+              $("#number-of-questions").parent()[0].style.transition="box-shadow 1s ease-in-out"
             }, 500);
 
           }
@@ -178,7 +179,7 @@
         $("#QuestionDiv").empty();
         oldNOQ = 0;
       }
-      // var data = {{data}};
+
       var data = [];
       var typeCheck = [];
 
@@ -193,50 +194,50 @@
 
 
       function cookUpQuestionElement(textNumber,questionData,i) {
-      return  "<div class='question'>"+
-              "<div class='row'>" +
-              "  <div class='col-xs-12'>" +
-              "    <div class='input-group'>" +
-              "      <span class='input-group-addon' id='basic-addon1'>"+textNumber+" Question<span class='required'>*</span></span>" +
-              "      <input type='text' name='question1'" +
-              "             value='"+questionData+"' class='form-control' required" +
-              "             placeholder='Type your question here'>" +
-              "    </div>" +
+          return  "<div class='question'>"+
+                  "<div class='row'>" +
+                  "  <div class='col-xs-12'>" +
+                  "    <div class='input-group'>" +
+                  "      <span class='input-group-addon' id='basic-addon1'>"+textNumber+" Question<span class='required'>*</span></span>" +
+                  "      <input type='text' name='question"+(i+1)+"'" +
+                  "             value='"+questionData+"' class='form-control' required" +
+                  "             placeholder='Type your question here'>" +
+                  "    </div>" +
 
-              "    <div class='col-xs-12 col-sm-4'>" +
-              "      <div class='input-group'>" +
-              "        <span class='input-group-addon'>" +
-              "          <input type='radio' name='qType"+i+"' value='both' onchange=\"CheckTypeBox(\'both"+i+"\')\" id='bothB"+i+"' >" +
-              "        </span>" +
-              "        <input class='form-control' value='Both' readonly style='background-color:#fff; cursor: pointer;' "+
-              "               onclick='return this.parentElement.children[0].children[0].checked=true; CheckTypeBox(string(both"+i+"))'>" +
-              "      </div>" +
-              "    </div> <!-- end of grid -->" +
+                  "    <div class='col-xs-12 col-sm-4'>" +
+                  "      <div class='input-group'>" +
+                  "        <span class='input-group-addon'>" +
+                  "          <input type='radio' name='qType"+i+"' value='both' onchange=\"CheckTypeBox(\'both"+i+"\')\" id='bothB"+i+"' required >" +
+                  "        </span>" +
+                  "        <input class='form-control' value='Both' readonly style='background-color:#fff; cursor: pointer;' "+
+                  "               onclick='return this.parentElement.children[0].children[0].checked=true; CheckTypeBox(string(both"+i+"))'>" +
+                  "      </div>" +
+                  "    </div> <!-- end of grid -->" +
 
-              "    <div class='col-xs-12 col-sm-4'>" +
-              "      <div class='input-group'>" +
-              "        <span class='input-group-addon'>" +
-              "          <input type='radio' name='qType"+i+"' value='dbRetrieval' onchange=\"CheckTypeBox(\'db"+i+"\')\" id='dbB"+i+"'>" +
-              "        </span>" +
-              "        <input class='form-control' value='Data Base Retrieval' readonly style='background-color:#fff; cursor: pointer;' "+
-              "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(string(db"+i+")) >" +
-              "      </div>" +
-              "    </div> <!-- end of grid -->" +
+                  "    <div class='col-xs-12 col-sm-4'>" +
+                  "      <div class='input-group'>" +
+                  "        <span class='input-group-addon'>" +
+                  "          <input type='radio' name='qType"+i+"' value='dbRetrieval' onchange=\"CheckTypeBox(\'db"+i+"\')\" id='dbB"+i+"' required >" +
+                  "        </span>" +
+                  "        <input class='form-control' value='Data Base Retrieval' readonly style='background-color:#fff; cursor: pointer;' "+
+                  "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(string(db"+i+")) >" +
+                  "      </div>" +
+                  "    </div> <!-- end of grid -->" +
 
-              "    <div class='col-xs-12 col-sm-4'>" +
-              "      <div class='input-group'>" +
-              "        <span class='input-group-addon'>" +
-              "          <input type='radio' name='qType"+i+"' value='userInfoRetrieval' onchange=\"CheckTypeBox(\'ui"+i+"\')\" id='uiB"+i+"'>" +
-              "        </span>" +
-              "        <input class='form-control' value='User Input Retrieval' readonly style='background-color:#fff; cursor: pointer;'"+
-              "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(string(ui"+i+"))>" +
-              "      </div>" +
-              "    </div> <!-- end of grid -->" +
+                  "    <div class='col-xs-12 col-sm-4'>" +
+                  "      <div class='input-group'>" +
+                  "        <span class='input-group-addon'>" +
+                  "          <input type='radio' name='qType"+i+"' value='userInfoRetrieval' onchange=\"CheckTypeBox(\'ui"+i+"\')\" id='uiB"+i+"' required >" +
+                  "        </span>" +
+                  "        <input class='form-control' value='User Input Retrieval' readonly style='background-color:#fff; cursor: pointer;'"+
+                  "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(string(ui"+i+"))>" +
+                  "      </div>" +
+                  "    </div> <!-- end of grid -->" +
 
-              "  </div>"+
-              " </div>"+
-              "<div class='ln_solid'></div>"+
-              " </div>"
+                  "  </div>"+
+                  " </div>"+
+                  "<div class='ln_solid'></div>"+
+                  " </div>"
       }
       // called on NOQ Submit Click
       function ChangeNofQuestions() {

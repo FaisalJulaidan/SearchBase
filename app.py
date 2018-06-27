@@ -159,7 +159,7 @@ def allowed_image_file(filename):
 @app.before_request
 def before_request():
     theurl = str(request.url_rule)
-    if "admin" not in theurl or "admin/homepage":
+    if "admin" not in theurl or "admin/homepage" in theurl:
         print("Ignore before request for: ", theurl)
         return None
     email = request.cookies.get("UserEmail")

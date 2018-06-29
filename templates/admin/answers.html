@@ -114,16 +114,20 @@
 {% block customJS %}
 <script src="/static/js/taggle.js" charset="utf-8"></script>
 <script>
-    // $("#answersForm")[0].submit(() => {
-    //     debugger
-    //     for (var i in currentNumOfAnswers) {
-    //         var input = $("<input>", { type: "hidden", name: 'action'+i, value: $("select[name=action"+i+"]").val() })
-    //         console.log(input);
-    //         $('#answersForm').append($(input));
-    //     }
-    //     return true; // return false to cancel form action
-    //
-    // })
+    // show errors messages from server
+    function searchToObject() {
+      var pairs = window.location.search.substring(1).split("&"), obj = {}, pair,i;
+      for ( i in pairs ) {
+        if ( pairs[i] === "" ) continue;
+        pair = pairs[i].split("=");
+        obj[ decodeURIComponent( pair[0] ) ] = decodeURIComponent( pair[1] );
+      } return obj;
+    }
+    var success = searchToObject().res
+    if (success) {
+        alertError('Success',(success-1)+' answers were added','success')
+    }
+
     $("#question-select").popover({ trigger: 'hover', title: 'Note:', content: "Make sure to press submit to save data.",placement:'top',width:"200px" })
 
     var numberOfQuestions = 0;
@@ -212,9 +216,6 @@
                     console.log(keywords);
                     if (!isTaggled)
                         new Taggle(element.id, {
-                            // TODO: here is a bug with the library
-                            // we can do better error handler to check the input before goes into prototype functions
-                            // report issue in the repo tagglejs and solve it :)
                             tags: keywords,
                             hiddenInputName: 'keywords'+element.id.split('keyword')[1]
                         });
@@ -314,7 +315,7 @@
                     "        <div class=\"panel-body\">\n" +
                     "            <div class=\"input-group\">\n" +
                     "              <span class=\"input-group-addon\">Answer Text</span>\n" +
-                    "              <input type=\"text\" name='"+pname+"' class=\"form-control\" placeholder=\"\" value="+pnameValue+">\n" +
+                    "              <input type=\"text\" name='"+pname+"' class=\"form-control\" placeholder=\"\" value='"+pnameValue+"'>\n" +
                     "            </div>\n" +
                     "            <div id=\""+keyword+"\"></div>\n" +
                     "            <div class=\"input-group\">\n" +

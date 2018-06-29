@@ -746,7 +746,7 @@ def admin_answers(assistantID):
                         (questionID, answer, keyword, action))
                     # TODO check insertAnswer
 
-                return redirect("/admin/assistant/{}/answers".format(assistantID))
+                return redirect("/admin/assistant/{}/answers".format(assistantID)+"?res="+str(noa)+"")
 
 
 @app.route("/admin/assistant/<assistantID>/products", methods=['GET', 'POST'])

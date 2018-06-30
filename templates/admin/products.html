@@ -108,7 +108,6 @@
 {% endblock %}
 
 {% block customJS %}
-<script src="/static/js/jquery.tabledit.min.js" charset="utf-8"></script>
 <script>
     // TODO:
     // 1- validate the inputs that satisfies the validatitons (done)
@@ -266,29 +265,38 @@
     document.getElementById('uploadButton').addEventListener('click',uploadProductFile)
     function uploadProductFile() {
         // TODO: validate the type of product before update
-        // 1- if submit without adding file
-        // 2- submit with a wroung dataType
-        var form = document.forms.namedItem("productFileForm");
-        formData = new FormData(form);
-
-        var xhttp = new XMLHttpRequest();
-        var msg = "";
-        xhttp.open("POST", "/admin/assistant/{{ id }}/products/file", true); // true is asynchronous
-        xhttp.onreadystatechange = function () {
-            if (xhttp.readyState === 4) {
-                if (xhttp.status === 200) {
-                    msg = xhttp.responseText;
-                    window.location.reload();
-                }
-                else {
-                    console.error(xhttp.statusText);
-                    msg = "Error: other wierd response " + xhttp.status;
-                }
-                console.log(msg);
+        // 1- if submit without adding file (done)
+        // 2- submit with a wroung dataType (done)
+        // 3- if there is backend response show it
+        if ($("#productFile").val()) {
+            if ($("#productFile").val().includes('json')
+            ||  $("#productFile").val().includes('xml') ) {
+                var form = document.forms.namedItem("productFileForm");
+                formData = new FormData(form);
+                var xhttp = new XMLHttpRequest();
+                var msg = "";
+                xhttp.open("POST", "/admin/assistant/{{ id }}/products/file", true); // true is asynchronous
+                xhttp.onreadystatechange = function () {
+                    if (xhttp.readyState === 4) {
+                        if (xhttp.status === 200) {
+                            msg = xhttp.responseText;
+                            window.location.reload();
+                        }
+                        else {
+                            console.error(xhttp.statusText);
+                            msg = "Error: other wierd response " + xhttp.status;
+                        }
+                        console.log(msg);
+                    }
+                };
+                xhttp.send(formData);
+                return false;
             }
-        };
-        xhttp.send(formData);
-        return false;
+            else
+                alertError('Upload File Error','<h2>Data Type must be <b>json</b> or <b>xml</b></h2>')
+        }
+        else
+            alertError('Upload File Error','<h2>There is no file to upload</h2>')
     }
 
 

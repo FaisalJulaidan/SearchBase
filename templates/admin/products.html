@@ -39,8 +39,7 @@
                                             <div class="x_content">
                                                 <br/>
                                                 <form id="productFileForm" name="productFileForm"
-                                                      enctype="multipart/form-data"
-                                                      onsubmit="return uploadProductFile()">
+                                                      enctype="multipart/form-data">
 
                                                     <div class="form-group">
                                                         <label class="control-label col-md-3 col-sm-3 col-xs-12"
@@ -56,10 +55,13 @@
                                                             <input type="file" id="productFile" name="productFile">
                                                         </div>
                                                         <br/>
-                                                        <button id="NOQ-SubmitB" class="btn btn-success"
-                                                                type="submit" value="submit">Upload Database
+                                                        <button id="uploadButton" class="btn btn-success"
+                                                                type="button" value="submit">
+                                                            Upload Database
                                                         </button>
                                                 </form>
+
+                                                <table class="table" id="tableExample"></table>
                                             </div>
                                         </div>
                                     </div>
@@ -100,16 +102,27 @@
             </div>
         </div>
     </div>
+    <!-- Abdullah Hashim did below code to avoid error occured from custom.min.js file -->
+    <form id="demo-form2"></form>
 {% endblock %}
 
 {% block customJS %}
+<script src="/static/js/jquery.tabledit.min.js" charset="utf-8"></script>
 <script>
+    // TODO:
+    // 1- validate the inputs that satisfies the validatitons (done)
+    // 2- when delete button is clicked, delete the row no need to save Updates
+
+    // data parsing
     var numberOfProducts = 0;
+
     {%for item in data%}
         numberOfProducts++;
     {%endfor%}
+
     var data = createArray(numberOfProducts);
     var i = 0;
+
     {%for item in data%}
         {%for product in item%}
             {%if product != None%}
@@ -118,37 +131,106 @@
         {%endfor%}
         i++;
     {%endfor%}
+
+    // first time rendering
     i = 0;
     for (var c = 0; c < data.length; c++) {
         i++;
         $("#tbody").append("<tr id=\"tr" + String(i) + "\">\
-      <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\
-      <td><input value=\"" + data[c][0] + "\" style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\
-      <td><input value=\"" + data[c][1] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\"></td>\
-      <td><input value=\"" + data[c][2] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\"></td>\
-      <td><input value=\"" + data[c][3] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\"></td>\
-      <td><input value=\"" + data[c][4] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\"></td>\
-      <td><input value=\"" + data[c][5] + "\" style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\"></td>\
-      <td><input value=\"" + data[c][6] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\"></td>\
-      <td><input value=\"" + data[c][7] + "\" style=\"width: 200px;\" type=\"text\" name=\"product_URL" + String(i) + "\"></td>\
-    </tr>");
+        <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\
+        <td><input required value=\"" + data[c][0] + "\" style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\
+        <td><input required value=\"" + data[c][1] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\" onchange='validateName(this)'></td>\
+        <td><input required value=\"" + data[c][2] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\" onchange='validate(this)'></td>\
+        <td><input required value=\"" + data[c][3] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\" onchange='validate(this)'></td>\
+        <td><input required value=\"" + data[c][4] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\" onchange='validate(this)'></td>\
+        <td><input required value=\"" + data[c][5] + "\" style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\" onchange='validate(this)'></td>\
+        <td><input required value=\"" + data[c][6] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\" onchange='validate(this)'></td>\
+        <td><input required value=\"" + data[c][7] + "\" style=\"width: 200px;\" type=\"text\" name=\"product_URL" + String(i) + "\" onchange='validate(this)'></td>\
+        </tr>");
     }
 
+    // events Listeners Functions
+    document.getElementById("addRow").addEventListener("click", AddRow);
     function AddRow() {
         i++;
         $("#tbody").append("<tr id=\"tr" + String(i) + "\">\
-      <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\
-      <td><input style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\
-      <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\"></td>\
-      <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\"></td>\
-      <td><input style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\"></td>\
-      <td><input style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\"></td>\
-      <td><input style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\"></td>\
-      <td><input style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\"></td>\
-      <td><input style=\"width: 200px;\" type=\"text\" name=\"product_URL" + String(i) + "\"></td>\
-    </tr>");
+        <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\
+        <td><input required style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\
+        <td><input required style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\" onchange='validate(this)'></td>\
+        <td><input required style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\" onchange='validate(this)' ></td>\
+        <td><input required style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\" onchange='validate(this)' ></td>\
+        <td><input required style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\" onchange='validate(this)' ></td>\
+        <td><input required style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\" onchange='validate(this)' ></td>\
+        <td><input required style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\" onchange='validate(this)' ></td>\
+        <td><input required style=\"width: 200px;\" type=\"text\" name=\"product_URL" + String(i) + "\" onchange='validate(this)' ></td>\
+        </tr>");
+    }
+    function validate(element) {
+        var elName = element.name
+        if ((elName).includes('product_Name')) {
+            var name = element.value
+            if (name.length < 2)
+                noPass(element,'Name of product should be more than 2 letters')
+            else
+                pass(element)
+        }
+        else if ((elName).includes('product_Brand')) {
+            var brand = element.value
+            if (brand.length < 2)
+                noPass(element,'Brand of product should be more than 2 letters')
+            else
+                pass(element)
+        }
+        else if ((elName).includes('product_Model')) {
+            var model = element.value
+            if (model.length < 2)
+                noPass(element,'Model of product should be more than 2 letters')
+            else
+                pass(element)
+        }
+        else if ((elName).includes('product_Price')) {
+            var price = element.value
+            // if there are more currencies we need to add it to the regex string
+            var regex =/^[$£€][\d\.,]+/
+
+            if (regex.test(price))
+                pass(element)
+            else
+                noPass(element,'<h3>Price should be in this format <b>[currency][numbers]</b></h3> <br> <h4> Where the approved currencies are ($, £, and €) </h4> <br> <h5> E.g: <code>$3200.50    -    £250,000.50 - €4,000</code></h5>')
+        }
+        else if ((elName).includes('product_Keywords')) {
+            // TODO:
+            var keywords = element.value
+        }
+        else if ((elName).includes('product_Discount')) {
+            // TODO:
+            var discount = element.value
+        }
+        else if ((elName).includes('product_URL')) {
+            var userURL = element.value
+            var URLRegex = /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/;
+
+            if (userURL.match(URLRegex))
+                pass(element)
+            else
+                noPass(element,"Please enter your website URL correctly.")
+        }
+
+        // helping function
+        function pass(element) {
+            element.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+            setTimeout(function () {
+                element.style.boxShadow=""
+                element.style.transition="box-shadow 1s ease-in-out"
+            }, 500);
+        }
+        function noPass(element,text) {
+            element.style.boxShadow="0 0 9px 0px #f44336"
+            alertError('Input Error',text)
+        }
     }
 
+    document.getElementById("removeRow").addEventListener("click", RemoveRow);
     function RemoveRow() {
         for (var c = 1; c <= i; c++) {
             try {
@@ -176,18 +258,11 @@
         }
     }
 
-    document.getElementById("addRow").addEventListener("click", AddRow);
-    document.getElementById("removeRow").addEventListener("click", RemoveRow);
-
-    function createArray(rows) {
-        var arrayRow = [];
-        for (var i = 0; i < rows; i++) {
-            arrayRow[i] = [];
-        }
-        return arrayRow;
-    }
-
+    document.getElementById('uploadButton').addEventListener('click',uploadProductFile)
     function uploadProductFile() {
+        // TODO: validate the type of product before update
+        // 1- if submit without adding file
+        // 2- submit with a wroung dataType
         var form = document.forms.namedItem("productFileForm");
         formData = new FormData(form);
 
@@ -209,6 +284,16 @@
         };
         xhttp.send(formData);
         return false;
+    }
+
+
+    // helping functions
+    function createArray(rows) {
+        var arrayRow = [];
+        for (var i = 0; i < rows; i++) {
+            arrayRow[i] = [];
+        }
+        return arrayRow;
     }
 </script>
 {% endblock %}

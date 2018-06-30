@@ -65,6 +65,7 @@
                                             </div>
                                         </div>
                                     </div>
+
                                     <form action="/admin/assistant/{{ id }}/products" method="post" enctype="multipart/form-data">
                                         <table id="datatable" class="table table-striped table-bordered">
                                             <thead>
@@ -84,14 +85,14 @@
                                             <!-- Row get inserted here -->
                                             </tbody>
                                         </table>
-                                        <button type="submit" class="btn btn-success" value="Send">Save Updates
+                                        <button type="submit" class="btn btn-success" value="Send">
+                                            Save Updates
                                         </button>
                                         <button type="button" class="btn btn-success" id="addRow" value="Send">
                                             Add Row
                                         </button>
                                         <button type="button" class="btn btn-success" id="removeRow" value="Send">
-                                            Delete
-                                            Row
+                                            Delete Row
                                         </button>
                                     </form>
                                 </div>
@@ -111,7 +112,7 @@
 <script>
     // TODO:
     // 1- validate the inputs that satisfies the validatitons (done)
-    // 2- when delete button is clicked, delete the row no need to save Updates
+    // 2- when delete button is clicked, delete the row no need to save Updates (done)
 
     // data parsing
     var numberOfProducts = 0;
@@ -232,29 +233,33 @@
 
     document.getElementById("removeRow").addEventListener("click", RemoveRow);
     function RemoveRow() {
-        for (var c = 1; c <= i; c++) {
-            try {
-                if (document.getElementById("cb" + String(c)).checked) {
-                    document.getElementById("tr" + String(c)).remove();
-                    c--;
-                    for (var v = c; v <= i; v++) {
-                        document.getElementsByName("product_Delete" + String(v + 1))[0].setAttribute("name", "product_Delete" + String(v));
-                        document.getElementsByName("product_ID" + String(v + 1))[0].setAttribute("name", "product_ID" + String(v));
-                        document.getElementsByName("product_Name" + String(v + 1))[0].setAttribute("name", "product_Name" + String(v));
-                        document.getElementsByName("product_Brand" + String(v + 1))[0].setAttribute("name", "product_Brand" + String(v));
-                        document.getElementsByName("product_Model" + String(v + 1))[0].setAttribute("name", "product_Model" + String(v));
-                        document.getElementsByName("product_Price" + String(v + 1))[0].setAttribute("name", "product_Price" + String(v));
-                        document.getElementsByName("product_Keywords" + String(v + 1))[0].setAttribute("name", "product_Keywords" + String(v));
-                        document.getElementsByName("product_Discount" + String(v + 1))[0].setAttribute("name", "product_Discount" + String(v));
-                        document.getElementsByName("product_URL" + String(v + 1))[0].setAttribute("name", "product_URL" + String(v));
-                        i--;
+        var confirmDelete = confirm('Are you sure you want to delete this rows?')
+        if (confirmDelete) {
+            for (var c = 1; c <= i; c++) {
+                try {
+                    if (document.getElementById("cb" + String(c)).checked) {
+                        document.getElementById("tr" + String(c)).remove();
+                        c--;
+                        for (var v = c; v <= i; v++) {
+                            document.getElementsByName("product_Delete" + String(v + 1))[0].setAttribute("name", "product_Delete" + String(v));
+                            document.getElementsByName("product_ID" + String(v + 1))[0].setAttribute("name", "product_ID" + String(v));
+                            document.getElementsByName("product_Name" + String(v + 1))[0].setAttribute("name", "product_Name" + String(v));
+                            document.getElementsByName("product_Brand" + String(v + 1))[0].setAttribute("name", "product_Brand" + String(v));
+                            document.getElementsByName("product_Model" + String(v + 1))[0].setAttribute("name", "product_Model" + String(v));
+                            document.getElementsByName("product_Price" + String(v + 1))[0].setAttribute("name", "product_Price" + String(v));
+                            document.getElementsByName("product_Keywords" + String(v + 1))[0].setAttribute("name", "product_Keywords" + String(v));
+                            document.getElementsByName("product_Discount" + String(v + 1))[0].setAttribute("name", "product_Discount" + String(v));
+                            document.getElementsByName("product_URL" + String(v + 1))[0].setAttribute("name", "product_URL" + String(v));
+                            i--;
+                        }
                     }
                 }
+                catch (exx) {
+                    // console.log("Skip " + String(c));
+                    console.log(exx);
+                }
             }
-            catch (exx) {
-                // console.log("Skip " + String(c));
-                console.log(exx);
-            }
+            $("form>button[type=submit]").click()
         }
     }
 

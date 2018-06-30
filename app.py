@@ -284,15 +284,11 @@ def signup():
             print("Invalid request")
             render_template("signup.html", msg="Invalid request", debug=app.debug), status.HTTP_400_BAD_REQUEST
 
-
-
         # TODO subscribe the company using Stripe API then retrieve the subscription ID and store it in DB
         # Make sure the payment succeeds
         insertCompanyResponse = insert_into_database_table(
             "INSERT INTO Companies ('Name', 'Size', 'URL') VALUES (?,?,?);",
             (companyName, companySize, websiteURL))
-
-
 
         if "added" not in insertCompanyResponse:
             if "UNIQUE constraint" in insertCompanyResponse:
@@ -318,13 +314,11 @@ def signup():
             # if app.debug:
             #     new_customer.delete()
 
-
             company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [companyName])
             # TODO check company for errors
             companyID = company[0]
             fullname = request.form.get("fullname", default="Error")
             accessLevel = "Admin"
-
 
             password = request.form.get("password", default="Error")
             if fullname == "Error" or accessLevel == "Error" or email == "Error" or password == "Error":
@@ -332,11 +326,18 @@ def signup():
                 render_template("signup.html", msg="Invalid request", debug=app.debug), status.HTTP_400_BAD_REQUEST
             else:
                 try:
-                    firstname = fullname.split(" ")[0]
-                    surname = fullname.split(" ")[1]
+                    firstname = fullname.trim.split(" ")[0]
+                    surname = fullname.trim.split(" ")[1]
+
+                    #debug
+                    print(firstname)
+                    print(surname)
+
                 except IndexError as e:
                     abort(status.HTTP_400_BAD_REQUEST)
                     # TODO handle much better
+
+
                 hashed_password = hash_password(password)
 
                 verified = app.debug
@@ -517,7 +518,7 @@ def admin_assistant_create():
                         [company[0], nickname])
                     if assistant is None or "Error" in assistant:
                         if "UNIQUE" in assistant:
-                            #TODO handle this better
+                            # TODO handle this better
                             abort(status.HTTP_409_CONFLICT)
                         else:
                             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -545,7 +546,8 @@ def admin_assistant_edit(assistantID):
                 autoPop = assistant[4]
                 nickname = assistant[5]
 
-                return render("admin/edit-assistant.html", autopop=autoPop, message=message, id=assistantID, nickname=nickname)
+                return render("admin/edit-assistant.html", autopop=autoPop, message=message, id=assistantID,
+                              nickname=nickname)
     elif request.method == "POST":
         email = request.cookies.get("UserEmail")
         company = get_company(email)
@@ -572,7 +574,8 @@ def admin_assistant_edit(assistantID):
                         secondsUntilPopup = "Off"
                     else:
                         secondsUntilPopup = popuptime
-                    updateAssistant = update_table("UPDATE Assistants SET Message=?, SecondsUntilPopup=?, Nickname=? WHERE ID=? AND CompanyID=?",
+                    updateAssistant = update_table(
+                        "UPDATE Assistants SET Message=?, SecondsUntilPopup=?, Nickname=? WHERE ID=? AND CompanyID=?",
                         [message, secondsUntilPopup, nickname, assistantID, company[0]])
 
                     if "Error" in updateAssistant:
@@ -1021,8 +1024,10 @@ def admin_thanks():
 
 @app.route("/admin/pay", methods=['GET', 'POST'])
 def admin_pay():
+
     if request.method == 'GET':
         return render("admin/pay.html")
+
     elif request.method == 'POST':
         token = request.form.get("stripeToken", default="Error")
         print(token)
@@ -1047,41 +1052,46 @@ def admin_pay():
                 )
 
                 updateCompany = update_table("UPDATE Companies SET StripeID=? WHERE ID=?", [customer['id'], company[0]])
-                if "Error" in updateCompany:
-                    # TODO handle this better
-                    customer.delete()
-                else:
-                    planid = ""
-                    subscription = company[4].lower()
-                    if subscription == "basic":
-                        planid = "plan_D3lp2yVtTotk2f"
-                    elif subscription == "advanced":
-                        planid = "plan_D3lp9R7ombKmSO"
-                    elif subscription == "ultimate":
-                        planid = "plan_D3lpeLZ3EV8IfA"
-                    elif subscription == "debug":
-                        planid = "plan_D48N4wxwAWEMOH"
-                    elif subscription == "trial":
-                        abort(status.HTTP_501_NOT_IMPLEMENTED)
-                    else:
-                        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-                    try:
-                        subscription = stripe.Subscription.create(
-                            customer=customer['id'],
-                            items=[
-                                {
-                                    "plan": planid,
-                                },
-                            ]
-                        )
-                        # if everything is ok
-                        # TODO activate assistants
+                planID = select_from_database_table("SELECT * FROM Plans WHERE ID=?", [], True)
 
-                    except Exception as e:
-                        print(e)
-                        # TODO check subscription for errors https://stripe.com/docs/api#errors
-                        # TODO this is important todo properly
+
+                # if "Error" in updateCompany:
+                #     # TODO handle this better
+                #     customer.delete()
+                # else:
+                #     planID = ""
+                #     subscription = company[4].lower()
+                #     if subscription == "basic":
+                #         planID = "plan_D3lp2yVtTotk2f"
+                #     elif subscription == "advanced":
+                #         planID = "plan_D3lp9R7ombKmSO"
+                #     elif subscription == "ultimate":
+                #         planID = "plan_D3lpeLZ3EV8IfA"
+                #     elif subscription == "debug":
+                #         planID = "plan_D48N4wxwAWEMOH"
+                #     elif subscription == "trial":
+                #         abort(status.HTTP_501_NOT_IMPLEMENTED)
+                #     else:
+                #         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+                try:
+                    subscription = stripe.Subscription.create(
+                        customer=customer['id'],
+                        items=[
+                             {
+                                "plan": planID,
+                             },
+                         ]
+                    )
+                     # if everything is ok
+                    # TODO activate assistants
+
+                except Exception as e:
+                     print(e)
+                     # TODO check subscription for errors https://stripe.com/docs/api#errors
+                     # TODO this is important todo properly
 
 
 # Stripe Webhooks
@@ -1187,11 +1197,11 @@ def admin_add_users():
                                "If you feel this is a mistake please contact {}. \n" \
                                "Your temporary password is: {}\n" \
                                "Please visit <a href='{}'>this link</a> to set password for account.".format(email,
-                                                                                                             password, link)
+                                                                                                             password,
+                                                                                                             link)
                     mail.send(msg)
 
                 return redirect("/admin/users")
-
 
 
 # Method for the billing

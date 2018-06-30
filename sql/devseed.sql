@@ -9,7 +9,7 @@ INSERT INTO Questions(ID, AssistantID, Question, Type) VALUES(3, 1, 'Question 3'
 
 INSERT INTO Answers(ID, QuestionID, Answer, Keyword) VALUES(1, 2, 'Answer 1', 'house');
 
-INSERT INTO Plans(ID, Nickname) VALUES('plan_D3lpeLZ3EV8IfA', 'Ultimate');
-INSERT INTO Plans(ID, Nickname) VALUES('plan_D3lp9R7ombKmSO', 'Advance');
-INSERT INTO Plans(ID, Nickname) VALUES('plan_D3lp2yVtTotk2f', 'Basic');
-INSERT INTO Plans(ID, Nickname) VALUES('plan_D48N4wxwAWEMOH', 'Debug');
+INSERT INTO Plans(ID, Nickname) VALUES('plan_D3lpeLZ3EV8IfA', 'ultimate');
+INSERT INTO Plans(ID, Nickname) VALUES('plan_D3lp9R7ombKmSO', 'advance');
+INSERT INTO Plans(ID, Nickname) VALUES('plan_D3lp2yVtTotk2f', 'basic');
+INSERT INTO Plans(ID, Nickname) VALUES('plan_D48N4wxwAWEMOH', 'debug');

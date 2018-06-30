@@ -58,7 +58,7 @@
                         <h2>Please Enter The Desired Number Of Questions:</h2>
                         <div class="input-group" style="width:250px;margin:10px 0 0 10px">
                           <span class="input-group-addon" id="basic-addon1">Number of questions<span class="required">*</span></span>
-                          <input id="number-of-questions" type="number" class="form-control" required placeholder="Number Of Questions" aria-describedby="basic-addon1">
+                          <input id="number-of-questions" type="number" class="form-control" onchange="checkNOQ(this)" required placeholder="Number Of Questions" aria-describedby="basic-addon1">
                         </div>
                       </div>
                       <div class="ln_solid"></div>
@@ -112,60 +112,59 @@
                         <!-- Question Templates appear here -->
 
                       </div>
+                      <button type="submit" id="QTemplate-SubmitB" class="btn btn-success">
+                        Submit
+                      </button>
+                      <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
                     </form>
 
                     <!-- <div class="ln_solid"></div> -->
-                    <button type="submit" id="QTemplate-SubmitB" class="btn btn-success">
-                      Submit
-                    </button>
-                    <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
                 </div>
             </div>
         </div>
     </div>
 {% endblock %}
 
-{% block javascript %}
-    <!-- jQuery -->
-    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-    <!-- FastClick -->
-    <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
-    <!-- NProgress -->
-    <script src="/static/vendors/nprogress/nprogress.js"></script>
-    <!-- bootstrap-progressbar -->
-    <script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-    <!-- iCheck -->
-    <script src="/static/vendors/iCheck/icheck.min.js"></script>
-    <!-- bootstrap-daterangepicker -->
-    <script src="/static/vendors/moment/min/moment.min.js"></script>
-    <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
-    <!-- bootstrap-wysiwyg -->
-    <script src="/static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
-    <script src="/static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
-    <script src="/static/vendors/google-code-prettify/src/prettify.js"></script>
-    <!-- jQuery Tags Input -->
-    <script src="/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
-    <!-- Switchery -->
-    <script src="/static/vendors/switchery/dist/switchery.min.js"></script>
-    <!-- Select2 -->
-    <script src="/static/vendors/select2/dist/js/select2.full.min.js"></script>
-    <!-- Parsley -->
-    <script src="/static/vendors/parsleyjs/dist/parsley.min.js"></script>
-    <!-- Autosize -->
-    <script src="/static/vendors/autosize/dist/autosize.min.js"></script>
-    <!-- jQuery autocomplete -->
-    <script src="/static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
-    <!-- starrr -->
-    <script src="/static/vendors/starrr/dist/starrr.js"></script>
-    <!-- Custom Theme Scripts -->
-    <script src="/static/build/js/custom.min.js"></script>
+{% block customJS %}
     <!-- Questions Script -->
     <script>
+
+      $("#number-of-questions").popover({ trigger: 'focus', title: 'Number Of Questions', content: "(Min Number: 1) - (Max Number: 12)",placement:'top',width:"200px" })
+
+      $("#number-of-questions").keyup((event) => {
+        delay(function(){
+          var value = Number(event.currentTarget.value)
+          if (value > 12) {
+            alertError('Input Error','The Max Number Questions is 12')
+            $("#number-of-questions").parent()[0].style.boxShadow="0 0 9px 0px #f44336"
+            $("#NOQ-SubmitB").attr('disabled','true')
+          }else if (value < 1) {
+            alertError('Input Error','The Min Number Questions is 1')
+            $("#number-of-questions").parent()[0].style.boxShadow="0 0 9px 0px #f44336"
+            $("#NOQ-SubmitB").attr('disabled','true')
+          }else {
+            $("#number-of-questions").parent()[0].style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+            $("#NOQ-SubmitB").removeAttr('disabled')
+
+            setTimeout(function () {
+              $("#number-of-questions").parent()[0].style.boxShadow=""
+              $("#number-of-questions").parent()[0].style.transition="box-shadow 1s ease-in-out"
+            }, 500);
+
+          }
+        }, 300 );
+      })
+      var delay = (function(){
+        var timer = 0;
+        return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+       };
+      })();
+
       // set variables
       var oldNOQ = 0;
-      var maxQuestions = 10;
+      var maxQuestions = 12;
       // set the question form template
       var qTemplate1 = "<div class = \"Questions\"><label class=\"control-label col-md-3 col-sm-3 col-xs-12\" for=\"last-name\">"
       var qTemplate2 = " question <span class=\"required\">*</span></label><div class=\"col-md-6 col-sm-6 col-xs-12\"><input type=\"text\" name=\""
@@ -180,7 +179,7 @@
         $("#QuestionDiv").empty();
         oldNOQ = 0;
       }
-      // var data = {{data}};
+
       var data = [];
       var typeCheck = [];
 
@@ -188,164 +187,62 @@
         data.push("{{item[0]}}");
         typeCheck.push("{{item[0].split(';')[1]}}");
       {%endfor%}
+
+
       var noq = data.length;
-      if (!Number.isNaN(noq)) {
-        if (noq <= maxQuestions) {
-          if (noq > oldNOQ) {
-            for (i = oldNOQ; i < noq; i++) {
-              var textNumber;
-              switch (i) {
-                case 0: textNumber="First"
-                  break;
-                case 1: textNumber="Second"
-                  break;
-                case 2: textNumber="Third"
-                  break;
-                case 3: textNumber="Fourth"
-                  break;
-                case 4: textNumber="Fifth"
-                  break;
-                case 5: textNumber="Sixth"
-                  break;
-                case 6: textNumber="Seventh"
-                  break;
-                case 7: textNumber="Eighth"
-                  break;
-                case 8: textNumber="Ninth"
-                  break;
-                case 9: textNumber="Tenth"
-                  break;
-                case 10: textNumber="Eleventh"
-                  break;
-                case 11: textNumber="Twelveth"
-                  break;
-              }
-
-              var questionData = data[i].split(";")[0]
-              $("#QuestionDiv").append(cookUpQuestionElement(textNumber,questionData,i))
-              // needs to be checked
-              // not sure of the business logic below
-
-              if (typeCheck[i] == "userInfoRetrieval") {
-                $("#bothB" + i).prop('checked', false);
-                $("#dbB" + i).prop('checked',   false);
-                $("#uiB" + i).prop('checked',   true);
-              }
-              else if (typeCheck[i] == "dbRetrieval") {
-                $("#bothB" + i).prop('checked', false);
-                $("#dbB" + i).prop('checked',   true);
-                $("#uiB" + i).prop('checked',   false);
-              }else {
-                $("#bothB" + i).prop('checked', true);
-                $("#dbB" + i).prop('checked',   false);
-                $("#uiB" + i).prop('checked',   false);
-              }
-              $("#number-of-questions").val(noq);
-
-            } // end of loop
-          }
-          else if (noq < oldNOQ) {
-            for (i = oldNOQ; i > noq; i--) {
-              $(".Questions")[$(".Questions").length - 1].remove();
-            }
-          }
-          oldNOQ = noq;
-          document.getElementById("noq-hidden").value = String(noq);
-        }
-      }
+      checkNOQ(noq)
 
 
       function cookUpQuestionElement(textNumber,questionData,i) {
-      return  "<div class='row'>" +
-              "  <div class='col-xs-12'>" +
-              "    <div class='input-group'>" +
-              "      <span class='input-group-addon' id='basic-addon1'>"+textNumber+" Question<span class='required'>*</span></span>" +
-              "      <input type='text' name='question1'" +
-              "             value='"+questionData+"' class='form-control' required" +
-              "             placeholder='Type your question here'>" +
-              "    </div>" +
+          return  "<div class='question'>"+
+                  "<div class='row'>" +
+                  "  <div class='col-xs-12'>" +
+                  "    <div class='input-group'>" +
+                  "      <span class='input-group-addon' id='basic-addon1'>"+textNumber+" Question<span class='required'>*</span></span>" +
+                  "      <input type='text' name='question"+(i+1)+"'" +
+                  "             value='"+questionData+"' class='form-control' required" +
+                  "             placeholder='Type your question here'>" +
+                  "    </div>" +
 
-              "    <div class='col-xs-12 col-sm-4'>" +
-              "      <div class='input-group'>" +
-              "        <span class='input-group-addon'>" +
-              "          <input type='radio' name='qType"+i+"' value='both' onchange='CheckTypeBox(both"+i+")' id='bothB"+i+"'>" +
-              "        </span>" +
-              "        <input class='form-control' value='Both' readonly style='background-color:#fff; cursor: pointer;' "+
-              "               onclick='return this.parentElement.children[0].children[0].checked=true; CheckTypeBox(both"+i+")'>" +
-              "      </div>" +
-              "    </div> <!-- end of grid -->" +
+                  "    <div class='col-xs-12 col-sm-4'>" +
+                  "      <div class='input-group'>" +
+                  "        <span class='input-group-addon'>" +
+                  "          <input type='radio' name='qType"+i+"' value='both' onchange=\"CheckTypeBox(\'both"+i+"\')\" id='bothB"+i+"' required >" +
+                  "        </span>" +
+                  "        <input class='form-control' value='Both' readonly style='background-color:#fff; cursor: pointer;' "+
+                  "               onclick='return this.parentElement.children[0].children[0].checked=true; CheckTypeBox(string(both"+i+"))'>" +
+                  "      </div>" +
+                  "    </div> <!-- end of grid -->" +
 
-              "    <div class='col-xs-12 col-sm-4'>" +
-              "      <div class='input-group'>" +
-              "        <span class='input-group-addon'>" +
-              "          <input type='radio' name='qType"+i+"' value='dbRetrieval' onchange='CheckTypeBox(db"+i+")' id='dbB"+i+"'>" +
-              "        </span>" +
-              "        <input class='form-control' value='Data Base Retrieval' readonly style='background-color:#fff; cursor: pointer;' "+
-              "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(db"+i+") >" +
-              "      </div>" +
-              "    </div> <!-- end of grid -->" +
+                  "    <div class='col-xs-12 col-sm-4'>" +
+                  "      <div class='input-group'>" +
+                  "        <span class='input-group-addon'>" +
+                  "          <input type='radio' name='qType"+i+"' value='dbRetrieval' onchange=\"CheckTypeBox(\'db"+i+"\')\" id='dbB"+i+"' required >" +
+                  "        </span>" +
+                  "        <input class='form-control' value='Data Base Retrieval' readonly style='background-color:#fff; cursor: pointer;' "+
+                  "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(string(db"+i+")) >" +
+                  "      </div>" +
+                  "    </div> <!-- end of grid -->" +
 
-              "    <div class='col-xs-12 col-sm-4'>" +
-              "      <div class='input-group'>" +
-              "        <span class='input-group-addon'>" +
-              "          <input type='radio' name='qType"+i+"' value='userInfoRetrieval' onchange='CheckTypeBox(ui"+i+")' id='uiB"+i+"'>" +
-              "        </span>" +
-              "        <input class='form-control' value='User Input Retrieval' readonly style='background-color:#fff; cursor: pointer;'"+
-              "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(ui"+i+")>" +
-              "      </div>" +
-              "    </div> <!-- end of grid -->" +
+                  "    <div class='col-xs-12 col-sm-4'>" +
+                  "      <div class='input-group'>" +
+                  "        <span class='input-group-addon'>" +
+                  "          <input type='radio' name='qType"+i+"' value='userInfoRetrieval' onchange=\"CheckTypeBox(\'ui"+i+"\')\" id='uiB"+i+"' required >" +
+                  "        </span>" +
+                  "        <input class='form-control' value='User Input Retrieval' readonly style='background-color:#fff; cursor: pointer;'"+
+                  "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(string(ui"+i+"))>" +
+                  "      </div>" +
+                  "    </div> <!-- end of grid -->" +
 
-              "  </div>"+
-              " </div>"+
-              "<div class='ln_solid'></div>"
+                  "  </div>"+
+                  " </div>"+
+                  "<div class='ln_solid'></div>"+
+                  " </div>"
       }
       // called on NOQ Submit Click
       function ChangeNofQuestions() {
-          var noq = parseInt(document.getElementById("number-of-questions").value);
-          if (!Number.isNaN(noq)) {
-            if (noq <= maxQuestions) {
-              if (noq > oldNOQ) {
-                for (i = oldNOQ; i < noq; i++) {
-                  var textNumber;
-                  switch (i) {
-                    case 0: textNumber="First"
-                      break;
-                    case 1: textNumber="Second"
-                      break;
-                    case 2: textNumber="Third"
-                      break;
-                    case 3: textNumber="Fourth"
-                      break;
-                    case 4: textNumber="Fifth"
-                      break;
-                    case 5: textNumber="Sixth"
-                      break;
-                    case 6: textNumber="Seventh"
-                      break;
-                    case 7: textNumber="Eighth"
-                      break;
-                    case 8: textNumber="Ninth"
-                      break;
-                    case 9: textNumber="Tenth"
-                      break;
-                    case 10: textNumber="Eleventh"
-                      break;
-                    case 11: textNumber="Twelveth"
-                      break;
-                  }
-                  var questionData = data[i].split(";")[0]
-                  $("#QuestionDiv").append(cookUpQuestionElement(textNumber,questionData,i))
-                }
-              }
-              else if (noq < oldNOQ) {
-                for (i = oldNOQ; i > noq; i--) {
-                  $("#QuestionDiv>.row")[$("#QuestionDiv>.row").length - 1].remove();
-                }
-              }
-              oldNOQ = noq;
-              document.getElementById("noq-hidden").value = String(noq);
-            }
-          }
+        var noq = parseInt(document.getElementById("number-of-questions").value);
+        checkNOQ(noq,true)
       }
 
       function CheckTypeBox(tBox) {
@@ -363,8 +260,85 @@
           }
       }
 
+      function checkNOQ(noq,isNew){
+        if (!Number.isNaN(noq)) {
+          if (noq <= maxQuestions) {
+            if (noq > oldNOQ) {
+              for (i = oldNOQ; i < noq; i++) {
+                var textNumber;
+                switch (i) {
+                  case 0: textNumber="First"
+                    break;
+                  case 1: textNumber="Second"
+                    break;
+                  case 2: textNumber="Third"
+                    break;
+                  case 3: textNumber="Fourth"
+                    break;
+                  case 4: textNumber="Fifth"
+                    break;
+                  case 5: textNumber="Sixth"
+                    break;
+                  case 6: textNumber="Seventh"
+                    break;
+                  case 7: textNumber="Eighth"
+                    break;
+                  case 8: textNumber="Ninth"
+                    break;
+                  case 9: textNumber="Tenth"
+                    break;
+                  case 10: textNumber="Eleventh"
+                    break;
+                  case 11: textNumber="Twelveth"
+                    break;
+                }
+
+                if (!isNew) {
+                  var questionData = data[i].split(";")[0]?data[i].split(";")[0]:console.log('err');;
+                }else {
+                  var questionData = ''
+                }
+
+                $("#QuestionDiv").append(cookUpQuestionElement(textNumber,questionData,i))
+
+                // needs to be checked
+                // not sure of the business logic below
+                if (typeCheck[i] == "userInfoRetrieval") {
+                  $("#bothB" + i).prop('checked', false);
+                  $("#dbB" + i).prop('checked',   false);
+                  $("#uiB" + i).prop('checked',   true);
+                }
+                else if (typeCheck[i] == "dbRetrieval") {
+                  $("#bothB" + i).prop('checked', false);
+                  $("#dbB" + i).prop('checked',   true);
+                  $("#uiB" + i).prop('checked',   false);
+                } else if (typeCheck[i] == "both") {
+                  $("#bothB" + i).prop('checked', true);
+                  $("#dbB" + i).prop('checked',   false);
+                  $("#uiB" + i).prop('checked',   false);
+                }else {
+                  $("#bothB" + i).prop('checked', false);
+                  $("#dbB" + i).prop('checked',   false);
+                  $("#uiB" + i).prop('checked',   false);
+                }
+
+                $("#number-of-questions").val(noq);
+
+              } // end of loop
+            }
+            else if (noq < oldNOQ) {
+              for (i = oldNOQ; i > noq; i--) {
+                $(".question")[$(".question").length - 1].remove();
+              }
+            }
+            oldNOQ = noq;
+            document.getElementById("noq-hidden").value = String(noq);
+          }
+        }
+      }
+
       function ClearQTemplate() {
-          $("#QuestionDiv input").val("");
+        $("#QuestionDiv input").val("");
       }
 
       function validation() {

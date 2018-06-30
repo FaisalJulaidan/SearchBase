@@ -1,101 +1,109 @@
 ﻿{% extends "admin/base.html" %}
 
-{% block headlinks %}
-    <title>Answers</title>
-
-    <!-- Bootstrap -->
-    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
-    <!-- iCheck -->
-    <link href="/static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
-    <!-- bootstrap-wysiwyg -->
-    <link href="/static/vendors/google-code-prettify/bin/prettify.min.css" rel="stylesheet">
-    <!-- Select2 -->
-    <link href="/static/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
-    <!-- Switchery -->
-    <link href="/static/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
-    <!-- starrayRowr -->
-    <link href="/static/vendors/starrayRowr/dist/starrayRowr.css" rel="stylesheet">
-    <!-- bootstrap-daterangepicker -->
-    <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-    <!-- Custom Theme Style -->
-    <link href="/static/build/css/custom.min.css" rel="stylesheet">
-
-    <!-- Core Stylesheet -->
-    <!-- <link href="../static/style.css" rel="stylesheet"> -->
-    <!-- Box stylesheets -->
-    <link href="/static/css/box.css" rel="stylesheet">
-    <!-- Responsive CSS -->
-    <!-- <link href="../static/css/responsive.css" rel="stylesheet"> -->
-{% endblock %}
-
+{% block title %}Answers{% endblock %}
 {% block content %}
+    <link href="/static/css/box.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/taggle.min.css">
     <div class="right_col" role="main">
-        <div class="">
-            <div class="page-title">
-                <div class="title_left">
-                    <h3>Linking answers to your questions</h3>
-                </div>
+        <div class="page-title">
+            <div class="title_left">
+                <h3>Answers</h3>
             </div>
-            <div class="clearfix"></div>
-            <div class="row">
-                <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-                <div class="clearfix"></div>
-                <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <div class="x_panel">
-                            <div class="x_content">
-                                <p class="text-muted font-13 m-b-30">Select a question to add answers for</p>
-                                <p class="text-muted font-13 m-b-30"><strong>Note: If you change the question you wish
-                                    to target, make sure to press submit.</strong></p>
-                                <div>
-                                    <select id="question-select">
-                                        {% for row in msg %}
-                                            {% if row[0].split(";")[1] != "userInfoRetrieval" %}
-                                                <option value="{{ row[0] }}">{{ row[0].split(";")[0] }}</option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                    <p class="text-muted font-13 m-b-30">How many answers will your question have?</p>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">How
-                                            many answers will your question have? <span class="required"></span>
-                                        </label>
-                                        <div class="col-md-1 col-sm-1 col-xs-12">
-                                            <input type="text" id="number-of-questions" required="required"
-                                                   class="form-control col-md-1 col-xs-1">
-                                        </div>
-                                    </div>
-                                </div>
-                                <br/>
-                                <br/>
-                                <br/>
-                                <button id="snoa" class="btn btn-success">Submit</button>
-                                <div>
-                                    <br/>
-                                    <br/>
-                                    <br/>
-                                    <div id="q1" class="">
-                                        <div class="box-holder">
-                                            <form enctype="multipart/form-data" style="text-align:center"
-                                                  action="/admin/assistant/{{ id }}/answers" method="post">
-                                                <div id="pasteForm">
-                                                    <!-- Answer Forms get inserted here -->
-                                                </div>
-                                                <br>
-                                                <input hidden name="question" id="question_inform"></input>
-                                                <button id="snoa" class="btn btn-success">Save answers</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>
+                          Linking answers to your questions
+                        </h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li>
+                                <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="#">Settings 1</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Settings 2</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a class="close-link"><i class="fa fa-close"></i></a>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <br>
+                        <style media="screen">
+                            .form-control {
+                              border-radius: 4px;
+                              width: 50%;
+                              height: inherit;
+                            }
+                            select:not([multiple]){
+                                -webkit-appearance:none;
+                                -moz-appearance:none;
+                                background-position:right 50%;
+                                background-repeat:no-repeat;
+                                background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAMCAYAAABSgIzaAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NDZFNDEwNjlGNzFEMTFFMkJEQ0VDRTM1N0RCMzMyMkIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NDZFNDEwNkFGNzFEMTFFMkJEQ0VDRTM1N0RCMzMyMkIiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0NkU0MTA2N0Y3MUQxMUUyQkRDRUNFMzU3REIzMzIyQiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0NkU0MTA2OEY3MUQxMUUyQkRDRUNFMzU3REIzMzIyQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PuGsgwQAAAA5SURBVHjaYvz//z8DOYCJgUxAf42MQIzTk0D/M+KzkRGPoQSdykiKJrBGpOhgJFYTWNEIiEeAAAMAzNENEOH+do8AAAAASUVORK5CYII=);
+                                padding: .5em;
+                                padding-right:1.5em;
+                            }
+
+                        </style>
+
+                        <!-- Abdullah Hashim did below code to avoid error occured from custom.min.js file -->
+                        <form id="demo-form2"></form>
+
+                        <div class="form-group">
+                            <h2>Please select a question to add answers for:</h2>
+                            <div class="input-group" style="width:250px;margin:10px 0 0 10px">
+                              <select name="subscription" id="question-select"
+                                      class="form-control" form="signupForm" title="Note:" required
+                                      style="border-radius:4px" onchange="changeQuestion()">
+                                  <!-- print all questions that is classified as userInfoRetrieval -->
+                                {% for row in msg %}
+                                  {% if row[0].split(";")[1] != "userInfoRetrieval" %}
+                                    <option value="{{ row[0] }}">{{ row[0].split(";")[0] }}</option>
+                                  {% endif %}
+                                {% endfor %}
+                              </select>
                             </div>
                         </div>
+
+                        <br>
+
+                        <h2>How many answers will your question have?</h2>
+                        <div class="input-group" style="width:250px;margin:10px 0 0 10px">
+                            <span class="input-group-addon">Number of answers<span class="required">*</span></span>
+                            <input id="number-of-answers" onchange="changeNumOfAnswers(this)" type="number" class="form-control" required placeholder="...">
+                        </div>
+
+                        <div class="ln_solid"></div>
+
+                        <form enctype="multipart/form-data" style="text-align:center"
+                              action="/admin/assistant/{{ id }}/answers" method="POST"
+                              id="answersForm" >
+
+                            <div id="pasteForm">
+                                <!-- Answer Forms get inserted here -->
+                            </div>
+
+                            <br>
+
+                            <input hidden name="question" id="question_inform"></input>
+                            <div class="ln_solid"></div>
+                            <button class="btn btn-success">Submit</button>
+
+                        </form>
                     </div>
                 </div>
             </div>
@@ -103,49 +111,25 @@
     </div>
 {% endblock %}
 
-{% block javascript %}
-    <!-- jQuery -->
-<script src="/static/vendors/jquery/dist/jquery.min.js"></script>
-<!-- Bootstrap -->
-<script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-<!-- FastClick -->
-<script src="/static/vendors/fastclick/lib/fastclick.js"></script>
-<!-- NProgress -->
-<script src="/static/vendors/nprogress/nprogress.js"></script>
-<!-- jQuery Smart Wizard -->
-<script src="/static/vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js"></script>
-<!-- Custom Theme Scripts -->
-<script src="/static/build/js/custom.min.js"></script>
-
-
-<!-- bootstrap-progressbar -->
-<script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-<!-- iCheck -->
-<script src="/static/vendors/iCheck/icheck.min.js"></script>
-<!-- bootstrap-daterangepicker -->
-<script src="/static/vendors/moment/min/moment.min.js"></script>
-<script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
-<!-- bootstrap-wysiwyg -->
-<script src="/static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
-<script src="/static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
-<script src="/static/vendors/google-code-prettify/src/prettify.js"></script>
-<!-- jQuery Tags Input -->
-<script src="/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
-<!-- Switchery -->
-<script src="/static/vendors/switchery/dist/switchery.min.js"></script>
-<!-- Select2 -->
-<script src="/static/vendors/select2/dist/js/select2.full.min.js"></script>
-<!-- Parsley -->
-<script src="/static/vendors/parsleyjs/dist/parsley.min.js"></script>
-<!-- Autosize -->
-<script src="/static/vendors/autosize/dist/autosize.min.js"></script>
-<!-- jQuery autocomplete -->
-<script src="/static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
-<!-- starrayRowr -->
-<script src="/static/vendors/starrayRowr/dist/starrayRowr.js"></script>
-
+{% block customJS %}
+<script src="/static/js/taggle.js" charset="utf-8"></script>
 <script>
-    document.getElementById("snoa").addEventListener("click", changeQuestion);
+    // show errors messages from server
+    function searchToObject() {
+      var pairs = window.location.search.substring(1).split("&"), obj = {}, pair,i;
+      for ( i in pairs ) {
+        if ( pairs[i] === "" ) continue;
+        pair = pairs[i].split("=");
+        obj[ decodeURIComponent( pair[0] ) ] = decodeURIComponent( pair[1] );
+      } return obj;
+    }
+    var success = searchToObject().res
+    if (success) {
+        alertError('Success',(success-1)+' answers were added','success')
+    }
+
+    $("#question-select").popover({ trigger: 'hover', title: 'Note:', content: "Make sure to press submit to save data.",placement:'top',width:"200px" })
+
     var numberOfQuestions = 0;
     {%for item in msg %}
         numberOfQuestions++;
@@ -164,95 +148,212 @@
     var questionPos = e.selectedIndex;
     var squestion = e.options[e.selectedIndex].value;
     $("#question_inform").val(squestion);
-    var numberOfAnswers = 0;
+    var currentNumOfAnswers = 0;
     getDatabaseData();
 
     function getDatabaseData() {
-        numberOfAnswers = 0;
+        currentNumOfAnswers = 0;
         for (var j = 0; j < data.length; j++) {
-            if (data[j][0] == document.getElementById("question-select").options[document.getElementById("question-select").selectedIndex].value && data[j][0].split(";")[1] != "userInfoRetrieval") {
+            var questionSelect = document.getElementById("question-select")
+            if (data[j][0] == questionSelect.options[questionSelect.selectedIndex].value
+            &&  data[j][0].split(";")[1] != "userInfoRetrieval") {
+                var indexOfRows = 0
+                var keywordsArr = []
                 for (var b = 1; b < data[j].length + 1; b++) {
-                    if (b == data[j].length) {
-                        break;
+
+                    if (b == data[j].length) break
+
+                    // if there is no answers
+                    if (data[j][b] == "") break
+
+                    var answerArr = data[j][b].split(";");
+                    var pnameValue = answerArr[0]
+                    var keywordValue = answerArr[1]
+                    var actionValue = answerArr[2]
+
+                    var i = (currentNumOfAnswers+1)
+                    var pname = 'pname'+i
+                    var keyword = 'keyword'+i
+                    var action = 'action'+i
+
+                    keywordsArr.push(keywordValue)
+
+                    // go through infinite loop untill we add the element
+                    while (true) {
+                        // if there is a row
+                        if ( $("#pasteForm>.row:eq("+indexOfRows+")")[0] ) {
+                            var rowChildrenCount = $("#pasteForm>.row:eq("+indexOfRows+")").children().length
+                            if (rowChildrenCount < 3) {
+                                $("#pasteForm>.row:eq("+indexOfRows+")").append(cookUpPanel(pname,keyword,action,i,pnameValue,keywordValue,actionValue))
+                                break
+                            }
+                            else indexOfRows++
+
+                        } else {
+                            // if there is no a row? then  add new one
+                            // and add the element immediatly since it will be empty row
+                            // it means no need to check if the children is less than 3
+                            $("#pasteForm").append("<div class='row'></div>")
+                            $("#pasteForm>.row:eq("+indexOfRows+")").append(cookUpPanel(pname,keyword,action,i,pnameValue,keywordValue,actionValue))
+                            break
+                        }
                     }
-                    if (data[j][b] == "") {
-                        break;
-                    }
-                    parts = data[j][b].split(";");
-                    $("#pasteForm").append("\
-                        <div class=\"columnA\">\
-                          <p> Answer Text</p>\
-                          <input name=\"pname" + String(b) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\"" + parts[0] + "\">\
-                          <br>\
-                          <p> Answer Keyword </p>\
-                          <input name=\"keywords" + String(b) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\" value=\"" + parts[1] + "\">\
-                          <br>\
-                          <p> Answer Action </p>\
-                          <select id=\"newSelect\" name=\"action" + String(b) + "\">\
-                          <option value =\"Next Question by Order\">Next Question by Order</option>" +
-                        {%for item in msg %}
-                            "<option value=\"Go to: " + "{{item[0]}}".split(";")[0] + "\">Go to: "
-                            + "{{item[0]}}".split(";")[0] + "</option>" +
-                        {% endfor %}
-                        "<option value=\"Get Solutions\">Get Solutions</option>\
-                        </div>");
-                    //$('#newSelect option').filter(function (i, e) { return $(e).text() == parts[2] })
+                    // to select the option corresponding to the record in db for the actionValue
                     $('[id=newSelect] option').filter(function () {
-                        return ($(this).text() == parts[2]);
+                        return ($(this).text() == actionValue);
                     }).prop('selected', true);
                     document.getElementById('newSelect').id = 'oldSelect';
-                    numberOfAnswers++;
+
+                    currentNumOfAnswers++;
                 }
-                $("#number-of-questions").val(numberOfAnswers);
+
+                // init taggled library
+                $("[id^=keyword]").each((i,element)=> {
+                    var isTaggled = $(element).children()[1]
+                    keywords = keywordsArr[i].split(',')
+                    // if there is not keywords
+                    keywords[0]? true : keywords=[]
+                    console.log(keywords);
+                    if (!isTaggled)
+                        new Taggle(element.id, {
+                            tags: keywords,
+                            hiddenInputName: 'keywords'+element.id.split('keyword')[1]
+                        });
+                })
+                $("#number-of-answers").val(currentNumOfAnswers);
             }
-        }
-        var buttons = document.getElementsByClassName("answerButtonDelPic");
-        for (var i = 0; i <= buttons.length - 1; i++) {
-            buttons[i].addEventListener("click", DeletePicture);
         }
     }
 
-    function ChangeNofQuestions() {
-        var nv = document.getElementById("number-of-questions").value;
-        if (nv > 12) {
-            nv = 12;
-            $("#number-of-questions").val(12);
+    function changeNumOfAnswers(inputEl) {
+        var inputNumOfAnswers = inputEl.value
+        if (inputNumOfAnswers <= 0){
+            inputEl.parentElement.style.boxShadow="0 0 9px 0px #f44336"
+            $(inputEl).val('');
+            return alertError('Input Error','Number of answers should be greater than 0')
+        }else {
+            inputEl.parentElement.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+            setTimeout(function () {
+                inputEl.parentElement.style.boxShadow=""
+                inputEl.parentElement.style.transition="box-shadow 2s ease-in-out"
+            }, 500);
+            checkAnswersPanels(inputNumOfAnswers)
         }
-        if (nv < 0) {
-            nv = 0;
-            $("#number-of-questions").val(0);
-        }
-        if (nv > numberOfAnswers) {
-            for (var b = numberOfAnswers; b < nv; b++) {
-                $("#pasteForm").append("\
-                    <div class=\"columnA\">\
-                      <p> Answer Text</p>\
-                      <input name=\"pname" + String(b + 1) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
-                      <br />\
-                      <p> Answer Keyword </p>\
-                      <input name=\"keywords" + String(b + 1) + "\" style=\"width: 100px;\" type=\"text\" required=\"required\">\
-                      <br>\
-                      <p> Answer Action </p>\
-                      <select name=\"action" + String(b + 1) + "\">\
-                      <option value =\"Next Question by Order\">Next Question by Order</option>" +
-                    {%for item in msg %}
-                        "<option value=\"Go to: " + "{{item[0]}}".split(";")[0] + "\">Go to: "
-                        + "{{item[0]}}".split(";")[0] + "</option>" +
-                    {% endfor %}
-                    "<option value=\"Get Solutions\">Get Solutions</option>\
-                  </div>")
-                numberOfAnswers++;
+    }
+    function checkAnswersPanels(inputNumOfAnswers) {
+        if (inputNumOfAnswers > currentNumOfAnswers) {
+            var elements = []
+            while (inputNumOfAnswers > currentNumOfAnswers) {
+                var i = (currentNumOfAnswers+1)
+                console.log(i);
+                var pname = 'pname'+i
+                var keyword = 'keyword'+i
+                var action = 'action'+i
+
+                elements.push(cookUpPanel(pname,keyword,action,i))
+                currentNumOfAnswers++
             }
-        } else if (nv < numberOfAnswers) {
-            for (b = numberOfAnswers; b > nv; b--) {
-                $(".columnA")[$(".columnA").length - 1].remove();
-                numberOfAnswers--;
+
+            var indexOfRows = 0
+            for (var [index, element] of elements.entries()) {
+                // go through infinite loop untill we add the element
+                while (true) {
+                    // if there is a row
+                    if ( $("#pasteForm>.row:eq("+indexOfRows+")")[0] ) {
+                        var rowChildrenCount = $("#pasteForm>.row:eq("+indexOfRows+")").children().length
+                        if (rowChildrenCount < 3) {
+                            $("#pasteForm>.row:eq("+indexOfRows+")").append(element)
+                            break
+                        }
+                        else
+                            indexOfRows++
+
+                    } else {
+                        // if there is no a row? then  add new one
+                        // and add the element immediatly since it will be empty row
+                        // it means no need to check if the children is less than 3
+                        $("#pasteForm").append("<div class='row'></div>")
+                        $("#pasteForm>.row:eq("+indexOfRows+")").append(element)
+                        break
+                    }
+                }
+                // init taggled library
+                $("[id^=keyword]").each((i,element)=> {
+                    var isTaggled = $(element).children()[1]
+                    if (!isTaggled)
+                        new Taggle(element.id,{
+                            hiddenInputName: 'keywords'+element.id.split('keyword')[1]
+                        })
+                })
+            }
+
+        }
+        else if (inputNumOfAnswers < currentNumOfAnswers) {
+            while (inputNumOfAnswers < currentNumOfAnswers) {
+                // remove panels by one panel
+                var rows = $(".col-sm-4.col-xs-12")
+                rows[rows.length - 1].remove();
+                currentNumOfAnswers--;
             }
         }
-        var buttons = document.getElementsByClassName("answerButtonDelPic");
-        for (var i = 0; i <= buttons.length - 1; i++) {
-            buttons[i].addEventListener("click", DeletePicture);
-        }
+    }
+    function cookUpPanel(pname,keyword,action,i, pnameValue, keywordValue, actionValue) {
+        // actions
+        var options = ""
+        {%for item in msg %}
+            options = options + "<option value=\"Go to: " + "{{item[0]}}".split(";")[0] + "\">Go to: "+ "{{item[0]}}".split(";")[0] + "</option>"
+        {% endfor %}
+
+
+        // if old data available
+        if (pnameValue || keywordValue)
+            return  "<div class=\"col-sm-4 col-xs-12\">\n" +
+                    "    <div class=\"panel panel-info\">\n" +
+                    "        <div class=\"panel-heading\">\n" +
+                    "            <h4>Answer "+i+"</h4>\n" +
+                    "        </div>\n" +
+                    "        <div class=\"panel-body\">\n" +
+                    "            <div class=\"input-group\">\n" +
+                    "              <span class=\"input-group-addon\">Answer Text</span>\n" +
+                    "              <input type=\"text\" name='"+pname+"' class=\"form-control\" placeholder=\"\" value='"+pnameValue+"'>\n" +
+                    "            </div>\n" +
+                    "            <div id=\""+keyword+"\"></div>\n" +
+                    "            <div class=\"input-group\">\n" +
+                    "               <span class=\"input-group-addon\">Question Action</span>\n" +
+                    "               <select id='newSelect' class=\"form-control\" form=\"answersForm\"  required name='"+action+"' value='"+actionValue+"'>\n" +
+                    "                   <option value =\"Next Question by Order\">Next Question by Order</option>" +
+                                        options +
+                    "                   <option value=\"Get Solutions\">Get Solutions</option>"+
+                    "               </select>\n"+
+                    "            </div>\n"+
+                    "        </div>\n"+
+                    "    </div>\n"+
+                    "</div>"
+
+        // if there is no old data
+        else
+            return  "<div class=\"col-sm-4 col-xs-12\">\n" +
+                    "    <div class=\"panel panel-info\">\n" +
+                    "        <div class=\"panel-heading\">\n" +
+                    "            <h4>Answer "+i+"</h4>\n" +
+                    "        </div>\n" +
+                    "        <div class=\"panel-body\">\n" +
+                    "            <div class=\"input-group\">\n" +
+                    "              <span class=\"input-group-addon\">Question Action</span>\n" +
+                    "              <input type=\"text\" name='"+pname+"' class=\"form-control\" placeholder=\"Enter answer for the question\" required>\n" +
+                    "            </div>\n" +
+                    "            <div id=\""+keyword+"\"></div>\n" +
+                    "            <div class=\"input-group\">\n" +
+                    "               <span class=\"input-group-addon\">Answer Text</span>\n" +
+                    "               <select id='newSelect' class=\"form-control\" form=\"answersForm\"  required name='"+action+"' value='"+actionValue+"'>\n" +
+                    "                   <option value =\"Next Question by Order\">Next Question by Order</option>" +
+                                        options +
+                    "                   <option value=\"Get Solutions\">Get Solutions</option>"+
+                    "               </select>\n"+
+                    "            </div>\n"+
+                    "        </div>\n"+
+                    "    </div>\n"+
+                    "</div>"
     }
 
     function createArray(rows) {
@@ -276,22 +377,8 @@
             lastQuestion = squestion;
             getDatabaseData();
         }
-        ChangeNofQuestions();
+        changeNumOfAnswers(e);
     }
 
-    // for 3+ D arrayRoways
-    // function createArray(length) {
-    //     var arrayRow = new Array(length || 0),
-    //         i = length;
-    //
-    //     if (arguments.length > 1) {
-    //         var args = Array.prototype.slice.call(arguments, 1);
-    //         while(i--) arrayRow[length-1 - i] = createArray.apply(this, args);
-    //     }
-    //
-    //     return arrayRow;
-
-
-    // }
 </script>
 {% endblock %}

@@ -1,20 +1,6 @@
 ﻿{% extends "admin/base.html" %}
 
-{% block headlinks %}
-    <title>Billing </title>
-
-    <!-- Bootstrap -->
-    <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
-    <!-- bootstrap-daterangepicker -->
-    <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-
-    <!-- Custom Theme Style -->
-    <link href="/static/build/css/custom.min.css" rel="stylesheet">
-{% endblock %}
+{% block title %}Billing{% endblock %}
 
 {% block content %}
     <div class="right_col" role="main">
@@ -41,28 +27,7 @@
     </div>
 {% endblock %}
 
-{% block javascript %}
-    <!-- jQuery -->
-    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-    <!-- FastClick -->
-    <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
-    <!-- NProgress -->
-    <script src="/static/vendors/nprogress/nprogress.js"></script>
-    <!-- morris.js -->
-    <script src="/static/vendors/raphael/raphael.min.js"></script>
-    <script src="/static/vendors/morris.js/morris.min.js"></script>
-    <!-- bootstrap-progressbar -->
-    <script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-    <!-- bootstrap-daterangepicker -->
-    <script src="/static/vendors/moment/min/moment.min.js"></script>
-    <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
-
-    <!-- Custom Theme Scripts -->
-    <script src="/static/build/js/custom.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk&callback=initMap"></script>
-
+{% block customJS %}
     <script>
         inputD = document.getElementById("inputDiv");
         outputD = document.getElementById("outputDiv");

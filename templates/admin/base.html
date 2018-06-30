@@ -207,6 +207,44 @@
         <!-- /top navigation -->
 
         <!-- page content -->
+
+        <!-- Modal -->
+        <button type="button" data-toggle="modal" data-target="#exampleModal" hidden id="showError"></button>
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="errorTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body" id="errorText"></div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Okay</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <button type="button" data-toggle="modal" data-target="#exampleModal1" hidden id="successShow"></button>
+        <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3 class="modal-title bg-success" id="successTitle"></h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body" id="successText"></div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal">Okay</button>
+              </div>
+            </div>
+          </div>
+        </div>
         {% block content %}
         {% endblock %}
 
@@ -223,7 +261,72 @@
         <!-- /footer content -->
     </div>
 
-    {% block javascript %}
+    <!-- jQuery -->
+    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="/static/vendors/nprogress/nprogress.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- iCheck -->
+    <script src="/static/vendors/iCheck/icheck.min.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="/static/vendors/moment/min/moment.min.js"></script>
+    <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <!-- bootstrap-wysiwyg -->
+    <script src="/static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
+    <script src="/static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
+    <script src="/static/vendors/google-code-prettify/src/prettify.js"></script>
+    <!-- jQuery Tags Input -->
+    <script src="/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
+    <!-- Switchery -->
+    <script src="/static/vendors/switchery/dist/switchery.min.js"></script>
+    <!-- Select2 -->
+    <script src="/static/vendors/select2/dist/js/select2.full.min.js"></script>
+    <!-- Parsley -->
+    <script src="/static/vendors/parsleyjs/dist/parsley.min.js"></script>
+    <!-- Autosize -->
+    <script src="/static/vendors/autosize/dist/autosize.min.js"></script>
+    <!-- jQuery autocomplete -->
+    <script src="/static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
+    <!-- starrr -->
+    <script src="/static/vendors/starrr/dist/starrr.js"></script>
+    <!-- Custom Theme Scripts -->
+    <script src="/static/build/js/custom.min.js"></script>
+    <script type="text/javascript">
+      var errTitle = $("#errorTitle")
+      var errText = $("#errorText")
+      var errShow = $("#showError")
+
+      var successTitle = $("#successTitle")
+      var successText = $("#successText")
+      var successShow = $("#successShow")
+      function alertError(name,text,type) {
+          if (type=='success') {
+              console.log('1');
+              // clear previous error message
+              successTitle.text('')
+              successText.html('')
+
+              successTitle.text(name)
+              successText.html(text)
+              successShow.click()
+
+          }else {
+              // clear previous error message
+              errTitle.text('')
+              errText.html('')
+
+              errTitle.text(name)
+              errText.html(text)
+              errShow.click()
+          }
+      }
+    </script>
+    {% block customJS %}
     {% endblock %}
 
 </body>

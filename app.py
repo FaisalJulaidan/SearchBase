@@ -70,6 +70,26 @@ def select_from_database_table(sql_statement, array_of_terms=None, all=False, da
         return data
 
 
+
+
+def get_last_row_from_table(table, database=DATABASE):
+    data = "Error"
+    conn = None
+    try:
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+        row = cur.execute("SELECT * FROM " + table + " WHERE ROWID IN ( SELECT max( ROWID ) FROM " + table +" );").fetchone()
+
+    except Exception as e:
+        row = -1
+    finally:
+        if conn is not None:
+            conn.close()
+        return row;
+
+
+
+
 def insert_into_database_table(sql_statement, tuple_of_terms, database=DATABASE):
     msg = "Error"
     conn = None
@@ -159,7 +179,7 @@ def allowed_image_file(filename):
 @app.before_request
 def before_request():
     theurl = str(request.url_rule)
-    if "admin" not in theurl or "admin/homepage":
+    if "admin" not in theurl or "admin/homepage" in theurl:
         print("Ignore before request for: ", theurl)
         return None
     email = request.cookies.get("UserEmail")
@@ -248,7 +268,7 @@ def login():
             if data is not None:
                 password = data[6]
                 if hash_password(password_to_check, password) == password:
-                    verified = data[7]
+                    verified = data[8]
                     print(verified == "True")
                     if verified == "True":
                         messages = dumps({"email": escape(email)})
@@ -269,35 +289,53 @@ def signup():
         return render_template("signup.html", debug=app.debug)
     elif request.method == "POST":
 
-        email = request.form.get("email", default="Error")
-        email = email.lower()
+        # # update company for with stripe details
+        # update_table("UPDATE Companies SET SubscriptionID=?, StripeID=? WHERE Name=?",
+        #              ['SubTest', new_customer['id'], companyName])
 
+        # TODO this need to be removed in production
+        # remove the Stripe customer when not in production to kepp Stripe clean when testing
+        # if app.debug:
+        #     new_customer.delete()
+
+        # company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [companyName])
+        # TODO check company for errors
+        # companyID = company[0]
+
+        email = request.form.get("email", default="Error").lower()
         companyName = request.form.get("companyName", default="Error")
         companySize = request.form.get("companySize")
-
-        # TODO should be the Stripe subscription ID
-        subscription = request.form.get("subscription", default="Error")
-
+        fullname = request.form.get("fullname", default="Error")
+        accessLevel = "Admin"
+        password = request.form.get("password", default="Error")
         websiteURL = request.form.get("websiteURL", default="Error")
 
-        if email == "Error" or companyName == "Error" or subscription == "Error" or websiteURL == "Error":
+
+        if fullname == "Error" or accessLevel == "Error" or email == "Error" or password == "Error" \
+                or companyName == "Error" or websiteURL == "Error":
             print("Invalid request")
-            render_template("signup.html", msg="Invalid request", debug=app.debug), status.HTTP_400_BAD_REQUEST
+            return render_template("signup.html", msg="Invalid request", debug=app.debug), status.HTTP_400_BAD_REQUEST
 
-        # TODO subscribe the company using Stripe API then retrieve the subscription ID and store it in DB
-        # Make sure the payment succeeds
-        insertCompanyResponse = insert_into_database_table(
-            "INSERT INTO Companies ('Name', 'Size', 'URL') VALUES (?,?,?);",
-            (companyName, companySize, websiteURL))
 
-        if "added" not in insertCompanyResponse:
-            if "UNIQUE constraint" in insertCompanyResponse:
-                return render_template("signup.html", msg=companyName + " already has an account.", debug=app.debug)
-            else:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        # if the company has been created successfully
         else:
+            user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
+            print(user)
+            if user is not None:
+                print("Email is already in use!")
+                return render_template("signup.html", msg="Email is already in use!", debug=app.debug), status.HTTP_400_BAD_REQUEST
+
+            try:
+                firstname = fullname.strip().split(" ")[0]
+                surname = fullname.strip().split(" ")[1]
+
+                #debug
+                print(firstname)
+                print(surname)
+
+            except IndexError as e:
+                abort(status.HTTP_400_BAD_REQUEST)
+                # TODO handle much better
+
 
             # Create a Stripe customer for the new company.
             new_customer = stripe.Customer.create(
@@ -305,76 +343,44 @@ def signup():
             )
             print(new_customer)
 
-            # update company for with stripe details
-            update_table("UPDATE Companies SET SubscriptionID=?, StripeID=? WHERE Name=?",
-                         ['SubTest', new_customer['id'], companyName])
+            hashed_password = hash_password(password)
 
-            # TODO this need to removed in production
-            # remove the Stripe customer when not in production to kepp Stripe clean when testing
-            # if app.debug:
-            #     new_customer.delete()
+            verified = app.debug
 
-            company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [companyName])
-            # TODO check company for errors
-            companyID = company[0]
-            fullname = request.form.get("fullname", default="Error")
-            accessLevel = "Admin"
+            insertCompanyResponse = insert_into_database_table(
+                "INSERT INTO Companies('NAME', 'URL') VALUES (?,?);", (companyName, websiteURL))
 
-            password = request.form.get("password", default="Error")
-            if fullname == "Error" or accessLevel == "Error" or email == "Error" or password == "Error":
-                print("Invalid request")
-                render_template("signup.html", msg="Invalid request", debug=app.debug), status.HTTP_400_BAD_REQUEST
-            else:
-                try:
-                    firstname = fullname.trim.split(" ")[0]
-                    surname = fullname.trim.split(" ")[1]
+            company = get_last_row_from_table("Companies")
 
-                    #debug
-                    print(firstname)
-                    print(surname)
-
-                except IndexError as e:
-                    abort(status.HTTP_400_BAD_REQUEST)
-                    # TODO handle much better
+            insertUserResponse = insert_into_database_table(
+                "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified') VALUES (?,?,?,?,?,?,?,?);",
+                (company[0], firstname, surname, accessLevel, email, hashed_password, new_customer['id'], str(verified)))
 
 
-                hashed_password = hash_password(password)
+            if not app.debug:
+                # TODO this needs improving
+                msg = Message("Account verification",
+                              sender="thesearchbase@gmail.com",
+                              recipients=[email])
 
-                verified = app.debug
+                payload = email + ";" + companyName
+                link = "www.thesearchbase.com/account/verify/{}".format(verificationSigner.dumps(payload))
+                msg.body = "You have registered with TheSearchBase.\n" \
+                           "Please visit <a href='{}'>this link</a> to verify your account.".format(email, link)
+                mail.send(msg)
 
-                insertUserResponse = insert_into_database_table(
-                    "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
-                    (companyID, firstname, surname, accessLevel, email, hashed_password, str(verified)))
-                if "added" not in insertUserResponse:
-                    if "UNIQUE constraint" in insertUserResponse:
-                        deleteCompany = delete_from_table("DELETE FROM Companies WHERE Name=?;", [companyName])
-                        # TODO check deleteCompany
-                        return render_template("signup.html", msg=email + " already in use.", debug=app.debug)
-                    else:
-                        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-                else:
-                    if not app.debug:
-                        # TODO this needs improving
-                        msg = Message("Account verification",
-                                      sender="thesearchbase@gmail.com",
-                                      recipients=[email])
+                # sending the registration confirmation email to us
+                msg = Message("A new company has signed up!",
+                              sender="thesearchbase@gmail.com",
+                              recipients=["thesearchbase@gmail.com"])
+                msg.body = "Company name: {} has signed up the admin's details are. Name: {}, Email: {}, ".format(
+                    companyName, fullname, email)
+                mail.send(msg)
 
-                        payload = email + ";" + companyName
-                        link = "www.thesearchbase.com/account/verify/{}".format(verificationSigner.dumps(payload))
-                        msg.body = "You have registered with TheSearchBase.\n" \
-                                   "Please visit <a href='{}'>this link</a> to verify your account.".format(email, link)
-                        mail.send(msg)
+            return render_template('errors/verification.html',
+                                   msg="Please check your email and follow instructions to verify account and get started.")
 
-                        # sending the registration confirmation email to us
-                        msg = Message("A new company has signed up!",
-                                      sender="thesearchbase@gmail.com",
-                                      recipients=["thesearchbase@gmail.com"])
-                        msg.body = "Company name: {} has signed up the admin's details are. Name: {}, Email: {}, ".format(
-                            companyName, fullname, email)
-                        mail.send(msg)
 
-                    return render_template('errors/verification.html',
-                                           msg="Please check your email and follow instructions to verify account and get started.")
 
 
 # Data retrieval functions
@@ -1022,39 +1028,66 @@ def admin_thanks():
     return render('admin/thank-you.html')
 
 
-@app.route("/admin/pay", methods=['GET', 'POST'])
-def admin_pay():
+@app.route("/admin/pay/<planID>", methods=['GET', 'POST'])
+def admin_pay(planID):
 
-    if request.method == 'GET':
-        return render("admin/pay.html")
+    # if request.method == 'GET':
+    #     return render("admin/pay.html")
 
-    elif request.method == 'POST':
-        token = request.form.get("stripeToken", default="Error")
-        print(token)
-        abort(status.HTTP_501_NOT_IMPLEMENTED)
+    if request.method == 'POST':
 
+        # abort(status.HTTP_501_NOT_IMPLEMENTED)
         email = request.cookies.get("UserEmail")
         company = get_company(email)
+
+
         if company is None or "Error" in company:
             # TODO handle this better, as it's payments so is very important we don't charge the customer etc
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return redirect("/login")
+
+
         else:
             token = request.form.get("stripeToken", default="Error")
+            print(token)
+            print(planID)
             if token is "Error":
                 # TODO improve this
                 abort(status.HTTP_400_BAD_REQUEST)
             else:
+
+                user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
+                try:
+                    subscription = stripe.Subscription.create(
+                        customer=user[7],
+                        source=token,
+                        items=[
+                            {
+                                "plan": planID,
+                            },
+                        ]
+                    )
+                    # if everything is ok
+                    # TODO activate assistants
+
+                except Exception as e:
+                    print(e)
+                    # TODO check subscription for errors https://stripe.com/docs/api#errors
+                    # TODO this is important todo properly
+
+                print("You have successfully subscribed!")
+                return render("admin/pricing-tables.html", msg="You have successfully subscribed!")
+
                 # TODO surround with try except and catch any errors
-                customer = stripe.Customer.create(
-                    source=token,
-                    email=email,
-                    description=company[1]
-                )
-
-                updateCompany = update_table("UPDATE Companies SET StripeID=? WHERE ID=?", [customer['id'], company[0]])
-
-                planID = select_from_database_table("SELECT * FROM Plans WHERE ID=?", [], True)
-
+                # customer = stripe.Customer.create(
+                #     source=token,
+                #     email=email,
+                #     description=company[1]
+                # )
+                #
+                # updateCompany = update_table("UPDATE Companies SET StripeID=? WHERE ID=?", [customer['id'], company[0]])
+                #
+                # planID = select_from_database_table("SELECT * FROM Plans WHERE ID=?", [], True)
+                #
 
                 # if "Error" in updateCompany:
                 #     # TODO handle this better
@@ -1076,22 +1109,7 @@ def admin_pay():
                 #         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-                try:
-                    subscription = stripe.Subscription.create(
-                        customer=customer['id'],
-                        items=[
-                             {
-                                "plan": planID,
-                             },
-                         ]
-                    )
-                     # if everything is ok
-                    # TODO activate assistants
 
-                except Exception as e:
-                     print(e)
-                     # TODO check subscription for errors https://stripe.com/docs/api#errors
-                     # TODO this is important todo properly
 
 
 # Stripe Webhooks
@@ -1699,7 +1717,7 @@ def render(template, **context):
 
         assistantDetails = []
         for assistant in assistants:
-            assistantDetails.append((assistant[0], assistant[6]))
+            assistantDetails.append((assistant[0], assistant[5]))
 
         return render_template(template, debug=app.debug, assistantDetails=assistantDetails, **context)
     else:

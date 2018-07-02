@@ -132,6 +132,16 @@
                     </div>
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
+                        <input class="input100" type="number"
+                               placeholder="+1-595585131"
+                               name="phoneNumber" onchange="checkboxesMatch('phone')">
+                        <span class="focus-input100"></span>
+                        <span class="symbol-input100">
+                            <i class="fa fa-mobile" aria-hidden="true"></i>
+                        </span>
+                    </div>
+
+                    <div class="wrap-input100 validate-input" data-validate="Required">
                         <p>Choose Plan</p>
                          <select name="subscription" id="inputState" class="form-control" form="signupForm" title="Choose Plan" required>
                           <option value="Trial">3 Month Trial</option>
@@ -229,7 +239,8 @@
           email:false,
           emailConf:false,
           password:false,
-          passwordConf:false
+          passwordConf:false,
+          phone:false
         }
 
         // Password popover init
@@ -253,37 +264,53 @@
         }
 
         function checkboxesMatch(boxID) {
-          if (   document.getElementById(boxID).value === document.getElementById('confirm' + boxID).value
-              && document.getElementById(boxID).value !== "") {
-            document.getElementById('confirm' + boxID).style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
-            // if all inputs are satisfied
-            for (var input of Object.entries(inputs)){
-              if (input[1] != true)
-                document.getElementById('submit').disabled = false;
-            }
+            if (document.getElementById('confirm' + boxID)) {
+                if (   document.getElementById(boxID).value === document.getElementById('confirm' + boxID).value
+                    && document.getElementById(boxID).value !== "") {
+                  document.getElementById('confirm' + boxID).style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+                  // if all inputs are satisfied
+                  for (var input of Object.entries(inputs)){
+                    if (input[1] != true)
+                      document.getElementById('submit').disabled = false;
+                  }
 
-            if (boxID=='password'){
-              document.getElementById("submit").classList.remove('login100-form-btn-disabled');
-              document.getElementById("submit").classList.add('login100-form-btn');
-              inputs.passwordConf = true
+                  if (boxID=='password'){
+                    document.getElementById("submit").classList.remove('login100-form-btn-disabled');
+                    document.getElementById("submit").classList.add('login100-form-btn');
+                    inputs.passwordConf = true
+                  }
+                  if (boxID=='email')
+                    inputs.emailConf = true
+                }
             }
-            if (boxID=='email')
-              inputs.emailConf = true
-          }
-          else {
-            if (boxID=='email'){
-              alertError('Email Matching Error','Please confirm your email as the above one')
-              inputs.emailConf = false
+            else {
+              if (boxID=='email'){
+                alertError('Email Matching Error','Please confirm your email as the above one')
+                inputs.emailConf = false
+              }
+              if (boxID=='password'){
+                alertError('Password Matching Error','Please match your passwords')
+                inputs.passwordConf = false
+              }
+              if (boxID=='phone') {
+                  var regex =""
+                  var element = $("input[name=phoneNumber]")[0]
+                  if (/\+[0-9]{1-}-[0-9]{9-10}/.test(element.value)) {
+                      inputs.phone = true;
+                      element.style.boxShadow='0 0 9px 0px rgba(100, 185, 110, 1)'
+                  }else {
+                      alertError('Mobile Error','Please add proper mobile number: <br> <h4>+123-123456789</h4>')
+                      inputs.passwordConf = false
+                  }
+
+              }
+
+              document.getElementById('submit').disabled = true;
+              document.getElementById("submit").classList.add('login100-form-btn-disabled');
+              document.getElementById("submit").classList.remove('login100-form-btn');
+              if (document.getElementById('confirm' + boxID))
+                  document.getElementById('confirm' + boxID).style.boxShadow="0 0 9px 0px #f44336"
             }
-            if (boxID=='password'){
-              alertError('Password Matching Error','Please match your passwords')
-              inputs.passwordConf = false
-            }
-            document.getElementById('confirm' + boxID).style.boxShadow="0 0 9px 0px #f44336"
-            document.getElementById('submit').disabled = true;
-            document.getElementById("submit").classList.add('login100-form-btn-disabled');
-            document.getElementById("submit").classList.remove('login100-form-btn');
-          }
         }
 
         function validatePassword(passwordElement) {
@@ -368,11 +395,11 @@
 
         function alertError(name,text) {
           // clear previous error message
-          errShow.text('')
-          errText.text('')
+          errShow.html('')
+          errText.html('')
 
-          errTitle.text(name)
-          errText.text(text)
+          errTitle.html(name)
+          errText.html(text)
           errShow.click()
         }
     </script>

@@ -92,9 +92,19 @@
                         </span>
                     </div>
 
+                    <div class="wrap-input100 validate-input" data-validate="Required">
+                        <input class="input100" type="number"
+                               placeholder="+1-595585131"
+                               name="phoneNumber" onchange="checkboxesMatch('phone')">
+                        <span class="focus-input100"></span>
+                        <span class="symbol-input100">
+                            <i class="fa fa-mobile" aria-hidden="true"></i>
+                        </span>
+                    </div>
+
                     <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
                         <input class="input100" type="email" id="email" name="email" placeholder="Email" autocomplete="off"
-                        onchange="validateUserEmail('email')">
+                               onchange="validateUserEmail('email')">
                         <!-- onkeyup="checkboxesMatch('email')" -->
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
@@ -131,29 +141,21 @@
                         </span>
                     </div>
 
-                    <div class="wrap-input100 validate-input" data-validate="Required">
-                        <input class="input100" type="number"
-                               placeholder="+1-595585131"
-                               name="phoneNumber" onchange="checkboxesMatch('phone')">
-                        <span class="focus-input100"></span>
-                        <span class="symbol-input100">
-                            <i class="fa fa-mobile" aria-hidden="true"></i>
-                        </span>
-                    </div>
 
-                    <div class="wrap-input100 validate-input" data-validate="Required">
+
+                    <!--<div class="wrap-input100 validate-input" data-validate="Required">
                         <p>Choose Plan</p>
-                         <select name="subscription" id="inputState" class="form-control" form="signupForm" title="Choose Plan" required>
-                          <option value="Trial">3 Month Trial</option>
-                          <option value="Basic">Basic Plan</option>
-                          <option value="Advanced">Advanced Plan</option>
-                          <option value="Ultimate">Ultimate Plan</option>
-                          {% if debug == True %}
-                          <option value="Debug"> Debug</option>
-                          {% endif %}
-                      </select>
+                        <select name="subscription" id="inputState" class="form-control" form="signupForm" title="Choose Plan" required>
+                            <option value="Trial">3 Month Trial</option>
+                            <option value="Basic">Basic Plan</option>
+                            <option value="Advanced">Advanced Plan</option>
+                            <option value="Ultimate">Ultimate Plan</option>
+                            {% if debug == True %}
+                            <option value="Debug"> Debug</option>
+                            {% endif %}
+                        </select>
                         <span class="focus-input100"></span>
-                    </div>
+                    </div>-->
 
                     <div class="container-login100-form-btn">
                         <button class="login100-form-btn-disabled" id="submit" disabled>

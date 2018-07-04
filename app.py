@@ -303,11 +303,14 @@ def signup():
         # companyID = company[0]
 
         email = request.form.get("email", default="Error").lower()
-        companyName = request.form.get("companyName", default="Error")
-        companySize = request.form.get("companySize")
+
         fullname = request.form.get("fullname", default="Error")
         accessLevel = "Admin"
         password = request.form.get("password", default="Error")
+
+        companyName = request.form.get("companyName", default="Error")
+        companySize = request.form.get("companySize")
+        companyPhoneNumber = request.form.get("phoneNumber")
         websiteURL = request.form.get("websiteURL", default="Error")
 
 
@@ -348,7 +351,7 @@ def signup():
             verified = app.debug
 
             insertCompanyResponse = insert_into_database_table(
-                "INSERT INTO Companies('NAME', 'URL') VALUES (?,?);", (companyName, websiteURL))
+                "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName,companySize, websiteURL, companyPhoneNumber))
 
             company = get_last_row_from_table("Companies")
 

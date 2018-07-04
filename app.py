@@ -1142,6 +1142,7 @@ def admin_pay(planID):
 
 
 # Stripe Webhooks
+#This will not work anymore since the StripeID column is moved from Companies table to the Users table.
 @app.route("/api/stripe/subscription-cancelled", methods=["POST"])
 def webhook_subscription_cancelled():
     if request.method == "POST":
@@ -1298,8 +1299,21 @@ def admin_emoji():
 def chatbot(route):
     if request.method == "GET":
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
+
+        if company is None:
+            abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
+
+        # for debugging
+        print(escape(route))
+        print(company)
+
         # TODO check company for errors
         assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
+
+        # for debugging
+        print(assistants)
+
+
         # TODO check assistant for errors
         assistantIndex = 0  # TODO implement this properly
         assistantID = assistants[assistantIndex][0]

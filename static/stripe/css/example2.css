@@ -80,55 +80,6 @@
   transition: color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.example.example2 .input.StripeElement {
-  opacity: 0;
-  transition: opacity 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-  will-change: opacity;
-}
-
-.example.example2 .input.focused,
-.example.example2 .input:not(.empty) {
-  opacity: 1;
-}
-
-.example.example2 .input.focused::-webkit-input-placeholder,
-.example.example2 .input:not(.empty)::-webkit-input-placeholder {
-  color: #cfd7df;
-}
-
-.example.example2 .input.focused::-moz-placeholder,
-.example.example2 .input:not(.empty)::-moz-placeholder {
-  color: #cfd7df;
-}
-
-.example.example2 .input.focused:-ms-input-placeholder,
-.example.example2 .input:not(.empty):-ms-input-placeholder {
-  color: #cfd7df;
-}
-
-.example.example2 .input.focused + label,
-.example.example2 .input:not(.empty) + label {
-  color: #aab7c4;
-  transform: scale(0.85) translateY(-25px);
-  cursor: default;
-}
-
-.example.example2 .input.focused + label {
-  color: #24b47e;
-}
-
-.example.example2 .input.invalid + label {
-  color: #ffa27b;
-}
-
-.example.example2 .input.focused + label + .baseline {
-  background-color: #24b47e;
-}
-
-.example.example2 .input.focused.invalid + label + .baseline {
-  background-color: #e25950;
-}
-
 .example.example2 input, .example.example2 button {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -141,10 +92,6 @@
   -webkit-text-fill-color: #e39f48;
   transition: background-color 100000000s;
   -webkit-animation: 1ms void-animation-out;
-}
-
-.example.example2 .StripeElement--webkit-autofill {
-  background: transparent !important;
 }
 
 .example.example2 input, .example.example2 button {

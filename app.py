@@ -1762,6 +1762,7 @@ def render(template, **context):
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         assistantDetails = []
+        # [0]= ID [5]= Nickname
         for assistant in assistants:
             assistantDetails.append((assistant[0], assistant[5]))
 

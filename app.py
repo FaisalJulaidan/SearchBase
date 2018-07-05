@@ -1241,18 +1241,15 @@ def admin_users_add():
 
                     # sending email to the new user.
                     # TODO this needs improving
-                    msg = Message("Account verification, {} {}".format(firstname, surname),
+                    msg = Message("Account verification, "+firstname+" "+surname,
                                   sender="thesearchbase@gmail.com",
                                   recipients=[email])
                     link = "www.thesearchbase.com/account/changepassword"
                     msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
-                               "If you feel this is a mistake please contact {}. \n" \
-                               "Your temporary password is: {}\n" \
-                               "Please visit <a href='{}'>this link</a> to set password for account.".format(email,
-                                                                                                             password,
-                                                                                                             link)
+                               "If you feel this is a mistake please contact "+email+". \n" \
+                               "Your temporary password is: "+password+"\n" \
+                               "Please visit <a href='"+link+"'>this link</a> to set password for account."
                     mail.send(msg)
-
                 return redirect("/admin/users")
 
 @app.route("/admin/users/delete/<userID>", methods=["GET"])

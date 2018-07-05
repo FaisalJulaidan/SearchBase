@@ -13,7 +13,8 @@ CREATE TABLE 'Companies' (
 	'ID'	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	'Name'	TEXT NOT NULL,
 	'Size'	TEXT,
-	'URL'	TEXT NOT NULL
+	'URL'	TEXT NOT NULL,
+	'PhoneNumber' TEXT
 );
 
 CREATE TABLE 'Users' (
@@ -36,8 +37,8 @@ CREATE TABLE 'Assistants' (
 	'Route'	TEXT UNIQUE,
 	'Message'	TEXT NOT NULL,
 	'SecondsUntilPopup'	TEXT NOT NULL DEFAULT 'Off',
-	'Active' TEXT NOT NULL DEFAULT 'True',
-	'Nickname' TEXT NOT NULL UNIQUE
+	'Nickname' TEXT NOT NULL UNIQUE,
+	'Active' TEXT NOT NULL DEFAULT 'True'
 );
 
 CREATE TABLE 'Products' (

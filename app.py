@@ -303,11 +303,14 @@ def signup():
         # companyID = company[0]
 
         email = request.form.get("email", default="Error").lower()
-        companyName = request.form.get("companyName", default="Error")
-        companySize = request.form.get("companySize")
+
         fullname = request.form.get("fullname", default="Error")
         accessLevel = "Admin"
         password = request.form.get("password", default="Error")
+
+        companyName = request.form.get("companyName", default="Error")
+        companySize = request.form.get("companySize")
+        companyPhoneNumber = request.form.get("phoneNumber")
         websiteURL = request.form.get("websiteURL", default="Error")
 
 
@@ -348,7 +351,7 @@ def signup():
             verified = app.debug
 
             insertCompanyResponse = insert_into_database_table(
-                "INSERT INTO Companies('NAME', 'URL') VALUES (?,?);", (companyName, websiteURL))
+                "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName,companySize, websiteURL, companyPhoneNumber))
 
             company = get_last_row_from_table("Companies")
 
@@ -1142,6 +1145,7 @@ def admin_pay(planID):
 
 
 # Stripe Webhooks
+#This will not work anymore since the StripeID column is moved from Companies table to the Users table.
 @app.route("/api/stripe/subscription-cancelled", methods=["POST"])
 def webhook_subscription_cancelled():
     if request.method == "POST":
@@ -1298,8 +1302,21 @@ def admin_emoji():
 def chatbot(route):
     if request.method == "GET":
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
+
+        if company is None:
+            abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
+
+        # for debugging
+        print(escape(route))
+        print(company)
+
         # TODO check company for errors
         assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
+
+        # for debugging
+        print(assistants)
+
+
         # TODO check assistant for errors
         assistantIndex = 0  # TODO implement this properly
         assistantID = assistants[assistantIndex][0]
@@ -1745,6 +1762,7 @@ def render(template, **context):
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         assistantDetails = []
+        # [0]= ID [5]= Nickname
         for assistant in assistants:
             assistantDetails.append((assistant[0], assistant[5]))
 

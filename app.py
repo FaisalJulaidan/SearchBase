@@ -1267,6 +1267,7 @@ def admin_users_delete(userID):
         targetUser = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?", [userID])[0]
         print(requestingUser, "              ", targetUser)
         if requestingUser[4] != "Admin" or requestingUser[1] != targetUser:
+            #TODO send feedback message
             return redirect("/admin/homepage", code=302)
         print(delete_from_table("DELETE FROM Users WHERE ID=?;", [userID]))
         return redirect("/admin/users", code=302)

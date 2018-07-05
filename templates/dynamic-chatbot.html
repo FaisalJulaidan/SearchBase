@@ -179,6 +179,9 @@
         if (message == "")
         {
             message = document.getElementById("textMessage").value;
+            if (message == "" || message.replace(/ /g , "") == ""){
+                return 0;
+            }
             $('#textMessage').val("");
         }
         $("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>" + emojione.toImage(message) + "</li></div>");

@@ -202,11 +202,12 @@ def dynamic_popup(route):
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
         if company is None:
             abort(status.HTTP_404_NOT_FOUND)
-        elif "Debug" in company[4]:
+        # elif "Debug" in company[4]:
+        else:
             url = company[3]
             if "http" not in url:
                 url = "https://" + url
-        return render("dynamic-popup.html", route=route, url=url)
+        return render_template("dynamic-popup.html", route=route, url=url)
 
 
 # drop down routes.
@@ -1767,6 +1768,7 @@ def render(template, **context):
 
         return render_template(template, debug=app.debug, assistantDetails=assistantDetails, **context)
     else:
+        print("Render function redirects to login")
         return redirect("/login")
 
 

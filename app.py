@@ -186,10 +186,10 @@ def before_request():
     print("USER EMAIL: " + str(email))
     if email is None:
         print("User not logged in")
-        return redirect("/login")
+        return render_template("login.html", msg="You are not logged in!")
     print("Before request checking: ", theurl, " ep: ", request.endpoint)
     if email == 'None' and request.endpoint != 'login':
-        return render_template("login.html", msg="Please log in first!")
+        return render_template("login.html", msg="You are not logged in!")
     print("Before Request checks out")
     return None
 
@@ -433,7 +433,7 @@ def admin_home():
             if messages is not None:
                 email = loads(messages)['email']
                 if email is None or email == "None":
-                    return redirect("/login")
+                    return render_template("login.html", msg="You are not logged in!")
                 sendEmail = True
             else:
                 abort(status.HTTP_400_BAD_REQUEST)
@@ -1769,7 +1769,7 @@ def render(template, **context):
         return render_template(template, debug=app.debug, assistantDetails=assistantDetails, **context)
     else:
         print("Render function redirects to login")
-        return redirect("/login")
+        return render_template("login.html", msg="You are not logged in!")
 
 
 class Del:

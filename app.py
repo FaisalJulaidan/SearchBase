@@ -1243,7 +1243,7 @@ def admin_users_add():
                     # TODO this needs improving
                     msg = Message("Account verification, "+firstname+" "+surname,
                                   sender="thesearchbase@gmail.com",
-                                  recipients=[email])
+                                  recipients=[newEmail])
                     link = "www.thesearchbase.com/account/changepassword"
                     msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
                                "If you feel this is a mistake please contact "+email+". \n" \

@@ -1057,7 +1057,7 @@ def admin_thanks():
     return render('admin/thank-you.html')
 
 
-@app.route("/admin/pay/<planID>", methods=['GET', 'POST'])
+@app.route("/admin/check-out/<planID>", methods=['GET', 'POST'])
 def admin_pay(planID):
     if request.method == 'GET':
         return render("admin/check-out.html")

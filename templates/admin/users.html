@@ -23,10 +23,11 @@
                               <tr id="tableHeadingUIn" class="headings">
                                   <th class="column-title">User ID</th>
                                   <th class="column-title">Name </th>
+                                  <th class="column-title">Email </th>
                                   <th class="column-title">Last Access </th>
                                   <th class="column-title">Permission Level </th>
                                   <th class="column-title no-link last">
-                                      <span class="nobr">Acess</span>
+                                      <span class="nobr">Delete User</span>
                                   </th>
                               </tr>
                               <!-- End of data -->
@@ -34,13 +35,16 @@
 
                           <tbody id="tBodyUIn">
                               <!-- Start -->
+                              {%for user in users%}
                               <tr class="even pointer">
-                                  <td class=" ">1</td>
-                                  <td class=" ">Test Name </td>
-                                  <td class=" ">208/06/2018 12:56 AM</td>
-                                  <td class=" ">Admin</td>
-                                  <td class=" "><strong><a href="">Delete</a></strong></td>
+                                  <td class=" ">{{user[0]}}</td>
+                                  <td class=" ">{{user[2]}} {{user[3]}}</td>
+                                  <td class=" ">{{user[5]}}</td>
+                                  <td class=" ">Not implemented</td>
+                                  <td class=" ">{{user[4]}}</td>
+                                  <td class=" "><strong><a href="/admin/users/delete/{{user[0]}}">Delete</a></strong></td>
                               </tr>
+                              {%endfor%}
                               <!-- End -->
                           </tbody>
                       </table>
@@ -52,10 +56,10 @@
                   <p>Enter the details of the additional user</p>
                   <!-- Content should go here -->
 
-                  <form action="admin/adduser" method="POST" enctype="multipart/form-data">
+                  <form action="/admin/users/add" method="post" enctype="multipart/form-data">
 
                       <!-- User's details -->
-                      <input class="form-control col-md-5 col-xs-10" id="user_fullname" type="text" name="name" placeholder="Name *">
+                      <input class="form-control col-md-5 col-xs-10" id="user_fullname" type="text" name="fullname" placeholder="First and Last Name *">
                       <br />
                       <br />
                       <br />
@@ -64,10 +68,10 @@
                       <br />
                       <br />
                       <!-- Options for the user to select roles. -->
-                      <select id="user_role" name="user-role" required>
+                      <select id="user_role" name="accessLevel" required>
                           <br />
-                          <option value="Select">Please Select</option>
-                          <option value="adminstrator">Administrator</option>
+                          <option value="Admin">Admin</option>
+                          <option value="user">User</option>
                       </select>
 
                       <br />
@@ -75,7 +79,6 @@
 
                       <!-- Submit button -->
                       <input class="btn btn-success" type="submit" value="Save" />
-
                   </form>
 
                   <!-- Content should go here -->

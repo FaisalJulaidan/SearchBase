@@ -34,11 +34,8 @@ stripe_keys = {
 
 # stripe.api_key = stripe_keys['secret_key']
 
-app = Flask(__name__, static_folder='static')
-mail = Mail(app)
 
-ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
-ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
+app = Flask(__name__, static_folder='static')
 
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
@@ -47,6 +44,13 @@ app.config.update(
     MAIL_USERNAME='thesearchbase@gmail.com',
     MAIL_PASSWORD='pilbvnczzdgxkyzy'
 )
+
+mail = Mail(app)
+
+
+ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
+ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
+
 
 
 def select_from_database_table(sql_statement, array_of_terms=None, all=False, database=DATABASE):
@@ -179,17 +183,18 @@ def allowed_image_file(filename):
 @app.before_request
 def before_request():
     theurl = str(request.url_rule)
-    if "admin" not in theurl or "admin/homepage" in theurl:
+    if "admin" not in theurl and "account" not in theurl or "admin/homepage" in theurl:
         print("Ignore before request for: ", theurl)
         return None
     email = request.cookies.get("UserEmail")
     print("USER EMAIL: " + str(email))
     if email is None:
         print("User not logged in")
-        return render_template("login.html", msg="You are not logged in!")
+        #TODO change this to redirect with feedback through out the server
+        return render_template("login.html", msg="Please log in first!")
     print("Before request checking: ", theurl, " ep: ", request.endpoint)
     if email == 'None' and request.endpoint != 'login':
-        return render_template("login.html", msg="You are not logged in!")
+        return render_template("login.html", msg="Please log in first!")
     print("Before Request checks out")
     return None
 
@@ -433,7 +438,7 @@ def admin_home():
             if messages is not None:
                 email = loads(messages)['email']
                 if email is None or email == "None":
-                    return render_template("login.html", msg="You are not logged in!")
+                    return redirect("/login")
                 sendEmail = True
             else:
                 abort(status.HTTP_400_BAD_REQUEST)
@@ -1201,9 +1206,8 @@ def admin_users():
                 users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
                 return render("admin/users.html", users=users)
 
-
 @app.route("/admin/users/add", methods=['POST'])
-def admin_add_users():
+def admin_users_add():
     if request.method == "POST":
         email = request.cookies.get("UserEmail")
         company = get_company(email)
@@ -1216,44 +1220,58 @@ def admin_add_users():
         # Generates a random password
 
         if fullname == "Error" or accessLevel == "Error" or newEmail == "Error":
-            print("Invalid request")
-            abort(status.HTTP_400_BAD_REQUEST)
+            print("A textbox has not been filled")
+            #TODO pass in feedback message
+            redirect("/admin/users", code=302)
         else:
             newEmail = newEmail.lower()
             try:
                 firstname = fullname.split(" ")[0]
                 surname = fullname.split(" ")[1]
             except IndexError as e:
-                abort(status.HTTP_400_BAD_REQUEST)
-                # TODO handle much better
+                print("Error in splitting")
+                #TODO pass in feedback message
+                redirect("/admin/users", code=302)
             hashed_password = hash_password(password)
 
             insertUserResponse = insert_into_database_table(
                 "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
                 (companyID, firstname, surname, accessLevel, newEmail, hashed_password, "True"))
             if "added" not in insertUserResponse:
-                if "UNIQUE constraint" in insertUserResponse:
-                    abort(status.HTTP_409_CONFLICT)
-                else:
-                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-                    # TODO handle this better
+                print("Error in insert operation")
+                #TODO pass in feedback message
+                redirect("/admin/users", code=302)
             else:
-                if not app.debug:
-                    # sending email to the new user.
-                    # TODO this needs improving
-                    msg = Message("Account verification, {} {}".format(firstname, surname),
-                                  sender="thesearchbase@gmail.com",
-                                  recipients=[email])
-                    link = "www.thesearchbase.com/account/changepassword"
-                    msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
-                               "If you feel this is a mistake please contact {}. \n" \
-                               "Your temporary password is: {}\n" \
-                               "Please visit <a href='{}'>this link</a> to set password for account.".format(email,
-                                                                                                             password,
-                                                                                                             link)
-                    mail.send(msg)
+                #if not app.debug:
 
+                # sending email to the new user.
+                # TODO this needs improving
+                link = "https://www.thesearchbase.com/account/changepassword"
+                msg = Message("Account verification, "+firstname+" "+surname,
+                              sender="thesearchbase@gmail.com",
+                              recipients=[newEmail])
+                msg.html = "<p>You have been registered with TheSearchBase by an Admin at your company.<br> \
+                            If you feel this is a mistake please contact "+email+".<br> \
+                            Your temporary password is: "+password+".<br>\
+                            Please visit <a href='"+link+"'>this link</a> to set password for your account.<p>"
+                mail.send(msg)
                 return redirect("/admin/users")
+
+@app.route("/admin/users/delete/<userID>", methods=["GET"])
+def admin_users_delete(userID):
+    if request.method == "GET":
+        email = request.cookies.get("UserEmail")
+        company = get_company(email)
+        # todo check company
+        companyID = company[0]
+
+        requestingUser = select_from_database_table("SELECT * FROM Users WHERE Email=?", [email])
+        targetUser = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?", [userID])[0]
+        if requestingUser[4] != "Admin" or requestingUser[1] != targetUser:
+            #TODO send feedback message
+            return redirect("/admin/homepage", code=302)
+        delete_from_table("DELETE FROM Users WHERE ID=?;", [userID])
+        return redirect("/admin/users", code=302)
 
 
 # Method for the billing
@@ -1763,14 +1781,13 @@ def render(template, **context):
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         assistantDetails = []
-        # [0]= ID [5]= Nickname
         for assistant in assistants:
             assistantDetails.append((assistant[0], assistant[5]))
 
         return render_template(template, debug=app.debug, assistantDetails=assistantDetails, **context)
     else:
         print("Render function redirects to login")
-        return render_template("login.html", msg="You are not logged in!")
+        return redirect("/login")
 
 
 class Del:

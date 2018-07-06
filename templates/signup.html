@@ -95,7 +95,8 @@
                     <div class="wrap-input100 validate-input" data-validate="Required">
                         <input class="input100" type="number"
                                placeholder="+1-595585131"
-                               name="phoneNumber" onchange="checkboxesMatch('phone')">
+                               name="phoneNumber" >
+                               <!-- onchange="checkboxesMatch('phone')"  for input ^-->
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-mobile" aria-hidden="true"></i>
@@ -143,7 +144,7 @@
 
 
 
-                    <!--<div class="wrap-input100 validate-input" data-validate="Required">
+                    <div class="wrap-input100 validate-input" data-validate="Required">
                         <p>Choose Plan</p>
                         <select name="subscription" id="inputState" class="form-control" form="signupForm" title="Choose Plan" required>
                             <option value="Trial">3 Month Trial</option>
@@ -155,7 +156,7 @@
                             {% endif %}
                         </select>
                         <span class="focus-input100"></span>
-                    </div>-->
+                    </div>
 
                     <div class="container-login100-form-btn">
                         <button class="login100-form-btn-disabled" id="submit" disabled>

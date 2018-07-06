@@ -183,7 +183,7 @@ def allowed_image_file(filename):
 @app.before_request
 def before_request():
     theurl = str(request.url_rule)
-    if "admin" not in theurl and "account" not in theurl or "admin/homepage" in theurl:
+    if "admin" not in theurl or "admin/homepage" in theurl:
         print("Ignore before request for: ", theurl)
         return None
     email = request.cookies.get("UserEmail")
@@ -354,7 +354,7 @@ def signup():
 
             hashed_password = hash_password(password)
 
-            verified = app.debug
+            verified = "False"
 
             insertCompanyResponse = insert_into_database_table(
                 "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName,companySize, websiteURL, companyPhoneNumber))
@@ -366,25 +366,24 @@ def signup():
                 (company[0], firstname, surname, accessLevel, email, hashed_password, new_customer['id'], str(verified)))
 
 
-            if not app.debug:
-                # TODO this needs improving
-                msg = Message("Account verification",
-                              sender="thesearchbase@gmail.com",
-                              recipients=[email])
+            # if not app.debug:
+            # TODO this needs improving
+            msg = Message("Account verification",
+                          sender="thesearchbase@gmail.com",
+                          recipients=[email])
 
-                payload = email + ";" + companyName
-                link = "www.thesearchbase.com/account/verify/{}".format(verificationSigner.dumps(payload))
-                msg.body = "You have registered with TheSearchBase.\n" \
-                           "Please visit <a href='{}'>this link</a> to verify your account.".format(email, link)
-                mail.send(msg)
+            payload = email + ";" + companyName
+            link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
+            msg.html = "You have registered with TheSearchBase. <br>Please visit \
+                        <a href='"+link+"'>this link</a> to verify your account."
+            mail.send(msg)
 
-                # sending the registration confirmation email to us
-                msg = Message("A new company has signed up!",
-                              sender="thesearchbase@gmail.com",
-                              recipients=["thesearchbase@gmail.com"])
-                msg.body = "Company name: {} has signed up the admin's details are. Name: {}, Email: {}, ".format(
-                    companyName, fullname, email)
-                mail.send(msg)
+            # sending the registration confirmation email to us
+            msg = Message("A new company has signed up!",
+                          sender="thesearchbase@gmail.com",
+                          recipients=["thesearchbase@gmail.com"])
+            msg.html = "<p>Company name: "+companyName+" has signed up. <br>The admin's details are: <br>Name: "+fullname+" <br>Email: "+email+".</p>"
+            mail.send(msg)
 
             return render_template('errors/verification.html',
                                    msg="Please check your email and follow instructions to verify account and get started.")
@@ -1246,7 +1245,7 @@ def admin_users_add():
 
                 # sending email to the new user.
                 # TODO this needs improving
-                link = "https://www.thesearchbase.com/account/changepassword"
+                link = "https://www.thesearchbase.com/admin/changepassword"
                 msg = Message("Account verification, "+firstname+" "+surname,
                               sender="thesearchbase@gmail.com",
                               recipients=[newEmail])
@@ -1547,64 +1546,61 @@ def chatbot(route):
 def verify_account(payload):
     if request.method == "GET":
         email = request.cookies.get("UserEmail")
-        if email is None or email is "None":
-            data = ""
+        data = ""
+        try:
+            data = verificationSigner.loads(payload)
             try:
-                data = verificationSigner.loads(payload)
-                try:
-                    email = data.split(";")[0]
-                    companyName = data.split(";")[1]
+                email = data.split(";")[0]
+                companyName = data.split(";")[1]
 
-                    company = get_company(email)
-                    # TODO check company
-                    if company is None:
-                        # TODO handle better
-                        print("Verification failed due to invalid payload.")
-                        abort(status.HTTP_400_BAD_REQUEST)
-                    elif "Error" in company:
-                        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-                    else:
-                        if company[1] != companyName:
-                            # TODO handle this
-                            abort(status.HTTP_400_BAD_REQUEST, "Company data doesn't match")
-                        else:
-                            updateUser = update_table("UPDATE Users SET Verified=? WHERE Email=?;", ["True", email])
-                            # TODO check updateUser
-
-                            user = select_from_database_table("SELECT * FROM Users WHERE Email=?", [email])
-                            # TODO check user
-
-                            # sending registration confirmation email to the user.
-                            msg = Message("Thank you for registering, {} {}".format(user[2], user[3]),
-                                          sender="thesearchbase@gmail.com",
-                                          recipients=[email])
-                            msg.body = "We appreciate you registering with TheSearchBase. A whole new world of possibilities is ahead of you."
-                            mail.send(msg)
-
-                            return redirect("/login")
-
-                except IndexError:
+                company = get_company(email)
+                # TODO check company
+                if company is None:
                     # TODO handle better
                     print("Verification failed due to invalid payload.")
                     abort(status.HTTP_400_BAD_REQUEST)
-            except BadSignature as e:
-                encodedData = e.payload
-                if encodedData is None:
-                    msg = "Verification failed due to payload containing no data."
+                elif "Error" in company:
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                else:
+                    if company[1] != companyName:
+                        # TODO handle this
+                        abort(status.HTTP_400_BAD_REQUEST, "Company data doesn't match")
+                    else:
+                        updateUser = update_table("UPDATE Users SET Verified=? WHERE Email=?;", ["True", email])
+                        # TODO check updateUser
+
+                        user = select_from_database_table("SELECT * FROM Users WHERE Email=?", [email])
+                        # TODO check user
+
+                        # sending registration confirmation email to the user.
+                        msg = Message("Thank you for registering, {} {}".format(user[2], user[3]),
+                                      sender="thesearchbase@gmail.com",
+                                      recipients=[email])
+                        msg.body = "We appreciate you registering with TheSearchBase. A whole new world of possibilities is ahead of you."
+                        mail.send(msg)
+
+                        return redirect("/login")
+
+            except IndexError:
+                # TODO handle better
+                print("Verification failed due to invalid payload.")
+                abort(status.HTTP_400_BAD_REQUEST)
+        except BadSignature as e:
+            encodedData = e.payload
+            if encodedData is None:
+                msg = "Verification failed due to payload containing no data."
+                print(msg)
+                abort(status.HTTP_400_BAD_REQUEST, msg)
+            else:
+                msg = ""
+                try:
+                    verificationSigner.load_payload(encodedData)
+                    msg = "Verification failed, bad signature"
+                except:
+                    msg = "Verification failed"
+                finally:
                     print(msg)
                     abort(status.HTTP_400_BAD_REQUEST, msg)
-                else:
-                    msg = ""
-                    try:
-                        verificationSigner.load_payload(encodedData)
-                        msg = "Verification failed, bad signature"
-                    except:
-                        msg = "Verification failed"
-                    finally:
-                        print(msg)
-                        abort(status.HTTP_400_BAD_REQUEST, msg)
-        else:
-            return redirect("/admin/homepage")
 
 
 @app.route("/account/resetpassword", methods=["GET", "POST"])
@@ -1653,7 +1649,7 @@ def reset_password():
         #         return
 
 
-@app.route("/account/changepassword", methods=["GET", "POST"])
+@app.route("/admin/changepassword", methods=["GET", "POST"])
 def change_password():
     if request.method == "GET":
         return render_template("/accounts/changepassword.html")

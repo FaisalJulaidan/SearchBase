@@ -34,11 +34,8 @@ stripe_keys = {
 
 # stripe.api_key = stripe_keys['secret_key']
 
-app = Flask(__name__, static_folder='static')
-mail = Mail(app)
 
-ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
-ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
+app = Flask(__name__, static_folder='static')
 
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
@@ -47,6 +44,13 @@ app.config.update(
     MAIL_USERNAME='thesearchbase@gmail.com',
     MAIL_PASSWORD='pilbvnczzdgxkyzy'
 )
+
+mail = Mail(app)
+
+
+ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
+ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
+
 
 
 def select_from_database_table(sql_statement, array_of_terms=None, all=False, database=DATABASE):
@@ -186,6 +190,7 @@ def before_request():
     print("USER EMAIL: " + str(email))
     if email is None:
         print("User not logged in")
+        #TODO change this to redirect with feedback through out the server
         return render_template("login.html", msg="Please log in first!")
     print("Before request checking: ", theurl, " ep: ", request.endpoint)
     if email == 'None' and request.endpoint != 'login':
@@ -1237,19 +1242,19 @@ def admin_users_add():
                 #TODO pass in feedback message
                 redirect("/admin/users", code=302)
             else:
-                if not app.debug:
+                #if not app.debug:
 
-                    # sending email to the new user.
-                    # TODO this needs improving
-                    msg = Message("Account verification, "+firstname+" "+surname,
-                                  sender="thesearchbase@gmail.com",
-                                  recipients=[newEmail])
-                    link = "www.thesearchbase.com/account/changepassword"
-                    msg.body = "You have been registered with TheSearchBase by an Admin at your company. \n" \
-                               "If you feel this is a mistake please contact "+email+". \n" \
-                               "Your temporary password is: "+password+"\n" \
-                               "Please visit <a href='"+link+"'>this link</a> to set password for account."
-                    mail.send(msg)
+                # sending email to the new user.
+                # TODO this needs improving
+                link = "https://www.thesearchbase.com/account/changepassword"
+                msg = Message("Account verification, "+firstname+" "+surname,
+                              sender="thesearchbase@gmail.com",
+                              recipients=[newEmail])
+                msg.html = "<p>You have been registered with TheSearchBase by an Admin at your company.<br> \
+                            If you feel this is a mistake please contact "+email+".<br> \
+                            Your temporary password is: "+password+".<br>\
+                            Please visit <a href='"+link+"'>this link</a> to set password for your account.<p>"
+                mail.send(msg)
                 return redirect("/admin/users")
 
 @app.route("/admin/users/delete/<userID>", methods=["GET"])
@@ -1262,11 +1267,10 @@ def admin_users_delete(userID):
 
         requestingUser = select_from_database_table("SELECT * FROM Users WHERE Email=?", [email])
         targetUser = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?", [userID])[0]
-        print(requestingUser, "              ", targetUser)
         if requestingUser[4] != "Admin" or requestingUser[1] != targetUser:
             #TODO send feedback message
             return redirect("/admin/homepage", code=302)
-        print(delete_from_table("DELETE FROM Users WHERE ID=?;", [userID]))
+        delete_from_table("DELETE FROM Users WHERE ID=?;", [userID])
         return redirect("/admin/users", code=302)
 
 

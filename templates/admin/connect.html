@@ -19,16 +19,18 @@
                             <link href="/static/pop-up/pop.css" rel="stylesheet">
 
                             <div class="bottom_left" id="contents1">
-                                <div id="contents1" style="display:none;">
-                                    <iframe src="http://www.thesearchbase.com/chatbot/nameofyourcompany" width="350"
-                                            height="350"></iframe>
+                                <div id="iframediv">
+                                    <div id="overChatbotIframe">
+                                        <a id="overChatbotIframeHeading">TheSearchBase</a>
+                                        <a id="overChatbotIframeCloseButton">X</a>
+                                    </div>
+                                    <!-- Will change this after the demo -->
+                                    <iframe frameBorder="0" id="chatbotIframe" src="https://thesearchbase.com/chatbot/"></iframe>
                                 </div>
-                                <ul>
-                                    <li class="him" href="#"
-                                        onclick="document.getElementById('contents1').style.cssText = ''">Launch
-                                        Assistant
-                                    </li>
-                                </ul>
+                                <div class="launch_btn_holder">
+                                    <div id="launch_button"></div>
+                                    <div id="launch_button_appendix"></div>
+                                </div>
                             </div>
 
                         </xmp>
@@ -39,6 +41,17 @@
                         <p> If you would like to have control the appearance of your assistant, you can also paste some
                             extra code into your CSS and make changes</p>
                         <xmp>
+                          <style>
+                           .main_wrapper{
+                            width: 100%;
+                            height:1080px;
+                            margin: 0 auto;
+                            background-image: url('../images/mango.png');
+                            background-color:#ffffff;
+                            background-repeat:no-repeat;
+                            background-position:top center;
+                            }
+
                             ul{
                             list-style: none;
                             margin: 0;
@@ -52,49 +65,208 @@
                             border-radius: 30px;
                             margin-bottom: 2px;
                             font-family: Helvetica, Arial, sans-serif;
-                            color: white;
                             }
 
                             .him{
-                            background: #6610f2;
+                            background: #e53935;
                             float: left;
-                            z-index: 1000;
                             }
 
                             .him{
                             border-bottom-left-radius: 5px;
-                            z-index: 1000;
                             }
 
                             .bottom_left{
                             position: fixed;
                             bottom: 0;
                             left: 0;
-                            margin: 20px;
-                            margin-left: 10px;
-                            z-index: 1000;
+                            padding: 0px 20px;
                             }
+
+                            #launch_button {
+                            background-image: url(../img/core-img/open-assistant-circle.png);
+                            width: 90px;
+                            height: 90px;
+                            margin-left: 27px;
+                            background-repeat: no-repeat;
+                            background-size: cover;
+                            display: inline-block;
+                            }
+
+                            #launch_button:hover, #launch_button_appendix {
+                            cursor: pointer;
+                            }
+
+                            #launch_button_appendix {
+                            background-image: url(../img/core-img/open-assistant-bar.png);
+                            width: 200px;
+                            height: 70px;
+                            background-repeat: no-repeat;
+
+                            margin-left: -133px;
+                            margin-bottom: -130px;
+
+                            background-size: cover;
+                            display: inline-block;
+                            -ms-transform: rotate(90deg);
+                            -moz-transform: rotate(90deg);
+                            -webkit-transform: rotate(90deg);
+                            transform: rotate(90deg);
+                            opacity: 0;
+                            }
+             
+                            #chatbotIframe {
+                            overflow: hidden;
+                            border-bottom-left-radius: 10px;
+                            border-bottom-right-radius: 10px;
+                            width: 400px;
+                            height: 450px;
+                            }
+
+                            /*iFrame styling*/
+                            #iframediv {
+                            opacity: 0;
+                            }
+
+                            #overChatbotIframeCloseButton {
+                            width: 67px;
+                            height: 31px;
+                            position: relative;
+                            right: 0.5px;
+                            background-color: #9023dc;
+                            padding: 22.5px;
+                            font-size: 25px;
+                            text-align: center;
+                            vertical-align: middle;
+                            line-height: 0px;
+                            border-top-right-radius: 10px;
+                            color: white;
+                            float: right;
+                            }
+
+                            #overChatbotIframeCloseButton:hover {
+                            color: #9023dc;
+                            background-color: white;
+                            font-weight: bold;
+                            cursor: pointer;
+                            }
+
+                            #chatbotIframe, #overChatbotIframe {
+                            box-shadow: 3px 3px 5px grey;
+                            }
+
+                            #overChatbotIframe {
+                            background-color: #e9ecef;
+                            border-top-left-radius: 10px;
+                            border-top-right-radius: 10px;
+                            background-color: #9023dc;
+                            color:white;
+                            font-weight:bold;
+                            }
+
+                            #overChatbotIframeImg {
+                            margin-left: 10px;
+                            width:62px;
+                            }
+
+                            #overChatbotIframeHeading {
+                            margin-left: 12px;
+                            margin-top: 20px;
+                            font-size: 30px;
+                            }
+                           </style>
                         </xmp>
                         <br/>
-                        <h4> Javascript (This is used for analytics) </h4>
-                        <p> If you would like to optimal control over your assistant and make big changes, you you can
+                        <h4> Javascript (This is used for analytics and the animation used in the bot) </h4>
+                        <p> If you would like to optimal control over your assistant and make big changes, you can
                             download our <strong><a href="">Js</a></strong> file or paste it as a script in your
                             website.</p>
                         <xmp>
 
                             <script>
+                                var angle = 0;
+                                var degreeInRadians = 2 * Math.PI / 360;
+                                var realX = 0;
+                                var realY = 0;
                                 var opened = false;
                                 var frame = document.getElementById("iframediv");
-                                frame.style = "display:none";
-                                document.getElementById("launch_button").addEventListener("click", function () {
-                                    if (!opened) {
-                                        frame.style = "display:block";
-                                        opened = true;
-                                    } else {
-                                        frame.style = "display:none";
-                                        opened = false;
-                                    }
+                                var but = document.getElementById("launch_button");
+                                var butAp = document.getElementById("launch_button_appendix");
+                                var closeBut = document.getElementById("overChatbotIframeCloseButton");
+                                var hoovered = false;
+                                var btn_text = $("#launch_button_appendix");
+
+                                $(document).ready(function () {
+                                    frame.style = "display:none";
+                                    but.addEventListener("click", openAssistant);
+                                    butAp.addEventListener("click", openAssistant);
+                                    closeBut.addEventListener("click", function () {
+                                        $("#iframediv").animate({
+                                            marginBottom: "-=35px",
+                                            opacity: 0
+                                        }, 400);
+                                        setTimeout(function () {
+                                            frame.style = "display:none";
+                                            but.style = "display:inline-block";
+                                            butAp.style = "display:inline-block";
+                                            opened = false;
+                                        }, 400);
+                                    });
+
+                                    $(document).on("mouseover", ".launch_btn_holder", function () {
+                                        OpenButtonHover();
+                                    });
+
+                                    $(document).on("mouseleave", ".launch_btn_holder", function () {
+                                        OpenButtonHoverEnd();
+                                    });
                                 });
+
+
+                                function openAssistant() {
+                                    frame.style = "display:block";
+                                    //$("#iframediv").fadeIn("slow", function () {
+                                    //    // Animation complete
+                                    //});
+                                    $("#iframediv").animate({
+                                        marginBottom: "+=35px",
+                                        opacity: 1
+                                    }, 400);
+                                    but.style = "display:none";
+                                    butAp.style = "display:none";
+                                    opened = true;
+                                }
+
+                                function OpenButtonHover() {
+                                    if (!hoovered) {
+                                        $("#launch_button_appendix").animate({
+                                            // marginLeft: "+=20px",
+                                            // marginBottom: "+=76px",
+                                            marginLeft: "-20px",
+                                            marginBottom: "0px",
+                                            opacity: 1,
+
+                                        }, 600);
+                                        $("#launch_button_appendix").rotate({
+                                            animateTo: 0,
+                                        })
+                                        hoovered = true;
+
+                                    }
+                                }
+                                function OpenButtonHoverEnd() {
+                                    if (hoovered) {
+                                        $("#launch_button_appendix").animate({
+                                            marginLeft: "-177px",
+                                            marginBottom: "-147px",
+                                            opacity: 0,
+                                        }, 600);
+                                        $("#launch_button_appendix").rotate({
+                                            animateTo: 90,
+                                        })
+                                        hoovered = false;
+                                    }
+                                }
                             </script>
 
                         </xmp>

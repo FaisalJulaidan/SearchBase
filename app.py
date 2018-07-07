@@ -308,8 +308,10 @@ def signup():
 
             payload = email + ";" + companyName
             link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
-            msg.html = "You have registered with TheSearchBase. <br>Please visit \
+            msg.html = "<img src='https://thesearchbase.com/static/email_images/password_reset.jpg' style='width:500px;height:228px;'> <br /><p>You have registered with TheSearchBase!</p> <br>Please visit \
                         <a href='"+link+"'>this link</a> to verify your account."
+            with app.open_resource("static\\email_images\\verify_email.png") as fp:
+                msg.attach("verify_email.png","image/png", fp.read())
             mail.send(msg)
 
             # sending the registration confirmation email to us

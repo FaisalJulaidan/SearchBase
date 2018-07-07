@@ -205,7 +205,6 @@ def render(template, **context):
 
         assistantDetails = []
         for assistant in assistants:
-            print(assistant)
             assistantDetails.append((assistant[0], assistant[5]))
 
         return render_template(template, debug=app.debug, assistantDetails=assistantDetails, **context)
@@ -1002,8 +1001,19 @@ def admin_thanks():
 
 @app.route("/admin/check-out/<planID>", methods=['GET', 'POST'])
 def admin_pay(planID):
+
     if request.method == 'GET':
-        return render("admin/check-out.html")
+
+        try:
+            plan = stripe.Plan.retrieve(planID)
+        except stripe.error.InvalidRequestError as e:
+            abort(status.HTTP_400_BAD_REQUEST, "This plan does't exist! Make sure the plan ID is correct.")
+
+        print(plan)
+        return render("admin/check-out.html", plan=plan)
+
+
+
 
     if request.method == 'POST':
 

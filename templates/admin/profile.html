@@ -1,9 +1,24 @@
-﻿{% extends "admin/base.html" %}
+{% extends "admin/base.html" %}
+{% block headlinks %}
+<title>Profile </title>
 
-{% block title %}Profile{% endblock %}
+<!-- Bootstrap -->
+<link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome -->
+<link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<!-- NProgress -->
+<link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
+<!-- bootstrap-daterangepicker -->
+<link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+
+<!-- Custom Theme Style -->
+<link href="/static/build/css/custom.min.css" rel="stylesheet">
+<link href="/static/css/admin.css" rel="stylesheet">
+
+{% endblock %}
 
 {% block content %}
-    <div class="right_col" role="main">
+<div class="right_col" role="main">
     <div class="">
         <div class="page-title">
             <div class="title_left">
@@ -13,11 +28,13 @@
 
         <div class="clearfix"></div>
 
+        <!-- Account Details -->
         <div class="row">
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2>User Report
+                        <h2>
+                            User Report
                             <small>Activity report</small>
                         </h2>
                         <ul class="nav navbar-right panel_toolbox">
@@ -33,56 +50,220 @@
                                 <div id="crop-avatar">
                                     <!-- Current avatar -->
                                     <img class="img-responsive avatar-view" src="/static/images/img.jpg"
-                                         alt="Avatar" title="Change the avatar">
+                                         alt="Avatar">
                                 </div>
                             </div>
                             <div id="outputDiv">
-                                <h3>{{ user[2] }} {{ user[3] }}</h3>
+                                <form id="profileForm" action="/admin/profile" method="post">
 
-                                <ul class="list-unstyled user_data">
-                                    <li>
-                                        <i class="fa fa-briefcase user-profile-icon"></i> {{ companyName }}
-                                    </li>
+                                    <h3 id="nameh3" style="display:inline-block;">{{ user[2] }} {{ user[3] }}</h3><img id="editName" class="editIcon" src="../static/images/pencil-edit-button.png" />
+                                    <input id="names" name="names" value="{{user[2]}} {{user[3]}}" /><img id="saveName" class="tickIcon" src="../static/images/tick.png" /><img id="cancelName" class="crossIcon" src="../static/images/cross.png" />
+                                    <br />
+                                    <h4 id="emailh4" style="display:inline-block;">{{ user[5] }}</h4><img id="editEmail" class="editIcon" src="../static/images/pencil-edit-button.png" />
+                                    <input id="email" name="email" value="{{user[5]}}" /><img id="saveEmail" class="tickIcon" src="../static/images/tick.png" /><img id="cancelEmail" class="crossIcon" src="../static/images/cross.png" />
 
-                                    <li class="m-top-xs">
-                                        <i class="fa fa-external-link user-profile-icon"></i>
-                                        <a href="https://www.thesearchbase.com/chatbot/{{ companyName }}"
-                                           target="_blank">Assistant</a>
-                                    </li>
-                                </ul>
+                                    <br />
+                                    <ul class="list-unstyled user_data">
+                                        <li>
+                                            <i class="fa fa-briefcase user-profile-icon" style="display:inline-block;"></i> <p id="companyNamep" style="display:inline-block;">{{ company[1] }}</p><img id="editCompanyName" class="editIcon" src="../static/images/pencil-edit-button.png" />
+                                            <input id="companyName" name="companyName" value="{{company[1]}}" /><img id="saveCompanyName" class="tickIcon" src="../static/images/tick.png" /><img id="cancelCompanyName" class="crossIcon" src="../static/images/cross.png" />
+                                        </li>
+
+                                        <li>
+                                            <a id="companyURLa" href="{{company[3]}}" target="_blank">{{company[3]}}</a><img id="editCompanyURL" class="editIcon" src="../static/images/pencil-edit-button.png" />
+                                            <input id="companyURL" name="companyURL" value="{{company[3]}}" /><img id="saveCompanyURL" class="tickIcon" src="../static/images/tick.png" /><img id="cancelCompanyURL" class="crossIcon" src="../static/images/cross.png" />
+                                        </li>
+
+                                        <li class="m-top-xs">
+                                            <i class="fa fa-external-link user-profile-icon"></i>
+                                            <a href="https://www.thesearchbase.com/chatbot/{{ company[1] }}" target="_blank">Assistant</a>
+                                        </li>
+                                    </ul>
+                                    <button class="btn btn-success">Save Changes</button>
+                                </form>
                             </div>
                         </div>
                     </div>
-                    <a href="/admin/changepassword" class="btn btn-success">Change Password</a>
+                    <button href="/account/changepassword" class="btn btn-success">Change Password</button>
                 </div>
             </div>
         </div>
     </div>
-{% endblock %}
+    {% endblock %}
 
-{% block customJS %}
-  <script>
-      inputD = document.getElementById("inputDiv");
-      outputD = document.getElementById("outputDiv");
-      editB = document.getElementById("EditB");
-      editB.addEventListener("click", openForm);
-      document.getElementById("cancelB").addEventListener("click", closeForm);
-      document.getElementById("submit").onclick = function () {
-          document.getElementById("form").submit();
-      };
+    {% block customJS %}
+    <!-- jQuery -->
+    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="/static/vendors/nprogress/nprogress.js"></script>
+    <!-- morris.js -->
+    <script src="/static/vendors/raphael/raphael.min.js"></script>
+    <script src="/static/vendors/morris.js/morris.min.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="/static/vendors/moment/min/moment.min.js"></script>
+    <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
 
-      inputDiv.style = "display:none";
+    <!-- Custom Theme Scripts -->
+    <script src="/static/build/js/custom.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk&callback=initMap"></script>
+    <script src="/static/js/cookies.js"></script>
 
-      function openForm() {
-          outputD.style = "display:none";
-          editB.style = "display:none";
-          inputD.style = "display:block";
-      }
-
-      function closeForm() {
-          outputD.style = "display:block";
-          editB.style = "display:block";
-          inputD.style = "display:none";
-      }
-  </script>
-{% endblock %}
+    <script>
+        if ("{{email}}" !== "") {
+            makeCookie("UserEmail", "{{email}}", 1);
+        }
+        //name changer
+        nameh3 = document.getElementById("nameh3");
+        editName = document.getElementById("editName");
+        saveName = document.getElementById("saveName");
+        cancelName = document.getElementById("cancelName");
+        names = document.getElementById("names");
+        saveName.style = "display:none;";
+        cancelName.style = "display:none;";
+        names.style = "display:none;";
+        editName.onclick = function () {
+            nameh3.style = "display:none";
+            editName.style = "display:none";
+            saveName.style = "display:inline-block;";
+            cancelName.style = "display:inline-block;";
+            names.style = "display:inline-block;";
+        };
+        saveName.onclick = function () {
+            nameh3.style = "display:inline-block";
+            editName.style = "display:inline-block";
+            saveName.style = "display:none;";
+            cancelName.style = "display:none;";
+            names.style = "display:none;";
+            nameh3.innerHTML = names.value;
+        };
+        cancelName.onclick = function () {
+            nameh3.style = "display:inline-block";
+            editName.style = "display:inline-block";
+            saveName.style = "display:none;";
+            cancelName.style = "display:none;";
+            names.style = "display:none;";
+            names.value = nameh3.innerHTML;
+        };
+        //email changer
+        emailh4 = document.getElementById("emailh4");
+        editEmail = document.getElementById("editEmail");
+        saveEmail = document.getElementById("saveEmail");
+        cancelEmail = document.getElementById("cancelEmail");
+        email = document.getElementById("email");
+        saveEmail.style = "display:none;";
+        cancelEmail.style = "display:none;";
+        email.style = "display:none;";
+        editEmail.onclick = function () {
+            emailh4.style = "display:none";
+            editEmail.style = "display:none";
+            saveEmail.style = "display:inline-block;";
+            cancelEmail.style = "display:inline-block;";
+            email.style = "display:inline-block;";
+        };
+        saveEmail.onclick = function () {
+            emailh4.style = "display:inline-block";
+            editEmail.style = "display:inline-block";
+            saveEmail.style = "display:none;";
+            cancelEmail.style = "display:none;";
+            email.style = "display:none;";
+            emailh4.innerHTML = email.value;
+        };
+        cancelEmail.onclick = function () {
+            emailh4.style = "display:inline-block";
+            editEmail.style = "display:inline-block";
+            saveEmail.style = "display:none;";
+            cancelEmail.style = "display:none;";
+            email.style = "display:none;";
+            email.value = emailh4.innerHTML;
+        };
+        //company name changer
+        companyNamep = document.getElementById("companyNamep");
+        editCompanyName = document.getElementById("editCompanyName");
+        saveCompanyName = document.getElementById("saveCompanyName");
+        cancelCompanyName = document.getElementById("cancelCompanyName");
+        companyName = document.getElementById("companyName");
+        saveCompanyName.style = "display:none;";
+        cancelCompanyName.style = "display:none;";
+        companyName.style = "display:none;";
+        editCompanyName.onclick = function () {
+            companyNamep.style = "display:none";
+            editCompanyName.style = "display:none";
+            saveCompanyName.style = "display:inline-block;";
+            cancelCompanyName.style = "display:inline-block;";
+            companyName.style = "display:inline-block;";
+        };
+        saveCompanyName.onclick = function () {
+            companyNamep.style = "display:inline-block";
+            editCompanyName.style = "display:inline-block";
+            saveCompanyName.style = "display:none;";
+            cancelCompanyName.style = "display:none;";
+            companyName.style = "display:none;";
+            companyNamep.innerHTML = companyName.value;
+        };
+        cancelCompanyName.onclick = function () {
+            companyNamep.style = "display:inline-block";
+            editCompanyName.style = "display:inline-block";
+            saveCompanyName.style = "display:none;";
+            cancelCompanyName.style = "display:none;";
+            companyName.style = "display:none;";
+            companyName.value = companyNamep.innerHTML;
+        };
+        //company url changer
+        companyURLa = document.getElementById("companyURLa");
+        editCompanyURL = document.getElementById("editCompanyURL");
+        saveCompanyURL = document.getElementById("saveCompanyURL");
+        cancelCompanyURL = document.getElementById("cancelCompanyURL");
+        companyURL = document.getElementById("companyURL");
+        saveCompanyURL.style = "display:none;";
+        cancelCompanyURL.style = "display:none;";
+        companyURL.style = "display:none;";
+        editCompanyURL.onclick = function () {
+            companyURLa.style = "display:none";
+            editCompanyURL.style = "display:none";
+            saveCompanyURL.style = "display:inline-block;";
+            cancelCompanyURL.style = "display:inline-block;";
+            companyURL.style = "display:inline-block;";
+        };
+        saveCompanyURL.onclick = function () {
+            companyURLa.style = "display:inline-block";
+            editCompanyURL.style = "display:inline-block";
+            saveCompanyURL.style = "display:none;";
+            cancelCompanyURL.style = "display:none;";
+            companyURL.style = "display:none;";
+            companyURLa.innerHTML = companyURL.value;
+        };
+        cancelCompanyURL.onclick = function () {
+            companyURLa.style = "display:inline-block";
+            editCompanyURL.style = "display:inline-block";
+            saveCompanyURL.style = "display:none;";
+            cancelCompanyURL.style = "display:none;";
+            companyURL.style = "display:none;";
+            companyURL.value = companyURLa.innerHTML;
+        };
+        //inputD = document.getElementById("inputDiv");
+        //outputD = document.getElementById("outputDiv");
+        //editB = document.getElementById("EditB");
+        //editB.addEventListener("click", openForm);
+        //document.getElementById("cancelB").addEventListener("click", closeForm);
+        //document.getElementById("submit").onclick = function () {
+        //    document.getElementById("form").submit();
+        //};
+        //inputDiv.style = "display:none";
+        //function openForm() {
+        //    outputD.style = "display:none";
+        //    editB.style = "display:none";
+        //    inputD.style = "display:block";
+        //}
+        //function closeForm() {
+        //    outputD.style = "display:block";
+        //    editB.style = "display:block";
+        //    inputD.style = "display:none";
+        //}
+    </script>
+    {% endblock %}

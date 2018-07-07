@@ -384,7 +384,7 @@ def admin_home():
             assistantIDs = []
             for assistant in assistants:
                 assistantIDs.append(assistant[0])
-            return render("admin/main.html", stats=statistics, email=email, assistantIDs=assistantIDs)
+            return render_template("admin/main.html", stats=statistics, email=email, assistantIDs=assistantIDs)
         else:
             return render("admin/main.html", stats=statistics)
 
@@ -1570,32 +1570,26 @@ def reset_password():
                  # TODO handle this better
                  abort(status.HTTP_500_INTERNAL_SERVER_ERROR, company)
              else:
-                 password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
-                 # Generates a random password
-        
-                 updateUser = update_table("UPDATE Users SET Password=?, Verified=? WHERE Email=?;",
-                                           [hash_password(password), "False"])
-                 # TODO check updateUser for errors
-        
                  # TODO this needs improving
                  msg = Message("Password reset",
                                sender="thesearchbase@gmail.com",
                                recipients=[email])
         
                  payload = email + ";" + company[1]
-                 link = "https://www.thesearchbase.com/account/verify/{}" + verificationSigner.dumps(payload)
+                 link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
                  msg.html = "<p>Your password has been reset as per your request.<br>Please visit <a href='"+link+"'>this link</a> to verify your account.</p>"
                  mail.send(msg)
         
                  return redirect("/account/resetpassword", code=302)
 
-@app.route("/account/resetpassword/<payload>", methods=['GET'])
+@app.route("/account/resetpassword/<payload>", methods=['GET', 'POST'])
 def reset_password_verify(payload):
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
         data = ""
         try:
+            print(payload)
             data = verificationSigner.loads(payload)
+            print(data)
             try:
                 email = data.split(";")[0]
                 companyName = data.split(";")[1]
@@ -1613,13 +1607,8 @@ def reset_password_verify(payload):
                         # TODO handle this
                         abort(status.HTTP_400_BAD_REQUEST, "Company data doesn't match")
                     else:
-                        msg = Message("Thank you for registering, {} {}".format(user[2], user[3]),
-                                      sender="thesearchbase@gmail.com",
-                                      recipients=[email])
-                        msg.body = "We appreciate you registering with TheSearchBase. A whole new world of possibilities is ahead of you."
-                        mail.send(msg)
-
-                        return render_template("/login")
+                        # Everything checks out
+                        return render_template("/accounts/resetpasswordset.html", email=email, payload=payload)
 
             except IndexError:
                 # TODO handle better
@@ -1641,6 +1630,13 @@ def reset_password_verify(payload):
                 finally:
                     print(msg)
                     abort(status.HTTP_400_BAD_REQUEST, msg)
+    else:
+        email = request.form.get("email", default="Error")
+        password = request.form.get("password", default="Error")
+        hashedNewPassword = hash_password(password)
+        updatePassword = update_table("UPDATE Users SET Password=? WHERE Email=?;", [hashedNewPassword, email])
+        return redirect("login", code=302)
+
 
 @app.route("/admin/changepassword", methods=["GET", "POST"])
 def change_password():
@@ -1854,38 +1850,38 @@ def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)
 def bad_request(e):
     print(e.description)
-    return render('errors/400.html', error=e.description), status.HTTP_400_BAD_REQUEST
+    return render_template('errors/400.html', error=e.description), status.HTTP_400_BAD_REQUEST
 
 
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
     print(e.description)
     print("++++++++++++++++++++++++++++++++")
-    return render('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
+    return render_template('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
 
 
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 def unsupported_media(e):
     print(e.description)
-    return render('errors/415.html', error=e.description), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+    return render_template('errors/415.html', error=e.description), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 
 @app.errorhandler(418)
 def im_a_teapot(e):
     print(e.description)
-    return render('errors/418.html', error=e.description), 418
+    return render_template('errors/418.html', error=e.description), 418
 
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(e):
     print(e.description)
-    return render('errors/500.html', error=e.description), status.HTTP_500_INTERNAL_SERVER_ERROR
+    return render_template('errors/500.html', error=e.description), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
 def not_implemented(e):
     print(e.description)
-    return render('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
+    return render_template('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
 
 
 

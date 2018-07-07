@@ -1666,6 +1666,13 @@ def change_password():
                                    msg="Account not verified, please check your email and follow instructions")
 
 
+
+# Terms and conditions page route
+@app.route("/routetofix", methods=['GET'])
+def fixxxxxxx():
+    if request.method == "GET":
+        return render_template("/accounts/set_resetpassword.html")
+
 # Sitemap route
 @app.route('/robots.txt')
 @app.route('/sitemap.xml')

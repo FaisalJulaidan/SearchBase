@@ -1552,69 +1552,119 @@ def reset_password():
     if request.method == "GET":
         return render_template("/accounts/resetpassword.html")
     else:
-        abort(status.HTTP_501_NOT_IMPLEMENTED)
+         email = request.form.get("email", default="Error")
+         # TODO check this
+        
+         user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
+         # TODO check user
+        
+         if user is None:
+             # TODO hadnle this better
+             abort(status.HTTP_400_BAD_REQUEST, "User doesn't exist")
+         elif "Error" in user:
+             # TODO handle this better
+             abort(status.HTTP_500_INTERNAL_SERVER_ERROR, user)
+         else:
+             company = get_company(email)
+             if company is None or "Error" in company:
+                 # TODO handle this better
+                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR, company)
+             else:
+                 password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
+                 # Generates a random password
+        
+                 updateUser = update_table("UPDATE Users SET Password=?, Verified=? WHERE Email=?;",
+                                           [hash_password(password), "False"])
+                 # TODO check updateUser for errors
+        
+                 # TODO this needs improving
+                 msg = Message("Password reset",
+                               sender="thesearchbase@gmail.com",
+                               recipients=[email])
+        
+                 payload = email + ";" + company[1]
+                 link = "https://www.thesearchbase.com/account/verify/{}" + verificationSigner.dumps(payload)
+                 msg.html = "<p>Your password has been reset as per your request.<br>Please visit <a href='"+link+"'>this link</a> to verify your account.</p>"
+                 mail.send(msg)
+        
+                 return redirect("/account/resetpassword", code=302)
 
-        # email = request.form.get("email", default="Error")
-        # # TODO check this
-        #
-        # user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
-        # # TODO check user
-        #
-        # if user is None:
-        #     # TODO hadnle this better
-        #     abort(status.HTTP_400_BAD_REQUEST, "User doesn't exist")
-        # elif "Error" in user:
-        #     # TODO handle this better
-        #     abort(status.HTTP_500_INTERNAL_SERVER_ERROR, user)
-        # else:
-        #     company = get_company(email)
-        #     if company is None or "Error" in company:
-        #         # TODO handle this better
-        #         abort(status.HTTP_500_INTERNAL_SERVER_ERROR, company)
-        #     else:
-        #         password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
-        #         # Generates a random password
-        #
-        #         updateUser = update_table("UPDATE Users SET Password=?, Verified=? WHERE Email=?;",
-        #                                   [hash_password(password), "False"])
-        #         # TODO check updateUser for errors
-        #
-        #         # TODO this needs improving
-        #         msg = Message("Password reset",
-        #                       sender="thesearchbase@gmail.com",
-        #                       recipients=[email])
-        #
-        #         payload = email + ";" + company[1]
-        #         link = "www.thesearchbase.com/account/verify/{}".format(verificationSigner.dumps(payload))
-        #         msg.body = "Your password has been reset as per your request.\n" \
-        #                    "Please visit <a href='{}'>this link</a> to verify your account.".format(email, link)
-        #         mail.send(msg)
-        #
-        #         return
+@app.route("/account/resetpassword/<payload>", methods=['GET'])
+def reset_password_verify(payload):
+    if request.method == "GET":
+        email = request.cookies.get("UserEmail")
+        data = ""
+        try:
+            data = verificationSigner.loads(payload)
+            try:
+                email = data.split(";")[0]
+                companyName = data.split(";")[1]
 
+                company = get_company(email)
+                # TODO check company
+                if company is None:
+                    # TODO handle better
+                    print("Verification failed due to invalid payload.")
+                    abort(status.HTTP_400_BAD_REQUEST)
+                elif "Error" in company:
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                else:
+                    if company[1] != companyName:
+                        # TODO handle this
+                        abort(status.HTTP_400_BAD_REQUEST, "Company data doesn't match")
+                    else:
+                        msg = Message("Thank you for registering, {} {}".format(user[2], user[3]),
+                                      sender="thesearchbase@gmail.com",
+                                      recipients=[email])
+                        msg.body = "We appreciate you registering with TheSearchBase. A whole new world of possibilities is ahead of you."
+                        mail.send(msg)
+
+                        return render_template("/login")
+
+            except IndexError:
+                # TODO handle better
+                print("Verification failed due to invalid payload.")
+                abort(status.HTTP_400_BAD_REQUEST)
+        except BadSignature as e:
+            encodedData = e.payload
+            if encodedData is None:
+                msg = "Verification failed due to payload containing no data."
+                print(msg)
+                abort(status.HTTP_400_BAD_REQUEST, msg)
+            else:
+                msg = ""
+                try:
+                    verificationSigner.load_payload(encodedData)
+                    msg = "Verification failed, bad signature"
+                except:
+                    msg = "Verification failed"
+                finally:
+                    print(msg)
+                    abort(status.HTTP_400_BAD_REQUEST, msg)
 
 @app.route("/admin/changepassword", methods=["GET", "POST"])
 def change_password():
     if request.method == "GET":
         return render_template("/accounts/changepassword.html")
     else:
-        email = request.form.get("email", default="Error")
+        email = request.cookies.get("UserEmail")
         currentPassword = request.form.get("currentPassword", default="Error")
-        newPassword = request.form.get("newPassword", defaul="Error")
+        newPassword = request.form.get("newPassword", default="Error")
         # TODO check these
 
         user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
         # TODO check user
-        if user[7] == "True":
+        print(currentPassword, "   ", newPassword)
+        if user[8] == "True":
             password = user[6]
             if hash_password(currentPassword, password) == password:
                 hashedNewPassword = hash_password(newPassword)
-                updatePassword = "UPDATE Users SET Password=? WHERE Email=?;", [hashedNewPassword, email]
+                updatePassword = update_table("UPDATE Users SET Password=? WHERE Email=?;", [hashedNewPassword, email])
                 # TODO check updatePassword
-
-                return render_template("/accounts/changepassword.html", "Success")
+                print(updatePassword)
+                return render_template("/accounts/changepassword.html", msg="Password has been successfully changed.")
             else:
-                return render_template("/accounts/changepassword.html", "Email and password don't match!")
+                return render_template("/accounts/changepassword.html", msg="Old password is incorrect!")
         else:
             return render_template('errors/verification.html',
                                    msg="Account not verified, please check your email and follow instructions")

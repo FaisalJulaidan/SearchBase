@@ -53,113 +53,7 @@ ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
 
 
 
-def select_from_database_table(sql_statement, array_of_terms=None, all=False, database=DATABASE):
-    data = "Error"
-    conn = None
-    try:
-        conn = sqlite3.connect(database)
-        cur = conn.cursor()
-        cur.execute(sql_statement, array_of_terms)
-        if (all):
-            data = cur.fetchall()
-        else:
-            data = cur.fetchone()
-    except sqlite3.ProgrammingError as e:
-        print("Error in select statement," + str(e))
-    except sqlite3.OperationalError as e:
-        print("Error in select operation," + str(e))
-    finally:
-        if (conn is not None):
-            conn.close()
-        return data
 
-
-
-
-def get_last_row_from_table(table, database=DATABASE):
-    data = "Error"
-    conn = None
-    try:
-        conn = sqlite3.connect(database)
-        cur = conn.cursor()
-        row = cur.execute("SELECT * FROM " + table + " WHERE ROWID IN ( SELECT max( ROWID ) FROM " + table +" );").fetchone()
-
-    except Exception as e:
-        row = -1
-    finally:
-        if conn is not None:
-            conn.close()
-        return row;
-
-
-
-
-def insert_into_database_table(sql_statement, tuple_of_terms, database=DATABASE):
-    msg = "Error"
-    conn = None
-    try:
-        conn = sqlite3.connect(database)
-        cur = conn.cursor()
-        cur.execute(sql_statement, tuple_of_terms)
-        conn.commit()
-        msg = "Record successfully added."
-    except sqlite3.ProgrammingError as e:
-        msg = "Error in insert statement: " + str(e)
-    except sqlite3.OperationalError as e:
-        msg = "Error in insert operation: " + str(e)
-    except Exception as e:
-        msg = "Error in insert operation: " + str(e)
-    finally:
-        if conn is not None:
-            conn.rollback()
-            conn.close()
-        print(msg)
-        return msg
-
-
-def update_table(sql_statement, array_of_terms, database=DATABASE):
-    msg = "Error"
-    conn = None
-    try:
-        conn = sqlite3.connect(database)
-        cur = conn.cursor()
-        cur.execute(sql_statement, array_of_terms)
-        conn.commit()
-        msg = "Record successfully updated."
-    except sqlite3.ProgrammingError as e:
-        msg = "Error in update statement" + str(e)
-    except sqlite3.OperationalError as e:
-        msg = "Error in update operation" + str(e)
-    finally:
-        if conn is not None:
-            conn.rollback()
-            conn.close()
-        print(msg)
-        return msg
-
-
-def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
-    msg = "Error"
-    conn = None
-    try:
-        conn = sqlite3.connect(database)
-        cur = conn.cursor()
-        cur.execute(sql_statement, array_of_terms)
-        conn.commit()
-        if cur.rowcount == 1:
-            msg = "Record successfully deleted."
-        else:
-            msg = "Record not deleted may not exist"
-    except sqlite3.ProgrammingError as e:
-        msg = "Error in delete statement" + str(e)
-    except sqlite3.OperationalError as e:
-        msg = "Error in delete operation" + str(e)
-    finally:
-        if conn is not None:
-            conn.rollback()
-            conn.close()
-        print(msg)
-        return msg
 
 
 def hash_password(password, salt=gensalt()):
@@ -176,27 +70,6 @@ def allowed_image_file(filename):
     ext = filename.rsplit('.', 1)[1]
     return '.' in filename and ext in ALLOWED_IMAGE_EXTENSION
 
-
-# TODO just overall better validation
-
-# code to ensure user is logged in
-@app.before_request
-def before_request():
-    theurl = str(request.url_rule)
-    if "admin" not in theurl or "admin/homepage" in theurl:
-        print("Ignore before request for: ", theurl)
-        return None
-    email = request.cookies.get("UserEmail")
-    print("USER EMAIL: " + str(email))
-    if email is None:
-        print("User not logged in")
-        #TODO change this to redirect with feedback through out the server
-        return render_template("login.html", msg="Please log in first!")
-    print("Before request checking: ", theurl, " ep: ", request.endpoint)
-    if email == 'None' and request.endpoint != 'login':
-        return render_template("login.html", msg="Please log in first!")
-    print("Before Request checks out")
-    return None
 
 
 # TODO jackassify it
@@ -286,6 +159,67 @@ def login():
                     return render_template('login.html', data="User name and password does not match!")
             else:
                 return render_template('login.html', data="User doesn't exist!")
+
+
+# TODO just overall better validation
+
+# code to ensure user is logged in
+@app.before_request
+def before_request():
+
+    theurl = str(request.url_rule)
+    print(theurl)
+    if "admin" not in theurl or "admin/homepage" in theurl:
+        print("Ignore before request for: ", theurl)
+        return None
+
+
+    email = request.cookies.get("UserEmail")
+    print("USER EMAIL: " + str(email))
+
+    if email is None:
+        print("User not logged in")
+        #TODO change this to redirect with feedback through out the server
+        return render_template("login.html", msg="Please log in first!")
+
+
+    print("Before request checking: ", theurl, " ep: ", request.endpoint)
+    if email == 'None' and request.endpoint != 'login':
+        return render_template("login.html", msg="Please log in first!")
+    print("Before Request checks out")
+    return None
+
+
+
+# Used to passthrough variables without repeating it in each method call
+# IE assistant information
+def render(template, **context):
+
+
+    email = request.cookies.get("UserEmail")
+    if email is not None:
+        assistants = get_assistants(email)
+        if assistants is not None:
+            if "Error" in assistants:
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        assistantDetails = []
+        for assistant in assistants:
+            assistantDetails.append((assistant[0], assistant[5]))
+
+        return render_template(template, debug=app.debug, assistantDetails=assistantDetails, **context)
+
+    else:
+        theurl = str(request.url_rule)
+        print(theurl)
+
+        if "admin" not in theurl or "admin/homepage" in theurl:
+            print("Ignore before request for: ", theurl)
+            return render_template(template, debug=app.debug, **context)
+
+        print("Render function redirects to login")
+        return redirect("/login")
+
 
 
 # TODO improve verification
@@ -1320,13 +1254,12 @@ def admin_emoji():
 def chatbot(route):
     if request.method == "GET":
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
-
-        if company is None:
-            abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
-
         # for debugging
         print(escape(route))
         print(company)
+
+        if company is None:
+            abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
 
         # TODO check company for errors
         assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
@@ -1343,6 +1276,7 @@ def chatbot(route):
 
         if assistantActive != "True":
             abort(status.HTTP_404_NOT_FOUND, "Assistant not active.")
+
         else:
             questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
                                                         [assistantID], True)
@@ -1734,56 +1668,167 @@ def sendMarketingEmail():
         mail.send(msg)
         return render_template("index.html")
 
+def select_from_database_table(sql_statement, array_of_terms=None, all=False, database=DATABASE):
+    data = "Error"
+    conn = None
+    try:
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+        cur.execute(sql_statement, array_of_terms)
+        if (all):
+            data = cur.fetchall()
+        else:
+            data = cur.fetchone()
+    except sqlite3.ProgrammingError as e:
+        print("Error in select statement," + str(e))
+    except sqlite3.OperationalError as e:
+        print("Error in select operation," + str(e))
+    finally:
+        if (conn is not None):
+            conn.close()
+        return data
+
+
+
+
+def get_last_row_from_table(table, database=DATABASE):
+    data = "Error"
+    conn = None
+    try:
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+        row = cur.execute("SELECT * FROM " + table + " WHERE ROWID IN ( SELECT max( ROWID ) FROM " + table +" );").fetchone()
+
+    except Exception as e:
+        row = -1
+    finally:
+        if conn is not None:
+            conn.close()
+        return row;
+
+
+
+
+def insert_into_database_table(sql_statement, tuple_of_terms, database=DATABASE):
+    msg = "Error"
+    conn = None
+    try:
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+        cur.execute(sql_statement, tuple_of_terms)
+        conn.commit()
+        msg = "Record successfully added."
+    except sqlite3.ProgrammingError as e:
+        msg = "Error in insert statement: " + str(e)
+    except sqlite3.OperationalError as e:
+        msg = "Error in insert operation: " + str(e)
+    except Exception as e:
+        msg = "Error in insert operation: " + str(e)
+    finally:
+        if conn is not None:
+            conn.rollback()
+            conn.close()
+        print(msg)
+        return msg
+
+
+def update_table(sql_statement, array_of_terms, database=DATABASE):
+    msg = "Error"
+    conn = None
+    try:
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+        cur.execute(sql_statement, array_of_terms)
+        conn.commit()
+        msg = "Record successfully updated."
+    except sqlite3.ProgrammingError as e:
+        msg = "Error in update statement" + str(e)
+    except sqlite3.OperationalError as e:
+        msg = "Error in update operation" + str(e)
+    finally:
+        if conn is not None:
+            conn.rollback()
+            conn.close()
+        print(msg)
+        return msg
+
+
+def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
+    msg = "Error"
+    conn = None
+    try:
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+        cur.execute(sql_statement, array_of_terms)
+        conn.commit()
+        if cur.rowcount == 1:
+            msg = "Record successfully deleted."
+        else:
+            msg = "Record not deleted may not exist"
+    except sqlite3.ProgrammingError as e:
+        msg = "Error in delete statement" + str(e)
+    except sqlite3.OperationalError as e:
+        msg = "Error in delete operation" + str(e)
+    finally:
+        if conn is not None:
+            conn.rollback()
+            conn.close()
+        print(msg)
+        return msg
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Error Handlers ##
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)
 def bad_request(e):
-    return render('errors/400.html', error=e), status.HTTP_400_BAD_REQUEST
+    print(e.description)
+    return render('errors/400.html', error=e.description), status.HTTP_400_BAD_REQUEST
 
 
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
-    return render('errors/404.html'), status.HTTP_404_NOT_FOUND
+    print(e.description)
+    print("++++++++++++++++++++++++++++++++")
+    return render('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
 
 
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 def unsupported_media(e):
-    return render('errors/415.html', error=e), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+    print(e.description)
+    return render('errors/415.html', error=e.description), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 
 @app.errorhandler(418)
 def im_a_teapot(e):
-    return render('errors/418.html', error=e), 418
+    print(e.description)
+    return render('errors/418.html', error=e.description), 418
 
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(e):
-    return render('errors/500.html', error=e), status.HTTP_500_INTERNAL_SERVER_ERROR
+    print(e.description)
+    return render('errors/500.html', error=e.description), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
 def not_implemented(e):
-    return render('errors/501.html', error=e), status.HTTP_501_NOT_IMPLEMENTED
+    print(e.description)
+    return render('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
 
 
-# Used to passthrough variables without repeating it in each method call
-# IE assistant information
-def render(template, **context):
-    email = request.cookies.get("UserEmail")
-    if email is not None:
-        assistants = get_assistants(email)
-        if assistants is not None:
-            if "Error" in assistants:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        assistantDetails = []
-        for assistant in assistants:
-            assistantDetails.append((assistant[0], assistant[5]))
-
-        return render_template(template, debug=app.debug, assistantDetails=assistantDetails, **context)
-    else:
-        print("Render function redirects to login")
-        return redirect("/login")
 
 
 class Del:

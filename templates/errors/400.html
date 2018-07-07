@@ -5,10 +5,13 @@
 {% endblock %}
 
 {% block content %}
-    <h2>400</h2>
-    <h3></h3>
+
+    <h2>Error :(</h2>
+    <h3>400</h3>
+
     <p>Bad request. Please contact thesearchbase@gmail.com and let them know what happened.</p>
     {% if debug == True %}
-        <p>{{ error }}</p>
+        <p>Reason: {{ error }}</p>
     {% endif %}
+    
 {% endblock %}

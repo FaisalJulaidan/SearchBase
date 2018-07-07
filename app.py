@@ -205,6 +205,7 @@ def render(template, **context):
 
         assistantDetails = []
         for assistant in assistants:
+            print(assistant)
             assistantDetails.append((assistant[0], assistant[5]))
 
         return render_template(template, debug=app.debug, assistantDetails=assistantDetails, **context)
@@ -384,7 +385,7 @@ def admin_home():
             assistantIDs = []
             for assistant in assistants:
                 assistantIDs.append(assistant[0])
-            return render_template("admin/main.html", stats=statistics, email=email, assistantIDs=assistantIDs)
+            return render("admin/main.html", stats=statistics, email=email, assistantIDs=assistantIDs)
         else:
             return render("admin/main.html", stats=statistics)
 

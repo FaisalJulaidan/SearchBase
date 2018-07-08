@@ -1586,7 +1586,7 @@ def reset_password():
                      msg.attach("password_reset.png","image/png", fp.read())
                  mail.send(msg)
         
-                 return redirect("/account/resetpassword", code=302)
+                 return redirect("/errors/verification_password.html", code=302)
 
 @app.route("/account/resetpassword/<payload>", methods=['GET', 'POST'])
 def reset_password_verify(payload):

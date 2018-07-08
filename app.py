@@ -1260,29 +1260,34 @@ def admin_emoji():
         return render("admin/emoji.html")
 
 
-@app.route("/chatbot/<route>", methods=['GET', 'POST'])
-def chatbot(route):
+@app.route("/chatbot/<companyName>/<assistantID>", methods=['GET', 'POST'])
+def chatbot(companyName, assistantID):
     if request.method == "GET":
-        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
+        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(companyName)])
+
         # for debugging
-        print(escape(route))
+        print(escape(companyName))
         print(company)
 
         if company is None:
             abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
 
         # TODO check company for errors
-        assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=?;", [assistantID])
+
+        if assistant is None:
+            abort(status.HTTP_400_BAD_REQUEST, "This Assistant does't exist")
 
         # for debugging
-        print(assistants)
+        print(assistant)
 
 
         # TODO check assistant for errors
-        assistantIndex = 0  # TODO implement this properly
-        assistantID = assistants[assistantIndex][0]
+        # assistantIndex = 0  # TODO implement this properly
+        # assistantID = assistant[assistantIndex][0]
 
-        assistantActive = assistants[assistantIndex][5]
+        # is assistant active ? True/False
+        assistantActive = assistant[6]
 
         if assistantActive != "True":
             abort(status.HTTP_404_NOT_FOUND, "Assistant not active.")
@@ -1319,7 +1324,7 @@ def chatbot(route):
                     merge = merge + tuple(answer)
                 questionsAndAnswers.append(merge)
 
-            message = assistants[assistantIndex][3]
+            message = assistant[3]
             # MONTHLY UPDATE
             date = datetime.now().strftime("%Y-%m")
             currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
@@ -1346,15 +1351,27 @@ def chatbot(route):
                                             [currentStats[3] + 1, assistantID, date])
             print(questionsAndAnswers)
 
-            return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route,
+            return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + companyName,
                                    message=message)
     elif request.method == "POST":
-        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
+
+
+        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(companyName)])
+
+        if company is None:
+            abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
+
+
         # TODO check company for errors
-        assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
+
+        if assistant is None:
+            abort(status.HTTP_400_BAD_REQUEST, "This Assistant does't exist")
+
         # TODO check assistant for errors
-        assistantIndex = 0  # TODO implement this properly
-        assistantID = assistants[assistantIndex][0]
+        # assistantIndex = 0  # TODO implement this properly
+
+        assistantID = assistant[0]
 
         questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?", [assistantID], True)
         # TODO check questions for errors
@@ -1810,7 +1827,6 @@ def bad_request(e):
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
     print(e.description)
-    print("++++++++++++++++++++++++++++++++")
     return render('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
 
 

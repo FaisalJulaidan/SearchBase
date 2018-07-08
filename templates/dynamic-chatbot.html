@@ -108,7 +108,7 @@
                         </div>
                         <!-- <ul> -->
                         <div id="ChatInputDiv">
-                            <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><img src="../static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />
+                            <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><input type="file" id="fileUploadB" size="10" /><img src="../static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />
                         </div>
                         <!-- </ul> -->
                     </div>
@@ -125,11 +125,15 @@
     var newPos = 0;
     var cancelScroll = false;
     var showChatBox = false;
+    var fileUploadQuestion = false;
     var params = "";
+    var questionType = "";
     var questionsAnswered = 0;
     var collectedInformation = [];
-    var qType = "";
     var question = undefined;
+    var fileUploads = []
+    var currentFileURL = "";
+
     $(window).scroll(function ()
     {
         newPos = $(window).scrollTop();
@@ -173,9 +177,30 @@
     $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot'>" + emojione.toImage("{{message}}") + "</li></div><br><br>");
     getNextQuestion("Next Question by Order");
 
+    function readURL(input) {
+
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                currentFileURL = e.target.result;
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $("#fileUploadB").change(function () {
+        readURL(this);
+    });
+
     async function submitMessage(message)
     {
         cancelScroll = false;
+        if (questionType == "fileUpload") {
+            message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
+            fileUploads.push(currentFileURL+":::"+(questionN+2)+":::"+message);
+        }
         if (message == "")
         {
             message = document.getElementById("textMessage").value;
@@ -313,6 +338,7 @@
             }
             return 0;
         } else if (action == "Next Question by Order") {
+            questionN++;
             for (var i = 0; i < data.length; i++) {
                 if (question == data[i]) {
                     question = data[i + 1];
@@ -332,12 +358,23 @@
         } else if (action == "None") {
             return 0;
         }
-        qType = question[0].split(";")[1];
         var answers = "<div id='qAnswers'>";
-        if (question[0].split(";")[1] == "userInfoRetrieval") {
+        questionType = question[0].split(";")[1];
+        if (questionType == "userInfoRetrieval") {
             showChatBox = true;
         } else {
             showChatBox = false;
+        }
+        if (questionType == "fileUpload") {
+            console.log("true");
+            document.getElementById("textMessage").style.display = "none";
+            document.getElementById("fileUploadB").style.display = "inline-block";
+            console.log(document.getElementById("textMessage").display);
+            showChatBox = true;
+        } else {
+            console.log("false");
+            document.getElementById("textMessage").style.display = "inline-block";
+            document.getElementById("fileUploadB").style.display = "none";
         }
         for (var i = 1; i < question.length; i++)
         {
@@ -460,7 +497,17 @@
         {
             params += "&collectedInformation=None"
         }
+        if (fileUploads.length > 0) {
+            params += "&fileUploads=" + fileUploads[0]
+            for (var i = 1; i <= fileUploads.length - 1; i++) {
+                params += "||" + fileUploads[i];
+            }
+        }
+        else {
+            params += "&fileUploads=None"
+        }
         collectedInformation = [];
+        fileUploads = [];
         questionsAnswered = 0;
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", '/' + "{{user}}", true);

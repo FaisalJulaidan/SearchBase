@@ -1849,8 +1849,8 @@ right: 0;
       width: 100%;
 }
 
-#bottomContainer input {
-    width: 85%;
+#textMessage {
+    width: 75%;
     margin-right: 3%;
     margin-left: 4%;
     border-style: none;
@@ -1859,6 +1859,10 @@ right: 0;
 
 #bottomContainer input:focus {
     outline: none;
+}
+
+#fileUploadB{
+    width:80%;
 }
 
 #ChatInputDiv {

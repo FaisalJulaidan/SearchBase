@@ -14,6 +14,7 @@ import sqlite3
 import stripe
 import string
 import random
+from urllib.request import urlopen
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
@@ -21,6 +22,7 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 DATABASE = APP_ROOT + "/database.db"
 PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
+USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
 
 pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
 secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
@@ -1284,7 +1286,7 @@ def chatbot(route):
         assistantIndex = 0  # TODO implement this properly
         assistantID = assistants[assistantIndex][0]
 
-        assistantActive = assistants[assistantIndex][5]
+        assistantActive = assistants[assistantIndex][6]
 
         if assistantActive != "True":
             abort(status.HTTP_404_NOT_FOUND, "Assistant not active.")
@@ -1364,15 +1366,35 @@ def chatbot(route):
         products = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?;", [assistantID], True)
         # TODO check products for errors
 
+        lastSessionID = select_from_database_table("SELECT * FROM UserInput", [], True)
+        print(lastSessionID)
+        lastSessionID = lastSessionID[len(lastSessionID)-1][4] + 1
+
         collectedInformation = request.form.get("collectedInformation").split("||")
         date = datetime.now().strftime("%d-%m-%Y")
         for i in range(0, len(collectedInformation)):
             questionIndex = int(collectedInformation[i].split(";")[0]) - 1
             input = collectedInformation[i].split(";")[1]
             questionID = int(questions[questionIndex][0])
-            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input) VALUES (?,?,?)",
-                                                     (questionID, date, input))
+            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID) VALUES (?,?,?,?)", (questionID, date, input, lastSessionID))
             # TODO check insertInput for errors
+
+        #lastSessionID = select_from_database_table("SELECT TOP(1) * FROM UserInput ORDER BY ID DESC", [], True)[0]
+        #TODO needs improving
+
+        fileUploads = request.form.get("fileUploads").split("||");
+        for i in range(0, len(fileUploads)):
+            file = urlopen(fileUploads[i].split(":::")[0])
+            filename = fileUploads[i].split(":::")[2]
+            print(date,"-----", lastSessionID, "------", fileUploads[i].split(":::")[1], "------", filename)
+            filename = date + '_' + str(lastSessionID) + '_' + fileUploads[i].split(":::")[1] + '_' + filename
+            #filename = secure_filename(filename)
+
+            #if file and allowed_file(filename):
+            if file:
+                open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
+                savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
+                insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID) VALUES (?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID))
 
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")

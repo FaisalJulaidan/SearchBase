@@ -308,7 +308,7 @@ def signup():
 
             payload = email + ";" + companyName
             link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
-            msg.html = "<img src='https://thesearchbase.com/static/email_images/password_reset.jpg' style='width:500px;height:228px;'> <br /><p>You have registered with TheSearchBase!</p> <br>Please visit \
+            msg.html = "<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'> <br /><p>You have registered with TheSearchBase!</p> <br>Please visit \
                         <a href='"+link+"'>this link</a> to verify your account."
             with app.open_resource("static\\email_images\\verify_email.png") as fp:
                 msg.attach("verify_email.png","image/png", fp.read())
@@ -1522,7 +1522,9 @@ def verify_account(payload):
                         msg = Message("Thank you for registering, {} {}".format(user[2], user[3]),
                                       sender="thesearchbase@gmail.com",
                                       recipients=[email])
-                        msg.body = "We appreciate you registering with TheSearchBase. A whole new world of possibilities is ahead of you."
+                        msg.body = "<img src='https://thesearchbase.com/static/email_images/welcome.png' style='width:500px;height:228px;'> <br /> We appreciate you registering with TheSearchBase. A whole new world of possibilities is ahead of you."
+                        with app.open_resource("static\\email_images\\welcome.png") as fp:
+                            msg.attach("welcome.png","image/png", fp.read())
                         mail.send(msg)
 
                         return redirect("/login")
@@ -1579,7 +1581,7 @@ def reset_password():
         
                  payload = email + ";" + company[1]
                  link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
-                 msg.html ="<img src='https://thesearchbase.com/static/email_images/password_reset.jpg' style='width:500px;height:228px;'><br /><p>Your password has been reset as per your request.<br/ >Please visit <a href='"+link+"'>this link</a> to verify your account.</p>"
+                 msg.html ="<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'><br /><p>Your password has been reset as per your request.<br/ >Please visit <a href='"+link+"'>this link</a> to verify your account.</p>"
                  with app.open_resource("static\\email_images\\password_reset.png") as fp:
                      msg.attach("password_reset.png","image/png", fp.read())
                  mail.send(msg)

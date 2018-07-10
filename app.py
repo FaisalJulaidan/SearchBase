@@ -229,18 +229,6 @@ def signup():
         return render_template("signup.html", debug=app.debug)
     elif request.method == "POST":
 
-        # # update company for with stripe details
-        # update_table("UPDATE Companies SET SubscriptionID=?, StripeID=? WHERE Name=?",
-        #              ['SubTest', new_customer['id'], companyName])
-
-        # TODO this need to be removed in production
-        # remove the Stripe customer when not in production to kepp Stripe clean when testing
-        # if app.debug:
-        #     new_customer.delete()
-
-        # company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [companyName])
-        # TODO check company for errors
-        # companyID = company[0]
 
         email = request.form.get("email", default="Error").lower()
 
@@ -284,23 +272,46 @@ def signup():
             new_customer = stripe.Customer.create(
                 email=email
             )
+
+            # debug
             print(new_customer)
 
             hashed_password = hash_password(password)
-
             verified = "False"
 
+            # Create a company record for the new user
             insertCompanyResponse = insert_into_database_table(
                 "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName,companySize, websiteURL, companyPhoneNumber))
 
             company = get_last_row_from_table("Companies")
 
+            # Create a user account and link it with the new created company record above
             insertUserResponse = insert_into_database_table(
                 "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified') VALUES (?,?,?,?,?,?,?,?);",
                 (company[0], firstname, surname, accessLevel, email, hashed_password, new_customer['id'], str(verified)))
 
 
-            # if not app.debug:
+
+            try:
+
+                # Subscribe to the Basic plan with a trial of 14 days
+                stripe.Subscription.create(
+                customer=new_customer['id'],
+                items=[{'plan': 'plan_D3lp2yVtTotk2f'}],
+                trial_period_days=14,
+                )
+
+                # if everything is ok activate assistants of this company
+                update_table("UPDATE Assistants SET Active=? WHERE CompanyID=?", ["True", user[1]])
+
+
+            except Exception as e:
+                print(e)
+                abort(status.HTTP_400_BAD_REQUEST, "An error occurred and could not subscribe.")
+                # TODO check subscription for errors https://stripe.com/docs/api#errors
+
+
+            if not app.debug:
             # TODO this needs improving
             msg = Message("Account verification",
                           sender="thesearchbase@gmail.com",
@@ -1005,7 +1016,7 @@ def admin_thanks():
 
 
 
-def coupon_is_valid(coupon="Error"):
+def is_coupon_valid(coupon="Error"):
     try:
         stripe.Coupon.retrieve(coupon)
         return True
@@ -1053,7 +1064,7 @@ def admin_pay(planID):
             print("make no use of coupons")
             # If coupon is not provided set it to None as Stripe API require.
             coupon = "None"
-        if not (coupon_is_valid(coupon)):
+        if not (is_coupon_valid(coupon)):
             return render("admin/check-out.html", error="The coupon used is not valid")
 
 
@@ -1079,13 +1090,17 @@ def admin_pay(planID):
                             },
                         ]
                     )
-                    # if everything is ok
-                    # TODO activate assistants
+
+                    # if everything is ok activate assistants
+                    update_table("UPDATE Assistants SET Active=? WHERE CompanyID=?", ["True", user[1]])
+
 
                 except Exception as e:
                     print(e)
+                    abort(status.HTTP_400_BAD_REQUEST, "An error occurred and could not subscribe.")
                     # TODO check subscription for errors https://stripe.com/docs/api#errors
-                    # TODO this is important todo properly
+
+
 
                 print("You have successfully subscribed!")
                 return render("admin/pricing-tables.html", msg="You have successfully subscribed!")

@@ -312,10 +312,10 @@ def signup():
 
 
             if not app.debug:
-            # TODO this needs improving
-            msg = Message("Account verification",
-                          sender="thesearchbase@gmail.com",
-                          recipients=[email])
+                # TODO this needs improving
+                msg = Message("Account verification",
+                              sender="thesearchbase@gmail.com",
+                              recipients=[email])
 
             payload = email + ";" + companyName
             link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
@@ -989,6 +989,16 @@ def admin_user_input(assistantID):
                 return render("admin/data-storage.html", data=data)
 
 
+# TODO implement this
+@app.route("/admin/assistant/<assistantID>/analytics", methods=['GET'])
+def admin_analytics(assistantID):
+    if request.method == "GET":
+        stats = select_from_database_table(
+            "SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?",
+            [assistantID], True)
+        return render("admin/analytics.html", data=stats)
+
+
 @app.route("/admin/templates", methods=['GET', 'POST'])
 def admin_templates():
     if request.method == "GET":
@@ -1124,20 +1134,6 @@ def webhook_subscription_cancelled():
             # TODO check update assistant for errors
         return '', status.HTTP_200_OK
 
-
-# TODO implement this
-@app.route("/admin/analytics", methods=['GET'])
-def admin_analytics():
-    if request.method == "GET":
-        email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        # TODO check assistants for errors
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
-        stats = select_from_database_table(
-            "SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?",
-            [assistantID], True)
-        return render("admin/analytics.html", data=stats)
 
 
 # Method for the users

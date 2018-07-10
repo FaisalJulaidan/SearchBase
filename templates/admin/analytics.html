@@ -3,11 +3,12 @@
 {% block title %}Analytics{% endblock %}
 
 {% block content %}
-    <div class="right_col" role="main">
+<div class="right_col" role="main">
     <div class="">
         <div class="page-title">
             <div class="title_left">
-                <h3>Analytics
+                <h3>
+                    Analytics
                     <small>Here are the statistics of your assistant</small>
                 </h3>
             </div>
@@ -15,14 +16,14 @@
         <div class="clearfix"></div>
         <div id="pasteDiv" class="row">
             <li> Export to Excel</li>
-            <br/>
+            <br />
             <button id="btnExport" onclick="fnExcelReport();"> EXPORT</button>
             <br>
             <iframe id="txtArea1" style="display:none"></iframe>
-            <br/>
-            <br/>
+            <br />
+            <br />
             <h2>General Data</h2>
-            <br/>
+            <br />
             <div class="analytics_line">
                 <!-- First chart -->
                 <div style="width:350px; height:200px;">
@@ -41,7 +42,7 @@
                 <div class="clearfix"></div>
             </div>
             <h2>Users over time</h2>
-            <br/>
+            <br />
             <div class="analytics_line">
                 <!-- First chart -->
                 <div style="width:700px; height:300px;">
@@ -51,19 +52,30 @@
             </div>
         </div>
     </div>
-{% endblock %}
+    {% endblock %}
 
-{% block customJS %}
+    {% block customJS %}
     <script src="/static/js/cookies.js"></script>
+    <script src="/static/js/Chart.js"></script>
     <script>
-
+        console.log("{{data[0][0]}}");
+        var firstDate = "{{data[0][0]}}";
+        var lastDate = "";
+        {%for item in data %}
+        lastDate = "{{item[0]}}"
+        {% endfor %}
+        var totalPeriod = firstDate + " TO " + lastDate
         //  Start of the chart code
+        var totalOpened = 0;
+        var totalQuestionsAnswered = 0;
+        var totalProductsReturned = 0;
+        {%for item in data %}
+        totalOpened += {{ item[1] }}
+        totalQuestionsAnswered += {{ item[2] }}
+        totalProductsReturned += {{ item[3] }}
+        {%endfor%}
         var chartData = {
-            labels: [{% for item in data %}
-                {%if ";" not in item[0] %}
-                    "{{item[0]}}",
-                {% endif %}
-            {% endfor %}],
+            labels: [totalPeriod],
             datasets: [{
                 label: 'Assistant Used',
                 fill: true,
@@ -83,11 +95,7 @@
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: [{% for item in data %}
-                    {%if ";" not in item[0] %}
-                        {{item[1]}},
-                    {% endif %}
-                {% endfor %}],
+                data: [totalOpened],
                 spanGaps: false
             }]
         }
@@ -100,11 +108,7 @@
         //  End of the chart code
 
         var chartData = {
-            labels: [{% for item in data %}
-                {%if ";" not in item[0] %}
-                    "{{item[0]}}",
-                {% endif %}
-            {% endfor %}],
+            labels: [totalPeriod],
             datasets: [{
                 label: 'Questions Answered',
                 fill: true,
@@ -124,11 +128,7 @@
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: [{% for item in data %}
-                    {%if ";" not in item[0] %}
-                        {{item[2]}},
-                    {% endif %}
-                {% endfor %}],
+                data: [totalQuestionsAnswered],
                 spanGaps: false
             }]
         }
@@ -140,11 +140,7 @@
 
 
         var chartData = {
-            labels: [{% for item in data %}
-                {%if ";" not in item[0] %}
-                    "{{item[0]}}",
-                {% endif %}
-            {% endfor %}],
+            labels: [totalPeriod],
             datasets: [{
                 label: 'Products Returned',
                 fill: true,
@@ -164,11 +160,7 @@
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: [{% for item in data %}
-                    {%if ";" not in item[0] %}
-                        {{item[3]}},
-                    {% endif %}
-                {% endfor %}],
+                data: [totalProductsReturned],
                 spanGaps: false
             }]
         }
@@ -265,4 +257,4 @@
             return (sa);
         }
     </script>
-{% endblock %}
+    {% endblock %}

@@ -82,18 +82,29 @@
                                                 <li><a>{{ name }}<span
                                                         class="fa fa-chevron-down"></span></a>
                                                     <ul class="nav child_menu">
-                                                        <li><a href="/admin/assistant/{{ id }}/settings">Settings</a>
+                                                        <li>
+                                                            <a href="/admin/assistant/{{ id }}/settings">Settings</a>
                                                         </li>
-                                                        <li><a href="/admin/assistant/{{ id }}/questions">Questions</a>
+                                                        <li>
+                                                            <a href="/admin/assistant/{{ id }}/questions">Questions</a>
                                                         </li>
                                                         <li><a href="/admin/assistant/{{ id }}/answers">Answers</a></li>
                                                         <li><a href="/admin/templates">Templates</a></li>
                                                         <li>
-                                                            <a href="/admin/assistant/{{ id }}/products"><i
-                                                                    class="fa fa-database"></i>Products</a>
+                                                            <a href="/admin/assistant/{{ id }}/products">
+                                                                <i class="fa fa-database"></i>Products
+                                                            </a>
                                                         </li>
-                                                        <li><a href="/admin/assistant/{{ id }}/userinput"><i
-                                                                class="fa fa-cloud"></i>User Input</a></li>
+                                                        <li>
+                                                            <a href="/admin/assistant/{{ id }}/userinput">
+                                                                <i class="fa fa-cloud"></i>User Input
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="/admin/assistant/{{ id }}/analytics">
+                                                                <i class="fa fa-cloud"></i>Analytics
+                                                            </a>
+                                                        </li>
                                                     </ul>
                                                 </li>
                                             {% endfor %}
@@ -130,10 +141,6 @@
                                         <li><a href="/admin/profile">Profile</a></li>
                                         <li><a href="/admin/users">Additional Users</a></li>
                                     </ul>
-                                </li>
-                                <li>
-                                    <a href="/admin/analytics"><i class="fa fa-bar-chart"></i> Analytics<span
-                                            class="fa"></span></a>
                                 </li>
                                 <li><a><i class="fa fa-money"></i> Price Plan <span
                                         class="fa fa-chevron-down"></span></a>

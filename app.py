@@ -954,29 +954,33 @@ def admin_user_input(assistantID):
                 questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
                                                        [assistantID], True)
                 data = []
-                dataTuple = tuple(["Null"])
+                #dataTuple = tuple(["Null"])
                 for i in range(0, len(questions)):
                     question = questions[i]
                     questionID = question[0]
                     userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID],
                                                            True)
-                    # TODO check userInput for errors
-                    inputTuple = ()
-                    for inputData in userInput:
-                        input = inputData[3]
-                        inputDate = inputData[2]
-                        if len(inputTuple) == 0:
-                            inputTuple = tuple([inputDate])
-                        elif inputTuple[0] != inputDate:
-                            dataTuple = dataTuple + inputTuple
-                            data.append(dataTuple)
-                            dataTuple = tuple(["Null"])
-                            inputTuple = tuple([inputDate])
-                        inputTuple = inputTuple + tuple([input])
-                    if len(userInput) > 0:
-                        dataTuple = dataTuple + inputTuple
-                        data.append(dataTuple)
-                        dataTuple = tuple(["Null"])
+                    if(userInput != [] and userInput != None):
+                        for record in userInput:
+                            data.append(record)
+                    ## TODO check userInput for errors
+                    #inputTuple = ()
+                    #for inputData in userInput:
+                    #    input = inputData[3]
+                    #    inputDate = inputData[2]
+                    #    if len(inputTuple) == 0:
+                    #        inputTuple = tuple([inputDate])
+                    #    elif inputTuple[0] != inputDate:
+                    #        dataTuple = dataTuple + inputTuple
+                    #        data.append(dataTuple)
+                    #        dataTuple = tuple(["Null"])
+                    #        inputTuple = tuple([inputDate])
+                    #    inputTuple = inputTuple + tuple([input])
+                    #if len(userInput) > 0:
+                    #    dataTuple = dataTuple + inputTuple
+                    #    data.append(dataTuple)
+                    #    dataTuple = tuple(["Null"])
+                print(data)
                 return render("admin/data-storage.html", data=data)
 
 
@@ -1376,7 +1380,10 @@ def chatbot(route):
             questionIndex = int(collectedInformation[i].split(";")[0]) - 1
             input = collectedInformation[i].split(";")[1]
             questionID = int(questions[questionIndex][0])
-            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID) VALUES (?,?,?,?)", (questionID, date, input, lastSessionID))
+            for question in questions:
+                if question[0] == questionID:
+                    questionName = question[2]
+            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, input, lastSessionID, questionName))
             # TODO check insertInput for errors
 
         #lastSessionID = select_from_database_table("SELECT TOP(1) * FROM UserInput ORDER BY ID DESC", [], True)[0]
@@ -1394,7 +1401,10 @@ def chatbot(route):
             if file:
                 open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
                 savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
-                insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID) VALUES (?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID))
+                for question in questions:
+                    if question[0] == questionID:
+                        questionName = question[2]
+                insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID, questionName))
 
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")

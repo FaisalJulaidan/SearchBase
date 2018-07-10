@@ -56,7 +56,7 @@
     console.log("{{data}}")
     {%for record in data %}
     if ("{{record[3]}}".includes(";")) {
-        tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td><a href=\"../" + "{{record[3]}}".split(";")[1] + "\" download>" + "{{record[3]}}".split(";")[0]+"</a></td></tr>";
+        tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td><a href=\"/" + "{{record[3]}}".split(";")[1] + "\" download=\"" + "{{record[3]}}".split(";")[0] +"\">" + "{{record[3]}}".split(";")[0]+"</a></td></tr>";
     } else {
         tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td>{{record[3]}}</td></tr>";
     }

@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 from flask_mail import Mail, Message
-from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, \
-    make_response
+from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, make_response, send_from_directory
 from werkzeug.utils import secure_filename
 from flask_api import status
 from datetime import datetime
@@ -70,6 +69,12 @@ def allowed_image_file(filename):
     ext = filename.rsplit('.', 1)[1]
     return '.' in filename and ext in ALLOWED_IMAGE_EXTENSION
 
+
+#TODO Check for security issues
+#return js file
+@app.route('/js/rotateJS')
+def send_js():
+    return send_from_directory('/static/js/', "jQueryRotate.js")
 
 
 # TODO jackassify it

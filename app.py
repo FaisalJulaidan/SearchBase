@@ -1109,9 +1109,9 @@ def admin_pay(planID):
 
 
 # Stripe Webhooks
-@app.route("/api/stripe/subscription-cancelled", methods=["GET"])
+@app.route("/api/stripe/subscription-cancelled", methods=["POST"])
 def webhook_subscription_cancelled():
-    if request.method == "GET":
+    if request.method == "POST":
         try:
 
             event_json = request.get_json(force=True)

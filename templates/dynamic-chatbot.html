@@ -179,11 +179,19 @@
         if (message == "")
         {
             message = document.getElementById("textMessage").value;
-            if (message == "" || message.replace(/ /g , "") == ""){
+        }
+        if (message == "" || message.replace(/ /g, "") == "") {
+            return 0;
+        }
+        //check for unwanted signs
+        var notAllowedSigns = [";", "/", "\\", "|"];
+        for (var i = 0; i < notAllowedSigns.length; i++) {
+            if (message.includes(notAllowedSigns[i])) {
                 return 0;
             }
-            $('#textMessage').val("");
         }
+        $('#textMessage').val("");
+
         $("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>" + emojione.toImage(message) + "</li></div>");
         $("#newMessage").animate({
             marginTop: "-=35px"

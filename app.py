@@ -312,25 +312,25 @@ def signup():
 
 
             if not app.debug:
-            # TODO this needs improving
-            msg = Message("Account verification",
-                          sender="thesearchbase@gmail.com",
-                          recipients=[email])
+                # TODO this needs improving
+                msg = Message("Account verification",
+                              sender="thesearchbase@gmail.com",
+                              recipients=[email])
 
-            payload = email + ";" + companyName
-            link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
-            msg.html = "<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'> <br /><p>You have registered with TheSearchBase!</p> <br>Please visit \
-                        <a href='"+link+"'>this link</a> to verify your account."
-            with app.open_resource("static\\email_images\\verify_email.png") as fp:
-                msg.attach("verify_email.png","image/png", fp.read())
-            mail.send(msg)
+                payload = email + ";" + companyName
+                link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
+                msg.html = "<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'> <br /><p>You have registered with TheSearchBase!</p> <br>Please visit \
+                            <a href='"+link+"'>this link</a> to verify your account."
+                with app.open_resource("static\\email_images\\verify_email.png") as fp:
+                    msg.attach("verify_email.png","image/png", fp.read())
+                mail.send(msg)
 
-            # sending the registration confirmation email to us
-            msg = Message("A new company has signed up!",
-                          sender="thesearchbase@gmail.com",
-                          recipients=["thesearchbase@gmail.com"])
-            msg.html = "<p>Company name: "+companyName+" has signed up. <br>The admin's details are: <br>Name: "+fullname+" <br>Email: "+email+".</p>"
-            mail.send(msg)
+                # sending the registration confirmation email to us
+                msg = Message("A new company has signed up!",
+                              sender="thesearchbase@gmail.com",
+                              recipients=["thesearchbase@gmail.com"])
+                msg.html = "<p>Company name: "+companyName+" has signed up. <br>The admin's details are: <br>Name: "+fullname+" <br>Email: "+email+".</p>"
+                mail.send(msg)
 
             return render_template('errors/verification.html',
                                    msg="Please check your email and follow instructions to verify account and get started.")
@@ -1109,20 +1109,31 @@ def admin_pay(planID):
 
 
 # Stripe Webhooks
-#This will not work anymore since the StripeID column is moved from Companies table to the Users table.
-@app.route("/api/stripe/subscription-cancelled", methods=["POST"])
+@app.route("/api/stripe/subscription-cancelled", methods=["GET"])
 def webhook_subscription_cancelled():
-    if request.method == "POST":
-        event_json = request.get_json(force=True)
-        customerID = event_json['data']['object']['customer']
-        print(customerID)
-        company = select_from_database_table("SELECT * FROM Companies WHERE StripeID=?", [customerID])
-        # TODO check company for errors
-        assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", [company[0]], True)
-        for assistant in assistants:
-            updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
-            # TODO check update assistant for errors
-        return '', status.HTTP_200_OK
+    if request.method == "GET":
+        try:
+
+            event_json = request.get_json(force=True)
+            customerID = event_json['data']['object']['customer']
+            print(customerID)
+
+            user = select_from_database_table("SELECT * FROM Users WHERE StripeID=?", [customerID])
+            # TODO check company for errors
+            assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", [user[1]], True)
+
+            # Check if user has assistants to deactivate first
+            if len(assistants) > 0:
+                for assistant in assistants:
+
+                    updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
+                    # TODO check update assistant for errors
+
+        except Exception as e:
+            abort(status.HTTP_400_BAD_REQUEST, "Error in Webhook event")
+
+
+        return "Assistants for " + user[5] + " account has been deactivated due to subscription cancellation", status.HTTP_200_OK
 
 
 # TODO implement this
@@ -1887,37 +1898,37 @@ def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
 ## Error Handlers ##
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)
 def bad_request(e):
-    print(e.description)
+    print("Error Handler:" + e.description)
     return render_template('errors/400.html', error=e.description), status.HTTP_400_BAD_REQUEST
 
 
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
-    print(e.description)
+    print("Error Handler:" + e.description)
     return render_template('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
 
 
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 def unsupported_media(e):
-    print(e.description)
+    print("Error Handler:" + e.description)
     return render_template('errors/415.html', error=e.description), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 
 @app.errorhandler(418)
 def im_a_teapot(e):
-    print(e.description)
+    print("Error Handler:" + e.description)
     return render_template('errors/418.html', error=e.description), 418
 
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(e):
-    print(e.description)
+    print("Error Handler for:" + e.description)
     return render_template('errors/500.html', error=e.description), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
 def not_implemented(e):
-    print(e.description)
+    print("Error Handler:" + e.description)
     return render_template('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
 
 

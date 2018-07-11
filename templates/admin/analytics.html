@@ -58,24 +58,22 @@
     <script src="/static/js/cookies.js"></script>
     <script src="/static/js/Chart.js"></script>
     <script>
-        console.log("{{data[0][0]}}");
-        var firstDate = "{{data[0][0]}}";
-        var lastDate = "";
-        {%for item in data %}
-        lastDate = "{{item[0]}}"
-        {% endfor %}
-        var totalPeriod = firstDate + " TO " + lastDate
+        var periods = [];
         //  Start of the chart code
-        var totalOpened = 0;
-        var totalQuestionsAnswered = 0;
-        var totalProductsReturned = 0;
+        var totalOpened = [];
+        var totalQuestionsAnswered = [];
+        var totalProductsReturned = [];
         {%for item in data %}
-        totalOpened += {{ item[1] }}
-        totalQuestionsAnswered += {{ item[2] }}
-        totalProductsReturned += {{ item[3] }}
+        //check if its a monthly record
+        if ("{{item[0]}}".includes("-")) {
+            periods.push("{{item[0]}}");
+            totalOpened.push({{item[1]}})
+            totalQuestionsAnswered.push({{item[2]}})
+            totalProductsReturned.push({{item[3]}})
+        }
         {%endfor%}
         var chartData = {
-            labels: [totalPeriod],
+            labels: periods,
             datasets: [{
                 label: 'Assistant Used',
                 fill: true,
@@ -95,7 +93,7 @@
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: [totalOpened],
+                data: totalOpened,
                 spanGaps: false
             }]
         }
@@ -108,7 +106,7 @@
         //  End of the chart code
 
         var chartData = {
-            labels: [totalPeriod],
+            labels: periods,
             datasets: [{
                 label: 'Questions Answered',
                 fill: true,
@@ -128,7 +126,7 @@
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: [totalQuestionsAnswered],
+                data: totalQuestionsAnswered,
                 spanGaps: false
             }]
         }
@@ -140,7 +138,7 @@
 
 
         var chartData = {
-            labels: [totalPeriod],
+            labels: periods,
             datasets: [{
                 label: 'Products Returned',
                 fill: true,
@@ -160,7 +158,7 @@
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: [totalProductsReturned],
+                data: totalProductsReturned,
                 spanGaps: false
             }]
         }

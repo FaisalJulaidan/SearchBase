@@ -233,7 +233,7 @@ def signup():
         email = request.form.get("email", default="Error").lower()
 
         fullname = request.form.get("fullname", default="Error")
-        accessLevel = "Admin"
+        accessLevel = "Owner"
         password = request.form.get("password", default="Error")
 
         companyName = request.form.get("companyName", default="Error")
@@ -312,10 +312,10 @@ def signup():
 
 
             if not app.debug:
-            # TODO this needs improving
-            msg = Message("Account verification",
-                          sender="thesearchbase@gmail.com",
-                          recipients=[email])
+                # TODO this needs improving
+                msg = Message("Account verification",
+                              sender="thesearchbase@gmail.com",
+                              recipients=[email])
 
             payload = email + ";" + companyName
             link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
@@ -1157,12 +1157,12 @@ def admin_users():
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             # TODO better handle this
         else:
-            if userLevel != "Admin":
+            if userLevel == "User":
                 return redirect("/admin/homepage")
             else:
                 # TODO improve this
                 users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
-                return render("admin/users.html", users=users)
+                return render("admin/users.html", users=users, email=email)
 
 @app.route("/admin/users/add", methods=['POST'])
 def admin_users_add():
@@ -1183,13 +1183,19 @@ def admin_users_add():
             redirect("/admin/users", code=302)
         else:
             newEmail = newEmail.lower()
+            user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [newEmail])
+            print(user)
+            if user is not None:
+                print("Email is already in use!")
+                #TODO Return feedback message
+                return redirect("/admin/users", code=302)
             try:
                 firstname = fullname.split(" ")[0]
                 surname = fullname.split(" ")[1]
             except IndexError as e:
                 print("Error in splitting")
                 #TODO pass in feedback message
-                redirect("/admin/users", code=302)
+                return redirect("/admin/users", code=302)
             hashed_password = hash_password(password)
 
             insertUserResponse = insert_into_database_table(
@@ -1213,7 +1219,23 @@ def admin_users_add():
                             Your temporary password is: "+password+".<br>\
                             Please visit <a href='"+link+"'>this link</a> to set password for your account.<p>"
                 mail.send(msg)
+                #TODO return feedbackmessage
                 return redirect("/admin/users")
+
+@app.route("/admin/users/modify", methods=["POST"])
+def admin_users_modify():
+    if request.method == "POST":
+        email = request.cookies.get("UserEmail")
+        userID = request.form.get("userID", default="Error")
+        newAccess = request.form.get("accessLevel", default="Error")
+        if userID != "Error" and newAccess != "Error":
+            updatedAccess = update_table("UPDATE Users SET AccessLevel=? WHERE ID=?;", [newAccess, userID])
+            if newAccess == "Owner":
+                updatedAccess = update_table("UPDATE Users SET AccessLevel=? WHERE Email=?;", ["Admin", email])
+                #TODO return feedbackmessage
+                return redirect("/admin/users", code=302)
+        #TODO return feedbackmessage
+        return redirect("/admin/users", code=302)
 
 @app.route("/admin/users/delete/<userID>", methods=["GET"])
 def admin_users_delete(userID):
@@ -1225,7 +1247,7 @@ def admin_users_delete(userID):
 
         requestingUser = select_from_database_table("SELECT * FROM Users WHERE Email=?", [email])
         targetUser = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?", [userID])[0]
-        if requestingUser[4] != "Admin" or requestingUser[1] != targetUser:
+        if requestingUser[4] == "User" or requestingUser[1] != targetUser:
             #TODO send feedback message
             return redirect("/admin/homepage", code=302)
         delete_from_table("DELETE FROM Users WHERE ID=?;", [userID])

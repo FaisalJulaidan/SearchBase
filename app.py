@@ -70,13 +70,6 @@ def allowed_image_file(filename):
     return '.' in filename and ext in ALLOWED_IMAGE_EXTENSION
 
 
-#TODO Check for security issues
-#return js file
-@app.route('/js/rotateJS')
-def send_js():
-    return send_from_directory('/static/js/', "jQueryRotate.js")
-
-
 # TODO jackassify it
 @app.route("/demo/<route>", methods=['GET'])
 def dynamic_popup(route):
@@ -446,7 +439,7 @@ def profilePage():
         return redirect("/admin/profile", code=302)
 
 
-@app.route("/popupsettings", methods=['GET'])
+@app.route("/getpopupsettings", methods=['GET'])
 def get_pop_settings():
     if request.method == "GET":
         url = request.form.get("URL", default="Error")
@@ -455,16 +448,13 @@ def get_pop_settings():
             if "127.0.0.1:5000" in url or "thesearchbase.com" in url:
                 # its on test route
                 companyName = url.split("/")[len(url.split("/")) - 1]
-                print(companyName)
                 companyID = select_from_database_table("SELECT ID FROM Companies WHERE Name=?", [companyName], True)
-                print(companyID)
             else:
                 # its on client route
                 companyID = select_from_database_table("SELECT ID FROM Companies WHERE URL=?", [url], True)
             secsUntilPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE CompanyID=?",
                                                       [companyID[0][0]], True)
             datastring = secsUntilPop[0][0]
-            print(datastring)
             return jsonify(datastring)
 
 

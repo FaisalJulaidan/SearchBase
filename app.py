@@ -71,8 +71,8 @@ def allowed_image_file(filename):
 
 
 # TODO jackassify it
-@app.route("/demo/<route>", methods=['GET'])
-def dynamic_popup(route):
+@app.route("/demo/<route><botID>", methods=['GET'])
+def dynamic_popup(route, botID):
     if request.method == "GET":
         url = "http://www.example.com/"
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
@@ -83,7 +83,7 @@ def dynamic_popup(route):
             url = company[3]
             if "http" not in url:
                 url = "https://" + url
-        return render_template("dynamic-popup.html", route=route, url=url)
+        return render_template("dynamic-popup.html", route=route, botID=botID, url=url)
 
 
 # drop down routes.

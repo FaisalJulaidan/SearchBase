@@ -392,6 +392,14 @@ def admin_home():
         else:
             return render("admin/main.html", stats=statistics)
 
+#data for the user which to be displayed on every admin page
+@app.route("/admin/getAdminPagesData", methods=['POST'])
+def adminPagesData():
+    if request.method == "POST":
+        email = request.cookies.get("UserEmail")
+        user = select_from_database_table("SELECT Firstname FROM Users WHERE Email=?;", [email])[0]
+        print(user)
+        return user
 
 @app.route("/admin/profile", methods=['GET', 'POST'])
 def profilePage():

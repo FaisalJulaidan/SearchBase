@@ -72,9 +72,9 @@
                 </div>
                 <!-- Will change this after the demo -->
                 {% if debug == 'True' %}
-                    <iframe frameBorder="0" id="chatbotIframe" src="https://thesearchbase.com/chatbot/{{route}}"></iframe>
+                    <iframe frameBorder="0" id="chatbotIframe" src="https://thesearchbase.com/chatbot/{{route}}/{{botID}}"></iframe>
                 {% else %}
-                    <iframe frameBorder="0" id="chatbotIframe" src="http://127.0.0.1:5000/chatbot/{{route}}"></iframe>
+                    <iframe frameBorder="0" id="chatbotIframe" src="http://127.0.0.1:5000/chatbot/{{route}}/{{botID}}"></iframe>
                 {% endif %}
             </div>
             <div class="launch_btn_holder">

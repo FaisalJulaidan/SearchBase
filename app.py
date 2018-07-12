@@ -16,6 +16,13 @@ import string
 import random
 from urllib.request import urlopen
 
+
+
+
+
+
+
+
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))

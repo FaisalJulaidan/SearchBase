@@ -66,16 +66,16 @@
                         <div class="form-group">
                             <h2>Please select a question to add answers for:</h2>
                             <div class="input-group" style="width:250px;margin:10px 0 0 10px">
-                              <select name="subscription" id="question-select"
-                                      class="form-control" form="signupForm" title="Note:" required
-                                      style="border-radius:4px" onchange="changeQuestion()">
-                                  <!-- print all questions that is classified as userInfoRetrieval -->
-                                {% for row in msg %}
-                                  {% if row[0].split(";")[1] != "userInfoRetrieval" %}
-                                    <option value="{{ row[0] }}">{{ row[0].split(";")[0] }}</option>
-                                  {% endif %}
-                                {% endfor %}
-                              </select>
+                                <select name="subscription" id="question-select"
+                                        class="form-control" form="signupForm" title="Note:" required
+                                        style="border-radius:4px" onchange="changeQuestion()">
+                                        <!-- print all questions that is classified as userInfoRetrieval -->
+                                        {% for row in msg %}
+                                        {% if row[0].split(";")[1] != "userInfoRetrieval" and row[0].split(";")[1] != "fileUpload" %}
+                                        <option value="{{ row[0] }}">{{ row[0].split(";")[0] }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                </select>
                             </div>
                         </div>
 

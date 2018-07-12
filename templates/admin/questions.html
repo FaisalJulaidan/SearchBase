@@ -234,6 +234,16 @@
                   "      </div>" +
                   "    </div> <!-- end of grid -->" +
 
+                  "    <div class='col-xs-12 col-sm-4'>" +
+                  "      <div class='input-group'>" +
+                  "        <span class='input-group-addon'>" +
+                  "          <input type='radio' name='qType" + i + "' value='fileUpload' onchange=\"CheckTypeBox(\'fileUp" + i + "\')\" id='fileUp" + i + "' required >" +
+                  "        </span>" +
+                  "        <input class='form-control' value='File Upload' readonly style='background-color:#fff; cursor: pointer;'" +
+                  "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(string(ui" + i + "))>" +
+                  "      </div>" +
+                  "    </div> <!-- end of grid -->" +
+
                   "  </div>"+
                   " </div>"+
                   "<div class='ln_solid'></div>"+
@@ -305,21 +315,30 @@
                 // not sure of the business logic below
                 if (typeCheck[i] == "userInfoRetrieval") {
                   $("#bothB" + i).prop('checked', false);
-                  $("#dbB" + i).prop('checked',   false);
+                  $("#dbB" + i).prop('checked', false);
+                  $("#fileUp" + i).prop('checked', false);
                   $("#uiB" + i).prop('checked',   true);
                 }
                 else if (typeCheck[i] == "dbRetrieval") {
                   $("#bothB" + i).prop('checked', false);
                   $("#dbB" + i).prop('checked',   true);
-                  $("#uiB" + i).prop('checked',   false);
+                  $("#uiB" + i).prop('checked', false);
+                  $("#fileUp" + i).prop('checked', false);
                 } else if (typeCheck[i] == "both") {
                   $("#bothB" + i).prop('checked', true);
                   $("#dbB" + i).prop('checked',   false);
-                  $("#uiB" + i).prop('checked',   false);
+                  $("#uiB" + i).prop('checked', false);
+                  $("#fileUp" + i).prop('checked', false);
+                } else if (typeCheck[i] == "fileUpload") {
+                  $("#bothB" + i).prop('checked', false);
+                  $("#dbB" + i).prop('checked', false);
+                  $("#uiB" + i).prop('checked', false);
+                  $("#fileUp" + i).prop('checked', true);
                 }else {
                   $("#bothB" + i).prop('checked', false);
                   $("#dbB" + i).prop('checked',   false);
-                  $("#uiB" + i).prop('checked',   false);
+                  $("#uiB" + i).prop('checked', false);
+                  $("#fileUp" + i).prop('checked', false);
                 }
 
                 $("#number-of-questions").val(noq);

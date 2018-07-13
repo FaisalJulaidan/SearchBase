@@ -57,7 +57,7 @@
                     </div>
                     <div class="profile_info">
                         <span>Welcome,</span>
-                        <h2>user</h2>
+                        <h2 id="userWelcomeName">user</h2>
                     </div>
                 </div>
                 <!-- /menu profile quick info -->
@@ -308,34 +308,52 @@
     <!-- Custom Theme Scripts -->
     <script src="/static/build/js/custom.min.js"></script>
     <script type="text/javascript">
-      var errTitle = $("#errorTitle")
-      var errText = $("#errorText")
-      var errShow = $("#showError")
+        var errTitle = $("#errorTitle")
+        var errText = $("#errorText")
+        var errShow = $("#showError")
 
-      var successTitle = $("#successTitle")
-      var successText = $("#successText")
-      var successShow = $("#successShow")
-      function alertError(name,text,type) {
-          if (type=='success') {
-              console.log('1');
-              // clear previous error message
-              successTitle.text('')
-              successText.html('')
+        var successTitle = $("#successTitle")
+        var successText = $("#successText")
+        var successShow = $("#successShow")
+        function alertError(name,text,type) {
+            if (type=='success') {
+                console.log('1');
+                // clear previous error message
+                successTitle.text('')
+                successText.html('')
 
-              successTitle.text(name)
-              successText.html(text)
-              successShow.click()
+                successTitle.text(name)
+                successText.html(text)
+                successShow.click()
 
-          }else {
-              // clear previous error message
-              errTitle.text('')
-              errText.html('')
+            }else {
+                // clear previous error message
+                errTitle.text('')
+                errText.html('')
 
-              errTitle.text(name)
-              errText.html(text)
-              errShow.click()
-          }
-      }
+                errTitle.text(name)
+                errText.html(text)
+                errShow.click()
+            }
+        }
+
+        //get user's name
+        var url = window.location.href;
+        params = "";
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/admin/getAdminPagesData", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.onreadystatechange = function () {
+            if (xhttp.readyState === 4) {
+                if (xhttp.status === 200) {
+                    document.getElementById("userWelcomeName").innerHTML = xhttp.responseText;
+                }
+                else {
+                    console.error(xhttp.statusText);
+                }
+            }
+        };
+        xhttp.send(params);
     </script>
     {% block customJS %}
     {% endblock %}

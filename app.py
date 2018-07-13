@@ -231,23 +231,11 @@ def signup():
         return render_template("signup.html", debug=app.debug)
     elif request.method == "POST":
 
-        # # update company for with stripe details
-        # update_table("UPDATE Companies SET SubscriptionID=?, StripeID=? WHERE Name=?",
-        #              ['SubTest', new_customer['id'], companyName])
-
-        # TODO this need to be removed in production
-        # remove the Stripe customer when not in production to kepp Stripe clean when testing
-        # if app.debug:
-        #     new_customer.delete()
-
-        # company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [companyName])
-        # TODO check company for errors
-        # companyID = company[0]
 
         email = request.form.get("email", default="Error").lower()
 
         fullname = request.form.get("fullname", default="Error")
-        accessLevel = "Owner"
+        accessLevel = "Admin"
         password = request.form.get("password", default="Error")
 
         companyName = request.form.get("companyName", default="Error")
@@ -286,45 +274,69 @@ def signup():
             new_customer = stripe.Customer.create(
                 email=email
             )
+
+            # debug
             print(new_customer)
 
             hashed_password = hash_password(password)
-
             verified = "False"
 
+            # Create a company record for the new user
             insertCompanyResponse = insert_into_database_table(
                 "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName,companySize, websiteURL, companyPhoneNumber))
 
             company = get_last_row_from_table("Companies")
 
+            # Create a user account and link it with the new created company record above
             insertUserResponse = insert_into_database_table(
                 "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified') VALUES (?,?,?,?,?,?,?,?);",
                 (company[0], firstname, surname, accessLevel, email, hashed_password, new_customer['id'], str(verified)))
 
 
-            # if not app.debug:
-            # TODO this needs improving
-            msg = Message("Account verification",
-                          sender="thesearchbase@gmail.com",
-                          recipients=[email])
 
-            payload = email + ";" + companyName
-            link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
-            msg.html = "<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'> <br /><p>You have registered with TheSearchBase!</p> <br>Please visit \
-                        <a href='"+link+"'>this link</a> to verify your account."
-            with app.open_resource("static\\email_images\\verify_email.png") as fp:
-                msg.attach("verify_email.png","image/png", fp.read())
-            mail.send(msg)
+            try:
 
-            # sending the registration confirmation email to us
-            msg = Message("A new company has signed up!",
-                          sender="thesearchbase@gmail.com",
-                          recipients=["thesearchbase@gmail.com"])
-            msg.html = "<p>Company name: "+companyName+" has signed up. <br>The admin's details are: <br>Name: "+fullname+" <br>Email: "+email+".</p>"
-            mail.send(msg)
+                # Subscribe to the Basic plan with a trial of 14 days
+                stripe.Subscription.create(
+                customer=new_customer['id'],
+                items=[{'plan': 'plan_D3lp2yVtTotk2f'}],
+                trial_period_days=14,
+                )
+
+                # if everything is ok activate assistants of this company
+                update_table("UPDATE Assistants SET Active=? WHERE CompanyID=?", ["True", user[1]])
+
+
+            except Exception as e:
+                print(e)
+                abort(status.HTTP_400_BAD_REQUEST, "An error occurred and could not subscribe.")
+                # TODO check subscription for errors https://stripe.com/docs/api#errors
+
+
+            if not app.debug:
+                # TODO this needs improving
+                msg = Message("Account verification",
+                              sender="thesearchbase@gmail.com",
+                              recipients=[email])
+
+                payload = email + ";" + companyName
+                link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
+                msg.html = "<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'> <br /><p>You have registered with TheSearchBase!</p> <br>Please visit \
+                            <a href='"+link+"'>this link</a> to verify your account."
+                with app.open_resource("static\\email_images\\verify_email.png") as fp:
+                    msg.attach("verify_email.png","image/png", fp.read())
+                mail.send(msg)
+
+                # sending the registration confirmation email to us
+                msg = Message("A new company has signed up!",
+                              sender="thesearchbase@gmail.com",
+                              recipients=["thesearchbase@gmail.com"])
+                msg.html = "<p>Company name: "+companyName+" has signed up. <br>The admin's details are: <br>Name: "+fullname+" <br>Email: "+email+".</p>"
+                mail.send(msg)
 
             return render_template('errors/verification.html',
                                    msg="Please check your email and follow instructions to verify account and get started.")
+
 
 
 

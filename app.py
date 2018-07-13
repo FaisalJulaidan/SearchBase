@@ -303,8 +303,6 @@ def signup():
                 trial_period_days=14,
                 )
 
-                # if everything is ok activate assistants of this company
-                update_table("UPDATE Assistants SET Active=? WHERE CompanyID=?", ["True", user[1]])
 
 
             except Exception as e:

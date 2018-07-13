@@ -1106,7 +1106,26 @@ def admin_pay(planID):
                 #         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@app.route("/admin/check-out/checkPromoCode", methods=['POST'])
+def checkPromoCode():
+    if request.method == 'POST':
 
+        # abort(status.HTTP_501_NOT_IMPLEMENTED)
+        email = request.cookies.get("UserEmail")
+        company = get_company(email)
+        
+        if company is None or "Error" in company:
+            # TODO handle this better, as it's payments so is very important we don't charge the customer etc
+            return redirect("/login")
+
+        else:
+
+            # TODO: check the promoCode from user then response with yes or no with json
+            promoCode = str(request.data, 'utf-8')
+            if promoCode == 'abc':
+                return jsonify(isValid=True)
+            else:
+                return jsonify(isValid=False)
 
 
 # Stripe Webhooks
@@ -1638,10 +1657,10 @@ def reset_password():
     else:
          email = request.form.get("email", default="Error")
          # TODO check this
-        
+
          user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
          # TODO check user
-        
+
          if user is None:
              # TODO hadnle this better
              abort(status.HTTP_400_BAD_REQUEST, "User doesn't exist")
@@ -1658,14 +1677,14 @@ def reset_password():
                  msg = Message("Password reset",
                                sender="thesearchbase@gmail.com",
                                recipients=[email])
-        
+
                  payload = email + ";" + company[1]
                  link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
                  msg.html ="<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'><br /><p>Your password has been reset as per your request.<br/ >Please visit <a href='"+link+"'>this link</a> to verify your account.</p>"
                  with app.open_resource("static\\email_images\\password_reset.png") as fp:
                      msg.attach("password_reset.png","image/png", fp.read())
                  mail.send(msg)
-        
+
                  return redirect("/errors/verification_password.html", code=302)
 
 @app.route("/account/resetpassword/<payload>", methods=['GET', 'POST'])

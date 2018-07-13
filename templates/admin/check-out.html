@@ -90,6 +90,16 @@
                                     <div class="baseline"></div>
                                   </div>
                                 </div>
+
+                                <br>
+
+                                <div class="row">
+                                    <div class="input-group">
+                                      <span class="input-group-addon">Promo Code</span>
+                                      <input type="text" class="form-control" id="promoCode" style="border-style:solid">
+                                    </div>
+                                </div>
+
                                 <button type="submit" data-tid="elements_examples.form.pay_button">Pay {{ plan['amount']/100 }} GBP </button>
                                 <div class="error" role="alert"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
                                     <path class="base" fill="#000" d="M8.5,17 C3.80557963,17 0,13.1944204 0,8.5 C0,3.80557963 3.80557963,0 8.5,0 C13.1944204,0 17,3.80557963 17,8.5 C17,13.1944204 13.1944204,17 8.5,17 Z"></path>
@@ -145,6 +155,28 @@
         $('button[type=submit]').text("Pay "+price+'GBP')
     }
    */
+   document.getElementById('promoCode').addEventListener("change", checkValidity);
+   function checkValidity(){
+       var element = $(document.getElementById('promoCode'))
+       var promoCode = element.val()
+       $.post({
+           url:'checkPromoCode',
+           contentType: 'application/json',
+           data:promoCode,
+           success: (res) => {
+               if (!res.isValid) {
+                   alertError('Promo Code Error','<h3>Please Enter Valid Promo Code 🙁')
+                   element.parent()[0].style.boxShadow="0 0 9px 0px #f44336"
+               }else {
+                   element.parent()[0].style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+                   setTimeout(function () {
+                     element.parent()[0].style.boxShadow=""
+                     element.parent()[0].style.transition="box-shadow 1s ease-in-out"
+                   }, 500);
+               }
+           }
+       })
+   }
 
 
 </script>

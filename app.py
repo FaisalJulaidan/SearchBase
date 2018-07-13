@@ -1448,15 +1448,47 @@ def chatbot(companyName, assistantID):
         products = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?;", [assistantID], True)
         # TODO check products for errors
 
+        lastSessionID = select_from_database_table("SELECT * FROM UserInput", [], True)
+        print(lastSessionID)
+        lastSessionID = lastSessionID[len(lastSessionID)-1][4] + 1
+
         collectedInformation = request.form.get("collectedInformation").split("||")
         date = datetime.now().strftime("%d-%m-%Y")
         for i in range(0, len(collectedInformation)):
             questionIndex = int(collectedInformation[i].split(";")[0]) - 1
             input = collectedInformation[i].split(";")[1]
             questionID = int(questions[questionIndex][0])
-            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input) VALUES (?,?,?)",
-                                                     (questionID, date, input))
+            for question in questions:
+                if question[0] == questionID:
+                    questionName = question[2]
+            for question in questions:
+                if question[0] == questionID:
+                    questionName = question[2]
+            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, input, lastSessionID, questionName))
             # TODO check insertInput for errors
+
+        #lastSessionID = select_from_database_table("SELECT TOP(1) * FROM UserInput ORDER BY ID DESC", [], True)[0]
+        #TODO needs improving
+
+        fileUploads = request.form.get("fileUploads").split("||");
+        for i in range(0, len(fileUploads)):
+            file = urlopen(fileUploads[i].split(":::")[0])
+            filename = fileUploads[i].split(":::")[2]
+            print(date,"-----", lastSessionID, "------", fileUploads[i].split(":::")[1], "------", filename)
+            filename = date + '_' + str(lastSessionID) + '_' + fileUploads[i].split(":::")[1] + '_' + filename
+            #filename = secure_filename(filename)
+
+            #if file and allowed_file(filename):
+            if file:
+                open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
+                savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
+                for question in questions:
+                    if question[0] == questionID:
+                        questionName = question[2]
+                for question in questions:
+                    if question[0] == questionID:
+                        questionName = question[2]
+                insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID, questionName))
 
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")

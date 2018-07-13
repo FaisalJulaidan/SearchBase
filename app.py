@@ -75,8 +75,8 @@ def allowed_image_file(filename):
 
 
 # TODO jackassify it
-@app.route("/demo/<route>", methods=['GET'])
-def dynamic_popup(route):
+@app.route("/demo/<route><botID>", methods=['GET'])
+def dynamic_popup(route, botID):
     if request.method == "GET":
         url = "http://www.example.com/"
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
@@ -87,7 +87,7 @@ def dynamic_popup(route):
             url = company[3]
             if "http" not in url:
                 url = "https://" + url
-        return render_template("dynamic-popup.html", route=route, url=url)
+        return render_template("dynamic-popup.html", route=route, botID=botID, url=url)
 
 
 # drop down routes.
@@ -247,7 +247,7 @@ def signup():
         email = request.form.get("email", default="Error").lower()
 
         fullname = request.form.get("fullname", default="Error")
-        accessLevel = "Admin"
+        accessLevel = "Owner"
         password = request.form.get("password", default="Error")
 
         companyName = request.form.get("companyName", default="Error")
@@ -1103,19 +1103,31 @@ def admin_pay(planID):
 
 # Stripe Webhooks
 #This will not work anymore since the StripeID column is moved from Companies table to the Users table.
-@app.route("/api/stripe/subscription-cancelled", methods=["POST"])
+@app.route("/api/stripe/subscription-cancelled", methods=["GET"])
 def webhook_subscription_cancelled():
-    if request.method == "POST":
-        event_json = request.get_json(force=True)
-        customerID = event_json['data']['object']['customer']
-        print(customerID)
-        company = select_from_database_table("SELECT * FROM Companies WHERE StripeID=?", [customerID])
-        # TODO check company for errors
-        assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", [company[0]], True)
-        for assistant in assistants:
-            updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
-            # TODO check update assistant for errors
-        return '', status.HTTP_200_OK
+     if request.method == "GET":
+        try:
+
+            event_json = request.get_json(force=True)
+            customerID = event_json['data']['object']['customer']
+            print(customerID)
+
+            user = select_from_database_table("SELECT * FROM Users WHERE StripeID=?", [customerID])
+            # TODO check company for errors
+            assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", [user[1]], True)
+
+            # Check if user has assistants to deactivate first
+            if len(assistants) > 0:
+                for assistant in assistants:
+
+                    updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
+                    # TODO check update assistant for errors
+
+        except Exception as e:
+            abort(status.HTTP_400_BAD_REQUEST, "Error in Webhook event")
+
+
+        return "Assistants for " + user[5] + " account has been deactivated due to subscription cancellation", status.HTTP_200_OK
 
 
 # TODO implement this
@@ -1150,12 +1162,12 @@ def admin_users():
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             # TODO better handle this
         else:
-            if userLevel != "Admin":
+            if userLevel == "User":
                 return redirect("/admin/homepage")
             else:
                 # TODO improve this
                 users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
-                return render("admin/users.html", users=users)
+                return render("admin/users.html", users=users, email=email)
 
 @app.route("/admin/users/add", methods=['POST'])
 def admin_users_add():
@@ -1173,9 +1185,15 @@ def admin_users_add():
         if fullname == "Error" or accessLevel == "Error" or newEmail == "Error":
             print("A textbox has not been filled")
             #TODO pass in feedback message
-            redirect("/admin/users", code=302)
+            return redirect("/admin/users", code=302)
         else:
             newEmail = newEmail.lower()
+            user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [newEmail])
+            print(user)
+            if user is not None:
+                print("Email is already in use!")
+                #TODO Return feedback message
+                return redirect("/admin/users", code=302)
             try:
                 firstname = fullname.split(" ")[0]
                 surname = fullname.split(" ")[1]
@@ -1206,7 +1224,23 @@ def admin_users_add():
                             Your temporary password is: "+password+".<br>\
                             Please visit <a href='"+link+"'>this link</a> to set password for your account.<p>"
                 mail.send(msg)
+                #TODO return feedbackmessage
                 return redirect("/admin/users")
+
+@app.route("/admin/users/modify", methods=["POST"])
+def admin_users_modify():
+    if request.method == "POST":
+        email = request.cookies.get("UserEmail")
+        userID = request.form.get("userID", default="Error")
+        newAccess = request.form.get("accessLevel", default="Error")
+        if userID != "Error" and newAccess != "Error":
+            updatedAccess = update_table("UPDATE Users SET AccessLevel=? WHERE ID=?;", [newAccess, userID])
+            if newAccess == "Owner":
+                updatedAccess = update_table("UPDATE Users SET AccessLevel=? WHERE Email=?;", ["Admin", email])
+                #TODO return feedbackmessage
+                return redirect("/admin/users", code=302)
+        #TODO return feedbackmessage
+        return redirect("/admin/users", code=302)
 
 @app.route("/admin/users/delete/<userID>", methods=["GET"])
 def admin_users_delete(userID):
@@ -1383,6 +1417,9 @@ def chatbot(route):
             for question in questions:
                 if question[0] == questionID:
                     questionName = question[2]
+            for question in questions:
+                if question[0] == questionID:
+                    questionName = question[2]
             insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, input, lastSessionID, questionName))
             # TODO check insertInput for errors
 
@@ -1401,6 +1438,9 @@ def chatbot(route):
             if file:
                 open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
                 savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
+                for question in questions:
+                    if question[0] == questionID:
+                        questionName = question[2]
                 for question in questions:
                     if question[0] == questionID:
                         questionName = question[2]
@@ -1887,38 +1927,37 @@ def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
 ## Error Handlers ##
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)
 def bad_request(e):
-    print(e.description)
+    print("Error Handler:" + e.description)
     return render_template('errors/400.html', error=e.description), status.HTTP_400_BAD_REQUEST
 
 
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
-    print(e.description)
-    print("++++++++++++++++++++++++++++++++")
+    print("Error Handler:" + e.description)
     return render_template('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
 
 
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 def unsupported_media(e):
-    print(e.description)
+    print("Error Handler:" + e.description)
     return render_template('errors/415.html', error=e.description), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 
 @app.errorhandler(418)
 def im_a_teapot(e):
-    print(e.description)
+    print("Error Handler:" + e.description)
     return render_template('errors/418.html', error=e.description), 418
 
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(e):
-    print(e.description)
+    print("Error Handler for:" + e.description)
     return render_template('errors/500.html', error=e.description), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
 def not_implemented(e):
-    print(e.description)
+    print("Error Handler:" + e.description)
     return render_template('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
 
 

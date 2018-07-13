@@ -1329,29 +1329,34 @@ def admin_emoji():
         return render("admin/emoji.html")
 
 
-@app.route("/chatbot/<route>", methods=['GET', 'POST'])
-def chatbot(route):
+@app.route("/chatbot/<companyName>/<assistantID>", methods=['GET', 'POST'])
+def chatbot(companyName, assistantID):
     if request.method == "GET":
-        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
+        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(companyName)])
+
         # for debugging
-        print(escape(route))
+        print(escape(companyName))
         print(company)
 
         if company is None:
             abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
 
         # TODO check company for errors
-        assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=?;", [assistantID])
+
+        if assistant is None:
+            abort(status.HTTP_400_BAD_REQUEST, "This Assistant does't exist")
 
         # for debugging
-        print(assistants)
+        print(assistant)
 
 
         # TODO check assistant for errors
-        assistantIndex = 0  # TODO implement this properly
-        assistantID = assistants[assistantIndex][0]
+        # assistantIndex = 0  # TODO implement this properly
+        # assistantID = assistant[assistantIndex][0]
 
-        assistantActive = assistants[assistantIndex][6]
+        # is assistant active ? True/False
+        assistantActive = assistant[6]
 
         if assistantActive != "True":
             abort(status.HTTP_404_NOT_FOUND, "Assistant not active.")
@@ -1388,7 +1393,7 @@ def chatbot(route):
                     merge = merge + tuple(answer)
                 questionsAndAnswers.append(merge)
 
-            message = assistants[assistantIndex][3]
+            message = assistant[3]
             # MONTHLY UPDATE
             date = datetime.now().strftime("%Y-%m")
             currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
@@ -1415,15 +1420,27 @@ def chatbot(route):
                                             [currentStats[3] + 1, assistantID, date])
             print(questionsAndAnswers)
 
-            return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + route,
+            return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + companyName,
                                    message=message)
     elif request.method == "POST":
-        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
+
+
+        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(companyName)])
+
+        if company is None:
+            abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
+
+
         # TODO check company for errors
-        assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
+
+        if assistant is None:
+            abort(status.HTTP_400_BAD_REQUEST, "This Assistant does't exist")
+
         # TODO check assistant for errors
-        assistantIndex = 0  # TODO implement this properly
-        assistantID = assistants[assistantIndex][0]
+        # assistantIndex = 0  # TODO implement this properly
+
+        assistantID = assistant[0]
 
         questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?", [assistantID], True)
         # TODO check questions for errors
@@ -1431,47 +1448,15 @@ def chatbot(route):
         products = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?;", [assistantID], True)
         # TODO check products for errors
 
-        lastSessionID = select_from_database_table("SELECT * FROM UserInput", [], True)
-        print(lastSessionID)
-        lastSessionID = lastSessionID[len(lastSessionID)-1][4] + 1
-
         collectedInformation = request.form.get("collectedInformation").split("||")
         date = datetime.now().strftime("%d-%m-%Y")
         for i in range(0, len(collectedInformation)):
             questionIndex = int(collectedInformation[i].split(";")[0]) - 1
             input = collectedInformation[i].split(";")[1]
             questionID = int(questions[questionIndex][0])
-            for question in questions:
-                if question[0] == questionID:
-                    questionName = question[2]
-            for question in questions:
-                if question[0] == questionID:
-                    questionName = question[2]
-            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, input, lastSessionID, questionName))
+            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input) VALUES (?,?,?)",
+                                                     (questionID, date, input))
             # TODO check insertInput for errors
-
-        #lastSessionID = select_from_database_table("SELECT TOP(1) * FROM UserInput ORDER BY ID DESC", [], True)[0]
-        #TODO needs improving
-
-        fileUploads = request.form.get("fileUploads").split("||");
-        for i in range(0, len(fileUploads)):
-            file = urlopen(fileUploads[i].split(":::")[0])
-            filename = fileUploads[i].split(":::")[2]
-            print(date,"-----", lastSessionID, "------", fileUploads[i].split(":::")[1], "------", filename)
-            filename = date + '_' + str(lastSessionID) + '_' + fileUploads[i].split(":::")[1] + '_' + filename
-            #filename = secure_filename(filename)
-
-            #if file and allowed_file(filename):
-            if file:
-                open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
-                savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
-                for question in questions:
-                    if question[0] == questionID:
-                        questionName = question[2]
-                for question in questions:
-                    if question[0] == questionID:
-                        questionName = question[2]
-                insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID, questionName))
 
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")

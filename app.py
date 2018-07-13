@@ -1015,6 +1015,16 @@ def admin_thanks():
     return render('admin/thank-you.html')
 
 
+
+
+def is_coupon_valid(coupon="Error"):
+    try:
+        stripe.Coupon.retrieve(coupon)
+        return True
+    except stripe.error.StripeError as e:
+        print("coupon is not valid")
+        return False
+
 @app.route("/admin/check-out/<planID>", methods=['GET', 'POST'])
 def admin_pay(planID):
 
@@ -1037,12 +1047,28 @@ def admin_pay(planID):
         email = request.cookies.get("UserEmail")
         company = get_company(email)
 
+        # Get the plan opject from Stripe API
+        try:
+            plan = stripe.Plan.retrieve(planID)
+        except stripe.error.InvalidRequestError as e:
+            abort(status.HTTP_400_BAD_REQUEST, "This plan does't exist! Make sure the plan ID is correct.")
 
+        # Check of a company is logged in TODO we should use sessions later
         if company is None or "Error" in company:
-            # TODO handle this better, as it's payments so is very important we don't charge the customer etc
             return redirect("/login")
 
+        coupon = request.form.get("coupon", default="Error")
 
+        # Validate the given coupon.
+        if coupon == "" or coupon is None:
+            print("make no use of coupons")
+            # If coupon is not provided set it to None as Stripe API require.
+            coupon = "None"
+        if not (is_coupon_valid(coupon)):
+            return render("admin/check-out.html", error="The coupon used is not valid")
+
+
+        # If no errors occurred, subscribe the user to plan.
         else:
             token = request.form.get("stripeToken", default="Error")
             print(token)
@@ -1051,59 +1077,33 @@ def admin_pay(planID):
                 # TODO improve this
                 abort(status.HTTP_400_BAD_REQUEST)
             else:
-
+                # Get the user by email
                 user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
                 try:
                     subscription = stripe.Subscription.create(
                         customer=user[7],
                         source=token,
+                        coupon=coupon,
                         items=[
                             {
                                 "plan": planID,
                             },
                         ]
                     )
-                    # if everything is ok
-                    # TODO activate assistants
+
+                    # if everything is ok activate assistants
+                    update_table("UPDATE Assistants SET Active=? WHERE CompanyID=?", ["True", user[1]])
+
 
                 except Exception as e:
                     print(e)
+                    abort(status.HTTP_400_BAD_REQUEST, "An error occurred and could not subscribe.")
                     # TODO check subscription for errors https://stripe.com/docs/api#errors
-                    # TODO this is important todo properly
+
+
 
                 print("You have successfully subscribed!")
                 return render("admin/pricing-tables.html", msg="You have successfully subscribed!")
-
-                # TODO surround with try except and catch any errors
-                # customer = stripe.Customer.create(
-                #     source=token,
-                #     email=email,
-                #     description=company[1]
-                # )
-                #
-                # updateCompany = update_table("UPDATE Companies SET StripeID=? WHERE ID=?", [customer['id'], company[0]])
-                #
-                # planID = select_from_database_table("SELECT * FROM Plans WHERE ID=?", [], True)
-                #
-
-                # if "Error" in updateCompany:
-                #     # TODO handle this better
-                #     customer.delete()
-                # else:
-                #     planID = ""
-                #     subscription = company[4].lower()
-                #     if subscription == "basic":
-                #         planID = "plan_D3lp2yVtTotk2f"
-                #     elif subscription == "advanced":
-                #         planID = "plan_D3lp9R7ombKmSO"
-                #     elif subscription == "ultimate":
-                #         planID = "plan_D3lpeLZ3EV8IfA"
-                #     elif subscription == "debug":
-                #         planID = "plan_D48N4wxwAWEMOH"
-                #     elif subscription == "trial":
-                #         abort(status.HTTP_501_NOT_IMPLEMENTED)
-                #     else:
-                #         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @app.route("/admin/check-out/checkPromoCode", methods=['POST'])
@@ -1129,10 +1129,9 @@ def checkPromoCode():
 
 
 # Stripe Webhooks
-#This will not work anymore since the StripeID column is moved from Companies table to the Users table.
-@app.route("/api/stripe/subscription-cancelled", methods=["GET"])
+@app.route("/api/stripe/subscription-cancelled", methods=["POST"])
 def webhook_subscription_cancelled():
-     if request.method == "GET":
+    if request.method == "POST":
         try:
 
             event_json = request.get_json(force=True)
@@ -1155,6 +1154,7 @@ def webhook_subscription_cancelled():
 
 
         return "Assistants for " + user[5] + " account has been deactivated due to subscription cancellation", status.HTTP_200_OK
+
 
 
 # TODO implement this

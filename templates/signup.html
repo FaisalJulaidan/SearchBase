@@ -13,7 +13,6 @@
     <link rel="stylesheet" type="text/css" href="../static/SL/Login/css/util.css">
     <link rel="stylesheet" type="text/css" href="../static/SL/Login/css/main.css">
 
-
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-70419779-2"></script>
     <script>
@@ -93,10 +92,10 @@
                     </div>
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
-                        <input class="input100" type="number"
-                               placeholder="+1-595585131"
-                               name="phoneNumber" >
-                               <!-- onchange="checkboxesMatch('phone')"  for input ^-->
+                        <input class="input100" type="text"
+                               placeholder="+123-123123123"
+                               name="phoneNumber"
+                               onchange="checkboxesMatch('phone')">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-mobile" aria-hidden="true"></i>
@@ -144,7 +143,7 @@
 
 
 
-                    <div class="wrap-input100 validate-input" data-validate="Required">
+                    <!-- <div class="wrap-input100 validate-input" data-validate="Required">
                         <p>Choose Plan</p>
                         <select name="subscription" id="inputState" class="form-control" form="signupForm" title="Choose Plan" required>
                             <option value="Trial">3 Month Trial</option>
@@ -156,7 +155,7 @@
                             {% endif %}
                         </select>
                         <span class="focus-input100"></span>
-                    </div>
+                    </div> -->
 
                     <div class="container-login100-form-btn">
                         <button class="login100-form-btn-disabled" id="submit" disabled>
@@ -298,14 +297,21 @@
               if (boxID=='phone') {
                   var regex =""
                   var element = $("input[name=phoneNumber]")[0]
-                  if (/\+[0-9]{1-}-[0-9]{9-10}/.test(element.value)) {
+                  if (/\+?-?\d{6,}/.test(element.value)) {
                       inputs.phone = true;
                       element.style.boxShadow='0 0 9px 0px rgba(100, 185, 110, 1)'
                   }else {
-                      alertError('Mobile Error','Please add proper mobile number: <br> <h4>+123-123456789</h4>')
+                      alertError('Mobile Error',
+                      '<h4>Please Only digits</h4><br>'+
+                      'Please add proper mobile number: <br><br>'+
+                      '<h5>+123-123456789</h5><br>'+
+                      '<h6>( OR )</h6><br>'+
+                      '<h5>123-4567890</h5><br>'+
+                      '<h6>( OR )</h6><br>'+
+                      '<h5>1234567890</h5>'
+                  )
                       inputs.passwordConf = false
                   }
-
               }
 
               document.getElementById('submit').disabled = true;

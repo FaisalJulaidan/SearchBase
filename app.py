@@ -1019,6 +1019,10 @@ def admin_connect():
 def admin_pricing():
     return render("admin/pricing-tables.html", pub_key=pub_key)
 
+@app.route("/admin/adjustments", methods=['GET'])
+def admin_pricing_adjust():
+    return render("admin/pricing-adjustments.html")
+
 
 @app.route('/admin/thanks', methods=['GET'])
 def admin_thanks():

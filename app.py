@@ -133,16 +133,29 @@ def contactpage():
         return render_template("contact.html")
 
 
+def loginFirst(message="Please log in first!"):
+    print("Redirecting to /login")
+    messages = dumps({"msg": escape(message)})
+    return redirect(url_for(".login", messages=messages))
+
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == "GET":
-        return render_template("login.html")
+        args = request.args
+        msg=" "
+        if len(args) > 0:
+            messages = args['messages']
+            if messages is not None:
+                msg = loads(messages)['msg']
+                if msg is None or msg == "None":
+                    msg = " "
+        return render_template("login.html", msg=msg)
     elif request.method == "POST":
         email = request.form.get("email", default="Error")
         password_to_check = request.form.get("password", default="Error")
         if email == "Error" or password_to_check == "Error":
             print("Invalid request: Email or password not received!")
-            return render_template('login.html', data="Email or password not received!"), status.HTTP_400_BAD_REQUEST
+            return loginFirst("Email or password not received!")
         else:
             email = email.lower()
             data = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
@@ -158,9 +171,9 @@ def login():
                         return render_template('errors/verification.html',
                                                data="Account not verified, please check your email and follow instructions")
                 else:
-                    return render_template('login.html', data="User name and password does not match!")
+                    return loginFirst("User name and password does not match!")
             else:
-                return render_template('login.html', data="User doesn't exist!")
+                return loginFirst("User not found!")
 
 
 # TODO just overall better validation
@@ -181,17 +194,14 @@ def before_request():
 
     if email is None:
         print("User not logged in")
-        #TODO change this to redirect with feedback through out the server
-        return render_template("login.html", msg="Please log in first!")
+        return loginFirst()
 
 
     print("Before request checking: ", theurl, " ep: ", request.endpoint)
     if email == 'None' and request.endpoint != 'login':
-        return render_template("login.html", msg="Please log in first!")
+        return loginFirst()
     print("Before Request checks out")
     return None
-
-
 
 # Used to passthrough variables without repeating it in each method call
 # IE assistant information
@@ -219,16 +229,25 @@ def render(template, **context):
             print("Ignore before request for: ", theurl)
             return render_template(template, debug=app.debug, **context)
 
-        print("Render function redirects to login")
-        return redirect("/login")
+        return loginFirst()
 
-
+def signupFirst(message):
+    messages = dumps({"msg": escape(message)})
+    return redirect(url_for(".signup", messages=messages))
 
 # TODO improve verification
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
     if request.method == "GET":
-        return render_template("signup.html", debug=app.debug)
+        args = request.args
+        msg=" "
+        if len(args) > 0:
+            messages = args['messages']
+            if messages is not None:
+                msg = loads(messages)['msg']
+                if msg is None or msg == "None":
+                    msg = " "
+        return render_template("signup.html", debug=app.debug, msg=msg)
     elif request.method == "POST":
 
 
@@ -247,7 +266,7 @@ def signup():
         if fullname == "Error" or accessLevel == "Error" or email == "Error" or password == "Error" \
                 or companyName == "Error" or websiteURL == "Error":
             print("Invalid request")
-            return render_template("signup.html", msg="Invalid request", debug=app.debug), status.HTTP_400_BAD_REQUEST
+            return signupFirst("Error in getting all input information")
 
 
         else:
@@ -255,7 +274,7 @@ def signup():
             print(user)
             if user is not None:
                 print("Email is already in use!")
-                return render_template("signup.html", msg="Email is already in use!", debug=app.debug), status.HTTP_400_BAD_REQUEST
+                return signupFirst("Email is already in use!")
 
             try:
                 firstname = fullname.strip().split(" ")[0]
@@ -266,8 +285,7 @@ def signup():
                 print(surname)
 
             except IndexError as e:
-                abort(status.HTTP_400_BAD_REQUEST)
-                # TODO handle much better
+                return signupFirst("Error in handling names")
 
 
             # Create a Stripe customer for the new company.
@@ -307,7 +325,7 @@ def signup():
 
             except Exception as e:
                 print(e)
-                abort(status.HTTP_400_BAD_REQUEST, "An error occurred and could not subscribe.")
+                return signupFirst("An error occurred and could not subscribe. Account has been created.")
                 # TODO check subscription for errors https://stripe.com/docs/api#errors
 
 
@@ -385,7 +403,7 @@ def admin_home():
             if messages is not None:
                 email = loads(messages)['email']
                 if email is None or email == "None":
-                    return redirect("/login")
+                    return loginFirst()
                 sendEmail = True
             else:
                 abort(status.HTTP_400_BAD_REQUEST)
@@ -1069,7 +1087,7 @@ def admin_pay(planID):
 
         # Check of a company is logged in TODO we should use sessions later
         if company is None or "Error" in company:
-            return redirect("/login")
+            return loginFirst()
 
         coupon = request.form.get("coupon", default="Error")
 
@@ -1130,7 +1148,7 @@ def checkPromoCode():
         
         if company is None or "Error" in company:
             # TODO handle this better, as it's payments so is very important we don't charge the customer etc
-            return redirect("/login")
+            return loginFirst()
 
         else:
 
@@ -1657,7 +1675,7 @@ def verify_account(payload):
                             msg.attach("welcome.png","image/png", fp.read())
                         mail.send(msg)
 
-                        return redirect("/login")
+                        return loginFirst("Thank you for verifying.")
 
             except IndexError:
                 # TODO handle better
@@ -1771,7 +1789,7 @@ def reset_password_verify(payload):
         password = request.form.get("password", default="Error")
         hashedNewPassword = hash_password(password)
         updatePassword = update_table("UPDATE Users SET Password=? WHERE Email=?;", [hashedNewPassword, email])
-        return redirect("login", code=302)
+        return loginFirst("Password has been changed.")
 
 
 @app.route("/admin/changepassword", methods=["GET", "POST"])

@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 from flask_mail import Mail, Message
 from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, \
-    make_response
+    make_response, g
 from werkzeug.utils import secure_filename
+from contextlib import closing
 from flask_api import status
 from datetime import datetime
 from bcrypt import hashpw, gensalt
@@ -1056,8 +1057,6 @@ def admin_pay(planID):
         return render("admin/check-out.html", plan=plan)
 
 
-
-
     if request.method == 'POST':
 
         # abort(status.HTTP_501_NOT_IMPLEMENTED)
@@ -1070,30 +1069,33 @@ def admin_pay(planID):
         except stripe.error.InvalidRequestError as e:
             abort(status.HTTP_400_BAD_REQUEST, "This plan does't exist! Make sure the plan ID is correct.")
 
+
         # Check of a company is logged in TODO we should use sessions later
         if company is None or "Error" in company:
             return redirect("/login")
 
-        coupon = request.form.get("coupon", default="Error")
 
         # Validate the given coupon.
-        # if coupon == "" or coupon is None or coupon == "Error":
-        #     print("make no use of coupons")
-        #     # If coupon is not provided set it to None as Stripe API require.
-        #     coupon = "None"
-        # if not (is_coupon_valid(coupon)):
-        #     return render("admin/check-out.html", error="The coupon used is not valid")
+        coupon = request.form.get("coupon", default="Error")
+        if coupon == "" or coupon is None or coupon == "Error":
+            print("make no use of coupons")
+            # If coupon is not provided set it to None as Stripe API require.
+            coupon = "None"
 
 
-        # If no errors occurred, subscribe the user to plan.
-        #else:
-        print(request)
+        if not (is_coupon_valid(coupon)):
+            return render("admin/check-out.html", error="The coupon used is not valid")
+
+
+        # Get Stripe token generated using JavaScript in the client-side
         token = request.form.get("tokenId", default="Error")
-        print(token)
-        print(planID)
+        print(">>>> The token: "+ token)
         if token is "Error":
             # TODO improve this
             abort(status.HTTP_400_BAD_REQUEST)
+
+
+        # If no errors occurred, subscribe the user to plan.
         else:
             # Get the user by email
             user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
@@ -1144,6 +1146,33 @@ def checkPromoCode():
                 return jsonify(isValid=True)
             else:
                 return jsonify(isValid=False)
+
+
+
+@app.route("/admin/unsubscribe", methods=['POST'])
+def unsubscribe():
+
+    if request.method == 'POST':
+        email = request.cookies.get("UserEmail")
+        company = get_company(email)
+
+        # Check of a company is logged in TODO we should use sessions later
+        if company is None or "Error" in company:
+            return redirect("/login")
+
+        # Get company Stripe subscription ID
+        user = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [company[0]])
+        subID = user[9]
+
+
+        if subID is None or subID == "" or subID == "null" :
+            abort(status.HTTP_404_NOT_FOUND, "This account has no active subscriptions ")
+
+        try:
+            sub = stripe.Subscription.retrieve(subID)
+            sub.delete()
+        except Exception as e:
+            abort(status.HTTP_400_BAD_REQUEST, "An error occurred while trying to unsubscribe")
 
 
 # Stripe Webhooks
@@ -1973,14 +2002,43 @@ def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
         return msg
 
 
+# ====\ Database (Connection & Initialisation) /====
+
+# Connects to the specific database.
+def connect_db():
+    print("Conncect to DB")
+    return sqlite3.connect(DATABASE)
 
 
 
+# facilitate querying data from the database.
+def query_db(query, args=(), one=False):
+    cur = g.db.execute(query, args)
+    rv = [dict((cur.description[idx][0], value)
+               for idx, value in enumerate(row)) for row in cur.fetchall()]
+    return (rv[0] if rv else None) if one else rv
 
 
+# Get connection when no requests e.g Pyton REPL.
+def get_connection():
+    db = getattr(g, '_db', None)
+    if db is None:
+        db = g._db = connect_db()
+    return db
 
 
+@app.before_request
+def before_request():
+    print("Before Request > connect to DB")
+    g.db = connect_db()
 
+
+@app.teardown_request
+def teardown_request(exception):
+    # Closes the database again at the end of the request."""
+    if hasattr(g, 'db'):
+        g.db.close()
+        print("Connection Closed")
 
 
 
@@ -2024,6 +2082,19 @@ def not_implemented(e):
 
 
 
+# Initializes the database.
+def init_db():
+    with closing(connect_db()) as db:
+        with app.open_resource(APP_ROOT + '/sql/schema.sql', mode='r') as f:
+            db.cursor().executescript(f.read())
+        db.commit()
+
+        if app.debug:
+            with app.open_resource(APP_ROOT + '/sql/devseed.sql', mode='r') as f:
+                db.cursor().executescript(f.read())
+            db.commit()
+
+    print("Database Initialized")
 
 
 class Del:
@@ -2035,30 +2106,33 @@ class Del:
 
 
 if __name__ == "__main__":
+
     app.run(debug=True)
-conn = None
-try:
-    conn = sqlite3.connect(DATABASE)
-    cur = conn.cursor()
-    devseed = open(APP_ROOT + '/sql/devseed.sql', 'r').read()
-    create_db = open(APP_ROOT + '/sql/createdb.sql', 'r').read()
-    if app.debug:
-        cur.executescript(create_db)
-        cur.executescript(devseed)
-        conn.commit()
-        print("Applied devseed file")
-    elif not os.path.exists(DATABASE):
-        cur.executescript(create_db)
-        conn.commit()
-        print("Created database structure")
-    cur.close()
-except Exception as e:
-    conn.rollback()
-    print(e)
-    exit(1)
-finally:
-    if conn is not None:
-        conn.close()
+
+init_db()
+# conn = None
+# try:
+#     conn = sqlite3.connect(DATABASE)
+#     cur = conn.cursor()
+#     devseed = open(APP_ROOT + '/sql/devseed.sql', 'r').read()
+#     create_db = open(APP_ROOT + '/sql/schema.sql', 'r').read()
+#     if app.debug:
+#         cur.executescript(create_db)
+#         cur.executescript(devseed)
+#         conn.commit()
+#         print("Applied devseed file")
+#     elif not os.path.exists(DATABASE):
+#         cur.executescript(create_db)
+#         conn.commit()
+#         print("Created database structure")
+#     cur.close()
+# except Exception as e:
+#     conn.rollback()
+#     print(e)
+#     exit(1)
+# finally:
+#     if conn is not None:
+#         conn.close()
 
 # Janky way to seed password
 if app.debug:

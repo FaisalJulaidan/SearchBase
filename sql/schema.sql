@@ -27,6 +27,7 @@ CREATE TABLE 'Users' (
 	'Password'	BLOB NOT NULL,
   'StripeID'	TEXT UNIQUE DEFAULT NULL,
 	'Verified'	TEXT DEFAULT 'False',
+  'SubID'	TEXT UNIQUE DEFAULT NULL,
 
 	FOREIGN KEY('CompanyID') REFERENCES 'Companies'('ID')
 );

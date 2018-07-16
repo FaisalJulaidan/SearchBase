@@ -136,13 +136,14 @@ def contactpage():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == "GET":
-        return render_template("login.html")
+        msg = checkForMessage()
+        return render_template("login.html", msg=msg)
     elif request.method == "POST":
         email = request.form.get("email", default="Error")
         password_to_check = request.form.get("password", default="Error")
         if email == "Error" or password_to_check == "Error":
             print("Invalid request: Email or password not received!")
-            return render_template('login.html', data="Email or password not received!"), status.HTTP_400_BAD_REQUEST
+            return redirectWithMessage("login", "Email or password not received!")
         else:
             email = email.lower()
             data = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
@@ -158,9 +159,9 @@ def login():
                         return render_template('errors/verification.html',
                                                data="Account not verified, please check your email and follow instructions")
                 else:
-                    return render_template('login.html', data="User name and password does not match!")
+                    return redirectWithMessage("login", "User name and password does not match!")
             else:
-                return render_template('login.html', data="User doesn't exist!")
+                return redirectWithMessage("login", "User not found!")
 
 
 # TODO just overall better validation
@@ -181,17 +182,14 @@ def before_request():
 
     if email is None:
         print("User not logged in")
-        #TODO change this to redirect with feedback through out the server
-        return render_template("login.html", msg="Please log in first!")
+        return redirectWithMessage("login", "Please log in first!")
 
 
     print("Before request checking: ", theurl, " ep: ", request.endpoint)
     if email == 'None' and request.endpoint != 'login':
-        return render_template("login.html", msg="Please log in first!")
+        return redirectWithMessage("login", "Please log in first!")
     print("Before Request checks out")
     return None
-
-
 
 # Used to passthrough variables without repeating it in each method call
 # IE assistant information
@@ -203,7 +201,7 @@ def render(template, **context):
         assistants = get_assistants(email)
         if assistants is not None:
             if "Error" in assistants:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return redirectWithMessage("login", "Error in finding assistant!")
 
         assistantDetails = []
         for assistant in assistants:
@@ -219,16 +217,29 @@ def render(template, **context):
             print("Ignore before request for: ", theurl)
             return render_template(template, debug=app.debug, **context)
 
-        print("Render function redirects to login")
-        return redirect("/login")
+        return redirectWithMessage("login", "Please log in first!")
 
+def redirectWithMessage(function, message):
+    messages = dumps({"msg": escape(message)})
+    return redirect(url_for("."+function, messages=messages))
 
+def checkForMessage():
+    args = request.args
+    msg=" "
+    if len(args) > 0:
+        messages = args['messages']
+        if messages is not None:
+            msg = loads(messages)['msg']
+            if msg is None or msg == "None":
+                msg = " "
+    return msg
 
 # TODO improve verification
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
     if request.method == "GET":
-        return render_template("signup.html", debug=app.debug)
+        msg = checkForMessage()
+        return render_template("signup.html", debug=app.debug, msg=msg)
     elif request.method == "POST":
 
 
@@ -247,7 +258,7 @@ def signup():
         if fullname == "Error" or accessLevel == "Error" or email == "Error" or password == "Error" \
                 or companyName == "Error" or websiteURL == "Error":
             print("Invalid request")
-            return render_template("signup.html", msg="Invalid request", debug=app.debug), status.HTTP_400_BAD_REQUEST
+            return redirectWithMessage("signup", "Error in getting all input information")
 
 
         else:
@@ -255,7 +266,7 @@ def signup():
             print(user)
             if user is not None:
                 print("Email is already in use!")
-                return render_template("signup.html", msg="Email is already in use!", debug=app.debug), status.HTTP_400_BAD_REQUEST
+                return redirectWithMessage("signup", "Email is already in use!")
 
             try:
                 firstname = fullname.strip().split(" ")[0]
@@ -266,8 +277,7 @@ def signup():
                 print(surname)
 
             except IndexError as e:
-                abort(status.HTTP_400_BAD_REQUEST)
-                # TODO handle much better
+                return redirectWithMessage("signup", "Error in handling names")
 
 
             # Create a Stripe customer for the new company.
@@ -307,7 +317,7 @@ def signup():
 
             except Exception as e:
                 print(e)
-                abort(status.HTTP_400_BAD_REQUEST, "An error occurred and could not subscribe.")
+                return redirectWithMessage("signup", "An error occurred and could not subscribe. Account has been created.")
                 # TODO check subscription for errors https://stripe.com/docs/api#errors
 
 
@@ -342,21 +352,36 @@ def signup():
 # Data retrieval functions
 def get_company(email):
     user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
-    # TODO check user for errors
-    company = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
-    # TODO check company for errors
-    return company
+    if user is not None and user is not "None" and user is not "Error":
+
+        company = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
+        if company is not None and company is not "None" and company is not "Error":
+            return company
+        else:
+            print("Error with finding company")
+            return "Error"
+    else:
+        print("Error with finding user")
+        return "Error"
 
 
 def get_assistants(email):
     user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
-    # TODO check user for errors
-    company = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
-    # TODO check company for errors
-    assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]],
-                                            True)
-    # TODO check assistants for errors
-    return assistants
+    if user is not None and user is not "None" and user is not "Error":
+        company = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
+        if company is not None and company is not "None" and company is not "Error":
+            assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
+            if assistants is not None and assistants is not "None" and assistants is not "Error":
+                return assistants
+            else:
+                print("Error with finding assistants")
+                return "Error"
+        else:
+            print("Error with finding company")
+            return "Error"
+    else:
+        print("Error with finding user")
+        return "Error"
 
 
 def get_total_statistics(num, email):
@@ -385,16 +410,17 @@ def admin_home():
             if messages is not None:
                 email = loads(messages)['email']
                 if email is None or email == "None":
-                    return redirect("/login")
+                    return redirectWithMessage("login", "Please log in first!")
                 sendEmail = True
             else:
-                abort(status.HTTP_400_BAD_REQUEST)
+                return redirectWithMessage("login", "Error in finding user!")
         else:
             email = request.cookies.get("UserEmail")
         statistics = [get_total_statistics(3, email), get_total_statistics(5, email)]
         if sendEmail:
             assistants = get_assistants(email)
-            # TODO check assistants for errors
+            if assistants == "Error":
+                return render_template("admin/main.html", stats=statistics, email=email, assistantIDs=[])
             assistantIDs = []
             for assistant in assistants:
                 assistantIDs.append(assistant[0])
@@ -427,8 +453,11 @@ def profilePage():
         else:
             email = request.cookies.get("UserEmail")
         user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
-        # TODO check database output for errors
+        if user is not None and user is not "None" and user is not "Error":
+            user="Error in finding user"
         company = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
+        if company is not None and company is not "None" and company is not "Error":
+            company="Error in finding company"
         return render_template("admin/profile.html", user=user, email=email, company=company)
 
     elif request.method == "POST":
@@ -444,8 +473,7 @@ def profilePage():
             updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE Email=?;", [name1,name2,newEmail,curEmail])
             companyID = select_from_database_table("SELECT CompanyID FROM Users WHERE Email=?;", [newEmail])
             updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [companyName,companyURL,companyID[0]])
-            messages = dumps({"email": escape(newEmail)})
-            return redirect(url_for(".profilePage", messages=messages))
+            return redirectWithMessage("profilePage", newEmail)
         print("Error in updating Company or Profile Data")
         return redirect("/admin/profile", code=302)
 
@@ -475,20 +503,22 @@ def get_pop_settings():
 @app.route("/admin/assistant/create", methods=['GET', 'POST'])
 def admin_assistant_create():
     if request.method == "GET":
+        msg = checkForMessage()
         email = request.cookies.get("UserEmail")
         assistants = get_assistants(email)
-        if assistants is None or len(assistants) < 4:
-            return render("admin/create-assistant.html", autopop="Off")
-        elif "Error" in assistants:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-        else:
-            abort(status.HTTP_404_NOT_FOUND)
+        if assistants is None or "Error" in assistants:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error in getting your assistants!")
+        return render("admin/create-assistant.html", autopop="Off", msg=msg)
     elif request.method == "POST":
         email = request.cookies.get("UserEmail")
+        assistants = get_assistants(email)
+        # Return the user to the page if has reached the limit of assistants
+        if type(assistants) is type([]) and assistants:
+            if len(assistants) >= 4:
+                return redirectWithMessage("admin_assistant_create", "You have reached the limit of 3 chat bots")
         company = get_company(email)
         if company is None or "Error" in company:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO handle this better
+            return redirectWithMessage("admin_assistant_create", "Error in getting company")
         else:
             nickname = request.form.get("nickname", default="Error")
             message = request.form.get("welcome-message", default="Error")
@@ -496,7 +526,7 @@ def admin_assistant_create():
             popuptime = request.form.get("timeto-autopop", default="Error")
 
             if message is "Error" or nickname is "Error" or (popuptime is "Error" and autopopup is not "off"):
-                abort(status.HTTP_400_BAD_REQUEST)
+                return redirectWithMessage("admin_assistant_create", "Error in getting input information")
             else:
                 if autopopup == "off":
                     secondsUntilPopup = "Off"
@@ -507,17 +537,13 @@ def admin_assistant_create():
                     (company[0], message, secondsUntilPopup, nickname))
 
                 if "Error" in createAssistant:
-                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return redirectWithMessage("admin_assistant_create", "There was an error in creating your assistant")
                 else:
                     assistant = select_from_database_table(
                         "SELECT ID FROM Assistants WHERE CompanyID=? AND Nickname=?",
                         [company[0], nickname])
                     if assistant is None or "Error" in assistant:
-                        if "UNIQUE" in assistant:
-                            # TODO handle this better
-                            abort(status.HTTP_409_CONFLICT)
-                        else:
-                            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        return redirectWithMessage("admin_assistant_create", "Error in creating your assistant")
                     else:
                         return redirect("/admin/assistant/{}/settings".format(assistant[0]))
 
@@ -528,15 +554,13 @@ def admin_assistant_edit(assistantID):
         email = request.cookies.get("UserEmail")
         company = get_company(email)
         if company is None or "Error" in company:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error in getting company")
             # TODO handle this better
         else:
             assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
                                                    [assistantID, company[0]])
-            if assistant is None:
-                abort(status.HTTP_404_NOT_FOUND)
-            elif "Error" in assistant:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            if assistant is None or "Error" in assistant:
+                abort(status.HTTP_404_NOT_FOUND, "Error in getting assistant")
             else:
                 message = assistant[3]
                 autoPop = assistant[4]
@@ -544,6 +568,7 @@ def admin_assistant_edit(assistantID):
 
                 return render("admin/edit-assistant.html", autopop=autoPop, message=message, id=assistantID,
                               nickname=nickname)
+
     elif request.method == "POST":
         email = request.cookies.get("UserEmail")
         company = get_company(email)
@@ -1002,6 +1027,13 @@ def admin_user_input(assistantID):
                 return render("admin/data-storage.html", data=data)
 
 
+@app.route("/admin/assistant/<assistantID>/connect", methods=['GET'])
+def admin_connect(assistantID):
+    companyID = select_from_database_table("SELECT CompanyID FROM Assistants WHERE ID=?;", [assistantID])
+    company = select_from_database_table("SELECT Name FROM Companies WHERE ID=?;", [companyID[0]])
+    return render("admin/connect.html", company=company[0], assistantID=assistantID)
+
+
 @app.route("/admin/templates", methods=['GET', 'POST'])
 def admin_templates():
     if request.method == "GET":
@@ -1009,10 +1041,6 @@ def admin_templates():
     elif request.method == "POST":
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
-
-@app.route("/admin/connect", methods=['GET'])
-def admin_connect():
-    return render("admin/connect.html")
 
 
 @app.route("/admin/pricing", methods=['GET'])
@@ -1072,7 +1100,7 @@ def admin_pay(planID):
 
         # Check of a company is logged in TODO we should use sessions later
         if company is None or "Error" in company:
-            return redirect("/login")
+            return redirectWithMessage("login", "Please log in first!")
 
         coupon = request.form.get("coupon", default="Error")
 
@@ -1134,7 +1162,7 @@ def checkPromoCode():
 
         if company is None or "Error" in company:
             # TODO handle this better, as it's payments so is very important we don't charge the customer etc
-            return redirect("/login")
+            return redirectWithMessage("login", "Please log in first!")
 
         else:
 
@@ -1176,14 +1204,9 @@ def webhook_subscription_cancelled():
 
 
 # TODO implement this
-@app.route("/admin/analytics", methods=['GET'])
-def admin_analytics():
+@app.route("/admin/assistant/<assistantID>/analytics", methods=['GET'])
+def admin_analytics(assistantID):
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        # TODO check assistants for errors
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
         stats = select_from_database_table(
             "SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?",
             [assistantID], True)
@@ -1200,19 +1223,12 @@ def admin_users():
         companyID = company[0]
 
         userLevel = select_from_database_table("SELECT AccessLevel FROM Users WHERE Email=?", [email])[0]
-        if userLevel is None:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO better handle
-        elif "Error" in userLevel:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO better handle this
+        if userLevel is None or "Error" in userLevel or userLevel == "User":
+            return redirect("/admin/homepage")
         else:
-            if userLevel == "User":
-                return redirect("/admin/homepage")
-            else:
-                # TODO improve this
-                users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
-                return render("admin/users.html", users=users, email=email)
+            # TODO improve this
+            users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
+            return render("admin/users.html", users=users, email=email)
 
 @app.route("/admin/users/add", methods=['POST'])
 def admin_users_add():
@@ -1438,12 +1454,12 @@ def chatbot(companyName, assistantID):
                                             [currentStats[3] + 1, assistantID, date])
             print(questionsAndAnswers)
 
-            return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + companyName,
+            return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + companyName + "/" + assistantID,
                                    message=message)
     elif request.method == "POST":
 
 
-        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(companyName)])
+        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(companyName)], True)
 
         if company is None:
             abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
@@ -1458,17 +1474,17 @@ def chatbot(companyName, assistantID):
         # TODO check assistant for errors
         # assistantIndex = 0  # TODO implement this properly
 
-        assistantID = assistant[0]
-
         questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?", [assistantID], True)
         # TODO check questions for errors
-
+        print(questions)
         products = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?;", [assistantID], True)
         # TODO check products for errors
 
-        lastSessionID = select_from_database_table("SELECT * FROM UserInput", [], True)
-        print(lastSessionID)
-        lastSessionID = lastSessionID[len(lastSessionID)-1][4] + 1
+        lastSessionID = select_from_database_table("SELECT * FROM UserInput", [])
+        if lastSessionID is None or not lastSessionID:
+            lastSessionID = 1
+        else:
+            lastSessionID = lastSessionID[len(lastSessionID)-1][4] + 1
 
         collectedInformation = request.form.get("collectedInformation").split("||")
         date = datetime.now().strftime("%d-%m-%Y")
@@ -1488,25 +1504,27 @@ def chatbot(companyName, assistantID):
         #lastSessionID = select_from_database_table("SELECT TOP(1) * FROM UserInput ORDER BY ID DESC", [], True)[0]
         #TODO needs improving
 
-        fileUploads = request.form.get("fileUploads").split("||");
-        for i in range(0, len(fileUploads)):
-            file = urlopen(fileUploads[i].split(":::")[0])
-            filename = fileUploads[i].split(":::")[2]
-            print(date,"-----", lastSessionID, "------", fileUploads[i].split(":::")[1], "------", filename)
-            filename = date + '_' + str(lastSessionID) + '_' + fileUploads[i].split(":::")[1] + '_' + filename
-            #filename = secure_filename(filename)
+        fileUploads = request.form.get("fileUploads", default="Error");
+        if "Error" not in fileUploads:
+            fileUploads = fileUploads.split("||");
+            for i in range(0, len(fileUploads)):
+                file = urlopen(fileUploads[i].split(":::")[0])
+                filename = fileUploads[i].split(":::")[2]
+                print(date,"-----", lastSessionID, "------", fileUploads[i].split(":::")[1], "------", filename)
+                filename = date + '_' + str(lastSessionID) + '_' + fileUploads[i].split(":::")[1] + '_' + filename
+                #filename = secure_filename(filename)
 
-            #if file and allowed_file(filename):
-            if file:
-                open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
-                savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
-                for question in questions:
-                    if question[0] == questionID:
-                        questionName = question[2]
-                for question in questions:
-                    if question[0] == questionID:
-                        questionName = question[2]
-                insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID, questionName))
+                #if file and allowed_file(filename):
+                if file:
+                    open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
+                    savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
+                    for question in questions:
+                        if question[0] == questionID:
+                            questionName = question[2]
+                    for question in questions:
+                        if question[0] == questionID:
+                            questionName = question[2]
+                    insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID, questionName))
 
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")
@@ -1661,7 +1679,7 @@ def verify_account(payload):
                             msg.attach("welcome.png","image/png", fp.read())
                         mail.send(msg)
 
-                        return redirect("/login")
+                        return redirectWithMessage("login", "Thank you for verifying.")
 
             except IndexError:
                 # TODO handle better
@@ -1696,17 +1714,12 @@ def reset_password():
          user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
          # TODO check user
 
-         if user is None:
-             # TODO hadnle this better
-             abort(status.HTTP_400_BAD_REQUEST, "User doesn't exist")
-         elif "Error" in user:
-             # TODO handle this better
-             abort(status.HTTP_500_INTERNAL_SERVER_ERROR, user)
+         if user is None or "Error" in user:
+             return redirectWithMessage("login", "Error in finding user!")
          else:
              company = get_company(email)
              if company is None or "Error" in company:
-                 # TODO handle this better
-                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR, company)
+                 return redirectWithMessage("login", "Error in finding company!")
              else:
                  # TODO this needs improving
                  msg = Message("Password reset",
@@ -1775,7 +1788,7 @@ def reset_password_verify(payload):
         password = request.form.get("password", default="Error")
         hashedNewPassword = hash_password(password)
         updatePassword = update_table("UPDATE Users SET Password=? WHERE Email=?;", [hashedNewPassword, email])
-        return redirect("login", code=302)
+        return redirectWithMessage("login", "Password has been changed.")
 
 
 @app.route("/admin/changepassword", methods=["GET", "POST"])

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from flask_mail import Mail, Message
 from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, \
-    make_response, g
+    make_response, g, session
 from werkzeug.utils import secure_filename
 from contextlib import closing
 from flask_api import status
@@ -16,6 +16,10 @@ import stripe
 import string
 import random
 from urllib.request import urlopen
+
+app = Flask(__name__, static_folder='static')
+app.config.from_object('config.DevelopmentConfig')
+
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
@@ -38,7 +42,7 @@ stripe_keys = {
 # stripe.api_key = stripe_keys['secret_key']
 
 
-app = Flask(__name__, static_folder='static')
+
 
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
@@ -95,6 +99,8 @@ def dynamic_popup(route, botID):
 @app.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
+        userID = query_db("SELECT * FROM Users WHERE ID=?;", [1], one=True)['ID']
+        print(userID)
         return render_template("index.html")
 
 
@@ -136,25 +142,44 @@ def contactpage():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+
     if request.method == "GET":
         return render_template("login.html")
+
+
     elif request.method == "POST":
+
         email = request.form.get("email", default="Error")
         password_to_check = request.form.get("password", default="Error")
+
+
         if email == "Error" or password_to_check == "Error":
             print("Invalid request: Email or password not received!")
             return render_template('login.html', data="Email or password not received!"), status.HTTP_400_BAD_REQUEST
+
+
         else:
             email = email.lower()
-            data = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
-            if data is not None:
-                password = data[6]
+            user = query_db("SELECT * FROM Users WHERE Email=?;", [email], one=True)
+
+            # If user exists
+            if user is not None:
+                password = user['Password']
                 if hash_password(password_to_check, password) == password:
-                    verified = data[8]
+
+                    verified = user['Verified']
                     print(verified == "True")
+
                     if verified == "True":
                         messages = dumps({"email": escape(email)})
+                        # Set the session for the logged in user
+                        session['User'] = user
+                        session['Logged_in'] = True
+                        # Test session specific values
+                        print(session)
+                        print(session.get('User')['Email'])
                         return redirect(url_for(".admin_home", messages=messages))
+
                     else:
                         return render_template('errors/verification.html',
                                                data="Account not verified, please check your email and follow instructions")
@@ -164,7 +189,14 @@ def login():
                 return render_template('login.html', data="User doesn't exist!")
 
 
-# TODO just overall better validation
+@app.route('/logout')
+def logout():
+    # Will clear out the session.
+    session.pop('User', None)
+    session.pop('Logged_in', False)
+    return redirect(url_for('login'))
+
+
 
 # code to ensure user is logged in
 @app.before_request
@@ -172,25 +204,12 @@ def before_request():
 
     theurl = str(request.url_rule)
     print(theurl)
-    if "admin" not in theurl or "admin/homepage" in theurl:
+    restrictedRoutes = ['/admin', 'admin/homepage']
+    # If the user try to visit one of the restricted routes without logging in he will be redirected
+    if any(route in theurl for route in restrictedRoutes) and not session.get('logged_in', False):
         print("Ignore before request for: ", theurl)
-        return None
-
-
-    email = request.cookies.get("UserEmail")
-    print("USER EMAIL: " + str(email))
-
-    if email is None:
-        print("User not logged in")
-        #TODO change this to redirect with feedback through out the server
         return render_template("login.html", msg="Please log in first!")
 
-
-    print("Before request checking: ", theurl, " ep: ", request.endpoint)
-    if email == 'None' and request.endpoint != 'login':
-        return render_template("login.html", msg="Please log in first!")
-    print("Before Request checks out")
-    return None
 
 
 
@@ -1922,8 +1941,8 @@ def get_last_row_from_table(table, database=DATABASE):
     try:
         conn = sqlite3.connect(database)
         cur = conn.cursor()
-        row = cur.execute("SELECT * FROM " + table + " WHERE ROWID IN ( SELECT max( ROWID ) FROM " + table +" );").fetchone()
-
+        # row = cur.execute("SELECT * FROM " + table + " WHERE ROWID IN ( SELECT max( ROWID ) FROM " + table +" );").fetchone()
+        row = query_db("SELECT * FROM " + table + " WHERE ROWID IN ( SELECT max( ROWID ) FROM " + table +" );", one=True)
     except Exception as e:
         row = -1
     finally:
@@ -2006,9 +2025,26 @@ def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
 
 # Connects to the specific database.
 def connect_db():
-    print("Conncect to DB")
+    print("Connect to DB")
     return sqlite3.connect(DATABASE)
 
+
+# Initializes the database with test data while in debug mode.
+def init_db():
+    with closing(connect_db()) as db:
+        with app.open_resource(APP_ROOT + '/sql/schema.sql', mode='r') as f:
+            db.cursor().executescript(f.read())
+        db.commit()
+
+        if app.debug:
+            with app.open_resource(APP_ROOT + '/sql/devseed.sql', mode='r') as f:
+                db.cursor().executescript(f.read())
+                # Create and store a hashed password for "test" user
+                hash = hash_password("test")
+                update_table("UPDATE Users SET Password=? WHERE ID=?", [hash, 1])
+            db.commit()
+
+    print("Database Initialized")
 
 
 # facilitate querying data from the database.
@@ -2029,7 +2065,7 @@ def get_connection():
 
 @app.before_request
 def before_request():
-    print("Before Request > connect to DB")
+    print("Before Request")
     g.db = connect_db()
 
 
@@ -2082,21 +2118,6 @@ def not_implemented(e):
 
 
 
-# Initializes the database.
-def init_db():
-    with closing(connect_db()) as db:
-        with app.open_resource(APP_ROOT + '/sql/schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
-
-        if app.debug:
-            with app.open_resource(APP_ROOT + '/sql/devseed.sql', mode='r') as f:
-                db.cursor().executescript(f.read())
-            db.commit()
-
-    print("Database Initialized")
-
-
 class Del:
     def __init__(self, keep=string.digits):
         self.comp = dict((ord(c), c) for c in keep)
@@ -2106,10 +2127,12 @@ class Del:
 
 
 if __name__ == "__main__":
-
+    print("TEST TEST TEST")
     app.run(debug=True)
 
+# Create the schema
 init_db()
+
 # conn = None
 # try:
 #     conn = sqlite3.connect(DATABASE)
@@ -2133,8 +2156,3 @@ init_db()
 # finally:
 #     if conn is not None:
 #         conn.close()
-
-# Janky way to seed password
-if app.debug:
-    hash = hash_password("test")
-    update_table("UPDATE Users SET Password=? WHERE ID=?", [hash, 1])

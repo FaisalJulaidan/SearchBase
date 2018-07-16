@@ -1450,12 +1450,12 @@ def chatbot(companyName, assistantID):
                                             [currentStats[3] + 1, assistantID, date])
             print(questionsAndAnswers)
 
-            return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + companyName,
+            return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + companyName + "/" + assistantID,
                                    message=message)
     elif request.method == "POST":
 
 
-        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(companyName)])
+        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(companyName)], True)
 
         if company is None:
             abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
@@ -1470,17 +1470,17 @@ def chatbot(companyName, assistantID):
         # TODO check assistant for errors
         # assistantIndex = 0  # TODO implement this properly
 
-        assistantID = assistant[0]
-
         questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?", [assistantID], True)
         # TODO check questions for errors
-
+        print(questions)
         products = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?;", [assistantID], True)
         # TODO check products for errors
 
-        lastSessionID = select_from_database_table("SELECT * FROM UserInput", [], True)
-        print(lastSessionID)
-        lastSessionID = lastSessionID[len(lastSessionID)-1][4] + 1
+        lastSessionID = select_from_database_table("SELECT * FROM UserInput", [])
+        if lastSessionID is None or not lastSessionID:
+            lastSessionID = 1
+        else:
+            lastSessionID = lastSessionID[len(lastSessionID)-1][4] + 1
 
         collectedInformation = request.form.get("collectedInformation").split("||")
         date = datetime.now().strftime("%d-%m-%Y")
@@ -1500,25 +1500,27 @@ def chatbot(companyName, assistantID):
         #lastSessionID = select_from_database_table("SELECT TOP(1) * FROM UserInput ORDER BY ID DESC", [], True)[0]
         #TODO needs improving
 
-        fileUploads = request.form.get("fileUploads").split("||");
-        for i in range(0, len(fileUploads)):
-            file = urlopen(fileUploads[i].split(":::")[0])
-            filename = fileUploads[i].split(":::")[2]
-            print(date,"-----", lastSessionID, "------", fileUploads[i].split(":::")[1], "------", filename)
-            filename = date + '_' + str(lastSessionID) + '_' + fileUploads[i].split(":::")[1] + '_' + filename
-            #filename = secure_filename(filename)
+        fileUploads = request.form.get("fileUploads", default="Error");
+        if "Error" not in fileUploads:
+            fileUploads = fileUploads.split("||");
+            for i in range(0, len(fileUploads)):
+                file = urlopen(fileUploads[i].split(":::")[0])
+                filename = fileUploads[i].split(":::")[2]
+                print(date,"-----", lastSessionID, "------", fileUploads[i].split(":::")[1], "------", filename)
+                filename = date + '_' + str(lastSessionID) + '_' + fileUploads[i].split(":::")[1] + '_' + filename
+                #filename = secure_filename(filename)
 
-            #if file and allowed_file(filename):
-            if file:
-                open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
-                savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
-                for question in questions:
-                    if question[0] == questionID:
-                        questionName = question[2]
-                for question in questions:
-                    if question[0] == questionID:
-                        questionName = question[2]
-                insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID, questionName))
+                #if file and allowed_file(filename):
+                if file:
+                    open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
+                    savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
+                    for question in questions:
+                        if question[0] == questionID:
+                            questionName = question[2]
+                    for question in questions:
+                        if question[0] == questionID:
+                            questionName = question[2]
+                    insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID, questionName))
 
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")

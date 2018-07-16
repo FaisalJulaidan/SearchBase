@@ -190,17 +190,6 @@ def before_request():
     print("Before Request checks out")
     return None
 
-def checkForMessage():
-    args = request.args
-    msg=" "
-    if len(args) > 0:
-        messages = args['messages']
-        if messages is not None:
-            msg = loads(messages)['msg']
-            if msg is None or msg == "None":
-                msg = " "
-    return msg
-
 # Used to passthrough variables without repeating it in each method call
 # IE assistant information
 def render(template, **context):
@@ -232,6 +221,17 @@ def render(template, **context):
 def redirectWithMessage(function, message):
     messages = dumps({"msg": escape(message)})
     return redirect(url_for("."+function, messages=messages))
+
+def checkForMessage():
+    args = request.args
+    msg=" "
+    if len(args) > 0:
+        messages = args['messages']
+        if messages is not None:
+            msg = loads(messages)['msg']
+            if msg is None or msg == "None":
+                msg = " "
+    return msg
 
 # TODO improve verification
 @app.route("/signup", methods=['GET', 'POST'])

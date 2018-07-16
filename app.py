@@ -1035,6 +1035,9 @@ def is_coupon_valid(coupon="Error"):
         print("coupon is not valid")
         return False
 
+
+
+
 @app.route("/admin/check-out/<planID>", methods=['GET', 'POST'])
 def admin_pay(planID):
 
@@ -1070,50 +1073,51 @@ def admin_pay(planID):
         coupon = request.form.get("coupon", default="Error")
 
         # Validate the given coupon.
-        if coupon == "" or coupon is None:
-            print("make no use of coupons")
-            # If coupon is not provided set it to None as Stripe API require.
-            coupon = "None"
-        if not (is_coupon_valid(coupon)):
-            return render("admin/check-out.html", error="The coupon used is not valid")
+        # if coupon == "" or coupon is None or coupon == "Error":
+        #     print("make no use of coupons")
+        #     # If coupon is not provided set it to None as Stripe API require.
+        #     coupon = "None"
+        # if not (is_coupon_valid(coupon)):
+        #     return render("admin/check-out.html", error="The coupon used is not valid")
 
 
         # If no errors occurred, subscribe the user to plan.
+        #else:
+        print(request)
+        token = request.form.get("tokenId", default="Error")
+        print(token)
+        print(planID)
+        if token is "Error":
+            # TODO improve this
+            abort(status.HTTP_400_BAD_REQUEST)
         else:
-            token = request.form.get("stripeToken", default="Error")
-            print(token)
-            print(planID)
-            if token is "Error":
-                # TODO improve this
-                abort(status.HTTP_400_BAD_REQUEST)
-            else:
-                # Get the user by email
-                user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
-                try:
-                    subscription = stripe.Subscription.create(
-                        customer=user[7],
-                        source=token,
-                        coupon=coupon,
-                        items=[
-                            {
-                                "plan": planID,
-                            },
-                        ]
-                    )
+            # Get the user by email
+            user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
+            try:
+                subscription = stripe.Subscription.create(
+                    customer=user[7],
+                    source=token,
+                    #coupon=coupon,
+                    items=[
+                        {
+                            "plan": planID,
+                        },
+                    ]
+                )
 
-                    # if everything is ok activate assistants
-                    update_table("UPDATE Assistants SET Active=? WHERE CompanyID=?", ["True", user[1]])
+                # if everything is ok activate assistants
+                update_table("UPDATE Assistants SET Active=? WHERE CompanyID=?", ["True", user[1]])
 
 
-                except Exception as e:
-                    print(e)
-                    abort(status.HTTP_400_BAD_REQUEST, "An error occurred and could not subscribe.")
-                    # TODO check subscription for errors https://stripe.com/docs/api#errors
+            except Exception as e:
+                print(e)
+                abort(status.HTTP_400_BAD_REQUEST, "An error occurred and could not subscribe.")
+                # TODO check subscription for errors https://stripe.com/docs/api#errors
 
 
 
-                print("You have successfully subscribed!")
-                return render("admin/pricing-tables.html", msg="You have successfully subscribed!")
+            print("You have successfully subscribed!")
+            return render("admin/pricing-tables.html", msg="You have successfully subscribed!")
 
 
 @app.route("/admin/check-out/checkPromoCode", methods=['POST'])
@@ -1123,7 +1127,7 @@ def checkPromoCode():
         # abort(status.HTTP_501_NOT_IMPLEMENTED)
         email = request.cookies.get("UserEmail")
         company = get_company(email)
-        
+
         if company is None or "Error" in company:
             # TODO handle this better, as it's payments so is very important we don't charge the customer etc
             return redirect("/login")

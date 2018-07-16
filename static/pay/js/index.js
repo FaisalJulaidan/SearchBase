@@ -1,6 +1,6 @@
 'use strict';
 
-var stripe = Stripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+var stripe = Stripe('pk_test_e4Tq89P7ma1K8dAjdjQbGHmR');
 
 function registerElements(elements, exampleName) {
   var formClass = '.' + exampleName;
@@ -116,13 +116,22 @@ function registerElements(elements, exampleName) {
     // Use Stripe.js to create a token. We only need to pass in one Element
     // from the Element group in order to create a token. We can also pass
     // in the additional customer data we collected in our form.
-    stripe.createToken(elements[0], additionalData).then(function(result) {
+    stripe.createToken(elements[0], additionalData)
+    .then(function(result) {
       // Stop loading!
       example.classList.remove('submitting');
 
       if (result.token) {
         // If we received a token, show the token ID.
         example.querySelector('.token').innerText = result.token.id;
+        var input = $("<input>", {
+            type: "hidden",
+            name: 'tokenId',
+            value: result.token.id
+        })
+        $(form).append($(input));
+        debugger
+        form.submit()
         example.classList.add('submitted');
       } else {
         // Otherwise, un-disable inputs.

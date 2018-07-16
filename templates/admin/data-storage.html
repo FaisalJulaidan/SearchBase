@@ -52,8 +52,7 @@
 {% block customJS %}
 <script>
     var tableHeading = $("#tableHeadingUIn");
-    var tableString = "<table><tr><th>Date</th><th>SessionID</th><th>Question</th><th>Recorded Data</th>";
-    console.log("{{data}}")
+    var tableString = "<div class=\"table-responsive\"><table class=\"table table-striped jambo_table bulk_action\"><thead><tr id=\"tableHeadingUIn\" class=\"headings\"><th class=\"column-title\">Date</th><th class=\"column-title\">SessionID</th><th class=\"column-title\">Question</th><th class=\"column-title\">Recorded Data</th></thead><tbody id=\"tBodyUIn\">";
     {%for record in data %}
     if ("{{record[3]}}".includes(";")) {
         tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td><a href=\"/" + "{{record[3]}}".split(";")[1] + "\" download=\"" + "{{record[3]}}".split(";")[0] +"\">" + "{{record[3]}}".split(";")[0]+"</a></td></tr>";
@@ -61,7 +60,7 @@
         tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td>{{record[3]}}</td></tr>";
     }
     {% endfor %}
-    tableString += "</table>";
+    tableString += "</tbody></table></div>";
     $("#tBodyUIn").append(tableString);
 
 

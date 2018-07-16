@@ -153,7 +153,8 @@ def login():
                     verified = data[8]
                     print(verified == "True")
                     if verified == "True":
-                        return redirectWithMessage("admin_home", email)
+                        messages = dumps({"email": escape(email)})
+                        return redirect(url_for(".admin_home", messages=messages))
                     else:
                         return render_template('errors/verification.html',
                                                data="Account not verified, please check your email and follow instructions")
@@ -1026,6 +1027,13 @@ def admin_user_input(assistantID):
                 return render("admin/data-storage.html", data=data)
 
 
+@app.route("/admin/assistant/<assistantID>/connect", methods=['GET'])
+def admin_connect(assistantID):
+    companyID = select_from_database_table("SELECT CompanyID FROM Assistants WHERE ID=?;", [assistantID])
+    company = select_from_database_table("SELECT Name FROM Companies WHERE ID=?;", [companyID[0]])
+    return render("admin/connect.html", company=company[0], assistantID=assistantID)
+
+
 @app.route("/admin/templates", methods=['GET', 'POST'])
 def admin_templates():
     if request.method == "GET":
@@ -1033,10 +1041,6 @@ def admin_templates():
     elif request.method == "POST":
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
-
-@app.route("/admin/connect", methods=['GET'])
-def admin_connect():
-    return render("admin/connect.html")
 
 
 @app.route("/admin/pricing", methods=['GET'])
@@ -1196,14 +1200,9 @@ def webhook_subscription_cancelled():
 
 
 # TODO implement this
-@app.route("/admin/analytics", methods=['GET'])
-def admin_analytics():
+@app.route("/admin/assistant/<assistantID>/analytics", methods=['GET'])
+def admin_analytics(assistantID):
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
-        assistants = get_assistants(email)
-        # TODO check assistants for errors
-        assistantIndex = 0  # TODO change this
-        assistantID = assistants[assistantIndex][0]
         stats = select_from_database_table(
             "SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?",
             [assistantID], True)

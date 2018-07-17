@@ -99,8 +99,9 @@ def dynamic_popup(route, botID):
 @app.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
-        userID = query_db("SELECT * FROM Users WHERE ID=?;", [1], one=True)['ID']
-        print(userID)
+        # query_db("UPDATE Users SET SubID=? WHERE ID=?;", ('dfg', 1))
+        # update_table("UPDATE Users SET SubID=? WHERE ID=?;",
+        #              ['ddd', 1])
         return render_template("index.html")
 
 
@@ -293,43 +294,62 @@ def signup():
             except IndexError as e:
                 return redirectWithMessage("signup", "Error in handling names")
 
+            newUser = None
+            newCompany = None
+            newCustomer = None
 
             # Create a Stripe customer for the new company.
-            new_customer = stripe.Customer.create(
+            newCustomer = stripe.Customer.create(
                 email=email
             )
 
             # debug
-            print(new_customer)
+            print(newCustomer)
 
             hashed_password = hash_password(password)
-            verified = "False"
+            verified = "True"
+
+
 
             # Create a company record for the new user
             insertCompanyResponse = insert_into_database_table(
                 "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName,companySize, websiteURL, companyPhoneNumber))
 
-            company = get_last_row_from_table("Companies")
-
-            # Create a user account and link it with the new created company record above
-            insertUserResponse = insert_into_database_table(
-                "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified') VALUES (?,?,?,?,?,?,?,?);",
-                (company[0], firstname, surname, accessLevel, email, hashed_password, new_customer['id'], str(verified)))
-
+            newCompany = get_last_row_from_table("Companies")
+            print(newCompany)
 
 
             try:
 
                 # Subscribe to the Basic plan with a trial of 14 days
-                stripe.Subscription.create(
-                customer=new_customer['id'],
+                sub = stripe.Subscription.create(
+                customer=newCustomer['id'],
                 items=[{'plan': 'plan_D3lp2yVtTotk2f'}],
                 trial_period_days=14,
                 )
 
+                # Create a user account and link it with the new created company record above
+                newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
+                          (newCompany['ID'], firstname, surname, accessLevel, email, hashed_password, newCustomer['id'],
+                           str(verified), sub['id'])
+                          )
 
 
             except Exception as e:
+                # Clear out when exception
+                if newUser is not None:
+                    query_db("DELETE FROM Users WHERE ID=?", [newUser['ID']])
+                    print("Delete new user")
+
+                if newCompany is not None:
+                    query_db("DELETE FROM Companies WHERE ID=?", [newCompany['ID']])
+                    print("Delete new company")
+
+                print("Delete new user' stripe account")
+                if newCustomer is not None:
+                    cus = stripe.Customer.retrieve(newCustomer['id'])
+                    cus.delete()
+
                 print(e)
                 return redirectWithMessage("signup", "An error occurred and could not subscribe. Account has been created.")
                 # TODO check subscription for errors https://stripe.com/docs/api#errors
@@ -1135,20 +1155,23 @@ def admin_pay(planID):
 
     if request.method == 'POST':
 
-        # abort(status.HTTP_501_NOT_IMPLEMENTED)
-        email = request.cookies.get("UserEmail")
-        company = get_company(email)
+        if not session.get('Logged_in', False):
+            redirectWithMessage("login", "You must login first!")
+
+        # Get Stripe token generated using JavaScript in the client-side
+        content = request.get_json(silent=True)
+        token = content['token']['id']
+        if token is "Error":
+            # TODO improve this
+            abort(status.HTTP_400_BAD_REQUEST)
+
+
 
         # Get the plan opject from Stripe API
         try:
             plan = stripe.Plan.retrieve(planID)
         except stripe.error.InvalidRequestError as e:
             abort(status.HTTP_400_BAD_REQUEST, "This plan does't exist! Make sure the plan ID is correct.")
-
-
-        # Check of a company is logged in TODO we should use sessions later
-        if company is None or "Error" in company:
-            return redirectWithMessage("login", "Please log in first!")
 
 
         # Validate the given coupon.
@@ -1163,18 +1186,11 @@ def admin_pay(planID):
             return render("admin/check-out.html", error="The coupon used is not valid")
 
 
-        # Get Stripe token generated using JavaScript in the client-side
-        token = request.form.get("tokenId", default="Error")
-        print(">>>> The token: "+ token)
-        if token is "Error":
-            # TODO improve this
-            abort(status.HTTP_400_BAD_REQUEST)
-
 
         # If no errors occurred, subscribe the user to plan.
         else:
             # Get the user by email
-            user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
+            user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [session.get('User')['Email']])
             try:
                 subscription = stripe.Subscription.create(
                     customer=user[7],
@@ -1206,14 +1222,8 @@ def admin_pay(planID):
 def checkPromoCode():
     if request.method == 'POST':
 
-        # abort(status.HTTP_501_NOT_IMPLEMENTED)
-        email = request.cookies.get("UserEmail")
-        company = get_company(email)
-
-        if company is None or "Error" in company:
-            # TODO handle this better, as it's payments so is very important we don't charge the customer etc
-            return redirectWithMessage("login", "Please log in first!")
-
+        if not session.get('Logged_in', False):
+            redirectWithMessage("login", "You must login first!")
         else:
 
             # TODO: check the promoCode from user then response with yes or no with json
@@ -1225,30 +1235,37 @@ def checkPromoCode():
 
 
 
-@app.route("/admin/unsubscribe", methods=['POST'])
+@app.route("/admin/unsubscribe", methods=['GET', 'POST'])
 def unsubscribe():
 
-    if request.method == 'POST':
-        email = request.cookies.get("UserEmail")
-        company = get_company(email)
+    if request.method == 'GET':
 
-        # Check of a company is logged in TODO we should use sessions later
-        if company is None or "Error" in company:
-            return redirect("/login")
+        # if not session.get('Logged_in', False):
+        #     redirectWithMessage("login", "You must login first!")
 
-        # Get company Stripe subscription ID
-        user = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [company[0]])
-        subID = user[9]
-
-
-        if subID is None or subID == "" or subID == "null" :
-            abort(status.HTTP_404_NOT_FOUND, "This account has no active subscriptions ")
+        subID = session.get('User')['SubID']
+        if subID is None:
+            # redirect("admin/pricing")
+            return redirectWithMessage("admin_pricing", "This account has no active subscriptions ")
+            print("This account has no active subscriptions ")
 
         try:
+            # Unsubscribe
             sub = stripe.Subscription.retrieve(subID)
             sub.delete()
+
+            # TODO why query_db does not work with update?
+            # query_db('UPDATE Users SET SubID=? WHERE ID=?;', (None,  session.get('User')['ID']))
+            update_table("UPDATE Users SET SubID=? WHERE ID=?;",
+                         [None, session.get('User')['ID']])
+
+            print("You have unsubscribed successfully!")
+            return redirectWithMessage("admin_pricing", "You have unsubscribed successfully!")
+
         except Exception as e:
-            abort(status.HTTP_400_BAD_REQUEST, "An error occurred while trying to unsubscribe")
+            print("An error occurred while trying to unsubscribe")
+            return redirectWithMessage("admin_pricing", "An error occurred while trying to unsubscribe")
+
 
 
 # Stripe Webhooks
@@ -1256,7 +1273,7 @@ def unsubscribe():
 def webhook_subscription_cancelled():
     if request.method == "POST":
         try:
-
+            print("HHHHGHFGDHDGHDFGDFHDFGDFGDFGDFGDFG")
             event_json = request.get_json(force=True)
             customerID = event_json['data']['object']['customer']
             print(customerID)

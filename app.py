@@ -219,7 +219,7 @@ def before_request():
     restrictedRoutes = ['/admin', 'admin/homepage']
     # If the user try to visit one of the restricted routes without logging in he will be redirected
     if any(route in theurl for route in restrictedRoutes) and not session.get('Logged_in', False):
-        return render_template("login.html", msg="Please log in first!")
+        return redirectWithMessage("login", "You are not logged in!")
 
 
 
@@ -565,6 +565,26 @@ def admin_assistant_create():
                         return redirectWithMessage("admin_assistant_create", "Error in creating your assistant")
                     else:
                         return redirect("/admin/assistant/{}/settings".format(assistant[0]))
+
+
+@app.route("/admin/assistant/delete/<assistantID>", methods=['GET', 'POST'])
+def admin_assistant_delete(assistantID):
+    if request.method == "GET":
+        email = request.cookies.get("UserEmail")
+        userCompanyID = select_from_database_table("SELECT CompanyID FROM Users WHERE Email=?", [email])
+        assistantCompanyID = select_from_database_table("SELECT CompanyID FROM Assistants WHERE ID=?", [assistantID])
+        print(userCompanyID[0], "   ", assistantCompanyID[0])
+
+        #Check if the user is from the company that owns the assistant
+        if userCompanyID[0] == assistantCompanyID[0]:
+            deleteAssistant = delete_from_table("DELETE FROM Assistants WHERE ID=?;",[assistantID])
+            print(deleteAssistant)
+            if deleteAssistant == "Record successfully deleted.":
+                return redirect("/admin/homepage")
+            else:
+                return redirect("/admin/assistant/"+str(assistantID)+"/settings")
+        else:
+            return redirect("/admin/homepage")
 
 
 @app.route("/admin/assistant/<assistantID>/settings", methods=['GET', 'POST'])

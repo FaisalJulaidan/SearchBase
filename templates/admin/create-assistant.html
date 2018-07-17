@@ -15,8 +15,10 @@
                             <div class="clearfix"></div>
                             <br>
                             <form action="/admin/assistant/create" method="POST" enctype="multipart/form-data">
-                                <h4>Enter a nickname for your assistant to easily identify it in the dashboard. Must be
-                                    unique.<span class="required">*</span></h4>
+                                <h4>
+                                    Enter a nickname for your assistant to easily identify it in the dashboard. Must be
+                                    unique.<span class="required">*</span>
+                                </h4>
                                 <div class="col-md-9 col-sm-9 col-xs-12">
                                     <input name="nickname" type="text"
                                            id="nickname"
@@ -36,13 +38,13 @@
                                 <br>
 
                                 <!--<h4>Select the assistant category.</h4>
-                                <select id="category-select">
-                                    <option value="recruitment">Recruitment</option>
-                                    <option value="property">Property</option>
-                                </select>
-                                <br>
-                                <br>
-                                <br>-->
+        <select id="category-select">
+            <option value="recruitment">Recruitment</option>
+            <option value="property">Property</option>
+        </select>
+        <br>
+        <br>
+        <br>-->
 
                                 <h4>Would you like the assistant to automatically open for the user?</h4>
                                 <label class="switch">
@@ -53,25 +55,39 @@
                                 <br>
                                 <br>
                                 <div id="popup-time" hidden>
-                                    <h4> How long should the chat bot wait before opening?
+                                    <h4>
+                                        How long should the chat bot wait before opening?
                                         <small> *Time in Seconds</small>
                                     </h4>
                                     <input name="timeto-autopop" style="width:50px"
                                            class="form-control col-md-5 col-xs-10"
                                            id="bot_time" type="text"
-                                            {% if autopop != 'Off' %}
+                                           {% if autopop !='Off' %}
                                            value="{{ autopop }}"
-                                            {% else %}
+                                           {% else %}
                                            value="6"
-                                            {% endif %}>
-                                    <br>
-                                    <br>
+                                           {% endif %}>
                                     <br>
                                     <br>
                                 </div>
+
                                 <!-- Submit button -->
+                                <p style="text-align:center;">{{msg}}</p>
                                 <button class="btn btn-success">Submit</button>
                             </form>
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p class="lead">
+                                    <p> Warning: Deleting your assistant will delete everything associated with it!</p>
+                                    <a style="background-color:red; border-color: red;" class="btn btn-primary btn-sm" href="/" role="button">Delete Assistant</a>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

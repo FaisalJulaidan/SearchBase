@@ -11,40 +11,8 @@
 
             <button onclick="fnExcelReport()">Export Excel</button>
 
-            <div class="table-responsive">
-                <table id="dataTable" class="table table-striped jambo_table bulk_action">
-                    <thead>
-                        <!-- Beginning of data -->
-                        <tr id="tableHeadingUIn" class="headings"></tr>
-                        <!-- End of data -->
-                    </thead>
+            <div id="tBodyUIn"></div>
 
-                    <tbody id="tBodyUIn"></tbody>
-                </table>
-                <!--<th class="column-title">Storage ID</th>
-    <th class="column-title">Date Stored </th>
-    <th class="column-title">Name </th>
-    <th class="column-title">Email </th>
-    <th class="column-title">Telephone </th>
-    <th class="column-title">CV </th>
-    <th class="column-title no-link last">
-        <span class="nobr">Action</span>
-    </th>
-    <th class="bulk-actions" colspan="7">
-        <a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
-    </th>-->
-                <!-- Start -->
-                <!--<tr class="even pointer">
-      <td class=" ">00001</td>
-      <td class=" ">May 23, 2018 11:47:56 PM </td>
-      <td class=" ">Mehdi Este</td>
-      <td class=" ">contact@thesearchbase.com</td>
-      <td class=" ">072364262</td>
-      <td class=" "><a href="#">File Here</a></td>
-      <td class=" last"><a href="#">View</a></td>
-    </tr>-->
-                <!-- End -->
-            </div>
         </div>
     </div>
 {% endblock %}
@@ -52,8 +20,7 @@
 {% block customJS %}
 <script>
     var tableHeading = $("#tableHeadingUIn");
-    var tableString = "<table><tr><th>Date</th><th>SessionID</th><th>Question</th><th>Recorded Data</th>";
-    console.log("{{data}}")
+    var tableString = "<table class=\"table table-striped jambo_table bulk_action\"><thead><tr id=\"tableHeadingUIn\" class=\"headings\"><th class=\"column-title\">Date</th><th class=\"column-title\">SessionID</th><th class=\"column-title\">Question</th><th class=\"column-title\">Recorded Data</th></thead><tbody id=\"tBodyUIn\">";
     {%for record in data %}
     if ("{{record[3]}}".includes(";")) {
         tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td><a href=\"/" + "{{record[3]}}".split(";")[1] + "\" download=\"" + "{{record[3]}}".split(";")[0] +"\">" + "{{record[3]}}".split(";")[0]+"</a></td></tr>";
@@ -61,69 +28,9 @@
         tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td>{{record[3]}}</td></tr>";
     }
     {% endfor %}
-    tableString += "</table>";
+    tableString += "</tbody></table>";
     $("#tBodyUIn").append(tableString);
-
-
-    //var tableHeading = $("#tableHeadingUIn");
-    //var tableString = "<table><tr><th>Record ID</th><th>Date</th>";
-    //tableHeading.append("<th class=\"column-title\">Record ID</th>");
-    //tableHeading.append("<th class=\"column-title\">Date</th>");
-    //var numberOfHeaders = 0;
-    //var curNOH = 0;
-    //var emptyPlaces = 0;
-    //{%for item in data %}
-    //    {%for record in item %}
-    //        if ("{{record}}" != "") {
-    //            curNOH++;
-    //            curNOH += emptyPlaces;
-    //            emptyPlaces = 0;
-    //        } else {
-    //            emptyPlaces++;
-    //        }
-    //    {% endfor %}
-    //    if (curNOH > numberOfHeaders) {
-    //        numberOfHeaders = curNOH;
-    //    }
-    //    curNOH = 0;
-    //    emptyPlaces = 0;
-    //{% endfor %}
-    //for (var i = 1; i <= numberOfHeaders - 2; i++) {
-    //    tableHeading.append("<th class=\"column-title\">Data " + i + "</th>");
-    //    tableString+="<th>Data"+i+"</th>"
-    //}
-    //tableString+="</tr>"
-    //var tableBody = $("#tBodyUIn");
-    //var i = 0;
-    //var ii = 0;
-    //var appendString = "";
-    //{%for item in data %}
-    //    i++;
-    //    ii = 0;
-    //appendString += "<tr id=\"" + i + "\" class=\"even pointer\">\
-    //<td id=\""+ i + "_1\">{{item}}[0]</td>\
-    //<td id=\""+ i + "_1\">{{item}}[1]</td>\
-    //<td id=\""+ i + "_1\">{{item}}[2]</td>\
-    //<td id=\""+ i + "_1\">{{item}}[3]</td>\
-    //<td id=\""+ i + "_1\">{{item}}[4]</td>";
-    //    tableString+="<tr>"
-    //    //{%for record in item %}
-    //    //    ii++;
-    //    //    if (ii <= numberOfHeaders) {
-    //    //        appendString += "<td id=\"" + i + "_" + ii + "\" class=\" \" >{{record}}</td >";
-    //    //        tableString+="<td>{{record}}</td>"
-    //    //    }
-    //    //{%endfor%}
-    //    appendString += "<td id=\"" + i + "_" + ii + "\" class=\" \" >{{record}}</td >";
-    //    tableString += "<td>{{record}}</td>"
-    //    appendString += "</tr>";
-    //    tableString+= "</tr>"
-    //    tableBody.append(appendString);
-    //    appendString = "";
-    //{% endfor %}
-    //tableString+="</table>"
-
-    //var tableString = $("#dataTable").html();
+    
 
     function fnExcelReport() {
         tab_text = tableString;

@@ -1185,7 +1185,7 @@ def admin_pay(planID):
                 subscription = stripe.Subscription.create(
                     customer=user[7],
                     source=token,
-                    #coupon=coupon,
+                    coupon=coupon,
                     items=[
                         {
                             "plan": planID,

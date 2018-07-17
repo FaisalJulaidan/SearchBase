@@ -452,12 +452,17 @@ def profilePage():
                 email = request.cookies.get("UserEmail")
         else:
             email = request.cookies.get("UserEmail")
+        print(email)
         user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
-        if user is not None and user is not "None" and user is not "Error":
+        print(user)
+        if user is None or user is "None" or user is "Error":
             user="Error in finding user"
+        print(user)
         company = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
-        if company is not None and company is not "None" and company is not "Error":
+        if company is None or company is "None" or company is "Error":
             company="Error in finding company"
+        print(company)
+        print(email)
         return render_template("admin/profile.html", user=user, email=email, company=company)
 
     elif request.method == "POST":

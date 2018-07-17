@@ -129,10 +129,18 @@ function registerElements(elements, exampleName) {
             name: 'tokenId',
             value: result.token.id
         })
-        $(form).append($(input));
-        debugger
-        form.submit()
-        example.classList.add('submitted');
+        // $(form).append($(input));
+        // debugger
+        // form.submit()
+
+        $.post({
+            url:'',
+            contentType: 'application/json',
+            data:JSON.stringify(result),
+            success: (res) => {
+                example.classList.add('submitted');
+            }
+        })
       } else {
         // Otherwise, un-disable inputs.
         enableInputs();

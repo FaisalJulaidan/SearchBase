@@ -565,12 +565,6 @@ def admin_assistant_create():
                     return redirectWithMessage("admin_assistant_create", "There was an error in creating your assistant")
 
                 else:
-                    # assistant = select_from_database_table(
-                    #     "SELECT ID FROM Assistants WHERE CompanyID=? AND Nickname=?",
-                    #     [company[0], nickname])
-                    # if assistant is None or "Error" in assistant:
-                    #     return redirectWithMessage("admin_assistant_create", "Error in creating your assistant")
-                    # else:
                      return redirect("/admin/assistant/{}/settings".format(newAssistant['ID']))
 
 

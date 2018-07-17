@@ -551,20 +551,27 @@ def admin_assistant_create():
                     secondsUntilPopup = "Off"
                 else:
                     secondsUntilPopup = popuptime
-                createAssistant = insert_into_database_table(
-                    "INSERT INTO Assistants (CompanyID, Message, SecondsUntilPopup, Nickname) VALUES (?,?,?,?);",
-                    (company[0], message, secondsUntilPopup, nickname))
 
-                if "Error" in createAssistant:
+                # Insert the new assistant to db
+                newAssistant = insert_db("Assistants", ('CompanyID', 'Message', 'SecondsUntilPopup', 'Nickname'),
+                                         (company[0], message, secondsUntilPopup, nickname))
+
+                # Update the session to have the new added assistant
+                session['UserAssistants'].append(newAssistant)
+                session.modified = True
+
+
+                if "Error" in newAssistant:
                     return redirectWithMessage("admin_assistant_create", "There was an error in creating your assistant")
+
                 else:
-                    assistant = select_from_database_table(
-                        "SELECT ID FROM Assistants WHERE CompanyID=? AND Nickname=?",
-                        [company[0], nickname])
-                    if assistant is None or "Error" in assistant:
-                        return redirectWithMessage("admin_assistant_create", "Error in creating your assistant")
-                    else:
-                        return redirect("/admin/assistant/{}/settings".format(assistant[0]))
+                    # assistant = select_from_database_table(
+                    #     "SELECT ID FROM Assistants WHERE CompanyID=? AND Nickname=?",
+                    #     [company[0], nickname])
+                    # if assistant is None or "Error" in assistant:
+                    #     return redirectWithMessage("admin_assistant_create", "Error in creating your assistant")
+                    # else:
+                     return redirect("/admin/assistant/{}/settings".format(newAssistant['ID']))
 
 
 @app.route("/admin/assistant/delete/<assistantID>", methods=['GET', 'POST'])
@@ -580,6 +587,15 @@ def admin_assistant_delete(assistantID):
             deleteAssistant = delete_from_table("DELETE FROM Assistants WHERE ID=?;",[assistantID])
             print(deleteAssistant)
             if deleteAssistant == "Record successfully deleted.":
+
+                # Update user assistants list stored in the session
+                assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?;",
+                                      [session.get('User')['CompanyID']])
+                if len(assistants) > 0:
+                    session['UserAssistants'] = assistants
+                else:
+                    session['UserAssistants'] = []
+
                 return redirect("/admin/homepage")
             else:
                 return redirect("/admin/assistant/"+str(assistantID)+"/settings")
@@ -1968,19 +1984,8 @@ def select_from_database_table(sql_statement, array_of_terms=None, all=False, da
 
 
 def get_last_row_from_table(table, database=DATABASE):
-    data = "Error"
-    conn = None
-    try:
-        conn = sqlite3.connect(database)
-        cur = conn.cursor()
-        # row = cur.execute("SELECT * FROM " + table + " WHERE ROWID IN ( SELECT max( ROWID ) FROM " + table +" );").fetchone()
-        row = query_db("SELECT * FROM " + table + " WHERE ROWID IN ( SELECT max( ROWID ) FROM " + table +" );", one=True)
-    except Exception as e:
-        row = -1
-    finally:
-        if conn is not None:
-            conn.close()
-        return row;
+    return query_db("SELECT * FROM " + table + " WHERE ROWID IN ( SELECT max( ROWID ) FROM " + table +" );", one=True)
+
 
 
 
@@ -2085,6 +2090,22 @@ def query_db(query, args=(), one=False):
     rv = [dict((cur.description[idx][0], value)
                for idx, value in enumerate(row)) for row in cur.fetchall()]
     return (rv[0] if rv else None) if one else rv
+
+
+def insert_db(table, fields=(), values=()):
+    # g.db is the database connection
+    cur = g.db.cursor()
+    query = 'INSERT INTO %s (%s) VALUES (%s)' % (
+        table,
+        ', '.join(fields),
+        ', '.join(['?'] * len(values))
+    )
+    cur.execute(query, values)
+    g.db.commit()
+    row = query_db("SELECT * FROM " + table + " WHERE ID=?", [cur.lastrowid], one=True)
+    cur.close()
+    return row
+
 
 
 # Get connection when no requests e.g Pyton REPL.

@@ -170,11 +170,21 @@ def login():
                     verified = user['Verified']
                     print(verified == "True")
 
+                    # If credentials are correct and users' account is verified
                     if verified == "True":
+
                         messages = dumps({"email": escape(email)})
+
                         # Set the session for the logged in user
                         session['User'] = user
                         session['Logged_in'] = True
+
+                        # Store user assistants if they exist, in the session
+                        assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?;",
+                                            [user['CompanyID']])
+                        if len(assistants) > 0:
+                            session['UserAssistants'] =  assistants
+
                         # Test session specific values
                         print(session)
                         print(session.get('User')['Email'])
@@ -191,9 +201,12 @@ def login():
 
 @app.route('/logout')
 def logout():
+
     # Will clear out the session.
     session.pop('User', None)
+    session.pop('UserAssistants', None)
     session.pop('Logged_in', False)
+
     return redirect(url_for('login'))
 
 
@@ -206,8 +219,7 @@ def before_request():
     print(theurl)
     restrictedRoutes = ['/admin', 'admin/homepage']
     # If the user try to visit one of the restricted routes without logging in he will be redirected
-    if any(route in theurl for route in restrictedRoutes) and not session.get('logged_in', False):
-        print("Ignore before request for: ", theurl)
+    if any(route in theurl for route in restrictedRoutes) and not session.get('Logged_in', False):
         return render_template("login.html", msg="Please log in first!")
 
 
@@ -217,30 +229,9 @@ def before_request():
 # IE assistant information
 def render(template, **context):
 
-
-    email = request.cookies.get("UserEmail")
-    if email is not None:
-        assistants = get_assistants(email)
-        if assistants is not None:
-            if "Error" in assistants:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        assistantDetails = []
-        for assistant in assistants:
-            assistantDetails.append((assistant[0], assistant[5]))
-
-        return render_template(template, debug=app.debug, assistantDetails=assistantDetails, **context)
-
-    else:
-        theurl = str(request.url_rule)
-        print(theurl)
-
-        if "admin" not in theurl or "admin/homepage" in theurl:
-            print("Ignore before request for: ", theurl)
-            return render_template(template, debug=app.debug, **context)
-
-        print("Render function redirects to login")
-        return redirect("/login")
+    if session.get('Logged_in', False):
+        return render_template(template, debug=app.debug, assistants=session.get('UserAssistants', []), **context)
+    return render_template(template, debug=app.debug, **context)
 
 
 
@@ -418,7 +409,7 @@ def admin_home():
             assistantIDs = []
             for assistant in assistants:
                 assistantIDs.append(assistant[0])
-            return render_template("admin/main.html", stats=statistics, email=email, assistantIDs=assistantIDs)
+            return render("admin/main.html", stats=statistics, email=email, assistantIDs=assistantIDs)
         else:
             return render("admin/main.html", stats=statistics)
 

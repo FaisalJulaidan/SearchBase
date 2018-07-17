@@ -77,38 +77,38 @@
                                     <a><i class="fa fa-comments-o"></i> Assistants <span
                                             class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
-                                        {% if assistantDetails|length > 0 %}
-                                            {% for id, name in assistantDetails %}
-                                                <li><a>{{ name }}<span
+                                        {% if assistants|length > 0 %}
+                                            {% for assistant in assistants %}
+                                                <li><a>{{ assistant.Nickname }}<span
                                                         class="fa fa-chevron-down"></span></a>
                                                     <ul class="nav child_menu">
                                                         <li>
-                                                            <a href="/admin/assistant/{{ id }}/settings">Settings</a>
+                                                            <a href="/admin/assistant/{{ assistant.ID }}/settings">Settings</a>
                                                         </li>
                                                         <li>
-                                                            <a href="/admin/assistant/{{ id }}/questions">Questions</a>
+                                                            <a href="/admin/assistant/{{ assistant.ID }}/questions">Questions</a>
                                                         </li>
-                                                        <li><a href="/admin/assistant/{{ id }}/answers">Answers</a></li>
+                                                        <li><a href="/admin/assistant/{{ assistant.ID }}/answers">Answers</a></li>
                                                         <li><a href="/admin/templates">Templates</a></li>
                                                         <li>
-                                                            <a href="/admin/assistant/{{ id }}/products">
+                                                            <a href="/admin/assistant/{{ assistant.ID }}/products">
                                                                 <i class="fa fa-database"></i>Products
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a href="/admin/assistant/{{ id }}/userinput">
+                                                            <a href="/admin/assistant/{{ assistant.ID }}/userinput">
                                                                 <i class="fa fa-cloud"></i>User Input
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a href="/admin/assistant/{{ id }}/analytics">
+                                                            <a href="/admin/assistant/{{ assistant.ID }}/analytics">
                                                                 <i class="fa fa-cloud"></i>Analytics
                                                             </a>
                                                         </li>
                                                     </ul>
                                                 </li>
                                             {% endfor %}
-                                            {% if assistantDetails|length < 4 %}
+                                            {% if assistants|length < 4 %}
                                                 <li><a href="/admin/assistant/create">Create another assistant</a></li>
                                             {% endif %}
                                         {% else %}

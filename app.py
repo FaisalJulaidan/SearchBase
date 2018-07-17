@@ -1313,7 +1313,7 @@ def admin_users_delete(userID):
 
         requestingUser = select_from_database_table("SELECT * FROM Users WHERE Email=?", [email])
         targetUser = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?", [userID])[0]
-        if requestingUser[4] != "Admin" or requestingUser[1] != targetUser:
+        if requestingUser[4] == "User" or requestingUser[1] != targetUser:
             #TODO send feedback message
             return redirect("/admin/homepage", code=302)
         delete_from_table("DELETE FROM Users WHERE ID=?;", [userID])

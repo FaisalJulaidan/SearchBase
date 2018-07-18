@@ -156,9 +156,10 @@ def contactpage():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-
     if request.method == "GET":
         msg = checkForMessage()
+        session['Logged_in'] = False
+        session['User'] = None
         return render_template("login.html", msg=msg)
 
     elif request.method == "POST":

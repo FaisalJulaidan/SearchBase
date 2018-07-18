@@ -697,7 +697,7 @@ def admin_questions(assistantID):
                 currentQuestions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
                                                               [assistantID], True)
                 # TODO check currentQuestions for errors
-
+                #if currentQuestions is None or "Error" in currentQuestions:
                 updatedQuestions = []
                 noq = request.form.get("noq-hidden", default="Error")
                 for i in range(1, int(noq) + 1):

@@ -95,6 +95,19 @@ def dynamic_popup(route, botID):
         return render_template("dynamic-popup.html", route=route, botID=botID, url=url)
 
 
+
+
+# code to ensure user is logged in
+@app.before_request
+def before_request():
+    theurl = str(request.url_rule)
+    restrictedRoutes = ['/admin', 'admin/homepage']
+    # If the user try to visit one of the restricted routes without logging in he will be redirected
+    if any(route in theurl for route in restrictedRoutes) and not session.get('Logged_in', False):
+        return redirectWithMessage("login", "You are not logged in!")
+
+
+
 # drop down routes.
 @app.route("/", methods=['GET'])
 def indexpage():
@@ -168,7 +181,6 @@ def login():
                 if hash_password(password_to_check, password) == password:
 
                     verified = user['Verified']
-                    print(verified == "True")
 
                     # If credentials are correct and users' account is verified
                     if verified == "True":
@@ -187,7 +199,6 @@ def login():
 
                         # Test session specific values
                         print(session)
-                        print(session.get('User')['Email'])
                         return redirect(url_for(".admin_home", messages=messages))
 
                     else:
@@ -208,19 +219,6 @@ def logout():
     session.pop('Logged_in', False)
 
     return redirect(url_for('login'))
-
-
-
-# code to ensure user is logged in
-@app.before_request
-def before_request():
-
-    theurl = str(request.url_rule)
-    print(theurl)
-    restrictedRoutes = ['/admin', 'admin/homepage']
-    # If the user try to visit one of the restricted routes without logging in he will be redirected
-    if any(route in theurl for route in restrictedRoutes) and not session.get('Logged_in', False):
-        return redirectWithMessage("login", "You are not logged in!")
 
 
 
@@ -278,7 +276,6 @@ def signup():
 
         else:
             user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
-            print(user)
             if user is not None:
                 print("Email is already in use!")
                 return redirectWithMessage("signup", "Email is already in use!")
@@ -316,7 +313,6 @@ def signup():
                 "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName,companySize, websiteURL, companyPhoneNumber))
 
             newCompany = get_last_row_from_table("Companies")
-            print(newCompany)
 
 
             try:
@@ -449,7 +445,7 @@ def admin_home():
             else:
                 return redirectWithMessage("login", "Error in finding user!")
         else:
-            email = request.cookies.get("UserEmail")
+            email = session.get('User')['Email']
         statistics = [get_total_statistics(3, email), get_total_statistics(5, email)]
         if sendEmail:
             assistants = get_assistants(email)
@@ -466,41 +462,24 @@ def admin_home():
 @app.route("/admin/getAdminPagesData", methods=['POST'])
 def adminPagesData():
     if request.method == "POST":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         user = select_from_database_table("SELECT Firstname FROM Users WHERE Email=?;", [email])[0]
-        print(user)
         return user
 
 @app.route("/admin/profile", methods=['GET', 'POST'])
 def profilePage():
     if request.method == "GET":
-        args = request.args
-        if len(args) > 0:
-            messages = args['messages']
-            if messages is not None:
-                email = loads(messages)['email']
-                if email is None or email == "None":
-                    email = request.cookies.get("UserEmail")
-                sendEmail = True
-            else:
-                email = request.cookies.get("UserEmail")
-        else:
-            email = request.cookies.get("UserEmail")
-        print(email)
+        email = session.get('User')['Email']
         user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [email])
-        print(user)
         if user is None or user is "None" or user is "Error":
             user="Error in finding user"
-        print(user)
         company = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user[1]])
         if company is None or company is "None" or company is "Error":
             company="Error in finding company"
-        print(company)
-        print(email)
         return render_template("admin/profile.html", user=user, email=email, company=company)
 
     elif request.method == "POST":
-        curEmail = request.cookies.get("UserEmail")
+        curEmail = session.get('User')['Email']
         names = request.form.get("names", default="Error")
         newEmail = request.form.get("email", default="error").lower()
         companyName = request.form.get("companyName", default="Error")
@@ -512,8 +491,10 @@ def profilePage():
             updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE Email=?;", [name1,name2,newEmail,curEmail])
             companyID = select_from_database_table("SELECT CompanyID FROM Users WHERE Email=?;", [newEmail])
             updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [companyName,companyURL,companyID[0]])
-            return redirectWithMessage("profilePage", newEmail)
-        print("Error in updating Company or Profile Data")
+            user = query_db("SELECT * FROM Users WHERE Email=?;", [newEmail], one=True)
+            session['User'] = user
+        else:
+            print("Error in updating Company or Profile Data")
         return redirect("/admin/profile", code=302)
 
 
@@ -521,21 +502,17 @@ def profilePage():
 def get_pop_settings():
     if request.method == "GET":
         url = request.form.get("URL", default="Error")
-        print(url)
         if url != "Error":
             if "127.0.0.1:5000" in url or "thesearchbase.com" in url:
                 # its on test route
                 companyName = url.split("/")[len(url.split("/")) - 1]
-                print(companyName)
                 companyID = select_from_database_table("SELECT ID FROM Companies WHERE Name=?", [companyName], True)
-                print(companyID)
             else:
                 # its on client route
                 companyID = select_from_database_table("SELECT ID FROM Companies WHERE URL=?", [url], True)
             secsUntilPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE CompanyID=?",
                                                       [companyID[0][0]], True)
             datastring = secsUntilPop[0][0]
-            print(datastring)
             return jsonify(datastring)
 
 
@@ -543,13 +520,13 @@ def get_pop_settings():
 def admin_assistant_create():
     if request.method == "GET":
         msg = checkForMessage()
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         assistants = get_assistants(email)
         if assistants is None or "Error" in assistants:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error in getting your assistants!")
         return render("admin/create-assistant.html", autopop="Off", msg=msg)
     elif request.method == "POST":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         assistants = get_assistants(email)
         # Return the user to the page if has reached the limit of assistants
         if type(assistants) is type([]) and assistants:
@@ -591,14 +568,13 @@ def admin_assistant_create():
 @app.route("/admin/assistant/delete/<assistantID>", methods=['GET', 'POST'])
 def admin_assistant_delete(assistantID):
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         userCompanyID = select_from_database_table("SELECT CompanyID FROM Users WHERE Email=?", [email])
         assistantCompanyID = select_from_database_table("SELECT CompanyID FROM Assistants WHERE ID=?", [assistantID])
 
         #Check if the user is from the company that owns the assistant
         if userCompanyID[0] == assistantCompanyID[0]:
             deleteAssistant = delete_from_table("DELETE FROM Assistants WHERE ID=?;",[assistantID])
-            print(deleteAssistant)
             if deleteAssistant == "Record successfully deleted.":
 
                 # Update user assistants list stored in the session
@@ -619,7 +595,7 @@ def admin_assistant_delete(assistantID):
 @app.route("/admin/assistant/<assistantID>/settings", methods=['GET', 'POST'])
 def admin_assistant_edit(assistantID):
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error in getting company")
@@ -638,7 +614,7 @@ def admin_assistant_edit(assistantID):
                               nickname=nickname)
 
     elif request.method == "POST":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -677,7 +653,7 @@ def admin_assistant_edit(assistantID):
 @app.route("/admin/assistant/<assistantID>/questions", methods=['GET', 'POST'])
 def admin_questions(assistantID):
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -701,7 +677,7 @@ def admin_questions(assistantID):
                     questions.append(tuple(question))
                 return render("admin/questions.html", data=questions, message=message, id=assistantID)
     elif request.method == "POST":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -734,7 +710,6 @@ def admin_questions(assistantID):
                         questionID = currentQuestions[i][0]
                         question = currentQuestions[i][2]
 
-                        # print("DELETING: ", question)
                         deleteQuestion = delete_from_table("DELETE FROM Questions WHERE AssistantID=? AND Question=?;",
                                                            [assistantID, escape(question)])
                         # TODO check deleteQuestion for errors
@@ -761,7 +736,7 @@ def admin_questions(assistantID):
 @app.route("/admin/assistant/<assistantID>/answers", methods=['GET', 'POST'])
 def admin_answers(assistantID):
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -825,7 +800,7 @@ def admin_answers(assistantID):
                     questionsAndAnswers.append(merge)
                 return render("admin/answers.html", msg=questionsAndAnswers, id=assistantID)
     elif request.method == "POST":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -863,7 +838,6 @@ def admin_answers(assistantID):
                     keyword = request.form.getlist("keywords" + str(i))
                     keyword = ','.join(keyword)
                     # TODO check keywords for errors
-                    # print(request.form.getlist("keywords" + str(i)))
                     action = request.form.get("action" + str(i), default="None")
                     # TODO check action for errors
                     insertAnswer = insert_into_database_table(
@@ -877,7 +851,7 @@ def admin_answers(assistantID):
 @app.route("/admin/assistant/<assistantID>/products", methods=['GET', 'POST'])
 def admin_products(assistantID):
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -896,7 +870,7 @@ def admin_products(assistantID):
                 # TODO check products for errors
                 return render("admin/products.html", data=products, id=assistantID)
     elif request.method == 'POST':
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -973,7 +947,7 @@ def admin_products_file_upload(assistantID):
         if 'productFile' not in request.files:
             msg = "Error no file given."
         else:
-            email = request.cookies.get("UserEmail")
+            email = session.get('User')['Email']
             company = get_company(email)
             if company is None or "Error" in company:
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1000,8 +974,6 @@ def admin_products_file_upload(assistantID):
                         if str(ext).lower() == "json":
                             json_file = open(PRODUCT_FILES + "/" + productFile.filename, "r")
                             data = load(json_file)
-                            print(len(data))
-                            print(data[0])
                             for i in range(0, len(data)):
                                 id = data[i]["ProductID"]
                                 name = data[i]["ProductName"]
@@ -1049,7 +1021,7 @@ def admin_products_file_upload(assistantID):
 @app.route("/admin/assistant/<assistantID>/userinput", methods=["GET"])
 def admin_user_input(assistantID):
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1091,7 +1063,6 @@ def admin_user_input(assistantID):
                     #    dataTuple = dataTuple + inputTuple
                     #    data.append(dataTuple)
                     #    dataTuple = tuple(["Null"])
-                print(data)
                 return render("admin/data-storage.html", data=data)
 
 
@@ -1310,7 +1281,7 @@ def admin_analytics(assistantID):
 @app.route("/admin/users", methods=['GET'])
 def admin_users():
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         company = get_company(email)
         # todo check company
         companyID = company[0]
@@ -1326,7 +1297,7 @@ def admin_users():
 @app.route("/admin/users/add", methods=['POST'])
 def admin_users_add():
     if request.method == "POST":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         company = get_company(email)
         # todo check company
         companyID = company[0]
@@ -1384,7 +1355,7 @@ def admin_users_add():
 @app.route("/admin/users/modify", methods=["POST"])
 def admin_users_modify():
     if request.method == "POST":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         userID = request.form.get("userID", default="Error")
         newAccess = request.form.get("accessLevel", default="Error")
         if userID != "Error" and newAccess != "Error":
@@ -1399,7 +1370,7 @@ def admin_users_modify():
 @app.route("/admin/users/delete/<userID>", methods=["GET"])
 def admin_users_delete(userID):
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         company = get_company(email)
         # todo check company
         companyID = company[0]
@@ -1737,7 +1708,7 @@ def chatbot(companyName, assistantID):
 @app.route("/account/verify/<payload>", methods=['GET'])
 def verify_account(payload):
     if request.method == "GET":
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         data = ""
         try:
             data = verificationSigner.loads(payload)
@@ -1890,7 +1861,7 @@ def change_password():
     if request.method == "GET":
         return render_template("/accounts/changepassword.html")
     else:
-        email = request.cookies.get("UserEmail")
+        email = session.get('User')['Email']
         currentPassword = request.form.get("currentPassword", default="Error")
         newPassword = request.form.get("newPassword", default="Error")
         # TODO check these

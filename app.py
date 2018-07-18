@@ -594,7 +594,6 @@ def admin_assistant_delete(assistantID):
         email = request.cookies.get("UserEmail")
         userCompanyID = select_from_database_table("SELECT CompanyID FROM Users WHERE Email=?", [email])
         assistantCompanyID = select_from_database_table("SELECT CompanyID FROM Assistants WHERE ID=?", [assistantID])
-        print(userCompanyID[0], "   ", assistantCompanyID[0])
 
         #Check if the user is from the company that owns the assistant
         if userCompanyID[0] == assistantCompanyID[0]:
@@ -1407,6 +1406,7 @@ def admin_users_delete(userID):
 
         requestingUser = select_from_database_table("SELECT * FROM Users WHERE Email=?", [email])
         targetUser = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?", [userID])[0]
+        #Check that users are from the same company and operating user isnt 'User'
         if requestingUser[4] == "User" or requestingUser[1] != targetUser:
             #TODO send feedback message
             return redirect("/admin/homepage", code=302)

@@ -158,8 +158,11 @@ def contactpage():
 def login():
     if request.method == "GET":
         msg = checkForMessage()
+
+        #Log out user upon entering this page (when user logs out through button he is directed here)
         session['Logged_in'] = False
         session['User'] = None
+
         return render_template("login.html", msg=msg)
 
     elif request.method == "POST":
@@ -353,7 +356,6 @@ def signup():
 
 
             if not app.debug:
-                # TODO this needs improving
                 msg = Message("Account verification",
                               sender="thesearchbase@gmail.com",
                               recipients=[email])
@@ -669,7 +671,8 @@ def admin_questions(assistantID):
             else:
                 questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
                                                             [assistant[0]], True)
-                # TODO check questionstuple for errors
+                if questionsTuple is None or "Error" in questionsTuple:
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
                 message = assistant[3]
 
                 questions = []
@@ -1047,7 +1050,6 @@ def admin_user_input(assistantID):
                     if(userInput != [] and userInput != None):
                         for record in userInput:
                             data.append(record)
-                    ## TODO check userInput for errors
                     #inputTuple = ()
                     #for inputData in userInput:
                     #    input = inputData[3]
@@ -2045,7 +2047,6 @@ def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
 
 # Connects to the specific database.
 def connect_db():
-    print("Connect to DB")
     return sqlite3.connect(DATABASE)
 
 
@@ -2101,7 +2102,6 @@ def get_connection():
 
 @app.before_request
 def before_request():
-    print("Before Request")
     g.db = connect_db()
 
 
@@ -2110,7 +2110,6 @@ def teardown_request(exception):
     # Closes the database again at the end of the request."""
     if hasattr(g, 'db'):
         g.db.close()
-        print("Connection Closed")
 
 
 

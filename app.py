@@ -251,6 +251,16 @@ def checkForMessage():
                 msg = " "
     return msg
 
+def redirectWithMessageAndAssistantID(function, assistantID, message):
+    return redirect(url_for("." + function, assistantID=assistantID, message=message))
+
+def checkForMessageWhenAssistantID():
+        try:
+            message = request.args["message"]
+        except:
+            message = " "
+        return message
+
 # TODO improve verification
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
@@ -656,6 +666,7 @@ def admin_assistant_edit(assistantID):
 @app.route("/admin/assistant/<assistantID>/questions", methods=['GET', 'POST'])
 def admin_questions(assistantID):
     if request.method == "GET":
+        message = checkForMessageWhenAssistantID()
         email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
@@ -673,7 +684,6 @@ def admin_questions(assistantID):
                                                             [assistant[0]], True)
                 if questionsTuple is None or "Error" in questionsTuple:
                     abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-                message = assistant[3]
 
                 questions = []
                 for i in range(0, len(questionsTuple)):
@@ -696,8 +706,9 @@ def admin_questions(assistantID):
             else:
                 currentQuestions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
                                                               [assistantID], True)
-                # TODO check currentQuestions for errors
-                #if currentQuestions is None or "Error" in currentQuestions:
+                if currentQuestions is None or "Error" in currentQuestions:
+                    return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting old questions!")
+
                 updatedQuestions = []
                 noq = request.form.get("noq-hidden", default="Error")
                 for i in range(1, int(noq) + 1):
@@ -714,12 +725,14 @@ def admin_questions(assistantID):
                         questionID = currentQuestions[i][0]
                         question = currentQuestions[i][2]
 
-                        deleteQuestion = delete_from_table("DELETE FROM Questions WHERE AssistantID=? AND Question=?;",
-                                                           [assistantID, escape(question)])
-                        # TODO check deleteQuestion for errors
-                        deleteAnswers = delete_from_table(DATABASE, "DELETE FROM Answers WHERE QuestionID=?;",
-                                                          [questionID])
-                        # TODO check deleteAnswers for errors
+                        deleteQuestion = delete_from_table("DELETE FROM Questions WHERE AssistantID=? AND Question=?;", [assistantID, escape(question)])
+                        if deleteQuestion is None or "Error" in deleteQuestion:
+                            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 1 Error in updating questions!")
+
+                        deleteAnswers = delete_from_table(DATABASE, "DELETE FROM Answers WHERE QuestionID=?;", [questionID])
+                        if deleteAnswers is None or "Error" in deleteAnswers:
+                            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in removing deleted question's answers!")
+
                 for q in updatedQuestions:
                     i += 1
                     qType = request.form.get("qType" + str(i))
@@ -727,11 +740,13 @@ def admin_questions(assistantID):
                         insertQuestion = insert_into_database_table(
                             "INSERT INTO Questions ('AssistantID', 'Question', 'Type')"
                             "VALUES (?,?,?);", (assistantID, q, qType))
-                        # TODO check insertQuestion for errors
+                        if insertQuestion is None or "Error" in insertQuestion:
+                            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 2 Error in updating questions!")
+
                     else:
-                        updateQuestion = update_table("UPDATE Questions SET Question=?, Type=? WHERE Question=?;",
-                                                      [escape(q), qType, currentQuestions[i][2]])
-                        # TODO check updateQuestion for errors
+                        updateQuestion = update_table("UPDATE Questions SET Question=?, Type=? WHERE Question=?;", [escape(q), qType, currentQuestions[i][2]])
+                        if updateQuestion is None or "Error" in updateQuestion:
+                            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 3 Error in updating questions!")
 
                 return redirect("/admin/assistant/{}/questions".format(assistantID))
 

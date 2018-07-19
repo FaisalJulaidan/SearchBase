@@ -1,0 +1,191 @@
+﻿{% extends "admin/base.html" %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<div class="right_col" role="main">
+  <div class="">
+      <div class="page-title">
+          <div class="title_left">
+              <h3>Users</h3>
+          </div>
+      </div>
+      <div class="clearfix"></div>
+      <div class="row">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+
+                  <p>A list of all of the users with access to your account </p>
+                  <div class="table-responsive">
+                      <table class="table table-striped jambo_table bulk_action">
+                          <thead>
+                              <!-- Beginning of data -->
+                              <tr id="tableHeadingUIn" class="headings">
+                                  <th class="column-title">Name </th>
+                                  <th class="column-title">Email </th>
+                                  <th class="column-title">Last Access </th>
+                                  <th class="column-title">Permission Level </th>
+                                  <th class="column-title no-link last">
+                                      <span class="nobr">Delete User</span>
+                                  </th>
+                              </tr>
+                              <!-- End of data -->
+                          </thead>
+
+                          <tbody id="tBodyUIn">
+                              <!-- Start -->
+                              {%for user in users%}
+                              <tr class="even pointer">
+                                  <td class=" ">{{user[2]}} {{user[3]}}</td>
+                                  <td class=" ">{{user[5]}}</td>
+                                  <td class=" ">Not implemented</td>
+                                  {%if user[4] != "Owner"%}
+                                  <td class=" ">{{user[4]}}</td>
+                                  {%if email != user[5]%}
+                                  <td class=" "><strong><a href="/admin/users/delete/{{user[0]}}">Delete</a></strong></td>
+                                  {%else%}
+                                  <td class=" "></td>
+                                  {%endif%}
+                                  {%else%}
+                                  <td class=" "><strong>{{user[4]}}</strong></td>
+                                  <td class=" "></td>
+                                  {%endif%}
+                              </tr>
+                              {%endfor%}
+                              <!-- End -->
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+
+              <div class="x_panel">
+
+                  <p>Enter the details of the additional user</p>
+                  <!-- Content should go here -->
+
+                  <form action="/admin/users/add" method="post" enctype="multipart/form-data">
+
+                      <!-- User's details -->
+                      <input class="form-control col-md-5 col-xs-10" id="user_fullname" type="text" name="fullname" placeholder="First and Last Name *">
+                      <br />
+                      <br />
+                      <br />
+                      <input class="form-control col-md-3 col-xs-10" id="user-email" type="text" name="email" placeholder="Email *">
+                      <br />
+                      <br />
+                      <br />
+                      <!-- Options for the user to select roles. -->
+                      <select id="user_role" name="accessLevel" required>
+                          <option value="User">User</option>
+                          <option value="Admin">Admin</option>
+                      </select>
+
+                      <br />
+                      <br />
+
+                      <!-- Submit button -->
+                      <input class="btn btn-success" type="submit" value="Save" />
+                  </form>
+
+                  <!-- Content should go here -->
+              </div>
+
+              <div class="x_panel">
+
+                  <p>Modify User's permissions</p>
+
+                  <form action="/admin/users/modify" method="post" enctype="multipart/form-data">
+
+                      <!-- User's details -->
+                      <select name="userID" required>
+                          {%for user in users%}
+                          {%if email != user[5] and user[4] != "Owner"%}
+                          <option value="{{user[0]}}">{{user[5]}}</option>
+                          {%endif%}
+                          {%endfor%}
+                      </select>
+                      <br />
+                      <br />
+                      <br />
+
+                      <!-- Options for the user to select roles. -->
+                      <select onchange="checkIfOwner()" id="userRole" name="accessLevel" required>
+                          <option value="User">User</option>
+                          <option value="Admin">Admin</option>
+                          {%for user in users%}
+                          {%if user[4] == "Owner"%}
+                          <option style="font-weight:900;" value="Owner">Owner</option>
+                          {%endif%}
+                          {%endfor%}
+                      </select>
+
+                      <!--Change Owner confirmation-->
+                      <div id="ownerConfirm">
+                          <p>You are about to transfer your <strong>Ownership</strong> to another User. Are you sure?</p>
+                          <button class="btn btn-success" type="button" id="confirmOwnerB">Yes</button>
+                      </div>
+
+                      <br />
+                      <br />
+
+                      <!-- Submit button -->
+                      <button class="btn btn-success" type="submit" id="submitModification">Save</button>
+                  </form>
+              </div>
+
+              <div class="x_panel">
+
+                  <h2>Levels of access</h2>
+                  <!-- Content should go here -->
+
+                  <p><strong>Owner</strong>- Full access with no limits.</p>
+                  <p><strong>Admin</strong>- Full access with no limits. Cannot modify <strong>Owner</strong>.</p>
+                  <p><strong>User</strong>- Limited access with no access to adding additional users.</p>
+                  <p><strong>Developer</strong>- Limited access with no access to any business data. (coming soon)</p>
+                  <p><strong>General</strong>- Limited access with no access to technical data. (coming soon)</p>
+
+                  <!-- Content should go here -->
+              </div>
+
+          </div>
+      </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block customJS %}
+  <!-- Custom Theme Scripts -->
+  <script src="/static/build/js/custom.min.js"></script>
+
+  <script>
+      var ownerConfirm = true;
+      
+      document.getElementById("confirmOwnerB").addEventListener("click", ownerConfirmCall);
+
+      document.getElementById("ownerConfirm").style = "display:none";
+
+      document.getElementById("submit").onclick = function() {
+          document.getElementById("form").submit();
+      };
+      function checkIfOwner() {
+          var conceptName = $('#userRole').find(":selected").text();
+          if (conceptName == "Owner") {
+              ownerConfirmCall();
+          } else {
+              ownerConfirm = false;
+              ownerConfirmCall();
+          }
+      }
+      function ownerConfirmCall() {
+          if (ownerConfirm) {
+              document.getElementById("ownerConfirm").style = "display:block";
+              ownerConfirm = false;
+              $("#submitModification").prop('disabled', true);
+          } else {
+              document.getElementById("ownerConfirm").style = "display:none";
+              ownerConfirm = true;
+              $("#submitModification").prop('disabled', false);
+          }
+      }
+  </script>
+{% endblock %}

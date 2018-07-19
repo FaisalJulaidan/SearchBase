@@ -1,0 +1,81 @@
+﻿{% extends "admin/base.html" %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>Users</h3>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+
+                        <p>A list of all of the users with access to your account </p>
+                        <div class="table-responsive">
+                            <table class="table table-striped jambo_table bulk_action">
+                                <thead>
+                                <!-- Beginning of data -->
+                                <tr id="tableHeadingUIn" class="headings">
+                                    <th class="column-title">User ID</th>
+                                    <th class="column-title">Name</th>
+                                    <th class="column-title">Last Access</th>
+                                    <th class="column-title">Permission Level</th>
+                                    <th class="column-title no-link last">
+                                        <span class="nobr">Acess</span>
+                                    </th>
+                                </tr>
+                                <!-- End of data -->
+                                </thead>
+
+                                <tbody id="tBodyUIn">
+                                <!-- Start -->
+                                <tr class="even pointer">
+                                    <td class=" ">1</td>
+                                    <td class=" ">Test Name</td>
+                                    <td class=" ">208/06/2018 12:56 AM</td>
+                                    <td class=" ">Admin</td>
+                                    <td class=" "><strong><a href="">Delete</a></strong></td>
+                                </tr>
+                                <!-- End -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Content should go here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block customJS %}
+    <script>
+        inputD = document.getElementById("inputDiv");
+        outputD = document.getElementById("outputDiv");
+        editB = document.getElementById("EditB");
+        editB.addEventListener("click", openForm);
+        document.getElementById("cancelB").addEventListener("click", closeForm);
+        document.getElementById("submit").onclick = function () {
+            document.getElementById("form").submit();
+        };
+
+        inputDiv.style = "display:none";
+
+        function openForm() {
+            outputD.style = "display:none";
+            editB.style = "display:none";
+            inputD.style = "display:block";
+        }
+
+        function closeForm() {
+            outputD.style = "display:block";
+            editB.style = "display:block";
+            inputD.style = "display:none";
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "errors/base.html" %}
+
+{% block title %}
+    <title>501 Method not yet implemented</title>
+{% endblock %}
+
+{% block content %}
+    <h2>Error :(</h2>
+    <h3>501</h3>
+    <p>Method not yet implemented. Please contact thesearchbase@gmail.com and let them know what happened.</p>
+    {% if debug == True %}
+        <p>Reason: {{ error }}</p>
+    {% endif %}
+{% endblock %}

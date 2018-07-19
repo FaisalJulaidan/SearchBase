@@ -1,0 +1,14 @@
+{% extends "errors/base.html" %}
+
+{% block title %}
+    <title>500 Internal server error</title>
+{% endblock %}
+
+{% block content %}
+    <h2>Error :(</h2>
+    <h3>500</h3>
+    <p>Internal server error. Please contact thesearchbase@gmail.com and let them know what happened.</p>
+    {% if debug == True %}
+        <p>Reason: {{ error }}</p>
+    {% endif %}
+{% endblock %}

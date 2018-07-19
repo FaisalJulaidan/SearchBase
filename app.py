@@ -304,7 +304,7 @@ def signup():
             )
 
             # debug
-            print(newCustomer)
+            # print(newCustomer)
 
             hashed_password = hash_password(password)
             verified = "True"
@@ -316,7 +316,7 @@ def signup():
                 "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName,companySize, websiteURL, companyPhoneNumber))
 
             newCompany = get_last_row_from_table("Companies")
-            print(newCompany)
+            # print(newCompany)
 
 
             try:
@@ -327,6 +327,10 @@ def signup():
                 items=[{'plan': 'plan_D3lp2yVtTotk2f'}],
                 trial_period_days=14,
                 )
+
+
+                print(sub['items']['data'][0]['plan']['nickname'])
+                # print(sub)
 
                 # Create a user account and link it with the new created company record above
                 newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
@@ -351,7 +355,7 @@ def signup():
                     cus.delete()
 
                 print(e)
-                return redirectWithMessage("signup", "An error occurred and could not subscribe. Account has been created.")
+                return redirectWithMessage("signup", "An error occurred and could not subscribe. Please try again!.")
                 # TODO check subscription for errors https://stripe.com/docs/api#errors
 
 
@@ -1129,6 +1133,7 @@ def admin_thanks():
 
 def is_coupon_valid(coupon="Error"):
     try:
+        print(coupon)
         stripe.Coupon.retrieve(coupon)
         return True
     except stripe.error.StripeError as e:
@@ -1148,21 +1153,25 @@ def admin_pay(planID):
         except stripe.error.InvalidRequestError as e:
             abort(status.HTTP_400_BAD_REQUEST, "This plan does't exist! Make sure the plan ID is correct.")
 
-        print(plan)
+        # print(plan)
         return render("admin/check-out.html", plan=plan)
 
 
     if request.method == 'POST':
 
+
         if not session.get('Logged_in', False):
             redirectWithMessage("login", "You must login first!")
 
-        # Get Stripe token generated using JavaScript in the client-side
-        content = request.get_json(silent=True)
-        token = content['token']['id']
+        # Get Stripe from data. That's includ the generated token using JavaScript
+        data = request.get_json(silent=True)
+        print(data)
+        token = data['token']['id']
+        coupon = data['coupon']
+
         if token is "Error":
             # TODO improve this
-            abort(status.HTTP_400_BAD_REQUEST)
+            return jsonify(error="No token provided to complete the payment!")
 
 
 
@@ -1170,51 +1179,53 @@ def admin_pay(planID):
         try:
             plan = stripe.Plan.retrieve(planID)
         except stripe.error.InvalidRequestError as e:
-            abort(status.HTTP_400_BAD_REQUEST, "This plan does't exist! Make sure the plan ID is correct.")
+            return jsonify(error="This plan does't exist! Make sure the plan ID is correct.")
 
 
         # Validate the given coupon.
-        coupon = request.form.get("coupon", default="Error")
         if coupon == "" or coupon is None or coupon == "Error":
-            print("make no use of coupons")
             # If coupon is not provided set it to None as Stripe API require.
-            coupon = "None"
+            coupon = None
+            print("make no use of coupons")
+
+        elif not (is_coupon_valid(coupon)):
+            print("The coupon used is not valid")
+            return jsonify(error="The coupon used is not valid")
 
 
-        if not (is_coupon_valid(coupon)):
-            return render("admin/check-out.html", error="The coupon used is not valid")
+    # If no errors occurred, subscribe the user to plan.
+
+        # Get the user by email
+        user = query_db("SELECT * FROM Users WHERE Email=?;", [session.get('User')['Email']], one=True)
+
+        try:
+            subscription = stripe.Subscription.create(
+                customer=user['StripeID'],
+                source=token,
+                coupon=coupon,
+                items=[
+                    {
+                        "plan": planID,
+                    },
+                ]
+            )
+
+            # print(subscription)
+
+            # if everything is ok activate assistants
+            update_table("UPDATE Assistants SET Active=? WHERE CompanyID=?", ("True", user['CompanyID']))
+            update_table("UPDATE Users SET SubID=? WHERE ID=?", (subscription['id'], user['ID']))
 
 
+        # TODO check subscription for errors https://stripe.com/docs/api#errors
+        except Exception as e:
+            print(e)
+            return jsonify(error="An error occurred and could not subscribe.")
 
-        # If no errors occurred, subscribe the user to plan.
-        else:
-            # Get the user by email
-            user = select_from_database_table("SELECT * FROM Users WHERE Email=?;", [session.get('User')['Email']])
-            try:
-                subscription = stripe.Subscription.create(
-                    customer=user[7],
-                    source=token,
-                    coupon=coupon,
-                    items=[
-                        {
-                            "plan": planID,
-                        },
-                    ]
-                )
-
-                # if everything is ok activate assistants
-                update_table("UPDATE Assistants SET Active=? WHERE CompanyID=?", ["True", user[1]])
-
-
-            except Exception as e:
-                print(e)
-                abort(status.HTTP_400_BAD_REQUEST, "An error occurred and could not subscribe.")
-                # TODO check subscription for errors https://stripe.com/docs/api#errors
-
-
-
-            print("You have successfully subscribed!")
-            return render("admin/pricing-tables.html", msg="You have successfully subscribed!")
+        # Reaching to point means no errors and subscription is successful
+        print("You have successfully subscribed!")
+        return jsonify(success="You have successfully subscribed!", url= "admin/pricing-tables.html")
+         # return render("admin/pricing-tables.html", msg="You have successfully subscribed!")
 
 
 @app.route("/admin/check-out/checkPromoCode", methods=['POST'])
@@ -1227,6 +1238,8 @@ def checkPromoCode():
 
             # TODO: check the promoCode from user then response with yes or no with json
             promoCode = str(request.data, 'utf-8')
+            print(">>>>>>>>>>>>>>>>")
+            print(promoCode)
             if promoCode == 'abc':
                 return jsonify(isValid=True)
             else:
@@ -1242,15 +1255,14 @@ def unsubscribe():
         # if not session.get('Logged_in', False):
         #     redirectWithMessage("login", "You must login first!")
 
-        subID = session.get('User')['SubID']
-        if subID is None:
-            # redirect("admin/pricing")
-            return redirectWithMessage("admin_pricing", "This account has no active subscriptions ")
+        user = query_db("SELECT * FROM Users WHERE Email=?;", [session.get('User')['Email']], one=True)
+        if user['SubID'] is None:
             print("This account has no active subscriptions ")
+            return redirectWithMessage("admin_pricing", "This account has no active subscriptions ")
 
         try:
             # Unsubscribe
-            sub = stripe.Subscription.retrieve(subID)
+            sub = stripe.Subscription.retrieve(user['SubID'])
             sub.delete()
 
             # TODO why query_db does not work with update?
@@ -2129,7 +2141,6 @@ def get_connection():
 
 @app.before_request
 def before_request():
-    print("Before Request")
     g.db = connect_db()
 
 
@@ -2138,7 +2149,6 @@ def teardown_request(exception):
     # Closes the database again at the end of the request."""
     if hasattr(g, 'db'):
         g.db.close()
-        print("Connection Closed")
 
 
 

@@ -136,11 +136,22 @@ function registerElements(elements, exampleName) {
         $.post({
             url:'',
             contentType: 'application/json',
-            data:JSON.stringify(result),
+            data:JSON.stringify({
+                token: result.token,
+                coupon: $(document.getElementById('promoCode')).val()
+            }),
             success: (res) => {
-                example.classList.add('submitted');
+              if(res.error){
+                alertError('Error', '<h2> ' + res.error)
+              } else {
+                 example.classList.add('submitted');
+
+
+              }
             }
+
         })
+        enableInputs();
       } else {
         // Otherwise, un-disable inputs.
         enableInputs();

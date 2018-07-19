@@ -23,10 +23,10 @@
     var tableHeading = $("#tableHeadingUIn");
     var tableString = "<table id=\"tableSort\" class=\"table table-striped jambo_table bulk_action\"><thead>\
                             <tr id=\"tableHeadingUIn\" class=\"headings\">\
-                                <th onclick=\"sortTable(0)\" class=\"column-title\">Date</th>\
-                                <th onclick=\"sortTable(1)\" class=\"column-title\">SessionID</th>\
-                                <th onclick=\"sortTable(2)\" class=\"column-title\">Question</th>\
-                                <th onclick=\"sortTable(3)\" class=\"column-title\">Recorded Data</th>\
+                                <th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Date</th>\
+                                <th style=\"cursor: pointer;\" onclick=\"sortTable(1)\" class=\"column-title\">SessionID</th>\
+                                <th style=\"cursor: pointer;\" onclick=\"sortTable(2)\" class=\"column-title\">Question</th>\
+                                <th style=\"cursor: pointer;\" onclick=\"sortTable(3)\" class=\"column-title\">Recorded Data</th>\
                             </tr></thead>\
                             <tbody id=\"tBodyUIn\">";
     {%for record in data %}

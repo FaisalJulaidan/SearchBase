@@ -1545,14 +1545,14 @@ def chatbot(companyName, assistantID):
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(companyName)], True)
 
         if company is None:
-            abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
+            return "We could not find the company in our records. Sorry about that!"
 
 
         # TODO check company for errors
         assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
 
         if assistant is None:
-            abort(status.HTTP_400_BAD_REQUEST, "This Assistant does't exist")
+            return "We could not find the assistant in our records. Sorry about that!"
 
         # TODO check assistant for errors
         # assistantIndex = 0  # TODO implement this properly
@@ -1612,7 +1612,7 @@ def chatbot(companyName, assistantID):
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")
         if nok is "Error":
-            abort(status.HTTP_501_NOT_IMPLEMENTED, "Number of keywords invalid")
+            return "Error in getting number of keywords. Sorry about that!"
         else:
             keywords = []
             budget = []
@@ -1626,7 +1626,7 @@ def chatbot(companyName, assistantID):
                     else:
                         keywords.append(keyword)
                 else:
-                    abort(status.HTTP_400_BAD_REQUEST)
+                    return "Error in getting keywords. Sorry about that!"
 
             keywordsmatch = []
             i = -1

@@ -1597,6 +1597,7 @@ def chatbot(companyName, assistantID):
                 if file:
                     open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
                     savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
+                    savePath = savePath.replace('\\', '/')
                     for question in questions:
                         if question[0] == questionID:
                             questionName = question[2]

@@ -1165,7 +1165,7 @@ def admin_pay(planID):
 
         # Get Stripe from data. That's includ the generated token using JavaScript
         data = request.get_json(silent=True)
-        print(data)
+        # print(data)
         token = data['token']['id']
         coupon = data['coupon']
 
@@ -1225,7 +1225,6 @@ def admin_pay(planID):
         # Reaching to point means no errors and subscription is successful
         print("You have successfully subscribed!")
         return jsonify(success="You have successfully subscribed!", url= "admin/pricing-tables.html")
-         # return render("admin/pricing-tables.html", msg="You have successfully subscribed!")
 
 
 @app.route("/admin/check-out/checkPromoCode", methods=['POST'])
@@ -1284,7 +1283,7 @@ def unsubscribe():
 def webhook_subscription_cancelled():
     if request.method == "POST":
         try:
-            print("HHHHGHFGDHDGHDFGDFHDFGDFGDFGDFGDFG")
+            print("STRIPE TRIGGER FOR UNSUBSCRIPTION...")
             event_json = request.get_json(force=True)
             customerID = event_json['data']['object']['customer']
             print(customerID)

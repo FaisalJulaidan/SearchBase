@@ -1578,13 +1578,9 @@ def chatbot(companyName, assistantID):
             for question in questions:
                 if question[0] == questionID:
                     questionName = question[2]
-            print(questions)
-            print(collectedInformation)
-            print(questionID, date, input, lastSessionID, questionName)
             insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, input, lastSessionID, questionName))
             # TODO check insertInput for errors
 
-        #lastSessionID = select_from_database_table("SELECT TOP(1) * FROM UserInput ORDER BY ID DESC", [], True)[0]
         #TODO needs improving
 
         fileUploads = request.form.get("fileUploads", default="Error");
@@ -1624,7 +1620,9 @@ def chatbot(companyName, assistantID):
                     if "-" in keyword:
                         budget = keyword.split("-")
                     else:
-                        keywords.append(keyword)
+                        keywordList = keyword.split(",")
+                        for ii in range(0, len(keywordList)):
+                            keywords.append(keywordList[ii])
                 else:
                     return "Error in getting keywords. Sorry about that!"
 

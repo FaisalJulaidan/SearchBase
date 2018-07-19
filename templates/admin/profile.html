@@ -1,21 +1,6 @@
 {% extends "admin/base.html" %}
-{% block headlinks %}
-<title>Profile </title>
 
-<!-- Bootstrap -->
-<link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- Font Awesome -->
-<link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-<!-- NProgress -->
-<link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
-<!-- bootstrap-daterangepicker -->
-<link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-
-<!-- Custom Theme Style -->
-<link href="/static/build/css/custom.min.css" rel="stylesheet">
-<link href="/static/css/admin.css" rel="stylesheet">
-
-{% endblock %}
+{% block title %}Profile{% endblock %}
 
 {% block content %}
 <div class="right_col" role="main">
@@ -83,11 +68,12 @@
                                 </form>
                             </div>
                         </div>
-                    </div>  
+                    </div>
                     <a href="/admin/changepassword" class="btn btn-success">Change Password</a>
                 </div>
             </div>
         </div>
+    </div>
     </div>
     {% endblock %}
 
@@ -115,9 +101,6 @@
     <script src="/static/js/cookies.js"></script>
 
     <script>
-        if ("{{email}}" !== "") {
-            makeCookie("UserEmail", "{{email}}", 1);
-        }
         //name changer
         nameh3 = document.getElementById("nameh3");
         editName = document.getElementById("editName");
@@ -246,24 +229,24 @@
             companyURL.style = "display:none;";
             companyURL.value = companyURLa.innerHTML;
         };
-        //inputD = document.getElementById("inputDiv");
-        //outputD = document.getElementById("outputDiv");
-        //editB = document.getElementById("EditB");
-        //editB.addEventListener("click", openForm);
-        //document.getElementById("cancelB").addEventListener("click", closeForm);
-        //document.getElementById("submit").onclick = function () {
-        //    document.getElementById("form").submit();
-        //};
-        //inputDiv.style = "display:none";
-        //function openForm() {
-        //    outputD.style = "display:none";
-        //    editB.style = "display:none";
-        //    inputD.style = "display:block";
-        //}
-        //function closeForm() {
-        //    outputD.style = "display:block";
-        //    editB.style = "display:block";
-        //    inputD.style = "display:none";
-        //}
+            //inputD = document.getElementById("inputDiv");
+            //outputD = document.getElementById("outputDiv");
+            //editB = document.getElementById("EditB");
+            //editB.addEventListener("click", openForm);
+            //document.getElementById("cancelB").addEventListener("click", closeForm);
+            //document.getElementById("submit").onclick = function () {
+            //    document.getElementById("form").submit();
+            //};
+            //inputDiv.style = "display:none";
+            //function openForm() {
+            //    outputD.style = "display:none";
+            //    editB.style = "display:none";
+            //    inputD.style = "display:block";
+            //}
+            //function closeForm() {
+            //    outputD.style = "display:block";
+            //    editB.style = "display:block";
+            //    inputD.style = "display:none";
+            //}
     </script>
     {% endblock %}

@@ -18,9 +18,17 @@
 {% endblock %}
 
 {% block customJS %}
+<script src="/static/js/sortTable.js"></script>
 <script>
     var tableHeading = $("#tableHeadingUIn");
-    var tableString = "<table class=\"table table-striped jambo_table bulk_action\"><thead><tr id=\"tableHeadingUIn\" class=\"headings\"><th class=\"column-title\">Date</th><th class=\"column-title\">SessionID</th><th class=\"column-title\">Question</th><th class=\"column-title\">Recorded Data</th></thead><tbody id=\"tBodyUIn\">";
+    var tableString = "<table id=\"tableSort\" class=\"table table-striped jambo_table bulk_action\"><thead>\
+                            <tr id=\"tableHeadingUIn\" class=\"headings\">\
+                                <th onclick=\"sortTable(0)\" class=\"column-title\">Date</th>\
+                                <th onclick=\"sortTable(1)\" class=\"column-title\">SessionID</th>\
+                                <th onclick=\"sortTable(2)\" class=\"column-title\">Question</th>\
+                                <th onclick=\"sortTable(3)\" class=\"column-title\">Recorded Data</th>\
+                            </tr></thead>\
+                            <tbody id=\"tBodyUIn\">";
     {%for record in data %}
     if ("{{record[3]}}".includes(";")) {
         tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td><a href=\"/" + "{{record[3]}}".split(";")[1] + "\" download=\"" + "{{record[3]}}".split(";")[0] +"\">" + "{{record[3]}}".split(";")[0]+"</a></td></tr>";
@@ -30,7 +38,8 @@
     {% endfor %}
     tableString += "</tbody></table>";
     $("#tBodyUIn").append(tableString);
-    
+
+    sortTable(1);
 
     function fnExcelReport() {
         tab_text = tableString;

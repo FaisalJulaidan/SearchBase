@@ -156,16 +156,14 @@
     var i = 0;
     {%for item in data%}
         {%for answer in item%}
-            {%if answer != None%}
-                {%if answer != ""%}
-                    data[i].push("{{answer}}");
-                {%endif%}
+            {%if answer != None and answer != ""%}
+                data[i].push("{{answer}}");
             {%endif%}
         {%endfor%}
         i++;
     {% endfor %}
     var questionNumber = 0;
-    var questionN = -1;
+    var questionN = 0;
     // document.getElementById("submitMessage").addEventListener("click", );
     $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot'>" + emojione.toImage("{{message}}") + "</li></div><br><br>");
     getNextQuestion("Next Question by Order");
@@ -310,6 +308,7 @@
             for (var i = 0; i < data.length; i++) {
                 if (question == data[i]) {
                     question = data[i + 1];
+                    questionN++;
                     if (question == undefined) {
                         questionsAnswered--;
                         sendData();
@@ -422,6 +421,7 @@
     }
     function sendData()
     {
+        var returnProducts = false;
         $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='/static/images/typing.gif'></li></div>")
         $("#thinkingGif").animate({
             marginTop: "-=25px"
@@ -429,6 +429,7 @@
         params = "numberOfKeywords=" + keywords.length.toString();
         if (keywords.length > 0)
         {
+            returnProducts = true;
             for (var i = 0; i <= keywords.length - 1; i++)
             {
                 params += "&";
@@ -462,25 +463,25 @@
                     $("#thinkingGif").remove();
                     var data = xhttp.responseText;
                     cRD = $("#messagesContainer");
-                    if (data == "We could not find anything that matched your search criteria. Please try different filter options.")
-                    {
-                        cRD.append("<br><br><br><lable class='chatProducts'>We could not find<br>anything that matched your seach criteria. Please try different filter options.</lable><br><br><br>");
-                    }
-                    else
-                    {
-                        resultdic = {};
-                        var temparray = data.split("&&&");
-                        for (var i = 0; i < temparray.length; i++)
-                        {
-                            resultdic[i] = temparray[i].split("|||");
+                    if (returnProducts) {
+                        if (data == "We could not find anything that matched your search criteria. Please try different filter options.") {
+                            cRD.append("<br><br><br><lable class='chatProducts'>We could not find<br>anything that matched your seach criteria. Please try different filter options.</lable><br><br><br>");
                         }
-                        delete resultdic[(temparray.length - 1).toString()];
-                        for (var i = 0; i < temparray.length - 1; i++)
-                        {
-                            resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
-                            // cRD.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
-                            cRD.append("<center><div class='chatProducts'><lable>" + resultdic[i][1] + "</lable><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + " Square feet</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
+                        else {
+                            resultdic = {};
+                            var temparray = data.split("&&&");
+                            for (var i = 0; i < temparray.length; i++) {
+                                resultdic[i] = temparray[i].split("|||");
+                            }
+                            delete resultdic[(temparray.length - 1).toString()];
+                            for (var i = 0; i < temparray.length - 1; i++) {
+                                resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
+                                // cRD.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
+                                cRD.append("<center><div class='chatProducts'><lable>" + resultdic[i][1] + "</lable><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + " Square feet</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
+                            }
                         }
+                    } else {
+                        cRD.append("<br><br><br><lable class='chatProducts'>" + emojione.toImage("Thank you for<br> your information. We will be in touch. :grin:") + "</lable><br><br><br>"); 
                     }
                 }
                 else

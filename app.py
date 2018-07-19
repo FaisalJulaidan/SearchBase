@@ -1559,11 +1559,10 @@ def chatbot(companyName, assistantID):
 
         questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?", [assistantID], True)
         # TODO check questions for errors
-        print(questions)
         products = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?;", [assistantID], True)
         # TODO check products for errors
 
-        lastSessionID = select_from_database_table("SELECT * FROM UserInput", [])
+        lastSessionID = select_from_database_table("SELECT * FROM UserInput", [], True)
         if lastSessionID is None or not lastSessionID:
             lastSessionID = 1
         else:
@@ -1572,15 +1571,16 @@ def chatbot(companyName, assistantID):
         collectedInformation = request.form.get("collectedInformation").split("||")
         date = datetime.now().strftime("%d-%m-%Y")
         for i in range(0, len(collectedInformation)):
-            questionIndex = int(collectedInformation[i].split(";")[0]) - 1
-            input = collectedInformation[i].split(";")[1]
+            colInfo = collectedInformation[i].split(";")
+            input = colInfo[1]
+            questionIndex = int(colInfo[0]) - 1
             questionID = int(questions[questionIndex][0])
             for question in questions:
                 if question[0] == questionID:
                     questionName = question[2]
-            for question in questions:
-                if question[0] == questionID:
-                    questionName = question[2]
+            print(questions)
+            print(collectedInformation)
+            print(questionID, date, input, lastSessionID, questionName)
             insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, input, lastSessionID, questionName))
             # TODO check insertInput for errors
 

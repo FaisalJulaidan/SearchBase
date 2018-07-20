@@ -230,7 +230,7 @@
 
         // show errors messages from server
         var msg = '{{ msg }}'
-        if (msg) {
+        if (msg != "" && msg != " ") {
           alertError('Server Error',msg)
         }
 

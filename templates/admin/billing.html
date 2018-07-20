@@ -1,0 +1,55 @@
+﻿{% extends "admin/base.html" %}
+
+{% block title %}Billing{% endblock %}
+
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>Billing</h3>
+                </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+
+                        <!-- Content should go here -->
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block customJS %}
+    <script>
+        inputD = document.getElementById("inputDiv");
+        outputD = document.getElementById("outputDiv");
+        editB = document.getElementById("EditB");
+        editB.addEventListener("click", openForm);
+        document.getElementById("cancelB").addEventListener("click", closeForm);
+        document.getElementById("submit").onclick = function () {
+            document.getElementById("form").submit();
+        }
+
+        inputDiv.style = "display:none";
+
+        function openForm() {
+            outputD.style = "display:none";
+            editB.style = "display:none";
+            inputD.style = "display:block";
+        }
+
+        function closeForm() {
+            outputD.style = "display:block";
+            editB.style = "display:block";
+            inputD.style = "display:none";
+        }
+    </script>
+{% endblock %}

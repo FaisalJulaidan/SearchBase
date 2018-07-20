@@ -1,0 +1,67 @@
+﻿{% extends "admin/base.html" %}
+
+{% block title %}Data Storage{% endblock %}
+
+{% block content %}
+    <div class="right_col" role="main">
+
+        <div class="x_content">
+
+            <p>All of the Data Collected</p>
+
+            <button onclick="fnExcelReport()">Export Excel</button>
+
+            <div id="tBodyUIn"></div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block customJS %}
+<script src="/static/js/sortTable.js"></script>
+<script>
+    var tableHeading = $("#tableHeadingUIn");
+    var tableString = "<table id=\"tableSort\" class=\"table table-striped jambo_table bulk_action\"><thead>\
+                            <tr id=\"tableHeadingUIn\" class=\"headings\">\
+                                <th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Date</th>\
+                                <th style=\"cursor: pointer;\" onclick=\"sortTable(1)\" class=\"column-title\">SessionID</th>\
+                                <th style=\"cursor: pointer;\" onclick=\"sortTable(2)\" class=\"column-title\">Question</th>\
+                                <th style=\"cursor: pointer;\" onclick=\"sortTable(3)\" class=\"column-title\">Recorded Data</th>\
+                            </tr></thead>\
+                            <tbody id=\"tBodyUIn\">";
+    {%for record in data %}
+    if ("{{record[3]}}".includes(";")) {
+        tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td><a href=\"/" + "{{record[3]}}".split(";")[1] + "\" download=\"" + "{{record[3]}}".split(";")[0] +"\">" + "{{record[3]}}".split(";")[0]+"</a></td></tr>";
+    } else {
+        tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td>{{record[3]}}</td></tr>";
+    }
+    {% endfor %}
+    tableString += "</tbody></table>";
+    $("#tBodyUIn").append(tableString);
+
+    sortTable(1);
+
+    function fnExcelReport() {
+        tab_text = tableString;
+        tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//comment if u want links in your table
+        tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // comment if u want images in your table
+        tab_text = tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // comment if you want input params
+
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf("MSIE ");
+
+        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
+        {
+            txtArea1.document.open("txt/html", "replace");
+            txtArea1.document.write(tab_text);
+            txtArea1.document.close();
+            txtArea1.focus();
+            sa = txtArea1.document.execCommand("SaveAs", true, "Say Thanks to Sumit.xls");
+        }
+        else                 //other browser not tested on IE 11
+            sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
+
+        return (sa);
+    }
+</script>
+{% endblock %}

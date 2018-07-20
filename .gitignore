@@ -101,7 +101,7 @@ fabric.properties
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
 
 # *.iml
-# modules.xml
+# modules.xmlCant garuntee it
 # .idea/misc.xml
 # *.ipr
 
@@ -239,7 +239,7 @@ $RECYCLE.BIN/
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # User-specific files
-*.suo
+*.suoCant garuntee it
 *.user
 *.userosscache
 *.sln.docstates
@@ -268,7 +268,7 @@ bld/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
-# NUNIT
+# NUNITCant garuntee it
 *.VisualState.xml
 TestResult.xml
 
@@ -318,7 +318,7 @@ ipch/
 *.opendb
 *.opensdf
 *.sdf
-*.cachefile
+*.cachefileCant garuntee it
 *.VC.db
 *.VC.VC.opendb
 
@@ -530,3 +530,5 @@ __pycache__/
 
 
 # End of https://www.gitignore.io/api/macos,linux,python,windows,pycharm,visualstudio
+
+*.db

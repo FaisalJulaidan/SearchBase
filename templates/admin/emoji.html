@@ -1,0 +1,71 @@
+﻿{% extends "admin/base.html" %}
+
+{% block title %}Emoji Converter{% endblock %}
+
+{% block content %}
+<div class="right_col" role="main">
+    <!-- top tiles -->
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel" style="height:600px;">
+                <div class="col-md-12">
+                    <div class="jumbotron text-xs-center">
+                        <h1 class="display-3">Emoji Converter</h1>
+                        <p class="lead">
+                            <strong>Enter the emoji you have copied underneath</strong> to find its
+                            text equivalent
+                        </p>
+                        <hr>
+                        <input type="text" id="emoji_input"> <label id="emoji_output"></label>
+                        <br />
+                        <br />
+                        <p class="lead">
+                            <button id="emoji_convert" onclick="convert()" class="btn btn-success">
+                                Convert
+                            </button>
+                        </p>
+                        <h4>Need some inspiration? Look for Emojies <strong><a href="https://www.emojicopy.com/"> here</a></strong> </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /top tiles -->
+    <br />
+</div>
+{% endblock %}
+
+{% block customJS %}
+<!-- Emoji JS and CSS -->
+<script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css" />
+<!-- to use -> emojione.toImage(input) -> input = :emojiname: -> example -> emojione.toImage(:smile:) -->
+<!-- phone emojis also work -->
+<!-- :P :) or such are not suported -->
+<!-- https://demos.emojione.com/latest/jstoshort.html to look at their :emoji: name -->
+
+<script>
+    function convert() {
+        var input = document.getElementById('emoji_input').value;
+        var output = emojione.toShort(input);
+        document.getElementById('emoji_output').innerHTML = output;
+    }
+</script>
+
+<!-- Jquery-2.2.4 JS -->
+<script src="/static/js/jquery-2.2.4.min.js"></script>
+<!-- Popper js -->
+<script src="/static/js/popper.min.js"></script>
+<!-- Bootstrap-4 Beta JS -->
+<script src="/static/js/bootstrap.min.js"></script>
+<!-- All Plugins JS -->
+<script src="/static/js/plugins.js"></script>
+<!-- Slick Slider Js-->
+<script src="/static/js/slick.min.js"></script>
+<!-- Footer Reveal JS -->
+<script src="/static/js/footer-reveal.min.js"></script>
+<!-- Active JS -->
+<script src="/static/js/active.js"></script>
+
+{% endblock %}

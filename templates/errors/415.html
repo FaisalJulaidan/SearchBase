@@ -1,0 +1,14 @@
+{% extends "errors/base.html" %}
+
+{% block title %}
+    <title>415 Unsupported media type</title>
+{% endblock %}
+
+{% block content %}
+
+    <h2>Error :(</h2>
+    <h3>415</h3>
+    <p>Reason: {{ error }}</p>
+    <p>Unsupported media type. Please contact thesearchbase@gmail.com and let them know what happened.</p>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+/*Edit Icon Button*/
+.editIcon {
+    width: 12px;
+    margin-top: -16px;
+    margin-left: 6px;
+    cursor: pointer;
+}
+
+.tickIcon {
+    width: 13px;
+    margin-top: -16px;
+    margin-left: 6px;
+    cursor: pointer;
+}
+
+.crossIcon {
+    width: 11px;
+    margin-top: -16px;
+    margin-left: 6px;
+    cursor: pointer;
+}

@@ -16,6 +16,7 @@ import stripe
 import string
 import random
 from urllib.request import urlopen
+from cryptography.fernet import Fernet
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object('config.DevelopmentConfig')
@@ -104,6 +105,18 @@ def indexpage():
         #              ['ddd', 1])
         return render_template("index.html")
 
+@app.route("/testingstuff", methods=["GET"])
+def testing():
+    message = "A really secret message. Not for prying eyes."
+    print("ORIGINAL MESSAGE: ", message)
+    key = Fernet.generate_key()
+    print("KEY : ", key)
+    cipher_suite = Fernet(key)
+    cipher_text = cipher_suite.encrypt(message.encode())
+    print("ENCRYPTED MESSAGE: ", cipher_text)
+    plain_text = cipher_suite.decrypt(cipher_text)
+    print("DECRYPTED MESSAGE: ", plain_text.decode())
+    return "hi"
 
 @app.route("/features", methods=['GET'])
 def features():

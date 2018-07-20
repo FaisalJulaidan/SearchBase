@@ -2200,7 +2200,6 @@ class Del:
 
 
 if __name__ == "__main__":
-    print("TEST TEST TEST")
     app.run(debug=True)
 
 # Create the schema

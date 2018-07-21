@@ -2198,9 +2198,9 @@ class Del:
     def __getitem__(self, k):
         return self.comp.get(k)
 
-
-if __name__ == "__main__":
-    app.run(debug=True)
+#
+# if __name__ == "__main__":
+#     app.run(debug=True)
 
 # Create the schema
 init_db()

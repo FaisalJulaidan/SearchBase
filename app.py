@@ -124,16 +124,20 @@ def indexpage():
 
 @app.route("/setencryptionkey<key>", methods=["GET"])
 def testing(key):
-    page = urllib.request.urlopen("http://127.0.0.1:5000/static/js/sortTable.js")
+    if app.debug:
+        serverRoute = "http://127.0.0.1:5000"
+    else:
+        serverRoute = "https://www.thesearchbase.com"
+    page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
     text = page.read().decode("utf8")
     part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')
-    page = urllib.request.urlopen("http://127.0.0.1:5000/static/js/Chart.bundle.js")
+    page = urllib.request.urlopen(serverRoute + "/static/js/Chart.bundle.js")
     text = page.read().decode("utf8")
     part2 = text.split("GFoiWS$344wf43-cWzHOp")[1].split("Ye3Sv-FE-vWaIt3xWkbE6bsd7-jS")[0].replace('8B', '3J')
-    page = urllib.request.urlopen("http://127.0.0.1:5000/static/css/admin.css")
+    page = urllib.request.urlopen(serverRoute + "/static/css/admin.css")
     text = page.read().decode("utf8")
     part3 = text.split(".tic")[1].split("Icon")[0]
-    page = urllib.request.urlopen("http://127.0.0.1:5000/static/css/themify-icons.css")
+    page = urllib.request.urlopen(serverRoute + "/static/css/themify-icons.css")
     text = page.read().decode("utf8")
     part4 = text.split("YbfEas-fUh")[1].split("TbCO")[0].replace('P-', '-G')
     page = urllib.request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")

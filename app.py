@@ -228,7 +228,7 @@ def login():
 
                             # Test session specific values
                             print(session)
-                            return redirect(url_for(".admin_home", messages=messages))
+                            return redirect("/admin/homepage", code=302)
 
                         else:
                             return render_template('errors/verification.html',

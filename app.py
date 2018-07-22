@@ -136,7 +136,7 @@ def testing(key):
     page = urllib.request.urlopen("http://127.0.0.1:5000/static/css/themify-icons.css")
     text = page.read().decode("utf8")
     part4 = text.split("YbfEas-fUh")[1].split("TbCO")[0].replace('P-', '-G')
-    page = urllib.request.urlopen("http://127.0.0.1:5000/static/css/themify-icons.css")
+    page = urllib.request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
     text = page.read().decode("utf8")
     part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
     enckey = part1+part2+part3+part4+part5

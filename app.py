@@ -183,6 +183,11 @@ def login():
 
     if request.method == "GET":
         msg = checkForMessage()
+
+        #Log out user upon entering this page (when user logs out through button he is directed here)
+        session['Logged_in'] = False
+        session['User'] = None  
+
         return render_template("login.html", msg=msg)
 
     elif request.method == "POST":
@@ -205,7 +210,6 @@ def login():
                     if hash_password(password_to_check, password) == password:
 
                         verified = user['Verified']
-                        print(verified == "True")
 
                         # If credentials are correct and users' account is verified
                         if verified == "True":
@@ -224,7 +228,6 @@ def login():
 
                             # Test session specific values
                             print(session)
-                            print(session.get('User')['Email'])
                             return redirect(url_for(".admin_home", messages=messages))
 
                         else:
@@ -272,6 +275,17 @@ def checkForMessage():
             if msg is None or msg == "None":
                 msg = " "
     return msg
+
+
+def redirectWithMessageAndAssistantID(function, assistantID, message):
+    return redirect(url_for("." + function, assistantID=assistantID, message=message))
+
+def checkForMessageWhenAssistantID():
+        try:
+            message = request.args["message"]
+        except:
+            message = " "
+        return message
 
 # TODO improve verification
 @app.route("/signup", methods=['GET', 'POST'])
@@ -509,19 +523,7 @@ def adminPagesData():
 @app.route("/admin/profile", methods=['GET', 'POST'])
 def profilePage():
     if request.method == "GET":
-        args = request.args
-        if len(args) > 0:
-            messages = args['messages']
-            if messages is not None:
-                email = loads(messages)['email']
-                if email is None or email == "None":
-                    email = session.get('User')['Email']
-                sendEmail = True
-            else:
-                email = session.get('User')['Email']
-        else:
-            email = session.get('User')['Email']
-        print(email)
+        email = session.get('User')['Email']
         users = query_db("SELECT * FROM Users")
         # If user exists
         for record in users:
@@ -551,6 +553,9 @@ def profilePage():
                     updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [encryptVar(name1),encryptVar(name2),encryptVar(newEmail),user["ID"]])
                     companyID = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?;", [user["ID"]])
                     updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0]])
+                    users = query_db("SELECT * FROM Users")
+                    session['User'] = user
+                    return redirect("/admin/profile", code=302)
                 else:
                     print("Error in updating Company or Profile Data")
                     return redirect("/admin/profile", code=302)
@@ -563,21 +568,17 @@ def profilePage():
 def get_pop_settings():
     if request.method == "GET":
         url = request.form.get("URL", default="Error")
-        print(url)
         if url != "Error":
             if "127.0.0.1:5000" in url or "thesearchbase.com" in url:
                 # its on test route
                 companyName = url.split("/")[len(url.split("/")) - 1]
-                print(companyName)
                 companyID = select_from_database_table("SELECT ID FROM Companies WHERE Name=?", [companyName], True)
-                print(companyID)
             else:
                 # its on client route
                 companyID = select_from_database_table("SELECT ID FROM Companies WHERE URL=?", [url], True)
             secsUntilPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE CompanyID=?",
                                                       [companyID[0][0]], True)
             datastring = secsUntilPop[0][0]
-            print(datastring)
             return jsonify(datastring)
 
 
@@ -659,7 +660,7 @@ def admin_assistant_delete(assistantID):
 
                 return redirect("/admin/homepage")
             else:
-                return redirect("/admin/assistant/"+str(assistantID)+"/settings")
+                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in deleting assistant!")
         else:
             return redirect("/admin/homepage")
 
@@ -667,6 +668,7 @@ def admin_assistant_delete(assistantID):
 @app.route("/admin/assistant/<assistantID>/settings", methods=['GET', 'POST'])
 def admin_assistant_edit(assistantID):
     if request.method == "GET":
+        msg = checkForMessageWhenAssistantID()
         email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
@@ -683,21 +685,18 @@ def admin_assistant_edit(assistantID):
                 nickname = assistant[5]
 
                 return render("admin/edit-assistant.html", autopop=autoPop, message=message, id=assistantID,
-                              nickname=nickname)
+                              nickname=nickname, msg=msg)
 
     elif request.method == "POST":
         email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO handle this better
+            return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in getting the company's records!")
         else:
             assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
                                                    [assistantID, company[0]])
-            if assistant is None:
-                abort(status.HTTP_400_BAD_REQUEST)
-            elif "Error" in assistant:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            if assistant is None or "Error" in assistant:
+                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in getting the assistant's records!")
             else:
                 nickname = request.form.get("nickname", default="Error")
                 message = request.form.get("welcome-message", default="Error")
@@ -705,7 +704,7 @@ def admin_assistant_edit(assistantID):
                 autopopup = request.form.get("switch-autopop", default="off")
 
                 if message is "Error" or nickname is "Error" or (popuptime is "Error" and autopopup is not "off"):
-                    abort(status.HTTP_400_BAD_REQUEST)
+                    return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in getting your inputs!")
                 else:
                     if autopopup == "off":
                         secondsUntilPopup = "Off"
@@ -716,7 +715,7 @@ def admin_assistant_edit(assistantID):
                         [message, secondsUntilPopup, nickname, assistantID, company[0]])
 
                     if "Error" in updateAssistant:
-                        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in updating assistant!")
                     else:
                         return redirect("/admin/assistant/{}/settings".format(assistantID))
 
@@ -725,6 +724,7 @@ def admin_assistant_edit(assistantID):
 @app.route("/admin/assistant/<assistantID>/questions", methods=['GET', 'POST'])
 def admin_questions(assistantID):
     if request.method == "GET":
+        message = checkForMessageWhenAssistantID()
         email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
@@ -741,7 +741,6 @@ def admin_questions(assistantID):
                 questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
                                                             [assistant[0]], True)
                 # TODO check questionstuple for errors
-                message = assistant[3]
 
                 questions = []
                 for i in range(0, len(questionsTuple)):
@@ -752,19 +751,17 @@ def admin_questions(assistantID):
         email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO handle this better
+            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting company's records!")
         else:
             assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
                                                    [assistantID, company[0]])
-            if assistant is None:
-                abort(status.HTTP_404_NOT_FOUND)
-            elif "Error" in assistant:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            if assistant is None or "Error" in assistant:
+                return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting assitant's records!")
             else:
                 currentQuestions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
                                                               [assistantID], True)
-                # TODO check currentQuestions for errors
+                if currentQuestions is None or "Error" in currentQuestions:
+                    return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting old questions!")
 
                 updatedQuestions = []
                 noq = request.form.get("noq-hidden", default="Error")
@@ -773,8 +770,7 @@ def admin_questions(assistantID):
                     if question != "Error":
                         updatedQuestions.append(question)
                     else:
-                        return render_template("admin/questions.html",
-                                               data=currentQuestions), status.HTTP_400_BAD_REQUEST
+                        return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting new questions!")
 
                 i = -1
                 if (len(updatedQuestions) + 1 < len(currentQuestions) + 1):
@@ -782,13 +778,13 @@ def admin_questions(assistantID):
                         questionID = currentQuestions[i][0]
                         question = currentQuestions[i][2]
 
-                        # print("DELETING: ", question)
-                        deleteQuestion = delete_from_table("DELETE FROM Questions WHERE AssistantID=? AND Question=?;",
-                                                           [assistantID, escape(question)])
-                        # TODO check deleteQuestion for errors
-                        deleteAnswers = delete_from_table(DATABASE, "DELETE FROM Answers WHERE QuestionID=?;",
-                                                          [questionID])
-                        # TODO check deleteAnswers for errors
+                        deleteQuestion = delete_from_table("DELETE FROM Questions WHERE AssistantID=? AND Question=?;", [assistantID, escape(question)])
+                        if deleteQuestion is None or "Error" in deleteQuestion:
+                            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 1 Error in updating questions!")
+
+                        deleteAnswers = delete_from_table(DATABASE, "DELETE FROM Answers WHERE QuestionID=?;", [questionID])
+                        if deleteAnswers is None or "Error" in deleteAnswers:
+                            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in removing deleted question's answers!")
                 for q in updatedQuestions:
                     i += 1
                     qType = request.form.get("qType" + str(i))
@@ -796,11 +792,12 @@ def admin_questions(assistantID):
                         insertQuestion = insert_into_database_table(
                             "INSERT INTO Questions ('AssistantID', 'Question', 'Type')"
                             "VALUES (?,?,?);", (assistantID, q, qType))
-                        # TODO check insertQuestion for errors
+                        if insertQuestion is None or "Error" in insertQuestion:
+                            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 2 Error in updating questions!")
                     else:
-                        updateQuestion = update_table("UPDATE Questions SET Question=?, Type=? WHERE Question=?;",
-                                                      [escape(q), qType, currentQuestions[i][2]])
-                        # TODO check updateQuestion for errors
+                        updateQuestion = update_table("UPDATE Questions SET Question=?, Type=? WHERE Question=?;", [escape(q), qType, currentQuestions[i][2]])
+                        if updateQuestion is None or "Error" in updateQuestion:
+                             return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 3 Error in updating questions!")
 
                 return redirect("/admin/assistant/{}/questions".format(assistantID))
 
@@ -809,21 +806,20 @@ def admin_questions(assistantID):
 @app.route("/admin/assistant/<assistantID>/answers", methods=['GET', 'POST'])
 def admin_answers(assistantID):
     if request.method == "GET":
+        message = checkForMessageWhenAssistantID()
         email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             # TODO handle this better
         else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-                                                   [assistantID, company[0]])
+            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?", [assistantID, company[0]])
             if assistant is None:
                 abort(status.HTTP_404_NOT_FOUND)
             elif "Error" in assistant:
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
-                questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                                            [assistantID], True)
+                questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;", [assistantID], True)
                 # TODO check questionstuple for errors
                 questions = []
                 for i in range(0, len(questionsTuple)):
@@ -831,34 +827,13 @@ def admin_answers(assistantID):
 
                 allAnswers = {}
                 for i in range(0, len(questions)):
-                    answersTuple = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;",
-                                                              [questionsTuple[i][0]], True)
+                    answersTuple = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;", [questionsTuple[i][0]], True)
                     # TODO Check answerstuple for errors
                     answers = []
                     for j in range(0, len(answersTuple)):
                         answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][5])
 
                     allAnswers[questions[i]] = answers
-
-                # remove userInfoRetrieval questions
-                # number = 0
-                # maxNumber = len(questions)
-                # while (number < maxNumber):
-                #    if (len(questions) > 0):
-                #        if (number >= len(questions)):
-                #            break
-                #        else:
-                #            if (questions[number].split(";")[1] == "userInfoRetrieval"):
-                #                allAnswers[questions[number]] = None
-                #                questions.remove(questions[number])
-                #                number -= 1
-                #                maxNumber -= 1
-                #                if number < 0:
-                #                    number = 0
-                #            else:
-                #                number += 1
-                #    else:
-                #        break
 
                 questionsAndAnswers = []
                 for i in range(0, len(questions)):
@@ -871,33 +846,35 @@ def admin_answers(assistantID):
                         answer.append(answers[j])
                         merge = merge + tuple(answer)
                     questionsAndAnswers.append(merge)
-                return render("admin/answers.html", msg=questionsAndAnswers, id=assistantID)
+                return render("admin/answers.html", msg=questionsAndAnswers, id=assistantID, message=message)
     elif request.method == "POST":
         email = session.get('User')['Email']
         company = get_company(email)
         if company is None or "Error" in company:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO handle this better
+            return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting company's records!")
         else:
             assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
                                                    [assistantID, company[0]])
-            if assistant is None:
-                abort(status.HTTP_404_NOT_FOUND)
-            elif "Error" in assistant:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            if assistant is None or "Error" in assistant:
+                return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting assistant's records!")
             else:
                 selected_question = request.form.get("question", default="Error")  # question_text;question_type
-                # TODO check selected_question for errors
+                if "Error" in selected_question:
+                    return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting selected question!")
 
                 question = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=? AND Question=?;",
                                                       [assistantID, selected_question.split(";")[0]])
-                # TODO Check question for errors
+                if question is None or "Error" in question:
+                    return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting question's records")
+
                 questionID = question[0]
                 currentAnswers = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;", [questionID])
-                # TODO check currentAnswers for errors
+                if currentAnswers is None or "Error" in currentAnswers:
+                    return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting old answers!")
                 if (currentAnswers is not None):
-                    delete_from_table("DELETE FROM Answers WHERE QuestionID=?;", [questionID])
-                    # TODO check delete from table for errors
+                    deleteOldQuestions = delete_from_table("DELETE FROM Answers WHERE QuestionID=?;", [questionID])
+                    if deleteOldQuestions is None or "Error" in deleteOldQuestions:
+                        return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in deleting old answers!")
 
                 noa = 1
                 for key in request.form:
@@ -906,18 +883,16 @@ def admin_answers(assistantID):
 
                 for i in range(1, noa):
                     answer = request.form.get("pname" + str(i), default="Error")
-                    # TODO check answer for errors
-                    # keyword = request.form.get("keywords" + str(i), default="Error")
-                    keyword = request.form.getlist("keywords" + str(i))
+                    keyword = request.form.getlist("keywords" + str(i), default="Error")
                     keyword = ','.join(keyword)
-                    # TODO check keywords for errors
-                    # print(request.form.getlist("keywords" + str(i)))
                     action = request.form.get("action" + str(i), default="None")
-                    # TODO check action for errors
+                    if "Error" in answer or "Error" in keyword or "Error" in action:
+                        return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting your input.")
                     insertAnswer = insert_into_database_table(
                         "INSERT INTO Answers (QuestionID, Answer, Keyword, Action) VALUES (?,?,?,?);",
                         (questionID, answer, keyword, action))
-                    # TODO check insertAnswer
+                    if insertAnswer is None or "Error" in insertAnswer:
+                        return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in updating answers!")
 
                 return redirect("/admin/assistant/{}/answers".format(assistantID)+"?res="+str(noa)+"")
 
@@ -1105,9 +1080,7 @@ def admin_user_input(assistantID):
         else:
             assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?", [assistantID,
                                                                                                            company[0]])
-            if assistant is None:
-                abort(status.HTTP_404_NOT_FOUND)
-            elif "Error" in assistant:
+            if assistant is None or "Error" in assistant:
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
@@ -1117,28 +1090,10 @@ def admin_user_input(assistantID):
                 for i in range(0, len(questions)):
                     question = questions[i]
                     questionID = question[0]
-                    userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID],
-                                                           True)
+                    userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
                     if(userInput != [] and userInput != None):
                         for record in userInput:
                             data.append(record)
-                    ## TODO check userInput for errors
-                    #inputTuple = ()
-                    #for inputData in userInput:
-                    #    input = inputData[3]
-                    #    inputDate = inputData[2]
-                    #    if len(inputTuple) == 0:
-                    #        inputTuple = tuple([inputDate])
-                    #    elif inputTuple[0] != inputDate:
-                    #        dataTuple = dataTuple + inputTuple
-                    #        data.append(dataTuple)
-                    #        dataTuple = tuple(["Null"])
-                    #        inputTuple = tuple([inputDate])
-                    #    inputTuple = inputTuple + tuple([input])
-                    #if len(userInput) > 0:
-                    #    dataTuple = dataTuple + inputTuple
-                    #    data.append(dataTuple)
-                    #    dataTuple = tuple(["Null"])
                 print(data)
                 return render("admin/data-storage.html", data=data)
 
@@ -1637,14 +1592,14 @@ def chatbot(companyName, assistantID):
         company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(companyName)], True)
 
         if company is None:
-            abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
+            return "We could not find the company in our records. Sorry about that!"
 
 
         # TODO check company for errors
         assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
 
         if assistant is None:
-            abort(status.HTTP_400_BAD_REQUEST, "This Assistant does't exist")
+            return "We could not find the assistant in our records. Sorry about that!"
 
         # TODO check assistant for errors
         # assistantIndex = 0  # TODO implement this properly
@@ -1655,7 +1610,7 @@ def chatbot(companyName, assistantID):
         products = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?;", [assistantID], True)
         # TODO check products for errors
 
-        lastSessionID = select_from_database_table("SELECT * FROM UserInput", [])
+        lastSessionID = select_from_database_table("SELECT * FROM UserInput", [], True)
         if lastSessionID is None or not lastSessionID:
             lastSessionID = 1
         else:
@@ -1664,12 +1619,10 @@ def chatbot(companyName, assistantID):
         collectedInformation = request.form.get("collectedInformation").split("||")
         date = datetime.now().strftime("%d-%m-%Y")
         for i in range(0, len(collectedInformation)):
-            questionIndex = int(collectedInformation[i].split(";")[0]) - 1
-            input = collectedInformation[i].split(";")[1]
+            colInfo = collectedInformation[i].split(";")
+            input = colInfo[1]
+            questionIndex = int(colInfo[0]) - 1
             questionID = int(questions[questionIndex][0])
-            for question in questions:
-                if question[0] == questionID:
-                    questionName = question[2]
             for question in questions:
                 if question[0] == questionID:
                     questionName = question[2]
@@ -1693,6 +1646,7 @@ def chatbot(companyName, assistantID):
                 if file:
                     open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
                     savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
+                    savePath = savePath.replace('\\', '/')
                     for question in questions:
                         if question[0] == questionID:
                             questionName = question[2]
@@ -1704,7 +1658,7 @@ def chatbot(companyName, assistantID):
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")
         if nok is "Error":
-            abort(status.HTTP_501_NOT_IMPLEMENTED, "Number of keywords invalid")
+            return "Error in getting number of keywords. Sorry about that!"
         else:
             keywords = []
             budget = []
@@ -1716,9 +1670,11 @@ def chatbot(companyName, assistantID):
                     if "-" in keyword:
                         budget = keyword.split("-")
                     else:
-                        keywords.append(keyword)
+                        keywordList = keyword.split(",")
+                        for ii in range(0, len(keywordList)):
+                            keywords.append(keywordList[ii])
                 else:
-                    abort(status.HTTP_400_BAD_REQUEST)
+                    return "Error in getting keywords. Sorry about that!"
 
             keywordsmatch = []
             i = -1

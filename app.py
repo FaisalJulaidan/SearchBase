@@ -17,6 +17,7 @@ import string
 import random
 from urllib.request import urlopen
 from cryptography.fernet import Fernet
+import urllib.request
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object('config.DevelopmentConfig')
@@ -32,7 +33,7 @@ USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
 
 pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
 secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
-encrypt_key = b'rlH-qYxpgbHWc3JAck-GeJD6ATu5o_nUFYUbwFPVFyU='
+encryption = None
 
 stripe.api_key = secret_key
 
@@ -41,7 +42,6 @@ stripe_keys = {
     'publishable_key': pub_key
 }
 
-encryption = Fernet(encrypt_key)
 
 # stripe.api_key = stripe_keys['secret_key']
 
@@ -122,27 +122,30 @@ def indexpage():
         #              ['ddd', 1])
         return render_template("index.html")
 
-@app.route("/testingstuff", methods=["GET"])
-def testing():
-    message = "A really secret message. Not for prying eyes."
-    #print("ORIGINAL MESSAGE: ", message)
-    #key = Fernet.generate_key()
-    print("KEY : ", encrypt_key)
-    #cipher_text = encryption.encrypt(message.encode())
-    #print("ENCRYPTED MESSAGE: ", cipher_text)
-    cipher_text = encryption.encrypt("TestCorp".encode())
-    print("TestCorp: ", cipher_text)
-    cipher_text = encryption.encrypt("example.com".encode())
-    print("example.com: ", cipher_text)
-    cipher_text = encryption.encrypt("John".encode())
-    print("John: ", cipher_text)
-    cipher_text = encryption.encrypt("Smith".encode())
-    print("Smith: ", cipher_text)
-    cipher_text = encryption.encrypt("test@test.test".encode())
-    print("test@test.test: ", cipher_text)
-    #plain_text = encryption.decrypt(cipher_text)
-    #print("DECRYPTED MESSAGE: ", plain_text.decode())
-    return "hi"
+@app.route("/setencryptionkey<key>", methods=["GET"])
+def testing(key):
+    page = urllib.request.urlopen("http://127.0.0.1:5000/static/js/sortTable.js")
+    text = page.read().decode("utf8")
+    part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')
+    page = urllib.request.urlopen("http://127.0.0.1:5000/static/js/Chart.bundle.js")
+    text = page.read().decode("utf8")
+    part2 = text.split("GFoiWS$344wf43-cWzHOp")[1].split("Ye3Sv-FE-vWaIt3xWkbE6bsd7-jS")[0].replace('8B', '3J')
+    page = urllib.request.urlopen("http://127.0.0.1:5000/static/css/admin.css")
+    text = page.read().decode("utf8")
+    part3 = text.split(".tic")[1].split("Icon")[0]
+    page = urllib.request.urlopen("http://127.0.0.1:5000/static/css/themify-icons.css")
+    text = page.read().decode("utf8")
+    part4 = text.split("YbfEas-fUh")[1].split("TbCO")[0].replace('P-', '-G')
+    page = urllib.request.urlopen("http://127.0.0.1:5000/static/css/themify-icons.css")
+    text = page.read().decode("utf8")
+    part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
+    enckey = part1+part2+part3+part4+part5
+    enckey = ((enckey+key).replace(" ", "")).encode()
+    print(enckey)
+    encryption = Fernet(enckey)
+    return "Done"
+
+
 
 @app.route("/features", methods=['GET'])
 def features():
@@ -2239,8 +2242,6 @@ def teardown_request(exception):
 
 
 
-
-
 ## Error Handlers ##
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)
 def bad_request(e):
@@ -2293,3 +2294,5 @@ if __name__ == "__main__":
 
 # Create the schema
 init_db()
+
+

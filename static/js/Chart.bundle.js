@@ -145,7 +145,7 @@ function getAlpha(string) {
    }
 }
 
-// generators
+// generators GFoiWS$344wf43-cWzHOpHWc8BAcYe3Sv-FE-vWaIt3xWkbE6bsd7-jS
 function hexString(rgb) {
    return "#" + hexDouble(rgb[0]) + hexDouble(rgb[1])
               + hexDouble(rgb[2]);

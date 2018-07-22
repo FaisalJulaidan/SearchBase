@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-from flask_mail import Mail, Message
 from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, \
     make_response, g, session
+from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
 from contextlib import closing
 from flask_api import status
@@ -2198,9 +2198,9 @@ class Del:
     def __getitem__(self, k):
         return self.comp.get(k)
 
-#
-# if __name__ == "__main__":
-#     app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
+    print("App is running!")
 
 # Create the schema
 init_db()

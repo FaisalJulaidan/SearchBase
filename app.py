@@ -100,14 +100,16 @@ def before_request():
 def dynamic_popup(route, botID):
     if request.method == "GET":
         url = "http://www.example.com/"
-        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(route)])
-        if company is None:
-            abort(status.HTTP_404_NOT_FOUND)
-        # elif "Debug" in company[4]:
-        else:
-            url = company[3]
-            if "http" not in url:
-                url = "https://" + url
+        companies = query_db("SELECT * FROM Companies")
+        # If company exists
+        for record in companies:
+            if record["Name"] == escape[route]:
+                company = record
+            else:
+                abort(status.HTTP_404_NOT_FOUND)
+        url = company["URL"]
+        if "http" not in url:
+            url = "https://" + url
         return render_template("dynamic-popup.html", route=route, botID=botID, url=url)
 
 
@@ -352,7 +354,7 @@ def signup():
 
                     # Create a company record for the new user
                     insertCompanyResponse = insert_into_database_table(
-                        "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName,companySize, websiteURL, companyPhoneNumber))
+                        "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
 
                     newCompany = get_last_row_from_table("Companies")
                     # print(newCompany)
@@ -572,10 +574,22 @@ def get_pop_settings():
             if "127.0.0.1:5000" in url or "thesearchbase.com" in url:
                 # its on test route
                 companyName = url.split("/")[len(url.split("/")) - 1]
-                companyID = select_from_database_table("SELECT ID FROM Companies WHERE Name=?", [companyName], True)
+                companies = query_db("SELECT * FROM Companies")
+                # If company exists
+                for record in companies:
+                    if record["Name"] == companyName:
+                        companyID = record["ID"]
+                    else:
+                        return None
             else:
                 # its on client route
-                companyID = select_from_database_table("SELECT ID FROM Companies WHERE URL=?", [url], True)
+                companies = query_db("SELECT * FROM Companies")
+                # If company exists
+                for record in companies:
+                    if record["URL"] == url:
+                        companyID = record["ID"]
+                    else:
+                        return None
             secsUntilPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE CompanyID=?",
                                                       [companyID[0][0]], True)
             datastring = secsUntilPop[0][0]
@@ -1496,7 +1510,13 @@ def admin_emoji():
 @app.route("/chatbot/<companyName>/<assistantID>", methods=['GET', 'POST'])
 def chatbot(companyName, assistantID):
     if request.method == "GET":
-        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(companyName)])
+        companies = query_db("SELECT * FROM Companies")
+        # If company exists
+        for record in companies:
+            if record["Name"] == escape(companyName):
+                company = record
+            else:
+                abort(status.HTTP_404_NOT_FOUND)
 
         # for debugging
         print(escape(companyName))
@@ -1588,11 +1608,14 @@ def chatbot(companyName, assistantID):
                                    message=message)
     elif request.method == "POST":
 
-
-        company = select_from_database_table("SELECT * FROM Companies WHERE Name=?;", [escape(companyName)], True)
-
-        if company is None:
-            return "We could not find the company in our records. Sorry about that!"
+        
+        companies = query_db("SELECT * FROM Companies")
+        # If company exists
+        for record in companies:
+            if record["Name"] == escape(companyName):
+                company = record
+            else:
+                return "We could not find the company in our records. Sorry about that!"
 
 
         # TODO check company for errors

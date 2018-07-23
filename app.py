@@ -20,7 +20,17 @@ from cryptography.fernet import Fernet
 import urllib.request
 
 app = Flask(__name__, static_folder='static')
-app.config.from_object('config.DevelopmentConfig')
+
+
+## -----
+# Only one should be commented in
+# For Production
+app.config.from_object('config.BaseConfig')
+
+# For Development
+# app.config.from_object('config.DevelopmentConfig')
+## -----
+
 
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
@@ -2186,6 +2196,7 @@ def init_db():
                 hash = hash_password("test")
                 update_table("UPDATE Users SET Password=? WHERE ID=?", [hash, 1])
             db.commit()
+            print("Test Data Inserted")
 
     print("Database Initialized")
 
@@ -2289,20 +2300,22 @@ def not_implemented(e):
     return render_template('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
 
 
-
-class Del:
-    def __init__(self, keep=string.digits):
-        self.comp = dict((ord(c), c) for c in keep)
-
-    def __getitem__(self, k):
-        return self.comp.get(k)
+# class Del:
+#     def __init__(self, keep=string.digits):
+#         self.comp = dict((ord(c), c) for c in keep)
+#
+#     def __getitem__(self, k):
+#         return self.comp.get(k)
 
 
 if __name__ == "__main__":
-    print("TEST TEST TEST")
-    app.run(debug=True)
 
-# Create the schema
-init_db()
+    print("Run the server...")
+    print(app.debug)
+
+    # Create the schema
+    init_db()
+    app.run()
+
 
 

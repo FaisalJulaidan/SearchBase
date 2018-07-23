@@ -121,11 +121,14 @@ def indexpage():
         # update_table("UPDATE Users SET SubID=? WHERE ID=?;",
         #              ['ddd', 1])
         return render_template("index.html")
-
+    # /setencryptionkeyUbwFPVFyU=gT5-f6ATu5o_nUFY
 @app.route("/setencryptionkey<key>", methods=["GET"])
 def testing(key):
     if app.debug:
         serverRoute = "http://127.0.0.1:5000"
+        if "&AND&" in key:
+            key = key.split("gT5-f")[1] + key.split("gT5-f")[0]
+            key = key.replace("gT5-f", "")
     else:
         serverRoute = "https://www.thesearchbase.com"
     page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
@@ -140,9 +143,12 @@ def testing(key):
     page = urllib.request.urlopen(serverRoute + "/static/css/themify-icons.css")
     text = page.read().decode("utf8")
     part4 = text.split("YbfEas-fUh")[1].split("TbCO")[0].replace('P-', '-G')
-    page = urllib.request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
-    text = page.read().decode("utf8")
-    part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
+    if not app.debug:
+        page = urllib.request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
+        text = page.read().decode("utf8")
+        part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
+    else:
+        part5 = ""
     enckey = part1+part2+part3+part4+part5
     enckey = ((enckey+key).replace(" ", "")).encode()
     print(enckey)

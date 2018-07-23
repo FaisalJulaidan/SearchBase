@@ -121,12 +121,12 @@ def indexpage():
         # update_table("UPDATE Users SET SubID=? WHERE ID=?;",
         #              ['ddd', 1])
         return render_template("index.html")
-    # /setencryptionkeyuF-rPVFyU=gT5-f6ATuPa-UFY
+
 @app.route("/setencryptionkey<key>", methods=["GET"])
 def testing(key):
     if app.debug:
         serverRoute = "http://127.0.0.1:5000"
-        if "&AND&" in key:
+        if "gT5-f" in key:
             key = key.split("gT5-f")[1] + key.split("gT5-f")[0]
             key = key.replace("gT5-f", "").replace("Pa-", "5o_n").replace("uF-r", "UbwF")
     else:

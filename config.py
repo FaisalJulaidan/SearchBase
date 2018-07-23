@@ -4,6 +4,7 @@ import os
 class BaseConfig(object):
 
     DEBUG = False
+    TESTING = False
 
     ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
     ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
@@ -23,5 +24,12 @@ class BaseConfig(object):
     MAIL_USERNAME = 'thesearchbase@gmail.com',
     MAIL_PASSWORD = 'pilbvnczzdgxkyzy'
 
+
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
+    TESTING = True
+
+
+class TestingConfig(BaseConfig):
+    DEBUG = False
+    TESTING = True

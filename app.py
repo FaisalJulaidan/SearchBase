@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#/usr/bin/python3.5
 from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, \
     make_response, g, session
 from flask_mail import Mail, Message

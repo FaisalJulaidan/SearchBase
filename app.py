@@ -161,7 +161,7 @@ def testing(key):
         part5 = ""
     enckey = part1+part2+part3+part4+part5
     enckey = ((enckey+key).replace(" ", "")).encode()
-    print(enckey)
+    global encryption
     encryption = Fernet(enckey)
     return "Done"
 
@@ -260,8 +260,7 @@ def login():
                                                    data="Account not verified, please check your email and follow instructions")
                     else:
                         return redirectWithMessage("login", "User name and password does not match!")
-                else:
-                    return redirectWithMessage("login", "User not found!")
+            return redirectWithMessage("login", "User not found!")
 
 
 @app.route('/logout')
@@ -328,8 +327,8 @@ def signup():
         password = request.form.get("password", default="Error")
 
         companyName = request.form.get("companyName", default="Error")
-        companySize = request.form.get("companySize")
-        companyPhoneNumber = request.form.get("phoneNumber")
+        companySize = request.form.get("companySize", default="0")
+        companyPhoneNumber = request.form.get("phoneNumber", default="Error")
         websiteURL = request.form.get("websiteURL", default="Error")
 
 
@@ -346,106 +345,104 @@ def signup():
                 if user["Email"] == email:
                     print("Email is already in use!")
                     return redirectWithMessage("signup", "Email is already in use!")
-                else:
-                    try:
-                        firstname = fullname.strip().split(" ")[0]
-                        surname = fullname.strip().split(" ")[1]
+            try:
+                firstname = fullname.strip().split(" ")[0]
+                surname = fullname.strip().split(" ")[1]
 
-                        #debug
-                        print(firstname)
-                        print(surname)
+                #debug
+                print(firstname)
+                print(surname)
 
-                    except IndexError as e:
-                        return redirectWithMessage("signup", "Error in handling names")
+            except IndexError as e:
+                return redirectWithMessage("signup", "Error in handling names")
 
-                    newUser = None
-                    newCompany = None
-                    newCustomer = None
+            newUser = None
+            newCompany = None
+            newCustomer = None
 
-                    # Create a Stripe customer for the new company.
-                    newCustomer = stripe.Customer.create(
-                        email=email
-                    )
+            # Create a Stripe customer for the new company.
+            newCustomer = stripe.Customer.create(
+                email=email
+            )
 
-                    # debug
-                    # print(newCustomer)
+            # debug
+            # print(newCustomer)
 
-                    hashed_password = hash_password(password)
-                    verified = "True"
-
+            hashed_password = hash_password(password)
+            verified = "True"
 
 
-                    # Create a company record for the new user
-                    insertCompanyResponse = insert_into_database_table(
-                        "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
 
-                    newCompany = get_last_row_from_table("Companies")
-                    # print(newCompany)
+            # Create a company record for the new user
+            insertCompanyResponse = insert_into_database_table(
+                "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
 
-
-                    try:
-
-                        # Subscribe to the Basic plan with a trial of 14 days
-                        sub = stripe.Subscription.create(
-                        customer=newCustomer['id'],
-                        items=[{'plan': 'plan_D3lp2yVtTotk2f'}],
-                        trial_period_days=14,
-                        )
+            newCompany = get_last_row_from_table("Companies")
+            # print(newCompany)
 
 
-                        print(sub['items']['data'][0]['plan']['nickname'])
-                        # print(sub)
+            try:
 
-                        # Create a user account and link it with the new created company record above
-                        newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
-                                    (newCompany['ID'], encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(email), hashed_password, newCustomer['id'],
-                                    str(verified), sub['id'])
-                                    )
-
-
-                    except Exception as e:
-                        # Clear out when exception
-                        if newUser is not None:
-                            query_db("DELETE FROM Users WHERE ID=?", [newUser['ID']])
-                            print("Delete new user")
-
-                        if newCompany is not None:
-                            query_db("DELETE FROM Companies WHERE ID=?", [newCompany['ID']])
-                            print("Delete new company")
-
-                        print("Delete new user' stripe account")
-                        if newCustomer is not None:
-                            cus = stripe.Customer.retrieve(newCustomer['id'])
-                            cus.delete()
-
-                        print(e)
-                        return redirectWithMessage("signup", "An error occurred and could not subscribe. Please try again!.")
-                        # TODO check subscription for errors https://stripe.com/docs/api#errors
+                # Subscribe to the Basic plan with a trial of 14 days
+                sub = stripe.Subscription.create(
+                customer=newCustomer['id'],
+                items=[{'plan': 'plan_D3lp2yVtTotk2f'}],
+                trial_period_days=14,
+                )
 
 
-                    if not app.debug:
-                        # TODO this needs improving
-                        msg = Message("Account verification",
-                                        sender="thesearchbase@gmail.com",
-                                        recipients=[email])
+                print(sub['items']['data'][0]['plan']['nickname'])
+                # print(sub)
 
-                        payload = email + ";" + companyName
-                        link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
-                        msg.html = "<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'> <br /><p>You have registered with TheSearchBase!</p> <br>Please visit \
-                                    <a href='"+link+"'>this link</a> to verify your account."
-                        with app.open_resource("static\\email_images\\verify_email.png") as fp:
-                            msg.attach("verify_email.png","image/png", fp.read())
-                        mail.send(msg)
+                # Create a user account and link it with the new created company record above
+                newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
+                            (newCompany['ID'], encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(email), hashed_password, newCustomer['id'],
+                            str(verified), sub['id'])
+                            )
 
-                        # sending the registration confirmation email to us
-                        msg = Message("A new company has signed up!",
-                                        sender="thesearchbase@gmail.com",
-                                        recipients=["thesearchbase@gmail.com"])
-                        msg.html = "<p>Company name: "+companyName+" has signed up. <br>The admin's details are: <br>Name: "+fullname+" <br>Email: "+email+".</p>"
-                        mail.send(msg)
 
-                    return render_template('errors/verification.html', msg="Please check your email and follow instructions to verify account and get started.")
-            return redirectWithMessage("signup", "Error in email varification")
+            except Exception as e:
+                # Clear out when exception
+                if newUser is not None:
+                    query_db("DELETE FROM Users WHERE ID=?", [newUser['ID']])
+                    print("Delete new user")
+
+                if newCompany is not None:
+                    query_db("DELETE FROM Companies WHERE ID=?", [newCompany['ID']])
+                    print("Delete new company")
+
+                print("Delete new user' stripe account")
+                if newCustomer is not None:
+                    cus = stripe.Customer.retrieve(newCustomer['id'])
+                    cus.delete()
+
+                print(e)
+                return redirectWithMessage("signup", "An error occurred and could not subscribe. Please try again!.")
+                # TODO check subscription for errors https://stripe.com/docs/api#errors
+
+
+            if not app.debug:
+                # TODO this needs improving
+                msg = Message("Account verification",
+                                sender="thesearchbase@gmail.com",
+                                recipients=[email])
+
+                payload = email + ";" + companyName
+                link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
+                msg.html = "<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'> <br /><p>You have registered with TheSearchBase!</p> <br>Please visit \
+                            <a href='"+link+"'>this link</a> to verify your account."
+                with app.open_resource("static\\email_images\\verify_email.png") as fp:
+                    msg.attach("verify_email.png","image/png", fp.read())
+                mail.send(msg)
+
+                # sending the registration confirmation email to us
+                msg = Message("A new company has signed up!",
+                                sender="thesearchbase@gmail.com",
+                                recipients=["thesearchbase@gmail.com"])
+                msg.html = "<p>Company name: "+companyName+" has signed up. <br>The admin's details are: <br>Name: "+fullname+" <br>Email: "+email+".</p>"
+                mail.send(msg)
+
+            return render_template('errors/verification.html', msg="Please check your email and follow instructions to verify account and get started.")
 
 
 
@@ -556,10 +553,13 @@ def profilePage():
                 user = record
             else:
                 user = "Error in finding user"
-        company = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user["CompanyID"]])
+        company = query_db("SELECT * FROM Companies WHERE ID=?;", [user["CompanyID"]])
         if company is None or company is "None" or company is "Error":
             company="Error in finding company"
-        return render_template("admin/profile.html", user=user, email=email, company=company)
+        print(company)
+        print(user)
+        print(email)
+        return render_template("admin/profile.html", user=user, email=email, company=company[0])
 
     elif request.method == "POST":
         curEmail = session.get('User')['Email']
@@ -579,6 +579,9 @@ def profilePage():
                     companyID = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?;", [user["ID"]])
                     updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0]])
                     users = query_db("SELECT * FROM Users")
+                    for record in users:
+                        if record["Email"] == newEmail:
+                            user = record
                     session['User'] = user
                     return redirect("/admin/profile", code=302)
                 else:
@@ -2077,14 +2080,14 @@ def sendMarketingEmail():
         mail.send(msg)
         return render_template("index.html")
 
-def select_from_database_table(sql_statement, array_of_terms=None, all=False, database=DATABASE):
+def select_from_database_table(sql_statement, array_of_terms=None, one=False, database=DATABASE):
     data = "Error"
     conn = None
     try:
         conn = sqlite3.connect(database)
         cur = conn.cursor()
         cur.execute(sql_statement, array_of_terms)
-        if (all):
+        if not (one):
             data = cur.fetchall()
         else:
             data = cur.fetchone()
@@ -2095,6 +2098,16 @@ def select_from_database_table(sql_statement, array_of_terms=None, all=False, da
     finally:
         if (conn is not None):
             conn.close()
+        
+        if "SELECT" in sql_statement:
+            for record in data:
+                if type(record) == list or type(record) == tuple:
+                    for value in record:
+                        if type(value) == bytes:
+                            record = encryption.decrypt(value).decode()
+                else:
+                    if type(record) == bytes:
+                            record = encryption.decrypt(value).decode()
         return data
 
 

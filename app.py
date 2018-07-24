@@ -134,6 +134,7 @@ def indexpage():
 
 @app.route("/setencryptionkey<key>", methods=["GET"])
 def testing(key):
+    print("Starting key get")
     if app.debug:
         serverRoute = "http://127.0.0.1:5000"
         if "gT5-f" in key:
@@ -141,6 +142,7 @@ def testing(key):
             key = key.replace("gT5-f", "").replace("Pa-", "5o_n").replace("uF-r", "UbwF")
     else:
         serverRoute = "https://www.thesearchbase.com"
+    print("Got default server part")
     page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
     text = page.read().decode("utf8")
     part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')

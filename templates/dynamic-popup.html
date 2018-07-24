@@ -210,7 +210,7 @@
             var url = window.location.href;
             params = "URL=" + url;
             var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", "/getPopSettings", true);
+            xhttp.open("POST", "/getpopsettings", true);
             xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             xhttp.onreadystatechange = function () {
                 if (xhttp.readyState === 4) {

@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="/images/favicon.ico" type="image/ico"/>
+    <link rel="icon" href="/images/favicon.ico" type="image/ico" />
     <!-- Bootstrap -->
     <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -30,7 +30,8 @@
     <!-- bootstrap-progressbar -->
     <link href="/static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
     <!-- JQVMap -->
-    <link href="/static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+    <link href="/static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet" />
+    <link href="/static/css/admin.css" rel="stylesheet">
     <title>{% block title %}{% endblock %}</title>
 
     {% block headlinks %}
@@ -343,7 +344,7 @@
         var url = window.location.href;
         params = "";
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/admin/getAdminPagesData", true);
+        xhttp.open("POST", "/admin/getadminpagesdata", true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhttp.onreadystatechange = function () {
             if (xhttp.readyState === 4) {

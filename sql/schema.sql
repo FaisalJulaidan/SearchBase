@@ -87,7 +87,8 @@ CREATE TABLE 'UserInput' (
 	'QuestionID'	INTEGER NOT NULL,
 	'Date'	TEXT NOT NULL,
 	'Input'	TEXT NOT NULL,
-	'SessionID' INTEGER NOT NULL
+	'SessionID' INTEGER NOT NULL,
+	'QuestionString' TEXT NOT NULL
 );
 
 CREATE TABLE 'Plans' (

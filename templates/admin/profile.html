@@ -41,28 +41,28 @@
                             <div id="outputDiv">
                                 <form id="profileForm" action="/admin/profile" method="post">
 
-                                    <h3 id="nameh3" style="display:inline-block;">{{ user[2] }} {{ user[3] }}</h3><img id="editName" class="editIcon" src="../static/images/pencil-edit-button.png" />
-                                    <input id="names" name="names" value="{{user[2]}} {{user[3]}}" /><img id="saveName" class="tickIcon" src="../static/images/tick.png" /><img id="cancelName" class="crossIcon" src="../static/images/cross.png" />
+                                    <h3 id="nameh3" style="display:inline-block;">{{ user["Firstname"] }} {{ user["Surname"] }}</h3><img id="editName" class="editIcon" src="../static/images/pencil-edit-button.png" />
+                                    <input id="names" name="names" value="{{user["Firstname"]}} {{user["Surname"]}}" /><img id="saveName" class="tickIcon" src="../static/images/tick.png" /><img id="cancelName" class="crossIcon" src="../static/images/cross.png" />
                                     <br />
-                                    <h4 id="emailh4" style="display:inline-block;">{{ user[5] }}</h4><img id="editEmail" class="editIcon" src="../static/images/pencil-edit-button.png" />
-                                    <input id="email" name="email" value="{{user[5]}}" /><img id="saveEmail" class="tickIcon" src="../static/images/tick.png" /><img id="cancelEmail" class="crossIcon" src="../static/images/cross.png" />
+                                    <h4 id="emailh4" style="display:inline-block;">{{ user["Email"] }}</h4><img id="editEmail" class="editIcon" src="../static/images/pencil-edit-button.png" />
+                                    <input id="email" name="email" value="{{user["Email"]}}" /><img id="saveEmail" class="tickIcon" src="../static/images/tick.png" /><img id="cancelEmail" class="crossIcon" src="../static/images/cross.png" />
 
                                     <br />
                                     <ul class="list-unstyled user_data">
                                         <li>
-                                            <i class="fa fa-briefcase user-profile-icon" style="display:inline-block;"></i> <p id="companyNamep" style="display:inline-block;">{{ company[1] }}</p><img id="editCompanyName" class="editIcon" src="../static/images/pencil-edit-button.png" />
-                                            <input id="companyName" name="companyName" value="{{company[1]}}" /><img id="saveCompanyName" class="tickIcon" src="../static/images/tick.png" /><img id="cancelCompanyName" class="crossIcon" src="../static/images/cross.png" />
+                                            <p id="companyNamep" style="display:inline-block;">{{ company["Name"] }}</p><img id="editCompanyName" class="editIcon" src="../static/images/pencil-edit-button.png" />
+                                            <input id="companyName" name="companyName" value="{{company["Name"]}}" /><img id="saveCompanyName" class="tickIcon" src="../static/images/tick.png" /><img id="cancelCompanyName" class="crossIcon" src="../static/images/cross.png" />
                                         </li>
 
                                         <li>
-                                            <a id="companyURLa" href="{{company[3]}}" target="_blank">{{company[3]}}</a><img id="editCompanyURL" class="editIcon" src="../static/images/pencil-edit-button.png" />
-                                            <input id="companyURL" name="companyURL" value="{{company[3]}}" /><img id="saveCompanyURL" class="tickIcon" src="../static/images/tick.png" /><img id="cancelCompanyURL" class="crossIcon" src="../static/images/cross.png" />
+                                            <a id="companyURLa" href="{{company["URL"]}}" target="_blank">{{company["URL"]}}</a><img id="editCompanyURL" class="editIcon" src="../static/images/pencil-edit-button.png" />
+                                            <input id="companyURL" name="companyURL" value="{{company["URL"]}}" /><img id="saveCompanyURL" class="tickIcon" src="../static/images/tick.png" /><img id="cancelCompanyURL" class="crossIcon" src="../static/images/cross.png" />
                                         </li>
 
-                                        <li class="m-top-xs">
+                                        <!--<li class="m-top-xs">
                                             <i class="fa fa-external-link user-profile-icon"></i>
-                                            <a href="https://www.thesearchbase.com/chatbot/{{ company[1] }}" target="_blank">Assistant</a>
-                                        </li>
+                                            <a href="https://www.thesearchbase.com/chatbot/{{ company["Name"] }}{{ company["Name"] }}" target="_blank">Assistant</a>
+                                        </li>-->
                                     </ul>
                                     <button class="btn btn-success">Save Changes</button>
                                 </form>

@@ -2321,12 +2321,14 @@ def not_implemented(e):
 #         return self.comp.get(k)
 
 if __name__ == "__main__":
-    print("TEST TEST TEST")
-    app.run(debug=True)
-
+    print("Server is running...")
     # Create the schema
     init_db()
+    # Print app configuration
+    print(app.config)
+    # Run the app server
     app.run()
+
 
 
 

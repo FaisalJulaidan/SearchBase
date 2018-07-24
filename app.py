@@ -144,25 +144,33 @@ def testing(key):
     page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
     text = page.read().decode("utf8")
     part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')
+    print("Part 1: ", part1)
     page = urllib.request.urlopen(serverRoute + "/static/js/Chart.bundle.js")
     text = page.read().decode("utf8")
     part2 = text.split("GFoiWS$344wf43-cWzHOp")[1].split("Ye3Sv-FE-vWaIt3xWkbE6bsd7-jS")[0].replace('8B', '3J')
+    print("Part 2: ", part2)
     page = urllib.request.urlopen(serverRoute + "/static/css/admin.css")
     text = page.read().decode("utf8")
     part3 = text.split(".tic")[1].split("Icon")[0]
+    print("Part 3: ", part3)
     page = urllib.request.urlopen(serverRoute + "/static/css/themify-icons.css")
     text = page.read().decode("utf8")
     part4 = text.split("YbfEas-fUh")[1].split("TbCO")[0].replace('P-', '-G')
+    print("Part 4: ", part4)
     if not app.debug:
         page = urllib.request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
         text = page.read().decode("utf8")
+        print("Page from heroku: ", text)
         part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
+        print("Part 5: ", part5)
     else:
         part5 = ""
     enckey = part1+part2+part3+part4+part5
     enckey = ((enckey+key).replace(" ", "")).encode()
+    print("Enckey: ", enckey)
     global encryption
     encryption = Fernet(enckey)
+    print("Encryption: ", encryption)
     print("Encryption key set")
     return "Done"
 

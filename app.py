@@ -25,10 +25,10 @@ app = Flask(__name__, static_folder='static')
 ## -----
 # Only one should be commented in
 # For Production
-#app.config.from_object('config.BaseConfig')
+app.config.from_object('config.BaseConfig')
 
 # For Development
-app.config.from_object('config.DevelopmentConfig')
+#app.config.from_object('config.DevelopmentConfig')
 ## -----
 
 

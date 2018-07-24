@@ -25,10 +25,10 @@ app = Flask(__name__, static_folder='static')
 ## -----
 # Only one should be commented in
 # For Production
-app.config.from_object('config.BaseConfig')
+# app.config.from_object('config.BaseConfig')
 
 # For Development
-# app.config.from_object('config.DevelopmentConfig')
+app.config.from_object('config.DevelopmentConfig')
 ## -----
 
 
@@ -2322,13 +2322,15 @@ def not_implemented(e):
 
 
 if __name__ == "__main__":
-
-    print("Run the server...")
-    print(app.debug)
-
+    print("Server is running...")
     # Create the schema
     init_db()
+    # Print app configuration
+    print(app.config)
+    # Run the app server
     app.run()
+
+
 
 
 

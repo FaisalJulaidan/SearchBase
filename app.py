@@ -24,11 +24,12 @@ app = Flask(__name__, static_folder='static')
 
 ## -----
 # Only one should be commented in
-# For Production
-app.config.from_object('config.BaseConfig')
-
-# For Development
-# app.config.from_object('config.DevelopmentConfig')
+if not app.debug:
+    # For Production
+    app.config.from_object('config.BaseConfig')
+else:
+    # For Development
+    app.config.from_object('config.DevelopmentConfig')
 ## -----
 
 
@@ -556,9 +557,6 @@ def profilePage():
         company = query_db("SELECT * FROM Companies WHERE ID=?;", [user["CompanyID"]])
         if company is None or company is "None" or company is "Error":
             company="Error in finding company"
-        print(company)
-        print(user)
-        print(email)
         return render_template("admin/profile.html", user=user, email=email, company=company[0])
 
     elif request.method == "POST":
@@ -575,19 +573,16 @@ def profilePage():
             # If user exists
             for user in users:
                 if user["Email"] == curEmail:
+                    #TODO check if they worked
                     updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [encryptVar(name1),encryptVar(name2),encryptVar(newEmail),user["ID"]])
                     companyID = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?;", [user["ID"]])
-                    updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0]])
+                    updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0][0]])
                     users = query_db("SELECT * FROM Users")
                     for record in users:
                         if record["Email"] == newEmail:
                             user = record
                     session['User'] = user
                     return redirect("/admin/profile", code=302)
-                else:
-                    print("Error in updating Company or Profile Data")
-                    return redirect("/admin/profile", code=302)
-            return redirectWithMessage("profilePage", newEmail)
         print("Error in updating Company or Profile Data")
         return redirect("/admin/profile", code=302)
 

@@ -5,7 +5,7 @@ from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
 from contextlib import closing
 from flask_api import status
-from datetime import datetime
+from datetime import datetime, timedelta
 from bcrypt import hashpw, gensalt
 from itsdangerous import URLSafeTimedSerializer, BadSignature, BadData
 from xml.dom import minidom

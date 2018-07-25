@@ -2293,6 +2293,7 @@ def insert_db(table, fields=(), values=()):
 
 #encryption function to save typing
 def encryptVar(var):
+    print(encryption)
     return encryption.encrypt(var.encode())
 
 # Get connection when no requests e.g Pyton REPL.

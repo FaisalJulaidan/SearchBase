@@ -1,7 +1,7 @@
-#/usr/bin/python3.5
+#!/usr/bin/python3
+from flask_mail import Mail, Message
 from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, \
     make_response, g, session
-from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
 from contextlib import closing
 from flask_api import status
@@ -28,7 +28,7 @@ app = Flask(__name__, static_folder='static')
 app.config.from_object('config.BaseConfig')
 
 # For Development
-# app.config.from_object('config.DevelopmentConfig')
+#app.config.from_object('config.DevelopmentConfig')
 ## -----
 
 
@@ -163,6 +163,7 @@ def testing(key):
     enckey = ((enckey+key).replace(" ", "")).encode()
     global encryption
     encryption = Fernet(enckey)
+    print("Encryption key set")
     return "Done"
 
 
@@ -556,9 +557,6 @@ def profilePage():
         company = query_db("SELECT * FROM Companies WHERE ID=?;", [user["CompanyID"]])
         if company is None or company is "None" or company is "Error":
             company="Error in finding company"
-        print(company)
-        print(user)
-        print(email)
         return render_template("admin/profile.html", user=user, email=email, company=company[0])
 
     elif request.method == "POST":
@@ -575,6 +573,7 @@ def profilePage():
             # If user exists
             for user in users:
                 if user["Email"] == curEmail:
+                    #TODO check if they worked
                     updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [encryptVar(name1),encryptVar(name2),encryptVar(newEmail),user["ID"]])
                     companyID = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?;", [user["ID"]])
                     updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0]])
@@ -584,10 +583,6 @@ def profilePage():
                             user = record
                     session['User'] = user
                     return redirect("/admin/profile", code=302)
-                else:
-                    print("Error in updating Company or Profile Data")
-                    return redirect("/admin/profile", code=302)
-            return redirectWithMessage("profilePage", newEmail)
         print("Error in updating Company or Profile Data")
         return redirect("/admin/profile", code=302)
 
@@ -715,14 +710,16 @@ def admin_assistant_edit(assistantID):
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error in getting company")
             # TODO handle this better
         else:
+            print(company)
             assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-                                                   [assistantID, company[0]])
+                                                   [assistantID, company[0]], True)
             if assistant is None or "Error" in assistant:
                 abort(status.HTTP_404_NOT_FOUND, "Error in getting assistant")
             else:
-                message = assistant[3]
-                autoPop = assistant[4]
-                nickname = assistant[5]
+                print(assistant[0])
+                message = assistant[0][3]
+                autoPop = assistant[0][4]
+                nickname = assistant[0][5]
 
                 return render("admin/edit-assistant.html", autopop=autoPop, message=message, id=assistantID,
                               nickname=nickname, msg=msg)
@@ -1377,17 +1374,13 @@ def admin_users():
         # todo check company
         companyID = company[0]
 
-        users = query_db("SELECT * FROM Users")
-        # If user exists
-        for record in users:
-            if record["Email"] == session.get('User')['Email']:
-                userLevel = record["AccessLevel"]
-            else:
-                return redirect("/admin/homepage")
-        else:
-            # TODO improve this
-            users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
-            return render("admin/users.html", users=users, email=email)
+        #Check user
+        if "User" in session.get('User')['AccessLevel']:
+            return redirect("/admin/main", code=302)
+
+        # TODO improve this
+        users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
+        return render("admin/users.html", users=users, email=email)
 
 @app.route("/admin/users/add", methods=['POST'])
 def admin_users_add():
@@ -1426,7 +1419,7 @@ def admin_users_add():
 
             insertUserResponse = insert_into_database_table(
                 "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
-                (companyID, encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(newEmail), hashed_password, "True"))
+                (companyID, encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(newEmail), hashed_password, "False"))
             if "added" not in insertUserResponse:
                 print("Error in insert operation")
                 #TODO pass in feedback message
@@ -2080,17 +2073,16 @@ def sendMarketingEmail():
         mail.send(msg)
         return render_template("index.html")
 
-def select_from_database_table(sql_statement, array_of_terms=None, one=False, database=DATABASE):
+def select_from_database_table(sql_statement, array_of_terms=None, multi=False, database=DATABASE):
     data = "Error"
     conn = None
     try:
         conn = sqlite3.connect(database)
         cur = conn.cursor()
         cur.execute(sql_statement, array_of_terms)
-        if not (one):
-            data = cur.fetchall()
-        else:
-            data = cur.fetchone()
+        data = cur.fetchall()
+        if not multi:
+            data = data[0]
     except sqlite3.ProgrammingError as e:
         print("Error in select statement," + str(e))
     except sqlite3.OperationalError as e:
@@ -2098,16 +2090,37 @@ def select_from_database_table(sql_statement, array_of_terms=None, one=False, da
     finally:
         if (conn is not None):
             conn.close()
-        
         if "SELECT" in sql_statement:
+            returnArray = []
+            arrayPos = 0
             for record in data:
+                tempVar = ""
                 if type(record) == list or type(record) == tuple:
+                    returnArray.append([])
                     for value in record:
                         if type(value) == bytes:
-                            record = encryption.decrypt(value).decode()
+                            try:
+                                tempVar = encryption.decrypt(value).decode()
+                            except:
+                                print("Could not decode value. Assuming hashed record!")
+                        else:
+                            tempVar = value
+                        returnArray[arrayPos].append(tempVar)
                 else:
                     if type(record) == bytes:
-                            record = encryption.decrypt(value).decode()
+                        try:
+                            tempVar = encryption.decrypt(record).decode()
+                        except:
+                            print("Could not decode value. Assuming hashed record!")
+                    else:
+                        tempVar = record
+                    returnArray.append(tempVar)
+                arrayPos+=1
+            #remove empty []
+            for records in returnArray:
+                if not records:
+                    returnArray.remove(records)
+            data = returnArray
         return data
 
 
@@ -2320,15 +2333,15 @@ def not_implemented(e):
 #     def __getitem__(self, k):
 #         return self.comp.get(k)
 
+
 if __name__ == "__main__":
-    print("Server is running...")
+
+    print("Run the server...")
+    print(app.debug)
+
     # Create the schema
     init_db()
-    # Print app configuration
-    print(app.config)
-    # Run the app server
     app.run()
-
 
 
 

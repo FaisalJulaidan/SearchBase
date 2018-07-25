@@ -249,8 +249,8 @@ def login():
                             # Store user assistants if they exist, in the session
                             assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?;",
                                                 [user['CompanyID']])
-                            if len(assistants) > 0:
-                                session['UserAssistants'] =  assistants
+
+                            session['UserAssistants'] = assistants
 
                             # Test session specific values
                             print(session)
@@ -432,10 +432,9 @@ def signup():
                 link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
                 msg.html = "<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'> <br /><p>You have registered with TheSearchBase!</p> <br>Please visit \
                             <a href='"+link+"'>this link</a> to verify your account."
-                with app.open_resource("static\\email_images\\verify_email.png") as fp:
+                with app.open_resource("static/email_images/verify_email.png") as fp:
                     msg.attach("verify_email.png","image/png", fp.read())
                 mail.send(msg)
-
                 # sending the registration confirmation email to us
                 msg = Message("A new company has signed up!",
                                 sender="thesearchbase@gmail.com",

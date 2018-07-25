@@ -16,7 +16,7 @@ import stripe
 import string
 import random
 from urllib.request import urlopen
-from cryptography.fernet import Fernet
+#from cryptography.fernet import Fernet
 import urllib.request
 
 app = Flask(__name__, static_folder='static')
@@ -43,7 +43,7 @@ USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
 
 pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
 secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
-encryption = None
+#encryption = None
 
 stripe.api_key = secret_key
 
@@ -170,8 +170,8 @@ def testing(key):
     enckey = part1+part2+part3+part4+part5
     enckey = ((enckey+key).replace(" ", "")).encode()
     print("Enckey: ", enckey)
-    global encryption
-    encryption = Fernet(enckey)
+    #global encryption
+    #encryption = Fernet(enckey)
     return "Done"
 
 
@@ -2121,37 +2121,37 @@ def select_from_database_table(sql_statement, array_of_terms=None, multi=False, 
     finally:
         if (conn is not None):
             conn.close()
-        if "SELECT" in sql_statement:
-            returnArray = []
-            arrayPos = 0
-            for record in data:
-                tempVar = ""
-                if type(record) == list or type(record) == tuple:
-                    returnArray.append([])
-                    for value in record:
-                        if type(value) == bytes:
-                            try:
-                                tempVar = encryption.decrypt(value).decode()
-                            except:
-                                print("Could not decode value. Assuming hashed record!")
-                        else:
-                            tempVar = value
-                        returnArray[arrayPos].append(tempVar)
-                else:
-                    if type(record) == bytes:
-                        try:
-                            tempVar = encryption.decrypt(record).decode()
-                        except:
-                            print("Could not decode value. Assuming hashed record!")
-                    else:
-                        tempVar = record
-                    returnArray.append(tempVar)
-                arrayPos+=1
-            #remove empty []
-            for records in returnArray:
-                if not records:
-                    returnArray.remove(records)
-            data = returnArray
+        #if "SELECT" in sql_statement:
+        #    returnArray = []
+        #    arrayPos = 0
+        #    for record in data:
+        #        tempVar = ""
+        #        if type(record) == list or type(record) == tuple:
+        #            returnArray.append([])
+        #            for value in record:
+        #                if type(value) == bytes:
+        #                    try:
+        #                        tempVar = encryption.decrypt(value).decode()
+        #                    except:
+        #                        print("Could not decode value. Assuming hashed record!")
+        #                else:
+        #                    tempVar = value
+        #                returnArray[arrayPos].append(tempVar)
+        #        else:
+        #            if type(record) == bytes:
+        #                try:
+        #                    tempVar = encryption.decrypt(record).decode()
+        #                except:
+        #                    print("Could not decode value. Assuming hashed record!")
+        #            else:
+        #                tempVar = record
+        #            returnArray.append(tempVar)
+        #        arrayPos+=1
+        #    #remove empty []
+        #    for records in returnArray:
+        #        if not records:
+        #            returnArray.remove(records)
+        #    data = returnArray
         return data
 
 
@@ -2263,11 +2263,11 @@ def query_db(query, args=(), one=False):
     cur = g.db.execute(query, args)
     rv = [dict((cur.description[idx][0], value)
                for idx, value in enumerate(row)) for row in cur.fetchall()]
-    if "SELECT" in query:
-        for record in rv:
-            for key, value in record.items():
-                if type(value) == bytes and "Password" not in key:
-                    record[key] = encryption.decrypt(value).decode()
+    #if "SELECT" in query:
+    #    for record in rv:
+    #        for key, value in record.items():
+    #            if type(value) == bytes and "Password" not in key:
+    #                record[key] = encryption.decrypt(value).decode()
     return (rv[0] if rv else None) if one else rv
 
 
@@ -2296,8 +2296,8 @@ def insert_db(table, fields=(), values=()):
 
 
 #encryption function to save typing
-def encryptVar(var):
-    return encryption.encrypt(var.encode())
+#def encryptVar(var):
+#    return encryption.encrypt(var.encode())
 
 # Get connection when no requests e.g Pyton REPL.
 def get_connection():

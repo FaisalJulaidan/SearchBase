@@ -327,6 +327,7 @@ def checkForMessageWhenAssistantID():
 def signup():
     if request.method == "GET":
         msg = checkForMessage()
+        print(encryption)
         return render_template("signup.html", debug=app.debug, msg=msg)
     elif request.method == "POST":
 

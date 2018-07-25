@@ -96,7 +96,7 @@ def allowed_image_file(filename):
 # code to ensure user is logged in
 @app.before_request
 def before_request():
-
+    print(encryption)
     theurl = str(request.url_rule)
     restrictedRoutes = ['/admin', 'admin/homepage']
     # If the user try to visit one of the restricted routes without logging in he will be redirected
@@ -134,7 +134,6 @@ def indexpage():
 
 @app.route("/setencryptionkey<key>", methods=["GET"])
 def testing(key):
-    print("Starting key get")
     if app.debug:
         serverRoute = "http://127.0.0.1:5000"
         if "gT5-f" in key:
@@ -142,34 +141,26 @@ def testing(key):
             key = key.replace("gT5-f", "").replace("Pa-", "5o_n").replace("uF-r", "UbwF")
     else:
         serverRoute = "https://www.thesearchbase.com"
-    print("Got default server part")
     page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
     text = page.read().decode("utf8")
     part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')
-    print("Part 1: ", part1)
     page = urllib.request.urlopen(serverRoute + "/static/js/Chart.bundle.js")
     text = page.read().decode("utf8")
     part2 = text.split("GFoiWS$344wf43-cWzHOp")[1].split("Ye3Sv-FE-vWaIt3xWkbE6bsd7-jS")[0].replace('8B', '3J')
-    print("Part 2: ", part2)
     page = urllib.request.urlopen(serverRoute + "/static/css/admin.css")
     text = page.read().decode("utf8")
     part3 = text.split(".tic")[1].split("Icon")[0]
-    print("Part 3: ", part3)
     page = urllib.request.urlopen(serverRoute + "/static/css/themify-icons.css")
     text = page.read().decode("utf8")
     part4 = text.split("YbfEas-fUh")[1].split("TbCO")[0].replace('P-', '-G')
-    print("Part 4: ", part4)
     if not app.debug:
         page = urllib.request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
         text = page.read().decode("utf8")
-        print("Page from heroku: ", text)
         part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
-        print("Part 5: ", part5)
     else:
         part5 = ""
     enckey = part1+part2+part3+part4+part5
     enckey = ((enckey+key).replace(" ", "")).encode()
-    print("Enckey: ", enckey)
     global encryption
     encryption = Fernet(enckey)
     return "Done"
@@ -214,14 +205,8 @@ def contactpage():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-
     if request.method == "GET":
         msg = checkForMessage()
-
-        #Log out user upon entering this page (when user logs out through button he is directed here)
-        session['Logged_in'] = False
-        session['User'] = None  
-
         return render_template("login.html", msg=msg)
 
     elif request.method == "POST":
@@ -327,7 +312,6 @@ def checkForMessageWhenAssistantID():
 def signup():
     if request.method == "GET":
         msg = checkForMessage()
-        print(encryption)
         return render_template("signup.html", debug=app.debug, msg=msg)
     elif request.method == "POST":
 
@@ -2293,7 +2277,6 @@ def insert_db(table, fields=(), values=()):
 
 #encryption function to save typing
 def encryptVar(var):
-    print(encryption)
     return encryption.encrypt(var.encode())
 
 # Get connection when no requests e.g Pyton REPL.

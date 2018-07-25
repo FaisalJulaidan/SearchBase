@@ -371,10 +371,10 @@ def signup():
 
             # Create a company record for the new user
             #ENCRYPTION
-            insertCompanyResponse = insert_into_database_table(
-                "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
             #insertCompanyResponse = insert_into_database_table(
-             #   "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName, companySize, websiteURL, companyPhoneNumber))
+            #    "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
+            insertCompanyResponse = insert_into_database_table(
+                "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName, companySize, websiteURL, companyPhoneNumber))
 
             newCompany = get_last_row_from_table("Companies")
             # print(newCompany)
@@ -395,14 +395,14 @@ def signup():
 
                 # Create a user account and link it with the new created company record above
                 #ENCRYPTION
+                #newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
+                #            (newCompany['ID'], encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(email), hashed_password, newCustomer['id'],
+                #            str(verified), sub['id'])
+                #            )
                 newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
-                            (newCompany['ID'], encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(email), hashed_password, newCustomer['id'],
+                            (newCompany['ID'], firstname, surname, accessLevel, email, hashed_password, newCustomer['id'],
                             str(verified), sub['id'])
                             )
-                #newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
-                 #           (newCompany['ID'], firstname, surname, accessLevel, email, hashed_password, newCustomer['id'],
-                  #          str(verified), sub['id'])
-                   #         )
 
 
 

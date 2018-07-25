@@ -1845,7 +1845,6 @@ def chatbot(companyName, assistantID):
 @app.route("/account/verify/<payload>", methods=['GET'])
 def verify_account(payload):
     if request.method == "GET":
-        email = session.get('User')['Email']
         data = ""
         try:
             data = verificationSigner.loads(payload)

@@ -163,6 +163,7 @@ def testing(key):
     enckey = ((enckey+key).replace(" ", "")).encode()
     global encryption
     encryption = Fernet(enckey)
+    print(encryption)
     return "Done"
 
 

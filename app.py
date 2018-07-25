@@ -225,6 +225,8 @@ def login():
         return render_template("login.html", msg=msg)
 
     elif request.method == "POST":
+        session.permanent = True
+        app.permanent_session_lifetime = timedelta(minutes=60)
 
         email = request.form.get("email", default="Error")
         password_to_check = request.form.get("password", default="Error")

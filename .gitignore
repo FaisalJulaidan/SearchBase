@@ -531,4 +531,3 @@ __pycache__/
 
 # End of https://www.gitignore.io/api/macos,linux,python,windows,pycharm,visualstudio
 
-*.db

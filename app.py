@@ -28,7 +28,7 @@ app = Flask(__name__, static_folder='static')
 app.config.from_object('config.BaseConfig')
 
 # For Development
-#app.config.from_object('config.DevelopmentConfig')
+# app.config.from_object('config.DevelopmentConfig')
 ## -----
 
 
@@ -172,8 +172,6 @@ def testing(key):
     print("Enckey: ", enckey)
     global encryption
     encryption = Fernet(enckey)
-    print("Encryption: ", encryption)
-    print("Encryption key set")
     return "Done"
 
 
@@ -389,7 +387,7 @@ def signup():
             #insertCompanyResponse = insert_into_database_table(
                 #"INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
             insertCompanyResponse = insert_into_database_table(
-                "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName, companySize, websiteURL, companyPhoneNumber))
+                "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
 
             newCompany = get_last_row_from_table("Companies")
             # print(newCompany)
@@ -415,7 +413,7 @@ def signup():
                 #            str(verified), sub['id'])
                 #            )
                 newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
-                            (newCompany['ID'], firstname, surname, accessLevel, email, hashed_password, newCustomer['id'],
+                            (newCompany['ID'], encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(email), hashed_password, newCustomer['id'],
                             str(verified), sub['id'])
                             )
 
@@ -576,6 +574,9 @@ def profilePage():
         company = query_db("SELECT * FROM Companies WHERE ID=?;", [user["CompanyID"]])
         if company is None or company is "None" or company is "Error":
             company="Error in finding company"
+        print(company)
+        print(user)
+        print(email)
         return render_template("admin/profile.html", user=user, email=email, company=company[0])
 
     elif request.method == "POST":
@@ -605,6 +606,10 @@ def profilePage():
                             user = record
                     session['User'] = user
                     return redirect("/admin/profile", code=302)
+                else:
+                    print("Error in updating Company or Profile Data")
+                    return redirect("/admin/profile", code=302)
+            return redirectWithMessage("profilePage", newEmail)
         print("Error in updating Company or Profile Data")
         return redirect("/admin/profile", code=302)
 
@@ -1445,7 +1450,7 @@ def admin_users_add():
             #    (companyID, encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(newEmail), hashed_password, "False"))
             insertUserResponse = insert_into_database_table(
                 "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
-                (companyID, firstname, surname, accessLevel, newEmail, hashed_password, "False"))
+                (companyID, encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(newEmail), hashed_password, "True"))
             if "added" not in insertUserResponse:
                 print("Error in insert operation")
                 #TODO pass in feedback message
@@ -2359,15 +2364,18 @@ def not_implemented(e):
 #     def __getitem__(self, k):
 #         return self.comp.get(k)
 
+
 if __name__ == "__main__":
-    print("Server is running...")
+
+    print("Run the server...")
+    print(app.debug)
+
     # Create the schema
     init_db()
     # Print app configuration
     print(app.config)
     # Run the app server
     app.run()
-
 
 
 

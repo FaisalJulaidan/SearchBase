@@ -1871,7 +1871,7 @@ def verify_account(payload):
                         msg = Message("Thank you for registering, {} {}".format(user["Firstname"], user["Surname"]),
                                       sender="thesearchbase@gmail.com",
                                       recipients=[email])
-                        msg.body = "<img src='https://thesearchbase.com/static/email_images/welcome.png' style='width:500px;height:228px;'> <br /> We appreciate you registering with TheSearchBase. A whole new world of possibilities is ahead of you."
+                        msg.html = "<img src='https://thesearchbase.com/static/email_images/welcome.png' style='width:500px;height:228px;'> <br /> We appreciate you registering with TheSearchBase. A whole new world of possibilities is ahead of you."
                         mail.send(msg)
 
                         return redirectWithMessage("login", "Thank you for verifying.")

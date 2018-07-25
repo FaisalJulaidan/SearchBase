@@ -1,7 +1,7 @@
-#!/usr/bin/python3
-from flask_mail import Mail, Message
+#/usr/bin/python3.5
 from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, \
     make_response, g, session
+from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
 from contextlib import closing
 from flask_api import status
@@ -28,7 +28,7 @@ app = Flask(__name__, static_folder='static')
 app.config.from_object('config.BaseConfig')
 
 # For Development
-#app.config.from_object('config.DevelopmentConfig')
+# app.config.from_object('config.DevelopmentConfig')
 ## -----
 
 
@@ -134,6 +134,7 @@ def indexpage():
 
 @app.route("/setencryptionkey<key>", methods=["GET"])
 def testing(key):
+    print("Starting key get")
     if app.debug:
         serverRoute = "http://127.0.0.1:5000"
         if "gT5-f" in key:
@@ -141,29 +142,36 @@ def testing(key):
             key = key.replace("gT5-f", "").replace("Pa-", "5o_n").replace("uF-r", "UbwF")
     else:
         serverRoute = "https://www.thesearchbase.com"
+    print("Got default server part")
     page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
     text = page.read().decode("utf8")
     part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')
+    print("Part 1: ", part1)
     page = urllib.request.urlopen(serverRoute + "/static/js/Chart.bundle.js")
     text = page.read().decode("utf8")
     part2 = text.split("GFoiWS$344wf43-cWzHOp")[1].split("Ye3Sv-FE-vWaIt3xWkbE6bsd7-jS")[0].replace('8B', '3J')
+    print("Part 2: ", part2)
     page = urllib.request.urlopen(serverRoute + "/static/css/admin.css")
     text = page.read().decode("utf8")
     part3 = text.split(".tic")[1].split("Icon")[0]
+    print("Part 3: ", part3)
     page = urllib.request.urlopen(serverRoute + "/static/css/themify-icons.css")
     text = page.read().decode("utf8")
     part4 = text.split("YbfEas-fUh")[1].split("TbCO")[0].replace('P-', '-G')
+    print("Part 4: ", part4)
     if not app.debug:
         page = urllib.request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
         text = page.read().decode("utf8")
+        print("Page from heroku: ", text)
         part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
+        print("Part 5: ", part5)
     else:
         part5 = ""
     enckey = part1+part2+part3+part4+part5
     enckey = ((enckey+key).replace(" ", "")).encode()
+    print("Enckey: ", enckey)
     global encryption
     encryption = Fernet(enckey)
-    print("Encryption key set")
     return "Done"
 
 
@@ -375,6 +383,9 @@ def signup():
 
 
             # Create a company record for the new user
+            #ENCRYPTION
+            #insertCompanyResponse = insert_into_database_table(
+                #"INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
             insertCompanyResponse = insert_into_database_table(
                 "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
 
@@ -396,10 +407,16 @@ def signup():
                 # print(sub)
 
                 # Create a user account and link it with the new created company record above
+                #ENCRYPTION
+                #newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
+                #            (newCompany['ID'], encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(email), hashed_password, newCustomer['id'],
+                #            str(verified), sub['id'])
+                #            )
                 newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
                             (newCompany['ID'], encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(email), hashed_password, newCustomer['id'],
                             str(verified), sub['id'])
                             )
+
 
 
             except Exception as e:
@@ -557,6 +574,9 @@ def profilePage():
         company = query_db("SELECT * FROM Companies WHERE ID=?;", [user["CompanyID"]])
         if company is None or company is "None" or company is "Error":
             company="Error in finding company"
+        print(company)
+        print(user)
+        print(email)
         return render_template("admin/profile.html", user=user, email=email, company=company[0])
 
     elif request.method == "POST":
@@ -574,15 +594,22 @@ def profilePage():
             for user in users:
                 if user["Email"] == curEmail:
                     #TODO check if they worked
-                    updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [encryptVar(name1),encryptVar(name2),encryptVar(newEmail),user["ID"]])
+                    #ENCRYPTION
+                   # updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [encryptVar(name1),encryptVar(name2),encryptVar(newEmail),user["ID"]])
+                    updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [name1,name2,newEmail,user["ID"]])
                     companyID = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?;", [user["ID"]])
-                    updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0]])
+                    #updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0]])
+                    updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [companyName,companyURL,companyID[0]])
                     users = query_db("SELECT * FROM Users")
                     for record in users:
                         if record["Email"] == newEmail:
                             user = record
                     session['User'] = user
                     return redirect("/admin/profile", code=302)
+                else:
+                    print("Error in updating Company or Profile Data")
+                    return redirect("/admin/profile", code=302)
+            return redirectWithMessage("profilePage", newEmail)
         print("Error in updating Company or Profile Data")
         return redirect("/admin/profile", code=302)
 
@@ -1417,9 +1444,13 @@ def admin_users_add():
                 redirect("/admin/users", code=302)
             hashed_password = hash_password(password)
 
+            #ENCRYPTION
+            #insertUserResponse = insert_into_database_table(
+            #    "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
+            #    (companyID, encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(newEmail), hashed_password, "False"))
             insertUserResponse = insert_into_database_table(
                 "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
-                (companyID, encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(newEmail), hashed_password, "False"))
+                (companyID, encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(newEmail), hashed_password, "True"))
             if "added" not in insertUserResponse:
                 print("Error in insert operation")
                 #TODO pass in feedback message
@@ -2341,6 +2372,9 @@ if __name__ == "__main__":
 
     # Create the schema
     init_db()
+    # Print app configuration
+    print(app.config)
+    # Run the app server
     app.run()
 
 

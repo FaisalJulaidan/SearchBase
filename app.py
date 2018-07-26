@@ -245,8 +245,7 @@ def login():
                             # Store user assistants if they exist, in the session
                             assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?;",
                                                 [user['CompanyID']])
-                            if len(assistants) > 0:
-                                session['UserAssistants'] =  assistants
+                            session['UserAssistants'] =  assistants
 
                             # Test session specific values
                             print(session)

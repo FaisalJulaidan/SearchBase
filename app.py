@@ -28,10 +28,8 @@ app = Flask(__name__, static_folder='static')
 app.config.from_object('config.BaseConfig')
  
 # For Development
-# app.config.from_object('config.DevelopmentConfig')
+#app.config.from_object('config.DevelopmentConfig')
 ## -----
-
-
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
@@ -52,11 +50,7 @@ stripe_keys = {
     'publishable_key': pub_key
 }
 
-
 # stripe.api_key = stripe_keys['secret_key']
-
-
-
 
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
@@ -71,10 +65,6 @@ mail = Mail(app)
 
 ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
 ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
-
-
-
-
 
 
 def hash_password(password, salt=gensalt()):
@@ -92,7 +82,6 @@ def allowed_image_file(filename):
     return '.' in filename and ext in ALLOWED_IMAGE_EXTENSION
 
 
-
 # code to ensure user is logged in
 @app.before_request
 def before_request():
@@ -101,7 +90,7 @@ def before_request():
     restrictedRoutes = ['/admin', 'admin/homepage']
     # If the user try to visit one of the restricted routes without logging in he will be redirected
     if any(route in theurl for route in restrictedRoutes) and not session.get('Logged_in', False):
-        return redirectWithMessage("login", "You are not logged in!")
+        return redirectWithMessage("login", "Please Login.")
 
 
 
@@ -167,7 +156,6 @@ def testing(key):
     return "Done"
 
 
-
 @app.route("/features", methods=['GET'])
 def features():
     if request.method == "GET":
@@ -220,7 +208,7 @@ def login():
 
         if email == "Error" or password_to_check == "Error":
             print("Invalid request: Email or password not received!")
-            return redirectWithMessage("login", "Email or password not received!")
+            return redirectWithMessage("login", "You entered an incorrect username or password.")
 
         else:
             email = email.lower()
@@ -253,10 +241,10 @@ def login():
 
                         else:
                             return render_template('errors/verification.html',
-                                                   data="Account not verified, please check your email and follow instructions")
+                                                   data="Your Account has not been verified, please check your email.")
                     else:
-                        return redirectWithMessage("login", "User name and password does not match!")
-            return redirectWithMessage("login", "User not found!")
+                        return redirectWithMessage("login", "You entered an incorrect username or password.")
+            return redirectWithMessage("login", "You entered an incorrect username or password.")
 
 
 @app.route('/logout')
@@ -340,7 +328,7 @@ def signup():
             for user in users:
                 if user["Email"] == email:
                     print("Email is already in use!")
-                    return redirectWithMessage("signup", "Email is already in use!")
+                    return redirectWithMessage("signup", "Email already in use.")
             try:
                 firstname = fullname.strip().split(" ")[0]
                 surname = fullname.strip().split(" ")[1]
@@ -435,7 +423,8 @@ def signup():
                 payload = email + ";" + companyName
                 link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
                 msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png' style='width:500px;height:228px;'> <br /><p>You have registered with TheSearchBase!</p> <br>Please visit \
-                            <a href='"+link+"'>this link</a> to verify your account."
+                            <a href='"+link+"'>this link</a> to verify your account. \
+                            <img src='https://thesearchbase.com/static/email_images/footer_image.png' style='width:500px;height:228px;'>"
                 mail.send(msg)
 
                 # sending the registration confirmation email to us

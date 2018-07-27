@@ -242,8 +242,6 @@ def login():
                         else:
                             return render_template('errors/verification.html',
                                                    data="Your Account has not been verified, please check your email.")
-                    else:
-                        return redirectWithMessage("login", "You entered an incorrect username or password.")
             return redirectWithMessage("login", "You entered an incorrect username or password.")
 
 
@@ -307,7 +305,7 @@ def signup():
         email = request.form.get("email", default="Error").lower()
 
         fullname = request.form.get("fullname", default="Error")
-        accessLevel = "Admin"
+        accessLevel = "Owner"
         password = request.form.get("password", default="Error")
 
         companyName = request.form.get("companyName", default="Error")
@@ -452,9 +450,7 @@ def get_company(email):
             else:
                 print("Error with finding company")
                 return "Error"
-        else:
-            print("Error with finding user")
-            return "Error"
+    print("Error with finding user")
     return "Error"
 
 
@@ -474,9 +470,7 @@ def get_assistants(email):
             else:
                 print("Error with finding company")
                 return "Error"
-        else:
-            print("Error with finding user")
-            return "Error"
+    print("Error with finding user")
     return "Error"
 
 
@@ -541,12 +535,13 @@ def profilePage():
     if request.method == "GET":
         email = session.get('User')['Email']
         users = query_db("SELECT * FROM Users")
+        user = "Error"
         # If user exists
         for record in users:
             if record["Email"] == email:
                 user = record
-            else:
-                user = "Error in finding user"
+        if "Error" in user:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error in finding user!")
         company = query_db("SELECT * FROM Companies WHERE ID=?;", [user["CompanyID"]])
         if company is None or company is "None" or company is "Error":
             company="Error in finding company"
@@ -577,15 +572,15 @@ def profilePage():
                     #updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0]])
                     updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [companyName,companyURL,companyID[0]])
                     users = query_db("SELECT * FROM Users")
+                    user = "Error"
                     for record in users:
                         if record["Email"] == newEmail:
                             user = record
+                    if "Error" in user:
+                        print("Error in updating Company or Profile Data")
+                        return redirect("/admin/profile", code=302)
                     session['User'] = user
                     return redirect("/admin/profile", code=302)
-                else:
-                    print("Error in updating Company or Profile Data")
-                    return redirect("/admin/profile", code=302)
-            return redirectWithMessage("profilePage", newEmail)
         print("Error in updating Company or Profile Data")
         return redirect("/admin/profile", code=302)
 
@@ -674,16 +669,17 @@ def admin_assistant_delete(assistantID):
     if request.method == "GET":
         email = session.get('User')['Email']
         users = query_db("SELECT * FROM Users")
+        userCompanyID = "Error" 
         # If user exists
         for user in users:
             if user["Email"] == email:
                 userCompanyID = user["CompanyID"]
-            else:
-                return redirect("/admin/homepage")
+        if "Error" in userCompanyID:
+            return redirect("/admin/homepage")
         assistantCompanyID = select_from_database_table("SELECT CompanyID FROM Assistants WHERE ID=?", [assistantID])
 
         #Check if the user is from the company that owns the assistant
-        if userCompanyID[0] == assistantCompanyID[0]:
+        if userCompanyID == assistantCompanyID[0]:
             deleteAssistant = delete_from_table("DELETE FROM Assistants WHERE ID=?;",[assistantID])
             print(deleteAssistant)
             if deleteAssistant == "Record successfully deleted.":
@@ -923,7 +919,10 @@ def admin_answers(assistantID):
 
                 for i in range(1, noa):
                     answer = request.form.get("pname" + str(i), default="Error")
-                    keyword = request.form.getlist("keywords" + str(i), default="Error")
+                    try:
+                        keyword = request.form.getlist("keywords" + str(i))
+                    except:
+                        keyword = "Error"
                     keyword = ','.join(keyword)
                     action = request.form.get("action" + str(i), default="None")
                     if "Error" in answer or "Error" in keyword or "Error" in action:
@@ -1236,12 +1235,13 @@ def admin_pay(planID):
 
         # Get the user by email
         users = query_db("SELECT * FROM Users")
+        user = "Error"
         # If user exists
         for record in users:
             if record["Email"] == session.get('User')['Email']:
                 user = record
-            else:
-                return jsonify(error="An error occurred and could not subscribe.")
+        if "Error" in user:
+            return jsonify(error="An error occurred and could not subscribe.")
 
         try:
             subscription = stripe.Subscription.create(
@@ -1300,12 +1300,13 @@ def unsubscribe():
         #     redirectWithMessage("login", "You must login first!")
         
         users = query_db("SELECT * FROM Users")
+        user = "Error"
         # If user exists
         for record in users:
             if record["Email"] == session.get('User')['Email']:
                 user = record
-            else:
-                return redirectWithMessage("admin_pricing", "An error occurred while trying to unsubscribe")
+        if "Error" in user:
+            return redirectWithMessage("admin_pricing", "An error occurred while trying to unsubscribe")
         if user['SubID'] is None:
             print("This account has no active subscriptions ")
             return redirectWithMessage("admin_pricing", "This account has no active subscriptions ")
@@ -1458,10 +1459,13 @@ def admin_users_modify():
             updatedAccess = update_table("UPDATE Users SET AccessLevel=? WHERE ID=?;", [newAccess, userID])
             if newAccess == "Owner":
                 users = query_db("SELECT * FROM Users")
+                recordID = "Error"
                 # If user exists
                 for record in users:
                     if record["Email"] == session.get('User')['Email']:
                         recordID = record["ID"]
+                if "Error" in recordID:
+                    return redirect("admin/users", code=302)
                 updatedAccess = update_table("UPDATE Users SET AccessLevel=? WHERE ID=?;", ["Admin", recordID])
                 #TODO return feedbackmessage
                 return redirect("/admin/users", code=302)
@@ -1477,10 +1481,13 @@ def admin_users_delete(userID):
         companyID = company[0]
         
         users = query_db("SELECT * FROM Users")
+        requestingUser = "Error"
         # If user exists
         for user in users:
             if user["Email"] == email:
                 requestingUser = user
+        if "Error" in requestingUser:
+            return redirect("/admin/users", code=302)
         targetUser = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?", [userID])[0]
         #Check that users are from the same company and operating user isnt 'User'
         if requestingUser["AccessLevel"] == "User" or requestingUser["CompanyID"] != targetUser:
@@ -1607,20 +1614,19 @@ def chatbot(companyName, assistantID):
             # MONTHLY UPDATE
             date = datetime.now().strftime("%Y-%m")
             currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
-            if currentStats is None:
+            if currentStats is None or "Error" in currentStats or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
                     (assistantID, date, 1, 0, 0))
                 # TODO check newStats for errors
             else:
-                updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
-                                            [currentStats[3] + 1, assistantID, date])
+                updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;", [currentStats[3] + 1, assistantID, date])
 
             # WEEKLY UPDATE
             dateParts = datetime.now().strftime("%Y-%m-%d").split("-")
             date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
             currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
-            if currentStats is None:
+            if currentStats is None or "Error" in currentStats or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
                     (assistantID, date, 1, 0, 0))
@@ -1844,19 +1850,24 @@ def verify_account(payload):
                         abort(status.HTTP_400_BAD_REQUEST, "Company data doesn't match")
                     else:
                         users = query_db("SELECT * FROM Users")
+                        requestingUser = "Error"
                         # If user exists
                         for user in users:
                             if user["Email"] == email:
                                 requestingUser = user
+                        if "Error" in requestingUser:
+                            abort(status.HTTP_400_BAD_REQUEST, "User not found!")
                         updateUser = update_table("UPDATE Users SET Verified=? WHERE ID=?;", ["True", requestingUser["ID"]])
                         # TODO check updateUser
                         
                         users = query_db("SELECT * FROM Users")
                         # If user exists
+                        user = "Error"
                         for record in users:
                             if record["Email"] == email:
                                 user = record
-                        # TODO check user
+                        if "Error" in user:
+                            abort(status.HTTP_400_BAD_REQUEST, "Target user not found!")
 
                         # sending registration confirmation email to the user.
                         msg = Message("Thank you for registering, {} {}".format(user["Firstname"], user["Surname"]),
@@ -1896,30 +1907,29 @@ def reset_password():
     else:
          email = request.form.get("email", default="Error")
          # TODO check this
-
          users = query_db("SELECT * FROM Users")
+         user = "Error"
          # If user exists
          for record in users:
              if record["Email"] == email:
                  user = record
-             else:
-                return redirectWithMessage("login", "Error in finding user!")
+         if "Error" in user:
+             return redirectWithMessage("login", "Error in finding user!")
+         company = get_company(email)
+         if company is None or "Error" in company:
+             return redirectWithMessage("login", "Error in finding company!")
          else:
-             company = get_company(email)
-             if company is None or "Error" in company:
-                 return redirectWithMessage("login", "Error in finding company!")
-             else:
-                 # TODO this needs improving
-                 msg = Message("Password reset",
-                               sender="thesearchbase@gmail.com",
-                               recipients=[email])
-
-                 payload = email + ";" + company[1]
-                 link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
-                 msg.html ="<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'><br /><p>Your password has been reset as per your request.<br/ >Please visit <a href='"+link+"'>this link</a> to verify your account.</p>"
-                 mail.send(msg)
-
-                 return redirect("/errors/verification_password.html", code=302)
+             # TODO this needs improving
+             msg = Message("Password reset",
+                         sender="thesearchbase@gmail.com",
+                         recipients=[email])
+              
+             payload = email + ";" + company[1]
+             link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
+             msg.html ="<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'><br /><p>Your password has been reset as per your request.<br/ >Please visit <a href='"+link+"'>this link</a> to verify your account.</p>"
+             mail.send(msg)
+ 
+             return redirectWithMessage("login", "Password reset email has been sent")
 
 @app.route("/account/resetpassword/<payload>", methods=['GET', 'POST'])
 def reset_password_verify(payload):
@@ -1947,7 +1957,7 @@ def reset_password_verify(payload):
                         abort(status.HTTP_400_BAD_REQUEST, "Company data doesn't match")
                     else:
                         # Everything checks out
-                        return render_template("/accounts/resetpasswordset.html", email=email, payload=payload)
+                        return render_template("/accounts/set_resetpassword.html", email=email, payload=payload)
 
             except IndexError:
                 # TODO handle better
@@ -1974,12 +1984,13 @@ def reset_password_verify(payload):
         password = request.form.get("password", default="Error")
         hashedNewPassword = hash_password(password)
         users = query_db("SELECT * FROM Users")
+        user = "Error"
         # If user exists
         for record in users:
             if record["Email"] == email:
                 user = record
-            else:
-                return redirectWithMessage("login", "Error in finding user!")
+        if "Error" in user:
+            return redirectWithMessage("login", "Error in finding user!")
         updatePassword = update_table("UPDATE Users SET Password=? WHERE ID=?;", [hashedNewPassword, user["ID"]])
         return redirectWithMessage("login", "Password has been changed.")
 
@@ -1995,14 +2006,15 @@ def change_password():
         # TODO check these
         
         users = query_db("SELECT * FROM Users")
+        user = "Error"
         # If user exists
         for record in users:
             if record["Email"] == email:
                 user = record
-            else:
-                return render_template("/accounts/changepassword.html", msg="User not found!")
+        if "Error" in user:
+            return render_template("/accounts/changepassword.html", msg="User not found!")
         # TODO check user
-        if user[8] == "True":
+        if user["Verified"] == "True":
             password = user["Password"]
             if hash_password(currentPassword, password) == password:
                 hashedNewPassword = hash_password(newPassword)

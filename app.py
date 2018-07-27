@@ -423,7 +423,7 @@ def signup():
                             <a href='"+link+"'> this link </a> to verify your account. \
                             In case the link above doesn't work you can click on the link below. <br /> <br /> " + link + " <br />  <br /> \
                             We look forward to you, using our platform, <br />\
-                            Regards \
+                            Regards, <br /> TheSearchBase Team <br />\
                             <img src='https://thesearchbase.com/static/email_images/footer_image.png' style='width:250px;height:128px;'>"
                 mail.send(msg)
 
@@ -1441,10 +1441,10 @@ def admin_users_add():
                 msg = Message("Account verification, "+firstname+" "+surname,
                               sender="thesearchbase@gmail.com",
                               recipients=[newEmail])
-                msg.html = "<p>You have been registered with TheSearchBase by an Admin at your company.<br> \
-                            If you feel this is a mistake please contact "+email+".<br> \
-                            Your temporary password is: "+password+".<br>\
-                            Please visit <a href='"+link+"'>this link</a> to set password for your account.<p>"
+                msg.html = "<h4>Hi, <h4> <br /> <p>You have been registered with TheSearchBase by an admin at your company.<br> \
+                            To get access to the platform, we have generated a temporary password for you to access the platform.</p> <br /> \
+                            <h4>Your temporary password is: "+password+".<h4><br />\
+                            Please visit <a href='"+link+"'>this link</a> to sign in and to set the password for your account.<p><br /> If you feel this is a mistake please contact "+email+". <br /> <br / > Regards, TheSearchBase Team"
                 mail.send(msg)
                 #TODO return feedbackmessage
                 return redirect("/admin/users")
@@ -1873,7 +1873,13 @@ def verify_account(payload):
                         msg = Message("Thank you for registering, {} {}".format(user["Firstname"], user["Surname"]),
                                       sender="thesearchbase@gmail.com",
                                       recipients=[email])
-                        msg.html = "<img src='https://thesearchbase.com/static/email_images/welcome.png' style='width:500px;height:228px;'> <br /> We appreciate you registering with TheSearchBase. A whole new world of possibilities is ahead of you."
+                        msg.html = "<img src='https://thesearchbase.com/static/email_images/welcome.png' style='width:500px;height:228px;'><br /> \
+                                   <h4>Hi,</h4> <p>Thank you for registering with TheSearchBase!</p> \
+                                   <br /> <p>A whole new world of possibilities is ahead of you, we strive to be a platform that aims to make chat bot technology available to everyone. \
+                                   If you would like to know more about our start up story, check our <a href=https://www.thesearchbase.com/about> Story <a/> and see what we're all about. </p> <br /> \
+                                   <p>More Importantly, we would like you to use our platform and tell us what you think. If you could share your ideas or suggestions with our team, we would be very happy to collect your feedback</p> \
+                                   <p>As a final message, we would like to say, we thoroughly hope you enjoy using our platform and hope to see your chat bot revolutionise your company or idea.</p><br /> <p> Happy chatboting, </p><br /> <p>TheSearchbase Team</p> \
+                                   <img src='https://thesearchbase.com/static/email_images/footer_image.png' style='width:500px;height:228px;'>"
                         mail.send(msg)
 
                         return redirectWithMessage("login", "Thank you for verifying.")
@@ -1926,7 +1932,10 @@ def reset_password():
               
              payload = email + ";" + company[1]
              link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
-             msg.html ="<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'><br /><p>Your password has been reset as per your request.<br/ >Please visit <a href='"+link+"'>this link</a> to verify your account.</p>"
+             msg.html ="<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'> <h4> Hi, </h4><br /><p>We are been informed you would like to reset your password. <br/ > \
+                        Please visit <a href='"+link+"'>this link</a> to verify your account and to set your new password.</p> <br /> <br /> \
+                        <p>If you have received this by mistake, please let our team know and kindly delete this email</p><br /> \
+                        <img src='https://thesearchbase.com/static/email_images/footer_image.png' style='width:500px;height:228px;'>"
              mail.send(msg)
  
              return redirectWithMessage("login", "Password reset email has been sent")

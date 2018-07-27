@@ -419,12 +419,14 @@ def signup():
                 msg = Message("Account verification",
                                 sender="thesearchbase@gmail.com",
                                 recipients=[email])
-
                 payload = email + ";" + companyName
                 link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
-                msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png' style='width:500px;height:228px;'> <br /><p>You have registered with TheSearchBase!</p> <br>Please visit \
-                            <a href='"+link+"'>this link</a> to verify your account. \
-                            <img src='https://thesearchbase.com/static/email_images/footer_image.png' style='width:500px;height:228px;'>"
+                msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png' style='width:250px;height:128px;'> <br /><h4>Hi,</h4> <p>Thank you for registering with TheSearchbase.</p> <br />  There is just one small step left, visit \
+                            <a href='"+link+"'> this link </a> to verify your account. \
+                            In case the link above doesn't work you can click on the link below. <br /> <br /> " + link + " <br />  <br /> \
+                            We look forward to you, using our platform, <br />\
+                            Regards \
+                            <img src='https://thesearchbase.com/static/email_images/footer_image.png' style='width:250px;height:128px;'>"
                 mail.send(msg)
 
                 # sending the registration confirmation email to us

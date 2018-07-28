@@ -272,14 +272,16 @@ def redirectWithMessage(function, message):
     return redirect(url_for("."+function, messages=messages))
 
 def checkForMessage():
+    print("Starting getting message process")
     args = request.args
+    print("ARGS: ", args)
     msg=" "
     if len(args) > 0:
         messages = args['messages']
+        print("Messages: ", messages)
         if messages is not None:
             msg = loads(messages)['msg']
-            if msg is None or msg == "None":
-                msg = " "
+    print("Return message: ", msg)
     return msg
 
 

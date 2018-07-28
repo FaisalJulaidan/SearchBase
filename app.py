@@ -91,6 +91,16 @@ def before_request():
     # If the user try to visit one of the restricted routes without logging in he will be redirected
     if any(route in theurl for route in restrictedRoutes) and not session.get('Logged_in', False):
         return redirectWithMessage("login", "Please log in first")
+    # Check user permissions as user type
+    if any(route in theurl for route in restrictedRoutes):
+        print(session['Permissions'])
+        if not session['Permissions']["EditChatbots"] and "/admin/assistant" in theurl:
+            return redirect("/admin/homepage", code=302)
+        if not session['Permissions']["EditUsers"] and "/admin/users" in theurl:
+            return redirect("/admin/homepage", code=302)
+        if not session['Permissions']["AccessBilling"] and "/admin/assistant/" in theurl:
+            return redirect("/admin/homepage", code=302)
+    
 
 
 
@@ -229,6 +239,24 @@ def login():
                             # Set the session for the logged in user
                             session['User'] = user
                             session['Logged_in'] = True
+                            
+                            permissionsDic = {}
+                            permissions = query_db("SELECT * FROM UserSettings WHERE CompanyID=?", [session.get('User')['CompanyID']])[0]
+                            if "Owner" in session.get('User')['AccessLevel']:
+                                permissions = permissions["AdminPermissions"].split(";")
+                                for perm in permissions:
+                                    if perm:
+                                        permissionsDic[perm.split(":")[0]] = True
+                            else:
+                                permissions = permissions[session.get('User')['AccessLevel']+"Permissions"].split(";")
+                                for perm in permissions:
+                                    if perm:
+                                        if "True" in perm.split(":")[1]:
+                                            permBool = True
+                                        else:
+                                            permBool = False
+                                        permissionsDic[perm.split(":")[0]] = permBool
+                            session['Permissions'] = dict(permissionsDic)
 
                             # Store user assistants if they exist, in the session
                             assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?;",
@@ -516,7 +544,11 @@ def adminPagesData():
         # If user exists
         for user in users:
             if user["Email"] == email:
-                return user["Firstname"]
+                returnString = ""
+                permissions = ""
+                for key,value in session['Permissions'].items():
+                    permissions+= key + ":" + str(value) + ";"
+                return user["Firstname"] + "&&&" + permissions
         return "wait...Who are you?"
 
 @app.route("/admin/profile", methods=['GET', 'POST'])
@@ -1518,6 +1550,25 @@ def admin_users_permissions():
         #update table
         #updatePermissions = query_db("UPDATE UserSettings SET AdminPermissions=?,UserPermissions=? WHERE CompanyID=?;", [adminPermissions, userPermissions, session.get('User')['CompanyID']])
         updatePermissions = update_table("UPDATE UserSettings SET AdminPermissions=?,UserPermissions=? WHERE CompanyID=?;", [adminPermissions, userPermissions, session.get('User')['CompanyID']])
+
+        #update current user's permisions
+        permissionsDic = {}
+        permissions = query_db("SELECT * FROM UserSettings WHERE CompanyID=?", [session.get('User')['CompanyID']])[0]
+        if "Owner" in session.get('User')['AccessLevel']:
+            permissions = permissions["AdminPermissions"].split(";")
+            for perm in permissions:
+                if perm:
+                    permissionsDic[perm.split(":")[0]] = True
+        else:
+            permissions = permissions[session.get('User')['AccessLevel']+"Permissions"].split(";")
+            for perm in permissions:
+                if perm:
+                    if "True" in perm.split(":")[1]:
+                        permBool = True
+                    else:
+                        permBool = False
+                    permissionsDic[perm.split(":")[0]] = permBool
+        session['Permissions'] = dict(permissionsDic)
 
         return redirect("/admin/users", code=302)
 

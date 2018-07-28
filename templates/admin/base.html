@@ -74,7 +74,7 @@
                                 <li>
                                     <a href="/admin/homepage"><i class="fa fa-home"></i> Dashboard</a>
                                 </li>
-                                <li>
+                                <li id="chatbots">
                                     <a><i class="fa fa-comments-o"></i> Assistants <span
                                             class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
@@ -141,10 +141,10 @@
                                     </a>
                                     <ul class="nav child_menu">
                                         <li><a href="/admin/profile">Profile</a></li>
-                                        <li><a href="/admin/users">Additional Users</a></li>
+                                        <li id="users"><a href="/admin/users">Additional Users</a></li>
                                     </ul>
                                 </li>
-                                <li><a><i class="fa fa-money"></i> Billing <span
+                                <li id="billing"><a><i class="fa fa-money"></i> Billing <span
                                         class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
                                         <li><a href="/admin/pricing">Pricing Tables</a></li>
@@ -341,7 +341,6 @@
         }
 
         //get user's name
-        var url = window.location.href;
         params = "";
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", "/admin/getadminpagesdata", true);
@@ -349,7 +348,24 @@
         xhttp.onreadystatechange = function () {
             if (xhttp.readyState === 4) {
                 if (xhttp.status === 200) {
-                    document.getElementById("userWelcomeName").innerHTML = xhttp.responseText;
+                    var responseString = xhttp.responseText
+                    document.getElementById("userWelcomeName").innerHTML = responseString.split("&&&")[0];
+
+                    //get user's permissions
+                    permissions = responseString.split("&&&")[1];
+                    var permissionsArray = permissions.split(";");
+                    for (var i = 0; i < permissionsArray.length; i++) {
+                        console.log(permissionsArray[i]);
+                        if (permissionsArray[i].includes("EditChatbots:False")) {
+                            $("#chatbots").hide();
+                        }
+                        if (permissionsArray[i].includes("EditUsers:False")) {
+                            $("#users").hide();
+                        }
+                        if (permissionsArray[i].includes("AccessBilling:False")) {
+                            $("#billing").hide();
+                        }
+                    }
                 }
                 else {
                     console.error(xhttp.statusText);
@@ -357,6 +373,7 @@
             }
         };
         xhttp.send(params);
+
     </script>
     {% block customJS %}
     {% endblock %}

@@ -280,6 +280,7 @@ def checkForMessage():
         messages = args['messages']
         print("Messages: ", messages)
         if messages is not None:
+            print(loads(messages))
             msg = loads(messages)['msg']
     print("Return message: ", msg)
     return msg

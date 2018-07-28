@@ -198,7 +198,7 @@
                             <li class="">
                                 <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
                                    aria-expanded="false">
-                                    <img src="/static/images/img.jpg" alt="">User
+                                    <img src="/static/images/img.jpg" alt=""><label id="userDropdownLabel">User</label>
                                     <span class=" fa fa-angle-down"></span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -350,7 +350,8 @@
                 if (xhttp.status === 200) {
                     var responseString = xhttp.responseText
                     document.getElementById("userWelcomeName").innerHTML = responseString.split("&&&")[0];
-
+                    document.getElementById("userDropdownLabel").innerHTML = responseString.split("&&&")[0];
+                    
                     //get user's permissions
                     permissions = responseString.split("&&&")[1];
                     var permissionsArray = permissions.split(";");

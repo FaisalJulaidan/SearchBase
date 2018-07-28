@@ -45,12 +45,6 @@
 {% block customJS %}
     <script src="/static/js/cookies.js"></script>
     <script>
-        if ("{{email}}" !== "") {
-            makeCookie("UserEmail", "{{email}}", 1);
-        }
-        if ("{{user}}" !== "") {
-            makeCookie("User Official", "{{user}}", 1);
-        }
         document.getElementById("welcomeh2").innerHTML = getCookie("User Official");
     </script>
 {% endblock %}

@@ -25,10 +25,10 @@ app = Flask(__name__, static_folder='static')
 ## -----
 # Only one should be commented in
 # For Production
-app.config.from_object('config.BaseConfig')
+#app.config.from_object('config.BaseConfig')
  
 # For Development
-#app.config.from_object('config.DevelopmentConfig')
+app.config.from_object('config.DevelopmentConfig')
 ## -----
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
@@ -90,7 +90,7 @@ def before_request():
     restrictedRoutes = ['/admin', 'admin/homepage']
     # If the user try to visit one of the restricted routes without logging in he will be redirected
     if any(route in theurl for route in restrictedRoutes) and not session.get('Logged_in', False):
-        return redirectWithMessage("login", "Please Login.")
+        return redirectWithMessage("login", "Please log in first")
 
 
 
@@ -240,8 +240,7 @@ def login():
                             return redirect("/admin/homepage", code=302)
 
                         else:
-                            return render_template('errors/verification.html',
-                                                   data="Your Account has not been verified, please check your email.")
+                            return redirectWithMessage("login", "Please verify your account before you log in.")
             return redirectWithMessage("login", "You entered an incorrect username or password.")
 
 
@@ -347,7 +346,10 @@ def signup():
             # print(newCustomer)
 
             hashed_password = hash_password(password)
-            verified = "False"
+            if app.debug:
+                verified = "True"
+            else:
+                verified = "False"
 
 
 
@@ -360,7 +362,9 @@ def signup():
 
             newCompany = get_last_row_from_table("Companies")
             # print(newCompany)
-
+            
+            createUserSettings = insert_into_database_table("INSERT INTO UserSettings('CompanyID') VALUES (?);", (newCompany['ID'],))
+            #TODO validate insertCompanyResponse and createUserSettings
 
             try:
 
@@ -490,27 +494,16 @@ def get_total_statistics(num, email):
 def admin_home():
     if request.method == "GET":
         sendEmail = False
-        args = request.args
-        if len(args) > 0:
-            messages = args['messages']
-            if messages is not None:
-                email = loads(messages)['email']
-                if email is None or email == "None":
-                    return redirectWithMessage("login", "Please log in first!")
-                sendEmail = True
-            else:
-                return redirectWithMessage("login", "Error in finding user!")
-        else:
-            email = session.get('User')['Email']
+        email = session.get('User')['Email'] 
         statistics = [get_total_statistics(3, email), get_total_statistics(5, email)]
         if sendEmail:
             assistants = get_assistants(email)
             if assistants == "Error":
-                return render_template("admin/main.html", stats=statistics, email=email, assistantIDs=[])
+                return render_template("admin/main.html", stats=statistics, assistantIDs=[])
             assistantIDs = []
             for assistant in assistants:
                 assistantIDs.append(assistant[0])
-            return render("admin/main.html", stats=statistics, email=email, assistantIDs=assistantIDs)
+            return render("admin/main.html", stats=statistics, assistantIDs=assistantIDs)
         else:
             return render("admin/main.html", stats=statistics)
 
@@ -1374,25 +1367,18 @@ def admin_analytics(assistantID):
 def admin_users():
     if request.method == "GET":
         email = session.get('User')['Email']
-        company = get_company(email)
-        # todo check company
-        companyID = company[0]
+        companyID = session.get('User')['CompanyID']
 
-        #Check user
-        if "User" in session.get('User')['AccessLevel']:
-            return redirect("/admin/main", code=302)
+        userSettings = query_db("SELECT * FROM UserSettings WHERE CompanyID=?", [companyID])
 
-        # TODO improve this
         users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
-        return render("admin/users.html", users=users, email=email)
+        return render("admin/users.html", users=users, email=email, userSettings=userSettings)
 
 @app.route("/admin/users/add", methods=['POST'])
 def admin_users_add():
     if request.method == "POST":
         email = session.get('User')['Email']
-        company = get_company(email)
-        # todo check company
-        companyID = company[0]
+        companyID = session.get('User')['CompanyID']
         fullname = request.form.get("fullname", default="Error")
         accessLevel = request.form.get("accessLevel", default="Error")
         newEmail = request.form.get("email", default="Error")
@@ -1418,7 +1404,7 @@ def admin_users_add():
             except IndexError as e:
                 print("Error in splitting")
                 #TODO pass in feedback message
-                redirect("/admin/users", code=302)
+                return redirect("/admin/users", code=302)
             hashed_password = hash_password(password)
 
             #ENCRYPTION
@@ -1476,9 +1462,7 @@ def admin_users_modify():
 def admin_users_delete(userID):
     if request.method == "GET":
         email = session.get('User')['Email']
-        company = get_company(email)
-        # todo check company
-        companyID = company[0]
+        companyID = session.get('User')['CompanyID']
         
         users = query_db("SELECT * FROM Users")
         requestingUser = "Error"
@@ -1494,6 +1478,47 @@ def admin_users_delete(userID):
             #TODO send feedback message
             return redirect("/admin/homepage", code=302)
         delete_from_table("DELETE FROM Users WHERE ID=?;", [userID])
+        return redirect("/admin/users", code=302)
+
+
+@app.route("/admin/users/permissions", methods=["POST"])
+def admin_users_permissions():
+    if request.method == "POST":
+        adminPermissions = ""
+        userPermissions = ""
+        
+        permissionTypes = ["EditChatbots", "EditUsers", "AccessBilling"]
+        #try to get admin permissions
+        for i in range(0,3):
+            permission = request.form.get("AdminPermission" + str(i+1), default="Error")
+            #look for Trues
+            if "Error" not in permission:
+                for pType in permissionTypes:
+                    if pType in permission:
+                        adminPermissions += (pType + ":True;")
+                        permissionTypes.remove(pType)
+        #look for Falses
+        for pType in permissionTypes:
+            adminPermissions += (pType + ":False;")
+
+        permissionTypes = ["EditChatbots", "EditUsers", "AccessBilling"]
+        #try to get user permissions
+        for i in range(0,3):
+            permission = request.form.get("UserPermission" + str(i+1), default="Error")
+            #look for Trues
+            if "Error" not in permission:
+                for pType in permissionTypes:
+                    if pType in permission:
+                        userPermissions += (pType + ":True;")
+                        permissionTypes.remove(pType)
+        #look for Falses
+        for pType in permissionTypes:
+            userPermissions += (pType + ":False;")
+
+        #update table
+        #updatePermissions = query_db("UPDATE UserSettings SET AdminPermissions=?,UserPermissions=? WHERE CompanyID=?;", [adminPermissions, userPermissions, session.get('User')['CompanyID']])
+        updatePermissions = update_table("UPDATE UserSettings SET AdminPermissions=?,UserPermissions=? WHERE CompanyID=?;", [adminPermissions, userPermissions, session.get('User')['CompanyID']])
+
         return redirect("/admin/users", code=302)
 
 

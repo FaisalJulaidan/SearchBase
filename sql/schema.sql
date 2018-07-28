@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS Questions;
 DROP TABLE IF EXISTS Answers;
 DROP TABLE IF EXISTS UserInput;
 DROP TABLE IF EXISTS Plans;
+DROP TABLE IF EXISTS UserSettings;
 
 
 CREATE TABLE 'Companies' (
@@ -28,6 +29,15 @@ CREATE TABLE 'Users' (
   'StripeID'	TEXT UNIQUE DEFAULT NULL,
 	'Verified'	TEXT DEFAULT 'False',
   'SubID'	TEXT UNIQUE DEFAULT NULL,
+
+	FOREIGN KEY('CompanyID') REFERENCES 'Companies'('ID')
+);
+
+CREATE TABLE 'UserSettings' (
+	'ID'	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	'CompanyID'	INTEGER NOT NULL,
+	'AdminPermissions' TEXT NOT NULL  DEFAULT 'EditChatbots:True;EditUsers:True;AccessBilling:False;',
+	'UserPermissions' TEXT NOT NULL  DEFAULT 'EditChatbots:True;EditUsers:False;AccessBilling:False;',
 
 	FOREIGN KEY('CompanyID') REFERENCES 'Companies'('ID')
 );

@@ -351,7 +351,7 @@ def signup():
             # print(newCustomer)
 
             hashed_password = hash_password(password)
-            verified = "True"
+            verified = "False"
 
 
 

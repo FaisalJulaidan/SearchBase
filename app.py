@@ -267,9 +267,26 @@ def render(template, **context):
     return render_template(template, debug=app.debug, **context)
 
 
+#def redirectWithMessage(function, message):
+#    messages = dumps({"msg": escape(message)})
+#    return redirect(url_for("."+function, messages=messages))
+
 def redirectWithMessage(function, message):
-    messages = dumps({"msg": escape(message)})
-    return redirect(url_for("."+function, messages=messages))
+    return redirect(url_for("."+function, messages=message))
+
+#def checkForMessage():
+#    print("Starting getting message process")
+#    args = request.args
+#    print("ARGS: ", args)
+#    msg=" "
+#    if len(args) > 0:
+#        messages = args['messages']
+#        print("Messages: ", messages)
+#        if messages is not None:
+#            print(loads(messages))
+#            msg = loads(messages)['msg']
+#    print("Return message: ", msg)
+#    return msg
 
 def checkForMessage():
     print("Starting getting message process")
@@ -277,11 +294,7 @@ def checkForMessage():
     print("ARGS: ", args)
     msg=" "
     if len(args) > 0:
-        messages = args['messages']
-        print("Messages: ", messages)
-        if messages is not None:
-            print(loads(messages))
-            msg = loads(messages)['msg']
+        msg = args['messages']
     print("Return message: ", msg)
     return msg
 

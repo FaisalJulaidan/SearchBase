@@ -419,12 +419,12 @@ def signup():
                                 recipients=[email])
                 payload = email + ";" + companyName
                 link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
-                msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png' style='width:250px;height:128px;'> <br /><h4>Hi,</h4> <p>Thank you for registering with TheSearchbase.</p> <br />  There is just one small step left, visit \
+                msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png'><br /><h4>Hi,</h4> <p>Thank you for registering with TheSearchbase.</p> <br />  There is just one small step left, visit \
                             <a href='"+link+"'> this link </a> to verify your account. \
                             In case the link above doesn't work you can click on the link below. <br /> <br /> " + link + " <br />  <br /> \
-                            We look forward to you, using our platform, <br />\
+                            We look forward to you, using our platform. <br /> <br />\
                             Regards, <br /> TheSearchBase Team <br />\
-                            <img src='https://thesearchbase.com/static/email_images/footer_image.png' style='width:250px;height:128px;'>"
+                            <img src='https://thesearchbase.com/static/email_images/footer_image.png'>"
                 mail.send(msg)
 
                 # sending the registration confirmation email to us
@@ -1875,10 +1875,10 @@ def verify_account(payload):
                                       recipients=[email])
                         msg.html = "<img src='https://thesearchbase.com/static/email_images/welcome.png' style='width:500px;height:228px;'><br /> \
                                    <h4>Hi,</h4> <p>Thank you for registering with TheSearchBase!</p> \
-                                   <br /> <p>A whole new world of possibilities is ahead of you, we strive to be a platform that aims to make chat bot technology available to everyone. \
-                                   If you would like to know more about our start up story, check our <a href=https://www.thesearchbase.com/about> Story <a/> and see what we're all about. </p> <br /> \
+                                   <p>A whole new world of possibilities is ahead of you, we strive to be a platform that aims to make chat bot technology available to everyone. \
+                                   If you would like to know more about our start up story, check our <a href=https://www.thesearchbase.com/about> Story <a/> and see what we're all about. </p> \
                                    <p>More Importantly, we would like you to use our platform and tell us what you think. If you could share your ideas or suggestions with our team, we would be very happy to collect your feedback</p> \
-                                   <p>As a final message, we would like to say, we thoroughly hope you enjoy using our platform and hope to see your chat bot revolutionise your company or idea.</p><br /> <p> Happy chatboting, </p><br /> <p>TheSearchbase Team</p> \
+                                   <p>As a final message, we would like to say, we thoroughly hope you enjoy using our platform and hope to see your chat bot revolutionise your company or idea.</p><br /> <p> Happy chatboting, </p><p>TheSearchbase Team</p> \
                                    <img src='https://thesearchbase.com/static/email_images/footer_image.png' style='width:500px;height:228px;'>"
                         mail.send(msg)
 
@@ -1932,9 +1932,9 @@ def reset_password():
               
              payload = email + ";" + company[1]
              link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
-             msg.html ="<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'> <h4> Hi, </h4><br /><p>We are been informed you would like to reset your password. <br/ > \
+             msg.html ="<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'> <h4> Hi, </h4><p>We have been informed you would like to reset your password. \
                         Please visit <a href='"+link+"'>this link</a> to verify your account and to set your new password.</p> <br /> <br /> \
-                        <p>If you have received this by mistake, please let our team know and kindly delete this email</p><br /> \
+                        <p>If you have received this by mistake, please let our team know and kindly delete this email</p><br /> Regards, <br /> TheSearchBase Team \
                         <img src='https://thesearchbase.com/static/email_images/footer_image.png' style='width:500px;height:228px;'>"
              mail.send(msg)
  

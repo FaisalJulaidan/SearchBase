@@ -1161,6 +1161,10 @@ def admin_pricing():
 def admin_pricing_adjust():
     return render("admin/pricing-adjustments.html")
 
+@app.route("/admin/cancellation/confirmation", methods=['GET'])
+def admin_plan_confirmation():
+    return render("admin/cancellation_confirmation.html")
+
 
 @app.route('/admin/thanks', methods=['GET'])
 def admin_thanks():
@@ -1189,7 +1193,7 @@ def admin_pay(planID):
         try:
             plan = stripe.Plan.retrieve(planID)
         except stripe.error.InvalidRequestError as e:
-            abort(status.HTTP_400_BAD_REQUEST, "This plan does't exist! Make sure the plan ID is correct.")
+            abort(status.HTTP_400_BAD_REQUEST, "This plan doesn't exist! Make sure the plan ID is correct.")
 
         # print(plan)
         return render("admin/check-out.html", plan=plan)
@@ -1322,7 +1326,7 @@ def unsubscribe():
                          [None, session.get('User')['ID']])
 
             print("You have unsubscribed successfully!")
-            return redirectWithMessage("admin_pricing", "You have unsubscribed successfully!")
+            return redirectWithMessage("admin_plan_confirmation", "You have unsubscribed successfully!")
 
         except Exception as e:
             print("An error occurred while trying to unsubscribe")

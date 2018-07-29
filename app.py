@@ -100,6 +100,10 @@ def before_request():
             return redirect("/admin/homepage", code=302)
         if not session['Permissions']["AccessBilling"] and "/admin/assistant/" in theurl:
             return redirect("/admin/homepage", code=302)
+    try:
+        print("PLAN:", session['UserPlan'])
+    except:
+        print("no user plan either")
     
 
 

@@ -184,9 +184,9 @@
   color: #e25950;
 }
 
-.example.example2 .success .icon .border {
-  stroke: #abe9d2;
-}
+    .example.example2 .success .icon .border {
+        stroke: #6610f2;
+    }
 
     .example.example2 .success .icon .checkmark {
         stroke: #6610f2;

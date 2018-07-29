@@ -92,7 +92,9 @@
 
               <div class="x_panel">
 
-                  <h2>Modify User's Access</h2>
+                  <h2>Modify User's Access 
+                    <small>You can also transfer the ownership of the account.</small>
+                  </h2>
 
                   <form action="/admin/users/modify" method="post" enctype="multipart/form-data">
 
@@ -138,27 +140,31 @@
                   <h2>Edit Permission Types</h2>
 
                   <form action="/admin/users/permissions" method="post" enctype="multipart/form-data">
-                      <table>
-                          <tr>
-                              <th></th>
-                              <th>Access To Chatbots</th>
-                              <th>Access To Users</th>
-                              <th>Access To Billing</th>
-                          </tr>
-                          <tr>
-                              <td><strong>Admin</strong></td>
-                              <td><input name="AdminPermission1" id="AdminPermission1" type="checkbox" value="EditChatbots" /></td>
-                              <td><input name="AdminPermission2" id="AdminPermission2" type="checkbox" value="EditUsers" /></td>
-                              <td><input name="AdminPermission3" id="AdminPermission3" type="checkbox" value="AccessBilling" /></td>
-                          </tr>
-                          <tr>
-                              <td><strong>User</strong></td>
-                              <td><input name="UserPermission1" id="UserPermission1" type="checkbox" value="EditChatbots" /></td>
-                              <td><input name="UserPermission2" id="UserPermission2" type="checkbox" value="EditUsers" /></td>
-                              <td><input name="UserPermission3" id="UserPermission3" type="checkbox" value="AccessBilling" /></td>
-                          </tr>
-                      </table>
-                      <button class="btn btn-success" type="submit">Save</button>
+                      <div class="table-responsive">
+                          <table class="table table-striped jambo_table bulk_action">
+                              <thead>
+                                  <tr id="tableHeadingUIn" class="headings">
+                                      <th></th>
+                                      <th class="column-title">Access To Chatbots</th>
+                                      <th class="column-title">Access To Users</th>
+                                      <th class="column-title">Access To Billing</th>
+                                  </tr>
+                              </thead>
+                                  <tr>
+                                      <td><strong>Admin</strong></td>
+                                      <td><input name="AdminPermission1" id="AdminPermission1" type="checkbox" value="EditChatbots" /></td>
+                                      <td><input name="AdminPermission2" id="AdminPermission2" type="checkbox" value="EditUsers" /></td>
+                                      <td><input name="AdminPermission3" id="AdminPermission3" type="checkbox" value="AccessBilling" /></td>
+                                  </tr>
+                                  <tr>
+                                      <td><strong>User</strong></td>
+                                      <td><input name="UserPermission1" id="UserPermission1" type="checkbox" value="EditChatbots" /></td>
+                                      <td><input name="UserPermission2" id="UserPermission2" type="checkbox" value="EditUsers" /></td>
+                                      <td><input name="UserPermission3" id="UserPermission3" type="checkbox" value="AccessBilling" /></td>
+                                  </tr>
+                          </table>
+                          <button class="btn btn-success" type="submit">Save</button>
+                         </div>
                   </form>
               </div>
 

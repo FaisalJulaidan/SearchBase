@@ -62,7 +62,7 @@
                                 <br>
                                 <br>
                                 <div id="popup-time"
-                                     {% if autopop =='Off' %}
+                                     {% if autopop=='Off' %}
                                      hidden
                                      {% endif %}>
                                     <h4>
@@ -82,13 +82,25 @@
                                     <br>
                                     <br>
                                 </div>
-                                <p style="text-align:center;">{{msg}}</p>
+                                <p>{{msg}}</p>
                                 <!-- Submit button -->
                                 <button class="btn btn-success">Submit</button>
                                 <br />
                                 <br />
                                 <br />
                                 <br />
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <p class="lead">
+                                        <p> Deactivating and activating assistants controls how many active assistants you currently have.</p>
+                                        {%if active == "True"%}
+                                        <a style="background-color:grey; border-color: grey;" class="btn btn-primary btn-sm" href="/admin/assistant/active/False/{{id}}" role="button">Deactivate Assistant</a>
+                                        {%else%}
+                                        <a style="background-color:limegreen; border-color: limegreen;" class="btn btn-primary btn-sm" href="/admin/assistant/active/True/{{id}}" role="button">Activate Assistant</a>
+                                        {%endif%}
+                                    </div>
+                                </div>
 
                                 <div class="row">
                                     <div class="col-md-12">

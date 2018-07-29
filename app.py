@@ -66,6 +66,10 @@ mail = Mail(app)
 ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
 ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
 
+BasicPlan = {"MaxProducts":600, "ActiveBotsCap":2, "InactiveBotsCap":3, "AdditionalUsersCap":5, "ExtendedLogic":False, "ImportDatabase":False, "CompanyNameonChatbot": False}
+AdvancedPlan = {"MaxProducts":5000, "ActiveBotsCap":4, "InactiveBotsCap":6, "AdditionalUsersCap":10, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
+UltimatePlan = {"MaxProducts":15000, "ActiveBotsCap":10, "InactiveBotsCap":30, "AdditionalUsersCap":999, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
+#count_db("Plans", " WHERE Nickname=?", ["basic",])
 
 def hash_password(password, salt=gensalt()):
     hashed = hashpw(bytes(password, 'utf-8'), salt)
@@ -91,21 +95,26 @@ def before_request():
     # If the user try to visit one of the restricted routes without logging in he will be redirected
     if any(route in theurl for route in restrictedRoutes) and not session.get('Logged_in', False):
         return redirectWithMessage("login", "Please log in first")
-    # Check user permissions as user type
+    #if on admin route
     if any(route in theurl for route in restrictedRoutes):
-        print(session['Permissions'])
+        #Check user permissions as user type
         if not session['Permissions']["EditChatbots"] and "/admin/assistant" in theurl:
             return redirect("/admin/homepage", code=302)
         if not session['Permissions']["EditUsers"] and "/admin/users" in theurl:
             return redirect("/admin/homepage", code=302)
         if not session['Permissions']["AccessBilling"] and "/admin/assistant/" in theurl:
             return redirect("/admin/homepage", code=302)
-    try:
+
+        #Check user plan permissions
         print("PLAN:", session['UserPlan'])
-    except:
-        print("no user plan either")
+        if "Basic" in session['UserPlan']['Nickname']:
+            print("basic plan")
     
 
+def checkAssistantID(assistantID):
+    assistantRecord = query_db("SELECT * FROM Assistants WHERE ID=?", [assistantID,], True)
+    if session.get('User')['CompanyID'] is not assistantRecord['CompanyID']:
+        return redirect("/admin/homepage", code=302)
 
 
 # TODO jackassify it
@@ -269,7 +278,14 @@ def login():
                             session['Permissions'] = dict(permissionsDic)
 
                             # Set user plan e.g. (Basic, Ultimate...)
-                            session['UserPlan'] =  getPlanNickname(user['SubID'])
+                            session['UserPlan'] = {}
+                            session['UserPlan']['Nickname'] =  getPlanNickname(user['SubID'])
+                            if "Basic" in getPlanNickname(user['SubID']):
+                                session['UserPlan']['Settings'] = BasicPlan
+                            elif "Advanced" in getPlanNickname(user['SubID']):
+                                session['UserPlan']['Settings'] = AdvancedPlan
+                            elif "Ultimate" in getPlanNickname(user['SubID']):
+                                session['UserPlan']['Settings'] = UltimatePlan
 
                             # Test session specific values
                             print(session)
@@ -320,13 +336,10 @@ def redirectWithMessage(function, message):
     return redirect(url_for("."+function, messages=message))
 
 def checkForMessage():
-    print("Starting getting message process")
     args = request.args
-    print("ARGS: ", args)
     msg=" "
     if len(args) > 0:
         msg = args['messages']
-    print("Return message: ", msg)
     return msg
 
 def redirectWithMessageAndAssistantID(function, assistantID, message):
@@ -710,6 +723,7 @@ def admin_assistant_create():
 
 @app.route("/admin/assistant/delete/<assistantID>", methods=['GET', 'POST'])
 def admin_assistant_delete(assistantID):
+    checkAssistantID(assistantID)
     if request.method == "GET":
         email = session.get('User')['Email']
         users = query_db("SELECT * FROM Users")
@@ -718,7 +732,7 @@ def admin_assistant_delete(assistantID):
         for user in users:
             if user["Email"] == email:
                 userCompanyID = user["CompanyID"]
-        if "Error" in userCompanyID:
+        if userCompanyID == "Error":
             return redirect("/admin/homepage")
         assistantCompanyID = select_from_database_table("SELECT CompanyID FROM Assistants WHERE ID=?", [assistantID])
 
@@ -745,27 +759,21 @@ def admin_assistant_delete(assistantID):
 
 @app.route("/admin/assistant/<assistantID>/settings", methods=['GET', 'POST'])
 def admin_assistant_edit(assistantID):
+    checkAssistantID(assistantID)
     if request.method == "GET":
         msg = checkForMessageWhenAssistantID()
         email = session.get('User')['Email']
-        company = get_company(email)
-        if company is None or "Error" in company:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error in getting company")
-            # TODO handle this better
+        assistant = query_db("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?", [assistantID, session.get('User')['CompanyID']], True)
+        if assistant is None or "Error" in assistant:
+            abort(status.HTTP_404_NOT_FOUND, "Error in getting assistant")
         else:
-            print(company)
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-                                                   [assistantID, company[0]], True)
-            if assistant is None or "Error" in assistant:
-                abort(status.HTTP_404_NOT_FOUND, "Error in getting assistant")
-            else:
-                print(assistant[0])
-                message = assistant[0][3]
-                autoPop = assistant[0][4]
-                nickname = assistant[0][5]
+            message = assistant["Message"]
+            autoPop = assistant["SecondsUntilPopup"]
+            nickname = assistant["Nickname"]
+            active = assistant["Active"]
 
-                return render("admin/edit-assistant.html", autopop=autoPop, message=message, id=assistantID,
-                              nickname=nickname, msg=msg)
+            return render("admin/edit-assistant.html", autopop=autoPop, message=message, id=assistantID,
+                            nickname=nickname, active=active, msg=msg)
 
     elif request.method == "POST":
         email = session.get('User')['Email']
@@ -800,9 +808,21 @@ def admin_assistant_edit(assistantID):
                         return redirect("/admin/assistant/{}/settings".format(assistantID))
 
 
+@app.route("/admin/assistant/active/<turnto>/<assistantID>", methods=['GET'])
+def admin_turn_assistant(turnto, assistantID):
+    checkAssistantID(assistantID)
+    if request.method == "GET":
+        updateBot = update_table("UPDATE Assistants SET Active=? WHERE ID=?;", [turnto, assistantID])
+        if turnto == "True":
+            message="activated."
+        else:
+            message="deactivated."
+        return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Chatbot has been "+message)
+
 # TODO rewrite
 @app.route("/admin/assistant/<assistantID>/questions", methods=['GET', 'POST'])
 def admin_questions(assistantID):
+    checkAssistantID(assistantID)
     if request.method == "GET":
         message = checkForMessageWhenAssistantID()
         email = session.get('User')['Email']
@@ -885,6 +905,7 @@ def admin_questions(assistantID):
 # TODO rewrite
 @app.route("/admin/assistant/<assistantID>/answers", methods=['GET', 'POST'])
 def admin_answers(assistantID):
+    checkAssistantID(assistantID)
     if request.method == "GET":
         message = checkForMessageWhenAssistantID()
         email = session.get('User')['Email']
@@ -982,6 +1003,7 @@ def admin_answers(assistantID):
 
 @app.route("/admin/assistant/<assistantID>/products", methods=['GET', 'POST'])
 def admin_products(assistantID):
+    checkAssistantID(assistantID)
     if request.method == "GET":
         email = session.get('User')['Email']
         company = get_company(email)
@@ -1010,6 +1032,10 @@ def admin_products(assistantID):
         else:
             assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
                                                    [assistantID, company[0]])
+
+            #get all company assistants (needed for totalproducts check)
+            assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?", [company[0]])
+
             if assistant is None:
                 abort(status.HTTP_404_NOT_FOUND)
             elif "Error" in assistant:
@@ -1062,6 +1088,14 @@ def admin_products(assistantID):
                     if url is "Error":
                         abort(status.HTTP_400_BAD_REQUEST, "Error with product url")
 
+                    #see if they have reached the limit
+                    numberOfProducts = 0
+                    maxNOP = session['UserPlan']['Settings']['MaxProducts']
+                    for record in assistants:
+                        numberOfProducts += count_db("Products", " WHERE AssistantID=?", [record["ID"],])
+                    if numberOfProducts > maxNOP:
+                        return redirectWithMessageAndAssistantID("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP)+ ". Solutions after " + name + " have not been added.")
+
                     insertProduct = insert_into_database_table(
                         "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) "
                         "VALUES (?,?,?,?,?,?,?,?,?);", (
@@ -1074,6 +1108,7 @@ def admin_products(assistantID):
 # TODO improve
 @app.route("/admin/assistant/<assistantID>/products/file", methods=['POST'])
 def admin_products_file_upload(assistantID):
+    checkAssistantID(assistantID)
     if request.method == "POST":
         msg = ""
         if 'productFile' not in request.files:
@@ -1154,6 +1189,7 @@ def admin_products_file_upload(assistantID):
 # TODO improve
 @app.route("/admin/assistant/<assistantID>/userinput", methods=["GET"])
 def admin_user_input(assistantID):
+    checkAssistantID(assistantID)
     if request.method == "GET":
         email = session.get('User')['Email']
         company = get_company(email)
@@ -1183,6 +1219,7 @@ def admin_user_input(assistantID):
 
 @app.route("/admin/assistant/<assistantID>/connect", methods=['GET'])
 def admin_connect(assistantID):
+    checkAssistantID(assistantID)
     companyID = select_from_database_table("SELECT CompanyID FROM Assistants WHERE ID=?;", [assistantID])
     company = select_from_database_table("SELECT Name FROM Companies WHERE ID=?;", [companyID[0]])
     return render("admin/connect.html", company=company[0], assistantID=assistantID)
@@ -1414,6 +1451,7 @@ def webhook_subscription_cancelled():
 # TODO implement this
 @app.route("/admin/assistant/<assistantID>/analytics", methods=['GET'])
 def admin_analytics(assistantID):
+    checkAssistantID(assistantID)
     if request.method == "GET":
         stats = select_from_database_table(
             "SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?",
@@ -2380,6 +2418,11 @@ def insert_db(table, fields=(), values=()):
     row = query_db("SELECT * FROM " + table + " WHERE ID=?", [cur.lastrowid], one=True)
     cur.close()
     return row
+
+
+def count_db(table, condition="", args=()):
+    cur = g.db.execute("SELECT count(*) FROM "+table+" "+condition, args)
+    return cur.fetchall()[0][0]
 
 
 #encryption function to save typing

@@ -243,7 +243,26 @@ def login():
                             # Store user assistants if they exist, in the session
                             assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?;",
                                                 [user['CompanyID']])
+
+                            #Store users access permisions
                             session['UserAssistants'] =  assistants
+                            permissionsDic = {}
+                            permissions = query_db("SELECT * FROM UserSettings WHERE CompanyID=?", [session.get('User')['CompanyID']])[0]
+                            if "Owner" in session.get('User')['AccessLevel']:
+                                permissions = permissions["AdminPermissions"].split(";")
+                                for perm in permissions:
+                                    if perm:
+                                        permissionsDic[perm.split(":")[0]] = True
+                            else:
+                                permissions = permissions[session.get('User')['AccessLevel']+"Permissions"].split(";")
+                                for perm in permissions:
+                                    if perm:
+                                        if "True" in perm.split(":")[1]:
+                                            permBool = True
+                                        else:
+                                            permBool = False
+                                        permissionsDic[perm.split(":")[0]] = permBool
+                            session['Permissions'] = dict(permissionsDic)
 
                             # Set user plan e.g. (Basic, Ultimate...)
                             session['UserPlan'] =  getPlanNickname(user['SubID'])

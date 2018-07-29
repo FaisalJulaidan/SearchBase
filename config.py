@@ -3,6 +3,7 @@ import os
 
 class BaseConfig(object):
 
+    ENV = 'production'
     DEBUG = False
     TESTING = False
 
@@ -26,10 +27,12 @@ class BaseConfig(object):
 
 
 class DevelopmentConfig(BaseConfig):
+    ENV = 'development'
     DEBUG = True
     TESTING = True
 
 
 class TestingConfig(BaseConfig):
+    ENV = 'development'
     DEBUG = False
     TESTING = True

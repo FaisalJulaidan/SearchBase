@@ -95,6 +95,10 @@ def before_request():
             return redirect("/admin/homepage", code=302)
         if not session['Permissions']["AccessBilling"] and "/admin/assistant/" in theurl:
             return redirect("/admin/homepage", code=302)
+    try:
+        print("PLAN:", session['UserPlan'])
+    except:
+        print("no user plan either")
     
 
 
@@ -234,7 +238,13 @@ def login():
                             # Set the session for the logged in user
                             session['User'] = user
                             session['Logged_in'] = True
-                            
+
+                            # Store user assistants if they exist, in the session
+                            assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?;",
+                                                [user['CompanyID']])
+
+                            #Store users access permisions
+                            session['UserAssistants'] =  assistants
                             permissionsDic = {}
                             permissions = query_db("SELECT * FROM UserSettings WHERE CompanyID=?", [session.get('User')['CompanyID']])[0]
                             if "Owner" in session.get('User')['AccessLevel']:
@@ -253,13 +263,12 @@ def login():
                                         permissionsDic[perm.split(":")[0]] = permBool
                             session['Permissions'] = dict(permissionsDic)
 
-                            # Store user assistants if they exist, in the session
-                            assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?;",
-                                                [user['CompanyID']])
-                            session['UserAssistants'] =  assistants
+                            # Set user plan e.g. (Basic, Ultimate...)
+                            session['UserPlan'] =  getPlanNickname(user['SubID'])
 
                             # Test session specific values
                             print(session)
+
                             return redirect("/admin/homepage", code=302)
 
                         else:
@@ -276,6 +285,20 @@ def logout():
     session.pop('Logged_in', False)
 
     return redirect(url_for('login'))
+
+def getPlanNickname(SubID=None):
+    try:
+        # Get subscription object from Stripe API
+        subscription = stripe.Subscription.retrieve(SubID)
+
+        # Debug
+        print(subscription)
+
+        # Return the subscription item's plan nickname e.g (Basic, Ultimate...)
+        return subscription["items"]["data"][0]["plan"]["nickname"]
+
+    except stripe.error.StripeError as e:
+        return None
 
 
 
@@ -1236,7 +1259,7 @@ def admin_pay(planID):
         # Get the plan opject from Stripe API
         try:
             plan = stripe.Plan.retrieve(planID)
-        except stripe.error.InvalidRequestError as e:
+        except stripe.error.StripeError as e:
             return jsonify(error="This plan does't exist! Make sure the plan ID is correct.")
 
 
@@ -1281,6 +1304,8 @@ def admin_pay(planID):
             update_table("UPDATE Assistants SET Active=? WHERE CompanyID=?", ("True", user['CompanyID']))
             update_table("UPDATE Users SET SubID=? WHERE ID=?", (subscription['id'], user['ID']))
 
+            # Resit the session
+            session['UserPlan'] = getPlanNickname(subscription['id'])
 
         # TODO check subscription for errors https://stripe.com/docs/api#errors
         except Exception as e:
@@ -1340,6 +1365,8 @@ def unsubscribe():
             # query_db('UPDATE Users SET SubID=? WHERE ID=?;', (None,  session.get('User')['ID']))
             update_table("UPDATE Users SET SubID=? WHERE ID=?;",
                          [None, session.get('User')['ID']])
+            # Reset session
+            session['UserPlan'] = None
 
             print("You have unsubscribed successfully!")
             return redirectWithMessage("admin_plan_confirmation", "You have unsubscribed successfully!")
@@ -2308,6 +2335,7 @@ def init_db():
         with app.open_resource(APP_ROOT + '/sql/schema.sql', mode='r') as f:
             db.cursor().executescript(f.read())
         db.commit()
+        print("Database Initialized...")
 
         if app.debug:
             with app.open_resource(APP_ROOT + '/sql/devseed.sql', mode='r') as f:
@@ -2316,7 +2344,7 @@ def init_db():
                 hash = hash_password("test")
                 update_table("UPDATE Users SET Password=? WHERE ID=?", [hash, 1])
             db.commit()
-            print("Test Data Inserted")
+            print("Test Data Inserted...")
 
     print("Database Initialized")
 
@@ -2424,8 +2452,10 @@ if __name__ == "__main__":
     print("Run the server...")
     print(app.debug)
 
-    # Create the schema
-    init_db()
+    # Create the schema only in development mode
+    if app.debug:
+        init_db()
+
     # Print app configuration
     print(app.config)
     # Run the app server

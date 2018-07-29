@@ -118,8 +118,9 @@ function registerElements(elements, exampleName) {
     // in the additional customer data we collected in our form.
     stripe.createToken(elements[0], additionalData)
     .then(function(result) {
-      // Stop loading!
-      example.classList.remove('submitting');
+        console.log(result)
+        // Disable all inputs.
+        disableInputs();
 
       if (result.token) {
         // If we received a token, show the token ID.
@@ -133,24 +134,34 @@ function registerElements(elements, exampleName) {
         // debugger
         // form.submit()
 
-        $.post({
-            url:'',
-            contentType: 'application/json',
-            data:JSON.stringify({
-                token: result.token,
-                coupon: $(document.getElementById('promoCode')).val()
-            }),
-            success: (res) => {
-              if(res.error){
-                alertError('Error', '<h2> ' + res.error)
-              } else {
-                 example.classList.add('submitted');
+    // check token for errors
+      if (!result.error) {
+          $.post({
+              url: '',
+              contentType: 'application/json',
+              data: JSON.stringify({
+                  token: result.token,
+                  coupon: $(document.getElementById('promoCode')).val()
+              }),
+              success: (res) => {
+                  if (res.error) {
+                      alertError('Error', '<h2> ' + res.error)
+                  } else {
+                      example.classList.add('submitted');
 
 
+                  }
               }
-            }
 
-        })
+          });
+
+            } else {
+          // Stop loading!
+          console.log("Token Error...")
+          example.classList.remove('submitting');
+
+       }
+
         enableInputs();
       } else {
         // Otherwise, un-disable inputs.
@@ -175,6 +186,7 @@ function registerElements(elements, exampleName) {
 
     // Resetting the form does not un-disable inputs, so we need to do it separately:
     enableInputs();
-    example.classList.remove('submitted');
+      example.classList.remove('submitted');
+      example.classList.remove('submitting');
   });
 }

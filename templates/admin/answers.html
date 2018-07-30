@@ -117,6 +117,8 @@
 {% block customJS %}
 <script src="/static/js/taggle.js" charset="utf-8"></script>
 <script>
+    var extendedLogicAllowed = true;
+
     // show errors messages from server
     function searchToObject() {
       var pairs = window.location.search.substring(1).split("&"), obj = {}, pair,i;
@@ -310,53 +312,99 @@
 
         // if old data available
         if (pnameValue || keywordValue)
-            return  "<div class=\"col-sm-4 col-xs-12\">\n" +
+            if (extendedLogicAllowed) {
+                return "<div class=\"col-sm-4 col-xs-12\">\n" +
                     "    <div class=\"panel panel-info\">\n" +
                     "        <div class=\"panel-heading\">\n" +
-                    "            <h4>Answer "+i+"</h4>\n" +
+                    "            <h4>Answer " + i + "</h4>\n" +
                     "        </div>\n" +
                     "        <div class=\"panel-body\">\n" +
                     "            <div class=\"input-group\">\n" +
                     "              <span class=\"input-group-addon\">Answer Text</span>\n" +
-                    "              <input type=\"text\" name='"+pname+"' class=\"form-control\" placeholder=\"\" value='"+pnameValue+"'>\n" +
+                    "              <input type=\"text\" name='" + pname + "' class=\"form-control\" placeholder=\"\" value='" + pnameValue + "'>\n" +
                     "            </div>\n" +
-                    "            <div id=\""+keyword+"\"></div>\n" +
+                    "            <div id=\"" + keyword + "\"></div>\n" +
                     "            <div class=\"input-group\">\n" +
                     "               <span class=\"input-group-addon\">Question Action</span>\n" +
-                    "               <select id='newSelect' class=\"form-control\" form=\"answersForm\"  required name='"+action+"' value='"+actionValue+"'>\n" +
+                    "               <select id='newSelect' class=\"form-control\" form=\"answersForm\"  required name='" + action + "' value='" + actionValue + "'>\n" +
                     "                   <option value =\"Next Question by Order\">Next Question by Order</option>" +
-                                        options +
-                    "                   <option value=\"Get Solutions\">Get Solutions</option>"+
-                    "               </select>\n"+
-                    "            </div>\n"+
-                    "        </div>\n"+
-                    "    </div>\n"+
+                    options +
+                    "                   <option value=\"Get Solutions\">Get Solutions</option>" +
+                    "               </select>\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "    </div>\n" +
                     "</div>"
+            } else {
+                return "<div class=\"col-sm-4 col-xs-12\">\n" +
+                    "    <div class=\"panel panel-info\">\n" +
+                    "        <div class=\"panel-heading\">\n" +
+                    "            <h4>Answer " + i + "</h4>\n" +
+                    "        </div>\n" +
+                    "        <div class=\"panel-body\">\n" +
+                    "            <div class=\"input-group\">\n" +
+                    "              <span class=\"input-group-addon\">Answer Text</span>\n" +
+                    "              <input type=\"text\" name='" + pname + "' class=\"form-control\" placeholder=\"\" value='" + pnameValue + "'>\n" +
+                    "            </div>\n" +
+                    "            <div id=\"" + keyword + "\"></div>\n" +
+                    "            <div class=\"input-group\">\n" +
+                    "               <span class=\"input-group-addon\">Question Action</span>\n" +
+                    "               <select id='newSelect' class=\"form-control\" form=\"answersForm\"  required name='" + action + "' value='" + actionValue + "'>\n" +
+                    "                   <option value =\"Next Question by Order\">Next Question by Order</option>" +
+                    "               </select>\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "    </div>\n" +
+                    "</div>"
+            }
 
         // if there is no old data
         else
-            return  "<div class=\"col-sm-4 col-xs-12\">\n" +
+            if (extendedLogicAllowed) {
+                return "<div class=\"col-sm-4 col-xs-12\">\n" +
                     "    <div class=\"panel panel-info\">\n" +
                     "        <div class=\"panel-heading\">\n" +
-                    "            <h4>Answer "+i+"</h4>\n" +
+                    "            <h4>Answer " + i + "</h4>\n" +
                     "        </div>\n" +
                     "        <div class=\"panel-body\">\n" +
                     "            <div class=\"input-group\">\n" +
                     "              <span class=\"input-group-addon\">Question Action</span>\n" +
-                    "              <input type=\"text\" name='"+pname+"' class=\"form-control\" placeholder=\"Enter answer for the question\" required>\n" +
+                    "              <input type=\"text\" name='" + pname + "' class=\"form-control\" placeholder=\"Enter answer for the question\" required>\n" +
                     "            </div>\n" +
-                    "            <div id=\""+keyword+"\"></div>\n" +
+                    "            <div id=\"" + keyword + "\"></div>\n" +
                     "            <div class=\"input-group\">\n" +
                     "               <span class=\"input-group-addon\">Answer Text</span>\n" +
-                    "               <select id='newSelect' class=\"form-control\" form=\"answersForm\"  required name='"+action+"' value='"+actionValue+"'>\n" +
+                    "               <select id='newSelect' class=\"form-control\" form=\"answersForm\"  required name='" + action + "' value='" + actionValue + "'>\n" +
                     "                   <option value =\"Next Question by Order\">Next Question by Order</option>" +
-                                        options +
-                    "                   <option value=\"Get Solutions\">Get Solutions</option>"+
-                    "               </select>\n"+
-                    "            </div>\n"+
-                    "        </div>\n"+
-                    "    </div>\n"+
+                    options +
+                    "                   <option value=\"Get Solutions\">Get Solutions</option>" +
+                    "               </select>\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "    </div>\n" +
                     "</div>"
+            } else {
+                return "<div class=\"col-sm-4 col-xs-12\">\n" +
+                    "    <div class=\"panel panel-info\">\n" +
+                    "        <div class=\"panel-heading\">\n" +
+                    "            <h4>Answer " + i + "</h4>\n" +
+                    "        </div>\n" +
+                    "        <div class=\"panel-body\">\n" +
+                    "            <div class=\"input-group\">\n" +
+                    "              <span class=\"input-group-addon\">Question Action</span>\n" +
+                    "              <input type=\"text\" name='" + pname + "' class=\"form-control\" placeholder=\"Enter answer for the question\" required>\n" +
+                    "            </div>\n" +
+                    "            <div id=\"" + keyword + "\"></div>\n" +
+                    "            <div class=\"input-group\">\n" +
+                    "               <span class=\"input-group-addon\">Answer Text</span>\n" +
+                    "               <select id='newSelect' class=\"form-control\" form=\"answersForm\"  required name='" + action + "' value='" + actionValue + "'>\n" +
+                    "                   <option value =\"Next Question by Order\">Next Question by Order</option>" +
+                    "               </select>\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "    </div>\n" +
+                    "</div>"
+            }
     }
 
     function createArray(rows) {
@@ -382,6 +430,30 @@
         }
         changeNumOfAnswers(e);
     }
+
+    // Hide Extended Logic depending on user Plan
+    params = "";
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/admin/getadminpagesdata", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.onreadystatechange = function () {
+        if (xhttp.readyState === 4) {
+            if (xhttp.status === 200) {
+                var responseString = xhttp.responseText
+
+                //get user's plan restrictions
+                restrictions = responseString.split("&&&")[2];
+                if (restrictions.includes("ExtendedLogic:False")) {
+                    extendedLogicAllowed = false;
+                }
+                //ACTIVATE THE PAGE
+            }
+            else {
+                console.error(xhttp.statusText);
+            }
+        }
+    };
+    xhttp.send(params);
 
 </script>
 {% endblock %}

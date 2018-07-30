@@ -25,10 +25,10 @@ app = Flask(__name__, static_folder='static')
 ## -----
 # Only one should be commented in
 # For Production
-app.config.from_object('config.BaseConfig')
+#app.config.from_object('config.BaseConfig')
  
 # For Development
-#app.config.from_object('config.DevelopmentConfig')
+app.config.from_object('config.DevelopmentConfig')
 ## -----
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
@@ -68,7 +68,7 @@ ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
 
 BasicPlan = {"MaxProducts":600, "ActiveBotsCap":2, "InactiveBotsCap":3, "AdditionalUsersCap":5, "ExtendedLogic":False, "ImportDatabase":False, "CompanyNameonChatbot": False}
 AdvancedPlan = {"MaxProducts":5000, "ActiveBotsCap":4, "InactiveBotsCap":6, "AdditionalUsersCap":10, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
-UltimatePlan = {"MaxProducts":15000, "ActiveBotsCap":10, "InactiveBotsCap":30, "AdditionalUsersCap":999, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
+UltimatePlan = {"MaxProducts":30000, "ActiveBotsCap":10, "InactiveBotsCap":30, "AdditionalUsersCap":999, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
 #count_db("Plans", " WHERE Nickname=?", ["basic",])
 
 def hash_password(password, salt=gensalt()):
@@ -645,34 +645,19 @@ def profilePage():
         return redirect("/admin/profile", code=302)
 
 
-@app.route("/popupsettings", methods=['GET'])
-def get_pop_settings():
+@app.route("/getpopupsettings/<assistantID>", methods=['GET'])
+def get_pop_settings(assistantID):
     if request.method == "GET":
         url = request.form.get("URL", default="Error")
         if url != "Error":
-            if "127.0.0.1:5000" in url or "thesearchbase.com" in url:
-                # its on test route
-                companyName = url.split("/")[len(url.split("/")) - 1]
-                companies = query_db("SELECT * FROM Companies")
-                # If company exists
-                for record in companies:
-                    if record["Name"] == companyName:
-                        companyID = record["ID"]
-                    else:
-                        return None
+            assistant = query_db("SELECT * FROM Assistants WHERE ID=?", [assistantID], True)
+            if session['UserPlan']['Settings']['CompanyNameonChatbot']:
+                assistantLabel = query_db("SELECT * FROM Companies WHERE ID=?", [assistant["CompanyID"]], True)["Name"]
             else:
-                # its on client route
-                companies = query_db("SELECT * FROM Companies")
-                # If company exists
-                for record in companies:
-                    if record["URL"] == url:
-                        companyID = record["ID"]
-                    else:
-                        return None
-            secsUntilPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE CompanyID=?",
-                                                      [companyID[0][0]], True)
-            datastring = secsUntilPop[0][0]
+                assistantLabel = "TheSearchBase"
+            datastring = assistant["SecondsUntilPopup"] + "&&&" + assistantLabel
             return jsonify(datastring)
+        return "Off"
 
 
 @app.route("/admin/assistant/create", methods=['GET', 'POST'])
@@ -689,8 +674,9 @@ def admin_assistant_create():
         assistants = get_assistants(email)
         # Return the user to the page if has reached the limit of assistants
         if type(assistants) is type([]) and assistants:
-            if len(assistants) >= 4:
-                return redirectWithMessage("admin_assistant_create", "You have reached the limit of 3 chat bots")
+            chatbotCap = session['UserPlan']['Settings']['ActiveBotsCap'] + session['UserPlan']['Settings']['InactiveBotsCap']
+            if len(assistants) >= chatbotCap:
+                return redirectWithMessage("admin_assistant_create", "You have reached the limit of "+chatbotCap+" assistants")
         company = get_company(email)
         if company is None or "Error" in company:
             return redirectWithMessage("admin_assistant_create", "Error in getting company")
@@ -1012,6 +998,8 @@ def admin_answers(assistantID):
                         keyword = "Error"
                     keyword = ','.join(keyword)
                     action = request.form.get("action" + str(i), default="None")
+                    if action != "Next Question by Order" and not session['UserPlan']['Settings']['ExtendedLogic']:
+                        return redirectWithMessageAndAssistantID("admin_answers", assistantID, "It appears you tried to access extended logic without having access to it. Action aborted!")
                     if "Error" in answer or "Error" in keyword or "Error" in action:
                         return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting your input.")
                     insertAnswer = insert_into_database_table(
@@ -1132,6 +1120,8 @@ def admin_products(assistantID):
 def admin_products_file_upload(assistantID):
     checkAssistantID(assistantID)
     if request.method == "POST":
+        if not session['UserPlan']['Settings']['ImportDatabase']:
+            return "You do not have access to uploading database feature."
         msg = ""
         if 'productFile' not in request.files:
             msg = "Error no file given."

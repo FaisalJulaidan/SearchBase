@@ -382,18 +382,14 @@
                     
                     //get user's permissions
                     permissions = responseString.split("&&&")[1];
-                    var permissionsArray = permissions.split(";");
-                    for (var i = 0; i < permissionsArray.length; i++) {
-                        console.log(permissionsArray[i]);
-                        if (permissionsArray[i].includes("EditChatbots:False")) {
-                            $("#chatbots").hide();
-                        }
-                        if (permissionsArray[i].includes("EditUsers:False")) {
-                            $("#users").hide();
-                        }
-                        if (permissionsArray[i].includes("AccessBilling:False")) {
-                            $("#billing").hide();
-                        }
+                    if (permissions.includes("EditChatbots:False")) {
+                        $("#chatbots").hide();
+                    }
+                    if (permissions.includes("EditUsers:False")) {
+                        $("#users").hide();
+                    }
+                    if (permissions.includes("AccessBilling:False")) {
+                        $("#billing").hide();
                     }
                 }
                 else {

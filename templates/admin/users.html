@@ -4,185 +4,189 @@
 
 {% block content %}
 <div class="right_col" role="main">
-  <div class="">
-      <div class="page-title">
-          <div class="title_left">
-              <h3>Users</h3>
-          </div>
-      </div>
-      <div class="clearfix"></div>
-      <div class="row">
-          <div class="col-md-12 col-sm-12 col-xs-12">
-              <div class="x_panel">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3>Users</h3>
+            </div>
+        </div>
+        <div class="clearfix"></div>
 
-                  <p>A list of all of the users with access to your account </p>
-                  <div class="table-responsive">
-                      <table class="table table-striped jambo_table bulk_action">
-                          <thead>
-                              <!-- Beginning of data -->
-                              <tr id="tableHeadingUIn" class="headings">
-                                  <th class="column-title">Name </th>
-                                  <th class="column-title">Email </th>
-                                  <th class="column-title">Last Access </th>
-                                  <th class="column-title">Permission Level </th>
-                                  <th class="column-title no-link last">
-                                      <span class="nobr">Delete User</span>
-                                  </th>
-                              </tr>
-                              <!-- End of data -->
-                          </thead>
+        <p style="font-weight: bolder;font-size: 16px;color: #de0d0d;">{{message}}</p>
 
-                          <tbody id="tBodyUIn">
-                              <!-- Start -->
-                              {%for user in users%}
-                              <tr class="even pointer">
-                                  <td class=" ">{{user[2]}} {{user[3]}}</td>
-                                  <td class=" ">{{user[5]}}</td>
-                                  <td class=" ">Not implemented</td>
-                                  {%if user[4] != "Owner"%}
-                                  <td class=" ">{{user[4]}}</td>
-                                  {%if email != user[5]%}
-                                  <td class=" "><strong><a href="/admin/users/delete/{{user[0]}}">Delete</a></strong></td>
-                                  {%else%}
-                                  <td class=" "></td>
-                                  {%endif%}
-                                  {%else%}
-                                  <td class=" "><strong>{{user[4]}}</strong></td>
-                                  <td class=" "></td>
-                                  {%endif%}
-                              </tr>
-                              {%endfor%}
-                              <!-- End -->
-                          </tbody>
-                      </table>
-                  </div>
-              </div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
 
-              <div class="x_panel">
+                    <p>A list of all of the users with access to your account </p>
+                    <div class="table-responsive">
+                        <table class="table table-striped jambo_table bulk_action">
+                            <thead>
+                                <!-- Beginning of data -->
+                                <tr id="tableHeadingUIn" class="headings">
+                                    <th class="column-title">Name </th>
+                                    <th class="column-title">Email </th>
+                                    <th class="column-title">Last Access </th>
+                                    <th class="column-title">Permission Level </th>
+                                    <th class="column-title no-link last">
+                                        <span class="nobr">Delete User</span>
+                                    </th>
+                                </tr>
+                                <!-- End of data -->
+                            </thead>
 
-                  <h2>Add a new company's user</h2>
-                  <!-- Content should go here -->
+                            <tbody id="tBodyUIn">
+                                <!-- Start -->
+                                {%for user in users%}
+                                <tr class="even pointer">
+                                    <td class=" ">{{user[2]}} {{user[3]}}</td>
+                                    <td class=" ">{{user[5]}}</td>
+                                    <td class=" ">Not implemented</td>
+                                    {%if user[4] != "Owner"%}
+                                    <td class=" ">{{user[4]}}</td>
+                                    {%if email != user[5]%}
+                                    <td class=" "><strong><a href="/admin/users/delete/{{user[0]}}">Delete</a></strong></td>
+                                    {%else%}
+                                    <td class=" "></td>
+                                    {%endif%}
+                                    {%else%}
+                                    <td class=" "><strong>{{user[4]}}</strong></td>
+                                    <td class=" "></td>
+                                    {%endif%}
+                                </tr>
+                                {%endfor%}
+                                <!-- End -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-                  <form action="/admin/users/add" method="post" enctype="multipart/form-data">
+                <div class="x_panel">
 
-                      <!-- User's details -->
-                      <input class="form-control col-md-5 col-xs-10" id="user_fullname" type="text" name="fullname" placeholder="First and Last Name *">
-                      <br />
-                      <br />
-                      <br />
-                      <input class="form-control col-md-3 col-xs-10" id="user-email" type="text" name="email" placeholder="Email *">
-                      <br />
-                      <br />
-                      <br />
-                      <!-- Options for the user to select roles. -->
-                      <select id="user_role" name="accessLevel" required>
-                          <option value="User">User</option>
-                          <option value="Admin">Admin</option>
-                      </select>
+                    <h2>Add a new company's user</h2>
+                    <!-- Content should go here -->
 
-                      <br />
-                      <br />
+                    <form action="/admin/users/add" method="post" enctype="multipart/form-data">
 
-                      <!-- Submit button -->
-                      <input class="btn btn-success" type="submit" value="Save" />
-                  </form>
+                        <!-- User's details -->
+                        <input class="form-control col-md-5 col-xs-10" id="user_fullname" type="text" name="fullname" placeholder="First and Last Name *">
+                        <br />
+                        <br />
+                        <br />
+                        <input class="form-control col-md-3 col-xs-10" id="user-email" type="text" name="email" placeholder="Email *">
+                        <br />
+                        <br />
+                        <br />
+                        <!-- Options for the user to select roles. -->
+                        <select id="user_role" name="accessLevel" required>
+                            <option value="User">User</option>
+                            <option value="Admin">Admin</option>
+                        </select>
 
-                  <!-- Content should go here -->
-              </div>
+                        <br />
+                        <br />
 
-              <div class="x_panel">
+                        <!-- Submit button -->
+                        <input class="btn btn-success" type="submit" value="Save" />
+                    </form>
 
-                  <h2>Modify User's Access 
-                    <small>You can also transfer the ownership of the account.</small>
-                  </h2>
+                    <!-- Content should go here -->
+                </div>
 
-                  <form action="/admin/users/modify" method="post" enctype="multipart/form-data">
+                <div class="x_panel">
 
-                      <!-- User's details -->
-                      <select name="userID" required>
-                          {%for user in users%}
-                          {%if email != user[5] and user[4] != "Owner"%}
-                          <option value="{{user[0]}}">{{user[5]}}</option>
-                          {%endif%}
-                          {%endfor%}
-                      </select>
-                      <br />
-                      <br />
-                      <br />
+                    <h2>
+                        Modify User's Access
+                        <small>You can also transfer the ownership of the account.</small>
+                    </h2>
 
-                      <!-- Options for the user to select roles. -->
-                      <select onchange="checkIfOwner()" id="userRole" name="accessLevel" required>
-                          <option value="User">User</option>
-                          <option value="Admin">Admin</option>
-                          {%for user in users%}
-                          {%if user[4] == "Owner"%}
-                          <option style="font-weight:900;" value="Owner">Owner</option>
-                          {%endif%}
-                          {%endfor%}
-                      </select>
+                    <form action="/admin/users/modify" method="post" enctype="multipart/form-data">
 
-                      <!--Change Owner confirmation-->
-                      <div id="ownerConfirm">
-                          <p>You are about to transfer your <strong>Ownership</strong> to another User. Are you sure?</p>
-                          <button class="btn btn-success" type="button" id="confirmOwnerB">Yes</button>
-                      </div>
+                        <!-- User's details -->
+                        <select name="userID" required>
+                            {%for user in users%}
+                            {%if email != user[5] and user[4] != "Owner"%}
+                            <option value="{{user[0]}}">{{user[5]}}</option>
+                            {%endif%}
+                            {%endfor%}
+                        </select>
+                        <br />
+                        <br />
+                        <br />
 
-                      <br />
-                      <br />
+                        <!-- Options for the user to select roles. -->
+                        <select onchange="checkIfOwner()" id="userRole" name="accessLevel" required>
+                            <option value="User">User</option>
+                            <option value="Admin">Admin</option>
+                            {%for user in users%}
+                            {%if user[4] == "Owner"%}
+                            <option style="font-weight:900;" value="Owner">Owner</option>
+                            {%endif%}
+                            {%endfor%}
+                        </select>
 
-                      <!-- Submit button -->
-                      <button class="btn btn-success" type="submit" id="submitModification">Save</button>
-                  </form>
-              </div>
+                        <!--Change Owner confirmation-->
+                        <div id="ownerConfirm">
+                            <p>You are about to transfer your <strong>Ownership</strong> to another User. Are you sure?</p>
+                            <button class="btn btn-success" type="button" id="confirmOwnerB">Yes</button>
+                        </div>
 
-              <div class="x_panel">
+                        <br />
+                        <br />
 
-                  <h2>Edit Permission Types</h2>
+                        <!-- Submit button -->
+                        <button class="btn btn-success" type="submit" id="submitModification">Save</button>
+                    </form>
+                </div>
 
-                  <form action="/admin/users/permissions" method="post" enctype="multipart/form-data">
-                      <div class="table-responsive">
-                          <table class="table table-striped jambo_table bulk_action">
-                              <thead>
-                                  <tr id="tableHeadingUIn" class="headings">
-                                      <th></th>
-                                      <th class="column-title">Access To Chatbots</th>
-                                      <th class="column-title">Access To Users</th>
-                                      <th class="column-title">Access To Billing</th>
-                                  </tr>
-                              </thead>
-                                  <tr>
-                                      <td><strong>Admin</strong></td>
-                                      <td><input name="AdminPermission1" id="AdminPermission1" type="checkbox" value="EditChatbots" /></td>
-                                      <td><input name="AdminPermission2" id="AdminPermission2" type="checkbox" value="EditUsers" /></td>
-                                      <td><input name="AdminPermission3" id="AdminPermission3" type="checkbox" value="AccessBilling" /></td>
-                                  </tr>
-                                  <tr>
-                                      <td><strong>User</strong></td>
-                                      <td><input name="UserPermission1" id="UserPermission1" type="checkbox" value="EditChatbots" /></td>
-                                      <td><input name="UserPermission2" id="UserPermission2" type="checkbox" value="EditUsers" /></td>
-                                      <td><input name="UserPermission3" id="UserPermission3" type="checkbox" value="AccessBilling" /></td>
-                                  </tr>
-                          </table>
-                          <button class="btn btn-success" type="submit">Save</button>
-                         </div>
-                  </form>
-              </div>
+                <div class="x_panel">
 
-              <!--<div class="x_panel">
+                    <h2>Edit Permission Types</h2>
 
-                  <h2>Levels of access</h2>
+                    <form action="/admin/users/permissions" method="post" enctype="multipart/form-data">
+                        <div class="table-responsive">
+                            <table class="table table-striped jambo_table bulk_action">
+                                <thead>
+                                    <tr id="tableHeadingUIn" class="headings">
+                                        <th></th>
+                                        <th class="column-title">Access To Chatbots</th>
+                                        <th class="column-title">Access To Users</th>
+                                        <th class="column-title">Access To Billing</th>
+                                    </tr>
+                                </thead>
+                                <tr>
+                                    <td><strong>Admin</strong></td>
+                                    <td><input name="AdminPermission1" id="AdminPermission1" type="checkbox" value="EditChatbots" /></td>
+                                    <td><input name="AdminPermission2" id="AdminPermission2" type="checkbox" value="EditUsers" /></td>
+                                    <td><input name="AdminPermission3" id="AdminPermission3" type="checkbox" value="AccessBilling" /></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>User</strong></td>
+                                    <td><input name="UserPermission1" id="UserPermission1" type="checkbox" value="EditChatbots" /></td>
+                                    <td><input name="UserPermission2" id="UserPermission2" type="checkbox" value="EditUsers" /></td>
+                                    <td><input name="UserPermission3" id="UserPermission3" type="checkbox" value="AccessBilling" /></td>
+                                </tr>
+                            </table>
+                            <button class="btn btn-success" type="submit">Save</button>
+                        </div>
+                    </form>
+                </div>
 
-                  <p><strong>Owner</strong>- Full access with no limits.</p>
-                  <p><strong>Admin</strong>- Full access with no limits. Cannot modify <strong>Owner</strong>.</p>
-                  <p><strong>User</strong>- Limited access with no access to adding additional users.</p>
-                  <p><strong>Developer</strong>- Limited access with no access to any business data. (coming soon)</p>
-                  <p><strong>General</strong>- Limited access with no access to technical data. (coming soon)</p>
+                <!--<div class="x_panel">
 
-              </div>-->
+                <h2>Levels of access</h2>
 
-          </div>
-      </div>
-  </div>
+                <p><strong>Owner</strong>- Full access with no limits.</p>
+                <p><strong>Admin</strong>- Full access with no limits. Cannot modify <strong>Owner</strong>.</p>
+                <p><strong>User</strong>- Limited access with no access to adding additional users.</p>
+                <p><strong>Developer</strong>- Limited access with no access to any business data. (coming soon)</p>
+                <p><strong>General</strong>- Limited access with no access to technical data. (coming soon)</p>
+
+            </div>-->
+
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -254,5 +258,25 @@
               $("#UserPermission3").prop('checked', true);
           }
       }
+
+      params = "";
+      var xhttp = new XMLHttpRequest();
+      xhttp.open("POST", "/admin/getadminpagesdata", true);
+      xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhttp.onreadystatechange = function () {
+          if (xhttp.readyState === 4) {
+              if (xhttp.status === 200) {
+                  var responseString = xhttp.responseText
+
+                  //get user's plan restrictions
+                  restrictions = responseString.split("&&&")[2];
+                  var restrictionsArray = restrictions.split(";");
+              }
+              else {
+                  console.error(xhttp.statusText);
+              }
+          }
+      };
+      xhttp.send(params);
   </script>
 {% endblock %}

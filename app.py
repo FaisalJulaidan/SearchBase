@@ -584,7 +584,10 @@ def adminPagesData():
                 permissions = ""
                 for key,value in session['Permissions'].items():
                     permissions+= key + ":" + str(value) + ";"
-                return user["Firstname"] + "&&&" + permissions
+                planSettings = ""
+                for key,value in session['UserPlan']['Settings'].items():
+                    planSettings += key + ":" + str(value) + ";"
+                return user["Firstname"] + "&&&" + permissions + "&&&" + planSettings
         return "wait...Who are you?"
 
 @app.route("/admin/profile", methods=['GET', 'POST'])
@@ -812,12 +815,31 @@ def admin_assistant_edit(assistantID):
 def admin_turn_assistant(turnto, assistantID):
     checkAssistantID(assistantID)
     if request.method == "GET":
-        updateBot = update_table("UPDATE Assistants SET Active=? WHERE ID=?;", [turnto, assistantID])
+        #Check if plan restrictions are ok with the assistant
+        numberOfProducts = 0
+        maxNOP = session['UserPlan']['Settings']['MaxProducts']
+        for record in assistants:
+            numberOfProducts += count_db("Products", " WHERE AssistantID=?", [record["ID"],])
+        if numberOfProducts > maxNOP:
+            return redirectWithMessageAndAssistantID("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP)+ ". In order to activate an assistant you will have to reduce the number of products you currently have: "+str(numberOfProducts)+".")
+        
         if turnto == "True":
+            #Check max number of active bots
+            numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "True"])
+            if numberOfActiveBots >= session['UserPlan']['Settings']['ActiveBotsCap']:
+                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "You have already reached the maximum amount of Active Assistant.")
+
             message="activated."
         else:
+            #Check max number of inactive bots
+            numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "False"])
+            if numberOfActiveBots >= session['UserPlan']['Settings']['InactiveBotsCap']:
+                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "You have already reached the maximum amount of Inactive Assistants. If you wish to deactivate this bot please delete or activate an inactivate assistant")
+
             message="deactivated."
-        return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Chatbot has been "+message)
+
+        updateBot = update_table("UPDATE Assistants SET Active=? WHERE ID=?;", [turnto, assistantID])
+        return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Assistant has been "+message)
 
 # TODO rewrite
 @app.route("/admin/assistant/<assistantID>/questions", methods=['GET', 'POST'])
@@ -1463,17 +1485,21 @@ def admin_analytics(assistantID):
 @app.route("/admin/users", methods=['GET'])
 def admin_users():
     if request.method == "GET":
+        message = checkForMessage()
         email = session.get('User')['Email']
         companyID = session.get('User')['CompanyID']
 
         userSettings = query_db("SELECT * FROM UserSettings WHERE CompanyID=?", [companyID])
 
         users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
-        return render("admin/users.html", users=users, email=email, userSettings=userSettings)
+        return render("admin/users.html", users=users, email=email, userSettings=userSettings, message=message)
 
 @app.route("/admin/users/add", methods=['POST'])
 def admin_users_add():
     if request.method == "POST":
+        numberOfCompanyUsers = count_db("Users", " WHERE CompanyID=?", [session.get('User')['CompanyID'],])
+        if numberOfCompanyUsers >= session['UserPlan']['Settings']['AdditionalUsersCap'] + 1:
+            return redirectWithMessage("admin_users", "You have reached the max amount of additional Users - " + session['UserPlan']['Settings']['AdditionalUsersCap']+".")
         email = session.get('User')['Email']
         companyID = session.get('User')['CompanyID']
         fullname = request.form.get("fullname", default="Error")
@@ -1483,25 +1509,19 @@ def admin_users_add():
         # Generates a random password
 
         if fullname == "Error" or accessLevel == "Error" or newEmail == "Error":
-            print("A textbox has not been filled")
-            #TODO pass in feedback message
-            return redirect("/admin/users", code=302)
+            return redirectWithMessage("admin_users", "Error in retrieving all textbox inputs.")
         else:
             newEmail = newEmail.lower()
             users = query_db("SELECT * FROM Users")
             # If user exists
             for record in users:
                 if record["Email"] == newEmail:
-                    print("Email is already in use!")
-                    #TODO Return feedback message
-                    return redirect("/admin/users", code=302)
+                    return redirectWithMessage("admin_users", "Email is already in use!")
             try:
                 firstname = fullname.split(" ")[0]
                 surname = fullname.split(" ")[1]
             except IndexError as e:
-                print("Error in splitting")
-                #TODO pass in feedback message
-                return redirect("/admin/users", code=302)
+                return redirectWithMessage("admin_users", "Error in retrieving both names.")
             hashed_password = hash_password(password)
 
             #ENCRYPTION
@@ -1512,9 +1532,7 @@ def admin_users_add():
                 "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
                 (companyID, firstname, surname, accessLevel, newEmail, hashed_password, "True"))
             if "added" not in insertUserResponse:
-                print("Error in insert operation")
-                #TODO pass in feedback message
-                redirect("/admin/users", code=302)
+                return redirectWithMessage("admin_users", "Error in adding user to our records.")
             else:
                 #if not app.debug:
 
@@ -1529,8 +1547,7 @@ def admin_users_add():
                             <h4>Your temporary password is: "+password+".<h4><br />\
                             Please visit <a href='"+link+"'>this link</a> to sign in and to set the password for your account.<p><br /> If you feel this is a mistake please contact "+email+". <br /> <br / > Regards, TheSearchBase Team"
                 mail.send(msg)
-                #TODO return feedbackmessage
-                return redirect("/admin/users")
+                return redirectWithMessage("admin_users", "User has been added. A temporary password has been emailed to them.")
 
 @app.route("/admin/users/modify", methods=["POST"])
 def admin_users_modify():
@@ -1548,12 +1565,10 @@ def admin_users_modify():
                     if record["Email"] == session.get('User')['Email']:
                         recordID = record["ID"]
                 if "Error" in recordID:
-                    return redirect("admin/users", code=302)
+                    return redirectWithMessage("admin_users", "Error in finding user.")
                 updatedAccess = update_table("UPDATE Users SET AccessLevel=? WHERE ID=?;", ["Admin", recordID])
-                #TODO return feedbackmessage
-                return redirect("/admin/users", code=302)
-        #TODO return feedbackmessage
-        return redirect("/admin/users", code=302)
+                return redirectWithMessage("admin_users", "User has been modified.")
+        return redirectWithMessage("admin_users", "Error in retrieving all textbox inputs.")
 
 @app.route("/admin/users/delete/<userID>", methods=["GET"])
 def admin_users_delete(userID):
@@ -1568,14 +1583,14 @@ def admin_users_delete(userID):
             if user["Email"] == email:
                 requestingUser = user
         if "Error" in requestingUser:
-            return redirect("/admin/users", code=302)
+            return redirectWithMessage("admin_users", "Error in finding user.")
         targetUser = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?", [userID])[0]
         #Check that users are from the same company and operating user isnt 'User'
         if requestingUser["AccessLevel"] == "User" or requestingUser["CompanyID"] != targetUser:
             #TODO send feedback message
             return redirect("/admin/homepage", code=302)
         delete_from_table("DELETE FROM Users WHERE ID=?;", [userID])
-        return redirect("/admin/users", code=302)
+        return redirectWithMessage("admin_users", "User has been deleted.")
 
 
 @app.route("/admin/users/permissions", methods=["POST"])

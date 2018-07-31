@@ -593,6 +593,25 @@ def adminPagesData():
                 return user["Firstname"] + "&&&" + permissions + "&&&" + planSettings
         return "wait...Who are you?"
 
+
+
+#data for the user which to be displayed on every admin page
+@app.route("/admin/userData", methods=['GET'])
+def getUserData():
+    if request.method == "GET":
+        userDict = {
+            "id": session['User']['ID'],
+            "email": session['User']['Email'],
+            "firstname": session['User']['Firstname'],
+            "surname": session['User']['Surname'],
+            "stripeID": session['User']['StripeID'],
+            "subID": session['User']['SubID'],
+
+        }
+        return jsonify(userDict)
+
+
+
 @app.route("/admin/profile", methods=['GET', 'POST'])
 def profilePage():
     if request.method == "GET":

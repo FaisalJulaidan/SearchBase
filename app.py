@@ -1442,6 +1442,10 @@ def webhook_subscription_cancelled():
             print(customerID)
 
             user = select_from_database_table("SELECT * FROM Users WHERE StripeID=?", [customerID])
+
+            update_table("UPDATE Users SET SubID=? WHERE StripeID=?;",
+                         [None, customerID])
+
             # TODO check company for errors
             assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", [user[1]], True)
 
@@ -1451,6 +1455,7 @@ def webhook_subscription_cancelled():
 
                     updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
                     # TODO check update assistant for errors
+
 
         except Exception as e:
             abort(status.HTTP_400_BAD_REQUEST, "Error in Webhook event")

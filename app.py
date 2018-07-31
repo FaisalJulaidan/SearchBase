@@ -107,8 +107,8 @@ def before_request():
             return redirect("/admin/homepage", code=302)
 
         #Check user plan permissions
-        print("PLAN:", session['UserPlan'])
-        if "Basic" in session['UserPlan']['Nickname']:
+        print("PLAN:", session.get('UserPlan', []))
+        if "Basic" is session.get('UserPlan', [])['Nickname']:
             print("basic plan")
     
 
@@ -594,6 +594,25 @@ def adminPagesData():
                     planSettings += key + ":" + str(value) + ";"
                 return user["Firstname"] + "&&&" + permissions + "&&&" + planSettings
         return "wait...Who are you?"
+
+
+
+#data for the user which to be displayed on every admin page
+@app.route("/admin/userData", methods=['GET'])
+def getUserData():
+    if request.method == "GET":
+        userDict = {
+            "id": session['User']['ID'],
+            "email": session['User']['Email'],
+            "firstname": session['User']['Firstname'],
+            "surname": session['User']['Surname'],
+            "stripeID": session['User']['StripeID'],
+            "subID": session['User']['SubID'],
+
+        }
+        return jsonify(userDict)
+
+
 
 @app.route("/admin/profile", methods=['GET', 'POST'])
 def profilePage():
@@ -1447,6 +1466,10 @@ def webhook_subscription_cancelled():
             print(customerID)
 
             user = select_from_database_table("SELECT * FROM Users WHERE StripeID=?", [customerID])
+
+            update_table("UPDATE Users SET SubID=? WHERE StripeID=?;",
+                         [None, customerID])
+
             # TODO check company for errors
             assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", [user[1]], True)
 
@@ -1456,6 +1479,7 @@ def webhook_subscription_cancelled():
 
                     updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
                     # TODO check update assistant for errors
+
 
         except Exception as e:
             abort(status.HTTP_400_BAD_REQUEST, "Error in Webhook event")

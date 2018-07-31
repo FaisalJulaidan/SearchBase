@@ -66,8 +66,9 @@ mail = Mail(app)
 ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
 ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
 
+NoPlan = {"MaxProducts":0, "ActiveBotsCap":0, "InactiveBotsCap":0, "AdditionalUsersCap":0, "ExtendedLogic":False, "ImportDatabase":False, "CompanyNameonChatbot": False}
 BasicPlan = {"MaxProducts":600, "ActiveBotsCap":2, "InactiveBotsCap":3, "AdditionalUsersCap":5, "ExtendedLogic":False, "ImportDatabase":False, "CompanyNameonChatbot": False}
-AdvancedPlan = {"MaxProducts":5000, "ActiveBotsCap":4, "InactiveBotsCap":6, "AdditionalUsersCap":10, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
+AdvancedPlan = {"MaxProducts":5000, "ActiveBotsCap":4, "InactiveBotsCap":8, "AdditionalUsersCap":10, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
 UltimatePlan = {"MaxProducts":30000, "ActiveBotsCap":10, "InactiveBotsCap":30, "AdditionalUsersCap":999, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
 #count_db("Plans", " WHERE Nickname=?", ["basic",])
 
@@ -280,7 +281,9 @@ def login():
                             # Set user plan e.g. (Basic, Ultimate...)
                             session['UserPlan'] = {}
                             session['UserPlan']['Nickname'] =  getPlanNickname(user['SubID'])
-                            if "Basic" in getPlanNickname(user['SubID']):
+                            if getPlanNickname(user['SubID']) is None:
+                                session['UserPlan']['Settings'] = NoPlan
+                            elif "Basic" in getPlanNickname(user['SubID']):
                                 session['UserPlan']['Settings'] = BasicPlan
                             elif "Advanced" in getPlanNickname(user['SubID']):
                                 session['UserPlan']['Settings'] = AdvancedPlan
@@ -1420,7 +1423,7 @@ def unsubscribe():
             update_table("UPDATE Users SET SubID=? WHERE ID=?;",
                          [None, session.get('User')['ID']])
             # Reset session
-            session['UserPlan'] = None
+            session['UserPlan'] = NoPlan
 
             print("You have unsubscribed successfully!")
             return redirectWithMessage("admin_plan_confirmation", "You have unsubscribed successfully!")

@@ -53,12 +53,6 @@
     <div class="limiter">
         <div class="container-login100">
             <div class="wrap-login100">
-                <div class="login100-form-title" style="text-align:left;margin-bottom: 1.7%;">
-                    <a class="txt2" href="/">
-                        <i class="fa fa-long-arrow-left m-l-5" aria-hidden="true"></i>
-                        Back to Homepage
-                    </a>
-                </div>
                 <div class="login100-pic">
                     <img src="../static/img/gifs/rocket-icon.gif" alt="GIF">
                     <br />
@@ -99,9 +93,8 @@
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
                         <input class="input100" type="text"
-                               placeholder="(01234) 123456"
-                               name="phoneNumber"
-                               onchange="checkboxesMatch('phone')">
+                               placeholder="+1-595585131"
+                               name="phoneNumber" onchange="checkboxesMatch('phone')">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-mobile" aria-hidden="true"></i>
@@ -111,14 +104,13 @@
                     <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
                         <input class="input100" type="email" id="email" name="email" placeholder="Email" autocomplete="off"
                                onchange="validateUserEmail('email')">
-                        <!-- onkeyup="checkboxesMatch('email')" -->
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-envelope" aria-hidden="true"></i>
                         </span>
                     </div>
 
-                    <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
+                    <!-- <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
                         <input class="input100 btn" type="email" id="confirmemail" name="confirmEmail"
                                placeholder="Confirm email" autocomplete="off" onchange="checkboxesMatch('email')" disabled
                                style="cursor:not-allowed;text-align: -webkit-auto;">
@@ -126,11 +118,11 @@
                         <span class="symbol-input100">
                             <i class="fa fa-envelope" aria-hidden="true"></i>
                         </span>
-                    </div>
+                    </div> -->
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
                         <input class="input100" type="password" id="password" name="password" autocomplete="new-password"
-                               placeholder="Password" onchange="validatePassword(this)">
+                               placeholder="Password" onchange="validatePassword(this);checkPassword()">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-lock" aria-hidden="true"></i>
@@ -139,7 +131,7 @@
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
                         <input class="input100 btn" type="password" id="confirmpassword" name="confirmPassword"
-                               placeholder="Confirm password" onchange="checkboxesMatch('password')" disabled
+                               placeholder="Confirm password" onchange="checkPassword()" disabled
                                style="cursor:not-allowed;text-align: -webkit-auto;">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
@@ -149,19 +141,19 @@
 
 
 
-                    <!-- <div class="wrap-input100 validate-input" data-validate="Required">
-            <p>Choose Plan</p>
-            <select name="subscription" id="inputState" class="form-control" form="signupForm" title="Choose Plan" required>
-                <option value="Trial">3 Month Trial</option>
-                <option value="Basic">Basic Plan</option>
-                <option value="Advanced">Advanced Plan</option>
-                <option value="Ultimate">Ultimate Plan</option>
-                {% if debug == True %}
-                <option value="Debug"> Debug</option>
-                {% endif %}
-            </select>
-            <span class="focus-input100"></span>
-        </div> -->
+                    <!--<div class="wrap-input100 validate-input" data-validate="Required">
+                        <p>Choose Plan</p>
+                        <select name="subscription" id="inputState" class="form-control" form="signupForm" title="Choose Plan" required>
+                            <option value="Trial">3 Month Trial</option>
+                            <option value="Basic">Basic Plan</option>
+                            <option value="Advanced">Advanced Plan</option>
+                            <option value="Ultimate">Ultimate Plan</option>
+                            {% if debug == True %}
+                            <option value="Debug"> Debug</option>
+                            {% endif %}
+                        </select>
+                        <span class="focus-input100"></span>
+                    </div>-->
 
                     <div class="container-login100-form-btn">
                         <button class="login100-form-btn-disabled" id="submit" disabled>
@@ -235,17 +227,17 @@
         var errShow = $("#showError")
 
         // show errors messages from server
-        var msg = '{{ msg }}'
-        if (msg != "" && msg != " ") {
-          alertError('Server Error',msg)
-        }
+        // var msg = '{{ msg }}'
+        // if (msg) {
+        //   alertError('Server Error',msg)
+        // }
 
         var inputs ={
           company:false,
           url:false,
           name:false,
           email:false,
-          emailConf:false,
+        //   emailConf:false,
           password:false,
           passwordConf:false,
           phone:false
@@ -270,7 +262,29 @@
           }
           return true;
         }
+        function checkPassword() {
+            pass = document.getElementById('password')
+            passwordConf = document.getElementById('confirmpassword')
+            // if it is matching 
+            if (password.value == passwordConf.value){
+                document.getElementById("submit").classList.remove('login100-form-btn-disabled');
+                document.getElementById("submit").classList.add('login100-form-btn');
+                inputs.passwordConf = true
+            }else{
+                alertError('Password Matching Error','Please match your passwords')
+                inputs.passwordConf = false
+            }
 
+            for (var input of Object.entries(inputs))
+                if (input[1] != true)
+                    document.getElementById('submit').disabled = false;
+                else
+                    document.getElementById('submit').disabled = true;
+            
+
+            // if both are not matching 
+
+        }
         function checkboxesMatch(boxID) {
             if (document.getElementById('confirm' + boxID)) {
                 if (   document.getElementById(boxID).value === document.getElementById('confirm' + boxID).value
@@ -281,12 +295,7 @@
                     if (input[1] != true)
                       document.getElementById('submit').disabled = false;
                   }
-
-                  if (boxID=='password'){
-                    document.getElementById("submit").classList.remove('login100-form-btn-disabled');
-                    document.getElementById("submit").classList.add('login100-form-btn');
-                    inputs.passwordConf = true
-                  }
+                  
                   if (boxID=='email')
                     inputs.emailConf = true
                 }
@@ -296,28 +305,17 @@
                 alertError('Email Matching Error','Please confirm your email as the above one')
                 inputs.emailConf = false
               }
-              if (boxID=='password'){
-                alertError('Password Matching Error','Please match your passwords')
-                inputs.passwordConf = false
-              }
               if (boxID=='phone') {
                   var regex =""
                   var element = $("input[name=phoneNumber]")[0]
-                  if (/\+?-?\d{6,}/.test(element.value)) {
+                  if (/^[0-9]*$/.test(element.value)) {
                       inputs.phone = true;
                       element.style.boxShadow='0 0 9px 0px rgba(100, 185, 110, 1)'
                   }else {
-                      alertError('Mobile Error',
-                      '<h4>Please Only digits</h4><br>'+
-                      'Please add proper mobile number: <br><br>'+
-                      '<h5>+123-123456789</h5><br>'+
-                      '<h6>( OR )</h6><br>'+
-                      '<h5>123-4567890</h5><br>'+
-                      '<h6>( OR )</h6><br>'+
-                      '<h5>1234567890</h5>'
-                  )
+                      alertError('Mobile Error','Please add proper mobile number Only numbers are acceptable')
                       inputs.passwordConf = false
                   }
+
               }
 
               document.getElementById('submit').disabled = true;

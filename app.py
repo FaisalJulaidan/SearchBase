@@ -107,8 +107,8 @@ def before_request():
             return redirect("/admin/homepage", code=302)
 
         #Check user plan permissions
-        print("PLAN:", session['UserPlan'])
-        if "Basic" in session['UserPlan']['Nickname']:
+        print("PLAN:", session.get('UserPlan', []))
+        if "Basic" is session.get('UserPlan', [])['Nickname']:
             print("basic plan")
     
 

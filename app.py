@@ -114,7 +114,9 @@ def before_request():
 
 def checkAssistantID(assistantID):
     assistantRecord = query_db("SELECT * FROM Assistants WHERE ID=?", [assistantID,], True)
-    if session.get('User')['CompanyID'] is not assistantRecord['CompanyID']:
+    if assistantRecord is None:
+        return redirect("/admin/homepage", code=302)
+    elif session.get('User')['CompanyID'] is not assistantRecord['CompanyID']:
         return redirect("/admin/homepage", code=302)
 
 

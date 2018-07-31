@@ -679,7 +679,7 @@ def admin_assistant_create():
         if type(assistants) is type([]) and assistants:
             chatbotCap = session['UserPlan']['Settings']['ActiveBotsCap'] + session['UserPlan']['Settings']['InactiveBotsCap']
             if len(assistants) >= chatbotCap:
-                return redirectWithMessage("admin_assistant_create", "You have reached the limit of "+chatbotCap+" assistants")
+                return redirectWithMessage("admin_assistant_create", "You have reached the limit of "+str(chatbotCap)+" assistants")
         company = get_company(email)
         if company is None or "Error" in company:
             return redirectWithMessage("admin_assistant_create", "Error in getting company")
@@ -1492,7 +1492,7 @@ def admin_users_add():
     if request.method == "POST":
         numberOfCompanyUsers = count_db("Users", " WHERE CompanyID=?", [session.get('User')['CompanyID'],])
         if numberOfCompanyUsers >= session['UserPlan']['Settings']['AdditionalUsersCap'] + 1:
-            return redirectWithMessage("admin_users", "You have reached the max amount of additional Users - " + session['UserPlan']['Settings']['AdditionalUsersCap']+".")
+            return redirectWithMessage("admin_users", "You have reached the max amount of additional Users - " + str(session['UserPlan']['Settings']['AdditionalUsersCap'])+".")
         email = session.get('User')['Email']
         companyID = session.get('User')['CompanyID']
         fullname = request.form.get("fullname", default="Error")

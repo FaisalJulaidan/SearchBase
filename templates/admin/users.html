@@ -258,25 +258,5 @@
               $("#UserPermission3").prop('checked', true);
           }
       }
-
-      params = "";
-      var xhttp = new XMLHttpRequest();
-      xhttp.open("POST", "/admin/getadminpagesdata", true);
-      xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      xhttp.onreadystatechange = function () {
-          if (xhttp.readyState === 4) {
-              if (xhttp.status === 200) {
-                  var responseString = xhttp.responseText
-
-                  //get user's plan restrictions
-                  restrictions = responseString.split("&&&")[2];
-                  var restrictionsArray = restrictions.split(";");
-              }
-              else {
-                  console.error(xhttp.statusText);
-              }
-          }
-      };
-      xhttp.send(params);
   </script>
 {% endblock %}

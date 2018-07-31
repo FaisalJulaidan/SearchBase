@@ -29,7 +29,6 @@ $(document).ready(function () {
     $(document).on("mouseleave", ".launch_btn_holder", function () {
         OpenButtonHoverEnd();
     });
-    GetPopSettings();
 });
 
 
@@ -97,21 +96,23 @@ function OpenButtonHoverEnd() {
     }
 }
 
-function GetPopSettings() {
+function GetPopSettings(assistantID) {
     var url = window.location.href;
     params = "URL=" + url;
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "https://www.thesearchbase.com/getpopupsettings", true);
+    xhttp.open("GET", "https://www.thesearchbase.com/getpopupsettings/" + assistantID, true);
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhttp.onreadystatechange = function () {
         if (xhttp.readyState === 4) {
             if (xhttp.status === 200) {
                 var data = xhttp.responseText;
-                autoPop = data;
+                autoPop = data.split("&&&")[0];
                 autoPop = autoPop.replace("\"", "");
                 if (autoPop != "Off") {
                     setTimeout(openAssistant, parseInt(autoPop) * 1000);
                 }
+                var frameText = data.split("&&&")[1]
+                document.getElementById("overChatbotIframeHeading").innerHTML = frameText;
             }
             else {
                 console.error(xhttp.statusText);

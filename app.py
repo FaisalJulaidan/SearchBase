@@ -704,7 +704,7 @@ def admin_assistant_create():
         numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "True"])
         print(session.get('UserPlan')['Settings'])
         if numberOfActiveBots >= session.get('UserPlan')['Settings']['ActiveBotsCap']:
-            return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "You have already reached the maximum amount of Active Assistants. Please deactivate one to proceed.")
+            return redirectWithMessage("admin_assistant_create", "You have already reached the maximum amount of Active Assistants. Please deactivate one to proceed.")
         company = get_company(email)
         if company is None or "Error" in company:
             return redirectWithMessage("admin_assistant_create", "Error in getting company")

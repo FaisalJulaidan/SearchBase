@@ -1734,7 +1734,7 @@ def chatbot(companyName, assistantID):
         companies = query_db("SELECT * FROM Companies")
         # If company exists
         for record in companies:
-            if record["Name"] == escape(companyName):
+            if record["Name"] == companyName:
                 company = record
             else:
                 abort(status.HTTP_404_NOT_FOUND)

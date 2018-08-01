@@ -702,7 +702,8 @@ def admin_assistant_create():
                 return redirectWithMessage("admin_assistant_create", "You have reached the limit of "+str(chatbotCap)+" assistants")
         #Check max number of active bots
         numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "True"])
-        if numberOfActiveBots >= session['UserPlan']['Settings']['ActiveBotsCap']:
+        print(session.get('UserPlan')['Settings'])
+        if numberOfActiveBots >= session.get('UserPlan')['Settings']['ActiveBotsCap']:
             return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "You have already reached the maximum amount of Active Assistants. Please deactivate one to proceed.")
         company = get_company(email)
         if company is None or "Error" in company:

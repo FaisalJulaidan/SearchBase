@@ -647,7 +647,7 @@ def profilePage():
             for user in users:
                 if user["Email"] == curEmail:
                     #TODO check if they worked
-                    ENCRYPTION
+                    #ENCRYPTION
                     updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [encryptVar(name1),encryptVar(name2),encryptVar(newEmail),user["ID"]])
                     #updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [name1,name2,newEmail,user["ID"]])
                     companyID = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?;", [user["ID"]])

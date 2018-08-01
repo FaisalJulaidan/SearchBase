@@ -1388,7 +1388,15 @@ def admin_pay(planID):
             update_table("UPDATE Users SET SubID=? WHERE ID=?", (subscription['id'], user['ID']))
 
             # Resit the session
-            session['UserPlan'] = getPlanNickname(subscription['id'])
+            session['UserPlan']['Nickname'] =  getPlanNickname(subscription['id'])
+            if getPlanNickname(user['SubID']) is None:
+                session['UserPlan']['Settings'] = NoPlan
+            elif "Basic" in getPlanNickname(user['SubID']):
+                session['UserPlan']['Settings'] = BasicPlan
+            elif "Advanced" in getPlanNickname(user['SubID']):
+                session['UserPlan']['Settings'] = AdvancedPlan
+            elif "Ultimate" in getPlanNickname(user['SubID']):
+                session['UserPlan']['Settings'] = UltimatePlan
 
         # TODO check subscription for errors https://stripe.com/docs/api#errors
         except Exception as e:

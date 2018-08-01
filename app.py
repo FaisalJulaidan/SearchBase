@@ -1733,17 +1733,13 @@ def chatbot(companyName, assistantID):
     if request.method == "GET":
         companies = query_db("SELECT * FROM Companies")
         # If company exists
-        print(companyName, assistantID)
         company = "Error"
         for record in companies:
-            print(record)
             if record["Name"] == companyName:
                 company = record
         if company is "Error":
             abort(status.HTTP_404_NOT_FOUND)
 
-        # for debugging
-        print(company)
 
         if company is None:
             abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
@@ -1754,8 +1750,6 @@ def chatbot(companyName, assistantID):
         if assistant is None or assistant is "Error":
             abort(status.HTTP_400_BAD_REQUEST, "This Assistant does't exist")
 
-        # for debugging
-        print(assistant)
 
 
         # TODO check assistant for errors

@@ -1743,16 +1743,15 @@ def chatbot(companyName, assistantID):
             abort(status.HTTP_404_NOT_FOUND)
 
         # for debugging
-        print(escape(companyName))
         print(company)
 
         if company is None:
             abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
 
         # TODO check company for errors
-        assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=?;", [assistantID])
+        assistant = query_db("SELECT * FROM Assistants WHERE ID=?;", [assistantID])
 
-        if assistant is None:
+        if assistant is None or assistant is "Error":
             abort(status.HTTP_400_BAD_REQUEST, "This Assistant does't exist")
 
         # for debugging
@@ -1764,7 +1763,7 @@ def chatbot(companyName, assistantID):
         # assistantID = assistant[assistantIndex][0]
 
         # is assistant active ? True/False
-        assistantActive = assistant[6]
+        assistantActive = assistant["Active"]
 
         if assistantActive != "True":
             abort(status.HTTP_404_NOT_FOUND, "Assistant not active.")
@@ -1801,7 +1800,7 @@ def chatbot(companyName, assistantID):
                     merge = merge + tuple(answer)
                 questionsAndAnswers.append(merge)
 
-            message = assistant[3]
+            message = assistant["Message"]
             # MONTHLY UPDATE
             date = datetime.now().strftime("%Y-%m")
             currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])

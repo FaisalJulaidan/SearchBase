@@ -136,46 +136,79 @@
             <div class="col-12 col-lg-2">
                 <div class="sing-up-button d-none d-lg-block">
                     <!-- <a href="#">Sign up in</a><br /> -->
-                    <!-- Login button -->
                     <a href="/signup">Sign up</a>
                 </div>
             </div>
         </div>
     </div>
 </header>
-<!-- ***** Header Area End ***** -->
-
 <!-- ***** Welcome Area Start ***** -->
 <section class="wellcome_area clearfix" id="home">
-    <div class="container h-100">
-        <div class="row h-100 align-items-center">
-            <div class="col-12 col-md">
-                <div class="wellcome-heading">
-                    <h2>Convert, Direct and Grow</h2>
-                    <p>Build And Deploy Your virtual Assistant in minutes</p>
-                </div>
-                <div class="get-start-area">
 
-                    <!-- Form Start -->
-                    <form action="/send/mailtop" method="post" class="form-inline">
-                        <input type="email" class="form-control email" placeholder="name@company.com" name="user_email">
-                        <button type="submit" value="Send" class="submit">Register Interest</button>
-                    </form>
-                    <!-- Form End -->
-                </div>
+<div class="container" style="padding:170px 60px">
+    <div class="row">
+        <!-- heading -->
+        <div class="col-xs-12">
+            <div class="wellcome-heading">
+                <h2>Convert, Direct and Grow</h2>
+                <p>Build And Deploy Your virtual Assistant in minutes</p>
             </div>
         </div>
     </div>
-    <!-- Welcome thumb -->
-    <div class="welcome-thumb wow fadeInDown" data-wow-delay="0.5s">
-        <!-- Video for the intro goes here-->
-        <video loop="loop" autoplay="autoplay" width="430" height="490" id="introVideo" media="all and (max-width:430px)">
-            <source src="../static/images/demo2.mp4" type="video/mp4">
-        </video>
-        <br />
-        <br />
-        <br />
+    <div class="row" id="bigScreen">
+        <div class="col-xs-6">
+            <div class="get-start-area">
+                <form action="/send/mailtop" method="post" class="form-inline">
+                    <input type="email" class="form-control email" placeholder="name@company.com" name="user_email">
+                    <button type="submit" value="Send" class="submit">Register Interest</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-6" style="margin-top:-100px">
+            <div class="welcome-thumb wow fadeInDown" data-wow-delay="0.5s" style="display:contents">
+                <video loop="loop" autoplay="autoplay" width="430" height="490" id="introVideo" media="all and (max-width:430px)">
+                    <source src="../static/images/demo2.mp4" type="video/mp4">
+                </video>
+            </div>
+        </div>
     </div>
+
+    <div class="row" id="smallScreen">
+        <div class="col-xs-12">
+            <div class="get-start-area">
+                <form action="/send/mailtop" method="post" class="form-inline">
+                    <input type="email" class="form-control email" placeholder="name@company.com" name="user_email">
+                    <button type="submit" value="Send" class="submit">Register Interest</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    var lg=document.getElementById('bigScreen')
+    var sm=document.getElementById('smallScreen')
+
+    if (window.innerWidth < 991) {
+        lg.style.display = 'none'
+        sm.style.display = ''
+    }else {
+        sm.style.display = 'none'
+        lg.style.display = ''
+    }
+    
+    window.addEventListener('resize',()=>{
+        if (window.innerWidth < 991) {
+            lg.style.display = 'none'
+            sm.style.display = ''
+        }else {
+            sm.style.display = 'none'
+            lg.style.display = ''
+        }
+    })
+</script>
+
 </section>
 <!-- ***** Welcome Area End ***** -->
 

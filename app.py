@@ -16,7 +16,7 @@ import stripe
 import string
 import random
 from urllib.request import urlopen
-#from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet
 import urllib.request
 
 app = Flask(__name__, static_folder='static')

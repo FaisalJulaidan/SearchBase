@@ -1733,7 +1733,9 @@ def chatbot(companyName, assistantID):
     if request.method == "GET":
         companies = query_db("SELECT * FROM Companies")
         # If company exists
+        print(companyName, assistantID)
         for record in companies:
+            print(record)
             if record["Name"] == companyName:
                 company = record
             else:

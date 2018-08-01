@@ -108,8 +108,6 @@ def before_request():
 
         #Check user plan permissions
         print("PLAN:", session.get('UserPlan', []))
-        if "Basic" is session.get('UserPlan', [])['Nickname']:
-            print("basic plan")
     
 
 def checkAssistantID(assistantID):
@@ -699,8 +697,13 @@ def admin_assistant_create():
         # Return the user to the page if has reached the limit of assistants
         if type(assistants) is type([]) and assistants:
             chatbotCap = session['UserPlan']['Settings']['ActiveBotsCap'] + session['UserPlan']['Settings']['InactiveBotsCap']
+            print(chatbotCap, " ", len(assistants))
             if len(assistants) >= chatbotCap:
                 return redirectWithMessage("admin_assistant_create", "You have reached the limit of "+str(chatbotCap)+" assistants")
+        #Check max number of active bots
+        numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "True"])
+        if numberOfActiveBots >= session['UserPlan']['Settings']['ActiveBotsCap']:
+            return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "You have already reached the maximum amount of Active Assistants. Please deactivate one to proceed.")
         company = get_company(email)
         if company is None or "Error" in company:
             return redirectWithMessage("admin_assistant_create", "Error in getting company")
@@ -826,8 +829,9 @@ def admin_turn_assistant(turnto, assistantID):
     checkAssistantID(assistantID)
     if request.method == "GET":
         #Check if plan restrictions are ok with the assistant
+        assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?", [session.get('User')['CompanyID']])
         numberOfProducts = 0
-        maxNOP = session['UserPlan']['Settings']['MaxProducts']
+        maxNOP = session.get('UserPlan')['Settings']['MaxProducts']
         for record in assistants:
             numberOfProducts += count_db("Products", " WHERE AssistantID=?", [record["ID"],])
         if numberOfProducts > maxNOP:
@@ -837,7 +841,7 @@ def admin_turn_assistant(turnto, assistantID):
             #Check max number of active bots
             numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "True"])
             if numberOfActiveBots >= session['UserPlan']['Settings']['ActiveBotsCap']:
-                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "You have already reached the maximum amount of Active Assistant.")
+                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "You have already reached the maximum amount of Active Assistants. Please deactivate one to proceed.")
 
             message="activated."
         else:

@@ -41,7 +41,7 @@ USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
 
 pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
 secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
-#encryption = None
+encryption = None
 
 stripe.api_key = secret_key
 
@@ -90,7 +90,7 @@ def allowed_image_file(filename):
 # code to ensure user is logged in
 @app.before_request
 def before_request():
-    #print(encryption)
+    print(encryption)
     theurl = str(request.url_rule)
     restrictedRoutes = ['/admin', 'admin/homepage']
     # If the user try to visit one of the restricted routes without logging in he will be redirected
@@ -422,10 +422,10 @@ def signup():
 
             # Create a company record for the new user
             #ENCRYPTION
-            #insertCompanyResponse = insert_into_database_table(
-            #    "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
             insertCompanyResponse = insert_into_database_table(
-                "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName, companySize, websiteURL, companyPhoneNumber))
+                "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
+            #insertCompanyResponse = insert_into_database_table(
+             #   "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName, companySize, websiteURL, companyPhoneNumber))
 
             newCompany = get_last_row_from_table("Companies")
             # print(newCompany)
@@ -448,14 +448,14 @@ def signup():
 
                 # Create a user account and link it with the new created company record above
                 #ENCRYPTION
-                #newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
-                #            (newCompany['ID'], encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(email), hashed_password, newCustomer['id'],
-                #            str(verified), sub['id'])
-                #            )
                 newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
-                            (newCompany['ID'], firstname, surname, accessLevel, email, hashed_password, newCustomer['id'],
+                            (newCompany['ID'], encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(email), hashed_password, newCustomer['id'],
                             str(verified), sub['id'])
                             )
+                #newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
+                 #           (newCompany['ID'], firstname, surname, accessLevel, email, hashed_password, newCustomer['id'],
+                  #          str(verified), sub['id'])
+                   #         )
 
 
 
@@ -647,12 +647,12 @@ def profilePage():
             for user in users:
                 if user["Email"] == curEmail:
                     #TODO check if they worked
-                    #ENCRYPTION
-                    #updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [encryptVar(name1),encryptVar(name2),encryptVar(newEmail),user["ID"]])
-                    updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [name1,name2,newEmail,user["ID"]])
+                    ENCRYPTION
+                    updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [encryptVar(name1),encryptVar(name2),encryptVar(newEmail),user["ID"]])
+                    #updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [name1,name2,newEmail,user["ID"]])
                     companyID = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?;", [user["ID"]])
-                    #updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0]])
-                    updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [companyName,companyURL,companyID[0]])
+                    updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0]])
+                    #updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [companyName,companyURL,companyID[0]])
                     users = query_db("SELECT * FROM Users")
                     user = "Error"
                     for record in users:
@@ -1557,12 +1557,12 @@ def admin_users_add():
             hashed_password = hash_password(password)
 
             #ENCRYPTION
-            #insertUserResponse = insert_into_database_table(
-             #   "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
-              #  (companyID, encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(newEmail), hashed_password, "False"))
             insertUserResponse = insert_into_database_table(
                 "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
-                (companyID, firstname, surname, accessLevel, newEmail, hashed_password, "True"))
+                (companyID, encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(newEmail), hashed_password, "False"))
+            #insertUserResponse = insert_into_database_table(
+             #   "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
+              #  (companyID, firstname, surname, accessLevel, newEmail, hashed_password, "True"))
             if "added" not in insertUserResponse:
                 return redirectWithMessage("admin_users", "Error in adding user to our records.")
             else:
@@ -2301,37 +2301,37 @@ def select_from_database_table(sql_statement, array_of_terms=None, multi=False, 
     finally:
         if (conn is not None):
             conn.close()
-        #if "SELECT" in sql_statement:
-        #    returnArray = []
-        #    arrayPos = 0
-        #    for record in data:
-        #        tempVar = ""
-        #        if type(record) == list or type(record) == tuple:
-        #            returnArray.append([])
-        #            for value in record:
-        #                if type(value) == bytes:
-        #                    try:
-        #                        tempVar = encryption.decrypt(value).decode()
-        #                    except:
-        #                        print("Could not decode value. Assuming hashed record!")
-        #                else:
-        #                    tempVar = value
-        #                returnArray[arrayPos].append(tempVar)
-        #        else:
-        #            if type(record) == bytes:
-        #                try:
-        #                    tempVar = encryption.decrypt(record).decode()
-        #                except:
-        #                    print("Could not decode value. Assuming hashed record!")
-        #            else:
-        #                tempVar = record
-        #            returnArray.append(tempVar)
-        #        arrayPos+=1
-        #    #remove empty []
-        #    for records in returnArray:
-        #        if not records:
-        #            returnArray.remove(records)
-        #    data = returnArray
+        if "SELECT" in sql_statement:
+            returnArray = []
+            arrayPos = 0
+            for record in data:
+                tempVar = ""
+                if type(record) == list or type(record) == tuple:
+                    returnArray.append([])
+                    for value in record:
+                        if type(value) == bytes:
+                            try:
+                                tempVar = encryption.decrypt(value).decode()
+                            except:
+                                print("Could not decode value. Assuming hashed record!")
+                        else:
+                            tempVar = value
+                        returnArray[arrayPos].append(tempVar)
+                else:
+                    if type(record) == bytes:
+                        try:
+                            tempVar = encryption.decrypt(record).decode()
+                        except:
+                            print("Could not decode value. Assuming hashed record!")
+                    else:
+                        tempVar = record
+                    returnArray.append(tempVar)
+                arrayPos+=1
+            #remove empty []
+            for records in returnArray:
+                if not records:
+                    returnArray.remove(records)
+            data = returnArray
         return data
 
 
@@ -2444,11 +2444,11 @@ def query_db(query, args=(), one=False):
     cur = g.db.execute(query, args)
     rv = [dict((cur.description[idx][0], value)
                for idx, value in enumerate(row)) for row in cur.fetchall()]
-    #if "SELECT" in query:
-    #    for record in rv:
-    #        for key, value in record.items():
-    #            if type(value) == bytes and "Password" not in key:
-    #                record[key] = encryption.decrypt(value).decode()
+    if "SELECT" in query:
+        for record in rv:
+            for key, value in record.items():
+                if type(value) == bytes and "Password" not in key:
+                    record[key] = encryption.decrypt(value).decode()
     return (rv[0] if rv else None) if one else rv
 
 
@@ -2473,8 +2473,8 @@ def count_db(table, condition="", args=()):
 
 
 #encryption function to save typing
-#def encryptVar(var):
-#    return encryption.encrypt(var.encode())
+def encryptVar(var):
+    return encryption.encrypt(var.encode())
 
 # Get connection when no requests e.g Pyton REPL.
 def get_connection():

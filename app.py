@@ -1749,7 +1749,7 @@ def chatbot(companyName, assistantID):
             abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
 
         # TODO check company for errors
-        assistant = query_db("SELECT * FROM Assistants WHERE ID=?;", [assistantID])
+        assistant = query_db("SELECT * FROM Assistants WHERE ID=?;", [assistantID], True)
 
         if assistant is None or assistant is "Error":
             abort(status.HTTP_400_BAD_REQUEST, "This Assistant does't exist")

@@ -25,10 +25,10 @@ app = Flask(__name__, static_folder='static')
 ## -----
 # Only one should be commented in
 # For Production
-app.config.from_object('config.BaseConfig')
+#app.config.from_object('config.BaseConfig')
  
 # For Development
-#app.config.from_object('config.DevelopmentConfig')
+app.config.from_object('config.DevelopmentConfig')
 ## -----
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
@@ -615,6 +615,7 @@ def getUserData():
 @app.route("/admin/profile", methods=['GET', 'POST'])
 def profilePage():
     if request.method == "GET":
+        message = checkForMessage()
         email = session.get('User')['Email']
         users = query_db("SELECT * FROM Users")
         user = "Error"
@@ -630,7 +631,7 @@ def profilePage():
         print(company)
         print(user)
         print(email)
-        return render_template("admin/profile.html", user=user, email=email, company=company[0])
+        return render_template("admin/profile.html", user=user, email=email, company=company[0], message=message)
 
     elif request.method == "POST":
         curEmail = session.get('User')['Email']
@@ -665,6 +666,50 @@ def profilePage():
                     return redirect("/admin/profile", code=302)
         print("Error in updating Company or Profile Data")
         return redirect("/admin/profile", code=302)
+
+
+@app.route("/admin/profile/delete", methods=['GET'])
+def profile_delete():
+    if request.method == "GET":
+        email = session.get('User')['Email']
+        company = query_db("SELECT * FROM Companies WHERE ID=?", [session.get('User')['CompanyID']], True)
+        if company is None:
+            return redirectWithMessage("profilePage", "Error in finding company!")
+        payload = email + ";" + str(company["ID"])
+        payload = verificationSigner.dumps(payload)
+        msg = Message("Account verification",
+                                sender="thesearchbase@gmail.com",
+                                recipients=[email])
+        link = "https://www.thesearchbase.com/account/delete/verify/"+verificationSigner.dumps(payload)
+        msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png'><br /><h4>Hi,</h4> <p>You haver requested that we delete your account.</p> <br />  To complete the process please follow \
+                    <a href='"+link+"'> this link </a> . \
+                    If you have not requested this then please change your password as soon as possible.<br />  <br /> \
+                    Thank you for using our platform. <br /> <br />\
+                    Regards, <br /> TheSearchBase Team <br />\
+                    <img src='https://thesearchbase.com/static/email_images/footer_image.png'>"
+        mail.send(msg)
+        return redirectWithMessage("profilePage", "We have sent you a confirmation email through which to delete your account.")
+
+
+@app.route("/account/delete/verify/<payload>", methods=['GET'])
+def profile_delete_verify():
+    if request.method == "GET":
+        data = verificationSigner.loads(payload)
+        email = data.split(";")[0]
+        companyID = data.split(";")[1]
+        deleteUser = delete_from_table("DELETE FROM Users WHERE Email=?, CompanyID=?;",[email, companyID])
+
+        # sending the registration confirmation email to us
+        msg = Message("User has deleted their account!",
+                        sender="thesearchbase@gmail.com",
+                        recipients=["thesearchbase@gmail.com"])
+        msg.html = "<p>User: "+email+" has deleted their account. Company ID is " + str(companyID) + ".</p>"
+        mail.send(msg)
+
+        if deleteUser == "Record successfully deleted.":
+            return redirect("/", code=302)
+        else:
+            return redirectWithMessage("profilePage", "Error in deleting account")
 
 
 @app.route("/getpopupsettings/<assistantID>", methods=['GET'])

@@ -142,9 +142,7 @@
                                                     </ul>
                                                 </li>
                                             {% endfor %}
-                                            {% if assistants|length < 4 %}
                                                 <li><a href="/admin/assistant/create">Create another assistant</a></li>
-                                            {% endif %}
                                         {% else %}
                                             <li><a href="/admin/assistant/create">Create assistant</a></li>
                                         {% endif %}
@@ -377,23 +375,20 @@
             if (xhttp.readyState === 4) {
                 if (xhttp.status === 200) {
                     var responseString = xhttp.responseText
+                    console.log(responseString)
                     document.getElementById("userWelcomeName").innerHTML = responseString.split("&&&")[0];
                     document.getElementById("userDropdownLabel").innerHTML = responseString.split("&&&")[0];
                     
                     //get user's permissions
                     permissions = responseString.split("&&&")[1];
-                    var permissionsArray = permissions.split(";");
-                    for (var i = 0; i < permissionsArray.length; i++) {
-                        console.log(permissionsArray[i]);
-                        if (permissionsArray[i].includes("EditChatbots:False")) {
-                            $("#chatbots").hide();
-                        }
-                        if (permissionsArray[i].includes("EditUsers:False")) {
-                            $("#users").hide();
-                        }
-                        if (permissionsArray[i].includes("AccessBilling:False")) {
-                            $("#billing").hide();
-                        }
+                    if (permissions.includes("EditChatbots:False")) {
+                        $("#chatbots").hide();
+                    }
+                    if (permissions.includes("EditUsers:False")) {
+                        $("#users").hide();
+                    }
+                    if (permissions.includes("AccessBilling:False")) {
+                        $("#billing").hide();
                     }
                 }
                 else {
@@ -402,6 +397,29 @@
             }
         };
         xhttp.send(params);
+
+
+        // Set SessionStorage which is similar to cookies in client-side
+        $.get({
+                url: '/admin/userData',
+                contentType: 'application/json'
+
+        }).done(function( res ) {
+
+           console.log(res);
+            sessionStorage.setItem('id', res.id)
+            sessionStorage.setItem('firstname', res.firstname)
+            sessionStorage.setItem('surname', res.surname)
+            sessionStorage.setItem('email', res.email)
+            sessionStorage.setItem('stripeID', res.stripeID)
+            sessionStorage.setItem('subIDh', res.subID)
+
+         }).fail(function( err ) {
+
+           console.log(err)
+         })
+
+
 
     </script>
     {% block customJS %}

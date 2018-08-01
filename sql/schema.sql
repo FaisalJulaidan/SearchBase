@@ -48,7 +48,7 @@ CREATE TABLE 'Assistants' (
 	'Route'	TEXT UNIQUE,
 	'Message'	TEXT NOT NULL,
 	'SecondsUntilPopup'	TEXT NOT NULL DEFAULT 'Off',
-	'Nickname' TEXT NOT NULL UNIQUE,
+	'Nickname' TEXT NOT NULL,
 	'Active' TEXT NOT NULL DEFAULT 'True'
 );
 

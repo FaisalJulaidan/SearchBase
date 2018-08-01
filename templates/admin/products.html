@@ -284,7 +284,7 @@
                         }
                         else {
                             console.error(xhttp.statusText);
-                            msg = "Error: other wierd response " + xhttp.status;
+                            msg = "Error: " + xhttp.status;
                         }
                         console.log(msg);
                     }
@@ -308,5 +308,30 @@
         }
         return arrayRow;
     }
+
+    // Hide Extended Logic depending on user Plan
+    params = "";
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/admin/getadminpagesdata", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.onreadystatechange = function () {
+        if (xhttp.readyState === 4) {
+            if (xhttp.status === 200) {
+                var responseString = xhttp.responseText
+
+                //get user's plan restrictions
+                restrictions = responseString.split("&&&")[2];
+                if (restrictions.includes("ImportDatabase:False")) {
+                    $("#productFileForm").hide();
+                }
+                //ACTIVATE THE PAGE
+            }
+            else {
+                console.error(xhttp.statusText);
+            }
+        }
+    };
+    xhttp.send(params);
+
 </script>
 {% endblock %}

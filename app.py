@@ -16,7 +16,7 @@ import stripe
 import string
 import random
 from urllib.request import urlopen
-#from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet
 import urllib.request
 
 app = Flask(__name__, static_folder='static')
@@ -41,7 +41,7 @@ USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
 
 pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
 secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
-#encryption = None
+encryption = None
 
 stripe.api_key = secret_key
 
@@ -66,9 +66,10 @@ mail = Mail(app)
 ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
 ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
 
+NoPlan = {"MaxProducts":0, "ActiveBotsCap":0, "InactiveBotsCap":0, "AdditionalUsersCap":0, "ExtendedLogic":False, "ImportDatabase":False, "CompanyNameonChatbot": False}
 BasicPlan = {"MaxProducts":600, "ActiveBotsCap":2, "InactiveBotsCap":3, "AdditionalUsersCap":5, "ExtendedLogic":False, "ImportDatabase":False, "CompanyNameonChatbot": False}
-AdvancedPlan = {"MaxProducts":5000, "ActiveBotsCap":4, "InactiveBotsCap":6, "AdditionalUsersCap":10, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
-UltimatePlan = {"MaxProducts":15000, "ActiveBotsCap":10, "InactiveBotsCap":30, "AdditionalUsersCap":999, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
+AdvancedPlan = {"MaxProducts":5000, "ActiveBotsCap":4, "InactiveBotsCap":8, "AdditionalUsersCap":10, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
+UltimatePlan = {"MaxProducts":30000, "ActiveBotsCap":10, "InactiveBotsCap":30, "AdditionalUsersCap":999, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
 #count_db("Plans", " WHERE Nickname=?", ["basic",])
 
 def hash_password(password, salt=gensalt()):
@@ -89,7 +90,7 @@ def allowed_image_file(filename):
 # code to ensure user is logged in
 @app.before_request
 def before_request():
-    #print(encryption)
+    print(encryption)
     theurl = str(request.url_rule)
     restrictedRoutes = ['/admin', 'admin/homepage']
     # If the user try to visit one of the restricted routes without logging in he will be redirected
@@ -106,14 +107,14 @@ def before_request():
             return redirect("/admin/homepage", code=302)
 
         #Check user plan permissions
-        print("PLAN:", session['UserPlan'])
-        if "Basic" in session['UserPlan']['Nickname']:
-            print("basic plan")
+        print("PLAN:", session.get('UserPlan', []))
     
 
 def checkAssistantID(assistantID):
     assistantRecord = query_db("SELECT * FROM Assistants WHERE ID=?", [assistantID,], True)
-    if session.get('User')['CompanyID'] is not assistantRecord['CompanyID']:
+    if assistantRecord is None:
+        return redirect("/admin/homepage", code=302)
+    elif session.get('User')['CompanyID'] is not assistantRecord['CompanyID']:
         return redirect("/admin/homepage", code=302)
 
 
@@ -280,7 +281,9 @@ def login():
                             # Set user plan e.g. (Basic, Ultimate...)
                             session['UserPlan'] = {}
                             session['UserPlan']['Nickname'] =  getPlanNickname(user['SubID'])
-                            if "Basic" in getPlanNickname(user['SubID']):
+                            if getPlanNickname(user['SubID']) is None:
+                                session['UserPlan']['Settings'] = NoPlan
+                            elif "Basic" in getPlanNickname(user['SubID']):
                                 session['UserPlan']['Settings'] = BasicPlan
                             elif "Advanced" in getPlanNickname(user['SubID']):
                                 session['UserPlan']['Settings'] = AdvancedPlan
@@ -419,10 +422,10 @@ def signup():
 
             # Create a company record for the new user
             #ENCRYPTION
-            #insertCompanyResponse = insert_into_database_table(
-            #    "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
             insertCompanyResponse = insert_into_database_table(
-                "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName, companySize, websiteURL, companyPhoneNumber))
+                "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
+            #insertCompanyResponse = insert_into_database_table(
+             #   "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName, companySize, websiteURL, companyPhoneNumber))
 
             newCompany = get_last_row_from_table("Companies")
             # print(newCompany)
@@ -445,14 +448,14 @@ def signup():
 
                 # Create a user account and link it with the new created company record above
                 #ENCRYPTION
-                #newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
-                #            (newCompany['ID'], encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(email), hashed_password, newCustomer['id'],
-                #            str(verified), sub['id'])
-                #            )
                 newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
-                            (newCompany['ID'], firstname, surname, accessLevel, email, hashed_password, newCustomer['id'],
+                            (newCompany['ID'], encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(email), hashed_password, newCustomer['id'],
                             str(verified), sub['id'])
                             )
+                #newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
+                 #           (newCompany['ID'], firstname, surname, accessLevel, email, hashed_password, newCustomer['id'],
+                  #          str(verified), sub['id'])
+                   #         )
 
 
 
@@ -590,6 +593,25 @@ def adminPagesData():
                 return user["Firstname"] + "&&&" + permissions + "&&&" + planSettings
         return "wait...Who are you?"
 
+
+
+#data for the user which to be displayed on every admin page
+@app.route("/admin/userData", methods=['GET'])
+def getUserData():
+    if request.method == "GET":
+        userDict = {
+            "id": session['User']['ID'],
+            "email": session['User']['Email'],
+            "firstname": session['User']['Firstname'],
+            "surname": session['User']['Surname'],
+            "stripeID": session['User']['StripeID'],
+            "subID": session['User']['SubID'],
+
+        }
+        return jsonify(userDict)
+
+
+
 @app.route("/admin/profile", methods=['GET', 'POST'])
 def profilePage():
     if request.method == "GET":
@@ -626,11 +648,11 @@ def profilePage():
                 if user["Email"] == curEmail:
                     #TODO check if they worked
                     #ENCRYPTION
-                    #updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [encryptVar(name1),encryptVar(name2),encryptVar(newEmail),user["ID"]])
-                    updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [name1,name2,newEmail,user["ID"]])
+                    updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [encryptVar(name1),encryptVar(name2),encryptVar(newEmail),user["ID"]])
+                    #updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [name1,name2,newEmail,user["ID"]])
                     companyID = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?;", [user["ID"]])
-                    #updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0]])
-                    updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [companyName,companyURL,companyID[0]])
+                    updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0]])
+                    #updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [companyName,companyURL,companyID[0]])
                     users = query_db("SELECT * FROM Users")
                     user = "Error"
                     for record in users:
@@ -645,34 +667,19 @@ def profilePage():
         return redirect("/admin/profile", code=302)
 
 
-@app.route("/popupsettings", methods=['GET'])
-def get_pop_settings():
+@app.route("/getpopupsettings/<assistantID>", methods=['GET'])
+def get_pop_settings(assistantID):
     if request.method == "GET":
         url = request.form.get("URL", default="Error")
         if url != "Error":
-            if "127.0.0.1:5000" in url or "thesearchbase.com" in url:
-                # its on test route
-                companyName = url.split("/")[len(url.split("/")) - 1]
-                companies = query_db("SELECT * FROM Companies")
-                # If company exists
-                for record in companies:
-                    if record["Name"] == companyName:
-                        companyID = record["ID"]
-                    else:
-                        return None
+            assistant = query_db("SELECT * FROM Assistants WHERE ID=?", [assistantID], True)
+            if session['UserPlan']['Settings']['CompanyNameonChatbot']:
+                assistantLabel = query_db("SELECT * FROM Companies WHERE ID=?", [assistant["CompanyID"]], True)["Name"]
             else:
-                # its on client route
-                companies = query_db("SELECT * FROM Companies")
-                # If company exists
-                for record in companies:
-                    if record["URL"] == url:
-                        companyID = record["ID"]
-                    else:
-                        return None
-            secsUntilPop = select_from_database_table("SELECT SecondsUntilPopup FROM Assistants WHERE CompanyID=?",
-                                                      [companyID[0][0]], True)
-            datastring = secsUntilPop[0][0]
+                assistantLabel = "TheSearchBase"
+            datastring = assistant["SecondsUntilPopup"] + "&&&" + assistantLabel
             return jsonify(datastring)
+        return "Off"
 
 
 @app.route("/admin/assistant/create", methods=['GET', 'POST'])
@@ -689,8 +696,15 @@ def admin_assistant_create():
         assistants = get_assistants(email)
         # Return the user to the page if has reached the limit of assistants
         if type(assistants) is type([]) and assistants:
-            if len(assistants) >= 4:
-                return redirectWithMessage("admin_assistant_create", "You have reached the limit of 3 chat bots")
+            chatbotCap = session['UserPlan']['Settings']['ActiveBotsCap'] + session['UserPlan']['Settings']['InactiveBotsCap']
+            print(chatbotCap, " ", len(assistants))
+            if len(assistants) >= chatbotCap:
+                return redirectWithMessage("admin_assistant_create", "You have reached the limit of "+str(chatbotCap)+" assistants")
+        #Check max number of active bots
+        numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "True"])
+        print(session.get('UserPlan')['Settings'])
+        if numberOfActiveBots >= session.get('UserPlan')['Settings']['ActiveBotsCap']:
+            return redirectWithMessage("admin_assistant_create", "You have already reached the maximum amount of Active Assistants. Please deactivate one to proceed.")
         company = get_company(email)
         if company is None or "Error" in company:
             return redirectWithMessage("admin_assistant_create", "Error in getting company")
@@ -816,8 +830,9 @@ def admin_turn_assistant(turnto, assistantID):
     checkAssistantID(assistantID)
     if request.method == "GET":
         #Check if plan restrictions are ok with the assistant
+        assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?", [session.get('User')['CompanyID']])
         numberOfProducts = 0
-        maxNOP = session['UserPlan']['Settings']['MaxProducts']
+        maxNOP = session.get('UserPlan')['Settings']['MaxProducts']
         for record in assistants:
             numberOfProducts += count_db("Products", " WHERE AssistantID=?", [record["ID"],])
         if numberOfProducts > maxNOP:
@@ -827,7 +842,7 @@ def admin_turn_assistant(turnto, assistantID):
             #Check max number of active bots
             numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "True"])
             if numberOfActiveBots >= session['UserPlan']['Settings']['ActiveBotsCap']:
-                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "You have already reached the maximum amount of Active Assistant.")
+                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "You have already reached the maximum amount of Active Assistants. Please deactivate one to proceed.")
 
             message="activated."
         else:
@@ -1012,6 +1027,8 @@ def admin_answers(assistantID):
                         keyword = "Error"
                     keyword = ','.join(keyword)
                     action = request.form.get("action" + str(i), default="None")
+                    if action != "Next Question by Order" and not session['UserPlan']['Settings']['ExtendedLogic']:
+                        return redirectWithMessageAndAssistantID("admin_answers", assistantID, "It appears you tried to access extended logic without having access to it. Action aborted!")
                     if "Error" in answer or "Error" in keyword or "Error" in action:
                         return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting your input.")
                     insertAnswer = insert_into_database_table(
@@ -1132,6 +1149,8 @@ def admin_products(assistantID):
 def admin_products_file_upload(assistantID):
     checkAssistantID(assistantID)
     if request.method == "POST":
+        if not session['UserPlan']['Settings']['ImportDatabase']:
+            return "You do not have access to uploading database feature."
         msg = ""
         if 'productFile' not in request.files:
             msg = "Error no file given."
@@ -1369,7 +1388,15 @@ def admin_pay(planID):
             update_table("UPDATE Users SET SubID=? WHERE ID=?", (subscription['id'], user['ID']))
 
             # Resit the session
-            session['UserPlan'] = getPlanNickname(subscription['id'])
+            session['UserPlan']['Nickname'] =  getPlanNickname(subscription['id'])
+            if getPlanNickname(user['SubID']) is None:
+                session['UserPlan']['Settings'] = NoPlan
+            elif "Basic" in getPlanNickname(user['SubID']):
+                session['UserPlan']['Settings'] = BasicPlan
+            elif "Advanced" in getPlanNickname(user['SubID']):
+                session['UserPlan']['Settings'] = AdvancedPlan
+            elif "Ultimate" in getPlanNickname(user['SubID']):
+                session['UserPlan']['Settings'] = UltimatePlan
 
         # TODO check subscription for errors https://stripe.com/docs/api#errors
         except Exception as e:
@@ -1430,7 +1457,7 @@ def unsubscribe():
             update_table("UPDATE Users SET SubID=? WHERE ID=?;",
                          [None, session.get('User')['ID']])
             # Reset session
-            session['UserPlan'] = None
+            session['UserPlan'] = NoPlan
 
             print("You have unsubscribed successfully!")
             return redirectWithMessage("admin_plan_confirmation", "You have unsubscribed successfully!")
@@ -1452,6 +1479,10 @@ def webhook_subscription_cancelled():
             print(customerID)
 
             user = select_from_database_table("SELECT * FROM Users WHERE StripeID=?", [customerID])
+
+            update_table("UPDATE Users SET SubID=? WHERE StripeID=?;",
+                         [None, customerID])
+
             # TODO check company for errors
             assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", [user[1]], True)
 
@@ -1461,6 +1492,7 @@ def webhook_subscription_cancelled():
 
                     updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
                     # TODO check update assistant for errors
+
 
         except Exception as e:
             abort(status.HTTP_400_BAD_REQUEST, "Error in Webhook event")
@@ -1499,7 +1531,7 @@ def admin_users_add():
     if request.method == "POST":
         numberOfCompanyUsers = count_db("Users", " WHERE CompanyID=?", [session.get('User')['CompanyID'],])
         if numberOfCompanyUsers >= session['UserPlan']['Settings']['AdditionalUsersCap'] + 1:
-            return redirectWithMessage("admin_users", "You have reached the max amount of additional Users - " + session['UserPlan']['Settings']['AdditionalUsersCap']+".")
+            return redirectWithMessage("admin_users", "You have reached the max amount of additional Users - " + str(session['UserPlan']['Settings']['AdditionalUsersCap'])+".")
         email = session.get('User')['Email']
         companyID = session.get('User')['CompanyID']
         fullname = request.form.get("fullname", default="Error")
@@ -1525,12 +1557,12 @@ def admin_users_add():
             hashed_password = hash_password(password)
 
             #ENCRYPTION
-            #insertUserResponse = insert_into_database_table(
-             #   "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
-              #  (companyID, encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(newEmail), hashed_password, "False"))
             insertUserResponse = insert_into_database_table(
                 "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
-                (companyID, firstname, surname, accessLevel, newEmail, hashed_password, "True"))
+                (companyID, encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(newEmail), hashed_password, "False"))
+            #insertUserResponse = insert_into_database_table(
+             #   "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
+              #  (companyID, firstname, surname, accessLevel, newEmail, hashed_password, "True"))
             if "added" not in insertUserResponse:
                 return redirectWithMessage("admin_users", "Error in adding user to our records.")
             else:
@@ -1701,23 +1733,25 @@ def chatbot(companyName, assistantID):
     if request.method == "GET":
         companies = query_db("SELECT * FROM Companies")
         # If company exists
+        print(companyName, assistantID)
+        company = "Error"
         for record in companies:
-            if record["Name"] == escape(companyName):
+            print(record)
+            if record["Name"] == companyName:
                 company = record
-            else:
-                abort(status.HTTP_404_NOT_FOUND)
+        if company is "Error":
+            abort(status.HTTP_404_NOT_FOUND)
 
         # for debugging
-        print(escape(companyName))
         print(company)
 
         if company is None:
             abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
 
         # TODO check company for errors
-        assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=?;", [assistantID])
+        assistant = query_db("SELECT * FROM Assistants WHERE ID=?;", [assistantID], True)
 
-        if assistant is None:
+        if assistant is None or assistant is "Error":
             abort(status.HTTP_400_BAD_REQUEST, "This Assistant does't exist")
 
         # for debugging
@@ -1729,7 +1763,7 @@ def chatbot(companyName, assistantID):
         # assistantID = assistant[assistantIndex][0]
 
         # is assistant active ? True/False
-        assistantActive = assistant[6]
+        assistantActive = assistant["Active"]
 
         if assistantActive != "True":
             abort(status.HTTP_404_NOT_FOUND, "Assistant not active.")
@@ -1766,7 +1800,7 @@ def chatbot(companyName, assistantID):
                     merge = merge + tuple(answer)
                 questionsAndAnswers.append(merge)
 
-            message = assistant[3]
+            message = assistant["Message"]
             # MONTHLY UPDATE
             date = datetime.now().strftime("%Y-%m")
             currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
@@ -2269,37 +2303,37 @@ def select_from_database_table(sql_statement, array_of_terms=None, multi=False, 
     finally:
         if (conn is not None):
             conn.close()
-        #if "SELECT" in sql_statement:
-        #    returnArray = []
-        #    arrayPos = 0
-        #    for record in data:
-        #        tempVar = ""
-        #        if type(record) == list or type(record) == tuple:
-        #            returnArray.append([])
-        #            for value in record:
-        #                if type(value) == bytes:
-        #                    try:
-        #                        tempVar = encryption.decrypt(value).decode()
-        #                    except:
-        #                        print("Could not decode value. Assuming hashed record!")
-        #                else:
-        #                    tempVar = value
-        #                returnArray[arrayPos].append(tempVar)
-        #        else:
-        #            if type(record) == bytes:
-        #                try:
-        #                    tempVar = encryption.decrypt(record).decode()
-        #                except:
-        #                    print("Could not decode value. Assuming hashed record!")
-        #            else:
-        #                tempVar = record
-        #            returnArray.append(tempVar)
-        #        arrayPos+=1
-        #    #remove empty []
-        #    for records in returnArray:
-        #        if not records:
-        #            returnArray.remove(records)
-        #    data = returnArray
+        if "SELECT" in sql_statement:
+            returnArray = []
+            arrayPos = 0
+            for record in data:
+                tempVar = ""
+                if type(record) == list or type(record) == tuple:
+                    returnArray.append([])
+                    for value in record:
+                        if type(value) == bytes:
+                            try:
+                                tempVar = encryption.decrypt(value).decode()
+                            except:
+                                print("Could not decode value. Assuming hashed record!")
+                        else:
+                            tempVar = value
+                        returnArray[arrayPos].append(tempVar)
+                else:
+                    if type(record) == bytes:
+                        try:
+                            tempVar = encryption.decrypt(record).decode()
+                        except:
+                            print("Could not decode value. Assuming hashed record!")
+                    else:
+                        tempVar = record
+                    returnArray.append(tempVar)
+                arrayPos+=1
+            #remove empty []
+            for records in returnArray:
+                if not records:
+                    returnArray.remove(records)
+            data = returnArray
         return data
 
 
@@ -2412,11 +2446,11 @@ def query_db(query, args=(), one=False):
     cur = g.db.execute(query, args)
     rv = [dict((cur.description[idx][0], value)
                for idx, value in enumerate(row)) for row in cur.fetchall()]
-    #if "SELECT" in query:
-    #    for record in rv:
-    #        for key, value in record.items():
-    #            if type(value) == bytes and "Password" not in key:
-    #                record[key] = encryption.decrypt(value).decode()
+    if "SELECT" in query:
+        for record in rv:
+            for key, value in record.items():
+                if type(value) == bytes and "Password" not in key:
+                    record[key] = encryption.decrypt(value).decode()
     return (rv[0] if rv else None) if one else rv
 
 
@@ -2441,8 +2475,8 @@ def count_db(table, condition="", args=()):
 
 
 #encryption function to save typing
-#def encryptVar(var):
-#    return encryption.encrypt(var.encode())
+def encryptVar(var):
+    return encryption.encrypt(var.encode())
 
 # Get connection when no requests e.g Pyton REPL.
 def get_connection():

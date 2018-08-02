@@ -1591,8 +1591,8 @@ def webhook_subscription_cancelled():
             print("Webhooks: Customer ID")
             print(customerID)
 
-            user = select_from_database_table("SELECT * FROM Users WHERE StripeID=?", [customerID])
-            user = query_db("SELECT * FROM Users WHERE StripeID=?", one=True)
+            # user = select_from_database_table("SELECT * FROM Users WHERE StripeID=?", [customerID])
+            user = query_db("SELECT * FROM Users WHERE StripeID=?", [customerID], one=True)
             print(user)
 
             if user:

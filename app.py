@@ -1586,32 +1586,34 @@ def webhook_subscription_cancelled():
         try:
             print("STRIPE TRIGGER FOR UNSUBSCRIPTION...")
             event_json = request.get_json(force=True)
-            # event_json = json.loads(request.body)
             customerID = event_json['data']['object']['customer']
-            print("CUSTOMER ID")
+
+            print("Webhooks: Customer ID")
             print(customerID)
 
-
             user = select_from_database_table("SELECT * FROM Users WHERE StripeID=?", [customerID])
+            user = query_db("SELECT * FROM Users WHERE StripeID=?", one=True)
             print(user)
 
-            if not user:
-                print("NOT USER")
-
-            update_table("UPDATE Users SET SubID=? WHERE StripeID=?;",
-                         [None, customerID])
+            if user:
 
 
-            # TODO check company for errors
-            assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", [user[1]], True)
+                update_table("UPDATE Users SET SubID=? WHERE StripeID=?;",
+                             [None, customerID])
 
-            # Check if user has assistants to deactivate first
-            if len(assistants) > 0:
-                for assistant in assistants:
 
-                    updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
-                    # TODO check update assistant for errors
+                # TODO check company for errors
+                assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", ['CompanyID'])
 
+                # Check if user has assistants to deactivate first
+                if len(assistants) > 0:
+                    for assistant in assistants:
+
+                        updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
+                        # TODO check update assistant for errors
+
+            else:
+                print("Webhooks Message: No User to unsubscribe")
 
         except Exception as e:
             abort(status.HTTP_400_BAD_REQUEST, "Webhook error")

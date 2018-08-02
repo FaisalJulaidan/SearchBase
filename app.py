@@ -677,12 +677,12 @@ def profile_delete():
             return redirectWithMessage("profilePage", "Error in finding company!")
         payload = email + ";" + str(company["ID"])
         payload = verificationSigner.dumps(payload)
-        msg = Message("Account verification",
+        msg = Message("Account deletion verification",
                                 sender="thesearchbase@gmail.com",
                                 recipients=[email])
         link = "https://www.thesearchbase.com/account/delete/verify/"+verificationSigner.dumps(payload)
-        msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png'><br /><h4>Hi,</h4> <p>You haver requested that we delete your account.</p> <br />  To complete the process please follow \
-                    <a href='"+link+"'> this link </a> . \
+        msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png'><br /><h4>Hi,</h4> <p>You haver requested that we delete your account.</p> <br /> \
+                    To complete the process please follow <a href='"+link+"'> this link </a> . <br /> \
                     If you have not requested this then please change your password as soon as possible.<br />  <br /> \
                     Thank you for using our platform. <br /> <br />\
                     Regards, <br /> TheSearchBase Team <br />\
@@ -697,6 +697,13 @@ def profile_delete_verify():
         data = verificationSigner.loads(payload)
         email = data.split(";")[0]
         companyID = data.split(";")[1]
+        users = query_db("SELECT * FROM Users")
+        userCheck = False
+        for user in users:
+            if user["Email"] is email and user["CompanyID"] is companyID:
+                userCheck = True
+        if not userCheck:
+            return redirectWithMessage("login", "User does not check out. Account deletion aborted!")
         deleteUser = delete_from_table("DELETE FROM Users WHERE Email=?, CompanyID=?;",[email, companyID])
 
         # sending the registration confirmation email to us
@@ -707,9 +714,65 @@ def profile_delete_verify():
         mail.send(msg)
 
         if deleteUser == "Record successfully deleted.":
-            return redirect("/", code=302)
+            return redirectWithMessage("login", "Account has been deleted")
         else:
-            return redirectWithMessage("profilePage", "Error in deleting account")
+            return redirectWithMessage("login", "Error in deleting account")
+
+
+@app.route("/admin/company/delete", methods=['GET'])
+def company_delete():
+    if request.method == "GET":
+        email = session.get('User')['Email']
+        company = query_db("SELECT * FROM Companies WHERE ID=?", [session.get('User')['CompanyID']], True)
+        if company is None:
+            return redirectWithMessage("profilePage", "Error in finding company!")
+        if session.get('User')['AccessLevel'] is not "Owner":
+            return redirectWithMessage("profilePage", "Only 'Owner' type account can delete company!")
+        payload = email + ";" + str(company["ID"])
+        payload = verificationSigner.dumps(payload)
+        msg = Message("Company deletion vefication",
+                                sender="thesearchbase@gmail.com",
+                                recipients=[email])
+        link = "https://www.thesearchbase.com/company/delete/verify/"+verificationSigner.dumps(payload)
+        msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png'><br /><h4>Hi,</h4> <p>You haver requested that we delete your company.</p> <br /> \
+                    Please do mind that deleting the company will also delete all accounts associated with it! <br />  \
+                    To complete the process please follow <a href='"+link+"'> this link </a> . <br /> \
+                    If you have not requested this then please change your password as soon as possible.<br />  <br /> \
+                    Thank you for using our platform. <br /> <br />\
+                    Regards, <br /> TheSearchBase Team <br />\
+                    <img src='https://thesearchbase.com/static/email_images/footer_image.png'>"
+        mail.send(msg)
+        return redirectWithMessage("profilePage", "We have sent you a confirmation email through which to delete your company.")
+
+
+@app.route("/company/delete/verify/<payload>", methods=['GET'])
+def company_delete_verify():
+    if request.method == "GET":
+        data = verificationSigner.loads(payload)
+        email = data.split(";")[0]
+        companyID = data.split(";")[1]
+        users = query_db("SELECT * FROM Users")
+        userCheck = False
+        for user in users:
+            if user["Email"] is email and user["CompanyID"] is companyID and user["AccessLevel"] is "Owner":
+                userCheck = True
+        if not userCheck:
+            return redirectWithMessage("login", "User does not check out. Company deletion aborted!")
+
+        deleteUser = delete_from_table("DELETE FROM Users WHERE CompanyID=?;",[companyID])
+        deleteCompany = delete_from_table("DELETE FROM Companies WHERE ID=?;",[companyID])
+
+        # sending the registration confirmation email to us
+        msg = Message("User has deleted their account!",
+                        sender="thesearchbase@gmail.com",
+                        recipients=["thesearchbase@gmail.com"])
+        msg.html = "<p>Company has deleted their records. Company ID was " + str(companyID) + ".</p>"
+        mail.send(msg)
+
+        if deleteUser == "Record successfully deleted.":
+            return redirectWithMessage("login", "Company has been deleted")
+        else:
+            return redirectWithMessage("login", "Error in deleting account")
 
 
 @app.route("/getpopupsettings/<assistantID>", methods=['GET'])

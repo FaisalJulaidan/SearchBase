@@ -1612,6 +1612,8 @@ def webhook_subscription_cancelled():
                         updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
                         # TODO check update assistant for errors
 
+                return "Assistants for " + user['Email'] + " account has been deactivated due to subscription cancellation"
+
             else:
                 print("Webhooks Message: No User to unsubscribe")
 
@@ -1619,7 +1621,6 @@ def webhook_subscription_cancelled():
             abort(status.HTTP_400_BAD_REQUEST, "Webhook error")
 
 
-        return "Assistants for " + user[5] + " account has been deactivated due to subscription cancellation", status.HTTP_200_OK
 
 
 

@@ -1585,8 +1585,8 @@ def webhook_subscription_cancelled():
     if request.method == "POST":
         try:
             print("STRIPE TRIGGER FOR UNSUBSCRIPTION...")
-            # event_json = request.get_json(force=True)
-            event_json = json.loads(request.body)
+            event_json = request.get_json(force=True)
+            # event_json = json.loads(request.body)
             customerID = event_json['data']['object']['customer']
             print("CUSTOMER ID")
             print(customerID)

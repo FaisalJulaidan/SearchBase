@@ -1593,12 +1593,14 @@ def webhook_subscription_cancelled():
 
 
             user = select_from_database_table("SELECT * FROM Users WHERE StripeID=?", [customerID])
+            print(user)
+
+            if not user:
+                print("NOT USER")
 
             update_table("UPDATE Users SET SubID=? WHERE StripeID=?;",
                          [None, customerID])
 
-            print("User")
-            print(user)
 
             # TODO check company for errors
             assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", [user[1]], True)

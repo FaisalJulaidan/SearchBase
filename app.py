@@ -1614,7 +1614,7 @@ def webhook_subscription_cancelled():
 
 
         except Exception as e:
-            abort(status.HTTP_400_BAD_REQUEST, e)
+            abort(status.HTTP_400_BAD_REQUEST, "Webhook error")
 
 
         return "Assistants for " + user[5] + " account has been deactivated due to subscription cancellation", status.HTTP_200_OK

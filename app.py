@@ -759,7 +759,8 @@ def company_delete_verify():
         if not userCheck:
             return redirectWithMessage("login", "User does not check out. Company deletion aborted!")
 
-        deleteUser = delete_from_table("DELETE FROM Users WHERE Email=?, CompanyID=?;",[email, companyID])
+        deleteUser = delete_from_table("DELETE FROM Users WHERE CompanyID=?;",[companyID])
+        deleteCompany = delete_from_table("DELETE FROM Companies WHERE ID=?;",[companyID])
 
         # sending the registration confirmation email to us
         msg = Message("User has deleted their account!",

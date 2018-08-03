@@ -28,7 +28,7 @@ app = Flask(__name__, static_folder='static')
 #app.config.from_object('config.BaseConfig')
  
 # For Development
-app.config.from_object('config.DevelopmentConfig')
+# app.config.from_object('config.DevelopmentConfig')
 ## -----
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
@@ -2664,16 +2664,24 @@ def not_implemented(e):
 if __name__ == "__main__":
 
     print("Run the server...")
-    print(app.debug)
 
     # Create the schema only in development mode
     if app.debug:
         init_db()
+        # For Development
+        app.config.from_object('config.DevelopmentConfig')
+        print("Debug Mode...")
+    else:
+        # For Production
+        app.config.from_object('config.BaseConfig')
+        print("Production Mode...")
+
 
     # Print app configuration
-    print(app.config)
+    # print(app.config)
     # Run the app server
     app.run()
+
 
 
 

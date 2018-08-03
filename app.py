@@ -1879,6 +1879,8 @@ def chatbot(companyName, assistantID):
             for i in range(0, len(collectedInformation)):
                 colInfo = collectedInformation[i][0].split(";")
                 input = collectedInformation[i][1].split(";")[0]
+                print("collectedInformation: ", collectedInformation)
+                print("input: ", input)
                 questionIndex = int(colInfo[0]) - 1
                 questionID = int(questions[questionIndex][0])
                 for question in questions:
@@ -1902,7 +1904,8 @@ def chatbot(companyName, assistantID):
 
                 #if file and allowed_file(filename):
                 if file:
-                    open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
+                    #open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
+                    file.save(os.path.join(USER_FILES, filename))
                     savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
                     savePath = savePath.replace('\\', '/')
                     for question in questions:

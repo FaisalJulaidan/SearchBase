@@ -110,7 +110,7 @@
                         <div id="ChatInputDiv">
                             <!--<input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><input type="file" id="fileUploadB" size="10" /><img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />-->
                             <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage">
-                            <div class="image-upload" style="display:inline-block">
+                            <div id="fileUploadDiv" class="image-upload" style="display:none">
                                 <label for="fileUploadB">
                                     <img src="https://www.thesearchbase.com/static/images/cloud-upload.png" />
                                 </label>
@@ -369,13 +369,13 @@
         if (questionType == "fileUpload") {
             console.log("true");
             document.getElementById("textMessage").style.display = "none";
-            document.getElementById("fileUploadB").style.display = "inline-block";
+            document.getElementById("fileUploadDiv").style.display = "inline-block";
             console.log(document.getElementById("textMessage").display);
             showChatBox = true;
         } else {
             console.log("false");
             document.getElementById("textMessage").style.display = "inline-block";
-            document.getElementById("fileUploadB").style.display = "none";
+            document.getElementById("fileUploadDiv").style.display = "none";
         }
         for (var i = 1; i < question.length; i++)
         {

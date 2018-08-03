@@ -1982,10 +1982,8 @@ def chatbot(companyName, assistantID):
         if collectedInformation is not "Error" and "None" not in collectedInformation:
             collectedInformation = collectedInformation.split("||")
             date = datetime.now().strftime("%d-%m-%Y")
-            print("collectedInformation: ", collectedInformation)
             for i in range(0, len(collectedInformation)):
                 colInfo = collectedInformation[i][0].split(";")
-                print("colInfo: ", colInfo)
                 input = collectedInformation[i][1].split(";")[0]
                 questionIndex = int(colInfo[0]) - 1
                 questionID = int(questions[questionIndex][0])
@@ -2092,6 +2090,7 @@ def chatbot(companyName, assistantID):
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
             currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
+            print("currentStats: ", currentStats)
             if currentStats is None or currentStats is "Error" or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",

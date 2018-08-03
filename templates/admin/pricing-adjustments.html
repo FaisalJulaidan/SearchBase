@@ -28,11 +28,95 @@
                                 <div class="col-md-12">
                                 <p class="lead">
                                 <p> Controlling your plan</p> 
-                                <a style="background-color:red; border-color: red;" class="btn btn-primary btn-sm" href="/admin/unsubscribe" role="button">Cancel Subscription</a>
+                                <button disabled  style="background-color:red; border-color: red;" class="btn btn-primary btn-sm" onclick="unsubscribeNow()" role="button">Cancel Subscription</button>
                         </div>
                       </div>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block customJS %}
+<!-- Simple localization script for Stripe's examples page. -->
+<script src="../../static/stripe/js/l10n.js" data-rel-js></script>
+<!-- Scripts for each example: -->
+<script src="../../static/pay/js/example2.js" data-rel-js></script>
+<!-- SweetAlert Library -->
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script type="text/javascript">
+
+
+    function unsubscribeNow(){
+
+        swal({
+          title: "Are you sure?",
+          text: "You will lose all your privileges.",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+
+               $.post({
+                        url: '/admin/unsubscribe',
+                        contentType: 'application/json'
+
+                }).done(function( res ) {
+                   console.log(res);
+
+                   // When successfully unsubscribe
+                   if(res.msg){
+
+                    swal(res.msg)
+                    .then((value) => {
+                        sessionStorage.removeItem('subID')
+                        document.location.href = "/admin/homepage"
+                    });
+
+                   // When error occurred
+                   } else if(res.error) {
+
+                    swal(res.error)
+                    .then((value) => {
+
+                    });
+                   }
+
+                 }).fail(function( err ) {
+
+                   console.log(err)
+                 })
+
+          } else {
+            // When clicking the cancel button in the alert box
+          }
+        });
+    }
+
+
+
+  {#// to cache reference (Check Modal in HTML)#}
+  {#  var errTitle = $("#errorTitle")#}
+  {#  var errText = $("#errorText")#}
+  {#  var errShow = $("#showError")#}
+  {##}
+  {##}
+  {#  function alertError(name,text) {#}
+  {#            // clear previous error message#}
+  {#            errShow.html('')#}
+  {#            errText.html('')#}
+  {##}
+  {#            errTitle.html(name)#}
+  {#            errText.html(text)#}
+  {#            errShow.click()#}
+  {#      }#}
+  {##}
+  {##}
+  {#  if(sessionStorage.getItem("subID") != null) {#}
+  {#      alertError("Warning", "You already have an active subscription . By subscribing now again, you will lose the current subscription")#}
+  {#  }#}
+
+</script>
 {% endblock %}

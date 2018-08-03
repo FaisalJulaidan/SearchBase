@@ -170,27 +170,51 @@
 <script src="../../static/stripe/js/l10n.js" data-rel-js></script>
 <!-- Scripts for each example: -->
 <script src="../../static/pay/js/example2.js" data-rel-js></script>
+<!-- SweetAlert Library -->
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 <script type="text/javascript">
 
 
+
+    swal({
+      title: "Are you sure?",
+      text: "You will lose your active subscription.",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+
+      } else {
+        document.location.href = '/admin/pricing'
+      }
+    });
+
+
+    /*
   // to cache reference (Check Modal in HTML)
-        var errTitle = $("#errorTitle")
-        var errText = $("#errorText")
-        var errShow = $("#showError")
+    var errTitle = $("#errorTitle")
+    var errText = $("#errorText")
+    var errShow = $("#showError")
 
 
-function alertError(name,text) {
-          // clear previous error message
-          errShow.html('')
-          errText.html('')
+    function alertError(name,text) {
+              // clear previous error message
+              errShow.html('')
+              errText.html('')
 
-          errTitle.html(name)
-          errText.html(text)
-          errShow.click()
+              errTitle.html(name)
+              errText.html(text)
+              errShow.click()
         }
 
 
+    if(sessionStorage.getItem("subID") != null) {
+        alertError("Warning", "You already have an active subscription . By subscribing now again, you will lose the current subscription")
+    }
+    */
 
 
     /*

@@ -1235,29 +1235,23 @@ def admin_user_input(assistantID):
     checkAssistantID(assistantID)
     if request.method == "GET":
         email = session.get('User')['Email']
-        company = get_company(email)
-        if company is None or "Error" in company:
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=?", [assistantID,])
+        if assistant is None or "Error" in assistant:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO handle this better
         else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?", [assistantID,
-                                                                                                           company[0]])
-            if assistant is None or "Error" in assistant:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            else:
-                questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                                       [assistantID], True)
-                data = []
-                #dataTuple = tuple(["Null"])
-                for i in range(0, len(questions)):
-                    question = questions[i]
-                    questionID = question[0]
-                    userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
-                    if(userInput != [] and userInput != None):
-                        for record in userInput:
-                            data.append(record)
-                print(data)
-                return render("admin/data-storage.html", data=data)
+            questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
+                                                    [assistantID], True)
+            data = []
+            #dataTuple = tuple(["Null"])
+            for i in range(0, len(questions)):
+                question = questions[i]
+                questionID = question[0]
+                userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
+                if(userInput != [] and userInput != None):
+                    for record in userInput:
+                        data.append(record)
+            print(data)
+            return render("admin/data-storage.html", data=data)
 
 
 @app.route("/admin/assistant/<assistantID>/connect", methods=['GET'])
@@ -1878,9 +1872,7 @@ def chatbot(companyName, assistantID):
             date = datetime.now().strftime("%d-%m-%Y")
             for i in range(0, len(collectedInformation)):
                 colInfo = collectedInformation[i].split(";")
-                print("collectedInformation: ", collectedInformation)
                 input = colInfo[1]
-                print("input: ", input)
                 questionIndex = int(colInfo[0]) - 1
                 questionID = int(questions[questionIndex][0])
                 for question in questions:
@@ -1907,13 +1899,13 @@ def chatbot(companyName, assistantID):
                     open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
                     savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
                     savePath = savePath.replace('\\', '/')
+                    print("savePath: ", savePath)
                     for question in questions:
                         if question[0] == questionID:
                             questionName = question[2]
-                    for question in questions:
-                        if question[0] == questionID:
-                            questionName = question[2]
+                    print("questionName: ", questionName)
                     insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID, questionName))
+                    print("insertInput: ", insertInput)
 
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")

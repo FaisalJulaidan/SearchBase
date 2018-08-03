@@ -1889,9 +1889,10 @@ def chatbot(companyName, assistantID):
             fileUploads = fileUploads.split("||");
             for i in range(0, len(fileUploads)):
                 file = urlopen(fileUploads[i].split(":::")[0])
+                questionID = int(fileUploads[i].split(":::")[1])
                 filename = fileUploads[i].split(":::")[2]
-                print(date,"-----", lastSessionID, "------", fileUploads[i].split(":::")[1], "------", filename)
-                filename = date + '_' + str(lastSessionID) + '_' + fileUploads[i].split(":::")[1] + '_' + filename
+                filename = date + '_' + str(lastSessionID) + '_' + str(questionID) + '_' + filename
+                print("filename: ", filename)
                 #filename = secure_filename(filename)
 
                 #if file and allowed_file(filename):

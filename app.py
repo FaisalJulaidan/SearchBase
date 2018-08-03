@@ -1943,7 +1943,7 @@ def chatbot(companyName, assistantID):
 
 
         # TODO check company for errors
-        assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company["ID"]], True)
 
         if assistant is None:
             return "We could not find the assistant in our records. Sorry about that!"

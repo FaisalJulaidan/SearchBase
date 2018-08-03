@@ -22,15 +22,6 @@ import urllib.request
 app = Flask(__name__, static_folder='static')
 
 
-## -----
-# Only one should be commented in
-# For Production
-#app.config.from_object('config.BaseConfig')
- 
-# For Development
-# app.config.from_object('config.DevelopmentConfig')
-## -----
-
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))

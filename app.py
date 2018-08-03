@@ -726,8 +726,9 @@ def company_delete():
         company = query_db("SELECT * FROM Companies WHERE ID=?", [session.get('User')['CompanyID']], True)
         if company is None:
             return redirectWithMessage("profilePage", "Error in finding company!")
+        print(session.get('User')['AccessLevel'])
         if session.get('User')['AccessLevel'] is not "Owner":
-            return redirectWithMessage("profilePage", "Only 'Owner' type account can delete company!")
+            return redirectWithMessage("profilePage", "Only Owner type account can delete company!")
         payload = email + ";" + str(company["ID"])
         payload = verificationSigner.dumps(payload)
         msg = Message("Company deletion vefication",

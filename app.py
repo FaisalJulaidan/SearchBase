@@ -1980,8 +1980,10 @@ def chatbot(companyName, assistantID):
 
         collectedInformation = request.form.get("collectedInformation").split("||")
         date = datetime.now().strftime("%d-%m-%Y")
+        print(collectedInformation)
         for i in range(0, len(collectedInformation)):
             colInfo = collectedInformation[i].split(";")
+            print(colInfo)
             input = colInfo[1]
             questionIndex = int(colInfo[0]) - 1
             questionID = int(questions[questionIndex][0])

@@ -101,7 +101,7 @@ function GetPopSettings(assistantID) {
     params = "URL=" + url;
     var xhttp = new XMLHttpRequest();
     xhttp.open("GET", "https://www.thesearchbase.com/getpopupsettings/" + assistantID, true);
-    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.setRequestHeader("Access-Control-Allow-Origin", window.location.href);
     xhttp.onreadystatechange = function () {
         if (xhttp.readyState === 4) {
             if (xhttp.status === 200) {

@@ -1958,7 +1958,7 @@ def chatbot(companyName, assistantID):
 
 
         # TODO check company for errors
-        assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company["ID"]], True)
 
         if assistant is None:
             return "We could not find the assistant in our records. Sorry about that!"
@@ -1978,24 +1978,26 @@ def chatbot(companyName, assistantID):
         else:
             lastSessionID = lastSessionID[len(lastSessionID)-1][4] + 1
 
-        collectedInformation = request.form.get("collectedInformation").split("||")
-        date = datetime.now().strftime("%d-%m-%Y")
-        for i in range(0, len(collectedInformation)):
-            colInfo = collectedInformation[i].split(";")
-            input = colInfo[1]
-            questionIndex = int(colInfo[0]) - 1
-            questionID = int(questions[questionIndex][0])
-            for question in questions:
-                if question[0] == questionID:
-                    questionName = question[2]
-            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, input, lastSessionID, questionName))
-            # TODO check insertInput for errors
+        collectedInformation = request.form.get("collectedInformation", default="Error")
+        if collectedInformation is not "Error" and "None" not in collectedInformation:
+            collectedInformation = collectedInformation.split("||")
+            date = datetime.now().strftime("%d-%m-%Y")
+            for i in range(0, len(collectedInformation)):
+                colInfo = collectedInformation[i][0].split(";")
+                input = collectedInformation[i][1].split(";")[0]
+                questionIndex = int(colInfo[0]) - 1
+                questionID = int(questions[questionIndex][0])
+                for question in questions:
+                    if question[0] == questionID:
+                        questionName = question[2]
+                insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, input, lastSessionID, questionName))
+                # TODO check insertInput for errors
 
         #lastSessionID = select_from_database_table("SELECT TOP(1) * FROM UserInput ORDER BY ID DESC", [], True)[0]
         #TODO needs improving
 
         fileUploads = request.form.get("fileUploads", default="Error");
-        if "Error" not in fileUploads:
+        if "Error" not in fileUploads and "None" not in fileUploads:
             fileUploads = fileUploads.split("||");
             for i in range(0, len(fileUploads)):
                 file = urlopen(fileUploads[i].split(":::")[0])
@@ -2087,15 +2089,16 @@ def chatbot(companyName, assistantID):
             date = datetime.now().strftime("%Y-%m")
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
-            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
-            if currentStats is None:
+            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?;", [date], True)
+            print("currentStats: ", currentStats)
+            if currentStats is None or currentStats is "Error" or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
                     (assistantID, date, 1, questionsAnswered, len(products)))
                 # TODO check newStats for errors
             else:
-                currentQuestionAnswerd = currentStats[4]
-                currentProductsReturned = currentStats[5]
+                currentQuestionAnswerd = currentStats["QuestionsAnswered"]
+                currentProductsReturned = currentStats["ProductsReturned"]
                 questionsAnswered = int(questionsAnswered) + int(currentQuestionAnswerd)
                 productsReturned = len(products) + int(currentProductsReturned)
                 updatedStats = update_table(
@@ -2107,15 +2110,15 @@ def chatbot(companyName, assistantID):
             date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
-            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
-            if currentStats is None:
+            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?;", [date], True)
+            if currentStats is None or currentStats is "Error" or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
                     (assistantID, date, 1, questionsAnswered, len(products)))
                 # TODO check newStats for errors
             else:
-                currentQuestionAnswerd = currentStats[4]
-                currentProductsReturned = currentStats[5]
+                currentQuestionAnswerd = currentStats["QuestionsAnswered"]
+                currentProductsReturned = currentStats["ProductsReturned"]
                 questionsAnswered = int(questionsAnswered) + int(currentQuestionAnswerd)
                 productsReturned = len(products) + int(currentProductsReturned)
                 updatedStats = update_table(

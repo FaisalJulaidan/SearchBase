@@ -2089,7 +2089,7 @@ def chatbot(companyName, assistantID):
             date = datetime.now().strftime("%Y-%m")
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
-            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
+            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?;", [date])
             print("currentStats: ", currentStats)
             if currentStats is None or currentStats is "Error" or not currentStats:
                 newStats = insert_into_database_table(
@@ -2097,8 +2097,8 @@ def chatbot(companyName, assistantID):
                     (assistantID, date, 1, questionsAnswered, len(products)))
                 # TODO check newStats for errors
             else:
-                currentQuestionAnswerd = currentStats[4]
-                currentProductsReturned = currentStats[5]
+                currentQuestionAnswerd = currentStats["QuestionsAnswered"]
+                currentProductsReturned = currentStats["ProductsReturned"]
                 questionsAnswered = int(questionsAnswered) + int(currentQuestionAnswerd)
                 productsReturned = len(products) + int(currentProductsReturned)
                 updatedStats = update_table(
@@ -2110,15 +2110,15 @@ def chatbot(companyName, assistantID):
             date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
-            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
+            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?;", [date])
             if currentStats is None or currentStats is "Error" or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
                     (assistantID, date, 1, questionsAnswered, len(products)))
                 # TODO check newStats for errors
             else:
-                currentQuestionAnswerd = currentStats[4]
-                currentProductsReturned = currentStats[5]
+                currentQuestionAnswerd = currentStats["QuestionsAnswered"]
+                currentProductsReturned = currentStats["ProductsReturned"]
                 questionsAnswered = int(questionsAnswered) + int(currentQuestionAnswerd)
                 productsReturned = len(products) + int(currentProductsReturned)
                 updatedStats = update_table(

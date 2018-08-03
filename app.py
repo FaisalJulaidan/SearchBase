@@ -2089,7 +2089,7 @@ def chatbot(companyName, assistantID):
             date = datetime.now().strftime("%Y-%m")
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
-            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?;", [date])
+            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?;", [date], True)
             print("currentStats: ", currentStats)
             if currentStats is None or currentStats is "Error" or not currentStats:
                 newStats = insert_into_database_table(
@@ -2110,7 +2110,7 @@ def chatbot(companyName, assistantID):
             date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
-            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?;", [date])
+            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?;", [date], True)
             if currentStats is None or currentStats is "Error" or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",

@@ -147,7 +147,7 @@ def indexpage():
 
 @app.route("/setencryptionkey<key>", methods=["GET"])
 def testing(key):
-    if app.debug:
+    if "debug" in key:
         serverRoute = "http://127.0.0.1:5000"
         if "gT5-f" in key:
             key = key.split("gT5-f")[1] + key.split("gT5-f")[0]
@@ -726,8 +726,9 @@ def company_delete():
         company = query_db("SELECT * FROM Companies WHERE ID=?", [session.get('User')['CompanyID']], True)
         if company is None:
             return redirectWithMessage("profilePage", "Error in finding company!")
+        print(session.get('User')['AccessLevel'])
         if session.get('User')['AccessLevel'] is not "Owner":
-            return redirectWithMessage("profilePage", "Only 'Owner' type account can delete company!")
+            return redirectWithMessage("profilePage", "Only Owner type account can delete company!")
         payload = email + ";" + str(company["ID"])
         payload = verificationSigner.dumps(payload)
         msg = Message("Company deletion vefication",
@@ -1234,6 +1235,8 @@ def admin_products(assistantID):
                     url = request.form.get("product_URL" + str(i), default="Error")
                     if url is "Error":
                         abort(status.HTTP_400_BAD_REQUEST, "Error with product url")
+                    if "http" not in url:
+                        url = "http://" + url
 
                     #see if they have reached the limit
                     numberOfProducts = 0

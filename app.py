@@ -147,7 +147,7 @@ def indexpage():
 
 @app.route("/setencryptionkey<key>", methods=["GET"])
 def testing(key):
-    if app.debug:
+    if "debug" in key:
         serverRoute = "http://127.0.0.1:5000"
         if "gT5-f" in key:
             key = key.split("gT5-f")[1] + key.split("gT5-f")[0]

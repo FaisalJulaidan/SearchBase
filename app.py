@@ -1978,26 +1978,28 @@ def chatbot(companyName, assistantID):
         else:
             lastSessionID = lastSessionID[len(lastSessionID)-1][4] + 1
 
-        collectedInformation = request.form.get("collectedInformation").split("||")
-        date = datetime.now().strftime("%d-%m-%Y")
-        print("collectedInformation: ", collectedInformation)
-        for i in range(0, len(collectedInformation)):
-            colInfo = collectedInformation[i][0].split(";")
-            print("colInfo: ", colInfo)
-            input = collectedInformation[i][1].split(";")[0]
-            questionIndex = int(colInfo[0]) - 1
-            questionID = int(questions[questionIndex][0])
-            for question in questions:
-                if question[0] == questionID:
-                    questionName = question[2]
-            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, input, lastSessionID, questionName))
-            # TODO check insertInput for errors
+        collectedInformation = request.form.get("collectedInformation", default="Error")
+        if collectedInformation is not "Error" and "None" not in collectedInformation:
+            collectedInformation = collectedInformation.split("||")
+            date = datetime.now().strftime("%d-%m-%Y")
+            print("collectedInformation: ", collectedInformation)
+            for i in range(0, len(collectedInformation)):
+                colInfo = collectedInformation[i][0].split(";")
+                print("colInfo: ", colInfo)
+                input = collectedInformation[i][1].split(";")[0]
+                questionIndex = int(colInfo[0]) - 1
+                questionID = int(questions[questionIndex][0])
+                for question in questions:
+                    if question[0] == questionID:
+                        questionName = question[2]
+                insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, input, lastSessionID, questionName))
+                # TODO check insertInput for errors
 
         #lastSessionID = select_from_database_table("SELECT TOP(1) * FROM UserInput ORDER BY ID DESC", [], True)[0]
         #TODO needs improving
 
         fileUploads = request.form.get("fileUploads", default="Error");
-        if "Error" not in fileUploads:
+        if "Error" not in fileUploads and "None" not in fileUploads:
             fileUploads = fileUploads.split("||");
             for i in range(0, len(fileUploads)):
                 file = urlopen(fileUploads[i].split(":::")[0])

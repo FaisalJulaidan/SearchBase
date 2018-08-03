@@ -110,12 +110,12 @@
                         <div id="ChatInputDiv">
                             <!--<input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><input type="file" id="fileUploadB" size="10" /><img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />-->
                             <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage">
-                            <div class="image-upload">
+                            <div id="fileUploadDiv" class="image-upload" style="display:none">
                                 <label for="fileUploadB">
                                     <img src="https://www.thesearchbase.com/static/images/cloud-upload.png" />
                                 </label>
 
-                                <input id="fileUploadB" type="file" />
+                                <input hidden id="fileUploadB" type="file" />
                             </div>
                             <img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />
                         </div>
@@ -369,13 +369,13 @@
         if (questionType == "fileUpload") {
             console.log("true");
             document.getElementById("textMessage").style.display = "none";
-            document.getElementById("fileUploadB").style.display = "inline-block";
+            document.getElementById("fileUploadDiv").style.display = "inline-block";
             console.log(document.getElementById("textMessage").display);
             showChatBox = true;
         } else {
             console.log("false");
             document.getElementById("textMessage").style.display = "inline-block";
-            document.getElementById("fileUploadB").style.display = "none";
+            document.getElementById("fileUploadDiv").style.display = "none";
         }
         for (var i = 1; i < question.length; i++)
         {
@@ -534,7 +534,7 @@
                             for (var i = 0; i < temparray.length - 1; i++) {
                                 resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
                                 // cRD.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
-                                cRD.append("<center><div class='chatProducts'><lable>" + resultdic[i][1] + "</lable><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + " Square feet</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
+                                cRD.append("<center><div class='chatProducts'><lable>" + resultdic[i][1] + "</lable><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + "</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
                             }
                         }
                     } else {

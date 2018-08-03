@@ -147,11 +147,11 @@ def indexpage():
 
 @app.route("/setencryptionkey<key>", methods=["GET"])
 def testing(key):
-    if app.debug:
+    if "debug" in key:
         serverRoute = "http://127.0.0.1:5000"
         if "gT5-f" in key:
             key = key.split("gT5-f")[1] + key.split("gT5-f")[0]
-            key = key.replace("gT5-f", "").replace("Pa-", "5o_n").replace("uF-r", "UbwF")
+            key = key.replace("gT5-f", "").replace("Pa-", "5o_n").replace("uF-r", "UbwF").replace("debug", "")
     else:
         serverRoute = "https://www.thesearchbase.com"
     page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
@@ -479,27 +479,26 @@ def signup():
                 # TODO check subscription for errors https://stripe.com/docs/api#errors
 
 
-            if not app.debug:
-                # TODO this needs improving
-                msg = Message("Account verification",
-                                sender="thesearchbase@gmail.com",
-                                recipients=[email])
-                payload = email + ";" + companyName
-                link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
-                msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png'><br /><h4>Hi,</h4> <p>Thank you for registering with TheSearchbase.</p> <br />  There is just one small step left, visit \
-                            <a href='"+link+"'> this link </a> to verify your account. \
-                            In case the link above doesn't work you can click on the link below. <br /> <br /> " + link + " <br />  <br /> \
-                            We look forward to you, using our platform. <br /> <br />\
-                            Regards, <br /> TheSearchBase Team <br />\
-                            <img src='https://thesearchbase.com/static/email_images/footer_image.png'>"
-                mail.send(msg)
+            # TODO this needs improving
+            msg = Message("Account verification",
+                            sender="thesearchbase@gmail.com",
+                            recipients=[email])
+            payload = email + ";" + companyName
+            link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
+            msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png'><br /><h4>Hi,</h4> <p>Thank you for registering with TheSearchbase.</p> <br />  There is just one small step left, visit \
+                        <a href='"+link+"'> this link </a> to verify your account. \
+                        In case the link above doesn't work you can click on the link below. <br /> <br /> " + link + " <br />  <br /> \
+                        We look forward to you, using our platform. <br /> <br />\
+                        Regards, <br /> TheSearchBase Team <br />\
+                        <img src='https://thesearchbase.com/static/email_images/footer_image.png'>"
+            mail.send(msg)
 
-                # sending the registration confirmation email to us
-                msg = Message("A new company has signed up!",
-                                sender="thesearchbase@gmail.com",
-                                recipients=["thesearchbase@gmail.com"])
-                msg.html = "<p>Company name: "+companyName+" has signed up. <br>The admin's details are: <br>Name: "+fullname+" <br>Email: "+email+".</p>"
-                mail.send(msg)
+            # sending the registration confirmation email to us
+            msg = Message("A new company has signed up!",
+                            sender="thesearchbase@gmail.com",
+                            recipients=["thesearchbase@gmail.com"])
+            msg.html = "<p>Company name: "+companyName+" has signed up. <br>The admin's details are: <br>Name: "+fullname+" <br>Email: "+email+".</p>"
+            mail.send(msg)
 
             return render_template('errors/verification.html', msg="Please check your email and follow instructions to verify account and get started.")
 
@@ -666,113 +665,6 @@ def profilePage():
                     return redirect("/admin/profile", code=302)
         print("Error in updating Company or Profile Data")
         return redirect("/admin/profile", code=302)
-
-
-@app.route("/admin/profile/delete", methods=['GET'])
-def profile_delete():
-    if request.method == "GET":
-        email = session.get('User')['Email']
-        company = query_db("SELECT * FROM Companies WHERE ID=?", [session.get('User')['CompanyID']], True)
-        if company is None:
-            return redirectWithMessage("profilePage", "Error in finding company!")
-        payload = email + ";" + str(company["ID"])
-        payload = verificationSigner.dumps(payload)
-        msg = Message("Account deletion verification",
-                                sender="thesearchbase@gmail.com",
-                                recipients=[email])
-        link = "https://www.thesearchbase.com/account/delete/verify/"+verificationSigner.dumps(payload)
-        msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png'><br /><h4>Hi,</h4> <p>You haver requested that we delete your account.</p> <br /> \
-                    To complete the process please follow <a href='"+link+"'> this link </a> . <br /> \
-                    If you have not requested this then please change your password as soon as possible.<br />  <br /> \
-                    Thank you for using our platform. <br /> <br />\
-                    Regards, <br /> TheSearchBase Team <br />\
-                    <img src='https://thesearchbase.com/static/email_images/footer_image.png'>"
-        mail.send(msg)
-        return redirectWithMessage("profilePage", "We have sent you a confirmation email through which to delete your account.")
-
-
-@app.route("/account/delete/verify/<payload>", methods=['GET'])
-def profile_delete_verify():
-    if request.method == "GET":
-        data = verificationSigner.loads(payload)
-        email = data.split(";")[0]
-        companyID = data.split(";")[1]
-        users = query_db("SELECT * FROM Users")
-        userCheck = False
-        for user in users:
-            if user["Email"] is email and user["CompanyID"] is companyID:
-                userCheck = True
-        if not userCheck:
-            return redirectWithMessage("login", "User does not check out. Account deletion aborted!")
-        deleteUser = delete_from_table("DELETE FROM Users WHERE Email=?, CompanyID=?;",[email, companyID])
-
-        # sending the registration confirmation email to us
-        msg = Message("User has deleted their account!",
-                        sender="thesearchbase@gmail.com",
-                        recipients=["thesearchbase@gmail.com"])
-        msg.html = "<p>User: "+email+" has deleted their account. Company ID is " + str(companyID) + ".</p>"
-        mail.send(msg)
-
-        if deleteUser == "Record successfully deleted.":
-            return redirectWithMessage("login", "Account has been deleted")
-        else:
-            return redirectWithMessage("login", "Error in deleting account")
-
-
-@app.route("/admin/company/delete", methods=['GET'])
-def company_delete():
-    if request.method == "GET":
-        email = session.get('User')['Email']
-        company = query_db("SELECT * FROM Companies WHERE ID=?", [session.get('User')['CompanyID']], True)
-        if company is None:
-            return redirectWithMessage("profilePage", "Error in finding company!")
-        if session.get('User')['AccessLevel'] is not "Owner":
-            return redirectWithMessage("profilePage", "Only 'Owner' type account can delete company!")
-        payload = email + ";" + str(company["ID"])
-        payload = verificationSigner.dumps(payload)
-        msg = Message("Company deletion vefication",
-                                sender="thesearchbase@gmail.com",
-                                recipients=[email])
-        link = "https://www.thesearchbase.com/company/delete/verify/"+verificationSigner.dumps(payload)
-        msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png'><br /><h4>Hi,</h4> <p>You haver requested that we delete your company.</p> <br /> \
-                    Please do mind that deleting the company will also delete all accounts associated with it! <br />  \
-                    To complete the process please follow <a href='"+link+"'> this link </a> . <br /> \
-                    If you have not requested this then please change your password as soon as possible.<br />  <br /> \
-                    Thank you for using our platform. <br /> <br />\
-                    Regards, <br /> TheSearchBase Team <br />\
-                    <img src='https://thesearchbase.com/static/email_images/footer_image.png'>"
-        mail.send(msg)
-        return redirectWithMessage("profilePage", "We have sent you a confirmation email through which to delete your company.")
-
-
-@app.route("/company/delete/verify/<payload>", methods=['GET'])
-def company_delete_verify():
-    if request.method == "GET":
-        data = verificationSigner.loads(payload)
-        email = data.split(";")[0]
-        companyID = data.split(";")[1]
-        users = query_db("SELECT * FROM Users")
-        userCheck = False
-        for user in users:
-            if user["Email"] is email and user["CompanyID"] is companyID and user["AccessLevel"] is "Owner":
-                userCheck = True
-        if not userCheck:
-            return redirectWithMessage("login", "User does not check out. Company deletion aborted!")
-
-        deleteUser = delete_from_table("DELETE FROM Users WHERE CompanyID=?;",[companyID])
-        deleteCompany = delete_from_table("DELETE FROM Companies WHERE ID=?;",[companyID])
-
-        # sending the registration confirmation email to us
-        msg = Message("User has deleted their account!",
-                        sender="thesearchbase@gmail.com",
-                        recipients=["thesearchbase@gmail.com"])
-        msg.html = "<p>Company has deleted their records. Company ID was " + str(companyID) + ".</p>"
-        mail.send(msg)
-
-        if deleteUser == "Record successfully deleted.":
-            return redirectWithMessage("login", "Company has been deleted")
-        else:
-            return redirectWithMessage("login", "Error in deleting account")
 
 
 @app.route("/getpopupsettings/<assistantID>", methods=['GET'])
@@ -1234,6 +1126,8 @@ def admin_products(assistantID):
                     url = request.form.get("product_URL" + str(i), default="Error")
                     if url is "Error":
                         abort(status.HTTP_400_BAD_REQUEST, "Error with product url")
+                    if "http" not in url:
+                        url = "http://" + url
 
                     #see if they have reached the limit
                     numberOfProducts = 0
@@ -1341,29 +1235,23 @@ def admin_user_input(assistantID):
     checkAssistantID(assistantID)
     if request.method == "GET":
         email = session.get('User')['Email']
-        company = get_company(email)
-        if company is None or "Error" in company:
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=?", [assistantID,])
+        if assistant is None or "Error" in assistant:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO handle this better
         else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?", [assistantID,
-                                                                                                           company[0]])
-            if assistant is None or "Error" in assistant:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            else:
-                questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                                       [assistantID], True)
-                data = []
-                #dataTuple = tuple(["Null"])
-                for i in range(0, len(questions)):
-                    question = questions[i]
-                    questionID = question[0]
-                    userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
-                    if(userInput != [] and userInput != None):
-                        for record in userInput:
-                            data.append(record)
-                print(data)
-                return render("admin/data-storage.html", data=data)
+            questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
+                                                    [assistantID], True)
+            data = []
+            #dataTuple = tuple(["Null"])
+            for i in range(0, len(questions)):
+                question = questions[i]
+                questionID = question[0]
+                userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
+                if(userInput != [] and userInput != None):
+                    for record in userInput:
+                        data.append(record)
+            print(data)
+            return render("admin/data-storage.html", data=data)
 
 
 @app.route("/admin/assistant/<assistantID>/connect", methods=['GET'])
@@ -1958,7 +1846,7 @@ def chatbot(companyName, assistantID):
 
 
         # TODO check company for errors
-        assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company["ID"]], True)
 
         if assistant is None:
             return "We could not find the assistant in our records. Sorry about that!"
@@ -1978,30 +1866,33 @@ def chatbot(companyName, assistantID):
         else:
             lastSessionID = lastSessionID[len(lastSessionID)-1][4] + 1
 
-        collectedInformation = request.form.get("collectedInformation").split("||")
-        date = datetime.now().strftime("%d-%m-%Y")
-        for i in range(0, len(collectedInformation)):
-            colInfo = collectedInformation[i].split(";")
-            input = colInfo[1]
-            questionIndex = int(colInfo[0]) - 1
-            questionID = int(questions[questionIndex][0])
-            for question in questions:
-                if question[0] == questionID:
-                    questionName = question[2]
-            insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, input, lastSessionID, questionName))
-            # TODO check insertInput for errors
+        collectedInformation = request.form.get("collectedInformation", default="Error")
+        if collectedInformation is not "Error" and "None" not in collectedInformation:
+            collectedInformation = collectedInformation.split("||")
+            date = datetime.now().strftime("%d-%m-%Y")
+            for i in range(0, len(collectedInformation)):
+                colInfo = collectedInformation[i].split(";")
+                input = colInfo[1]
+                questionIndex = int(colInfo[0]) - 1
+                questionID = int(questions[questionIndex][0])
+                for question in questions:
+                    if question[0] == questionID:
+                        questionName = question[2]
+                insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, input, lastSessionID, questionName))
+                # TODO check insertInput for errors
 
         #lastSessionID = select_from_database_table("SELECT TOP(1) * FROM UserInput ORDER BY ID DESC", [], True)[0]
         #TODO needs improving
 
         fileUploads = request.form.get("fileUploads", default="Error");
-        if "Error" not in fileUploads:
+        if "Error" not in fileUploads and "None" not in fileUploads:
             fileUploads = fileUploads.split("||");
             for i in range(0, len(fileUploads)):
                 file = urlopen(fileUploads[i].split(":::")[0])
+                questionID = int(fileUploads[i].split(":::")[1])
                 filename = fileUploads[i].split(":::")[2]
-                print(date,"-----", lastSessionID, "------", fileUploads[i].split(":::")[1], "------", filename)
-                filename = date + '_' + str(lastSessionID) + '_' + fileUploads[i].split(":::")[1] + '_' + filename
+                filename = date + '_' + str(lastSessionID) + '_' + str(questionID) + '_' + filename
+                print("filename: ", filename)
                 #filename = secure_filename(filename)
 
                 #if file and allowed_file(filename):
@@ -2009,13 +1900,13 @@ def chatbot(companyName, assistantID):
                     open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
                     savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
                     savePath = savePath.replace('\\', '/')
+                    print("savePath: ", savePath)
                     for question in questions:
                         if question[0] == questionID:
                             questionName = question[2]
-                    for question in questions:
-                        if question[0] == questionID:
-                            questionName = question[2]
+                    print("questionName: ", questionName)
                     insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID, questionName))
+                    print("insertInput: ", insertInput)
 
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")
@@ -2087,15 +1978,16 @@ def chatbot(companyName, assistantID):
             date = datetime.now().strftime("%Y-%m")
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
-            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
-            if currentStats is None:
+            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?;", [date], True)
+            print("currentStats: ", currentStats)
+            if currentStats is None or currentStats is "Error" or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
                     (assistantID, date, 1, questionsAnswered, len(products)))
                 # TODO check newStats for errors
             else:
-                currentQuestionAnswerd = currentStats[4]
-                currentProductsReturned = currentStats[5]
+                currentQuestionAnswerd = currentStats["QuestionsAnswered"]
+                currentProductsReturned = currentStats["ProductsReturned"]
                 questionsAnswered = int(questionsAnswered) + int(currentQuestionAnswerd)
                 productsReturned = len(products) + int(currentProductsReturned)
                 updatedStats = update_table(
@@ -2107,15 +1999,15 @@ def chatbot(companyName, assistantID):
             date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
-            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
-            if currentStats is None:
+            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?;", [date], True)
+            if currentStats is None or currentStats is "Error" or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
                     (assistantID, date, 1, questionsAnswered, len(products)))
                 # TODO check newStats for errors
             else:
-                currentQuestionAnswerd = currentStats[4]
-                currentProductsReturned = currentStats[5]
+                currentQuestionAnswerd = currentStats["QuestionsAnswered"]
+                currentProductsReturned = currentStats["ProductsReturned"]
                 questionsAnswered = int(questionsAnswered) + int(currentQuestionAnswerd)
                 productsReturned = len(products) + int(currentProductsReturned)
                 updatedStats = update_table(

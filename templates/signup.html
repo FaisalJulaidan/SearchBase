@@ -122,7 +122,7 @@
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
                         <input class="input100" type="password" id="password" name="password" autocomplete="new-password"
-                               placeholder="Password" onchange="validatePassword(this);checkPassword()">
+                               placeholder="Password" onchange="validatePassword(this);">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-lock" aria-hidden="true"></i>
@@ -131,7 +131,7 @@
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
                         <input class="input100 btn" type="password" id="confirmpassword" name="confirmPassword"
-                               placeholder="Confirm password" onchange="checkPassword()" disabled
+                               placeholder="Confirm password" onkeyup="checkPasswordWithoutAlert()" onchange="checkPassword()" disabled
                                style="cursor:not-allowed;text-align: -webkit-auto;">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
@@ -154,6 +154,8 @@
                         </select>
                         <span class="focus-input100"></span>
                     </div>-->
+                    <center>{{msg}}</center>
+
 
                     <div class="container-login100-form-btn">
                         <button class="login100-form-btn-disabled" id="submit" disabled>
@@ -262,29 +264,60 @@
           }
           return true;
         }
-        function checkPassword() {
+        // onkeyup check validty without alert 
+        function checkPasswordWithoutAlert() {
             pass = document.getElementById('password')
             passwordConf = document.getElementById('confirmpassword')
-            // if it is matching 
+            submit = document.getElementById("submit")
+
             if (password.value == passwordConf.value){
-                document.getElementById("submit").classList.remove('login100-form-btn-disabled');
-                document.getElementById("submit").classList.add('login100-form-btn');
+                // sucess 
+                submit.disabled = false
+                submit.classList.remove('login100-form-btn-disabled');
+                submit.classList.add('login100-form-btn');
+                passwordConf.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
                 inputs.passwordConf = true
             }else{
-                alertError('Password Matching Error','Please match your passwords')
+                // fail
+                passwordConf.style.boxShadow="0 0 9px 0px #f44336"
+                submit.disabled = true
                 inputs.passwordConf = false
             }
 
-            for (var input of Object.entries(inputs))
-                if (input[1] != true)
-                    document.getElementById('submit').disabled = false;
-                else
-                    document.getElementById('submit').disabled = true;
-            
-
-            // if both are not matching 
+            for (var input of Object.entries(inputs)){
+                if (!input[1]){
+                    submit.classList.add('login100-form-btn-disabled');
+                    submit.classList.remove('login100-form-btn');
+                    break
+                }
+            }
 
         }
+        // onchange check validty with an alert
+        function checkPassword() {
+            pass = document.getElementById('password')
+            passwordConf = document.getElementById('confirmpassword')
+            submit = document.getElementById("submit")
+            if (password.value == passwordConf.value){
+                submit.disabled = false
+                submit.classList.remove('login100-form-btn-disabled');
+                submit.classList.add('login100-form-btn');
+                passwordConf.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+                inputs.passwordConf = true
+            }else{
+                alertError('Password Matching Error','Please match your passwords')
+                submit.disabled = true
+                inputs.passwordConf = false
+            }
+            for (var input of Object.entries(inputs)){
+                if (!input[1]){
+                    submit.classList.add('login100-form-btn-disabled');
+                    submit.classList.remove('login100-form-btn');
+                    break
+                }
+            }
+        }
+
         function checkboxesMatch(boxID) {
             if (document.getElementById('confirm' + boxID)) {
                 if (   document.getElementById(boxID).value === document.getElementById('confirm' + boxID).value

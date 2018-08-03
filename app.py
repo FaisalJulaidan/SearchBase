@@ -1234,6 +1234,8 @@ def admin_products(assistantID):
                     url = request.form.get("product_URL" + str(i), default="Error")
                     if url is "Error":
                         abort(status.HTTP_400_BAD_REQUEST, "Error with product url")
+                    if "http" not in url:
+                        url = "http://" + url
 
                     #see if they have reached the limit
                     numberOfProducts = 0

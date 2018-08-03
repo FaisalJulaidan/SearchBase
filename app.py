@@ -1904,8 +1904,7 @@ def chatbot(companyName, assistantID):
 
                 #if file and allowed_file(filename):
                 if file:
-                    with open(os.path.join(USER_FILES, filename), 'wb') as fp:
-                        fp.write(file.read())
+                    open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
                     savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
                     savePath = savePath.replace('\\', '/')
                     for question in questions:

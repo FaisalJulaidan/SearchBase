@@ -1,6 +1,6 @@
 #/usr/bin/python3.5
 from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, \
-    make_response, g, session
+    make_response, g, session, json
 from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
 from contextlib import closing
@@ -1535,10 +1535,10 @@ def checkPromoCode():
 
 
 
-@app.route("/admin/unsubscribe", methods=['GET', 'POST'])
+@app.route("/admin/unsubscribe", methods=['POST'])
 def unsubscribe():
 
-    if request.method == 'GET':
+    if request.method == 'POST':
 
         # if not session.get('Logged_in', False):
         #     redirectWithMessage("login", "You must login first!")
@@ -1546,18 +1546,20 @@ def unsubscribe():
         users = query_db("SELECT * FROM Users")
         user = "Error"
         # If user exists
+        print(session.get('User')['Email'])
         for record in users:
             if record["Email"] == session.get('User')['Email']:
                 user = record
         if "Error" in user:
-            return redirectWithMessage("admin_pricing", "An error occurred while trying to unsubscribe")
+            return jsonify(error="This user does't exist. Please login again!")
         if user['SubID'] is None:
             print("This account has no active subscriptions ")
-            return redirectWithMessage("admin_pricing", "This account has no active subscriptions ")
+            return jsonify(error="This account has no active subscription")
 
         try:
             # Unsubscribe
             sub = stripe.Subscription.retrieve(user['SubID'])
+            print(sub)
             sub.delete()
 
             # TODO why query_db does not work with update?
@@ -1568,11 +1570,12 @@ def unsubscribe():
             session['UserPlan'] = NoPlan
 
             print("You have unsubscribed successfully!")
-            return redirectWithMessage("admin_plan_confirmation", "You have unsubscribed successfully!")
+            return jsonify(msg="You have unsubscribed successfully!")
 
         except Exception as e:
             print("An error occurred while trying to unsubscribe")
-            return redirectWithMessage("admin_pricing", "An error occurred while trying to unsubscribe")
+            return jsonify(error="An error occurred while trying to unsubscribe")
+
 
 
 
@@ -1584,29 +1587,41 @@ def webhook_subscription_cancelled():
             print("STRIPE TRIGGER FOR UNSUBSCRIPTION...")
             event_json = request.get_json(force=True)
             customerID = event_json['data']['object']['customer']
+
+            print("Webhooks: Customer ID")
             print(customerID)
 
-            user = select_from_database_table("SELECT * FROM Users WHERE StripeID=?", [customerID])
+            # user = select_from_database_table("SELECT * FROM Users WHERE StripeID=?", [customerID])
+            user = query_db("SELECT * FROM Users WHERE StripeID=?", [customerID], one=True)
+            print(user)
 
-            update_table("UPDATE Users SET SubID=? WHERE StripeID=?;",
-                         [None, customerID])
+            if user:
 
-            # TODO check company for errors
-            assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", [user[1]], True)
 
-            # Check if user has assistants to deactivate first
-            if len(assistants) > 0:
-                for assistant in assistants:
+                update_table("UPDATE Users SET SubID=? WHERE StripeID=?;",
+                             [None, customerID])
 
-                    updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
-                    # TODO check update assistant for errors
 
+                # TODO check company for errors
+                assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", ['CompanyID'])
+
+                # Check if user has assistants to deactivate first
+                if len(assistants) > 0:
+                    for assistant in assistants:
+
+                        updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?", ["False", assistant[0]])
+                        # TODO check update assistant for errors
+
+                return "Assistants for " + user['Email']\
+                       + " account has been deactivated due to subscription cancellation"
+
+            else:
+                return "Webhooks Message: No User to unsubscribe"
 
         except Exception as e:
-            abort(status.HTTP_400_BAD_REQUEST, "Error in Webhook event")
+            abort(status.HTTP_400_BAD_REQUEST, "Webhook error")
 
 
-        return "Assistants for " + user[5] + " account has been deactivated due to subscription cancellation", status.HTTP_200_OK
 
 
 

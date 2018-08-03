@@ -1877,7 +1877,7 @@ def chatbot(companyName, assistantID):
             collectedInformation = collectedInformation.split("||")
             date = datetime.now().strftime("%d-%m-%Y")
             for i in range(0, len(collectedInformation)):
-                colInfo = collectedInformation[i][0].split(";")
+                colInfo = collectedInformation[i].split(";")
                 print("collectedInformation: ", collectedInformation)
                 input = colInfo[1]
                 print("input: ", input)

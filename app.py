@@ -1776,7 +1776,7 @@ def chatbot(companyName, assistantID):
             # TODO check questionstuple for errors
             questions = []
             for i in range(0, len(questionsTuple)):
-                questions.append(questionsTuple[i][2] + ";" + questionsTuple[i][3] + ";" + questionsTuple[i][0])
+                questions.append(questionsTuple[i][2] + ";" + questionsTuple[i][3] + ";" + str(questionsTuple[i][0]))
 
             allAnswers = {}
             for i in range(0, len(questions)):
@@ -1786,7 +1786,7 @@ def chatbot(companyName, assistantID):
                 # TODO Check answerstuple for errors
                 answers = []
                 for j in range(0, len(answersTuple)):
-                    answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][5] + ";" + answersTuple[j][0])
+                    answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][5] + ";" + str(answersTuple[j][0]))
 
                 allAnswers[questions[i]] = answers
 

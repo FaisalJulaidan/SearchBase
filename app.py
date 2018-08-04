@@ -1233,15 +1233,20 @@ def admin_user_input(assistantID):
             questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
                                                     [assistantID], True)
             data = []
+            print("questions: ", questions)
             #dataTuple = tuple(["Null"])
             for i in range(0, len(questions)):
                 question = questions[i]
+                print("question: ", question)
                 questionID = question[0]
+                print("questionID: ", questionID)
                 userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
-                if(userInput != [] and userInput != None):
+                print("userInput: ", userInput)
+                if userInput and userInput is not None:
                     for record in userInput:
+                        print("record: ", record)
                         data.append(record)
-            print(data)
+            print("data:", data)
             return render("admin/data-storage.html", data=data)
 
 

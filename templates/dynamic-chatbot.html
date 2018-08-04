@@ -143,7 +143,7 @@
     var fileUploads = []
     var currentFileURL = "";
     var fileUploadQuestion = false;
-    var questionsID = 0;
+    var questionID = 0;
 
     $(window).scroll(function ()
     {
@@ -407,7 +407,7 @@
         fileUploads = [];
         fileUploadQuestion = false;
         getNextQuestion("Next Question by Order");
-        var questionsID = 0;
+        questionID = 0;
     }
     function handleEnter(e)
     {

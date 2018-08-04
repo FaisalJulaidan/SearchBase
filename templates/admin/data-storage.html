@@ -31,7 +31,9 @@
                             </tr></thead>\
                             <tbody id=\"tBodyUIn\">";
     {%for record in data %}
+    console.log("{{data}}");
     if ("{{record[3]}}".includes(";")) {
+        console.log("Adding file record: {{record}}");
         tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td><a href=\"/" + "{{record[3]}}".split(";")[1] + "\" download=\"" + "{{record[3]}}".split(";")[0] +"\">" + "{{record[3]}}".split(";")[0]+"</a></td></tr>";
     } else {
         tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td>{{record[3]}}</td></tr>";

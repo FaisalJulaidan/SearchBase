@@ -1903,6 +1903,8 @@ def chatbot(companyName, assistantID):
                     print("questionName: ", questionName)
                     insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID, questionName))
                     print("insertInput: ", insertInput)
+                    userInputs = query_db("SELECT * FROM UserInput", [])
+                    print(userInputs)
 
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")

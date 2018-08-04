@@ -198,6 +198,10 @@
     async function submitMessage(message)
     {
         cancelScroll = false;
+        if (questionType == "fileUpload") {
+            message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
+            fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
+        }
         if (message == "")
         {
             message = document.getElementById("textMessage").value;
@@ -228,10 +232,6 @@
         }
         await sleep(400 + Math.floor(Math.random() * 900));
         $("#thinkingGif").remove();
-        if (questionType == "fileUpload") {
-            message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
-            fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
-        }
         if (question[0].split(";")[1] == "both" || question[0].split(";")[1] == "userInfoRetrieval") {
             collectedInformation.push(questionID + ";" + message);
             var thanks = "";
@@ -366,9 +366,9 @@
             answers += "<a class='answerOptions' id='option" + i + "' onclick=\"submitMessage('" + emojione.toImage(question[i].split(";")[0]) + "')\">" + emojione.toImage(question[i].split(";")[0]) + "</a>";
             showChatBox = false;
         }
-        if (questionID == 2) {
-            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"SkipQuestion()\">Skip Question</a>";
-        }
+        //if (questionID == 2) {
+        //    answers += "<a class='answerOptions' id='option" + i + "' onclick=\"SkipQuestion()\">Skip Question</a>";
+        //}
         answers += "</div>"
         $("#optionsDiv").append(answers);
         if (showChatBox)

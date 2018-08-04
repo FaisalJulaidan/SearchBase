@@ -1883,13 +1883,16 @@ def chatbot(companyName, assistantID):
 
         fileUploads = request.form.get("fileUploads", default="Error");
         if "Error" not in fileUploads and "None" not in fileUploads:
+            print("fileUploads: ", fileUploads)
             fileUploads = fileUploads.split("||");
+            print("fileUploads: ", fileUploads)
             for i in range(0, len(fileUploads)):
                 try:
                     file = urlopen(fileUploads[i].split(":::")[0])
                 except:
                     return "Could not get one of the sent files. Please try saving it in another location before uploading it. Thank you."
                 questionID = int(fileUploads[i].split(":::")[1])
+                print("questionID: ", questionID)
                 filename = fileUploads[i].split(":::")[2]
                 filename = date + '_' + str(lastSessionID) + '_' + str(questionID) + '_' + filename
                 #filename = secure_filename(filename)
@@ -1902,7 +1905,7 @@ def chatbot(companyName, assistantID):
                     for question in questions:
                         if question[0] == questionID:
                             questionName = question[2]
-                    insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID, questionName))
+                    insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, filename+";"+savePath, lastSessionID, questionName))
                     userInputs = query_db("SELECT * FROM UserInput", [])
                     print(userInputs)
 

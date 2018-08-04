@@ -1877,9 +1877,14 @@ def chatbot(companyName, assistantID):
 
         fileUploads = request.form.get("fileUploads", default="Error");
         if "Error" not in fileUploads and "None" not in fileUploads:
+            print("fileUploads: ", fileUploads)
             fileUploads = fileUploads.split("||");
+            print("fileUploads: ", fileUploads)
             for i in range(0, len(fileUploads)):
-                file = urlopen(fileUploads[i].split(":::")[0])
+                try:
+                    file = urlopen(fileUploads[i].split(":::")[0])
+                except:
+                    return "Could not get one of the sent files. Please try saving it in another location before uploading it. Thank you."
                 questionID = int(fileUploads[i].split(":::")[1])
                 filename = fileUploads[i].split(":::")[2]
                 filename = date + '_' + str(lastSessionID) + '_' + str(questionID) + '_' + filename
@@ -2502,38 +2507,62 @@ def teardown_request(exception):
 ## Error Handlers ##
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)
 def bad_request(e):
-    print("Error Handler:" + e.description)
-    return render_template('errors/400.html', error=e.description), status.HTTP_400_BAD_REQUEST
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/400.html', error=e.description), status.HTTP_400_BAD_REQUEST
+    except:
+        print("Error without description")
+        return render_template('errors/400.html'), status.HTTP_400_BAD_REQUEST
 
 
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
-    print("Error Handler:" + e.description)
-    return render_template('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
+    except:
+        print("Error without description")
+        return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
 
 
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 def unsupported_media(e):
-    print("Error Handler:" + e.description)
-    return render_template('errors/415.html', error=e.description), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/415.html', error=e.description), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+    except:
+        print("Error without description")
+        return render_template('errors/415.html'), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 
 @app.errorhandler(418)
 def im_a_teapot(e):
-    print("Error Handler:" + e.description)
-    return render_template('errors/418.html', error=e.description), 418
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/418.html', error=e.description), 418
+    except:
+        print("Error without description")
+        return render_template('errors/418.html'), 418
 
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(e):
-    print("Error Handler for:" + e.description)
-    return render_template('errors/500.html', error=e.description), status.HTTP_500_INTERNAL_SERVER_ERROR
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/500.html', error=e.description), status.HTTP_500_INTERNAL_SERVER_ERROR
+    except:
+        print("Error without description")
+        return render_template('errors/500.html'), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
 def not_implemented(e):
-    print("Error Handler:" + e.description)
-    return render_template('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
+    except:
+        print("Error without description")
+        return render_template('errors/501.html'), status.HTTP_501_NOT_IMPLEMENTED
 
 
 # class Del:

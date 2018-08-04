@@ -1240,6 +1240,7 @@ def admin_user_input(assistantID):
                 print("question: ", question)
                 questionID = question[0]
                 print("questionID: ", questionID)
+                print(query_db("SELECT * FROM UserInput"), [])
                 userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
                 print("userInput: ", userInput)
                 if userInput and userInput is not None:
@@ -1882,9 +1883,7 @@ def chatbot(companyName, assistantID):
 
         fileUploads = request.form.get("fileUploads", default="Error");
         if "Error" not in fileUploads and "None" not in fileUploads:
-            print("fileUploads: ", fileUploads)
             fileUploads = fileUploads.split("||");
-            print("fileUploads: ", fileUploads)
             for i in range(0, len(fileUploads)):
                 try:
                     file = urlopen(fileUploads[i].split(":::")[0])
@@ -1893,7 +1892,6 @@ def chatbot(companyName, assistantID):
                 questionID = int(fileUploads[i].split(":::")[1])
                 filename = fileUploads[i].split(":::")[2]
                 filename = date + '_' + str(lastSessionID) + '_' + str(questionID) + '_' + filename
-                print("filename: ", filename)
                 #filename = secure_filename(filename)
 
                 #if file and allowed_file(filename):
@@ -1901,13 +1899,10 @@ def chatbot(companyName, assistantID):
                     open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
                     savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
                     savePath = savePath.replace('\\', '/')
-                    print("savePath: ", savePath)
                     for question in questions:
                         if question[0] == questionID:
                             questionName = question[2]
-                    print("questionName: ", questionName)
                     insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID, questionName))
-                    print("insertInput: ", insertInput)
                     userInputs = query_db("SELECT * FROM UserInput", [])
                     print(userInputs)
 

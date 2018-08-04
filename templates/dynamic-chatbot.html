@@ -322,7 +322,6 @@
             for (var i = 0; i < data.length; i++) {
                 if (question == data[i]) {
                     question = data[i + 1];
-                    questionID = parseInt(question[0].split(";")[2])
                     if (question == undefined) {
                         questionsAnswered--;
                         sendData();
@@ -333,6 +332,7 @@
                         }
                         return 0;
                     }
+                    questionID = parseInt(question[0].split(";")[2])
                     break;
                 }
             }

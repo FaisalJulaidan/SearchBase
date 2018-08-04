@@ -22,15 +22,6 @@ import urllib.request
 app = Flask(__name__, static_folder='static')
 
 
-## -----
-# Only one should be commented in
-# For Production
-app.config.from_object('config.BaseConfig')
- 
-# For Development
-#app.config.from_object('config.DevelopmentConfig')
-## -----
-
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -1235,29 +1226,29 @@ def admin_user_input(assistantID):
     checkAssistantID(assistantID)
     if request.method == "GET":
         email = session.get('User')['Email']
-        company = get_company(email)
-        if company is None or "Error" in company:
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=?", [assistantID,])
+        if assistant is None or "Error" in assistant:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO handle this better
         else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?", [assistantID,
-                                                                                                           company[0]])
-            if assistant is None or "Error" in assistant:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            else:
-                questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                                       [assistantID], True)
-                data = []
-                #dataTuple = tuple(["Null"])
-                for i in range(0, len(questions)):
-                    question = questions[i]
-                    questionID = question[0]
-                    userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
-                    if(userInput != [] and userInput != None):
-                        for record in userInput:
-                            data.append(record)
-                print(data)
-                return render("admin/data-storage.html", data=data)
+            questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
+                                                    [assistantID], True)
+            data = []
+            print("questions: ", questions)
+            #dataTuple = tuple(["Null"])
+            for i in range(0, len(questions)):
+                question = questions[i]
+                print("question: ", question)
+                questionID = question[0]
+                print("questionID: ", questionID)
+                print(query_db("SELECT * FROM UserInput"), [])
+                userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
+                print("userInput: ", userInput)
+                if userInput and userInput is not None:
+                    for record in userInput:
+                        print("record: ", record)
+                        data.append(record)
+            print("data:", data)
+            return render("admin/data-storage.html", data=data)
 
 
 @app.route("/admin/assistant/<assistantID>/connect", methods=['GET'])
@@ -1785,7 +1776,7 @@ def chatbot(companyName, assistantID):
             # TODO check questionstuple for errors
             questions = []
             for i in range(0, len(questionsTuple)):
-                questions.append(questionsTuple[i][2] + ";" + questionsTuple[i][3])
+                questions.append(questionsTuple[i][2] + ";" + questionsTuple[i][3] + ";" + str(questionsTuple[i][0]))
 
             allAnswers = {}
             for i in range(0, len(questions)):
@@ -1795,7 +1786,7 @@ def chatbot(companyName, assistantID):
                 # TODO Check answerstuple for errors
                 answers = []
                 for j in range(0, len(answersTuple)):
-                    answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][5])
+                    answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][5] + ";" + str(answersTuple[j][0]))
 
                 allAnswers[questions[i]] = answers
 
@@ -1877,10 +1868,8 @@ def chatbot(companyName, assistantID):
             collectedInformation = collectedInformation.split("||")
             date = datetime.now().strftime("%d-%m-%Y")
             for i in range(0, len(collectedInformation)):
-                colInfo = collectedInformation[i][0].split(";")
-                input = collectedInformation[i][1].split(";")[0]
-                print("collectedInformation: ", collectedInformation)
-                print("input: ", input)
+                colInfo = collectedInformation[i].split(";")
+                input = colInfo[1]
                 questionIndex = int(colInfo[0]) - 1
                 questionID = int(questions[questionIndex][0])
                 for question in questions:
@@ -1894,12 +1883,18 @@ def chatbot(companyName, assistantID):
 
         fileUploads = request.form.get("fileUploads", default="Error");
         if "Error" not in fileUploads and "None" not in fileUploads:
+            print("fileUploads: ", fileUploads)
             fileUploads = fileUploads.split("||");
+            print("fileUploads: ", fileUploads)
             for i in range(0, len(fileUploads)):
-                file = urlopen(fileUploads[i].split(":::")[0])
+                try:
+                    file = urlopen(fileUploads[i].split(":::")[0])
+                except:
+                    return "Could not get one of the sent files. Please try saving it in another location before uploading it. Thank you."
+                questionID = int(fileUploads[i].split(":::")[1])
+                print("questionID: ", questionID)
                 filename = fileUploads[i].split(":::")[2]
-                print(date,"-----", lastSessionID, "------", fileUploads[i].split(":::")[1], "------", filename)
-                filename = date + '_' + str(lastSessionID) + '_' + fileUploads[i].split(":::")[1] + '_' + filename
+                filename = date + '_' + str(lastSessionID) + '_' + str(questionID) + '_' + filename
                 #filename = secure_filename(filename)
 
                 #if file and allowed_file(filename):
@@ -1910,10 +1905,9 @@ def chatbot(companyName, assistantID):
                     for question in questions:
                         if question[0] == questionID:
                             questionName = question[2]
-                    for question in questions:
-                        if question[0] == questionID:
-                            questionName = question[2]
-                    insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (fileUploads[i].split(":::")[1], date, fileUploads[i].split(":::")[2]+";"+savePath, lastSessionID, questionName))
+                    insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, filename+";"+savePath, lastSessionID, questionName))
+                    userInputs = query_db("SELECT * FROM UserInput", [])
+                    print(userInputs)
 
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")
@@ -2518,38 +2512,62 @@ def teardown_request(exception):
 ## Error Handlers ##
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)
 def bad_request(e):
-    print("Error Handler:" + e.description)
-    return render_template('errors/400.html', error=e.description), status.HTTP_400_BAD_REQUEST
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/400.html', error=e.description), status.HTTP_400_BAD_REQUEST
+    except:
+        print("Error without description")
+        return render_template('errors/400.html'), status.HTTP_400_BAD_REQUEST
 
 
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
-    print("Error Handler:" + e.description)
-    return render_template('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
+    except:
+        print("Error without description")
+        return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
 
 
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 def unsupported_media(e):
-    print("Error Handler:" + e.description)
-    return render_template('errors/415.html', error=e.description), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/415.html', error=e.description), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+    except:
+        print("Error without description")
+        return render_template('errors/415.html'), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 
 @app.errorhandler(418)
 def im_a_teapot(e):
-    print("Error Handler:" + e.description)
-    return render_template('errors/418.html', error=e.description), 418
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/418.html', error=e.description), 418
+    except:
+        print("Error without description")
+        return render_template('errors/418.html'), 418
 
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(e):
-    print("Error Handler for:" + e.description)
-    return render_template('errors/500.html', error=e.description), status.HTTP_500_INTERNAL_SERVER_ERROR
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/500.html', error=e.description), status.HTTP_500_INTERNAL_SERVER_ERROR
+    except:
+        print("Error without description")
+        return render_template('errors/500.html'), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
 def not_implemented(e):
-    print("Error Handler:" + e.description)
-    return render_template('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
+    except:
+        print("Error without description")
+        return render_template('errors/501.html'), status.HTTP_501_NOT_IMPLEMENTED
 
 
 # class Del:
@@ -2563,16 +2581,24 @@ def not_implemented(e):
 if __name__ == "__main__":
 
     print("Run the server...")
-    print(app.debug)
 
     # Create the schema only in development mode
     if app.debug:
         init_db()
+        # For Development
+        app.config.from_object('config.DevelopmentConfig')
+        print("Debug Mode...")
+    else:
+        # For Production
+        app.config.from_object('config.BaseConfig')
+        print("Production Mode...")
+
 
     # Print app configuration
-    print(app.config)
+    # print(app.config)
     # Run the app server
     app.run()
+
 
 
 

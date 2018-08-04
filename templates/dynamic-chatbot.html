@@ -143,6 +143,7 @@
     var fileUploads = []
     var currentFileURL = "";
     var fileUploadQuestion = false;
+    var questionID = 0;
 
     $(window).scroll(function ()
     {
@@ -176,8 +177,6 @@
         {%endfor%}
         i++;
     {% endfor %}
-    var questionNumber = 0;
-    var questionN = 0;
     // document.getElementById("submitMessage").addEventListener("click", );
 
     $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot'>" + emojione.toImage("{{message}}") + "</li></div><br><br>");
@@ -201,7 +200,7 @@
         cancelScroll = false;
         if (questionType == "fileUpload") {
             message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
-            fileUploads.push(currentFileURL + ":::" + (questionN + 1) + ":::" + message);
+            fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
         }
         if (message == "")
         {
@@ -234,7 +233,7 @@
         await sleep(400 + Math.floor(Math.random() * 900));
         $("#thinkingGif").remove();
         if (question[0].split(";")[1] == "both" || question[0].split(";")[1] == "userInfoRetrieval") {
-            collectedInformation.push((questionN + 1) + ";" + message);
+            collectedInformation.push(questionID + ";" + message);
             var thanks = "";
             switch (Math.round(Math.random() * 6)) {
                 case 0:
@@ -291,24 +290,6 @@
             }
         }
         getNextQuestion("Next Question by Order");
-        /*$("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>I apologise but I need an answer from the showed ones in order to get you the best match</li></div>");
-        $("#newMessage").animate({
-            marginTop: "-=35px"
-        }, "slow");
-        if(!cancelScroll){
-            scrollTo("chatBottom");
-        }
-        document.getElementById('newMessage').id = 'oldMessage';
-        var answers = "<div id='qAnswers'>";
-        for(var i=1; i<data[questionN].length; i++){
-            answers+="<a class='answerOptions' id='option"+i+"' onclick=\"submitMessage('"+emojione.toImage(data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0])+"</a>"
-        }
-        answers+="</div>"
-        $("#optionsDiv").append(answers);
-        checkOutsideElements();
-        if(!cancelScroll){
-            scrollTo("chatBottom");
-        }*/
     }
     function SkipQuestion() {
         questionsAnswered--;
@@ -324,7 +305,7 @@
             for (var i = 0; i < data.length; i++) {
                 if (action.split(": ")[1] == data[i][0].split(";")[0]) {
                     question = data[i];
-                    questionN = i;
+                    questionID = parseInt(question[0].split(";")[2])
                 }
             }
         } else if (action == "Get Solutions") {
@@ -341,7 +322,6 @@
             for (var i = 0; i < data.length; i++) {
                 if (question == data[i]) {
                     question = data[i + 1];
-                    questionN++;
                     if (question == undefined) {
                         questionsAnswered--;
                         sendData();
@@ -352,6 +332,7 @@
                         }
                         return 0;
                     }
+                    questionID = parseInt(question[0].split(";")[2])
                     break;
                 }
             }
@@ -385,9 +366,9 @@
             answers += "<a class='answerOptions' id='option" + i + "' onclick=\"submitMessage('" + emojione.toImage(question[i].split(";")[0]) + "')\">" + emojione.toImage(question[i].split(";")[0]) + "</a>";
             showChatBox = false;
         }
-        if (questionN == 2) {
-            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"SkipQuestion()\">Skip Question</a>";
-        }
+        //if (questionID == 2) {
+        //    answers += "<a class='answerOptions' id='option" + i + "' onclick=\"SkipQuestion()\">Skip Question</a>";
+        //}
         answers += "</div>"
         $("#optionsDiv").append(answers);
         if (showChatBox)
@@ -422,12 +403,11 @@
         keywords = [];
         collectedInformation = [];
         questionsAnswered = 0;
-        questionNumber = 0;
-        questionN = -1;
         question = undefined;
         fileUploads = [];
         fileUploadQuestion = false;
         getNextQuestion("Next Question by Order");
+        questionID = 0;
     }
     function handleEnter(e)
     {

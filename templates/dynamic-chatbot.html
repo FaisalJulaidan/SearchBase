@@ -320,15 +320,11 @@
             }
             return 0;
         } else if (action == "Next Question by Order") {
-            console.log("DATA: ", data);
             for (var i = 0; i < data.length; i++) {
-                console.log("QUESTION: ", question, "DATA[I]: ", data[i]);
                 if (question == data[i]) {
                     question = data[i + 1];
-                    console.log("QUESTION + 1; ", question);
                     if (question == undefined) {
                         questionsAnswered--;
-                        console.log("LETS GO");
                         sendData();
                         SetRepeat();
                         chatInputDov.style = "display:none";
@@ -408,8 +404,8 @@
         question = undefined;
         fileUploads = [];
         fileUploadQuestion = false;
-        getNextQuestion("Next Question by Order");
         questionID = 0;
+        getNextQuestion("Next Question by Order");
     }
     function handleEnter(e)
     {

@@ -1895,9 +1895,12 @@ def chatbot(companyID, assistantID):
                     open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
                     savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
                     savePath = savePath.replace('\\', '/')
-                    for question in questions:
-                        if question[0] == questionID:
-                            questionName = question[2]
+                    questionName = "Error"
+                    for record in questions:
+                        if record["ID"] is questionID:
+                            questionName = record["Question"]
+                    if questionName is "Error":
+                        return "Error in uploading a sent file. We apologise for the inconvenience!"
                     insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, filename+";"+savePath, lastSessionID, questionName))
                     userInputs = query_db("SELECT * FROM UserInput", [])
 

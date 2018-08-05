@@ -53,7 +53,7 @@ app.config.update(
 
 mail = Mail(app)
 
-ALLOWED_UPLOAD-FILE-EXTENSIONS = set(['txt', 'pdf', 'doc', 'docx'])
+ALLOWED_UPLOAD_FILE_EXTENSIONS = set(['txt', 'pdf', 'doc', 'docx'])
 ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
 ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
 

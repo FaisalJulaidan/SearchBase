@@ -1883,7 +1883,8 @@ def chatbot(companyID, assistantID):
             for i in range(0, len(fileUploads)):
                 try:
                     file = urlopen(fileUploads[i].split(":::")[0])
-                except:
+                except Exception as e:
+                    print(e)
                     return "Could not get one of the sent files. Please try saving it in another location before uploading it. We apologise for the inconvenience!"
                 questionID = int(fileUploads[i].split(":::")[1])
                 filename = fileUploads[i].split(":::")[2]
@@ -1907,7 +1908,9 @@ def chatbot(companyID, assistantID):
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")
         if nok is "Error":
-            return "Error in getting number of keywords. Sorry about that!"
+            return "Error in getting<br> number of keywords. Sorry about that!"
+        elif int(nok) == 0:
+            return "Thank you for<br> your information. We will be in touch. :grin:"
         else:
             keywords = []
             budget = []

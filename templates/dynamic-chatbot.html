@@ -498,25 +498,22 @@
                     $("#thinkingGif").remove();
                     var data = xhttp.responseText;
                     cRD = $("#messagesContainer");
-                    if (returnProducts) {
-                        if (!data.includes("&&&")) {
-                            cRD.append("<br><br><br><label class='chatProducts'>   "+data+"</label><br><br><br>");
+                    if (!data.includes("&&&")) {
+                        cRD.append("<br><br><br><label class='chatProducts'>" + data + "</label><br><br><br>");
+                    } else if (returnProducts) {
+                        resultdic = {};
+                        var temparray = data.split("&&&");
+                        for (var i = 0; i < temparray.length; i++) {
+                            resultdic[i] = temparray[i].split("|||");
                         }
-                        else {
-                            resultdic = {};
-                            var temparray = data.split("&&&");
-                            for (var i = 0; i < temparray.length; i++) {
-                                resultdic[i] = temparray[i].split("|||");
-                            }
-                            delete resultdic[(temparray.length - 1).toString()];
-                            for (var i = 0; i < temparray.length - 1; i++) {
-                                resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
-                                // cRD.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><label>"+resultdic[i][1]+"</label><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
-                                cRD.append("<center><div class='chatProducts'><label>" + resultdic[i][1] + "</label><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + "</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
-                            }
+                        delete resultdic[(temparray.length - 1).toString()];
+                        for (var i = 0; i < temparray.length - 1; i++) {
+                            resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
+                            // cRD.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><label>"+resultdic[i][1]+"</label><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
+                            cRD.append("<center><div class='chatProducts'><label>" + resultdic[i][1] + "</label><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + "</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
                         }
                     } else {
-                        cRD.append("<br><br><br><label class='chatProducts'>" + emojione.toImage("Thank you for<br> your information. We will be in touch. :grin:") + "</label><br><br><br>"); 
+                        cRD.append("<br><br><br><label class='chatProducts'>Woops!<br> Something went wrong. Sorry about that!</label><br><br><br>");
                     }
                 }
                 else

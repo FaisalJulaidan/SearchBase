@@ -232,7 +232,7 @@
         }
         await sleep(400 + Math.floor(Math.random() * 900));
         $("#thinkingGif").remove();
-        if (question[0].split(";")[1] == "both" || question[0].split(";")[1] == "userInfoRetrieval") {
+        if (questionType == "both" || questionType == "userInfoRetrieval") {
             collectedInformation.push(questionID + ";" + message);
             var thanks = "";
             switch (Math.round(Math.random() * 6)) {
@@ -320,11 +320,15 @@
             }
             return 0;
         } else if (action == "Next Question by Order") {
+            console.log("DATA: ", data);
             for (var i = 0; i < data.length; i++) {
+                console.log("QUESTION: ", question, "DATA[I]: ", data[i]);
                 if (question == data[i]) {
                     question = data[i + 1];
+                    console.log("QUESTION + 1; ", question);
                     if (question == undefined) {
                         questionsAnswered--;
+                        console.log("LETS GO");
                         sendData();
                         SetRepeat();
                         chatInputDov.style = "display:none";
@@ -499,8 +503,8 @@
                     var data = xhttp.responseText;
                     cRD = $("#messagesContainer");
                     if (returnProducts) {
-                        if (data == "We could not find anything that matched your search criteria. Please try different filter options.") {
-                            cRD.append("<br><br><br><lable class='chatProducts'>We could not find<br>anything that matched your seach criteria. Please try different filter options.</lable><br><br><br>");
+                        if (!data.includes("&&&")) {
+                            cRD.append("<br><br><br><label class='chatProducts'>   "+data+"</label><br><br><br>");
                         }
                         else {
                             resultdic = {};
@@ -511,12 +515,12 @@
                             delete resultdic[(temparray.length - 1).toString()];
                             for (var i = 0; i < temparray.length - 1; i++) {
                                 resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
-                                // cRD.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
-                                cRD.append("<center><div class='chatProducts'><lable>" + resultdic[i][1] + "</lable><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + "</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
+                                // cRD.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><label>"+resultdic[i][1]+"</label><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
+                                cRD.append("<center><div class='chatProducts'><label>" + resultdic[i][1] + "</label><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + "</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
                             }
                         }
                     } else {
-                        cRD.append("<br><br><br><lable class='chatProducts'>" + emojione.toImage("Thank you for<br> your information. We will be in touch. :grin:") + "</lable><br><br><br>"); 
+                        cRD.append("<br><br><br><label class='chatProducts'>" + emojione.toImage("Thank you for<br> your information. We will be in touch. :grin:") + "</label><br><br><br>"); 
                     }
                 }
                 else

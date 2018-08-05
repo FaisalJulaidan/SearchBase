@@ -533,3 +533,4 @@ __pycache__/
 
 .db
 *.db
+/static/file_uploads/user_files

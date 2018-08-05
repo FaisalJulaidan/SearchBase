@@ -346,7 +346,6 @@
         var successShow = $("#successShow")
         function alertError(name,text,type) {
             if (type=='success') {
-                console.log('1');
                 // clear previous error message
                 successTitle.text('')
                 successText.html('')
@@ -402,16 +401,13 @@
 
         // Only ask for user data when SessionStorage is empty for better performance
         if (sessionStorage.getItem('id') == null || sessionStorage.getItem('subID') == null){
-            console.log(sessionStorage.getItem('subID'));
-            console.log(sessionStorage.getItem('id') == null);
             // Set SessionStorage which is similar to cookies in client-side
             $.get({
                     url: '/admin/userData',
                     contentType: 'application/json'
 
             }).done(function( res ) {
-
-               console.log(res);
+                
                 sessionStorage.setItem('id', res.id);
                 sessionStorage.setItem('firstname', res.firstname);
                 sessionStorage.setItem('surname', res.surname);
@@ -424,7 +420,6 @@
                console.log(err)
              })
         } else {
-            console.log(sessionStorage.getItem('id'));
             console.log("SessionStorage is already filled");
         }
 

@@ -1254,9 +1254,8 @@ def admin_user_input(assistantID):
 @app.route("/admin/assistant/<assistantID>/connect", methods=['GET'])
 def admin_connect(assistantID):
     checkAssistantID(assistantID)
-    companyID = select_from_database_table("SELECT CompanyID FROM Assistants WHERE ID=?;", [assistantID])
-    company = select_from_database_table("SELECT Name FROM Companies WHERE ID=?;", [companyID[0]])
-    return render("admin/connect.html", company=company[0], assistantID=assistantID)
+    assistant = query_db("SELECT * FROM Assistants WHERE ID=?;", [assistantID], True)
+    return render("admin/connect.html", companyID=assistant["CompanyID"], assistantID=assistantID)
 
 
 @app.route("/admin/templates", methods=['GET', 'POST'])
@@ -1736,21 +1735,20 @@ def admin_emoji():
         return render("admin/emoji.html")
 
 
-@app.route("/chatbot/<companyName>/<assistantID>", methods=['GET', 'POST'])
-def chatbot(companyName, assistantID):
+@app.route("/chatbot/<companyID>/<assistantID>", methods=['GET', 'POST'])
+def chatbot(companyID, assistantID):
     if request.method == "GET":
+        companyID = int(companyID)
+        assistantID = int(assistantID)
         companies = query_db("SELECT * FROM Companies")
         # If company exists
         company = "Error"
         for record in companies:
-            if record["Name"] == companyName:
+            if record["ID"] is companyID:
                 company = record
         if company is "Error":
             abort(status.HTTP_404_NOT_FOUND)
 
-
-        if company is None:
-            abort(status.HTTP_400_BAD_REQUEST, "This company does't exist")
 
         # TODO check company for errors
         assistant = query_db("SELECT * FROM Assistants WHERE ID=?;", [assistantID], True)
@@ -1782,7 +1780,6 @@ def chatbot(companyName, assistantID):
             for i in range(0, len(questions)):
                 answersTuple = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;",
                                                           [questionsTuple[i][0]], True)
-                print(answersTuple)
                 # TODO Check answerstuple for errors
                 answers = []
                 for j in range(0, len(answersTuple)):
@@ -1826,20 +1823,21 @@ def chatbot(companyName, assistantID):
             else:
                 updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
                                             [currentStats[3] + 1, assistantID, date])
-            print(questionsAndAnswers)
-
-            return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + companyName + "/" + assistantID,
+            return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + str(companyID) + "/" + str(assistantID),
                                    message=message)
     elif request.method == "POST":
+        companyID = int(companyID)
+        assistantID = int(assistantID)
 
         
         companies = query_db("SELECT * FROM Companies")
         # If company exists
+        company = "Error"
         for record in companies:
-            if record["Name"] == escape(companyName):
+            if record["ID"] is companyID:
                 company = record
-            else:
-                return "We could not find the company in our records. Sorry about that!"
+        if company is "Error":
+            return "We could not find the company in our records. Sorry about that!"
 
 
         # TODO check company for errors
@@ -1851,9 +1849,8 @@ def chatbot(companyName, assistantID):
         # TODO check assistant for errors
         # assistantIndex = 0  # TODO implement this properly
 
-        questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?", [assistantID], True)
+        questions = query_db("SELECT * FROM Questions WHERE AssistantID=?", [assistantID])
         # TODO check questions for errors
-        print(questions)
         products = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?;", [assistantID], True)
         # TODO check products for errors
 
@@ -1870,12 +1867,11 @@ def chatbot(companyName, assistantID):
             for i in range(0, len(collectedInformation)):
                 colInfo = collectedInformation[i].split(";")
                 input = colInfo[1]
-                questionIndex = int(colInfo[0]) - 1
-                questionID = int(questions[questionIndex][0])
-                for question in questions:
-                    if question[0] == questionID:
-                        questionName = question[2]
-                insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, input, lastSessionID, questionName))
+                question = "Error"
+                for record in questions:
+                    if record["ID"] is int(colInfo[0]):
+                        question = record
+                insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (question["ID"], date, input, lastSessionID, question["Question"]))
                 # TODO check insertInput for errors
 
         #lastSessionID = select_from_database_table("SELECT TOP(1) * FROM UserInput ORDER BY ID DESC", [], True)[0]
@@ -1883,16 +1879,13 @@ def chatbot(companyName, assistantID):
 
         fileUploads = request.form.get("fileUploads", default="Error");
         if "Error" not in fileUploads and "None" not in fileUploads:
-            print("fileUploads: ", fileUploads)
             fileUploads = fileUploads.split("||");
-            print("fileUploads: ", fileUploads)
             for i in range(0, len(fileUploads)):
                 try:
                     file = urlopen(fileUploads[i].split(":::")[0])
                 except:
-                    return "Could not get one of the sent files. Please try saving it in another location before uploading it. Thank you."
+                    return "Could not get one of the sent files. Please try saving it in another location before uploading it. We apologise for the inconvenience!"
                 questionID = int(fileUploads[i].split(":::")[1])
-                print("questionID: ", questionID)
                 filename = fileUploads[i].split(":::")[2]
                 filename = date + '_' + str(lastSessionID) + '_' + str(questionID) + '_' + filename
                 #filename = secure_filename(filename)
@@ -1902,12 +1895,14 @@ def chatbot(companyName, assistantID):
                     open(os.path.join(USER_FILES, filename), 'wb').write(file.read())
                     savePath = "static"+os.path.join(USER_FILES, filename).split("static")[len(os.path.join(USER_FILES, filename).split("static")) - 1]
                     savePath = savePath.replace('\\', '/')
-                    for question in questions:
-                        if question[0] == questionID:
-                            questionName = question[2]
+                    questionName = "Error"
+                    for record in questions:
+                        if record["ID"] is questionID:
+                            questionName = record["Question"]
+                    if questionName is "Error":
+                        return "Error in uploading a sent file. We apologise for the inconvenience!"
                     insertInput = insert_into_database_table("INSERT INTO UserInput (QuestionID, Date, Input, SessionID, QuestionString) VALUES (?,?,?,?,?)", (questionID, date, filename+";"+savePath, lastSessionID, questionName))
                     userInputs = query_db("SELECT * FROM UserInput", [])
-                    print(userInputs)
 
         # TODO work out wtf this is actually doing
         nok = request.form.get("numberOfKeywords", default="Error")

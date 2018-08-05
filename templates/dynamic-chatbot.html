@@ -301,6 +301,7 @@
         $("#qAnswers").remove();
         if (question == undefined) {
             question = data[0];
+            questionID = parseInt(question[0].split(";")[2])
         } else if (action.includes("Go to: ")) {
             for (var i = 0; i < data.length; i++) {
                 if (action.split(": ")[1] == data[i][0].split(";")[0]) {
@@ -348,13 +349,10 @@
             showChatBox = false;
         }
         if (questionType == "fileUpload") {
-            console.log("true");
             document.getElementById("textMessage").style.display = "none";
             document.getElementById("fileUploadDiv").style.display = "inline-block";
-            console.log(document.getElementById("textMessage").display);
             showChatBox = true;
         } else {
-            console.log("false");
             document.getElementById("textMessage").style.display = "inline-block";
             document.getElementById("fileUploadDiv").style.display = "none";
         }

@@ -1890,7 +1890,7 @@ def chatbot(companyName, assistantID):
                 try:
                     file = urlopen(fileUploads[i].split(":::")[0])
                 except:
-                    return "Could not get one of the sent files. Please try saving it in another location before uploading it. Thank you."
+                    return "Could not get one of the sent files. Please try saving it in another location before uploading it. We apologise for the inconvenience!"
                 questionID = int(fileUploads[i].split(":::")[1])
                 print("questionID: ", questionID)
                 filename = fileUploads[i].split(":::")[2]

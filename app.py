@@ -596,9 +596,18 @@ def getUserData():
             "surname": session['User']['Surname'],
             "stripeID": session['User']['StripeID'],
             "subID": session['User']['SubID'],
+            "subRemainingDays": getSubRemainingDays(session['User']['SubID'])
 
         }
         return jsonify(userDict)
+
+def getSubRemainingDays(subID = None):
+
+    if subID is None or subID == "":
+        return 0
+
+    
+
 
 
 

@@ -1389,6 +1389,7 @@ def admin_pay(planID):
                 session['UserPlan']['Settings'] = AdvancedPlan
             elif "Ultimate" in getPlanNickname(user['SubID']):
                 session['UserPlan']['Settings'] = UltimatePlan
+            print("Plan changed to: ", session.get('UserPlan')['Settings'])
 
         # TODO check subscription for errors https://stripe.com/docs/api#errors
         except Exception as e:

@@ -3,7 +3,6 @@ from flask import Flask, redirect, request, render_template, jsonify, send_from_
     make_response, g, session, json
 from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
-from contextlib import closing
 from flask_api import status
 from datetime import datetime, timedelta
 from bcrypt import hashpw, gensalt
@@ -19,14 +18,21 @@ from urllib.request import urlopen
 from cryptography.fernet import Fernet
 import urllib.request
 
+
+from utilties.db_services import *
+
+from routes.public import public_router
+
 app = Flask(__name__, static_folder='static')
 
+app.register_blueprint(public_router)
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 DATABASE = APP_ROOT + "/database.db"
+
 PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
 USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
 
@@ -128,13 +134,6 @@ def dynamic_popup(route, botID):
 
 
 # drop down routes.
-@app.route("/", methods=['GET'])
-def indexpage():
-    if request.method == "GET":
-        # query_db("UPDATE Users SET SubID=? WHERE ID=?;", ('dfg', 1))
-        # update_table("UPDATE Users SET SubID=? WHERE ID=?;",
-        #              ['ddd', 1])
-        return render_template("index.html")
 
 @app.route("/setencryptionkey<key>", methods=["GET"])
 def testing(key):
@@ -171,152 +170,6 @@ def testing(key):
     return "Done"
 
 
-@app.route("/features", methods=['GET'])
-def features():
-    if request.method == "GET":
-        return render_template("features.html")
-
-
-@app.route("/dataRetrieval", methods=['GET'])
-def data_retrieval():
-    if request.method == "GET":
-        return render_template("retrieval.html")
-
-
-@app.route("/dataCollection", methods=['GET'])
-def data_collection():
-    if request.method == "GET":
-        return render_template("collection.html")
-
-
-@app.route("/pricing", methods=['GET'])
-def pricing():
-    if request.method == "GET":
-        return render_template("pricing.html")
-
-
-@app.route("/about", methods=['GET'])
-def about():
-    if request.method == "GET":
-        return render_template("about.html")
-
-
-@app.route("/contact", methods=['GET'])
-def contactpage():
-    if request.method == "GET":
-        return render_template("contact.html")
-
-
-@app.route("/login", methods=['GET', 'POST'])
-def login():
-    if request.method == "GET":
-        msg = checkForMessage()
-        return render_template("login.html", msg=msg)
-
-    elif request.method == "POST":
-        session.permanent = True
-        app.permanent_session_lifetime = timedelta(minutes=60)
-
-        email = request.form.get("email", default="Error")
-        password_to_check = request.form.get("password", default="Error")
-
-
-        if email == "Error" or password_to_check == "Error":
-            print("Invalid request: Email or password not received!")
-            return redirectWithMessage("login", "You entered an incorrect username or password.")
-
-        else:
-            email = email.lower()
-            users = query_db("SELECT * FROM Users")
-            # If user exists
-            for user in users:
-                if user["Email"] == email:
-                    password = user['Password']
-                    if hash_password(password_to_check, password) == password:
-
-                        verified = user['Verified']
-
-                        # If credentials are correct and users' account is verified
-                        if verified == "True":
-
-                            messages = dumps({"email": escape(email)})
-
-                            # Set the session for the logged in user
-                            session['User'] = user
-                            session['Logged_in'] = True
-
-                            # Store user assistants if they exist, in the session
-                            assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?;",
-                                                [user['CompanyID']])
-
-                            #Store users access permisions
-                            session['UserAssistants'] =  assistants
-                            permissionsDic = {}
-                            permissions = query_db("SELECT * FROM UserSettings WHERE CompanyID=?", [session.get('User')['CompanyID']])[0]
-                            if "Owner" in session.get('User')['AccessLevel']:
-                                permissions = permissions["AdminPermissions"].split(";")
-                                for perm in permissions:
-                                    if perm:
-                                        permissionsDic[perm.split(":")[0]] = True
-                            else:
-                                permissions = permissions[session.get('User')['AccessLevel']+"Permissions"].split(";")
-                                for perm in permissions:
-                                    if perm:
-                                        if "True" in perm.split(":")[1]:
-                                            permBool = True
-                                        else:
-                                            permBool = False
-                                        permissionsDic[perm.split(":")[0]] = permBool
-                            session['Permissions'] = dict(permissionsDic)
-
-                            # Set user plan e.g. (Basic, Ultimate...)
-                            session['UserPlan'] = {}
-                            session['UserPlan']['Nickname'] =  getPlanNickname(user['SubID'])
-                            if getPlanNickname(user['SubID']) is None:
-                                session['UserPlan']['Settings'] = NoPlan
-                            elif "Basic" in getPlanNickname(user['SubID']):
-                                session['UserPlan']['Settings'] = BasicPlan
-                            elif "Advanced" in getPlanNickname(user['SubID']):
-                                session['UserPlan']['Settings'] = AdvancedPlan
-                            elif "Ultimate" in getPlanNickname(user['SubID']):
-                                session['UserPlan']['Settings'] = UltimatePlan
-
-                            # Test session specific values
-                            print(session)
-
-                            return redirect("/admin/homepage", code=302)
-
-                        else:
-                            return redirectWithMessage("login", "Please verify your account before you log in.")
-            return redirectWithMessage("login", "You entered an incorrect username or password.")
-
-
-@app.route('/logout')
-def logout():
-
-    # Will clear out the session.
-    session.pop('User', None)
-    session.pop('UserAssistants', None)
-    session.pop('Logged_in', False)
-
-    return redirect(url_for('login'))
-
-def getPlanNickname(SubID=None):
-    try:
-        # Get subscription object from Stripe API
-        subscription = stripe.Subscription.retrieve(SubID)
-
-        # Debug
-        print(subscription)
-
-        # Return the subscription item's plan nickname e.g (Basic, Ultimate...)
-        return subscription["items"]["data"][0]["plan"]["nickname"]
-
-    except stripe.error.StripeError as e:
-        return None
-
-
-
 
 # Used to passthrough variables without repeating it in each method call
 # IE assistant information
@@ -345,155 +198,6 @@ def checkForMessageWhenAssistantID():
         except:
             message = " "
         return message
-
-# TODO improve verification
-@app.route("/signup", methods=['GET', 'POST'])
-def signup():
-    if request.method == "GET":
-        msg = checkForMessage()
-        return render_template("signup.html", debug=app.debug, msg=msg)
-    elif request.method == "POST":
-
-
-        email = request.form.get("email", default="Error").lower()
-
-        fullname = request.form.get("fullname", default="Error")
-        accessLevel = "Owner"
-        password = request.form.get("password", default="Error")
-
-        companyName = request.form.get("companyName", default="Error")
-        companySize = request.form.get("companySize", default="0")
-        companyPhoneNumber = request.form.get("phoneNumber", default="Error")
-        websiteURL = request.form.get("websiteURL", default="Error")
-
-
-        if fullname == "Error" or accessLevel == "Error" or email == "Error" or password == "Error" \
-                or companyName == "Error" or websiteURL == "Error":
-            print("Invalid request")
-            return redirectWithMessage("signup", "Error in getting all input information")
-
-
-        else:
-            users = query_db("SELECT * FROM Users")
-            # If user exists
-            for user in users:
-                if user["Email"] == email:
-                    print("Email is already in use!")
-                    return redirectWithMessage("signup", "Email already in use.")
-            try:
-                firstname = fullname.strip().split(" ")[0]
-                surname = fullname.strip().split(" ")[1]
-
-                #debug
-                print(firstname)
-                print(surname)
-
-            except IndexError as e:
-                return redirectWithMessage("signup", "Error in handling names")
-
-            newUser = None
-            newCompany = None
-            newCustomer = None
-
-            # Create a Stripe customer for the new company.
-            newCustomer = stripe.Customer.create(
-                email=email
-            )
-
-            # debug
-            # print(newCustomer)
-
-            hashed_password = hash_password(password)
-            if app.debug:
-                verified = "True"
-            else:
-                verified = "False"
-
-
-
-            # Create a company record for the new user
-            #ENCRYPTION
-            insertCompanyResponse = insert_into_database_table(
-                "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL), encryptVar(companyPhoneNumber)))
-            #insertCompanyResponse = insert_into_database_table(
-             #   "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName, companySize, websiteURL, companyPhoneNumber))
-
-            newCompany = get_last_row_from_table("Companies")
-            # print(newCompany)
-            
-            createUserSettings = insert_into_database_table("INSERT INTO UserSettings('CompanyID') VALUES (?);", (newCompany['ID'],))
-            #TODO validate insertCompanyResponse and createUserSettings
-
-            try:
-
-                # Subscribe to the Basic plan with a trial of 14 days
-                sub = stripe.Subscription.create(
-                customer=newCustomer['id'],
-                items=[{'plan': 'plan_D3lp2yVtTotk2f'}],
-                trial_period_days=14,
-                )
-
-
-                print(sub['items']['data'][0]['plan']['nickname'])
-                # print(sub)
-
-                # Create a user account and link it with the new created company record above
-                #ENCRYPTION
-                newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
-                            (newCompany['ID'], encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(email), hashed_password, newCustomer['id'],
-                            str(verified), sub['id'])
-                            )
-                #newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
-                 #           (newCompany['ID'], firstname, surname, accessLevel, email, hashed_password, newCustomer['id'],
-                  #          str(verified), sub['id'])
-                   #         )
-
-
-
-            except Exception as e:
-                # Clear out when exception
-                if newUser is not None:
-                    query_db("DELETE FROM Users WHERE ID=?", [newUser['ID']])
-                    print("Delete new user")
-
-                if newCompany is not None:
-                    query_db("DELETE FROM Companies WHERE ID=?", [newCompany['ID']])
-                    print("Delete new company")
-
-                print("Delete new user' stripe account")
-                if newCustomer is not None:
-                    cus = stripe.Customer.retrieve(newCustomer['id'])
-                    cus.delete()
-
-                print(e)
-                return redirectWithMessage("signup", "An error occurred and could not subscribe. Please try again!.")
-                # TODO check subscription for errors https://stripe.com/docs/api#errors
-
-
-            # TODO this needs improving
-            msg = Message("Account verification",
-                            sender="thesearchbase@gmail.com",
-                            recipients=[email])
-            payload = email + ";" + companyName
-            link = "https://www.thesearchbase.com/account/verify/"+verificationSigner.dumps(payload)
-            msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png'><br /><h4>Hi,</h4> <p>Thank you for registering with TheSearchbase.</p> <br />  There is just one small step left, visit \
-                        <a href='"+link+"'> this link </a> to verify your account. \
-                        In case the link above doesn't work you can click on the link below. <br /> <br /> " + link + " <br />  <br /> \
-                        We look forward to you, using our platform. <br /> <br />\
-                        Regards, <br /> TheSearchBase Team <br />\
-                        <img src='https://thesearchbase.com/static/email_images/footer_image.png'>"
-            mail.send(msg)
-
-            # sending the registration confirmation email to us
-            msg = Message("A new company has signed up!",
-                            sender="thesearchbase@gmail.com",
-                            recipients=["thesearchbase@gmail.com"])
-            msg.html = "<p>Company name: "+companyName+" has signed up. <br>The admin's details are: <br>Name: "+fullname+" <br>Email: "+email+".</p>"
-            mail.send(msg)
-
-            return render_template('errors/verification.html', msg="Please check your email and follow instructions to verify account and get started.")
-
-
 
 # Data retrieval functions
 def get_company(email):
@@ -847,6 +551,8 @@ def admin_turn_assistant(turnto, assistantID):
         updateBot = update_table("UPDATE Assistants SET Active=? WHERE ID=?;", [turnto, assistantID])
         return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Assistant has been "+message)
 
+
+# Not working temp
 # TODO rewrite
 @app.route("/admin/assistant/<assistantID>/questions", methods=['GET', 'POST'])
 def admin_questions(assistantID):
@@ -1297,6 +1003,19 @@ def is_coupon_valid(coupon="Error"):
         return False
 
 
+def getPlanNickname(SubID=None):
+    try:
+        # Get subscription object from Stripe API
+        subscription = stripe.Subscription.retrieve(SubID)
+
+        # Debug
+        print(subscription)
+
+        # Return the subscription item's plan nickname e.g (Basic, Ultimate...)
+        return subscription["items"]["data"][0]["plan"]["nickname"]
+
+    except stripe.error.StripeError as e:
+        return None
 
 
 @app.route("/admin/check-out/<planID>", methods=['GET', 'POST'])
@@ -2299,6 +2018,7 @@ def sendMarketingEmail():
         mail.send(msg)
         return render_template("index.html")
 
+# Not working temp
 def select_from_database_table(sql_statement, array_of_terms=None, multi=False, database=DATABASE):
     data = "Error"
     conn = None
@@ -2351,14 +2071,14 @@ def select_from_database_table(sql_statement, array_of_terms=None, multi=False, 
 
 
 
-
+# Not working temp
 def get_last_row_from_table(table, database=DATABASE):
     return query_db("SELECT * FROM " + table + " WHERE ROWID IN ( SELECT max( ROWID ) FROM " + table +" );", one=True)
 
 
 
 
-
+# Not working temp
 def insert_into_database_table(sql_statement, tuple_of_terms, database=DATABASE):
     msg = "Error"
     conn = None
@@ -2381,7 +2101,8 @@ def insert_into_database_table(sql_statement, tuple_of_terms, database=DATABASE)
         print(msg)
         return msg
 
-
+# Not working
+# should be deleted
 def update_table(sql_statement, array_of_terms, database=DATABASE):
     msg = "Error"
     conn = None
@@ -2402,7 +2123,7 @@ def update_table(sql_statement, array_of_terms, database=DATABASE):
         print(msg)
         return msg
 
-
+# Not working
 def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
     msg = "Error"
     conn = None
@@ -2425,79 +2146,6 @@ def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
             conn.close()
         print(msg)
         return msg
-
-
-# ====\ Database (Connection & Initialisation) /====
-
-# Connects to the specific database.
-def connect_db():
-    return sqlite3.connect(DATABASE)
-
-
-# Initializes the database with test data while in debug mode.
-def init_db():
-    with closing(connect_db()) as db:
-        with app.open_resource(APP_ROOT + '/sql/schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
-        print("Database Initialized...")
-
-        if app.debug:
-            with app.open_resource(APP_ROOT + '/sql/devseed.sql', mode='r') as f:
-                db.cursor().executescript(f.read())
-                # Create and store a hashed password for "test" user
-                hash = hash_password("test")
-                update_table("UPDATE Users SET Password=? WHERE ID=?", [hash, 1])
-            db.commit()
-            print("Test Data Inserted...")
-
-    print("Database Initialized")
-
-
-# facilitate querying data from the database.
-def query_db(query, args=(), one=False):
-    cur = g.db.execute(query, args)
-    rv = [dict((cur.description[idx][0], value)
-               for idx, value in enumerate(row)) for row in cur.fetchall()]
-    if "SELECT" in query:
-        for record in rv:
-            for key, value in record.items():
-                if type(value) == bytes and "Password" not in key:
-                    record[key] = encryption.decrypt(value).decode()
-    return (rv[0] if rv else None) if one else rv
-
-
-def insert_db(table, fields=(), values=()):
-    # g.db is the database connection
-    cur = g.db.cursor()
-    query = 'INSERT INTO %s (%s) VALUES (%s)' % (
-        table,
-        ', '.join(fields),
-        ', '.join(['?'] * len(values))
-    )
-    cur.execute(query, values)
-    g.db.commit()
-    row = query_db("SELECT * FROM " + table + " WHERE ID=?", [cur.lastrowid], one=True)
-    cur.close()
-    return row
-
-
-def count_db(table, condition="", args=()):
-    cur = g.db.execute("SELECT count(*) FROM "+table+" "+condition, args)
-    return cur.fetchall()[0][0]
-
-
-#encryption function to save typing
-def encryptVar(var):
-    return encryption.encrypt(var.encode())
-
-# Get connection when no requests e.g Pyton REPL.
-def get_connection():
-    db = getattr(g, '_db', None)
-    if db is None:
-        db = g._db = connect_db()
-    return db
-
 
 @app.before_request
 def before_request():

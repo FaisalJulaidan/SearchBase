@@ -1804,25 +1804,31 @@ def chatbot(companyID, assistantID):
             # MONTHLY UPDATE
             date = datetime.now().strftime("%Y-%m")
             currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?,AssitantID=?;", [date, assistantID])
-            if currentStats is None or "Error" in currentStats or not currentStats:
+            print("currentStats: ", currentStats)
+            if currentStats is "Error":
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            if currentStats is None or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
                     (assistantID, date, 1, 0, 0))
                 # TODO check newStats for errors
             else:
-                updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;", [currentStats[3] + 1, assistantID, date])
+                updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=?,Date=?;", [currentStats[3] + 1, assistantID, date])
 
             # WEEKLY UPDATE
             dateParts = datetime.now().strftime("%Y-%m-%d").split("-")
             date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
             currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?,AssitantID=?;", [date, assistantID])
-            if currentStats is None or "Error" in currentStats or not currentStats:
+            print("currentStats: ", currentStats)
+            if currentStats is "Error":
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            if currentStats is None or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
                     (assistantID, date, 1, 0, 0))
                 # TODO check newStats for errors
             else:
-                updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=? AND Date=?;",
+                updatedStats = update_table("UPDATE Statistics SET Opened=? WHERE AssistantID=?,Date=?;",
                                             [currentStats[3] + 1, assistantID, date])
             return render_template("dynamic-chatbot.html", data=questionsAndAnswers, user="chatbot/" + str(companyID) + "/" + str(assistantID),
                                    message=message)

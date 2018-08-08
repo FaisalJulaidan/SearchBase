@@ -1804,7 +1804,6 @@ def chatbot(companyID, assistantID):
             # MONTHLY UPDATE
             date = datetime.now().strftime("%Y-%m")
             currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=? AND AssistantID=?;", [date, assistantID])
-            print("currentStats: ", currentStats)
             if currentStats is "Error":
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             if currentStats is None or not currentStats:
@@ -1819,7 +1818,6 @@ def chatbot(companyID, assistantID):
             dateParts = datetime.now().strftime("%Y-%m-%d").split("-")
             date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
             currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=? AND AssistantID=?;", [date, assistantID])
-            print("currentStats: ", currentStats)
             if currentStats is "Error":
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             if currentStats is None or not currentStats:

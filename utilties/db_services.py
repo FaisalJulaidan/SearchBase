@@ -6,10 +6,19 @@ from flask import Blueprint
 from .helpers import *
 
 from app import app
+from models import Company
 
 APP_ROOT = os.path.dirname(os.path.dirname(__file__))
 
 DATABASE = APP_ROOT + "/database.db"
+
+def addCompany():
+    print('hello world')
+    # companyObject = Company(Name="xyz", Size="1-10", URL="www.test.com")
+    # db.session.add(companyObject)
+    # db.session.commit()
+
+    # print(Company.query.all())
 
 
 # ====\ Database CRUD Operations /====

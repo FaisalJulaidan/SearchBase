@@ -2,11 +2,31 @@ from flask import Blueprint, render_template, request,session
 from utilties.helpers import hash_password, checkForMessage
 
 
+from app import db
+from models import Company, User
+
 public_router = Blueprint('public_router',__name__,template_folder="../templates")
 
 @public_router.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
+        # create a new company
+        # make a function in db_services that's creates
+        db.create_all()
+
+        companyObject = Company(Name="xyz",Size="1-10",URL="www.test.com")
+        db.session.add(companyObject)
+
+        user1 = User(Firstname="a",Surname="b",AccessLevel="owener",Email="a1@a.com",Password="abc",StripeID="ABC1",Verified="True",SubID="1234",company=companyObject)
+        # user2 = User(Firstname="a",Surname="b",AccessLevel="user",Email="a2@a.com",Password="abc",StripeID="ABC2",Verified="True",SubID="1235",company=companyObject)
+        # user3 = User(Firstname="a",Surname="b",AccessLevel="user",Email="a3@a.com",Password="abc",StripeID="ABC3",Verified="True",SubID="1236",company=companyObject)
+        # user4 = User(Firstname="a",Surname="b",AccessLevel="user",Email="a4@a.com",Password="abc",StripeID="ABC4",Verified="True",SubID="1237",company=companyObject)
+        db.session.add(user1)
+        db.session.commit()
+
+        print(companyObject.Users)
+
+        # print(Company.query.all())
         return render_template("index.html")
 
 

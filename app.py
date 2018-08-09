@@ -2,6 +2,7 @@
 from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, \
     make_response, g, session, json
 from flask_mail import Mail, Message
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from flask_api import status
 from datetime import datetime, timedelta
@@ -21,11 +22,21 @@ import urllib.request
 
 from utilties.db_services import *
 
-from routes.public import public_router
 
 app = Flask(__name__, static_folder='static')
 
+app.config.from_object('config.DevelopmentConfig')
+db = SQLAlchemy(app)
+
+from routes.public import public_router
 app.register_blueprint(public_router)
+
+from routes.admin.index import homepage_router,profile_router,  admin_api
+app.register_blueprint(homepage_router)
+app.register_blueprint(profile_router)
+app.register_blueprint(admin_api)
+
+
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
@@ -85,27 +96,27 @@ def allowed_image_file(filename):
 
 
 # code to ensure user is logged in
-@app.before_request
-def before_request():
-    print(encryption)
-    theurl = str(request.url_rule)
-    restrictedRoutes = ['/admin', 'admin/homepage']
-    # If the user try to visit one of the restricted routes without logging in he will be redirected
-    if any(route in theurl for route in restrictedRoutes) and not session.get('Logged_in', False):
-        return redirectWithMessage("login", "Please log in first")
-    #if on admin route
-    if any(route in theurl for route in restrictedRoutes):
-        #Check user permissions as user type
-        if not session['Permissions']["EditChatbots"] and "/admin/assistant" in theurl:
-            return redirect("/admin/homepage", code=302)
-        if not session['Permissions']["EditUsers"] and "/admin/users" in theurl:
-            return redirect("/admin/homepage", code=302)
-        if not session['Permissions']["AccessBilling"] and "/admin/assistant/" in theurl:
-            return redirect("/admin/homepage", code=302)
-
-        #Check user plan permissions
-        print("PLAN:", session.get('UserPlan', []))
-    
+# @app.before_request
+# def before_request():
+#     print(encryption)
+#     theurl = str(request.url_rule)
+#     restrictedRoutes = ['/admin', 'admin/homepage']
+#     # If the user try to visit one of the restricted routes without logging in he will be redirected
+#     if any(route in theurl for route in restrictedRoutes) and not session.get('Logged_in', False):
+#         return redirectWithMessage("login", "Please log in first")
+#     #if on admin route
+#     if any(route in theurl for route in restrictedRoutes):
+#         #Check user permissions as user type
+#         if not session['Permissions']["EditChatbots"] and "/admin/assistant" in theurl:
+#             return redirect("/admin/homepage", code=302)
+#         if not session['Permissions']["EditUsers"] and "/admin/users" in theurl:
+#             return redirect("/admin/homepage", code=302)
+#         if not session['Permissions']["AccessBilling"] and "/admin/assistant/" in theurl:
+#             return redirect("/admin/homepage", code=302)
+#
+#         #Check user plan permissions
+#         print("PLAN:", session.get('UserPlan', []))
+#
 
 def checkAssistantID(assistantID):
     assistantRecord = query_db("SELECT * FROM Assistants WHERE ID=?", [assistantID,], True)
@@ -113,6 +124,10 @@ def checkAssistantID(assistantID):
         return redirect("/admin/homepage", code=302)
     elif session.get('User')['CompanyID'] is not assistantRecord['CompanyID']:
         return redirect("/admin/homepage", code=302)
+
+
+# @app.route("/testdb", methods=['GET'])
+# def testdb():
 
 
 # TODO jackassify it
@@ -174,7 +189,6 @@ def testing(key):
 # Used to passthrough variables without repeating it in each method call
 # IE assistant information
 def render(template, **context):
-
     if session.get('Logged_in', False):
         return render_template(template, debug=app.debug, assistants=session.get('UserAssistants', []), **context)
     return render_template(template, debug=app.debug, **context)
@@ -235,131 +249,8 @@ def get_assistants(email):
     return "Error"
 
 
-def get_total_statistics(num, email):
-    try:
-        assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [get_company(email)[0]])
-        statistics = select_from_database_table("SELECT * FROM Statistics WHERE AssistantID=?;", [assistant[0]])
-        total = 0
-        try:
-            for c in statistics[num]:
-                total += int(c)
-        except:
-            total = statistics[num]
-    except:
-        total = 0
-    return total
 
 
-# Admin pages
-@app.route("/admin/homepage", methods=['GET'])
-def admin_home():
-    if request.method == "GET":
-        sendEmail = False
-        email = session.get('User')['Email'] 
-        statistics = [get_total_statistics(3, email), get_total_statistics(5, email)]
-        if sendEmail:
-            assistants = get_assistants(email)
-            if assistants == "Error":
-                return render_template("admin/main.html", stats=statistics, assistantIDs=[])
-            assistantIDs = []
-            for assistant in assistants:
-                assistantIDs.append(assistant[0])
-            return render("admin/main.html", stats=statistics, assistantIDs=assistantIDs)
-        else:
-            return render("admin/main.html", stats=statistics)
-
-#data for the user which to be displayed on every admin page
-@app.route("/admin/getadminpagesdata", methods=['POST'])
-def adminPagesData():
-    if request.method == "POST":
-        email = session.get('User')['Email']
-        users = query_db("SELECT * FROM Users")
-        # If user exists
-        for user in users:
-            if user["Email"] == email:
-                returnString = ""
-                permissions = ""
-                for key,value in session['Permissions'].items():
-                    permissions+= key + ":" + str(value) + ";"
-                planSettings = ""
-                for key,value in session['UserPlan']['Settings'].items():
-                    planSettings += key + ":" + str(value) + ";"
-                return user["Firstname"] + "&&&" + permissions + "&&&" + planSettings
-        return "wait...Who are you?"
-
-
-
-#data for the user which to be displayed on every admin page
-@app.route("/admin/userData", methods=['GET'])
-def getUserData():
-    if request.method == "GET":
-        userDict = {
-            "id": session['User']['ID'],
-            "email": session['User']['Email'],
-            "firstname": session['User']['Firstname'],
-            "surname": session['User']['Surname'],
-            "stripeID": session['User']['StripeID'],
-            "subID": session['User']['SubID'],
-
-        }
-        return jsonify(userDict)
-
-
-
-@app.route("/admin/profile", methods=['GET', 'POST'])
-def profilePage():
-    if request.method == "GET":
-        message = checkForMessage()
-        email = session.get('User')['Email']
-        users = query_db("SELECT * FROM Users")
-        user = "Error"
-        # If user exists
-        for record in users:
-            if record["Email"] == email:
-                user = record
-        if "Error" in user:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error in finding user!")
-        company = query_db("SELECT * FROM Companies WHERE ID=?;", [user["CompanyID"]])
-        if company is None or company is "None" or company is "Error":
-            company="Error in finding company"
-        print(company)
-        print(user)
-        print(email)
-        return render_template("admin/profile.html", user=user, email=email, company=company[0], message=message)
-
-    elif request.method == "POST":
-        curEmail = session.get('User')['Email']
-        names = request.form.get("names", default="Error")
-        newEmail = request.form.get("email", default="error").lower()
-        companyName = request.form.get("companyName", default="Error")
-        companyURL = request.form.get("companyURL", default="error").lower()
-        if names != "Error" and newEmail != "error" and companyURL != "error" and companyName != "Error":
-            names = names.split(" ")
-            name1 = names[0]
-            name2 = names[1]
-            users = query_db("SELECT * FROM Users")
-            # If user exists
-            for user in users:
-                if user["Email"] == curEmail:
-                    #TODO check if they worked
-                    #ENCRYPTION
-                    updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [encryptVar(name1),encryptVar(name2),encryptVar(newEmail),user["ID"]])
-                    #updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [name1,name2,newEmail,user["ID"]])
-                    companyID = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?;", [user["ID"]])
-                    updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0]])
-                    #updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [companyName,companyURL,companyID[0]])
-                    users = query_db("SELECT * FROM Users")
-                    user = "Error"
-                    for record in users:
-                        if record["Email"] == newEmail:
-                            user = record
-                    if "Error" in user:
-                        print("Error in updating Company or Profile Data")
-                        return redirect("/admin/profile", code=302)
-                    session['User'] = user
-                    return redirect("/admin/profile", code=302)
-        print("Error in updating Company or Profile Data")
-        return redirect("/admin/profile", code=302)
 
 
 @app.route("/getpopupsettings/<assistantID>", methods=['GET'])
@@ -2229,13 +2120,14 @@ def not_implemented(e):
 #         return self.comp.get(k)
 
 
+
 if __name__ == "__main__":
 
     print("Run the server...")
 
     # Create the schema only in development mode
     if app.debug:
-        init_db()
+        # init_db()
         # For Development
         app.config.from_object('config.DevelopmentConfig')
         print("Debug Mode...")
@@ -2244,12 +2136,11 @@ if __name__ == "__main__":
         app.config.from_object('config.BaseConfig')
         print("Production Mode...")
 
+    # db = SQLAlchemy(app)
+
 
     # Print app configuration
     # print(app.config)
     # Run the app server
     app.run()
-
-
-
 

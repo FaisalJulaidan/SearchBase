@@ -8,7 +8,8 @@ import sqlalchemy.exc
 
 from .helpers import *
 
-from models import Company,User, db, Callback
+from models import Callback,\
+    Company,User, db, Role, Permissions
 
 
 APP_ROOT = os.path.dirname(os.path.dirname(__file__))
@@ -16,14 +17,28 @@ DATABASE = APP_ROOT + "/database.db"
 
 
 class db_services_class:
+
+    def addCompanyAndUserAndRole(self):
+        db.session.add(Role(Name="Admin"))
+        db.session.add(Role(Name="User"))
+        self.addCompany()
+        self.addUser()
+        # db.session.add(Permissions(EditChatbots=True,EditUsers=True,AccessBilling=False))  # Permissions.ID = 1
+        # return _safeCommit()
+
     def addCompany():
         companyObject = Company(Name="xyz", Size="1-10", URL="www.test.com")
         db.session.add(companyObject)
         return _safeCommit()
+        # print(companyObject.Users)
 
     def addUser():
         companyObject = Company.query.get(1)
-        user = User(Firstname="abd",Surname="aa",AccessLevel="owner",Email="aa@aa.com",Password="123",StripeID="12",Verified="true",SubID="123",Company=companyObject)
+        roleObject = Role.query.filter(Role.Name.like("Admin")).first()
+
+        user = User(Firstname="abd",Surname="aa",Email="aa@aa.com",Password="123",
+                    StripeID="12",Verified="true",SubID="123",
+                    Role=roleObject)
         db.session.add(user)
         return _safeCommit()
 

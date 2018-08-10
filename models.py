@@ -12,6 +12,7 @@ class Company(db.Model):
 
     # Relationships:
     Users = db.relationship('User', back_populates='Company')
+    Assistants = db.relationship('Assistant', back_populates='Company')
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)
@@ -26,7 +27,7 @@ class User(db.Model):
     Password = db.Column(db.String(128),nullable=False)
     StripeID = db.Column(db.String(128), default=None, unique=True)
     SubID = db.Column(db.String(64), default=None, unique=True)
-    Verified = db.Column(db.String(64), nullable=False, default=False)
+    Verified = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID'), nullable=False)
@@ -59,17 +60,107 @@ class Assistant(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Nickname = db.Column(db.String(128),nullable=False)
-    Route = db.Column(db.String(64), nullable=False)
-    Message = db.Column(db.String(64), nullable=False)
-    SecondsUntilPopup = db.Column(db.String(64), nullable=False, unique=True)
-    Active = db.Column(db.String(64), nullable=False, default=False)
+    Route = db.Column(db.String(64), unique=True)
+    Message = db.Column(db.String(500), nullable=False)
+    SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0)
+    Active = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID'), nullable=False)
+    Company = db.relationship('Company', back_populates='Assistants')
+
+    Products = db.relationship('Product', back_populates='Assistant')
+    Statistics = db.relationship('Statistics', back_populates='Assistant')
+    Questions = db.relationship('Question', back_populates='Assistant')
+
 
     def __repr__(self):
-        return '<Assistant {}>'.format(self.Email)
+        return '<Assistant {}>'.format(self.Nickname)
 
+
+class Product(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    ProductID = db.Column(db.Integer, nullable=False)
+    Name = db.Column(db.String(128), nullable=False)
+    Brand = db.Column(db.String(128), nullable=False)
+    Model = db.Column(db.String(128), nullable=False)
+    Price = db.Column(db.String(128), nullable=False)
+    Keywords = db.Column(db.String(128), nullable=False)
+    Discount = db.Column(db.String(128), nullable=False)
+    URL = db.Column(db.String(), nullable=False)
+
+    # Relationships:
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='Products')
+
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID'), nullable=False)
+    Company = db.relationship('Company', back_populates='Assistants')
+
+    def __repr__(self):
+        return '<Product {}>'.format(self.Name)
+
+
+class Statistics(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(128), nullable=False)
+    Date = db.Column(db.DateTime, nullable=False)
+    Opened = db.Column(db.Boolean, nullable=False, default=False)
+    QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
+    ProductsReturned = db.Column(db.Integer, nullable=False, default=0)
+
+    # Relationships:
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='Statistics')
+
+    def __repr__(self):
+        return '<Statistics {}>'.format(self.Name)
+
+
+class Question(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Question = db.Column(db.String(), nullable=False)
+    Type = db.Column(db.String(), nullable=False)
+
+    # Relationships:
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='Questions')
+
+    Answers = db.relationship('Answer', back_populates='Question')
+
+    def __repr__(self):
+        return '<Question {}>'.format(self.Question)
+
+
+class Answer(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Answer = db.Column(db.String(), nullable=False)
+    Keyword = db.Column(db.String(), nullable=False)
+    Action = db.Column(db.String(), nullable=False, default='Next Question by Order')
+    TimesClicked = db.Column(db.Integer, nullable=False, default=0)
+
+    # Relationships:
+    QuestionID = db.Column(db.Integer, db.ForeignKey('question.ID'), nullable=False)
+    Question = db.relationship('Question', back_populates='Answers')
+
+    def __repr__(self):
+        return '<Answer {}>'.format(self.Answer)
+
+
+class UserInput(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Answer = db.Column(db.String(), nullable=False)
+    Keyword = db.Column(db.String(), nullable=False)
+    Action = db.Column(db.String(), nullable=False, default='Next Question by Order')
+    TimesClicked = db.Column(db.Integer, nullable=False, default=0)
+
+    # Relationships:
+    QuestionID = db.Column(db.Integer, db.ForeignKey('question.ID'), nullable=False)
+    Question = db.relationship('Question', back_populates='Questions')
+
+    def __repr__(self):
+        return '<Question {}>'.format(self.Name)
 
 class Callback:
     def __init__(self, success, message):

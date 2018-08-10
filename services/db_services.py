@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 import sqlalchemy.exc
 
-from .helpers import *
+from utilties.helpers import *
 
 from models import Callback,\
     Company,User, db, Role
@@ -17,8 +17,6 @@ DATABASE = APP_ROOT + "/database.db"
 
 
 class db_services_class:
-
-
     # def addCompanyAndUserAndRole(self):
     #     db.session.add(Role(Name="Admin", EditChatbots=True, EditUsers=True, AccessBilling=False))
     #     db.session.add(Role(Name="User", EditChatbots=True, EditUsers=True, AccessBilling=False))

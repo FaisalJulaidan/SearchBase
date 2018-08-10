@@ -13,7 +13,6 @@ class Company(db.Model):
     # Relationships:
     Users = db.relationship('User', back_populates='Company')
 
-
     def __repr__(self):
         return '<Company {}>'.format(self.Name)
 
@@ -70,20 +69,6 @@ class Assistant(db.Model):
 
     def __repr__(self):
         return '<Assistant {}>'.format(self.Email)
-
-
-
-
-#
-# class Permissions(db.Model):
-#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-#
-#     EditChatbots = db.Column(db.Boolean(), nullable=False, default=False)
-#     EditUsers = db.Column(db.Boolean(), nullable=False, default=False)
-#     AccessBilling = db.Column(db.Boolean(), nullable=False, default=False)
-#
-#     def __repr__(self):
-#         return '<Permissions {}>'.format(self.EditChatbots)
 
 
 class Callback:

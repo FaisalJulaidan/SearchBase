@@ -2,17 +2,14 @@ from datetime import timedelta
 
 from flask import Blueprint, render_template, request, session
 from utilties.helpers import hash_password, checkForMessage, redirectWithMessage
-from utilties.db_services import db_services_class
-from utilties.company_services import CompanyServices
-from models import Callback
 
 public_router = Blueprint('public_router',__name__,template_folder="../templates")
 
 @public_router.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
-        db_services_class.addCompanyAndUserAndRole(db_services_class)
-        print(CompanyServices.getByID(1).Users)
+        # db_services_class.addCompanyAndUserAndRole(db_services_class)
+        # print(CompanyServices.getByID(1).Users)
         # callback: Callback = db_services_class.addCompany()
         # print(callback.Success, callback.Message)
         #

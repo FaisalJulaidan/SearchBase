@@ -26,3 +26,10 @@ def checkForMessageWhenAssistantID():
 
 def redirectWithMessage(function, message):
     return redirect(url_for("."+function, messages=message))
+
+def checkForMessage():
+    args = request.args
+    msg=" "
+    if len(args) > 0:
+        msg = args['messages']
+    return msg

@@ -22,16 +22,16 @@ def admin_home():
         else:
             return render_template("admin/main.html") #,stats=statistics)
 
-# def get_total_statistics(num:int, email:str):
-#     try:
-#         assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;",[get_company(email)[0]])
-#         statistics = select_from_database_table("SELECT * FROM Statistics WHERE AssistantID=?;", [assistant[0]])
-#         total = 0
-#         try:
-#             for c in statistics[num]:
-#                 total += int(c)
-#         except:
-#             total = statistics[num]
-#     except:
-#         total = 0
-#     return total
+def get_total_statistics(num:int, email:str):
+    try:
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;",[get_company(email)[0]])
+        statistics = select_from_database_table("SELECT * FROM Statistics WHERE AssistantID=?;", [assistant[0]])
+        total = 0
+        try:
+            for c in statistics[num]:
+                total += int(c)
+        except:
+            total = statistics[num]
+    except:
+        total = 0
+    return total

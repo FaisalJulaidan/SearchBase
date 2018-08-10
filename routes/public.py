@@ -11,11 +11,12 @@ public_router = Blueprint('public_router',__name__,template_folder="../templates
 @public_router.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
-        callback: Callback = db_services_class.addCompany()
-        print(callback.Success, callback.Message)
-
-        callback: Callback = db_services_class.addUser()
-        print(callback.Success, callback.Message)
+        db_services_class.addCompanyAndUserAndRole(db_services_class)
+        # callback: Callback = db_services_class.addCompany()
+        # print(callback.Success, callback.Message)
+        #
+        # callback: Callback = db_services_class.addUser()
+        # print(callback.Success, callback.Message)
         return render_template("index.html")
 
 

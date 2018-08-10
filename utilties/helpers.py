@@ -22,3 +22,7 @@ def checkForMessageWhenAssistantID():
         except:
             message = " "
         return message
+
+
+def redirectWithMessage(function, message):
+    return redirect(url_for("."+function, messages=message))

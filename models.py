@@ -1,5 +1,5 @@
-from app import db
-
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
 
 class Company(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
@@ -28,3 +28,6 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.Email)
+
+
+

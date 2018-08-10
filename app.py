@@ -19,23 +19,18 @@ from urllib.request import urlopen
 from cryptography.fernet import Fernet
 import urllib.request
 
-
-from utilties.db_services import *
+from routes.public import public_router
+from routes.admin.index import homepage_router,profile_router,  admin_api
 
 
 app = Flask(__name__, static_folder='static')
 
-app.config.from_object('config.DevelopmentConfig')
-db = SQLAlchemy(app)
+from models import db
 
-from routes.public import public_router
 app.register_blueprint(public_router)
-
-from routes.admin.index import homepage_router,profile_router,  admin_api
 app.register_blueprint(homepage_router)
 app.register_blueprint(profile_router)
 app.register_blueprint(admin_api)
-
 
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
@@ -2038,9 +2033,9 @@ def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
         print(msg)
         return msg
 
-@app.before_request
-def before_request():
-    g.db = connect_db()
+# @app.before_request
+# def before_request():
+#     g.db = connect_db()
 
 
 @app.teardown_request
@@ -2127,13 +2122,21 @@ if __name__ == "__main__":
 
     # Create the schema only in development mode
     if app.debug:
-        # init_db()
         # For Development
         app.config.from_object('config.DevelopmentConfig')
+
+        db.init_app(app)
+        app.app_context().push()
+
+        db.drop_all()
+        db.create_all()
+
         print("Debug Mode...")
     else:
         # For Production
         app.config.from_object('config.BaseConfig')
+        db.init_app(app)
+        app.app_context().push()
         print("Production Mode...")
 
     # db = SQLAlchemy(app)

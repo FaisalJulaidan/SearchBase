@@ -6,5 +6,5 @@ class UserServices:
     def getByID(id):
         return User.query.get(id)
 
-    def getUsers():
+    def getAll():
         return User.query.get()

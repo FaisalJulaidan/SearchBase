@@ -1,13 +1,16 @@
 function includeHTML() {
+    console.log("Starting chatbot process")
     var z, i, elmnt, file, xhttp;
     /*loop through a collection of all HTML elements:*/
-    z = document.getElementsByTagName("*");
+    z = document.getElementsByTagName("div");
     for (i = 0; i < z.length; i++) {
         elmnt = z[i];
         /*search for elements with a certain atrribute:*/
         file = elmnt.getAttribute("w3-include-html");
+        console.log(file);
         if (file) {
             /*make an HTTP request using the attribute value as the file name:*/
+            console.log("Getting chatbot from TheSearchBase");
             xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4) {
@@ -23,6 +26,7 @@ function includeHTML() {
             /*exit the function:*/
             return;
         } else {
+            console.log("Initialising chatbot");
             LoadChatbot();
         }
     }

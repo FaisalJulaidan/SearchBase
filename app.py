@@ -27,6 +27,23 @@ app = Flask(__name__, static_folder='static')
 
 from models import db
 
+
+#################################
+#      THIS IS TO BE ABLE       #
+#     TO DEBUG FROM PYCHARM     #
+#    IN PRODUCTION THIS CODE    #
+#      WILL BE REMOVED          #
+#################################
+
+app.config.from_object('config.DevelopmentConfig')
+
+db.init_app(app)
+app.app_context().push()
+
+db.drop_all()
+db.create_all()
+
+#################################
 app.register_blueprint(public_router)
 app.register_blueprint(homepage_router)
 app.register_blueprint(profile_router)
@@ -2115,35 +2132,35 @@ def not_implemented(e):
 #         return self.comp.get(k)
 
 
-
-if __name__ == "__main__":
-
-    print("Run the server...")
-
-    # Create the schema only in development mode
-    if app.debug:
-        # For Development
-        app.config.from_object('config.DevelopmentConfig')
-
-        db.init_app(app)
-        app.app_context().push()
-
-        db.drop_all()
-        db.create_all()
-
-        print("Debug Mode...")
-    else:
-        # For Production
-        app.config.from_object('config.BaseConfig')
-        db.init_app(app)
-        app.app_context().push()
-        print("Production Mode...")
-
-    # db = SQLAlchemy(app)
-
-
-    # Print app configuration
-    # print(app.config)
-    # Run the app server
-    app.run()
-
+#
+# if __name__ == "__main__":
+#
+#     print("Run the server...")
+#
+#     # Create the schema only in development mode
+#     if app.debug:
+#         # For Development
+#         app.config.from_object('config.DevelopmentConfig')
+#
+#         db.init_app(app)
+#         app.app_context().push()
+#
+#         db.drop_all()
+#         db.create_all()
+#
+#         print("Debug Mode...")
+#     else:
+#         # For Production
+#         app.config.from_object('config.BaseConfig')
+#         db.init_app(app)
+#         app.app_context().push()
+#         print("Production Mode...")
+#
+#     # db = SQLAlchemy(app)
+#
+#
+#     # Print app configuration
+#     # print(app.config)
+#     # Run the app server
+#     app.run()
+#

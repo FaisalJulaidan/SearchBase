@@ -1,16 +1,17 @@
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
+
 class Company(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(80), nullable=False, unique=True)
     Size = db.Column(db.String(60))
     PhoneNumber = db.Column(db.String(30))
     URL = db.Column(db.String(250), nullable=False)
-    Users = db.relationship('User', backref='company')
+    Users = db.relationship('User', backref='Company')
 
     def __repr__(self):
-        return '<User {}>'.format(self.Name)
+        return '<Company {}>'.format(self.Name)
 
 
 class User(db.Model):
@@ -30,4 +31,8 @@ class User(db.Model):
         return '<User {}>'.format(self.Email)
 
 
-
+class Callback:
+    def __init__(self, success,message):
+        self.Success:bool = success
+        self.Message:str = message
+    pass

@@ -4,24 +4,30 @@ from contextlib import closing
 from flask import Blueprint
 from flask_sqlalchemy import SQLAlchemy
 
+import sqlalchemy.exc
+
 from .helpers import *
 
-from models import Company,db
+from models import Company,User, db, Callback
 
 
 APP_ROOT = os.path.dirname(os.path.dirname(__file__))
 DATABASE = APP_ROOT + "/database.db"
 
+
 class db_services_class:
     def addCompany():
         companyObject = Company(Name="xyz", Size="1-10", URL="www.test.com")
         db.session.add(companyObject)
-        db.session.commit()
+        return _safeCommit()
 
-        print(Company.query.all())
+    def addUser():
+        companyObject = Company.query.get(1)
+        user = User(Firstname="abd",Surname="aa",AccessLevel="owner",Email="aa@aa.com",Password="123",StripeID="12",Verified="true",SubID="123",Company=companyObject)
+        db.session.add(user)
+        return _safeCommit()
 
     # ====\ Database CRUD Operations /====
-
     def update(sql_statement, array_of_terms):
         msg = "Error"
         conn = None
@@ -111,3 +117,11 @@ class db_services_class:
             db = g._db = connect_db()
         return db
 
+
+def _safeCommit():
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.SQLAlchemyError as exc:
+        return (Callback(False, "Error: "+exc.orig))
+
+    return (Callback(True, None))

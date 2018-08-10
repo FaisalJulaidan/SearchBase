@@ -2,121 +2,112 @@ import os
 import sqlite3
 from contextlib import closing
 from flask import Blueprint
+from flask_sqlalchemy import SQLAlchemy
 
 from .helpers import *
 
-from app import app
-from models import Company
+from models import Company,db
+
 
 APP_ROOT = os.path.dirname(os.path.dirname(__file__))
-
 DATABASE = APP_ROOT + "/database.db"
 
-def addCompany():
-    print('hello world')
-    # companyObject = Company(Name="xyz", Size="1-10", URL="www.test.com")
-    # db.session.add(companyObject)
-    # db.session.commit()
+class db_services_class:
+    def addCompany():
+        companyObject = Company(Name="xyz", Size="1-10", URL="www.test.com")
+        db.session.add(companyObject)
+        db.session.commit()
 
-    # print(Company.query.all())
+        print(Company.query.all())
 
+    # ====\ Database CRUD Operations /====
 
-# ====\ Database CRUD Operations /====
+    def update(sql_statement, array_of_terms):
+        msg = "Error"
+        conn = None
+        try:
+            conn = sqlite3.connect(database)
+            cur = conn.cursor()
+            cur.execute(sql_statement, array_of_terms)
+            conn.commit()
+            msg = "Record successfully updated."
+        except sqlite3.ProgrammingError as e:
+            msg = "Error in update statement" + str(e)
+        except sqlite3.OperationalError as e:
+            msg = "Error in update operation" + str(e)
+        finally:
+            if conn is not None:
+                conn.rollback()
+                conn.close()
+            print(msg)
+            return msg
 
-def update(sql_statement, array_of_terms):
-    msg = "Error"
-    conn = None
-    try:
-        conn = sqlite3.connect(database)
-        cur = conn.cursor()
-        cur.execute(sql_statement, array_of_terms)
-        conn.commit()
-        msg = "Record successfully updated."
-    except sqlite3.ProgrammingError as e:
-        msg = "Error in update statement" + str(e)
-    except sqlite3.OperationalError as e:
-        msg = "Error in update operation" + str(e)
-    finally:
-        if conn is not None:
-            conn.rollback()
-            conn.close()
-        print(msg)
-        return msg
+    def get(query, args=(), one=False):
+        cur = g.db.execute(query, args)
+        rv = [dict((cur.description[idx][0], value)
+                   for idx, value in enumerate(row)) for row in cur.fetchall()]
+        if "SELECT" in query:
+            for record in rv:
+                for key, value in record.items():
+                    if type(value) == bytes and "Password" not in key:
+                        record[key] = encryption.decrypt(value).decode()
+        return (rv[0] if rv else None) if one else rv
 
-# facilitate querying data from the database.
-def get(query, args=(), one=False):
-    cur = g.db.execute(query, args)
-    rv = [dict((cur.description[idx][0], value)
-               for idx, value in enumerate(row)) for row in cur.fetchall()]
-    if "SELECT" in query:
-        for record in rv:
-            for key, value in record.items():
-                if type(value) == bytes and "Password" not in key:
-                    record[key] = encryption.decrypt(value).decode()
-    return (rv[0] if rv else None) if one else rv
+    # facilitate querying data from the database.
 
+    def insert(table, fields=(), values=()):
+        # g.db is the database connection
+        cur = g.db.cursor()
+        query = 'INSERT INTO %s (%s) VALUES (%s)' % (
+            table,
+            ', '.join(fields),
+            ', '.join(['?'] * len(values))
+        )
+        cur.execute(query, values)
+        g.db.commit()
+        row = query_db("SELECT * FROM " + table + " WHERE ID=?", [cur.lastrowid], one=True)
+        cur.close()
+        return row
 
-def insert(table, fields=(), values=()):
-    # g.db is the database connection
-    cur = g.db.cursor()
-    query = 'INSERT INTO %s (%s) VALUES (%s)' % (
-        table,
-        ', '.join(fields),
-        ', '.join(['?'] * len(values))
-    )
-    cur.execute(query, values)
-    g.db.commit()
-    row = query_db("SELECT * FROM " + table + " WHERE ID=?", [cur.lastrowid], one=True)
-    cur.close()
-    return row
+    # def delete(table, primary_key):
 
-# def delete(table, primary_key):
+    def count_db(table, condition="", args=()):
+        cur = g.db.execute("SELECT count(*) FROM " + table + " " + condition, args)
+        return cur.fetchall()[0][0]
 
+    # encryption function to save typing
+    def encryptVar(var):
+        return encryption.encrypt(var.encode())
 
+    # ====\ Database (Connection & Initialisation) /====
 
-def count_db(table, condition="", args=()):
-    cur = g.db.execute("SELECT count(*) FROM "+table+" "+condition, args)
-    return cur.fetchall()[0][0]
+    # Connects to the specific database.
+    def connect_db():
+        return sqlite3.connect(DATABASE)
 
-
-#encryption function to save typing
-def encryptVar(var):
-    return encryption.encrypt(var.encode())
-
-
-
-
-
-# ====\ Database (Connection & Initialisation) /====
-
-# Connects to the specific database.
-def connect_db():
-    return sqlite3.connect(DATABASE)
-
-
-# Initializes the database with test data while in debug mode.
-def init_db():
-    with closing(connect_db()) as db:
-        with app.open_resource(APP_ROOT + '/sql/schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
-        print("Database Initialized...")
-
-
-        if app.debug:
-            with app.open_resource(APP_ROOT + '/sql/devseed.sql', mode='r') as f:
+    # Initializes the database with test data while in debug mode.
+    def init_db():
+        with closing(connect_db()) as db:
+            with app.open_resource(APP_ROOT + '/sql/schema.sql', mode='r') as f:
                 db.cursor().executescript(f.read())
-                # Create and store a hashed password for "test" user
-                hash = hash_password("test")
-                update("UPDATE Users SET Password=? WHERE ID=?", [hash, 1])
             db.commit()
-            print("Test Data Inserted...")
+            print("Database Initialized...")
 
-    print("Database Initialized")
+            if app.debug:
+                with app.open_resource(APP_ROOT + '/sql/devseed.sql', mode='r') as f:
+                    db.cursor().executescript(f.read())
+                    # Create and store a hashed password for "test" user
+                    hash = hash_password("test")
+                    update("UPDATE Users SET Password=? WHERE ID=?", [hash, 1])
+                db.commit()
+                print("Test Data Inserted...")
 
-# Get connection when no requests e.g Pyton REPL.
-def get_connection():
-    db = getattr(g, '_db', None)
-    if db is None:
-        db = g._db = connect_db()
-    return db
+        print("Database Initialized")
+
+    # Get connection when no requests e.g Pyton REPL.
+    def get_connection():
+        db = getattr(g, '_db', None)
+        if db is None:
+            db = g._db = connect_db()
+        return db
+

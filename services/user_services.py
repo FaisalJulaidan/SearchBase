@@ -29,6 +29,7 @@ def createUser(firstname, surname, email, password, company: Company, role: Role
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
         return None
+
     db.session.commit()
     return user
 

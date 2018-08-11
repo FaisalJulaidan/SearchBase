@@ -20,7 +20,7 @@ from cryptography.fernet import Fernet
 import urllib.request
 
 
-from models import db, Role, Company, Assistant
+from models import db, Role, Company, Assistant, Plan
 
 # Import all routers to register them as blueprints
 from routes.public.routers import public_router
@@ -80,6 +80,12 @@ user_services.createUser(firstname='firstname', surname='lastname', email='email
 user_services.createUser(firstname='firstname', surname='lastname', email='email4', password='123', company=sabic, role=admin)
 user_services.createUser(firstname='firstname', surname='lastname', email='email5', password='123', company=sabic, role=user)
 user_services.createUser(firstname='firstname', surname='lastname', email='email6', password='123', company=sabic, role=user)
+
+
+db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic'))
+db.session.add(Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate'))
+db.session.add(Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced'))
+db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug'))
 
 #################################
 

@@ -170,7 +170,7 @@ class UserInput(db.Model):
 
 
 class Plan(db.Model):
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    ID = db.Column(db.String(), primary_key=True, unique=True)
     Nickname = db.Column(db.String(), nullable=False, unique=True)
 
     MaxProducts = db.Column(db.Integer, nullable=False, default=0)

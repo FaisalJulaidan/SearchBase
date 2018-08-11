@@ -3,7 +3,7 @@ from json import dumps
 
 from flask import Blueprint, request, session, escape
 import utilties.helpers as helpers
-from services.users_services import UserServices
+from services.user_services import UserServices
 login_router = Blueprint('public_router',__name__,template_folder="../templates")
 
 @login_router.route("/login", methods=['POST'])

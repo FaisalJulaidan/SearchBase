@@ -11,7 +11,7 @@ def getAll() -> list:
     return db.session.query(Company)
 
 
-def createCompany(name, size, phoneNumber, url) -> Company or None:
+def create(name, size, phoneNumber, url) -> Company or None:
 
     try:
         company = Company(Name=name, Size=size, PhoneNumber=phoneNumber, URL=url)

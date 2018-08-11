@@ -1,9 +1,9 @@
 from datetime import timedelta
 
 from flask import Blueprint, render_template, request, session
-from utilties.helpers import hashPass, checkForMessage, redirectWithMessage
-from services import user_services, company_services, db_services
-from models import User, Company, Role
+from utilties import helpers
+from services import user_services, company_services, db_services, auth_services
+from models import User, Company, Role, Callback
 from utilties import helpers
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
@@ -21,9 +21,9 @@ def indexpage():
 
         company = Company(Name='companyName', Size=12, PhoneNumber='4344423', URL='ff.com')
         role = Role.query.filter(Role.Name == "Admin").first()
-        user = User(Firstname='firstname', Surname='lastname', Email='email', Password=helpers.hashPass('123'), Company=company, Role=role)
+        # user = User(irstname='firstname', Surname='lastname', Email='email', Password=helpers.hashPass('123'), Company=company, Role=role)
         # company_services.addCompany("companyName", 12, "4344423", "ff.com" )
-        user_services.createUser(user)
+        user_services.createUser(firstname='firstname', surname='lastname', email='email', password='123', company=company, role=role)
 
         return render_template("index.html")
 
@@ -68,24 +68,27 @@ def contactpage():
 
 @public_router.route("/login", methods=['GET', 'POST'])
 def login():
-    if request.method == "GET":
-        msg = checkForMessage()
+    # if request.method == "GET":
+    msg = helpers.checkForMessage()
+    #     return render_template("login.html", msg=msg)
+    #
+    # elif request.method == "POST":
+    if request.method == "POST" or request.method == "GET":
+        session.permanent = True
+
+        email :str = request.form.get("email", default="Error")
+        password_to_check :str = request.form.get("password", default="Error")
+
+        callback: Callback = auth_services.login(email,password_to_check)
+
+        # if not callback.Success:
+        #     return helpers.redirectWithMessage("login", callback.Message)
+
+
         return render_template("login.html", msg=msg)
 
-    elif request.method == "POST":
-        session.permanent = True
-        app.permanent_session_lifetime = timedelta(minutes=60)
+        # else:
 
-        email = request.form.get("email", default="Error")
-        password_to_check = request.form.get("password", default="Error")
-
-
-        if email == "Error" or password_to_check == "Error":
-            print("Invalid request: Email or password not received!")
-            return redirectWithMessage("login", "You entered an incorrect username or password.")
-
-        else:
-            email = email.lower()
             # users = query_db("SELECT * FROM Users")
 
             # users = db_services

@@ -65,7 +65,7 @@ class Assistant(db.Model):
     Nickname = db.Column(db.String(128),nullable=False)
     Route = db.Column(db.String(64), unique=True)
     Message = db.Column(db.String(500), nullable=False)
-    SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0)
+    SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
     Active = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
@@ -188,8 +188,8 @@ class Plan(db.Model):
         return '<Plan {}>'.format(self.Nickname)
 
 
-class Callback:
-    def __init__(self, success, message):
-        self.Success:bool = success
-        self.Message:str = message
+class Callback():
+    def __init__(self, success: bool, message: str):
+        self.Success: bool = success
+        self.Message: str = message
     pass

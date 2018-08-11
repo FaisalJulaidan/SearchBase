@@ -6,19 +6,19 @@ from models import db, User, Company, Role
 from utilties import helpers
 
 
-def getByID(id):
+def getByID(id) -> User or None:
     return db.session.query(User).get(id)
 
 
-def getByEmail(email):
+def getByEmail(email) -> User or None:
     return db.session.query(User).filter(User.Email == email).first()
 
 
-def getAll():
+def getAll() -> list:
     return db.session.query(User)
 
 
-def createUser(firstname, surname, email, password, company: Company, role: Role):
+def createUser(firstname, surname, email, password, company: Company, role: Role) -> User or None:
 
     try:
         # Create a new user with its associated company and role
@@ -28,16 +28,18 @@ def createUser(firstname, surname, email, password, company: Company, role: Role
 
         db.session.add(user)
     except sqlalchemy.exc.SQLAlchemyError as exc:
+        print(exc)
         return None
 
     return user
 
 
-def removeByEmail(email):
+def removeByEmail(email) -> bool:
 
     try:
      db.session.query(User).filter(User.Email == email).delete()
     except sqlalchemy.exc.SQLAlchemyError as exc:
+        print(exc)
         return False
 
     return True

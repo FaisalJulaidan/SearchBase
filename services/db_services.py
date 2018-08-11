@@ -16,7 +16,7 @@ APP_ROOT = os.path.dirname(os.path.dirname(__file__))
 DATABASE = APP_ROOT + "/database.db"
 
 
-class db_services_class:
+class db_services:
     # def addCompanyAndUserAndRole(self):
     #     db.session.add(Role(Name="Admin", EditChatbots=True, EditUsers=True, AccessBilling=False))
     #     db.session.add(Role(Name="User", EditChatbots=True, EditUsers=True, AccessBilling=False))
@@ -33,22 +33,7 @@ class db_services_class:
         db.session.add(companyObject)
         return _safeCommit()
 
-    def addUser():
-        companyObject = Company.query.get(1)
-        roleObject = Role.query.filter(Role.Name.like("Admin")).first()
 
-        user1 = User(Firstname="abd",Surname="aa",Email="aa@aa.com",Password="123",
-                    StripeID="12",Verified="true",SubID="123",
-                    Company=companyObject,Role=roleObject)
-
-        user2 = User(Firstname="fgh", Surname="hgf", Email="bb@aa.com", Password="123",
-                    StripeID="123", Verified="true", SubID="1234",
-                    Company=companyObject, Role=roleObject)
-
-        db.session.add(user1)
-        db.session.add(user2)
-
-        return _safeCommit()
 
     # ====\ Database CRUD Operations /====
     def update(sql_statement, array_of_terms):
@@ -126,7 +111,7 @@ class db_services_class:
                 with app.open_resource(APP_ROOT + '/sql/devseed.sql', mode='r') as f:
                     db.cursor().executescript(f.read())
                     # Create and store a hashed password for "test" user
-                    hash = hash_password("test")
+                    hash = hashPass("test")
                     update("UPDATE Users SET Password=? WHERE ID=?", [hash, 1])
                 db.commit()
                 print("Test Data Inserted...")
@@ -145,6 +130,7 @@ def _safeCommit():
     try:
         db.session.commit()
     except sqlalchemy.exc.SQLAlchemyError as exc:
-        return (Callback(False, "Error: "+exc.orig))
+        db.session.rollback()
+        return (Callback(False, exc.orig))
 
     return (Callback(True, None))

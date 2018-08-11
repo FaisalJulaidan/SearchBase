@@ -27,7 +27,7 @@ def login():
             for user in users:
                 if user["Email"] == email:
                     password = user['Password']
-                    if helpers.hash_password(password_to_check, password) == password:
+                    if helpers.hashPass(password_to_check, password) == password:
                         verified = user['Verified']
 
                         # If credentials are correct and users' account is verified

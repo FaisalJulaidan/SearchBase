@@ -1,26 +1,38 @@
 from datetime import timedelta
 
 from flask import Blueprint, render_template, request, session
-from utilties.helpers import hash_password, checkForMessage, redirectWithMessage
+from utilties.helpers import hashPass, checkForMessage, redirectWithMessage
+from services import users_services, company_services, db_services
+from models import User, Company, Role
+from utilties import helpers
 
-public_router = Blueprint('public_router',__name__,template_folder="../templates")
+public_router = Blueprint('public_router', __name__, template_folder="../templates")
 
 @public_router.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
-        # db_services_class.addCompanyAndUserAndRole(db_services_class)
+        # db_services.addCompanyAndUserAndRole(db_services)
         # print(CompanyServices.getByID(1).Users)
-        # callback: Callback = db_services_class.addCompany()
+        # callback: Callback = db_services.addCompany()
         # print(callback.Success, callback.Message)
         #
-        # callback: Callback = db_services_class.addUser()
+        # callback: Callback = db_services.addUser()
         # print(callback.Success, callback.Message)
+
+        company = Company(Name='companyName', Size=12, PhoneNumber='4344423', URL='ff.com')
+        role = Role.query.filter(Role.Name == "Admin").first()
+        user = User(Firstname='firstname', Surname='lastname', Email='email', Password=helpers.hashPass('123'), Company=company, Role=role)
+        # company_services.addCompany("companyName", 12, "4344423", "ff.com" )
+        users_services.addUser(user)
+
         return render_template("index.html")
 
 
 @public_router.route("/features", methods=['GET'])
 def features():
     if request.method == "GET":
+        company_services.deleteByName('companyName')
+        # users_services.deleteByEmail('email')
         return render_template("features.html")
 
 

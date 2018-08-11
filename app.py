@@ -19,14 +19,21 @@ from urllib.request import urlopen
 from cryptography.fernet import Fernet
 import urllib.request
 
-from routes.public import public_router
-from routes.admin.index import homepage_router,profile_router,  admin_api
+
+from models import db
+
+# Import all routers to register them as blueprints
+from routes.public.routers import public_router
+from routes.admin.routers import homepage_router, profile_router,  admin_api
 
 
 app = Flask(__name__, static_folder='static')
 
-from models import db
 
+app.register_blueprint(public_router)
+app.register_blueprint(homepage_router)
+app.register_blueprint(profile_router)
+app.register_blueprint(admin_api)
 
 #################################
 #      THIS IS TO BE ABLE       #
@@ -44,10 +51,7 @@ db.drop_all()
 db.create_all()
 
 #################################
-app.register_blueprint(public_router)
-app.register_blueprint(homepage_router)
-app.register_blueprint(profile_router)
-app.register_blueprint(admin_api)
+
 
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')

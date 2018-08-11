@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 db = SQLAlchemy()
 
 
@@ -11,7 +12,7 @@ class Company(db.Model):
     URL = db.Column(db.String(250), nullable=False)
 
     # Relationships:
-    Users = db.relationship('User', back_populates='Company')
+    Users = db.relationship('User', back_populates='Company', cascade='all, delete-orphan')
     Assistants = db.relationship('Assistant', back_populates='Company')
 
     def __repr__(self):
@@ -28,6 +29,7 @@ class User(db.Model):
     StripeID = db.Column(db.String(128), default=None, unique=True)
     SubID = db.Column(db.String(64), default=None, unique=True)
     Verified = db.Column(db.Boolean(), nullable=False, default=False)
+    CreatedOn = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID'), nullable=False)
@@ -44,12 +46,13 @@ class Role(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(64))
+
     EditChatbots = db.Column(db.Boolean(), nullable=False, default=False)
     EditUsers = db.Column(db.Boolean(), nullable=False, default=False)
     AccessBilling = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
-    # The Role refers back to the relationship in Model.User NOT the table
+    # The User refers back to the relationship in Model.User NOT the table
     Users = db.relationship('User', back_populates="Role")
 
     def __repr__(self):
@@ -94,9 +97,6 @@ class Product(db.Model):
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='Products')
 
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID'), nullable=False)
-    Company = db.relationship('Company', back_populates='Assistants')
-
     def __repr__(self):
         return '<Product {}>'.format(self.Name)
 
@@ -105,7 +105,7 @@ class Statistics(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
-    Date = db.Column(db.DateTime, nullable=False)
+    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     Opened = db.Column(db.Boolean, nullable=False, default=False)
     QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
     ProductsReturned = db.Column(db.Integer, nullable=False, default=0)
@@ -129,6 +129,9 @@ class Question(db.Model):
 
     Answers = db.relationship('Answer', back_populates='Question')
 
+    UserInputs = db.relationship('UserInput', back_populates='Question')
+
+
     def __repr__(self):
         return '<Question {}>'.format(self.Question)
 
@@ -150,17 +153,37 @@ class Answer(db.Model):
 
 class UserInput(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Answer = db.Column(db.String(), nullable=False)
-    Keyword = db.Column(db.String(), nullable=False)
-    Action = db.Column(db.String(), nullable=False, default='Next Question by Order')
-    TimesClicked = db.Column(db.Integer, nullable=False, default=0)
+    Input = db.Column(db.String(), nullable=False)
+    QuestionString = db.Column(db.String(), nullable=False)
+    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+    SessionID = db.Column(db.Integer, nullable=False)
 
     # Relationships:
     QuestionID = db.Column(db.Integer, db.ForeignKey('question.ID'), nullable=False)
-    Question = db.relationship('Question', back_populates='Questions')
+    Question = db.relationship('Question', back_populates='UserInputs')
 
     def __repr__(self):
-        return '<Question {}>'.format(self.Name)
+        return '<UserInput {}>'.format(self.Input)
+
+
+class Plan(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Nickname = db.Column(db.String(), nullable=False, unique=True)
+
+    MaxProducts = db.Column(db.Integer, nullable=False, default=0)
+    ActiveBotsCap = db.Column(db.Integer, nullable=False, default=0)
+    InactiveBotsCap = db.Column(db.Integer, nullable=False, default=0)
+    AdditionalUsersCap = db.Column(db.Integer, nullable=False, default=0)
+    ExtendedLogic = db.Column(db.Boolean, nullable=False, default=False)
+    ImportDatabase = db.Column(db.Boolean, nullable=False, default=False)
+    CompanyNameOnChatbot = db.Column(db.Boolean, nullable=False, default=False)
+
+    # Relationships:
+    ###
+
+    def __repr__(self):
+        return '<Plan {}>'.format(self.Nickname)
+
 
 class Callback:
     def __init__(self, success, message):

@@ -23,14 +23,13 @@ def createUser(firstname, surname, email, password, company: Company, role: Role
     try:
         # Create a new user with its associated company and role
         user = User(Firstname=firstname, Surname=surname, Email=email,
-                    Password=helpers.hashPass(password),Company=company,
+                    Password=helpers.hashPass(password), Company=company,
                     Role=role)
-
         db.session.add(user)
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
         return None
-
+    db.session.commit()
     return user
 
 

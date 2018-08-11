@@ -20,12 +20,12 @@ from cryptography.fernet import Fernet
 import urllib.request
 
 
-from models import db
+from models import db, Role, Company, Assistant
 
 # Import all routers to register them as blueprints
 from routes.public.routers import public_router
 from routes.admin.routers import homepage_router, profile_router,  admin_api
-
+from services import user_services
 
 app = Flask(__name__, static_folder='static')
 
@@ -43,12 +43,43 @@ app.register_blueprint(admin_api)
 #################################
 
 app.config.from_object('config.DevelopmentConfig')
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 
 db.init_app(app)
 app.app_context().push()
 
 db.drop_all()
 db.create_all()
+
+# Generates dummy data for testing
+
+db.session.add(Company(Name='Aramco', Size=12, PhoneNumber='4344423', URL='ff.com'))
+db.session.add(Company(Name='Sabic', Size=12, PhoneNumber='4344423', URL='ff.com'))
+
+aramco = Company.query.filter(Company.Name == "Aramco").first()
+sabic = Company.query.filter(Company.Name == "Sabic").first()
+
+db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=aramco))
+db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=aramco))
+
+db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=sabic))
+db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=sabic))
+
+db.session.commit()
+
+db.session.add(Role(Name="Admin", EditChatbots=True, EditUsers=True, AccessBilling=False))
+db.session.add(Role(Name="User", EditChatbots=False, EditUsers=False, AccessBilling=False))
+
+admin = Role.query.filter(Role.Name == "Admin").first()
+user = Role.query.filter(Role.Name == "User").first()
+
+user_services.createUser(firstname='firstname', surname='lastname', email='email1', password='123', company=aramco, role=admin)
+user_services.createUser(firstname='firstname', surname='lastname', email='email2', password='123', company=aramco, role=admin)
+user_services.createUser(firstname='firstname', surname='lastname', email='email3', password='123', company=aramco, role=user)
+
+user_services.createUser(firstname='firstname', surname='lastname', email='email4', password='123', company=sabic, role=admin)
+user_services.createUser(firstname='firstname', surname='lastname', email='email5', password='123', company=sabic, role=user)
+user_services.createUser(firstname='firstname', surname='lastname', email='email6', password='123', company=sabic, role=user)
 
 #################################
 
@@ -2141,6 +2172,7 @@ def not_implemented(e):
 #
 #     print("Run the server...")
 #
+    # app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 #     # Create the schema only in development mode
 #     if app.debug:
 #         # For Development

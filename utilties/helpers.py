@@ -36,3 +36,8 @@ def checkForMessage():
     if len(args) > 0:
         msg = args['messages']
     return msg
+
+
+def hash_password(password, salt=gensalt()):
+    hashed = hashpw(bytes(password, 'utf-8'), salt)
+    return hashed

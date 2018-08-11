@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from flask import Blueprint, render_template, request, session
 from utilties.helpers import hashPass, checkForMessage, redirectWithMessage
-from services import users_services, company_services, db_services
+from services import user_services, company_services, db_services
 from models import User, Company, Role
 from utilties import helpers
 
@@ -23,7 +23,7 @@ def indexpage():
         role = Role.query.filter(Role.Name == "Admin").first()
         user = User(Firstname='firstname', Surname='lastname', Email='email', Password=helpers.hashPass('123'), Company=company, Role=role)
         # company_services.addCompany("companyName", 12, "4344423", "ff.com" )
-        users_services.addUser(user)
+        user_services.createUser(user)
 
         return render_template("index.html")
 
@@ -31,7 +31,7 @@ def indexpage():
 @public_router.route("/features", methods=['GET'])
 def features():
     if request.method == "GET":
-        company_services.deleteByName('companyName')
+        company_services.removeByName('companyName')
         # users_services.deleteByEmail('email')
         return render_template("features.html")
 

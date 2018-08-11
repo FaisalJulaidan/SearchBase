@@ -12,7 +12,7 @@ class Company(db.Model):
     URL = db.Column(db.String(250), nullable=False)
 
     # Relationships:
-    Users = db.relationship('User', back_populates='Company', cascade='all, delete-orphan')
+    Users = db.relationship('User', back_populates='Company', cascade="all, delete, delete-orphan")
     Assistants = db.relationship('Assistant', back_populates='Company')
 
     def __repr__(self):
@@ -75,6 +75,9 @@ class Assistant(db.Model):
     Products = db.relationship('Product', back_populates='Assistant')
     Statistics = db.relationship('Statistics', back_populates='Assistant')
     Questions = db.relationship('Question', back_populates='Assistant')
+
+    # Constraints:
+    db.UniqueConstraint('CompanyID', 'Nickname', name='uix_1')
 
 
     def __repr__(self):

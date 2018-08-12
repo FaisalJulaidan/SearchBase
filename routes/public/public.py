@@ -1,6 +1,5 @@
 from datetime import timedelta
-# from app import mail, Message
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, render_template, request, session, redirect
 from utilties import helpers
 from models import User, Company, Role, Callback
 from itsdangerous import URLSafeTimedSerializer
@@ -69,12 +68,11 @@ def contactpage():
 
 @public_router.route("/login", methods=['GET', 'POST'])
 def login():
-    # if request.method == "GET":
-    msg = helpers.checkForMessage()
-    #     return render_template("login.html", msg=msg)
-    #
-    # elif request.method == "POST":
-    if request.method == "POST" or request.method == "GET":
+    if request.method == "GET":
+        msg = helpers.checkForMessage()
+        return render_template("login.html", msg=msg)
+
+    elif request.method == "POST":
         session.permanent = True
 
         email :str = request.form.get("email", default="Error")
@@ -82,79 +80,12 @@ def login():
 
         callback: Callback = auth_services.login(email,password_to_check)
 
-        # if not callback.Success:
-        #     return helpers.redirectWithMessage("login", callback.Message)
+        if callback.Success:
+            return redirect("/admin/homepage", code=302)
+        else:
+            return helpers.redirectWithMessage("login", callback.Message)
 
 
-        return render_template("login.html", msg=msg)
-
-        # else:
-
-            # users = query_db("SELECT * FROM Users")
-
-            # users = db_services
-            # If user exists
-            # for user in users:
-            #     if user["Email"] == email:
-            #         password = user['Password']
-            #         if hash_password(password_to_check, password) == password:
-            #
-            #             verified = user['Verified']
-            #
-            #             # If credentials are correct and users' account is verified
-            #             if verified == "True":
-            #
-            #                 messages = dumps({"email": escape(email)})
-            #
-            #                 # Set the session for the logged in user
-            #                 session['User'] = user
-            #                 session['Logged_in'] = True
-            #
-            #                 # Store user assistants if they exist, in the session
-            #                 assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?;",
-            #                                     [user['CompanyID']])
-            #
-            #                 #Store users access permisions
-            #                 session['UserAssistants'] =  assistants
-            #                 permissionsDic = {}
-            #                 permissions = query_db("SELECT * FROM UserSettings WHERE CompanyID=?", [session.get('User')['CompanyID']])[0]
-            #                 if "Owner" in session.get('User')['AccessLevel']:
-            #                     permissions = permissions["AdminPermissions"].split(";")
-            #                     for perm in permissions:
-            #                         if perm:
-            #                             permissionsDic[perm.split(":")[0]] = True
-            #                 else:
-            #                     permissions = permissions[session.get('User')['AccessLevel']+"Permissions"].split(";")
-            #                     for perm in permissions:
-            #                         if perm:
-            #                             if "True" in perm.split(":")[1]:
-            #                                 permBool = True
-            #                             else:
-            #                                 permBool = False
-            #                             permissionsDic[perm.split(":")[0]] = permBool
-            #                 session['Permissions'] = dict(permissionsDic)
-            #
-            #                 # Set user plan e.g. (Basic, Ultimate...)
-            #                 session['UserPlan'] = {}
-            #                 session['UserPlan']['Nickname'] =  getPlanNickname(user['SubID'])
-            #                 if getPlanNickname(user['SubID']) is None:
-            #                     session['UserPlan']['Settings'] = NoPlan
-            #                 elif "Basic" in getPlanNickname(user['SubID']):
-            #                     session['UserPlan']['Settings'] = BasicPlan
-            #                 elif "Advanced" in getPlanNickname(user['SubID']):
-            #                     session['UserPlan']['Settings'] = AdvancedPlan
-            #                 elif "Ultimate" in getPlanNickname(user['SubID']):
-            #                     session['UserPlan']['Settings'] = UltimatePlan
-            #
-            #                 # Test session specific values
-            #                 print(session)
-            #
-            #                 return redirect("/admin/homepage", code=302)
-            #
-            #             else:
-            #                 return redirectWithMessage("login", "Please verify your account before you log in.")
-            # return redirectWithMessage("login", "You entered an incorrect username or password.")
-#
 
 # @public_router.route('/logout')
 # def logout():

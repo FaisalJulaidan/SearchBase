@@ -17,12 +17,11 @@ def getByEmail(email) -> User or None:
 def getAll() -> list:
     return db.session.query(User)
 
-
-def create(firstname, surname, email, password, company: Company, role: Role) -> User or None:
+def create(firstname, surname, email, password,company: Company, role: Role, verified=False) -> User or None:
 
     try:
         # Create a new user with its associated company and role
-        user = User(Firstname=firstname, Surname=surname, Email=email,
+        user = User(Firstname=firstname, Surname=surname, Email=email, Verified=verified,
                     Password=helpers.hashPass(password), Company=company,
                     Role=role)
         db.session.add(user)

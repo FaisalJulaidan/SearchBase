@@ -2,7 +2,7 @@ import sqlalchemy.exc
 
 from models import User
 from .db_services import _safeCommit
-from models import db, User, Company, Role
+from models import db, Callback, User, Company, Role
 from utilties import helpers
 
 
@@ -18,7 +18,7 @@ def getAll() -> list:
     return db.session.query(User)
 
 
-def createUser(firstname, surname, email, password, company: Company, role: Role) -> User or None:
+def create(firstname, surname, email, password, company: Company, role: Role) -> User or None:
 
     try:
         # Create a new user with its associated company and role
@@ -34,12 +34,40 @@ def createUser(firstname, surname, email, password, company: Company, role: Role
     return user
 
 
-def removeByEmail(email) -> bool:
+def updateSubID(email, subID: str):
+
+    try:
+        db.session.query(User).filter(User.Email == email).update({"SubID": (subID)})
+    except sqlalchemy.exc.SQLAlchemyError as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Could not update subID for ' + email)
+
+    db.session.commit()
+    return Callback(True, 'SubID is updated successfully')
+
+
+def updateStripeID(email, cusID: str):
+
+    try:
+        db.session.query(User).filter(User.Email == email).update({"StripeID": (cusID)})
+    except sqlalchemy.exc.SQLAlchemyError as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Could not update subID for ' + email)
+
+    db.session.commit()
+    return Callback(True, 'StripeID is updated successfully')
+
+
+
+def removeByEmail(email) -> Callback:
 
     try:
      db.session.query(User).filter(User.Email == email).delete()
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
-        return False
+        return Callback(False, 'User with email ' + email + " could not be removed.")
 
-    return True
+    db.session.commit()
+    return Callback(True, 'User with email ' + email + " has been removed successfully.")

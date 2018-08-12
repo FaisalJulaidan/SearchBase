@@ -1,7 +1,7 @@
 #/usr/bin/python3.5
 from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, \
     make_response, g, session, json
-from flask_mail import Mail, Message
+# from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from flask_api import status
@@ -21,17 +21,18 @@ import urllib.request
 
 
 from models import db, Role, Company, Assistant, Plan
+from .services.mail_services import mail
 
 # Import all routers to register them as blueprints
-from routes.public.routers import public_router
 from routes.admin.routers import homepage_router, profile_router,  admin_api
+from routes.public.routers import public_router
 from services import user_services
 
 app = Flask(__name__, static_folder='static')
 
 
-app.register_blueprint(public_router)
 app.register_blueprint(homepage_router)
+app.register_blueprint(public_router)
 app.register_blueprint(profile_router)
 app.register_blueprint(admin_api)
 
@@ -46,10 +47,12 @@ app.config.from_object('config.DevelopmentConfig')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 
 db.init_app(app)
+mail.init_app(app)
 app.app_context().push()
 
 db.drop_all()
 db.create_all()
+
 
 # Generates dummy data for testing
 
@@ -65,21 +68,19 @@ db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPop
 db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=sabic))
 db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=sabic))
 
-db.session.commit()
-
 db.session.add(Role(Name="Admin", EditChatbots=True, EditUsers=True, AccessBilling=False))
 db.session.add(Role(Name="User", EditChatbots=False, EditUsers=False, AccessBilling=False))
 
 admin = Role.query.filter(Role.Name == "Admin").first()
 user = Role.query.filter(Role.Name == "User").first()
 
-user_services.createUser(firstname='firstname', surname='lastname', email='email1', password='123', company=aramco, role=admin)
-user_services.createUser(firstname='firstname', surname='lastname', email='email2', password='123', company=aramco, role=admin)
-user_services.createUser(firstname='firstname', surname='lastname', email='email3', password='123', company=aramco, role=user)
+user_services.create(firstname='firstname', surname='lastname', email='email1', password='123', company=aramco, role=admin)
+user_services.create(firstname='firstname', surname='lastname', email='email2', password='123', company=aramco, role=admin)
+user_services.create(firstname='firstname', surname='lastname', email='email3', password='123', company=aramco, role=user)
 
-user_services.createUser(firstname='firstname', surname='lastname', email='email4', password='123', company=sabic, role=admin)
-user_services.createUser(firstname='firstname', surname='lastname', email='email5', password='123', company=sabic, role=user)
-user_services.createUser(firstname='firstname', surname='lastname', email='email6', password='123', company=sabic, role=user)
+user_services.create(firstname='firstname', surname='lastname', email='email4', password='123', company=sabic, role=admin)
+user_services.create(firstname='firstname', surname='lastname', email='email5', password='123', company=sabic, role=user)
+user_services.create(firstname='firstname', surname='lastname', email='email6', password='123', company=sabic, role=user)
 
 
 db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic'))
@@ -87,9 +88,10 @@ db.session.add(Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate'))
 db.session.add(Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced'))
 db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug'))
 
+db.session.commit()
+
+
 #################################
-
-
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
@@ -121,7 +123,8 @@ app.config.update(
     MAIL_PASSWORD='pilbvnczzdgxkyzy'
 )
 
-mail = Mail(app)
+# mail = Mail(app)
+
 
 ALLOWED_UPLOAD_FILE_EXTENSIONS = set(['txt', 'pdf', 'doc', 'docx'])
 ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}

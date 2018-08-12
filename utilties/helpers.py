@@ -1,6 +1,7 @@
 from bcrypt import hashpw, gensalt
-from flask import request,redirect,url_for
+from flask import request, redirect, url_for
 import json
+
 
 def hashPass(password, salt=gensalt()):
     hashed = hashpw(bytes(password, 'utf-8'), salt)
@@ -9,7 +10,7 @@ def hashPass(password, salt=gensalt()):
 
 def checkForMessage():
     args = request.args
-    msg=" "
+    msg = " "
     if len(args) > 0:
         msg = args['messages']
     return msg
@@ -20,23 +21,24 @@ def redirectWithMessageAndAssistantID(function, assistantID, message):
 
 
 def checkForMessageWhenAssistantID():
-        try:
-            message = request.args["message"]
-        except:
-            message = " "
-        return message
+    try:
+        message = request.args["message"]
+    except:
+        message = " "
+    return message
 
 
 def redirectWithMessage(function, message):
-    return redirect(url_for("."+function, messages=message))
+    return redirect(url_for("." + function, messages=message))
 
 
 def checkForMessage():
     args = request.args
-    msg=" "
+    msg = " "
     if len(args) > 0:
         msg = args['messages']
     return msg
+
 
 def getPlanNickname(SubID=None):
     try:
@@ -52,6 +54,7 @@ def getPlanNickname(SubID=None):
     except stripe.error.StripeError as e:
         return None
 
+# todo: add this to db
 UserPlans = {
     "NoPlan": {
         "MaxProducts": 0,
@@ -71,7 +74,7 @@ UserPlans = {
         "ImportDatabase": False,
         "CompanyNameonChatbot": False
     },
-    "AdvancedPlan":{
+    "AdvancedPlan": {
         "MaxProducts": 5000,
         "ActiveBotsCap": 4,
         "InactiveBotsCap": 8,

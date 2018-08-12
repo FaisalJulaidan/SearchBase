@@ -22,7 +22,6 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
     if user:
         return Callback(False, 'User already exists.')
 
-
     # Create a new user with its associated company and role
     role = role_services.getByName('Admin')
     company = Company(Name=companyName, Size=companySize, PhoneNumber=companyPhoneNumber, URL=websiteURL)

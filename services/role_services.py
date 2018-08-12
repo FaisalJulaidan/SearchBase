@@ -8,4 +8,4 @@ def getByID(id) -> Role or None:
 
 
 def getByName(name) -> Role or None:
-    return db.session.query(Role).filer(Role.Name == name)
+    return db.session.query(Role).filter(Role.Name == name).first()

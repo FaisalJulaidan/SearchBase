@@ -8,8 +8,9 @@ from models import Callback, db, Role, Plan
 def subscribe(email, planNickname, trialDays=None) -> Callback:
 
     plan: Plan = getPlanByNickname(planNickname)
-    if not Plan:
-        Callback(False, 'Plan does not exist')
+    print(plan)
+    if not plan:
+        return Callback(False, 'Plan does not exist')
 
     try:
         # Create a Stripe customer for the new company.
@@ -31,8 +32,8 @@ def subscribe(email, planNickname, trialDays=None) -> Callback:
     except Exception as e:
         return Callback(False, 'An error occurred while subscribing with Stripe')
 
-    return Callback(True, 'Subscribed successfully!')
+    return Callback(True, 'Subscribed successfully',{'stripeID': customer['id'], 'subID': sub['id']})
 
 
 def getPlanByNickname(nickname) -> Plan or None:
-    return db.session.query(Plan).filter(Plan.Nickname).first()
+    return db.session.query(Plan).filter(Plan.Nickname == nickname).first()

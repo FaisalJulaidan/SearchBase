@@ -1,12 +1,15 @@
 from datetime import timedelta
-
+# from app import mail, Message
 from flask import Blueprint, render_template, request, session
 from utilties import helpers
-from services import user_services, company_services, db_services, auth_services
 from models import User, Company, Role, Callback
-from utilties import helpers
+from itsdangerous import URLSafeTimedSerializer
+from services import user_services, company_services, db_services, auth_services, mail_services
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
+
+verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
+
 
 @public_router.route("/", methods=['GET'])
 def indexpage():
@@ -19,11 +22,11 @@ def indexpage():
         # callback: Callback = db_services.addUser()
         # print(callback.Success, callback.Message)
 
-        company = Company(Name='companyName', Size=12, PhoneNumber='4344423', URL='ff.com')
-        role = Role.query.filter(Role.Name == "Admin").first()
+        # company = Company(Name='companyName', Size=12, PhoneNumber='4344423', URL='ff.com')
+        # role = Role.query.filter(Role.Name == "Admin").first()
         # user = User(irstname='firstname', Surname='lastname', Email='email', Password=helpers.hashPass('123'), Company=company, Role=role)
         # company_services.addCompany("companyName", 12, "4344423", "ff.com" )
-        user_services.createUser(firstname='firstname', surname='lastname', email='email', password='123', company=company, role=role)
+        # user_services.createUser(firstname='firstname', surname='lastname', email='email', password='123', company=company, role=role)
 
         return render_template("index.html")
 
@@ -31,8 +34,6 @@ def indexpage():
 @public_router.route("/features", methods=['GET'])
 def features():
     if request.method == "GET":
-        company_services.removeByName('companyName')
-        # users_services.deleteByEmail('email')
         return render_template("features.html")
 
 
@@ -169,150 +170,49 @@ def login():
 # TODO improve verification
 @public_router.route("/signup", methods=['GET', 'POST'])
 def signup():
+
     if request.method == "GET":
         msg = helpers.checkForMessage()
         return render_template("signup.html", msg=msg)
 
+    elif request.method == "POST":
 
-    # elif request.method == "POST":
-    #
-    #     email = request.form.get("email", default="Error").lower()
-    #
-    #     fullname = request.form.get("fullname", default="Error")
-    #     accessLevel = "Owner"
-    #     password = request.form.get("password", default="Error")
-    #
-    #     companyName = request.form.get("companyName", default="Error")
-    #     companySize = request.form.get("companySize", default="0")
-    #     companyPhoneNumber = request.form.get("phoneNumber", default="Error")
-    #     websiteURL = request.form.get("websiteURL", default="Error")
-    #
-    #     if fullname == "Error" or accessLevel == "Error" or email == "Error" or password == "Error" \
-    #             or companyName == "Error" or websiteURL == "Error":
-    #         print("Invalid request")
-    #         return redirectWithMessage("signup", "Error in getting all input information")
-    #
-    #
-    #     else:
-    #         users = query_db("SELECT * FROM Users")
-    #         # If user exists
-    #         for user in users:
-    #             if user["Email"] == email:
-    #                 print("Email is already in use!")
-    #                 return redirectWithMessage("signup", "Email already in use.")
-    #         try:
-    #             firstname = fullname.strip().split(" ")[0]
-    #             surname = fullname.strip().split(" ")[1]
-    #
-    #             # debug
-    #             print(firstname)
-    #             print(surname)
-    #
-    #         except IndexError as e:
-    #             return redirectWithMessage("signup", "Error in handling names")
-    #
-    #         newUser = None
-    #         newCompany = None
-    #         newCustomer = None
-    #
-    #         # Create a Stripe customer for the new company.
-    #         newCustomer = stripe.Customer.create(
-    #             email=email
-    #         )
-    #
-    #         # debug
-    #         # print(newCustomer)
-    #
-    #         hashed_password = hash_password(password)
-    #         if app.debug:
-    #             verified = "True"
-    #         else:
-    #             verified = "False"
-    #
-    #         # Create a company record for the new user
-    #         # ENCRYPTION
-    #         insertCompanyResponse = insert_into_database_table(
-    #             "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (
-    #             encryptVar(companyName), encryptVar(companySize), encryptVar(websiteURL),
-    #             encryptVar(companyPhoneNumber)))
-    #         # insertCompanyResponse = insert_into_database_table(
-    #         #   "INSERT INTO Companies('Name','Size', 'URL', 'PhoneNumber') VALUES (?,?,?,?);", (companyName, companySize, websiteURL, companyPhoneNumber))
-    #
-    #         newCompany = get_last_row_from_table("Companies")
-    #         # print(newCompany)
-    #
-    #         createUserSettings = insert_into_database_table("INSERT INTO UserSettings('CompanyID') VALUES (?);",
-    #                                                         (newCompany['ID'],))
-    #         # TODO validate insertCompanyResponse and createUserSettings
-    #
-    #         try:
-    #
-    #             # Subscribe to the Basic plan with a trial of 14 days
-    #             sub = stripe.Subscription.create(
-    #                 customer=newCustomer['id'],
-    #                 items=[{'plan': 'plan_D3lp2yVtTotk2f'}],
-    #                 trial_period_days=14,
-    #             )
-    #
-    #             print(sub['items']['data'][0]['plan']['nickname'])
-    #             # print(sub)
-    #
-    #             # Create a user account and link it with the new created company record above
-    #             # ENCRYPTION
-    #             newUser = insert_db("Users", (
-    #             'CompanyID', 'Firstname', 'Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified',
-    #             'SubID'),
-    #                                 (newCompany['ID'], encryptVar(firstname), encryptVar(surname), accessLevel,
-    #                                  encryptVar(email), hashed_password, newCustomer['id'],
-    #                                  str(verified), sub['id'])
-    #                                 )
-    #             # newUser = insert_db("Users", ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'StripeID', 'Verified', 'SubID'),
-    #             #           (newCompany['ID'], firstname, surname, accessLevel, email, hashed_password, newCustomer['id'],
-    #             #          str(verified), sub['id'])
-    #             #         )
-    #
-    #
-    #
-    #         except Exception as e:
-    #             # Clear out when exception
-    #             if newUser is not None:
-    #                 query_db("DELETE FROM Users WHERE ID=?", [newUser['ID']])
-    #                 print("Delete new user")
-    #
-    #             if newCompany is not None:
-    #                 query_db("DELETE FROM Companies WHERE ID=?", [newCompany['ID']])
-    #                 print("Delete new company")
-    #
-    #             print("Delete new user' stripe account")
-    #             if newCustomer is not None:
-    #                 cus = stripe.Customer.retrieve(newCustomer['id'])
-    #                 cus.delete()
-    #
-    #             print(e)
-    #             return redirectWithMessage("signup", "An error occurred and could not subscribe. Please try again!.")
-    #             # TODO check subscription for errors https://stripe.com/docs/api#errors
-    #
-    #       # TODO this needs improving
-        msg = Message("Account verification",
-                      sender="thesearchbase@gmail.com",
-                      recipients=[email])
-        payload = email + ";" + companyName
-        link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
-        msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png'><br /><h4>Hi,</h4> <p>Thank you for registering with TheSearchbase.</p> <br />  There is just one small step left, visit \
-                    <a href='" + link + "'> this link </a> to verify your account. \
-                    In case the link above doesn't work you can click on the link below. <br /> <br /> " + link + " <br />  <br /> \
-                    We look forward to you, using our platform. <br /> <br />\
-                    Regards, <br /> TheSearchBase Team <br />\
-                    <img src='https://thesearchbase.com/static/email_images/footer_image.png'>"
-        mail.send(msg)
+        # User info
+        email = request.form.get("email", default=None)
+        fullname = request.form.get("fullname", default=None)
+        password = request.form.get("password", default=None)
 
-        # sending the registration confirmation email to us
-        msg = Message("A new company has signed up!",
-                      sender="thesearchbase@gmail.com",
-                      recipients=["thesearchbase@gmail.com"])
-        msg.html = "<p>Company name: " + companyName + " has signed up. <br>The admin's details are: <br>Name: " + fullname + " <br>Email: " + email + ".</p>"
-        mail.send(msg)
-    #
-    #         return render_template('errors/verification.html',
-    #                                msg="Please check your email and follow instructions to verify account and get started.")
+        # Company info
+        name = request.form.get("companyName", default=None)
+        size = request.form.get("companySize", default=None)
+        url = request.form.get("websiteURL", default=None)
+        phone = request.form.get("phoneNumber", default=None)
 
+        if not (fullname and email and password
+                and name and url and phone):
+            print("Signup Error .1")
+            return helpers.redirectWithMessage("signup", "Error in getting all input information.")
+
+        # Split fullname
+        firstname = fullname.strip().split(" ")[0]
+        surname = fullname.strip().split(" ")[1]
+
+        # Signup new user
+        signup_callback: Callback = auth_services.signup(email.lower(), firstname, surname, password,
+                                                         name, size, phone, url)
+        print(signup_callback.Success, signup_callback.Message)
+        if not signup_callback.Success:
+            print("Signup Error .2")
+            return helpers.redirectWithMessage("signup", signup_callback.Message)
+
+        # Send verification email
+        mail_callback: Callback = mail_services.sendVerificationEmail(email, name, fullname)
+        print(mail_callback.Message)
+
+        # If error while sending verification email
+        if not mail_callback.Success:
+            helpers.redirectWithMessage('signup", "signed up successfully but > ' + mail_callback.Message
+                                        + '. Please contact TheSearchBaseStaff to activate your account.')
+
+        return render_template('errors/verification.html',
+                               msg="Please check your email and follow instructions to verify account and get started.")

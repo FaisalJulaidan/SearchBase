@@ -292,27 +292,27 @@ def signup():
     #             return redirectWithMessage("signup", "An error occurred and could not subscribe. Please try again!.")
     #             # TODO check subscription for errors https://stripe.com/docs/api#errors
     #
-    #         # TODO this needs improving
-            msg = Message("Account verification",
-                          sender="thesearchbase@gmail.com",
-                          recipients=[email])
-            payload = email + ";" + companyName
-            link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
-            msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png'><br /><h4>Hi,</h4> <p>Thank you for registering with TheSearchbase.</p> <br />  There is just one small step left, visit \
-                        <a href='" + link + "'> this link </a> to verify your account. \
-                        In case the link above doesn't work you can click on the link below. <br /> <br /> " + link + " <br />  <br /> \
-                        We look forward to you, using our platform. <br /> <br />\
-                        Regards, <br /> TheSearchBase Team <br />\
-                        <img src='https://thesearchbase.com/static/email_images/footer_image.png'>"
-            mail.send(msg)
+    #       # TODO this needs improving
+        msg = Message("Account verification",
+                      sender="thesearchbase@gmail.com",
+                      recipients=[email])
+        payload = email + ";" + companyName
+        link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
+        msg.html = "<img src='https://thesearchbase.com/static/email_images/verify_email.png'><br /><h4>Hi,</h4> <p>Thank you for registering with TheSearchbase.</p> <br />  There is just one small step left, visit \
+                    <a href='" + link + "'> this link </a> to verify your account. \
+                    In case the link above doesn't work you can click on the link below. <br /> <br /> " + link + " <br />  <br /> \
+                    We look forward to you, using our platform. <br /> <br />\
+                    Regards, <br /> TheSearchBase Team <br />\
+                    <img src='https://thesearchbase.com/static/email_images/footer_image.png'>"
+        mail.send(msg)
 
-            # sending the registration confirmation email to us
-            msg = Message("A new company has signed up!",
-                          sender="thesearchbase@gmail.com",
-                          recipients=["thesearchbase@gmail.com"])
-            msg.html = "<p>Company name: " + companyName + " has signed up. <br>The admin's details are: <br>Name: " + fullname + " <br>Email: " + email + ".</p>"
-            mail.send(msg)
+        # sending the registration confirmation email to us
+        msg = Message("A new company has signed up!",
+                      sender="thesearchbase@gmail.com",
+                      recipients=["thesearchbase@gmail.com"])
+        msg.html = "<p>Company name: " + companyName + " has signed up. <br>The admin's details are: <br>Name: " + fullname + " <br>Email: " + email + ".</p>"
+        mail.send(msg)
     #
     #         return render_template('errors/verification.html',
     #                                msg="Please check your email and follow instructions to verify account and get started.")
-    #
+

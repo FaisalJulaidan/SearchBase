@@ -15,7 +15,7 @@ def getAll()-> list:
     return db.session.query(Assistant)
 
 
-def createAssistant(nickname, route, message , secondsUntilPopup, company: Company) -> Assistant or None:
+def create(nickname, route, message, secondsUntilPopup, company: Company) -> Assistant or None:
 
     try:
         # Create a new user with its associated company and role

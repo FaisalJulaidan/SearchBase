@@ -1,4 +1,3 @@
-import stripe
 from bcrypt import hashpw, gensalt
 from flask import request,redirect,url_for
 import json
@@ -117,3 +116,10 @@ def toJSON(inst, cls):
             d[c.name] = v
     print(d)
     return json.dumps(d)
+
+
+def isValidEmail(email: str) -> bool:
+    """Validate the email address using a regex."""
+    if not re.match("[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}", email):
+        return False
+    return True

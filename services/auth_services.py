@@ -8,13 +8,14 @@ from json import dumps
 
 from services import assistant_services, user_services
 from services import user_services, assistant_services, role_services, sub_services, company_services
-from validate_email import validate_email
+from utilties import helpers
 
 
-def signup(email, firstname, surname, password, companyName, companySize, companyPhoneNumber, websiteURL):
+
+def signup(email, firstname, surname, password, companyName, companySize, companyPhoneNumber, websiteURL) -> Callback:
 
     # Validate Email
-    if validate_email(email):
+    if helpers.isValidEmail(email):
         return Callback(False, 'Invalid Email.')
 
     # Check if user exists
@@ -25,16 +26,20 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
     # Create a new user with its associated company and role
     role = role_services.getByName('Admin')
     company = Company(Name=companyName, Size=companySize, PhoneNumber=companyPhoneNumber, URL=websiteURL)
-    user = user_services.createUser(firstname, surname, email, password, company, role)
+    user = user_services.create(firstname, surname, email, password, company, role)
 
     # Subscribe to basic plan with 14 trial days
-    callback: Callback = sub_services.subscribe(email=email, planNickname='basic', trialDays=14)
+    sub_callback: Callback = sub_services.subscribe(email=email, planNickname='basic', trialDays=14)
 
     # if subscription failed, remove the new created company and user
-    if not callback.Success:
+    if not sub_callback.Success:
         company_services.removeByName(companyName)
         user_services.removeByEmail(email)
-        return callback
+        return sub_callback
+
+    # Update new user subID and cusID
+    user_services.updateSubID(email, sub_callback.Data['subID'])
+    user_services.updateStripeID(email, sub_callback.Data['stripeID'])
 
     # Return a callback with a message
     return Callback(True, 'Signed up successfully!')

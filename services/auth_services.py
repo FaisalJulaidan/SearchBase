@@ -43,8 +43,6 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
 
 
 def login(email: str, password_to_check: str) -> Callback:
-    email = email.lower()
-    user: User = user_services.getByEmail(email)
 
     # Login Exception Handling
     if not (email or password_to_check):

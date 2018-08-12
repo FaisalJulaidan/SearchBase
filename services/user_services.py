@@ -17,7 +17,8 @@ def getByEmail(email) -> User or None:
 def getAll() -> list:
     return db.session.query(User)
 
-def create(firstname, surname, email, password,company: Company, role: Role, verified=False) -> User or None:
+
+def create(firstname, surname, email, password, company: Company, role: Role, verified=False) -> User or None:
 
     try:
         # Create a new user with its associated company and role
@@ -36,7 +37,7 @@ def create(firstname, surname, email, password,company: Company, role: Role, ver
 def updateSubID(email, subID: str):
 
     try:
-        db.session.query(User).filter(User.Email == email).update({"SubID": (subID)})
+        db.session.query(User).filter(User.Email == email).update({"SubID": subID})
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
         db.session.rollback()

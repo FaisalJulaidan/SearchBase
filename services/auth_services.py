@@ -43,17 +43,13 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
 
 
 def login(email: str, password_to_check: str) -> Callback:
-    email = email.lower()
-    user: User = user_services.getByEmail(email)
 
-
-    '''
-        Login Exception Handling
-    '''
-    if email == "error" or password_to_check == "error":
+    # Login Exception Handling
+    if not (email or password_to_check):
         print("Invalid request: Email or password not received!")
         return Callback(False, "You entered an incorrect username or password.")
 
+    user: User = user_services.getByEmail(email.lower())
     if not user:
         print("Invalid request: Email not found")
         return Callback(False, "Email not found")
@@ -66,30 +62,9 @@ def login(email: str, password_to_check: str) -> Callback:
         print("Invalid request: Account is not verified")
         return Callback(False, "Account is not verified")
 
-
-    '''
-        If all the tests are valid then do login process
-    '''
+    # If all the tests are valid then do login process
     session['Logged_in'] = True
-    session['user.ID'] = user.ID
-    planNickname = helpers.getPlanNickname(user.SubID)
-    session['UserPlan'] = {
-        'Nickname': '',
-        'Settings': ''
-    }
-
-    session['UserPlan']['Nickname'] = planNickname
-
-    if planNickname is None:
-        session['UserPlan']['Settings'] = helpers.UserPlans["NoPlan"]
-
-    elif "Basic" in planNickname:
-        session['UserPlan']['Settings'] = helpers.UserPlans["BasicPlan"]
-
-    elif "Advanced" in planNickname:
-        session['UserPlan']['Settings'] = helpers.UserPlans["AdvancedPlan"]
-
-    elif "Ultimate" in planNickname:
-        session['UserPlan']['Settings'] = helpers.UserPlans["UltimatePlan"]
+    session['userID'] = user.ID
+    session['UserPlan'] = helpers.getPlanNickname(user.SubID)
 
     return Callback(True, "Login Successful")

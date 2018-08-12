@@ -74,7 +74,7 @@ db.session.add(Role(Name="User", EditChatbots=False, EditUsers=False, AccessBill
 admin = Role.query.filter(Role.Name == "Admin").first()
 user = Role.query.filter(Role.Name == "User").first()
 
-user_services.create(firstname='firstname', surname='lastname', email='email1', password='123', company=aramco, role=admin)
+user_services.create(firstname='firstname', surname='lastname', verified=True, email='aa@aa.com', password='123', company=aramco, role=admin)
 user_services.create(firstname='firstname', surname='lastname', email='email2', password='123', company=aramco, role=admin)
 user_services.create(firstname='firstname', surname='lastname', email='email3', password='123', company=aramco, role=user)
 

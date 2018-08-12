@@ -10,9 +10,7 @@ from services import user_services, assistant_services, role_services, sub_servi
 from utilties import helpers
 
 
-
 def signup(email, firstname, surname, password, companyName, companySize, companyPhoneNumber, websiteURL) -> Callback:
-
     # Validate Email
     if helpers.isValidEmail(email):
         return Callback(False, 'Invalid Email.')
@@ -44,66 +42,54 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
     return Callback(True, 'Signed up successfully!')
 
 
-
 def login(email: str, password_to_check: str) -> Callback:
-    # if email == "Error" or password_to_check == "Error":
-    #     print("Invalid request: Email or password not received!")
-    #     return Callback(False, "You entered an incorrect username or password.")
-
-    # email = email.lower()
-
-    # test input
-    email = "email5"
-
-    # user: User = User.query.filter(User.Email == email).first()
+    email = email.lower()
     user: User = user_services.getByEmail(email)
 
-    if user:
-        password = user.Password
-        # todo REMINDER remove the testing if statements
-        # if helpers.hash_password(password_to_check, password) == password:
-        if not helpers.hashPass(password_to_check, password) == password:
-            # If credentials are correct and users' account is verified
 
-            # if user.Verified:
-            if not user.Verified:
-                # messages = dumps({"email": escape(email)})
-                # Set the session for the logged in user
+    '''
+        Login Exception Handling
+    '''
+    if email == "error" or password_to_check == "error":
+        print("Invalid request: Email or password not received!")
+        return Callback(False, "You entered an incorrect username or password.")
 
-                # It fires an error TODO
+    if not user:
+        print("Invalid request: Email not found")
+        return Callback(False, "Email not found")
 
-                session['User'] = helpers.toJSON(user,User)
+    if not helpers.hashPass(password_to_check, user.Password) == user.Password:
+        print("Invalid request: Incorrect Password")
+        return Callback(False, "Incorrect Password")
 
-                session['Logged_in'] = True
+    if not user.Verified:
+        print("Invalid request: Account is not verified")
+        return Callback(False, "Account is not verified")
 
-                # Store user assistants if they exist, in the session
-                # assistant = assistant_services.getByID(user.Company.ID)
 
-                # Store users access permisions
-                # It fires an error TODO
-                # session['UserAssistants'] = assistant
+    '''
+        If all the tests are valid then do login process
+    '''
+    session['Logged_in'] = True
+    session['user.ID'] = user.ID
+    planNickname = helpers.getPlanNickname(user.SubID)
+    session['UserPlan'] = {
+        'Nickname': '',
+        'Settings': ''
+    }
 
-                    # Set user plan e.g. (Basic, Ultimate...)
-                    # session['UsersPlan'] = {}
-                    # session['UserPlan']['Nickname'] =  helpers.getPlanNickname(user['SubID'])
-                    #
-                    # if helpers.getPlanNickname(user['SubID']) is None:
-                    #     session['UserPlan']['Settings'] = helpers.UserPlans["NoPlan"]
-                    #
-                    # elif "Basic" in helpers.getPlanNickname(user['SubID']):
-                    #     session['UserPlan']['Settings'] = helpers.UserPlans["BasicPlan"]
-                    #
-                    # elif "Advanced" in helpers.getPlanNickname(user['SubID']):
-                    #     session['UserPlan']['Settings'] = helpers.UserPlans["AdvancedPlan"]
-                    #
-                    # elif "Ultimate" in helpers.getPlanNickname(user['SubID']):
-                    #     session['UserPlan']['Settings'] = helpers.UserPlans["UltimatePlan"]
+    session['UserPlan']['Nickname'] = planNickname
 
-                    # Test session specific values
-    #                 print(session)
-    #
-                    # return redirect("/admin/homepage", code=302)
-    #
-    #             else:
-    #                 return redirectWithMessage("login", "Please verify your account before you log in.")
-    # return redirectWithMessage("login", "You entered an incorrect username or password.")
+    if planNickname is None:
+        session['UserPlan']['Settings'] = helpers.UserPlans["NoPlan"]
+
+    elif "Basic" in planNickname:
+        session['UserPlan']['Settings'] = helpers.UserPlans["BasicPlan"]
+
+    elif "Advanced" in planNickname:
+        session['UserPlan']['Settings'] = helpers.UserPlans["AdvancedPlan"]
+
+    elif "Ultimate" in planNickname:
+        session['UserPlan']['Settings'] = helpers.UserPlans["UltimatePlan"]
+
+    return Callback(True, "Login Successful")

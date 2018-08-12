@@ -29,6 +29,7 @@ class User(db.Model):
     StripeID = db.Column(db.String(128), default=None, unique=True)
     SubID = db.Column(db.String(64), default=None, unique=True)
     Verified = db.Column(db.Boolean(), nullable=False, default=False)
+    LastAccess = db.Column(db.DateTime(), nullable=True)
     CreatedOn = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
     # Relationships:

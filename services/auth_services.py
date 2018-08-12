@@ -46,7 +46,6 @@ def login(email: str, password_to_check: str) -> Callback:
     email = email.lower()
     user: User = user_services.getByEmail(email)
 
-
     '''
         Login Exception Handling
     '''
@@ -56,16 +55,15 @@ def login(email: str, password_to_check: str) -> Callback:
 
     if not user:
         print("Invalid request: Email not found")
-        return Callback(False, "Email not found")
+        return Callback(False, "Email not found.")
 
     if not helpers.hashPass(password_to_check, user.Password) == user.Password:
         print("Invalid request: Incorrect Password")
-        return Callback(False, "Incorrect Password")
+        return Callback(False, "Incorrect Password.")
 
     if not user.Verified:
         print("Invalid request: Account is not verified")
-        return Callback(False, "Account is not verified")
-
+        return Callback(False, "Account is not verified.")
 
     '''
         If all the tests are valid then do login process

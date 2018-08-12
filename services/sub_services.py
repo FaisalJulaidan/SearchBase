@@ -1,4 +1,3 @@
-import sqlalchemy.exc
 import stripe
 
 
@@ -32,7 +31,7 @@ def subscribe(email, planNickname, trialDays=None) -> Callback:
     except Exception as e:
         return Callback(False, 'An error occurred while subscribing with Stripe')
 
-    return Callback(True, 'Subscribed successfully',{'stripeID': customer['id'], 'subID': sub['id']})
+    return Callback(True, 'Subscribed successfully', {'stripeID': customer['id'], 'subID': sub['id']})
 
 
 def getPlanByNickname(nickname) -> Plan or None:

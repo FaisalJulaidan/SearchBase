@@ -174,15 +174,15 @@
 
                 <!--<div class="x_panel">
 
-                <h2>Levels of access</h2>
+                    <h2>Levels of access</h2>
 
-                <p><strong>Owner</strong>- Full access with no limits.</p>
-                <p><strong>Admin</strong>- Full access with no limits. Cannot modify <strong>Owner</strong>.</p>
-                <p><strong>User</strong>- Limited access with no access to adding additional users.</p>
-                <p><strong>Developer</strong>- Limited access with no access to any business data. (coming soon)</p>
-                <p><strong>General</strong>- Limited access with no access to technical data. (coming soon)</p>
+                    <p><strong>Owner</strong>- Full access with no limits.</p>
+                    <p><strong>Admin</strong>- Full access with no limits. Cannot modify <strong>Owner</strong>.</p>
+                    <p><strong>User</strong>- Limited access with no access to adding additional users.</p>
+                    <p><strong>Developer</strong>- Limited access with no access to any business data. (coming soon)</p>
+                    <p><strong>General</strong>- Limited access with no access to technical data. (coming soon)</p>
 
-            </div>-->
+                </div>-->
 
             </div>
         </div>
@@ -191,10 +191,10 @@
 {% endblock %}
 
 {% block customJS %}
-  <!-- Custom Theme Scripts -->
-  <script src="/static/build/js/custom.min.js"></script>
+<!-- Custom Theme Scripts -->
+<!--<script src="/static/build/js/custom.min.js"></script>  Bugs the Menu Drop down animation-->
 
-  <script>
+<script>
       // preset functions
       Array.prototype.remove = function () {
           var what, a = arguments, L = a.length, ax;
@@ -209,11 +209,11 @@
 
       // Modify User
       var ownerConfirm = true;
-      
+
       document.getElementById("confirmOwnerB").addEventListener("click", ownerConfirmCall);
 
       document.getElementById("ownerConfirm").style = "display:none";
-      
+
       function checkIfOwner() {
           var conceptName = $('#userRole').find(":selected").text();
           if (conceptName == "Owner") {
@@ -258,5 +258,5 @@
               $("#UserPermission3").prop('checked', true);
           }
       }
-  </script>
+</script>
 {% endblock %}

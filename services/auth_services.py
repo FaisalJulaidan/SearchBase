@@ -22,6 +22,7 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
     if user:
         return Callback(False, 'User already exists.')
 
+
     # Create a new user with its associated company and role
     role = role_services.getByName('Admin')
     company = Company(Name=companyName, Size=companySize, PhoneNumber=companyPhoneNumber, URL=websiteURL)
@@ -55,68 +56,54 @@ def login(email: str, password_to_check: str) -> Callback:
     # test input
     email = "email5"
 
-    user: User = User.query.filter(User.Email == email).first()
+    # user: User = User.query.filter(User.Email == email).first()
+    user: User = user_services.getByEmail(email)
 
-    if user.Email == email:
+    if user:
         password = user.Password
         # todo REMINDER remove the testing if statements
         # if helpers.hash_password(password_to_check, password) == password:
-        if not helpers.hash_password(password_to_check, password) == password:
+        if not helpers.hashPass(password_to_check, password) == password:
             # If credentials are correct and users' account is verified
 
             # if user.Verified:
             if not user.Verified:
-                messages = dumps({"email": escape(email)})
+                # messages = dumps({"email": escape(email)})
                 # Set the session for the logged in user
 
                 # It fires an error TODO
-                # session['User'] = user
+
+                session['User'] = helpers.toJSON(user,User)
 
                 session['Logged_in'] = True
 
                 # Store user assistants if they exist, in the session
-                assistant = assistant_services.getByID(user.Company.ID)
+                # assistant = assistant_services.getByID(user.Company.ID)
 
-                #Store users access permisions
+                # Store users access permisions
                 # It fires an error TODO
                 # session['UserAssistants'] = assistant
 
+                    # Set user plan e.g. (Basic, Ultimate...)
+                    # session['UsersPlan'] = {}
+                    # session['UserPlan']['Nickname'] =  helpers.getPlanNickname(user['SubID'])
+                    #
+                    # if helpers.getPlanNickname(user['SubID']) is None:
+                    #     session['UserPlan']['Settings'] = helpers.UserPlans["NoPlan"]
+                    #
+                    # elif "Basic" in helpers.getPlanNickname(user['SubID']):
+                    #     session['UserPlan']['Settings'] = helpers.UserPlans["BasicPlan"]
+                    #
+                    # elif "Advanced" in helpers.getPlanNickname(user['SubID']):
+                    #     session['UserPlan']['Settings'] = helpers.UserPlans["AdvancedPlan"]
+                    #
+                    # elif "Ultimate" in helpers.getPlanNickname(user['SubID']):
+                    #     session['UserPlan']['Settings'] = helpers.UserPlans["UltimatePlan"]
 
-                # permissionsDic = {}
-                # permissions = query_db("SELECT * FROM UserSettings WHERE CompanyID=?", [session.get('User')['CompanyID']])[0]
-
-                # if "Owner" in session.get('User')['AccessLevel']:
-                #     permissions = permissions["AdminPermissions"].split(";")
-                #         for perm in permissions:
-                #             if perm:
-                #                 permissionsDic[perm.split(":")[0]] = True
-    #                 else:
-    #                     permissions = permissions[session.get('User')['AccessLevel']+"Permissions"].split(";")
-    #                     for perm in permissions:
-    #                         if perm:
-    #                             if "True" in perm.split(":")[1]:
-    #                                 permBool = True
-    #                             else:
-    #                                 permBool = False
-    #                             permissionsDic[perm.split(":")[0]] = permBool
-    #                 session['Permissions'] = dict(permissionsDic)
-    #
-    #                 # Set user plan e.g. (Basic, Ultimate...)
-    #                 session['UserPlan'] = {}
-    #                 session['UserPlan']['Nickname'] =  getPlanNickname(user['SubID'])
-    #                 if getPlanNickname(user['SubID']) is None:
-    #                     session['UserPlan']['Settings'] = NoPlan
-    #                 elif "Basic" in getPlanNickname(user['SubID']):
-    #                     session['UserPlan']['Settings'] = BasicPlan
-    #                 elif "Advanced" in getPlanNickname(user['SubID']):
-    #                     session['UserPlan']['Settings'] = AdvancedPlan
-    #                 elif "Ultimate" in getPlanNickname(user['SubID']):
-    #                     session['UserPlan']['Settings'] = UltimatePlan
-    #
-    #                 # Test session specific values
+                    # Test session specific values
     #                 print(session)
     #
-    #                 return redirect("/admin/homepage", code=302)
+                    # return redirect("/admin/homepage", code=302)
     #
     #             else:
     #                 return redirectWithMessage("login", "Please verify your account before you log in.")

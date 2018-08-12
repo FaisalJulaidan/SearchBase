@@ -1,7 +1,7 @@
 from bcrypt import hashpw, gensalt
 from flask import request, redirect, url_for
 import json
-
+import stripe
 
 def hashPass(password, salt=gensalt()):
     hashed = hashpw(bytes(password, 'utf-8'), salt)

@@ -1,7 +1,7 @@
 import sqlalchemy.exc
 
 from models import User
-from .db_services import _safeCommit
+
 from models import db, Callback, User, Company, Role
 from utilties import helpers
 
@@ -19,7 +19,6 @@ def getAll() -> list:
 
 
 def create(firstname, surname, email, password, company: Company, role: Role, verified=False) -> User or None:
-
     try:
         # Create a new user with its associated company and role
         user = User(Firstname=firstname, Surname=surname, Email=email, Verified=verified,
@@ -29,8 +28,6 @@ def create(firstname, surname, email, password, company: Company, role: Role, ve
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
         return None
-
-    db.session.commit()
     return user
 
 

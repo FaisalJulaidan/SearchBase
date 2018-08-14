@@ -126,11 +126,14 @@ class db_services:
         return db
 
 
-def _safeCommit():
+def _safeCommit(data):
     try:
         db.session.commit()
     except sqlalchemy.exc.SQLAlchemyError as exc:
         db.session.rollback()
         return (Callback(False, exc.orig))
 
-    return (Callback(True, None))
+    if data:
+        return (Callback(True, None, data))
+    else:
+        return (Callback(True, None))

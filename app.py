@@ -20,7 +20,7 @@ from cryptography.fernet import Fernet
 import urllib.request
 
 
-from models import db, Role, Company, Assistant, Plan
+from models import db, Role, Company, Assistant, Plan, Statistics
 from .services.mail_services import mail
 
 # Import all routers to register them as blueprints
@@ -65,16 +65,20 @@ sabic = Company.query.filter(Company.Name == "Sabic").first()
 db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=aramco))
 db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=aramco))
 
+for assistant in aramco.Assistants:
+    db.session.add(Statistics(Name="test",Opened=True, QuestionsAnswered=12, ProductsReturned=12, Assistant=assistant))
+    db.session.add(Statistics(Name="test1", Opened=True, QuestionsAnswered=52, ProductsReturned=32, Assistant=assistant))
+
 db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=sabic))
 db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=sabic))
 
-db.session.add(Role(Name="Admin", EditChatbots=True, EditUsers=True, AccessBilling=False))
+db.session.add(Role(Name="Admin", EditChatbots=True, EditUsers=True, AccessBilling=True))
 db.session.add(Role(Name="User", EditChatbots=False, EditUsers=False, AccessBilling=False))
 
 admin = Role.query.filter(Role.Name == "Admin").first()
 user = Role.query.filter(Role.Name == "User").first()
 
-user_services.create(firstname='firstname', surname='lastname', verified=True, email='aa@aa.com', password='123', company=aramco, role=admin)
+user_services.create(firstname='Ahmad', surname='Hadi', verified=True, email='aa@aa.com', password='123', company=aramco, role=admin)
 user_services.create(firstname='firstname', surname='lastname', email='email2', password='123', company=aramco, role=admin)
 user_services.create(firstname='firstname', surname='lastname', email='email3', password='123', company=aramco, role=user)
 

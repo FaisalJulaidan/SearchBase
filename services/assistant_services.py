@@ -1,5 +1,6 @@
 import sqlalchemy.exc
-
+from flask import session
+from services import user_services
 from models import db, Company, Assistant
 
 
@@ -12,7 +13,19 @@ def getByNickname(nickname) -> Assistant or None:
 
 
 def getAll()-> list:
-    return db.session.query(Assistant)
+    user = user_services.getByID(session['userID'])
+    return user.Company.Assistants
+
+def getAllAsList()-> list:
+    myList = []
+    user = user_services.getByID(session['userID'])
+    for assistant in user.Company.Assistants:
+        myList.append({
+            "ID": assistant.ID,
+            "Nickname": assistant.Nickname
+        })
+
+    return myList
 
 
 def create(nickname, route, message, secondsUntilPopup, company: Company) -> Assistant or None:

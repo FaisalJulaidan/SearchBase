@@ -81,7 +81,7 @@ def login():
         callback: Callback = auth_services.login(email,password_to_check)
 
         if callback.Success:
-            return redirect("/admin/homepage", code=302)
+            return redirect("/admin/dashboard", code=302)
         else:
             return helpers.redirectWithMessage("login", callback.Message)
 

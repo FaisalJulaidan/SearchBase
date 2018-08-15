@@ -12,9 +12,10 @@ def getByNickname(nickname) -> Assistant or None:
     return db.session.query(Assistant).filter(Assistant.Nickname == nickname).first()
 
 
-def getAll()-> list:
-    user = user_services.getByID(session['userID'])
-    return user.Company.Assistants
+def getAll(companyID):
+
+    return db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all().asdict()
+
 
 def getAllAsList()-> list:
     myList = []

@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from .homepage.homepage import homepage_router
+from .homepage.dashboard import homepage_router
 homepage_router: Blueprint = homepage_router
 
 from .profile.profile import profile_router

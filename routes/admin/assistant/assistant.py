@@ -2,10 +2,11 @@ from flask import Blueprint, render_template, request, redirect
 from services import statistics_services, assistant_services
 from models import Callback
 
-homepage_router: Blueprint = Blueprint('homepage_router', __name__ , template_folder="../../templates")
+assistant_router: Blueprint = Blueprint('assistant_router', __name__ , template_folder="../../templates")
 
-# Admin pages
-@homepage_router.route("/admin/homepage", methods=['GET'])
+
+# get all assistants
+@assistant_router.route("/admin/assistants", methods=['GET'])
 def admin_home():
     if request.method == "GET":
         callback: Callback = statistics_services.getTotalAll()
@@ -17,3 +18,5 @@ def admin_home():
         else:
             print(callback.Message)
             return redirect('login')
+
+

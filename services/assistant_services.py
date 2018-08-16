@@ -2,7 +2,7 @@ import sqlalchemy.exc
 from flask import session
 from services import user_services
 from models import db, Company, Assistant
-
+from utilties import helpers
 
 def getByID(id) -> Assistant or None:
     return db.session.query(Assistant).get(id)
@@ -13,8 +13,14 @@ def getByNickname(nickname) -> Assistant or None:
 
 
 def getAll(companyID):
+    # we map each record to be a dict then the map object we convert it to a list
+    # Explanation: map(function_to_apply, list_of_inputs)
 
-    return db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all().asdict()
+    # Note the results variable is just for explanation purposes we can remove it later
+    results = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
+    return list(map(helpers.object_as_dict, results))
+
+    # return db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
 
 
 def getAllAsList()-> list:

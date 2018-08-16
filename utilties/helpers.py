@@ -1,5 +1,6 @@
 from bcrypt import hashpw, gensalt
 from flask import request, redirect, url_for
+from sqlalchemy import inspect
 import json
 import stripe
 import re
@@ -52,3 +53,8 @@ def isValidEmail(email: str) -> bool:
     if not re.match("[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}", email):
         return False
     return True
+
+
+def object_as_dict(obj):
+    return {c.key: getattr(obj, c.key)
+            for c in inspect(obj).mapper.column_attrs}

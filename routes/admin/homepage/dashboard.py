@@ -11,10 +11,16 @@ def admin_home():
     if request.method == "GET":
         callback: Callback = statistics_services.getTotalAll()
 
+        # def object_as_dict(obj):
+        #     return {c.key: getattr(obj, c.key)
+        #             for c in inspect(obj).mapper.column_attrs}
+
         # TESTING
         row = assistant_services.getAll(1)
-        a = dict((col, getattr(row, col)) for col in row[0].__table__.columns.keys())
         print(row)
+        # for u in row:
+        #     print(u)
+            # print(hepler.sobject_as_dict(u))
         # #########
 
         if callback.Success:

@@ -17,8 +17,11 @@ def getAll(companyID):
     # Explanation: map(function_to_apply, list_of_inputs)
 
     # Note the results variable is just for explanation purposes we can remove it later
-    results = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
-    return list(map(helpers.object_as_dict, results))
+    return helpers.getListFromSQLAlchemy(db.session.query(Assistant)
+                                         .filter(Assistant.CompanyID == companyID)
+                                         .all()
+                                         )
+
 
     # return db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
 

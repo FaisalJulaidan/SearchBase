@@ -1,7 +1,6 @@
 from bcrypt import hashpw, gensalt
 from flask import request, redirect, url_for
 from sqlalchemy import inspect
-import json
 import stripe
 import re
 
@@ -55,6 +54,10 @@ def isValidEmail(email: str) -> bool:
     return True
 
 
-def object_as_dict(obj):
-    return {c.key: getattr(obj, c.key)
-            for c in inspect(obj).mapper.column_attrs}
+def getListFromSQLAlchemy(SQLAlchemyResult):
+    def _object_as_dict(obj):
+        return {c.key: getattr(obj, c.key)
+                for c in inspect(obj).mapper.column_attrs}
+
+    return list(map(_object_as_dict, SQLAlchemyResult))
+

@@ -1,45 +1,31 @@
 import sqlalchemy.exc
 from flask import session
 from services import user_services
-from models import db, Company, Assistant
+from models import db, Company, Assistant,Callback
 from utilties import helpers
 
-def getByID(id) -> Assistant or None:
-    return db.session.query(Assistant).get(id)
+def getByID(id) -> Callback:
+    try:
+        return Callback(True,
+                        "Got assistant by id",
+                        db.session.query(Assistant).get(id))
+    except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
+        print(exc)
+        return Callback(False,
+                        "Error: Couldn't get the assistant by id")
+
 
 
 def getByNickname(nickname) -> Assistant or None:
     return db.session.query(Assistant).filter(Assistant.Nickname == nickname).first()
 
 
-def getAll(companyID):
-    # we map each record to be a dict then the map object we convert it to a list
-    # Explanation: map(function_to_apply, list_of_inputs)
-
-    # Note the results variable is just for explanation purposes we can remove it later
+def getAll(companyID) -> list:
     return helpers.getListFromSQLAlchemy(db.session.query(Assistant)
                                          .filter(Assistant.CompanyID == companyID)
-                                         .all()
-                                         )
-
-
-    # return db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
-
-
-def getAllAsList()-> list:
-    myList = []
-    user = user_services.getByID(session['userID'])
-    for assistant in user.Company.Assistants:
-        myList.append({
-            "ID": assistant.ID,
-            "Nickname": assistant.Nickname
-        })
-
-    return myList
-
+                                         .all())
 
 def create(nickname, route, message, secondsUntilPopup, company: Company) -> Assistant or None:
-
     try:
         # Create a new user with its associated company and role
         assistant = Assistant(Nickname=nickname, Route=route, Message=message,
@@ -55,7 +41,6 @@ def create(nickname, route, message, secondsUntilPopup, company: Company) -> Ass
 
 
 def removeByNickname(nickname) -> bool:
-
     try:
      db.session.query(Assistant).filter(Assistant.Nickname == nickname).delete()
     except sqlalchemy.exc.SQLAlchemyError as exc:

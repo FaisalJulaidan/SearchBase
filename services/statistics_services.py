@@ -7,12 +7,11 @@ from services import user_services, db_services
 def getByAssistantID(id) -> Statistics:
     return db.session.query(Statistics).get(id)
 
-def getTotalAll() -> Callback:
+def getTotalAll(assistants) -> Callback:
     answered = 0
     products = 0
     try:
-        user = user_services.getByID(session['userID'])
-        for assistant in user.Company.Assistants:
+        for assistant in assistants:
             statistic = getByAssistantID(assistant.ID)
             answered += statistic.QuestionsAnswered
             products += statistic.ProductsReturned

@@ -1,13 +1,26 @@
 import sqlalchemy.exc
 
-from models import User
-
 from models import db, Callback, User, Company, Role
 from utilties import helpers
+from flask import session
 
+def getUserFromSession() -> Callback:
+    try:
+        return Callback(True,
+                        "Got the user from session",
+                        getByID(session['userID']))
+    except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
+        return Callback(False,
+                        "Error: Couldn't get user from session")
 
-def getByID(id) -> User or None:
-    return db.session.query(User).get(id)
+def getByID(id) -> Callback:
+    try:
+        return Callback(True,
+                        "Got the user from session",
+                        db.session.query(User).get(id))
+    except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
+        return Callback(False,
+                        "Error: Couldn't get user from session")
 
 
 def getByEmail(email) -> User or None:

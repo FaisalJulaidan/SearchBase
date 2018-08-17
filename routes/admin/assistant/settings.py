@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, session
-from services import statistics_services, assistant_services,user_services, auth_services
-from models import Callback
+from services import statistics_services, assistant_services,admin_services, auth_services
+from models import Callback, Assistant
 
 settings_router: Blueprint = Blueprint('settings_router', __name__, template_folder="../../templates")
 
@@ -10,13 +10,14 @@ def admin_assistant_edit(assistantID):
     if request.method == "GET" and auth_services.isLogged():
         callback: Callback = assistant_services.getByID(assistantID)
         if callback.Success:
-            message = callback.Data.Message
-            autoPop = callback.Data.SecondsUntilPopup
-            nickname = callback.Data.Nickname
-            active = callback.Data.Active
-            return render_template("admin/edit-assistant.html",
-                                   autopop=autoPop, message=message, id=assistantID,
-                                   nickname=nickname, active=active)
+            assistant: Assistant = callback.Data
+            print(assistant.SecondsUntilPopup)
+            return admin_services.render("admin/edit-assistant.html",
+                                         message=assistant.Message,
+                                         autopop=assistant.SecondsUntilPopup,
+                                         nickname=assistant.Nickname,
+                                         active=assistant.Active,
+                                         id=assistant.ID)
         else:
             print(callback.Message)
             return redirect('login')

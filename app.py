@@ -64,15 +64,15 @@ db.session.add(Company(Name='Sabic', Size=12, PhoneNumber='4344423', URL='ff.com
 aramco = Company.query.filter(Company.Name == "Aramco").first()
 sabic = Company.query.filter(Company.Name == "Sabic").first()
 
-db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=aramco))
-db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=aramco))
+db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
+db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
 
 for assistant in aramco.Assistants:
     db.session.add(Statistics(Name="test",Opened=True, QuestionsAnswered=12, ProductsReturned=12, Assistant=assistant))
     db.session.add(Statistics(Name="test1", Opened=True, QuestionsAnswered=52, ProductsReturned=32, Assistant=assistant))
 
-db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=sabic))
-db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup="1",Active=True, Company=sabic))
+db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
+db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
 
 db.session.add(Role(Name="Admin", EditChatbots=True, EditUsers=True, AccessBilling=True))
 db.session.add(Role(Name="User", EditChatbots=False, EditUsers=False, AccessBilling=False))

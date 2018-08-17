@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template,redirect
 from services import auth_services, assistant_services, user_services
 from models import Callback, User
 
@@ -15,4 +15,3 @@ def render(template, **context):
             raise ValueError('Can not render a template')
     else:
         raise ValueError('Can not render a template')
-

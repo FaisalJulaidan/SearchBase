@@ -26,16 +26,38 @@ from .services.mail_services import mail
 # Import all routers to register them as blueprints
 from routes.admin.routers import homepage_router, profile_router,  admin_api, settings_router
 from routes.public.routers import public_router
-from services import user_services
+from services import user_services, auth_services
 
 app = Flask(__name__, static_folder='static')
-
 
 app.register_blueprint(homepage_router)
 app.register_blueprint(public_router)
 app.register_blueprint(profile_router)
 app.register_blueprint(admin_api)
 app.register_blueprint(settings_router)
+
+# code to ensure user is logged in
+@app.before_request
+def before_request():
+    currentURL = str(request.url_rule)
+    # restrictedRoutes = ['/admin', 'admin/homepage']
+    # If the user try to visit one of the restricted routes without logging in he will be redirected
+    if 'admin' in currentURL:
+        if not auth_services.isLogged():
+            return redirect('login')
+
+    #if on admin route
+    # if any(route in theurl for route in restrictedRoutes):
+    #     Check user permissions as user type
+        # if not session['Permissions']["EditChatbots"] and "/admin/assistant" in theurl:
+        #     return redirect("/admin/homepage", code=302)
+        # if not session['Permissions']["EditUsers"] and "/admin/users" in theurl:
+        #     return redirect("/admin/homepage", code=302)
+        # if not session['Permissions']["AccessBilling"] and "/admin/assistant/" in theurl:
+        #     return redirect("/admin/homepage", code=302)
+
+        #Check user plan permissions
+        # print("PLAN:", session.get('UserPlan', []))
 
 #################################
 #      THIS IS TO BE ABLE       #
@@ -99,6 +121,7 @@ db.session.commit()
 
 #################################
 
+
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -156,29 +179,6 @@ def allowed_image_file(filename):
     ext = filename.rsplit('.', 1)[1]
     return '.' in filename and ext in ALLOWED_IMAGE_EXTENSION
 
-
-# code to ensure user is logged in
-# @app.before_request
-# def before_request():
-#     print(encryption)
-#     theurl = str(request.url_rule)
-#     restrictedRoutes = ['/admin', 'admin/homepage']
-#     # If the user try to visit one of the restricted routes without logging in he will be redirected
-#     if any(route in theurl for route in restrictedRoutes) and not session.get('Logged_in', False):
-#         return redirectWithMessage("login", "Please log in first")
-#     #if on admin route
-#     if any(route in theurl for route in restrictedRoutes):
-#         #Check user permissions as user type
-#         if not session['Permissions']["EditChatbots"] and "/admin/assistant" in theurl:
-#             return redirect("/admin/homepage", code=302)
-#         if not session['Permissions']["EditUsers"] and "/admin/users" in theurl:
-#             return redirect("/admin/homepage", code=302)
-#         if not session['Permissions']["AccessBilling"] and "/admin/assistant/" in theurl:
-#             return redirect("/admin/homepage", code=302)
-#
-#         #Check user plan permissions
-#         print("PLAN:", session.get('UserPlan', []))
-#
 
 def checkAssistantID(assistantID):
     assistantRecord = query_db("SELECT * FROM Assistants WHERE ID=?", [assistantID,], True)

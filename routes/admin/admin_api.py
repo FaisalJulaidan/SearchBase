@@ -1,6 +1,6 @@
-from flask import Blueprint, request, session, jsonify
+from flask import Blueprint, request, session, jsonify, redirect
 from services import user_services
-
+from models import Callback
 
 admin_api: Blueprint = Blueprint('admin_api', __name__ ,template_folder="../../templates")
 
@@ -9,29 +9,46 @@ admin_api: Blueprint = Blueprint('admin_api', __name__ ,template_folder="../../t
 @admin_api.route("/admin/getadminpagesdata", methods=['POST'])
 def adminPagesData():
     if request.method == "POST":
-        user = user_services.getByID(session['userID'])
+        callback: Callback = user_services.getUserFromSession()
+        if callback.Success:
+            user = callback.Data
+            callback: Callback = user_services.getByID(user.ID)
+            if callback.Success:
+                return jsonify({
+                    "name": callback.data.Firstname + " " + callback.data.Surname,
+                    "EditChatbots": callback.data.Role.EditChatbots,
+                    "AccessBilling": callback.data.Role.AccessBilling,
+                    "EditUsers": callback.data.Role.EditUsers
+                })
+            else:
+                print(callback.Message)
+                return redirect('login')
+        else:
+            print(callback.Message)
+            return redirect('login')
 
-
-        json = {
-            "name": user.Firstname + " " + user.Surname,
-            "EditChatbots":user.Role.EditChatbots,
-            "AccessBilling":user.Role.AccessBilling,
-            "EditUsers":user.Role.EditUsers
-        }
-        return jsonify(json)
 
 
 #data for the user which to be displayed on every admin page
 @admin_api.route("/admin/userData", methods=['GET'])
 def getUserData():
     if request.method == "GET":
-        user = user_services.getByID(session['userID'])
-        userDict = {
-            "id": user.ID,
-            "email": user.Email,
-            "firstname": user.Firstname,
-            "surname": user.Surname,
-            "stripeID": user.StripeID,
-            "subID": user.SubID,
-        }
-        return jsonify(userDict)
+        callback: Callback = user_services.getUserFromSession()
+        if callback.Success:
+            user = callback.Data
+            callback: Callback = user_services.getByID(user.ID)
+            if callback.Success:
+                return jsonify({
+                    "id": callback.Data.ID,
+                    "email": callback.Data.Email,
+                    "firstname": callback.Data.Firstname,
+                    "surname": callback.Data.Surname,
+                    "stripeID": callback.Data.StripeID,
+                    "subID": callback.Data.SubID,
+                })
+            else:
+                print(callback.Message)
+                return redirect('login')
+        else:
+            print(callback.Message)
+            return redirect('login')

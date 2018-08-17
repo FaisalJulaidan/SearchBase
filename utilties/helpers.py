@@ -1,5 +1,5 @@
 from bcrypt import hashpw, gensalt
-from flask import request, redirect, url_for
+from flask import request, redirect, url_for, session, render_template
 from sqlalchemy import inspect
 import stripe
 import re
@@ -61,3 +61,8 @@ def getListFromSQLAlchemy(SQLAlchemyResult):
 
     return list(map(_object_as_dict, SQLAlchemyResult))
 
+
+def render(template, **context):
+    if session.get('Logged_in', False):
+        return render_template(template, debug=0, assistants=session.get('UserAssistants', []), **context)
+    return render_template(template, debug=0, **context)

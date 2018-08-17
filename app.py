@@ -24,7 +24,7 @@ from models import db, Role, Company, Assistant, Plan, Statistics
 from .services.mail_services import mail
 
 # Import all routers to register them as blueprints
-from routes.admin.routers import homepage_router, profile_router,  admin_api
+from routes.admin.routers import homepage_router, profile_router,  admin_api, settings_router
 from routes.public.routers import public_router
 from services import user_services
 
@@ -35,6 +35,7 @@ app.register_blueprint(homepage_router)
 app.register_blueprint(public_router)
 app.register_blueprint(profile_router)
 app.register_blueprint(admin_api)
+app.register_blueprint(settings_router)
 
 #################################
 #      THIS IS TO BE ABLE       #
@@ -45,6 +46,7 @@ app.register_blueprint(admin_api)
 
 app.config.from_object('config.DevelopmentConfig')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
+
 
 db.init_app(app)
 mail.init_app(app)
@@ -419,56 +421,6 @@ def admin_assistant_delete(assistantID):
         else:
             return redirect("/admin/homepage")
 
-
-@app.route("/admin/assistant/<assistantID>/settings", methods=['GET', 'POST'])
-def admin_assistant_edit(assistantID):
-    checkAssistantID(assistantID)
-    if request.method == "GET":
-        msg = checkForMessageWhenAssistantID()
-        email = session.get('User')['Email']
-        assistant = query_db("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?", [assistantID, session.get('User')['CompanyID']], True)
-        if assistant is None or "Error" in assistant:
-            abort(status.HTTP_404_NOT_FOUND, "Error in getting assistant")
-        else:
-            message = assistant["Message"]
-            autoPop = assistant["SecondsUntilPopup"]
-            nickname = assistant["Nickname"]
-            active = assistant["Active"]
-
-            return render("admin/edit-assistant.html", autopop=autoPop, message=message, id=assistantID,
-                            nickname=nickname, active=active, msg=msg)
-
-    elif request.method == "POST":
-        email = session.get('User')['Email']
-        company = get_company(email)
-        if company is None or "Error" in company:
-            return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in getting the company's records!")
-        else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-                                                   [assistantID, company[0]])
-            if assistant is None or "Error" in assistant:
-                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in getting the assistant's records!")
-            else:
-                nickname = request.form.get("nickname", default="Error")
-                message = request.form.get("welcome-message", default="Error")
-                popuptime = request.form.get("timeto-autopop", default="Error")
-                autopopup = request.form.get("switch-autopop", default="off")
-
-                if message is "Error" or nickname is "Error" or (popuptime is "Error" and autopopup is not "off"):
-                    return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in getting your inputs!")
-                else:
-                    if autopopup == "off":
-                        secondsUntilPopup = "Off"
-                    else:
-                        secondsUntilPopup = popuptime
-                    updateAssistant = update_table(
-                        "UPDATE Assistants SET Message=?, SecondsUntilPopup=?, Nickname=? WHERE ID=? AND CompanyID=?",
-                        [message, secondsUntilPopup, nickname, assistantID, company[0]])
-
-                    if "Error" in updateAssistant:
-                        return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in updating assistant!")
-                    else:
-                        return redirect("/admin/assistant/{}/settings".format(assistantID))
 
 
 @app.route("/admin/assistant/active/<turnto>/<assistantID>", methods=['GET'])

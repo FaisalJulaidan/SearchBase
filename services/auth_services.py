@@ -10,6 +10,13 @@ from services import user_services, assistant_services, role_services, sub_servi
 from utilties import helpers
 
 
+def isLogged() -> bool:
+    try:
+        if session['Logged_in']:
+            return True
+    except Exception:
+        return False
+
 def signup(email, firstname, surname, password, companyName, companySize, companyPhoneNumber, websiteURL) -> Callback:
     # Validate Email
     if helpers.isValidEmail(email):

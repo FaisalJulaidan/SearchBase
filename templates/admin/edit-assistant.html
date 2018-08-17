@@ -52,11 +52,12 @@
     <br>
     <br>-->
 
+
                                 <h4>Would you like the chat bot to automatically open for the user?</h4>
                                 <label class="switch">
                                     <input id="switch-autopop" name="switch-autopop" type="checkbox"
                                            onclick="switchchecked()"
-                                           {% if autopop !='Off' %} checked {% endif %}>
+                                           {% if autopop !=0.0 %} checked {% endif %}>
                                     <span class="slider round"></span>
                                 </label>
                                 <br>
@@ -72,7 +73,7 @@
                                     <input name="timeto-autopop" style="width:50px"
                                            class="form-control col-md-5 col-xs-10"
                                            id="bot_time" type="text"
-                                           {% if autopop !='Off' %}
+                                           {% if autopop !=0.0 %}
                                            value="{{ autopop }}"
                                            {% else %}
                                            value="6"

@@ -1,11 +1,11 @@
-from flask import render_template,redirect
+from flask import render_template,redirect, session
 from services import auth_services, assistant_services, user_services
 from models import Callback, User
 
 
 def render(template, **context):
-    if auth_services.isLogged():
-        callback: Callback = user_services.getUserFromSession()
+    if session.get('Logged_in', False):
+        callback: Callback = user_services.getByID(session['userID'])
         if callback.Success:
             user: User = callback.Data
             return render_template(template,

@@ -1,7 +1,7 @@
 from flask import Blueprint
 
-from .homepage.dashboard import homepage_router
-homepage_router: Blueprint = homepage_router
+from .dashboard.dashboard import dashboard_router
+dashboard_router: Blueprint = dashboard_router
 
 from .profile.profile import profile_router
 profile_router: Blueprint = profile_router

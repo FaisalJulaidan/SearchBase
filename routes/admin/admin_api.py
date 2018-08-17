@@ -4,10 +4,10 @@ from models import Callback, User
 admin_api: Blueprint = Blueprint('admin_api', __name__ ,template_folder="../../templates")
 
 
-#data for the user which to be displayed on every admin page
+# Data for the user which to be displayed on every admin page
 @admin_api.route("/admin/getadminpagesdata", methods=['POST'])
 def adminPagesData():
-    if request.method == "POST" and auth_services.isLogged():
+    if request.method == "POST" and session.get('Logged_in', False):
         callback: Callback = user_services.getByID(session['userID'])
         if callback.Success:
             user: User = callback.Data
@@ -28,7 +28,7 @@ def adminPagesData():
 #data for the user which to be displayed on every admin page
 @admin_api.route("/admin/userData", methods=['GET'])
 def getUserData():
-    if request.method == "GET" and auth_services.isLogged():
+    if request.method == "GET" and session.get('Logged_in', False):
         callback: Callback = user_services.getByID(session['userID'])
         if callback.Success:
             user: User = callback.Data

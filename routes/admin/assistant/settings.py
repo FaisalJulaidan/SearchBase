@@ -7,11 +7,10 @@ settings_router: Blueprint = Blueprint('settings_router', __name__, template_fol
 
 @settings_router.route("/admin/assistant/<assistantID>/settings", methods=['GET', 'POST'])
 def admin_assistant_edit(assistantID):
-    if request.method == "GET" and auth_services.isLogged():
+    if request.method == "GET":
         callback: Callback = assistant_services.getByID(assistantID)
         if callback.Success:
             assistant: Assistant = callback.Data
-            print(assistant.SecondsUntilPopup)
             return admin_services.render("admin/edit-assistant.html",
                                          message=assistant.Message,
                                          autopop=assistant.SecondsUntilPopup,
@@ -21,8 +20,6 @@ def admin_assistant_edit(assistantID):
         else:
             print(callback.Message)
             return redirect('login')
-    else:
-        return redirect('login')
 
     # elif request.method == "POST":
     #     email = session.get('User')['Email']

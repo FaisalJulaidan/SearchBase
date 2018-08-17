@@ -35,4 +35,9 @@ def subscribe(email, planNickname, trialDays=None) -> Callback:
 
 
 def getPlanByNickname(nickname) -> Plan or None:
-    return db.session.query(Plan).filter(Plan.Nickname == nickname).first()
+    try:
+        return Callback(True, 'No message.',
+                        db.session.query(Plan).filter(Plan.Nickname == nickname).first())
+    except Exception as e:
+        return Callback(False, 'Could not find a plan with ' + nickname + ' nickname',
+                        db.session.query(Plan).filter(Plan.Nickname == nickname).first())

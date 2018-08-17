@@ -4,31 +4,25 @@ from models import db, Callback, User, Company, Role
 from utilties import helpers
 from flask import session
 
-def getUserFromSession() -> Callback:
-    try:
-        callback: Callback = getByID(session['userID'])
-        if callback.Success:
-            return Callback(True,
-                            "Got the user from session",callback.Data)
-        else:
-            raise ValueError('User is not in session')
-
-    except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
-        return Callback(False,
-                        "Error: Couldn't get user from session " + exc.args[0])
 
 def getByID(id) -> Callback:
     try:
         return Callback(True,
-                        "Got the user from session",
+                        'User with ID ' + str(id) + ' was successfully retrieved',
                         db.session.query(User).get(id))
     except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
         return Callback(False,
-                        "Error: Couldn't get user from session")
+                        'User with ID ' + str(id) + ' does not exist')
 
 
 def getByEmail(email) -> User or None:
-    return db.session.query(User).filter(User.Email == email).first()
+    try:
+        return Callback(True,
+                        'User with email ' + email + ' was successfully retrieved.',
+                        db.session.query(User).filter(User.Email == email).first())
+    except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
+        return Callback(False,
+                        'User with email ' + email + ' does not exist.')
 
 
 def getAll() -> list:
@@ -44,8 +38,8 @@ def create(firstname, surname, email, password, company: Company, role: Role, ve
         db.session.add(user)
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
-        return None
-    return user
+        return Callback(False, 'Sorry, Could not create the user.')
+    return Callback(True, 'User has been created successfully!')
 
 
 def updateSubID(email, subID: str):

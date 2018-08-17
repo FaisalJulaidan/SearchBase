@@ -24,37 +24,39 @@ from models import db, Role, Company, Assistant, Plan, Statistics
 from .services.mail_services import mail
 
 # Import all routers to register them as blueprints
-from routes.admin.routers import homepage_router, profile_router,  admin_api, settings_router
+from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router
 from routes.public.routers import public_router
 from services import user_services, auth_services
 
 app = Flask(__name__, static_folder='static')
 
-app.register_blueprint(homepage_router)
+app.register_blueprint(dashboard_router)
 app.register_blueprint(public_router)
 app.register_blueprint(profile_router)
 app.register_blueprint(admin_api)
 app.register_blueprint(settings_router)
 
+
 # code to ensure user is logged in
 @app.before_request
 def before_request():
+
     currentURL = str(request.url_rule)
-    # restrictedRoutes = ['/admin', 'admin/homepage']
+    restrictedRoutes = ['/admin', 'admin/dashboard']
+
     # If the user try to visit one of the restricted routes without logging in he will be redirected
-    if 'admin' in currentURL:
-        if not auth_services.isLogged():
-            return redirect('login')
+    if any(route in currentURL for route in restrictedRoutes) and not session.get('Logged_in', False):
+        return redirect('login')
 
     #if on admin route
     # if any(route in theurl for route in restrictedRoutes):
     #     Check user permissions as user type
         # if not session['Permissions']["EditChatbots"] and "/admin/assistant" in theurl:
-        #     return redirect("/admin/homepage", code=302)
+        #     return redirect("/admin/dashboard", code=302)
         # if not session['Permissions']["EditUsers"] and "/admin/users" in theurl:
-        #     return redirect("/admin/homepage", code=302)
+        #     return redirect("/admin/dashboard", code=302)
         # if not session['Permissions']["AccessBilling"] and "/admin/assistant/" in theurl:
-        #     return redirect("/admin/homepage", code=302)
+        #     return redirect("/admin/dashboard", code=302)
 
         #Check user plan permissions
         # print("PLAN:", session.get('UserPlan', []))
@@ -183,9 +185,9 @@ def allowed_image_file(filename):
 def checkAssistantID(assistantID):
     assistantRecord = query_db("SELECT * FROM Assistants WHERE ID=?", [assistantID,], True)
     if assistantRecord is None:
-        return redirect("/admin/homepage", code=302)
+        return redirect("/admin/dashboard", code=302)
     elif session.get('User')['CompanyID'] is not assistantRecord['CompanyID']:
-        return redirect("/admin/homepage", code=302)
+        return redirect("/admin/dashboard", code=302)
 
 
 # @app.route("/testdb", methods=['GET'])
@@ -398,7 +400,7 @@ def admin_assistant_delete(assistantID):
             if user["Email"] == email:
                 userCompanyID = user["CompanyID"]
         if userCompanyID == "Error":
-            return redirect("/admin/homepage")
+            return redirect("/admin/dashboard")
         assistantCompanyID = select_from_database_table("SELECT CompanyID FROM Assistants WHERE ID=?", [assistantID])
 
         #Check if the user is from the company that owns the assistant
@@ -415,11 +417,11 @@ def admin_assistant_delete(assistantID):
                 else:
                     session['UserAssistants'] = []
 
-                return redirect("/admin/homepage")
+                return redirect("/admin/dashboard")
             else:
                 return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in deleting assistant!")
         else:
-            return redirect("/admin/homepage")
+            return redirect("/admin/dashboard")
 
 
 
@@ -1250,7 +1252,7 @@ def admin_users_delete(userID):
         #Check that users are from the same company and operating user isnt 'User'
         if requestingUser["AccessLevel"] == "User" or requestingUser["CompanyID"] != targetUser:
             #TODO send feedback message
-            return redirect("/admin/homepage", code=302)
+            return redirect("/admin/dashboard", code=302)
         delete_from_table("DELETE FROM Users WHERE ID=?;", [userID])
         return redirectWithMessage("admin_users", "User has been deleted.")
 

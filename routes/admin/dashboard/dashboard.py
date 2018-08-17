@@ -14,7 +14,7 @@ def admin_home():
             user: User = callback.Data
             callback: Callback = statistics_services.getTotalAll(user.Company.Assistants)
             if callback.Success:
-                return admin_services.render("admin/main.html",
+                return admin_services.render("admin/dashboard.html",
                                              totalClicks=callback.Data.ProductsReturned,
                                              loadedAnswers=callback.Data.QuestionsAnswered)
             else:

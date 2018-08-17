@@ -11,7 +11,7 @@ def admin_home():
     if request.method == "GET":
         callback: Callback = statistics_services.getTotalAll()
         if callback.Success:
-            return render_template("admin/main.html",
+            return render_template("admin/dashboard.html",
                                    totalClicks=callback.Data.ProductsReturned,
                                    loadedAnswers=callback.Data.QuestionsAnswered,
                                    assistants=assistant_services.getAllAsList())

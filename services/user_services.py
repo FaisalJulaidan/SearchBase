@@ -6,12 +6,16 @@ from flask import session
 
 def getUserFromSession() -> Callback:
     try:
-        return Callback(True,
-                        "Got the user from session",
-                        getByID(session['userID']))
+        callback: Callback = getByID(session['userID'])
+        if callback.Success:
+            return Callback(True,
+                            "Got the user from session",callback.Data)
+        else:
+            raise ValueError('User is not in session')
+
     except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
         return Callback(False,
-                        "Error: Couldn't get user from session")
+                        "Error: Couldn't get user from session " + exc.args[0])
 
 def getByID(id) -> Callback:
     try:

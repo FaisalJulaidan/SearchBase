@@ -1,191 +1,105 @@
 
-from flask import Blueprint, request, redirect
+from flask import Blueprint, request, redirect, abort, render_template, session, jsonify
+from flask_api import status
+from services import admin_services, sub_services, user_services, assistant_services
+from utilties import helpers
+import stripe
+from models import Callback, User
+
 
 sub_router: Blueprint = Blueprint('sub_router', __name__ ,template_folder="../../templates")
 
+pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
+secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
+encryption = None
 
-def is_coupon_valid(coupon="Error"):
-    try:
-        print(coupon)
-        stripe.Coupon.retrieve(coupon)
-        return True
-    except stripe.error.StripeError as e:
-        print("coupon is not valid")
-        return False
+stripe.api_key = secret_key
 
-
-def getPlanNickname(SubID=None):
-    try:
-        # Get subscription object from Stripe API
-        subscription = stripe.Subscription.retrieve(SubID)
-
-        # Debug
-        print(subscription)
-
-        # Return the subscription item's plan nickname e.g (Basic, Ultimate...)
-        return subscription["items"]["data"][0]["plan"]["nickname"]
-
-    except stripe.error.StripeError as e:
-        return None
+stripe_keys = {
+    'secret_key': secret_key,
+    'publishable_key': pub_key
+}
 
 
-@sub_router.route("/admin/check-out/<planID>", methods=['GET', 'POST'])
+@sub_router.route("/admin/pricing", methods=['GET'])
+def admin_pricing():
+    return admin_services.render("admin/pricing-tables.html", pub_key=pub_key)
+
+
+@sub_router.route("/admin/subscribe/<planID>", methods=['GET', 'POST'])
 def admin_pay(planID):
     if request.method == 'GET':
 
-        try:
-            plan = stripe.Plan.retrieve(planID)
-        except stripe.error.InvalidRequestError as e:
-            abort(status.HTTP_400_BAD_REQUEST, "This plan doesn't exist! Make sure the plan ID is correct.")
+        stripePlan_callback: Callback = sub_services.getStripePlan(planID)
+        print(stripePlan_callback.Message)
+        if not stripePlan_callback.Success:
+            helpers.redirectWithMessage('admin_pricing', 'This plan does not exist! Make sure the plan ID '
+                                        + planID + ' is correct.')
 
-        # print(plan)
-        return render("admin/check-out.html", plan=plan)
+        stripePlan = stripePlan_callback.Data
+        return admin_services.render("admin/check-out.html", plan=stripePlan)
 
     if request.method == 'POST':
 
         if not session.get('Logged_in', False):
-            redirectWithMessage("login", "You must login first!")
+            helpers.redirectWithMessage("login", "You must login first!")
 
-        # Get Stripe from data. That's includ the generated token using JavaScript
+        # Get Stripe from passed data. That's include the generated token using JavaScript
         data = request.get_json(silent=True)
-        # print(data)
         token = data['token']['id']
         coupon = data['coupon']
 
         if token is "Error":
-            # TODO improve this
             return jsonify(error="No token provided to complete the payment!")
 
-        # Get the plan opject from Stripe API
-        try:
-            plan = stripe.Plan.retrieve(planID)
-        except stripe.error.StripeError as e:
-            return jsonify(error="This plan does't exist! Make sure the plan ID is correct.")
+        sub_callback: Callback = sub_services.subscribe(email=session.get('userEmail', 'Invalid Email'),
+                                                        planID=planID, token=token, coupon=coupon)
 
-        # Validate the given coupon.
-        if coupon == "" or coupon is None or coupon == "Error":
-            # If coupon is not provided set it to None as Stripe API require.
-            coupon = None
-            print("make no use of coupons")
+        if not sub_callback.Success:
+            return jsonify(error=sub_callback.Message)
 
-        elif not (is_coupon_valid(coupon)):
-            print("The coupon used is not valid")
-            return jsonify(error="The coupon used is not valid")
+        # Reaching to this point means no errors and subscription is successful
 
-        # If no errors occurred, subscribe the user to plan.
+        # session['UserPlan']['Nickname'] = getPlanNickname(subscription['id'])
+        # if getPlanNickname(user['SubID']) is None:
+        #     session['UserPlan']['Settings'] = NoPlan
+        # elif "Basic" in getPlanNickname(user['SubID']):
+        #     session['UserPlan']['Settings'] = BasicPlan
+        # elif "Advanced" in getPlanNickname(user['SubID']):
+        #     session['UserPlan']['Settings'] = AdvancedPlan
+        # elif "Ultimate" in getPlanNickname(user['SubID']):
+        #     session['UserPlan']['Settings'] = UltimatePlan
+        # print("Plan changed to: ", session.get('UserPlan')['Settings'])
 
-        # Get the user by email
-        users = query_db("SELECT * FROM Users")
-        user = "Error"
-        # If user exists
-        for record in users:
-            if record["Email"] == session.get('User')['Email']:
-                user = record
-        if "Error" in user:
-            return jsonify(error="An error occurred and could not subscribe.")
-
-        try:
-            subscription = stripe.Subscription.create(
-                customer=user['StripeID'],
-                source=token,
-                coupon=coupon,
-                items=[
-                    {
-                        "plan": planID,
-                    },
-                ]
-            )
-
-            # print(subscription)
-
-            # if everything is ok activate assistants
-            update_table("UPDATE Assistants SET Active=? WHERE CompanyID=?", ("True", user['CompanyID']))
-            update_table("UPDATE Users SET SubID=? WHERE ID=?", (subscription['id'], user['ID']))
-
-            # Resit the session
-            session['UserPlan']['Nickname'] = getPlanNickname(subscription['id'])
-            if getPlanNickname(user['SubID']) is None:
-                session['UserPlan']['Settings'] = NoPlan
-            elif "Basic" in getPlanNickname(user['SubID']):
-                session['UserPlan']['Settings'] = BasicPlan
-            elif "Advanced" in getPlanNickname(user['SubID']):
-                session['UserPlan']['Settings'] = AdvancedPlan
-            elif "Ultimate" in getPlanNickname(user['SubID']):
-                session['UserPlan']['Settings'] = UltimatePlan
-            print("Plan changed to: ", session.get('UserPlan')['Settings'])
-
-        # TODO check subscription for errors https://stripe.com/docs/api#errors
-        except Exception as e:
-            print(e)
-            return jsonify(error="An error occurred and could not subscribe.")
-
-        # Reaching to point means no errors and subscription is successful
+        # Set Plan session for logged in user
+        session['userPlan'] = sub_callback.Data['planNickname']
         print("You have successfully subscribed!")
         return jsonify(success="You have successfully subscribed!", url="admin/pricing-tables.html")
-
-
-@sub_router.route("/admin/check-out/checkPromoCode", methods=['POST'])
-def checkPromoCode():
-    if request.method == 'POST':
-
-        if not session.get('Logged_in', False):
-            redirectWithMessage("login", "You must login first!")
-        else:
-
-            # TODO: check the promoCode from user then response with yes or no with json
-            promoCode = str(request.data, 'utf-8')
-            print(">>>>>>>>>>>>>>>>")
-            print(promoCode)
-            if promoCode == 'abc':
-                return jsonify(isValid=True)
-            else:
-                return jsonify(isValid=False)
 
 
 @sub_router.route("/admin/unsubscribe", methods=['POST'])
 def unsubscribe():
     if request.method == 'POST':
 
-        # if not session.get('Logged_in', False):
-        #     redirectWithMessage("login", "You must login first!")
+        if not session.get('Logged_in', False):
+            helpers.redirectWithMessage("login", "You must login first!")
 
-        users = query_db("SELECT * FROM Users")
-        user = "Error"
-        # If user exists
-        print(session.get('User')['Email'])
-        for record in users:
-            if record["Email"] == session.get('User')['Email']:
-                user = record
-        if "Error" in user:
-            return jsonify(error="This user does't exist. Please login again!")
-        if user['SubID'] is None:
-            print("This account has no active subscriptions ")
-            return jsonify(error="This account has no active subscription")
+        unsubscribe_callback: Callback = sub_services.unsubscribe(session.get('userEmail', 'InvalidEmail'))
 
-        try:
-            # Unsubscribe
-            sub = stripe.Subscription.retrieve(user['SubID'])
-            print(sub)
-            sub.delete()
+        if not unsubscribe_callback.Success:
+            return jsonify(error=unsubscribe_callback.Message)
 
-            # TODO why query_db does not work with update?
-            # query_db('UPDATE Users SET SubID=? WHERE ID=?;', (None,  session.get('User')['ID']))
-            update_table("UPDATE Users SET SubID=? WHERE ID=?;",
-                         [None, session.get('User')['ID']])
-            # Reset session
-            session['UserPlan'] = NoPlan
+        # Reaching to this point means unsubscribe successfully
+        # Clear plan session
+        session.pop('UserPlan')
 
-            print("You have unsubscribed successfully!")
-            return jsonify(msg="You have unsubscribed successfully!")
-
-        except Exception as e:
-            print("An error occurred while trying to unsubscribe")
-            return jsonify(error="An error occurred while trying to unsubscribe")
+        print(unsubscribe_callback.Message)
+        return jsonify(success=unsubscribe_callback.Message)
 
 
 # Stripe Webhooks
 @sub_router.route("/api/stripe/subscription-cancelled", methods=["POST"])
-def webhook_subscription_cancelled():
+def webhooks_subscription_cancelled():
     if request.method == "POST":
         try:
             print("STRIPE TRIGGER FOR UNSUBSCRIPTION...")

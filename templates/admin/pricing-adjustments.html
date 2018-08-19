@@ -67,9 +67,9 @@
                    console.log(res);
 
                    // When successfully unsubscribe
-                   if(res.msg){
+                   if(res.success){
 
-                    swal(res.msg)
+                    swal(res.success)
                     .then((value) => {
                         sessionStorage.removeItem('subID')
                         document.location.href = "/admin/dashboard"

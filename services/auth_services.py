@@ -11,6 +11,7 @@ from utilties import helpers
 
 
 def signup(email, firstname, surname, password, companyName, companySize, companyPhoneNumber, websiteURL) -> Callback:
+
     # Validate Email
     if helpers.isValidEmail(email):
         return Callback(False, 'Invalid Email.')
@@ -26,17 +27,13 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
     user = user_services.create(firstname, surname, email, password, company, role)
 
     # Subscribe to basic plan with 14 trial days
-    sub_callback: Callback = sub_services.subscribe(email=email, planNickname='basic', trialDays=14)
+    sub_callback: Callback = sub_services.subscribe(email=email, planID='plan_D3lp2yVtTotk2f', trialDays=14)
 
     # if subscription failed, remove the new created company and user
     if not sub_callback.Success:
         company_services.removeByName(companyName)
         user_services.removeByEmail(email)
         return sub_callback
-
-    # Update new user subID and cusID
-    user_services.updateSubID(email, sub_callback.Data['subID'])
-    user_services.updateStripeID(email, sub_callback.Data['stripeID'])
 
     # Return a callback with a message
     return Callback(True, 'Signed up successfully!')
@@ -68,6 +65,7 @@ def login(email: str, password_to_check: str) -> Callback:
     # If all the tests are valid then do login process
     session['Logged_in'] = True
     session['userID'] = user.ID
+    session['userEmail'] = user.Email
     session['UserPlan'] = helpers.getPlanNickname(user.SubID)
 
     return Callback(True, "Login Successful")

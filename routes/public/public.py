@@ -133,7 +133,7 @@ def signup():
                                                          name, size, phone, url)
         print(signup_callback.Success, signup_callback.Message)
         if not signup_callback.Success:
-            print("Signup Error .2")
+            print(signup_callback.Message)
             return helpers.redirectWithMessage("signup", signup_callback.Message)
 
         # Send verification email

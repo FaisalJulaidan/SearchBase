@@ -2,16 +2,16 @@ import sqlalchemy.exc
 from models import db, Company, Assistant,Callback
 from utilties import helpers
 
+
 def getByID(id) -> Callback:
     try:
         return Callback(True,
-                        "Got assistant by id",
+                        "Got assistant by id successfully.",
                         db.session.query(Assistant).get(id))
     except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
         print(exc)
         return Callback(False,
-                        "Error: Couldn't get the assistant by id")
-
+                        'Could not get the assistant by id.')
 
 
 def getByNickname(nickname) -> Assistant or None:
@@ -19,9 +19,8 @@ def getByNickname(nickname) -> Assistant or None:
 
 
 def getAll(companyID) -> list:
-    return helpers.getListFromSQLAlchemy(db.session.query(Assistant)
-                                         .filter(Assistant.CompanyID == companyID)
-                                         .all())
+    return db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
+
 
 def create(nickname, route, message, secondsUntilPopup, company: Company) -> Assistant or None:
     try:

@@ -176,21 +176,23 @@
 <script type="text/javascript">
 
 
+    if (sessionStorage.getItem('subID') == null){
+      swal({
+          title: "Are you sure?",
+          text: "You will lose your active subscription.",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+      }).then((willDelete) => {
+        if (willDelete) {
 
-    swal({
-      title: "Are you sure?",
-      text: "You will lose your active subscription.",
-      icon: "warning",
-      buttons: true,
-      dangerMode: true,
-    })
-    .then((willDelete) => {
-      if (willDelete) {
-
-      } else {
+        } else {
         document.location.href = '/admin/pricing'
-      }
-    });
+        }
+        });
+    }
+
+
 
 
     /*

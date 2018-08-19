@@ -285,10 +285,19 @@
             </div>
           </div>
         </div>
+        <script>
+            window.onload = function(e){
+                x=document.getElementsByClassName('right_col')[0]
+                y=document.getElementById('flash')
 
-        {% with messages = get_flashed_messages() %}
+                x.innerHTML = y.innerHTML + x.innerHTML
+                y.innerHTML = ''
+            }
+        </script>
+        <div id="flash" hidden>
+            {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <div class="col-md-9 col-md-offset-3">
+                <div class="col-md-12">
                     {% for message in messages %}
                         <div class="alert alert-success" role="alert">
                             {{ message }}
@@ -297,7 +306,7 @@
                 </div>
             {% endif %}
         {% endwith %}
-
+        </div>
         {% block content %}
         {% endblock %}
 

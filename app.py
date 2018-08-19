@@ -21,7 +21,7 @@ import urllib.request
 
 
 from models import db, Role, Company, Assistant, Plan, Statistics
-from .services.mail_services import mail
+from services.mail_services import mail
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router, products_router
@@ -69,58 +69,64 @@ def before_request():
 #      WILL BE REMOVED          #
 #################################
 
-app.config.from_object('config.DevelopmentConfig')
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
-
-
-db.init_app(app)
-mail.init_app(app)
-app.app_context().push()
-
-db.drop_all()
-db.create_all()
+# app.config.from_object('config.DevelopmentConfig')
+# app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
+#
+#
+# db.init_app(app)
+# mail.init_app(app)
+# app.app_context().push()
+#
+# db.drop_all()
+# db.create_all()
 
 
 # Generates dummy data for testing
+def genDummyData():
+    db.session.add(Company(Name='Aramco', Size=12, PhoneNumber='4344423', URL='ff.com'))
+    db.session.add(Company(Name='Sabic', Size=12, PhoneNumber='4344423', URL='ff.com'))
 
-db.session.add(Company(Name='Aramco', Size=12, PhoneNumber='4344423', URL='ff.com'))
-db.session.add(Company(Name='Sabic', Size=12, PhoneNumber='4344423', URL='ff.com'))
+    aramco = Company.query.filter(Company.Name == "Aramco").first()
+    sabic = Company.query.filter(Company.Name == "Sabic").first()
 
-aramco = Company.query.filter(Company.Name == "Aramco").first()
-sabic = Company.query.filter(Company.Name == "Sabic").first()
+    db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
+    db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
 
-db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
-db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
+    for assistant in aramco.Assistants:
+        db.session.add(
+            Statistics(Name="test", Opened=True, QuestionsAnswered=12, ProductsReturned=12, Assistant=assistant))
+        db.session.add(
+            Statistics(Name="test1", Opened=True, QuestionsAnswered=52, ProductsReturned=32, Assistant=assistant))
 
-for assistant in aramco.Assistants:
-    db.session.add(Statistics(Name="test",Opened=True, QuestionsAnswered=12, ProductsReturned=12, Assistant=assistant))
-    db.session.add(Statistics(Name="test1", Opened=True, QuestionsAnswered=52, ProductsReturned=32, Assistant=assistant))
+    db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
+    db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
 
-db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
-db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
+    db.session.add(Role(Name="Admin", EditChatbots=True, EditUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="User", EditChatbots=False, EditUsers=False, AccessBilling=False))
 
-db.session.add(Role(Name="Admin", EditChatbots=True, EditUsers=True, AccessBilling=True))
-db.session.add(Role(Name="User", EditChatbots=False, EditUsers=False, AccessBilling=False))
+    admin = Role.query.filter(Role.Name == "Admin").first()
+    user = Role.query.filter(Role.Name == "User").first()
 
-admin = Role.query.filter(Role.Name == "Admin").first()
-user = Role.query.filter(Role.Name == "User").first()
+    user_services.create(firstname='Ahmad', surname='Hadi', verified=True, email='aa@aa.com', password='123',
+                         company=aramco, role=admin)
+    user_services.create(firstname='firstname', surname='lastname', email='email2', password='123', company=aramco,
+                         role=admin)
+    user_services.create(firstname='firstname', surname='lastname', email='email3', password='123', company=aramco,
+                         role=user)
 
-user_services.create(firstname='Ahmad', surname='Hadi', verified=True, email='aa@aa.com', password='123', company=aramco, role=admin)
-user_services.create(firstname='firstname', surname='lastname', email='email2', password='123', company=aramco, role=admin)
-user_services.create(firstname='firstname', surname='lastname', email='email3', password='123', company=aramco, role=user)
+    user_services.create(firstname='firstname', surname='lastname', email='email4', password='123', company=sabic,
+                         role=admin)
+    user_services.create(firstname='firstname', surname='lastname', email='email5', password='123', company=sabic,
+                         role=user)
+    user_services.create(firstname='firstname', surname='lastname', email='email6', password='123', company=sabic,
+                         role=user)
 
-user_services.create(firstname='firstname', surname='lastname', email='email4', password='123', company=sabic, role=admin)
-user_services.create(firstname='firstname', surname='lastname', email='email5', password='123', company=sabic, role=user)
-user_services.create(firstname='firstname', surname='lastname', email='email6', password='123', company=sabic, role=user)
+    db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic'))
+    db.session.add(Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate'))
+    db.session.add(Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced'))
+    db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug'))
 
-
-db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic'))
-db.session.add(Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate'))
-db.session.add(Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced'))
-db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug'))
-
-db.session.commit()
-
+    db.session.commit()
 
 #################################
 
@@ -1712,36 +1718,27 @@ def not_implemented(e):
 #         return self.comp.get(k)
 
 
-#
-# if __name__ == "__main__":
-#
-#     print("Run the server...")
-#
-    # app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
-#     # Create the schema only in development mode
-#     if app.debug:
-#         # For Development
-#         app.config.from_object('config.DevelopmentConfig')
-#
-#         db.init_app(app)
-#         app.app_context().push()
-#
-#         db.drop_all()
-#         db.create_all()
-#
-#         print("Debug Mode...")
-#     else:
-#         # For Production
-#         app.config.from_object('config.BaseConfig')
-#         db.init_app(app)
-#         app.app_context().push()
-#         print("Production Mode...")
-#
-#     # db = SQLAlchemy(app)
-#
-#
-#     # Print app configuration
-#     # print(app.config)
-#     # Run the app server
-#     app.run()
-#
+
+if __name__ == "__main__":
+
+    print("Run the server...")
+
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
+
+    app.config.from_object('config.DevelopmentConfig')
+    app.secret_key = 'KeYCatApP'
+    app.config['SESSION_TYPE'] = 'filesystem'
+
+    db.init_app(app)
+    app.app_context().push()
+
+    db.drop_all()
+    db.create_all()
+
+    genDummyData()
+
+    print("Debug Mode...")
+
+    # Run the app server
+    app.run()
+

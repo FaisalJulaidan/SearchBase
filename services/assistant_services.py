@@ -5,21 +5,47 @@ from utilties import helpers
 
 def getByID(id) -> Callback:
     try:
+        # Get result and check if None then raise exception
+        result = db.session.query(Assistant).get(id)
+        if not result: raise Exception
+
         return Callback(True,
                         "Got assistant by id successfully.",
-                        db.session.query(Assistant).get(id))
+                        result)
     except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
         print(exc)
         return Callback(False,
                         'Could not get the assistant by id.')
 
 
-def getByNickname(nickname) -> Assistant or None:
-    return db.session.query(Assistant).filter(Assistant.Nickname == nickname).first()
+def getByNickname(nickname) -> Callback:
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(Assistant).filter(Assistant.Nickname == nickname).first()
+        if not result: raise Exception
+
+        return Callback(True,
+                        "Got assistant by nickname successfully.",
+                        result)
+    except Exception as exc:
+        print(exc)
+        return Callback(False,
+                        'Could not get the assistant by nickname.')
 
 
-def getAll(companyID) -> list:
-    return db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
+def getAll(companyID) -> Callback:
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
+        if not result: raise Exception
+
+        return Callback(True,
+                        "Got all assistants  successfully.",
+                        result)
+    except Exception as exc:
+        print(exc)
+        return Callback(False,
+                        'Could not get all assistants.')
 
 
 def create(nickname, route, message, secondsUntilPopup, company: Company) -> Assistant or None:

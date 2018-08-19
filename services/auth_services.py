@@ -22,14 +22,17 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
         return Callback(False, 'User already exists.')
 
     # Create a new user with its associated company and role
-    role = role_services.getByName('Admin')
+    role_callback: Callback = role_services.getByName('Admin')
+    if not role_callback.Success:
+        return Callback(False, 'Role does not exist')
+
     company = Company(Name=companyName, Size=companySize, PhoneNumber=companyPhoneNumber, URL=websiteURL)
-    user = user_services.create(firstname, surname, email, password, company, role)
+    user = user_services.create(firstname, surname, email, password, company, role_callback.Data)
 
     # Subscribe to basic plan with 14 trial days
     sub_callback: Callback = sub_services.subscribe(email=email, planID='plan_D3lp2yVtTotk2f', trialDays=14)
 
-    # if subscription failed, remove the new created company and user
+    # If subscription failed, remove the new created company and user
     if not sub_callback.Success:
         company_services.removeByName(companyName)
         user_services.removeByEmail(email)

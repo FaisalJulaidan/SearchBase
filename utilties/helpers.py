@@ -24,6 +24,12 @@ def redirectWithMessage(function, message):
     return redirect(url_for("." + function, messages=message))
 
 
+def render(template, **context):
+    if session.get('Logged_in', False):
+        return render_template(template, debug=0, assistants=session.get('UserAssistants', []), **context)
+    return render_template(template, debug=0, **context)
+
+
 def checkForMessage():
     args = request.args
     msg = " "
@@ -53,16 +59,14 @@ def isValidEmail(email: str) -> bool:
         return False
     return True
 
+# Convert a SQLAlchemy object to a single dict
+def getDictFromSQLAlchemy(obj):
+    return {c.key: getattr(obj, c.key)
+            for c in inspect(obj).mapper.column_attrs}
 
+
+# Convert a SQLAlchemy list of objects to a list of dicts
 def getListFromSQLAlchemy(SQLAlchemyResult):
-    def _object_as_dict(obj):
-        return {c.key: getattr(obj, c.key)
-                for c in inspect(obj).mapper.column_attrs}
-
-    return list(map(_object_as_dict, SQLAlchemyResult))
+    return list(map(getDictFromSQLAlchemy, SQLAlchemyResult))
 
 
-def render(template, **context):
-    if session.get('Logged_in', False):
-        return render_template(template, debug=0, assistants=session.get('UserAssistants', []), **context)
-    return render_template(template, debug=0, **context)

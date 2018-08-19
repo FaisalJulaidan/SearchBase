@@ -28,8 +28,14 @@ def getByEmail(email) -> User or None:
                         'User with email ' + email + ' does not exist.')
 
 
-def getAll() -> list:
-    return db.session.query(User)
+def getAllByCompanyID(companyID) -> Callback:
+    try:
+        return Callback(True,
+                        'Users with company ID ' + str(companyID) + ' were successfully retrieved.',
+                        db.session.query(User).filter(User.CompanyID == companyID).all())
+    except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
+        return Callback(False,
+                        'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
 
 def create(firstname, surname, email, password, company: Company, role: Role, verified=False) -> User or None:
@@ -43,6 +49,18 @@ def create(firstname, surname, email, password, company: Company, role: Role, ve
         print(exc)
         return Callback(False, 'Sorry, Could not create the user.')
     return Callback(True, 'User has been created successfully!')
+
+
+def removeByEmail(email) -> Callback:
+
+    try:
+     db.session.query(User).filter(User.Email == email).delete()
+    except sqlalchemy.exc.SQLAlchemyError as exc:
+        print(exc)
+        return Callback(False, 'User with email ' + email + " could not be removed.")
+
+    db.session.commit()
+    return Callback(True, 'User with email ' + email + " has been removed successfully.")
 
 
 def updateSubID(email, subID: str):
@@ -72,13 +90,3 @@ def updateStripeID(email, cusID: str):
 
 
 
-def removeByEmail(email) -> Callback:
-
-    try:
-     db.session.query(User).filter(User.Email == email).delete()
-    except sqlalchemy.exc.SQLAlchemyError as exc:
-        print(exc)
-        return Callback(False, 'User with email ' + email + " could not be removed.")
-
-    db.session.commit()
-    return Callback(True, 'User with email ' + email + " has been removed successfully.")

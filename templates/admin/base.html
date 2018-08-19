@@ -285,6 +285,19 @@
             </div>
           </div>
         </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="col-md-9 col-md-offset-3">
+                    {% for message in messages %}
+                        <div class="alert alert-success" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
         {% block content %}
         {% endblock %}
 

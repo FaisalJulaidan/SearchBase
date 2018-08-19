@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, session
-from services import statistics_services, assistant_services,admin_services, auth_services
+from flask import Blueprint, request, redirect, flash
+from services import assistant_services,admin_services
 from models import Callback, Assistant
 
 settings_router: Blueprint = Blueprint('settings_router', __name__, template_folder="../../templates")
@@ -21,34 +21,32 @@ def admin_assistant_edit(assistantID):
             print(callback.Message)
             return redirect('login')
 
-    # elif request.method == "POST":
-    #     email = session.get('User')['Email']
-    #     company = get_company(email)
-    #     if company is None or "Error" in company:
-    #         return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in getting the company's records!")
-    #     else:
-    #         assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-    #                                                [assistantID, company[0]])
-    #         if assistant is None or "Error" in assistant:
-    #             return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in getting the assistant's records!")
-    #         else:
-    #             nickname = request.form.get("nickname", default="Error")
-    #             message = request.form.get("welcome-message", default="Error")
-    #             popuptime = request.form.get("timeto-autopop", default="Error")
-    #             autopopup = request.form.get("switch-autopop", default="off")
-    #
-    #             if message is "Error" or nickname is "Error" or (popuptime is "Error" and autopopup is not "off"):
-    #                 return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in getting your inputs!")
-    #             else:
-    #                 if autopopup == "off":
-    #                     secondsUntilPopup = "Off"
-    #                 else:
-    #                     secondsUntilPopup = popuptime
-    #                 updateAssistant = update_table(
-    #                     "UPDATE Assistants SET Message=?, SecondsUntilPopup=?, Nickname=? WHERE ID=? AND CompanyID=?",
-    #                     [message, secondsUntilPopup, nickname, assistantID, company[0]])
-    #
-    #                 if "Error" in updateAssistant:
-    #                     return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in updating assistant!")
-    #                 else:
-    #                     return redirect("/admin/assistant/{}/settings".format(assistantID))
+    elif request.method == "POST":
+        nickname = request.form.get("nickname", default=False)
+        message = request.form.get("welcome-message", default=False)
+        autopopup = request.form.get("switch-autopop", default=False) # true / false
+        popuptime = request.form.get("timeto-autopop", default=False) # float 1.0
+
+
+        if not message or \
+           not nickname or \
+           (not popuptime and not autopopup):
+            flash('Error in getting your inputs!')
+            return redirect("/admin/assistant/{}/settings".format(assistantID))
+        else:
+            if not autopopup:
+                secondsUntilPopup = 0.0
+            else:
+                secondsUntilPopup = popuptime
+
+            callback: Callback = assistant_services.update(id=assistantID,
+                                                           nickname=nickname, message=message,
+                                                           secondsUntilPopup=secondsUntilPopup)
+            if callback.Success:
+                flash(nickname + ' Updated Successfully')
+                return redirect("/admin/assistant/{}/settings".format(assistantID))
+            else:
+                flash('Error in updating ' + nickname)
+                return redirect("/admin/assistant/{}/settings".format(assistantID))
+
+

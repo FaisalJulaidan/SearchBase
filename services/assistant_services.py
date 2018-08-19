@@ -1,6 +1,4 @@
 import sqlalchemy.exc
-from flask import session
-from services import user_services
 from models import db, Company, Assistant,Callback
 from utilties import helpers
 
@@ -27,7 +25,6 @@ def getAll(companyID) -> list:
 
 def create(nickname, route, message, secondsUntilPopup, company: Company) -> Assistant or None:
     try:
-        # Create a new user with its associated company and role
         assistant = Assistant(Nickname=nickname, Route=route, Message=message,
                               SecondsUntilPopup=secondsUntilPopup,
                               Company=company)
@@ -39,6 +36,21 @@ def create(nickname, route, message, secondsUntilPopup, company: Company) -> Ass
 
     return assistant
 
+
+def update(id, nickname, message, secondsUntilPopup)-> Callback:
+    try:
+        db.session.query(Assistant).filter(Assistant.ID == id).update({'Nickname': nickname,
+                                                                       'Message': message,
+                                                                       'SecondsUntilPopup': secondsUntilPopup})
+        db.session.commit()
+
+        return Callback(True,
+                        nickname+' Updated Successfully')
+
+    except sqlalchemy.exc.SQLAlchemyError as exc:
+        print(exc)
+        return Callback(False,
+                        "Couldn't update assistant "+nickname)
 
 def removeByNickname(nickname) -> bool:
     try:

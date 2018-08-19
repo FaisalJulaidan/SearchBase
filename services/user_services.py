@@ -7,9 +7,12 @@ from flask import session
 
 def getByID(id) -> Callback:
     try:
-        return Callback(True,
-                        'User with ID ' + str(id) + ' was successfully retrieved',
-                        db.session.query(User).get(id))
+        if id:
+            return Callback(True,
+                            'User with ID ' + str(id) + ' was successfully retrieved',
+                            db.session.query(User).get(id))
+        else:
+            raise Exception
     except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
         return Callback(False,
                         'User with ID ' + str(id) + ' does not exist')

@@ -34,6 +34,6 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
                    + fullname + " <br>Email: " + email + ".</p>"
         mail.send(msg)
     except Exception as e:
-        return Callback(False, 'Error in sending verification email to ' + email)
+        return Callback(False, 'Could not send a verification email to ' + email)
 
     return Callback(True, 'Verification email sent successfully to ' + email)

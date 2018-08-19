@@ -1,5 +1,5 @@
 from datetime import timedelta
-from flask import Blueprint, render_template, request, session, redirect
+from flask import Blueprint, render_template, request, session, redirect, url_for
 from utilties import helpers
 from models import User, Company, Role, Callback
 from itsdangerous import URLSafeTimedSerializer
@@ -86,16 +86,16 @@ def login():
             return helpers.redirectWithMessage("login", callback.Message)
 
 
+@public_router.route('/logout',  methods=['GET'])
+def logout():
 
-# @public_router.route('/logout')
-# def logout():
-#
-#     # Will clear out the session.
-#     session.pop('User', None)
-#     session.pop('UserAssistants', None)
-#     session.pop('Logged_in', False)
-#
-#     return redirect(url_for('login'))
+    # Will clear out the session.
+    session.pop('userID', None)
+    session.pop('userEmail', None)
+    session.pop('UserPlan', None)
+    session.pop('Logged_in', False)
+
+    return redirect(url_for('public_router.login'))
 
 
 # TODO improve verification
@@ -142,7 +142,7 @@ def signup():
 
         # If error while sending verification email
         if not mail_callback.Success:
-            helpers.redirectWithMessage('signup", "signed up successfully but > ' + mail_callback.Message
+            helpers.redirectWithMessage('signup', 'signed up successfully but > ' + mail_callback.Message
                                         + '. Please contact TheSearchBaseStaff to activate your account.')
 
         return render_template('errors/verification.html',

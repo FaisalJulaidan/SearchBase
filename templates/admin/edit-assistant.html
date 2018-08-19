@@ -63,21 +63,17 @@
                                 <br>
                                 <br>
                                 <div id="popup-time"
-                                     {% if autopop=='Off' %}
+                                     {% if autopop==0.0 %}
                                      hidden
                                      {% endif %}>
                                     <h4>
                                         How long should the chat bot wait before opening?
                                         <small> *Time in Seconds</small>
                                     </h4>
-                                    <input name="timeto-autopop" style="width:50px"
+                                    <input name="timeto-autopop" style="width:70px"
                                            class="form-control col-md-5 col-xs-10"
-                                           id="bot_time" type="text"
-                                           {% if autopop !=0.0 %}
-                                           value="{{ autopop }}"
-                                           {% else %}
-                                           value="6"
-                                           {% endif %}>
+                                           id="bot_time" type="number"
+                                           value="{{ autopop }}">
                                     <br>
                                     <br>
                                     <br>

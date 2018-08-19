@@ -1,6 +1,6 @@
 import sqlalchemy.exc
 
-from models import Callback, User, Company
+from models import Callback, User, Company, db
 from utilties import helpers
 from datetime import datetime
 from flask import session, escape
@@ -77,7 +77,10 @@ def login(email: str, password_to_check: str) -> Callback:
     session['UserPlan'] = helpers.getPlanNickname(user.SubID)
 
     # Set LastAccess
-    print(datetime.now())
     user.LastAccess = datetime.now()
+    
+    # Save db changes
+    db.session.commit()
+
 
     return Callback(True, "Login Successful")

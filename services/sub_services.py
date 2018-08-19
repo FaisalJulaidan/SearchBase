@@ -85,6 +85,10 @@ def subscribe(email, planID, trialDays=None, token=None, coupon=None) -> Callbac
         user.StripeID = customer['id']
         user.SubID = subscription['id']
 
+        # Save db changes
+        db.session.commit()
+
+
     except Exception as e:
         return Callback(False, 'An error occurred while subscribing with Stripe')
 

@@ -192,6 +192,6 @@ class Plan(db.Model):
 class Callback():
     def __init__(self, success: bool, message: str, data: str or dict or bool = None):
         self.Success: bool = success
-        self.Message: str = success if message else 'Error: ' + message
+        self.Message: str = message if success else 'Error: ' + message
         self.Data: str or dict or bool = data
     pass

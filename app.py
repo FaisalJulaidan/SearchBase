@@ -24,7 +24,7 @@ from models import db, Role, Company, Assistant, Plan, Statistics
 from .services.mail_services import mail
 
 # Import all routers to register them as blueprints
-from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router
+from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router, sub_router
 from routes.public.routers import public_router
 from services import user_services, auth_services
 
@@ -35,6 +35,7 @@ app.register_blueprint(public_router)
 app.register_blueprint(profile_router)
 app.register_blueprint(admin_api)
 app.register_blueprint(settings_router)
+app.register_blueprint(sub_router)
 
 
 # code to ensure user is logged in
@@ -878,9 +879,7 @@ def admin_templates():
 
 
 
-@app.route("/admin/pricing", methods=['GET'])
-def admin_pricing():
-    return render("admin/pricing-tables.html", pub_key=pub_key)
+
 
 @app.route("/admin/adjustments", methods=['GET'])
 def admin_pricing_adjust():

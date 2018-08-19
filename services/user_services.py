@@ -45,9 +45,13 @@ def create(firstname, surname, email, password, company: Company, role: Role, ve
                     Password=helpers.hashPass(password), Company=company,
                     Role=role)
         db.session.add(user)
+
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
+        db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')
+    # Save
+    db.session.commit()
     return Callback(True, 'User has been created successfully!')
 
 
@@ -55,23 +59,41 @@ def removeByEmail(email) -> Callback:
 
     try:
      db.session.query(User).filter(User.Email == email).delete()
+
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
+        db.session.rollback()
         return Callback(False, 'User with email ' + email + " could not be removed.")
-
+    # Save
     db.session.commit()
     return Callback(True, 'User with email ' + email + " has been removed successfully.")
+
+
+def verifyByEmail(email: str):
+
+    try:
+        db.session.query(User).filter(User.Email == email).update({"Verified": True})
+
+    except sqlalchemy.exc.SQLAlchemyError as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Could not verify account with email  ' + email)
+    # Save
+    db.session.commit()
+    return Callback(True, 'Account has been verified successfully')
+
 
 
 def updateSubID(email, subID: str):
 
     try:
         db.session.query(User).filter(User.Email == email).update({"SubID": subID})
+
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
         db.session.rollback()
         return Callback(False, 'Could not update subID for ' + email)
-
+    # Save
     db.session.commit()
     return Callback(True, 'SubID is updated successfully')
 
@@ -80,11 +102,12 @@ def updateStripeID(email, cusID: str):
 
     try:
         db.session.query(User).filter(User.Email == email).update({"StripeID": (cusID)})
+
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
         db.session.rollback()
         return Callback(False, 'Could not update subID for ' + email)
-
+    # Save
     db.session.commit()
     return Callback(True, 'StripeID is updated successfully')
 

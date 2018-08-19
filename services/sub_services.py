@@ -13,13 +13,13 @@ def unsubscribe(email) -> Callback:
     if not callback.Success:
         return jsonify(error='Could not find the logged in user to unsubscribe.')
 
-    # Set the User
+    # Set the User from the callback
     user: User = callback.Data
 
     try:
         # If user has no sub. already
         if not user.SubID:
-            Callback(False, 'This account has no active subscription')
+            Callback(False, 'This account has no active subscription to unsubscribe')
 
         # Unsubscribe
         stripeSub = stripe.Subscription.retrieve(user.SubID)
@@ -57,6 +57,7 @@ def subscribe(email, planID, trialDays=None, token=None, coupon=None) -> Callbac
         # Check user if already has a StripeID
         if user.StripeID:
             customer = {'id': user.StripeID}
+
         # If not, then create a new Stripe customer
         else:
 
@@ -119,9 +120,6 @@ def getStripePlanNicknameBySubID(SubID=None):
     try:
         # Get subscription object from Stripe API
         subscription = stripe.Subscription.retrieve(SubID)
-
-        # Debug
-        print(subscription)
 
         # Return the subscription item's plan nickname e.g (Basic, Ultimate...)
         return subscription["items"]["data"][0]["plan"]["nickname"]

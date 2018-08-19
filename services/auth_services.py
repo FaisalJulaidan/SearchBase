@@ -2,7 +2,7 @@ import sqlalchemy.exc
 
 from models import Callback, User, Company
 from utilties import helpers
-
+from datetime import datetime
 from flask import session, escape
 from json import dumps
 
@@ -17,8 +17,8 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
         return Callback(False, 'Invalid Email.')
 
     # Check if user exists
-    user = user_services.getByEmail(email)
-    if user:
+    user_callback = user_services.getByEmail(email).Data
+    if user_callback:
         return Callback(False, 'User already exists.')
 
     # Create a new user with its associated company and role
@@ -27,7 +27,7 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
         return Callback(False, 'Role does not exist')
 
     company = Company(Name=companyName, Size=companySize, PhoneNumber=companyPhoneNumber, URL=websiteURL)
-    user = user_services.create(firstname, surname, email, password, company, role_callback.Data)
+    user_callback = user_services.create(firstname, surname, email, password, company, role_callback.Data)
 
     # Subscribe to basic plan with 14 trial days
     sub_callback: Callback = sub_services.subscribe(email=email, planID='plan_D3lp2yVtTotk2f', trialDays=14)
@@ -37,6 +37,11 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
         company_services.removeByName(companyName)
         user_services.removeByEmail(email)
         return sub_callback
+
+    # ###############
+    # Just for testing, But to be REMOVED because user has to verify this manually
+    user_services.verifyByEmail(email)
+    # ###############
 
     # Return a callback with a message
     return Callback(True, 'Signed up successfully!')
@@ -70,5 +75,9 @@ def login(email: str, password_to_check: str) -> Callback:
     session['userID'] = user.ID
     session['userEmail'] = user.Email
     session['UserPlan'] = helpers.getPlanNickname(user.SubID)
+
+    # Set LastAccess
+    print(datetime.now())
+    user.LastAccess = datetime.now()
 
     return Callback(True, "Login Successful")

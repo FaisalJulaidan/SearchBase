@@ -31,6 +31,7 @@ def create(nickname, route, message, secondsUntilPopup, company: Company) -> Ass
         db.session.add(assistant)
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
+        db.session.rollback()
         return None
 
     return assistant
@@ -48,6 +49,7 @@ def update(id, nickname, message, secondsUntilPopup)-> Callback:
 
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
+        db.session.rollback()
         return Callback(False,
                         "Couldn't update assistant "+nickname)
 
@@ -56,6 +58,7 @@ def removeByNickname(nickname) -> bool:
      db.session.query(Assistant).filter(Assistant.Nickname == nickname).delete()
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
+        db.session.rollback()
         return False
 
     return True

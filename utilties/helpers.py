@@ -60,13 +60,13 @@ def isValidEmail(email: str) -> bool:
     return True
 
 # Convert a SQLAlchemy object to a single dict
-def getDictFromSQLAlchemy(obj):
+def getDictFromSQLAlchemyObj(obj):
     return {c.key: getattr(obj, c.key)
             for c in inspect(obj).mapper.column_attrs}
 
 
 # Convert a SQLAlchemy list of objects to a list of dicts
-def getListFromSQLAlchemy(SQLAlchemyResult):
-    return list(map(getDictFromSQLAlchemy, SQLAlchemyResult))
+def getListFromSQLAlchemyList(SQLAlchemyList):
+    return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
 
 

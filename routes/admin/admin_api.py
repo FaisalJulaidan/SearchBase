@@ -24,7 +24,6 @@ def adminPagesData():
         return redirect('login')
 
 
-
 #data for the user which to be displayed on every admin page
 @admin_api.route("/admin/userData", methods=['GET'])
 def getUserData():

@@ -8,9 +8,13 @@ from flask import session
 def getByID(id) -> Callback:
     try:
         if id:
+            # Get result and check if None then raise exception
+            result = db.session.query(User).get(id)
+            if not result: raise Exception
+
             return Callback(True,
                             'User with ID ' + str(id) + ' was successfully retrieved',
-                            db.session.query(User).get(id))
+                            result)
         else:
             raise Exception
     except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
@@ -20,20 +24,28 @@ def getByID(id) -> Callback:
 
 def getByEmail(email) -> User or None:
     try:
+        # Get result and check if None then raise exception
+        result = db.session.query(User).filter(User.Email == email).first()
+        if not result: raise Exception
+
         return Callback(True,
                         'User with email ' + email + ' was successfully retrieved.',
-                        db.session.query(User).filter(User.Email == email).first())
-    except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
+                        result)
+    except Exception as exc:
         return Callback(False,
                         'User with email ' + email + ' does not exist.')
 
 
 def getAllByCompanyID(companyID) -> Callback:
     try:
+        # Get result and check if None then raise exception
+        result = db.session.query(User).filter(User.CompanyID == companyID).all()
+        if not result: raise Exception
+
         return Callback(True,
                         'Users with company ID ' + str(companyID) + ' were successfully retrieved.',
-                        db.session.query(User).filter(User.CompanyID == companyID).all())
-    except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
+                        result)
+    except Exception as exc:
         return Callback(False,
                         'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
@@ -46,7 +58,7 @@ def create(firstname, surname, email, password, company: Company, role: Role, ve
                     Role=role)
         db.session.add(user)
 
-    except sqlalchemy.exc.SQLAlchemyError as exc:
+    except Exception as exc:
         print(exc)
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')
@@ -60,7 +72,7 @@ def removeByEmail(email) -> Callback:
     try:
      db.session.query(User).filter(User.Email == email).delete()
 
-    except sqlalchemy.exc.SQLAlchemyError as exc:
+    except Exception as exc:
         print(exc)
         db.session.rollback()
         return Callback(False, 'User with email ' + email + " could not be removed.")
@@ -74,7 +86,7 @@ def verifyByEmail(email: str):
     try:
         db.session.query(User).filter(User.Email == email).update({"Verified": True})
 
-    except sqlalchemy.exc.SQLAlchemyError as exc:
+    except Exception as exc:
         print(exc)
         db.session.rollback()
         return Callback(False, 'Could not verify account with email  ' + email)
@@ -89,7 +101,7 @@ def updateSubID(email, subID: str):
     try:
         db.session.query(User).filter(User.Email == email).update({"SubID": subID})
 
-    except sqlalchemy.exc.SQLAlchemyError as exc:
+    except Exception as exc:
         print(exc)
         db.session.rollback()
         return Callback(False, 'Could not update subID for ' + email)
@@ -103,7 +115,7 @@ def updateStripeID(email, cusID: str):
     try:
         db.session.query(User).filter(User.Email == email).update({"StripeID": (cusID)})
 
-    except sqlalchemy.exc.SQLAlchemyError as exc:
+    except Exception as exc:
         print(exc)
         db.session.rollback()
         return Callback(False, 'Could not update subID for ' + email)

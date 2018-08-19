@@ -89,8 +89,8 @@ def genDummyData():
     aramco = Company.query.filter(Company.Name == "Aramco").first()
     sabic = Company.query.filter(Company.Name == "Sabic").first()
 
-    db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
-    db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
+    db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
+    db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
 
     for assistant in aramco.Assistants:
         db.session.add(

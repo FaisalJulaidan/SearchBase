@@ -73,14 +73,15 @@ def login(email: str, password_to_check: str) -> Callback:
     # If all the tests are valid then do login process
     session['Logged_in'] = True
     session['userID'] = user.ID
+    session['companyID'] = user.CompanyID
     session['userEmail'] = user.Email
     session['UserPlan'] = helpers.getPlanNickname(user.SubID)
 
     # Set LastAccess
     user.LastAccess = datetime.now()
-    
+
     # Save db changes
     db.session.commit()
-
+    print(db.session.query(User).filter(User.Email == 'ddd').first())
 
     return Callback(True, "Login Successful")

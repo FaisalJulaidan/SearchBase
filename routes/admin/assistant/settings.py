@@ -48,5 +48,3 @@ def admin_assistant_edit(assistantID):
             else:
                 flash('Error in updating ' + nickname)
                 return redirect("/admin/assistant/{}/settings".format(assistantID))
-
-

@@ -20,11 +20,11 @@ from cryptography.fernet import Fernet
 import urllib.request
 
 
-from models import db, Role, Company, Assistant, Plan, Statistics
+from models import db, Role, Company, Assistant, Plan, Statistics, Question
 from services.mail_services import mail
 
 # Import all routers to register them as blueprints
-from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router, products_router
+from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router, products_router, questions_router, analytics_router
 from routes.public.routers import public_router
 from services import user_services, auth_services
 
@@ -36,6 +36,8 @@ app.register_blueprint(profile_router)
 app.register_blueprint(admin_api)
 app.register_blueprint(settings_router)
 app.register_blueprint(products_router)
+app.register_blueprint(questions_router)
+app.register_blueprint(analytics_router)
 
 
 # code to ensure user is logged in
@@ -97,6 +99,13 @@ def genDummyData():
             Statistics(Name="test", Opened=True, QuestionsAnswered=12, ProductsReturned=12, Assistant=assistant))
         db.session.add(
             Statistics(Name="test1", Opened=True, QuestionsAnswered=52, ProductsReturned=32, Assistant=assistant))
+
+        db.session.add(
+            Question(Question="how old are you?", Type="userInfoRetrieval", Assistant=assistant))
+        db.session.add(
+            Question(Question="how do you do?", Type="dbRetrieval", Assistant=assistant))
+
+
 
     db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
     db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
@@ -464,90 +473,6 @@ def admin_turn_assistant(turnto, assistantID):
         return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Assistant has been "+message)
 
 
-# Not working temp
-# TODO rewrite
-@app.route("/admin/assistant/<assistantID>/questions", methods=['GET', 'POST'])
-def admin_questions(assistantID):
-    checkAssistantID(assistantID)
-    if request.method == "GET":
-        message = checkForMessageWhenAssistantID()
-        email = session.get('User')['Email']
-        company = get_company(email)
-        if company is None or "Error" in company:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO handle this better
-        else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-                                                   [assistantID, company[0]])
-            if assistant is None:
-                abort(status.HTTP_404_NOT_FOUND)
-            elif "Error" in assistant:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            else:
-                questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                                            [assistant[0]], True)
-                # TODO check questionstuple for errors
-
-                questions = []
-                for i in range(0, len(questionsTuple)):
-                    question = [questionsTuple[i][2] + ";" + questionsTuple[i][3]]
-                    questions.append(tuple(question))
-                return render("admin/questions.html", data=questions, message=message, id=assistantID)
-    elif request.method == "POST":
-        email = session.get('User')['Email']
-        company = get_company(email)
-        if company is None or "Error" in company:
-            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting company's records!")
-        else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-                                                   [assistantID, company[0]])
-            if assistant is None or "Error" in assistant:
-                return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting assitant's records!")
-            else:
-                currentQuestions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                                              [assistantID], True)
-                if currentQuestions is None or "Error" in currentQuestions:
-                    return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting old questions!")
-
-                updatedQuestions = []
-                noq = request.form.get("noq-hidden", default="Error")
-                for i in range(1, int(noq) + 1):
-                    question = request.form.get("question" + str(i), default="Error")
-                    if question != "Error":
-                        updatedQuestions.append(question)
-                    else:
-                        return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting new questions!")
-
-                i = -1
-                if (len(updatedQuestions) + 1 < len(currentQuestions) + 1):
-                    for b in range(len(updatedQuestions) + 1, len(currentQuestions) + 1):
-                        questionID = currentQuestions[i][0]
-                        question = currentQuestions[i][2]
-
-                        deleteQuestion = delete_from_table("DELETE FROM Questions WHERE AssistantID=? AND Question=?;", [assistantID, escape(question)])
-                        if deleteQuestion is None or "Error" in deleteQuestion:
-                            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 1 Error in updating questions!")
-
-                        deleteAnswers = delete_from_table(DATABASE, "DELETE FROM Answers WHERE QuestionID=?;", [questionID])
-                        if deleteAnswers is None or "Error" in deleteAnswers:
-                            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in removing deleted question's answers!")
-                for q in updatedQuestions:
-                    i += 1
-                    qType = request.form.get("qType" + str(i))
-                    if i >= len(currentQuestions):
-                        insertQuestion = insert_into_database_table(
-                            "INSERT INTO Questions ('AssistantID', 'Question', 'Type')"
-                            "VALUES (?,?,?);", (assistantID, q, qType))
-                        if insertQuestion is None or "Error" in insertQuestion:
-                            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 2 Error in updating questions!")
-                    else:
-                        updateQuestion = update_table("UPDATE Questions SET Question=?, Type=? WHERE Question=?;", [escape(q), qType, currentQuestions[i][2]])
-                        if updateQuestion is None or "Error" in updateQuestion:
-                             return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 3 Error in updating questions!")
-
-                return redirect("/admin/assistant/{}/questions".format(assistantID))
-
-
 # TODO rewrite
 @app.route("/admin/assistant/<assistantID>/answers", methods=['GET', 'POST'])
 def admin_answers(assistantID):
@@ -649,7 +574,6 @@ def admin_answers(assistantID):
                 return redirect("/admin/assistant/{}/answers".format(assistantID)+"?res="+str(noa)+"")
 
 
-
 # TODO improve
 @app.route("/admin/assistant/<assistantID>/userinput", methods=["GET"])
 def admin_user_input(assistantID):
@@ -713,20 +637,6 @@ def admin_plan_confirmation():
 @app.route('/admin/thanks', methods=['GET'])
 def admin_thanks():
     return render('admin/thank-you.html')
-
-
-
-
-
-# TODO implement this
-@app.route("/admin/assistant/<assistantID>/analytics", methods=['GET'])
-def admin_analytics(assistantID):
-    checkAssistantID(assistantID)
-    if request.method == "GET":
-        stats = select_from_database_table(
-            "SELECT Date, Opened, QuestionsAnswered, ProductsReturned FROM Statistics WHERE AssistantID=?",
-            [assistantID], True)
-        return render("admin/analytics.html", data=stats)
 
 
 # Method for the users

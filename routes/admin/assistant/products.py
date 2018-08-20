@@ -8,11 +8,11 @@ products_router: Blueprint = Blueprint('products_router', __name__, template_fol
 def admin_products(assistantID):
     if request.method == "GET":
 
-        products_callback: Callback = solutions_services.getByAssistantID(assistantID)
+        solutions_callback: Callback = solutions_services.getByAssistantID(assistantID)
 
-        if not products_callback.Success: raise ValueError('Can not retrieve products')
+        if not solutions_callback.Success: raise ValueError('Can not retrieve products')
 
-        return admin_services.render("admin/solutions.html", data=products_callback.Data, id=assistantID)
+        return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID)
 
     elif request.method == 'POST':
         email = session.get('User')['Email']

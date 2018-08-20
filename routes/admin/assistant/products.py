@@ -1,5 +1,5 @@
 from flask import Blueprint, request, redirect, flash
-from services import assistant_services
+from services import solutions_services, admin_services
 from models import Callback
 
 products_router: Blueprint = Blueprint('products_router', __name__, template_folder="../../templates")
@@ -8,24 +8,11 @@ products_router: Blueprint = Blueprint('products_router', __name__, template_fol
 def admin_products(assistantID):
     if request.method == "GET":
 
-        # reuse the one in assistant services
-        # Services are based on atomic data models
-        products_callback: Callback = assistant_services.getByID(assistantID)
-        # products_callback: Callback = solutions_services.getByAssistantID(assistantID)
-        #  ^^ is not utilizing the written functions
-        #  so we are okay to remove the solutions services
+        products_callback: Callback = solutions_services.getByAssistantID(assistantID)
 
         if not products_callback.Success: raise ValueError('Can not retrieve products')
 
-        # there is not solutions.html file!
-        # there is a user the function in helpers called render
-        # it will be helpers.render
-        # import helpers module above like:
-        # from utiltiies import helpers
-        # and use it like this " helpers.render "
-        # how ever you need to check the html page before :)
-        # * I think it is called products.html *
-        return render("admin/solutions.html", data=products_callback.Data, id=assistantID)
+        return admin_services.render("admin/solutions.html", data=products_callback.Data, id=assistantID)
 
     elif request.method == 'POST':
         email = session.get('User')['Email']

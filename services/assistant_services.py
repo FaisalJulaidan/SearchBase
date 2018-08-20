@@ -16,7 +16,7 @@ def getByID(id) -> Callback:
         print(exc)
         return Callback(False,
                         'Could not get the assistant by id.')
-
+    
 
 def getByNickname(nickname) -> Callback:
     try:

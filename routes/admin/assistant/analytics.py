@@ -5,9 +5,7 @@ from models import Callback
 analytics_router: Blueprint = Blueprint('analytics_router', __name__, template_folder="../../templates")
 
 
-
-# TODO implement this
-@app.route("/admin/assistant/<assistantID>/analytics", methods=['GET'])
+@analytics_router.route("/admin/assistant/<assistantID>/analytics", methods=['GET'])
 def admin_analytics(assistantID):
     if request.method == "GET":
         stats = select_from_database_table(

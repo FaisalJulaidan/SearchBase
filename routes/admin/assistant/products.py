@@ -1,31 +1,19 @@
 from flask import Blueprint, request, redirect, flash
-from services import solutions_services
+from services import solutions_services, admin_services
 from models import Callback
 
 products_router: Blueprint = Blueprint('products_router', __name__, template_folder="../../templates")
 
-# Evgeniy make the get request running :)
-@products_router.route("/admin/assistant/<assistantID>/products", methods=['GET', 'POST'])
-def admin_products(assistantID):
+@products_router.route("/admin/assistant/<assistantID>/solutions", methods=['GET', 'POST'])
+def admin_solutions(assistantID):
     if request.method == "GET":
-        email = session.get('User')['Email']
-        company = get_company(email)
-        if company is None or "Error" in company:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO handle this better
-        else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-                                                   [assistantID, company[0]])
-            if assistant is None:
-                abort(status.HTTP_404_NOT_FOUND)
-            elif "Error" in assistant:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            else:
-                products = select_from_database_table(
-                    "SELECT ProductID, Name, Brand, Model, Price, Keywords, Discount, URL "
-                    "FROM Products WHERE AssistantID=?;", [assistantID], True)
-                # TODO check products for errors
-                return render("admin/products.html", data=products, id=assistantID)
+
+        solutions_callback: Callback = solutions_services.getByAssistantID(assistantID)
+
+        if not solutions_callback.Success: raise ValueError('Can not retrieve products')
+
+        return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID)
+
     elif request.method == 'POST':
         email = session.get('User')['Email']
         company = get_company(email)
@@ -33,9 +21,6 @@ def admin_products(assistantID):
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             # TODO handle this better
         else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-                                                   [assistantID, company[0]])
-
             #get all company assistants (needed for totalproducts check)
             assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?", [company[0]])
 
@@ -107,9 +92,9 @@ def admin_products(assistantID):
                             assistantID, id, name, brand, model, price,
                             keywords, discount, url))
                     # TODO try to recover by re-adding old data if insertProduct fails
-                return redirect("/admin/assistant/{}/products".format(assistantID))
+                return redirect("/admin/assistant/{}/solutions".format(assistantID))
 
-
+# TODO improve
 @products_router.route("/admin/assistant/<assistantID>/products/file", methods=['POST'])
 def admin_products_file_upload(assistantID):
     checkAssistantID(assistantID)

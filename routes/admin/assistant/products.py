@@ -1,17 +1,30 @@
 from flask import Blueprint, request, redirect, flash
-from services import solutions_services
+from services import assistant_services
 from models import Callback
 
 products_router: Blueprint = Blueprint('products_router', __name__, template_folder="../../templates")
 
 @products_router.route("/admin/assistant/<assistantID>/solutions", methods=['GET', 'POST'])
 def admin_products(assistantID):
-    checkAssistantID(assistantID)
     if request.method == "GET":
-        
-        products_callback : Callback = solutions_services.getByAssistantID(assistantID)
+
+        # reuse the one in assistant services
+        # Services are based on atomic data models
+        products_callback: Callback = assistant_services.getByID(assistantID)
+        # products_callback: Callback = solutions_services.getByAssistantID(assistantID)
+        #  ^^ is not utilizing the written functions
+        #  so we are okay to remove the solutions services
+
         if not products_callback.Success: raise ValueError('Can not retrieve products')
-        
+
+        # there is not solutions.html file!
+        # there is a user the function in helpers called render
+        # it will be helpers.render
+        # import helpers module above like:
+        # from utiltiies import helpers
+        # and use it like this " helpers.render "
+        # how ever you need to check the html page before :)
+        # * I think it is called products.html *
         return render("admin/solutions.html", data=products_callback.Data, id=assistantID)
 
     elif request.method == 'POST':
@@ -97,7 +110,6 @@ def admin_products(assistantID):
                     # TODO try to recover by re-adding old data if insertProduct fails
                 return redirect("/admin/assistant/{}/solutions".format(assistantID))
 
-
 # TODO improve
 @products_router.route("/admin/assistant/<assistantID>/products/file", methods=['POST'])
 def admin_products_file_upload(assistantID):
@@ -179,3 +191,5 @@ def admin_products_file_upload(assistantID):
                         msg = "Error not allowed that type of file."
                         print(msg)
                 return msg
+
+

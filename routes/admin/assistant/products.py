@@ -5,7 +5,7 @@ from models import Callback
 products_router: Blueprint = Blueprint('products_router', __name__, template_folder="../../templates")
 
 @products_router.route("/admin/assistant/<assistantID>/solutions", methods=['GET', 'POST'])
-def admin_products(assistantID):
+def admin_solutions(assistantID):
     if request.method == "GET":
 
         solutions_callback: Callback = solutions_services.getByAssistantID(assistantID)
@@ -21,9 +21,6 @@ def admin_products(assistantID):
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             # TODO handle this better
         else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-                                                   [assistantID, company[0]])
-
             #get all company assistants (needed for totalproducts check)
             assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?", [company[0]])
 

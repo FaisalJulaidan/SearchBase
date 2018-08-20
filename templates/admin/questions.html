@@ -167,9 +167,7 @@
       // set variables
       var oldNOQ = 0;
       var maxQuestions = 12;
-      // set the question form template
-      var qTemplate1 = "<div class = \"Questions\"><label class=\"control-label col-md-3 col-sm-3 col-xs-12\" for=\"last-name\">"
-      var qTemplate2 = " question <span class=\"required\">*</span></label><div class=\"col-md-6 col-sm-6 col-xs-12\"><input type=\"text\" name=\""
+
       // set event listeners
       document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
       document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
@@ -185,15 +183,12 @@
       var data = [];
       var typeCheck = [];
 
+
+
       {%for item in data%}
-        data.push("{{item[0]}}");
-        typeCheck.push("{{item[0].split(';')[1]}}");
+        data.push({{ item|tojson|safe }})
       {%endfor%}
-
-
-      var noq = data.length;
-      checkNOQ(noq)
-
+      checkNOQ(data.length)
 
       function cookUpQuestionElement(textNumber,questionData,i) {
           return  "<div class='question'>"+
@@ -273,65 +268,66 @@
       }
 
       function checkNOQ(noq,isNew){
-        if (!Number.isNaN(noq)) {
-          if (noq <= maxQuestions) {
-            if (noq > oldNOQ) {
-              for (i = oldNOQ; i < noq; i++) {
-                var textNumber;
-                switch (i) {
+          function getText(i) {
+              switch (i) {
                   case 0: textNumber="First"
-                    break;
+                      break;
                   case 1: textNumber="Second"
-                    break;
+                      break;
                   case 2: textNumber="Third"
-                    break;
+                      break;
                   case 3: textNumber="Fourth"
-                    break;
+                      break;
                   case 4: textNumber="Fifth"
-                    break;
+                      break;
                   case 5: textNumber="Sixth"
-                    break;
+                      break;
                   case 6: textNumber="Seventh"
-                    break;
+                      break;
                   case 7: textNumber="Eighth"
-                    break;
+                      break;
                   case 8: textNumber="Ninth"
-                    break;
+                      break;
                   case 9: textNumber="Tenth"
-                    break;
+                      break;
                   case 10: textNumber="Eleventh"
-                    break;
+                      break;
                   case 11: textNumber="Twelveth"
-                    break;
-                }
+                      break;
+              }
+          }
+            if (!Number.isNaN(noq)) {
+                if (noq <= maxQuestions && noq > oldNOQ) {
 
-                if (!isNew) {
-                  var questionData = data[i].split(";")[0]?data[i].split(";")[0]:console.log('err');;
-                }else {
-                  var questionData = ''
-                }
+                    for (i = oldNOQ; i < noq; i++) {
+                        var textNumber = getText(i)
+                    if (!isNew) {
+                        var questionData = data[i].Question
+                    }else {
+                        var questionData = ''
+                    }
 
                 $("#QuestionDiv").append(cookUpQuestionElement(textNumber,questionData,i))
 
                 // needs to be checked
                 // not sure of the business logic below
-                if (typeCheck[i] == "userInfoRetrieval") {
+                if (data[i].Type == "userInfoRetrieval") {
                   $("#bothB" + i).prop('checked', false);
                   $("#dbB" + i).prop('checked', false);
                   $("#fileUp" + i).prop('checked', false);
                   $("#uiB" + i).prop('checked',   true);
                 }
-                else if (typeCheck[i] == "dbRetrieval") {
+                else if (data[i].Type == "dbRetrieval") {
                   $("#bothB" + i).prop('checked', false);
                   $("#dbB" + i).prop('checked',   true);
                   $("#uiB" + i).prop('checked', false);
                   $("#fileUp" + i).prop('checked', false);
-                } else if (typeCheck[i] == "both") {
+                } else if (data[i].Type == "both") {
                   $("#bothB" + i).prop('checked', true);
                   $("#dbB" + i).prop('checked',   false);
                   $("#uiB" + i).prop('checked', false);
                   $("#fileUp" + i).prop('checked', false);
-                } else if (typeCheck[i] == "fileUpload") {
+                } else if (data[i].Type == "fileUpload") {
                   $("#bothB" + i).prop('checked', false);
                   $("#dbB" + i).prop('checked', false);
                   $("#uiB" + i).prop('checked', false);
@@ -355,7 +351,7 @@
             oldNOQ = noq;
             document.getElementById("noq-hidden").value = String(noq);
           }
-        }
+
       }
 
       function ClearQTemplate() {

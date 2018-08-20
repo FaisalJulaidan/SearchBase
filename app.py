@@ -11,7 +11,7 @@ from itsdangerous import URLSafeTimedSerializer, BadSignature, BadData
 from xml.dom import minidom
 from json import dumps, loads, load, dump
 import os
-import sqlite3
+#import sqlite3
 import stripe
 import string
 import random

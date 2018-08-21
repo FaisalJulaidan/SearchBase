@@ -24,11 +24,6 @@ def redirectWithMessage(function, message):
     return redirect(url_for("." + function, messages=message))
 
 
-def render(template, **context):
-    if session.get('Logged_in', False):
-        return render_template(template, debug=0, assistants=session.get('UserAssistants', []), **context)
-    return render_template(template, debug=0, **context)
-
 
 def checkForMessage():
     args = request.args

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect
+from flask import Blueprint, request, redirect,flash
 from services import assistant_services,admin_services
 from models import Callback, Assistant
 from utilties import helpers
@@ -16,7 +16,7 @@ def admin_questions(assistantID):
         assistant: Assistant = callback.Data
         questionList = helpers.getListFromSQLAlchemyList(assistant.Questions)
 
-        return helpers.render("admin/questions.html", data=questionList, id=assistantID)
+        return admin_services.render("admin/questions.html", data=questionList, id=assistantID)
 
     elif request.method == "POST":
         email = session.get('User')['Email']

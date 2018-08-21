@@ -1,11 +1,13 @@
 from flask import Blueprint, request, redirect, flash
-from services import solutions_services, admin_services
+from services import solutions_services, admin_services, assistant_services
 from models import Callback
+from utilties import helpers
 
 products_router: Blueprint = Blueprint('products_router', __name__, template_folder="../../templates")
 
 @products_router.route("/admin/assistant/<assistantID>/solutions", methods=['GET', 'POST'])
 def admin_solutions(assistantID):
+# Evgeniy make the get request running :)
     if request.method == "GET":
 
         solutions_callback: Callback = solutions_services.getByAssistantID(assistantID)
@@ -15,84 +17,69 @@ def admin_solutions(assistantID):
         return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID)
 
     elif request.method == 'POST':
-        email = session.get('User')['Email']
-        company = get_company(email)
-        if company is None or "Error" in company:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO handle this better
-        else:
-            #get all company assistants (needed for totalproducts check)
-            assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?", [company[0]])
+        companyID = session.get('User')['CompanyID']
 
-            if assistant is None:
-                abort(status.HTTP_404_NOT_FOUND)
-            elif "Error" in assistant:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            else:
-                currentProducts = select_from_database_table("SELECT * FROM Products WHERE AssistantID=?;",
-                                                             [assistantID], True)
-                if "Error" in currentProducts:
-                    # TODO handle errors with currentProducts
-                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Retrieving current products: " + currentProducts)
-                elif currentProducts is not None and currentProducts != []:
-                    deleteCurrentProducts = delete_from_table("DELETE FROM Products WHERE AssistantID=?;",
-                                                              [assistantID])
-                    if "Error" in deleteCurrentProducts:
-                        # TODO handle errors with deleteCurrentProducts
-                        abort(status.HTTP_500_INTERNAL_SERVER_ERROR,
-                              "Deleting current products: " + deleteCurrentProducts)
-                    else:
-                        pass
+        #get all company assistants (needed for totalproducts check)
+        assistant_callback : Callback = assistant_services.getAll(companyID)
+        if not assistant_callback.Success: return helpers.redirectWithMessage("admin_solutions", assistant_callback.Message)
 
-                nop = 1
-                for key in request.form:
-                    if "product_ID" in key:
-                        nop += 1
+        solutions_callback: Callback = solutions_services.getByAssistantID(assistantID)
+        if not solutions_callback.Success: return helpers.redirectWithMessage("admin_solutions", solutions_callback.Message)
+        currentSolutions = solutions_callback.Data
+        #currentProducts -> solutions_callback
 
-                for i in range(1, nop):
-                    # TODO add more info to these error messages
-                    id = request.form.get("product_ID" + str(i), default="Error")
-                    if id is "Error":
-                        abort(status.HTTP_400_BAD_REQUEST, "Error with product ID")
-                    name = request.form.get("product_Name" + str(i), default="Error")
-                    if name is "Error":
-                        abort(status.HTTP_400_BAD_REQUEST, "Error with product name")
-                    brand = request.form.get("product_Brand" + str(i), default="Error")
-                    if brand is "Error":
-                        abort(status.HTTP_400_BAD_REQUEST, "Error with product brand")
-                    model = request.form.get("product_Model" + str(i), default="Error")
-                    if model is "Error":
-                        abort(status.HTTP_400_BAD_REQUEST, "Error with product model")
-                    price = request.form.get("product_Price" + str(i), default="Error")
-                    if price is "Error":
-                        abort(status.HTTP_400_BAD_REQUEST, "Error with product price")
-                    keywords = request.form.get("product_Keywords" + str(i), default="Error")
-                    if keywords is "Error":
-                        abort(status.HTTP_400_BAD_REQUEST, "Error with product keywords")
-                    discount = request.form.get("product_Discount" + str(i), default="Error")
-                    if discount is "Error":
-                        abort(status.HTTP_400_BAD_REQUEST, "Error with product discount")
-                    url = request.form.get("product_URL" + str(i), default="Error")
-                    if url is "Error":
-                        abort(status.HTTP_400_BAD_REQUEST, "Error with product url")
-                    if "http" not in url:
-                        url = "http://" + url
+        deleteOldData : bool = solutions_services.deleteAllByAssistantID(assistantID)
+        if not deleteOldData: return helpers.redirectWithMessage("admin_solutions", "Could not delete old data in order to put the new one.")
 
-                    #see if they have reached the limit
-                    numberOfProducts = 0
-                    maxNOP = session['UserPlan']['Settings']['MaxProducts']
-                    for record in assistants:
-                        numberOfProducts += count_db("Products", " WHERE AssistantID=?", [record["ID"],])
-                    if numberOfProducts > maxNOP:
-                        return redirectWithMessageAndAssistantID("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP)+ ". Solutions after " + name + " have not been added.")
+        nop = 1
+        for key in request.form:
+            if "product_ID" in key:
+                nop += 1
 
-                    insertProduct = insert_into_database_table(
-                        "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) "
-                        "VALUES (?,?,?,?,?,?,?,?,?);", (
-                            assistantID, id, name, brand, model, price,
-                            keywords, discount, url))
-                    # TODO try to recover by re-adding old data if insertProduct fails
-                return redirect("/admin/assistant/{}/solutions".format(assistantID))
+        for i in range(1, nop):
+            # TODO add more info to these error messages
+            id = request.form.get("product_ID" + str(i), default="Error")
+            if id is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product ID")
+            name = request.form.get("product_Name" + str(i), default="Error")
+            if name is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product name")
+            brand = request.form.get("product_Brand" + str(i), default="Error")
+            if brand is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product brand")
+            model = request.form.get("product_Model" + str(i), default="Error")
+            if model is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product model")
+            price = request.form.get("product_Price" + str(i), default="Error")
+            if price is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product price")
+            keywords = request.form.get("product_Keywords" + str(i), default="Error")
+            if keywords is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product keywords")
+            discount = request.form.get("product_Discount" + str(i), default="Error")
+            if discount is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product discount")
+            url = request.form.get("product_URL" + str(i), default="Error")
+            if url is "Error":
+                abort(status.HTTP_400_BAD_REQUEST, "Error with product url")
+            if "http" not in url:
+                url = "http://" + url
+
+            #see if they have reached the limit
+            numberOfProducts = 0
+            maxNOP = session['UserPlan']['Settings']['MaxProducts']
+            for record in assistants:
+                numberOfProducts += count_db("Products", " WHERE AssistantID=?", [record["ID"],])
+            if numberOfProducts > maxNOP:
+                return redirectWithMessageAndAssistantID("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP)+ ". Solutions after " + name + " have not been added.")
+
+            insertProduct = insert_into_database_table(
+                "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) "
+                "VALUES (?,?,?,?,?,?,?,?,?);", (
+                    assistantID, id, name, brand, model, price,
+                    keywords, discount, url))
+            # TODO try to recover by re-adding old data if insertProduct fails
+        return redirect("/admin/assistant/{}/solutions".format(assistantID))
 
 # TODO improve
 @products_router.route("/admin/assistant/<assistantID>/products/file", methods=['POST'])

@@ -4,9 +4,17 @@ from models import db,Callback,Product
 
 def getByAssistantID(assistantID):
 
-    products_callback : Callback = db.session.query(Product).get(assistantID)
+    try:
+        if assistantID:
+            # Get result and check if None then raise exception
+            result = db.session.query(Product).get(assistantID)
+            if not result: raise Exception
 
-    return products_callback
+            return Callback(True, 'Solutions have been successfully retrieved', result)
+        else:
+            raise Exception
+    except Exception as exc:
+        return Callback(False, 'Could not retrieve solutions for ID: ' + assistantID)
 
 def deleteAllByAssistantID(assistantID):
 

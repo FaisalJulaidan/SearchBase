@@ -20,12 +20,13 @@ from cryptography.fernet import Fernet
 import urllib.request
 
 
-from models import db, Role, Company, Assistant, Plan, Statistics
+from models import db, Role, Company, Assistant, Plan, Statistics, Question
 from services.mail_services import mail
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
                                  products_router, sub_router
+from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router, products_router, questions_router, analytics_router
 from routes.public.routers import public_router
 from services import user_services, mail_services
 
@@ -38,6 +39,8 @@ app.register_blueprint(admin_api)
 app.register_blueprint(sub_router)
 app.register_blueprint(settings_router)
 app.register_blueprint(products_router)
+app.register_blueprint(questions_router)
+app.register_blueprint(analytics_router)
 
 
 # code to ensure user is logged in
@@ -99,6 +102,13 @@ def genDummyData():
             Statistics(Name="test", Opened=True, QuestionsAnswered=12, ProductsReturned=12, Assistant=assistant))
         db.session.add(
             Statistics(Name="test1", Opened=True, QuestionsAnswered=52, ProductsReturned=32, Assistant=assistant))
+
+        db.session.add(
+            Question(Question="how old are you?", Type="userInfoRetrieval", Assistant=assistant))
+        db.session.add(
+            Question(Question="how do you do?", Type="dbRetrieval", Assistant=assistant))
+
+
 
     db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
     db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
@@ -163,6 +173,7 @@ app.config.update(
     MAIL_PASSWORD='pilbvnczzdgxkyzy'
 )
 
+# mail = Mail(app)
 
 
 ALLOWED_UPLOAD_FILE_EXTENSIONS = set(['txt', 'pdf', 'doc', 'docx'])
@@ -840,7 +851,34 @@ def admin_products_file_upload(assistantID):
 
 
 # TODO improve
-
+@app.route("/admin/assistant/<assistantID>/userinput", methods=["GET"])
+def admin_user_input(assistantID):
+    checkAssistantID(assistantID)
+    if request.method == "GET":
+        email = session.get('User')['Email']
+        assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=?", [assistantID,])
+        if assistant is None or "Error" in assistant:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
+                                                    [assistantID], True)
+            data = []
+            print("questions: ", questions)
+            #dataTuple = tuple(["Null"])
+            for i in range(0, len(questions)):
+                question = questions[i]
+                print("question: ", question)
+                questionID = question[0]
+                print("questionID: ", questionID)
+                print(query_db("SELECT * FROM UserInput"), [])
+                userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
+                print("userInput: ", userInput)
+                if userInput and userInput is not None:
+                    for record in userInput:
+                        print("record: ", record)
+                        data.append(record)
+            print("data:", data)
+            return render("admin/data-storage.html", data=data)
 
 
 @app.route("/admin/assistant/<assistantID>/connect", methods=['GET'])

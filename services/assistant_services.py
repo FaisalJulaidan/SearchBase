@@ -16,7 +16,7 @@ def getByID(id) -> Callback:
         print(exc)
         return Callback(False,
                         'Could not get the assistant by id.')
-
+    
 
 def getByNickname(nickname) -> Callback:
     try:
@@ -81,7 +81,7 @@ def update(id, nickname, message, secondsUntilPopup)-> Callback:
 
 def removeByNickname(nickname) -> bool:
     try:
-     db.session.query(Assistant).filter(Assistant.Nickname == nickname).delete()
+        db.session.query(Assistant).filter(Assistant.Nickname == nickname).delete()
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
         db.session.rollback()

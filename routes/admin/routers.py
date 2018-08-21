@@ -17,3 +17,9 @@ products_router: Blueprint = products_router
 
 from .subscription.sub import sub_router
 sub_router: Blueprint = sub_router
+
+from .assistant.questions import questions_router
+questions_router: Blueprint = questions_router
+
+from .assistant.analytics import analytics_router
+analytics_router: Blueprint = analytics_router

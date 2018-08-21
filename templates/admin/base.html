@@ -293,6 +293,7 @@
                 x.innerHTML = y.innerHTML + x.innerHTML
                 y.innerHTML = ''
             }
+            var prev_handler = window.onload;
         </script>
         <div id="flash" hidden>
             {% with messages = get_flashed_messages() %}

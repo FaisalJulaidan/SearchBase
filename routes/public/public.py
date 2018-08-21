@@ -75,7 +75,7 @@ def login():
     elif request.method == "POST":
         session.permanent = True
 
-        email :str = request.form.get("email", default=None)
+        email: str = request.form.get("email", default=None)
         password_to_check :str = request.form.get("password", default=None)
 
         callback: Callback = auth_services.login(email,password_to_check)

@@ -415,30 +415,24 @@
         xhttp.send(params);
 
 
+        // Set SessionStorage which is similar to cookies in client-side
+        $.get({
+                url: '/admin/userData',
+                contentType: 'application/json'
 
-        // Only ask for user data when SessionStorage is empty for better performance
-        if (sessionStorage.getItem('id') == null || sessionStorage.getItem('subID') == null){
-            // Set SessionStorage which is similar to cookies in client-side
-            $.get({
-                    url: '/admin/userData',
-                    contentType: 'application/json'
+        }).done(function( res ) {
 
-            }).done(function( res ) {
-                
-                sessionStorage.setItem('id', res.id);
-                sessionStorage.setItem('firstname', res.firstname);
-                sessionStorage.setItem('surname', res.surname);
-                sessionStorage.setItem('email', res.email);
-                sessionStorage.setItem('stripeID', res.stripeID);
-                sessionStorage.setItem('subID', res.subID);
+            sessionStorage.setItem('id', res.id);
+            sessionStorage.setItem('firstname', res.firstname);
+            sessionStorage.setItem('surname', res.surname);
+            sessionStorage.setItem('email', res.email);
+            sessionStorage.setItem('stripeID', res.stripeID);
+            sessionStorage.setItem('subID', res.subID);
 
-             }).fail(function( err ) {
+         }).fail(function( err ) {
 
-               console.log(err)
-             })
-        } else {
-            console.log("SessionStorage is already filled");
-        }
+           console.log(err)
+         })
 
 
 

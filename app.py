@@ -24,9 +24,10 @@ from models import db, Role, Company, Assistant, Plan, Statistics
 from services.mail_services import mail
 
 # Import all routers to register them as blueprints
-from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router, products_router
+from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
+                                 products_router, sub_router
 from routes.public.routers import public_router
-from services import user_services, auth_services
+from services import user_services, mail_services
 
 app = Flask(__name__, static_folder='static')
 
@@ -34,6 +35,7 @@ app.register_blueprint(dashboard_router)
 app.register_blueprint(public_router)
 app.register_blueprint(profile_router)
 app.register_blueprint(admin_api)
+app.register_blueprint(sub_router)
 app.register_blueprint(settings_router)
 app.register_blueprint(products_router)
 
@@ -161,7 +163,6 @@ app.config.update(
     MAIL_PASSWORD='pilbvnczzdgxkyzy'
 )
 
-# mail = Mail(app)
 
 
 ALLOWED_UPLOAD_FILE_EXTENSIONS = set(['txt', 'pdf', 'doc', 'docx'])
@@ -839,34 +840,7 @@ def admin_products_file_upload(assistantID):
 
 
 # TODO improve
-@app.route("/admin/assistant/<assistantID>/userinput", methods=["GET"])
-def admin_user_input(assistantID):
-    checkAssistantID(assistantID)
-    if request.method == "GET":
-        email = session.get('User')['Email']
-        assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=?", [assistantID,])
-        if assistant is None or "Error" in assistant:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-        else:
-            questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                                    [assistantID], True)
-            data = []
-            print("questions: ", questions)
-            #dataTuple = tuple(["Null"])
-            for i in range(0, len(questions)):
-                question = questions[i]
-                print("question: ", question)
-                questionID = question[0]
-                print("questionID: ", questionID)
-                print(query_db("SELECT * FROM UserInput"), [])
-                userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
-                print("userInput: ", userInput)
-                if userInput and userInput is not None:
-                    for record in userInput:
-                        print("record: ", record)
-                        data.append(record)
-            print("data:", data)
-            return render("admin/data-storage.html", data=data)
+
 
 
 @app.route("/admin/assistant/<assistantID>/connect", methods=['GET'])
@@ -1918,6 +1892,7 @@ if __name__ == "__main__":
     app.config['SESSION_TYPE'] = 'filesystem'
 
     db.init_app(app)
+    mail.init_app(app)
     app.app_context().push()
 
     db.drop_all()
@@ -1929,4 +1904,6 @@ if __name__ == "__main__":
 
     # Run the app server
     app.run()
+
+    mail_services.sendVerificationEmail('julaidan.faisal@gmail.com', 'companyName', 'faisal julaidan')
 

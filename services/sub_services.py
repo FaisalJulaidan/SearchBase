@@ -26,6 +26,9 @@ def unsubscribe(email) -> Callback:
         stripeSub.delete()
         user.SubID = None
 
+        # Save db changes
+        db.session.commit()
+
         return Callback(True, 'You have unsubscribe successfully!')
 
     except Exception as e:
@@ -74,11 +77,15 @@ def subscribe(email, planID, trialDays=None, token=None, coupon=None) -> Callbac
             coupon=coupon
         )
 
-        # Get all company's assistants
-        assistants = assistant_services.getAll(user.CompanyID)
+        # Get all company's assistants for activation
+        assistants_callback = assistant_services.getAll(user.CompanyID)
+        if not assistants_callback.Success:
+            # unsubscribe before return the error
+            unsubscribe(email)
+            return Callback(False, "Issue while dealing with user's assistants.")
 
         # If everything is OK, activate company's assistants
-        for assistant in assistants:
+        for assistant in assistants_callback.Data:
             assistant.Active = True
 
         # Update user's StripeID & SubID
@@ -99,42 +106,57 @@ def subscribe(email, planID, trialDays=None, token=None, coupon=None) -> Callbac
 
 def getPlanByID(planID) -> Callback:
     try:
+        # Get result and check if None then raise exception
+        result = db.session.query(Plan).filter(Plan.ID == planID).first()
+        if not result: raise Exception
+
         return Callback(True, 'Plan found.',
-                        db.session.query(Plan).filter(Plan.ID == planID).first())
+                        result)
     except Exception as e:
         return Callback(False, 'Could not find a plan with ID ' + planID)
 
 
 def getPlanByNickname(nickname) -> Callback:
     try:
+        # Get result and check if None then raise exception
+        result = db.session.query(Plan).filter(Plan.Nickname == nickname).first()
+        if not result: raise Exception
+
         return Callback(True, 'No message.',
-                        db.session.query(Plan).filter(Plan.Nickname == nickname).first())
+                        result)
     except Exception as e:
         return Callback(False, 'Could not find a plan with ' + nickname + ' nickname')
 
 
 def getStripePlan(planID) -> Callback:
     try:
-        return Callback(True, 'No message.', stripe.Plan.retrieve(planID))
+        # Get result and check if None then raise exception
+        result = stripe.Plan.retrieve(planID)
+        if not result: raise Exception
+
+        return Callback(True, 'No message.', result)
     except Exception as e:
         return Callback(False, "This plan doesn't exist! Make sure the plan ID is correct.")
 
 
-def getStripePlanNicknameBySubID(SubID=None):
+def getStripePlanNicknameBySubID(SubID):
     try:
+        # Get result and check if None then raise exception
+        result = stripe.Subscription.retrieve(SubID)["items"]["data"][0]["plan"]["nickname"]
+        if not result: raise Exception
+
         # Get subscription object from Stripe API
-        subscription = stripe.Subscription.retrieve(SubID)
 
         # Return the subscription item's plan nickname e.g (Basic, Ultimate...)
-        return subscription["items"]["data"][0]["plan"]["nickname"]
+        return Callback(True, 'No message.', result)
 
-    except stripe.error.StripeError as e:
-        return None
+    except Exception as e:
+        return Callback(False, 'Could not find plan nickname form Stripe')
 
 
-def isCouponValid(coupon="Error"):
+def isCouponValid(coupon):
     try:
-        stripe.Coupon.retrieve(coupon)
+        stripe.Coupon.retrieve(str(coupon))
         return True
     except stripe.error.StripeError as e:
         print("coupon is not valid")

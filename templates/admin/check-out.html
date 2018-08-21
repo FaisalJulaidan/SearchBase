@@ -44,7 +44,7 @@
                 <div class="x_content">
                     <main>
                         <div class="cell example example2" style="margin: 0 25%">
-                            <form action="/admin/check-out/{{plan['id']}}" method="post">
+                            <form action="/admin/subscribe/{{plan['id']}}" method="post">
 
                                 <div data-locale-reversible>
                                   <div class="row">
@@ -176,7 +176,7 @@
 <script type="text/javascript">
 
 
-    if (sessionStorage.getItem('subID') == null){
+    if (sessionStorage.getItem('subID') != 'null'){
       swal({
           title: "Are you sure?",
           text: "You will lose your active subscription.",

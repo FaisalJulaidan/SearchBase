@@ -36,8 +36,7 @@ def admin_pay(planID):
             helpers.redirectWithMessage('admin_pricing', 'This plan does not exist! Make sure the plan ID '
                                         + planID + ' is correct.')
 
-        stripePlan = stripePlan_callback.Data
-        return admin_services.render("admin/check-out.html", plan=stripePlan)
+        return admin_services.render("admin/check-out.html", plan=stripePlan_callback.Data)
 
     if request.method == 'POST':
 

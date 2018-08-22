@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, flash, session
-from services import solutions_services, admin_services, assistant_services
-from models import Callback
+from services import solutions_services, admin_services, assistant_services, sub_services
+from models import Callback, Product
 from utilties import helpers
 
 products_router: Blueprint = Blueprint('products_router', __name__, template_folder="../../templates")
@@ -11,10 +11,13 @@ def admin_solutions(assistantID):
     if request.method == "GET":
 
         solutions_callback: Callback = solutions_services.getByAssistantID(assistantID)
-
+        print(solutions_callback.Data)
+        print(type(solutions_callback.Data))
         if not solutions_callback.Success: solutions_callback.Data = []
-
-        solutions = helpers.getListFromSQLAlchemyList(solutions_callback.Data)
+        if type(solutions_callback.Data) is Product:
+            solutions = helpers.getDictFromSQLAlchemyObj(solutions_callback.Data)
+        else:
+            solutions = helpers.getListFromSQLAlchemyList(solutions_callback.Data)
 
         return admin_services.render("admin/solutions.html", data=solutions, id=assistantID)
 
@@ -34,57 +37,66 @@ def admin_solutions(assistantID):
 
         #delete old solutions so the new one can be put it
         deleteOldData : bool = solutions_services.deleteAllByAssistantID(assistantID)
-        if not deleteOldData: return helpers.redirectWithMessage("admin_solutions", "Could not delete old data in order to put the new one.")
+        if not deleteOldData: 
+            solutions_services.addOldByAssitantID(assistantID, "Could not delete old data in order to put the new one. Old records were lost.", currentSolutions)
+            return helpers.redirectWithMessage("admin_solutions", "Could not delete old data in order to put the new one. Old records are restored")
 
-        nop = 1
+        #the form submits each cell individiually so here it counts how many records there are so it can then initiate a loop
+        NumberOfSolutions = 1
         for key in request.form:
-            print("key: ", key)
             if "product_ID" in key:
-                nop += 1
+                NumberOfSolutions += 1
 
-        for i in range(1, nop):
+        for i in range(1, NumberOfSolutions):
             # TODO add more info to these error messages
             id = request.form.get("product_ID" + str(i), default="Error")
-            if id is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product ID")
+
             name = request.form.get("product_Name" + str(i), default="Error")
-            if name is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product name")
+
             brand = request.form.get("product_Brand" + str(i), default="Error")
-            if brand is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product brand")
+
             model = request.form.get("product_Model" + str(i), default="Error")
-            if model is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product model")
+
             price = request.form.get("product_Price" + str(i), default="Error")
-            if price is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product price")
+
             keywords = request.form.get("product_Keywords" + str(i), default="Error")
-            if keywords is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product keywords")
+
             discount = request.form.get("product_Discount" + str(i), default="Error")
-            if discount is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product discount")
+
             url = request.form.get("product_URL" + str(i), default="Error")
-            if url is "Error":
-                abort(status.HTTP_400_BAD_REQUEST, "Error with product url")
+
+            if id is "Error" or name is "Error" or brand is "Error" or model is "Error" or price is "Error" or keywords is "Error" or discount is "Error" or url is "Error":
+                solutions_services.deleteByAssitantID(assistantID, "Could not retrieve part of the new data." + str(i) + " records have been added after deletion of the old ones.")
+                solutions_services.addOldByAssitantID(assistantID, "Could not retrieve part of the new data. Solutions have been emptied.", currentSolutions)
+                return helpers.redirectWithMessage("admin_solutions", "Could not retrieve part of the new data. Process aborted and old data has been restored.")
+
+            #add in http:// in their url if they havent so later html accepts it as a link
             if "http" not in url:
                 url = "http://" + url
 
-            #see if they have reached the limit
-            numberOfProducts = 0
-            maxNOP = session['UserPlan']['Settings']['MaxProducts']
-            for record in assistant_callback.Data:
-                numberOfProducts += count_db("Products", " WHERE AssistantID=?", [record["ID"],])
-            if numberOfProducts > maxNOP:
-                return redirectWithMessageAndAssistantID("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP)+ ". Solutions after " + name + " have not been added.")
+            #get user's sub plan
+            #print("session.get('UserPlan', None): ", session.get('UserPlan', None))
+            #plan_callback : Callback = sub_services.getPlanByNickname(session.get('UserPlan', None)) #change to userPlan 
+            plan_callback : Callback = Callback(True, "Plan Found", "basic")
+            if not plan_callback.Success: return helpers.redirectWithMessage("admin_solutions", "Could not retrieve Sub Plan for max products check.")
 
-            insertProduct = insert_into_database_table(
-                "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) "
-                "VALUES (?,?,?,?,?,?,?,?,?);", (
-                    assistantID, id, name, brand, model, price,
-                    keywords, discount, url))
-            # TODO try to recover by re-adding old data if insertProduct fails
+            #count how much products they have in total
+            numberOfProducts = 0
+            for record in assistant_callback.Data:
+                recordsCount = solutions_services.countRecordsByAssistantID(record.ID)
+                numberOfProducts += recordsCount
+
+            #see if they have reached the limit of how many solutions they can have
+            #if numberOfProducts > plan_callback.Data.MaxProducts:
+            if numberOfProducts > 5:
+                return helpers.redirectWithMessage("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP)+ ". Solutions after " + name + " have not been added.")
+
+            createSolution_callback : Callback = solutions_services.createNew(assistantID, id, name, brand, model, price, keywords, discount, url)
+            
+            if not createSolution_callback.Success:
+                solutions_services.deleteByAssitantID(assistantID, "Could not create one of the new solutions: "+id+" "+name+"." + str(i) + " records have been added after deletion of the old ones.")
+                solutions_services.addOldByAssitantID(assistantID, "Could not create on of the new solutions. Solutions have been emptied.", currentSolutions)
+                return helpers.redirectWithMessage("admin_solutions", "Could not create one of the new solutions: "+id+" "+name+". Reverting to old ones")
         return redirect("/admin/assistant/{}/solutions".format(assistantID))
 
 # TODO improve

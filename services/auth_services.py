@@ -76,6 +76,10 @@ def login(email: str, password_to_check: str) -> Callback:
     session['companyID'] = user.CompanyID
     session['userEmail'] = user.Email
     session['UserPlan'] = helpers.getPlanNickname(user.SubID)
+    print("user: ", user)
+    print("user.SubID: ", user.SubID)
+    print("helpers.getPlanNickname(user.SubID): ", helpers.getPlanNickname(user.SubID))
+    print("session['UserPlan']: ", session['UserPlan'])
 
     # Set LastAccess
     user.LastAccess = datetime.now()

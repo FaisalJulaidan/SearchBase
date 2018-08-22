@@ -56,7 +56,7 @@
                                                         </div>
                                                         <br/>
                                                         <button id="uploadButton" class="btn btn-success"
-                                                                type="button" value="submit">
+                                                                type="button" value="submit" onclick="uploadProductFile()">
                                                             Upload Database
                                                         </button>
                                                 </form>
@@ -88,10 +88,10 @@
                                         <button type="submit" class="btn btn-success" value="Send">
                                             Save Updates
                                         </button>
-                                        <button type="button" class="btn btn-success" id="addRow" value="Send">
+                                        <button type="button" class="btn btn-success" id="addRow" value="Send" onclick="AddRow()">
                                             Add Row
                                         </button>
-                                        <button type="button" class="btn btn-success" id="removeRow" value="Send">
+                                        <button type="button" class="btn btn-success" id="removeRow" value="Send" onclick="RemoveRow()">
                                             Delete Row
                                         </button>
                                     </form>
@@ -150,9 +150,9 @@
     }
 
     // events Listeners Functions
-    document.getElementById("addRow").addEventListener("click", AddRow);
+    //document.getElementById("addRow").addEventListener("click", AddRow);
     function AddRow() {
-        print("adding row");
+        console.log("adding row");
         i++;
         $("#tbody").append("<tr id=\"tr" + String(i) + "\">\
         <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\
@@ -231,7 +231,7 @@
         }
     }
 
-    document.getElementById("removeRow").addEventListener("click", RemoveRow);
+    //document.getElementById("removeRow").addEventListener("click", RemoveRow);
     function RemoveRow() {
         var confirmDelete = confirm('Are you sure you want to delete this row?')
         if (confirmDelete) {
@@ -263,7 +263,7 @@
         }
     }
 
-    document.getElementById('uploadButton').addEventListener('click',uploadProductFile)
+    //document.getElementById('uploadButton').addEventListener('click',uploadProductFile)
     function uploadProductFile() {
         // TODO: validate the type of product before update
         // 1- if submit without adding file (done)

@@ -14,7 +14,6 @@ def render(template, **context):
             # If there are assistants then convert them to a list of dict. Otherwise return empty list[].
             if assistants: assistants = helpers.getListFromSQLAlchemyList(assistants)
             else: assistants = []
-            print(assistants)
             user: User = callback.Data
             return render_template(template,
                                    assistants=assistants,

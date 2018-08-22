@@ -68,7 +68,8 @@
 			<div class="x_content">
 				<br/>
 				<div class="form-group">
-					<form id="QuestionForm" action="/admin/assistant/{{ id }}/questions" method="post">
+{#					<form id="QuestionForm" action="/admin/assistant/{{ id }}/questions" method="post">#}
+					<div id="QuestionForm">
 					  <input type="hidden" id="noq-hidden" name="noq-hidden" value="">
 					  <div id="QuestionDiv">
 						<!-- Question Templates appear here -->
@@ -78,7 +79,7 @@
 						Submit
 					  </button>
 					  <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
-					</form>
+					</div>
 
 					<!-- <div class="ln_solid"></div> -->
 				</div>
@@ -137,7 +138,21 @@
         document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
         document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
         document.getElementById("number-of-questions").addEventListener("change", checkNOQ(+document.getElementById("number-of-questions").value))
+        document.getElementById("QTemplate-SubmitB").addEventListener("click", submitFunction);
 
+        function submitFunction(){
+            data =[];
+
+            var questions = $(".question")
+            questions.each(function (id,question){
+                question = $($($($(question).children()[0]).children()[0]).children()[0]).children()[1]
+                console.log(question)
+            })
+//            $.post({
+  //              url: '/admin/assistant/{{ id }}/questions',
+    //            data:data
+      //      })
+        }
         // called on NOQ Reset Click
         function ClearNOQ() {
             document.getElementById("number-of-questions").value = "";
@@ -238,11 +253,13 @@
                         if (!isNew) {
                             var questionData = data[i].Question
                             Type = data[i].Type
+                            ID = data[i].ID
                         } else {
                             var questionData = ''
                             Type = ''
+                            ID = undefined
                         }
-                        $("#QuestionDiv").append(cookUpQuestionElement(textNumber, questionData, i))
+                        $("#QuestionDiv").append(cookUpQuestionElement(textNumber, questionData, i, ID))
                         selectRadioButton(Type)
                         $("#number-of-questions").val(noq);
 

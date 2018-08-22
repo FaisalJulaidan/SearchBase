@@ -14,6 +14,7 @@ def getByAssistantID(assistantID):
         else:
             raise Exception
     except Exception as exc:
+        print("Error: ", exc)
         return Callback(False, 'Could not retrieve solutions for ID: ' + assistantID)
 
 def deleteAllByAssistantID(assistantID):
@@ -21,7 +22,7 @@ def deleteAllByAssistantID(assistantID):
     try:
         db.session.query(Product).filter(Product.AssistantID == assistantID).delete()
     except sqlalchemy.exc.SQLAlchemyError as exc:
-        print(exc)
+        print("Error: ", exc)
         db.session.rollback()
         return False
 

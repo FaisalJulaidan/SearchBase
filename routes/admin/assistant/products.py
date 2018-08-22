@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, flash
+from flask import Blueprint, request, redirect, flash, session
 from services import solutions_services, admin_services, assistant_services
 from models import Callback
 from utilties import helpers
@@ -12,27 +12,33 @@ def admin_solutions(assistantID):
 
         solutions_callback: Callback = solutions_services.getByAssistantID(assistantID)
 
-        if not solutions_callback.Success: raise ValueError('Can not retrieve products')
+        if not solutions_callback.Success: solutions_callback.Data = []
 
-        return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID)
+        solutions = helpers.getListFromSQLAlchemyList(solutions_callback.Data)
+
+        return admin_services.render("admin/solutions.html", data=solutions, id=assistantID)
 
     elif request.method == 'POST':
-        companyID = session.get('User')['CompanyID']
+        companyID = session.get('companyID', None)
+        if not companyID: return helpers.redirectWithMessage("admin_solutions", "Could not retrive company's ID")
 
         #get all company assistants (needed for totalproducts check)
         assistant_callback : Callback = assistant_services.getAll(companyID)
         if not assistant_callback.Success: return helpers.redirectWithMessage("admin_solutions", assistant_callback.Message)
 
+        #get all previous solutions
         solutions_callback: Callback = solutions_services.getByAssistantID(assistantID)
-        if not solutions_callback.Success: return helpers.redirectWithMessage("admin_solutions", solutions_callback.Message)
         currentSolutions = solutions_callback.Data
+        if not solutions_callback.Success: solutions_callback.Data = []
         #currentProducts -> solutions_callback
 
+        #delete old solutions so the new one can be put it
         deleteOldData : bool = solutions_services.deleteAllByAssistantID(assistantID)
         if not deleteOldData: return helpers.redirectWithMessage("admin_solutions", "Could not delete old data in order to put the new one.")
 
         nop = 1
         for key in request.form:
+            print("key: ", key)
             if "product_ID" in key:
                 nop += 1
 
@@ -68,7 +74,7 @@ def admin_solutions(assistantID):
             #see if they have reached the limit
             numberOfProducts = 0
             maxNOP = session['UserPlan']['Settings']['MaxProducts']
-            for record in assistants:
+            for record in assistant_callback.Data:
                 numberOfProducts += count_db("Products", " WHERE AssistantID=?", [record["ID"],])
             if numberOfProducts > maxNOP:
                 return redirectWithMessageAndAssistantID("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP)+ ". Solutions after " + name + " have not been added.")
@@ -82,7 +88,7 @@ def admin_solutions(assistantID):
         return redirect("/admin/assistant/{}/solutions".format(assistantID))
 
 # TODO improve
-@products_router.route("/admin/assistant/<assistantID>/products/file", methods=['POST'])
+@products_router.route("/admin/assistant/<assistantID>/solutions/file", methods=['POST'])
 def admin_products_file_upload(assistantID):
     checkAssistantID(assistantID)
     if request.method == "POST":

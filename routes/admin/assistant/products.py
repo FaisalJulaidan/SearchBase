@@ -7,13 +7,14 @@ products_router: Blueprint = Blueprint('products_router', __name__, template_fol
 
 @products_router.route("/admin/assistant/<assistantID>/solutions", methods=['GET', 'POST'])
 def admin_solutions(assistantID):
-# Evgeniy make the get request running :)
     if request.method == "GET":
 
         solutions_callback: Callback = solutions_services.getByAssistantID(assistantID)
-        print(solutions_callback.Data)
-        print(type(solutions_callback.Data))
+
+        #if it coudnt find anything assume its empty
         if not solutions_callback.Success: solutions_callback.Data = []
+
+        #convert solutions to dics
         if type(solutions_callback.Data) is Product:
             solutions = helpers.getDictFromSQLAlchemyObj(solutions_callback.Data)
         else:
@@ -91,6 +92,7 @@ def admin_solutions(assistantID):
             if numberOfProducts > 5:
                 return helpers.redirectWithMessage("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP)+ ". Solutions after " + name + " have not been added.")
 
+            print("New Record: ", assistantID, id, name, brand, model, price, keywords, discount, url)
             createSolution_callback : Callback = solutions_services.createNew(assistantID, id, name, brand, model, price, keywords, discount, url)
             
             if not createSolution_callback.Success:

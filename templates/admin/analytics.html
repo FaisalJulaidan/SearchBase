@@ -66,7 +66,7 @@
         {%for item in data %}
         console.log("{{item}}");
         console.log("{{item['DateTime']}}");
-        console.log("{{item['Opened']}}");
+        console.log({{item['Opened']}});
         console.log({{ item['ProductsReturned'] }});
         //check if its a monthly record
         if ("{{item['DateTime']}}".includes("-")) {
@@ -75,7 +75,11 @@
             totalQuestionsAnswered.push({{ item['QuestionsAnswered']}})
             totalProductsReturned.push({{ item['ProductsReturned']}})
         }
-        {%endfor%}
+        {% endfor %}
+        console.log(periods);
+        console.log(totalOpened);
+        console.log(totalQuestionsAnswered);
+        console.log(totalProductsReturned);
         var chartData = {
             labels: periods,
             datasets: [{

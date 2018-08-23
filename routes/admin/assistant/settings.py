@@ -31,7 +31,7 @@ def admin_assistant_edit(assistantID):
         if not message or \
            not nickname or \
            (not popuptime and not autopopup):
-            flash('Error in getting your inputs!')
+            flash({'type': 'danger', 'msg': 'Error in getting your inputs!'})
             return redirect("/admin/assistant/{}/settings".format(assistantID))
         else:
             if not autopopup:
@@ -43,8 +43,8 @@ def admin_assistant_edit(assistantID):
                                                            nickname=nickname, message=message,
                                                            secondsUntilPopup=secondsUntilPopup)
             if callback.Success:
-                flash(nickname + ' Updated Successfully')
+                flash({'type': 'success', 'msg': nickname + ' Updated Successfully'})
                 return redirect("/admin/assistant/{}/settings".format(assistantID))
             else:
-                flash('Error in updating ' + nickname)
+                flash({'type': 'danger', 'msg': 'Error in updating ' + nickname})
                 return redirect("/admin/assistant/{}/settings".format(assistantID))

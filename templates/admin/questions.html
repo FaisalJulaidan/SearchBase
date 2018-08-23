@@ -3,387 +3,359 @@
 {% block title %}Questions{% endblock %}
 
 {% block content %}
-    <div class="right_col" role="main">
-    <div class="">
-    <div class="page-title">
-        <div class="title_left">
-          <h3>Questions</h3>
-        </div>
-    </div>
-    <div class="clearfix"></div>
+	<div class="right_col" role="main">
+	<div class="">
+	<div class="page-title">
+		<div class="title_left">
+		  <h3>Questions</h3>
+		</div>
+	</div>
+	<div class="clearfix"></div>
 
-        <p style="font-weight: bolder;font-size: 16px;color: #de0d0d;">{{message}}</p>
+		<p style="font-weight: bolder;font-size: 16px;color: #de0d0d;">{{message}}</p>
 
-    <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="x_panel">
-                <div class="x_title">
-                    <h2>
-                        Enter the number of questions your assistant will have
-                        <small>
-                            Tip: it's best to keep the number of questions to no more than 12 for a better
-                            assistant.
-                        </small>
-                    </h2>
-                    <ul class="nav navbar-right panel_toolbox">
-                        <li>
-                            <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                               aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li>
-                                    <a href="#">Settings 1</a>
-                                </li>
-                                <li>
-                                    <a href="#">Settings 2</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a class="close-link"><i class="fa fa-close"></i></a>
-                        </li>
-                    </ul>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                    <br/>
-                    <style media="screen">
-                    .form-control {
-                      border-radius: 4px;
-                      width: 50%;
-                    }
-                    </style>
-                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
-                      <div class="form-group">
-                        <h2>Please Enter The Desired Number Of Questions:</h2>
-                        <div class="input-group" style="width:250px;margin:10px 0 0 10px">
-                          <span class="input-group-addon" id="basic-addon1">Number of questions<span class="required">*</span></span>
-                          <input id="number-of-questions" type="number" class="form-control" required placeholder="Number Of Questions" aria-describedby="basic-addon1">
-                        </div>
-                      </div>
-                      <div class="ln_solid"></div>
-                    </form>
-                    <button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
-                    <button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="row">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2>
+						Enter the number of questions your assistant will have
+						<small>
+							Tip: it's best to keep the number of questions to no more than 12 for a better
+							assistant.
+						</small>
+					</h2>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content">
+					<br/>
+					<style media="screen">
+					.form-control {
+					  border-radius: 4px;
+					  width: 50%;
+					}
+					</style>
+					<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+					  <div class="form-group">
+						<h2>Please Enter The Desired Number Of Questions:</h2>
+						<div class="input-group" style="width:250px;margin:10px 0 0 10px">
+						  <span class="input-group-addon" id="basic-addon1">Number of questions<span class="required">*</span></span>
+						  <input id="number-of-questions" type="number" class="form-control" required placeholder="Number Of Questions" aria-describedby="basic-addon1">
+						</div>
+					  </div>
+					  <div class="ln_solid"></div>
+					</form>
+					<button id="NOQ-SubmitB" class="btn btn-success">Submit</button>
+					<button id="NOQ-ResetB" class="btn btn-primary">Reset</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
-    <div class="row">
-    <div class="col-md-12 col-sm-12 col-xs-12">
-        <div class="x_panel">
-            <div class="x_title">
-                <h2>
-                    Enter your questions below
-                    <small>
-                        Tip: Keep your questions as simple as possible to keep your assistant
-                        universal
-                    </small>
-                </h2>
-                <ul class="nav navbar-right panel_toolbox">
-                    <li>
-                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                    </li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                           aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li>
-                                <a href="#">Settings 1</a>
-                            </li>
-                            <li>
-                                <a href="#">Settings 2</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a class="close-link"><i class="fa fa-close"></i></a>
-                    </li>
-                </ul>
-                <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-                <br/>
-                <div class="form-group">
-                    <form id="QuestionForm" action="/admin/assistant/{{ id }}/questions" method="post">
-                      <input type="hidden" id="noq-hidden" name="noq-hidden" value="">
-                      <div id="QuestionDiv">
-                        <!-- Question Templates appear here -->
+	<div class="row">
+	<div class="col-md-12 col-sm-12 col-xs-12">
+		<div class="x_panel">
+			<div class="x_title">
+				<h2>
+					Enter your questions below
+					<small>
+						Tip: Keep your questions as simple as possible to keep your assistant
+						universal
+					</small>
+				</h2>
+				<div class="clearfix"></div>
+			</div>
+			<div class="x_content">
+				<br/>
+				<div class="form-group">
+{#					<form id="QuestionForm" action="/admin/assistant/{{ id }}/questions" method="post">#}
+					<div id="QuestionForm">
+					  <input type="hidden" id="noq-hidden" name="noq-hidden" value="">
+					  <div id="QuestionDiv">
+						<!-- Question Templates appear here -->
 
-                      </div>
-                      <button type="submit" id="QTemplate-SubmitB" class="btn btn-success">
-                        Submit
-                      </button>
-                      <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
-                    </form>
+					  </div>
+					  <button type="submit" id="QTemplate-SubmitB" class="btn btn-success">
+						Submit
+					  </button>
+					  <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
+					</div>
 
-                    <!-- <div class="ln_solid"></div> -->
-                </div>
-            </div>
-        </div>
-    </div>
+					<!-- <div class="ln_solid"></div> -->
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}
 
 {% block customJS %}
-    <!-- Questions Script -->
-    <script>
-              // set variables
-          var oldNOQ = 0;
-          var maxQuestions = 12;
+	<!-- Questions Script -->
+	<script>
+			  // set variables
+		  var oldNOQ = 0;
+		  var maxQuestions = 12;
 
-    window.onload = function () {
-        if (prev_handler)
-            prev_handler();
+	window.onload = function () {
+		if (prev_handler)
+			prev_handler()
 
-            $("#number-of-questions").popover({ trigger: 'focus', title: 'Number Of Questions', content: "(Min Number: 1) - (Max Number: 12)",placement:'top',width:"200px" })
+        var numbOfQuestions = $("#number-of-questions")
+        numbOfQuestions.popover({ trigger: 'focus', title: 'Number Of Questions', content: "(Min Number: 1) - (Max Number: 12)",placement:'top',width:"200px" })
 
-          $("#number-of-questions").keyup((event) => {
+        numbOfQuestions.keyup(function (event) {
             delay(function(){
-              var value = Number(event.currentTarget.value)
-              if (value > 12) {
-                alertError('Input Error','The Max Number Questions is 12')
-                $("#number-of-questions").parent()[0].style.boxShadow="0 0 9px 0px #f44336"
-                $("#NOQ-SubmitB").attr('disabled','true')
-              }else if (value < 1) {
-                alertError('Input Error','The Min Number Questions is 1')
-                $("#number-of-questions").parent()[0].style.boxShadow="0 0 9px 0px #f44336"
-                $("#NOQ-SubmitB").attr('disabled','true')
-              }else {
-                $("#number-of-questions").parent()[0].style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
-                $("#NOQ-SubmitB").removeAttr('disabled')
+                var value = Number(event.currentTarget.value)
+                if (value > 12) {
+                    alertError('Input Error','The Max Number Questions is 12')
+                    $("#number-of-questions").parent()[0].style.boxShadow="0 0 9px 0px #f44336"
+                    $("#NOQ-SubmitB").attr('disabled','true')
+                }else if (value < 1) {
+                    alertError('Input Error','The Min Number Questions is 1')
+                    $("#number-of-questions").parent()[0].style.boxShadow="0 0 9px 0px #f44336"
+                    $("#NOQ-SubmitB").attr('disabled','true')
+                }else {
+                    $("#number-of-questions").parent()[0].style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+                    $("#NOQ-SubmitB").removeAttr('disabled')
 
-                setTimeout(function () {
-                  $("#number-of-questions").parent()[0].style.boxShadow=""
-                  $("#number-of-questions").parent()[0].style.transition="box-shadow 1s ease-in-out"
-                }, 500);
-
-              }
+                    setTimeout(function () {
+                        $("#number-of-questions").parent()[0].style.boxShadow=""
+                        $("#number-of-questions").parent()[0].style.transition="box-shadow 1s ease-in-out"
+                    }, 500);
+                }
             }, 300 );
-          })
-          var delay = (function(){
+        });
+
+        var delay = (function(){
             var timer = 0;
             return function(callback, ms){
-            clearTimeout (timer);
-            timer = setTimeout(callback, ms);
-           };
-          })();
+                clearTimeout (timer);
+                timer = setTimeout(callback, ms);
+            };
+        })();
 
-          // set event listeners
-          document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
-          document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
-          document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
-          document.getElementById("number-of-questions").addEventListener("change", a())
-          function a() {
-              checkNOQ(+document.getElementById("number-of-questions").value);
-          }
-          // called on NOQ Reset Click
-          function ClearNOQ() {
+        // set event listeners
+        document.getElementById("NOQ-ResetB").addEventListener("click", ClearNOQ);
+        document.getElementById("NOQ-SubmitB").addEventListener("click", ChangeNofQuestions);
+        document.getElementById("QTemplate-ResetB").addEventListener("click", ClearQTemplate);
+        document.getElementById("number-of-questions").addEventListener("change", checkNOQ(+document.getElementById("number-of-questions").value))
+        document.getElementById("QTemplate-SubmitB").addEventListener("click", submitFunction);
+
+        function submitFunction(){
+            data =[];
+
+            var questions = $(".question")
+            questions.each(function (id,question){
+                question = $($($($(question).children()[0]).children()[0]).children()[0]).children()[1]
+                console.log(question)
+            })
+//            $.post({
+  //              url: '/admin/assistant/{{ id }}/questions',
+    //            data:data
+      //      })
+        }
+        // called on NOQ Reset Click
+        function ClearNOQ() {
             document.getElementById("number-of-questions").value = "";
             $("#QuestionDiv").empty();
             oldNOQ = 0;
-          }
+        }
 
-          var data = [];
+		  var data = [];
 
-          {%for item in data%}
-            data.push({{ item|tojson|safe }})
-          {%endfor%}
-          checkNOQ(data.length)
+		  {%for item in data%}
+			data.push({{ item|tojson|safe }})
+		  {%endfor%}
+		  checkNOQ(data.length)
 
-          function cookUpQuestionElement(textNumber,questionData,i) {
-              return  "<div class='question'>"+
-                      "<div class='row'>" +
-                      "  <div class='col-xs-12'>" +
-                      "    <div class='input-group'>" +
-                      "      <span class='input-group-addon' id='basic-addon1'>"+textNumber+" Question<span class='required'>*</span></span>" +
-                      "      <input type='text' name='question"+(i+1)+"'" +
-                      "             value='"+questionData+"' class='form-control' required" +
-                      "             placeholder='Type your question here'>" +
-                      "    </div>" +
+		  function cookUpQuestionElement(textNumber,questionData,i) {
+			  return  "<div class='question'>"+
+					  "<div class='row'>" +
+					  "  <div class='col-xs-12'>" +
+					  "    <div class='input-group'>" +
+					  "      <span class='input-group-addon' id='basic-addon1'>"+textNumber+" Question<span class='required'>*</span></span>" +
+					  "      <input type='text' name='question"+(i+1)+"'" +
+					  "             value='"+questionData+"' class='form-control' required" +
+					  "             placeholder='Type your question here'>" +
+					  "    </div>" +
 
-                      "    <div class='col-xs-12 col-sm-4'>" +
-                      "      <div class='input-group'>" +
-                      "        <span class='input-group-addon'>" +
-                      "          <input type='radio' name='qType"+i+"' value='both' onchange=\"CheckTypeBox(\'both"+i+"\')\" id='bothB"+i+"' required >" +
-                      "        </span>" +
-                      "        <input class='form-control' value='Both' readonly style='background-color:#fff; cursor: pointer;' "+
-                      "               onclick='return this.parentElement.children[0].children[0].checked=true; CheckTypeBox(string(both"+i+"))'>" +
-                      "      </div>" +
-                      "    </div> <!-- end of grid -->" +
+					  "    <div class='col-xs-12 col-sm-3'>" +
+					  "      <div class='input-group'>" +
+					  "        <span class='input-group-addon'>" +
+					  "          <input type='radio' name='qType"+i+"' value='both' onchange=\"CheckTypeBox(\'both"+i+"\')\" id='bothB"+i+"' required >" +
+					  "        </span>" +
+					  "        <input class='form-control' value='Both' readonly style='background-color:#fff; cursor: pointer;' "+
+					  "               onclick='return this.parentElement.children[0].children[0].checked=true; CheckTypeBox(string(both"+i+"))'>" +
+					  "      </div>" +
+					  "    </div> <!-- end of grid -->" +
 
-                      "    <div class='col-xs-12 col-sm-4'>" +
-                      "      <div class='input-group'>" +
-                      "        <span class='input-group-addon'>" +
-                      "          <input type='radio' name='qType"+i+"' value='dbRetrieval' onchange=\"CheckTypeBox(\'db"+i+"\')\" id='dbB"+i+"' required >" +
-                      "        </span>" +
-                      "        <input class='form-control' value='Data Base Retrieval' readonly style='background-color:#fff; cursor: pointer;' "+
-                      "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(string(db"+i+")) >" +
-                      "      </div>" +
-                      "    </div> <!-- end of grid -->" +
+					  "    <div class='col-xs-12 col-sm-3'>" +
+					  "      <div class='input-group'>" +
+					  "        <span class='input-group-addon'>" +
+					  "          <input type='radio' name='qType"+i+"' value='dbRetrieval' onchange=\"CheckTypeBox(\'db"+i+"\')\" id='dbB"+i+"' required >" +
+					  "        </span>" +
+					  "        <input class='form-control' value='Data Base Retrieval' readonly style='background-color:#fff; cursor: pointer;' "+
+					  "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(string(db"+i+")) >" +
+					  "      </div>" +
+					  "    </div> <!-- end of grid -->" +
 
-                      "    <div class='col-xs-12 col-sm-4'>" +
-                      "      <div class='input-group'>" +
-                      "        <span class='input-group-addon'>" +
-                      "          <input type='radio' name='qType"+i+"' value='userInfoRetrieval' onchange=\"CheckTypeBox(\'ui"+i+"\')\" id='uiB"+i+"' required >" +
-                      "        </span>" +
-                      "        <input class='form-control' value='User Input Retrieval' readonly style='background-color:#fff; cursor: pointer;'"+
-                      "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(string(ui"+i+"))>" +
-                      "      </div>" +
-                      "    </div> <!-- end of grid -->" +
+					  "    <div class='col-xs-12 col-sm-3'>" +
+					  "      <div class='input-group'>" +
+					  "        <span class='input-group-addon'>" +
+					  "          <input type='radio' name='qType"+i+"' value='userInfoRetrieval' onchange=\"CheckTypeBox(\'ui"+i+"\')\" id='uiB"+i+"' required >" +
+					  "        </span>" +
+					  "        <input class='form-control' value='User Input Retrieval' readonly style='background-color:#fff; cursor: pointer;'"+
+					  "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(string(ui"+i+"))>" +
+					  "      </div>" +
+					  "    </div> <!-- end of grid -->" +
 
-                      "    <div class='col-xs-12 col-sm-4'>" +
-                      "      <div class='input-group'>" +
-                      "        <span class='input-group-addon'>" +
-                      "          <input type='radio' name='qType" + i + "' value='fileUpload' onchange=\"CheckTypeBox(\'fileUp" + i + "\')\" id='fileUp" + i + "' required >" +
-                      "        </span>" +
-                      "        <input class='form-control' value='File Upload' readonly style='background-color:#fff; cursor: pointer;'" +
-                      "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(string(ui" + i + "))>" +
-                      "      </div>" +
-                      "    </div> <!-- end of grid -->" +
+					  "    <div class='col-xs-12 col-sm-3'>" +
+					  "      <div class='input-group'>" +
+					  "        <span class='input-group-addon'>" +
+					  "          <input type='radio' name='qType" + i + "' value='fileUpload' onchange=\"CheckTypeBox(\'fileUp" + i + "\')\" id='fileUp" + i + "' required >" +
+					  "        </span>" +
+					  "        <input class='form-control' value='File Upload' readonly style='background-color:#fff; cursor: pointer;'" +
+					  "               onclick='return this.parentElement.children[0].children[0].checked=true'; CheckTypeBox(string(ui" + i + "))>" +
+					  "      </div>" +
+					  "    </div> <!-- end of grid -->" +
 
-                      "  </div>"+
-                      " </div>"+
-                      "<div class='ln_solid'></div>"+
-                      " </div>"
-          }
-          // called on NOQ Submit Click
-          function ChangeNofQuestions() {
+					  "  </div>"+
+					  " </div>"+
+					  "<div class='ln_solid'></div>"+
+					  " </div>"
+		  }
+        // called on NOQ Submit Click
+        function ChangeNofQuestions() {
             var noq = parseInt(document.getElementById("number-of-questions").value);
             checkNOQ(noq,true)
-          }
+        }
 
 
-          function CheckTypeBox(tBox) {
-              if (tBox.replace(/[0-9]/g, '') == "both") {
-                  $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
-                  $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
-              }
-              if (tBox.replace(/[0-9]/g, '') == "db") {
-                  $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
-                  $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
-              }
-              if (tBox.replace(/[0-9]/g, '') == "ui") {
-                  $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
-                  $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
-              }
-          }
+        function CheckTypeBox(tBox) {
+            if (tBox.replace(/[0-9]/g, '') == "both") {
+                $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
+                $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
+            }
+            if (tBox.replace(/[0-9]/g, '') == "db") {
+                $("#uiB" + tBox.replace(/\D/g, '')).prop('checked', false);
+                $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
+            }
+            if (tBox.replace(/[0-9]/g, '') == "ui") {
+                $("#dbB" + tBox.replace(/\D/g, '')).prop('checked', false);
+                $("#bothB" + tBox.replace(/\D/g, '')).prop('checked', false);
+            }
+        }
 
-          function checkNOQ(noq,isNew){
-              if (!Number.isNaN(noq)) {
-                    if (noq <= maxQuestions && noq > oldNOQ) {
-                        for (i = oldNOQ; i < noq; i++) {
-                            var textNumber = getText(i)
+        function checkNOQ(noq,isNew){
+            if (!Number.isNaN(noq)) {
+                if (noq <= maxQuestions && noq > oldNOQ) {
+                    for (i = oldNOQ; i < noq; i++) {
+                        var textNumber = getText(i)
                         if (!isNew) {
                             var questionData = data[i].Question
+                            Type = data[i].Type
+                            ID = data[i].ID
                         } else {
-                                var questionData =''
-                                return $("#QuestionDiv").append(cookUpQuestionElement(textNumber,questionData,i))
+                            var questionData = ''
+                            Type = ''
+                            ID = undefined
                         }
+                        $("#QuestionDiv").append(cookUpQuestionElement(textNumber, questionData, i, ID))
+                        selectRadioButton(Type)
+                        $("#number-of-questions").val(noq);
 
-                    $("#QuestionDiv").append(cookUpQuestionElement(textNumber,questionData,i))
-                    Type = data[i].Type
-
-                    // needs to be checked
-                    // not sure of the business logic below
-                    if (Type == "userInfoRetrieval") {
-                      $("#bothB" + i).prop('checked', false);
-                      $("#dbB" + i).prop('checked', false);
-                      $("#fileUp" + i).prop('checked', false);
-                      $("#uiB" + i).prop('checked',   true);
-                    }
-                    else if (Type == "dbRetrieval") {
-                      $("#bothB" + i).prop('checked', false);
-                      $("#dbB" + i).prop('checked',   true);
-                      $("#uiB" + i).prop('checked', false);
-                      $("#fileUp" + i).prop('checked', false);
-                    } else if (Type == "both") {
-                      $("#bothB" + i).prop('checked', true);
-                      $("#dbB" + i).prop('checked',   false);
-                      $("#uiB" + i).prop('checked', false);
-                      $("#fileUp" + i).prop('checked', false);
-                    } else if (Type == "fileUpload") {
-                      $("#bothB" + i).prop('checked', false);
-                      $("#dbB" + i).prop('checked', false);
-                      $("#uiB" + i).prop('checked', false);
-                      $("#fileUp" + i).prop('checked', true);
-                    }else {
-                      $("#bothB" + i).prop('checked', false);
-                      $("#dbB" + i).prop('checked',   false);
-                      $("#uiB" + i).prop('checked', false);
-                      $("#fileUp" + i).prop('checked', false);
-                    }
-
-                    $("#number-of-questions").val(noq);
-
-                  } // end of loop
+                    } // end of loop
                 }
-                else if (noq < oldNOQ) {
-                  for (i = oldNOQ; i > noq; i--) {
+            } else if (noq < oldNOQ) {
+                for (i = oldNOQ; i > noq; i--) {
                     $(".question")[$(".question").length - 1].remove();
-                  }
                 }
-                oldNOQ = noq;
-                document.getElementById("noq-hidden").value = String(noq);
-              }
-
-              function getText(i) {
-                  switch (i) {
-                      case 0: return "First"
-                      case 1: return "Second"
-                      case 2: return "Third"
-                      case 3: return "Fourth"
-                      case 4: return "Fifth"
-                      case 5: return "Sixth"
-                      case 6: return "Seventh"
-                      case 7: return "Eighth"
-                      case 8: return "Ninth"
-                      case 9: return "Tenth"
-                      case 10: return "Eleventh"
-                      case 11: return "Twelveth"
-                  }
-              }
-
-          }
-
-          function ClearQTemplate() {
-            $("#QuestionDiv input").val("");
-          }
-
-          function validation() {
-              // check if input is bigger than 10
-              var boxNumberOfQuestions = document.getElementById('number-of-questions').value;
-              var boxWelcomeMessage = document.getElementById('welcome-message').value;
-              // General validation
-              if (boxNumberOfQuestions == "") {
-                  document.getElementById("number-of-questions").style.borderStyle = "solid";
-                  document.getElementById("number-of-questions").style.borderColor = "red";
-                  alert("Please enter the amount of numbers you would like to ask users.")
-                  return false;
-              }
-              // Checking the lrngth of the input
-              if (boxNumberOfQuestions > 10) {
-                  mesg = "You have entered too mnany questions."
-                  mesg = mesg + "Please re-enter the number of question(s).\n"
-                  mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
-                  alert(mesg);
-                  return false;
-              }
-              // Change colour of the border of the box
-              if (boxWelcomeMessage.length > 20) {
-                  mesg = "The length of the welcome message is too long."
-                  mesg = mesg + "Please re-enter the welcome message.\n"
-                  mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
-                  alert(mesg);
-                  return false;
-              }
-              // Change colour of the border of the box
-              // Validation for the dynmaicaly loaded boxes
-              return true;
             }
+            oldNOQ = noq;
+            document.getElementById("noq-hidden").value = String(noq);
 
-    };
-    </script>
+            function getText(i) {
+                switch (i) {
+                    case 0: return "First"
+                    case 1: return "Second"
+                    case 2: return "Third"
+                    case 3: return "Fourth"
+                    case 4: return "Fifth"
+                    case 5: return "Sixth"
+                    case 6: return "Seventh"
+                    case 7: return "Eighth"
+                    case 8: return "Ninth"
+                    case 9: return "Tenth"
+                    case 10: return "Eleventh"
+                    case 11: return "Twelveth"
+                }
+            }
+            function selectRadioButton(Type) {
+                if (Type == "userInfoRetrieval") {
+                    $("#bothB" + i).prop('checked', false);
+                    $("#dbB" + i).prop('checked', false);
+                    $("#fileUp" + i).prop('checked', false);
+                    $("#uiB" + i).prop('checked', true);
+                }
+                else if (Type == "dbRetrieval") {
+                    $("#bothB" + i).prop('checked', false);
+                    $("#dbB" + i).prop('checked', true);
+                    $("#uiB" + i).prop('checked', false);
+                    $("#fileUp" + i).prop('checked', false);
+                } else if (Type == "both") {
+                    $("#bothB" + i).prop('checked', true);
+                    $("#dbB" + i).prop('checked', false);
+                    $("#uiB" + i).prop('checked', false);
+                    $("#fileUp" + i).prop('checked', false);
+                } else if (Type == "fileUpload") {
+                    $("#bothB" + i).prop('checked', false);
+                    $("#dbB" + i).prop('checked', false);
+                    $("#uiB" + i).prop('checked', false);
+                    $("#fileUp" + i).prop('checked', true);
+                } else {
+                    $("#bothB" + i).prop('checked', false);
+                    $("#dbB" + i).prop('checked', false);
+                    $("#uiB" + i).prop('checked', false);
+                    $("#fileUp" + i).prop('checked', false);
+                }
+            }
+        }
+
+        function ClearQTemplate() {
+            $("#QuestionDiv input").val("");
+        }
+
+        function validation() {
+            // check if input is bigger than 10
+            var boxNumberOfQuestions = document.getElementById('number-of-questions').value;
+            var boxWelcomeMessage = document.getElementById('welcome-message').value;
+            // General validation
+            if (boxNumberOfQuestions == "") {
+                document.getElementById("number-of-questions").style.borderStyle = "solid";
+                document.getElementById("number-of-questions").style.borderColor = "red";
+                alert("Please enter the amount of numbers you would like to ask users.")
+                return false;
+            }
+            // Checking the lrngth of the input
+            if (boxNumberOfQuestions > 10) {
+                mesg = "You have entered too mnany questions."
+                mesg = mesg + "Please re-enter the number of question(s).\n"
+                mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
+                alert(mesg);
+                return false;
+            }
+            // Change colour of the border of the box
+            if (boxWelcomeMessage.length > 20) {
+                mesg = "The length of the welcome message is too long."
+                mesg = mesg + "Please re-enter the welcome message.\n"
+                mesg = mesg + "Read documentation for futher help or contact support for help building your assistant."
+                alert(mesg);
+                return false;
+            }
+            // Change colour of the border of the box
+            // Validation for the dynmaicaly loaded boxes
+            return true;
+        }
+
+	};
+	</script>
 {% endblock %}

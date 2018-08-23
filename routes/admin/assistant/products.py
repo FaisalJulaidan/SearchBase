@@ -16,7 +16,7 @@ def admin_solutions(assistantID):
 
         #convert solutions to dics
         if type(solutions_callback.Data) is Product:
-            solutions = helpers.getDictFromSQLAlchemyObj(solutions_callback.Data)
+            solutions = [helpers.getDictFromSQLAlchemyObj(solutions_callback.Data)]
         else:
             solutions = helpers.getListFromSQLAlchemyList(solutions_callback.Data)
 

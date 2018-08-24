@@ -300,9 +300,15 @@
             {% if messages %}
                 <div class="col-md-12">
                     {% for message in messages %}
-                        <div class="alert alert-success" role="alert">
-                            {{ message }}
-                        </div>
+                        {% if message.type %}
+                            <div class="alert alert-{{ message.type }}" role="alert">
+                                {{ message.msg }}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
             {% endif %}
@@ -325,7 +331,9 @@
     </div>
 
     <!-- jQuery -->
-    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <!-- jQuery Tags Input -->
+    <script src="/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
     <!-- Bootstrap -->
     <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- FastClick -->
@@ -343,8 +351,7 @@
     <script src="/static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
     <script src="/static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
     <script src="/static/vendors/google-code-prettify/src/prettify.js"></script>
-    <!-- jQuery Tags Input -->
-    <script src="/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
+
     <!-- Switchery -->
     <script src="/static/vendors/switchery/dist/switchery.min.js"></script>
     <!-- Select2 -->
@@ -359,6 +366,8 @@
     <script src="/static/vendors/starrr/dist/starrr.js"></script>
     <!-- Custom Theme Scripts -->
     <script src="/static/build/js/custom.min.js"></script>
+
+
     <script type="text/javascript">
         var errTitle = $("#errorTitle")
         var errText = $("#errorText")

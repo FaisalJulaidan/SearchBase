@@ -64,14 +64,22 @@
         var totalQuestionsAnswered = [];
         var totalProductsReturned = [];
         {%for item in data %}
+        console.log("{{item}}");
+        console.log("{{item['DateTime']}}");
+        console.log({{item['Opened']}});
+        console.log({{ item['ProductsReturned'] }});
         //check if its a monthly record
-        if ("{{item[0]}}".includes("-")) {
-            periods.push("{{item[0]}}");
-            totalOpened.push({{item[1]}})
-            totalQuestionsAnswered.push({{item[2]}})
-            totalProductsReturned.push({{item[3]}})
+        if ("{{item['DateTime']}}".includes("-")) {
+            periods.push("{{item['DateTime']}}");
+            totalOpened.push({{item['Opened']}})
+            totalQuestionsAnswered.push({{ item['QuestionsAnswered']}})
+            totalProductsReturned.push({{ item['ProductsReturned']}})
         }
-        {%endfor%}
+        {% endfor %}
+        console.log(periods);
+        console.log(totalOpened);
+        console.log(totalQuestionsAnswered);
+        console.log(totalProductsReturned);
         var chartData = {
             labels: periods,
             datasets: [{

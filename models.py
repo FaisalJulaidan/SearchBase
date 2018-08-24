@@ -110,7 +110,7 @@ class Statistics(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
-    Opened = db.Column(db.Boolean, nullable=False, default=False)
+    Opened = db.Column(db.Integer, nullable=False, default=False)
     QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
     ProductsReturned = db.Column(db.Integer, nullable=False, default=0)
 

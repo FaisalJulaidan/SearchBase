@@ -31,12 +31,11 @@ def admin_pay(planID):
     if request.method == 'GET':
 
         stripePlan_callback: Callback = sub_services.getStripePlan(planID)
-        print(stripePlan_callback.Message)
         if not stripePlan_callback.Success:
             helpers.redirectWithMessage('admin_pricing', 'This plan does not exist! Make sure the plan ID '
                                         + planID + ' is correct.')
 
-        return admin_services.render("admin/check-out.html", plan=stripePlan_callback.Data)
+        return admin_services.render("admin/sub.html", plan=stripePlan_callback.Data)
 
     if request.method == 'POST':
 
@@ -47,6 +46,10 @@ def admin_pay(planID):
         data = request.get_json(silent=True)
         token = data['token']['id']
         coupon = data['coupon']
+
+        print(">>>>>>>>>>>")
+        print(token)
+        print(coupon)
 
         if token is "Error":
             return jsonify(error="No token provided to complete the payment!")
@@ -73,6 +76,7 @@ def admin_pay(planID):
         # Set Plan session for logged in user
         session['userPlan'] = sub_callback.Data['planNickname']
         print("You have successfully subscribed!")
+
         return jsonify(success="You have successfully subscribed!", url="admin/pricing-tables.html")
 
 

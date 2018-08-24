@@ -11,7 +11,7 @@ def admin_questions(assistantID):
         callback: Callback = questions_services.getByAssistantID(assistantID)
 
         if not callback.Success:
-            flash("Error")
+            flash({'type': 'danger', 'msg': 'Error in getting your questions!'})
             return admin_services.render("admin/questions.html")
 
         questionList = helpers.getListFromSQLAlchemyList(callback.Data)

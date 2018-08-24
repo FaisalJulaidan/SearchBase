@@ -85,8 +85,11 @@ def subscribe(email, planID, trialDays=None, token=None, coupon=None) -> Callbac
             return Callback(False, "Issue while dealing with user's assistants.")
 
         # If everything is OK, activate company's assistants
-        for assistant in assistants_callback.Data:
-            assistant.Active = True
+        assistants = assistants_callback.Data
+        if assistants != 0:
+            for assistant in assistants:
+                assistant.Active = True
+
 
         # Update user's StripeID & SubID
         user.StripeID = customer['id']

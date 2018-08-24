@@ -39,6 +39,7 @@
                 </div>
                 <div class="x_content">
                     <main>
+                    <form id="stripe_form">
 
                       <div class="form-row">
                         <label for="card-element" style="font-size: 15px; font-weight: 200">
@@ -62,7 +63,9 @@
 
 
 
-                      <button id="stripe_button">Submit Payment {{ plan['amount']/100 }} GBP</button>
+
+                    </form>
+                        <button type="button" id="stripe_button">Submit Payment {{ plan['amount']/100 }} GBP</button>
 
                     </main>
                     <br>
@@ -118,7 +121,6 @@ var elements = stripe.elements();
 var style = {
   base: {
     color: '#32325d',
-    lineHeight: '18px',
     fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
     fontSmoothing: 'antialiased',
     fontSize: '16px',
@@ -149,13 +151,15 @@ card.addEventListener('change', function(event) {
 });
 
 // Handle form submission.
-var form = document.getElementById('stripe_button');
-form.addEventListener('click', function(event) {
-  event.preventDefault();
-  event.stopImmediatePropagation();
 
+
+$("#stripe_button").on('click',function(event) {
+  // event.preventDefault();
+  console.log("OOOOOOOOFOFOFOFOFOFOFOFOFOFOFO");
   stripe.createToken(card).then(function(result) {
-      cosole.log(result);
+      console.log(">>>>>>>>>>>>");
+      console.log(result);
+
     if (result.error) {
       // Inform the user if there was an error.
       var errorElement = document.getElementById('card-errors');
@@ -168,10 +172,11 @@ form.addEventListener('click', function(event) {
 });
 
 
+
 function stripeTokenHandler(token) {
         console.log(token)
       $.post({
-        url: '/admin/subscribe/' + {{plan['id']}},
+        url: '/admin/subscribe/' + '{{plan['id']}}',
         contentType: 'application/json',
         data: JSON.stringify({
             token: token,

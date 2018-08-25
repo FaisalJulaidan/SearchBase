@@ -28,7 +28,7 @@ def admin_solutions(assistantID):
 
         #get all company assistants (needed for totalproducts check)
         assistant_callback : Callback = assistant_services.getAll(companyID)
-        if not assistant_callback.Success: return helpers.redirectWithMessage("admin_solutions", assistant_callback.Message)
+        if not assistant_callback.Success: return helpers.redirectWithMessageAndAssistantID("admin_solutions", assistantID, assistant_callback.Message)
 
         #get all previous solutions
         solutions_callback: Callback = solutions_services.getByAssistantID(assistantID)
@@ -40,7 +40,7 @@ def admin_solutions(assistantID):
         deleteOldData : bool = solutions_services.deleteAllByAssistantID(assistantID)
         if not deleteOldData: 
             solutions_services.addOldByAssitantID(assistantID, "Could not delete old data in order to put the new one. Old records were lost.", currentSolutions)
-            return helpers.redirectWithMessage("admin_solutions", "Could not delete old data in order to put the new one. Old records are restored")
+            return helpers.redirectWithMessageAndAssistantID("admin_solutions", assistantID, "Could not delete old data in order to put the new one. Old records are restored")
 
         #the form submits each cell individiually so here it counts how many records there are so it can then initiate a loop
         NumberOfSolutions = 1
@@ -69,7 +69,7 @@ def admin_solutions(assistantID):
             if id is "Error" or name is "Error" or brand is "Error" or model is "Error" or price is "Error" or keywords is "Error" or discount is "Error" or url is "Error":
                 solutions_services.deleteByAssitantID(assistantID, "Could not retrieve part of the new data." + str(i) + " records have been added after deletion of the old ones.")
                 solutions_services.addOldByAssitantID(assistantID, "Could not retrieve part of the new data. Solutions have been emptied.", currentSolutions)
-                return helpers.redirectWithMessage("admin_solutions", "Could not retrieve part of the new data. Process aborted and old data has been restored.")
+                return helpers.redirectWithMessageAndAssistantID("admin_solutions", assistantID, "Could not retrieve part of the new data. Process aborted and old data has been restored.")
 
             #add in http:// in their url if they havent so later html accepts it as a link
             if "http" not in url:
@@ -90,7 +90,7 @@ def admin_solutions(assistantID):
             #see if they have reached the limit of how many solutions they can have
             #if numberOfProducts > plan_callback.Data.MaxProducts:
             if numberOfProducts > 5:
-                return helpers.redirectWithMessage("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP)+ ". Solutions after " + name + " have not been added.")
+                return helpers.redirectWithMessageAndAssistantID("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP)+ ". Solutions after " + name + " have not been added.")
 
             print("New Record: ", assistantID, id, name, brand, model, price, keywords, discount, url)
             createSolution_callback : Callback = solutions_services.createNew(assistantID, id, name, brand, model, price, keywords, discount, url)
@@ -98,7 +98,7 @@ def admin_solutions(assistantID):
             if not createSolution_callback.Success:
                 solutions_services.deleteByAssitantID(assistantID, "Could not create one of the new solutions: "+id+" "+name+"." + str(i) + " records have been added after deletion of the old ones.")
                 solutions_services.addOldByAssitantID(assistantID, "Could not create on of the new solutions. Solutions have been emptied.", currentSolutions)
-                return helpers.redirectWithMessage("admin_solutions", "Could not create one of the new solutions: "+id+" "+name+". Reverting to old ones")
+                return helpers.redirectWithMessageAndAssistantID("admin_solutions", assistantID, "Could not create one of the new solutions: "+id+" "+name+". Reverting to old ones")
         return redirect("/admin/assistant/{}/solutions".format(assistantID))
 
 # TODO improve

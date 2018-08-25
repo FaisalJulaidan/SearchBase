@@ -26,7 +26,7 @@ from services.mail_services import mail
 # Import all routers to register them as blueprints
 
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
-    products_router, questions_router, analytics_router, sub_router
+    products_router, questions_router, analytics_router, sub_router, connection_router, userInput_router
 from routes.public.routers import public_router
 from services import user_services, mail_services
 
@@ -41,6 +41,8 @@ app.register_blueprint(settings_router)
 app.register_blueprint(products_router)
 app.register_blueprint(questions_router)
 app.register_blueprint(analytics_router)
+app.register_blueprint(connection_router)
+app.register_blueprint(userInput_router)
 
 
 # code to ensure user is logged in
@@ -1943,5 +1945,5 @@ if __name__ == "__main__":
     # Run the app server
     app.run()
 
-    mail_services.sendVerificationEmail('julaidan.faisal@gmail.com', 'companyName', 'faisal julaidan')
+    mail_services.sendVerificationEmail('m.esteghamatdar@gmail.com', 'companyName', 'Mehdi Este')
 

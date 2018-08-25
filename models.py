@@ -160,7 +160,6 @@ class UserInput(db.Model):
     Input = db.Column(db.String(), nullable=False)
     QuestionString = db.Column(db.String(), nullable=False)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
-    SessionID = db.Column(db.Integer, nullable=False)
 
     # Relationships:
     QuestionID = db.Column(db.Integer, db.ForeignKey('question.ID'), nullable=False)

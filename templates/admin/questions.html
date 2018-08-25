@@ -75,7 +75,7 @@
 						<!-- Question Templates appear here -->
 
 					  </div>
-					  <button type="submit" id="QTemplate-SubmitB" class="btn btn-success">
+					  <button id="QTemplate-SubmitB" class="btn btn-success">
 						Submit
 					  </button>
 					  <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
@@ -141,17 +141,52 @@
         document.getElementById("QTemplate-SubmitB").addEventListener("click", submitFunction);
 
         function submitFunction(){
-            data =[];
+            var serverData = []
 
             var questions = $(".question")
             questions.each(function (id,question){
-                question = $($($($(question).children()[0]).children()[0]).children()[0]).children()[1]
-                console.log(question)
-            })
-//            $.post({
-  //              url: '/admin/assistant/{{ id }}/questions',
-    //            data:data
-      //      })
+                var currentQ = {
+                    ID: '',
+                    Question: '',
+                    Type: ''
+                }
+                question = $(question).find('input');
+                for (var index of Object.keys(question)) {
+                    input = question[index]
+                    if (input.constructor.name == "HTMLInputElement" ){
+                        if (input.name.includes('question'))
+                            currentQ.Question = input.value
+                        if (input.name == 'ID')
+                            currentQ.ID = +input.value
+                        if (input.name.includes('Type') && input.checked)
+                            currentQ.Type = input.value
+                    }
+                }
+                serverData.push(currentQ)
+            });
+
+            for (i in serverData){
+                var sendAble = false
+                question = serverData[i]
+                if (question.Question &&
+                    question.Type){
+                    sendAble = true
+                }else{
+                    sendAble = false
+                    break;
+                }
+            }
+
+            if (sendAble){
+                id = {{ id }}
+                link = "/admin/assistant/"+id+"/questions"
+                $.ajax({
+                    method:'POST',
+                    url:link,
+                    contentType: "application/json",
+                    data:JSON.stringify(serverData)
+                })
+            }
         }
         // called on NOQ Reset Click
         function ClearNOQ() {
@@ -160,14 +195,16 @@
             oldNOQ = 0;
         }
 
-		  var data = [];
+		var data = [];
+
 
 		  {%for item in data%}
 			data.push({{ item|tojson|safe }})
 		  {%endfor%}
+            console.log(data)
 		  checkNOQ(data.length)
 
-		  function cookUpQuestionElement(textNumber,questionData,i) {
+        function cookUpQuestionElement(textNumber,questionData,i, ID) {
 			  return  "<div class='question'>"+
 					  "<div class='row'>" +
 					  "  <div class='col-xs-12'>" +
@@ -176,6 +213,7 @@
 					  "      <input type='text' name='question"+(i+1)+"'" +
 					  "             value='"+questionData+"' class='form-control' required" +
 					  "             placeholder='Type your question here'>" +
+                      "      <input style='display:none' type='text' name='ID' value='"+ID+"'>" +
 					  "    </div>" +
 
 					  "    <div class='col-xs-12 col-sm-3'>" +
@@ -245,7 +283,7 @@
             }
         }
 
-        function checkNOQ(noq,isNew){
+        function checkNOQ(noq,isNew) {
             if (!Number.isNaN(noq)) {
                 if (noq <= maxQuestions && noq > oldNOQ) {
                     for (i = oldNOQ; i < noq; i++) {
@@ -262,60 +300,73 @@
                         $("#QuestionDiv").append(cookUpQuestionElement(textNumber, questionData, i, ID))
                         selectRadioButton(Type)
                         $("#number-of-questions").val(noq);
-
                     } // end of loop
-                }
-            } else if (noq < oldNOQ) {
-                for (i = oldNOQ; i > noq; i--) {
-                    $(".question")[$(".question").length - 1].remove();
-                }
-            }
-            oldNOQ = noq;
-            document.getElementById("noq-hidden").value = String(noq);
 
-            function getText(i) {
-                switch (i) {
-                    case 0: return "First"
-                    case 1: return "Second"
-                    case 2: return "Third"
-                    case 3: return "Fourth"
-                    case 4: return "Fifth"
-                    case 5: return "Sixth"
-                    case 6: return "Seventh"
-                    case 7: return "Eighth"
-                    case 8: return "Ninth"
-                    case 9: return "Tenth"
-                    case 10: return "Eleventh"
-                    case 11: return "Twelveth"
+                } else if (noq < oldNOQ) {
+                    for (i = oldNOQ; i > noq; i--) {
+                        $(".question")[$(".question").length - 1].remove();
+                    }
                 }
-            }
-            function selectRadioButton(Type) {
-                if (Type == "userInfoRetrieval") {
-                    $("#bothB" + i).prop('checked', false);
-                    $("#dbB" + i).prop('checked', false);
-                    $("#fileUp" + i).prop('checked', false);
-                    $("#uiB" + i).prop('checked', true);
+                oldNOQ = noq;
+                document.getElementById("noq-hidden").value = String(noq);
+
+                function getText(i) {
+                    switch (i) {
+                        case 0:
+                            return "First"
+                        case 1:
+                            return "Second"
+                        case 2:
+                            return "Third"
+                        case 3:
+                            return "Fourth"
+                        case 4:
+                            return "Fifth"
+                        case 5:
+                            return "Sixth"
+                        case 6:
+                            return "Seventh"
+                        case 7:
+                            return "Eighth"
+                        case 8:
+                            return "Ninth"
+                        case 9:
+                            return "Tenth"
+                        case 10:
+                            return "Eleventh"
+                        case 11:
+                            return "Twelveth"
+                    }
                 }
-                else if (Type == "dbRetrieval") {
-                    $("#bothB" + i).prop('checked', false);
-                    $("#dbB" + i).prop('checked', true);
-                    $("#uiB" + i).prop('checked', false);
-                    $("#fileUp" + i).prop('checked', false);
-                } else if (Type == "both") {
-                    $("#bothB" + i).prop('checked', true);
-                    $("#dbB" + i).prop('checked', false);
-                    $("#uiB" + i).prop('checked', false);
-                    $("#fileUp" + i).prop('checked', false);
-                } else if (Type == "fileUpload") {
-                    $("#bothB" + i).prop('checked', false);
-                    $("#dbB" + i).prop('checked', false);
-                    $("#uiB" + i).prop('checked', false);
-                    $("#fileUp" + i).prop('checked', true);
-                } else {
-                    $("#bothB" + i).prop('checked', false);
-                    $("#dbB" + i).prop('checked', false);
-                    $("#uiB" + i).prop('checked', false);
-                    $("#fileUp" + i).prop('checked', false);
+
+                function selectRadioButton(Type) {
+                    if (Type == "userInfoRetrieval") {
+                        $("#bothB" + i).prop('checked', false);
+                        $("#dbB" + i).prop('checked', false);
+                        $("#fileUp" + i).prop('checked', false);
+                        $("#uiB" + i).prop('checked', true);
+                    }
+                    else if (Type == "dbRetrieval") {
+                        $("#bothB" + i).prop('checked', false);
+                        $("#dbB" + i).prop('checked', true);
+                        $("#uiB" + i).prop('checked', false);
+                        $("#fileUp" + i).prop('checked', false);
+                    } else if (Type == "both") {
+                        $("#bothB" + i).prop('checked', true);
+                        $("#dbB" + i).prop('checked', false);
+                        $("#uiB" + i).prop('checked', false);
+                        $("#fileUp" + i).prop('checked', false);
+                    } else if (Type == "fileUpload") {
+                        $("#bothB" + i).prop('checked', false);
+                        $("#dbB" + i).prop('checked', false);
+                        $("#uiB" + i).prop('checked', false);
+                        $("#fileUp" + i).prop('checked', true);
+                    } else {
+                        $("#bothB" + i).prop('checked', false);
+                        $("#dbB" + i).prop('checked', false);
+                        $("#uiB" + i).prop('checked', false);
+                        $("#fileUp" + i).prop('checked', false);
+                    }
                 }
             }
         }

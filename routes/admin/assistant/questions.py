@@ -15,11 +15,32 @@ def admin_questions(assistantID):
             return admin_services.render("admin/questions.html")
 
         questionList = helpers.getListFromSQLAlchemyList(callback.Data)
-
         return admin_services.render("admin/questions.html", data=questionList, id=assistantID)
 
     elif request.method == "POST":
-        print(request.form.get)
+        callback: Callback = questions_services.getByAssistantID(assistantID)
+        if callback.Success:
+            requestedQuestions = request.json
+            databaseQuestions = helpers.getListFromSQLAlchemyList(callback.Data)
+
+            deletedIDs = set()
+            for rq in requestedQuestions:
+                for dbq in databaseQuestions:
+                    if not dbq.get('ID') == rq.get('ID'):
+                        deletedIDs.add(dbq.get('ID'))
+
+            # loop in questions and update and add the others
+            for id in deletedIDs:
+                # delete id
+                pass
+            for question in requestedQuestions:
+                if question['ID']:
+                    # update question
+                    pass
+                else:
+                    # insert question with new id
+                    pass
+
         # assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
         #                                        [assistantID, company[0]])
         # if assistant is None or "Error" in assistant:

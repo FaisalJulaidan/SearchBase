@@ -23,3 +23,9 @@ questions_router: Blueprint = questions_router
 
 from .assistant.analytics import analytics_router
 analytics_router: Blueprint = analytics_router
+
+from .assistant.connection import connection_router
+connection_router: Blueprint = connection_router
+
+from .assistant.userInput import userInput_router
+userInput_router: Blueprint = userInput_router

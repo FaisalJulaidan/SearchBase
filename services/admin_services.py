@@ -1,6 +1,6 @@
 from flask import render_template,redirect, session
 from services import auth_services, assistant_services, user_services
-from models import Callback, User
+from models import Callback, User, Company
 from utilties import helpers
 
 
@@ -22,3 +22,14 @@ def render(template, **context):
             raise ValueError('Can not render a template')
     else:
         raise ValueError('Can not render a template')
+
+def convertForJinja(toConvert, convertType):
+    try:
+        if type(toConvert) is convertType:
+            result = [helpers.getDictFromSQLAlchemyObj(toConvert)]
+        else:
+            result = helpers.getListFromSQLAlchemyList(toConvert)
+        return Callback(True, 'Data converted', result)
+    except Exception as exc:
+        print("convertForJinja() Error: ", exc)
+        return Callback(False, 'Data could not be converted')

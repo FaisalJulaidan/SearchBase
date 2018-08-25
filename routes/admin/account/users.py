@@ -1,4 +1,4 @@
-from services import user_services
+from services import user_services, admin_services
 from models import Callback, User
 from flask import Blueprint, request, redirect, session
 from utilties import helpers
@@ -10,15 +10,14 @@ users_router: Blueprint = Blueprint('users_router', __name__ ,template_folder=".
 @users_router.route("/admin/users", methods=['GET'])
 def admin_users():
     if request.method == "GET":
-        callback: Callback = user_services.getByID(session['userID'])
-        callback: Callback = user_services.getAllByCompanyID(session.get())
+        callback: Callback = user_services.getAllByCompanyID(session.get('CompanyID', 0))
+        users = []
         if callback.Success:
-            user: User = callback.Data
+            users = callback.Data
 
+        print(users)
 
-
-        users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
-        return render("admin/users.html", users=users, email=email, userSettings=userSettings, message=message)
+        return admin_services.render("admin/users.html", users=users)
 
 
 @users_router.route("/admin/users/add", methods=['POST'])

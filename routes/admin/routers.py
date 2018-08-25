@@ -3,7 +3,7 @@ from flask import Blueprint
 from .dashboard.dashboard import dashboard_router
 dashboard_router: Blueprint = dashboard_router
 
-from .profile.profile import profile_router
+from .account.profile import profile_router
 profile_router: Blueprint = profile_router
 
 from .admin_api import admin_api

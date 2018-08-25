@@ -1,38 +1,32 @@
-
-from flask import Blueprint, request, redirect
+from services import profile_services, admin_services
+from models import Callback
+from flask import Blueprint, request, redirect, session
 
 profile_router: Blueprint = Blueprint('profile', __name__ ,template_folder="../../templates")
 @profile_router.route("/admin/profile", methods=['GET', 'POST'])
 def profilePage():
     if request.method == "GET":
-        message = checkForMessage()
-        email = session.get('User')['Email']
-        users = query_db("SELECT * FROM Users")
-        user = "Error"
-        # If user exists
-        for record in users:
-            if record["Email"] == email:
-                user = record
-        if "Error" in user:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error in finding user!")
-        company = query_db("SELECT * FROM Companies WHERE ID=?;", [user["CompanyID"]])
-        if company is None or company is "None" or company is "Error":
-            company="Error in finding company"
-        print(company)
-        print(user)
-        print(email)
-        return render_template("admin/profile.html", user=user, email=email, company=company[0], message=message)
+        email = session.get('userEmail', None)
+
+        profile_callback : Callback = profile_services.getUserAndCompany(email)
+        if not profile_callback:
+            return admin_services.render("admin/profile.html", user=None, email=email, company=None)
+
+        return admin_services.render("admin/profile.html", user=profile_callback.Data["user"], email=email, company=profile_callback.Data["company"])
 
     elif request.method == "POST":
-        curEmail = session.get('User')['Email']
+        curEmail = session.get('userEmail', None)
+
         names = request.form.get("names", default="Error")
         newEmail = request.form.get("email", default="error").lower()
         companyName = request.form.get("companyName", default="Error")
         companyURL = request.form.get("companyURL", default="error").lower()
+
         if names != "Error" and newEmail != "error" and companyURL != "error" and companyName != "Error":
             names = names.split(" ")
             name1 = names[0]
             name2 = names[1]
+
             users = query_db("SELECT * FROM Users")
             # If user exists
             for user in users:

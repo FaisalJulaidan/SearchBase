@@ -1945,5 +1945,5 @@ if __name__ == "__main__":
     # Run the app server
     app.run()
 
-    mail_services.sendVerificationEmail('julaidan.faisal@gmail.com', 'companyName', 'faisal julaidan')
+    mail_services.sendVerificationEmail('m.esteghamatdar@gmail.com', 'companyName', 'Mehdi Este')
 

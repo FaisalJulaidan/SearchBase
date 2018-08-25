@@ -20,7 +20,7 @@ def getTotalAll(assistants) -> Callback:
                         "Got all numbers",
                         Statistics(Name="Average", QuestionsAnswered=answered, ProductsReturned=products))
 
-    except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
+    except Exception as exc:
         print(exc)
         return Callback(False,
                         "Error: Couldn't get total numbers for all assistants")

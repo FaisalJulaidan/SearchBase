@@ -90,7 +90,6 @@ def subscribe(email, planID, trialDays=None, token=None, coupon=None) -> Callbac
             for assistant in assistants:
                 assistant.Active = True
 
-
         # Update user's StripeID & SubID
         user.StripeID = customer['id']
         user.SubID = subscription['id']

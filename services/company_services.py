@@ -16,7 +16,7 @@ def create(name, size, phoneNumber, url) -> Company or None:
     try:
         company = Company(Name=name, Size=size, PhoneNumber=phoneNumber, URL=url)
         db.session.add(company)
-    except sqlalchemy.exc.SQLAlchemyError as exc:
+    except Exception as exc:
         print(exc)
         return None
 
@@ -27,7 +27,7 @@ def removeByName(name) -> bool:
 
     try:
         db.session.query(Company).filter(Company.Name == name).delete()
-    except sqlalchemy.exc.SQLAlchemyError as exc:
+    except Exception as exc:
         print(exc)
         return False
 

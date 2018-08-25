@@ -1,19 +1,17 @@
 import sqlalchemy.exc
-from models import db, Company, Assistant, Callback
+from models import db, Callback, UserInput
 from utilties import helpers
 
-
-def getByID(id) -> Callback:
+def getByQuestionID(questionID):
     try:
-        # Get result and check if None then raise exception
-        result = db.session.query(Assistant).get(id)
+
+        result = db.session.query(UserInput).get(questionID)
         if not result: raise Exception
 
-        return Callback(True,
-                        "Got assistant by id successfully.",
-                        result)
-    except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
-        print(exc)
-        return Callback(False,
-                        'Could not get the assistant by id.')
+        return Callback(True, "Got user input by question id successfully.", result)
 
+    except Exception as exc:
+
+        print("getByQuestionID() Error: ", exc)
+
+        return Callback(False, 'Could not get the user input.')

@@ -8,7 +8,7 @@ admin_api: Blueprint = Blueprint('admin_api', __name__ ,template_folder="../../t
 @admin_api.route("/admin/getadminpagesdata", methods=['POST'])
 def adminPagesData():
     if request.method == "POST" and session.get('Logged_in', False):
-        callback: Callback = user_services.getByID(session['userID'])
+        callback: Callback = user_services.getByID(session['UserID'])
         if callback.Success:
             user: User = callback.Data
             return jsonify({
@@ -28,7 +28,7 @@ def adminPagesData():
 @admin_api.route("/admin/userData", methods=['GET'])
 def getUserData():
     if request.method == "GET" and session.get('Logged_in', False):
-        callback: Callback = user_services.getByID(session['userID'])
+        callback: Callback = user_services.getByID(session['UserID'])
         if callback.Success:
             user: User = callback.Data
             return jsonify({

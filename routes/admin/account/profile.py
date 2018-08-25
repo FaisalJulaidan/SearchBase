@@ -7,7 +7,7 @@ profile_router: Blueprint = Blueprint('profile_router', __name__ ,template_folde
 @profile_router.route("/admin/account", methods=['GET', 'POST'])
 def profilePage():
     if request.method == "GET":
-        email = session.get('userEmail', None)
+        email = session.get('UserEmail', None)
 
         profile_callback : Callback = profile_services.getUserAndCompany(email)
         if not profile_callback:
@@ -16,7 +16,7 @@ def profilePage():
         return admin_services.render("admin/account.html", user=profile_callback.Data["user"], email=email, company=profile_callback.Data["company"])
 
     elif request.method == "POST":
-        curEmail = session.get('userEmail', None)
+        curEmail = session.get('UserEmail', None)
 
         names = request.form.get("names", default="Error")
         newEmail = request.form.get("email", default="error").lower()
@@ -29,10 +29,10 @@ def profilePage():
         name1 = names[0]
         name2 = names[1]
             
-        updateUser_callback : Callback = profile_services.updateUser(name1, name2, newEmail, session.get('userID', None))
+        updateUser_callback : Callback = profile_services.updateUser(name1, name2, newEmail, session.get('UserID', None))
         if not updateUser_callback.Success: return helpers.redirectWithMessage("profilePage", "Could not update User's information.")
 
-        updateCompany_callback : Callback = profile_services.updateCompany(companyName, session.get('companyID', None))
+        updateCompany_callback : Callback = profile_services.updateCompany(companyName, session.get('CompanyID', None))
         if not updateCompany_callback.Success: return helpers.redirectWithMessage("profilePage", "Could not update Company's information.")
 
         return helpers.redirectWithMessage("profilePage", "User and Company information has been updated.")

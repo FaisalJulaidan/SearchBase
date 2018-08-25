@@ -90,8 +90,8 @@ def login():
 def logout():
 
     # Will clear out the session.
-    session.pop('userID', None)
-    session.pop('userEmail', None)
+    session.pop('UserID', None)
+    session.pop('UserEmail', None)
     session.pop('UserPlan', None)
     session.pop('Logged_in', False)
 

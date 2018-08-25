@@ -9,7 +9,7 @@ dashboard_router: Blueprint = Blueprint('dashboard_router', __name__, template_f
 @dashboard_router.route("/admin/dashboard", methods=['GET'])
 def admin_home():
     if request.method == "GET":
-        callback: Callback = user_services.getByID(session.get('userID', 0))
+        callback: Callback = user_services.getByID(session.get('UserID', 0))
         if callback.Success:
             user: User = callback.Data
             callback: Callback = statistics_services.getTotalAll(user.Company.Assistants)

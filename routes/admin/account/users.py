@@ -13,7 +13,7 @@ def admin_users():
         callback: Callback = user_services.getAllByCompanyID(session.get('CompanyID', 0))
         users = []
         if callback.Success:
-            users = callback.Data
+            users = helpers.getListFromSQLAlchemyList(callback.Data)
 
         print(users)
 

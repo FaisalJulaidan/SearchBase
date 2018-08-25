@@ -1,7 +1,7 @@
 import sqlalchemy.exc
 
 from services import company_services, admin_services, user_services
-from models import Callback, User, Company
+from models import Callback, User, Company, db
 from flask import Blueprint, request, redirect, session
 
 def getUserAndCompany(email):
@@ -24,4 +24,23 @@ def getUserAndCompany(email):
     return Callback(True, "Profile GET Request: Success", {"user" : user.Data[0], "company" : company.Data[0]})
 
 def updateUser(firstname, secondname, newEmail, userID):
+    user_callback: Callback = user_services.getByID(userID)
+    if not user_callback: return Callback(False, "Could not find user")
+    
+    user_callback.Data.Firstname = firstname
+    user_callback.Data.Surname = secondname
+    user_callback.Data.Email = newEmail
 
+    db.session.commit()
+
+    return Callback(True, "User has been updated")
+
+def updateCompany(companyName, companyID):
+    company_callback : Callback = company_services.getByCompanyID(companyID)
+    if not company_callback: return Callback(False, "Could not find company")
+
+    company_callback.Data.Name = companyName
+
+    db.session.commit()
+
+    return Callback(True, "Company has been updated")

@@ -1,6 +1,7 @@
 from services import profile_services, admin_services
 from models import Callback
 from flask import Blueprint, request, redirect, session
+from utilties import helpers
 
 profile_router: Blueprint = Blueprint('profile', __name__ ,template_folder="../../templates")
 @profile_router.route("/admin/profile", methods=['GET', 'POST'])
@@ -20,33 +21,18 @@ def profilePage():
         names = request.form.get("names", default="Error")
         newEmail = request.form.get("email", default="error").lower()
         companyName = request.form.get("companyName", default="Error")
-        companyURL = request.form.get("companyURL", default="error").lower()
 
-        if names != "Error" and newEmail != "error" and companyURL != "error" and companyName != "Error":
-            names = names.split(" ")
-            name1 = names[0]
-            name2 = names[1]
+        if names is "Error" and newEmail is "error" and companyName is "Error":
+            return helpers.redirectWithMessage("profilePage", "Could not retrieve all written information.")
 
-            users = query_db("SELECT * FROM Users")
-            # If user exists
-            for user in users:
-                if user["Email"] == curEmail:
-                    #TODO check if they worked
-                    #ENCRYPTION
-                    updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [encryptVar(name1),encryptVar(name2),encryptVar(newEmail),user["ID"]])
-                    #updateUser = update_table("UPDATE Users SET Firstname=?, Surname=?, Email=? WHERE ID=?;", [name1,name2,newEmail,user["ID"]])
-                    companyID = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?;", [user["ID"]])
-                    updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [encryptVar(companyName),encryptVar(companyURL),companyID[0]])
-                    #updateCompany = update_table("UPDATE Companies SET Name=?, URL=? WHERE ID=?;", [companyName,companyURL,companyID[0]])
-                    users = query_db("SELECT * FROM Users")
-                    user = "Error"
-                    for record in users:
-                        if record["Email"] == newEmail:
-                            user = record
-                    if "Error" in user:
-                        print("Error in updating Company or Profile Data")
-                        return redirect("/admin/profile", code=302)
-                    session['User'] = user
-                    return redirect("/admin/profile", code=302)
-        print("Error in updating Company or Profile Data")
-        return redirect("/admin/profile", code=302)
+        names = names.split(" ")
+        name1 = names[0]
+        name2 = names[1]
+            
+        updateUser_callback : Callback = profile_services.updateUser(name1, name2, newEmail, session.get('userID', None))
+        if not updateUser_callback.Success: return helpers.redirectWithMessage("profilePage", "Could not update User's information.")
+
+        updateCompany_callback : Callback = profile_services.updateCompany(companyName, session.get('companyID', None))
+        if not updateCompany_callback.Success: return helpers.redirectWithMessage("profilePage", "Could not update Company's information.")
+
+        return helpers.redirectWithMessage("profilePage", "User and Company information has been updated.")

@@ -6,6 +6,9 @@ dashboard_router: Blueprint = dashboard_router
 from .account.profile import profile_router
 profile_router: Blueprint = profile_router
 
+from .account.users import users_router
+users_router: Blueprint = users_router
+
 from .account.changePassword import changePassword_router
 changePassword_router: Blueprint = changePassword_router
 

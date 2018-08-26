@@ -1,6 +1,6 @@
 from services import admin_services, user_services, company_services, mail_services
 from models import Callback
-from flask import Blueprint, request, redirect
+from flask import Blueprint, request, redirect, render_template
 from utilties import helpers
 from itsdangerous import URLSafeTimedSerializer
 
@@ -11,7 +11,7 @@ verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y
 @resetPassword_router.route("/account/resetpassword", methods=["GET", "POST"])
 def reset_password():
     if request.method == "GET":
-        return admin_services.render("/accounts/resetpassword.html")
+        return render_template("accounts/resetpassword.html")
     else:
          email = request.form.get("email", default="Error")
 
@@ -19,7 +19,7 @@ def reset_password():
          if not email_callback.Success: return helpers.redirectWithMessage("reset_password", email_callback.Message)
 
          company_callback : Callback = company_services.getByEmail(email)
-         if not company_callback.Success: return helpers.redirectWithMessage("reset_password", email_callback.Message)
+         if not company_callback.Success: return helpers.redirectWithMessage("reset_password", company_callback.Message)
 
          mail_callback : Callback = mail_services.sendPasswordResetEmail(email, company_callback.Data.ID)
 
@@ -31,7 +31,7 @@ def reset_password_verify(payload):
         try:
             data = verificationSigner.loads(payload)
             email = data.split(";")[0]
-            companyID = data.split(";")[1]
+            companyID = int(data.split(";")[1])
 
             company_callback : Callback = company_services.getByEmail(email)
             if not company_callback.Success: raise Exception
@@ -40,7 +40,7 @@ def reset_password_verify(payload):
         except:
             return helpers.redirectWithMessage("login", "The link you requested is invalid.")
 
-        return admin_services.render("/accounts/set_resetpassword.html", email=email, payload=payload)
+        return render_template("accounts/set_resetpassword.html", email=email, payload=payload)
 
     if request.method == "POST":
         email = request.form.get("email", default="Error")

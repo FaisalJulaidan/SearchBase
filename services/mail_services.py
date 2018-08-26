@@ -13,7 +13,7 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
 
     try:
         msg = Message("Account verification",
-                      sender="thesearchbase@gmail.com",
+                      sender="noreply@thesearchbase.com",
                       recipients=[email])
         payload = email + ";" + companyName
         link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
@@ -28,7 +28,7 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
 
         # sending the registration confirmation email to us
         msg = Message("A new company has signed up!",
-                      sender="thesearchbase@gmail.com",
+                      sender="noreply@thesearchbase.com",
                       recipients=["thesearchbase@gmail.com"])
         msg.html = "<p>Company name: " + companyName + " has signed up. <br>The admin's details are: <br>Name: " \
                    + fullname + " <br>Email: " + email + ".</p>"
@@ -41,10 +41,10 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
 def sendPasswordResetEmail(email, companyID):
     try:
         msg = Message("Password reset",
-                    sender="thesearchbase@gmail.com",
+                    sender="noreply@thesearchbase.com",
                     recipients=[email])
               
-        payload = email + ";" + companyID
+        payload = email + ";" + str(companyID)
         link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
         msg.html ="<img src='https://thesearchbase.com/static/email_images/password_reset.png' style='width:500px;height:228px;'> <h4> Hi, </h4><p>We have been informed you would like to reset your password. \
                 Please visit <a href='"+link+"'>this link</a> to verify your account and to set your new password.</p> <br /> <br /> \
@@ -53,6 +53,7 @@ def sendPasswordResetEmail(email, companyID):
         mail.send(msg)
 
     except Exception as e:
+        print("sendPasswordResetEmail() Error: ", e)
         return Callback(False, 'Could not send a password reset email to ' + email)
     
     return Callback(True, 'Password reset email sent successfully to ' + email)

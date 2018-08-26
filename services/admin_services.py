@@ -19,9 +19,9 @@ def render(template, **context):
                                    assistants=assistants,
                                    **context)
         else:
-            raise ValueError('Can not render a template')
+            return helpers.redirectWithMessage("login", "Could not find user. Please relog.")
     else:
-        raise ValueError('Can not render a template')
+        return helpers.redirectWithMessage("login", "Please log in first.")
 
 def convertForJinja(toConvert, convertType):
     try:

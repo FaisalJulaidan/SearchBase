@@ -39,7 +39,7 @@ def getByEmail(email) -> Callback:
     result = db.session.query(User).filter(User.Email == email).first()
     if not result: return Callback(False, 'Could not retrieve user\'s data')
 
-    result = db.session.query(Company).filter(Company.ID == result.ID).first()
+    result = db.session.query(Company).filter(Company.ID == result.CompanyID).first()
     if not result: return Callback(False, 'Could not retrieve company\'s data.')
     
     return Callback(True, 'Company was successfully retrieved.', result)

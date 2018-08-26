@@ -23,7 +23,7 @@ def admin_solutions(assistantID):
         return admin_services.render("admin/solutions.html", data=solutions, id=assistantID)
 
     elif request.method == 'POST':
-        companyID = session.get('companyID', None)
+        companyID = session.get('CompanyID', None)
         if not companyID: return helpers.redirectWithMessage("admin_solutions", "Could not retrive company's ID")
 
         #get all company assistants (needed for totalproducts check)

@@ -17,7 +17,7 @@ def getByID(id) -> Callback:
                             result)
         else:
             raise Exception
-    except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
+    except Exception as exc:
         return Callback(False,
                         'User with ID ' + str(id) + ' does not exist')
 

@@ -3,6 +3,8 @@ import sqlalchemy.exc
 from models import db, Callback, User, Company, Role
 from utilties import helpers
 from flask import session
+from sqlalchemy.orm import Load
+
 
 
 def getByID(id) -> Callback:
@@ -39,7 +41,7 @@ def getByEmail(email) -> User or None:
 def getAllByCompanyID(companyID) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(User).filter(User.CompanyID == companyID).all()
+        result = db.session.query(User).options(Load(User).load_only("ID")).filter(User.CompanyID == companyID).all()
         if not result: raise Exception
 
         return Callback(True,

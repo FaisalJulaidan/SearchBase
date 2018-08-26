@@ -68,6 +68,33 @@ def create(firstname, surname, email, password, company: Company, role: Role, ve
     db.session.commit()
     return Callback(True, 'User has been created successfully!')
 
+def changePasswordByID(userID, newPassword, currentPassword=None):
+    user_callback : Callback = user_services.getByID(userID)
+    if not user_callback.Success:
+        return Callback(False, "Could not find user's records")
+
+    if currentPassword is not None:
+        if not helpers.hashPass(currentPassword, user_callback.Data.Password) == user_callback.Data.Password:
+            return Callback(False, "Incorrect Password.")
+
+    user_callback.Data.Password = helpers.hashPass(newPassword)
+    db.session.commit()
+
+    return Callback(True, "Password has been changed.")
+
+def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
+    user_callback : Callback = user_services.getByEmail(userEmail)
+    if not user_callback.Success:
+        return Callback(False, "Could not find user's records")
+
+    if currentPassword is not None:
+        if not helpers.hashPass(currentPassword, user_callback.Data.Password) == user_callback.Data.Password:
+            return Callback(False, "Incorrect Password.")
+
+    user_callback.Data.Password = helpers.hashPass(newPassword)
+    db.session.commit()
+
+    return Callback(True, "Password has been changed.")
 
 def removeByEmail(email) -> Callback:
 

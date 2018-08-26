@@ -10,7 +10,7 @@ def getUserAndCompany(email):
         print("Profile GET Request: Email not found")
         return Callback(False, "Profile GET Request: Email not found")
 
-    company_callback : Callback = company_services.getByCompanyID(session.get('companyID', None))
+    company_callback : Callback = company_services.getByCompanyID(session.get('companyID', 0))
     if not company_callback.Success:
         print("Profile GET Request: Company not found")
         return Callback(False, "Profile GET Request: Company not found")

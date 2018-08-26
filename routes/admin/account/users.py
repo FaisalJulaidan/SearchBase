@@ -1,7 +1,9 @@
+from flask import jsonify, json
 from services import user_services, admin_services
 from models import Callback, User
 from flask import Blueprint, request, redirect, session
 from utilties import helpers
+from datetime import datetime
 
 users_router: Blueprint = Blueprint('users_router', __name__ ,template_folder="../../templates")
 
@@ -10,14 +12,25 @@ users_router: Blueprint = Blueprint('users_router', __name__ ,template_folder=".
 @users_router.route("/admin/users", methods=['GET'])
 def admin_users():
     if request.method == "GET":
+        # callback: Callback = user_services.getAllByCompanyID(session.get('CompanyID', 0))
+        # users = []
+        # if callback.Success:
+        #     users = helpers.getListFromSQLAlchemyList(callback.Data)
+        #
+        # print(users)
+
+        return admin_services.render("admin/users.html")
+
+@users_router.route("/admin/users/get", methods=['GET'])
+def admin_get_users():
+    if request.method == "GET":
         callback: Callback = user_services.getAllByCompanyID(session.get('CompanyID', 0))
         users = []
         if callback.Success:
             users = helpers.getListFromSQLAlchemyList(callback.Data)
 
         print(users)
-
-        return admin_services.render("admin/users.html", users=users)
+    return 'dsf'
 
 
 @users_router.route("/admin/users/add", methods=['POST'])

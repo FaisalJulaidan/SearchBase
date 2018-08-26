@@ -26,8 +26,9 @@ from services.mail_services import mail
 # Import all routers to register them as blueprints
 
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
-    products_router, questions_router, analytics_router, sub_router, connection_router, userInput_router, users_router, \
+    products_router, questions_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
     changePassword_router
+
 from routes.public.routers import public_router, resetPassword_router
 from services import user_services, mail_services
 
@@ -46,6 +47,7 @@ app.register_blueprint(analytics_router)
 app.register_blueprint(connection_router)
 app.register_blueprint(userInput_router)
 app.register_blueprint(changePassword_router)
+app.register_blueprint(users_router)
 
 
 # code to ensure user is logged in

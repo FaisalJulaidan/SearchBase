@@ -25,40 +25,38 @@
                             Your details
                             <small>You can update your details here.</small>
                         </h2>
-                        <ul class="nav navbar-right panel_toolbox">
-                            <li>
-                                <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                            </li>
-                        </ul>
                         <div class="clearfix"></div>
                     </div>
+
                     <div class="x_content">
-                        <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
-                            <div class="profile_img">
+                        <div class="col-xs-2">
+                            <div class="profile_img" style="margin-top: 25px">
                                 <div id="crop-avatar">
                                     <!-- Current avatar -->
                                     <img class="img-responsive avatar-view" src="/static/images/img.jpg"
                                          alt="Avatar">
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-xs-10 profile_left">
                             <div id="outputDiv">
                                 <form id="profileForm" action="/admin/profile" method="post">
+                                    <div class="input-group" style="margin:10px 0 0 10px">
+                                        <span class="input-group-addon">First and Last Name</span>
+                                        <input type="text" class="form-control" id="names" name="names" value="{{user["Firstname"]}} {{user["Surname"]}}" />
+                                    </div>
 
-                                    <label>First and Last Name</label><br />
-                                    <!--<div class="wrap-input100 validate-input">
-                                        <input class="input100" id="names" type="text" name="names" value="{{user["Firstname"]}} {{user["Surname"]}}" />
-                                        <span class="focus-input100"></span>
-                                    </div>-->
-                                    <input class="form-control col-md-8 col-xs-10" id="names" name="names" value="{{user["Firstname"]}} {{user["Surname"]}}" />
-                                    <br /><br />
+                                    <div class="input-group" style="margin:10px 0 0 10px">
+                                        <span class="input-group-addon">Email</span>
+                                        <input type="text" class="form-control" id="email" name="email" value="{{user["Email"]}}" />
+                                    </div>
 
-                                    <label>Email</label><br />
-                                    <input class="form-control col-md-8 col-xs-10" id="email" name="email" value="{{user["Email"]}}" />
-                                    <br /><br />
+                                    <div class="input-group" style="margin:10px 0 0 10px">
+                                        <span class="input-group-addon">Company Name</span>
+                                        <input type="text" class="form-control" id="companyName" name="companyName" value="{{company["Name"]}}" />
+                                    </div>
 
-                                    <label>Company Name</label><br />
-                                    <input class="form-control col-md-8 col-xs-10" id="companyName" name="companyName" value="{{company["Name"]}}" />
-                                    <br /><br />
+
 
                                     <!--<h3 id="nameh3" style="display:inline-block;">{{ user["Firstname"] }} {{ user["Surname"] }}</h3><img id="editName" class="editIcon" src="../static/images/pencil-edit-button.png" />
                                     <input id="names" name="names" value="{{user["Firstname"]}} {{user["Surname"]}}" /><img id="saveName" class="tickIcon" src="../static/images/tick.png" /><img id="cancelName" class="crossIcon" src="../static/images/cross.png" />
@@ -99,17 +97,20 @@
 
 
 
+                                    <div class="input-group" style="margin:10px 0 0 10px">
+                                        <button class="btn btn-success">Save Changes</button>
+                                        <a href="/admin/changepassword" class="btn btn-success">Change Password</a>
+                                    </div>
 
 
 
 
 
-                                    <button class="btn btn-success">Save Changes</button>
                                 </form>
                             </div>
                         </div>
                     </div>
-                    <a href="/admin/changepassword" class="btn btn-success">Change Password</a>
+
                 </div>
             </div>
         </div>

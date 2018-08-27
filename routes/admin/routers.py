@@ -3,8 +3,14 @@ from flask import Blueprint
 from .dashboard.dashboard import dashboard_router
 dashboard_router: Blueprint = dashboard_router
 
-from .profile.profile import profile_router
+from .account.profile import profile_router
 profile_router: Blueprint = profile_router
+
+from .account.users import users_router
+users_router: Blueprint = users_router
+
+from .account.changePassword import changePassword_router
+changePassword_router: Blueprint = changePassword_router
 
 from .admin_api import admin_api
 admin_api: Blueprint = admin_api
@@ -23,3 +29,15 @@ questions_router: Blueprint = questions_router
 
 from .assistant.analytics import analytics_router
 analytics_router: Blueprint = analytics_router
+
+from .assistant.connection import connection_router
+connection_router: Blueprint = connection_router
+
+from .assistant.userInput import userInput_router
+userInput_router: Blueprint = userInput_router
+
+from .account.users import users_router
+users_router: Blueprint = users_router
+
+from .account.profile import profile_router
+profile_router: Blueprint = profile_router

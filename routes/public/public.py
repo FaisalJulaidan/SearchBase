@@ -90,8 +90,8 @@ def login():
 def logout():
 
     # Will clear out the session.
-    session.pop('userID', None)
-    session.pop('userEmail', None)
+    session.pop('UserID', None)
+    session.pop('UserEmail', None)
     session.pop('UserPlan', None)
     session.pop('Logged_in', False)
 
@@ -142,7 +142,7 @@ def signup():
 
         # If error while sending verification email
         if not mail_callback.Success:
-            helpers.redirectWithMessage('signup', 'signed up successfully but > ' + mail_callback.Message
+            helpers.redirectWithMessage('signup', 'Signed up successfully but > ' + mail_callback.Message
                                         + '. Please contact TheSearchBaseStaff to activate your account.')
 
         return render_template('errors/verification.html',

@@ -72,9 +72,9 @@ def login(email: str, password_to_check: str) -> Callback:
 
     # If all the tests are valid then do login process
     session['Logged_in'] = True
-    session['userID'] = user.ID
-    session['companyID'] = user.CompanyID
-    session['userEmail'] = user.Email
+    session['UserID'] = user.ID
+    session['CompanyID'] = user.CompanyID
+    session['UserEmail'] = user.Email
     session['UserPlan'] = helpers.getPlanNickname(user.SubID)
     print("user: ", user)
     print("user.SubID: ", user.SubID)

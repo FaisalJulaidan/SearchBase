@@ -13,12 +13,14 @@ pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
 secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
 encryption = None
 
-stripe.api_key = secret_key
-
 stripe_keys = {
     'secret_key': secret_key,
     'publishable_key': pub_key
 }
+
+stripe.api_key = secret_key
+
+
 
 
 @sub_router.route("/admin/pricing", methods=['GET'])
@@ -35,6 +37,7 @@ def admin_pay(planID):
             helpers.redirectWithMessage('admin_pricing', 'This plan does not exist! Make sure the plan ID '
                                         + planID + ' is correct.')
 
+        print(stripePlan_callback.Data)
         return admin_services.render("admin/sub.html", plan=stripePlan_callback.Data)
 
     if request.method == 'POST':
@@ -54,27 +57,14 @@ def admin_pay(planID):
         if token is "Error":
             return jsonify(error="No token provided to complete the payment!")
 
-        sub_callback: Callback = sub_services.subscribe(email=session.get('userEmail', 'Invalid Email'),
+        sub_callback: Callback = sub_services.subscribe(email=session.get('UserEmail', 'Invalid Email'),
                                                         planID=planID, token=token, coupon=coupon)
 
         if not sub_callback.Success:
             return jsonify(error=sub_callback.Message)
 
-        # Reaching to this point means no errors and subscription is successful
-
-        # session['UserPlan']['Nickname'] = getPlanNickname(subscription['id'])
-        # if getPlanNickname(user['SubID']) is None:
-        #     session['UserPlan']['Settings'] = NoPlan
-        # elif "Basic" in getPlanNickname(user['SubID']):
-        #     session['UserPlan']['Settings'] = BasicPlan
-        # elif "Advanced" in getPlanNickname(user['SubID']):
-        #     session['UserPlan']['Settings'] = AdvancedPlan
-        # elif "Ultimate" in getPlanNickname(user['SubID']):
-        #     session['UserPlan']['Settings'] = UltimatePlan
-        # print("Plan changed to: ", session.get('UserPlan')['Settings'])
-
         # Set Plan session for logged in user
-        session['userPlan'] = sub_callback.Data['planNickname']
+        session['UserPlan'] = sub_callback.Data['planNickname']
         print("You have successfully subscribed!")
 
         return jsonify(success="You have successfully subscribed!", url="admin/pricing-tables.html")
@@ -87,7 +77,7 @@ def unsubscribe():
         if not session.get('Logged_in', False):
             helpers.redirectWithMessage("login", "You must login first!")
 
-        unsubscribe_callback: Callback = sub_services.unsubscribe(session.get('userEmail', 'InvalidEmail'))
+        unsubscribe_callback: Callback = sub_services.unsubscribe(session.get('UserEmail', 'InvalidEmail'))
 
         if not unsubscribe_callback.Success:
             return jsonify(error=unsubscribe_callback.Message)

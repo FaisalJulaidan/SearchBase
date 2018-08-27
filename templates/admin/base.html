@@ -56,11 +56,13 @@
     <!-- JQVMap -->
     <link href="/static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet" />
     <link href="/static/css/admin.css" rel="stylesheet">
-    <title>{% block title %}{% endblock %}</title>
+
+
 
     {% block headlinks %}
     {% endblock %}
 
+    <title>{% block title %}{% endblock %}</title>
 
 
 
@@ -79,7 +81,7 @@
 
                 <div class="clearfix"></div>
 
-                <!-- menu profile quick info -->
+                <!-- menu account quick info -->
                 <div class="profile clearfix">
                     <div class="profile_pic">
                         <img src="/static/images/img.jpg" alt="..." class="img-circle profile_img">
@@ -89,7 +91,7 @@
                         <h2 id="userWelcomeName">user</h2>
                     </div>
                 </div>
-                <!-- /menu profile quick info -->
+                <!-- /menu account quick info -->
 
                 <br/>
 
@@ -331,9 +333,11 @@
         {% endblock %}
         <!-- /footer content -->
     </div>
+</div>
 
     <!-- jQuery -->
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+{#    <script src="/static/vendor/jquery/jquery-3.2.1.min.js"></script>#}
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
     <!-- jQuery Tags Input -->
     <script src="/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
     <!-- Bootstrap -->
@@ -371,6 +375,8 @@
 
 
     <script type="text/javascript">
+
+
         var errTitle = $("#errorTitle")
         var errText = $("#errorText")
         var errShow = $("#showError")

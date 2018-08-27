@@ -1,12 +1,13 @@
 from flask import Blueprint, request, redirect, flash, session
-from services import solutions_services, admin_services, assistant_services, sub_services
-from models import Callback, Product
-from utilties import helpers
+from services import admin_services, assistant_services
+from models import Callback
 
-products_router: Blueprint = Blueprint('products_router', __name__, template_folder="../../templates")
+connection_router: Blueprint = Blueprint('connection_router', __name__, template_folder="../../templates")
 
-@products_router.route("/admin/assistant/<assistantID>/solutions", methods=['GET', 'POST'])
+@connection_router.route("/admin/assistant/<assistantID>/connect", methods=['GET'])
 def admin_connect(assistantID):
-    checkAssistantID(assistantID)
-    assistant = query_db("SELECT * FROM Assistants WHERE ID=?;", [assistantID], True)
-    return render("admin/connect.html", companyID=assistant["CompanyID"], assistantID=assistantID)
+    if request.method == "GET":
+
+        companyID = session.get('CompanyID', None)
+
+        return admin_services.render("admin/connect.html", companyID=companyID, assistantID=assistantID)

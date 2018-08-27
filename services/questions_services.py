@@ -3,9 +3,7 @@ from models import Callback, db, Question
 
 def getByAssistantID(assistantID):
     try:
-        # Get result and check if None then raise exception
         result = db.session.query(Question).filter(Question.AssistantID == assistantID).all()
-        if not result: raise Exception
 
         return Callback(True,
                         "Got questions successfully.",
@@ -13,4 +11,28 @@ def getByAssistantID(assistantID):
     except Exception as exc:
         print(exc)
         return Callback(False,
-                        'Could not questions by assistant id.')
+                        'Could not get questions by assistant id.')
+
+def reset(assistantID):
+    try:
+        db.session.query(Question).filter(Question.AssistantID == assistantID).delete()
+        db.session.commit()
+
+        return Callback(True,
+                        "All questions deleted related to assistant. Ready for updated batch.")
+    except Exception as exc:
+        print(exc)
+        return Callback(False,
+                        'Could not delete all questions by assistant id.')
+
+def add(question):
+    try:
+        db.session.add(question)
+        db.session.commit()
+
+        return Callback(True,
+                        "Question added")
+    except Exception as exc:
+        print(exc)
+        return Callback(False,
+                        'Could not delete all questions by assistant id.')

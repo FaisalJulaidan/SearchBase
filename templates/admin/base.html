@@ -428,7 +428,8 @@
         };
         xhttp.send(params);
         // Set SessionStorage which is similar to cookies in client-side
-        $.get({
+        $.ajax({
+            method:'GET',
             url: '/admin/userData',
             contentType: 'application/json'
         }).done(function (res) {

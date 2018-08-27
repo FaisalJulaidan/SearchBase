@@ -11,81 +11,29 @@ def admin_questions(assistantID):
         callback: Callback = questions_services.getByAssistantID(assistantID)
 
         if not callback.Success:
-            flash({'type': 'danger', 'msg': 'Error in getting your questions!'})
+            flash({'type': 'danger', 'msg': callback.Message})
             return admin_services.render("admin/questions.html")
 
         questionList = helpers.getListFromSQLAlchemyList(callback.Data)
         return admin_services.render("admin/questions.html", data=questionList, id=assistantID)
 
     elif request.method == "POST":
-        callback: Callback = questions_services.getByAssistantID(assistantID)
+        callback: Callback = questions_services.reset(assistantID)
         if callback.Success:
             requestedQuestions = request.json
-            databaseQuestions = helpers.getListFromSQLAlchemyList(callback.Data)
+            isAllAdded = True
 
-            deletedIDs = set()
-            for rq in requestedQuestions:
-                for dbq in databaseQuestions:
-                    if not dbq.get('ID') == rq.get('ID'):
-                        deletedIDs.add(dbq.get('ID'))
+            for rq_question in requestedQuestions:
+                callback: Callback = questions_services.add(Question(Question=rq_question['Question'],
+                                                                     Type=rq_question['Type'],
+                                                                     AssistantID=assistantID))
+                if not callback.Success:
+                    print(callback.Message)
+                    flash({'type': 'danger', 'msg': 'Cannot update questions for this assistant'})
+                    isAllAdded = False
+                    break
 
-            # loop in questions and update and add the others
-            for id in deletedIDs:
-                # delete id
-                pass
-            for question in requestedQuestions:
-                if question['ID']:
-                    # update question
-                    pass
-                else:
-                    # insert question with new id
-                    pass
-
-        # assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-        #                                        [assistantID, company[0]])
-        # if assistant is None or "Error" in assistant:
-        #     return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting assitant's records!")
-        # else:
-        #     currentQuestions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-        #                                                   [assistantID], True)
-        #     if currentQuestions is None or "Error" in currentQuestions:
-        #         return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting old questions!")
-        #
-        #     updatedQuestions = []
-        #     noq = request.form.get("noq-hidden", default="Error")
-        #     for i in range(1, int(noq) + 1):
-        #         question = request.form.get("question" + str(i), default="Error")
-        #         if question != "Error":
-        #             updatedQuestions.append(question)
-        #         else:
-        #             return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting new questions!")
-        #
-        #     i = -1
-        #     if (len(updatedQuestions) + 1 < len(currentQuestions) + 1):
-        #         for b in range(len(updatedQuestions) + 1, len(currentQuestions) + 1):
-        #             questionID = currentQuestions[i][0]
-        #             question = currentQuestions[i][2]
-        #
-        #             deleteQuestion = delete_from_table("DELETE FROM Questions WHERE AssistantID=? AND Question=?;", [assistantID, escape(question)])
-        #             if deleteQuestion is None or "Error" in deleteQuestion:
-        #                 return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 1 Error in updating questions!")
-        #
-        #             deleteAnswers = delete_from_table(DATABASE, "DELETE FROM Answers WHERE QuestionID=?;", [questionID])
-        #             if deleteAnswers is None or "Error" in deleteAnswers:
-        #                 return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in removing deleted question's answers!")
-        #     for q in updatedQuestions:
-        #         i += 1
-        #         qType = request.form.get("qType" + str(i))
-        #         if i >= len(currentQuestions):
-        #             insertQuestion = insert_into_database_table(
-        #                 "INSERT INTO Questions ('AssistantID', 'Question', 'Type')"
-        #                 "VALUES (?,?,?);", (assistantID, q, qType))
-        #             if insertQuestion is None or "Error" in insertQuestion:
-        #                 return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 2 Error in updating questions!")
-        #         else:
-        #             updateQuestion = update_table("UPDATE Questions SET Question=?, Type=? WHERE Question=?;", [escape(q), qType, currentQuestions[i][2]])
-        #             if updateQuestion is None or "Error" in updateQuestion:
-        #                 return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 3 Error in updating questions!")
-        #
-        return redirect("/admin/assistant/{}/questions".format(assistantID))
+            if isAllAdded:
+                flash({'type': 'success', 'msg': str(len(requestedQuestions)) + ' Questions updated successfully'})
+        return 'Done'
 

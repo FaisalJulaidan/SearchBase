@@ -188,7 +188,10 @@
                     method:'POST',
                     url:link,
                     contentType: "application/json",
-                    data:JSON.stringify(serverData)
+                    data:JSON.stringify(serverData),
+                    success:function (res) {
+                        location.reload();
+                    }
                 })
             }
         }

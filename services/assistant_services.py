@@ -35,12 +35,13 @@ def getByNickname(nickname) -> Callback:
 
 def getAll(companyID) -> Callback:
     try:
-        # Get result and check if None then raise exception
-        result = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
-        if len(result) == 0:
-            return Callback(True,"No assistants  to be retrieved.", [])
+        if companyID:
+            # Get result and check if None then raise exception
+            result = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
+            if len(result) == 0:
+                return Callback(True,"No assistants  to be retrieved.", [])
 
-        return Callback(True, "Got all assistants  successfully.", result)
+            return Callback(True, "Got all assistants  successfully.", result)
 
     except Exception as exc:
         print(exc)

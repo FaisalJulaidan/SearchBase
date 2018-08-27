@@ -57,7 +57,7 @@ def isValidEmail(email: str) -> bool:
 # Convert a SQLAlchemy object to a single dict
 def getDictFromSQLAlchemyObj(obj):
     return {c.key: getattr(obj, c.key)
-            for c in inspect(obj).mapper.column_attrs}
+            for c in inspect(obj).mapper.column_attrs if c.key not in ("Password")}
 
 
 # Convert a SQLAlchemy list of objects to a list of dicts

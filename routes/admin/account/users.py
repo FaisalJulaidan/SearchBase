@@ -3,7 +3,6 @@ from services import user_services, admin_services
 from models import Callback, User
 from flask import Blueprint, request, redirect, session
 from utilties import helpers
-from datetime import datetime
 
 users_router: Blueprint = Blueprint('users_router', __name__ ,template_folder="../../templates")
 
@@ -12,14 +11,91 @@ users_router: Blueprint = Blueprint('users_router', __name__ ,template_folder=".
 @users_router.route("/admin/users", methods=['GET'])
 def admin_users():
     if request.method == "GET":
-        # callback: Callback = user_services.getAllByCompanyID(session.get('CompanyID', 0))
-        # users = []
-        # if callback.Success:
-        #     users = helpers.getListFromSQLAlchemyList(callback.Data)
-        #
-        # print(users)
+        callback: Callback = user_services.getAllByCompanyID(session.get('CompanyID', 0))
+        users = []
+        if callback.Success:
+            users = helpers.getListFromSQLAlchemyList(callback.Data)
 
-        return admin_services.render("admin/users.html")
+        print(users)
+
+        return admin_services.render("admin/users.html", users=users)
+
+@users_router.route("/admin/user/<userID>", methods=['PUT'])
+def update_user(userID):
+    if request.method == "PUT":
+
+        # Get the user to be edited.
+        if not userID: userID = 0
+        callback: Callback = user_services.getByID(userID)
+        if not callback.Success:
+            return json.dumps({'success': False, 'msg': "Sorry, but this user doesn't exist"}),\
+                   400, {'ContentType': 'application/json'}
+        userToBeEdited: User = callback.Data
+
+        # Get the admin user who is logged in and wants to edit.
+        callback: Callback = user_services.getByID(session.get('UserID', 0))
+        if not callback.Success:
+            return json.dumps({'success': False, 'msg': "Sorry, error occurred. Try again please!"}), \
+                   400, {'ContentType': 'application/json'}
+        adminUser: User = callback.Data
+
+        # Check if the admin user is authorised for such an operation.
+        if (not adminUser.Role.EditUsers) or \
+                userToBeEdited.CompanyID != adminUser.CompanyID or \
+                userToBeEdited.Role.Name == 'Owner':
+            return json.dumps({'success': False, 'msg': "Sorry, You're not authorised"}), \
+                   401, {'ContentType': 'application/json'}
+
+        # Edit the user
+        callback: Callback = user_services.updateAsOwner(userToBeEdited.ID)
+        if not callback.Success:
+            return json.dumps({'success': False, 'msg': "Sorry, error occurred. Try again please!"}), \
+               500, {'ContentType': 'application/json'}
+
+        print("Success.  " + userID)
+
+        return json.dumps({'success':True, 'msg': "User deleted successfully!"}),\
+               200,\
+               {'ContentType':'application/json'}
+
+@users_router.route("/admin/user/<userID>", methods=['DELETE'])
+def delete_user(userID):
+    if request.method == "DELETE":
+
+        # Get the user to be deleted.
+        if not userID: userID = 0
+        callback: Callback = user_services.getByID(userID)
+        if not callback.Success:
+            return json.dumps({'success': False, 'msg': "Sorry, but this user doesn't exist"}),\
+                   400, {'ContentType': 'application/json'}
+        userToBeDeleted: User = callback.Data
+
+        # Get the admin user who is logged in and wants to delete.
+        callback: Callback = user_services.getByID(session.get('UserID', 0))
+        if not callback.Success:
+            return json.dumps({'success': False, 'msg': "Sorry, error occurred. Try again please!"}), \
+                   400, {'ContentType': 'application/json'}
+        adminUser: User = callback.Data
+
+        # Check if the admin user is authorised for such an operation.
+        if (not adminUser.Role.DeleteUsers) or\
+                userToBeDeleted.CompanyID != adminUser.CompanyID or\
+                userToBeDeleted.Role.Name == 'Owner':
+            return json.dumps({'success': False, 'msg': "Sorry, You're not authorised"}), \
+                   401, {'ContentType': 'application/json'}
+
+        # Delete the user
+        callback: Callback = user_services.removeByID(userToBeDeleted.ID)
+        if not callback.Success:
+            return json.dumps({'success': False, 'msg': "Sorry, error occurred. Try again please!"}), \
+               500, {'ContentType': 'application/json'}
+
+        print("Success.  " + userID)
+
+        return json.dumps({'success':True, 'msg': "User deleted successfully!"}),\
+               200,\
+               {'ContentType':'application/json'}
+
 
 @users_router.route("/admin/users/get", methods=['GET'])
 def admin_get_users():
@@ -30,7 +106,7 @@ def admin_get_users():
             users = helpers.getListFromSQLAlchemyList(callback.Data)
 
         print(users)
-    return 'dsf'
+    return jsonify(users)
 
 
 @users_router.route("/admin/users/add", methods=['POST'])

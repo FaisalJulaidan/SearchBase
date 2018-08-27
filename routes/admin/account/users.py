@@ -42,6 +42,7 @@ def update_user(userID):
         # Check if the admin user is authorised for such an operation.
         if (not adminUser.Role.EditUsers) or \
                 userToBeEdited.CompanyID != adminUser.CompanyID or \
+                userToBeEdited.Role.Name == adminUser.Role.Name or \
                 userToBeEdited.Role.Name == 'Owner':
             return json.dumps({'success': False, 'msg': "Sorry, You're not authorised"}), \
                    401, {'ContentType': 'application/json'}

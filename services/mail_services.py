@@ -13,7 +13,7 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
 
     try:
         msg = Message("Account verification",
-                      sender="noreply@thesearchbase.com",
+                      sender="thesearchbase@gmail.com",
                       recipients=[email])
         payload = email + ";" + companyName
         link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
@@ -28,7 +28,7 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
 
         # sending the registration confirmation email to us
         msg = Message("A new company has signed up!",
-                      sender="noreply@thesearchbase.com",
+                      sender="thesearchbase@gmail.com",
                       recipients=["thesearchbase@gmail.com"])
         msg.html = "<p>Company name: " + companyName + " has signed up. <br>The admin's details are: <br>Name: " \
                    + fullname + " <br>Email: " + email + ".</p>"
@@ -41,7 +41,7 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
 def sendPasswordResetEmail(email, companyID):
     try:
         msg = Message("Password reset",
-                    sender="noreply@thesearchbase.com",
+                    sender="thesearchbase@gmail.com",
                     recipients=[email])
               
         payload = email + ";" + str(companyID)

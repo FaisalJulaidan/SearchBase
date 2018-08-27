@@ -17,7 +17,7 @@
     <link rel="apple-touch-icon-precomposed" sizes="76x76" href="https://www.thesearchbase.com/static/img/core-img/admin_icon/apple-touch-icon-76x76.png" />
     <link rel="apple-touch-icon-precomposed" sizes="152x152" href="https://www.thesearchbase.com/static/img/core-img/admin_icon/apple-touch-icon-152x152.png" />
     <link rel="icon" type="image/png" href="https://www.thesearchbase.com/static/img/core-img/admin_icon/favicon-196x196.png" sizes="196x196" />
-    <link rel="icon" type="image/png" href="https://www.thesearchbase.com/static/img/core-img/admin_icon/favicon.ico"/>
+    <link rel="icon" type="image/png" href="https://www.thesearchbase.com/static/img/core-img/admin_icon/favicon.ico" />
     <link rel="icon" type="image/png" href="https://www.thesearchbase.com/static/img/core-img/admin_icon/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/png" href="https://www.thesearchbase.com/static/img/core-img/admin_icon/favicon-32x32.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="https://www.thesearchbase.com/static/img/core-img/admin_icon/favicon-16x16.png" sizes="16x16" />
@@ -69,33 +69,34 @@
 </head>
 
 <body class="nav-md">
-<div class="container body">
-    <div class="main_container">
-        <div class="col-md-3 left_col">
-            <div class="left_col scroll-view">
-                <div class="navbar nav_title" style="border: 0;">
-                    <a href="/admin/dashboard" class="site_title"> <img
-                            src="/static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchBase</span></a>
-                    <br/>
-                </div>
-
-                <div class="clearfix"></div>
-
-                <!-- menu account quick info -->
-                <div class="profile clearfix">
-                    <div class="profile_pic">
-                        <img src="/static/images/img.jpg" alt="..." class="img-circle profile_img">
+    <div class="container body">
+        <div class="main_container">
+            <div class="col-md-3 left_col">
+                <div class="left_col scroll-view">
+                    <div class="navbar nav_title" style="border: 0;">
+                        <a href="/admin/dashboard" class="site_title">
+                            <img src="/static/img/core-img/android-icon-72x72.png" width="42" height="42"><span> TheSearchBase</span>
+                        </a>
+                        <br />
                     </div>
-                    <div class="profile_info">
-                        <span>Welcome,</span>
-                        <h2 id="userWelcomeName">user</h2>
+
+                    <div class="clearfix"></div>
+
+                    <!-- menu account quick info -->
+                    <div class="profile clearfix">
+                        <div class="profile_pic">
+                            <img src="/static/images/img.jpg" alt="..." class="img-circle profile_img">
+                        </div>
+                        <div class="profile_info">
+                            <span>Welcome,</span>
+                            <h2 id="userWelcomeName">user</h2>
+                        </div>
                     </div>
-                </div>
-                <!-- /menu account quick info -->
+                    <!-- /menu account quick info -->
 
-                <br/>
+                    <br />
 
-                {% block sidenav %}
+                    {% block sidenav %}
                     <!-- sidebar menu -->
                     <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
                         <div class="menu_section">
@@ -105,48 +106,51 @@
                                     <a href="/admin/dashboard"><i class="fa fa-home"></i> Dashboard</a>
                                 </li>
                                 <li id="chatbots">
-                                    <a><i class="fa fa-comments-o"></i> Assistants <span
-                                            class="fa fa-chevron-down"></span></a>
+                                    <a>
+                                        <i class="fa fa-comments-o"></i> Assistants <span class="fa fa-chevron-down"></span>
+                                    </a>
                                     <ul class="nav child_menu">
                                         {% if assistants|length > 0 %}
-                                            {% for assistant in assistants %}
-                                                <li><a>{{ assistant.Nickname }}<span
-                                                        class="fa fa-chevron-down"></span></a>
-                                                    <ul class="nav child_menu">
-                                                        <li>
-                                                            <a href="/admin/assistant/{{ assistant.ID }}/settings">Settings</a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="/admin/assistant/{{ assistant.ID }}/questions">Questions</a>
-                                                        </li>
-                                                        <li><a href="/admin/assistant/{{ assistant.ID }}/answers">Answers</a></li>
-                                                        <!--<li><a href="/admin/templates">Templates</a></li>-->
-                                                        <li>
-                                                            <a href="/admin/assistant/{{ assistant.ID }}/solutions">
-                                                                <i class="fa fa-database"></i>Products
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="/admin/assistant/{{ assistant.ID }}/userinput">
-                                                                <i class="fa fa-cloud"></i>User Input
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="/admin/assistant/{{ assistant.ID }}/analytics">
-                                                                <i class="fa fa-bar-chart"></i>Analytics
-                                                            </a>
-                                                        </li>
-                                                           <li>
-                                                            <a href="/admin/assistant/{{ assistant.ID }}/connect">
-                                                                <i class="fa fa-plug"></i>Connection
-                                                            </a>
-                                                        </li>
-                                                    </ul>
+                                        {% for assistant in assistants %}
+                                        <li>
+                                            <a>
+                                                {{ assistant.Nickname }}<span class="fa fa-chevron-down"></span>
+                                            </a>
+                                            <ul class="nav child_menu">
+                                                <li>
+                                                    <a href="/admin/assistant/{{ assistant.ID }}/settings">Settings</a>
                                                 </li>
-                                            {% endfor %}
-                                                <li><a href="/admin/assistant/create">Create another assistant</a></li>
+                                                <li>
+                                                    <a href="/admin/assistant/{{ assistant.ID }}/questions">Questions</a>
+                                                </li>
+                                                <li><a href="/admin/assistant/{{ assistant.ID }}/answers">Answers</a></li>
+                                                <!--<li><a href="/admin/templates">Templates</a></li>-->
+                                                <li>
+                                                    <a href="/admin/assistant/{{ assistant.ID }}/solutions">
+                                                        <i class="fa fa-database"></i>Products
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/admin/assistant/{{ assistant.ID }}/userinput">
+                                                        <i class="fa fa-cloud"></i>User Input
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/admin/assistant/{{ assistant.ID }}/analytics">
+                                                        <i class="fa fa-bar-chart"></i>Analytics
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/admin/assistant/{{ assistant.ID }}/connect">
+                                                        <i class="fa fa-plug"></i>Connection
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        {% endfor %}
+                                        <li><a href="/admin/assistant/create">Create another assistant</a></li>
                                         {% else %}
-                                            <li><a href="/admin/assistant/create">Create assistant</a></li>
+                                        <li><a href="/admin/assistant/create">Create assistant</a></li>
                                         {% endif %}
                                     </ul>
                                 </li>
@@ -172,8 +176,10 @@
                                         <li id="users"><a href="/admin/users">Additional Users</a></li>
                                     </ul>
                                 </li>
-                                <li id="billing"><a><i class="fa fa-money"></i> Billing <span
-                                        class="fa fa-chevron-down"></span></a>
+                                <li id="billing">
+                                    <a>
+                                        <i class="fa fa-money"></i> Billing <span class="fa fa-chevron-down"></span>
+                                    </a>
                                     <ul class="nav child_menu">
                                         <li><a href="/admin/pricing">Pricing Tables</a></li>
                                         <li><a href="/admin/adjustments">Adjustments</a></li>
@@ -194,8 +200,10 @@
                                                     <a href="/admin/support/setup">Getting setup</a>
                                                 </li>
                                                 <li>
-                                                    <a href="/admin/support/integration">Integration with your
-                                                        site</a>
+                                                    <a href="/admin/support/integration">
+                                                        Integration with your
+                                                        site
+                                                    </a>
                                                 </li>
                                             </ul>
                                         </li>
@@ -208,13 +216,13 @@
                         </div>
                     </div>
                     <!-- /sidebar menu -->
-                {% endblock %}
+                    {% endblock %}
 
+                </div>
             </div>
-        </div>
 
-        <!-- top navigation -->
-        {% block topnav %}
+            <!-- top navigation -->
+            {% block topnav %}
             <div class="top_nav">
                 <div class="nav_menu">
                     <nav>
@@ -245,97 +253,95 @@
                     </nav>
                 </div>
             </div>
-        {% endblock %}
-        <!-- /top navigation -->
-
-        <!-- page content -->
-
-        <!-- Modal -->
-        <button type="button" data-toggle="modal" data-target="#exampleModal" hidden id="showError"></button>
-        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="errorTitle"></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body" id="errorText"></div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Okay</button>
-              </div>
+            {% endblock %}
+            <!-- /top navigation -->
+            <!-- page content -->
+            <!-- Modal -->
+            <button type="button" data-toggle="modal" data-target="#exampleModal" hidden id="showError"></button>
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="errorTitle"></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" id="errorText"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Okay</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Modal -->
-        <button type="button" data-toggle="modal" data-target="#exampleModal1" hidden id="successShow"></button>
-        <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h3 class="modal-title bg-success" id="successTitle"></h3>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body" id="successText"></div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-success" data-dismiss="modal">Okay</button>
-              </div>
+            <!-- Modal -->
+            <button type="button" data-toggle="modal" data-target="#exampleModal1" hidden id="successShow"></button>
+            <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title bg-success" id="successTitle"></h3>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" id="successText"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success" data-dismiss="modal">Okay</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-        <script>
-            window.onload = function(e){
-                x=document.getElementsByClassName('right_col')[0]
-                y=document.getElementById('flash')
-
-                x.innerHTML = y.innerHTML + x.innerHTML
-                y.innerHTML = ''
-            }
-            var prev_handler = window.onload;
-        </script>
-        <div id="flash" hidden>
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
+            <script>
+                window.onload = function (e) {
+                    x = document.getElementsByClassName('right_col')[0]
+                    y = document.getElementById('flash')
+                    x.innerHTML = y.innerHTML + x.innerHTML
+                    y.innerHTML = ''
+                }
+                var prev_handler = window.onload;
+            </script>
+            <div id="flash" hidden>
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
                 <div class="col-md-12">
                     {% for message in messages %}
-                        {% if message.type %}
-                            <div class="alert alert-{{ message.type }}" role="alert">
-                                {{ message.msg }}
-                            </div>
-                        {% else %}
-                            <div class="alert alert-info" role="alert">
-                                {{ message }}
-                            </div>
-                        {% endif %}
+                    {% if message.type %}
+                    <div class="alert alert-{{ message.type }}" role="alert">
+                        {{ message.msg }}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
-            {% endif %}
-        {% endwith %}
-        </div>
-        {% block content %}
-        {% endblock %}
+                {% endif %}
+                {% endwith %}
+            </div>
+            {% block content %}
+            {% endblock %}
 
 
-        <!-- footer content -->
-        {% block footer %}
+            <!-- footer content -->
+            {% block footer %}
             <footer>
                 <div class="pull-right">
                     TheSearchBase 2018 All Rights Reserved.</a>
                 </div>
                 <div class="clearfix"></div>
             </footer>
-        {% endblock %}
-        <!-- /footer content -->
+            {% endblock %}
+            <!-- /footer content -->
+        </div>
     </div>
-</div>
 
     <!-- jQuery -->
-{#    <script src="/static/vendor/jquery/jquery-3.2.1.min.js"></script>#}
-<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    {#
+    <script src="/static/vendor/jquery/jquery-3.2.1.min.js"></script>#}
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
     <!-- jQuery Tags Input -->
     <script src="/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
     <!-- Bootstrap -->
@@ -373,36 +379,29 @@
 
 
     <script type="text/javascript">
-
-
         var errTitle = $("#errorTitle")
         var errText = $("#errorText")
         var errShow = $("#showError")
-
         var successTitle = $("#successTitle")
         var successText = $("#successText")
         var successShow = $("#successShow")
-        function alertError(name,text,type) {
-            if (type=='success') {
+        function alertError(name, text, type) {
+            if (type == 'success') {
                 // clear previous error message
                 successTitle.text('')
                 successText.html('')
-
                 successTitle.text(name)
                 successText.html(text)
                 successShow.click()
-
-            }else {
+            } else {
                 // clear previous error message
                 errTitle.text('')
                 errText.html('')
-
                 errTitle.text(name)
                 errText.html(text)
                 errShow.click()
             }
         }
-
         //get user's name
         params = "";
         var xhttp = new XMLHttpRequest();
@@ -415,7 +414,6 @@
                     console.log(res)
                     document.getElementById("userWelcomeName").innerHTML = res.name
                     document.getElementById("userDropdownLabel").innerHTML = res.name
-
                     if (!res.EditChatbots)
                         $("#chatbots").hide();
                     if (!res.EditUsers)
@@ -429,31 +427,21 @@
             }
         };
         xhttp.send(params);
-
-
         // Set SessionStorage which is similar to cookies in client-side
-        $.get({
-                url: '/admin/userData',
-                contentType: 'application/json'
-
-        }).done(function( res ) {
-
+        $.ajax({
+            method:'GET',
+            url: '/admin/userData',
+            contentType: 'application/json'
+        }).done(function (res) {
             sessionStorage.setItem('id', res.id);
             sessionStorage.setItem('firstname', res.firstname);
             sessionStorage.setItem('surname', res.surname);
             sessionStorage.setItem('email', res.email);
             sessionStorage.setItem('stripeID', res.stripeID);
             sessionStorage.setItem('subID', res.subID);
-
-         }).fail(function( err ) {
-
-           console.log(err)
-         })
-
-
-
-
-
+        }).fail(function (err) {
+            console.log(err)
+        })
     </script>
 
 

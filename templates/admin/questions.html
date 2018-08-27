@@ -80,12 +80,16 @@
 					  </button>
 					  <button id="QTemplate-ResetB" class="btn btn-primary">Reset</button>
 					</div>
+                    </form>
 
 					<!-- <div class="ln_solid"></div> -->
 				</div>
 			</div>
 		</div>
+        </div>
 	</div>
+        </div>
+        </div>
 {% endblock %}
 
 {% block customJS %}
@@ -184,7 +188,10 @@
                     method:'POST',
                     url:link,
                     contentType: "application/json",
-                    data:JSON.stringify(serverData)
+                    data:JSON.stringify(serverData),
+                    success:function (res) {
+                        location.reload();
+                    }
                 })
             }
         }

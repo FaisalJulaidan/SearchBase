@@ -14,6 +14,7 @@ class Company(db.Model):
     # Relationships:
     Users = db.relationship('User', back_populates='Company', cascade="all, delete, delete-orphan")
     Assistants = db.relationship('Assistant', back_populates='Company')
+    Roles = db.relationship('Role', back_populates='Company')
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)
@@ -50,11 +51,15 @@ class Role(db.Model):
 
     EditChatbots = db.Column(db.Boolean(), nullable=False, default=False)
     EditUsers = db.Column(db.Boolean(), nullable=False, default=False)
+    DeleteUsers = db.Column(db.Boolean(), nullable=False, default=False)
     AccessBilling = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
     # The User refers back to the relationship in Model.User NOT the table
     Users = db.relationship('User', back_populates="Role")
+
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID'), nullable=False)
+    Company = db.relationship('Company', back_populates='Roles')
 
     def __repr__(self):
         return '<Role {}>'.format(self.Name)

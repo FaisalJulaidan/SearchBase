@@ -22,7 +22,7 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
         return Callback(False, 'User already exists.')
 
     # Create a new user with its associated company and role
-    role_callback: Callback = role_services.getByName('Admin')
+    role_callback: Callback = role_services.getByName('Owner')
     if not role_callback.Success:
         return Callback(False, 'Role does not exist')
 

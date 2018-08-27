@@ -79,7 +79,8 @@ def delete_user(userID):
 
         # Check if the admin user is authorised for such an operation.
         if (not adminUser.Role.DeleteUsers) or\
-                userToBeDeleted.CompanyID != adminUser.CompanyID or\
+                userToBeDeleted.CompanyID != adminUser.CompanyID or \
+                userToBeDeleted.Role.Name == adminUser.Role.Name or \
                 userToBeDeleted.Role.Name == 'Owner':
             return json.dumps({'success': False, 'msg': "Sorry, You're not authorised"}), \
                    401, {'ContentType': 'application/json'}

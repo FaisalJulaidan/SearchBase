@@ -132,19 +132,19 @@ def genDummyData():
     admin = Role.query.filter(Role.Name == "Admin").first()
     user = Role.query.filter(Role.Name == "User").first()
 
-    user_services.create(firstname='Ahmad', surname='Hadi', verified=True, email='aa@aa.com', password='123',
-                         company=aramco, role=owner)
+    user_services.create(firstname='Ahmad', surname='Hadi', email='aa@aa.com', password='123',
+                         company=aramco, role=owner, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', company=aramco,
-                         role=admin)
+                         role=admin, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', company=aramco,
-                         role=user)
+                         role=user, verified=True)
 
     user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', company=sabic,
-                         role=owner)
+                         role=owner, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', company=sabic,
-                         role=user)
+                         role=user, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e6@e.com', password='123', company=sabic,
-                         role=user)
+                         role=user, verified=True)
 
     db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic'))
     db.session.add(Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate'))

@@ -19,7 +19,7 @@ $(document).on('submit', '#userForm', function (e) {
 function deleteUser(userID) {
     swal({
           title: "Are you sure?",
-          text: "User will be removed completely form the system",
+          text: "User will be removed completely from the system",
           icon: "warning",
           buttons: true,
           dangerMode: true,

@@ -1,63 +1,150 @@
 from flask import jsonify, json
-from services import user_services, admin_services
-from models import Callback, User
+from services import user_services, admin_services, role_services, company_services
+from models import Callback, User, Company
 from flask import Blueprint, request, redirect, session
 from utilties import helpers
 
 users_router: Blueprint = Blueprint('users_router', __name__ ,template_folder="../../templates")
 
 
-# Method for the users
+# Get all users for logged in company
 @users_router.route("/admin/users", methods=['GET'])
 def admin_users():
     if request.method == "GET":
-        callback: Callback = user_services.getAllByCompanyID(session.get('CompanyID', 0))
-        users = []
-        if callback.Success:
-            users = helpers.getListFromSQLAlchemyList(callback.Data)
+        users_callback: Callback = user_services.getAllByCompanyID(session.get('CompanyID', 0))
+        role_callback: Callback =  role_services.getAllByCompanyID(session.get('CompanyID', 0))
 
-        print(users)
+        roles = []
+        userWithRoles = []
+        if users_callback.Success and role_callback.Success:
+            users = helpers.getListFromSQLAlchemyList(users_callback.Data)
+            roles = helpers.getListFromSQLAlchemyList(role_callback.Data)
+            userWithRoles = helpers.mergeRolesToUserLists(users, roles)
 
-        return admin_services.render("admin/users.html", users=users)
+        return admin_services.render("admin/users.html", users=userWithRoles, roles=roles)
 
-@users_router.route("/admin/user/<userID>", methods=['PUT'])
-def update_user(userID):
-    if request.method == "PUT":
 
-        # Get the user to be edited.
-        if not userID: userID = 0
-        callback: Callback = user_services.getByID(userID)
-        if not callback.Success:
-            return json.dumps({'success': False, 'msg': "Sorry, but this user doesn't exist"}),\
-                   400, {'ContentType': 'application/json'}
-        userToBeEdited: User = callback.Data
+# Create a new user under the logged in user's company
+@users_router.route("/admin/user", methods=['POST'])
+def admin_users_add():
+    if request.method == "POST":
 
-        # Get the admin user who is logged in and wants to edit.
+        # Get the admin user who is logged in and wants to create a new user.
         callback: Callback = user_services.getByID(session.get('UserID', 0))
         if not callback.Success:
             return json.dumps({'success': False, 'msg': "Sorry, error occurred. Try again please!"}), \
                    400, {'ContentType': 'application/json'}
         adminUser: User = callback.Data
 
+        # Check if the admin user is authorised to create a new user.
+        if not adminUser.Role.EditUsers:
+            return json.dumps({'success': False, 'msg': "Sorry, You're not authorised to create a user"}), \
+                   401, {'ContentType': 'application/json'}
+
+        # If authorised then complete the process
+        # Get submitted user info
+        firstname = request.form.get("firstname", default='').strip()
+        surname = request.form.get("surname", default='').strip()
+        email = request.form.get("email", default='').strip()
+        role = request.form.get("role", default='').strip()
+
+        # Check if info valid
+        if not helpers.isStringsLengthGreaterThanZero(firstname, surname, email, role):
+            return json.dumps({'success': False, 'msg': "Please provide all required info for the new user."}), \
+                   400, {'ContentType': 'application/json'}
+
+        # Validate the given email
+        if not helpers.isValidEmail(email):
+            return json.dumps({'success': False, 'msg': "Please provide a valid email."}), \
+                   400, {'ContentType': 'application/json'}
+
+        # Check if email is already used
+        user: User = user_services.getByEmail(email).Data
+        if user:
+            return json.dumps({'success': False, 'msg': 'Email is already on use.'}), \
+                   400, {'ContentType': 'application/json'}
+
+        # Get the role to be assigned for the user
+        callback: Callback = role_services.getByNameAndCompanyID(role, adminUser.Company.ID)
+        if not callback.Success:
+            return json.dumps({'success': False, 'msg': role + " role does not exist."}), \
+                   400, {'ContentType': 'application/json'}
+        role = callback.Data
+
+        # Create the new user for the company
+        callback: Callback = user_services.create(firstname, surname, email, 'passwordToBeChanged',
+                                                  adminUser.Company, role, verified=True)
+        if not callback.Success:
+            return json.dumps({'success': False, 'msg': " Sorry couldn't create the user. Try again!"}), \
+                   400, {'ContentType': 'application/json'}
+
+        print('new user > success!')
+        return json.dumps({'success': True, 'msg': " User has been created successfully!"}), \
+                   200, {'ContentType': 'application/json'}
+
+
+# Update user with id <userID>
+@users_router.route("/admin/user/<userID>", methods=['PUT'])
+def update_user(userID):
+    if request.method == "PUT":
+
+        # User info
+        firstname = request.form.get("firstname", default='').strip()
+        surname = request.form.get("surname", default='').strip()
+        email = request.form.get("email", default='').strip()
+        role = request.form.get("role", default='').strip()
+
+        if not helpers.isStringsLengthGreaterThanZero(firstname, surname, email, role):
+            return json.dumps({'success': False, 'msg': "Please provide all required info for the new user."}), \
+                   400, {'ContentType': 'application/json'}
+
+        # Validate the given email
+        if not helpers.isValidEmail(email):
+            return json.dumps({'success': False, 'msg': "Please provide a valid email."}), \
+                   400, {'ContentType': 'application/json'}
+
+        # Get the user to be updated.
+        if not userID: userID = 0
+        callback: Callback = user_services.getByID(userID)
+        if not callback.Success:
+            return json.dumps({'success': False, 'msg': "Sorry, but this user doesn't exist"}),\
+                   400, {'ContentType': 'application/json'}
+        userToUpdate: User = callback.Data
+
+        # Get the admin user who is logged in and wants to edit.
+        callback: Callback = user_services.getByID(session.get('UserID', 0))
+        if not callback.Success:
+            return json.dumps({'success': False, 'msg': "Sorry, you account doesn't exist. Try again please!"}), \
+                   400, {'ContentType': 'application/json'}
+        adminUser: User = callback.Data
+
         # Check if the admin user is authorised for such an operation.
         if (not adminUser.Role.EditUsers) or \
-                userToBeEdited.CompanyID != adminUser.CompanyID or \
-                userToBeEdited.Role.Name == adminUser.Role.Name or \
-                userToBeEdited.Role.Name == 'Owner':
+                userToUpdate.CompanyID != adminUser.CompanyID or \
+                userToUpdate.Role.Name == adminUser.Role.Name or \
+                userToUpdate.Role.Name == 'Owner':
             return json.dumps({'success': False, 'msg': "Sorry, You're not authorised"}), \
                    401, {'ContentType': 'application/json'}
 
-        # Edit the user
-        callback: Callback = user_services.updateAsOwner(userToBeEdited.ID)
+
+        # Get the role to be assigned for the userToUpdate
+        callback: Callback = role_services.getByNameAndCompanyID(role, adminUser.Company.ID)
         if not callback.Success:
-            return json.dumps({'success': False, 'msg': "Sorry, error occurred. Try again please!"}), \
-               500, {'ContentType': 'application/json'}
+            return json.dumps({'success': False, 'msg': role + " role does not exist."}), \
+                   400, {'ContentType': 'application/json'}
+        role = callback.Data
 
-        print("Success.  " + userID)
+        # Update the user (userToUpdate)
+        callback: Callback = user_services.updateAsOwner(userToUpdate.ID, firstname, surname, email, role)
+        if not callback.Success:
+            return json.dumps({'success': False, 'msg': " Sorry couldn't update the user. Please try again!"}), \
+                   400, {'ContentType': 'application/json'}
 
-        return json.dumps({'success':True, 'msg': "User deleted successfully!"}),\
+        print("Success >> user updated")
+        return json.dumps({'success':True, 'msg': "User updated successfully!"}),\
                200,\
                {'ContentType':'application/json'}
+
 
 @users_router.route("/admin/user/<userID>", methods=['DELETE'])
 def delete_user(userID):
@@ -99,75 +186,16 @@ def delete_user(userID):
                {'ContentType':'application/json'}
 
 
-@users_router.route("/admin/users/get", methods=['GET'])
-def admin_get_users():
-    if request.method == "GET":
-        callback: Callback = user_services.getAllByCompanyID(session.get('CompanyID', 0))
-        users = []
-        if callback.Success:
-            users = helpers.getListFromSQLAlchemyList(callback.Data)
-
-        print(users)
-    return jsonify(users)
-
-
-@users_router.route("/admin/users/add", methods=['POST'])
-def admin_users_add():
-    if request.method == "POST":
-        numberOfCompanyUsers = count_db("Users", " WHERE CompanyID=?", [session.get('User')['CompanyID'], ])
-        if numberOfCompanyUsers >= session['UserPlan']['Settings']['AdditionalUsersCap'] + 1:
-            return redirectWithMessage("admin_users", "You have reached the max amount of additional Users - " + str(
-                session['UserPlan']['Settings']['AdditionalUsersCap']) + ".")
-        email = session.get('User')['Email']
-        companyID = session.get('User')['CompanyID']
-        fullname = request.form.get("fullname", default="Error")
-        accessLevel = request.form.get("accessLevel", default="Error")
-        newEmail = request.form.get("email", default="Error")
-        password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
-        # Generates a random password
-
-        if fullname == "Error" or accessLevel == "Error" or newEmail == "Error":
-            return redirectWithMessage("admin_users", "Error in retrieving all textbox inputs.")
-        else:
-            newEmail = newEmail.lower()
-            users = query_db("SELECT * FROM Users")
-            # If user exists
-            for record in users:
-                if record["Email"] == newEmail:
-                    return redirectWithMessage("admin_users", "Email is already in use!")
-            try:
-                firstname = fullname.split(" ")[0]
-                surname = fullname.split(" ")[1]
-            except IndexError as e:
-                return redirectWithMessage("admin_users", "Error in retrieving both names.")
-            hashed_password = hash_password(password)
-
-            # ENCRYPTION
-            insertUserResponse = insert_into_database_table(
-                "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
-                (companyID, encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(newEmail),
-                 hashed_password, "False"))
-            # insertUserResponse = insert_into_database_table(
-            #   "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
-            #  (companyID, firstname, surname, accessLevel, newEmail, hashed_password, "True"))
-            if "added" not in insertUserResponse:
-                return redirectWithMessage("admin_users", "Error in adding user to our records.")
-            else:
-                # if not app.debug:
-
-                # sending email to the new user.
-                # TODO this needs improving
-                link = "https://www.thesearchbase.com/admin/changepassword"
-                msg = Message("Account verification, " + firstname + " " + surname,
-                              sender="thesearchbase@gmail.com",
-                              recipients=[newEmail])
-                msg.html = "<h4>Hi, <h4> <br /> <p>You have been registered with TheSearchBase by an admin at your company.<br> \
-                            To get access to the platform, we have generated a temporary password for you to access the platform.</p> <br /> \
-                            <h4>Your temporary password is: " + password + ".<h4><br />\
-                            Please visit <a href='" + link + "'>this link</a> to sign in and to set the password for your account.<p><br /> If you feel this is a mistake please contact " + email + ". <br /> <br / > Regards, TheSearchBase Team"
-                mail.send(msg)
-                return redirectWithMessage("admin_users",
-                                           "User has been added. A temporary password has been emailed to them.")
+# @users_router.route("/admin/users/get", methods=['GET'])
+# def admin_get_users():
+#     if request.method == "GET":
+#         callback: Callback = user_services.getAllByCompanyID(session.get('CompanyID', 0))
+#         users = []
+#         if callback.Success:
+#             users = helpers.getListFromSQLAlchemyList(callback.Data)
+#
+#         print(users)
+#     return jsonify(users)
 
 
 @users_router.route("/admin/users/modify", methods=["POST"])

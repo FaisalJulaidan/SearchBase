@@ -50,7 +50,7 @@ def getPlanNickname(SubID=None):
 
 def isValidEmail(email: str) -> bool:
     # Validate the email address using a regex.
-    if not re.match("[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}", email):
+    if not re.match("^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", email):
         return False
     return True
 
@@ -65,3 +65,20 @@ def getListFromSQLAlchemyList(SQLAlchemyList):
     return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
 
 
+def mergeRolesToUserLists(users: list, roles: list):
+    for user in users:
+        if 'Role' not in user:
+            for role in roles:
+                if user['RoleID'] == role['ID']:
+                    user['Role']= role
+                    break
+                else:
+                    user['Role']= None
+    return users
+
+
+def isStringsLengthGreaterThanZero(*args):
+    for arg in args:
+        if len(arg.strip()) == 0:
+            return False
+    return True

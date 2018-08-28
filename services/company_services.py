@@ -6,7 +6,21 @@ from flask import session
 
 
 def getByID(id) -> Company or None:
-    return db.session.query(Company).get(id)
+    try:
+        if id:
+            # Get result and check if None then raise exception
+            result = db.session.query(Company).get(id)
+            if not result: raise Exception
+
+            return Callback(True,
+                            'Company with ID ' + str(id) + ' was successfully retrieved',
+                            result)
+        else:
+            raise Exception
+    except Exception as exc:
+        return Callback(False,
+                        'Company with ID ' + str(id) + ' does not exist')
+
 
 def getAll() -> list:
     return db.session.query(Company)

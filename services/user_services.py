@@ -75,10 +75,10 @@ def getAllByCompanyID_safe(companyID) -> Callback:
 def create(firstname, surname, email, password, company: Company, role: Role, verified=False) -> Callback:
     try:
         # Create a new user with its associated company and role
-        user = User(Firstname=firstname, Surname=surname, Email=email, Verified=verified,
+        newUser = User(Firstname=firstname, Surname=surname, Email=email, Verified=verified,
                     Password=helpers.hashPass(password), Company=company,
                     Role=role)
-        db.session.add(user)
+        db.session.add(newUser)
 
     except Exception as exc:
         print(exc)
@@ -86,10 +86,10 @@ def create(firstname, surname, email, password, company: Company, role: Role, ve
         return Callback(False, 'Sorry, Could not create the user.')
     # Save
     db.session.commit()
-    return Callback(True, 'User has been created successfully!')
+    return Callback(True, 'User has been created successfully!', newUser)
 
 
-def updateAsOwner(userID, firstname, surname, email, password, role: Role) -> Callback:
+def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
     try:
         # Create a new user with its associated company and role
         user_callback: Callback = getByID(userID)
@@ -101,7 +101,6 @@ def updateAsOwner(userID, firstname, surname, email, password, role: Role) -> Ca
         user.Firstname = firstname
         user.Surname = surname
         user.Email = email
-        user.Password = password
         user.Role = role
 
     except Exception as exc:

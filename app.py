@@ -128,23 +128,27 @@ def genDummyData():
     db.session.add(Role(Name="Admin", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
     db.session.add(Role(Name="User", Company= sabic, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
 
-    owner = Role.query.filter(Role.Name == "Owner").first()
-    admin = Role.query.filter(Role.Name == "Admin").first()
-    user = Role.query.filter(Role.Name == "User").first()
+    owner_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "Owner").first()
+    admin_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "Admin").first()
+    user_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "User").first()
+
+    owner_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "Owner").first()
+    admin_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "Admin").first()
+    user_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "User").first()
 
     user_services.create(firstname='Ahmad', surname='Hadi', email='aa@aa.com', password='123',
-                         company=aramco, role=owner, verified=True)
+                         company=aramco, role=owner_aramco, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', company=aramco,
-                         role=admin, verified=True)
+                         role=admin_aramco, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', company=aramco,
-                         role=user, verified=True)
+                         role=user_aramco, verified=True)
 
     user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', company=sabic,
-                         role=owner, verified=True)
+                         role=owner_sabic, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', company=sabic,
-                         role=user, verified=True)
+                         role=admin_sabic, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e6@e.com', password='123', company=sabic,
-                         role=user, verified=True)
+                         role=user_sabic, verified=True)
 
     db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic'))
     db.session.add(Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate'))

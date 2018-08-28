@@ -13,29 +13,35 @@ from utilties import helpers
 def signup(email, firstname, surname, password, companyName, companySize, companyPhoneNumber, websiteURL) -> Callback:
 
     # Validate Email
-    if helpers.isValidEmail(email):
+    if not helpers.isValidEmail(email):
         return Callback(False, 'Invalid Email.')
 
     # Check if user exists
-    user_callback = user_services.getByEmail(email).Data
-    if user_callback:
+    user = user_services.getByEmail(email).Data
+    if user:
         return Callback(False, 'User already exists.')
 
-    # Create a new user with its associated company and role
-    role_callback: Callback = role_services.getByName('Owner')
-    if not role_callback.Success:
-        return Callback(False, 'Role does not exist')
-
     company = Company(Name=companyName, Size=companySize, PhoneNumber=companyPhoneNumber, URL=websiteURL)
-    user_callback = user_services.create(firstname, surname, email, password, company, role_callback.Data)
+
+    # Create owner, admin, user roles for the new company
+    ownerRole: Callback = role_services.create('Owner', True, True, True, True, company)
+    adminRole: Callback = role_services.create('Admin', True, True, True, False, company)
+    userRole: Callback = role_services.create('User', True, False, False, False, company)
+    if not (ownerRole.Success or adminRole.Success or userRole.Success) :
+        return Callback(False, 'Could create roles for the new user.')
+
+    # Create a new user with its associated company and owner role
+    user_callback = user_services.create(firstname, surname, email, password, company, ownerRole.Data)
 
     # Subscribe to basic plan with 14 trial days
     sub_callback: Callback = sub_services.subscribe(email=email, planID='plan_D3lp2yVtTotk2f', trialDays=14)
 
     # If subscription failed, remove the new created company and user
     if not sub_callback.Success:
+        role_services.removeAllByCompany(company)
         company_services.removeByName(companyName)
         user_services.removeByEmail(email)
+
         return sub_callback
 
     # ###############

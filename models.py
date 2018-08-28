@@ -61,6 +61,9 @@ class Role(db.Model):
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID'), nullable=False)
     Company = db.relationship('Company', back_populates='Roles')
 
+    # Constraints:
+    db.UniqueConstraint('Name', 'CompanyID', name='uix1_role')
+
     def __repr__(self):
         return '<Role {}>'.format(self.Name)
 
@@ -83,7 +86,7 @@ class Assistant(db.Model):
     Questions = db.relationship('Question', back_populates='Assistant')
 
     # Constraints:
-    db.UniqueConstraint('CompanyID', 'Nickname', name='uix_1')
+    db.UniqueConstraint('CompanyID', 'Nickname', name='uix1_assistant')
 
 
     def __repr__(self):

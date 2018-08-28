@@ -23,7 +23,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
 
-                    <button type="button" class="btn btn-success" onclick="handleUserForm(edit=false)">Create new user</button>
+                    <button type="button" class="btn btn-success" onclick="fillUserForm(edit=false)">Create new user</button>
                     <div class="table-responsive">
                        <table id="usersTable" class="table" cellspacing="0" width="100%">
                             <thead>
@@ -45,20 +45,13 @@
                                     <td data-type="firstname">{{ user.Firstname }}</td>
                                     <td data-type="surname">{{ user.Surname }}</td>
                                     <td data-type="email">{{ user.Email }}</td>
-
-                                    {% if user.RoleID == 1 %}
-                                    <td data-type="role">Owner</td>
-                                    {% elif user.RoleID == 2 %}
-                                    <td data-type="role">Admin</td>
-                                    {% else %}
-                                    <td data-type="role">User</td>
-                                    {% endif %}
+                                    <td data-type="role">{{ user.Role.Name }}</td>
 
                                     <td>
-                                        {% if user.RoleID != 1 %}
+                                        {% if user.Role.Name != 'Owner' %}
                                         <button type="button" class="btn btn-primary"
                                                 data-toggle="modal"
-                                                onclick="handleUserForm({{ user.ID }}, edit=true)">Edit</button>
+                                                onclick="fillUserForm({{ user.ID }}, edit=true)">Edit</button>
                                         <button type="button" class="btn btn-danger" onclick="deleteUser({{ user.ID }})">Delete</button>
                                         {% endif %}
                                     </td>

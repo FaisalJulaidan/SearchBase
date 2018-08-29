@@ -61,7 +61,6 @@ def getAllByCompanyID_safe(companyID) -> Callback:
                                   User.Email,
                                   User.LastAccess)\
             .filter(User.CompanyID == companyID).all()
-        print(result)
         if not result: raise Exception
 
         return Callback(True,

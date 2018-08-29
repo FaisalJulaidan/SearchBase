@@ -32,6 +32,7 @@ def unsubscribe(email) -> Callback:
         return Callback(True, 'You have unsubscribe successfully!')
 
     except Exception as e:
+        db.session.rollback()
         return Callback(False, 'An error occurred while trying to unsubscribe')
 
 
@@ -99,6 +100,7 @@ def subscribe(email, planID, trialDays=None, token=None, coupon=None) -> Callbac
 
 
     except Exception as e:
+        db.session.rollback()
         return Callback(False, 'An error occurred while subscribing with Stripe')
 
     return Callback(True, 'Subscribed successfully', {'stripeID': customer['id'],
@@ -115,6 +117,7 @@ def getPlanByID(planID) -> Callback:
         return Callback(True, 'Plan found.',
                         result)
     except Exception as e:
+        db.session.rollback()
         return Callback(False, 'Could not find a plan with ID ' + planID)
 
 
@@ -127,6 +130,7 @@ def getPlanByNickname(nickname) -> Callback:
         return Callback(True, 'No message.',
                         result)
     except Exception as e:
+        db.session.rollback()
         return Callback(False, 'Could not find a plan with ' + nickname + ' nickname')
 
 
@@ -138,6 +142,7 @@ def getStripePlan(planID) -> Callback:
 
         return Callback(True, 'No message.', result)
     except Exception as e:
+        db.session.rollback()
         return Callback(False, "This plan doesn't exist! Make sure the plan ID is correct.")
 
 
@@ -153,6 +158,7 @@ def getStripePlanNicknameBySubID(SubID):
         return Callback(True, 'No message.', result)
 
     except Exception as e:
+        db.session.rollback()
         return Callback(False, 'Could not find plan nickname form Stripe')
 
 

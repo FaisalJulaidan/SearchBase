@@ -39,7 +39,7 @@ def getPlanNickname(SubID=None):
         subscription = stripe.Subscription.retrieve(SubID)
 
         # Debug
-        print(subscription)
+        # print(subscription)
 
         # Return the subscription item's plan nickname e.g (Basic, Ultimate...)
         return subscription["items"]["data"][0]["plan"]["nickname"]
@@ -53,6 +53,7 @@ def isValidEmail(email: str) -> bool:
     if not re.match("^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", email):
         return False
     return True
+
 
 # Convert a SQLAlchemy object to a single dict
 def getDictFromSQLAlchemyObj(obj):

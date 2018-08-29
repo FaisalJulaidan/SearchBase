@@ -49,6 +49,7 @@ function deleteUser(userID) {
 
  }
 
+ // ----- Users ----
 function submitEditUserForm(form,userID, event) {
     console.log('EDIT USER.');
      $.ajax({
@@ -114,20 +115,56 @@ $(document).on('hide.bs.modal', '#userModal', function (e) {
     $(document).off('submit', '#userForm');
 });
 
- // $.post({
- //        url: '/admin/user/' + userID,
- //        contentType: 'application/json',
- //        data: JSON.stringify({
- //            token: result.token,
- //            coupon: $(document.getElementById('promoCode')).val()
- //        }),
- //        success: (res) => {
- //            if (res.error) {
- //                alertError('Error', '<h2> ' + res.error)
- //            } else {
- //                example.classList.add('submitted');
- //
- //
- //            }
- //        }
- //    });
+
+
+ // ----- Roles ----
+
+
+// Bind the appropriate handler for roles form submission
+    $(document).on('submit', '#rolesForm', function (e) {
+        e.preventDefault();
+        submitRolesForm(this);
+    });
+
+
+function submitRolesForm(form) {
+    console.log('Update USER.');
+    data = [];
+
+    // Iterate through each row and get checkboxes values
+    $('table#rolesTable > tbody > tr').each(function (i, row) {
+        $row = $(row);
+        console.log( );
+        data.push({
+            ID: $row.attr('data-rowID'),
+            EditChatbots: $row.find('input[name="editChatbots"]').is(":checked"),
+            EditUsers: $row.find('input[name="editUsers"]').is(":checked"),
+            DeleteUsers: $row.find('input[name="deleteUsers"]').is(":checked"),
+            AccessBilling: $row.find('input[name="accessBilling"]').is(":checked"),
+        })
+    });
+
+    console.log( data );
+
+     $.ajax({
+        url: '/admin/roles',
+        type: "PUT",
+        data: {data: JSON.stringify(data)}
+    }).done(function (res) {
+        console.log(res);
+        swal("Success!", "Roles has been updated successfully", "success").then((value) => {
+          document.location.reload()
+        });
+    }).fail(function (res) {
+        let resJson = JSON.parse(res.responseText);
+        swal("Error!", resJson.msg, "error").then((value) => {
+             document.location.reload()
+        });
+    });
+}
+
+
+
+
+
+

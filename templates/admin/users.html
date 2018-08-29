@@ -53,6 +53,10 @@
                                                 data-toggle="modal"
                                                 onclick="fillUserForm({{ user.ID }}, edit=true)">Edit</button>
                                         <button type="button" class="btn btn-danger" onclick="deleteUser({{ user.ID }})">Delete</button>
+
+                                        {% else %}
+                                        <button type="button" class="btn btn-primary" disabled>Edit</button>
+                                        <button type="button" class="btn btn-danger" disabled>Delete</button>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -74,7 +78,75 @@
                     </div>
                 </div>
 
-                 <!-- Modal -->
+
+        <div class="">
+                <div class="page-title">
+                    <div class="title_left">
+                        <h3>Roles</h3>
+                    </div>
+                </div>
+
+                <div class="clearfix"></div>
+
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="x_panel">
+                            <table id="rolesTable" class="table" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Role</th>
+                                        <th>Edit Chatbots</th>
+                                        <th>Edit Users</th>
+                                        <th>Delete Users</th>
+                                        <th>Access Billing</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                 <form id="rolesForm">
+                                    {% if roles|length > 0 %}
+                                    {% for role in roles %}
+                                    <tr data-rowID={{ role.ID }}>
+                                        <td data-type="id">{{ role.ID }}</td>
+                                        <td data-type="name">{{ role.Name }}</td>
+                                        <td data-type="editChatbots">
+                                            <label class="checkbox-inline">
+                                            <input type="checkbox" name="editChatbots" {% if role.EditChatbots %} checked {% endif %}>
+                                            </label>
+                                        </td>
+
+                                        <td data-type="editUsers">
+                                            <label class="checkbox-inline">
+                                            <input type="checkbox" name="editUsers" {% if role.EditUsers %} checked {% endif %}>
+                                            </label>
+                                        </td>
+
+                                        <td data-type="deleteUsers">
+                                            <label class="checkbox-inline">
+                                            <input type="checkbox" name="deleteUsers" {% if role.DeleteUsers %} checked {% endif %}>
+                                            </label>
+                                        </td>
+
+                                        <td data-type="accessBilling">
+                                            <label class="checkbox-inline">
+                                            <input type="checkbox"  name="accessBilling" {% if role.AccessBilling %} checked {% endif %}>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+                                    <button type="submit" class="btn btn-success" onclick="submitRolesForm()">Update Roles</button>
+                                 </form>
+                                </tbody>
+                        </table>
+                        </div>
+
+
+
+
+
+                 <!-- User Modal -->
                 <div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userModalCenterTitle" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">

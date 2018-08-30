@@ -1666,51 +1666,6 @@ def change_password():
                                    msg="Account not verified, please check your email and follow instructions")
 
 
-# Sitemap route
-@app.route('/robots.txt')
-@app.route('/sitemap.xml')
-def static_from_root():
-    return send_from_directory(app.static_folder, request.path[1:])
-
-
-# Terms and conditions page route
-@app.route("/termsandconditions", methods=['GET'])
-def terms_and_conditions():
-    if request.method == "GET":
-        return render_template("terms.html")
-
-
-@app.route("/privacy", methods=['GET'])
-def privacy():
-    if request.method == "GET":
-        return render_template("privacy-policy.html")
-
-
-# Affiliate page route
-@app.route("/affiliate", methods=['GET'])
-def affiliate():
-    if request.method == "GET":
-        abort(status.HTTP_501_NOT_IMPLEMENTED, "Affiliate program coming soon")
-        # return render_template("affiliate.html")
-
-
-@app.route("/send/mail", methods=['GET', 'POST'])
-def sendEmail():
-    if request.method == "GET":
-        return render_template("index.html")
-    if request.method == "POST":
-        mailFirstname = request.form.get("sendingName", default="Error")
-        mailUserEmail = request.form.get("sendingEmail", default="Error")
-        mailUserMessage = request.form.get("sendMessage", default="Error")
-
-        msg = Message(mailFirstname + " from " + mailUserEmail + " has sent you a message.",
-                      sender=mailUserEmail,
-                      recipients=["thesearchbase@gmail.com"])
-        msg.body = mailFirstname + " said: " + mailUserMessage + " their email is: " + mailUserEmail
-        mail.send(msg)
-        return render_template("index.html")
-
-
 @app.route("/send/mailtop", methods=['GET', 'POST'])
 def sendMarketingEmail():
     if request.method == "GET":

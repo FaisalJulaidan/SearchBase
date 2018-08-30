@@ -13,6 +13,21 @@ def getByAssistantID(assistantID):
         return Callback(False,
                         'Could not get questions by assistant id.')
 
+def getUserInput(assistantID):
+    try:
+        result = db.session.query(Question)\
+            .filter(Question.AssistantID == assistantID)\
+            .filter(Question.Type == "userInfoRetrieval")\
+            .all()
+
+        return Callback(True,
+                        "Got questions successfully.",
+                        result)
+    except Exception as exc:
+        print(exc)
+        return Callback(False,
+                        'Could not get questions by assistant id.')
+
 def reset(assistantID):
     try:
         db.session.query(Question).filter(Question.AssistantID == assistantID).delete()

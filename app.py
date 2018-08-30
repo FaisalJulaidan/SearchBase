@@ -20,14 +20,14 @@ from cryptography.fernet import Fernet
 import urllib.request
 
 
-from models import db, Role, Company, Assistant, Plan, Statistics, Question
+from models import db, Role, Company, Assistant, Plan, Statistics, Question, Answer
 from services.mail_services import mail
 
 # Import all routers to register them as blueprints
 
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
     products_router, questions_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
-    changePassword_router
+    changePassword_router, answers_router
 
 from routes.public.routers import public_router, resetPassword_router
 from services import user_services, mail_services
@@ -48,6 +48,7 @@ app.register_blueprint(connection_router)
 app.register_blueprint(userInput_router)
 app.register_blueprint(changePassword_router)
 app.register_blueprint(users_router)
+app.register_blueprint(answers_router)
 
 
 # code to ensure user is logged in
@@ -112,6 +113,10 @@ def genDummyData():
 
         db.session.add(
             Question(Question="how old are you?", Type="userInfoRetrieval", Assistant=assistant))
+        for q in assistant.Questions:
+            db.session.add(
+                Answer(Answer="yes", Keyword="jeddah,khaled", Action="", TimesClicked=12, Question=q))
+
         db.session.add(
             Question(Question="how do you do?", Type="dbRetrieval", Assistant=assistant))
 
@@ -575,107 +580,6 @@ def admin_questions(assistantID):
                              return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 3 Error in updating questions!")
 
                 return redirect("/admin/assistant/{}/questions".format(assistantID))
-
-
-# TODO rewrite
-@app.route("/admin/assistant/<assistantID>/answers", methods=['GET', 'POST'])
-def admin_answers(assistantID):
-    checkAssistantID(assistantID)
-    if request.method == "GET":
-        message = checkForMessageWhenAssistantID()
-        email = session.get('User')['Email']
-        company = get_company(email)
-        if company is None or "Error" in company:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO handle this better
-        else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?", [assistantID, company[0]])
-            if assistant is None:
-                abort(status.HTTP_404_NOT_FOUND)
-            elif "Error" in assistant:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            else:
-                questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;", [assistantID], True)
-                # TODO check questionstuple for errors
-                questions = []
-                for i in range(0, len(questionsTuple)):
-                    questions.append(questionsTuple[i][2] + ";" + questionsTuple[i][3])
-
-                allAnswers = {}
-                for i in range(0, len(questions)):
-                    answersTuple = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;", [questionsTuple[i][0]], True)
-                    # TODO Check answerstuple for errors
-                    answers = []
-                    for j in range(0, len(answersTuple)):
-                        answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][5])
-
-                    allAnswers[questions[i]] = answers
-
-                questionsAndAnswers = []
-                for i in range(0, len(questions)):
-                    question = []
-                    question.append(questions[i])
-                    merge = tuple(question)
-                    answers = allAnswers[questions[i]]
-                    for j in range(0, len(answers)):
-                        answer = []
-                        answer.append(answers[j])
-                        merge = merge + tuple(answer)
-                    questionsAndAnswers.append(merge)
-                return render("admin/answers.html", msg=questionsAndAnswers, id=assistantID, message=message)
-    elif request.method == "POST":
-        email = session.get('User')['Email']
-        company = get_company(email)
-        if company is None or "Error" in company:
-            return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting company's records!")
-        else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-                                                   [assistantID, company[0]])
-            if assistant is None or "Error" in assistant:
-                return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting assistant's records!")
-            else:
-                selected_question = request.form.get("question", default="Error")  # question_text;question_type
-                if "Error" in selected_question:
-                    return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting selected question!")
-
-                question = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=? AND Question=?;",
-                                                      [assistantID, selected_question.split(";")[0]])
-                if question is None or "Error" in question:
-                    return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting question's records")
-
-                questionID = question[0]
-                currentAnswers = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;", [questionID])
-                if currentAnswers is None or "Error" in currentAnswers:
-                    return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting old answers!")
-                if (currentAnswers is not None):
-                    deleteOldQuestions = delete_from_table("DELETE FROM Answers WHERE QuestionID=?;", [questionID])
-                    if deleteOldQuestions is None or "Error" in deleteOldQuestions:
-                        return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in deleting old answers!")
-
-                noa = 1
-                for key in request.form:
-                    if "pname" in key:
-                        noa += 1
-
-                for i in range(1, noa):
-                    answer = request.form.get("pname" + str(i), default="Error")
-                    try:
-                        keyword = request.form.getlist("keywords" + str(i))
-                    except:
-                        keyword = "Error"
-                    keyword = ','.join(keyword)
-                    action = request.form.get("action" + str(i), default="None")
-                    if action != "Next Question by Order" and not session['UserPlan']['Settings']['ExtendedLogic']:
-                        return redirectWithMessageAndAssistantID("admin_answers", assistantID, "It appears you tried to access extended logic without having access to it. Action aborted!")
-                    if "Error" in answer or "Error" in keyword or "Error" in action:
-                        return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting your input.")
-                    insertAnswer = insert_into_database_table(
-                        "INSERT INTO Answers (QuestionID, Answer, Keyword, Action) VALUES (?,?,?,?);",
-                        (questionID, answer, keyword, action))
-                    if insertAnswer is None or "Error" in insertAnswer:
-                        return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in updating answers!")
-
-                return redirect("/admin/assistant/{}/answers".format(assistantID)+"?res="+str(noa)+"")
 
 
 @app.route("/admin/assistant/<assistantID>/products", methods=['GET', 'POST'])

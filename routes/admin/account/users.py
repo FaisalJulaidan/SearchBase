@@ -42,7 +42,7 @@ def update_roles():
                         role.AccessBilling = newRole['AccessBilling']
             # Save changes
             db.session.commit()
-            
+
         except Exception as e:
             db.session.rollback()
             return json.dumps({'success': False, 'msg': "An error occurred! Try again please."}), \

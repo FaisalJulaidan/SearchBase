@@ -24,25 +24,31 @@ def admin_solutions(assistantID):
 
     elif request.method == 'POST':
         companyID = session.get('CompanyID', None)
-        if not companyID: return helpers.redirectWithMessage("admin_solutions", "Could not retrive company's ID")
+        if not companyID: return helpers.redirectWithMessage("admin_solutions", "Could not retrieve company's ID")
 
-        #get all company assistants (needed for totalproducts check)
+        # Get all company assistants (needed for totalproducts check)
         assistant_callback : Callback = assistant_services.getAll(companyID)
         if not assistant_callback.Success: return helpers.redirectWithMessageAndAssistantID("admin_solutions", assistantID, assistant_callback.Message)
 
-        #get all previous solutions
+        # Get all previous solutions
         solutions_callback: Callback = solutions_services.getByAssistantID(assistantID)
         currentSolutions = solutions_callback.Data
         if not solutions_callback.Success: solutions_callback.Data = []
         #currentProducts -> solutions_callback
 
-        #delete old solutions so the new one can be put it
+        # Delete old solutions so the new one can be put it
         deleteOldData : bool = solutions_services.deleteAllByAssistantID(assistantID)
         if not deleteOldData: 
-            solutions_services.addOldByAssitantID(assistantID, "Could not delete old data in order to put the new one. Old records were lost.", currentSolutions)
-            return helpers.redirectWithMessageAndAssistantID("admin_solutions", assistantID, "Could not delete old data in order to put the new one. Old records are restored")
+            solutions_services.addOldByAssitantID(assistantID,
+                                                  "Could not delete old data in order to put the new one."
+                                                  " Old records were lost.",
+                                                  currentSolutions)
+            return helpers.redirectWithMessageAndAssistantID("admin_solutions",
+                                                             assistantID,
+                                                             "Could not delete old data in order to put the new one."
+                                                             " Old records are restored")
 
-        #the form submits each cell individiually so here it counts how many records there are so it can then initiate a loop
+        # The form submits each cell individiually so here it counts how many records there are so it can then initiate a loop
         NumberOfSolutions = 1
         for key in request.form:
             if "product_ID" in key:
@@ -50,23 +56,23 @@ def admin_solutions(assistantID):
 
         for i in range(1, NumberOfSolutions):
             # TODO add more info to these error messages
-            id = request.form.get("product_ID" + str(i), default="Error")
+            id = request.form.get("product_ID" + str(i), default=None)
 
-            name = request.form.get("product_Name" + str(i), default="Error")
+            name = request.form.get("product_Name" + str(i), default=None)
 
-            brand = request.form.get("product_Brand" + str(i), default="Error")
+            brand = request.form.get("product_Brand" + str(i), default=None)
 
-            model = request.form.get("product_Model" + str(i), default="Error")
+            model = request.form.get("product_Model" + str(i), default=None)
 
-            price = request.form.get("product_Price" + str(i), default="Error")
+            price = request.form.get("product_Price" + str(i), default=None)
 
-            keywords = request.form.get("product_Keywords" + str(i), default="Error")
+            keywords = request.form.get("product_Keywords" + str(i), default=None)
 
-            discount = request.form.get("product_Discount" + str(i), default="Error")
+            discount = request.form.get("product_Discount" + str(i), default=None)
 
-            url = request.form.get("product_URL" + str(i), default="Error")
+            url = request.form.get("product_URL" + str(i), default=None)
 
-            if id is "Error" or name is "Error" or brand is "Error" or model is "Error" or price is "Error" or keywords is "Error" or discount is "Error" or url is "Error":
+            if not (id or name  or brand  or model  or price  or keywords  or discount  or url):
                 solutions_services.deleteByAssitantID(assistantID, "Could not retrieve part of the new data." + str(i) + " records have been added after deletion of the old ones.")
                 solutions_services.addOldByAssitantID(assistantID, "Could not retrieve part of the new data. Solutions have been emptied.", currentSolutions)
                 return helpers.redirectWithMessageAndAssistantID("admin_solutions", assistantID, "Could not retrieve part of the new data. Process aborted and old data has been restored.")

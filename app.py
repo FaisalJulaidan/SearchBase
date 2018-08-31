@@ -116,6 +116,8 @@ def genDummyData():
         for q in assistant.Questions:
             db.session.add(
                 Answer(Answer="yes", Keyword="jeddah,khaled", Action="", TimesClicked=12, Question=q))
+            db.session.add(
+                Answer(Answer="hey", Keyword="riyadh,khaled", Action="", TimesClicked=12, Question=q))
 
         db.session.add(
             Question(Question="how do you do?", Type="dbRetrieval", Assistant=assistant))

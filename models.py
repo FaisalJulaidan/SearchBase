@@ -1,6 +1,9 @@
+from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-db = SQLAlchemy()
+
+db = SQLAlchemy(model_class=FlaskBaseModel)
+db = initialize_flask_sqlathanor(db)
 
 
 class Company(db.Model):
@@ -130,22 +133,36 @@ class Statistics(db.Model):
         return '<Statistics {}>'.format(self.Name)
 
 
+
+
 class Question(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Question = db.Column(db.String(), nullable=False)
-    Type = db.Column(db.String(), nullable=False)
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='Questions')
 
+    QuestionTypeID = db.Column(db.Integer, db.ForeignKey('question_type.ID'), nullable=False)
+    QuestionType = db.relationship('QuestionType', back_populates='Questions')
+
     Answers = db.relationship('Answer', back_populates='Question')
 
     UserInputs = db.relationship('UserInput', back_populates='Question')
 
-
     def __repr__(self):
         return '<Question {}>'.format(self.Question)
+
+class QuestionType(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(), nullable=False)
+
+    # Relationships:
+    Questions = db.relationship('Question', back_populates='QuestionType')
+
+    def __repr__(self):
+        return '<QuestionType {}>'.format(self.Name)
+
 
 
 class Answer(db.Model):

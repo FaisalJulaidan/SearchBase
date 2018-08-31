@@ -20,7 +20,7 @@ from cryptography.fernet import Fernet
 import urllib.request
 
 
-from models import db, Role, Company, Assistant, Plan, Statistics, Question, Answer
+from models import db, Role, Company, Assistant, Plan, Statistics, Question, Answer, QuestionType
 from services.mail_services import mail
 
 # Import all routers to register them as blueprints
@@ -105,6 +105,15 @@ def genDummyData():
     db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
     db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
 
+    db.session.add(QuestionType(Name="OpenAnswers"))
+    db.session.add(QuestionType(Name="PredefinedAnswers"))
+    db.session.add(QuestionType(Name="FileUpload"))
+
+    openAnswers = QuestionType.query.filter(QuestionType.Name == "OpenAnswers").first()
+    predefinedAnswers = QuestionType.query.filter(QuestionType.Name == "PredefinedAnswers").first()
+    fileUpload = QuestionType.query.filter(QuestionType.Name == "FileUpload").first()
+
+
     for assistant in aramco.Assistants:
         db.session.add(
             Statistics(Name="test", Opened=True, QuestionsAnswered=12, ProductsReturned=12, Assistant=assistant))
@@ -112,14 +121,13 @@ def genDummyData():
             Statistics(Name="test1", Opened=True, QuestionsAnswered=52, ProductsReturned=32, Assistant=assistant))
 
         db.session.add(
-            Question(Question="how old are you?", Type="userInfoRetrieval", Assistant=assistant))
+            Question(Question="how old are you?", Assistant=assistant, QuestionType=openAnswers))
         for q in assistant.Questions:
             db.session.add(
                 Answer(Answer="yes", Keyword="jeddah,khaled", Action="", TimesClicked=12, Question=q))
 
         db.session.add(
-            Question(Question="how do you do?", Type="dbRetrieval", Assistant=assistant))
-
+            Question(Question="how do you do?", Assistant=assistant, QuestionType=predefinedAnswers))
 
 
     db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))

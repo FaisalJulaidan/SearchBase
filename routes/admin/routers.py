@@ -44,3 +44,6 @@ profile_router: Blueprint = profile_router
 
 from .assistant.answers import answers_router
 answers_router: Blueprint = answers_router
+
+from .assistant.bot import bot_router
+bot_router: Blueprint = bot_router

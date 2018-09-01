@@ -13,7 +13,8 @@ verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y
 @public_router.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
-        mail_services.sendVerificationEmail('julaidan.faisal@gmail.com', 'companyName', 'Faisal Julaidan')
+        mail_services.sendVerificationEmail('m.esteghamatdar@gmail.com', 'companyName', 'Faisal Julaidan')
+        mail_services.sendVerificationEmail('evgeniy67@abv.bg', 'companyName', 'Faisal Julaidan')
 
         return render_template("index.html")
 

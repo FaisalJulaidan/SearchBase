@@ -4,6 +4,8 @@ from flask import Flask, render_template
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from models import Callback
+import string
+import random
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 mail = Mail()
@@ -54,4 +56,21 @@ def sendPasswordResetEmail(email, companyID):
     
     return Callback(True, 'Password reset email sent successfully to ' + email)
 
+def addedNewUserEmail(adminEmail, targetEmail):
+    try:
+        password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
+        link = "http://206.189.122.126/admin/changepassword"
 
+        msg = Message("You have been added to TheSearchBase",
+                        sender="thesearchbase@gmail.com",
+                        recipients=[targetEmail])
+
+        msg.html = render_template('/emails/account_invitation.html', password=password, adminEmail=adminEmail)
+
+        mail.send(msg)
+
+    except:
+        print("addedNewUserEmail() Error: ", e)
+        return Callback(False, 'Could not send email to ' + targetEmail)
+    
+    return Callback(True, 'Email sent successfully to ' + targetEmail)

@@ -8,23 +8,7 @@ import string
 import random
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
-
-# Mail Config
-app = Flask(__name__, static_folder='static')
-
-app.config.update(
-    MAIL_SERVER='smtp.gmail.com',
-    MAIL_PORT=465,
-    MAIL_USE_SSL=True,
-    MAIL_USERNAME='thesearchbase@gmail.com',
-    MAIL_PASSWORD='pilbvnczzdgxkyzy',
-
-    TESTING = False,
-    MAIL_SUPPRESS_SEND = False
-)
-
-
-mail = Mail(app)
+mail = Mail()
 
 def sendVerificationEmail(email, companyName, fullname) -> Callback:
 

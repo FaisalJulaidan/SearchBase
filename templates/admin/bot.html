@@ -33,36 +33,45 @@
 
         <div class="clearfix"></div>
 
-        <ul id="draggablePanelList" class="list-unstyled">
-{#            <li class="panel panel-info">#}
-{#                <div class="panel-heading">#}
-{#                    <div class="panel-title">#}
-{#                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>#}
-{#                        <b>Do you sleep?</b>#}
-{#                    </div>#}
-{#                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>#}
-{#                    <div class="col-xs-3 pull-right" style="margin-top: -30px">#}
-{#                        <div class="input-group">#}
-{#                            <input type="text" style="height: 34px" class="form-control" aria-label="...">#}
-{#                            <div class="input-group-btn">#}
-{#                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"#}
-{#                                        aria-haspopup="true" aria-expanded="false">#}
-{#                                    Type <span style="margin: 0" class="caret"></span>#}
-{#                                </button>#}
-{#                                <ul class="dropdown-menu dropdown-menu-right">#}
-{#                                    <li><a href="#">Pre defined</a></li>#}
-{#                                    <li><a href="#">Open Answer</a></li>#}
-{#                                    <li><a href="#">File Upload</a></li>#}
-{#                                </ul>#}
-{#                            </div><!-- /btn-group -->#}
-{#                        </div><!-- /input-group -->#}
-{#                    </div><!-- /.col-lg-3 -->#}
-{#                </div>#}
-{#                <div class="panel-body">#}
-{#                    Question content#}
-{#                </div>#}
-{#            </li>#}
-        </ul>
+        <div class="x_panel">
+            <div class="x_title">
+                <h4>🤖 Bot Configuration</h4>
+                <small>Showing all questions and answers with its sort</small>
+            </div>
+            <div class="x_conent">
+                <ul id="draggablePanelList" class="list-unstyled">
+{#                    <li class="panel panel-info">#}
+{#                        <div class="panel-heading">#}
+{#                            <div class="panel-title">#}
+{#                                <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>#}
+{#                                <b>Do you sleep?</b>#}
+{#                            </div>#}
+{#                            <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>#}
+{#                            <div class="col-xs-3 pull-right" style="margin-top: -30px">#}
+{#                                <div class="input-group">#}
+{#                                    <input type="text" style="height: 34px" class="form-control" aria-label="...">#}
+{#                                    <div class="input-group-btn">#}
+{#                                        <button type="button" class="btn btn-default dropdown-toggle"#}
+{#                                                data-toggle="dropdown"#}
+{#                                                aria-haspopup="true" aria-expanded="false">#}
+{#                                            Type <span style="margin: 0" class="caret"></span>#}
+{#                                        </button>#}
+{#                                        <ul class="dropdown-menu dropdown-menu-right">#}
+{#                                            <li><a href="#">Pre defined</a></li>#}
+{#                                            <li><a href="#">Open Answer</a></li>#}
+{#                                            <li><a href="#">File Upload</a></li>#}
+{#                                        </ul>#}
+{#                                    </div><!-- /btn-group -->#}
+{#                                </div><!-- /input-group -->#}
+{#                            </div><!-- /.col-lg-3 -->#}
+{#                        </div>#}
+{#                        <div class="panel-body">#}
+{#                            Question content#}
+{#                        </div>#}
+{#                    </li>#}
+                </ul>
+            </div>
+        </div>
     </div>
 {% endblock %}
 
@@ -141,13 +150,13 @@
             function render_questions(questions) {
                 function cookUpQuestion(question){
                     return "" +
-                    "<li class=\"panel panel-info\">\n" +
+                    "<li class=\"panel panel-default\">\n" +
                     "    <div class=\"panel-heading\">\n" +
                     "        <div class=\"panel-title\">\n" +
-                    "            <span class=\"moveable\"><i class=\"glyphicon glyphicon-menu-hamburger\"></i></span>\n" +
+                    "            <span class=\"moveable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-menu-hamburger\"></i></span>\n" +
                     "            <b>"+ question.question +"</b>\n" +
                     "        </div>\n" +
-                    "        <span class=\"pull-right clickable\"><i class=\"glyphicon glyphicon-chevron-down\"></i></span>\n" +
+                    "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-chevron-down\"></i></span>\n" +
                     "        <div class=\"col-xs-3 pull-right\" style=\"margin-top: -30px\">\n" +
                     "            <div class=\"input-group\">\n" +
                     "                <input type=\"text\" style=\"height: 34px\" class=\"form-control\" aria-label=\"...\">\n" +

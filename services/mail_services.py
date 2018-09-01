@@ -85,4 +85,4 @@ def addedNewUserEmail(adminEmail, targetEmail):
         print("addedNewUserEmail() Error: ", e)
         return Callback(False, 'Could not send email to ' + targetEmail)
     
-    return Callback(True, 'Password reset email sent successfully to ' + targetEmail)
+    return Callback(True, 'Email sent successfully to ' + targetEmail)

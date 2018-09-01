@@ -6,6 +6,6 @@ from utilties import helpers
 bot_router: Blueprint = Blueprint('bot_router', __name__, template_folder="../../templates")
 
 @bot_router.route("/admin/assistant/<assistantID>/bot", methods=['GET', 'POST'])
-def admin_solutions(assistantID):
+def bot(assistantID):
     if request.method == "GET":
         return admin_services.render('admin/bot.html')

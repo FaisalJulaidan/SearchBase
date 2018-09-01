@@ -3,17 +3,143 @@
 {% block title %}Bot{% endblock %}
 
 {% block content %}
+    <style>
+        .clickable {
+            cursor: pointer;
+        }
+
+        .moveable {
+
+            margin-left: -5px;
+            padding: 5px;
+            cursor: move;
+        }
+
+        .panel-heading span {
+            margin-top: -20px;
+            font-size: 15px;
+        }
+    </style>
     <div class="right_col" role="main">
         <div class="page-title">
             <div class="title_left">
                 <h3>Assistant Name</h3>
             </div>
         </div>
+
         <div class="clearfix"></div>
+
+{#        <div class="panel panel-info">#}
+
+{#        </div>#}
+        <ul id="draggablePanelList" class="list-unstyled">
+            <li class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>
+                        <b>Do you sleep?</b>
+                    </div>
+                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                </div>
+                <div class="panel-body">
+                    Question content
+                </div>
+            </li>
+            <li class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>
+                        <b>Do you eat?</b>
+                    </div>
+                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                </div>
+                <div class="panel-body">
+                    Question content
+                </div>
+            </li>
+            <li class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>
+                        <b>Do you smoke?</b>
+                    </div>
+                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                </div>
+                <div class="panel-body">
+                    Question content
+                </div>
+            </li>
+            <li class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>
+                        <b>Do you study?</b>
+                    </div>
+                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                </div>
+                <div class="panel-body">
+                    Question content
+                </div>
+            </li>
+        </ul>
     </div>
 {% endblock %}
 
 
 
 {% block customJS %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script>
+        window.onload = function () {
+            if (prev_handler)
+                prev_handler();
+
+            $(document).on('click', '.panel-heading', function () {
+                var $this = $(this);
+                if (!$this.hasClass('panel-collapsed')) {
+                    $this.parents('.panel').find('.panel-body').slideUp();
+                    $this.addClass('panel-collapsed');
+                    $this.find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+
+                } else {
+                    $this.parents('.panel').find('.panel-body').slideDown();
+                    $this.removeClass('panel-collapsed');
+                    $this.find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+                }
+            });
+
+            var panelList = $('#draggablePanelList');
+
+            panelList.sortable({
+                // Only make the .panel-heading child elements support dragging.
+                // Omit this to make then entire <li>...</li> draggable.
+                handle: '.panel-heading',
+                update: function () {
+                    arr = [];
+                    $('.panel', panelList).each(function (index, elem) {
+                        var $listItem = $(elem), newIndex = $listItem.index();
+
+                        arr.push(buildQuestion($listItem,newIndex));
+                    });
+                    console.log(arr)
+                }
+            });
+
+            function buildQuestion(element,index) {
+                let question = element.children().first().children().first().text();
+                return new QuestionsModel(1,'Type',question,['PNG','JPG'],'go to next',null,index);
+            }
+            class QuestionsModel{
+                    constructor(id,type,question,fileTypes,action,questionIdToGo,order){
+                        this.id = id;
+                        this.type = type;
+                        this.question = question;
+                        this.fileTypes = fileTypes;
+                        this.action = action;
+                        this.questionIdToGo = questionIdToGo;
+                        this.order = order
+                    }
+                }
+        }
+    </script>
 {% endblock %}

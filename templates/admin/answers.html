@@ -92,6 +92,8 @@
 
                         <div class="ln_solid"></div>
 
+                        <p id="load_text">Loading...</p>
+
                         <form enctype="multipart/form-data" style="text-align:center"
                               action="/admin/assistant/{{ id }}/answers" method="POST"
                               id="answersForm">
@@ -154,7 +156,6 @@
     var squestion = e.options[e.selectedIndex].value;
     $("#question_inform").val(squestion);
     var currentNumOfAnswers = 0;
-    getDatabaseData();
 
     function getDatabaseData() {
         currentNumOfAnswers = 0;
@@ -447,6 +448,8 @@
                     extendedLogicAllowed = false;
                 }
                 //ACTIVATE THE PAGE
+                $("#load_text").hide();
+                getDatabaseData();
             }
             else {
                 console.error(xhttp.statusText);

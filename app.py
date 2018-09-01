@@ -1398,6 +1398,7 @@ def admin_pay(planID):
                 session['UserPlan']['Settings'] = AdvancedPlan
             elif "Ultimate" in getPlanNickname(user['SubID']):
                 session['UserPlan']['Settings'] = UltimatePlan
+            print("Plan changed to: ", session.get('UserPlan')['Settings'])
 
         # TODO check subscription for errors https://stripe.com/docs/api#errors
         except Exception as e:
@@ -1811,8 +1812,10 @@ def chatbot(companyID, assistantID):
             message = assistant["Message"]
             # MONTHLY UPDATE
             date = datetime.now().strftime("%Y-%m")
-            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
-            if currentStats is None or "Error" in currentStats or not currentStats:
+            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=? AND AssistantID=?;", [date, assistantID])
+            if currentStats is "Error":
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            if currentStats is None or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
                     (assistantID, date, 1, 0, 0))
@@ -1823,8 +1826,10 @@ def chatbot(companyID, assistantID):
             # WEEKLY UPDATE
             dateParts = datetime.now().strftime("%Y-%m-%d").split("-")
             date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
-            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=?;", [date])
-            if currentStats is None or "Error" in currentStats or not currentStats:
+            currentStats = select_from_database_table("SELECT * FROM Statistics WHERE Date=? AND AssistantID=?;", [date, assistantID])
+            if currentStats is "Error":
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            if currentStats is None or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",
                     (assistantID, date, 1, 0, 0))
@@ -1894,7 +1899,7 @@ def chatbot(companyID, assistantID):
                     file = urlopen(fileUploads[i].split(":::")[0])
                 except Exception as e:
                     print(e)
-                    return "Could not get one of the sent files. Please try saving it in another location before uploading it. We apologise for the inconvenience!"
+                    return "Could not get<br> one of the sent files. Please try saving it in another location before uploading it. We apologise for the inconvenience!"
                 questionID = int(fileUploads[i].split(":::")[1])
                 filename = fileUploads[i].split(":::")[2]
                 filename = date + '_' + str(lastSessionID) + '_' + str(questionID) + '_' + filename
@@ -1986,7 +1991,7 @@ def chatbot(companyID, assistantID):
             date = datetime.now().strftime("%Y-%m")
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
-            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?;", [date], True)
+            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?,AssitantID=?;", [date, assistantID], True)
             print("currentStats: ", currentStats)
             if currentStats is None or currentStats is "Error" or not currentStats:
                 newStats = insert_into_database_table(
@@ -2007,7 +2012,7 @@ def chatbot(companyID, assistantID):
             date = datetime.now().strftime("%Y") + ";" + str(datetime.date(datetime.now()).isocalendar()[1])
             questionsAnswered = request.form.get("questionsAnswered", default="Error")
             # TODO check questionsAnswered for errors
-            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?;", [date], True)
+            currentStats = query_db("SELECT * FROM Statistics WHERE Date=?,AssitantID=?;", [date, assistantID], True)
             if currentStats is None or currentStats is "Error" or not currentStats:
                 newStats = insert_into_database_table(
                     "INSERT INTO Statistics (AssistantID, Date, Opened, QuestionsAnswered, ProductsReturned) VALUES (?, ?, ?, ?, ?);",

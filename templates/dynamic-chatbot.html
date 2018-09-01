@@ -499,7 +499,7 @@
                     var data = xhttp.responseText;
                     cRD = $("#messagesContainer");
                     if (!data.includes("&&&")) {
-                        cRD.append("<br><br><br><label class='chatProducts'>" + data + "</label><br><br><br>");
+                        cRD.append("<br><br><br><label class='chatProducts'>" + emojione.toImage(data) + "</label><br><br><br>");
                     } else if (returnProducts) {
                         resultdic = {};
                         var temparray = data.split("&&&");

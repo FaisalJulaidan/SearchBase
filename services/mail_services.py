@@ -73,11 +73,7 @@ def addedNewUserEmail(adminEmail, targetEmail):
                         sender="thesearchbase@gmail.com",
                         recipients=[targetEmail])
 
-        msg.html = "<h4>Hi, <h4> <br /> <p>You have been registered with TheSearchBase by an admin at your company.<br /> \
-                    To get access to the platform, we have generated a temporary password for you to access the platform.</p> <br /> \
-                    <h4>Your temporary password is: "+password+".<h4><br />\
-                    Please visit <a href='"+link+"'>this link</a> to sign in. To change your password you can use the same link or go to Account Details -> Profile on the left menu.<p><br /> \
-                    If you feel this is a mistake please contact "+adminEmail+". <br /> <br /> Regards, <br />TheSearchBase Team"
+        msg.html = render_template('/emails/account_invitation.html', password=password, adminEmail=adminEmail)
 
         mail.send(msg)
 

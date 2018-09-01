@@ -499,6 +499,12 @@ class UserInput(db.Model):
                          on_serialize=None,
                          on_deserialize=None
                          )
+    SessionID = db.Column(db.Integer, nullable=False,
+                         supports_json=True,
+                         supports_dict=True,
+                         on_serialize=None,
+                         on_deserialize=None
+                         )
 
     # Relationships:
     QuestionID = db.Column(db.Integer, db.ForeignKey('question.ID'), nullable=False)

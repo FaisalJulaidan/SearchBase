@@ -17,46 +17,45 @@ def bot(assistantID):
 def get_botQuestions(assistantID):
     if request.method == "GET":
         res = {
-  "botVersion": "1.0.0",
-  "assistant": {
-    "id": 1,
-    "name": "Helper"
-  },
-  "questions":
-    [
-      {
-        "id": 1,
-        "type": "FileUpload",
-        "question": "Upload Your CV",
-        "fileTypes": ["GIF","PGN"],
-        "action": "GoToNextQuestion",
-        "questionIdToGo": None
-      },
-       {
-        "id": 2,
-        "type": "OpenAnswers",
-        "question": "What's your email?",
-        "answer": "faisal@hotmail.com",
-        "validation": "email",
-        "keywords": [],
-        "action": "GoToSpecificQuestion",
-        "questionIdToGo": 6
-      },
-      {
-        "id": 3,
-        "type": "PredefinedAnswers",
-        "question": "Do You Smoke?",
-        "answer": "Yes",
-        "keywords": ["smoker"],
-        "storeDB": True,
-        "action": "GoToSpecificQuestion",
-        "questionIdToGo": 1
-      }
-
-    ]
-}
+            "botVersion": "1.0.0",
+            "assistant": {
+                "id": 1,
+                "name": "Helper"
+            },
+            "questions":
+                [
+                    {
+                        "id": 1,
+                        "type": "FileUpload",
+                        "question": "Upload Your CV",
+                        "fileTypes": ["GIF", "PGN"],
+                        "action": "GoToNextQuestion",
+                        "questionIdToGo": None
+                    },
+                    {
+                        "id": 2,
+                        "type": "OpenAnswers",
+                        "question": "What's your email?",
+                        "answer": "faisal@hotmail.com",
+                        "validation": "email",
+                        "keywords": [],
+                        "action": "GoToSpecificQuestion",
+                        "questionIdToGo": 6
+                    },
+                    {
+                        "id": 3,
+                        "type": "PredefinedAnswers",
+                        "question": "Do You Smoke?",
+                        "answer": "Yes",
+                        "keywords": ["smoker"],
+                        "storeDB": True,
+                        "action": "GoToSpecificQuestion",
+                        "questionIdToGo": 1
+                    }
+                ]
+        }
         return json.dumps({'success': True, 'msg': "Assistant found :).", 'data': res}), \
-                   200, {'ContentType': 'application/json'}
+               200, {'ContentType': 'application/json'}
 
 
 

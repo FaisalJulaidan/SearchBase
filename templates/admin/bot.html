@@ -19,68 +19,49 @@
             margin-top: -20px;
             font-size: 15px;
         }
+        .btn-default.focus, .btn-default:focus{
+            background-color:#fff;
+            border-color:#ccc
+        }
     </style>
     <div class="right_col" role="main">
         <div class="page-title">
             <div class="title_left">
-                <h3>Assistant Name</h3>
+                <h3 id="assistantName"></h3>
             </div>
         </div>
 
         <div class="clearfix"></div>
 
-{#        <div class="panel panel-info">#}
-
-{#        </div>#}
         <ul id="draggablePanelList" class="list-unstyled">
-            <li class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>
-                        <b>Do you sleep?</b>
-                    </div>
-                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>
-                </div>
-                <div class="panel-body">
-                    Question content
-                </div>
-            </li>
-            <li class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>
-                        <b>Do you eat?</b>
-                    </div>
-                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>
-                </div>
-                <div class="panel-body">
-                    Question content
-                </div>
-            </li>
-            <li class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>
-                        <b>Do you smoke?</b>
-                    </div>
-                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>
-                </div>
-                <div class="panel-body">
-                    Question content
-                </div>
-            </li>
-            <li class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>
-                        <b>Do you study?</b>
-                    </div>
-                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>
-                </div>
-                <div class="panel-body">
-                    Question content
-                </div>
-            </li>
+{#            <li class="panel panel-info">#}
+{#                <div class="panel-heading">#}
+{#                    <div class="panel-title">#}
+{#                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>#}
+{#                        <b>Do you sleep?</b>#}
+{#                    </div>#}
+{#                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>#}
+{#                    <div class="col-xs-3 pull-right" style="margin-top: -30px">#}
+{#                        <div class="input-group">#}
+{#                            <input type="text" style="height: 34px" class="form-control" aria-label="...">#}
+{#                            <div class="input-group-btn">#}
+{#                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"#}
+{#                                        aria-haspopup="true" aria-expanded="false">#}
+{#                                    Type <span style="margin: 0" class="caret"></span>#}
+{#                                </button>#}
+{#                                <ul class="dropdown-menu dropdown-menu-right">#}
+{#                                    <li><a href="#">Pre defined</a></li>#}
+{#                                    <li><a href="#">Open Answer</a></li>#}
+{#                                    <li><a href="#">File Upload</a></li>#}
+{#                                </ul>#}
+{#                            </div><!-- /btn-group -->#}
+{#                        </div><!-- /input-group -->#}
+{#                    </div><!-- /.col-lg-3 -->#}
+{#                </div>#}
+{#                <div class="panel-body">#}
+{#                    Question content#}
+{#                </div>#}
+{#            </li>#}
         </ul>
     </div>
 {% endblock %}
@@ -94,52 +75,128 @@
             if (prev_handler)
                 prev_handler();
 
-            $(document).on('click', '.panel-heading', function () {
-                var $this = $(this);
-                if (!$this.hasClass('panel-collapsed')) {
-                    $this.parents('.panel').find('.panel-body').slideUp();
-                    $this.addClass('panel-collapsed');
-                    $this.find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+            main();
 
-                } else {
-                    $this.parents('.panel').find('.panel-body').slideDown();
-                    $this.removeClass('panel-collapsed');
-                    $this.find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+            function main() {
+                init_page();
+                init_data();
+            }
+            function init_page() {
+                $(document).on('click', '.panel-heading', function (e) {
+                    if ( $(e.target).is('a') ||
+                         $(e.target).is('input.form-control') ) {
+                        e.preventDefault();
+                        return;
+                    }
+                    let $this = $(this);
+                    if (!$this.hasClass('panel-collapsed')) {
+                        $this.parents('.panel').find('.panel-body').slideUp();
+                        $this.addClass('panel-collapsed');
+                        $this.find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+
+                    } else {
+                        $this.parents('.panel').find('.panel-body').slideDown();
+                        $this.removeClass('panel-collapsed');
+                        $this.find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+                    }
+                });
+                var panelList = $('#draggablePanelList');
+                panelList.sortable({
+                    // Only make the .panel-heading child elements support dragging.
+                    // Omit this to make then entire <li>...</li> draggable.
+                    handle: '.panel-heading',
+                    update: function () {
+                        arr = [];
+                        $('.panel', panelList).each(function (index, elem) {
+                            var $listItem = $(elem), newIndex = $listItem.index();
+
+                            arr.push(buildQuestion($listItem, newIndex));
+                        });
+                        console.log(arr)
+                    }
+                });
+            }
+            function init_data() {
+                $.ajax({
+                    url: 'bot/questions',
+                    type: "GET"
+                }).done(function (res) {
+                    res = JSON.parse(res);
+                    if (res.success){
+                        res = res.data;
+                        assistant = res.assistant;
+                        questions = res.questions;
+                        // TODO:
+                        // we need plan type + questions left
+                        render_page(assistant.name, res.botVersion);
+                        render_questions(res.questions)
+                    }
+                }).fail(function (res) {
+                    let resJson = JSON.parse(res.responseText);
+                    console.log(resJson)
+                });
+
+            }
+
+            function render_questions(questions) {
+                function cookUpQuestion(question){
+                    return "" +
+                    "<li class=\"panel panel-info\">\n" +
+                    "    <div class=\"panel-heading\">\n" +
+                    "        <div class=\"panel-title\">\n" +
+                    "            <span class=\"moveable\"><i class=\"glyphicon glyphicon-menu-hamburger\"></i></span>\n" +
+                    "            <b>"+ question.question +"</b>\n" +
+                    "        </div>\n" +
+                    "        <span class=\"pull-right clickable\"><i class=\"glyphicon glyphicon-chevron-down\"></i></span>\n" +
+                    "        <div class=\"col-xs-3 pull-right\" style=\"margin-top: -30px\">\n" +
+                    "            <div class=\"input-group\">\n" +
+                    "                <input type=\"text\" style=\"height: 34px\" class=\"form-control\" aria-label=\"...\">\n" +
+                    "                <div class=\"input-group-btn\">\n" +
+                    "                    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\"\n" +"" +
+                    "                            aria-haspopup=\"true\" aria-expanded=\"false\">\n" +
+                    "                        Type <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                    "                    </button>\n" +
+                    "                    <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                    "                        <li><a href=\"#\">Pre defined</a></li>\n" +
+                    "                        <li><a href=\"#\">Open Answer</a></li>\n" +
+                    "                        <li><a href=\"#\">File Upload</a></li>\n" +
+                    "                    </ul>\n" +
+                    "                </div><!-- /btn-group -->\n" +
+                    "            </div><!-- /input-group -->\n" +
+                    "        </div><!-- /.col-lg-3 -->\n" +
+                    "    </div>\n" +
+                    "    <div class=\"panel-body\">\n" +
+                    "        Question content\n" +
+                    "    </div>\n" +
+                    "</li>"
                 }
-            });
 
-            var panelList = $('#draggablePanelList');
-
-            panelList.sortable({
-                // Only make the .panel-heading child elements support dragging.
-                // Omit this to make then entire <li>...</li> draggable.
-                handle: '.panel-heading',
-                update: function () {
-                    arr = [];
-                    $('.panel', panelList).each(function (index, elem) {
-                        var $listItem = $(elem), newIndex = $listItem.index();
-
-                        arr.push(buildQuestion($listItem,newIndex));
-                    });
-                    console.log(arr)
-                }
-            });
-
+                var elements = '';
+                for (question of questions)
+                    elements += cookUpQuestion(question)
+                $("#draggablePanelList").html(elements);
+            }
+            function render_page(assistantName,botVersion){
+                $("#assistantName").html(
+                    "Assistant: "+ assistantName +
+                    "<span class=\"pull-right h5\">Bot version: " + botVersion + "</span>"
+                )
+            }
             function buildQuestion(element,index) {
-                let question = element.children().first().children().first().text();
+                let question = element.children().first().children().first().children().next().text();
                 return new QuestionsModel(1,'Type',question,['PNG','JPG'],'go to next',null,index);
             }
-            class QuestionsModel{
-                    constructor(id,type,question,fileTypes,action,questionIdToGo,order){
-                        this.id = id;
-                        this.type = type;
-                        this.question = question;
-                        this.fileTypes = fileTypes;
-                        this.action = action;
-                        this.questionIdToGo = questionIdToGo;
-                        this.order = order
-                    }
+            class QuestionsModel {
+                constructor(id, type, question, fileTypes, action, questionIdToGo, order) {
+                    this.id = id;
+                    this.type = type;
+                    this.question = question;
+                    this.fileTypes = fileTypes;
+                    this.action = action;
+                    this.questionIdToGo = questionIdToGo;
+                    this.order = order
                 }
+            }
         }
     </script>
 {% endblock %}

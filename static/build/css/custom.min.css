@@ -630,7 +630,7 @@ body {
 }
 
 .page-title .title_left {
-    width: 45%;
+    width: 100%;
     float: left;
     display: block
 }
@@ -1794,27 +1794,6 @@ ul.quick-list li {
     text-overflow: ellipsis
 }
 
-.dropdown-menu {
-    box-shadow: none;
-    display: none;
-    float: left;
-    font-size: 12px;
-    left: 0;
-    list-style: none;
-    padding: 0;
-    position: absolute;
-    text-shadow: none;
-    top: 100%;
-    z-index: 9998;
-    border: 1px solid #D9DEE4;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0
-}
-
-.dropdown-menu>li>a {
-    color: #5A738E
-}
-
 .navbar-nav .open .dropdown-menu {
     position: absolute;
     background: #fff;
@@ -2543,12 +2522,6 @@ span.section {
     color: #333;
     border: 0;
     border-bottom: 1px solid #e5e5e5
-}
-
-.form-control {
-    border-radius: 0;
-    width: 50%;
-
 }
 
 .form-horizontal .control-label {

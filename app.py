@@ -20,14 +20,14 @@ from cryptography.fernet import Fernet
 import urllib.request
 
 
-from models import db, Role, Company, Assistant, Plan, Statistics, Question
+from models import db, Role, Company, Assistant, Plan, Statistics, Question, Answer, QuestionType
 from services.mail_services import mail
 
 # Import all routers to register them as blueprints
 
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
     products_router, questions_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
-    changePassword_router
+    changePassword_router, answers_router, bot_router
 
 from routes.public.routers import public_router, resetPassword_router
 from services import user_services, mail_services
@@ -48,6 +48,8 @@ app.register_blueprint(connection_router)
 app.register_blueprint(userInput_router)
 app.register_blueprint(changePassword_router)
 app.register_blueprint(users_router)
+app.register_blueprint(answers_router)
+app.register_blueprint(bot_router)
 
 
 # code to ensure user is logged in
@@ -104,6 +106,15 @@ def genDummyData():
     db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
     db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
 
+    db.session.add(QuestionType(Name="OpenAnswers"))
+    db.session.add(QuestionType(Name="PredefinedAnswers"))
+    db.session.add(QuestionType(Name="FileUpload"))
+
+    openAnswers = QuestionType.query.filter(QuestionType.Name == "OpenAnswers").first()
+    predefinedAnswers = QuestionType.query.filter(QuestionType.Name == "PredefinedAnswers").first()
+    fileUpload = QuestionType.query.filter(QuestionType.Name == "FileUpload").first()
+
+
     for assistant in aramco.Assistants:
         db.session.add(
             Statistics(Name="test", Opened=True, QuestionsAnswered=12, ProductsReturned=12, Assistant=assistant))
@@ -111,34 +122,49 @@ def genDummyData():
             Statistics(Name="test1", Opened=True, QuestionsAnswered=52, ProductsReturned=32, Assistant=assistant))
 
         db.session.add(
-            Question(Question="how old are you?", Type="userInfoRetrieval", Assistant=assistant))
-        db.session.add(
-            Question(Question="how do you do?", Type="dbRetrieval", Assistant=assistant))
+            Question(Question="how old are you?", Assistant=assistant, QuestionType=openAnswers))
+        for q in assistant.Questions:
+            db.session.add(
+                Answer(Answer="yes", Keyword="jeddah,khaled", Action="", TimesClicked=12, Question=q))
+            db.session.add(
+                Answer(Answer="hey", Keyword="riyadh,khaled", Action="", TimesClicked=12, Question=q))
 
+        db.session.add(
+            Question(Question="how do you do?", Assistant=assistant, QuestionType=predefinedAnswers))
 
 
     db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
     db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
 
-    db.session.add(Role(Name="Admin", EditChatbots=True, EditUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="User", EditChatbots=False, EditUsers=False, AccessBilling=False))
+    db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="Admin", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="User", Company= aramco, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
 
-    admin = Role.query.filter(Role.Name == "Admin").first()
-    user = Role.query.filter(Role.Name == "User").first()
+    db.session.add(Role(Name="Owner", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="Admin", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="User", Company= sabic, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
 
-    user_services.create(firstname='Ahmad', surname='Hadi', verified=True, email='aa@aa.com', password='123',
-                         company=aramco, role=admin)
-    user_services.create(firstname='firstname', surname='lastname', email='email2', password='123', company=aramco,
-                         role=admin)
-    user_services.create(firstname='firstname', surname='lastname', email='email3', password='123', company=aramco,
-                         role=user)
+    owner_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "Owner").first()
+    admin_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "Admin").first()
+    user_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "User").first()
 
-    user_services.create(firstname='firstname', surname='lastname', email='email4', password='123', company=sabic,
-                         role=admin)
-    user_services.create(firstname='firstname', surname='lastname', email='email5', password='123', company=sabic,
-                         role=user)
-    user_services.create(firstname='firstname', surname='lastname', email='email6', password='123', company=sabic,
-                         role=user)
+    owner_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "Owner").first()
+    admin_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "Admin").first()
+    user_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "User").first()
+
+    user_services.create(firstname='Ahmad', surname='Hadi', email='aa@aa.com', password='123',
+                         company=aramco, role=owner_aramco, verified=True)
+    user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', company=aramco,
+                         role=admin_aramco, verified=True)
+    user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', company=aramco,
+                         role=user_aramco, verified=True)
+
+    user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', company=sabic,
+                         role=owner_sabic, verified=True)
+    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', company=sabic,
+                         role=admin_sabic, verified=True)
+    user_services.create(firstname='firstname', surname='lastname', email='e6@e.com', password='123', company=sabic,
+                         role=user_sabic, verified=True)
 
     db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic'))
     db.session.add(Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate'))
@@ -565,107 +591,6 @@ def admin_questions(assistantID):
                              return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 3 Error in updating questions!")
 
                 return redirect("/admin/assistant/{}/questions".format(assistantID))
-
-
-# TODO rewrite
-@app.route("/admin/assistant/<assistantID>/answers", methods=['GET', 'POST'])
-def admin_answers(assistantID):
-    checkAssistantID(assistantID)
-    if request.method == "GET":
-        message = checkForMessageWhenAssistantID()
-        email = session.get('User')['Email']
-        company = get_company(email)
-        if company is None or "Error" in company:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            # TODO handle this better
-        else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?", [assistantID, company[0]])
-            if assistant is None:
-                abort(status.HTTP_404_NOT_FOUND)
-            elif "Error" in assistant:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-            else:
-                questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;", [assistantID], True)
-                # TODO check questionstuple for errors
-                questions = []
-                for i in range(0, len(questionsTuple)):
-                    questions.append(questionsTuple[i][2] + ";" + questionsTuple[i][3])
-
-                allAnswers = {}
-                for i in range(0, len(questions)):
-                    answersTuple = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;", [questionsTuple[i][0]], True)
-                    # TODO Check answerstuple for errors
-                    answers = []
-                    for j in range(0, len(answersTuple)):
-                        answers.append(answersTuple[j][2] + ";" + answersTuple[j][3] + ";" + answersTuple[j][5])
-
-                    allAnswers[questions[i]] = answers
-
-                questionsAndAnswers = []
-                for i in range(0, len(questions)):
-                    question = []
-                    question.append(questions[i])
-                    merge = tuple(question)
-                    answers = allAnswers[questions[i]]
-                    for j in range(0, len(answers)):
-                        answer = []
-                        answer.append(answers[j])
-                        merge = merge + tuple(answer)
-                    questionsAndAnswers.append(merge)
-                return render("admin/answers.html", msg=questionsAndAnswers, id=assistantID, message=message)
-    elif request.method == "POST":
-        email = session.get('User')['Email']
-        company = get_company(email)
-        if company is None or "Error" in company:
-            return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting company's records!")
-        else:
-            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-                                                   [assistantID, company[0]])
-            if assistant is None or "Error" in assistant:
-                return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting assistant's records!")
-            else:
-                selected_question = request.form.get("question", default="Error")  # question_text;question_type
-                if "Error" in selected_question:
-                    return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting selected question!")
-
-                question = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=? AND Question=?;",
-                                                      [assistantID, selected_question.split(";")[0]])
-                if question is None or "Error" in question:
-                    return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting question's records")
-
-                questionID = question[0]
-                currentAnswers = select_from_database_table("SELECT * FROM Answers WHERE QuestionID=?;", [questionID])
-                if currentAnswers is None or "Error" in currentAnswers:
-                    return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting old answers!")
-                if (currentAnswers is not None):
-                    deleteOldQuestions = delete_from_table("DELETE FROM Answers WHERE QuestionID=?;", [questionID])
-                    if deleteOldQuestions is None or "Error" in deleteOldQuestions:
-                        return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in deleting old answers!")
-
-                noa = 1
-                for key in request.form:
-                    if "pname" in key:
-                        noa += 1
-
-                for i in range(1, noa):
-                    answer = request.form.get("pname" + str(i), default="Error")
-                    try:
-                        keyword = request.form.getlist("keywords" + str(i))
-                    except:
-                        keyword = "Error"
-                    keyword = ','.join(keyword)
-                    action = request.form.get("action" + str(i), default="None")
-                    if action != "Next Question by Order" and not session['UserPlan']['Settings']['ExtendedLogic']:
-                        return redirectWithMessageAndAssistantID("admin_answers", assistantID, "It appears you tried to access extended logic without having access to it. Action aborted!")
-                    if "Error" in answer or "Error" in keyword or "Error" in action:
-                        return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in getting your input.")
-                    insertAnswer = insert_into_database_table(
-                        "INSERT INTO Answers (QuestionID, Answer, Keyword, Action) VALUES (?,?,?,?);",
-                        (questionID, answer, keyword, action))
-                    if insertAnswer is None or "Error" in insertAnswer:
-                        return redirectWithMessageAndAssistantID("admin_answers", assistantID, "Error in updating answers!")
-
-                return redirect("/admin/assistant/{}/answers".format(assistantID)+"?res="+str(noa)+"")
 
 
 @app.route("/admin/assistant/<assistantID>/products", methods=['GET', 'POST'])
@@ -1654,51 +1579,6 @@ def change_password():
         else:
             return render_template('errors/verification.html',
                                    msg="Account not verified, please check your email and follow instructions")
-
-
-# Sitemap route
-@app.route('/robots.txt')
-@app.route('/sitemap.xml')
-def static_from_root():
-    return send_from_directory(app.static_folder, request.path[1:])
-
-
-# Terms and conditions page route
-@app.route("/termsandconditions", methods=['GET'])
-def terms_and_conditions():
-    if request.method == "GET":
-        return render_template("terms.html")
-
-
-@app.route("/privacy", methods=['GET'])
-def privacy():
-    if request.method == "GET":
-        return render_template("privacy-policy.html")
-
-
-# Affiliate page route
-@app.route("/affiliate", methods=['GET'])
-def affiliate():
-    if request.method == "GET":
-        abort(status.HTTP_501_NOT_IMPLEMENTED, "Affiliate program coming soon")
-        # return render_template("affiliate.html")
-
-
-@app.route("/send/mail", methods=['GET', 'POST'])
-def sendEmail():
-    if request.method == "GET":
-        return render_template("index.html")
-    if request.method == "POST":
-        mailFirstname = request.form.get("sendingName", default="Error")
-        mailUserEmail = request.form.get("sendingEmail", default="Error")
-        mailUserMessage = request.form.get("sendMessage", default="Error")
-
-        msg = Message(mailFirstname + " from " + mailUserEmail + " has sent you a message.",
-                      sender=mailUserEmail,
-                      recipients=["thesearchbase@gmail.com"])
-        msg.body = mailFirstname + " said: " + mailUserMessage + " their email is: " + mailUserEmail
-        mail.send(msg)
-        return render_template("index.html")
 
 
 @app.route("/send/mailtop", methods=['GET', 'POST'])

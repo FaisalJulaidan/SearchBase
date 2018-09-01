@@ -121,9 +121,12 @@
                                                     <a href="/admin/assistant/{{ assistant.ID }}/settings">Settings</a>
                                                 </li>
                                                 <li>
-                                                    <a href="/admin/assistant/{{ assistant.ID }}/questions">Questions</a>
+                                                    <a href="/admin/assistant/{{ assistant.ID }}/bot">Bot</a>
                                                 </li>
-                                                <li><a href="/admin/assistant/{{ assistant.ID }}/answers">Answers</a></li>
+                                                <li>
+                                                    <a href="/admin/assistant/{{ assistant.ID }}/questions">Questions <sub>(Temp)</sub></a>
+                                                </li>
+                                                <li><a href="/admin/assistant/{{ assistant.ID }}/answers">Answers <sub>(Temp)</sub></a></li>
                                                 <!--<li><a href="/admin/templates">Templates</a></li>-->
                                                 <li>
                                                     <a href="/admin/assistant/{{ assistant.ID }}/solutions">
@@ -443,6 +446,8 @@
             console.log(err)
         })
     </script>
+
+
     {% block customJS %}
     {% endblock %}
 

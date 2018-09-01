@@ -41,7 +41,7 @@ def getByEmail(email) -> User or None:
 def getAllByCompanyID(companyID) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(User).options(Load(User).load_only("ID")).filter(User.CompanyID == companyID).all()
+        result = db.session.query(User).filter(User.CompanyID == companyID).all()
         if not result: raise Exception
 
         return Callback(True,
@@ -52,13 +52,32 @@ def getAllByCompanyID(companyID) -> Callback:
                         'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
 
-def create(firstname, surname, email, password, company: Company, role: Role, verified=False) -> User or None:
+def getAllByCompanyID_safe(companyID) -> Callback:
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(User.ID,
+                                  User.Firstname,
+                                  User.Surname,
+                                  User.Email,
+                                  User.LastAccess)\
+            .filter(User.CompanyID == companyID).all()
+        if not result: raise Exception
+
+        return Callback(True,
+                        'Users with company ID ' + str(companyID) + ' were successfully retrieved.',
+                        result)
+    except Exception as exc:
+        return Callback(False,
+                        'Users with company ID ' + str(companyID) + ' could not be retrieved.')
+
+
+def create(firstname, surname, email, password, company: Company, role: Role, verified=False) -> Callback:
     try:
         # Create a new user with its associated company and role
-        user = User(Firstname=firstname, Surname=surname, Email=email, Verified=verified,
+        newUser = User(Firstname=firstname, Surname=surname, Email=email, Verified=verified,
                     Password=helpers.hashPass(password), Company=company,
                     Role=role)
-        db.session.add(user)
+        db.session.add(newUser)
 
     except Exception as exc:
         print(exc)
@@ -66,10 +85,34 @@ def create(firstname, surname, email, password, company: Company, role: Role, ve
         return Callback(False, 'Sorry, Could not create the user.')
     # Save
     db.session.commit()
-    return Callback(True, 'User has been created successfully!')
+    return Callback(True, 'User has been created successfully!', newUser)
+
+
+def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
+    try:
+        # Create a new user with its associated company and role
+        user_callback: Callback = getByID(userID)
+        if not user_callback.Success:
+            return Callback(False, "Could not find user's records")
+        user: User = user_callback.Data
+
+        # Update user
+        user.Firstname = firstname
+        user.Surname = surname
+        user.Email = email
+        user.Role = role
+
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Sorry, Could not create the user.')
+
+    # Save
+    db.session.commit()
+    return Callback(True, 'User has been edited successfully!')
 
 def changePasswordByID(userID, newPassword, currentPassword=None):
-    user_callback : Callback = user_services.getByID(userID)
+    user_callback : Callback = getByID(userID)
     if not user_callback.Success:
         return Callback(False, "Could not find user's records")
 
@@ -81,9 +124,10 @@ def changePasswordByID(userID, newPassword, currentPassword=None):
     db.session.commit()
 
     return Callback(True, "Password has been changed.")
+
 
 def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
-    user_callback : Callback = user_services.getByEmail(userEmail)
+    user_callback : Callback = getByEmail(userEmail)
     if not user_callback.Success:
         return Callback(False, "Could not find user's records")
 
@@ -95,6 +139,7 @@ def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
     db.session.commit()
 
     return Callback(True, "Password has been changed.")
+
 
 def removeByEmail(email) -> Callback:
 
@@ -110,6 +155,20 @@ def removeByEmail(email) -> Callback:
     return Callback(True, 'User with email ' + email + " has been removed successfully.")
 
 
+def removeByID(id) -> Callback:
+
+    try:
+     db.session.query(User).filter(User.ID == id).delete()
+
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'User with id ' + str(id) + " could not be removed.")
+    # Save
+    db.session.commit()
+    return Callback(True, 'User with id ' + str(id) + " has been removed successfully.")
+
+
 def verifyByEmail(email: str):
 
     try:
@@ -122,7 +181,6 @@ def verifyByEmail(email: str):
     # Save
     db.session.commit()
     return Callback(True, 'Account has been verified successfully')
-
 
 
 def updateSubID(email, subID: str):

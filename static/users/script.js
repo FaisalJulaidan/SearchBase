@@ -1,83 +1,170 @@
-let editor; // use a global for the submit and return data rendering in the examples
 
-$(document).ready(function() {
-    editor = new $.fn.dataTable.Editor( {
-        "ajax": "../php/staff.php",
-        "table": "#example",
-        "fields": [ {
-                "label": "First name:",
-                "name": "first_name"
-            }, {
-                "label": "Last name:",
-                "name": "last_name"
-            }, {
-                "label": "Position:",
-                "name": "position"
-            }, {
-                "label": "Office:",
-                "name": "office"
-            }, {
-                "label": "Extension:",
-                "name": "extn"
-            }, {
-                "label": "Start date:",
-                "name": "start_date",
-                "type": "datetime"
-            }, {
-                "label": "Salary:",
-                "name": "salary"
-            }
-        ]
-    } );
 
-    // New record
-    $('a.editor_create').on('click', function (e) {
+
+$(document).ready(function () {
+
+    console.log("Script Works");
+
+
+// $(document).on('submit', '#userForm', function (e) {
+//     e.preventDefault();
+//     submitUserForm(this)
+// })
+
+
+
+});
+
+
+function deleteUser(userID) {
+    swal({
+          title: "Are you sure?",
+          text: "User will be removed completely from the system",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+
+            $.ajax({
+                url: '/admin/user/' + userID,
+                type: "DELETE"
+            }).done(function (res) {
+                console.log(res);
+                swal("Success!", "User has been deleted successfully", "success").then((value) => {
+                  document.location.reload()
+                });
+            }).fail(function (res) {
+                let resJson = JSON.parse(res.responseText);
+                swal("Error!", resJson.msg, "error").then((value) => {
+                  document.location.reload()
+                });
+            });
+
+          } else {
+            // When clicking the cancel button in the alert box
+          }
+        });
+
+ }
+
+ // ----- Users ----
+function submitEditUserForm(form,userID, event) {
+    console.log('EDIT USER.');
+     $.ajax({
+        url: '/admin/user/' + userID,
+        type: "PUT",
+        data: $('#userForm').serialize()
+    }).done(function (res) {
+        console.log(res);
+        swal("Success!", "User has been updated successfully", "success").then((value) => {
+          document.location.reload()
+        });
+    }).fail(function (res) {
+        let resJson = JSON.parse(res.responseText);
+        swal("Error!", resJson.msg, "error").then((value) => {
+        });
+    });
+}
+
+function submitNewUserForm(form, event) {
+    console.log('NEW USER.');
+    console.log();
+    $.ajax({
+        url: '/admin/user',
+        type: "POST",
+        data: $('#userForm').serialize()
+    }).done(function (res) {
+        console.log(res);
+        swal("Success!", "User has been created successfully", "success").then((value) => {
+          document.location.reload()
+        });
+    }).fail(function (res) {
+        let resJson = JSON.parse(res.responseText);
+        swal("Error!", resJson.msg, "error").then((value) => {
+        });
+    });
+}
+
+function fillUserForm(userID, edit=false){
+    let $form = $('form#userForm');
+    let $row = $('#usersTable tbody tr[data-rowID="' + userID + '"]');
+    $('#userModal').modal('show');
+
+    if(edit){
+         // fill current user
+        $form.find('input[name="firstname"]').val($row.find('td[data-type="firstname"]').text());
+        $form.find('input[name="surname"]').val($row.find('td[data-type="surname"]').text());
+        $form.find('input[name="email"]').val($row.find('td[data-type="email"]').text());
+        $form.find('select[name="role"]').val($row.find('td[data-type="role"]').text()).change();
+    }
+
+    // Bind the appropriate handlers depends on edit value
+    $(document).on('submit', '#userForm', function (e) {
+    e.preventDefault();
+    if (edit){submitEditUserForm(this,userid=userID, event=e)}
+    else {submitNewUserForm(this, event=e)}
+    })
+
+}
+
+// Once the modal is closed, unbind all onSubmit handlers from the userForm
+$(document).on('hide.bs.modal', '#userModal', function (e) {
+    console.log('Unbind submit event.');
+    $(document).off('submit', '#userForm');
+});
+
+
+
+ // ----- Roles ----
+
+
+// Bind the appropriate handler for roles form submission
+    $(document).on('submit', '#rolesForm', function (e) {
         e.preventDefault();
+        submitRolesForm(this);
+    });
 
-        editor.create( {
-            title: 'Create new record',
-            buttons: 'Add'
-        } );
-    } );
 
-    // Edit record
-    $('#example').on('click', 'a.editor_edit', function (e) {
-        e.preventDefault();
+function submitRolesForm(form) {
+    console.log('Update USER.');
+    data = [];
 
-        editor.edit( $(this).closest('tr'), {
-            title: 'Edit record',
-            buttons: 'Update'
-        } );
-    } );
+    // Iterate through each row and get checkboxes values
+    $('table#rolesTable > tbody > tr').each(function (i, row) {
+        $row = $(row);
+        console.log( );
+        data.push({
+            ID: $row.attr('data-rowID'),
+            EditChatbots: $row.find('input[name="editChatbots"]').is(":checked"),
+            EditUsers: $row.find('input[name="editUsers"]').is(":checked"),
+            DeleteUsers: $row.find('input[name="deleteUsers"]').is(":checked"),
+            AccessBilling: $row.find('input[name="accessBilling"]').is(":checked"),
+        })
+    });
 
-    // Delete a record
-    $('#example').on('click', 'a.editor_remove', function (e) {
-        e.preventDefault();
+    console.log( data );
 
-        editor.remove( $(this).closest('tr'), {
-            title: 'Delete record',
-            message: 'Are you sure you wish to remove this record?',
-            buttons: 'Delete'
-        } );
-    } );
+     $.ajax({
+        url: '/admin/roles',
+        type: "PUT",
+        data: {data: JSON.stringify(data)}
+    }).done(function (res) {
+        console.log(res);
+        swal("Success!", "Roles has been updated successfully", "success").then((value) => {
+          document.location.reload()
+        });
+    }).fail(function (res) {
+        let resJson = JSON.parse(res.responseText);
+        swal("Error!", resJson.msg, "error").then((value) => {
+             document.location.reload()
+        });
+    });
+}
 
-    $('#example').DataTable( {
-        ajax: "../php/staff.php",
-        columns: [
-            { data: null, render: function ( data, type, row ) {
-                // Combine the first and last names into a single table field
-                return data.first_name+' '+data.last_name;
-            } },
-            { data: "position" },
-            { data: "office" },
-            { data: "extn" },
-            { data: "start_date" },
-            { data: "salary", render: $.fn.dataTable.render.number( ',', '.', 0, '$' ) },
-            {
-                data: null,
-                className: "center",
-                defaultContent: '<a href="" class="editor_edit">Edit</a> / <a href="" class="editor_remove">Delete</a>'
-            }
-        ]
-    } );
-} );
+
+
+
+
+

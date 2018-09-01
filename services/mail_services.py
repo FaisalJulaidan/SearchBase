@@ -22,7 +22,8 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
         link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
         print(4)
         # need to add the links to the email, right now its just a page.
-        msg.html = render_template('/emails/verification.html', link = link)
+        #msg.html = render_template('/emails/verification.html', link = link)
+        msg.html = "Hi"
         print(5)
         mail.send(msg)
         print(6)

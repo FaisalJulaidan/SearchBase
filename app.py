@@ -15,7 +15,7 @@ from cryptography.fernet import Fernet
 import urllib.request
 
 from models import db, Role, Company, Assistant, Plan, Statistics, Question, Answer, QuestionType
-from services.mail_services import mail
+#from services.mail_services import mail
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
@@ -1523,7 +1523,7 @@ if __name__ == "__main__":
     app.config['SESSION_TYPE'] = 'filesystem'
 
     db.init_app(app)
-    mail.init_app(app)
+    #mail.init_app(app)
     app.app_context().push()
 
     db.drop_all()

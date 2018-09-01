@@ -1507,7 +1507,7 @@ if __name__ == "__main__":
 
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 
-    app.config.from_object('config.DevelopmentConfig')
+    app.config.from_object('config.BaseConfig')
     app.secret_key = 'KeYCatApP'
     app.config['SESSION_TYPE'] = 'filesystem'
 

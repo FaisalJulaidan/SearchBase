@@ -1,6 +1,8 @@
 from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Enum
 from datetime import datetime
+import enum
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
@@ -363,6 +365,11 @@ class Statistics(db.Model):
         return '<Statistics {}>'.format(self.Name)
 
 
+class QuestionType(enum.Enum):
+    OpenAnswers = 1
+    PredefinedAnswers = 2
+    FileUpload = 3
+
 class Question(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
                    supports_json=True,
@@ -386,13 +393,14 @@ class Question(db.Model):
                                 on_deserialize=None
                                 )
 
-    QuestionTypeID = db.Column(db.Integer, db.ForeignKey('question_type.ID'), nullable=False)
-    QuestionType = db.relationship('QuestionType', back_populates='Questions',
-                                   supports_json=True,
-                                   supports_dict=True,
-                                   on_serialize=None,
-                                   on_deserialize=None
-                                   )
+    QuestionType = db.Column(Enum(QuestionType), nullable=False)
+    # QuestionTypeID = db.Column(db.Integer, db.ForeignKey('question_type.ID'), nullable=False)
+    # QuestionType = db.relationship('QuestionType', back_populates='Questions',
+    #                                supports_json=True,
+    #                                supports_dict=True,
+    #                                on_serialize=None,
+    #                                on_deserialize=None
+    #                                )
 
     Answers = db.relationship('Answer', back_populates='Question',
                               supports_json=True,
@@ -407,25 +415,25 @@ class Question(db.Model):
         return '<Question {}>'.format(self.Question)
 
 
-class QuestionType(db.Model):
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
-                   supports_json=True,
-                   supports_dict=True,
-                   on_serialize=None,
-                   on_deserialize=None
-                   )
-    Name = db.Column(db.String(), nullable=False,
-                     supports_json=True,
-                     supports_dict=True,
-                     on_serialize=None,
-                     on_deserialize=None
-                     )
-
-    # Relationships:
-    Questions = db.relationship('Question', back_populates='QuestionType')
-
-    def __repr__(self):
-        return '<QuestionType {}>'.format(self.Name)
+# class QuestionType(db.Model):
+#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
+#                    supports_json=True,
+#                    supports_dict=True,
+#                    on_serialize=None,
+#                    on_deserialize=None
+#                    )
+#     Name = db.Column(db.String(), nullable=False,
+#                      supports_json=True,
+#                      supports_dict=True,
+#                      on_serialize=None,
+#                      on_deserialize=None
+#                      )
+#
+#     # Relationships:
+#     Questions = db.relationship('Question', back_populates='QuestionType')
+#
+#     def __repr__(self):
+#         return '<QuestionType {}>'.format(self.Name)
 
 
 class Answer(db.Model):

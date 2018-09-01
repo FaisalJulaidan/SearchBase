@@ -7,7 +7,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-
     <!-- Title -->
     <title>Pricing</title>
 
@@ -27,11 +26,11 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-70419779-2"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-      gtag('config', 'UA-70419779-2');
+        gtag('config', 'UA-70419779-2');
     </script>
 
     <!-- Icon images -->
@@ -44,7 +43,7 @@
     <link rel="apple-touch-icon" sizes="144x144" href="../static/img/core-img/apple-icon-144x144.png">
     <link rel="apple-touch-icon" sizes="152x152" href="../static/img/core-img/apple-icon-152x152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="../static/img/core-img/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="../static/img/core-img/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../static/img/core-img/android-icon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../static/img/core-img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="../static/img/core-img/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../static/img/core-img/favicon-16x16.png">
@@ -52,6 +51,30 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="../static/img/core-img/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.js"></script>
+    <script>
+        window.addEventListener("load", function () {
+            window.cookieconsent.initialise({
+                "palette": {
+                    "popup": {
+                        "background": "#64386b",
+                        "text": "#ffcdfd"
+                    },
+                    "button": {
+                        "background": "#f8a8ff",
+                        "text": "#3f0045"
+                    }
+                },
+                "theme": "edgeless",
+                "position": "top",
+                "content": {
+                    "dismiss": "I Agree"
+                }
+            })
+        });
+    </script>
 
 </head>
 
@@ -193,15 +216,12 @@
                             <h5>Trail Plan</h5>
                             <div class="ca-price d-flex justify-content-center">
                                 <span></span>
-                                <h4>14 Day Trail</h4>
+                                <h4>14 Day Trial</h4>
                             </div>
                         </div>
                         <div class="package-description">
-                            <p>Up to 1 Database</p>
-                            <p>Number of Bots: 1</p>
-                            <p>Up to 200 Products</p>
-                            <p>Additional users: 2</p>
-                            <p>Branding at the bottom</p>
+                            <p> Everything on the Ultimate plan</p>
+                            <p>Free for 14 days</p>
                             <p>No Credit Card needed</p>
                         </div>
                         <!-- Plan Button  -->
@@ -222,12 +242,11 @@
                             </div>
                         </div>
                         <div class="package-description">
-                            <p>Up to 2 Databases</p>
                             <p>Number of bots: 2</p>
-                            <p>Up to 600 Products</p>
+                            <p>Up to 600 Solutions</p>
                             <p>Additional users: 5</p>
                             <p>Data Storage</p>
-                            <p>Branding at the bottom</p>
+                            <p>Branding at the Top</p>
                             <p>Setup support</p>
                         </div>
                         <!-- Plan Button  -->
@@ -248,13 +267,13 @@
                             </div>
                         </div>
                         <div class="package-description">
-                            <p>Up to 3 Databases</p>
                             <p>Number of bots: 4</p>
-                            <p>Up to 1500 Products</p>
+                            <p>Up to 1500 Solutions</p>
                             <p>Additional users: 10</p>
                             <p>Data Storage</p>
-                            <p>Branding at the bottom</p>
+                            <p>No Branding at the Top</p>
                             <p>Logical Questions </p>
+                            <p>Database import</p>
                             <p>Extended Setup support</p>
                         </div>
                         <!-- Plan Button  -->
@@ -275,9 +294,8 @@
                             </div>
                         </div>
                         <div class="package-description">
-                            <p>Up to 4 Databases</p>
-                            <p>Number of bots: Unlimited</p>
-                            <p>Unlimited Products</p>
+                            <p>Number of bots: 10</p>
+                            <p>Unlimited solutions storage</p>
                             <p>Additional users: Unlimited</p>
                             <p>Encrypted Data Storage</p>
                             <p>Database Import & Automatic scan </p>

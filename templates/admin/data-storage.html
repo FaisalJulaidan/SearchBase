@@ -21,6 +21,29 @@
 {% block customJS %}
 <script src="/static/js/sortTable.js"></script>
 <script>
+    var lastSessionID = 0;
+    var currentLength = 0;
+    var headingsLength = 0;
+    var position = -1;
+    var data = []
+
+    {%for record in data %}
+
+    if ({{ record["SessionID"] }} != lastSessionID) {
+        data.append(["{{record['Date']}}", "{{record['Recorded Data']}}&;&{{record['QuestionString']}}"]);
+        position++;
+        currentLength = 1;
+        lastSessionID = {{record["SessionID"]}};
+    } else {
+        data[position].append("{{record['Recorded Data']}}&;&{{record['QuestionString']}}")
+        currentLength++;
+    }
+    if (currentLength > headingsLength) { headingsLength = currentLength;}
+    {% endfor %}
+    console.log(data);
+
+
+
     var tableHeading = $("#tableHeadingUIn");
     var tableString = "<table id=\"tableSort\" class=\"table table-striped jambo_table bulk_action\"><thead>\
                             <tr id=\"tableHeadingUIn\" class=\"headings\">\
@@ -31,10 +54,10 @@
                             </tr></thead>\
                             <tbody id=\"tBodyUIn\">";
     {%for record in data %}
-    if ("{{record[3]}}".includes(";")) {
-        tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td><a href=\"/" + "{{record[3]}}".split(";")[1] + "\" download=\"" + "{{record[3]}}".split(";")[0] +"\">" + "{{record[3]}}".split(";")[0]+"</a></td></tr>";
+    if ("{{record['Input']}}".includes(";")) {
+        tableString += "<tr><td>" + "{{record['DateTime']}}".split(" ")[0] + "</td><td>{{record['QuestionString']}}</td><td><a href=\"/" + "{{record['Input']}}".split(";")[1] + "\" download=\"" + "{{record['Input']}}".split(";")[0] + "\">" + "{{record['Input']}}".split(";")[0]+"</a></td></tr>";
     } else {
-        tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td>{{record[3]}}</td></tr>";
+        tableString += "<tr><td>" + "{{record['DateTime']}}".split(" ")[0] + "</td><td>{{record['QuestionString']}}</td><td>{{record['Input']}}</td></tr>";
     }
     {% endfor %}
     tableString += "</tbody></table>";
@@ -44,8 +67,8 @@
 
     function fnExcelReport() {
         tab_text = tableString;
-        tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//comment if u want links in your table
-        tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // comment if u want images in your table
+        tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//comment if you want links in the table
+        tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // comment if you want images in the table
         tab_text = tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // comment if you want input params
 
         var ua = window.navigator.userAgent;

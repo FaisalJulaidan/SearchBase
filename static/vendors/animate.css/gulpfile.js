@@ -34,7 +34,7 @@ var opts = {
   banner: [
     '@charset "UTF-8";\n',
     '/*!',
-    ' * <%= name %> -<%= homepage %>',
+    ' * <%= name %> -<%= dashboard %>',
     ' * Version - <%= version %>',
     ' * Licensed under the MIT license - http://opensource.org/licenses/MIT',
     ' *',

@@ -52,31 +52,28 @@
     <br>
     <br>-->
 
+
                                 <h4>Would you like the chat bot to automatically open for the user?</h4>
                                 <label class="switch">
                                     <input id="switch-autopop" name="switch-autopop" type="checkbox"
                                            onclick="switchchecked()"
-                                           {% if autopop !='Off' %} checked {% endif %}>
+                                           {% if autopop !=0.0 %} checked {% endif %}>
                                     <span class="slider round"></span>
                                 </label>
                                 <br>
                                 <br>
                                 <div id="popup-time"
-                                     {% if autopop=='Off' %}
+                                     {% if autopop==0.0 %}
                                      hidden
                                      {% endif %}>
                                     <h4>
                                         How long should the chat bot wait before opening?
                                         <small> *Time in Seconds</small>
                                     </h4>
-                                    <input name="timeto-autopop" style="width:50px"
+                                    <input name="timeto-autopop" style="width:70px"
                                            class="form-control col-md-5 col-xs-10"
-                                           id="bot_time" type="text"
-                                           {% if autopop !='Off' %}
-                                           value="{{ autopop }}"
-                                           {% else %}
-                                           value="6"
-                                           {% endif %}>
+                                           id="bot_time" type="number"
+                                           value="{{ autopop }}">
                                     <br>
                                     <br>
                                     <br>

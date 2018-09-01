@@ -3,6 +3,7 @@
 {% block title %}Profile{% endblock %}
 
 {% block content %}
+<!--<link rel="stylesheet" type="text/css" href="../static/SL/Login/css/main.css">-->
 <div class="right_col" role="main">
     <div class="">
         <div class="page-title">
@@ -24,26 +25,40 @@
                             Your details
                             <small>You can update your details here.</small>
                         </h2>
-                        <ul class="nav navbar-right panel_toolbox">
-                            <li>
-                                <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                            </li>
-                        </ul>
                         <div class="clearfix"></div>
                     </div>
+
                     <div class="x_content">
-                        <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
-                            <div class="profile_img">
+                        <div class="col-xs-2">
+                            <div class="profile_img" style="margin-top: 25px">
                                 <div id="crop-avatar">
                                     <!-- Current avatar -->
                                     <img class="img-responsive avatar-view" src="/static/images/img.jpg"
                                          alt="Avatar">
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-xs-10 profile_left">
                             <div id="outputDiv">
                                 <form id="profileForm" action="/admin/profile" method="post">
+                                    <div class="input-group" style="margin:10px 0 0 10px">
+                                        <span class="input-group-addon">First and Last Name</span>
+                                        <input type="text" class="form-control" id="names" name="names" value="{{user["Firstname"]}} {{user["Surname"]}}" />
+                                    </div>
 
-                                    <h3 id="nameh3" style="display:inline-block;">{{ user["Firstname"] }} {{ user["Surname"] }}</h3><img id="editName" class="editIcon" src="../static/images/pencil-edit-button.png" />
+                                    <div class="input-group" style="margin:10px 0 0 10px">
+                                        <span class="input-group-addon">Email</span>
+                                        <input type="text" class="form-control" id="email" name="email" value="{{user["Email"]}}" />
+                                    </div>
+
+                                    <div class="input-group" style="margin:10px 0 0 10px">
+                                        <span class="input-group-addon">Company Name</span>
+                                        <input type="text" class="form-control" id="companyName" name="companyName" value="{{company["Name"]}}" />
+                                    </div>
+
+
+
+                                    <!--<h3 id="nameh3" style="display:inline-block;">{{ user["Firstname"] }} {{ user["Surname"] }}</h3><img id="editName" class="editIcon" src="../static/images/pencil-edit-button.png" />
                                     <input id="names" name="names" value="{{user["Firstname"]}} {{user["Surname"]}}" /><img id="saveName" class="tickIcon" src="../static/images/tick.png" /><img id="cancelName" class="crossIcon" src="../static/images/cross.png" />
                                     <br />
                                     <h4 id="emailh4" style="display:inline-block;">{{ user["Email"] }}</h4><img id="editEmail" class="editIcon" src="../static/images/pencil-edit-button.png" />
@@ -54,200 +69,208 @@
                                         <li>
                                             <p id="companyNamep" style="display:inline-block;">{{ company["Name"] }}</p><img id="editCompanyName" class="editIcon" src="../static/images/pencil-edit-button.png" />
                                             <input id="companyName" name="companyName" value="{{company["Name"]}}" /><img id="saveCompanyName" class="tickIcon" src="../static/images/tick.png" /><img id="cancelCompanyName" class="crossIcon" src="../static/images/cross.png" />
-                                        </li>
+                                        </li>-->
+                                    <!--<li>
+                                        <a id="companyURLa" href="{{company["URL"]}}" target="_blank">{{company["URL"]}}</a><img id="editCompanyURL" class="editIcon" src="../static/images/pencil-edit-button.png" />
+                                        <input id="companyURL" name="companyURL" value="{{company["URL"]}}" /><img id="saveCompanyURL" class="tickIcon" src="../static/images/tick.png" /><img id="cancelCompanyURL" class="crossIcon" src="../static/images/cross.png" />
+                                    </li>-->
+                                    <!--<li class="m-top-xs">
+                                        <i class="fa fa-external-link user-account-icon"></i>
+                                        <a href="https://www.thesearchbase.com/chatbot/{{ company["Name"] }}{{ company["Name"] }}" target="_blank">Assistant</a>
+                                    </li>-->
+                                    
 
-                                        <li>
-                                            <a id="companyURLa" href="{{company["URL"]}}" target="_blank">{{company["URL"]}}</a><img id="editCompanyURL" class="editIcon" src="../static/images/pencil-edit-button.png" />
-                                            <input id="companyURL" name="companyURL" value="{{company["URL"]}}" /><img id="saveCompanyURL" class="tickIcon" src="../static/images/tick.png" /><img id="cancelCompanyURL" class="crossIcon" src="../static/images/cross.png" />
-                                        </li>
-
-                                        <!--<li class="m-top-xs">
-                            <i class="fa fa-external-link user-profile-icon"></i>
-                            <a href="https://www.thesearchbase.com/chatbot/{{ company["Name"] }}{{ company["Name"] }}" target="_blank">Assistant</a>
-                        </li>-->
                                     </ul>
-                                    <button class="btn btn-success">Save Changes</button>
+
+                                    <!--<h4>Data Sharing Settings</h4>
+                                    <p>Any data that you collect, process and store on TheSearchBase platform is kept secure an confidential at all times. The data that you collect is data
+                                        that enables our software to work at its optimum level. </p>
+                                    <p>This part of the website enables you to control what settings you may share with us.</p>
+                                    <p>Newsletters<small>Recommended</small></p>
+                                    <input name="data_sharing_1" id="data_sharing_option_1" type="checkbox"/>
+                                    <p>We would like to keep you updated with the latest software updates and features available to you,
+                                    if you decide to subscribe you may miss on important features an announcements.</p>
+                                    <p>Erasing data</p>
+                                    <p>If you decide to stop using our platform, we will simply delete your information after 60 days of inactivity.</p>
+                                    <p>Tracking your data</p>
+                                    <p>We do not in any way track your information for marketing or recommendation purposes.</p>-->
+
+
+
+                                    <div class="input-group" style="margin:10px 0 0 10px">
+                                        <button class="btn btn-success">Save Changes</button>
+                                        <a href="/admin/changepassword" class="btn btn-success">Change Password</a>
+                                    </div>
+
+
+
+
+
                                 </form>
                             </div>
                         </div>
                     </div>
-                    <a href="/admin/changepassword" class="btn btn-success">Change Password</a>
+
                 </div>
             </div>
         </div>
     </div>
-    </div>
+</div>
     {% endblock %}
 
     {% block customJS %}
-    <!-- jQuery -->
-    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-    <!-- FastClick -->
-    <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
-    <!-- NProgress -->
-    <script src="/static/vendors/nprogress/nprogress.js"></script>
-    <!-- morris.js -->
-    <script src="/static/vendors/raphael/raphael.min.js"></script>
-    <script src="/static/vendors/morris.js/morris.min.js"></script>
-    <!-- bootstrap-progressbar -->
-    <script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-    <!-- bootstrap-daterangepicker -->
-    <script src="/static/vendors/moment/min/moment.min.js"></script>
-    <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
 
-    <!-- Custom Theme Scripts -->
-    <!--<script src="/static/build/js/custom.min.js"></script>  Bugs the Menu Drop down animation-->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk&callback=initMap"></script>
 
-    <script>
-        //name changer
-        nameh3 = document.getElementById("nameh3");
-        editName = document.getElementById("editName");
-        saveName = document.getElementById("saveName");
-        cancelName = document.getElementById("cancelName");
-        names = document.getElementById("names");
-        saveName.style = "display:none;";
-        cancelName.style = "display:none;";
-        names.style = "display:none;";
-        editName.onclick = function () {
-            nameh3.style = "display:none";
-            editName.style = "display:none";
-            saveName.style = "display:inline-block;";
-            cancelName.style = "display:inline-block;";
-            names.style = "display:inline-block;";
-        };
-        saveName.onclick = function () {
-            nameh3.style = "display:inline-block";
-            editName.style = "display:inline-block";
-            saveName.style = "display:none;";
-            cancelName.style = "display:none;";
-            names.style = "display:none;";
-            nameh3.innerHTML = names.value;
-        };
-        cancelName.onclick = function () {
-            nameh3.style = "display:inline-block";
-            editName.style = "display:inline-block";
-            saveName.style = "display:none;";
-            cancelName.style = "display:none;";
-            names.style = "display:none;";
-            names.value = nameh3.innerHTML;
-        };
-        //email changer
-        emailh4 = document.getElementById("emailh4");
-        editEmail = document.getElementById("editEmail");
-        saveEmail = document.getElementById("saveEmail");
-        cancelEmail = document.getElementById("cancelEmail");
-        email = document.getElementById("email");
-        saveEmail.style = "display:none;";
-        cancelEmail.style = "display:none;";
-        email.style = "display:none;";
-        editEmail.onclick = function () {
-            emailh4.style = "display:none";
-            editEmail.style = "display:none";
-            saveEmail.style = "display:inline-block;";
-            cancelEmail.style = "display:inline-block;";
-            email.style = "display:inline-block;";
-        };
-        saveEmail.onclick = function () {
-            emailh4.style = "display:inline-block";
-            editEmail.style = "display:inline-block";
-            saveEmail.style = "display:none;";
-            cancelEmail.style = "display:none;";
-            email.style = "display:none;";
-            emailh4.innerHTML = email.value;
-        };
-        cancelEmail.onclick = function () {
-            emailh4.style = "display:inline-block";
-            editEmail.style = "display:inline-block";
-            saveEmail.style = "display:none;";
-            cancelEmail.style = "display:none;";
-            email.style = "display:none;";
-            email.value = emailh4.innerHTML;
-        };
-        //company name changer
-        companyNamep = document.getElementById("companyNamep");
-        editCompanyName = document.getElementById("editCompanyName");
-        saveCompanyName = document.getElementById("saveCompanyName");
-        cancelCompanyName = document.getElementById("cancelCompanyName");
-        companyName = document.getElementById("companyName");
-        saveCompanyName.style = "display:none;";
-        cancelCompanyName.style = "display:none;";
-        companyName.style = "display:none;";
-        editCompanyName.onclick = function () {
-            companyNamep.style = "display:none";
-            editCompanyName.style = "display:none";
-            saveCompanyName.style = "display:inline-block;";
-            cancelCompanyName.style = "display:inline-block;";
-            companyName.style = "display:inline-block;";
-        };
-        saveCompanyName.onclick = function () {
-            companyNamep.style = "display:inline-block";
-            editCompanyName.style = "display:inline-block";
-            saveCompanyName.style = "display:none;";
-            cancelCompanyName.style = "display:none;";
-            companyName.style = "display:none;";
-            companyNamep.innerHTML = companyName.value;
-        };
-        cancelCompanyName.onclick = function () {
-            companyNamep.style = "display:inline-block";
-            editCompanyName.style = "display:inline-block";
-            saveCompanyName.style = "display:none;";
-            cancelCompanyName.style = "display:none;";
-            companyName.style = "display:none;";
-            companyName.value = companyNamep.innerHTML;
-        };
-        //company url changer
-        companyURLa = document.getElementById("companyURLa");
-        editCompanyURL = document.getElementById("editCompanyURL");
-        saveCompanyURL = document.getElementById("saveCompanyURL");
-        cancelCompanyURL = document.getElementById("cancelCompanyURL");
-        companyURL = document.getElementById("companyURL");
-        saveCompanyURL.style = "display:none;";
-        cancelCompanyURL.style = "display:none;";
-        companyURL.style = "display:none;";
-        editCompanyURL.onclick = function () {
-            companyURLa.style = "display:none";
-            editCompanyURL.style = "display:none";
-            saveCompanyURL.style = "display:inline-block;";
-            cancelCompanyURL.style = "display:inline-block;";
-            companyURL.style = "display:inline-block;";
-        };
-        saveCompanyURL.onclick = function () {
-            companyURLa.style = "display:inline-block";
-            editCompanyURL.style = "display:inline-block";
-            saveCompanyURL.style = "display:none;";
-            cancelCompanyURL.style = "display:none;";
-            companyURL.style = "display:none;";
-            companyURLa.innerHTML = companyURL.value;
-        };
-        cancelCompanyURL.onclick = function () {
-            companyURLa.style = "display:inline-block";
-            editCompanyURL.style = "display:inline-block";
-            saveCompanyURL.style = "display:none;";
-            cancelCompanyURL.style = "display:none;";
-            companyURL.style = "display:none;";
-            companyURL.value = companyURLa.innerHTML;
-        };
-            //inputD = document.getElementById("inputDiv");
-            //outputD = document.getElementById("outputDiv");
-            //editB = document.getElementById("EditB");
-            //editB.addEventListener("click", openForm);
-            //document.getElementById("cancelB").addEventListener("click", closeForm);
-            //document.getElementById("submit").onclick = function () {
-            //    document.getElementById("form").submit();
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk&callback=initMap"></script>
+<script src="/static/js/cookies.js"></script>
+
+<script>
+            ////name changer
+            //nameh3 = document.getElementById("nameh3");
+            //editName = document.getElementById("editName");
+            //saveName = document.getElementById("saveName");
+            //cancelName = document.getElementById("cancelName");
+            //names = document.getElementById("names");
+            //saveName.style = "display:none;";
+            //cancelName.style = "display:none;";
+            //names.style = "display:none;";
+            //editName.onclick = function () {
+            //    nameh3.style = "display:none";
+            //    editName.style = "display:none";
+            //    saveName.style = "display:inline-block;";
+            //    cancelName.style = "display:inline-block;";
+            //    names.style = "display:inline-block;";
             //};
-            //inputDiv.style = "display:none";
-            //function openForm() {
-            //    outputD.style = "display:none";
-            //    editB.style = "display:none";
-            //    inputD.style = "display:block";
-            //}
-            //function closeForm() {
-            //    outputD.style = "display:block";
-            //    editB.style = "display:block";
-            //    inputD.style = "display:none";
-            //}
-    </script>
+            //saveName.onclick = function () {
+            //    nameh3.style = "display:inline-block";
+            //    editName.style = "display:inline-block";
+            //    saveName.style = "display:none;";
+            //    cancelName.style = "display:none;";
+            //    names.style = "display:none;";
+            //    nameh3.innerHTML = names.value;
+            //};
+            //cancelName.onclick = function () {
+            //    nameh3.style = "display:inline-block";
+            //    editName.style = "display:inline-block";
+            //    saveName.style = "display:none;";
+            //    cancelName.style = "display:none;";
+            //    names.style = "display:none;";
+            //    names.value = nameh3.innerHTML;
+            //};
+            ////email changer
+            //emailh4 = document.getElementById("emailh4");
+            //editEmail = document.getElementById("editEmail");
+            //saveEmail = document.getElementById("saveEmail");
+            //cancelEmail = document.getElementById("cancelEmail");
+            //email = document.getElementById("email");
+            //saveEmail.style = "display:none;";
+            //cancelEmail.style = "display:none;";
+            //email.style = "display:none;";
+            //editEmail.onclick = function () {
+            //    emailh4.style = "display:none";
+            //    editEmail.style = "display:none";
+            //    saveEmail.style = "display:inline-block;";
+            //    cancelEmail.style = "display:inline-block;";
+            //    email.style = "display:inline-block;";
+            //};
+            //saveEmail.onclick = function () {
+            //    emailh4.style = "display:inline-block";
+            //    editEmail.style = "display:inline-block";
+            //    saveEmail.style = "display:none;";
+            //    cancelEmail.style = "display:none;";
+            //    email.style = "display:none;";
+            //    emailh4.innerHTML = email.value;
+            //};
+            //cancelEmail.onclick = function () {
+            //    emailh4.style = "display:inline-block";
+            //    editEmail.style = "display:inline-block";
+            //    saveEmail.style = "display:none;";
+            //    cancelEmail.style = "display:none;";
+            //    email.style = "display:none;";
+            //    email.value = emailh4.innerHTML;
+            //};
+            ////company name changer
+            //companyNamep = document.getElementById("companyNamep");
+            //editCompanyName = document.getElementById("editCompanyName");
+            //saveCompanyName = document.getElementById("saveCompanyName");
+            //cancelCompanyName = document.getElementById("cancelCompanyName");
+            //companyName = document.getElementById("companyName");
+            //saveCompanyName.style = "display:none;";
+            //cancelCompanyName.style = "display:none;";
+            //companyName.style = "display:none;";
+            //editCompanyName.onclick = function () {
+            //    companyNamep.style = "display:none";
+            //    editCompanyName.style = "display:none";
+            //    saveCompanyName.style = "display:inline-block;";
+            //    cancelCompanyName.style = "display:inline-block;";
+            //    companyName.style = "display:inline-block;";
+            //};
+            //saveCompanyName.onclick = function () {
+            //    companyNamep.style = "display:inline-block";
+            //    editCompanyName.style = "display:inline-block";
+            //    saveCompanyName.style = "display:none;";
+            //    cancelCompanyName.style = "display:none;";
+            //    companyName.style = "display:none;";
+            //    companyNamep.innerHTML = companyName.value;
+            //};
+            //cancelCompanyName.onclick = function () {
+            //    companyNamep.style = "display:inline-block";
+            //    editCompanyName.style = "display:inline-block";
+            //    saveCompanyName.style = "display:none;";
+            //    cancelCompanyName.style = "display:none;";
+            //    companyName.style = "display:none;";
+            //    companyName.value = companyNamep.innerHTML;
+            //};
+            //company url changer
+            //companyURLa = document.getElementById("companyURLa");
+            //editCompanyURL = document.getElementById("editCompanyURL");
+            //saveCompanyURL = document.getElementById("saveCompanyURL");
+            //cancelCompanyURL = document.getElementById("cancelCompanyURL");
+            //companyURL = document.getElementById("companyURL");
+            //saveCompanyURL.style = "display:none;";
+            //cancelCompanyURL.style = "display:none;";
+            //companyURL.style = "display:none;";
+            //editCompanyURL.onclick = function () {
+            //    companyURLa.style = "display:none";
+            //    editCompanyURL.style = "display:none";
+            //    saveCompanyURL.style = "display:inline-block;";
+            //    cancelCompanyURL.style = "display:inline-block;";
+            //    companyURL.style = "display:inline-block;";
+            //};
+            //saveCompanyURL.onclick = function () {
+            //    companyURLa.style = "display:inline-block";
+            //    editCompanyURL.style = "display:inline-block";
+            //    saveCompanyURL.style = "display:none;";
+            //    cancelCompanyURL.style = "display:none;";
+            //    companyURL.style = "display:none;";
+            //    companyURLa.innerHTML = companyURL.value;
+            //};
+            //cancelCompanyURL.onclick = function () {
+            //    companyURLa.style = "display:inline-block";
+            //    editCompanyURL.style = "display:inline-block";
+            //    saveCompanyURL.style = "display:none;";
+            //    cancelCompanyURL.style = "display:none;";
+            //    companyURL.style = "display:none;";
+            //    companyURL.value = companyURLa.innerHTML;
+            //};
+                //inputD = document.getElementById("inputDiv");
+                //outputD = document.getElementById("outputDiv");
+                //editB = document.getElementById("EditB");
+                //editB.addEventListener("click", openForm);
+                //document.getElementById("cancelB").addEventListener("click", closeForm);
+                //document.getElementById("submit").onclick = function () {
+                //    document.getElementById("form").submit();
+                //};
+                //inputDiv.style = "display:none";
+                //function openForm() {
+                //    outputD.style = "display:none";
+                //    editB.style = "display:none";
+                //    inputD.style = "display:block";
+                //}
+                //function closeForm() {
+                //    outputD.style = "display:block";
+                //    editB.style = "display:block";
+                //    inputD.style = "display:none";
+                //}
+</script>
     {% endblock %}

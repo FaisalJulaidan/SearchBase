@@ -1,0 +1,105 @@
+
+
+// Create a Stripe client.
+var stripe = Stripe('pk_test_e4Tq89P7ma1K8dAjdjQbGHmR');
+
+// Create an instance of Elements.
+var elements = stripe.elements();
+
+// Custom styling can be passed to options when creating an Element.
+// (Note that this demo uses a wider set of styles than the guide below.)
+var style = {
+  base: {
+    color: '#32325d',
+    lineHeight: '18px',
+    fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+    fontSmoothing: 'antialiased',
+    fontSize: '16px',
+    '::placeholder': {
+      color: '#aab7c4'
+    }
+  },
+  invalid: {
+    color: '#fa755a',
+    iconColor: '#fa755a'
+  }
+};
+
+// Create an instance of the card Element.
+var card = elements.create('card', {style: style});
+
+// Add an instance of the card Element into the `card-element` <div>.
+var el = document.getElementById('card-element')
+card.mount(el);
+console.log(card)
+
+// Handle real-time validation errors from the card Element.
+card.addEventListener('change', function(event) {
+  var displayError = document.getElementById('card-errors');
+  if (event.error) {
+    displayError.textContent = event.error.message;
+  } else {
+    displayError.textContent = '';
+  }
+});
+
+// Handle form submission.
+// var form = document.getElementById('payment-form');
+// form.addEventListener('submit', function() {
+//     console.log("Ykjsldkfgjklsdfjglkjsdlkfjglksdjfg")
+//   stripe.createToken(card).then(function(result) {
+//     if (result.error) {
+//       // Inform the user if there was an error.
+//       var errorElement = document.getElementById('card-errors');
+//       errorElement.textContent = result.error.message;
+//     } else {
+//       // Send the token to your server.
+//       stripeTokenHandler(result.token);
+//     }
+//   });
+// });
+
+
+function submit() {
+    console.log("Ykjsldkfgjklsdfjglkjsdlkfjglksdjfg");
+
+    stripe.createToken(card).then(function (result) {
+        console.log(result);
+
+        if (result.error) {
+            // Inform the user if there was an error.
+            var errorElement = document.getElementById('card-errors');
+            errorElement.textContent = result.error.message;
+        } else {
+            // Send the token to your server.
+            console.log("CORRRECTTTT!!!");
+            stripeTokenHandler(result.token);
+        }
+    });
+}
+function stripeTokenHandler(token) {
+
+      $.post({
+        url: '/admin/subscribe/' ,
+        contentType: 'application/json',
+        data: JSON.stringify({
+            token: token,
+            coupon: $(document.getElementById('promo-code')).val()
+        }),
+        success: (res) => {
+            if (res.error) {
+                swal("Ooops!", res.error, "error");
+            } else {
+
+                swal({
+                  title: "Successful Payment",
+                  text: res.success,
+                  icon: "success",
+                });
+
+            }
+        }
+      });
+
+
+}

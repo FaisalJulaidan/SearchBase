@@ -1,33 +1,26 @@
 #/usr/bin/python3.5
-from flask import Flask, redirect, request, render_template, jsonify, send_from_directory, abort, escape, url_for, \
-    make_response, g, session, json
-# from flask_mail import Mail, Message
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, redirect, request, render_template, jsonify, abort, escape, \
+    g, session
 from werkzeug.utils import secure_filename
 from flask_api import status
 from datetime import datetime, timedelta
 from bcrypt import hashpw, gensalt
 from itsdangerous import URLSafeTimedSerializer, BadSignature, BadData
 from xml.dom import minidom
-from json import dumps, loads, load, dump
 import os
 import sqlite3
 import stripe
-import string
-import random
 from urllib.request import urlopen
 from cryptography.fernet import Fernet
 import urllib.request
-
 
 from models import db, Role, Company, Assistant, Plan, Statistics, Question, Answer, QuestionType
 from services.mail_services import mail
 
 # Import all routers to register them as blueprints
-
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
     products_router, questions_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
-    changePassword_router, answers_router, bot_router
+    changePassword_router, answers_router, bot_router, emoji_router
 
 from routes.public.routers import public_router, resetPassword_router
 from services import user_services, mail_services
@@ -50,6 +43,7 @@ app.register_blueprint(changePassword_router)
 app.register_blueprint(users_router)
 app.register_blueprint(answers_router)
 app.register_blueprint(bot_router)
+app.register_blueprint(emoji_router)
 
 
 # code to ensure user is logged in
@@ -209,9 +203,6 @@ app.config.update(
 # mail = Mail(app)
 
 
-ALLOWED_UPLOAD_FILE_EXTENSIONS = set(['txt', 'pdf', 'doc', 'docx'])
-ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
-ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
 
 NoPlan = {"MaxProducts":0, "ActiveBotsCap":0, "InactiveBotsCap":0, "AdditionalUsersCap":0, "ExtendedLogic":False, "ImportDatabase":False, "CompanyNameonChatbot": False}
 BasicPlan = {"MaxProducts":600, "ActiveBotsCap":2, "InactiveBotsCap":3, "AdditionalUsersCap":5, "ExtendedLogic":False, "ImportDatabase":False, "CompanyNameonChatbot": False}
@@ -219,9 +210,6 @@ AdvancedPlan = {"MaxProducts":5000, "ActiveBotsCap":4, "InactiveBotsCap":8, "Add
 UltimatePlan = {"MaxProducts":30000, "ActiveBotsCap":10, "InactiveBotsCap":30, "AdditionalUsersCap":999, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
 #count_db("Plans", " WHERE Nickname=?", ["basic",])
 
-def hash_password(password, salt=gensalt()):
-    hashed = hashpw(bytes(password, 'utf-8'), salt)
-    return hashed
 
 
 def allowed_product_file(filename):
@@ -299,74 +287,6 @@ def testing(key):
     encryption = Fernet(enckey)
     print(encryption)
     return "Done"
-
-
-
-# Used to passthrough variables without repeating it in each method call
-# IE assistant information
-def render(template, **context):
-    if session.get('Logged_in', False):
-        return render_template(template, debug=app.debug, assistants=session.get('UserAssistants', []), **context)
-    return render_template(template, debug=app.debug, **context)
-
-def redirectWithMessage(function, message):
-    return redirect(url_for("."+function, messages=message))
-
-def checkForMessage():
-    args = request.args
-    msg=" "
-    if len(args) > 0:
-        msg = args['messages']
-    return msg
-
-def redirectWithMessageAndAssistantID(function, assistantID, message):
-    return redirect(url_for("." + function, assistantID=assistantID, message=message))
-
-def checkForMessageWhenAssistantID():
-        try:
-            message = request.args["message"]
-        except:
-            message = " "
-        return message
-
-# Data retrieval functions
-def get_company(email):
-    users = query_db("SELECT * FROM Users")
-    # If user exists
-    for user in users:
-        if user["Email"] == email:
-            company = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user["CompanyID"]])
-            if company is not None and company is not "None" and company is not "Error":
-                return company
-            else:
-                print("Error with finding company")
-                return "Error"
-    print("Error with finding user")
-    return "Error"
-
-
-def get_assistants(email):
-    users = query_db("SELECT * FROM Users")
-    # If user exists
-    for user in users:
-        if user["Email"] == email:
-            company = select_from_database_table("SELECT * FROM Companies WHERE ID=?;", [user["CompanyID"]])
-            if company is not None and company is not "None" and company is not "Error":
-                assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?;", [company[0]], True)
-                if assistants is not None and assistants is not "None" and assistants is not "Error":
-                    return assistants
-                else:
-                    print("Error with finding assistants")
-                    return "Error"
-            else:
-                print("Error with finding company")
-                return "Error"
-    print("Error with finding user")
-    return "Error"
-
-
-
-
 
 
 @app.route("/getpopupsettings/<assistantID>", methods=['GET'])
@@ -782,42 +702,7 @@ def admin_products_file_upload(assistantID):
                 return msg
 
 
-# TODO improve
-@app.route("/admin/assistant/<assistantID>/userinput", methods=["GET"])
-def admin_user_input(assistantID):
-    checkAssistantID(assistantID)
-    if request.method == "GET":
-        email = session.get('User')['Email']
-        assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=?", [assistantID,])
-        if assistant is None or "Error" in assistant:
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-        else:
-            questions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
-                                                    [assistantID], True)
-            data = []
-            print("questions: ", questions)
-            #dataTuple = tuple(["Null"])
-            for i in range(0, len(questions)):
-                question = questions[i]
-                print("question: ", question)
-                questionID = question[0]
-                print("questionID: ", questionID)
-                print(query_db("SELECT * FROM UserInput"), [])
-                userInput = select_from_database_table("SELECT * FROM UserInput WHERE QuestionID=?", [questionID], True)
-                print("userInput: ", userInput)
-                if userInput and userInput is not None:
-                    for record in userInput:
-                        print("record: ", record)
-                        data.append(record)
-            print("data:", data)
-            return render("admin/data-storage.html", data=data)
 
-
-@app.route("/admin/assistant/<assistantID>/connect", methods=['GET'])
-def admin_connect(assistantID):
-    checkAssistantID(assistantID)
-    assistant = query_db("SELECT * FROM Assistants WHERE ID=?;", [assistantID], True)
-    return render("admin/connect.html", companyID=assistant["CompanyID"], assistantID=assistantID)
 
 
 @app.route("/admin/templates", methods=['GET', 'POST'])
@@ -828,10 +713,6 @@ def admin_templates():
         abort(status.HTTP_501_NOT_IMPLEMENTED)
 
 
-
-@app.route("/admin/pricing", methods=['GET'])
-def admin_pricing():
-    return render("admin/pricing-tables.html", pub_key=pub_key)
 
 @app.route("/admin/adjustments", methods=['GET'])
 def admin_pricing_adjust():
@@ -860,177 +741,6 @@ def admin_analytics(assistantID):
             [assistantID], True)
         return render("admin/analytics.html", data=stats)
 
-
-# Method for the users
-@app.route("/admin/users", methods=['GET'])
-def admin_users():
-    if request.method == "GET":
-        message = checkForMessage()
-        email = session.get('User')['Email']
-        companyID = session.get('User')['CompanyID']
-
-        userSettings = query_db("SELECT * FROM UserSettings WHERE CompanyID=?", [companyID])
-
-        users = select_from_database_table("SELECT * FROM Users WHERE CompanyID=?", [companyID], True)
-        return render("admin/users.html", users=users, email=email, userSettings=userSettings, message=message)
-
-@app.route("/admin/users/add", methods=['POST'])
-def admin_users_add():
-    if request.method == "POST":
-        numberOfCompanyUsers = count_db("Users", " WHERE CompanyID=?", [session.get('User')['CompanyID'],])
-        if numberOfCompanyUsers >= session['UserPlan']['Settings']['AdditionalUsersCap'] + 1:
-            return redirectWithMessage("admin_users", "You have reached the max amount of additional Users - " + str(session['UserPlan']['Settings']['AdditionalUsersCap'])+".")
-        email = session.get('User')['Email']
-        companyID = session.get('User')['CompanyID']
-        fullname = request.form.get("fullname", default="Error")
-        accessLevel = request.form.get("accessLevel", default="Error")
-        newEmail = request.form.get("email", default="Error")
-        password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
-        # Generates a random password
-
-        if fullname == "Error" or accessLevel == "Error" or newEmail == "Error":
-            return redirectWithMessage("admin_users", "Error in retrieving all textbox inputs.")
-        else:
-            newEmail = newEmail.lower()
-            users = query_db("SELECT * FROM Users")
-            # If user exists
-            for record in users:
-                if record["Email"] == newEmail:
-                    return redirectWithMessage("admin_users", "Email is already in use!")
-            try:
-                firstname = fullname.split(" ")[0]
-                surname = fullname.split(" ")[1]
-            except IndexError as e:
-                return redirectWithMessage("admin_users", "Error in retrieving both names.")
-            hashed_password = hash_password(password)
-
-            #ENCRYPTION
-            insertUserResponse = insert_into_database_table(
-                "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
-                (companyID, encryptVar(firstname), encryptVar(surname), accessLevel, encryptVar(newEmail), hashed_password, "False"))
-            #insertUserResponse = insert_into_database_table(
-             #   "INSERT INTO Users ('CompanyID', 'Firstname','Surname', 'AccessLevel', 'Email', 'Password', 'Verified') VALUES (?,?,?,?,?,?,?);",
-              #  (companyID, firstname, surname, accessLevel, newEmail, hashed_password, "True"))
-            if "added" not in insertUserResponse:
-                return redirectWithMessage("admin_users", "Error in adding user to our records.")
-            else:
-                #if not app.debug:
-
-                # sending email to the new user.
-                # TODO this needs improving
-                link = "https://www.thesearchbase.com/admin/changepassword"
-                msg = Message("Account verification, "+firstname+" "+surname,
-                              sender="thesearchbase@gmail.com",
-                              recipients=[newEmail])
-                msg.html = "<h4>Hi, <h4> <br /> <p>You have been registered with TheSearchBase by an admin at your company.<br> \
-                            To get access to the platform, we have generated a temporary password for you to access the platform.</p> <br /> \
-                            <h4>Your temporary password is: "+password+".<h4><br />\
-                            Please visit <a href='"+link+"'>this link</a> to sign in and to set the password for your account.<p><br /> If you feel this is a mistake please contact "+email+". <br /> <br / > Regards, TheSearchBase Team"
-                mail.send(msg)
-                return redirectWithMessage("admin_users", "User has been added. A temporary password has been emailed to them.")
-
-@app.route("/admin/users/modify", methods=["POST"])
-def admin_users_modify():
-    if request.method == "POST":
-        email = session.get('User')['Email']
-        userID = request.form.get("userID", default="Error")
-        newAccess = request.form.get("accessLevel", default="Error")
-        if userID != "Error" and newAccess != "Error":
-            updatedAccess = update_table("UPDATE Users SET AccessLevel=? WHERE ID=?;", [newAccess, userID])
-            if newAccess == "Owner":
-                users = query_db("SELECT * FROM Users")
-                recordID = "Error"
-                # If user exists
-                for record in users:
-                    if record["Email"] == session.get('User')['Email']:
-                        recordID = record["ID"]
-                if "Error" in recordID:
-                    return redirectWithMessage("admin_users", "Error in finding user.")
-                updatedAccess = update_table("UPDATE Users SET AccessLevel=? WHERE ID=?;", ["Admin", recordID])
-                return redirectWithMessage("admin_users", "User has been modified.")
-        return redirectWithMessage("admin_users", "Error in retrieving all textbox inputs.")
-
-@app.route("/admin/users/delete/<userID>", methods=["GET"])
-def admin_users_delete(userID):
-    if request.method == "GET":
-        email = session.get('User')['Email']
-        companyID = session.get('User')['CompanyID']
-        
-        users = query_db("SELECT * FROM Users")
-        requestingUser = "Error"
-        # If user exists
-        for user in users:
-            if user["Email"] == email:
-                requestingUser = user
-        if "Error" in requestingUser:
-            return redirectWithMessage("admin_users", "Error in finding user.")
-        targetUser = select_from_database_table("SELECT CompanyID FROM Users WHERE ID=?", [userID])[0]
-        #Check that users are from the same company and operating user isnt 'User'
-        if requestingUser["AccessLevel"] == "User" or requestingUser["CompanyID"] != targetUser:
-            #TODO send feedback message
-            return redirect("/admin/dashboard", code=302)
-        delete_from_table("DELETE FROM Users WHERE ID=?;", [userID])
-        return redirectWithMessage("admin_users", "User has been deleted.")
-
-
-@app.route("/admin/users/permissions", methods=["POST"])
-def admin_users_permissions():
-    if request.method == "POST":
-        adminPermissions = ""
-        userPermissions = ""
-        
-        permissionTypes = ["EditChatbots", "EditUsers", "AccessBilling"]
-        #try to get admin permissions
-        for i in range(0,3):
-            permission = request.form.get("AdminPermission" + str(i+1), default="Error")
-            #look for Trues
-            if "Error" not in permission:
-                for pType in permissionTypes:
-                    if pType in permission:
-                        adminPermissions += (pType + ":True;")
-                        permissionTypes.remove(pType)
-        #look for Falses
-        for pType in permissionTypes:
-            adminPermissions += (pType + ":False;")
-
-        permissionTypes = ["EditChatbots", "EditUsers", "AccessBilling"]
-        #try to get user permissions
-        for i in range(0,3):
-            permission = request.form.get("UserPermission" + str(i+1), default="Error")
-            #look for Trues
-            if "Error" not in permission:
-                for pType in permissionTypes:
-                    if pType in permission:
-                        userPermissions += (pType + ":True;")
-                        permissionTypes.remove(pType)
-        #look for Falses
-        for pType in permissionTypes:
-            userPermissions += (pType + ":False;")
-
-        #update table
-        #updatePermissions = query_db("UPDATE UserSettings SET AdminPermissions=?,UserPermissions=? WHERE CompanyID=?;", [adminPermissions, userPermissions, session.get('User')['CompanyID']])
-        updatePermissions = update_table("UPDATE UserSettings SET AdminPermissions=?,UserPermissions=? WHERE CompanyID=?;", [adminPermissions, userPermissions, session.get('User')['CompanyID']])
-
-        #update current user's permisions
-        permissionsDic = {}
-        permissions = query_db("SELECT * FROM UserSettings WHERE CompanyID=?", [session.get('User')['CompanyID']])[0]
-        if "Owner" in session.get('User')['AccessLevel']:
-            permissions = permissions["AdminPermissions"].split(";")
-            for perm in permissions:
-                if perm:
-                    permissionsDic[perm.split(":")[0]] = True
-        else:
-            permissions = permissions[session.get('User')['AccessLevel']+"Permissions"].split(";")
-            for perm in permissions:
-                if perm:
-                    if "True" in perm.split(":")[1]:
-                        permBool = True
-                    else:
-                        permBool = False
-                    permissionsDic[perm.split(":")[0]] = permBool
-        session['Permissions'] = dict(permissionsDic)
-
-        return redirect("/admin/users", code=302)
 
 
 # Method for the billing
@@ -1070,10 +780,6 @@ def admin_support_billing():
         return render("admin/support/billing.html")
 
 
-@app.route("/admin/emoji-converter", methods=['GET'])
-def admin_emoji():
-    if request.method == "GET":
-        return render("admin/emoji.html")
 
 
 @app.route("/chatbot/<companyID>/<assistantID>", methods=['GET', 'POST'])

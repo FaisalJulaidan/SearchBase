@@ -13,6 +13,7 @@ class BaseConfig(object):
 
     ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
     ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
+    ALLOWED_UPLOAD_FILE_EXTENSIONS = {'txt', 'pdf', 'doc', 'docx'}
 
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))
     PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')

@@ -6,10 +6,14 @@ from itsdangerous import URLSafeTimedSerializer
 from models import Callback
 import string
 import random
+from celery import Celery
+
+celeryMail = Celery('tasks')
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 mail = Mail()
 
+@celeryMail.task
 def sendVerificationEmail(email, companyName, fullname) -> Callback:
     try:
         print(1)
@@ -21,9 +25,7 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
         print(3)
         link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
         print(4)
-        # need to add the links to the email, right now its just a page.
-        #msg.html = render_template('/emails/verification.html', link = link)
-        msg.html = "Hi"
+        msg.html = render_template('/emails/verification.html', link = link)
         print(5)
         mail.send(msg)
         print(6)

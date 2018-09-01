@@ -24,7 +24,7 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
                       recipients=[email])
         payload = email + ";" + companyName
         link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
-        // need to add the links to the email, right now its just a page.
+        # need to add the links to the email, right now its just a page.
         msg.html = render_template('/emails/verification.html', link)
         mail.send(msg)
 
@@ -52,7 +52,8 @@ def sendPasswordResetEmail(email, companyID):
               
         payload = email + ";" + str(companyID)
         link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
-        msg.html render_template('/emails/reset-password.html', link)
+        # msg.html
+        render_template('/emails/reset-password.html', link)
         mail.send(msg)
 
     except Exception as e:

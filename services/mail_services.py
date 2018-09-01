@@ -1,20 +1,28 @@
 import sqlalchemy.exc
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from models import Callback
 
-mail = Mail()
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 # Mail Config
-MAIL_SERVER = 'smtp.gmail.com',
-MAIL_PORT = 465,
-MAIL_USE_SSL = True,
-MAIL_USERNAME = 'thesearchbase@gmail.com',
-MAIL_PASSWORD = 'pilbvnczzdgxkyzy'
+app = Flask(__name__, static_folder='static')
 
+app.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=465,
+    MAIL_USE_SSL=True,
+    MAIL_USERNAME='thesearchbase@gmail.com',
+    MAIL_PASSWORD='pilbvnczzdgxkyzy',
+
+    TESTING = False,
+    MAIL_SUPPRESS_SEND = False
+)
+
+
+mail = Mail(app)
 
 def sendVerificationEmail(email, companyName, fullname) -> Callback:
 
@@ -25,7 +33,7 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
         payload = email + ";" + companyName
         link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
         # need to add the links to the email, right now its just a page.
-        msg.html = render_template('/emails/verification.html', link)
+        msg.html = render_template('/emails/verification.html', link = link)
         mail.send(msg)
 
         # sending the registration confirmation email to us
@@ -49,11 +57,16 @@ def sendPasswordResetEmail(email, companyID):
         msg = Message("Password reset",
                     sender="thesearchbase@gmail.com",
                     recipients=[email])
+        print("msg.recipients: ", msg.recipients)
+        print("email: ", email)
               
         payload = email + ";" + str(companyID)
+        print("payload: ", payload)
         link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
-        # msg.html
-        render_template('/emails/reset-password.html', link)
+        print("link: ", link)
+        msg.html = "Hi"
+        print("msg.html: ", msg.html)
+        #msg.html = render_template('/emails/reset-password.html', link = link)
         mail.send(msg)
 
     except Exception as e:

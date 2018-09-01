@@ -19,9 +19,10 @@
             margin-top: -20px;
             font-size: 15px;
         }
-        .btn-default.focus, .btn-default:focus{
-            background-color:#fff;
-            border-color:#ccc
+
+        .btn-default.focus, .btn-default:focus {
+            background-color: #fff;
+            border-color: #ccc
         }
     </style>
     <div class="right_col" role="main">
@@ -40,35 +41,37 @@
             </div>
             <div class="x_conent">
                 <ul id="draggablePanelList" class="list-unstyled">
-{#                    <li class="panel panel-info">#}
-{#                        <div class="panel-heading">#}
-{#                            <div class="panel-title">#}
-{#                                <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>#}
-{#                                <b>Do you sleep?</b>#}
-{#                            </div>#}
-{#                            <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>#}
-{#                            <div class="col-xs-3 pull-right" style="margin-top: -30px">#}
-{#                                <div class="input-group">#}
-{#                                    <input type="text" style="height: 34px" class="form-control" aria-label="...">#}
-{#                                    <div class="input-group-btn">#}
-{#                                        <button type="button" class="btn btn-default dropdown-toggle"#}
-{#                                                data-toggle="dropdown"#}
-{#                                                aria-haspopup="true" aria-expanded="false">#}
-{#                                            Type <span style="margin: 0" class="caret"></span>#}
-{#                                        </button>#}
-{#                                        <ul class="dropdown-menu dropdown-menu-right">#}
-{#                                            <li><a href="#">Pre defined</a></li>#}
-{#                                            <li><a href="#">Open Answer</a></li>#}
-{#                                            <li><a href="#">File Upload</a></li>#}
-{#                                        </ul>#}
-{#                                    </div><!-- /btn-group -->#}
-{#                                </div><!-- /input-group -->#}
-{#                            </div><!-- /.col-lg-3 -->#}
-{#                        </div>#}
-{#                        <div class="panel-body">#}
-{#                            Question content#}
-{#                        </div>#}
-{#                    </li>#}
+                    <li class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                <span class="moveable" style="color:#660ff2">
+                                    <i class="glyphicon glyphicon-menu-hamburger"></i>
+                                </span>
+                                <b>Upload Your CV</b>
+                            </div>
+                            <span class="pull-right clickable" style="color:#660ff2"><i
+                                    class="glyphicon glyphicon-chevron-down"></i></span>
+                            <div class="col-xs-3 pull-right" style="margin-top: -30px">
+                                <div class="input-group">
+                                    <input type="text" style="height: 34px" class="form-control" aria-label="..." id="questionType">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default dropdown-toggle"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Type <span style="margin: 0" class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <li><a>Predefined Answers</a></li>
+                                            <li><a>Open Answers</a></li>
+                                            <li><a>File Upload</a></li>
+                                        </ul>
+                                    </div><!-- /btn-group -->
+                                </div><!-- /input-group -->
+                            </div><!-- /.col-lg-3 -->
+                        </div>
+                        <div class="panel-body">
+                            Question content
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -87,10 +90,13 @@
             main();
 
             function main() {
-                init_page();
-                init_data();
+                init_data()
+                    .then(() => {
+                        init_page()
+                    })
             }
             function init_page() {
+                // to collopse and expand the panel
                 $(document).on('click', '.panel-heading', function (e) {
                     if ( $(e.target).is('a') ||
                          $(e.target).is('input.form-control') ) {
@@ -109,6 +115,8 @@
                         $this.find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
                     }
                 });
+
+                // to drag and drop the panels
                 var panelList = $('#draggablePanelList');
                 panelList.sortable({
                     // Only make the .panel-heading child elements support dragging.
@@ -124,9 +132,14 @@
                         console.log(arr)
                     }
                 });
+
+                // to change the textbox next to type dropdown
+                $("ul.dropdown-menu.dropdown-menu-right").on("click",function(e){
+                    $(e.target).parent().parent().parent().parent().children().first().val($(e.target).text())
+                })
             }
             function init_data() {
-                $.ajax({
+                return $.ajax({
                     url: 'bot/questions',
                     type: "GET"
                 }).done(function (res) {
@@ -159,15 +172,15 @@
                     "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-chevron-down\"></i></span>\n" +
                     "        <div class=\"col-xs-3 pull-right\" style=\"margin-top: -30px\">\n" +
                     "            <div class=\"input-group\">\n" +
-                    "                <input type=\"text\" style=\"height: 34px\" class=\"form-control\" aria-label=\"...\">\n" +
+                    "                <input type=\"text\" style=\"height: 34px\" class=\"form-control\" aria-label=\"...\">" +
                     "                <div class=\"input-group-btn\">\n" +
                     "                    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\"\n" +"" +
                     "                            aria-haspopup=\"true\" aria-expanded=\"false\">\n" +
                     "                        Type <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                     "                    </button>\n" +
                     "                    <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
-                    "                        <li><a href=\"#\">Pre defined</a></li>\n" +
-                    "                        <li><a href=\"#\">Open Answer</a></li>\n" +
+                    "                        <li><a href=\"#\">Predefined Answers</a></li>\n" +
+                    "                        <li><a href=\"#\">Open Answers</a></li>\n" +
                     "                        <li><a href=\"#\">File Upload</a></li>\n" +
                     "                    </ul>\n" +
                     "                </div><!-- /btn-group -->\n" +

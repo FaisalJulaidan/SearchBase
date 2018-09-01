@@ -13,19 +13,7 @@ verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y
 @public_router.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
-        # db_services.addCompanyAndUserAndRole(db_services)
-        # print(CompanyServices.getByID(1).Users)
-        # callback: Callback = db_services.addCompany()
-        # print(callback.Success, callback.Message)
-        #
-        # callback: Callback = db_services.addUser()
-        # print(callback.Success, callback.Message)
-
-        # company = Company(Name='companyName', Size=12, PhoneNumber='4344423', URL='ff.com')
-        # role = Role.query.filter(Role.Name == "Admin").first()
-        # user = User(irstname='firstname', Surname='lastname', Email='email', Password=helpers.hashPass('123'), Company=company, Role=role)
-        # company_services.addCompany("companyName", 12, "4344423", "ff.com" )
-        # user_services.createUser(firstname='firstname', surname='lastname', email='email', password='123', company=company, role=role)
+        mail_services.sendVerificationEmail('julaidan.faisal@gmail.com', 'companyName', 'Faisal Julaidan')
 
         return render_template("index.html")
 

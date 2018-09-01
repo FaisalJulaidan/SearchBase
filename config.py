@@ -22,13 +22,14 @@ class BaseConfig(object):
     SECRET_KEY = os.urandom(24)
     CSRF_SESSION_KEY = os.urandom(24)
 
-
     # Mail Config
-    MAIL_SERVER = 'smtp.gmail.com',
-    MAIL_PORT = 465,
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 465
     MAIL_USE_SSL = True,
-    MAIL_USERNAME = 'thesearchbase@gmail.com',
+    MAIL_USERNAME = 'thesearchbase@gmail.com'
     MAIL_PASSWORD = 'pilbvnczzdgxkyzy'
+    MAIL_SUPPRESS_SEND = False
+
 
 
 class DevelopmentConfig(BaseConfig):

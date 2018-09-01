@@ -77,17 +77,6 @@ def before_request():
 #      WILL BE REMOVED          #
 #################################
 
-# app.config.from_object('config.DevelopmentConfig')
-# app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
-#
-#
-# db.init_app(app)
-# mail.init_app(app)
-# app.app_context().push()
-#
-# db.drop_all()
-# db.create_all()
-
 
 # Generates dummy data for testing
 def genDummyData():
@@ -192,13 +181,13 @@ stripe_keys = {
 
 # stripe.api_key = stripe_keys['secret_key']
 
-app.config.update(
-    MAIL_SERVER='smtp.gmail.com',
-    MAIL_PORT=465,
-    MAIL_USE_SSL=True,
-    MAIL_USERNAME='thesearchbase@gmail.com',
-    MAIL_PASSWORD='pilbvnczzdgxkyzy'
-)
+# app.config.update(
+#     MAIL_SERVER='smtp.gmail.com',
+#     MAIL_PORT=465,
+#     MAIL_USE_SSL=True,
+#     MAIL_USERNAME='thesearchbase@gmail.com',
+#     MAIL_PASSWORD='pilbvnczzdgxkyzy'
+# )
 
 # mail = Mail(app)
 
@@ -1535,6 +1524,4 @@ if __name__ == "__main__":
 
     # Run the app server
     app.run()
-
-    mail_services.sendVerificationEmail('m.esteghamatdar@gmail.com', 'companyName', 'Mehdi Este')
 

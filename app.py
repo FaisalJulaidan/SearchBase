@@ -13,9 +13,11 @@ import stripe
 from urllib.request import urlopen
 from cryptography.fernet import Fernet
 import urllib.request
+#from celery import Celery
 
 from models import db, Role, Company, Assistant, Plan, Statistics, Question, Answer, QuestionType
 from services.mail_services import mail
+#, celery
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
@@ -1507,9 +1509,16 @@ if __name__ == "__main__":
 
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 
-    app.config.from_object('config.BaseConfig')
+    app.config.from_object('config.DevelopmentConfig')
     app.secret_key = 'KeYCatApP'
     app.config['SESSION_TYPE'] = 'filesystem'
+
+    ##Celery
+    #app.config['CELERY_BROKER_URL'] = 'redis://127.0.0.1:5000'
+    #app.config['CELERY_RESULT_BACKEND'] = 'redis://127.0.0.1:5000'
+    
+    #celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+    #celery.conf.update(app.config)
 
     db.init_app(app)
     mail.init_app(app)

@@ -51,21 +51,21 @@ def sendPasswordResetEmail(email, companyID):
     
     return Callback(True, 'Password reset email sent successfully to ' + email)
 
-def addedNewUserEmail(adminEmail, targetEmail):
-    try:
-        password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
-        link = "http://206.189.122.126/admin/changepassword"
+#def addedNewUserEmail(adminEmail, targetEmail):
+#    try:
+#        password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
+#        link = "http://206.189.122.126/admin/changepassword"
 
-        msg = Message("You have been added to TheSearchBase",
-                        sender="thesearchbase@gmail.com",
-                        recipients=[targetEmail])
+#        msg = Message("You have been added to TheSearchBase",
+#                        sender="thesearchbase@gmail.com",
+#                        recipients=[targetEmail])
 
-        msg.html = render_template('/emails/account_invitation.html', password=password, adminEmail=adminEmail)
+#        msg.html = render_template('/emails/account_invitation.html', password=password, adminEmail=adminEmail)
 
-        mail.send(msg)
+#        mail.send(msg)
 
-    except:
-        print("addedNewUserEmail() Error: ", e)
-        return Callback(False, 'Could not send email to ' + targetEmail)
+#    except:
+#        print("addedNewUserEmail() Error: ", e)
+#        return Callback(False, 'Could not send email to ' + targetEmail)
     
-    return Callback(True, 'Email sent successfully to ' + targetEmail)
+#    return Callback(True, 'Email sent successfully to ' + targetEmail)

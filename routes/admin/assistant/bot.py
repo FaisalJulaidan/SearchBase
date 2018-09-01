@@ -55,7 +55,7 @@ def get_botQuestions(assistantID):
 
     ]
 }
-        return json.dumps({'success': False, 'msg': "Assistant not found.", 'data': res}), \
+        return json.dumps({'success': True, 'msg': "Assistant found :).", 'data': res}), \
                    200, {'ContentType': 'application/json'}
 
 

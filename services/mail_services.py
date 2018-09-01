@@ -4,14 +4,13 @@ from flask import Flask, render_template
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from models import Callback
-import string
-import random
+#import string
+#import random
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 mail = Mail()
 
 def sendVerificationEmail(email, companyName, fullname) -> Callback:
-
     try:
         msg = Message("Account verification",
                       sender="thesearchbase@gmail.com",
@@ -33,10 +32,6 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
         return Callback(False, 'Could not send a verification email to ' + email)
 
     return Callback(True, 'Verification email sent successfully to ' + email)
-
-
-
-
 
 def sendPasswordResetEmail(email, companyID):
     try:

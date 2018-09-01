@@ -100,13 +100,13 @@ def genDummyData():
     db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
     db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
 
-    db.session.add(QuestionType(Name="OpenAnswers"))
-    db.session.add(QuestionType(Name="PredefinedAnswers"))
-    db.session.add(QuestionType(Name="FileUpload"))
-
-    openAnswers = QuestionType.query.filter(QuestionType.Name == "OpenAnswers").first()
-    predefinedAnswers = QuestionType.query.filter(QuestionType.Name == "PredefinedAnswers").first()
-    fileUpload = QuestionType.query.filter(QuestionType.Name == "FileUpload").first()
+    # db.session.add(QuestionType(Name="OpenAnswers"))
+    # db.session.add(QuestionType(Name="PredefinedAnswers"))
+    # db.session.add(QuestionType(Name="FileUpload"))
+    #
+    # openAnswers = QuestionType.query.filter(QuestionType.Name == "OpenAnswers").first()
+    # predefinedAnswers = QuestionType.query.filter(QuestionType.Name == "PredefinedAnswers").first()
+    # fileUpload = QuestionType.query.filter(QuestionType.Name == "FileUpload").first()
 
 
     for assistant in aramco.Assistants:
@@ -116,7 +116,7 @@ def genDummyData():
             Statistics(Name="test1", Opened=True, QuestionsAnswered=52, ProductsReturned=32, Assistant=assistant))
 
         db.session.add(
-            Question(Question="how old are you?", Assistant=assistant, QuestionType=openAnswers))
+            Question(Question="how old are you?", Assistant=assistant, QuestionType=QuestionType.OpenAnswers))
         for q in assistant.Questions:
             db.session.add(
                 Answer(Answer="yes", Keyword="jeddah,khaled", Action="", TimesClicked=12, Question=q))
@@ -124,7 +124,7 @@ def genDummyData():
                 Answer(Answer="hey", Keyword="riyadh,khaled", Action="", TimesClicked=12, Question=q))
 
         db.session.add(
-            Question(Question="how do you do?", Assistant=assistant, QuestionType=predefinedAnswers))
+            Question(Question="how do you do?", Assistant=assistant, QuestionType=QuestionType.PredefinedAnswers))
 
 
     db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))

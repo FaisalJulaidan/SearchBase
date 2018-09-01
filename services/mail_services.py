@@ -57,16 +57,11 @@ def sendPasswordResetEmail(email, companyID):
         msg = Message("Password reset",
                     sender="thesearchbase@gmail.com",
                     recipients=[email])
-        print("msg.recipients: ", msg.recipients)
-        print("email: ", email)
               
         payload = email + ";" + str(companyID)
-        print("payload: ", payload)
         link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
-        print("link: ", link)
         msg.html = "Hi"
-        print("msg.html: ", msg.html)
-        #msg.html = render_template('/emails/reset-password.html', link = link)
+        #msg.html = render_template('/emails/reset-password.html', link = link) error with '/emails/reset-password.html' missing?
         mail.send(msg)
 
     except Exception as e:

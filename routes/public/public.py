@@ -191,5 +191,4 @@ def signup():
             helpers.redirectWithMessage('signup', 'Signed up successfully but > ' + mail_callback.Message
                                         + '. Please contact TheSearchBaseStaff to activate your account.')
 
-        return render_template('errors/verification.html',
-                               msg="Please check your email and follow instructions to verify account and get started.")
+        return helpers.redirectWithMessage("login", "We have sent you a verification email. Please use it to complete the sign up process.")

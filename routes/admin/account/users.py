@@ -4,7 +4,7 @@ from models import Callback, db, User, Company
 from flask import Blueprint, request, redirect, session
 from utilties import helpers
 
-users_router: Blueprint = Blueprint('users_router', __name__ ,template_folder="../../templates")
+users_router: Blueprint = Blueprint('users_router', __name__, template_folder="../../templates")
 
 
 # Update roles

@@ -15,11 +15,8 @@ def reset_password():
     else:
          email = request.form.get("email", default="Error")
 
-         email_callback : Callback = user_services.getByEmail(email)
-         if not email_callback.Success: return helpers.redirectWithMessage("reset_password", email_callback.Message)
-
          company_callback : Callback = company_services.getByEmail(email)
-         if not company_callback.Success: return helpers.redirectWithMessage("reset_password", company_callback.Message)
+         if not company_callback.Success: return helpers.redirectWithMessage("reset_password", "User with that email does not exist.")
 
          mail_callback : Callback = mail_services.sendPasswordResetEmail(email, company_callback.Data.ID)
 

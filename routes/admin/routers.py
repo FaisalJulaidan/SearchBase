@@ -47,3 +47,6 @@ answers_router: Blueprint = answers_router
 
 from .assistant.bot import bot_router
 bot_router: Blueprint = bot_router
+
+from .tools.emojiConverter import emoji_router
+emoji_router: Blueprint = emoji_router

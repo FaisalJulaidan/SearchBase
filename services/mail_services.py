@@ -25,7 +25,7 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
                       sender="thesearchbase@gmail.com",
                       recipients=[email])
         payload = email + ";" + companyName
-        link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
+        link = "http://206.189.122.126/account/verify/" + verificationSigner.dumps(payload)
         # need to add the links to the email, right now its just a page.
         msg.html = render_template('/emails/verification.html', link)
         mail.send(msg)
@@ -53,7 +53,7 @@ def sendPasswordResetEmail(email, companyID):
                     recipients=[email])
               
         payload = email + ";" + str(companyID)
-        link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
+        link = "http://206.189.122.126/account/resetpassword/" + verificationSigner.dumps(payload)
         # msg.html
         render_template('/emails/reset-password.html', link)
         mail.send(msg)
@@ -67,7 +67,7 @@ def sendPasswordResetEmail(email, companyID):
 def addedNewUserEmail(adminEmail, targetEmail):
     try:
         password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
-        link = "https://www.thesearchbase.com/admin/changepassword"
+        link = "http://206.189.122.126/admin/changepassword"
 
         msg = Message("You have been added to TheSearchBase",
                         sender="thesearchbase@gmail.com",

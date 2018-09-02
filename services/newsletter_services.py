@@ -20,7 +20,6 @@ def checkForNewsletter(email):
         print(result)
         if not result: raise Exception
     except Exception as e:
-        print(email + " not registered for newsletters")
         return Callback(False, email + ' is not registered for newsletters')
 
     return Callback(True, email + ' is registered for newsletters')

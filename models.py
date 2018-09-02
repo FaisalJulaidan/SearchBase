@@ -191,7 +191,7 @@ class Assistant(db.Model):
                    on_serialize=None,
                    on_deserialize=None
                    )
-    Nickname = db.Column(db.String(128),nullable=False,
+    Name = db.Column(db.String(128),nullable=False,
                          supports_json=True,
                          supports_dict=True,
                          on_serialize=None,
@@ -240,7 +240,7 @@ class Assistant(db.Model):
 
 
     def __repr__(self):
-        return '<Assistant {}>'.format(self.Nickname)
+        return '<Assistant {}>'.format(self.Name)
 
 
 class Product(db.Model):
@@ -366,9 +366,31 @@ class Statistics(db.Model):
 
 
 class QuestionType(enum.Enum):
-    OpenAnswers = 1
-    PredefinedAnswers = 2
-    FileUpload = 3
+    UserInput = 'User Input'
+    PredefinedAnswers = 'Predefined Answers'
+    FileUpload = 'File Upload'
+
+    # def __str__(self):
+    #     return str(self.value)
+
+
+class QuestionAction(enum.Enum):
+    GoToNextQuestion = 'Go To Next Question'
+    GoToSpecificQuestion = 'Go To Specific Question'
+    ShowSolutions = 'Show Solutions'
+
+    def __str__(self):
+        return str(self.value)
+
+class UserInputValidation(enum.Enum):
+    Email = 'Email'
+    Telephone = 'Telephone'
+    Decimal = 'Decimal'
+    Integer = 'Integer'
+
+    def __str__(self):
+        return str(self.value)
+
 
 class Question(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
@@ -377,12 +399,31 @@ class Question(db.Model):
                    on_serialize=None,
                    on_deserialize=None
                    )
-    Question = db.Column(db.String(), nullable=False,
+    Text = db.Column(db.String(), nullable=False,
                          supports_json=True,
                          supports_dict=True,
                          on_serialize=None,
                          on_deserialize=None
                          )
+
+    Type = db.Column(Enum(QuestionType), nullable=False,
+                             supports_json=True,
+                             supports_dict=True,
+                             on_serialize=None,
+                             on_deserialize=None
+                             )
+    Order = db.Column(db.Integer, nullable=False,
+                      supports_json=True,
+                      supports_dict=True,
+                      on_serialize=None,
+                      on_deserialize=None
+                      )
+    StoreInDB = db.Column(db.Boolean(), nullable=False, default=True,
+                          supports_json=True,
+                          supports_dict=True,
+                          on_serialize=None,
+                          on_deserialize=None
+                          )
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID'), nullable=False)
@@ -393,47 +434,113 @@ class Question(db.Model):
                                 on_deserialize=None
                                 )
 
-    QuestionType = db.Column(Enum(QuestionType), nullable=False)
-    # QuestionTypeID = db.Column(db.Integer, db.ForeignKey('question_type.ID'), nullable=False)
-    # QuestionType = db.relationship('QuestionType', back_populates='Questions',
-    #                                supports_json=True,
-    #                                supports_dict=True,
-    #                                on_serialize=None,
-    #                                on_deserialize=None
-    #                                )
-
-    Answers = db.relationship('Answer', back_populates='Question',
-                              supports_json=True,
-                              supports_dict=True,
-                              on_serialize=None,
-                              on_deserialize=None
-                              )
-
-    UserInputs = db.relationship('UserInput', back_populates='Question')
+    # Constraints:
+    db.UniqueConstraint('AssistantID', 'Order', name='uix1_question')
 
     def __repr__(self):
-        return '<Question {}>'.format(self.Question)
+        return '<Question {}>'.format(self.Text)
 
 
-# class QuestionType(db.Model):
-#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
-#                    supports_json=True,
-#                    supports_dict=True,
-#                    on_serialize=None,
-#                    on_deserialize=None
-#                    )
-#     Name = db.Column(db.String(), nullable=False,
-#                      supports_json=True,
-#                      supports_dict=True,
-#                      on_serialize=None,
-#                      on_deserialize=None
-#                      )
-#
-#     # Relationships:
-#     Questions = db.relationship('Question', back_populates='QuestionType')
-#
-#     def __repr__(self):
-#         return '<QuestionType {}>'.format(self.Name)
+class QuestionUI(db.Model):
+    ID = db.Column(db.Integer, db.ForeignKey(Question.ID), primary_key=True, unique=True,
+                   supports_json=True,
+                   supports_dict=True,
+                   on_serialize=None,
+                   on_deserialize=None
+                   )
+
+    Action = db.Column(Enum(QuestionAction), nullable=False,
+                       supports_json=True,
+                       supports_dict=True,
+                       on_serialize=None,
+                       on_deserialize=None
+                       )
+    Validation = db.Column(Enum(UserInputValidation), nullable=False,
+                           supports_json=True,
+                           supports_dict=True,
+                           on_serialize=None,
+                           on_deserialize=None
+                           )
+    # Relationships:
+    Question = db.relationship('Question', foreign_keys=[ID])
+    QuestionToGoID = db.Column(db.Integer, db.ForeignKey('question.ID'),
+                               supports_json=True,
+                               supports_dict=True,
+                               on_serialize=None,
+                               on_deserialize=None
+                               )
+    QuestionToGo = db.relationship('Question', foreign_keys=[QuestionToGoID])
+
+    def __repr__(self):
+        return '<QuestionUI {}>'.format(self.Question)
+
+
+class UserInput(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
+                   supports_json=True,
+                   supports_dict=True,
+                   on_serialize=None,
+                   on_deserialize=None
+                   )
+    SessionID = db.Column(db.Integer, nullable=False,
+                          supports_json=True,
+                          supports_dict=True,
+                          on_serialize=None,
+                          on_deserialize=None
+                          )
+    Text = db.Column(db.String(), nullable=False,
+                      supports_json=True,
+                      supports_dict=True,
+                      on_serialize=None,
+                      on_deserialize=None
+                      )
+
+    QuestionText = db.Column(db.String(), nullable=False,
+                             supports_json=True,
+                             supports_dict=True,
+                             on_serialize=None,
+                             on_deserialize=None
+                             )
+    Keywords = db.Column(db.String(), nullable=False,
+                         supports_json=True,
+                         supports_dict=True,
+                         on_serialize=None,
+                         on_deserialize=None
+                         )
+    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now,
+                         supports_json=True,
+                         supports_dict=True,
+                         on_serialize=None,
+                         on_deserialize=None
+                         )
+
+    # Relationships:
+    QuestionUIID = db.Column(db.Integer, db.ForeignKey('questionUI.ID'), nullable=False)
+    QuestionUI = db.relationship('QuestionUI', foreign_keys=[QuestionUIID],
+                                 supports_json=True,
+                                 supports_dict=True,
+                                 on_serialize=None,
+                                 on_deserialize=None
+                                 )
+
+    def __repr__(self):
+        return '<UserInput {}>'.format(self.Text)
+
+class QuestionPA(db.Model):
+    ID = db.Column(db.Integer, db.ForeignKey(Question.ID), primary_key=True, unique=True,
+                   supports_json=True,
+                   supports_dict=True,
+                   on_serialize=None,
+                   on_deserialize=None
+                   )
+    # Relationships:
+    Answers = db.relationship('Answer', back_populates='QuestionPA')
+
+    Question = db.relationship('Question', foreign_keys=[ID])
+
+    def __repr__(self):
+        return '<QuestionPA {}>'.format(self.Question)
+
 
 
 class Answer(db.Model):
@@ -443,19 +550,19 @@ class Answer(db.Model):
                    on_serialize=None,
                    on_deserialize=None
                    )
-    Answer = db.Column(db.String(), nullable=False,
+    Text = db.Column(db.String(), nullable=False,
                        supports_json=True,
                        supports_dict=True,
                        on_serialize=None,
                        on_deserialize=None
                        )
-    Keyword = db.Column(db.String(), nullable=False,
-                        supports_json=True,
-                        supports_dict=True,
-                        on_serialize=None,
-                        on_deserialize=None
-                        )
-    Action = db.Column(db.String(), nullable=False, default='Next Question by Order',
+    Keywords = db.Column(db.String(), nullable=False,
+                         supports_json=True,
+                         supports_dict=True,
+                         on_serialize=None,
+                         on_deserialize=None
+                         )
+    Action = db.Column(Enum(QuestionAction), nullable=False,
                        supports_json=True,
                        supports_dict=True,
                        on_serialize=None,
@@ -469,45 +576,86 @@ class Answer(db.Model):
                              )
 
     # Relationships:
-    QuestionID = db.Column(db.Integer, db.ForeignKey('question.ID'), nullable=False)
-    Question = db.relationship('Question', back_populates='Answers',
-                               supports_json=False,
-                               supports_dict=False,
+    QuestionPAID = db.Column(db.Integer, db.ForeignKey('questionPA.ID'), nullable=False)
+    QuestionPA = db.relationship('QuestionPA', back_populates='Answers', foreign_keys=[QuestionPAID],
+                                 supports_json=False,
+                                 supports_dict=False,
+                                 on_serialize=None,
+                                 on_deserialize=None
+                                 )
+    QuestionToGoID = db.Column(db.Integer, db.ForeignKey('question.ID'), nullable=True)
+    QuestionToGo = db.relationship('Question', foreign_keys=[QuestionToGoID])
+
+    def __repr__(self):
+        return '<Answer {}>'.format(self.Text)
+
+
+class QuestionFU(db.Model):
+    ID = db.Column(db.Integer, db.ForeignKey(Question.ID), primary_key=True, unique=True,
+                   supports_json=True,
+                   supports_dict=True,
+                   on_serialize=None,
+                   on_deserialize=None
+                   )
+    Action = db.Column(Enum(QuestionAction), nullable=False,
+                       supports_json=True,
+                       supports_dict=True,
+                       on_serialize=None,
+                       on_deserialize=None
+                       )
+    TypesAllowed = db.Column(db.String(), nullable=False,
+                             supports_json=True,
+                             supports_dict=True,
+                             on_serialize=None,
+                             on_deserialize=None
+                             )
+    # Relationships:
+    Question = db.relationship('Question', foreign_keys=[ID])
+    QuestionToGoID = db.Column(db.Integer, db.ForeignKey('question.ID'),
+                               supports_json=True,
+                               supports_dict=True,
                                on_serialize=None,
                                on_deserialize=None
                                )
+    QuestionToGo = db.relationship('Question', foreign_keys=[QuestionToGoID])
 
     def __repr__(self):
-        return '<Answer {}>'.format(self.Answer)
+        return '<QuestionFU {}>'.format(self.Question)
 
 
-
-class UserInput(db.Model):
+class UserFiles(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
                    supports_json=True,
                    supports_dict=True,
                    on_serialize=None,
                    on_deserialize=None
                    )
-    Input = db.Column(db.String(), nullable=False,
-                      supports_json=True,
-                      supports_dict=True,
-                      on_serialize=None,
-                      on_deserialize=None
-                      )
-    QuestionString = db.Column(db.String(), nullable=False,
-                               supports_json=True,
-                               supports_dict=True,
-                               on_serialize=None,
-                               on_deserialize=None
-                               )
-    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now,
-                         supports_json=True,
-                         supports_dict=True,
-                         on_serialize=None,
-                         on_deserialize=None
-                         )
     SessionID = db.Column(db.Integer, nullable=False,
+                          supports_json=True,
+                          supports_dict=True,
+                          on_serialize=None,
+                          on_deserialize=None
+                          )
+    Name = db.Column(db.String(), nullable=False,
+                    supports_json=True,
+                    supports_dict=True,
+                    on_serialize=None,
+                    on_deserialize=None
+                    )
+    URL = db.Column(db.String(), nullable=False, unique=True,
+                    supports_json=True,
+                    supports_dict=True,
+                    on_serialize=None,
+                    on_deserialize=None
+                    )
+
+    QuestionText = db.Column(db.String(), nullable=False,
+                             supports_json=True,
+                             supports_dict=True,
+                             on_serialize=None,
+                             on_deserialize=None
+                             )
+    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now,
                          supports_json=True,
                          supports_dict=True,
                          on_serialize=None,
@@ -515,16 +663,16 @@ class UserInput(db.Model):
                          )
 
     # Relationships:
-    QuestionID = db.Column(db.Integer, db.ForeignKey('question.ID'), nullable=False)
-    Question = db.relationship('Question', back_populates='UserInputs',
-                               supports_json=True,
-                               supports_dict=True,
-                               on_serialize=None,
-                               on_deserialize=None
-                               )
+    QuestionFUID = db.Column(db.Integer, db.ForeignKey('questionFU.ID'), nullable=False)
+    QuestionFU = db.relationship('QuestionFU', foreign_keys=[QuestionFUID],
+                                 supports_json=True,
+                                 supports_dict=True,
+                                 on_serialize=None,
+                                 on_deserialize=None
+                                 )
 
     def __repr__(self):
-        return '<UserInput {}>'.format(self.Input)
+        return '<UserFiles {}>'.format(self.Name)
 
 
 class Plan(db.Model):

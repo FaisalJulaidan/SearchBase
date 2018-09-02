@@ -14,7 +14,8 @@ from urllib.request import urlopen
 from cryptography.fernet import Fernet
 import urllib.request
 
-from models import db, Role, Company, Assistant, Plan, Statistics, Question, Answer, QuestionType
+from models import db, Role, Company, Assistant, Plan, Statistics, Question, Answer, QuestionType, QuestionAction,\
+    QuestionFU, QuestionUI, QuestionPA, UserInputValidation
 from services.mail_services import mail
 
 # Import all routers to register them as blueprints
@@ -91,44 +92,49 @@ def before_request():
 
 # Generates dummy data for testing
 def genDummyData():
+
+    # Companies creation
     db.session.add(Company(Name='Aramco', Size=12, PhoneNumber='4344423', URL='ff.com'))
     db.session.add(Company(Name='Sabic', Size=12, PhoneNumber='4344423', URL='ff.com'))
 
     aramco = Company.query.filter(Company.Name == "Aramco").first()
     sabic = Company.query.filter(Company.Name == "Sabic").first()
 
-    db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
-    db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco))
+    # Assistants creation for Aramco and Sabic companies
+    reader_a = Assistant(Name="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco)
+    helper_a = Assistant(Name="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco)
 
-    # db.session.add(QuestionType(Name="OpenAnswers"))
-    # db.session.add(QuestionType(Name="PredefinedAnswers"))
-    # db.session.add(QuestionType(Name="FileUpload"))
-    #
-    # openAnswers = QuestionType.query.filter(QuestionType.Name == "OpenAnswers").first()
-    # predefinedAnswers = QuestionType.query.filter(QuestionType.Name == "PredefinedAnswers").first()
-    # fileUpload = QuestionType.query.filter(QuestionType.Name == "FileUpload").first()
+    reader_s = Assistant(Name="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic)
+    helper_s = Assistant(Name="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic)
 
 
-    for assistant in aramco.Assistants:
-        db.session.add(
-            Statistics(Name="test", Opened=True, QuestionsAnswered=12, ProductsReturned=12, Assistant=assistant))
-        db.session.add(
-            Statistics(Name="test1", Opened=True, QuestionsAnswered=52, ProductsReturned=32, Assistant=assistant))
+    # Questions for Aramco
+    question_UI = Question(Text="What's your email?", Type=QuestionType.UserInput, Order=1,
+                                     StoreInDB=True, Assistant=reader_a)
+    question_PA: Question = Question(Text="Do you smoke?", Type=QuestionType.PredefinedAnswers, Order=2,
+                                     StoreInDB=True, Assistant=reader_a)
+    question_FU: Question = Question(Text="Upload your CV", Type=QuestionType.FileUpload, Order=3,
+                                     StoreInDB=True, Assistant=reader_a)
+    # Questions Associations
+    questionUI = QuestionUI(Question=question_UI, Validation=UserInputValidation.Email,
+                            Action=QuestionAction.GoToNextQuestion, QuestionToGo=question_PA )
 
-        db.session.add(
-            Question(Question="how old are you?", Assistant=assistant, QuestionType=QuestionType.OpenAnswers))
-        for q in assistant.Questions:
-            db.session.add(
-                Answer(Answer="yes", Keyword="jeddah,khaled", Action="", TimesClicked=12, Question=q))
-            db.session.add(
-                Answer(Answer="hey", Keyword="riyadh,khaled", Action="", TimesClicked=12, Question=q))
+    questionPA = QuestionPA(Question=question_PA)
+    answer1 = Answer(QuestionPA=questionPA, Text="Yes", Keywords="smoker,sad", TimesClicked=1,
+                     Action=QuestionAction.GoToSpecificQuestion, QuestionToGo=question_FU)
+    answer2 = Answer(QuestionPA=questionPA, Text="No", Keywords="smoker,sad", TimesClicked=1,
+                     Action=QuestionAction.ShowSolutions, QuestionToGo=None)
 
-        db.session.add(
-            Question(Question="how do you do?", Assistant=assistant, QuestionType=QuestionType.PredefinedAnswers))
+    questionFU = QuestionFU(Question=question_FU, TypesAllowed="gif,pdf",
+                            Action=QuestionAction.ShowSolutions, QuestionToGo=None)
+
+    db.session.add(questionUI)
+    db.session.add(questionPA)
+    db.session.add(answer1)
+    db.session.add(answer2)
+    db.session.add(questionFU)
 
 
-    db.session.add(Assistant(Nickname="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
-    db.session.add(Assistant(Nickname="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic))
 
     db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
     db.session.add(Role(Name="Admin", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
@@ -1535,6 +1541,4 @@ if __name__ == "__main__":
 
     # Run the app server
     app.run()
-
-    mail_services.sendVerificationEmail('m.esteghamatdar@gmail.com', 'companyName', 'Mehdi Este')
 

@@ -1,5 +1,5 @@
 from bcrypt import hashpw, gensalt
-from flask import request, redirect, url_for, session, render_template
+from flask import request, redirect, url_for, session, render_template, json
 from sqlalchemy import inspect
 import stripe
 import re
@@ -83,3 +83,8 @@ def isStringsLengthGreaterThanZero(*args):
         if len(arg.strip()) == 0:
             return False
     return True
+
+
+def jsonResponse(success: bool, http_code: int, msg: str, data):
+    return json.dumps({'success': success, 'code': http_code, 'msg': msg, 'data': data}),\
+            http_code, {'ContentType': 'application/json'}

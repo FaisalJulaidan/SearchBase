@@ -3,7 +3,7 @@ import sqlalchemy.exc
 from flask import Flask, render_template
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
-from .models import Callback
+from models import Callback
 import string
 import random
 #from celery import Celery

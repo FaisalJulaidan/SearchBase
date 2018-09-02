@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, session
 from services import questions_services, admin_services, userInput_services
-from models import Callback
+from models import Callback, UserInput
 
 userInput_router: Blueprint = Blueprint('userInput_router', __name__ , template_folder="../../templates")
 
@@ -20,7 +20,7 @@ def admin_user_input(assistantID):
             userInput_callback : Callback = userInput_services.getByQuestionID(question.ID)
             if not userInput_callback.Success : return admin_services.render("admin/data-storage.html")
 
-            userInputData = admin_services.convertForJinja(userInput_callback.Data)
+            userInputData = admin_services.convertForJinja(userInput_callback.Data, UserInput)
 
             data.append(userInputData)
 

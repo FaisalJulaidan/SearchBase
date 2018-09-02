@@ -1,4 +1,4 @@
-from services import profile_services, admin_services
+from services import profile_services, admin_services, newsletter_services.py
 from models import Callback
 from flask import Blueprint, request, redirect, session
 from utilties import helpers
@@ -15,7 +15,7 @@ def profilePage():
         if not profile_callback.Success:
             return admin_services.render("admin/profile.html", user=None, email=email, company=None)
 
-        return admin_services.render("admin/profile.html", user=profile_callback.Data["user"], email=email, company=profile_callback.Data["company"])
+        return admin_services.render("admin/profile.html", user=profile_callback.Data["user"], company=profile_callback.Data["company"])
 
     elif request.method == "POST":
         curEmail = session.get('UserEmail', None)
@@ -23,6 +23,7 @@ def profilePage():
         names = request.form.get("names", default="Error")
         newEmail = request.form.get("email", default="error").lower()
         companyName = request.form.get("companyName", default="Error")
+        newsletters = request.form.get("newsletters", default="Error")
 
         if names is "Error" and newEmail is "error" and companyName is "Error":
             return helpers.redirectWithMessage("profilePage", "Could not retrieve all written information.")
@@ -35,6 +36,12 @@ def profilePage():
         if not updateUser_callback.Success: return helpers.redirectWithMessage("profilePage", "Could not update User's information.")
 
         updateCompany_callback : Callback = profile_services.updateCompany(companyName, session.get('CompanyID', 0))
-        if not updateCompany_callback.Success: return helpers.redirectWithMessage("profilePage", "Could not update Company's information.")
+        if not updateCompany_callback.Success: return helpers.redirectWithMessage("profilePage", "Could not update Company's information. User information has been updated.")
+
+        if newsletters is "newlettersON":
+            newsletter_callback : Callback = newsletter_services.addNewsletterPerson(newEmail)
+        elif newsletters is "Error":
+            newsletter_callback : Callback = newsletter_services.removeNewsletterPerson(newEmail)
+        if not newsletter_callback.Success: return helpers.redirectWithMessage("profilePage", newsletter_callback.Message + " Company and User information has been updated.")
 
         return helpers.redirectWithMessage("profilePage", "User and Company information has been updated.")

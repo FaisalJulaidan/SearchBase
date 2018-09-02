@@ -3,13 +3,22 @@
 {% block title %}Bot{% endblock %}
 
 {% block content %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesome-bootstrap-checkbox/1.0.1/awesome-bootstrap-checkbox.css" />
     <style>
+        .my-btn-default{
+            background-color: #fff;
+            border-color: #ccc;
+            color: black;
+        }
+        .normalCursor {
+            cursor: default !important;
+            background-color: #fff!important;
+        }
         .clickable {
             cursor: pointer;
         }
 
         .moveable {
-
             margin-left: -5px;
             padding: 5px;
             cursor: move;
@@ -19,69 +28,139 @@
             margin-top: -20px;
             font-size: 15px;
         }
+
+        .btn-default.focus, .btn-default:focus {
+            background-color: #fff;
+            border: 1px solid #ccc;
+        }
+
+        a.hover{
+            background-color: #f5f5f5;
+            border-color: #ccc;
+            text-decoration: none;
+        }
+
+        .radio-group label {
+            overflow: hidden;
+        }
+
+        .radio-group input {
+            /* This is on purpose for accessibility. Using display: hidden is evil.
+            This makes things keyboard friendly right out tha box! */
+            height: 1px;
+            width: 1px;
+            position: absolute;
+            top: -20px;
+        }
+        .btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle){
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .radio-group .not-active {
+            background-color: #f5f5f5;
+            color: black;
+            border: 1px solid #ccc;
+        }
+
+        .abc-checkbox-info input[type="checkbox"]:checked + label::before, .abc-checkbox-info input[type="radio"]:checked + label::before {
+            background-color: #660ff2;
+            border-color: #a88ad9;
+        }
+
     </style>
     <div class="right_col" role="main">
         <div class="page-title">
             <div class="title_left">
-                <h3>Assistant Name</h3>
+                <h3 id="assistantName"></h3>
             </div>
         </div>
 
         <div class="clearfix"></div>
 
-{#        <div class="panel panel-info">#}
-
-{#        </div>#}
-        <ul id="draggablePanelList" class="list-unstyled">
-            <li class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>
-                        <b>Do you sleep?</b>
-                    </div>
-                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>
-                </div>
-                <div class="panel-body">
-                    Question content
-                </div>
-            </li>
-            <li class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>
-                        <b>Do you eat?</b>
-                    </div>
-                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>
-                </div>
-                <div class="panel-body">
-                    Question content
-                </div>
-            </li>
-            <li class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>
-                        <b>Do you smoke?</b>
-                    </div>
-                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>
-                </div>
-                <div class="panel-body">
-                    Question content
-                </div>
-            </li>
-            <li class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <span class="moveable"><i class="glyphicon glyphicon-menu-hamburger"></i></span>
-                        <b>Do you study?</b>
-                    </div>
-                    <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></span>
-                </div>
-                <div class="panel-body">
-                    Question content
-                </div>
-            </li>
-        </ul>
+        <div class="x_panel">
+            <div class="x_title">
+                <h4>🤖 Bot Configuration</h4>
+                <small>Showing all questions and answers with its sort</small>
+            </div>
+            <div class="x_conent">
+                <ul id="draggablePanelList" class="list-unstyled">
+                    <li class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                <span class="moveable" style="color:#660ff2">
+                                    <i class="glyphicon glyphicon-menu-hamburger"></i>
+                                </span>
+                                <b>Upload Your CV</b>
+                            </div>
+                            <span class="pull-right clickable" style="color:#660ff2"><i
+                                    class="glyphicon glyphicon-chevron-down"></i></span>
+                            <div class="col-xs-3 pull-right" style="margin-top: -30px">
+                                <div class="input-group">
+                                    <input type="text" style="height: 34px" class="form-control normalCursor" disabled aria-label="...">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default dropdown-toggle"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Type <span style="margin: 0" class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <li><a>Predefined Answers</a></li>
+                                            <li><a>Open Answers</a></li>
+                                            <li><a>File Upload</a></li>
+                                        </ul>
+                                    </div><!-- /btn-group -->
+                                </div><!-- /input-group -->
+                            </div><!-- /.col-lg-3 -->
+                        </div>
+                        <div class="panel-body">
+                            <div class="input-group col-md-6">
+                                <span class="input-group-addon">Question:</span>
+                                <input type="text" class="form-control" placeholder="Question"
+                                       aria-describedby="basic-addon1" value="Upload Your CV">
+                            </div>
+                            <div class="input-group col-md-6">
+                                <input type="text" style="height: 34px" class="form-control normalCursor" disabled=""
+                                       aria-label="..." value="Go to next question">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">Action
+                                        <span style="margin: 0" class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li><a>Go to next question</a></li>
+                                        <li><a>Go to specific question</a></li>
+                                    </ul>
+                                </div><!-- /btn-group -->
+                            </div><!-- /input-group -->
+                            <div class="input-group col-md-6">
+                                <span class="input-group-addon">File Type:</span>
+                                <div class="btn-group radio-group">
+                                    <label class="btn my-btn-default not-active">PDF <input type="radio" value="male"
+                                                                                            name="fileType"></label>
+                                    <label class="btn my-btn-default not-active">PNG <input type="radio" value="female"
+                                                                                            name="fileType"></label>
+                                    <label class="btn my-btn-default not-active">GIF <input type="radio" value="female"
+                                                                                            name="fileType"></label>
+                                </div>
+                            </div>
+                            <small style="margin-top:-10px">Max size 10MB</small>
+                            <div class="col-md-1 pull-right inline">
+                                <div class="btn btn-default">Save</div>
+                            </div>
+                            <div class="col-md-2 pull-right inline">
+                                <div class="form-check abc-checkbox abc-checkbox-info abc-checkbox-circle" style="margin-top: 7px">
+                                    <input class="form-check-input" id="checkbox" type="checkbox" checked="" disabled>
+                                    <label class="form-check-label" for="checkbox"
+                                           style="padding-left: 10px;padding-top: 2px">
+                                        Save in DB
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 {% endblock %}
 
@@ -89,57 +168,226 @@
 
 {% block customJS %}
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-checkbox/1.5.0/js/bootstrap-checkbox.js"></script>
     <script>
         window.onload = function () {
             if (prev_handler)
                 prev_handler();
 
-            $(document).on('click', '.panel-heading', function () {
-                var $this = $(this);
-                if (!$this.hasClass('panel-collapsed')) {
-                    $this.parents('.panel').find('.panel-body').slideUp();
-                    $this.addClass('panel-collapsed');
-                    $this.find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+            main();
 
-                } else {
-                    $this.parents('.panel').find('.panel-body').slideDown();
-                    $this.removeClass('panel-collapsed');
-                    $this.find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
-                }
-            });
+            function main() {
+                init_data()
+                     .then(() => {
+                         init_page()
+                     })
+            }
+            function init_page() {
+                // to collopse and expand the panel
+                $(document).on('click', '.panel-heading', function (e) {
+                    if ( $(e.target).is('a') ||
+                         $(e.target).is('input.form-control') ) {
+                        e.preventDefault();
+                        return;
+                    }
+                    let $this = $(this);
+                    if (!$this.hasClass('panel-collapsed')) {
+                        $this.parents('.panel').find('.panel-body').slideUp();
+                        $this.addClass('panel-collapsed');
+                        $this.find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
 
-            var panelList = $('#draggablePanelList');
+                    } else {
+                        $this.parents('.panel').find('.panel-body').slideDown();
+                        $this.removeClass('panel-collapsed');
+                        $this.find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+                    }
+                });
 
-            panelList.sortable({
-                // Only make the .panel-heading child elements support dragging.
-                // Omit this to make then entire <li>...</li> draggable.
-                handle: '.panel-heading',
-                update: function () {
-                    arr = [];
-                    $('.panel', panelList).each(function (index, elem) {
-                        var $listItem = $(elem), newIndex = $listItem.index();
+                // to drag and drop the panels
+                var panelList = $('#draggablePanelList');
+                panelList.sortable({
+                    // Only make the .panel-heading child elements support dragging.
+                    // Omit this to make then entire <li>...</li> draggable.
+                    handle: '.panel-heading',
+                    update: function () {
+                        arr = [];
+                        $('.panel', panelList).each(function (index, elem) {
+                            var $listItem = $(elem), newIndex = $listItem.index();
 
-                        arr.push(buildQuestion($listItem,newIndex));
+                            arr.push(buildQuestion($listItem, newIndex));
+                        });
+                        console.log(arr)
+                    }
+                });
+
+                // to make the current type highlighted
+                $("button.btn.btn-default.dropdown-toggle").on("click",function (e) {
+                    $input = $(e.target).parent().parent().children().first().val();
+
+                    $(e.target).siblings().first().children().each(function (i,element) {
+                        let item = $(element).text();
+                        if ($input === item){
+                            return $(element).children().first().addClass('hover')
+                        }
+                        $(element).children().first().removeClass()
+
                     });
-                    console.log(arr)
-                }
-            });
+                });
 
+                // to change the textbox next to type dropdown
+                $("ul.dropdown-menu.dropdown-menu-right").on("click",function(e){
+                    $input = $(e.target).parent().parent().parent().parent().children().first();
+                    $input.val($(e.target).text());
+                });
+
+                // Input radio-group visual controls
+                $('.radio-group label').on('click', function () {
+                    $(this).removeClass('not-active').siblings().addClass('not-active');
+                });
+
+            }
+            function init_data() {
+                return $.ajax({
+                    url: 'bot/questions',
+                    type: "GET"
+                }).done(function (res) {
+                    res = JSON.parse(res);
+                    if (res.success){
+                        res = res.data;
+                        assistant = res.assistant;
+                        questions = res.questions;
+                        // TODO:
+                        // we need plan type + questions left
+                        render_page(assistant.name, res.botVersion);
+                        render_questions(res.questions)
+                    }
+                }).fail(function (res) {
+                    let resJson = JSON.parse(res.responseText);
+                    console.log(resJson)
+                });
+
+            }
+
+            function render_questions(questions) {
+                function cookUpQuestion(question){
+                    function getQuestionType(questionType) {
+                        if (questionType.includes('FileUpload'))
+                            return "File Upload";
+                        if (questionType.includes('OpenAnswers'))
+                            return "Open Answers";
+                        if (questionType.includes('PredefinedAnswers'))
+                            return "Predefined Answers"
+                    }
+                    function getQuestionAction(questionAction) {
+                        if (questionAction.includes('GoToNextQuestion'))
+                            return "Go to next question";
+                        if (questionAction.includes('GoToSpecificQuestion'))
+                            return "Go to specific question"
+                        
+                    }
+                    function getQuestionContent(question) {
+                        if (question.type === "FileUpload")
+                            return ""+
+                                "<div class=\"input-group col-md-6\">\n" +
+                                "  <span class=\"input-group-addon\">Question:</span>\n" +
+                                "  <input type=\"text\" class=\"form-control\"\n" +
+                                "         placeholder=\"Question\"\n" +
+                                "         aria-describedby=\"basic-addon1\"\n" +
+                                "         value='"+question.question+"'>\n" +
+                                "</div>\n" +
+                                "<div class=\"input-group col-md-6\">\n" +
+                                "    <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
+                                "           value=\""+getQuestionAction(question.action)+"\">\n" +
+                                "    <div class=\"input-group-btn\">\n" +
+                                "        <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
+                                "                data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Action\n" +
+                                "            <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                                "        </button>\n" +
+                                "        <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                                "            <li><a>Go to next question</a></li>\n" +
+                                "            <li><a>Go to specific question</a></li>\n" +
+                                "        </ul>\n" +
+                                "    </div><!-- /btn-group -->\n" +
+                                "</div><!-- /input-group -->\n" +
+                                "<div class=\"input-group col-md-6\">\n" +
+                                "  <span class=\"input-group-addon\">File Type:</span>\n" +
+                                "  <div class=\"btn-group radio-group\">\n" +
+                                "     <label class=\"btn my-btn-default btn-sm not-active\" >PDF <input type=\"radio\" value=\"PDF\" name=\"fileType\"></label>\n" +
+                                "     <label class=\"btn my-btn-default btn-sm not-active\">PNG <input type=\"radio\" value=\"PNG\" name=\"fileType\"></label>\n" +
+                                "     <label class=\"btn my-btn-default btn-sm not-active\">GIF <input type=\"radio\" value=\"GIF\" name=\"fileType\"></label>\n" +
+                                "  </div>\n" +
+                                "</div>" +
+                                "<small style='margin-top:-10px'>Max size 10MB</small>"+
+                                "<div class=\"col-md-1 pull-right inline\">\n" +
+                                "    <div class=\"btn btn-default\">Save</div>\n" +
+                                "</div>\n" +
+                                "<div class=\"col-md-2 pull-right inline\">\n" +
+                                "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 7px\">\n" +
+                                "        <input class=\"form-check-input\" id=\"checkbox\" type=\"checkbox\" checked=\"\" disabled>\n" +
+                                "        <label class=\"form-check-label\" for=\"checkbox\"\n" +
+                                "               style=\"padding-left: 10px;padding-top: 2px\">\n" +
+                                "            Save in DB\n" +
+                                "        </label>\n" +
+                                "    </div>\n" +
+                                "</div>"
+                    }
+                    return "" +
+                    "<li class=\"panel panel-default\">\n" +
+                    "    <div class=\"panel-heading\">\n" +
+                    "        <div class=\"panel-title\">\n" +
+                    "            <span class=\"moveable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-menu-hamburger\"></i></span>\n" +
+                    "            <b>"+ question.question +"</b>\n" +
+                    "        </div>\n" +
+                    "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-chevron-down\"></i></span>\n" +
+                    "        <div class=\"col-xs-11  col-sm-5 col-md-4 pull-right\" style=\"margin-top: -30px;margin-right:-7px\">\n" +
+                    "            <div class=\"input-group\">\n" +
+                    "                <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\" value='"+getQuestionType(question.type)+"'>" +
+                    "                <div class=\"input-group-btn\">\n" +
+                    "                    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\"\n" +"" +
+                    "                            aria-haspopup=\"true\" aria-expanded=\"false\">" +
+                                                "Type <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                    "                    </button>\n" +
+                    "                    <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                    "                        <li><a selected>Predefined Answers</a></li>\n" +
+                    "                        <li><a href=\"#\">Open Answers</a></li>\n" +
+                    "                        <li><a href=\"#\">File Upload</a></li>\n" +
+                    "                    </ul>\n" +
+                    "                </div><!-- /btn-group -->\n" +
+                    "            </div><!-- /input-group -->\n" +
+                    "        </div><!-- /.col-lg-3 -->\n" +
+                    "    </div>\n" +
+                    "    <div class=\"panel-body\">\n" + 
+                    getQuestionContent(question) +
+                    "    </div>\n" +
+                    "</li>"
+                }
+
+                var elements = '';
+                for (question of questions)
+                    elements += cookUpQuestion(question)
+                $("#draggablePanelList").html(elements);
+            }
+            function render_page(assistantName,botVersion){
+                $("#assistantName").html(
+                    "Assistant: "+ assistantName +
+                    "<span class=\"pull-right h5\">Bot version: " + botVersion + "</span>"
+                )
+            }
             function buildQuestion(element,index) {
-                let question = element.children().first().children().first().text();
+                let question = element.children().first().children().first().children().next().text();
                 return new QuestionsModel(1,'Type',question,['PNG','JPG'],'go to next',null,index);
             }
-            class QuestionsModel{
-                    constructor(id,type,question,fileTypes,action,questionIdToGo,order){
-                        this.id = id;
-                        this.type = type;
-                        this.question = question;
-                        this.fileTypes = fileTypes;
-                        this.action = action;
-                        this.questionIdToGo = questionIdToGo;
-                        this.order = order
-                    }
+            class QuestionsModel {
+                constructor(id, type, question, fileTypes, action, questionIdToGo, order) {
+                    this.id = id;
+                    this.type = type;
+                    this.question = question;
+                    this.fileTypes = fileTypes;
+                    this.action = action;
+                    this.questionIdToGo = questionIdToGo;
+                    this.order = order
                 }
+            }
         }
     </script>
 {% endblock %}

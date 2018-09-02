@@ -14,7 +14,7 @@ def admin_assistant_edit(assistantID):
             return admin_services.render("admin/edit-assistant.html",
                                          message=assistant.Message,
                                          autopop=assistant.SecondsUntilPopup,
-                                         nickname=assistant.Nickname,
+                                         nickname=assistant.Name,
                                          active=assistant.Active,
                                          id=assistant.ID)
         else:

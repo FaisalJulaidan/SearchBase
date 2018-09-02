@@ -73,7 +73,7 @@ def login(email: str, password_to_check: str) -> Callback:
         return Callback(False, "Incorrect Password.")
 
     if not user.Verified:
-        print("Invalid request: Account is not verified")
+        print("Account is not verified!")
         return Callback(False, "Account is not verified.")
 
     # If all the tests are valid then do login process
@@ -92,6 +92,5 @@ def login(email: str, password_to_check: str) -> Callback:
 
     # Save db changes
     db.session.commit()
-    print(db.session.query(User).filter(User.Email == 'ddd').first())
 
     return Callback(True, "Login Successful")

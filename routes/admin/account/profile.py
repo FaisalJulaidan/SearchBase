@@ -42,7 +42,9 @@ def profilePage():
         if not updateCompany_callback.Success: return helpers.redirectWithMessage("profilePage", "Could not update Company's information. User information has been updated.")
 
         if newsletters == "newlettersON":
-            newsletter_callback : Callback = newsletter_services.addNewsletterPerson(newEmail)
+            newsletter_callback : Callback = newsletter_services.checkForNewsletter(newEmail)
+            if not newsletter_callback.Success:
+                newsletter_callback : Callback = newsletter_services.addNewsletterPerson(newEmail)
         elif newsletters is "Error":
             newsletter_callback : Callback = newsletter_services.removeNewsletterPerson(newEmail)
         if not newsletter_callback.Success: return helpers.redirectWithMessage("profilePage", newsletter_callback.Message + " Company and User information has been updated.")

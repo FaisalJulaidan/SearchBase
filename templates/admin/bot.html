@@ -4,12 +4,20 @@
 
 {% block content %}
     <style>
+        .my-btn-default{
+            background-color: #fff;
+            border-color: #ccc;
+            color: black;
+        }
+        .normalCursor {
+            cursor: default !important;
+            background-color: #fff!important;
+        }
         .clickable {
             cursor: pointer;
         }
 
         .moveable {
-
             margin-left: -5px;
             padding: 5px;
             cursor: move;
@@ -22,13 +30,38 @@
 
         .btn-default.focus, .btn-default:focus {
             background-color: #fff;
-            border-color: #ccc
+            border: 1px solid #ccc;
         }
+
         a.hover{
-            color: #262626;
-            text-decoration: none;
             background-color: #f5f5f5;
+            border-color: #ccc;
+            text-decoration: none;
         }
+
+        .radio-group label {
+            overflow: hidden;
+        }
+
+        .radio-group input {
+            /* This is on purpose for accessibility. Using display: hidden is evil.
+            This makes things keyboard friendly right out tha box! */
+            height: 1px;
+            width: 1px;
+            position: absolute;
+            top: -20px;
+        }
+        .btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle){
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .radio-group .not-active {
+            background-color: #f5f5f5;
+            color: black;
+            border: 1px solid #ccc;
+        }
+
     </style>
     <div class="right_col" role="main">
         <div class="page-title">
@@ -58,7 +91,7 @@
                                     class="glyphicon glyphicon-chevron-down"></i></span>
                             <div class="col-xs-3 pull-right" style="margin-top: -30px">
                                 <div class="input-group">
-                                    <input type="text" style="height: 34px" class="form-control" aria-label="..." id="questionType">
+                                    <input type="text" style="height: 34px" class="form-control normalCursor" disabled aria-label="...">
                                     <div class="input-group-btn">
                                         <button type="button" class="btn btn-default dropdown-toggle"
                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -74,7 +107,6 @@
                             </div><!-- /.col-lg-3 -->
                         </div>
                         <div class="panel-body">
-                            Question content
                         </div>
                     </li>
                 </ul>
@@ -96,9 +128,9 @@
 
             function main() {
                 init_data()
-                    .then(() => {
-                        init_page()
-                    })
+                     .then(() => {
+                         init_page()
+                     })
             }
             function init_page() {
                 // to collopse and expand the panel
@@ -140,7 +172,6 @@
 
                 // to make the current type highlighted
                 $("button.btn.btn-default.dropdown-toggle").on("click",function (e) {
-                    console.log(e)
                     $input = $(e.target).parent().parent().children().first().val();
 
                     $(e.target).siblings().first().children().each(function (i,element) {
@@ -158,6 +189,12 @@
                     $input = $(e.target).parent().parent().parent().parent().children().first();
                     $input.val($(e.target).text());
                 });
+
+                // Input radio-group visual controls
+                $('.radio-group label').on('click', function () {
+                    $(this).removeClass('not-active').siblings().addClass('not-active');
+                });
+
             }
             function init_data() {
                 return $.ajax({
@@ -190,7 +227,47 @@
                             return "Open Answers";
                         if (questionType.includes('PredefinedAnswers'))
                             return "Predefined Answers"
+                    }
+                    function getQuestionAction(questionAction) {
+                        if (questionAction.includes('GoToNextQuestion'))
+                            return "Go to next question";
+                        if (questionAction.includes('GoToSpecificQuestion'))
+                            return "Go to specific question"
                         
+                    }
+                    function getQuestionContent(question) {
+                        if (question.type === "FileUpload")
+                            return ""+
+                                "<div class=\"input-group col-xs-6\">\n" +
+                                "  <span class=\"input-group-addon\">Question:</span>\n" +
+                                "  <input type=\"text\" class=\"form-control\"\n" +
+                                "         placeholder=\"Question\"\n" +
+                                "         aria-describedby=\"basic-addon1\"\n" +
+                                "         value='"+question.question+"'>\n" +
+                                "</div>\n" +
+                                "<div class=\"input-group col-xs-6\">\n" +
+                                "    <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
+                                "           value=\""+getQuestionAction(question.action)+"\">\n" +
+                                "    <div class=\"input-group-btn\">\n" +
+                                "        <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
+                                "                data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Action\n" +
+                                "            <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                                "        </button>\n" +
+                                "        <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                                "            <li><a>Go to next question</a></li>\n" +
+                                "            <li><a>Go to specific question</a></li>\n" +
+                                "        </ul>\n" +
+                                "    </div><!-- /btn-group -->\n" +
+                                "</div><!-- /input-group -->\n" +
+                                "<div class=\"input-group col-xs-6\">\n" +
+                                "  <span class=\"input-group-addon\">File Type:</span>\n" +
+                                "  <div class=\"btn-group radio-group\">\n" +
+                                "     <label class=\"btn my-btn-default not-active\" >PDF <input type=\"radio\" value=\"male\" name=\"fileType\"></label>\n" +
+                                "     <label class=\"btn my-btn-default not-active\">PNG <input type=\"radio\" value=\"female\" name=\"fileType\"></label>\n" +
+                                "     <label class=\"btn my-btn-default not-active\">GIF <input type=\"radio\" value=\"female\" name=\"fileType\"></label>\n" +
+                                "  </div>\n" +
+                                "</div>" +
+                                "<small style='margin-top:-10px'>Max size 10MB</small>"
                     }
                     return "" +
                     "<li class=\"panel panel-default\">\n" +
@@ -200,9 +277,9 @@
                     "            <b>"+ question.question +"</b>\n" +
                     "        </div>\n" +
                     "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-chevron-down\"></i></span>\n" +
-                    "        <div class=\"col-xs-3 pull-right\" style=\"margin-top: -30px\">\n" +
+                    "        <div class=\"col-xs-4 pull-right\" style=\"margin-top: -30px\">\n" +
                     "            <div class=\"input-group\">\n" +
-                    "                <input type=\"text\" style=\"height: 34px\" class=\"form-control\" aria-label=\"...\" value='"+getQuestionType(question.type)+"'>" +
+                    "                <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\" value='"+getQuestionType(question.type)+"'>" +
                     "                <div class=\"input-group-btn\">\n" +
                     "                    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\"\n" +"" +
                     "                            aria-haspopup=\"true\" aria-expanded=\"false\">" +
@@ -217,8 +294,8 @@
                     "            </div><!-- /input-group -->\n" +
                     "        </div><!-- /.col-lg-3 -->\n" +
                     "    </div>\n" +
-                    "    <div class=\"panel-body\">\n" +
-                    "        Question content\n" +
+                    "    <div class=\"panel-body\">\n" + 
+                    getQuestionContent(question) +
                     "    </div>\n" +
                     "</li>"
                 }

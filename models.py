@@ -389,6 +389,18 @@ class Plan(db.Model):
         return '<Plan {}>'.format(self.Nickname)
 
 
+class Newsletters(db.Model):
+
+    Email = db.Column(db.String(), nullable=False, unique=True)
+
+
+    # Relationships:
+    ###
+
+    def __repr__(self):
+        return '<Newsletters {}>'.format(self.Email)
+
+
 class Callback():
     def __init__(self, success: bool, message: str, data: str or dict or bool = None):
         self.Success: bool = success

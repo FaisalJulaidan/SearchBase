@@ -6,21 +6,27 @@ from itsdangerous import URLSafeTimedSerializer
 from models import Callback
 import string
 import random
+#from celery import Celery
+
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 mail = Mail()
 
 def sendVerificationEmail(email, companyName, fullname) -> Callback:
-
     try:
+        print(1)
         msg = Message("Account verification",
                       sender="thesearchbase@gmail.com",
                       recipients=[email])
+        print(2)
         payload = email + ";" + companyName
+        print(3)
         link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
-        # need to add the links to the email, right now its just a page.
+        print(4)
         msg.html = render_template('/emails/verification.html', link = link)
+        print(5)
         mail.send(msg)
+        print(6)
 
         # sending the registration confirmation email to us
         msg = Message("A new company has signed up!",
@@ -29,14 +35,12 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
         msg.html = "<p>Company name: " + companyName + " has signed up. <br>The admin's details are: <br>Name: " \
                    + fullname + " <br>Email: " + email + ".</p>"
         mail.send(msg)
+        print(7)
     except Exception as e:
+        print("sendVerificationEmail() Error: ", e)
         return Callback(False, 'Could not send a verification email to ' + email)
 
     return Callback(True, 'Verification email sent successfully to ' + email)
-
-
-
-
 
 def sendPasswordResetEmail(email, companyID):
     try:

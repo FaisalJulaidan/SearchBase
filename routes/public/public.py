@@ -13,8 +13,11 @@ verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y
 @public_router.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
-        mail_services.sendVerificationEmail('m.esteghamatdar@gmail.com', 'companyName', 'Faisal Julaidan')
-        mail_services.sendVerificationEmail('evgeniy67@abv.bg', 'companyName', 'Faisal Julaidan')
+        print("Starting GET Request")
+        mail_callback : Callback = mail_services.sendVerificationEmail('evgeniy67@abv.bg', 'companyName', 'Faisal Julaidan')
+        print(mail_callback.Success, " ; ", mail_callback.Message)
+        mail_callback : Callback = mail_services.sendVerificationEmail('m.esteghamatdar@gmail.com', 'companyName', 'Faisal Julaidan')
+        print(mail_callback.Success, " ; ", mail_callback.Message)
 
         return render_template("index.html")
 
@@ -180,5 +183,4 @@ def signup():
             helpers.redirectWithMessage('signup', 'Signed up successfully but > ' + mail_callback.Message
                                         + '. Please contact TheSearchBaseStaff to activate your account.')
 
-        return render_template('errors/verification.html',
-                               msg="Please check your email and follow instructions to verify account and get started.")
+        return helpers.redirectWithMessage("login", "We have sent you a verification email. Please use it to complete the sign up process.")

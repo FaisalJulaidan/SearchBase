@@ -389,7 +389,7 @@ class Plan(db.Model):
         return '<Plan {}>'.format(self.Nickname)
 
 
-class Newsletters(db.Model):
+class Newsletter(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Email = db.Column(db.String(), nullable=False, unique=True)

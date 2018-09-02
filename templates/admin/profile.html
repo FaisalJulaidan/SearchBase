@@ -60,7 +60,11 @@
                                     <div class="input-group" style="margin:10px 0 0 10px">
                                         <label>Recommended Newsletters</label><br />
                                         <label class="checkboxContainer">
-                                            <input name="newsletters" value="newlettersON" type="checkbox" />
+                                            {%if newsletters%}
+                                            <input name="newsletters" value="newlettersON" type="checkbox" checked/>
+                                            {%else%}
+                                            <input name="newsletters" value="newlettersON" type="checkbox"/>
+                                            {%endif%}
                                             <span class="checkmark"></span>
                                         </label>
                                     </div>

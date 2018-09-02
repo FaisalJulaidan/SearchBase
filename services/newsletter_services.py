@@ -10,8 +10,20 @@ def addNewsletterPerson(email):
         db.session.rollback()
         print("addNewsletterPerson() Error: ", e)
         return Callback(False, 'Couldnot register' + email+ ' for newsletters.')
-
+    
+    db.session.commit()
     return Callback(True, email + ' has been registered for newsletters.')
+
+def checkForNewsletter(email):
+    try:
+        result = db.session.query(Newsletter).filter(Newsletter.Email == email).first()
+        print(result)
+        if not result: raise Exception
+    except Exception as e:
+        print(email + " not registered for newsletters")
+        return Callback(False, email + ' is not registered for newsletters')
+
+    return Callback(True, email + ' is registered for newsletters')
 
 def removeNewsletterPerson(email):
     try:
@@ -20,5 +32,6 @@ def removeNewsletterPerson(email):
         db.session.rollback()
         print("removeNewsletterPerson() Error: ", e)
         return Callback(False, 'Couldnot unsubsribe' + email+ ' from newsletters.')
-
+    
+    db.session.commit()
     return Callback(True, email + ' has been unsubsribed from newsletters.')

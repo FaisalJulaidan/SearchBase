@@ -24,6 +24,11 @@
             background-color: #fff;
             border-color: #ccc
         }
+        a.hover{
+            color: #262626;
+            text-decoration: none;
+            background-color: #f5f5f5;
+        }
     </style>
     <div class="right_col" role="main">
         <div class="page-title">
@@ -133,10 +138,26 @@
                     }
                 });
 
+                // to make the current type highlighted
+                $("button.btn.btn-default.dropdown-toggle").on("click",function (e) {
+                    console.log(e)
+                    $input = $(e.target).parent().parent().children().first().val();
+
+                    $(e.target).siblings().first().children().each(function (i,element) {
+                        let item = $(element).text();
+                        if ($input === item){
+                            return $(element).children().first().addClass('hover')
+                        }
+                        $(element).children().first().removeClass()
+
+                    });
+                });
+
                 // to change the textbox next to type dropdown
                 $("ul.dropdown-menu.dropdown-menu-right").on("click",function(e){
-                    $(e.target).parent().parent().parent().parent().children().first().val($(e.target).text())
-                })
+                    $input = $(e.target).parent().parent().parent().parent().children().first();
+                    $input.val($(e.target).text());
+                });
             }
             function init_data() {
                 return $.ajax({
@@ -162,6 +183,15 @@
 
             function render_questions(questions) {
                 function cookUpQuestion(question){
+                    function getQuestionType(questionType) {
+                        if (questionType.includes('FileUpload'))
+                            return "File Upload";
+                        if (questionType.includes('OpenAnswers'))
+                            return "Open Answers";
+                        if (questionType.includes('PredefinedAnswers'))
+                            return "Predefined Answers"
+                        
+                    }
                     return "" +
                     "<li class=\"panel panel-default\">\n" +
                     "    <div class=\"panel-heading\">\n" +
@@ -172,14 +202,14 @@
                     "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-chevron-down\"></i></span>\n" +
                     "        <div class=\"col-xs-3 pull-right\" style=\"margin-top: -30px\">\n" +
                     "            <div class=\"input-group\">\n" +
-                    "                <input type=\"text\" style=\"height: 34px\" class=\"form-control\" aria-label=\"...\">" +
+                    "                <input type=\"text\" style=\"height: 34px\" class=\"form-control\" aria-label=\"...\" value='"+getQuestionType(question.type)+"'>" +
                     "                <div class=\"input-group-btn\">\n" +
                     "                    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\"\n" +"" +
-                    "                            aria-haspopup=\"true\" aria-expanded=\"false\">\n" +
-                    "                        Type <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                    "                            aria-haspopup=\"true\" aria-expanded=\"false\">" +
+                                                "Type <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                     "                    </button>\n" +
                     "                    <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
-                    "                        <li><a href=\"#\">Predefined Answers</a></li>\n" +
+                    "                        <li><a selected>Predefined Answers</a></li>\n" +
                     "                        <li><a href=\"#\">Open Answers</a></li>\n" +
                     "                        <li><a href=\"#\">File Upload</a></li>\n" +
                     "                    </ul>\n" +

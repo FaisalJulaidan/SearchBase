@@ -177,6 +177,23 @@
                         </select>
                         <span class="focus-input100"></span>
                     </div>-->
+
+                    <div class="text-center p-t-12">
+                        <input id="TAPPCheckbox" type="checkbox" onchange="checkCheckbox()">
+                        <span class="txt1">
+                            I agree to
+                        </span>
+                        <a class="txt2" href="/termsandconditions">
+                            <strong>Terms</strong>
+                        </a>
+                        <span class="text1">
+                            &
+                        </span>
+                        <a class="text2" href="/privacy">
+                            <strong>Privacy Policy</strong>
+                        </a>
+                    </div>
+
                     <center>{{msg}}</center>
 
 
@@ -190,21 +207,6 @@
                         <a class="txt2" href="/login">
                             Already have an Account?
                             <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
-                        </a>
-                    </div>
-
-                    <div class="text-center p-t-12">
-                        <span class="txt1">
-                            By Signing up you agree to our
-                        </span>
-                        <a class="txt2" href="/termsandconditions">
-                            <strong>Terms</strong>
-                        </a>
-                        <span class="text1">
-                            &
-                        </span>
-                        <a class="text2" href="/privacy">
-                            <strong>Privacy Policy</strong>
                         </a>
                     </div>
                 </form>
@@ -265,7 +267,13 @@
         //   emailConf:false,
           password:false,
           passwordConf:false,
-          phone:false
+          phone: false,
+          TAPP: false
+        }
+
+        // Terms and Privacy Policy checkbox
+        function checkCheckbox() {
+            inputs.TAPP = $('#TAPPCheckbox').prop('checked');
         }
 
         // Password popover init
@@ -273,18 +281,24 @@
         $('#email').popover({ trigger: 'focus', title: 'Valid Email 📮', content: "Valid email is required: example@abc.com",placement:'top' })
 
         function submitForm() {
-          var form = document.forms["signupForm"];
-          var companyName = form["companyName"].value;
-          var websiteURL = form["websiteURL"].value;
-          var fullname = form["fullname"].value;
-          var email = form["email"].value;
-          var password = form["password"].value;
+            var form = document.forms["signupForm"];
+            var companyName = form["companyName"].value;
+            var websiteURL = form["websiteURL"].value;
+            var fullname = form["fullname"].value;
+            var email = form["email"].value;
+            var password = form["password"].value;
 
-          var subscription = document.getElementById("inputState").value;
-          if (subscription === "None") {
-              subscription.setError("Please select one");
-              return false;
-          }
+            //no sub is currently selected on signup
+            //var subscription = document.getElementById("inputState").value;
+            //if (subscription === "None") {
+            //    subscription.setError("Please select one");
+            //    return false;
+            //  }
+
+            if (!inputs.TAPP) {
+                alertError('Terms & Privacy Policy', 'Please agree to our Terms & Privacy Policy. You can read them by clicking on the bold text.');
+                return false;
+            }
           return true;
         }
         // onkeyup check validty without alert 

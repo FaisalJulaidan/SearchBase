@@ -14,7 +14,7 @@ class Company(db.Model):
                    on_serialize=None,
                    on_deserialize=None
                    )
-    Name = db.Column(db.String(80), nullable=False, unique=True,
+    Name = db.Column(db.String(80), nullable=False,
                      supports_json=True,
                      supports_dict=True,
                      on_serialize=None,

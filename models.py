@@ -581,6 +581,16 @@ class Plan(db.Model):
     def __repr__(self):
         return '<Plan {}>'.format(self.Nickname)
 
+class Newsletter(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Email = db.Column(db.String(), nullable=False, unique=True)
+
+    # Relationships:
+    ###
+
+    def _repr_(self):
+        return '<Newsletter {}>'.format(self.Email)
 
 class Callback():
     def __init__(self, success: bool, message: str, data: str or dict or bool = None):

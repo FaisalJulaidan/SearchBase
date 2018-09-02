@@ -391,8 +391,8 @@ class Plan(db.Model):
 
 class Newsletters(db.Model):
 
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Email = db.Column(db.String(), nullable=False, unique=True)
-
 
     # Relationships:
     ###

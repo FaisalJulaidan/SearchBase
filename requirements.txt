@@ -20,6 +20,8 @@ isbnlib==3.6.8
 iso3166==0.8
 itsdangerous==0.24
 Jinja2==2.10
+jsonref==0.1
+jsonschema==2.6.0
 MarkupSafe==1.0
 py-moneyed==0.7.0
 pycparser==2.18

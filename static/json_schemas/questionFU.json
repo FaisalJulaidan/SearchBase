@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Questions of predefined answers  response schema",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["File Upload"]},
+    "id": {"type": "number"},
+    "order": {"type": "number"},
+    "question": {"type": "string"},
+    "action": {"type": "string"},
+    "fileTypes": {"type": "array", "items": {"type": "string"}},
+    "questionToGoID": {"type": ["number", "null"]},
+    "storeInDB": {"type": "boolean"}
+    },
+  "required": ["id", "type", "order", "question", "action", "fileTypes", "questionToGoID", "storeInDB"],
+  "additionalProperties": false
+}
+

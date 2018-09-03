@@ -1,12 +1,35 @@
-from flask import render_template, redirect, session, flash
-from services import auth_services, assistant_services, user_services
+from flask import session
+from services import assistant_services
 from utilties import helpers
 from typing import List
+from config import BaseConfig
 
 from models import db, Callback, User, Company, Question, QuestionUI, QuestionPA, QuestionFU, QuestionType,\
-    UserInputValidation, Assistant
+    UserInputValidation, QuestionAction, Assistant
 
 bot_currentVersion = "1.0.0"
+
+
+def getFeatures() -> dict:
+    return {
+            'botVersion': bot_currentVersion,
+            'userInputType': {
+                'name': QuestionType.UserInput.value,
+                'validations': [uiv.value for uiv in UserInputValidation],
+                'actions': [a.value for a in QuestionAction]
+            },
+            'PredefinedAnswersType': {
+                'name': QuestionType.PredefinedAnswers.value,
+                'actionsForAnswers': [a.value for a in QuestionAction]
+            },
+            'FileUploadType': {
+                'name': QuestionType.FileUpload.value,
+                'actions': [a.value for a in QuestionAction],
+                'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
+                'fileMaxSize': BaseConfig.MAX_CONTENT_LENGTH + 'MB'
+
+            },
+           }
 
 
 def botBuilder(assistant: Assistant) -> dict:

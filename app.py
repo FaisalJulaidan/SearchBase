@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from bcrypt import hashpw, gensalt
 from itsdangerous import URLSafeTimedSerializer, BadSignature, BadData
 from xml.dom import minidom
+from config import BaseConfig
 import os
 import sqlite3
 import stripe
@@ -167,14 +168,7 @@ def genDummyData():
 #################################
 
 
-verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-
-DATABASE = APP_ROOT + "/database.db"
-
-PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
-USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
 
 pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
 secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
@@ -1298,7 +1292,7 @@ def sendMarketingEmail():
         return render_template("index.html")
 
 # Not working temp
-def select_from_database_table(sql_statement, array_of_terms=None, multi=False, database=DATABASE):
+def select_from_database_table(sql_statement, array_of_terms=None, multi=False):
     data = "Error"
     conn = None
     try:
@@ -1351,14 +1345,14 @@ def select_from_database_table(sql_statement, array_of_terms=None, multi=False, 
 
 
 # Not working temp
-def get_last_row_from_table(table, database=DATABASE):
+def get_last_row_from_table(table):
     return query_db("SELECT * FROM " + table + " WHERE ROWID IN ( SELECT max( ROWID ) FROM " + table +" );", one=True)
 
 
 
 
 # Not working temp
-def insert_into_database_table(sql_statement, tuple_of_terms, database=DATABASE):
+def insert_into_database_table(sql_statement, tuple_of_terms, database):
     msg = "Error"
     conn = None
     try:
@@ -1382,7 +1376,7 @@ def insert_into_database_table(sql_statement, tuple_of_terms, database=DATABASE)
 
 # Not working
 # should be deleted
-def update_table(sql_statement, array_of_terms, database=DATABASE):
+def update_table(sql_statement, array_of_terms, database):
     msg = "Error"
     conn = None
     try:
@@ -1403,7 +1397,7 @@ def update_table(sql_statement, array_of_terms, database=DATABASE):
         return msg
 
 # Not working
-def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
+def delete_from_table(sql_statement, array_of_terms, database):
     msg = "Error"
     conn = None
     try:

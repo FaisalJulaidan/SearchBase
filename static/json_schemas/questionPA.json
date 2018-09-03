@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Questions of predefined answers  response schema",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["File Upload"]},
+    "id": {"type": "number"},
+    "order": {"type": "number"},
+    "question": {"type": "string"},
+    "action": {"type": "string"},
+    "fileTypes": {"type": "array", "items": {"type": "string"}},
+    "questionToGoID": {"type": "number"},
+    "storeInDB": {"type": "boolean"}
+    },
+  "required": ["type", "id", "attributes"],
+  "additionalProperties": false
+  },
+
+  "required": ["data"]
+},
+
+{
+        "action": "Show Solutions",
+        "fileTypes": [
+          "gif",
+          "pdf"
+        ],
+        "id": 3,
+        "order": 3,
+        "question": "Upload your CV",
+        "questionToGoID": null,
+        "storeInDB": true,
+        "type": "File Upload"
+      }
+
+ "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "type": {"enum": ["users"]},
+        "id": {"type": "number"},
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "email": {"type": "string", "format": "email"},
+            "username": {"type": "string"}
+          },
+          "required": ["email", "username"]
+        }
+      },
+      "required": ["type", "id", "attributes"]
+    }
+  }

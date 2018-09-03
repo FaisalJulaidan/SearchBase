@@ -1,9 +1,12 @@
 {% extends "admin/base.html" %}
 
-{% block title %}Bot{% endblock %}
 
+{% block title %}Bot{% endblock %}
+{% block headlinks %}
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/awesome-bootstrap-checkbox/1.0.1/awesome-bootstrap-checkbox.css"/>
+{% endblock %}
 {% block content %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesome-bootstrap-checkbox/1.0.1/awesome-bootstrap-checkbox.css" />
     <style>
         .my-btn-default{
             background-color: #fff;
@@ -93,6 +96,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Abdullah Hashim did below code to avoid error occured from custom.min.js file -->
+    <form id="demo-form2"></form>
 {% endblock %}
 
 
@@ -100,6 +106,7 @@
 {% block customJS %}
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-checkbox/1.5.0/js/bootstrap-checkbox.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
         window.onload = function () {
             if (prev_handler)
@@ -109,15 +116,20 @@
 
             function main() {
                 init_data()
-                     .then(() => {
-                         init_page()
-                     })
+                    .then((res) => {
+                        res = JSON.parse(res).data;
+                        init_options(res)
+                            .then(()=>
+                                init_page() )
+                    })
             }
             function init_page() {
                 // to collopse and expand the panel
                 $(document).on('click', '.panel-heading', function (e) {
                     if ( $(e.target).is('a') ||
-                         $(e.target).is('input.form-control') ) {
+                         $(e.target).is('input.form-control') ||
+                         $(e.target).is('i.trash')
+                    ) {
                         e.preventDefault();
                         return;
                     }
@@ -125,11 +137,11 @@
                     if (!$this.hasClass('panel-collapsed')) {
                         $this.parents('.panel').find('.panel-body').slideUp();
                         $this.addClass('panel-collapsed');
-                        $this.find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+                        $this.find('i.indicator').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
                     } else {
                         $this.parents('.panel').find('.panel-body').slideDown();
                         $this.removeClass('panel-collapsed');
-                        $this.find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+                        $this.find('i.indicator').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
                     }
                 });
 
@@ -174,24 +186,48 @@
                     $(this).removeClass('not-active').siblings().addClass('not-active');
                 });
 
-            }
+                // Input radio-group visual controls
+                $('i.trash').on('click', function (e) {
+                    swal({
+                        title: "Are you sure?",
+                        text: "Question will be removed completely from the system",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    })
+                        .then((willDelete) => {
+                            if (willDelete) {
+                                $(e.target).parent().parent().parent().remove()
+                                swal("Success!", "Question has been deleted successfully", "success")
+                            }
+                        });
+                })
 
+            }
             function init_data() {
                 return $.ajax({
                     url: 'bot/questions',
                     type: "GET"
                 }).done(function (res) {
-                    res = JSON.parse(res);
-                    if (res.success) {
+                }).fail(function (res) {
+                    let resJson = JSON.parse(res.responseText);
+                    console.log(resJson)
+                });
 
-                        $.ajax({
-                            url: '/admin/assistant/bot/features',
-                            type: "GET"
-                        }).done(function (res) {
-                            console.log(res)
-                        });
-
-                    }
+            }
+            function init_options(res) {
+                return $.ajax({
+                    url: '/admin/assistant/bot/features',
+                    type: "GET"
+                }).done(function (options) {
+                    options = JSON.parse(options).data;
+                    console.log(options)
+                    assistant = res.assistant;
+                    questions = res.questions;
+                    // TODO:
+                    // we need plan type + questions left
+                    render_page(assistant.name, options.botVersion);
+                    render_questions(res.questions, options)
                 }).fail(function (res) {
                     let resJson = JSON.parse(res.responseText);
                     console.log(resJson)
@@ -199,9 +235,9 @@
 
             }
 
-            function render_questions(questions) {
+            function render_questions(questions,options) {
                 function cookUpQuestion(question,qTypes){
-                    function getActionElement(questionAction) {
+                    function getActionElement(questionAction,actions) {
                         return ""+
                         "<div class=\"input-group col-md-6\">\n" +
                         "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
@@ -212,14 +248,12 @@
                         "           <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                         "       </button>\n" +
                         "       <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
-                        "           <li><a>Go To Next Question</a></li>\n" +
-                        "           <li><a>Go to specific question</a></li>\n" +
-                        "           <li><a>Show Solutions</a></li>\n" +
+                                getDropdownEelement(actions) +
                         "       </ul>\n" +
                         "   </div><!-- /btn-group -->\n"+
                         "</div><!-- /input-group -->\n"
                     }
-                    function getValidationElement(questionValidation) {
+                    function getValidationElement(questionValidation,options) {
                         return ""+
                         "<div class=\"input-group col-md-6\">\n" +
                         "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
@@ -230,7 +264,7 @@
                         "           <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                         "       </button>\n" +
                         "       <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
-                        "           <li><a>"+questionValidation+"</a></li>\n" +
+                                    getDropdownEelement(options) +
                         "       </ul>\n" +
                         "   </div><!-- /btn-group -->\n"+
                         "</div><!-- /input-group -->\n"
@@ -261,10 +295,10 @@
                         "         value=\""+question+"\">\n" +
                         "</div>\n"
                     }
-                    function getQTypes(qTypes) {
+                    function getDropdownEelement(items) {
                         let elements = '';
-                        for (qType of qTypes)
-                            elements += "<li><a>"+qType+"</a></li>\n"
+                        for (item of items)
+                            elements += "<li><a>"+item+"</a></li>\n"
                         return elements
                     }
 
@@ -278,20 +312,20 @@
                         }
                         if (question.type === "File Upload")
                             return getQuestionElement(question.question)+
-                                   getActionElement(question.action) +
-                                   "<div class=\"input-group col-md-6\">\n" +
+                                   getActionElement(question.action, options.FileUploadType.actions) +
+                                   "<div class=\"input-group col-md-8\">\n" +
                                    "  <span class=\"input-group-addon\">File Type:</span>\n" +
                                    "  <div class=\"btn-group radio-group\">\n" +
-                                        getRadioButtons(question.fileTypes) +
+                                        getRadioButtons(options.FileUploadType.typesAllowed) +
                                    "  </div>\n" +
                                    "</div>" +
-                                   "<small style='margin-top:-10px'>Max size 10MB</small>"+
+                                   "<small style='margin-top:-10px'>Max size: "+options.FileUploadType.fileMaxSize+"</small>"+
                                    getSubmitElemnt(false);
 
                         if (question.type === "User Input")
                             return getQuestionElement(question.question)+
-                                   getActionElement(question.action) +
-                                   getValidationElement(question.validation)+
+                                   getActionElement(question.action,options.userInputType.actions) +
+                                   getValidationElement(question.validation, options.userInputType.validations)+
                                    getSubmitElemnt(false);
 
                         if (question.type === "Predefined Answers")
@@ -305,7 +339,8 @@
                     "            <span class=\"moveable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-menu-hamburger\"></i></span>\n" +
                     "            <b>"+ question.question +"</b>\n" +
                     "        </div>\n" +
-                    "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-chevron-down\"></i></span>\n" +
+                    "        <span class=\"pull-right clickable\" style='color:#660ff2;margin-left:15px'><i class=\"trash glyphicon glyphicon-trash\"></i></span>\n" +
+                    "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"indicator glyphicon glyphicon-chevron-down\"></i></span>\n" +
                     "        <div class=\"col-xs-11  col-sm-5 col-md-4 pull-right\" style=\"margin-top: -30px;margin-right:-9px\">\n" +
                     "            <div class=\"input-group\">\n" +
                     "                <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\" value=\""+question.type+"\">" +
@@ -315,23 +350,23 @@
                                                 "Type <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                     "                    </button>\n" +
                     "                    <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
-                                            getQTypes(qTypes) +
+                                            getDropdownEelement(qTypes) +
                     "                    </ul>\n" +
                     "                </div><!-- /btn-group -->\n" +
                     "            </div><!-- /input-group -->\n" +
                     "        </div><!-- /.col-lg-3 -->\n" +
                     "    </div>\n" +
                     "    <div class=\"panel-body\">\n" + 
-                            getQuestionContent(question) +
+                            getQuestionContent(question,options) +
                     "    </div>\n" +
                     "</li>"
                 }
 
                 // collects all available qTypes
                 qTypes = [];
-                for (question of questions)
-                    if (!qTypes.includes(question.type))
-                        qTypes.push(question.type);
+                Object.entries(options).forEach(([x,y])=>{
+                   y.name? qTypes.push(y.name):''
+                });
 
                 let elements = '';
                 for (question of questions)

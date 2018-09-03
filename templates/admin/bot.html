@@ -175,20 +175,22 @@
                 });
 
             }
+
             function init_data() {
                 return $.ajax({
                     url: 'bot/questions',
                     type: "GET"
                 }).done(function (res) {
                     res = JSON.parse(res);
-                    if (res.success){
-                        res = res.data;
-                        assistant = res.assistant;
-                        questions = res.questions;
-                        // TODO:
-                        // we need plan type + questions left
-                        render_page(assistant.name, res.botVersion);
-                        render_questions(res.questions)
+                    if (res.success) {
+
+                        $.ajax({
+                            url: '/admin/assistant/bot/features',
+                            type: "GET"
+                        }).done(function (res) {
+                            console.log(res)
+                        });
+
                     }
                 }).fail(function (res) {
                     let resJson = JSON.parse(res.responseText);

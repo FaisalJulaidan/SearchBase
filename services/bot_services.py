@@ -26,8 +26,7 @@ def getFeatures() -> dict:
                 'name': QuestionType.FileUpload.value,
                 'actions': [a.value for a in QuestionAction],
                 'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
-                'fileMaxSize': BaseConfig.MAX_CONTENT_LENGTH + 'MB'
-
+                'fileMaxSize': str(BaseConfig.MAX_CONTENT_LENGTH) + 'MB'
             },
            }
 

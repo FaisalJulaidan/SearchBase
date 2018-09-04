@@ -69,7 +69,7 @@ def addedNewUserEmail(adminEmail, targetEmail):
 def send_async_email(app, msg):
     with app.app_context():
         #uncomment bellow to add delay
-        #for i in range(1, -1, -1):
+        #for i in range(*delay int*, -1, -1):
         #    sleep(2)
         #    print('time:', i)
         #print('====> sending async')

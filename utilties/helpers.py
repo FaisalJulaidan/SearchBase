@@ -85,6 +85,6 @@ def isStringsLengthGreaterThanZero(*args):
     return True
 
 
-def jsonResponse(success: bool, http_code: int, msg: str, data):
+def jsonResponse(success: bool, http_code: int, msg: str, data=None):
     return json.dumps({'success': success, 'code': http_code, 'msg': msg, 'data': data}),\
             http_code, {'ContentType': 'application/json'}

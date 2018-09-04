@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Questions of file uploads schema",
+  "type": "object",
+  "properties": {
+    "text": {"type": "string"},
+    "action": {"enum": ["Show Solutions", "Go To Next Block", "Go To Specific Block"]},
+    "fileTypes": {"type": "array", "items": {"type": "string"}},
+    "blockToGoID": {"type": ["integer", "null"]}
+    },
+  "required": ["text", "action", "fileTypes", "blockToGoID"],
+  "additionalProperties": false
+}
+

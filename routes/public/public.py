@@ -1,9 +1,8 @@
-from datetime import timedelta
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from utilties import helpers
-from models import User, Company, Role, Callback
+from models import Callback
 from itsdangerous import URLSafeTimedSerializer
-from services import user_services, company_services, db_services, auth_services, mail_services
+from services import auth_services, mail_services
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
 
@@ -13,12 +12,6 @@ verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y
 @public_router.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
-        print("Starting GET Request")
-        mail_callback : Callback = mail_services.sendVerificationEmail('evgeniy67@abv.bg', 'companyName', 'Faisal Julaidan')
-        print(mail_callback.Success, " ; ", mail_callback.Message)
-        mail_callback : Callback = mail_services.sendVerificationEmail('m.esteghamatdar@gmail.com', 'companyName', 'Faisal Julaidan')
-        print(mail_callback.Success, " ; ", mail_callback.Message)
-
         return render_template("index.html")
 
 

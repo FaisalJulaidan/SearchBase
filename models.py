@@ -1,11 +1,49 @@
 from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Enum
+from sqlalchemy import Enum, event, ForeignKey, types
+from sqlalchemy.ext import mutable
 from datetime import datetime
 import enum
+import json
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
+
+from sqlalchemy.engine import Engine
+from sqlite3 import Connection as SQLite3Connection
+
+
+@event.listens_for(Engine, "connect")
+def _set_sqlite_pragma(dbapi_connection, connection_record):
+    if isinstance(dbapi_connection, SQLite3Connection):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON;")
+        cursor.close()
+
+
+class JsonEncodedDict(types.TypeDecorator):
+    """Stores and retrieves JSON as TEXT."""
+
+    impl = types.Text
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            value = json.dumps(value)
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            value = json.loads(value)
+        return value
+
+
+# TypeEngine.with_variant says "use StringyJSON instead when
+# connecting to 'sqlite'"
+# MagicJSON = types.JSON().with_variant(JsonEncodedDict, 'sqlite')
+mutable.MutableDict.associate_with(JsonEncodedDict)
+
+
+# ============= Models ===================
 
 
 class Company(db.Model):
@@ -97,6 +135,7 @@ class User(db.Model):
                            on_serialize=None,
                            on_deserialize=None
                            )
+
     CreatedOn = db.Column(db.DateTime(), nullable=False, default=datetime.now,
                           supports_json=True,
                           supports_dict=True,
@@ -105,7 +144,7 @@ class User(db.Model):
                           )
 
     # Relationships:
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID'), nullable=False)
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='Users',
                               supports_json=True,
                               supports_dict=True,
@@ -113,7 +152,7 @@ class User(db.Model):
                               on_deserialize=None
                               )
 
-    RoleID = db.Column(db.Integer, db.ForeignKey('role.ID'))
+    RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
     Role = db.relationship('Role', back_populates='Users',
                            supports_json=True,
                            supports_dict=True,
@@ -165,7 +204,7 @@ class Role(db.Model):
                               )
 
     # Relationships:
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID'), nullable=False)
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='Roles')
 
     Users = db.relationship('User', back_populates="Role")
@@ -187,16 +226,15 @@ class Assistant(db.Model):
     Active = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID'), nullable=False,)
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False,)
     Company = db.relationship('Company', back_populates='Assistants')
 
     Products = db.relationship('Product', back_populates='Assistant')
     Statistics = db.relationship('Statistics', back_populates='Assistant')
-    Questions = db.relationship('Question', back_populates='Assistant')
+    Blocks = db.relationship('Block', back_populates='Assistant')
 
     # Constraints:
     db.UniqueConstraint('CompanyID', 'Nickname', name='uix1_assistant')
-
 
     def __repr__(self):
         return '<Assistant {}>'.format(self.Name)
@@ -232,66 +270,49 @@ class Statistics(db.Model):
     ProductsReturned = db.Column(db.Integer, nullable=False, default=0)
 
     # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID'), nullable=False)
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='Statistics')
 
     def __repr__(self):
         return '<Statistics {}>'.format(self.Name)
 
 
-class QuestionType(enum.Enum):
-    UserInput = 'User Input'
-    PredefinedAnswers = 'Predefined Answers'
-    FileUpload = 'File Upload'
-
-
-class QuestionAction(enum.Enum):
-
-    GoToNextQuestion = 'Go To Next Question'
-    GoToSpecificQuestion = 'Go To Specific Question'
-    ShowSolutions = 'Show Solutions'
-
-
-class UserInputValidation(enum.Enum):
+class ValidationType(enum.Enum):
 
     Email = 'Email'
     Telephone = 'Telephone'
-    Decimal = 'Decimal'
-    Integer = 'Integer'
 
 
-class Question(db.Model):
+class BlockType(enum.Enum):
+    UserInput = 'User Input'
+    Question = 'Question'
+    FileUpload = 'File Upload'
+
+
+class BlockAction(enum.Enum):
+
+    GoToNextBlock = 'Go To Next Block'
+    GoToSpecificBlock = 'Go To Specific Block'
+    # ShowSolutions = 'Show Solutions'
+
+
+class Block(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Text = db.Column(db.String(), nullable=False)
-    Type = db.Column(Enum(QuestionType), nullable=False)
+    Type = db.Column(Enum(BlockType), nullable=False)
     Order = db.Column(db.Integer, nullable=False)
+    Content = db.Column(JsonEncodedDict, nullable=False)
     StoreInDB = db.Column(db.Boolean(), nullable=False, default=True)
 
     # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='Questions')
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='Blocks')
 
     # Constraints:
     db.UniqueConstraint('AssistantID', 'Order', name='uix1_question')
 
     def __repr__(self):
-        return '<Question {}>'.format(self.Text)
-
-
-class QuestionUI(db.Model):
-
-    ID = db.Column(db.Integer, db.ForeignKey(Question.ID), primary_key=True, unique=True)
-    Action = db.Column(Enum(QuestionAction), nullable=False )
-    Validation = db.Column(Enum(UserInputValidation), nullable=False)
-
-    # Relationships:
-    Question = db.relationship('Question', foreign_keys=[ID])
-    QuestionToGoID = db.Column(db.Integer, db.ForeignKey('question.ID'))
-    QuestionToGo = db.relationship('Question', foreign_keys=[QuestionToGoID])
-
-    def __repr__(self):
-        return '<QuestionUI {}>'.format(self.Question)
+        return '<Block {}>'.format(self.Type)
 
 
 class UserInput(db.Model):
@@ -304,20 +325,11 @@ class UserInput(db.Model):
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
     # Relationships:
-    QuestionUIID = db.Column(db.Integer, db.ForeignKey('questionUI.ID'), nullable=False)
-    QuestionUI = db.relationship('QuestionUI', foreign_keys=[QuestionUIID])
+    BlockID = db.Column(db.Integer, db.ForeignKey('block.ID', ondelete='SET NULL'), nullable=False)
+    Block = db.relationship('Block', foreign_keys=[BlockID])
 
     def __repr__(self):
         return '<UserInput {}>'.format(self.Text)
-
-class QuestionPA(db.Model):
-    ID = db.Column(db.Integer, db.ForeignKey(Question.ID), primary_key=True, unique=True)
-    # Relationships:
-    Answers = db.relationship('Answer', back_populates='QuestionPA')
-    Question = db.relationship('Question', foreign_keys=[ID])
-
-    def __repr__(self):
-        return '<QuestionPA {}>'.format(self.Question)
 
 
 class Answer(db.Model):
@@ -325,46 +337,27 @@ class Answer(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Text = db.Column(db.String(), nullable=False)
     Keywords = db.Column(db.String(), nullable=False)
-    Action = db.Column(Enum(QuestionAction), nullable=False)
     TimesClicked = db.Column(db.Integer, nullable=False, default=0)
 
     # Relationships:
-    QuestionPAID = db.Column(db.Integer, db.ForeignKey('questionPA.ID'), nullable=False)
-    QuestionPA = db.relationship('QuestionPA', back_populates='Answers', foreign_keys=[QuestionPAID])
-    QuestionToGoID = db.Column(db.Integer, db.ForeignKey('question.ID'), nullable=True)
-    QuestionToGo = db.relationship('Question', foreign_keys=[QuestionToGoID])
+    BlockID = db.Column(db.Integer, db.ForeignKey('block.ID', ondelete='SET NULL'), nullable=False)
+    Block = db.relationship('Block', foreign_keys=[BlockID])
 
     def __repr__(self):
         return '<Answer {}>'.format(self.Text)
 
 
-class QuestionFU(db.Model):
-
-    ID = db.Column(db.Integer, db.ForeignKey(Question.ID), primary_key=True, unique=True)
-    Action = db.Column(Enum(QuestionAction), nullable=False)
-    TypesAllowed = db.Column(db.String(), nullable=False)
-
-    # Relationships:
-    Question = db.relationship('Question', foreign_keys=[ID])
-    QuestionToGoID = db.Column(db.Integer, db.ForeignKey('question.ID'))
-    QuestionToGo = db.relationship('Question', foreign_keys=[QuestionToGoID])
-
-    def __repr__(self):
-        return '<QuestionFU {}>'.format(self.Question)
-
-
 class UserFiles(db.Model):
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     SessionID = db.Column(db.Integer, nullable=False)
     Name = db.Column(db.String(), nullable=False)
     URL = db.Column(db.String(), nullable=False, unique=True)
-
-    QuestionText = db.Column(db.String(), nullable=False)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now )
 
     # Relationships:
-    QuestionFUID = db.Column(db.Integer, db.ForeignKey('questionFU.ID'), nullable=False)
-    QuestionFU = db.relationship('QuestionFU', foreign_keys=[QuestionFUID])
+    BlockID = db.Column(db.Integer, db.ForeignKey('block.ID', ondelete='SET NULL'), nullable=False)
+    Block = db.relationship('Block', foreign_keys=[BlockID])
 
     def __repr__(self):
         return '<UserFiles {}>'.format(self.Name)
@@ -404,6 +397,8 @@ class Newsletter(db.Model):
 class Callback():
     def __init__(self, success: bool, message: str, data: str or dict or bool = None):
         self.Success: bool = success
-        self.Message: str = message if success else 'Error: ' + message
+        self.Message: str = message
         self.Data: str or dict or bool = data
     pass
+    # if success else 'Error: ' + message
+

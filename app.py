@@ -16,14 +16,13 @@ from cryptography.fernet import Fernet
 import urllib.request
 #from celery import Celery
 
-from models import db, Role, Company, Assistant, Plan, Statistics, Question, Answer, QuestionType, QuestionAction,\
-    QuestionFU, QuestionUI, QuestionPA, UserInputValidation
+from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType
 from services.mail_services import mail
 #, celery
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
-    products_router, questions_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
+    products_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
     changePassword_router, answers_router, bot_router, emoji_router
 
 from routes.public.routers import public_router, resetPassword_router
@@ -39,7 +38,6 @@ app.register_blueprint(admin_api)
 app.register_blueprint(sub_router)
 app.register_blueprint(settings_router)
 app.register_blueprint(products_router)
-app.register_blueprint(questions_router)
 app.register_blueprint(analytics_router)
 app.register_blueprint(connection_router)
 app.register_blueprint(userInput_router)
@@ -99,32 +97,50 @@ def genDummyData():
     reader_s = Assistant(Name="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic)
     helper_s = Assistant(Name="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic)
 
-
-    # Questions for Aramco
-    question_UI = Question(Text="What's your email?", Type=QuestionType.UserInput, Order=1,
-                                     StoreInDB=True, Assistant=reader_a)
-    question_PA: Question = Question(Text="Do you smoke?", Type=QuestionType.PredefinedAnswers, Order=2,
-                                     StoreInDB=True, Assistant=reader_a)
-    question_FU: Question = Question(Text="Upload your CV", Type=QuestionType.FileUpload, Order=3,
-                                     StoreInDB=True, Assistant=reader_a)
-    # Questions Associations
-    questionUI = QuestionUI(Question=question_UI, Validation=UserInputValidation.Email,
-                            Action=QuestionAction.GoToNextQuestion, QuestionToGo=question_PA )
-
-    questionPA = QuestionPA(Question=question_PA)
-    answer1 = Answer(QuestionPA=questionPA, Text="Yes", Keywords="smoker,sad", TimesClicked=1,
-                     Action=QuestionAction.GoToSpecificQuestion, QuestionToGo=question_FU)
-    answer2 = Answer(QuestionPA=questionPA, Text="No", Keywords="smoker,sad", TimesClicked=1,
-                     Action=QuestionAction.ShowSolutions, QuestionToGo=None)
-
-    questionFU = QuestionFU(Question=question_FU, TypesAllowed="gif,pdf",
-                            Action=QuestionAction.ShowSolutions, QuestionToGo=None)
-
-    db.session.add(questionUI)
-    db.session.add(questionPA)
-    db.session.add(answer1)
-    db.session.add(answer2)
-    db.session.add(questionFU)
+    # Blocks
+    db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Assistant=reader_a, Content={
+        "answers": [
+          {
+            "action": "Go To Specific Block",
+            "answer":  {"text": "Yes", "timesClicked": 0},
+            "keywords": [
+              "smoker",
+              "sad"
+            ],
+            "blockToGoId": 3
+          },
+          {
+            "action": "Go To Specific Block",
+            "answer": {"text": "No", "timesClicked": 0},
+            "keywords": [
+              "smoker",
+              "sad"
+            ],
+            "blockToGoId": None
+          }
+        ],
+        "id": 2,
+        "order": 2,
+        "text": "Do you smoke?",
+        "storeInDB": True,
+      }))
+    db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Assistant=reader_a, Content={
+        "action": "Go To Next Block",
+        "text": "What's your email?",
+        "blockToGoID": 2,
+        "storeInDB": True,
+        "validation": "Email"
+      }))
+    db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
+        "action": "Go To Specific Block",
+        "fileTypes": [
+          "gif",
+          "pdf"
+        ],
+        "text": "Upload your CV",
+        "blockToGoID": None,
+        "storeInDB": True,
+      }))
 
 
 

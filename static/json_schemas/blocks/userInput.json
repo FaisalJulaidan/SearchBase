@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Questions of file uploads schema",
+  "type": "object",
+  "properties": {
+    "text": {"type": "string"},
+    "blockToGoID": {"type": ["number", "null"]},
+    "validation": {"enum": ["Email", "Telephone"]},
+    "action": {"type": "string"}
+    },
+  "required": ["text", "action", "blockToGoID", "validation"],
+  "additionalProperties": false
+}

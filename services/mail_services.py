@@ -1,19 +1,13 @@
 import sqlalchemy.exc
 
-from flask import Flask, render_template
+from flask import Flask, render_template, current_app
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from models import Callback
+from threading import Thread
+from time import sleep  
 import string
 import random
-#from celery import Celery
-
-#mailing
-from threading import Thread
-from flask import current_app, render_template
-from flask_mail import Message
-#from .extensions import mail
-from time import sleep  
 
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')

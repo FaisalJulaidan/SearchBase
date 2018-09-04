@@ -68,8 +68,6 @@ def addedNewUserEmail(adminEmail, targetEmail):
 #mailing
 def send_async_email(app, msg):
     with app.app_context():
-        # block only for testing parallel thread
-
         #uncomment bellow to add delay
         #for i in range(1, -1, -1):
         #    sleep(2)

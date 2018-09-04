@@ -115,14 +115,17 @@
             main();
 
             function main() {
-                init_data()
-                    .then((res) => {
+                Promise.all([init_data(), init_options()]).then((res) => {
+                    data = JSON.parse(res[0]).data;
+                    options = JSON.parse(res[1]).data;
+                    assistant = data.assistant;
+                    questions = data.questions;
 
-                        res = JSON.parse(res).data;
-                        init_options(res)
-                            .then(()=>
-                                init_page() )
-                    })
+                    // TODO: we need plan type + questions left
+                    render_page(assistant.name, options.botVersion);
+                    render_questions(res.questions, options);
+                    init_page()
+                });
             }
             function init_page() {
                 // to collopse and expand the panel
@@ -216,19 +219,11 @@
                 });
 
             }
-            function init_options(res) {
+            function init_options() {
                 return $.ajax({
                     url: '/admin/assistant/bot/features',
                     type: "GET"
-                }).done(function (options) {
-                    options = JSON.parse(options).data;
-                    console.log(options)
-                    assistant = res.assistant;
-                    questions = res.questions;
-                    // TODO:
-                    // we need plan type + questions left
-                    render_page(assistant.name, options.botVersion);
-                    render_questions(res.questions, options)
+                }).done(function () {
                 }).fail(function (res) {
                     let resJson = JSON.parse(res.responseText);
                     console.log(resJson)
@@ -357,7 +352,7 @@
                     "            </div><!-- /input-group -->\n" +
                     "        </div><!-- /.col-lg-3 -->\n" +
                     "    </div>\n" +
-                    "    <div class=\"panel-body\">\n" + 
+                    "    <div class=\"panel-body\">\n" +
                             getQuestionContent(question,options) +
                     "    </div>\n" +
                     "</li>"
@@ -374,9 +369,8 @@
                     for (question of questions)
                         elements += cookUpQuestion(question, qTypes)
                     $("#draggablePanelList").html(elements);
-                } else {
-                    $("#draggablePanelList").html("<h2>Sorry there are no questions for this bot 🙁</h2>");
                 }
+                else $("#draggablePanelList").html("<h2>Sorry there are no questions for this bot 🙁</h2>");
             }
             function render_page(assistantName,botVersion){
                 $("#assistantName").html(

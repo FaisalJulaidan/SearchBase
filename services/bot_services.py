@@ -112,3 +112,25 @@ def isValidBlock(block: dict, type: BlockType, fileName):
                         str(block['id']) + "' doesn't follow the correct format of "
                         + type.value + " block type", exc.args[0])
     return Callback(True, "Valid block")
+
+
+def getOptions() -> dict:
+    return {
+            'botVersion': bot_currentVersion,
+            'blockTypes': [ {
+                'name': BlockType.UserInput.value,
+                'validations': [uiv.value for uiv in ValidationType],
+                'actions': [a.value for a in BlockAction]
+                },
+                {
+                'name': BlockType.Question.value,
+                'actionsForAnswers': [a.value for a in BlockAction]
+                },
+                {
+                'name': BlockType.FileUpload.value,
+                'actions': [a.value for a in BlockAction],
+                'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
+                'fileMaxSize': BaseConfig.MAX_CONTENT_LENGTH + 'MB'
+                }
+            ]
+           }

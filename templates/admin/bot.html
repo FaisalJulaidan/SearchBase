@@ -117,6 +117,7 @@
             function main() {
                 init_data()
                     .then((res) => {
+
                         res = JSON.parse(res).data;
                         init_options(res)
                             .then(()=>
@@ -362,16 +363,20 @@
                     "</li>"
                 }
 
-                // collects all available qTypes
-                qTypes = [];
-                Object.entries(options).forEach(([x,y])=>{
-                   y.name? qTypes.push(y.name):''
-                });
+                if (questions[0]) {
+                    // collects all available qTypes
+                    qTypes = [];
+                    Object.entries(options).forEach(([x, y]) => {
+                        y.name ? qTypes.push(y.name) : ''
+                    });
 
-                let elements = '';
-                for (question of questions)
-                    elements += cookUpQuestion(question,qTypes)
-                $("#draggablePanelList").html(elements);
+                    let elements = '';
+                    for (question of questions)
+                        elements += cookUpQuestion(question, qTypes)
+                    $("#draggablePanelList").html(elements);
+                } else {
+                    $("#draggablePanelList").html("<h2>Sorry there are no questions for this bot 🙁</h2>");
+                }
             }
             function render_page(assistantName,botVersion){
                 $("#assistantName").html(

@@ -71,7 +71,7 @@
                                     <!-- end of data sharing-->
                                     <!-- first check box-->
                                     <div class="input-group" style="margin-bottom: 5px;">
-                                        <p class="checkboxContainer" style="margin-bottom: 5px;">
+                                        <label class="checkboxContainer" style="margin-bottom: 5px;">
                                             <strong>Newsletters</strong>
                                             {%if newsletters%}
                                             <input name="newsletters" value="newlettersON" type="checkbox" checked />
@@ -79,7 +79,7 @@
                                             <input name="newsletters" value="newlettersON" type="checkbox" />
                                             {%endif%}
                                             <span class="checkmark"></span>
-                                        </p>
+                                        </label>
                                         <p>
                                             We would like to keep you updated with the latest software updates and features available to you,
                                             If you decide to not subscribe you may miss on important features and announcements.
@@ -93,15 +93,15 @@
                                     <br />
 
                                     <div class="input-group" style="margin-bottom: 5px;">
-                                        <p class="checkboxContainer" style="margin-bottom: 5px;">
+                                        <label class="checkboxContainer" style="margin-bottom: 5px;">
                                             <strong>Tracking your data</strong>
                                             {%if newsletters%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox" checked />
+                                            <input name="tracking" value="trackingON" type="checkbox" checked />
                                             {%else%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox" />
+                                            <input name="tracking" value="trackingON" type="checkbox" />
                                             {%endif%}
                                             <span class="checkmark"></span>
-                                        </p>
+                                        </label>
                                     </div>
                                     <p>
                                         We do not in any way track your information for marketing purposes. However we would <strong>recommend</strong>
@@ -111,34 +111,38 @@
 
 
                                     <div class="input-group" style="margin-bottom: 5px;">
-                                        <p class="checkboxContainer" style="margin-bottom: 5px;">
+                                        <label class="checkboxContainer" style="margin-bottom: 5px;">
                                             <strong>Technical Support</strong>
                                             {%if newsletters%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox" checked />
+                                            <input name="techSupport" value="techSupportON" type="checkbox" checked />
                                             {%else%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox" />
+                                            <input name="techSupport" value="techSupportON" type="checkbox" />
                                             {%endif%}
                                             <span class="checkmark"></span>
-                                        </p>
+                                        </label>
                                     </div>
                                     <p>Let our team view your errors and problems in order for us to solve your issues.</p>
                                     <br />
 
 
                                     <div class="input-group" style="margin-bottom: 5px;">
-                                        <p class="checkboxContainer" style="margin-bottom: 5px;">
+                                        <label class="checkboxContainer" style="margin-bottom: 5px;">
                                             <strong>Account Specialist</strong>
                                             {%if newsletters%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox" checked />
+                                            <input name="accountSpecialist" value="accountSpecialistON" type="checkbox" checked />
                                             {%else%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox" />
+                                            <input name="accountSpecialist" value="accountSpecialistON" type="checkbox" />
                                             {%endif%}
                                             <span class="checkmark"></span>
-                                        </p>
+                                        </label>
                                     </div>
-                                    <p>Let our team contact you to help make recommendations as to how you can <strong>make your bots
-                                    more successful and ways to collect more valuable data</strong>. If you don't have a sales specialist, 
-                                    we recommend you enable this so we can help you make the most of our software.</p>
+                                    <p>
+                                        Let our team contact you to help make recommendations as to how you can <strong>
+                                            make your bots
+                                            more successful and ways to collect more valuable data
+                                        </strong>. If you don't have a sales specialist,
+                                        we recommend you enable this so we can help you make the most of our software.
+                                    </p>
                                 </form>
 
                                 <!-- submit buttons-->

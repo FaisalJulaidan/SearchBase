@@ -59,39 +59,89 @@
                                     <br />
                                     <br />
 
-
+                                    <!-- Start of data sharing-->
                                     <h2>Data Sharing Settings</h2>
                                     <p>
                                         Any data that you collect, process and store on TheSearchBase platform is kept secure and confidential at all times. The data that you collect is data
                                         that enables our software to work at its optimum level.
                                     </p>
-                                    <p>This part of the website enables you to control what settings you may share with us.</p>
-                                    <div class="input-group">
-                                        <br />
-                                        <label class="checkboxContainer">Newsletters
+                                    <hr>
+                                    <h4>This part of the website enables you to control what settings you may share with us.</h4>
+                                    <br />
+                                    <!-- end of data sharing-->
+                                    <!-- first check box-->
+                                    <div class="input-group" style="margin-bottom: 5px;">
+                                        <p class="checkboxContainer" style="margin-bottom: 5px;">
+                                            <strong>Newsletters</strong>
                                             {%if newsletters%}
                                             <input name="newsletters" value="newlettersON" type="checkbox" checked />
                                             {%else%}
                                             <input name="newsletters" value="newlettersON" type="checkbox" />
                                             {%endif%}
                                             <span class="checkmark"></span>
-                                        </label>
+                                        </p>
+                                        <p>
+                                            We would like to keep you updated with the latest software updates and features available to you,
+                                            If you decide to not subscribe you may miss on important features and announcements.
+                                        </p>
                                     </div>
-                                    
+                                    <!-- end of first check box-->
+                                    <!-- text information-->
+                                    <p><strong>Erasing data</strong></p>
+                                    <p>If you decide to stop using our platform, we will simply delete your information after a year of inactivity.</p>
+
+                                    <br />
+
+                                    <div class="input-group" style="margin-bottom: 5px;">
+                                        <p class="checkboxContainer" style="margin-bottom: 5px;">
+                                            <strong>Tracking your data</strong>
+                                            {%if newsletters%}
+                                            <input name="newsletters" value="newlettersON" type="checkbox" checked />
+                                            {%else%}
+                                            <input name="newsletters" value="newlettersON" type="checkbox" />
+                                            {%endif%}
+                                            <span class="checkmark"></span>
+                                        </p>
+                                    </div>
                                     <p>
-                                        We would like to keep you updated with the latest software updates and features available to you,
-                                        If you decide to not subscribe you may miss on important features and announcements.
+                                        We do not in any way track your information for marketing purposes. However we would <strong>recommend</strong>
+                                        allowing us to <strong>contact you if we see that there are ways we could enhance your bot or use of our software</strong>.
                                     </p>
+                                    <br />
 
 
-                                    <label>Erasing data</label><br />
-                                    <p>If you decide to stop using our platform, we will simply delete your information after an year of inactivity.</p>
+                                    <div class="input-group" style="margin-bottom: 5px;">
+                                        <p class="checkboxContainer" style="margin-bottom: 5px;">
+                                            <strong>Technical Support</strong>
+                                            {%if newsletters%}
+                                            <input name="newsletters" value="newlettersON" type="checkbox" checked />
+                                            {%else%}
+                                            <input name="newsletters" value="newlettersON" type="checkbox" />
+                                            {%endif%}
+                                            <span class="checkmark"></span>
+                                        </p>
+                                    </div>
+                                    <p>Let our team view your errors and problems in order for us to solve your issues.</p>
+                                    <br />
 
-                                    <label>Tracking your data</label><br />
-                                    <p>We do not in any way track your information for marketing or recommendation purposes.</p>
+
+                                    <div class="input-group" style="margin-bottom: 5px;">
+                                        <p class="checkboxContainer" style="margin-bottom: 5px;">
+                                            <strong>Account Specialist</strong>
+                                            {%if newsletters%}
+                                            <input name="newsletters" value="newlettersON" type="checkbox" checked />
+                                            {%else%}
+                                            <input name="newsletters" value="newlettersON" type="checkbox" />
+                                            {%endif%}
+                                            <span class="checkmark"></span>
+                                        </p>
+                                    </div>
+                                    <p>Let our team contact you to help make recommendations as to how you can <strong>make your bots
+                                    more successful and ways to collect more valuable data</strong>. If you don't have a sales specialist, 
+                                    we recommend you enable this so we can help you make the most of our software.</p>
                                 </form>
 
-
+                                <!-- submit buttons-->
                                 <div class="input-group" style="margin:10px 0 0 10px">
                                     <button class="btn btn-success">Save</button>
                                     <a href="/admin/changepassword" class="btn btn-success">Change Password</a>
@@ -99,7 +149,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

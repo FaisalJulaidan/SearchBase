@@ -47,8 +47,8 @@ body.cd-overlay::after {
 }
 
 a {
-  color: #a9c056;
-  text-decoration: none;
+    color: #6610f2;
+    text-decoration: none;
 }
 
 /* -------------------------------- 
@@ -385,23 +385,23 @@ header h1 {
     margin: 0;
     padding: 24px 72px 24px 24px;
   }
-  .cd-faq-trigger::before, .cd-faq-trigger::after {
-    /* arrow icon on the right */
-    position: absolute;
-    right: 24px;
-    top: 50%;
-    height: 2px;
-    width: 13px;
-    background: #cfdca0;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-transition-property: -webkit-transform;
-    -moz-transition-property: -moz-transform;
-    transition-property: transform;
-    -webkit-transition-duration: 0.2s;
-    -moz-transition-duration: 0.2s;
-    transition-duration: 0.2s;
-  }
+    .cd-faq-trigger::before, .cd-faq-trigger::after {
+        /* arrow icon on the right */
+        position: absolute;
+        right: 24px;
+        top: 50%;
+        height: 2px;
+        width: 13px;
+        background: #6610f2;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        -webkit-transition-property: -webkit-transform;
+        -moz-transition-property: -moz-transform;
+        transition-property: transform;
+        -webkit-transition-duration: 0.2s;
+        -moz-transition-duration: 0.2s;
+        transition-duration: 0.2s;
+    }
   .cd-faq-trigger::before {
     -webkit-transform: rotate(45deg);
     -moz-transform: rotate(45deg);

@@ -13,6 +13,8 @@
     <link rel="stylesheet" type="text/css" href="../static/SL/Login/css/util.css">
     <link rel="stylesheet" type="text/css" href="../static/SL/Login/css/main.css">
 
+    <link rel="stylesheet" type="text/css" href="../static/css/checkbox.css">
+
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-70419779-2"></script>
     <script>
@@ -178,7 +180,7 @@
                         <span class="focus-input100"></span>
                     </div>-->
 
-                    <div class="text-center p-t-12">
+                    <!--<div class="text-center p-t-12"> old checkbox
                         <input id="TAPPCheckbox" type="checkbox" onchange="checkCheckbox()">
                         <span class="txt1">
                             I agree to
@@ -192,6 +194,25 @@
                         <a class="text2" href="/privacy">
                             <strong>Privacy Policy</strong>
                         </a>
+                    </div>-->
+                    <div class="input-group" style="margin-left: 8%; margin-top: 5%;">
+                        <br />
+                        <label class="checkboxContainer">
+                            <span class="txt1">
+                                I agree to
+                            </span>
+                            <a class="txt2" href="/termsandconditions">
+                                <strong>Terms</strong>
+                            </a>
+                            <span class="text1">
+                                &
+                            </span>
+                            <a class="text2" href="/privacy">
+                                <strong>Privacy Policy</strong>
+                            </a>
+                            <input name="newsletters" value="newlettersON" type="checkbox" onchange="checkCheckbox()"/>
+                            <span class="checkmark"></span>
+                        </label>
                     </div>
 
                     <center>{{msg}}</center>

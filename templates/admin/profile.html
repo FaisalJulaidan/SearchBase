@@ -56,45 +56,47 @@
                                         <span class="input-group-addon">Company Name</span>
                                         <input type="text" class="form-control" id="companyName" name="companyName" value="{{company["Name"]}}" />
                                     </div>
-                                    
+                                    <br />
+                                    <br />
+
+
+                                    <h2>Data Sharing Settings</h2>
+                                    <p>
+                                        Any data that you collect, process and store on TheSearchBase platform is kept secure and confidential at all times. The data that you collect is data
+                                        that enables our software to work at its optimum level.
+                                    </p>
+                                    <p>This part of the website enables you to control what settings you may share with us.</p>
+                                    <label>Newsletters</label><br />
+                                    <p>
+                                        We would like to keep you updated with the latest software updates and features available to you,
+                                        If you decide to not subscribe you may miss on important features and announcements.
+                                    </p>
+
                                     <div class="input-group" style="margin:10px 0 0 10px">
-                                        <label>Recommended Newsletters</label><br />
+                                        <br />
                                         <label class="checkboxContainer">
                                             {%if newsletters%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox" checked/>
+                                            <input name="newsletters" value="newlettersON" type="checkbox" checked />
                                             {%else%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox"/>
+                                            <input name="newsletters" value="newlettersON" type="checkbox" />
                                             {%endif%}
                                             <span class="checkmark"></span>
                                         </label>
                                     </div>
                                     <br />
 
-                                    <div class="input-group" style="margin:10px 0 0 10px">
-                                        <button class="btn btn-success">Save Changes</button>
-                                        <a href="/admin/changepassword" class="btn btn-success">Change Password</a>
-                                    </div>
-                                    <br />
-                                    
-
-                                    <label>Data Sharing Settings</label>
-                                    <p>Any data that you collect, process and store on TheSearchBase platform is kept secure and confidential at all times. The data that you collect is data
-                                        that enables our software to work at its optimum level. </p>
-                                    <p>This part of the website enables you to control what settings you may share with us.</p>
-
-                                    <label>Newsletters</label><br />
-                                    <p>We would like to keep you updated with the latest software updates and features available to you,
-                                    If you decide to not subscribe you may miss on important features and announcements.</p>
-
                                     <label>Erasing data</label><br />
                                     <p>If you decide to stop using our platform, we will simply delete your information after an year of inactivity.</p>
 
                                     <label>Tracking your data</label><br />
                                     <p>We do not in any way track your information for marketing or recommendation purposes.</p>
-
-
-
                                 </form>
+
+
+                                <div class="input-group" style="margin:10px 0 0 10px">
+                                    <button class="btn btn-success">Save</button>
+                                    <a href="/admin/changepassword" class="btn btn-success">Change Password</a>
+                                </div>
                             </div>
                         </div>
                     </div>

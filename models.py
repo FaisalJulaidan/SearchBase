@@ -16,7 +16,7 @@ class Company(db.Model):
                    on_serialize=None,
                    on_deserialize=None
                    )
-    Name = db.Column(db.String(80), nullable=False, unique=True,
+    Name = db.Column(db.String(80), nullable=False,
                      supports_json=True,
                      supports_dict=True,
                      on_serialize=None,
@@ -388,6 +388,16 @@ class Plan(db.Model):
     def __repr__(self):
         return '<Plan {}>'.format(self.Nickname)
 
+class Newsletter(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Email = db.Column(db.String(), nullable=False, unique=True)
+
+    # Relationships:
+    ###
+
+    def _repr_(self):
+        return '<Newsletter {}>'.format(self.Email)
 
 class Newsletter(db.Model):
 

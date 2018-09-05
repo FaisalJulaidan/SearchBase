@@ -1,5 +1,5 @@
 from flask import jsonify, json
-from services import user_services, admin_services, role_services, company_services
+from services import user_services, admin_services, role_services, company_services, mail_services
 from models import Callback, db, User, Company
 from flask import Blueprint, request, redirect, session
 from utilties import helpers
@@ -126,6 +126,11 @@ def admin_users_add():
                    400, {'ContentType': 'application/json'}
 
         print('new user > success!')
+        email_callback : Callback = mail_services.addedNewUserEmail(session.get('UserEmail', "Error"), email)
+        if not email_callback.Success:
+            return json.dumps({'success': False, 'msg': " New user was created but could not send email with login information. Please delete and readd the user."}), \
+                   400, {'ContentType': 'application/json'}
+
         return json.dumps({'success': True, 'msg': " User has been created successfully!"}), \
                    200, {'ContentType': 'application/json'}
 

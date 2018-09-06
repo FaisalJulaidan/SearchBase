@@ -399,18 +399,6 @@ class Newsletter(db.Model):
     def _repr_(self):
         return '<Newsletter {}>'.format(self.Email)
 
-class Newsletter(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Email = db.Column(db.String(), nullable=False, unique=True)
-
-    # Relationships:
-    ###
-
-    def __repr__(self):
-        return '<Newsletters {}>'.format(self.Email)
-
-
 class Callback():
     def __init__(self, success: bool, message: str, data: str or dict or bool = None):
         self.Success: bool = success

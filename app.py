@@ -86,8 +86,8 @@ def before_request():
 def genDummyData():
 
     # Companies creation
-    db.session.add(Company(Name='Aramco', Size=12, PhoneNumber='4344423', URL='ff.com'))
-    db.session.add(Company(Name='Sabic', Size=12, PhoneNumber='4344423', URL='ff.com'))
+    db.session.add(Company(Name='Aramco', URL='ff.com'))
+    db.session.add(Company(Name='Sabic', URL='ff.com'))
 
     aramco = Company.query.filter(Company.Name == "Aramco").first()
     sabic = Company.query.filter(Company.Name == "Sabic").first()
@@ -144,18 +144,18 @@ def genDummyData():
     admin_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "Admin").first()
     user_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "User").first()
 
-    user_services.create(firstname='Ahmad', surname='Hadi', email='aa@aa.com', password='123',
+    user_services.create(firstname='Ahmad', surname='Hadi', email='aa@aa.com', password='123', phone='4344423',
                          company=aramco, role=owner_aramco, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', company=aramco,
+    user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='4344423', company=aramco,
                          role=admin_aramco, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', company=aramco,
+    user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', phone='4344423', company=aramco,
                          role=user_aramco, verified=True)
 
-    user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', company=sabic,
+    user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', phone='4344423', company=sabic,
                          role=owner_sabic, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', company=sabic,
+    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='4344423', company=sabic,
                          role=admin_sabic, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e6@e.com', password='123', company=sabic,
+    user_services.create(firstname='firstname', surname='lastname', email='e6@e.com', password='123', phone='4344423', company=sabic,
                          role=user_sabic, verified=True)
 
     db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic'))

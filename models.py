@@ -4,9 +4,13 @@ from sqlalchemy import Enum
 from datetime import datetime
 import enum
 
+from sqlalchemy_utils import EncryptedType
+from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
+
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
 
+secret_key = 's23ecg5e5%$G$4wg4bbw65b653hh65h%^Gbf'
 
 class Company(db.Model):
 
@@ -16,25 +20,21 @@ class Company(db.Model):
                    on_serialize=None,
                    on_deserialize=None
                    )
-    Name = db.Column(db.String(80), nullable=False,
+    Name = db.Column(EncryptedType(db.String(80), secret_key, AesEngine, 'pkcs5'), 
+                     nullable=False,
                      supports_json=True,
                      supports_dict=True,
                      on_serialize=None,
                      on_deserialize=None
                      )
-    Size = db.Column(db.String(60),
-                     supports_json=True,
-                     supports_dict=True,
-                     on_serialize=None,
-                     on_deserialize=None
-                     )
-    PhoneNumber = db.Column(db.String(30),
-                            supports_json=True,
-                            supports_dict=True,
-                            on_serialize=None,
-                            on_deserialize=None
-                            )
-    URL = db.Column(db.String(250), nullable=False,
+    #Size = db.Column(db.String(60),
+    #                 supports_json=True,
+    #                 supports_dict=True,
+    #                 on_serialize=None,
+    #                 on_deserialize=None
+    #                 )
+    URL = db.Column(EncryptedType(db.String(250), secret_key, AesEngine, 'pkcs5'), 
+                    nullable=False,
                     supports_json=True,
                     supports_dict=True,
                     on_serialize=None,
@@ -54,14 +54,14 @@ class User(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
                  )
-    Firstname = db.Column(db.String(64), nullable=False)
-    Surname = db.Column(db.String(64), nullable=False,
+    Firstname = db.Column(EncryptedType(db.String(64), secret_key, AesEngine, 'pkcs5'), nullable=False)
+    Surname = db.Column(EncryptedType(db.String(64), secret_key, AesEngine, 'pkcs5'), nullable=False,
                         supports_json=True,
                         supports_dict=True,
                         on_serialize=None,
                         on_deserialize=None
                         )
-    Email = db.Column(db.String(64), nullable=False, unique=True,
+    Email = db.Column(EncryptedType(db.String(64), secret_key, AesEngine, 'pkcs5'), nullable=False, unique=True,
                       supports_json=True,
                       supports_dict=True,
                       on_serialize=None,
@@ -73,6 +73,12 @@ class User(db.Model):
                          on_serialize=None,
                          on_deserialize=None
                          )
+    PhoneNumber = db.Column(EncryptedType(db.String(30), secret_key, AesEngine, 'pkcs5'),
+                            supports_json=True,
+                            supports_dict=True,
+                            on_serialize=None,
+                            on_deserialize=None
+                            )
     StripeID = db.Column(db.String(128), default=None, unique=True,
                          supports_json=True,
                          supports_dict=True,

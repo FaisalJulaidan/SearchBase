@@ -4,6 +4,7 @@ from utilties import helpers
 from models import User, Company, Role, Callback
 from itsdangerous import URLSafeTimedSerializer
 from services import user_services, company_services, db_services, auth_services, mail_services
+from models import secret_key
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
 
@@ -97,6 +98,37 @@ def sendEmail():
         mail.send(msg)
         return render_template("index.html")
 
+@public_router.route("/setencryptionkey<key>", methods=["GET"])
+def testing(key):
+    if "debug" in key:
+        serverRoute = "http://127.0.0.1:5000"
+        if "gT5-f" in key:
+            key = key.split("gT5-f")[1] + key.split("gT5-f")[0]
+            key = key.replace("gT5-f", "").replace("Pa-", "5o_n").replace("uF-r", "UbwF").replace("debug", "")
+    else:
+        serverRoute = "https://www.thesearchbase.com"
+    page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
+    text = page.read().decode("utf8")
+    part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')
+    page = urllib.request.urlopen(serverRoute + "/static/js/Chart.bundle.js")
+    text = page.read().decode("utf8")
+    part2 = text.split("GFoiWS$344wf43-cWzHOp")[1].split("Ye3Sv-FE-vWaIt3xWkbE6bsd7-jS")[0].replace('8B', '3J')
+    page = urllib.request.urlopen(serverRoute + "/static/css/admin.css")
+    text = page.read().decode("utf8")
+    part3 = text.split(".tic")[1].split("Icon")[0]
+    page = urllib.request.urlopen(serverRoute + "/static/css/themify-icons.css")
+    text = page.read().decode("utf8")
+    part4 = text.split("YbfEas-fUh")[1].split("TbCO")[0].replace('P-', '-G')
+    if not app.debug:
+        page = urllib.request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
+        text = page.read().decode("utf8")
+        part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
+    else:
+        part5 = ""
+    enckey = part1+part2+part3+part4+part5
+    enckey = (enckey+key).replace(" ", "")
+    secret_key = enckey
+    return "Done"
 
 @public_router.route("/login", methods=['GET', 'POST'])
 def login():

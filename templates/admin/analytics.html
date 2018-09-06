@@ -119,7 +119,7 @@
             datasets: [{
                 label: 'Questions Answered',
                 fill: true,
-                lineTension: 0.1,
+                lineTension: 1,
                 backgroundColor: "rgb(0,191,255)",
                 borderColor: "rgb(0,191,255)",
                 borderCapStyle: 'butt',
@@ -151,7 +151,7 @@
             datasets: [{
                 label: 'Products Returned',
                 fill: true,
-                lineTension: 0.1,
+                lineTension: 1,
                 backgroundColor: "rgb(255,255,0)",
                 borderColor: "rgb(255,255,0)",
                 borderCapStyle: 'butt',
@@ -186,9 +186,9 @@
                 {% endif %}
             {% endfor %}],
             datasets: [{
-                label: 'Assistant Used',
-                fill: false,
-                lineTension: 0.1,
+                label: 'Users Overtime',
+                fill: true,
+                lineTension: 1,
                 backgroundColor: "rgb(50,205,50)",
                 borderColor: "rgb(50,205,50)",
                 borderCapStyle: 'butt',
@@ -231,17 +231,6 @@
             tableString += "</tr>"
         {%endfor%}
         function fnExcelReport() {
-            // var tab_text="<table border='2px'><tr bgcolor='#87AFC6'>";
-            // var textRange; var j=0;
-            // tab = document.getElementById('headerTable'); // id of table
-            //
-            // for(j = 0 ; j < tab.rows.length ; j++)
-            // {
-            //     tab_text=tab_text+tab.rows[j].innerHTML+"</tr>";
-            //     //tab_text=tab_text+"</tr>";
-            // }
-            //
-            // tab_text=tab_text+"</table>";
             tab_text = tableString;
             tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//comment if u want links in your table
             tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // comment if u want images in your table

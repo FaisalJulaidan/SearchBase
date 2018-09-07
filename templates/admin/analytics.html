@@ -83,25 +83,16 @@
                 <div class="clearfix"></div>
             </div>
         </div>
-        </div>
     </div>
+</div>
     {% endblock %}
 
     {% block customJS %}
-    <script src="/static/js/Chart.js"></script>
-    <script>
-        window.onload = function () {
-            var ctx = document.getElementById("putcharthere1").getContext("2d");
-            window.myObjBar = new Chart(ctx).Bar(barChartData, {
-                responsive: true
-            });
-
-            //nuevos colores
-            myObjBar.datasets[0].bars[0].fillColor = "green"; //bar 1
-            myObjBar.datasets[0].bars[1].fillColor = "orange"; //bar 2
-            myObjBar.datasets[0].bars[2].fillColor = "red"; //bar 3
-            myObjBar.update();
-        }
+<script asyn src="https://livegap.com/charts/js/webfont.js">
+</script>
+<script src="https://livegap.com/charts/js/Chart.min.js"></script>
+<script src="/static/js/Chart.js"></script>
+<script>
         var periods = [];
         //  Start of the chart code
         var totalOpened = [];
@@ -122,18 +113,18 @@
                 label: 'Assistant Used',
                 fill: true,
                 lineTension: 0.1,
-                backgroundColor: "rgb(138,43,226)",
-                borderColor: "rgb(255,0,0)",
+                backgroundColor: ["rgba(220,220,220,0.5)", "navy", "red", "orange"],
+                //borderColor: "rgb(255,0,0)",
                 borderCapStyle: 'butt',
                 borderDash: [],
                 borderDashOffset: 0.0,
                 borderJoinStyle: 'miter',
-                pointBorderColor: "rgba(75,192,192,1)",
-                pointBackgroundColor: "#fff",
+                //pointBorderColor: "rgba(75,192,192,1)",
+                //pointBackgroundColor: "#fff",
                 pointBorderWidth: 1,
                 pointHoverRadius: 5,
-                pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                pointHoverBorderColor: "rgba(220,220,220,1)",
+                //pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                //pointHoverBorderColor: "rgba(220,220,220,1)",
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
@@ -413,5 +404,5 @@
 
             return (sa);
         }
-    </script>
+</script>
     {% endblock %}

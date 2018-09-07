@@ -22,6 +22,33 @@
             <iframe id="txtArea1" style="display:none"></iframe>
             <br />
             <br />
+            <h2>Critical Data</h2>
+            <br />
+            <div class="analytics_line">
+                <!-- First chart -->
+                <br />
+                <div style="width:350px; height:200px;">
+                    <p>Most searched for Sector</p>
+                    <canvas id="putcharthere6" style="width:350px; height:0px;"></canvas>
+                </div>
+
+                <!-- Second chart -->
+                <div style="width:350px; height:200px;">
+                    <p>Most search for location</p>
+                    <canvas id="putcharthere7" style="width:350px; height:0px;"></canvas>
+                </div>
+
+                <!-- Second chart -->
+                <div style="width:350px; height:200px;">
+                    <p>Most returned solution</p>
+                    <canvas id="putcharthere8" style="width:350px; height:0px;"></canvas>
+                </div>
+            </div>
+
+
+
+
+
             <h2>General Data</h2>
             <br />
             <div class="analytics_line">
@@ -49,9 +76,14 @@
                     <canvas id="putcharthere4" style="width:350px; height:0px;"></canvas>
                 </div>
                 <div class="clearfix"></div>
+
+                <div style="width:700px; height:300px;">
+                    <canvas id="putcharthere5" style="width:350px; height:0px;"></canvas>
+                </div>
+                <div class="clearfix"></div>
             </div>
         </div>
-    </div>
+        </div>
     </div>
     {% endblock %}
 
@@ -78,7 +110,7 @@
                 label: 'Assistant Used',
                 fill: true,
                 lineTension: 0.1,
-                backgroundColor: "rgb(255,0,0)",
+                backgroundColor: "rgb(138,43,226)",
                 borderColor: "rgb(255,0,0)",
                 borderCapStyle: 'butt',
                 borderDash: [],
@@ -106,12 +138,12 @@
         //  End of the chart code
 
         var chartData = {
-            labels: periods,
+            labels: [1, 2, 3, 4],
             datasets: [{
                 label: 'Questions Answered',
                 fill: true,
                 lineTension: 1,
-                backgroundColor: "rgb(0,191,255)",
+                backgroundColor: "rgb(138,43,226)",
                 borderColor: "rgb(0,191,255)",
                 borderCapStyle: 'butt',
                 borderDash: [],
@@ -126,7 +158,7 @@
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: totalQuestionsAnswered,
+                data: [11, 22, 33, 44],
                 spanGaps: false
             }]
         }
@@ -138,12 +170,12 @@
 
 
         var chartData = {
-            labels: periods,
+            labels: [1, 2, 3, 4],
             datasets: [{
                 label: 'Products Returned',
                 fill: true,
                 lineTension: 1,
-                backgroundColor: "rgb(255,255,0)",
+                backgroundColor: "rgb(138,43,226)",
                 borderColor: "rgb(255,255,0)",
                 borderCapStyle: 'butt',
                 borderDash: [],
@@ -158,7 +190,7 @@
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: totalProductsReturned,
+                data: [11, 22, 33, 44],
                 spanGaps: false
             }]
         }
@@ -171,16 +203,12 @@
 
         //  Start of the chart code
         var chartData = {
-            labels: [{% for item in data %}
-                {%if ";" in item[0] %}
-                    "Week " + "{{item[0]}}".split(";")[1] + " of " + "{{item[0]}}".split(";")[0],
-                {% endif %}
-            {% endfor %}],
+            labels: [1, 2, 3, 4,5,6,7,8,9,10,11,12,13,14,15,16],
             datasets: [{
                 label: 'Users Overtime',
                 fill: true,
-                lineTension: 1,
-                backgroundColor: "rgb(50,205,50)",
+                lineTension: 0.3,
+                backgroundColor: "rgb(138,43,226)",
                 borderColor: "rgb(50,205,50)",
                 borderCapStyle: 'butt',
                 borderDash: [],
@@ -193,16 +221,13 @@
                 pointHoverBackgroundColor: "rgba(75,192,192,1)",
                 pointHoverBorderColor: "rgba(220,220,220,1)",
                 pointHoverBorderWidth: 2,
-                pointRadius: 1,
+                pointRadius: 0.5,
                 pointHitRadius: 10,
-                data: [{% for item in data %}
-                    {%if ";" in item[0] %}
-                        {{item[1]}},
-                    {% endif %}
-                {% endfor %}],
+                data: [13, 22, 5, 25,33,12,66,43,56,69, 66,2,30,25,50,150,78,68,44],
                 spanGaps: false
             }]
         }
+
         var chartdiv = document.getElementById("putcharthere4").getContext("2d");
         new Chart(chartdiv, {
             data: chartData,
@@ -211,6 +236,139 @@
 
         //  End of the chart code
 
+        //  Start of the chart code
+        var chartData = {
+            labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            datasets: [{
+                label: 'Users Overtime',
+                fill: true,
+                lineTension: 0.3,
+                backgroundColor: "rgb(138,43,226)",
+                borderColor: "rgb(50,205,50)",
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgba(75,192,192,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 0.5,
+                pointHitRadius: 10,
+                data: [13, 22, 5, 25, 33, 12, 66, 43, 56, 69],
+                spanGaps: false
+            }]
+        }
+
+        var chartdiv = document.getElementById("putcharthere5").getContext("2d");
+        new Chart(chartdiv, {
+            data: chartData,
+            type: 'line',
+        });
+        //  End of the chart code
+
+
+        //  Start of the chart code
+        var chartData = {
+            labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            datasets: [{
+                label: 'Users Overtime',
+                fill: true,
+                lineTension: 0.3,
+                backgroundColor: "rgb(138,43,226)",
+                borderColor: "rgb(50,205,50)",
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgba(75,192,192,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 0.5,
+                pointHitRadius: 10,
+                data: [13, 22, 5, 25, 33, 12, 66, 43, 56, 69],
+                spanGaps: false
+            }]
+        }
+
+        var chartdiv = document.getElementById("putcharthere6").getContext("2d");
+        new Chart(chartdiv, {
+            data: chartData,
+            type: 'pie',
+        });
+
+        //  Start of the chart code
+        var chartData = {
+            labels: ['Technology', 'Finance', 'Engineering', 'Public'],
+            datasets: [{
+                label: 'Users Overtime',
+                fill: true,
+                lineTension: 0.3,
+                backgroundColor: "rgb(138,43,226)",
+                borderColor: "rgb(50,205,50)",
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgba(75,192,192,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 0.5,
+                pointHitRadius: 10,
+                data: [13, 22, 5, 25],
+                spanGaps: false
+            }]
+        }
+
+        var chartdiv = document.getElementById("putcharthere8").getContext("2d");
+        new Chart(chartdiv, {
+            data: chartData,
+            type: 'pie',
+        });
+
+        //  Start of the chart code
+        var chartData = {
+            labels: ['Technology', 'Finance', 'Engineering', 'Public'],
+            datasets: [{
+                label: 'Users Overtime',
+                fill: true,
+                lineTension: 0.3,
+                backgroundColor: "rgb(138,43,226)",
+                borderColor: "rgb(50,205,50)",
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgba(75,192,192,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 0.5,
+                pointHitRadius: 10,
+                data: [13, 22, 30, 25],
+                spanGaps: false
+            }]
+        }
+
+        var chartdiv = document.getElementById("putcharthere7").getContext("2d");
+        new Chart(chartdiv, {
+            data: chartData,
+            type: 'radar',
+        });
 
         //Create table for Excel export
         var tableString = "<table><tr><th>Date</th><th>Assistant Opened</th><th>Questions Answered</th><th>Products Returned</th></tr>";

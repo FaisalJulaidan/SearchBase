@@ -58,6 +58,18 @@
     {% block customJS %}
     <script src="/static/js/Chart.js"></script>
     <script>
+        window.onload = function () {
+            var ctx = document.getElementById("putcharthere1").getContext("2d");
+            window.myObjBar = new Chart(ctx).Bar(barChartData, {
+                responsive: true
+            });
+
+            //nuevos colores
+            myObjBar.datasets[0].bars[0].fillColor = "green"; //bar 1
+            myObjBar.datasets[0].bars[1].fillColor = "orange"; //bar 2
+            myObjBar.datasets[0].bars[2].fillColor = "red"; //bar 3
+            myObjBar.update();
+        }
         var periods = [];
         //  Start of the chart code
         var totalOpened = [];

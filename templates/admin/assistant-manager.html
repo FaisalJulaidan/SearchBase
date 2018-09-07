@@ -36,28 +36,36 @@
                             </thead>
                             <tbody>
 
-                                {% if users|length > 0 %}
-                                {% for user in users %}
-                                <tr data-rowID={{ assistant.ID }}>
-                                    <td data-type="assistant_id">{{ assistant.ID }}</td>
-                                    <td data-type="assistant_name">{{ assistant.name }}</td>
-                                    <td data-type="assistant_status">{{ assistant.status }}</td>
-
+                                {% for assistant in assistants %}
+                                <tr data-rowID={{ assistant['ID'] }}>
+                                    <td data-type="assistant_id">{{ assistant['ID'] }}</td>
+                                    <td data-type="assistant_name">{{ assistant['Name'] }}</td>
+                                    {%if assistant['Active']%}
+                                    <td data-type="assistant_status">Active</td>
+                                    {%else%}
+                                    <td data-type="assistant_status">Inactive</td>
+                                    {%endif%}
                                     <td>
-                                        {% if user.Role.Name != 'Owner' %}
-                                        <button type="button" class="btn btn-primary"
-                                                data-toggle="modal"
-                                                onclick="fillUserForm({{ user.ID }}, edit=true)">Activate</button>
-                                        <button type="button" class="btn btn-danger" onclick="deleteUser({{ user.ID }})">Deactivate</button>
+                                        {% if userRole['EditChatbots'] %}
+
+                                        {%if assistant['Active']%}
+                                        <button style="background-color:grey; border-color: grey;" class="btn btn-primary" href="/admin/assistant/active/False/{{ assistant['ID'] }}">Deactivate</button>
+                                        {%else%}
+                                        <button style="background-color:limegreen; border-color: limegreen;" class="btn btn-primary" href="/admin/assistant/active/True/{{ assistant['ID'] }}">Activate</button>
+                                        {%endif%}
 
                                         {% else %}
-                                        <button type="button" class="btn btn-primary" disabled>Activate</button>
-                                        <button type="button" class="btn btn-danger" disabled>Deactivate</button>
+
+                                        {%if assistant['Active']%}
+                                        <button style="background-color:grey; border-color: grey;" class="btn btn-primary" disabled>Deactivate</button>
+                                        {%else%}
+                                        <button style="background-color:limegreen; border-color: limegreen;" class="btn btn-primary" disabled>Activate</button>
+                                        {%endif%}
+
                                         {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
-                                {% endif %}
 
                             </tbody>
                             <tfoot>
@@ -91,12 +99,5 @@
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
      <!-- Script for editing users table -->
     <script src="../../static/users/script.js" type="text/javascript"></script>
-
-    <script type="text/javascript">
-
-
-
-    </script>
-
 
 {% endblock %}

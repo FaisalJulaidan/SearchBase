@@ -31,6 +31,7 @@ Shapely==1.6.4.post1
 simplejson==3.16.0
 six==1.11.0
 SQLAlchemy==1.2.10
+sqlalchemy_utils==0.33.3
 sqlathanor==0.3.0
 stripe==2.0.3
 urllib3==1.23

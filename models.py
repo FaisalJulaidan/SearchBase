@@ -4,9 +4,14 @@ from sqlalchemy import Enum
 from datetime import datetime
 import enum
 
+from sqlalchemy_utils import EncryptedType
+from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
+
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
 
+secret_key = 's23ecg5e5%$G$4wg4bbw65b653hh65h%^Gbf'
+useEncryption = False
 
 class Company(db.Model):
 
@@ -16,30 +21,42 @@ class Company(db.Model):
                    on_serialize=None,
                    on_deserialize=None
                    )
-    Name = db.Column(db.String(80), nullable=False,
-                     supports_json=True,
-                     supports_dict=True,
-                     on_serialize=None,
-                     on_deserialize=None
-                     )
-    Size = db.Column(db.String(60),
-                     supports_json=True,
-                     supports_dict=True,
-                     on_serialize=None,
-                     on_deserialize=None
-                     )
-    PhoneNumber = db.Column(db.String(30),
-                            supports_json=True,
-                            supports_dict=True,
-                            on_serialize=None,
-                            on_deserialize=None
-                            )
-    URL = db.Column(db.String(250), nullable=False,
-                    supports_json=True,
-                    supports_dict=True,
-                    on_serialize=None,
-                    on_deserialize=None
-                    )
+    if useEncryption:
+        Name = db.Column(EncryptedType(db.String(80), secret_key, AesEngine, 'pkcs5'), 
+                         nullable=False,
+                         supports_json=True,
+                         supports_dict=True,
+                         on_serialize=None,
+                         on_deserialize=None
+                         )
+        URL = db.Column(EncryptedType(db.String(250), secret_key, AesEngine, 'pkcs5'), 
+                        nullable=False,
+                        supports_json=True,
+                        supports_dict=True,
+                        on_serialize=None,
+                        on_deserialize=None
+                        )
+    else:
+        Name = db.Column(db.String(80), 
+                         nullable=False,
+                         supports_json=True,
+                         supports_dict=True,
+                         on_serialize=None,
+                         on_deserialize=None
+                         )
+        URL = db.Column(db.String(250), 
+                        nullable=False,
+                        supports_json=True,
+                        supports_dict=True,
+                        on_serialize=None,
+                        on_deserialize=None
+                        )
+    #Size = db.Column(db.String(60),
+    #                 supports_json=True,
+    #                 supports_dict=True,
+    #                 on_serialize=None,
+    #                 on_deserialize=None
+    #                 )
 
     # Relationships:
     Users = db.relationship('User', back_populates='Company', cascade="all, delete, delete-orphan")
@@ -54,19 +71,46 @@ class User(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
                  )
-    Firstname = db.Column(db.String(64), nullable=False)
-    Surname = db.Column(db.String(64), nullable=False,
-                        supports_json=True,
-                        supports_dict=True,
-                        on_serialize=None,
-                        on_deserialize=None
-                        )
-    Email = db.Column(db.String(64), nullable=False, unique=True,
-                      supports_json=True,
-                      supports_dict=True,
-                      on_serialize=None,
-                      on_deserialize=None
-                      )
+    if useEncryption:
+        Firstname = db.Column(EncryptedType(db.String(64), secret_key, AesEngine, 'pkcs5'), nullable=False)
+        Surname = db.Column(EncryptedType(db.String(64), secret_key, AesEngine, 'pkcs5'), nullable=False,
+                            supports_json=True,
+                            supports_dict=True,
+                            on_serialize=None,
+                            on_deserialize=None
+                            )
+        Email = db.Column(EncryptedType(db.String(64), secret_key, AesEngine, 'pkcs5'), nullable=False, unique=True,
+                          supports_json=True,
+                          supports_dict=True,
+                          on_serialize=None,
+                          on_deserialize=None
+                          )
+        PhoneNumber = db.Column(EncryptedType(db.String(30), secret_key, AesEngine, 'pkcs5'),
+                                supports_json=True,
+                                supports_dict=True,
+                                on_serialize=None,
+                                on_deserialize=None
+                                )
+    else:
+        Firstname = db.Column(db.String(64), nullable=False)
+        Surname = db.Column(db.String(64), nullable=False,
+                            supports_json=True,
+                            supports_dict=True,
+                            on_serialize=None,
+                            on_deserialize=None
+                            )
+        Email = db.Column(db.String(64), nullable=False, unique=True,
+                          supports_json=True,
+                          supports_dict=True,
+                          on_serialize=None,
+                          on_deserialize=None
+                          )
+        PhoneNumber = db.Column(db.String(30),
+                                supports_json=True,
+                                supports_dict=True,
+                                on_serialize=None,
+                                on_deserialize=None
+                                )
     Password = db.Column(db.String(255),nullable=False,
                          supports_json=False,
                          supports_dict=False,
@@ -398,6 +442,7 @@ class Newsletter(db.Model):
 
     def _repr_(self):
         return '<Newsletter {}>'.format(self.Email)
+
 
 class Callback():
     def __init__(self, success: bool, message: str, data: str or dict or bool = None):

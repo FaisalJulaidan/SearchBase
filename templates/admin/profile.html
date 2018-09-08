@@ -15,6 +15,8 @@
 
         <div class="clearfix"></div>
 
+        <p style="font-weight: bolder;font-size: 16px;color: #de0d0d;">{{message}}</p>
+
         <!-- Account Details -->
         <div class="row">
             <div class="col-md-12 col-sm-12 col-xs-12">
@@ -47,7 +49,7 @@
 
                                     <div class="input-group" style="margin:10px 0 0 10px">
                                         <span class="input-group-addon">Email</span>
-                                        <input type="text" class="form-control" id="email" name="email" value="{{user["Email"]}}" />
+                                        <input type="text" class="form-control" id="email" name="email" value="{{user["Email"]}}" readonly/>
                                     </div>
 
                                     <div class="input-group" style="margin:10px 0 0 10px">
@@ -94,9 +96,9 @@
                                         <label class="checkboxContainer" style="margin-bottom: 5px;">
                                             <strong>Tracking your data</strong>
                                             {%if newsletters%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox" checked />
+                                            <input name="tracking" value="trackingON" type="checkbox" checked />
                                             {%else%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox" />
+                                            <input name="tracking" value="trackingON" type="checkbox" />
                                             {%endif%}
                                             <span class="checkmark"></span>
                                         </label>
@@ -112,9 +114,9 @@
                                         <label class="checkboxContainer" style="margin-bottom: 5px;">
                                             <strong>Technical Support</strong>
                                             {%if newsletters%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox" checked />
+                                            <input name="techSupport" value="techSupportON" type="checkbox" checked />
                                             {%else%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox" />
+                                            <input name="techSupport" value="techSupportON" type="checkbox" />
                                             {%endif%}
                                             <span class="checkmark"></span>
                                         </label>
@@ -127,23 +129,27 @@
                                         <label class="checkboxContainer" style="margin-bottom: 5px;">
                                             <strong>Account Specialist</strong>
                                             {%if newsletters%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox" checked />
+                                            <input name="accountSpecialist" value="accountSpecialistON" type="checkbox" checked />
                                             {%else%}
-                                            <input name="newsletters" value="newlettersON" type="checkbox" />
+                                            <input name="accountSpecialist" value="accountSpecialistON" type="checkbox" />
                                             {%endif%}
                                             <span class="checkmark"></span>
                                         </label>
                                     </div>
-                                    <p>Let our team contact you to help make recommendations as to how you can <strong>make your bots
-                                    more successful and ways to collect more valuable data</strong>. If you don't have a sales specialist, 
-                                    we recommend you enable this so we can help you make the most of our software.</p>
-
-                                    <!-- submit buttons-->
-                                    <div class="input-group" style="margin:10px 0 0 10px">
-                                        <button class="btn btn-success">Save</button>
-                                        <a href="/admin/changepassword" class="btn btn-success">Change Password</a>
-                                    </div>
+                                    <p>
+                                        Let our team contact you to help make recommendations as to how you can <strong>
+                                            make your bots
+                                            more successful and ways to collect more valuable data
+                                        </strong>. If you don't have a sales specialist,
+                                        we recommend you enable this so we can help you make the most of our software.
+                                    </p>
                                 </form>
+
+                                <!-- submit buttons-->
+                                <div class="input-group" style="margin:10px 0 0 10px">
+                                    <button class="btn btn-success">Save</button>
+                                    <a href="/admin/changepassword" class="btn btn-success">Change Password</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -157,5 +163,8 @@
     {% block customJS %}
 
 
-<!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk&callback=initMap"></script>-->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk&callback=initMap"></script>
+<script>
+    console.log("{{user}}")
+</script>
     {% endblock %}

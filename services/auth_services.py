@@ -21,7 +21,7 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
     if user:
         return Callback(False, 'User already exists.')
 
-    company = Company(Name=companyName, Size=companySize, PhoneNumber=companyPhoneNumber, URL=websiteURL)
+    company = Company(Name=companyName, URL=websiteURL)
 
     # Create owner, admin, user roles for the new company
     ownerRole: Callback = role_services.create('Owner', True, True, True, True, company)
@@ -31,7 +31,7 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
         return Callback(False, 'Could create roles for the new user.')
 
     # Create a new user with its associated company and owner role
-    user_callback = user_services.create(firstname, surname, email, password, company, ownerRole.Data)
+    user_callback = user_services.create(firstname, surname, email, password, companyPhoneNumber, company, ownerRole.Data)
 
     # Subscribe to basic plan with 14 trial days
     sub_callback: Callback = sub_services.subscribe(email=email, planID='plan_D3lp2yVtTotk2f', trialDays=14)

@@ -23,7 +23,7 @@ from services.mail_services import mail
 # Import all routers to register them as blueprints
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
     products_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
-    changePassword_router, answers_router, bot_router, emoji_router
+    changePassword_router, answers_router, bot_router, emoji_router, adminBasic_router
 
 from routes.public.routers import public_router, resetPassword_router
 from services import user_services, mail_services
@@ -31,6 +31,7 @@ from services import user_services, mail_services
 app = Flask(__name__, static_folder='static')
 
 # Register Routes:
+app.register_blueprint(adminBasic_router)
 app.register_blueprint(dashboard_router)
 app.register_blueprint(public_router)
 app.register_blueprint(resetPassword_router)
@@ -39,6 +40,7 @@ app.register_blueprint(admin_api)
 app.register_blueprint(sub_router)
 app.register_blueprint(settings_router)
 app.register_blueprint(products_router)
+app.register_blueprint(questions_router)
 app.register_blueprint(analytics_router)
 app.register_blueprint(connection_router)
 app.register_blueprint(userInput_router)
@@ -166,18 +168,18 @@ def genDummyData():
     user_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "User").first()
 
     # Create Users
-    user_services.create(firstname='Ahmad', surname='Hadi', email='aa@aa.com', password='123',
+    user_services.create(firstname='Ahmad', surname='Hadi', email='aa@aa.com', password='123', phone='4344423',
                          company=aramco, role=owner_aramco, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', company=aramco,
+    user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='4344423', company=aramco,
                          role=admin_aramco, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', company=aramco,
+    user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', phone='4344423', company=aramco,
                          role=user_aramco, verified=True)
 
-    user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', company=sabic,
+    user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', phone='4344423', company=sabic,
                          role=owner_sabic, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', company=sabic,
+    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='4344423', company=sabic,
                          role=admin_sabic, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e6@e.com', password='123', company=sabic,
+    user_services.create(firstname='firstname', surname='lastname', email='e6@e.com', password='123', phone='4344423', company=sabic,
                          role=user_sabic, verified=True)
 
     # Plans
@@ -202,7 +204,14 @@ def genDummyData():
 #################################
 
 
+verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+DATABASE = APP_ROOT + "/database.db"
+
+PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
+USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
 
 pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
 secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
@@ -215,11 +224,48 @@ stripe_keys = {
     'publishable_key': pub_key
 }
 
+# stripe.api_key = stripe_keys['secret_key']
+
+# app.config.update(
+#     MAIL_SERVER='smtp.gmail.com',
+#     MAIL_PORT=465,
+#     MAIL_USE_SSL=True,
+#     MAIL_USERNAME='thesearchbase@gmail.com',
+#     MAIL_PASSWORD='pilbvnczzdgxkyzy'
+# )
+
+# mail = Mail(app)
 
 
 
+NoPlan = {"MaxProducts":0, "ActiveBotsCap":0, "InactiveBotsCap":0, "AdditionalUsersCap":0, "ExtendedLogic":False, "ImportDatabase":False, "CompanyNameonChatbot": False}
+BasicPlan = {"MaxProducts":600, "ActiveBotsCap":2, "InactiveBotsCap":3, "AdditionalUsersCap":5, "ExtendedLogic":False, "ImportDatabase":False, "CompanyNameonChatbot": False}
+AdvancedPlan = {"MaxProducts":5000, "ActiveBotsCap":4, "InactiveBotsCap":8, "AdditionalUsersCap":10, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
+UltimatePlan = {"MaxProducts":30000, "ActiveBotsCap":10, "InactiveBotsCap":30, "AdditionalUsersCap":999, "ExtendedLogic":True, "ImportDatabase":True, "CompanyNameonChatbot": True}
+#count_db("Plans", " WHERE Nickname=?", ["basic",])
 
 
+
+def allowed_product_file(filename):
+    ext = filename.rsplit('.', 1)[1]
+    return '.' in filename and ext in ALLOWED_PRODUCT_FILE_EXTENSIONS
+
+
+def allowed_image_file(filename):
+    ext = filename.rsplit('.', 1)[1]
+    return '.' in filename and ext in ALLOWED_IMAGE_EXTENSION
+
+
+def checkAssistantID(assistantID):
+    assistantRecord = query_db("SELECT * FROM Assistants WHERE ID=?", [assistantID,], True)
+    if assistantRecord is None:
+        return redirect("/admin/dashboard", code=302)
+    elif session.get('User')['CompanyID'] is not assistantRecord['CompanyID']:
+        return redirect("/admin/dashboard", code=302)
+
+
+# @app.route("/testdb", methods=['GET'])
+# def testdb():
 
 
 # TODO jackassify it
@@ -276,6 +322,229 @@ def testing(key):
     print(encryption)
     return "Done"
 
+
+@app.route("/getpopupsettings/<assistantID>", methods=['GET'])
+def get_pop_settings(assistantID):
+    if request.method == "GET":
+        url = request.form.get("URL", default="Error")
+        if url != "Error":
+            assistant = query_db("SELECT * FROM Assistants WHERE ID=?", [assistantID], True)
+            if session['UserPlan']['Settings']['CompanyNameonChatbot']:
+                assistantLabel = query_db("SELECT * FROM Companies WHERE ID=?", [assistant["CompanyID"]], True)["Name"]
+            else:
+                assistantLabel = "TheSearchBase"
+            datastring = assistant["SecondsUntilPopup"] + "&&&" + assistantLabel
+            return jsonify(datastring)
+        return "Off"
+
+
+@app.route("/admin/assistant/create", methods=['GET', 'POST'])
+def admin_assistant_create():
+    if request.method == "GET":
+        msg = checkForMessage()
+        email = session.get('User')['Email']
+        assistants = get_assistants(email)
+        if assistants is None or "Error" in assistants:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error in getting your assistants!")
+        return render("admin/create-assistant.html", autopop="Off", msg=msg)
+    elif request.method == "POST":
+        email = session.get('User')['Email']
+        assistants = get_assistants(email)
+        # Return the user to the page if has reached the limit of assistants
+        if type(assistants) is type([]) and assistants:
+            chatbotCap = session['UserPlan']['Settings']['ActiveBotsCap'] + session['UserPlan']['Settings']['InactiveBotsCap']
+            print(chatbotCap, " ", len(assistants))
+            if len(assistants) >= chatbotCap:
+                return redirectWithMessage("admin_assistant_create", "You have reached the limit of "+str(chatbotCap)+" assistants")
+        #Check max number of active bots
+        numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "True"])
+        print(session.get('UserPlan')['Settings'])
+        if numberOfActiveBots >= session.get('UserPlan')['Settings']['ActiveBotsCap']:
+            return redirectWithMessage("admin_assistant_create", "You have already reached the maximum amount of Active Assistants. Please deactivate one to proceed.")
+        company = get_company(email)
+        if company is None or "Error" in company:
+            return redirectWithMessage("admin_assistant_create", "Error in getting company")
+        else:
+            nickname = request.form.get("nickname", default="Error")
+            message = request.form.get("welcome-message", default="Error")
+            autopopup = request.form.get("switch-autopop", default="off")
+            popuptime = request.form.get("timeto-autopop", default="Error")
+
+            if message is "Error" or nickname is "Error" or (popuptime is "Error" and autopopup is not "off"):
+                return redirectWithMessage("admin_assistant_create", "Error in getting input information")
+            else:
+                if autopopup == "off":
+                    secondsUntilPopup = "Off"
+                else:
+                    secondsUntilPopup = popuptime
+
+                # Insert the new assistant to db
+                newAssistant = insert_db("Assistants", ('CompanyID', 'Message', 'SecondsUntilPopup', 'Nickname'),
+                                         (company[0], message, secondsUntilPopup, nickname))
+
+                # Update the session to have the new added assistant
+                session['UserAssistants'].append(newAssistant)
+                session.modified = True
+
+
+                if "Error" in newAssistant:
+                    return redirectWithMessage("admin_assistant_create", "There was an error in creating your assistant")
+
+                else:
+                     return redirect("/admin/assistant/{}/settings".format(newAssistant['ID']))
+
+
+@app.route("/admin/assistant/delete/<assistantID>", methods=['GET', 'POST'])
+def admin_assistant_delete(assistantID):
+    checkAssistantID(assistantID)
+    if request.method == "GET":
+        email = session.get('User')['Email']
+        users = query_db("SELECT * FROM Users")
+        userCompanyID = "Error" 
+        # If user exists
+        for user in users:
+            if user["Email"] == email:
+                userCompanyID = user["CompanyID"]
+        if userCompanyID == "Error":
+            return redirect("/admin/dashboard")
+        assistantCompanyID = select_from_database_table("SELECT CompanyID FROM Assistants WHERE ID=?", [assistantID])
+
+        #Check if the user is from the company that owns the assistant
+        if userCompanyID == assistantCompanyID[0]:
+            deleteAssistant = delete_from_table("DELETE FROM Assistants WHERE ID=?;",[assistantID])
+            print(deleteAssistant)
+            if deleteAssistant == "Record successfully deleted.":
+
+                # Update user assistants list stored in the session
+                assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?;",
+                                      [session.get('User')['CompanyID']])
+                if len(assistants) > 0:
+                    session['UserAssistants'] = assistants
+                else:
+                    session['UserAssistants'] = []
+
+                return redirect("/admin/dashboard")
+            else:
+                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in deleting assistant!")
+        else:
+            return redirect("/admin/dashboard")
+
+
+
+@app.route("/admin/assistant/active/<turnto>/<assistantID>", methods=['GET'])
+def admin_turn_assistant(turnto, assistantID):
+    checkAssistantID(assistantID)
+    if request.method == "GET":
+        #Check if plan restrictions are ok with the assistant
+        assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?", [session.get('User')['CompanyID']])
+        numberOfProducts = 0
+        maxNOP = session.get('UserPlan')['Settings']['MaxProducts']
+        for record in assistants:
+            numberOfProducts += count_db("Products", " WHERE AssistantID=?", [record["ID"],])
+        if numberOfProducts > maxNOP:
+            return redirectWithMessageAndAssistantID("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP)+ ". In order to activate an assistant you will have to reduce the number of products you currently have: "+str(numberOfProducts)+".")
+        
+        if turnto == "True":
+            #Check max number of active bots
+            numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "True"])
+            if numberOfActiveBots >= session['UserPlan']['Settings']['ActiveBotsCap']:
+                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "You have already reached the maximum amount of Active Assistants. Please deactivate one to proceed.")
+
+            message="activated."
+        else:
+            #Check max number of inactive bots
+            numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "False"])
+            if numberOfActiveBots >= session['UserPlan']['Settings']['InactiveBotsCap']:
+                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "You have already reached the maximum amount of Inactive Assistants. If you wish to deactivate this bot please delete or activate an inactivate assistant")
+
+            message="deactivated."
+
+        updateBot = update_table("UPDATE Assistants SET Active=? WHERE ID=?;", [turnto, assistantID])
+        return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Assistant has been "+message)
+
+
+# Not working temp
+# TODO rewrite
+@app.route("/admin/assistant/<assistantID>/questions", methods=['GET', 'POST'])
+def admin_questions(assistantID):
+    checkAssistantID(assistantID)
+    if request.method == "GET":
+        message = checkForMessageWhenAssistantID()
+        email = session.get('User')['Email']
+        company = get_company(email)
+        if company is None or "Error" in company:
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # TODO handle this better
+        else:
+            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
+                                                   [assistantID, company[0]])
+            if assistant is None:
+                abort(status.HTTP_404_NOT_FOUND)
+            elif "Error" in assistant:
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                questionsTuple = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
+                                                            [assistant[0]], True)
+                # TODO check questionstuple for errors
+
+                questions = []
+                for i in range(0, len(questionsTuple)):
+                    question = [questionsTuple[i][2] + ";" + questionsTuple[i][3]]
+                    questions.append(tuple(question))
+                return render("admin/questions.html", data=questions, message=message, id=assistantID)
+    elif request.method == "POST":
+        email = session.get('User')['Email']
+        company = get_company(email)
+        if company is None or "Error" in company:
+            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting company's records!")
+        else:
+            assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
+                                                   [assistantID, company[0]])
+            if assistant is None or "Error" in assistant:
+                return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting assitant's records!")
+            else:
+                currentQuestions = select_from_database_table("SELECT * FROM Questions WHERE AssistantID=?;",
+                                                              [assistantID], True)
+                if currentQuestions is None or "Error" in currentQuestions:
+                    return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting old questions!")
+
+                updatedQuestions = []
+                noq = request.form.get("noq-hidden", default="Error")
+                for i in range(1, int(noq) + 1):
+                    question = request.form.get("question" + str(i), default="Error")
+                    if question != "Error":
+                        updatedQuestions.append(question)
+                    else:
+                        return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in getting new questions!")
+
+                i = -1
+                if (len(updatedQuestions) + 1 < len(currentQuestions) + 1):
+                    for b in range(len(updatedQuestions) + 1, len(currentQuestions) + 1):
+                        questionID = currentQuestions[i][0]
+                        question = currentQuestions[i][2]
+
+                        deleteQuestion = delete_from_table("DELETE FROM Questions WHERE AssistantID=? AND Question=?;", [assistantID, escape(question)])
+                        if deleteQuestion is None or "Error" in deleteQuestion:
+                            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 1 Error in updating questions!")
+
+                        deleteAnswers = delete_from_table(DATABASE, "DELETE FROM Answers WHERE QuestionID=?;", [questionID])
+                        if deleteAnswers is None or "Error" in deleteAnswers:
+                            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Error in removing deleted question's answers!")
+                for q in updatedQuestions:
+                    i += 1
+                    qType = request.form.get("qType" + str(i))
+                    if i >= len(currentQuestions):
+                        insertQuestion = insert_into_database_table(
+                            "INSERT INTO Questions ('AssistantID', 'Question', 'Type')"
+                            "VALUES (?,?,?);", (assistantID, q, qType))
+                        if insertQuestion is None or "Error" in insertQuestion:
+                            return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 2 Error in updating questions!")
+                    else:
+                        updateQuestion = update_table("UPDATE Questions SET Question=?, Type=? WHERE Question=?;", [escape(q), qType, currentQuestions[i][2]])
+                        if updateQuestion is None or "Error" in updateQuestion:
+                             return redirectWithMessageAndAssistantID("admin_questions", assistantID, "Position 3 Error in updating questions!")
+
+                return redirect("/admin/assistant/{}/questions".format(assistantID))
 
 
 @app.route("/admin/assistant/<assistantID>/products", methods=['GET', 'POST'])
@@ -1064,6 +1333,147 @@ def sendMarketingEmail():
         msg.body = userEmail + " Has registerd their Interest for your product"
         mail.send(msg)
         return render_template("index.html")
+
+# Not working temp
+def select_from_database_table(sql_statement, array_of_terms=None, multi=False, database=DATABASE):
+    data = "Error"
+    conn = None
+    try:
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+        cur.execute(sql_statement, array_of_terms)
+        data = cur.fetchall()
+        if not multi:
+            data = data[0]
+    except sqlite3.ProgrammingError as e:
+        print("Error in select statement," + str(e))
+    except sqlite3.OperationalError as e:
+        print("Error in select operation," + str(e))
+    finally:
+        if (conn is not None):
+            conn.close()
+        if "SELECT" in sql_statement:
+            returnArray = []
+            arrayPos = 0
+            for record in data:
+                tempVar = ""
+                if type(record) == list or type(record) == tuple:
+                    returnArray.append([])
+                    for value in record:
+                        if type(value) == bytes:
+                            try:
+                                tempVar = encryption.decrypt(value).decode()
+                            except:
+                                print("Could not decode value. Assuming hashed record!")
+                        else:
+                            tempVar = value
+                        returnArray[arrayPos].append(tempVar)
+                else:
+                    if type(record) == bytes:
+                        try:
+                            tempVar = encryption.decrypt(record).decode()
+                        except:
+                            print("Could not decode value. Assuming hashed record!")
+                    else:
+                        tempVar = record
+                    returnArray.append(tempVar)
+                arrayPos+=1
+            #remove empty []
+            for records in returnArray:
+                if not records:
+                    returnArray.remove(records)
+            data = returnArray
+        return data
+
+
+
+# Not working temp
+def get_last_row_from_table(table, database=DATABASE):
+    return query_db("SELECT * FROM " + table + " WHERE ROWID IN ( SELECT max( ROWID ) FROM " + table +" );", one=True)
+
+
+
+
+# Not working temp
+def insert_into_database_table(sql_statement, tuple_of_terms, database=DATABASE):
+    msg = "Error"
+    conn = None
+    try:
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+        cur.execute(sql_statement, tuple_of_terms)
+        conn.commit()
+        msg = "Record successfully added."
+    except sqlite3.ProgrammingError as e:
+        msg = "Error in insert statement: " + str(e)
+    except sqlite3.OperationalError as e:
+        msg = "Error in insert operation: " + str(e)
+    except Exception as e:
+        msg = "Error in insert operation: " + str(e)
+    finally:
+        if conn is not None:
+            conn.rollback()
+            conn.close()
+        print(msg)
+        return msg
+
+# Not working
+# should be deleted
+def update_table(sql_statement, array_of_terms, database=DATABASE):
+    msg = "Error"
+    conn = None
+    try:
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+        cur.execute(sql_statement, array_of_terms)
+        conn.commit()
+        msg = "Record successfully updated."
+    except sqlite3.ProgrammingError as e:
+        msg = "Error in update statement" + str(e)
+    except sqlite3.OperationalError as e:
+        msg = "Error in update operation" + str(e)
+    finally:
+        if conn is not None:
+            conn.rollback()
+            conn.close()
+        print(msg)
+        return msg
+
+# Not working
+def delete_from_table(sql_statement, array_of_terms, database=DATABASE):
+    msg = "Error"
+    conn = None
+    try:
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+        cur.execute(sql_statement, array_of_terms)
+        conn.commit()
+        if cur.rowcount == 1:
+            msg = "Record successfully deleted."
+        else:
+            msg = "Record not deleted may not exist"
+    except sqlite3.ProgrammingError as e:
+        msg = "Error in delete statement" + str(e)
+    except sqlite3.OperationalError as e:
+        msg = "Error in delete operation" + str(e)
+    finally:
+        if conn is not None:
+            conn.rollback()
+            conn.close()
+        print(msg)
+        return msg
+
+# @app.before_request
+# def before_request():
+#     g.db = connect_db()
+
+
+@app.teardown_request
+def teardown_request(exception):
+    # Closes the database again at the end of the request."""
+    if hasattr(g, 'db'):
+        g.db.close()
+
 
 
 ## Error Handlers ##

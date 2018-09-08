@@ -6,11 +6,17 @@ from datetime import datetime
 import enum
 import json
 
+from sqlalchemy_utils import EncryptedType
+from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
+
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
 
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
+
+secret_key = 's23ecg5e5%$G$4wg4bbw65b653hh65h%^Gbf'
+useEncryption = False
 
 
 @event.listens_for(Engine, "connect")
@@ -46,6 +52,7 @@ mutable.MutableDict.associate_with(JsonEncodedDict)
 # ============= Models ===================
 
 
+
 class Company(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
@@ -54,30 +61,42 @@ class Company(db.Model):
                    on_serialize=None,
                    on_deserialize=None
                    )
-    Name = db.Column(db.String(80), nullable=False, unique=True,
-                     supports_json=True,
-                     supports_dict=True,
-                     on_serialize=None,
-                     on_deserialize=None
-                     )
-    Size = db.Column(db.String(60),
-                     supports_json=True,
-                     supports_dict=True,
-                     on_serialize=None,
-                     on_deserialize=None
-                     )
-    PhoneNumber = db.Column(db.String(30),
-                            supports_json=True,
-                            supports_dict=True,
-                            on_serialize=None,
-                            on_deserialize=None
-                            )
-    URL = db.Column(db.String(250), nullable=False,
-                    supports_json=True,
-                    supports_dict=True,
-                    on_serialize=None,
-                    on_deserialize=None
-                    )
+    if useEncryption:
+        Name = db.Column(EncryptedType(db.String(80), secret_key, AesEngine, 'pkcs5'),
+                         nullable=False,
+                         supports_json=True,
+                         supports_dict=True,
+                         on_serialize=None,
+                         on_deserialize=None
+                         )
+        URL = db.Column(EncryptedType(db.String(250), secret_key, AesEngine, 'pkcs5'),
+                        nullable=False,
+                        supports_json=True,
+                        supports_dict=True,
+                        on_serialize=None,
+                        on_deserialize=None
+                        )
+    else:
+        Name = db.Column(db.String(80),
+                         nullable=False,
+                         supports_json=True,
+                         supports_dict=True,
+                         on_serialize=None,
+                         on_deserialize=None
+                         )
+        URL = db.Column(db.String(250),
+                        nullable=False,
+                        supports_json=True,
+                        supports_dict=True,
+                        on_serialize=None,
+                        on_deserialize=None
+                        )
+    #Size = db.Column(db.String(60),
+    #                 supports_json=True,
+    #                 supports_dict=True,
+    #                 on_serialize=None,
+    #                 on_deserialize=None
+    #                 )
 
     # Relationships:
     Users = db.relationship('User', back_populates='Company', cascade="all, delete, delete-orphan")
@@ -92,19 +111,46 @@ class User(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
                  )
-    Firstname = db.Column(db.String(64), nullable=False)
-    Surname = db.Column(db.String(64), nullable=False,
-                        supports_json=True,
-                        supports_dict=True,
-                        on_serialize=None,
-                        on_deserialize=None
-                        )
-    Email = db.Column(db.String(64), nullable=False, unique=True,
-                      supports_json=True,
-                      supports_dict=True,
-                      on_serialize=None,
-                      on_deserialize=None
-                      )
+    if useEncryption:
+        Firstname = db.Column(EncryptedType(db.String(64), secret_key, AesEngine, 'pkcs5'), nullable=False)
+        Surname = db.Column(EncryptedType(db.String(64), secret_key, AesEngine, 'pkcs5'), nullable=False,
+                            supports_json=True,
+                            supports_dict=True,
+                            on_serialize=None,
+                            on_deserialize=None
+                            )
+        Email = db.Column(EncryptedType(db.String(64), secret_key, AesEngine, 'pkcs5'), nullable=False, unique=True,
+                          supports_json=True,
+                          supports_dict=True,
+                          on_serialize=None,
+                          on_deserialize=None
+                          )
+        PhoneNumber = db.Column(EncryptedType(db.String(30), secret_key, AesEngine, 'pkcs5'),
+                                supports_json=True,
+                                supports_dict=True,
+                                on_serialize=None,
+                                on_deserialize=None
+                                )
+    else:
+        Firstname = db.Column(db.String(64), nullable=False)
+        Surname = db.Column(db.String(64), nullable=False,
+                            supports_json=True,
+                            supports_dict=True,
+                            on_serialize=None,
+                            on_deserialize=None
+                            )
+        Email = db.Column(db.String(64), nullable=False, unique=True,
+                          supports_json=True,
+                          supports_dict=True,
+                          on_serialize=None,
+                          on_deserialize=None
+                          )
+        PhoneNumber = db.Column(db.String(30),
+                                supports_json=True,
+                                supports_dict=True,
+                                on_serialize=None,
+                                on_deserialize=None
+                                )
     Password = db.Column(db.String(255),nullable=False,
                          supports_json=False,
                          supports_dict=False,
@@ -236,6 +282,7 @@ class Assistant(db.Model):
     # Constraints:
     db.UniqueConstraint('CompanyID', 'Nickname', name='uix1_assistant')
 
+
     def __repr__(self):
         return '<Assistant {}>'.format(self.Name)
 
@@ -287,6 +334,12 @@ class BlockType(enum.Enum):
     UserInput = 'User Input'
     Question = 'Question'
     FileUpload = 'File Upload'
+
+
+class QuestionAction(enum.Enum):
+
+    GoToNextQuestion = 'Go To Next Question'
+    GoToSpecificQuestion = 'Go To Specific Question'
     ShowSolutions = 'Show Solutions'
 
 
@@ -332,12 +385,22 @@ class UserInput(db.Model):
     def __repr__(self):
         return '<UserInput {}>'.format(self.Text)
 
+class QuestionPA(db.Model):
+    ID = db.Column(db.Integer, db.ForeignKey(Question.ID), primary_key=True, unique=True)
+    # Relationships:
+    Answers = db.relationship('Answer', back_populates='QuestionPA')
+    Question = db.relationship('Question', foreign_keys=[ID])
+
+    def __repr__(self):
+        return '<QuestionPA {}>'.format(self.Question)
+
 
 class Answer(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Text = db.Column(db.String(), nullable=False)
     Keywords = db.Column(db.String(), nullable=False)
+    Action = db.Column(Enum(QuestionAction), nullable=False)
     TimesClicked = db.Column(db.Integer, nullable=False, default=0)
 
     # Relationships:
@@ -346,6 +409,21 @@ class Answer(db.Model):
 
     def __repr__(self):
         return '<Answer {}>'.format(self.Text)
+
+
+class QuestionFU(db.Model):
+
+    ID = db.Column(db.Integer, db.ForeignKey(Question.ID), primary_key=True, unique=True)
+    Action = db.Column(Enum(QuestionAction), nullable=False)
+    TypesAllowed = db.Column(db.String(), nullable=False)
+
+    # Relationships:
+    Question = db.relationship('Question', foreign_keys=[ID])
+    QuestionToGoID = db.Column(db.Integer, db.ForeignKey('question.ID'))
+    QuestionToGo = db.relationship('Question', foreign_keys=[QuestionToGoID])
+
+    def __repr__(self):
+        return '<QuestionFU {}>'.format(self.Question)
 
 
 class UserFiles(db.Model):
@@ -399,7 +477,7 @@ class Newsletter(db.Model):
 class Callback():
     def __init__(self, success: bool, message: str, data: str or dict or bool = None):
         self.Success: bool = success
-        self.Message: str = message
+        self.Message: str = message if success else 'Error: ' + message
         self.Data: str or dict or bool = data
     pass
     # if success else 'Error: ' + message

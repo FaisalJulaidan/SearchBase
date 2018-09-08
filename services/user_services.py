@@ -71,11 +71,11 @@ def getAllByCompanyID_safe(companyID) -> Callback:
                         'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
 
-def create(firstname, surname, email, password, company: Company, role: Role, verified=False) -> Callback:
+def create(firstname, surname, email, password, phone, company: Company, role: Role, verified=False) -> Callback:
     try:
         # Create a new user with its associated company and role
         newUser = User(Firstname=firstname, Surname=surname, Email=email, Verified=verified,
-                    Password=helpers.hashPass(password), Company=company,
+                    Password=helpers.hashPass(password), PhoneNumber=phone, Company=company,
                     Role=role)
         db.session.add(newUser)
 

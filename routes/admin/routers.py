@@ -1,5 +1,8 @@
 from flask import Blueprint
 
+from .adminBasic.adminBasic import adminBasic_router
+adminBasic_router: Blueprint = adminBasic_router
+
 from .dashboard.dashboard import dashboard_router
 dashboard_router: Blueprint = dashboard_router
 

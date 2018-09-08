@@ -1,4 +1,5 @@
 import os
+from models import useEncryption
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -29,7 +30,7 @@ class BaseConfig(object):
     MAIL_USERNAME = 'thesearchbase@gmail.com'
     MAIL_PASSWORD = 'pilbvnczzdgxkyzy'
     MAIL_SUPPRESS_SEND = False
-
+    useEncryption = True
 
 
 class DevelopmentConfig(BaseConfig):

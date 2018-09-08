@@ -4,6 +4,7 @@
 
 {% block content %}
 <!--<link rel="stylesheet" type="text/css" href="../static/SL/Login/css/main.css">-->
+<link rel="stylesheet" type="text/css" href="../static/css/checkbox.css">
 <div class="right_col" role="main">
     <div class="">
         <div class="page-title">
@@ -48,69 +49,110 @@
 
                                     <div class="input-group" style="margin:10px 0 0 10px">
                                         <span class="input-group-addon">Email</span>
-                                        <input type="text" class="form-control" id="email" name="email" value="{{user["Email"]}}" />
+                                        <input type="text" class="form-control" id="email" name="email" value="{{user["Email"]}}" readonly/>
                                     </div>
 
                                     <div class="input-group" style="margin:10px 0 0 10px">
                                         <span class="input-group-addon">Company Name</span>
                                         <input type="text" class="form-control" id="companyName" name="companyName" value="{{company["Name"]}}" />
                                     </div>
-
-
-
-                                    <!--<h3 id="nameh3" style="display:inline-block;">{{ user["Firstname"] }} {{ user["Surname"] }}</h3><img id="editName" class="editIcon" src="../static/images/pencil-edit-button.png" />
-                                    <input id="names" name="names" value="{{user["Firstname"]}} {{user["Surname"]}}" /><img id="saveName" class="tickIcon" src="../static/images/tick.png" /><img id="cancelName" class="crossIcon" src="../static/images/cross.png" />
                                     <br />
-                                    <h4 id="emailh4" style="display:inline-block;">{{ user["Email"] }}</h4><img id="editEmail" class="editIcon" src="../static/images/pencil-edit-button.png" />
-                                    <input id="email" name="email" value="{{user["Email"]}}" /><img id="saveEmail" class="tickIcon" src="../static/images/tick.png" /><img id="cancelEmail" class="crossIcon" src="../static/images/cross.png" />
-
                                     <br />
-                                    <ul class="list-unstyled user_data">
-                                        <li>
-                                            <p id="companyNamep" style="display:inline-block;">{{ company["Name"] }}</p><img id="editCompanyName" class="editIcon" src="../static/images/pencil-edit-button.png" />
-                                            <input id="companyName" name="companyName" value="{{company["Name"]}}" /><img id="saveCompanyName" class="tickIcon" src="../static/images/tick.png" /><img id="cancelCompanyName" class="crossIcon" src="../static/images/cross.png" />
-                                        </li>-->
-                                    <!--<li>
-                                        <a id="companyURLa" href="{{company["URL"]}}" target="_blank">{{company["URL"]}}</a><img id="editCompanyURL" class="editIcon" src="../static/images/pencil-edit-button.png" />
-                                        <input id="companyURL" name="companyURL" value="{{company["URL"]}}" /><img id="saveCompanyURL" class="tickIcon" src="../static/images/tick.png" /><img id="cancelCompanyURL" class="crossIcon" src="../static/images/cross.png" />
-                                    </li>-->
-                                    <!--<li class="m-top-xs">
-                                        <i class="fa fa-external-link user-account-icon"></i>
-                                        <a href="https://www.thesearchbase.com/chatbot/{{ company["Name"] }}{{ company["Name"] }}" target="_blank">Assistant</a>
-                                    </li>-->
-                                    
 
-                                    </ul>
-
-                                    <!--<h4>Data Sharing Settings</h4>
-                                    <p>Any data that you collect, process and store on TheSearchBase platform is kept secure an confidential at all times. The data that you collect is data
-                                        that enables our software to work at its optimum level. </p>
-                                    <p>This part of the website enables you to control what settings you may share with us.</p>
-                                    <p>Newsletters<small>Recommended</small></p>
-                                    <input name="data_sharing_1" id="data_sharing_option_1" type="checkbox"/>
-                                    <p>We would like to keep you updated with the latest software updates and features available to you,
-                                    if you decide to subscribe you may miss on important features an announcements.</p>
-                                    <p>Erasing data</p>
-                                    <p>If you decide to stop using our platform, we will simply delete your information after 60 days of inactivity.</p>
-                                    <p>Tracking your data</p>
-                                    <p>We do not in any way track your information for marketing or recommendation purposes.</p>-->
-
-
-
-                                    <div class="input-group" style="margin:10px 0 0 10px">
-                                        <button class="btn btn-success">Save Changes</button>
-                                        <a href="/admin/changepassword" class="btn btn-success">Change Password</a>
+                                    <!-- Start of data sharing-->
+                                    <h2>Data Sharing Settings</h2>
+                                    <p>
+                                        Any data that you collect, process and store on TheSearchBase platform is kept secure and confidential at all times. The data that you collect is data
+                                        that enables our software to work at its optimum level.
+                                    </p>
+                                    <hr>
+                                    <h4>This part of the website enables you to control what settings you may share with us.</h4>
+                                    <br />
+                                    <!-- end of data sharing-->
+                                    <!-- first check box-->
+                                    <div class="input-group" style="margin-bottom: 5px;">
+                                        <label class="checkboxContainer" style="margin-bottom: 5px;">
+                                            <strong>Newsletters</strong>
+                                            {%if newsletters%}
+                                            <input name="newsletters" value="newlettersON" type="checkbox" checked />
+                                            {%else%}
+                                            <input name="newsletters" value="newlettersON" type="checkbox" />
+                                            {%endif%}
+                                            <span class="checkmark"></span>
+                                        </label>
+                                        <p>
+                                            We would like to keep you updated with the latest software updates and features available to you,
+                                            If you decide to not subscribe you may miss on important features and announcements.
+                                        </p>
                                     </div>
+                                    <!-- end of first check box-->
+                                    <!-- text information-->
+                                    <p><strong>Erasing data</strong></p>
+                                    <p>If you decide to stop using our platform, we will simply delete your information after a year of inactivity.</p>
+
+                                    <br />
+
+                                    <div class="input-group" style="margin-bottom: 5px;">
+                                        <label class="checkboxContainer" style="margin-bottom: 5px;">
+                                            <strong>Tracking your data</strong>
+                                            {%if newsletters%}
+                                            <input name="tracking" value="trackingON" type="checkbox" checked />
+                                            {%else%}
+                                            <input name="tracking" value="trackingON" type="checkbox" />
+                                            {%endif%}
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+                                    <p>
+                                        We do not in any way track your information for marketing purposes. However we would <strong>recommend</strong>
+                                        allowing us to <strong>contact you if we see that there are ways we could enhance your bot or use of our software</strong>.
+                                    </p>
+                                    <br />
 
 
+                                    <div class="input-group" style="margin-bottom: 5px;">
+                                        <label class="checkboxContainer" style="margin-bottom: 5px;">
+                                            <strong>Technical Support</strong>
+                                            {%if newsletters%}
+                                            <input name="techSupport" value="techSupportON" type="checkbox" checked />
+                                            {%else%}
+                                            <input name="techSupport" value="techSupportON" type="checkbox" />
+                                            {%endif%}
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+                                    <p>Let our team view your errors and problems in order for us to solve your issues.</p>
+                                    <br />
 
 
-
+                                    <div class="input-group" style="margin-bottom: 5px;">
+                                        <label class="checkboxContainer" style="margin-bottom: 5px;">
+                                            <strong>Account Specialist</strong>
+                                            {%if newsletters%}
+                                            <input name="accountSpecialist" value="accountSpecialistON" type="checkbox" checked />
+                                            {%else%}
+                                            <input name="accountSpecialist" value="accountSpecialistON" type="checkbox" />
+                                            {%endif%}
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+                                    <p>
+                                        Let our team contact you to help make recommendations as to how you can <strong>
+                                            make your bots
+                                            more successful and ways to collect more valuable data
+                                        </strong>. If you don't have a sales specialist,
+                                        we recommend you enable this so we can help you make the most of our software.
+                                    </p>
                                 </form>
+
+                                <!-- submit buttons-->
+                                <div class="input-group" style="margin:10px 0 0 10px">
+                                    <button class="btn btn-success">Save</button>
+                                    <a href="/admin/changepassword" class="btn btn-success">Change Password</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -122,155 +164,7 @@
 
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk&callback=initMap"></script>
-<script src="/static/js/cookies.js"></script>
-
 <script>
-            ////name changer
-            //nameh3 = document.getElementById("nameh3");
-            //editName = document.getElementById("editName");
-            //saveName = document.getElementById("saveName");
-            //cancelName = document.getElementById("cancelName");
-            //names = document.getElementById("names");
-            //saveName.style = "display:none;";
-            //cancelName.style = "display:none;";
-            //names.style = "display:none;";
-            //editName.onclick = function () {
-            //    nameh3.style = "display:none";
-            //    editName.style = "display:none";
-            //    saveName.style = "display:inline-block;";
-            //    cancelName.style = "display:inline-block;";
-            //    names.style = "display:inline-block;";
-            //};
-            //saveName.onclick = function () {
-            //    nameh3.style = "display:inline-block";
-            //    editName.style = "display:inline-block";
-            //    saveName.style = "display:none;";
-            //    cancelName.style = "display:none;";
-            //    names.style = "display:none;";
-            //    nameh3.innerHTML = names.value;
-            //};
-            //cancelName.onclick = function () {
-            //    nameh3.style = "display:inline-block";
-            //    editName.style = "display:inline-block";
-            //    saveName.style = "display:none;";
-            //    cancelName.style = "display:none;";
-            //    names.style = "display:none;";
-            //    names.value = nameh3.innerHTML;
-            //};
-            ////email changer
-            //emailh4 = document.getElementById("emailh4");
-            //editEmail = document.getElementById("editEmail");
-            //saveEmail = document.getElementById("saveEmail");
-            //cancelEmail = document.getElementById("cancelEmail");
-            //email = document.getElementById("email");
-            //saveEmail.style = "display:none;";
-            //cancelEmail.style = "display:none;";
-            //email.style = "display:none;";
-            //editEmail.onclick = function () {
-            //    emailh4.style = "display:none";
-            //    editEmail.style = "display:none";
-            //    saveEmail.style = "display:inline-block;";
-            //    cancelEmail.style = "display:inline-block;";
-            //    email.style = "display:inline-block;";
-            //};
-            //saveEmail.onclick = function () {
-            //    emailh4.style = "display:inline-block";
-            //    editEmail.style = "display:inline-block";
-            //    saveEmail.style = "display:none;";
-            //    cancelEmail.style = "display:none;";
-            //    email.style = "display:none;";
-            //    emailh4.innerHTML = email.value;
-            //};
-            //cancelEmail.onclick = function () {
-            //    emailh4.style = "display:inline-block";
-            //    editEmail.style = "display:inline-block";
-            //    saveEmail.style = "display:none;";
-            //    cancelEmail.style = "display:none;";
-            //    email.style = "display:none;";
-            //    email.value = emailh4.innerHTML;
-            //};
-            ////company name changer
-            //companyNamep = document.getElementById("companyNamep");
-            //editCompanyName = document.getElementById("editCompanyName");
-            //saveCompanyName = document.getElementById("saveCompanyName");
-            //cancelCompanyName = document.getElementById("cancelCompanyName");
-            //companyName = document.getElementById("companyName");
-            //saveCompanyName.style = "display:none;";
-            //cancelCompanyName.style = "display:none;";
-            //companyName.style = "display:none;";
-            //editCompanyName.onclick = function () {
-            //    companyNamep.style = "display:none";
-            //    editCompanyName.style = "display:none";
-            //    saveCompanyName.style = "display:inline-block;";
-            //    cancelCompanyName.style = "display:inline-block;";
-            //    companyName.style = "display:inline-block;";
-            //};
-            //saveCompanyName.onclick = function () {
-            //    companyNamep.style = "display:inline-block";
-            //    editCompanyName.style = "display:inline-block";
-            //    saveCompanyName.style = "display:none;";
-            //    cancelCompanyName.style = "display:none;";
-            //    companyName.style = "display:none;";
-            //    companyNamep.innerHTML = companyName.value;
-            //};
-            //cancelCompanyName.onclick = function () {
-            //    companyNamep.style = "display:inline-block";
-            //    editCompanyName.style = "display:inline-block";
-            //    saveCompanyName.style = "display:none;";
-            //    cancelCompanyName.style = "display:none;";
-            //    companyName.style = "display:none;";
-            //    companyName.value = companyNamep.innerHTML;
-            //};
-            //company url changer
-            //companyURLa = document.getElementById("companyURLa");
-            //editCompanyURL = document.getElementById("editCompanyURL");
-            //saveCompanyURL = document.getElementById("saveCompanyURL");
-            //cancelCompanyURL = document.getElementById("cancelCompanyURL");
-            //companyURL = document.getElementById("companyURL");
-            //saveCompanyURL.style = "display:none;";
-            //cancelCompanyURL.style = "display:none;";
-            //companyURL.style = "display:none;";
-            //editCompanyURL.onclick = function () {
-            //    companyURLa.style = "display:none";
-            //    editCompanyURL.style = "display:none";
-            //    saveCompanyURL.style = "display:inline-block;";
-            //    cancelCompanyURL.style = "display:inline-block;";
-            //    companyURL.style = "display:inline-block;";
-            //};
-            //saveCompanyURL.onclick = function () {
-            //    companyURLa.style = "display:inline-block";
-            //    editCompanyURL.style = "display:inline-block";
-            //    saveCompanyURL.style = "display:none;";
-            //    cancelCompanyURL.style = "display:none;";
-            //    companyURL.style = "display:none;";
-            //    companyURLa.innerHTML = companyURL.value;
-            //};
-            //cancelCompanyURL.onclick = function () {
-            //    companyURLa.style = "display:inline-block";
-            //    editCompanyURL.style = "display:inline-block";
-            //    saveCompanyURL.style = "display:none;";
-            //    cancelCompanyURL.style = "display:none;";
-            //    companyURL.style = "display:none;";
-            //    companyURL.value = companyURLa.innerHTML;
-            //};
-                //inputD = document.getElementById("inputDiv");
-                //outputD = document.getElementById("outputDiv");
-                //editB = document.getElementById("EditB");
-                //editB.addEventListener("click", openForm);
-                //document.getElementById("cancelB").addEventListener("click", closeForm);
-                //document.getElementById("submit").onclick = function () {
-                //    document.getElementById("form").submit();
-                //};
-                //inputDiv.style = "display:none";
-                //function openForm() {
-                //    outputD.style = "display:none";
-                //    editB.style = "display:none";
-                //    inputD.style = "display:block";
-                //}
-                //function closeForm() {
-                //    outputD.style = "display:block";
-                //    editB.style = "display:block";
-                //    inputD.style = "display:none";
-                //}
+    console.log("{{user}}")
 </script>
     {% endblock %}

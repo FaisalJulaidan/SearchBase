@@ -141,7 +141,7 @@ def getOptions() -> dict:
                 },
                 {
                 'name': BlockType.Question.value,
-                'actionsForAnswers': [a.value for a in BlockAction]
+                'actions': [a.value for a in BlockAction]
                 },
                 {
                 'name': BlockType.FileUpload.value,

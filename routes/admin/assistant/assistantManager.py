@@ -26,6 +26,9 @@ def admin_turn_assistant(turnto, assistantID):
 
     if request.method == "GET":
 
+        ownership_callback : Callback = assistant_services.checkOwnership(assistantID, session.get('CompanyID', None))
+        if not ownership_callback.Success: return helpers.redirectWithMessage("assistant_manager", ownership_callback.Message)
+
         #Get all assistants in order to check if plan restrictions are good with everything
         assistants_callback : Callback = assistant_services.getAll(session.get('CompanyID', None))
         if not assistants_callback.Success: helpers.redirectWithMessage("assistant_manager", "Error in pre-change checks.")

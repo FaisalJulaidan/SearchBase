@@ -148,27 +148,26 @@ def isValidBlock(block: dict):
 
 def getOptions() -> dict:
     return {
-            'botVersion': bot_currentVersion,
-            'blockTypes': [ {
-                'name': BlockType.UserInput.value,
-                'validations': [uiv.value for uiv in ValidationType],
-                'actions': [a.value for a in BlockAction],
-                'alwaysStoreInDB': True
-                },
-                {
-                'name': BlockType.Question.value,
-                'actions': [a.value for a in BlockAction],
-                'alwaysStoreInDB': False
-                },
-                {
-                'name': BlockType.FileUpload.value,
-                'actions': [a.value for a in BlockAction],
-                'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
-                'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH/1000000)) + 'MB',
-                'alwaysStoreInDB': True
+        'botVersion': bot_currentVersion,
+        'types': [a.value for a in BlockType],
+        'blockTypes': [ {
+            'name': BlockType.UserInput.value,
+            'validations': [uiv.value for uiv in ValidationType],
+            'actions': [a.value for a in BlockAction],
+            'alwaysStoreInDB': True
+            },
+            {
+            'name': BlockType.Question.value,
+            'actions': [a.value for a in BlockAction],
+            'alwaysStoreInDB': False
+            },
+            {
+            'name': BlockType.FileUpload.value,
+            'actions': [a.value for a in BlockAction],
+            'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
+            'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH/1000000)) + 'MB',
+            'alwaysStoreInDB': True
 
-    }
-            ],
-        'types': ['User Input', 'Question', 'File Upload']
-
+            }
+        ]
     }

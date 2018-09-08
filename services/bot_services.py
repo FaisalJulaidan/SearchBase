@@ -131,7 +131,7 @@ def isValidBlock(block: dict):
 
 
 def getOptions() -> dict:
-    print(str(BaseConfig.MAX_CONTENT_LENGTH) + 'MB')
+    # TODO: make types dynamic
     return {
             'botVersion': bot_currentVersion,
             'blockTypes': [ {
@@ -149,5 +149,6 @@ def getOptions() -> dict:
                 'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
                 'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH/1000000)) + 'MB'
                 }
-            ]
+            ],
+            'types': ['User Input','Question','File Upload']
            }

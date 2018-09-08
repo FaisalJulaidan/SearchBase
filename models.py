@@ -19,6 +19,7 @@ secret_key = 's23ecg5e5%$G$4wg4bbw65b653hh65h%^Gbf'
 useEncryption = False
 
 
+# Activate Foreign Keys
 @event.listens_for(Engine, "connect")
 def _set_sqlite_pragma(dbapi_connection, connection_record):
     if isinstance(dbapi_connection, SQLite3Connection):
@@ -91,7 +92,7 @@ class Company(db.Model):
                         on_serialize=None,
                         on_deserialize=None
                         )
-    #Size = db.Column(db.String(60),
+    # Size = db.Column(db.String(60),
     #                 supports_json=True,
     #                 supports_dict=True,
     #                 on_serialize=None,
@@ -385,15 +386,6 @@ class UserInput(db.Model):
     def __repr__(self):
         return '<UserInput {}>'.format(self.Text)
 
-class QuestionPA(db.Model):
-    ID = db.Column(db.Integer, db.ForeignKey(Question.ID), primary_key=True, unique=True)
-    # Relationships:
-    Answers = db.relationship('Answer', back_populates='QuestionPA')
-    Question = db.relationship('Question', foreign_keys=[ID])
-
-    def __repr__(self):
-        return '<QuestionPA {}>'.format(self.Question)
-
 
 class Answer(db.Model):
 
@@ -410,20 +402,6 @@ class Answer(db.Model):
     def __repr__(self):
         return '<Answer {}>'.format(self.Text)
 
-
-class QuestionFU(db.Model):
-
-    ID = db.Column(db.Integer, db.ForeignKey(Question.ID), primary_key=True, unique=True)
-    Action = db.Column(Enum(QuestionAction), nullable=False)
-    TypesAllowed = db.Column(db.String(), nullable=False)
-
-    # Relationships:
-    Question = db.relationship('Question', foreign_keys=[ID])
-    QuestionToGoID = db.Column(db.Integer, db.ForeignKey('question.ID'))
-    QuestionToGo = db.relationship('Question', foreign_keys=[QuestionToGoID])
-
-    def __repr__(self):
-        return '<QuestionFU {}>'.format(self.Question)
 
 
 class UserFiles(db.Model):

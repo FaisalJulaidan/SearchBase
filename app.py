@@ -40,7 +40,6 @@ app.register_blueprint(admin_api)
 app.register_blueprint(sub_router)
 app.register_blueprint(settings_router)
 app.register_blueprint(products_router)
-app.register_blueprint(questions_router)
 app.register_blueprint(analytics_router)
 app.register_blueprint(connection_router)
 app.register_blueprint(userInput_router)
@@ -90,8 +89,8 @@ def before_request():
 def genDummyData():
 
     # Companies creation
-    db.session.add(Company(Name='Aramco', Size=12, PhoneNumber='4344423', URL='ff.com'))
-    db.session.add(Company(Name='Sabic', Size=12, PhoneNumber='4344423', URL='ff.com'))
+    db.session.add(Company(Name='Aramco', URL='ff.com'))
+    db.session.add(Company(Name='Sabic', URL='ff.com'))
 
     # Get Companies
     aramco = Company.query.filter(Company.Name == "Aramco").first()

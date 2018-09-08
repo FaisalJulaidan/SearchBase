@@ -112,7 +112,7 @@
         }
         {% endfor %}
         var chartData = {
-            labels: [1,2,3,4],
+            labels: periods,
             datasets: [{
                 label: 'Assistant Used',
                 fill: true,
@@ -132,7 +132,7 @@
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: [11,22,33,44],
+                data: totalOpened,
                 spanGaps: false
             }]
         }
@@ -145,7 +145,7 @@
         //  End of the chart code
 
         var chartData = {
-            labels: [1, 2, 3, 4],
+            labels: periods,
             datasets: [{
                 label: 'Questions Answered',
                 fill: true,
@@ -165,7 +165,7 @@
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: [11, 22, 33, 44],
+                data: totalQuestionsAnswered,
                 spanGaps: false
             }]
         }
@@ -177,7 +177,7 @@
 
 
         var chartData = {
-            labels: [1, 2, 3, 4],
+            labels: periods,
             datasets: [{
                 label: 'Products Returned',
                 fill: true,
@@ -197,7 +197,7 @@
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: [11, 22, 33, 44],
+                data: totalProductsReturned,
                 spanGaps: false
             }]
         }
@@ -209,9 +209,13 @@
         });
 
         //  users overtime chart
-        var chartData = {
-            labels: ['Sep-31', 'Oct-14', 'Oct-30', 'Nov-14', 'Nov-30', 'Dec-14', 'Dec-31','Jan-14','Jan-30'],
-            datasets: [{
+            var chartData = {
+                labels: [{% for item in data %}
+                {%if ";" in item[0] %}
+                "Week " + "{{item[0]}}".split(";")[1] + " of " + "{{item[0]}}".split(";")[0],
+                    {% endif %}
+                {% endfor %}],
+                datasets: [{
                 label: 'Users Overtime',
                 fill: false,
                 lineTension: 0.3,
@@ -230,7 +234,11 @@
                 pointHoverBorderWidth: 8,
                 pointRadius: 0,
                 pointHitRadius: 10,
-                data: [13, 22, 5, 25,33,12,66,43,56,69, 66,2,30,25,50,150,78,68,44],
+                data: [{% for item in data %}
+                    {%if ";" in item[0] %}
+                    { { item[1] } },
+                    {% endif %}
+                    {% endfor %}],
                 spanGaps: false
             }]
         }
@@ -318,8 +326,8 @@
                 label: 'Most Searched for locations',
                 fill: true,
                 lineTension: 0.3,
-                backgroundColor: ["rgb(186,85,211)"],
-                borderColor: "rgb(186,85,211)",
+                backgroundColor: ["rgb(186,85,211)", "rgb(148,0,211)", "rgb(153,50,204)", "rgb(139,0,139)", "rgb(128, 0, 128)", "rgb(75,0,130)", "rgb(147,112,219)", "rgb(128,0,128)", "rgb(147,112,219)"],
+                borderColor: "rgb(255,255,255)",
                 borderCapStyle: 'butt',
                 borderDash: [],
                 borderDashOffset: 0.0,
@@ -341,7 +349,7 @@
         var chartdiv = document.getElementById("mostSearchedLocation").getContext("2d");
         new Chart(chartdiv, {
             data: chartData,
-            type: 'radar',
+            type: 'polarArea',
     });
 
     //  Sector Chart

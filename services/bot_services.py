@@ -1,3 +1,6 @@
+from flask import session
+from services import assistant_services
+from utilties import helpers
 from typing import List
 from config import BaseConfig
 from utilties import json_utils
@@ -58,6 +61,8 @@ def addBlock(block: dict, assistant: Assistant) -> Callback:
                          Content=block['content'], Assistant=assistant))
     db.session.commit()
     return Callback(True, 'Block added successfully!')
+
+
 
 
 def updateBot(bot, assistant: Assistant) -> Callback:
@@ -142,7 +147,6 @@ def isValidBlock(block: dict):
 
 
 def getOptions() -> dict:
-    print(str(BaseConfig.MAX_CONTENT_LENGTH) + 'MB')
     return {
             'botVersion': bot_currentVersion,
             'blockTypes': [ {
@@ -153,9 +157,8 @@ def getOptions() -> dict:
                 },
                 {
                 'name': BlockType.Question.value,
-                'actionsForAnswers': [a.value for a in BlockAction],
+                'actions': [a.value for a in BlockAction],
                 'alwaysStoreInDB': False
-
                 },
                 {
                 'name': BlockType.FileUpload.value,
@@ -165,5 +168,7 @@ def getOptions() -> dict:
                 'alwaysStoreInDB': True
 
     }
-            ]
-           }
+            ],
+        'types': ['User Input', 'Question', 'File Upload']
+
+    }

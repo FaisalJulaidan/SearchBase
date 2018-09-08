@@ -1,7 +1,9 @@
 from flask import Blueprint, request, redirect, flash, session, json
 from services import admin_services, assistant_services, company_services, bot_services
-from models import db, Callback, Company, Assistant, ValidationType, User
+from models import db, Callback, Company, Assistant, ValidationType, User, Block
 from utilties import helpers, json_utils
+from sqlalchemy.sql import exists, func
+
 
 bot_router: Blueprint = Blueprint('bot_router', __name__, template_folder="../../templates")
 
@@ -25,7 +27,7 @@ def bot(assistantID):
 
         # Get bot data (Blocks, Assistant...)
         data = bot_services.getBot(assistant)
-
+        print(db.session.query(func.count(Block)).filter(Block.AssistantID == assistantID).scalar())
         return helpers.jsonResponse(True, 200, "No Message", data)
 
     # Add a block

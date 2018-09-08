@@ -337,13 +337,6 @@ class BlockType(enum.Enum):
     FileUpload = 'File Upload'
 
 
-class QuestionAction(enum.Enum):
-
-    GoToNextQuestion = 'Go To Next Question'
-    GoToSpecificQuestion = 'Go To Specific Question'
-    ShowSolutions = 'Show Solutions'
-
-
 class BlockAction(enum.Enum):
 
     GoToNextBlock = 'Go To Next Block'
@@ -392,7 +385,6 @@ class Answer(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Text = db.Column(db.String(), nullable=False)
     Keywords = db.Column(db.String(), nullable=False)
-    Action = db.Column(Enum(QuestionAction), nullable=False)
     TimesClicked = db.Column(db.Integer, nullable=False, default=0)
 
     # Relationships:

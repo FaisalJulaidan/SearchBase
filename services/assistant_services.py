@@ -2,7 +2,6 @@ import sqlalchemy.exc
 from models import db, Company, Assistant,Callback
 from utilties import helpers
 
-
 def getByID(id) -> Callback:
     try:
         # Get result and check if None then raise exception
@@ -80,12 +79,44 @@ def update(id, nickname, message, secondsUntilPopup)-> Callback:
         return Callback(False,
                         "Couldn't update assistant "+nickname)
 
-def removeByName(nickname) -> bool:
+def changeStatus(id, active):
     try:
-        db.session.query(Assistant).filter(Assistant.Name == nickname).delete()
-    except sqlalchemy.exc.SQLAlchemyError as exc:
-        print(exc)
-        db.session.rollback()
-        return False
+        if type(active) is str:
+            if active == "True": active = True
+            elif active == "False": active = False
+            else: raise Exception
 
-    return True
+        db.session.query(Assistant).filter(Assistant.ID == id).update({'Active': active})
+        db.session.commit()
+        return Callback(True, 'Assistant status has been changed.')
+
+    except Exception as exc:
+        print("Error in assistant_services.changeStatus(): ", exc)
+        db.session.rollback()
+        return Callback(False, 'Sorry, Could not change the assistant\' status.')
+
+def removeByID(id) -> bool:
+    try:
+        db.session.query(Assistant).filter(Assistant.ID == id).delete()
+        db.session.commit()
+        return Callback(True, 'Assistant has been deleted.')
+
+    except sqlalchemy.exc.SQLAlchemyError as exc:
+        print("Error in assistant_services.removeByID(): ", exc)
+        db.session.rollback()
+        return Callback(False, 'Error in deleting assistant.')
+
+def checkOwnership(assistantID, companyID):
+    try:
+        assistant_callback : Callback = getByID(assistantID)
+        if not assistant_callback.Success: 
+            return Callback(False, "Error in retrieving necessary information.")
+
+        #Check if the user is from the company that owns the assistant
+        if companyID != assistant_callback.Data.CompanyID:
+            return Callback(False, 'Security check failed. Process terminated.')
+
+        return Callback(True, 'Ownership check passed')
+    except Exception as exc:
+        print("Error in assistant_services.checkOwnership(): ", exc)
+        return Callback(False, 'Error in verifying ownership over assistant.')

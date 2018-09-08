@@ -40,7 +40,7 @@ def admin_answers(assistantID):
                 return admin_services.render("admin/answers.html")
             answers.append(helpers.getListFromSQLAlchemyList(callback.Data))
 
-        return admin_services.render("admin/answers.html", questions=questions, answers=answers)
+        return admin_services.render("admin/answers.html", questions=questions, answers=answers, assistantID=assistantID)
 
     elif request.method == "POST":
         email = session.get('User')['Email']

@@ -18,7 +18,6 @@
         </div>
         <div class="clearfix"></div>
 
-
         <div class="row">
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
@@ -49,11 +48,11 @@
                                         {% if userRole['EditChatbots'] %}
 
                                         {%if assistant['Active']%}
-                                        <button style="background-color:grey; border-color: grey;" class="btn btn-primary" href="/admin/assistant/active/False/{{ assistant['ID'] }}">Deactivate</button>
+                                        <a style="background-color:grey; border-color: grey;" class="btn btn-primary" href="/admin/assistant/active/False/{{ assistant['ID'] }}">Deactivate</a>
                                         {%else%}
-                                        <button style="background-color:limegreen; border-color: limegreen;" class="btn btn-primary" href="/admin/assistant/active/True/{{ assistant['ID'] }}">Activate</button>
+                                        <a style="background-color:limegreen; border-color: limegreen;" class="btn btn-primary" href="/admin/assistant/active/True/{{ assistant['ID'] }}">Activate</a>
                                         {%endif%}
-                                        <button style="background-color:red; border-color: red;" class="btn btn-primary" href="/admin/assistant/delete/{{ assistant['ID'] }}">Delete</button>
+                                        <a style="background-color:red; border-color: red;" class="btn btn-primary" href="/admin/assistant/delete/{{ assistant['ID'] }}">Delete</a>
 
                                         {% else %}
 

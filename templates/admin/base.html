@@ -306,7 +306,7 @@
                 }
                 var prev_handler = window.onload;
             </script>-->
-            <div id="flash" hidden>
+            <!--<div id="flash" hidden>
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}
                 <div class="col-md-12">
@@ -324,6 +324,15 @@
                 </div>
                 {% endif %}
                 {% endwith %}
+            </div>-->
+            <div style="margin-left:233px" id="flash">
+                {% if returnMessage %}
+                <div class="col-md-12">
+                    <div class="alert alert-info" role="alert">
+                        {{ returnMessage }}
+                    </div>
+                </div>
+                {% endif %}
             </div>
             {% block content %}
             {% endblock %}

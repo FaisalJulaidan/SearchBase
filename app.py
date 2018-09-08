@@ -396,39 +396,6 @@ def admin_assistant_delete(assistantID):
 
 
 
-@app.route("/admin/assistant/active/<turnto>/<assistantID>", methods=['GET'])
-def admin_turn_assistant(turnto, assistantID):
-    checkAssistantID(assistantID)
-    if request.method == "GET":
-        #Check if plan restrictions are ok with the assistant
-        assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?", [session.get('User')['CompanyID']])
-        numberOfProducts = 0
-        maxNOP = session.get('UserPlan')['Settings']['MaxProducts']
-        for record in assistants:
-            numberOfProducts += count_db("Products", " WHERE AssistantID=?", [record["ID"],])
-        if numberOfProducts > maxNOP:
-            return redirectWithMessageAndAssistantID("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP)+ ". In order to activate an assistant you will have to reduce the number of products you currently have: "+str(numberOfProducts)+".")
-        
-        if turnto == "True":
-            #Check max number of active bots
-            numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "True"])
-            if numberOfActiveBots >= session['UserPlan']['Settings']['ActiveBotsCap']:
-                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "You have already reached the maximum amount of Active Assistants. Please deactivate one to proceed.")
-
-            message="activated."
-        else:
-            #Check max number of inactive bots
-            numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "False"])
-            if numberOfActiveBots >= session['UserPlan']['Settings']['InactiveBotsCap']:
-                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "You have already reached the maximum amount of Inactive Assistants. If you wish to deactivate this bot please delete or activate an inactivate assistant")
-
-            message="deactivated."
-
-        updateBot = update_table("UPDATE Assistants SET Active=? WHERE ID=?;", [turnto, assistantID])
-        return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Assistant has been "+message)
-
-
-
 
 @app.route("/admin/templates", methods=['GET', 'POST'])
 def admin_templates():

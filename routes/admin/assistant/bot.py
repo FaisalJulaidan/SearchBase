@@ -7,15 +7,17 @@ bot_router: Blueprint = Blueprint('bot_router', __name__, template_folder="../..
 
 
 @bot_router.route("/admin/assistant/<int:assistantID>/bot", methods=['GET', 'POST'])
-def bot(assistantID):
+def bot_controller(assistantID):
     if request.method == "GET":
         return admin_services.render('admin/bot.html')
 
 
-# @bot_router.route("/admin/assistant/<int:assistantID>/bot/questions", methods=['GET', 'POST'])
-@bot_router.route("/test/<int:assistantID>", methods=['POST', 'GET'])
-def get_botQuestions(assistantID):
+@bot_router.route("/test/<int:assistantID>", methods=['POST', 'GET', 'PUT', 'DELETE'])
+# @bot_router.route("/admin/assistant/<int:assistantID>/bot/data", methods=['GET', 'POST'])
+def bot(assistantID):
+
     if request.method == "GET":
+
         callback: Callback = assistant_services.getByID(assistantID)
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "Assistant not found.", None)
@@ -26,8 +28,20 @@ def get_botQuestions(assistantID):
 
         return helpers.jsonResponse(True, 200, "No Message", data)
 
+    # Add a block
     if request.method == "POST":
 
+        callback: Callback = assistant_services.getByID(assistantID)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+        assistant: Assistant = callback.Data
+        data = request.get_json(silent=True)
+        callback: Callback = bot_services.addBlock(data, assistant)
+
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+
+    # Update the blocks
+    if request.method == "PUT":
 
         callback: Callback = assistant_services.getByID(assistantID)
         if not callback.Success:
@@ -43,28 +57,3 @@ def get_botQuestions(assistantID):
 def get_botFeatures():
     if request.method == "GET":
         return helpers.jsonResponse(True, 200, "These are the options the bot provide.", bot_services.getOptions())
-
-
-@bot_router.route("/admin/assistant/bot/j", methods=['GET'])
-def validate_json():
-    if request.method == "GET":
-        json = {
-                "action": "Show Solutions",
-                "fileTypes": [
-                  "gif",
-                  "pdf"
-                ],
-                "id": 3,
-                "order": 3,
-                "question": "Upload your CV",
-                "questionToGoID": 1,
-                "storeInDB": True,
-                "type": "File Upload"
-                }
-        try:
-            json_utils.validateSchema(json, 'fileUpload.json')
-        except Exception as exc:
-            print(exc.args)
-
-        return helpers.jsonResponse(True, 200, "These are the features the bot provide.",
-                                    {"hi": "hi"})

@@ -11,9 +11,7 @@ class BaseConfig(object):
     DEBUG = False
     TESTING = False
 
-    ALLOWED_EXTENSIONS = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG',
-                          'json', 'JSON', 'xml', 'xml',
-                          'txt', 'pdf', 'doc', 'docx'}
+    ALLOWED_EXTENSIONS = {'png', 'jpg','json', 'xml','txt', 'pdf', 'doc', 'docx'}
     UPLOAD_FOLDER = '/static/file_uploads/user_files'
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 

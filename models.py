@@ -287,6 +287,7 @@ class BlockType(enum.Enum):
     UserInput = 'User Input'
     Question = 'Question'
     FileUpload = 'File Upload'
+    ShowSolutions = 'Show Solutions'
 
 
 class BlockAction(enum.Enum):
@@ -368,6 +369,7 @@ class Plan(db.Model):
     ID = db.Column(db.String(), primary_key=True, unique=True)
     Nickname = db.Column(db.String(), nullable=False, unique=True)
     MaxProducts = db.Column(db.Integer, nullable=False, default=0)
+    MaxBlocks = db.Column(db.Integer, nullable=False, default=0)
     ActiveBotsCap = db.Column(db.Integer, nullable=False, default=0)
     InactiveBotsCap = db.Column(db.Integer, nullable=False, default=0)
     AdditionalUsersCap = db.Column(db.Integer, nullable=False, default=0)

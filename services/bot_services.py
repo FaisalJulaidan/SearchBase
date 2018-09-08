@@ -4,10 +4,10 @@ from utilties import helpers
 from typing import List
 from config import BaseConfig
 from utilties import json_utils
-from sqlalchemy.sql import exists
+from sqlalchemy.sql import exists, func
 
 
-from models import db, Callback, User, Company, ValidationType, Assistant, Answer, Block, BlockType, BlockAction
+from models import db, Callback, User, Company, ValidationType, Assistant, Answer, Block, BlockType, BlockAction, Plan
 
 bot_currentVersion = "1.0.0"
 
@@ -26,6 +26,28 @@ def getBlocks(assistant: Assistant) -> List[dict]:
                        'content': block.Content, 'storeInDB': block.StoreInDB})
     return blocks
 
+def getBlocksCountByAssistant(assistant: Assistant):
+    return db.session.query(func.count(Block)).filter(Block.AssistantID == assistant.ID).scalar()
+
+
+def addBlock(block: dict, assistant: Assistant) -> Callback:
+    # Get company MaxBlocks.
+    # Note: we will get Debug plan for now
+    print(db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first())
+    if getBlocksCountByAssistant(assistant) > db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first():
+        return Callback(False, "Blocks limit has been exceeded!")
+
+    callback: Callback = isValidBlock(block)
+    if not callback.Success:
+        return callback
+
+    db.session.add(Block(Type=BlockType(block['type']), StoreInDB=block['storeInDB'],
+                         Content=block['content'], Assistant=assistant))
+    db.session.commit()
+    return Callback(True, 'Block added successfully!')
+
+
+
 
 def updateBot(bot, assistant: Assistant) -> Callback:
     try:
@@ -41,7 +63,7 @@ def updateBot(bot, assistant: Assistant) -> Callback:
 
 
 def updateBlocks(blocks, assistant: Assistant) -> Callback:
-    # ------ Validations Block Integrity ------ #
+    # ------ Block Integrity Validations ------ #
     orders = []
     ids = []
     for block in blocks:
@@ -75,46 +97,41 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
     # Make sure the number of submitted questions is equivalent to what stored in the database
     if numOfBlocks != len(assistant.Blocks):
         return Callback(False, "The number of submitted blocks isn't equivalent to what stored in the database")
+
     # ------------------------- #
-
-    # ------ Update each block's content ------ #
+    # Validate each block's content depends on its type
     for block in blocks:
-        callback: Callback = Callback(False, "Block type is not recognised")
-        if block['type'].strip() == BlockType.UserInput.value:
-            callback = isValidBlock(block, BlockType.UserInput, 'userInput.json')
-
-        elif block['type'].strip() == BlockType.Question.value:
-            callback = isValidBlock(block, BlockType.Question, 'question.json')
-
-        elif block['type'].strip() == BlockType.FileUpload.value:
-            callback = isValidBlock(block, BlockType.FileUpload, 'fileUpload.json')
-
+        callback: Callback = isValidBlock(block)
         if not callback.Success:
             return callback
 
+        # Update the block
         oldBlock: Block = db.session.query(Block).filter(Block.ID == block['id']).first()
         oldBlock.Order = block['order']
         oldBlock.Type = BlockType(block['type'])
         oldBlock.Content = block['content']
-        # Save
-        db.session.commit()
-        print(block['id'])
-        print(block['order'])
+
+    # Save
+    db.session.commit()
     return Callback(True, "Blocks updated successfully")
 
 
-def isValidBlock(block: dict, type: BlockType, fileName):
+def isValidBlock(block: dict):
+
     try:
-        json_utils.validateSchema(block['content'], 'blocks/' + fileName)
+        json_utils.validateSchema(block['content'], 'blocks/' + str(BlockType(block['type']).name + '.json'))
     except Exception as exc:
         print(exc.args[0])
+        db.session.rollback()
         return Callback(False, "the block with id '" +
                         str(block['id']) + "' doesn't follow the correct format of "
-                        + type.value + " block type", exc.args[0])
+                        + str(BlockType(block['type']).value) + " block type", exc.args[0])
+
     return Callback(True, "Valid block")
 
 
 def getOptions() -> dict:
+    print(str(BaseConfig.MAX_CONTENT_LENGTH) + 'MB')
     return {
             'botVersion': bot_currentVersion,
             'blockTypes': [ {
@@ -130,7 +147,7 @@ def getOptions() -> dict:
                 'name': BlockType.FileUpload.value,
                 'actions': [a.value for a in BlockAction],
                 'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
-                'fileMaxSize': BaseConfig.MAX_CONTENT_LENGTH + 'MB'
+                'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH/1000000)) + 'MB'
                 }
             ]
            }

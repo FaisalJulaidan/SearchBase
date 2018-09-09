@@ -27,7 +27,7 @@ def bot(assistantID):
 
         # Get bot data (Blocks, Assistant...)
         data = bot_services.getBot(assistant)
-        print(db.session.query(func.count(Block)).filter(Block.AssistantID == assistantID).scalar())
+        # print(db.session.query(func.count(Block)).filter(Block.AssistantID == assistantID).scalar())
         return helpers.jsonResponse(True, 200, "No Message", data)
 
     # Add a block

@@ -158,6 +158,7 @@ def logout():
     session.pop('UserID', None)
     session.pop('UserEmail', None)
     session.pop('UserPlan', None)
+    session.pop('CompanyID', None)
     session.pop('Logged_in', False)
 
     return redirect(url_for('public_router.login'))
@@ -180,12 +181,12 @@ def signup():
 
         # Company info
         name = request.form.get("companyName", default=None)
-        size = request.form.get("companySize", default=None)
+        # size = request.form.get("companySize", default=None)
         url = request.form.get("websiteURL", default=None)
-        phone = request.form.get("phoneNumber", default=None)
+        # phone = request.form.get("phoneNumber", default=None)
 
         if not (fullname and email and password
-                and name and url and phone):
+                and name and url):
             print("Signup Error .1")
             return helpers.redirectWithMessage("signup", "Error in getting all input information.")
 
@@ -194,8 +195,7 @@ def signup():
         surname = fullname.strip().split(" ")[1]
 
         # Signup new user
-        signup_callback: Callback = auth_services.signup(email.lower(), firstname, surname, password,
-                                                         name, size, phone, url)
+        signup_callback: Callback = auth_services.signup(email.lower(), firstname, surname, password, name, url)
         print(signup_callback.Success, signup_callback.Message)
         if not signup_callback.Success:
             print(signup_callback.Message)

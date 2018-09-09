@@ -26,6 +26,7 @@ def getBlocks(assistant: Assistant) -> List[dict]:
                        'content': block.Content, 'storeInDB': block.StoreInDB})
     return blocks
 
+
 def getBlocksCountByAssistant(assistant: Assistant):
     return db.session.query(func.count(Block)).filter(Block.AssistantID == assistant.ID).scalar()
 
@@ -36,6 +37,21 @@ def addBlock(block: dict, assistant: Assistant) -> Callback:
     print(db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first())
     if getBlocksCountByAssistant(assistant) > db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first():
         return Callback(False, "Blocks limit has been exceeded!")
+
+    # Create a question block with max order + 1 and then return it to client
+    # newBlock = Block(Type=BlockType.Question, Order=)
+    data =  {
+            "id": 1,
+            "order": 1,
+            "type": "User Input",
+            "storeInDB": True,
+            "content": {
+                "action": "Go To Next Block",
+                "text": "What's your email?",
+                "blockToGoID": 2,
+                "validation": "Email"
+            }
+     }
 
     callback: Callback = isValidBlock(block)
     if not callback.Success:
@@ -131,24 +147,27 @@ def isValidBlock(block: dict):
 
 
 def getOptions() -> dict:
-    # TODO: make types dynamic
     return {
-            'botVersion': bot_currentVersion,
-            'blockTypes': [ {
-                'name': BlockType.UserInput.value,
-                'validations': [uiv.value for uiv in ValidationType],
-                'actions': [a.value for a in BlockAction]
-                },
-                {
-                'name': BlockType.Question.value,
-                'actions': [a.value for a in BlockAction]
-                },
-                {
-                'name': BlockType.FileUpload.value,
-                'actions': [a.value for a in BlockAction],
-                'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
-                'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH/1000000)) + 'MB'
-                }
-            ],
-            'types': ['User Input','Question','File Upload']
-           }
+        'botVersion': bot_currentVersion,
+        'types': [a.value for a in BlockType],
+        'blockTypes': [ {
+            'name': BlockType.UserInput.value,
+            'validations': [uiv.value for uiv in ValidationType],
+            'actions': [a.value for a in BlockAction],
+            'alwaysStoreInDB': True
+            },
+            {
+            'name': BlockType.Question.value,
+            'actions': [a.value for a in BlockAction],
+            'alwaysStoreInDB': False
+            },
+            {
+            'name': BlockType.FileUpload.value,
+            'actions': [a.value for a in BlockAction],
+            'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
+            'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH/1000000)) + 'MB',
+            'alwaysStoreInDB': True
+
+            }
+        ]
+    }

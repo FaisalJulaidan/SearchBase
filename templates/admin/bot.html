@@ -211,9 +211,17 @@
                     $input.val($(e.target).text());
                 });
 
+                i = 0
                 // Input radio-group visual controls
-                $('.radio-group label').on('click', function () {
-                    $(this).removeClass('not-active').siblings().addClass('not-active');
+                $('.radio-group label').on('click', function (evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+
+                    if ($(this).hasClass('not-active'))
+                        $(this).removeClass('not-active');
+                    else
+                        $(this).addClass('not-active');
+
                 });
 
                 // Input radio-group visual controls
@@ -263,11 +271,11 @@
             function render_blocks(blocks) {
 
                 function cookUpBlock(block_template, block) {
-                    function getActionElement(questionAction, actions) {
+                    function getActionElement(actions) {
                         return "" +
                             "<div class=\"input-group col-md-6\">\n" +
                             "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
-                            "          value=\"" + questionAction + "\">\n" +
+                            "          value=\"BLOCK_ACTION\">\n" +
                             "   <div class=\"input-group-btn\">\n" +
                             "       <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
                             "               data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Action\n" +
@@ -280,18 +288,18 @@
                             "</div><!-- /input-group -->\n"
                     }
 
-                    function getValidationElement(questionValidation, options) {
+                    function getValidationElement(validations) {
                         return "" +
                             "<div class=\"input-group col-md-6\">\n" +
                             "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
-                            "          value=\"" + questionValidation + "\">\n" +
+                            "          value=\"BLOCK_VALIDATION\">\n" +
                             "   <div class=\"input-group-btn\">\n" +
                             "       <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
                             "               data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Validation\n" +
                             "           <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                             "       </button>\n" +
                             "       <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
-                            getDropdownEelement(options) +
+                            getDropdownEelement(validations) +
                             "       </ul>\n" +
                             "   </div><!-- /btn-group -->\n" +
                             "</div><!-- /input-group -->\n"
@@ -321,33 +329,37 @@
                         return elements
                     }
 
-                    function getRadioButtons(fileTypes) {
+                    function getRadioButtons(fileTypes, selectedFileTypes) {
                         let elements = '';
-                        for (fileType of fileTypes)
-                            elements += "" +
-                                "<label class=\"btn my-btn-default btn-sm not-active\" >" + fileType +
-                                "<input type=\"radio\" value=\"" + fileType + "\" name=\"fileType\"></label>"
+                        for (fileType of fileTypes) {
+                            if (selectedFileTypes.includes(fileType)) {
+                                elements += "<label class=\"btn my-btn-default btn-sm\" >" + fileType +
+                                    "<input type=\"radio\" value=\"" + fileType + "\" name=\"fileType\"></label>";
+                            } else
+                                elements += "<label class=\"btn my-btn-default btn-sm not-active\" >" + fileType +
+                                    "<input type=\"radio\" value=\"" + fileType + "\" name=\"fileType\"></label>"
+                        }
                         return elements
-                     }
+                    }
 
-
-                    function getFileUpload(fileTypes) {
-                        return ""+
-                                "<div class=\"input-group col-md-8\">\n" +
-                                "  <span class=\"input-group-addon\">File Type:</span>\n" +
-                                "  <div class=\"btn-group radio-group\">\n" +
-                                getRadioButtons(fileTypes) +
-                                "  </div>\n" +
-                                "</div>"
-                                {#"<small style='margin-top:-10px'>Max size: " + options.FileUploadType.fileMaxSize + "</small>"#}
+                    function getFileUpload(fileTypes, fileSize, selectedFileTypes) {
+                        return "" +
+                            "<div class=\"input-group col-md-8\">\n" +
+                            "  <span class=\"input-group-addon\">File Type:</span>\n" +
+                            "  <div class=\"btn-group radio-group\">\n" +
+                            getRadioButtons(fileTypes, selectedFileTypes) +
+                            "  </div>\n" +
+                            "</div>" +
+                            "<small style='margin-top:-10px'>Max size: " + fileSize + "</small>"
                     }
 
                     function getBlockContent(template, block) {
                         template = template.replace('BLOCK_TYPE', block.type);
                         template = template.replace('BLOCK_TEXT', block.content.text);
                         template = template.replace('BLOCK_TEXT_EDITABLE', block.content.text);
-                        template = template.replace('BLOCK_CONTENT', JSON.stringify(block.content, 4, 4));
-                        template = template.replace('BLOCK_FILE_TYPE', block.content.fileTypes? getFileUpload(block.content.fileTypes):'');
+                        template = template.replace('BLOCK_ACTION', block.content.action);
+                        template = template.replace('BLOCK_VALIDATION', block.content.validation);
+                        {#template = template.replace('BLOCK_CONTENT', JSON.stringify(block.content, 4, 4));#}
                         return template = template.replace('BLOCK_SUBMIT', getSubmitElemnt(block.storeInDB, block.id));
 
 
@@ -375,8 +387,8 @@
                         {#           getSubmitElemnt(true,block.id);#}
                     }
 
-                    function getTemplate(block_template) {
-                        return "" +
+                    function getTemplate(block_template, block) {
+                        templateHTML =
                             "<li class=\"panel panel-default\">\n" +
                             "    <div class=\"panel-heading\">\n" +
                             "        <div class=\"panel-title\">\n" +
@@ -400,6 +412,7 @@
                             "            </div><!-- /input-group -->\n" +
                             "        </div><!-- /.col-lg-3 -->\n" +
                             "    </div>\n" +
+                            // Block text
                             "    <div class=\"panel-body\">\n" +
                             "       <div class=\"input-group col-md-6\">\n" +
                             "         <span class=\"input-group-addon\">Question:</span>\n" +
@@ -408,15 +421,35 @@
                             "           aria-describedby=\"basic-addon1\"\n" +
                             "           value=\"BLOCK_TEXT_EDITABLE\">\n" +
                             "       </div>\n" +
-                            "       BLOCK_CONTENT" +
+                            // placeholders
+                            "       BLOCK_ACTION" +
+                            "       BLOCK_VALIDATION" +
                             "       BLOCK_FILE_TYPE" +
                             "       BLOCK_SUBMIT" +
                             "    </div>\n" +
-                            "</li>"
+                            "</li>";
 
+
+                        if (block_template.name == "File Upload")
+                            templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', getFileUpload(block_template.typesAllowed, block_template.fileMaxSize, block.content.fileTypes));
+                        else
+                            templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', '');
+
+
+                        if (block_template.name == "File Upload" || block_template.name == "User Input")
+                            templateHTML = templateHTML.replace('BLOCK_ACTION', getActionElement(block_template.actions));
+                        else
+                            templateHTML = templateHTML.replace('BLOCK_ACTION', '');
+
+                        if (block_template.name == "User Input")
+                            templateHTML = templateHTML.replace('BLOCK_VALIDATION', getValidationElement(block_template.validations));
+                        else
+                            templateHTML = templateHTML.replace('BLOCK_VALIDATION', '');
+
+                        return templateHTML;
                     }
 
-                    blockHTML = getTemplate(block_template);
+                    blockHTML = getTemplate(block_template, block);
                     return blockHTML = getBlockContent(blockHTML, block)
                     // generate block then feed it
                 }

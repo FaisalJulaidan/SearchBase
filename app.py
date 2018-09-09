@@ -140,7 +140,7 @@ def genDummyData():
     db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
         "action": "Go To Specific Block",
         "fileTypes": [
-          "gif",
+          "doc",
           "pdf"
         ],
         "text": "Upload your CV",

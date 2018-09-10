@@ -5,6 +5,9 @@
 {% block headlinks %}
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/awesome-bootstrap-checkbox/1.0.1/awesome-bootstrap-checkbox.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.css"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css"/>
 {% endblock %}
 {% block content %}
     <style>
@@ -78,6 +81,13 @@
             height: 34px;
         }
 
+        .addAnswer {
+            font-size: 10pt;
+            padding: 5px;
+            background-color: #c4c4c4;
+            border-radius: 100%;
+            color: white;
+        }
     </style>
     <div class="right_col" role="main">
         <div class="page-title">
@@ -95,7 +105,172 @@
             </div>
             <div class="x_conent">
                 <ul id="draggablePanelList" class="list-unstyled">
+                    <li class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                <span class="moveable" style="color:#660ff2"><i
+                                        class="glyphicon glyphicon-menu-hamburger"></i></span>
+                                <b>Do you smoke?</b>
+                            </div>
+                            <span class="pull-right clickable" style="color:#660ff2;margin-left:15px"><i
+                                    class="trash glyphicon glyphicon-trash"></i></span>
+                            <span class="pull-right clickable" style="color:#660ff2"><i
+                                    class="indicator glyphicon glyphicon-chevron-down"></i></span>
+                            <div class="col-xs-11  col-sm-5 col-md-4 pull-right"
+                                 style="margin-top: -30px;margin-right:-9px">
+                                <div class="input-group">
+                                    <input type="text" style="height: 34px" class="form-control normalCursor"
+                                           disabled="" aria-label="..." value="Question">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default dropdown-toggle"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Type
+                                            <span style="margin: 0" class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <li><a>User Input</a></li>
+                                            <li><a>Question</a></li>
+                                            <li><a>File Upload</a></li>
+                                        </ul>
+                                    </div><!-- /btn-group -->
+                                </div><!-- /input-group -->
+                            </div><!-- /.col-lg-3 -->
+                        </div>
+                        <div class="panel-body">
+                            <div class="input-group col-md-6">
+                                <span class="input-group-addon">Question:</span>
+                                <input type="text" class="form-control" placeholder="Question"
+                                       aria-describedby="basic-addon1" value="Do you smoke?">
+                            </div>
+                            Answers: <span class=" clickable" style="margin-bottom: 10px">
+                                <i class="addAnswer glyphicon glyphicon-plus"></i>
+                            </span>
+                            <div class="answers" style="margin-top:10px;">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Answer -1</h3>
+                                                <span class="pull-right clickable"
+                                                      style="color:#660ff2;margin-left:15px">
+                                                    <i class="trashAnswer glyphicon glyphicon-trash"></i>
+                                                </span>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="Answer"
+                                                           aria-describedby="basic-addon1" value="Yes I do">
 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Answer -2</h3>
+                                                <span class="pull-right clickable"
+                                                      style="color:#660ff2;margin-left:15px">
+                                            <i class="trashAnswer glyphicon glyphicon-trash"></i>
+                                        </span>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="Answer"
+                                                           aria-describedby="basic-addon1" value="No I don't">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Answer -3</h3>
+                                                <span class="pull-right clickable"
+                                                      style="color:#660ff2;margin-left:15px">
+                                            <i class="trashAnswer glyphicon glyphicon-trash"></i>
+                                        </span>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="Answer"
+                                                           aria-describedby="basic-addon1" value="Maybe...">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Answer -4</h3>
+                                                <span class="pull-right clickable"
+                                                      style="color:#660ff2;margin-left:15px">
+                                            <i class="trashAnswer glyphicon glyphicon-trash"></i>
+                                        </span>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="Answer"
+                                                           aria-describedby="basic-addon1" value="Yes I do">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Answer -5</h3>
+                                                <span class="pull-right clickable"
+                                                      style="color:#660ff2;margin-left:15px">
+                                            <i class="trashAnswer glyphicon glyphicon-trash"></i>
+                                        </span>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="Answer"
+                                                           aria-describedby="basic-addon1" value="No I don't">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Answer -6</h3>
+                                                <span class="pull-right clickable"
+                                                      style="color:#660ff2;margin-left:15px">
+                                            <i class="trashAnswer glyphicon glyphicon-trash"></i>
+                                        </span>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="Answer"
+                                                           aria-describedby="basic-addon1" value="Maybe...">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-1 pull-right inline">
+                                <div class="btn btn-default">Save</div>
+                            </div>
+                            <div class="col-md-2 pull-right inline text-right">
+                                <div class="form-check abc-checkbox abc-checkbox-info abc-checkbox-circle"
+                                     style="margin-top: 9px">
+                                    <input class="form-check-input" id="1" type="checkbox" checked="">
+                                    <label class="form-check-label" for="1"
+                                           style="padding-left: 10px;padding-top: 2px; text-align: -webkit-auto;">
+                                        Save in DB
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -111,12 +286,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-checkbox/1.5.0/js/bootstrap-checkbox.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.js"></script>
+
     <script>
         window.onload = function () {
             if (prev_handler)
                 prev_handler();
 
-            main();
+            {#main();#}
+            init_page()
 
             function main() {
                 Promise.all([GET_data(), GET_options()]).then((res) => {
@@ -158,7 +336,8 @@
                 $(document).on('click', '.panel-heading', function (e) {
                     if ($(e.target).is('a') ||
                         $(e.target).is('input.form-control') ||
-                        $(e.target).is('i.trash')
+                        $(e.target).is('i.trash') ||
+                        $(e.target).is('i.trashAnswer')
                     ) {
                         e.preventDefault();
                         return;
@@ -211,7 +390,6 @@
                     $input.val($(e.target).text());
                 });
 
-                i = 0
                 // Input radio-group visual controls
                 $('.radio-group label').on('click', function (evt) {
                     evt.stopPropagation();
@@ -222,6 +400,13 @@
                     else
                         $(this).addClass('not-active');
 
+                });
+
+                // Add answer
+                $('.addAnswer').on('click', function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    addAnswer($(e.target).parent().parent().children('.answers'));
                 });
 
                 // Input radio-group visual controls
@@ -240,6 +425,147 @@
                             }
                         });
                 });
+                // Input radio-group delete answer
+                $('i.trashAnswer').on('click', function (e) {
+                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().val();
+                    if (hasAnswer) {
+                        swal({
+                            title: "Are you sure?",
+                            text: "Answer will be removed completely from the system",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        })
+                            .then((willDelete) => {
+                                temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                                if (willDelete) {
+                                    $(e.target).parent().parent().parent().parent().remove();
+                                    swal("Success!", "Answer has been deleted successfully", "success")
+                                }
+                                // run answers restructure function
+                                answersRestructure(temp)
+                            });
+                    } else {
+                        temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                        $(e.target).parent().parent().parent().parent().remove();
+                        // run answers restructure function
+                        answersRestructure(temp)
+                    }
+                });
+            }
+
+            function init_answers_panels() {
+                $('i.trashAnswer').on('click', function (e) {
+                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().val();
+                    if (hasAnswer) {
+                        swal({
+                            title: "Are you sure?",
+                            text: "Answer will be removed completely from the system",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        })
+                            .then((willDelete) => {
+                                temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                                if (willDelete) {
+                                    $(e.target).parent().parent().parent().parent().remove();
+                                    swal("Success!", "Answer has been deleted successfully", "success")
+                                }
+                                // run answers restructure function
+                                answersRestructure(temp)
+                            });
+                    } else {
+                        temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                        $(e.target).parent().parent().parent().parent().remove();
+                        // run answers restructure function
+                        answersRestructure(temp)
+                    }
+                });
+            }
+
+            function renderAnswer(element) {
+                let rows = $(".answers").children();
+                let isAdded = false;
+                rows.each((i, row) => {
+                    let rowChildrenLength = $(row).children().length;
+                    if (rowChildrenLength < 3) {
+                        $(row).append(element);
+                        isAdded = true
+                    }
+                });
+                if (!isAdded) {
+                    $answers = $(rows).parent();
+                    $answers.append("<div class='row'></div>");
+                    $answers.children().last().append("<div class=\"col-sm-4\"><div class=\"panel panel-default\"><div class=\"panel-heading\"><h3 class=\"panel-title\"></h3>\n" +
+                        "<span class=\"pull-right clickable\" style=\"color:#660ff2;margin-left:15px\"><i class=\"trashAnswer glyphicon glyphicon-trash\"></i> </span>\n" +
+                        "</div><div class=\"panel-body\"><div class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Answer\"aria-describedby=\"basic-addon1\" value=\"\">\n" +
+                        "</div></div></div></div>");
+                }
+                answersRestructure(target)
+            }
+
+            function addAnswer(target) {
+                let rows = $(target).children();
+                let isAdded = false;
+                rows.each((i, row) => {
+                    let rowChildrenLength = $(row).children().length;
+                    if (rowChildrenLength < 3) {
+                        $(row).append("<div class=\"col-sm-4\"><div class=\"panel panel-default\"><div class=\"panel-heading\"><h3 class=\"panel-title\"></h3>\n" +
+                            "<span class=\"pull-right clickable\" style=\"color:#660ff2;margin-left:15px\"><i class=\"trashAnswer glyphicon glyphicon-trash\"></i> </span>\n" +
+                            "</div><div class=\"panel-body\"><div class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Answer\"aria-describedby=\"basic-addon1\" value=\"\">\n" +
+                            "</div></div></div></div>");
+                        isAdded = true
+                    }
+                });
+                if (!isAdded) {
+                    $answers = $(rows).parent();
+                    $answers.append("<div class='row'></div>");
+                    $answers.children().last().append("<div class=\"col-sm-4\"><div class=\"panel panel-default\"><div class=\"panel-heading\"><h3 class=\"panel-title\"></h3>\n" +
+                        "<span class=\"pull-right clickable\" style=\"color:#660ff2;margin-left:15px\"><i class=\"trashAnswer glyphicon glyphicon-trash\"></i> </span>\n" +
+                        "</div><div class=\"panel-body\"><div class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Answer\"aria-describedby=\"basic-addon1\" value=\"\">\n" +
+                        "</div></div></div></div>");
+                }
+                answersRestructure(target)
+
+            }
+
+            function answersRestructure(target) {
+                let rows = $(target).children();
+
+                // push all in array
+                let answersElements = [];
+                rows.each((i, row) => {
+                    let $rowChildren = $(row).children();
+                    $rowChildren.each((i, answer) => {
+                        answersElements.push(answer)
+                    })
+                });
+
+                // clear .answers
+                $answers = $(rows).parent();
+                $answers.html('');
+
+                function appendAnswerElement(i) {
+                    $(answersElements[i]).find('.panel-title').html(`Answer- ${(i + 1)}`);
+                    $answers.children().last().append(answersElements[i]);
+                }
+
+                let rowSize = 0;
+                $answers.append("<div class='row'></div>");
+                for (let i = 0; i < answersElements.length; i++) {
+                    if (rowSize < 3) {
+                        appendAnswerElement(i);
+                        rowSize++;
+                    }
+                    else {
+                        $answers.append("<div class='row'></div>");
+                        appendAnswerElement(i);
+                        rowSize = 1;
+
+                    }
+
+                }
+                init_answers_panels();
 
             }
 
@@ -266,7 +592,6 @@
                 });
 
             }
-
 
             function render_blocks(blocks) {
 
@@ -353,6 +678,7 @@
                             "<small style='margin-top:-10px'>Max size: " + fileSize + "</small>"
                     }
 
+
                     function getBlockContent(template, block) {
                         template = template.replace('BLOCK_TYPE', block.type);
                         template = template.replace('BLOCK_TEXT', block.content.text);
@@ -361,30 +687,6 @@
                         template = template.replace('BLOCK_VALIDATION', block.content.validation);
                         {#template = template.replace('BLOCK_CONTENT', JSON.stringify(block.content, 4, 4));#}
                         return template = template.replace('BLOCK_SUBMIT', getSubmitElemnt(block.storeInDB, block.id));
-
-
-                        {#function getRadioButtons(fileTypes) {#}
-                        {#    let elements = '';#}
-                        {#    for (fileType of fileTypes)#}
-                        {#        elements += "<label class=\"btn my-btn-default btn-sm not-active\" >" + fileType +#}
-                        {#            "<input type=\"radio\" value=\"" + fileType + "\" name=\"fileType\"></label>"#}
-                        {#    return elements#}
-                        {# } #}
-
-                        {#if (block.type === "File Upload")#}
-                        {#    return getBlockElement(block.content.text) +#}
-                        {#        getActionElement(block.content.action, options.FileUploadType.actions) +#}
-                        {#        getSubmitElemnt(false, block.id);#}
-
-                        {#if (block.type === "User Input")#}
-                        {#    return getBlockElement(block.question)+#}
-                        {#           getActionElement(block.action,options.userInputType.actions) +#}
-                        {#           getValidationElement(block.validation, options.userInputType.validations)+#}
-                        {#           getSubmitElemnt(false,block.id);#}
-                        {##}
-                        {#if (block.type === "Predefined Answers")#}
-                        {#    return getBlockElement(block.question) +#}
-                        {#           getSubmitElemnt(true,block.id);#}
                     }
 
                     function getTemplate(block_template, block) {
@@ -422,6 +724,7 @@
                             "           value=\"BLOCK_TEXT_EDITABLE\">\n" +
                             "       </div>\n" +
                             // placeholders
+                            "       BLOCK_ANSWERS" +
                             "       BLOCK_ACTION" +
                             "       BLOCK_VALIDATION" +
                             "       BLOCK_FILE_TYPE" +
@@ -445,6 +748,11 @@
                             templateHTML = templateHTML.replace('BLOCK_VALIDATION', getValidationElement(block_template.validations));
                         else
                             templateHTML = templateHTML.replace('BLOCK_VALIDATION', '');
+
+                        if (block_template.name == "Question")
+                            templateHTML = templateHTML.replace('BLOCK_ANSWERS', "TBD");
+                        else
+                            templateHTML = templateHTML.replace('BLOCK_ANSWERS', '');
 
                         return templateHTML;
                     }
@@ -476,22 +784,6 @@
                 )
             }
 
-            function buildQuestion(element, index) {
-                let question = element.children().first().children().first().children().next().text();
-                return new QuestionsModel(1, 'Type', question, ['PNG', 'JPG'], 'go to next', null, index);
-            }
-
-            class QuestionsModel {
-                constructor(id, type, question, fileTypes, action, questionIdToGo, order) {
-                    this.id = id;
-                    this.type = type;
-                    this.question = question;
-                    this.fileTypes = fileTypes;
-                    this.action = action;
-                    this.questionIdToGo = questionIdToGo;
-                    this.order = order
-                }
-            }
         }
     </script>
 {% endblock %}

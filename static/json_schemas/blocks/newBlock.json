@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "bot schema",
+  "title": "new block schema",
   "type": "object",
   "properties": {
     "botVersion": {"enum": ["1.0.0"]},
@@ -8,11 +8,10 @@
       "type": "object",
       "properties":{
         "type": {"enum": ["Question", "User Input", "File Upload"]},
-        "order": {"type": "integer", "minimum": 1},
         "storeInDB": {"type": "boolean"},
         "content": {"type": "object"}
         },
-      "required": ["id", "type", "order", "content"],
+      "required": ["type", "storeInDB", "content"],
       "additionalProperties": false
     }
   },

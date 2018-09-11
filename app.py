@@ -221,19 +221,6 @@ def allowed_image_file(filename):
     return '.' in filename and ext in ALLOWED_IMAGE_EXTENSION
 
 
-def checkAssistantID(assistantID):
-    assistantRecord = query_db("SELECT * FROM Assistants WHERE ID=?", [assistantID,], True)
-    if assistantRecord is None:
-        return redirect("/admin/dashboard", code=302)
-    elif session.get('User')['CompanyID'] is not assistantRecord['CompanyID']:
-        return redirect("/admin/dashboard", code=302)
-
-
-# @app.route("/testdb", methods=['GET'])
-# def testdb():
-
-
-# TODO jackassify it
 @app.route("/demo/<route><botID>", methods=['GET'])
 def dynamic_popup(route, botID):
     if request.method == "GET":
@@ -249,43 +236,6 @@ def dynamic_popup(route, botID):
         if "http" not in url:
             url = "https://" + url
         return render_template("dynamic-popup.html", route=route, botID=botID, url=url)
-
-
-# drop down routes.
-
-@app.route("/setencryptionkey<key>", methods=["GET"])
-def testing(key):
-    if "debug" in key:
-        serverRoute = "http://127.0.0.1:5000"
-        if "gT5-f" in key:
-            key = key.split("gT5-f")[1] + key.split("gT5-f")[0]
-            key = key.replace("gT5-f", "").replace("Pa-", "5o_n").replace("uF-r", "UbwF").replace("debug", "")
-    else:
-        serverRoute = "https://www.thesearchbase.com"
-    page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
-    text = page.read().decode("utf8")
-    part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')
-    page = urllib.request.urlopen(serverRoute + "/static/js/Chart.bundle.js")
-    text = page.read().decode("utf8")
-    part2 = text.split("GFoiWS$344wf43-cWzHOp")[1].split("Ye3Sv-FE-vWaIt3xWkbE6bsd7-jS")[0].replace('8B', '3J')
-    page = urllib.request.urlopen(serverRoute + "/static/css/admin.css")
-    text = page.read().decode("utf8")
-    part3 = text.split(".tic")[1].split("Icon")[0]
-    page = urllib.request.urlopen(serverRoute + "/static/css/themify-icons.css")
-    text = page.read().decode("utf8")
-    part4 = text.split("YbfEas-fUh")[1].split("TbCO")[0].replace('P-', '-G')
-    if not app.debug:
-        page = urllib.request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
-        text = page.read().decode("utf8")
-        part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
-    else:
-        part5 = ""
-    enckey = part1+part2+part3+part4+part5
-    enckey = ((enckey+key).replace(" ", "")).encode()
-    global encryption
-    encryption = Fernet(enckey)
-    print(encryption)
-    return "Done"
 
 
 @app.route("/getpopupsettings/<assistantID>", methods=['GET'])
@@ -359,65 +309,6 @@ def admin_assistant_create():
                      return redirect("/admin/assistant/{}/settings".format(newAssistant['ID']))
 
 
-@app.route("/admin/assistant/delete/<assistantID>", methods=['GET', 'POST'])
-def admin_assistant_delete(assistantID):
-    checkAssistantID(assistantID)
-    if request.method == "GET":
-        email = session.get('User')['Email']
-        users = query_db("SELECT * FROM Users")
-        userCompanyID = "Error" 
-        # If user exists
-        for user in users:
-            if user["Email"] == email:
-                userCompanyID = user["CompanyID"]
-        if userCompanyID == "Error":
-            return redirect("/admin/dashboard")
-        assistantCompanyID = select_from_database_table("SELECT CompanyID FROM Assistants WHERE ID=?", [assistantID])
-
-        #Check if the user is from the company that owns the assistant
-        if userCompanyID == assistantCompanyID[0]:
-            deleteAssistant = delete_from_table("DELETE FROM Assistants WHERE ID=?;",[assistantID])
-            print(deleteAssistant)
-            if deleteAssistant == "Record successfully deleted.":
-
-                # Update user assistants list stored in the session
-                assistants = query_db("SELECT * FROM Assistants WHERE CompanyID=?;",
-                                      [session.get('User')['CompanyID']])
-                if len(assistants) > 0:
-                    session['UserAssistants'] = assistants
-                else:
-                    session['UserAssistants'] = []
-
-                return redirect("/admin/dashboard")
-            else:
-                return redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, "Error in deleting assistant!")
-        else:
-            return redirect("/admin/dashboard")
-
-
-
-
-@app.route("/admin/templates", methods=['GET', 'POST'])
-def admin_templates():
-    if request.method == "GET":
-        return render("admin/convo-template.html")
-    elif request.method == "POST":
-        abort(status.HTTP_501_NOT_IMPLEMENTED)
-
-
-
-@app.route("/admin/adjustments", methods=['GET'])
-def admin_pricing_adjust():
-    return render("admin/pricing-adjustments.html")
-
-@app.route("/admin/cancellation/confirmation", methods=['GET'])
-def admin_plan_confirmation():
-    return render("admin/cancellation_confirmation.html")
-
-
-@app.route('/admin/thanks', methods=['GET'])
-def admin_thanks():
-    return render('admin/thank-you.html')
 
 
 
@@ -715,86 +606,6 @@ def chatbot(companyID, assistantID):
             return jsonify(datastring)
 
 
-@app.route("/account/verify/<payload>", methods=['GET'])
-def verify_account(payload):
-    if request.method == "GET":
-        data = ""
-        try:
-            data = verificationSigner.loads(payload)
-            try:
-                email = data.split(";")[0]
-                companyName = data.split(";")[1]
-
-                company = get_company(email)
-                # TODO check company
-                if company is None:
-                    # TODO handle better
-                    print("Verification failed due to invalid payload.")
-                    abort(status.HTTP_400_BAD_REQUEST)
-                elif "Error" in company:
-                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-                else:
-                    if company[1] != companyName:
-                        # TODO handle this
-                        abort(status.HTTP_400_BAD_REQUEST, "Company data doesn't match")
-                    else:
-                        users = query_db("SELECT * FROM Users")
-                        requestingUser = "Error"
-                        # If user exists
-                        for user in users:
-                            if user["Email"] == email:
-                                requestingUser = user
-                        if "Error" in requestingUser:
-                            abort(status.HTTP_400_BAD_REQUEST, "User not found!")
-                        updateUser = update_table("UPDATE Users SET Verified=? WHERE ID=?;", ["True", requestingUser["ID"]])
-                        # TODO check updateUser
-                        
-                        users = query_db("SELECT * FROM Users")
-                        # If user exists
-                        user = "Error"
-                        for record in users:
-                            if record["Email"] == email:
-                                user = record
-                        if "Error" in user:
-                            abort(status.HTTP_400_BAD_REQUEST, "Target user not found!")
-
-                        # sending registration confirmation email to the user.
-                        msg = Message("Thank you for registering, {} {}".format(user["Firstname"], user["Surname"]),
-                                      sender="thesearchbase@gmail.com",
-                                      recipients=[email])
-                        msg.html = "<img src='https://thesearchbase.com/static/email_images/welcome.png' style='width:500px;height:228px;'><br /> \
-                                   <h4>Hi,</h4> <p>Thank you for registering with TheSearchBase!</p> \
-                                   <p>A whole new world of possibilities is ahead of you, we strive to be a platform that aims to make chat bot technology available to everyone. \
-                                   If you would like to know more about our start up story, check our <a href=https://www.thesearchbase.com/about> Story <a/> and see what we're all about. </p> \
-                                   <p>More Importantly, we would like you to use our platform and tell us what you think. If you could share your ideas or suggestions with our team, we would be very happy to collect your feedback</p> \
-                                   <p>As a final message, we would like to say, we thoroughly hope you enjoy using our platform and hope to see your chat bot revolutionise your company or idea.</p><br /> <p> Happy chatboting, </p><p>TheSearchbase Team</p> \
-                                   <img src='https://thesearchbase.com/static/email_images/footer_image.png' style='width:500px;height:228px;'>"
-                        mail.send(msg)
-
-                        return redirectWithMessage("login", "Thank you for verifying.")
-
-            except IndexError:
-                # TODO handle better
-                print("Verification failed due to invalid payload.")
-                abort(status.HTTP_400_BAD_REQUEST)
-        except BadSignature as e:
-            encodedData = e.payload
-            if encodedData is None:
-                msg = "Verification failed due to payload containing no data."
-                print(msg)
-                abort(status.HTTP_400_BAD_REQUEST, msg)
-            else:
-                msg = ""
-                try:
-                    verificationSigner.load_payload(encodedData)
-                    msg = "Verification failed, bad signature"
-                except:
-                    msg = "Verification failed"
-                finally:
-                    print(msg)
-                    abort(status.HTTP_400_BAD_REQUEST, msg)
-
-
 @app.route("/send/mailtop", methods=['GET', 'POST'])
 def sendMarketingEmail():
     if request.method == "GET":
@@ -807,74 +618,6 @@ def sendMarketingEmail():
         msg.body = userEmail + " Has registerd their Interest for your product"
         mail.send(msg)
         return render_template("index.html")
-
-## Error Handlers ##
-@app.errorhandler(status.HTTP_400_BAD_REQUEST)
-def bad_request(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/400.html', error=e.description), status.HTTP_400_BAD_REQUEST
-    except:
-        print("Error without description")
-        return render_template('errors/400.html'), status.HTTP_400_BAD_REQUEST
-
-
-@app.errorhandler(status.HTTP_404_NOT_FOUND)
-def page_not_found(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
-    except:
-        print("Error without description")
-        return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
-
-
-@app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-def unsupported_media(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/415.html', error=e.description), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
-    except:
-        print("Error without description")
-        return render_template('errors/415.html'), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
-
-
-@app.errorhandler(418)
-def im_a_teapot(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/418.html', error=e.description), 418
-    except:
-        print("Error without description")
-        return render_template('errors/418.html'), 418
-
-
-@app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
-def internal_server_error(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/500.html', error=e.description), status.HTTP_500_INTERNAL_SERVER_ERROR
-    except:
-        print("Error without description")
-        return render_template('errors/500.html'), status.HTTP_500_INTERNAL_SERVER_ERROR
-
-
-@app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
-def not_implemented(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
-    except:
-        print("Error without description")
-        return render_template('errors/501.html'), status.HTTP_501_NOT_IMPLEMENTED
-
-
-# class Del:
-#     def __init__(self, keep=string.digits):
-#         self.comp = dict((ord(c), c) for c in keep)
-#
-#     def __getitem__(self, k):
-#         return self.comp.get(k)
 
 
 

@@ -82,6 +82,7 @@ def login(email: str, password_to_check: str) -> Callback:
     session['CompanyID'] = user.CompanyID
     session['UserEmail'] = user.Email
     session['UserPlan'] = helpers.getPlanNickname(user.SubID)
+    session['RoleID'] = user.RoleID
     print("user: ", user)
     print("user.SubID: ", user.SubID)
     print("helpers.getPlanNickname(user.SubID): ", helpers.getPlanNickname(user.SubID))

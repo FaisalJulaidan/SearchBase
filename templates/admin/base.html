@@ -110,6 +110,7 @@
                                         <i class="fa fa-comments-o"></i> Assistants <span class="fa fa-chevron-down"></span>
                                     </a>
                                     <ul class="nav child_menu">
+                                        <li><a href="/admin/assistant/manage"><strong>Assistant Manager</strong></a></li>
                                         {% if assistants|length > 0 %}
                                         {% for assistant in assistants %}
                                         <li>
@@ -296,7 +297,7 @@
                     </div>
                 </div>
             </div>
-            <script>
+            <!--<script> makes charts dissapear in analytics
                 window.onload = function (e) {
                     x = document.getElementsByClassName('right_col')[0]
                     y = document.getElementById('flash')
@@ -304,8 +305,8 @@
                     y.innerHTML = ''
                 }
                 var prev_handler = window.onload;
-            </script>
-            <div id="flash" hidden>
+            </script>-->
+            <!--<div id="flash" hidden>
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}
                 <div class="col-md-12">
@@ -323,6 +324,15 @@
                 </div>
                 {% endif %}
                 {% endwith %}
+            </div>-->
+            <div style="margin-left:233px" id="flash">
+                {% if returnMessage %}
+                <div class="col-md-12">
+                    <div class="alert alert-info" role="alert">
+                        {{ returnMessage }}
+                    </div>
+                </div>
+                {% endif %}
             </div>
             {% block content %}
             {% endblock %}
@@ -334,7 +344,6 @@
                 <div class="pull-right">
                     <a>TheSearchBase 2018 All Rights Reserved.</a>
                 </div>
-                <div class="clearfix"></div>
             </footer>
             {% endblock %}
             <!-- /footer content -->

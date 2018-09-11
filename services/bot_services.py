@@ -12,7 +12,7 @@ from models import db, Callback, User, Company, ValidationType, Assistant, Answe
 bot_currentVersion = "1.0.0"
 
 
-def getBot(assistant: Assistant):
+def getBot(assistant: Assistant) -> dict:
     return {'botVersion': bot_currentVersion,
             'assistant': {'id': assistant.ID, 'name': assistant.Name, 'active': assistant.Active},
             'blocks': getBlocks(assistant)}
@@ -28,41 +28,32 @@ def getBlocks(assistant: Assistant) -> List[dict]:
 
 
 def getBlocksCountByAssistant(assistant: Assistant):
-    return db.session.query(func.count(Block)).filter(Block.AssistantID == assistant.ID).scalar()
+    return db.session.query(func.count(Block.ID)).filter(Block.AssistantID == assistant.ID).scalar()
 
 
-def addBlock(block: dict, assistant: Assistant) -> Callback:
+def addBlock(data: dict, assistant: Assistant) -> Callback:
     # Get company MaxBlocks.
     # Note: we will get Debug plan for now
-    print(db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first())
-    if getBlocksCountByAssistant(assistant) > db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first():
+    if getBlocksCountByAssistant(assistant) >= db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first()[0]:
         return Callback(False, "Blocks limit has been exceeded!")
 
-    # Create a question block with max order + 1 and then return it to client
-    # newBlock = Block(Type=BlockType.Question, Order=)
-    data =  {
-            "id": 1,
-            "order": 1,
-            "type": "User Input",
-            "storeInDB": True,
-            "content": {
-                "action": "Go To Next Block",
-                "text": "What's your email?",
-                "blockToGoID": 2,
-                "validation": "Email"
-            }
-     }
+    # Set the block with max order + 1
+    maxOrder = db.session.query(func.max(Block.Order)).filter(Block.AssistantID == assistant.ID).scalar()
+    if maxOrder is None: maxOrder = 0
 
-    callback: Callback = isValidBlock(block)
-    if not callback.Success:
-        return callback
+    try:
+        # Validate submitted block data
+        json_utils.validateSchema(data, 'blocks/newBlock.json')
+        block = data.get('block')
+        newBlock = Block(Type=BlockType(block['type']), Order=maxOrder + 1, Content=block['content'],
+                         StoreInDB=block['storeInDB'], Assistant=assistant)
+        db.session.add(newBlock)
+    except Exception as exc:
+        print(exc.args[0])
+        return Callback(False, 'Error occurred while creating a new Block object', exc.args[0])
 
-    db.session.add(Block(Type=BlockType(block['type']), StoreInDB=block['storeInDB'],
-                         Content=block['content'], Assistant=assistant))
     db.session.commit()
-    return Callback(True, 'Block added successfully!')
-
-
+    return Callback(True, 'Block added successfully!', {"newBlockID": newBlock.ID})
 
 
 def updateBot(bot, assistant: Assistant) -> Callback:
@@ -70,7 +61,7 @@ def updateBot(bot, assistant: Assistant) -> Callback:
         json_utils.validateSchema(bot, 'bot.json')
     except Exception as exc:
         print(exc.args)
-        return Callback(False, "the bot does not doesn't follow the correct format")
+        return Callback(False, "the submitted bot data does not doesn't follow the correct format")
 
     callback: Callback = updateBlocks(bot['blocks'], assistant)
     if not callback.Success:
@@ -83,8 +74,8 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
     orders = []
     ids = []
     for block in blocks:
-        order = block['order']
-        id = block['id']
+        order = block.get('order')
+        id = block.get('id')
 
         # Make sure all submitted questions exist in the database
         if not db.session.query(exists().where(Block.ID == id)).scalar():
@@ -117,32 +108,53 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
     # ------------------------- #
     # Validate each block's content depends on its type
     for block in blocks:
-        callback: Callback = isValidBlock(block)
+        callback: Callback = isValidBlock(block, str(BlockType(block.get('type')).name))
         if not callback.Success:
             return callback
 
         # Update the block
-        oldBlock: Block = db.session.query(Block).filter(Block.ID == block['id']).first()
-        oldBlock.Order = block['order']
-        oldBlock.Type = BlockType(block['type'])
-        oldBlock.Content = block['content']
+        oldBlock: Block = db.session.query(Block).filter(Block.ID == block.get('id')).first()
+        oldBlock.Order = block.get('order')
+        oldBlock.Type = BlockType(block.get('type'))
+        oldBlock.Content = block.get('content')
+        oldBlock.StoreInDB = block.get('storeInDB')
 
     # Save
     db.session.commit()
     return Callback(True, "Blocks updated successfully")
 
 
-def isValidBlock(block: dict):
+def deleteBlockByID(id) -> Callback:
+    try:
+        if not db.session.query(exists().where(Block.ID == id)).scalar():
+            return Callback(False, "the block with id '" + str(id) + "' doesn't exist")
+        db.session.query(Block).filter(Block.ID == id).delete()
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Block with id' + str(id) + " could not be removed.")
+        # Save
+    db.session.commit()
+    return Callback(True, 'Block with id ' + str(id) + " has been removed successfully.")
+
+
+
+def isValidBlock(block: dict, blockType: str):
 
     try:
-        json_utils.validateSchema(block['content'], 'blocks/' + str(BlockType(block['type']).name + '.json'))
+        json_utils.validateSchema(block.get('content'), 'blocks/' + blockType + '.json')
     except Exception as exc:
         print(exc.args[0])
         db.session.rollback()
-        return Callback(False, "the block with id '" +
-                        str(block['id']) + "' doesn't follow the correct format of "
-                        + str(BlockType(block['type']).value) + " block type", exc.args[0])
+        blockID = block.get('id')
+        blockType = block.get('type')
+        msg = "Block data doesn't follow the correct format"
 
+        if blockType and blockID:
+            msg = "the block with id '" + str(blockID) + "' doesn't follow the correct format of "\
+                  + str(BlockType(blockType).value) + " block type"
+
+        return Callback(False, msg, exc.args[0])
     return Callback(True, "Valid block")
 
 

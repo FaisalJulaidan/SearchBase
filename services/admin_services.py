@@ -15,8 +15,11 @@ def render(template, **context):
             if assistants: assistants = helpers.getListFromSQLAlchemyList(assistants)
             else: assistants = []
             user: User = callback.Data
+
+            returnMessage = helpers.checkForMessage()
+
             return render_template(template,
-                                   assistants=assistants,
+                                   assistants=assistants, returnMessage=returnMessage,
                                    **context)
         else:
             return redirect("login")

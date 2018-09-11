@@ -12,7 +12,7 @@
         </div>
         <div class="clearfix"></div>
 
-        <p style="font-weight: bolder;font-size: 16px;color: #de0d0d;">{{message}}</p>
+        <p style="font-weight: bolder;font-size: 16px;color: #de0d0d;">{{returnMessage}}</p>
 
         <div class="row">
             <div class="col-md-12 col-sm-12 col-xs-12">
@@ -95,7 +95,7 @@
                         <p id="load_text">Loading...</p>
 
                         <form enctype="multipart/form-data" style="text-align:center"
-                              action="/admin/assistant/{{ id }}/answers" method="POST"
+                              action="/admin/assistant/{{ assistantID }}/answers" method="POST"
                               id="answersForm">
 
                             <div id="pasteForm">

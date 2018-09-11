@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.css"/>
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css"/>
+    <link rel="stylesheet" href="/../../static/tagify/tagify.css">
 {% endblock %}
 {% block content %}
     <style>
@@ -157,99 +158,34 @@
                                             </div>
                                             <div class="panel-body">
                                                 <div class="input-group">
+                                                    <label for="input">Answer:</label>
                                                     <input type="text" class="form-control" placeholder="Answer"
                                                            aria-describedby="basic-addon1" value="Yes I do">
+                                                </div>
 
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">Answer -2</h3>
-                                                <span class="pull-right clickable"
-                                                      style="color:#660ff2;margin-left:15px">
-                                            <i class="trashAnswer glyphicon glyphicon-trash"></i>
-                                        </span>
-                                            </div>
-                                            <div class="panel-body">
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" placeholder="Answer"
-                                                           aria-describedby="basic-addon1" value="No I don't">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">Answer -3</h3>
-                                                <span class="pull-right clickable"
-                                                      style="color:#660ff2;margin-left:15px">
-                                            <i class="trashAnswer glyphicon glyphicon-trash"></i>
-                                        </span>
-                                            </div>
-                                            <div class="panel-body">
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" placeholder="Answer"
-                                                           aria-describedby="basic-addon1" value="Maybe...">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                                <label for="input">Kewords:</label>
+                                                <input name='tags' value=''>
 
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">Answer -4</h3>
-                                                <span class="pull-right clickable"
-                                                      style="color:#660ff2;margin-left:15px">
-                                            <i class="trashAnswer glyphicon glyphicon-trash"></i>
-                                        </span>
-                                            </div>
-                                            <div class="panel-body">
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" placeholder="Answer"
-                                                           aria-describedby="basic-addon1" value="Yes I do">
 
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">Answer -5</h3>
-                                                <span class="pull-right clickable"
-                                                      style="color:#660ff2;margin-left:15px">
-                                            <i class="trashAnswer glyphicon glyphicon-trash"></i>
-                                        </span>
-                                            </div>
-                                            <div class="panel-body">
+                                                <label for=".input-group">Actions:</label>
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control" placeholder="Answer"
-                                                           aria-describedby="basic-addon1" value="No I don't">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">Answer -6</h3>
-                                                <span class="pull-right clickable"
-                                                      style="color:#660ff2;margin-left:15px">
-                                            <i class="trashAnswer glyphicon glyphicon-trash"></i>
-                                        </span>
-                                            </div>
-                                            <div class="panel-body">
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" placeholder="Answer"
-                                                           aria-describedby="basic-addon1" value="Maybe...">
-                                                </div>
+                                                    <input type="text" style="height: 34px"
+                                                           class="form-control normalCursor"
+                                                           disabled="" aria-label="..." value="Question">
+                                                    <div class="input-group-btn">
+                                                        <button type="button"
+                                                                class="btn btn-default dropdown-toggle"
+                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                aria-expanded="false"> Type
+                                                            <span style="margin: 0" class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-right">
+                                                            <li><a>User Input</a></li>
+                                                            <li><a>Question</a></li>
+                                                            <li><a>File Upload</a></li>
+                                                        </ul>
+                                                    </div><!-- /btn-group -->
+                                                </div><!-- /input-group -->
                                             </div>
                                         </div>
                                     </div>
@@ -280,21 +216,20 @@
     <form id="demo-form2"></form>
 {% endblock %}
 
-
-
 {% block customJS %}
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-checkbox/1.5.0/js/bootstrap-checkbox.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.js"></script>
+    <script src="/../../static/tagify/tagify.js"></script>
 
     <script>
         window.onload = function () {
             if (prev_handler)
                 prev_handler();
 
-            {#main();#}
-            init_page()
+            main();
+            {#init_page()#}
 
             function main() {
                 Promise.all([GET_data(), GET_options()]).then((res) => {
@@ -427,6 +362,7 @@
                 });
                 // Input radio-group delete answer
                 $('i.trashAnswer').on('click', function (e) {
+
                     let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().val();
                     if (hasAnswer) {
                         swal({
@@ -450,6 +386,13 @@
                         $(e.target).parent().parent().parent().parent().remove();
                         // run answers restructure function
                         answersRestructure(temp)
+                    }
+                });
+                // init tags
+                $('input[name=tags]').each((i, input) => {
+                    if (!$(input).hasClass('tagified')) {
+                        new Tagify(input);
+                        $(input).addClass('tagified')
                     }
                 });
             }
@@ -481,10 +424,56 @@
                         answersRestructure(temp)
                     }
                 });
+                // init tags
+                $('input[name=tags]').each((i, input) => {
+                    if (!$(input).hasClass('tagified')) {
+                        new Tagify(input);
+                        $(input).addClass('tagified')
+                    }
+                });
+
             }
 
-            function renderAnswer(element) {
-                let rows = $(".answers").children();
+
+            function addAnswer(target) {
+                let element = $("<div class=\"col-sm-4\">  <div class=\"panel panel-default\">\n" +
+                    "    <div class=\"panel-heading\">\n" +
+                    "      <h3 class=\"panel-title\"></h3>\n" +
+                    "      <span class=\"pull-right clickable\"\n" +
+                    " style=\"color:#660ff2;margin-left:15px\">\n" +
+                    "        <i class=\"trashAnswer glyphicon glyphicon-trash\"></i>\n" +
+                    "      </span>\n" +
+                    "    </div>\n" +
+                    "<div class=\"panel-body\">\n" +
+                    "      <div class=\"input-group\">\n" +
+                    "        <label for=\"input\">Answer:</label>\n" +
+                    "        <input type=\"text\" class=\"form-control\" placeholder=\"Answer\"\n" +
+                    "               aria-describedby=\"basic-addon1\" value=\"\">\n" +
+                    "      </div>      <label for=\"input\">Kewords:</label>\n" +
+                    "      <input name='tags' value=''>\n" +
+                    "      <label for=\".input-group\">Actions:</label>\n" +
+                    "      <div class=\"input-group\">\n" +
+                    "        <input type=\"text\" style=\"height: 34px\"\n" +
+                    "               class=\"form-control normalCursor\"\n" +
+                    "               disabled=\"\" aria-label=\"...\" value=\"\">\n" +
+                    "        <div class=\"input-group-btn\">\n" +
+                    "          <button type=\"button\"\n" +
+                    "                  class=\"btn btn-default dropdown-toggle\"\n" +
+                    "                  data-toggle=\"dropdown\" aria-haspopup=\"true\"\n" +
+                    "                  aria-expanded=\"false\"> Action\n" +
+                    "             <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                    "          </button>\n" +
+                    "          <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                    "<li><a>Go To Next Block</a></li>\n" +
+                    "<li><a>Go To Specific Block</a></li>\n" +
+                    "          </ul>\n" +
+                    "        </div><!-- /btn-group -->\n" +
+                    "      </div><!-- /input-group -->\n" +
+                    "    </div>\n" +
+                    "  </div>\n" +
+                    "</div></div></div>");
+
+                let rows = $(target).children();
                 let isAdded = false;
                 rows.each((i, row) => {
                     let rowChildrenLength = $(row).children().length;
@@ -496,37 +485,23 @@
                 if (!isAdded) {
                     $answers = $(rows).parent();
                     $answers.append("<div class='row'></div>");
-                    $answers.children().last().append("<div class=\"col-sm-4\"><div class=\"panel panel-default\"><div class=\"panel-heading\"><h3 class=\"panel-title\"></h3>\n" +
-                        "<span class=\"pull-right clickable\" style=\"color:#660ff2;margin-left:15px\"><i class=\"trashAnswer glyphicon glyphicon-trash\"></i> </span>\n" +
-                        "</div><div class=\"panel-body\"><div class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Answer\"aria-describedby=\"basic-addon1\" value=\"\">\n" +
-                        "</div></div></div></div>");
-                }
-                answersRestructure(target)
-            }
 
-            function addAnswer(target) {
-                let rows = $(target).children();
-                let isAdded = false;
-                rows.each((i, row) => {
-                    let rowChildrenLength = $(row).children().length;
-                    if (rowChildrenLength < 3) {
-                        $(row).append("<div class=\"col-sm-4\"><div class=\"panel panel-default\"><div class=\"panel-heading\"><h3 class=\"panel-title\"></h3>\n" +
-                            "<span class=\"pull-right clickable\" style=\"color:#660ff2;margin-left:15px\"><i class=\"trashAnswer glyphicon glyphicon-trash\"></i> </span>\n" +
-                            "</div><div class=\"panel-body\"><div class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Answer\"aria-describedby=\"basic-addon1\" value=\"\">\n" +
-                            "</div></div></div></div>");
-                        isAdded = true
-                    }
+                    $answers.children().last().append(element);
+                }
+
+                // Input radio-group visual controls
+                $('.radio-group label').on('click', function (evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+
+                    if ($(this).hasClass('not-active'))
+                        $(this).removeClass('not-active');
+                    else
+                        $(this).addClass('not-active');
+
                 });
-                if (!isAdded) {
-                    $answers = $(rows).parent();
-                    $answers.append("<div class='row'></div>");
-                    $answers.children().last().append("<div class=\"col-sm-4\"><div class=\"panel panel-default\"><div class=\"panel-heading\"><h3 class=\"panel-title\"></h3>\n" +
-                        "<span class=\"pull-right clickable\" style=\"color:#660ff2;margin-left:15px\"><i class=\"trashAnswer glyphicon glyphicon-trash\"></i> </span>\n" +
-                        "</div><div class=\"panel-body\"><div class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Answer\"aria-describedby=\"basic-addon1\" value=\"\">\n" +
-                        "</div></div></div></div>");
-                }
-                answersRestructure(target)
-
+                answersRestructure(target);
+                init_page();
             }
 
             function answersRestructure(target) {
@@ -594,8 +569,8 @@
             }
 
             function render_blocks(blocks) {
-
                 function cookUpBlock(block_template, block) {
+
                     function getActionElement(actions) {
                         return "" +
                             "<div class=\"input-group col-md-6\">\n" +
@@ -679,13 +654,105 @@
                     }
 
 
+                    function getAnswersElement(actions, answers) {
+                        //////////////////////// Generate answers templates
+                        let rowSize = 0;
+
+                        let $answers = $("<div class='answers' style='margin-top:10px'></div>");
+
+                        $answers.append($("<div class='row'></div>"));
+                        for (let i = 0; i < answers.length; i++) {
+                            if (rowSize < 3) {
+                                answerTemplate = $(getAnswerTemplate(actions));
+                                answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
+                                answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
+                                answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
+                                answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].answer.text);
+
+                                $answers.children().last().append(answerTemplate);
+
+                                rowSize++;
+                            }
+                            else {
+                                $answers.children().append($("<div class='row'></div>"));
+
+                                answerTemplate = $(getAnswerTemplate(actions));
+                                answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
+                                answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
+                                answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
+                                answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
+                                $answers.children().last().append(answerTemplate);
+
+                                rowSize = 1;
+                            }
+                        }
+
+                        return $answers[0].outerHTML;
+                    }
+
+                    function getAddAnswerButton() {
+                        return "Answers: <span class=\" clickable\" style=\"margin-bottom: 10px\">\n" +
+                            "<i class=\"addAnswer glyphicon glyphicon-plus\"></i>\n" +
+                            "</span>"
+                    }
+
+                    function getAnswerTemplate(actions) {
+                        // make the rows here then return div.answers with all answers
+                        return "" +
+                            "<div class=\"col-sm-4\">" +
+                            "  <div class=\"panel panel-default\">\n" +
+                            "    <div class=\"panel-heading\">\n" +
+                            "      <h3 class=\"panel-title\">ANSWER_NUMBER</h3>\n" +
+                            "      <span class=\"pull-right clickable\"\n style=\"color:#660ff2;margin-left:15px\">\n" +
+                            "        <i class=\"trashAnswer glyphicon glyphicon-trash\"></i>\n" +
+                            "      </span>\n" +
+                            "    </div>\n" +
+                            "<div class=\"panel-body\">\n" +
+
+                            // ANSWER
+                            "      <div class=\"input-group\">\n" +
+                            "        <label for=\"input\">Answer:</label>\n" +
+                            "        <input type=\"text\" class=\"form-control\" placeholder=\"Answer\"\n" +
+                            "               aria-describedby=\"basic-addon1\" value=\"ANSWER_VALUE\">\n" +
+                            "      </div>" +
+
+                            // Keywords
+                            "      <label for=\"input\">Kewords:</label>\n" +
+                            "      <input name='tags' value='KEYWORDS_VALUES'>\n" +
+
+                            // ACTIONS
+                            "      <label for=\".input-group\">Actions:</label>\n" +
+                            "      <div class=\"input-group\">\n" +
+                            "        <input type=\"text\" style=\"height: 34px\"\n" +
+                            "               class=\"form-control normalCursor\"\n" +
+                            "               disabled=\"\" aria-label=\"...\" value=\"ANSWER_ACTION\">\n" +
+                            "        <div class=\"input-group-btn\">\n" +
+                            "          <button type=\"button\"\n" +
+                            "                  class=\"btn btn-default dropdown-toggle\"\n" +
+                            "                  data-toggle=\"dropdown\" aria-haspopup=\"true\"\n" +
+                            "                  aria-expanded=\"false\"> Action\n" +
+                            "             <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                            "          </button>\n" +
+                            "          <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                            getDropdownEelement(actions) +
+                            "          </ul>\n" +
+                            "        </div><!-- /btn-group -->\n" +
+                            "      </div><!-- /input-group -->\n" +
+
+                            "    </div>\n" +
+                            "  </div>\n" +
+                            "</div>" +
+                            "</div>" +
+                            "</div>"
+                    }
+
                     function getBlockContent(template, block) {
                         template = template.replace('BLOCK_TYPE', block.type);
                         template = template.replace('BLOCK_TEXT', block.content.text);
                         template = template.replace('BLOCK_TEXT_EDITABLE', block.content.text);
                         template = template.replace('BLOCK_ACTION', block.content.action);
                         template = template.replace('BLOCK_VALIDATION', block.content.validation);
-                        {#template = template.replace('BLOCK_CONTENT', JSON.stringify(block.content, 4, 4));#}
+
                         return template = template.replace('BLOCK_SUBMIT', getSubmitElemnt(block.storeInDB, block.id));
                     }
 
@@ -723,7 +790,9 @@
                             "           aria-describedby=\"basic-addon1\"\n" +
                             "           value=\"BLOCK_TEXT_EDITABLE\">\n" +
                             "       </div>\n" +
+
                             // placeholders
+                            "       BLOCK_ADD_ANSER_BUTTON" +
                             "       BLOCK_ANSWERS" +
                             "       BLOCK_ACTION" +
                             "       BLOCK_VALIDATION" +
@@ -749,10 +818,14 @@
                         else
                             templateHTML = templateHTML.replace('BLOCK_VALIDATION', '');
 
-                        if (block_template.name == "Question")
-                            templateHTML = templateHTML.replace('BLOCK_ANSWERS', "TBD");
-                        else
+                        if (block_template.name == "Question") {
+                            templateHTML = templateHTML.replace('BLOCK_ANSWERS', getAnswersElement(block_template.actions, block.content.answers));
+                            templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', getAddAnswerButton());
+                        }
+                        else {
                             templateHTML = templateHTML.replace('BLOCK_ANSWERS', '');
+                            templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', '');
+                        }
 
                         return templateHTML;
                     }
@@ -783,7 +856,6 @@
                     "<span class=\"pull-right h5\">Bot version: " + botVersion + "</span>"
                 )
             }
-
         }
     </script>
 {% endblock %}

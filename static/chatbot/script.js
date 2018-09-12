@@ -1,11 +1,10 @@
 
-var  assistantID = 1;
 // Blocks ordered
 var blocks = [];
 
 
 
-function chatbotInit() {
+function chatbotInit(assistantID) {
     console.log("Chatbot Init...");
      $.ajax({
         url: 'assistant/' + assistantID +'/chatbot',
@@ -23,6 +22,7 @@ function chatbotInit() {
         console.log(res);
     });
 }
+
 
 function controller() {
 

@@ -15,7 +15,7 @@ def bot_controller(assistantID):
 
 
 @bot_router.route("/test/<int:assistantID>", methods=['POST', 'GET', 'PUT'])
-# @bot_router.route("/admin/assistant/<int:assistantID>/bot/data", methods=['GET', 'POST'])
+# @bot_router.route("/admin/assistant/<int:assistantID>/bot/block", methods=['GET', 'POST', 'PUT'])
 def bot(assistantID):
     # For all type of requests, get the assistant
     callback: Callback = assistant_services.getByID(assistantID)
@@ -35,7 +35,7 @@ def bot(assistantID):
         data = request.get_json(silent=True)
         callback: Callback = bot_services.addBlock(data, assistant)
         if not callback.Success:
-            return helpers.jsonResponse(False, 404, callback.Message, None)
+            return helpers.jsonResponse(False, 404, callback.Message, callback.Data)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
     # Update the blocks

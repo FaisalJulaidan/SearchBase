@@ -15,6 +15,7 @@ bot_currentVersion = "1.0.0"
 def getBot(assistant: Assistant) -> dict:
     return {'botVersion': bot_currentVersion,
             'assistant': {'id': assistant.ID, 'name': assistant.Name, 'active': assistant.Active},
+            'remainingBlocks': getRemainingBlocksByAssistant(assistant),
             'blocks': getBlocks(assistant)}
 
 
@@ -29,6 +30,11 @@ def getBlocks(assistant: Assistant) -> List[dict]:
 
 def getBlocksCountByAssistant(assistant: Assistant):
     return db.session.query(func.count(Block.ID)).filter(Block.AssistantID == assistant.ID).scalar()
+
+
+def getRemainingBlocksByAssistant(assistant: Assistant):
+    # BlocksCap - numberOfCreatedBlocks
+    return db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first()[0] - getBlocksCountByAssistant(assistant)
 
 
 def addBlock(data: dict, assistant: Assistant) -> Callback:

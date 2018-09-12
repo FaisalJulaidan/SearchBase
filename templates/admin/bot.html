@@ -229,7 +229,9 @@
                 prev_handler();
 
             main();
-            {#init_page()#}
+
+            blocks_templates = {};
+            BlocksTypes = [];
 
             function main() {
                 Promise.all([GET_data(), GET_options()]).then((res) => {
@@ -242,9 +244,6 @@
                     init_page();
                 });
             }
-
-            blocks_templates = {};
-            BlocksTypes = [];
 
             function init_blocks_templates(blockTypes) {
                 for (const blockType of blockTypes) {
@@ -338,7 +337,7 @@
                 });
 
                 // Add answer
-                $('.addAnswer').on('click', function (e) {
+                $('.addAnswerClick').on('click', function (e) {
                     e.stopPropagation();
                     e.preventDefault();
                     addAnswer($(e.target).parent().parent().children('.answers'));
@@ -362,8 +361,7 @@
                 });
                 // Input radio-group delete answer
                 $('i.trashAnswer').on('click', function (e) {
-
-                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().val();
+                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
                     if (hasAnswer) {
                         swal({
                             title: "Are you sure?",
@@ -399,7 +397,7 @@
 
             function init_answers_panels() {
                 $('i.trashAnswer').on('click', function (e) {
-                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().val();
+                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
                     if (hasAnswer) {
                         swal({
                             title: "Are you sure?",
@@ -431,9 +429,26 @@
                         $(input).addClass('tagified')
                     }
                 });
+                // to change the textbox next to type dropdown
+                $("ul.dropdown-menu.dropdown-menu-right").on("click", function (e) {
+                    $input = $(e.target).parent().parent().parent().parent().children().first();
+                    $input.val($(e.target).text());
+                });
+                // to make the current type highlighted
+                $("button.btn.btn-default.dropdown-toggle").on("click", function (e) {
+                    $input = $(e.target).parent().parent().children().first().val();
+
+                    $(e.target).siblings().first().children().each(function (i, element) {
+                        let item = $(element).text();
+                        if ($input === item) {
+                            return $(element).children().first().addClass('hover')
+                        }
+                        $(element).children().first().removeClass()
+
+                    });
+                });
 
             }
-
 
             function addAnswer(target) {
                 let element = $("<div class=\"col-sm-4\">  <div class=\"panel panel-default\">\n" +
@@ -501,7 +516,7 @@
 
                 });
                 answersRestructure(target);
-                init_page();
+                init_answers_panels();
             }
 
             function answersRestructure(target) {
@@ -653,7 +668,6 @@
                             "<small style='margin-top:-10px'>Max size: " + fileSize + "</small>"
                     }
 
-
                     function getAnswersElement(actions, answers) {
                         //////////////////////// Generate answers templates
                         let rowSize = 0;
@@ -691,7 +705,7 @@
                     }
 
                     function getAddAnswerButton() {
-                        return "Answers: <span class=\" clickable\" style=\"margin-bottom: 10px\">\n" +
+                        return "Answers: <span class=\"addAnswerClick clickable\" style=\"margin-bottom: 10px\">\n" +
                             "<i class=\"addAnswer glyphicon glyphicon-plus\"></i>\n" +
                             "</span>"
                     }
@@ -836,12 +850,6 @@
                 }
 
                 if (blocks.length) {
-                    // collects all available qTypes
-                    qTypes = [];
-                    Object.entries(options).forEach(([x, y]) => {
-                        y.name ? qTypes.push(y.name) : ''
-                    });
-
                     let elements = '';
                     for (block of blocks)
                         elements += cookUpBlock(blocks_templates[block.type], block)

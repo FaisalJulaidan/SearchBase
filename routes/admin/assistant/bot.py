@@ -14,8 +14,8 @@ def bot_controller(assistantID):
         return admin_services.render('admin/bot.html')
 
 
-@bot_router.route("/test/<int:assistantID>", methods=['POST', 'GET', 'PUT'])
-# @bot_router.route("/admin/assistant/<int:assistantID>/bot/block", methods=['GET', 'POST', 'PUT'])
+# @bot_router.route("/test/<int:assistantID>", methods=['POST', 'GET', 'PUT'])
+@bot_router.route("/admin/assistant/<int:assistantID>/bot/data", methods=['GET', 'POST', 'PUT'])
 def bot(assistantID):
     # For all type of requests, get the assistant
     callback: Callback = assistant_services.getByID(assistantID)
@@ -45,8 +45,8 @@ def bot(assistantID):
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
-@bot_router.route("/test/<int:blockID>", methods=['DELETE'])
-# @bot_router.route("/admin/assistant/bot/block/<int:blockID>", methods=['DELETE'])
+# @bot_router.route("/test/<int:blockID>", methods=['DELETE'])
+@bot_router.route("/admin/assistant/bot/block/<int:blockID>", methods=['DELETE'])
 def delete_block(blockID):
     if request.method == "DELETE":
 

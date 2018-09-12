@@ -107,7 +107,7 @@ def admin_users_add():
         role = callback.Data
 
         # Create the new user for the company
-        callback: Callback = user_services.create(firstname, surname, email, 'passwordToBeChanged',
+        callback: Callback = user_services.create(firstname, surname, email, 'passwordToBeChanged', "00000",
                                                   adminUser.Company, role, verified=True)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry couldn't create the user. Try again!")

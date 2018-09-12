@@ -386,11 +386,43 @@
                         answersRestructure(temp)
                     }
                 });
+
                 // init tags
                 $('input[name=tags]').each((i, input) => {
                     if (!$(input).hasClass('tagified')) {
                         new Tagify(input);
                         $(input).addClass('tagified')
+                    }
+                });
+
+                // change type of block
+                $('.dropdown-menu.dropdown-menu-right > li').on('click', (e) => {
+                    $target = $(e.target);
+                    let isTargetType = $target.parent().parent().parent().children().first().text().includes('Type');
+                    let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val()
+
+                    if (isTargetType && hasData) {
+                        swal({
+                            title: "Are you sure?",
+                            text: "Old block will be removed completely from the system",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        })
+                            .then((willUpdate) => {
+                                if (willUpdate) {
+                                    let newTemplateName = $target.text();
+
+                                    $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
+                                    $blockBody.html(render_blocks_change(newTemplateName));
+                                    init_page();
+                                }
+                            });
+                    } else {
+                        let newTemplateName = $target.text();
+                        $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
+                        $blockBody.html(render_blocks_change(newTemplateName));
+                        init_page();
                     }
                 });
             }
@@ -784,7 +816,7 @@
                             "            <div class=\"input-group\">\n" +
                             "                <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\" value=\"BLOCK_TYPE\">" +
                             "                <div class=\"input-group-btn\">\n" +
-                            "                    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\"\n" + "" +
+                            "                    <button type=\"button\" class=\"blockType btn btn-default dropdown-toggle\" data-toggle=\"dropdown\"\n" + "" +
                             "                            aria-haspopup=\"true\" aria-expanded=\"false\">" +
                             "                            Type <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                             "                    </button>\n" +
@@ -857,6 +889,157 @@
                 }
                 else $("#draggablePanelList").html("<h2>Sorry there are no blocks for this bot 🙁</h2>");
             }
+
+            function render_blocks_change(block_template) {
+                function cookUpBlock(block_template, block) {
+
+                    function getActionElement(actions) {
+                        return "" +
+                            "<div class=\"input-group col-md-6\">\n" +
+                            "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
+                            "          value=\"\">\n" +
+                            "   <div class=\"input-group-btn\">\n" +
+                            "       <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
+                            "               data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Action\n" +
+                            "           <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                            "       </button>\n" +
+                            "       <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                            getDropdownEelement(actions) +
+                            "       </ul>\n" +
+                            "   </div><!-- /btn-group -->\n" +
+                            "</div><!-- /input-group -->\n"
+                    }
+
+                    function getValidationElement(validations) {
+                        return "" +
+                            "<div class=\"input-group col-md-6\">\n" +
+                            "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
+                            "          value=\"\">\n" +
+                            "   <div class=\"input-group-btn\">\n" +
+                            "       <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
+                            "               data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Validation\n" +
+                            "           <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                            "       </button>\n" +
+                            "       <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                            getDropdownEelement(validations) +
+                            "       </ul>\n" +
+                            "   </div><!-- /btn-group -->\n" +
+                            "</div><!-- /input-group -->\n"
+                    }
+
+                    function getSubmitElemnt(storeInDB, id) {
+                        let isDisabled = storeInDB ? '' : 'disabled';
+                        return "" +
+                            "<div class=\"col-md-1 pull-right inline\">\n" +
+                            "    <div class=\"btn btn-default\">Save</div>\n" +
+                            "</div>\n" +
+                            "<div class=\"col-md-2 pull-right inline text-right\">\n" +
+                            "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 9px\">\n" +
+                            "        <input class=\"form-check-input\" id=\"" + id + "\" type=\"checkbox\" checked=\"\" " + isDisabled + ">\n" +
+                            "        <label class=\"form-check-label\" for=\"" + id + "\"\n" +
+                            "               style=\"padding-left: 10px;padding-top: 2px; text-align: -webkit-auto;\">\n" +
+                            "            Save in DB\n" +
+                            "        </label>\n" +
+                            "    </div>\n" +
+                            "</div>"
+                    }
+
+                    function getDropdownEelement(items) {
+                        let elements = '';
+                        for (item of items)
+                            elements += "<li><a>" + item + "</a></li>\n"
+                        return elements
+                    }
+
+                    function getRadioButtons(fileTypes) {
+                        let elements = '';
+                        for (fileType of fileTypes)
+                            elements += "<label class=\"btn my-btn-default btn-sm not-active\" >" + fileType +
+                                "<input type=\"radio\" value=\"" + fileType + "\" name=\"fileType\"></label>"
+
+                        return elements
+                    }
+
+                    function getFileUpload(fileTypes, fileSize) {
+                        return "" +
+                            "<div class=\"input-group col-md-8\">\n" +
+                            "  <span class=\"input-group-addon\">File Type:</span>\n" +
+                            "  <div class=\"btn-group radio-group\">\n" +
+                            getRadioButtons(fileTypes) +
+                            "  </div>\n" +
+                            "</div>" +
+                            "<small style='margin-top:-10px'>Max size: " + fileSize + "</small>"
+                    }
+
+                    function getAnswersElement() {
+                        //////////////////////// Generate answers templates
+                        let rowSize = 0;
+                        let $answers = $("<div class='answers' style='margin-top:10px'></div>");
+                        $answers.append($("<div class='row'></div>"));
+                        return $answers[0].outerHTML;
+                    }
+
+                    function getAddAnswerButton() {
+                        return "Answers: <span class=\"addAnswerClick clickable\" style=\"margin-bottom: 10px\">\n" +
+                            "<i class=\"addAnswer glyphicon glyphicon-plus\"></i>\n" +
+                            "</span>"
+                    }
+
+                    function getTemplate(block_template) {
+                        templateHTML =
+                            // Block text
+                            "<div class=\"panel-body\">\n" +
+                            "    <div class=\"input-group col-md-6\">\n" +
+                            "         <span class=\"input-group-addon\">Question:</span>\n" +
+                            "         <input type=\"text\" class=\"form-control\"\n" +
+                            "                placeholder=\"Question\"\n" +
+                            "                aria-describedby=\"basic-addon1\"\n" +
+                            "                value=''>\n" +
+                            "    </div>\n" +
+
+                            // placeholders
+                            "       BLOCK_ADD_ANSER_BUTTON" +
+                            "       BLOCK_ANSWERS" +
+                            "       BLOCK_ACTION" +
+                            "       BLOCK_VALIDATION" +
+                            "       BLOCK_FILE_TYPE" +
+                            getSubmitElemnt(true, 'x') +
+                            "</div>\n";
+                        if (block_template.name == "File Upload")
+                            templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', getFileUpload(block_template.typesAllowed, block_template.fileMaxSize));
+                        else
+                            templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', '');
+
+
+                        if (block_template.name == "File Upload" || block_template.name == "User Input")
+                            templateHTML = templateHTML.replace('BLOCK_ACTION', getActionElement(block_template.actions));
+                        else
+                            templateHTML = templateHTML.replace('BLOCK_ACTION', '');
+
+                        if (block_template.name == "User Input")
+                            templateHTML = templateHTML.replace('BLOCK_VALIDATION', getValidationElement(block_template.validations));
+                        else
+                            templateHTML = templateHTML.replace('BLOCK_VALIDATION', '');
+
+                        if (block_template.name == "Question") {
+                            templateHTML = templateHTML.replace('BLOCK_ANSWERS', getAnswersElement(block_template.actions));
+                            templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', getAddAnswerButton());
+                        }
+                        else {
+                            templateHTML = templateHTML.replace('BLOCK_ANSWERS', '');
+                            templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', '');
+                        }
+
+                        return templateHTML;
+                    }
+
+
+                    return getTemplate(block_template, block);
+                }
+
+                return cookUpBlock(blocks_templates[block_template]);
+            }
+
 
             function render_page(assistantName, botVersion) {
                 $("#assistantName").html(

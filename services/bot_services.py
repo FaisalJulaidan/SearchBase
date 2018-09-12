@@ -20,7 +20,8 @@ def getBot(assistant: Assistant) -> dict:
 
 
 def getBlocks(assistant: Assistant) -> List[dict]:
-    result: List[Block] = db.session.query(Block).filter(Block.AssistantID == assistant.ID).all()
+    result: List[Block] = db.session.query(Block).filter(Block.AssistantID == assistant.ID)\
+        .order_by(Block.Order.asc()).all()
     blocks = []
     for block in result:
         blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,

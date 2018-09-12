@@ -2,14 +2,36 @@ from datetime import timedelta
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from flask_api import status
 from utilties import helpers
-from models import Callback
+from models import Callback, Assistant
 from itsdangerous import URLSafeTimedSerializer
-from services import user_services, company_services, db_services, auth_services, mail_services
+from services import user_services, company_services, db_services, auth_services, mail_services,\
+    assistant_services, bot_services
 from models import secret_key
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
+
+
+@public_router.route("/test-chatbot", methods=['GET'])
+def test_chatbot_page():
+    if request.method == "GET":
+        return render_template("test-chatbot.html")
+
+
+@public_router.route("/assistant/<int:assistantID>/chatbot", methods=['GET'])
+def chatbot(assistantID):
+    # For all type of requests, get the assistant
+    callback: Callback = assistant_services.getByID(assistantID)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+    assistant: Assistant = callback.Data
+
+    if request.method == "GET":
+        assistant: Assistant = callback.Data
+        # Get blocks for the chatbot to use
+        data: dict = bot_services.getBlocks(assistant)
+        return helpers.jsonResponse(True, 200, "No Message", data)
 
 
 @public_router.route("/", methods=['GET'])

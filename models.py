@@ -333,6 +333,7 @@ class BlockType(enum.Enum):
     UserInput = 'User Input'
     Question = 'Question'
     FileUpload = 'File Upload'
+    Solutions = 'Solutions'
 
 
 class BlockAction(enum.Enum):

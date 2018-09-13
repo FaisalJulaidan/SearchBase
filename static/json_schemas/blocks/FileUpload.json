@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Questions of file uploads schema",
+  "title": "File uploads block schema",
   "type": "object",
   "properties": {
     "text": {"type": "string"},

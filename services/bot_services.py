@@ -12,9 +12,18 @@ from models import db, Callback, User, Company, ValidationType, Assistant, Answe
 bot_currentVersion = "1.0.0"
 
 
+# Get the chatbot for the public to use
+def getChatbot(assistant: Assistant) -> dict:
+    return {'assistant': {'id': assistant.ID, 'name': assistant.Name, 'message': assistant.Message,
+                          'secondsUntilPopup': assistant.SecondsUntilPopup, 'active': assistant.Active},
+            'blocks': getBlocks(assistant)}
+
+
+# Get the bot for the company to manage the blocks in bot.html
 def getBot(assistant: Assistant) -> dict:
     return {'botVersion': bot_currentVersion,
-            'assistant': {'id': assistant.ID, 'name': assistant.Name, 'active': assistant.Active},
+            'assistant': {'id': assistant.ID, 'name': assistant.Name, 'message': assistant.Message,
+                          'secondsUntilPopup': assistant.SecondsUntilPopup, 'active': assistant.Active},
             'remainingBlocks': getRemainingBlocksByAssistant(assistant),
             'blocks': getBlocks(assistant)}
 

@@ -30,7 +30,7 @@ def chatbot(assistantID):
     if request.method == "GET":
         assistant: Assistant = callback.Data
         # Get blocks for the chatbot to use
-        data: dict = bot_services.getBlocks(assistant)
+        data: dict = bot_services.getChatbot(assistant)
         return helpers.jsonResponse(True, 200, "No Message", data)
 
 

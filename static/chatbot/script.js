@@ -4,7 +4,8 @@ var blocks = []; // Blocks ordered
 var keywords = [];
 
 
-
+// This function will get the blocks from the server by assistantID and set the blocks array to be used to create
+// the cahtbot conversational flow
 function chatbotInit(assistantID) {
     console.log("Chatbot Init...");
      $.ajax({
@@ -23,8 +24,8 @@ function chatbotInit(assistantID) {
         start();
 
         // Test
-        // console.log(blocks);
-        // console.log(assistant.name);
+        console.log(blocks);
+        console.log(assistant.name);
 
     }).fail(function (res) {
         console.log("Error in retrieving blocks.");
@@ -64,11 +65,11 @@ function submitMessage() {
 // and get  the solutions back based on the sent data
 function sendData(){
     var solutions = [];
-    var dataToSend = null
+    var dataToSend = null;
      console.log("Send data...");
      $.ajax({
         url: 'assistant/' + assistantID +'/solutions', // We still don't have this
-        type: "GET"
+        type: "GET",
         data: dataToSend
     }).done(function (res) {
 

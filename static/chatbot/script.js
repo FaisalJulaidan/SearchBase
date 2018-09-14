@@ -9,6 +9,7 @@ var oldPos = 0;
 var newPos = 0;
 var collectedInformation = [];
 var fileUpload = false;
+var params = undefined;
 
 //scrolling setter
 $(window).scroll(function () {
@@ -83,12 +84,13 @@ function getBlock(id) {
 // and get  the solutions back based on the sent data
 function sendData(){
     var solutions = [];
-     console.log("Send data...");
-     $.ajax({
+    params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": 5}
+    console.log("Send data...");
+    $.ajax({
         contentType: 'application/json', //this is important
         url: '../assistant/' + assistantID +'/chatbot', // We still don't have this
         type: "POST",
-        data: JSON.stringify(collectedInformation)
+        data: JSON.stringify(params)
 
     }).done(function (res) {
 

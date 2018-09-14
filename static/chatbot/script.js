@@ -99,6 +99,7 @@ function sleep(ms) {
 // --------------- //
 
 function renderBlock(block) {
+    $("#qAnswers").remove();
     switch (block.type) {
         case "Question":
             renderQuestion(block);
@@ -118,16 +119,14 @@ function renderBlock(block) {
 }
 
 // This function will render a block of type Questions with its answers to the chatbot.
-// not finished but just to give an idea of what should be done inside this function
 function renderQuestion(block) {
-    $("#qAnswers").remove();
     var answerAppendString = "<div id='qAnswers'>";
     document.getElementById("textMessage").style.display = "inline-block";
     document.getElementById("fileUploadDiv").style.display = "none";
 
     var blockAnswers = block.content.answers;
     for (var i = 1; i < blockAnswers.length; i++) {
-        answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"submitAnswer('" + toEmoticon(blockAnswers[i].text) + "'," + blockAnswers[i].keywords + ")\">" + toEmoticon(blockAnswers[i].text) + "</a>";
+        answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"submitAnswer('" + toEmoticon(blockAnswers[i].content.text) + "'," + blockAnswers[i].keywords + ")\">" + toEmoticon(blockAnswers[i].content.text) + "</a>";
     }
     //add skip button
     //answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"SkipQuestion()\">Skip Question</a>";
@@ -145,6 +144,7 @@ function renderQuestion(block) {
 
 function renderUserInput(block) {
     // make sure to validate user's input depends on block.content.validation
+
 }
 
 function renderFileUpload(block) {
@@ -165,8 +165,7 @@ function submitAnswer(message, blockKeywords) {
         //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
     }
 
-    if (message == "") {
-        //been submited through Send button click
+    if (message == "") { //been submited through Send button click
         message = document.getElementById("textMessage").value;
         if (message == "" || message.replace(/ /g, "") == "") {
             return 0;
@@ -182,7 +181,11 @@ function submitAnswer(message, blockKeywords) {
     putThinkingGif(900);
 
     if (currentBlock.storeInDB) {
-        collectedInformation.push({"questionID": currentBlock.id, "message": message});
+        if (currentBlock.type != "UserInput") {
+            collectedInformation.push({ "blockID": currentBlock.id, "input": message, "keywords": blockKeywords });
+        } else {
+            collectedInformation.push({ "blockID": currentBlock.id, "input": message, "keywords": [] });
+        }
 
         sendAssistantMessage(generateUserInputThanks(), 300)
 

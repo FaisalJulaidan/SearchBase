@@ -33,6 +33,23 @@ function chatbotInit(assistantID) {
     });
 }
 
+
+function f() {
+      $.ajax({
+          url: '/test',
+          contentType: 'application/json', //this is important
+          type: "POST",
+          data: JSON.stringify({"keywords": ["smoker","anger"]})
+    }).done(function (res) {
+        console.log("GOOD");
+    }).fail(function (res) {
+        console.log("Error");
+    });
+}
+
+
+
+
 // This start the lunch the chatbot for the first time
 function start() {
     // 1.Popup the chatbot after assistant.secondsUntilPopup

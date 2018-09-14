@@ -22,7 +22,7 @@ from services.mail_services import mail
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
-    products_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
+    solutions_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
     changePassword_router, answers_router, bot_router, emoji_router, adminBasic_router, assistantManager_router
 
 from routes.public.routers import public_router, resetPassword_router
@@ -40,7 +40,7 @@ app.register_blueprint(profile_router)
 app.register_blueprint(admin_api)
 app.register_blueprint(sub_router)
 app.register_blueprint(settings_router)
-app.register_blueprint(products_router)
+app.register_blueprint(solutions_router)
 app.register_blueprint(analytics_router)
 app.register_blueprint(connection_router)
 app.register_blueprint(userInput_router)
@@ -183,18 +183,18 @@ def genDummyData():
                          role=user_sabic, verified=True)
 
     # Plans
-    db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic', MaxProducts=600, MaxBlocks=20, ActiveBotsCap=2, InactiveBotsCap=3,
+    db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic', MaxSolutions=600, MaxBlocks=20, ActiveBotsCap=2, InactiveBotsCap=3,
                         AdditionalUsersCap=5, ExtendedLogic=False, ImportDatabase=False, CompanyNameOnChatbot=False))
 
     db.session.add(
-        Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate', MaxProducts=5000, MaxBlocks=20, ActiveBotsCap=4, InactiveBotsCap=8,
+        Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate', MaxSolutions=5000, MaxBlocks=20, ActiveBotsCap=4, InactiveBotsCap=8,
              AdditionalUsersCap=10, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
     db.session.add(
-        Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxProducts=30000, MaxBlocks=20, ActiveBotsCap=10, InactiveBotsCap=30,
+        Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=20, ActiveBotsCap=10, InactiveBotsCap=30,
              AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
-    db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxProducts=100, MaxBlocks=5,  ActiveBotsCap=2, InactiveBotsCap=2,
+    db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=5,  ActiveBotsCap=2, InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
 

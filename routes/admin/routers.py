@@ -21,8 +21,8 @@ admin_api: Blueprint = admin_api
 from .assistant.settings import settings_router
 settings_router: Blueprint = settings_router
 
-from .assistant.products import products_router
-products_router: Blueprint = products_router
+from .assistant.solutions import solutions_router
+solutions_router: Blueprint = solutions_router
 
 from .subscription.sub import sub_router
 sub_router: Blueprint = sub_router

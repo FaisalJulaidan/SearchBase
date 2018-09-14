@@ -13,6 +13,13 @@ public_router = Blueprint('public_router', __name__, template_folder="../templat
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 
+@public_router.route("/test", methods=['POST'])
+def t():
+    if request.method == "POST":
+        print(request.get_json(silent=True))
+        return helpers.jsonResponse(True, 200, "!!!", None)
+
+
 @public_router.route("/test-chatbot", methods=['GET'])
 def test_chatbot_page():
     if request.method == "GET":
@@ -33,6 +40,9 @@ def chatbot(assistantID):
         data: dict = bot_services.getChatbot(assistant)
         return helpers.jsonResponse(True, 200, "No Message", data)
 
+    if request.method == "POST":
+        print(request.get_json(silent=True))
+        return helpers.jsonResponse(True, 200, "!!!", None)
 
 @public_router.route("/", methods=['GET'])
 def indexpage():

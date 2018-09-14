@@ -274,7 +274,7 @@ class Assistant(db.Model):
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False,)
     Company = db.relationship('Company', back_populates='Assistants')
 
-    Products = db.relationship('Product', back_populates='Assistant')
+    Solutions = db.relationship('Solution', back_populates='Assistant')
     Statistics = db.relationship('Statistics', back_populates='Assistant')
     Blocks = db.relationship('Block', back_populates='Assistant')
 
@@ -286,10 +286,10 @@ class Assistant(db.Model):
         return '<Assistant {}>'.format(self.Name)
 
 
-class Product(db.Model):
+class Solution(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    ProductID = db.Column(db.Integer, nullable=False)
+    SolutionID = db.Column(db.Integer, nullable=False)
     Name = db.Column(db.String(128), nullable=False)
     Brand = db.Column(db.String(128), nullable=False)
     Model = db.Column(db.String(128), nullable=False)
@@ -300,10 +300,10 @@ class Product(db.Model):
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='Products')
+    Assistant = db.relationship('Assistant', back_populates='Solutions')
 
     def __repr__(self):
-        return '<Product {}>'.format(self.Name)
+        return '<Solution {}>'.format(self.Name)
 
 
 class Statistics(db.Model):
@@ -313,7 +313,7 @@ class Statistics(db.Model):
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     Opened = db.Column(db.Integer, nullable=False, default=False)
     QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
-    ProductsReturned = db.Column(db.Integer, nullable=False, default=0)
+    SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
@@ -339,7 +339,7 @@ class BlockAction(enum.Enum):
 
     GoToNextBlock = 'Go To Next Block'
     GoToSpecificBlock = 'Go To Specific Block'
-    # ShowSolutions = 'Show Solutions'
+    ShowSolutions = 'Show Solutions'
 
 
 class Block(db.Model):
@@ -413,7 +413,7 @@ class Plan(db.Model):
 
     ID = db.Column(db.String(), primary_key=True, unique=True)
     Nickname = db.Column(db.String(), nullable=False, unique=True)
-    MaxProducts = db.Column(db.Integer, nullable=False, default=0)
+    MaxSolutions = db.Column(db.Integer, nullable=False, default=0)
     MaxBlocks = db.Column(db.Integer, nullable=False, default=0)
     ActiveBotsCap = db.Column(db.Integer, nullable=False, default=0)
     InactiveBotsCap = db.Column(db.Integer, nullable=False, default=0)

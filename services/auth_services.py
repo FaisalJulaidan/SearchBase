@@ -10,7 +10,7 @@ from services import user_services, assistant_services, role_services, sub_servi
 from utilties import helpers
 
 
-def signup(email, firstname, surname, password, companyName, companySize, companyPhoneNumber, websiteURL) -> Callback:
+def signup(email, firstname, surname, password, companyName, companyPhoneNumber, websiteURL) -> Callback:
 
     # Validate Email
     if not helpers.isValidEmail(email):
@@ -28,7 +28,7 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
     adminRole: Callback = role_services.create('Admin', True, True, True, False, company)
     userRole: Callback = role_services.create('User', True, False, False, False, company)
     if not (ownerRole.Success or adminRole.Success or userRole.Success) :
-        return Callback(False, 'Could create roles for the new user.')
+        return Callback(False, 'Could not create roles for the new user.')
 
     # Create a new user with its associated company and owner role
     user_callback = user_services.create(firstname, surname, email, password, companyPhoneNumber, company, ownerRole.Data)
@@ -46,7 +46,7 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
 
     # ###############
     # Just for testing, But to be REMOVED because user has to verify this manually
-    user_services.verifyByEmail(email)
+    # user_services.verifyByEmail(email)
     # ###############
 
     # Return a callback with a message

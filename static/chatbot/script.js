@@ -44,20 +44,6 @@ function chatbotInit(assistantID) {
 }
 
 
-function f() {
-      $.ajax({
-          url: '/test',
-          contentType: 'application/json', //this is important
-          type: "POST",
-          data: JSON.stringify({"keywords": ["smoker","anger"]})
-    }).done(function (res) {
-        console.log("GOOD");
-    }).fail(function (res) {
-        console.log("Error");
-    });
-}
-
-
 
 
 // This start the lunch the chatbot for the first time
@@ -80,20 +66,22 @@ function getBlock(id) {
     return null
 }
 
-// This should send the data to the server, data such as keywords.
+// This should send the data to the server, data such as keywords and inputs.
 // and get  the solutions back based on the sent data
 function sendData(){
     var solutions = [];
-    var dataToSend = null;
      console.log("Send data...");
      $.ajax({
-        url: 'assistant/' + assistantID +'/solutions', // We still don't have this
-        type: "GET",
-        data: dataToSend
+        contentType: 'application/json', //this is important
+        url: 'assistant/' + assistant.id +'/chatbot', // We still don't have this
+        type: "POST",
+        data: JSON.stringify(collectedInformation)
+
     }).done(function (res) {
 
         console.log("Solutions retrieved successfully!");
         var data = JSON.parse(res).data;
+        solutions = data.solutions;
 
     }).fail(function (res) {
         console.log("Error in retrieving blocks.");

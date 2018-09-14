@@ -365,7 +365,7 @@ class UserInput(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     SessionID = db.Column(db.Integer, nullable=False)
-    Text = db.Column(db.String(), nullable=False)
+    Input = db.Column(db.String(), nullable=False)
     QuestionText = db.Column(db.String(), nullable=False)
     Keywords = db.Column(db.String(), nullable=False)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
@@ -375,7 +375,7 @@ class UserInput(db.Model):
     Block = db.relationship('Block', foreign_keys=[BlockID])
 
     def __repr__(self):
-        return '<UserInput {}>'.format(self.Text)
+        return '<UserInput {}>'.format(self.Input)
 
 
 class Answer(db.Model):

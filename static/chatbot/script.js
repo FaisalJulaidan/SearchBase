@@ -86,7 +86,7 @@ function sendData(){
      console.log("Send data...");
      $.ajax({
         contentType: 'application/json', //this is important
-        url: '../assistant/' + assistant.id +'/chatbot', // We still don't have this
+        url: '../assistant/' + assistantID +'/chatbot', // We still don't have this
         type: "POST",
         data: JSON.stringify(collectedInformation)
 
@@ -239,11 +239,13 @@ async function submitAnswer(message, blockKeywords) {
             if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].answer.text == message) {
                 action = blockAnswers[i].action;
                 var blockToGoId = blockAnswers[i].blockToGoId;
+
                 getNextBlock(action, blockToGoId);
             }
         }
     } else if (currentBlock.type == "UserInput" || currentBlock.type == "File Upload") {
         action = currentBlock.action;
+
         getNextBlock(action);
     }
 

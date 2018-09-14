@@ -130,6 +130,13 @@
     </div> -->
     <script src="/static/chatbot/script.js"></script>
 
+    <script>
+        $(document).ready(function () {
+            console.log("JS is working...");
+            var hrefSplit = window.location.href.split("/")
+            chatbotInit(assistantID = hrefSplit[hrefSplit.length -1]);
+        });
+    </script>
 </body>
 
 </html>

@@ -205,6 +205,8 @@ class User(db.Model):
                            on_deserialize=None
                            )
 
+    Settings = db.relationship("UserSettings", uselist=False, back_populates="User")
+
     def __repr__(self):
         return '<User {}>'.format(self.Email)
 
@@ -441,6 +443,19 @@ class Newsletter(db.Model):
     def __repr__(self):
         return '<Newsletters {}>'.format(self.Email)
 
+
+class UserSettings(db.Model):
+
+    ID = db.Column(db.Integer, db.ForeignKey("user.ID", ondelete='cascade'), primary_key=True, unique=True)
+    TrackingData = db.Column(db.Boolean, nullable=False, default=False)
+    TechnicalSupport = db.Column(db.Boolean, nullable=False, default=False)
+    AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
+
+    # Relationships:
+    User = db.relationship('User', back_populates='Settings')
+
+    def __repr__(self):
+        return '<UserSettings {}>'.format(self.ID)
 
 class Callback():
     def __init__(self, success: bool, message: str, data: str or dict or bool = None):

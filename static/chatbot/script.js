@@ -5,13 +5,10 @@ var currentBlock = undefined;
 var keywords = [];
 var cancelScroll = false;
 var chatInputDiv = document.getElementById("ChatInputDiv");
-
-//old vars need check if needed
 var oldPos = 0;
 var newPos = 0;
-var params = "";
-var questionsAnswered = 0;
 var collectedInformation = [];
+var fileUpload = false;
 
 //scrolling setter
 $(window).scroll(function () {
@@ -46,12 +43,12 @@ function chatbotInit(assistantID) {
         blocks = data.blocks;
 
         // Start the chatbot
-        console.log(blocks)
+        //console.log(blocks)
         start();
 
         // Test
-        console.log(blocks);
-        console.log(assistant.name);
+        //console.log(blocks);
+        //console.log(assistant.name);
 
     }).fail(function (res) {
         console.log("Error in retrieving blocks.");
@@ -75,7 +72,6 @@ function start() {
 function getBlock(id) {
     for (var i = 0, l = blocks.length; i < l; i++) {
         if (blocks[i].id === id) {
-            console.log("found block: ", blocks[i])
             return blocks[i]
         }
     }
@@ -119,7 +115,6 @@ function openSolution(link) {
 function renderBlock(block) {
     $("#qAnswers").remove();
     currentBlock = block;
-    console.log(block)
     switch (block.type) {
         case "Question":
             renderQuestion(block);
@@ -166,14 +161,17 @@ function renderUserInput(block) {
     // make sure to validate user's input depends on block.content.validation
     document.getElementById("textMessage").style.display = "inline-block";
     document.getElementById("fileUploadDiv").style.display = "none";
-
-    chatInputDov.style = "display:block";
+    chatInputDiv.style = "display:block";
 
     sendAssistantMessage(block.text)
 }
 
 function renderFileUpload(block) {
+    document.getElementById("textMessage").style.display = "none";
+    document.getElementById("fileUploadDiv").style.display = "inline-block";
+    chatInputDiv.style = "display:block";
 
+    sendAssistantMessage(block.text)
 }
 
 function renderSolutions(block) {
@@ -185,10 +183,9 @@ async function submitAnswer(message, blockKeywords) {
     cancelScroll = false;
 
     blockKeywords = blockKeywords.split(",")
-    console.log(currentBlock);
     if (currentBlock.type == "File Upload") {
         //needs rework
-        //message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
+        message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
         //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
     }
 
@@ -260,9 +257,7 @@ function getNextBlock(action, blockToGoId=undefined) {
         targetBlock = blocks[blockNumber];
     }
     else if (action == "Go To Specific Block") {
-        console.log("here")
         for (var i = 0; i < blocks.length; i++) {
-            console.log(blocks[i].id, "  ", blockToGoId)
             if (blocks[i].id == blockToGoId) {
                 targetBlock = blocks[i];
             }
@@ -290,7 +285,7 @@ function Reset() {
     $("#qAnswers").remove();
     keywords = [];
     collectedInformation = [];
-    questionsAnswered = 0;
+    fileUpload = false;
     start();
 }
 

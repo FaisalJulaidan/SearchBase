@@ -195,7 +195,10 @@ def getOptions() -> dict:
             'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
             'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH/1000000)) + 'MB',
             'alwaysStoreInDB': True
-
-            }
+            },
+            {
+                'name': BlockType.Solutions.value,
+                'maxSolutions': 5
+            },
         ]
     }

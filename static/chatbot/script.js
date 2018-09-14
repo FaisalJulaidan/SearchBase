@@ -218,7 +218,7 @@ function getNextBlock() {
         return 0;
     }
 
-    if (currentBlock != undefined) {
+    if (currentBlock != undefined) { //check if its not trying to reload the same block
         if (currentBlock != targetBlock) {
             renderBlock(targetBlock);
         }

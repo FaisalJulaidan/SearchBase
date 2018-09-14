@@ -29,9 +29,9 @@ var style = {
 var card = elements.create('card', {style: style});
 
 // Add an instance of the card Element into the `card-element` <div>.
-var el = document.getElementById('card-element')
+var el = document.getElementById('card-element');
 card.mount(el);
-console.log(card)
+console.log(card);
 
 // Handle real-time validation errors from the card Element.
 card.addEventListener('change', function(event) {
@@ -43,63 +43,71 @@ card.addEventListener('change', function(event) {
   }
 });
 
-// Handle form submission.
-// var form = document.getElementById('payment-form');
-// form.addEventListener('submit', function() {
-//     console.log("Ykjsldkfgjklsdfjglkjsdlkfjglksdjfg")
-//   stripe.createToken(card).then(function(result) {
-//     if (result.error) {
-//       // Inform the user if there was an error.
-//       var errorElement = document.getElementById('card-errors');
-//       errorElement.textContent = result.error.message;
-//     } else {
-//       // Send the token to your server.
-//       stripeTokenHandler(result.token);
-//     }
-//   });
-// });
+
+function openSubForm(planId, price){
+    $('#subModal').modal('show');
+    var $form = $('form#subForm');
+
+    $form.find('#payBtn').html('Pay £' + price);
+    $(document).on('submit', 'form#subForm', function (e) {
+        e.preventDefault();
+        pay(planID=planId)
+    })
+
+}
 
 
-function submit() {
-    console.log("Ykjsldkfgjklsdfjglkjsdlkfjglksdjfg");
+function pay(planID) {
+    var token = stripeTokenHandler();
+    console.log(token);
+    if(token){
+        $.ajax({
+        url: '/admin/subscribe/' + planID,
+        type: "POST",
+        contentType: 'application/json', //this is important
+        data: JSON.stringify({
+            "token": token ,
+            "coupon": $(document.getElementById('promo-code')).val()
+        })
 
+        }).done(function (res) {
+
+        console.log("Successful Payment");
+        swal({
+                  title: "Successful Payment",
+                  text: res.msg,
+                  icon: "success"
+                });
+
+        }).fail(function (res) {
+            console.log("Error");
+            console.log(res);
+            swal("Ooops!", res.msg, "error");
+        });
+    } else {
+
+    }
+
+}
+
+
+function stripeTokenHandler() {
+    card.mount(el);
     stripe.createToken(card).then(function (result) {
+        console.log(">>>>");
         console.log(result);
-
+        console.log(">>>>");
         if (result.error) {
             // Inform the user if there was an error.
             var errorElement = document.getElementById('card-errors');
             errorElement.textContent = result.error.message;
+             swal("Ooops!",result.error.message, "error");
+            return null;
         } else {
             // Send the token to your server.
-            console.log("CORRRECTTTT!!!");
-            stripeTokenHandler(result.token);
+            console.log("token generated");
+            return result.token;
         }
     });
-}
-function stripeTokenHandler(token) {
-
-      $.post({
-        url: '/admin/subscribe/' ,
-        contentType: 'application/json',
-        data: JSON.stringify({
-            token: token,
-            coupon: $(document.getElementById('promo-code')).val()
-        }),
-        success: (res) => {
-            if (res.error) {
-                swal("Ooops!", res.error, "error");
-            } else {
-
-                swal({
-                  title: "Successful Payment",
-                  text: res.success,
-                  icon: "success",
-                });
-
-            }
-        }
-      });
-
 
 }

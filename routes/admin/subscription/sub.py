@@ -47,27 +47,26 @@ def admin_pay(planID):
 
         # Get Stripe from passed data. That's include the generated token using JavaScript
         data = request.get_json(silent=True)
+        print(data)
         token = data['token']['id']
         coupon = data['coupon']
 
-        print(">>>>>>>>>>>")
-        print(token)
-        print(coupon)
+        # print(">>>>>>>>>>>")
+        # print(token)
+        # print(coupon)
 
         if token is "Error":
-            return jsonify(error="No token provided to complete the payment!")
+            helpers.jsonResponse(False, 404, "No token provided to complete the payment!", None)
 
         sub_callback: Callback = sub_services.subscribe(email=session.get('UserEmail', 'Invalid Email'),
                                                         planID=planID, token=token, coupon=coupon)
-
         if not sub_callback.Success:
             return jsonify(error=sub_callback.Message)
 
         # Set Plan session for logged in user
         session['UserPlan'] = sub_callback.Data['planNickname']
         print("You have successfully subscribed!")
-
-        return jsonify(success="You have successfully subscribed!", url="admin/pricing-tables.html")
+        helpers.jsonResponse(True, 200, "You have successfully subscribed!", {"url": "admin/pricing-tables.html"})
 
 
 @sub_router.route("/admin/unsubscribe", methods=['POST'])

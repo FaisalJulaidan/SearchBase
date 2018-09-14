@@ -8,7 +8,7 @@
       "type": "object",
       "properties":{
         "id": {"type": "integer"},
-        "type": {"enum": ["Question", "User Input", "File Upload"]},
+        "type": {"enum": ["Question", "User Input", "File Upload", "Solutions"]},
         "order": {"type": "integer", "minimum": 1},
         "storeInDB": {"type": "boolean"},
         "content": {"type": "object"}

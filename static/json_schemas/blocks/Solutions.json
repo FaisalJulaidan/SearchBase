@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Solutions block schema",
+  "type": "object",
+  "properties": {
+    "showHighest": {"type": "integer", "minimum": 1}
+    },
+  "required": ["showHighest"],
+  "additionalProperties": false
+}

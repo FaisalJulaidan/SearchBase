@@ -44,7 +44,7 @@ class JsonEncodedDict(types.TypeDecorator):
         return value
 
 
-# TypeEngine.with_variant says "use StringyJSON instead when
+ # TypeEngine.with_variant says "use StringyJSON instead when
 # connecting to 'sqlite'"
 # MagicJSON = types.JSON().with_variant(JsonEncodedDict, 'sqlite')
 mutable.MutableDict.associate_with(JsonEncodedDict)
@@ -333,6 +333,7 @@ class BlockType(enum.Enum):
     UserInput = 'User Input'
     Question = 'Question'
     FileUpload = 'File Upload'
+    Solutions = 'Solutions'
 
 
 class BlockAction(enum.Enum):

@@ -262,12 +262,14 @@
                           <div class="modal-body">
 
                                     <div class="form-group">
-                                      <label for="inputFirstname"> Credit/Debit Card:</label>
+                                      <label for="card-element"> Credit/Debit Card:</label>
+
+                                      <div id="card-element"></div>
 
                                       <div id="card-errors" role="alert"></div>
 
                                     </div>
-                                    <div id="card-element"></div>
+
                                     <div class="form-group">
                                       <label for="inputSurname">Promo Code</label>
                                       <input type="text" class="form-control" id="promo-code" name="promo-code" placeholder="50OFF">
@@ -277,7 +279,7 @@
 
                           <div class="modal-footer">
                              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                             <button id="payBtn" type="submit" class="btn btn-success" onclick="pay();">Pay</button>
+                             <button id="payBtn" type="submit" class="btn btn-success">Pay</button>
                           </div>
                     </form>
 

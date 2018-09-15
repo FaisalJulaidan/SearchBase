@@ -44,6 +44,7 @@ def subscribe(email, planID, trialDays=None, token=None, coupon=None) -> Callbac
         return Callback(False, 'Plan does not exist')
 
     # Validate Coupon
+    if len(coupon.strip()) == 0: coupon = None
     if coupon and not isCouponValid(coupon):
         return Callback(False, 'Coupon is not valid!')
 
@@ -60,23 +61,31 @@ def subscribe(email, planID, trialDays=None, token=None, coupon=None) -> Callbac
     try:
         # Check user if already has a StripeID
         if user.StripeID:
-            customer = {'id': user.StripeID}
+            print(1)
+            customer = stripe.Customer.retrieve(user.StripeID)
+            customer.source = token
+            customer.save()
+
 
         # If not, then create a new Stripe customer
         else:
-
+            print(2)
             customer = stripe.Customer.create(
-                email=email
+                email=email,
+                source=token
             )
+
+        print(customer['id'])
+        print(token)
 
         # Subscribe to the  plan
         subscription = stripe.Subscription.create(
             customer=customer['id'],
             items=[{'plan': plan.ID}],
             trial_period_days=trialDays,
-            token=token,
             coupon=coupon
         )
+        print(3)
 
         # Get all company's assistants for activation
         assistants_callback = assistant_services.getAll(user.CompanyID)
@@ -85,6 +94,7 @@ def subscribe(email, planID, trialDays=None, token=None, coupon=None) -> Callbac
             unsubscribe(email)
             return Callback(False, "Issue while dealing with user's assistants.")
 
+        print(4)
         # If everything is OK, activate company's assistants
         assistants = assistants_callback.Data
         if assistants != 0:
@@ -101,6 +111,7 @@ def subscribe(email, planID, trialDays=None, token=None, coupon=None) -> Callbac
 
     except Exception as e:
         db.session.rollback()
+        print(e)
         return Callback(False, 'An error occurred while subscribing with Stripe')
 
     return Callback(True, 'Subscribed successfully', {'stripeID': customer['id'],
@@ -142,7 +153,6 @@ def getStripePlan(planID) -> Callback:
 
         return Callback(True, 'No message.', result)
     except Exception as e:
-        db.session.rollback()
         return Callback(False, "This plan doesn't exist! Make sure the plan ID is correct.")
 
 

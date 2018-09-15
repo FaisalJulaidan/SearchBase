@@ -1,5 +1,6 @@
 from flask import Blueprint, request, session, jsonify, redirect
 from services import user_services, auth_services
+from utilties import json_utils
 from models import Callback, User
 admin_api: Blueprint = Blueprint('admin_api', __name__ ,template_folder="../../templates")
 
@@ -31,13 +32,14 @@ def getUserData():
         callback: Callback = user_services.getByID(session['UserID'])
         if callback.Success:
             user: User = callback.Data
-            return jsonify({
+            return json_utils.jsonResponse(True, 200, "User data",{
                 "id": user.ID,
                 "email": user.Email,
                 "firstname": user.Firstname,
                 "surname": user.Surname,
-                "stripeID": user.StripeID,
-                "subID": user.SubID,
+                "stripeID": user.Company.StripeID,
+                "subID": user.Company.SubID,
+                "role": user.Role.to_dict()
             })
         else:
             print(callback.Message)

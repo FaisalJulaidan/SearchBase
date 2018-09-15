@@ -90,8 +90,8 @@ def before_request():
 def genDummyData():
 
     # Companies creation
-    db.session.add(Company(Name='Aramco', URL='ff.com'))
-    db.session.add(Company(Name='Sabic', URL='ff.com'))
+    db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_DbgPyBCx0osKmr'))
+    db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly'))
 
     # Get Companies
     aramco = Company.query.filter(Company.Name == "Aramco").first()

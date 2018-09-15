@@ -42,31 +42,25 @@ card.addEventListener('change', function(event) {
 });
 
 
-function warn() {
-    subID = sessionStorage.getItem('subID');
-    if (subID !== 'null' || subID !== '' || subID !== undefined || subID !== null) {
-        swal({
-            title: "Are you sure?",
-            text: "You will lose your active subscription.",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willDelete) => {
-            if (willDelete) {
-                return true;
-            } else {
-                return false;
-         }
-        });
-    }
-    return true;
-}
+
 
 function openSubForm(planId, price){
+    function showForm() {
+
+         $('#subModal').modal('show');
+                var $form = $('form#subForm');
+                $form.find('#payBtn').html('Pay £' + price);
+                card.mount('#card-element');
+                $(document).on('submit', 'form#subForm', function (e) {
+                    e.preventDefault();
+                    stripeTokenHandler(planId)
+                })
+    }
 
     subID = sessionStorage.getItem('subID');
-    if (subID !== 'null' || subID !== '' || subID !== undefined || subID !== null) {
-        
+    console.log(typeof subID);
+    if (subID !== 'null') {
+
         swal({
             title: "Are you sure?",
             text: "You will lose your active subscription.",
@@ -77,21 +71,21 @@ function openSubForm(planId, price){
         }).then((willDelete) => {
             if (willDelete) {
 
-                $('#subModal').modal('show');
-                var $form = $('form#subForm');
-                $form.find('#payBtn').html('Pay £' + price);
-                card.mount('#card-element');
-                $(document).on('submit', 'form#subForm', function (e) {
-                    e.preventDefault();
-                    stripeTokenHandler(planId)
-                })
-
+               showForm()
             } else {
                 document.location.href = '/admin/pricing'
             }
         });
-    }
+    } else {showForm()}
+
 }
+
+
+// Once the modal is closed, unbind all onSubmit handlers from the userForm
+$(document).on('hide.bs.modal', '#subModal', function (e) {
+    console.log('Unbind submit event.');
+    $(document).off('submit', 'form#subForm');
+});
 
 
 
@@ -122,6 +116,7 @@ function pay(planID, token) {
         url: '/admin/subscribe/' + planID,
         type: "POST",
         contentType: 'application/json', //this is important
+        dataType: "json",
         data: JSON.stringify({
             "token": token ,
             "coupon": $(document.getElementById('promo-code')).val()

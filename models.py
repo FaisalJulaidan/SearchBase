@@ -90,12 +90,11 @@ class Company(db.Model):
                         on_serialize=None,
                         on_deserialize=None
                         )
-    # Size = db.Column(db.String(60),
-    #                 supports_json=True,
-    #                 supports_dict=True,
-    #                 on_serialize=None,
-    #                 on_deserialize=None
-    #                 )
+
+    StripeID = db.Column(db.String(68), unique=True, nullable=False,)
+    SubID = db.Column(db.String(68), unique=True, default=None)
+
+    # Size = db.Column(db.String(60))
 
     # Relationships:
     Users = db.relationship('User', back_populates='Company', cascade="all, delete, delete-orphan")
@@ -156,18 +155,6 @@ class User(db.Model):
                          on_serialize=None,
                          on_deserialize=None
                          )
-    StripeID = db.Column(db.String(128), default=None, unique=True,
-                         supports_json=True,
-                         supports_dict=True,
-                         on_serialize=None,
-                         on_deserialize=None
-                         )
-    SubID = db.Column(db.String(64), default=None, unique=True,
-                      supports_json=True,
-                      supports_dict=True,
-                      on_serialize=None,
-                      on_deserialize=None
-                      )
     Verified = db.Column(db.Boolean(), nullable=False, default=False,
                          supports_json=True,
                          supports_dict=True,

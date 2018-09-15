@@ -3,6 +3,7 @@ import sqlalchemy.exc
 from .db_services import _safeCommit
 from models import db, Callback, Company, User, Role
 from flask import session
+import stripe
 
 
 def getByID(id) -> Company or None:
@@ -26,16 +27,28 @@ def getAll() -> list:
     return db.session.query(Company)
 
 
-def create(name, size, phoneNumber, url) -> Company or None:
+def create(name, url, ownerEmail) -> Company or None:
 
     try:
-        company = Company(Name=name, Size=size, PhoneNumber=phoneNumber, URL=url)
-        db.session.add(company)
+        stripeCus = stripe.Customer.create(
+            description="Customer for " + name + " company.",
+            email=ownerEmail
+        )
+        newCompany = Company(Name=name, URL=url, StripeID=stripeCus['id'])
+        db.session.add(newCompany)
+
+    except stripe.error as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, "An error occurred while creating a stripe customer for the new company.")
     except Exception as exc:
         print(exc)
-        return None
+        db.session.rollback()
+        return Callback(False, "Couldn't create a company entity.")
 
-    return company
+    # Save
+    db.session.commit()
+    return newCompany
 
 
 def removeByName(name) -> bool:

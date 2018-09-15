@@ -20,10 +20,10 @@ def t():
         return helpers.jsonResponse(True, 200, "!!!", None)
 
 
-@public_router.route("/test-chatbot", methods=['GET'])
-def test_chatbot_page():
+@public_router.route("/chatbottemplate/<assistantID>", methods=['GET'])
+def test_chatbot_page(assistantID):
     if request.method == "GET":
-        return render_template("test-chatbot.html")
+        return render_template("chatbot-template.html")
 
 
 @public_router.route("/assistant/<int:assistantID>/chatbot", methods=['GET'])

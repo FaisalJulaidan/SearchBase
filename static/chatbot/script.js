@@ -1,25 +1,38 @@
 ﻿
 var assistant = null;
 var blocks = []; // Blocks ordered
-var currentBlock = undefined
+var currentBlock = undefined;
 var keywords = [];
 var cancelScroll = false;
 var chatInputDiv = document.getElementById("ChatInputDiv");
-
-//old vars need check if needed
 var oldPos = 0;
 var newPos = 0;
-var params = "";
-var questionsAnswered = 0;
 var collectedInformation = [];
+var fileUpload = false;
+var params = undefined;
 
+//scrolling setter
+$(window).scroll(function () {
+    newPos = $(window).scrollTop();
+    if (newPos + 3 < oldPos) {
+        $('html, body').stop();
+        cancelScroll = true;
+    }
+    oldPos = newPos;
+});
+jQuery.expr.filters.offscreen = function (el) {
+    var rect = el.getBoundingClientRect();
+    return (
+        (rect.x + rect.width) > window.innerWidth
+    );
+};
 
 // This function will get the blocks from the server by assistantID and set the blocks array to be used to create
 // the cahtbot conversational flow
 function chatbotInit(assistantID) {
     console.log("Chatbot Init...");
      $.ajax({
-        url: 'assistant/' + assistantID +'/chatbot',
+        url: '../assistant/' + assistantID +'/chatbot',
         type: "GET"
     }).done(function (res) {
 
@@ -31,11 +44,12 @@ function chatbotInit(assistantID) {
         blocks = data.blocks;
 
         // Start the chatbot
+        //console.log(blocks)
         start();
 
         // Test
-        console.log(blocks);
-        console.log(assistant.name);
+        //console.log(blocks);
+        //console.log(assistant.name);
 
     }).fail(function (res) {
         console.log("Error in retrieving blocks.");
@@ -58,7 +72,7 @@ function start() {
 // Get block by id
 function getBlock(id) {
     for (var i = 0, l = blocks.length; i < l; i++) {
-        if(blocks[i].id === id){
+        if (blocks[i].id === id) {
             return blocks[i]
         }
     }
@@ -70,12 +84,13 @@ function getBlock(id) {
 // and get  the solutions back based on the sent data
 function sendData(){
     var solutions = [];
-     console.log("Send data...");
-     $.ajax({
+    params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": 5}
+    console.log("Send data...");
+    $.ajax({
         contentType: 'application/json', //this is important
-        url: 'assistant/' + assistant.id +'/chatbot', // We still don't have this
+        url: '../assistant/' + assistantID +'/chatbot', // We still don't have this
         type: "POST",
-        data: JSON.stringify(collectedInformation)
+        data: JSON.stringify(params)
 
     }).done(function (res) {
 
@@ -95,16 +110,13 @@ function openSolution(link) {
     window.open(link);
 }
 
-function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 
 // Blocks Renderer //
 // --------------- //
 
 function renderBlock(block) {
     $("#qAnswers").remove();
+    currentBlock = block;
     switch (block.type) {
         case "Question":
             renderQuestion(block);
@@ -112,7 +124,7 @@ function renderBlock(block) {
         case "UserInput":
             renderUserInput(block);
             break;
-        case "FileUpload":
+        case "File Upload":
             renderFileUpload(block);
             break;
         case "Solutions":
@@ -130,16 +142,16 @@ function renderQuestion(block) {
     document.getElementById("fileUploadDiv").style.display = "none";
 
     var blockAnswers = block.content.answers;
-    for (var i = 1; i < blockAnswers.length; i++) {
-        answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"submitAnswer('" + toEmoticon(blockAnswers[i].content.text) + "'," + blockAnswers[i].keywords + ")\">" + toEmoticon(blockAnswers[i].content.text) + "</a>";
+    for (var i = 0; i < blockAnswers.length; i++) {
+        answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"submitAnswer('" + toEmoticon(blockAnswers[i].answer.text) + "','" + blockAnswers[i].keywords + "')\">" + toEmoticon(blockAnswers[i].answer.text) + "</a>";
     }
     //add skip button
     //answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"SkipQuestion()\">Skip Question</a>";
     answerAppendString += "</div>"
     $("#optionsDiv").append(answerAppendString);
     chatInputDiv.style = "display:none";
-
-    sendAssistantMessage(block.text, 0)
+    
+    sendAssistantMessage(block.content.text)
 
     checkOutsideElements();
     if (!cancelScroll) {
@@ -149,11 +161,19 @@ function renderQuestion(block) {
 
 function renderUserInput(block) {
     // make sure to validate user's input depends on block.content.validation
+    document.getElementById("textMessage").style.display = "inline-block";
+    document.getElementById("fileUploadDiv").style.display = "none";
+    chatInputDiv.style = "display:block";
 
+    sendAssistantMessage(block.text)
 }
 
 function renderFileUpload(block) {
+    document.getElementById("textMessage").style.display = "none";
+    document.getElementById("fileUploadDiv").style.display = "inline-block";
+    chatInputDiv.style = "display:block";
 
+    sendAssistantMessage(block.text)
 }
 
 function renderSolutions(block) {
@@ -161,12 +181,13 @@ function renderSolutions(block) {
     // However reaching to this block means you have to sendData() and get the solutions back
 }
 
-function submitAnswer(message, blockKeywords) {
+async function submitAnswer(message, blockKeywords) {
     cancelScroll = false;
 
+    blockKeywords = blockKeywords.split(",")
     if (currentBlock.type == "File Upload") {
         //needs rework
-        //message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
+        message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
         //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
     }
 
@@ -181,9 +202,20 @@ function submitAnswer(message, blockKeywords) {
     $("#qAnswers").remove();
     chatInputDiv.style = "display:none";
     
-    sendUserMessage(message, 500) //print user's message in the chatbox to appear like he is typing back
+    sendUserMessage(message) //print user's message in the chatbox to appear like he is typing back
+    await sleep(500);
     
-    putThinkingGif(900);
+    putThinkingGif();
+    await sleep(400 + Math.floor(Math.random() * 900));
+    removeThinkingGif();
+
+    if (currentBlock.type == "UserInput") { //validate user input
+        if (!validateUserInput(message, currentBlock.validation)) {
+            sendAssistantMessage("I am sorry but that was not in the format I think it should be...")
+            await sleep(200);
+            return 0;
+        }
+    }
 
     if (currentBlock.storeInDB) {
         if (currentBlock.type != "UserInput") {
@@ -192,28 +224,50 @@ function submitAnswer(message, blockKeywords) {
             collectedInformation.push({ "blockID": currentBlock.id, "input": message, "keywords": [] });
         }
 
-        sendAssistantMessage(generateUserInputThanks(), 300)
+        sendAssistantMessage(generateUserInputThanks())
+        await sleep(300);
 
-        putThinkingGif(500);
+        putThinkingGif();
+        await sleep(400 + Math.floor(Math.random() * 500));
+        removeThinkingGif();
     }
 
     addKeywords(blockKeywords)
 
-    getNextBlock();
+    var action = undefined;
+    if (currentBlock.type == "Question") {
+        var blockAnswers = currentBlock.content.answers;
+        for (var i = 0; i < blockAnswers.length; i++) {
+            if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].answer.text == message) {
+                action = blockAnswers[i].action;
+                var blockToGoId = blockAnswers[i].blockToGoId;
+
+                getNextBlock(action, blockToGoId);
+            }
+        }
+    } else if (currentBlock.type == "UserInput" || currentBlock.type == "File Upload") {
+        action = currentBlock.action;
+
+        getNextBlock(action);
+    }
+
 }
 
-function getNextBlock() {
+function getNextBlock(action, blockToGoId=undefined) {
     var targetBlock = undefined
-    if (currentBlock.action == "Go To Next Block") {
+
+    if (action == "Go To Next Block") {
         var blockNumber = currentBlock.order + 1;
         targetBlock = blocks[blockNumber];
     }
-    else if (currentBlock.action == "Go To Specific Block") {
+    else if (action == "Go To Specific Block") {
         for (var i = 0; i < blocks.length; i++) {
-            if (blocks[i].id == currentBlock.blockToGoID) { targetBlock = blocks[i]; }
+            if (blocks[i].id == blockToGoId) {
+                targetBlock = blocks[i];
+            }
         }
     }
-    else if (currentBlock.action == "Show Solutions") {
+    else if (action == "Show Solutions") {
         //send the request to server
         return 0;
     }
@@ -235,31 +289,45 @@ function Reset() {
     $("#qAnswers").remove();
     keywords = [];
     collectedInformation = [];
-    questionsAnswered = 0;
+    fileUpload = false;
     start();
 }
 
 
 // helper functions
-function sendUserMessage(message, waitTime) {
+function sendUserMessage(message) {
     $("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>" + toEmoticon(message) + "</li></div>");
     animateMessage("#newMessage");
     document.getElementById('newMessage').id = 'oldMessage';
-    await sleep(waitTime);
 }
 
-function sendAssistantMessage(message, waitTime) {
+function sendAssistantMessage(message) {
     $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + toEmoticon(message) + "</li></div>");
     animateMessage("#newMessage");
     document.getElementById('newMessage').id = 'oldMessage';
-    await sleep(waitTime);
 }
 
-function putThinkingGif(addMiliseconds) {
+function putThinkingGif() {
     $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='/static/images/typing.gif'></li></div>")
     animateMessage("#thinkingGif");
-    await sleep(400 + Math.floor(Math.random() * addMiliseconds));
+}
+
+function removeThinkingGif() {
     $("#thinkingGif").remove();
+}
+
+function validateUserInput(message, messageType) {
+    var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        
+    if (messageType == "Email" && !message.match(emailRegex)) {
+        return false;
+    } else if (messageType == "FullName" && name.indexOf(' ') <= 0) {
+        return false;
+    } else if (messageType == "Telephone" && !/^[0-9]*$/.test(message)) {
+        return false;
+    }
+
+    return true;
 }
 
 function addKeywords(blockKeywords) {
@@ -322,3 +390,56 @@ function animateMessage(id) {
 function toEmoticon(message) {
     return emojione.toImage(message);
 }
+
+function checkOutsideElements() {
+    var offScreenElements = $(':offscreen');
+    for (var z = 0; z < offScreenElements.length; z++) {
+        var elementID = offScreenElements[z].outerHTML.split("id=\"")[1].split("\"")[0];
+        $("<br><br>").insertBefore("#" + elementID);
+        checkOutsideElements();
+        return 0;
+    }
+}
+
+function scrollTo(id) {
+    $('html, body').stop();
+    id = "#" + id
+    $('html, body').animate({
+        scrollTop: ($(id).offset().top)
+    }, 2000);
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+//compare arrays function
+// Warn if overriding existing method
+if (Array.prototype.equals)
+    console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
+// attach the .equals method to Array's prototype to call it on any array
+Array.prototype.equals = function (array) {
+    // if the other array is a falsy value, return
+    if (!array)
+        return false;
+
+    // compare lengths - can save a lot of time 
+    if (this.length != array.length)
+        return false;
+
+    for (var i = 0, l = this.length; i < l; i++) {
+        // Check if we have nested arrays
+        if (this[i] instanceof Array && array[i] instanceof Array) {
+            // recurse into the nested arrays
+            if (!this[i].equals(array[i]))
+                return false;
+        }
+        else if (this[i] != array[i]) {
+            // Warning - two different object instances will never be equal: {x:20} != {x:20}
+            return false;
+        }
+    }
+    return true;
+}
+// Hide method from for-in loops
+Object.defineProperty(Array.prototype, "equals", { enumerable: false });

@@ -1,6 +1,6 @@
 import sqlalchemy.exc
 
-from models import Callback, User, Company, db
+from models import Callback, User, Company, UserSettings, db
 from utilties import helpers
 from datetime import datetime
 from flask import session, escape
@@ -37,6 +37,9 @@ def signup(email, firstname, surname, password, companyName, companyPhoneNumber,
 
     # Create a new user with its associated company and owner role
     user_callback = user_services.create(firstname, surname, email, password, companyPhoneNumber, company, ownerRole.Data)
+
+    # Create userSettings for this user
+    db.session.add(UserSettings(User=user_callback.Data))
 
     # Subscribe to basic plan with 14 trial days
     sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lp2yVtTotk2f', trialDays=14)

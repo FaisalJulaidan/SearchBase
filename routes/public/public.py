@@ -26,7 +26,7 @@ def test_chatbot_page(assistantID):
         return render_template("chatbot-template.html")
 
 
-@public_router.route("/assistant/<int:assistantID>/chatbot", methods=['GET'])
+@public_router.route("/assistant/<int:assistantID>/chatbot", methods=['GET', 'POST'])
 def chatbot(assistantID):
     # For all type of requests, get the assistant
     callback: Callback = assistant_services.getByID(assistantID)

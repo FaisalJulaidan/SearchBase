@@ -84,7 +84,7 @@ function getBlock(id) {
 // and get  the solutions back based on the sent data
 function sendData(){
     var solutions = [];
-    params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": 5}
+    params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": 5};
     console.log("Send data...");
     $.ajax({
         contentType: 'application/json', //this is important

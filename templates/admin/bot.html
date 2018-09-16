@@ -89,6 +89,20 @@
             border-radius: 100%;
             color: white;
         }
+
+        .tagify {
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .input-group1 > input {
+            -webkit-border-radius: 5px !important;
+            -moz-border-radius: 5px !important;
+            border-radius: 5px !important;
+            margin-bottom: 10px;
+        }
     </style>
     <div class="right_col" role="main">
         <div class="page-title">
@@ -219,8 +233,7 @@
 {% block customJS %}
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-checkbox/1.5.0/js/bootstrap-checkbox.js"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.js"></script>
+    <script src="/../../static/swal/sweetalert.min.js"></script>
     <script src="/../../static/tagify/tagify.js"></script>
 
     <script>
@@ -266,7 +279,7 @@
             }
 
             function init_page() {
-                // to collopse and expand the panel
+                // to collapse and expand the panel
                 $(document).on('click', '.panel-heading', function (e) {
                     if ($(e.target).is('a') ||
                         $(e.target).is('input.form-control') ||
@@ -276,15 +289,31 @@
                         e.preventDefault();
                         return;
                     }
+
+                    e.stopPropagation();
+                    e.preventDefault();
+
                     let $this = $(this);
-                    if (!$this.hasClass('panel-collapsed')) {
-                        $this.parents('.panel').find('.panel-body').slideUp();
-                        $this.addClass('panel-collapsed');
-                        $this.find('i.indicator').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
-                    } else {
-                        $this.parents('.panel').find('.panel-body').slideDown();
+                    // open a panel
+                    if ($this.hasClass('panel-collapsed')) {
+                        // before open the current close all
+                        $('li > .panel-body').slideUp();
+                        $('li > .panel-heading').addClass('panel-collapsed');
+                        $('button.blockType').attr('disabled', '');
+                        $('i.indicator').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+
+                        // now open the $this
                         $this.removeClass('panel-collapsed');
+                        $this.parents('.panel').find('.panel-body').slideDown();
+                        $this.find('button.blockType').removeAttr('disabled');
                         $this.find('i.indicator').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+                    }
+                    // close a panel
+                    else {
+                        $this.addClass('panel-collapsed');
+                        $this.parents('.panel').find('.panel-body').slideUp();
+                        $this.find('button.blockType').attr('disabled', '');
+                        $this.find('i.indicator').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
                     }
                 });
 
@@ -415,15 +444,121 @@
 
                                     $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
                                     $blockBody.html(render_blocks_change(newTemplateName));
-                                    init_page();
+                                    init_changed_block();
                                 }
                             });
                     } else {
                         let newTemplateName = $target.text();
                         $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
                         $blockBody.html(render_blocks_change(newTemplateName));
-                        init_page();
+                        init_changed_block();
                     }
+                });
+
+                $('.save').on('click', (e) => {
+                    $target = $(e.target);
+                    // collect all data then pass it
+
+                });
+            }
+
+            function init_changed_block() {
+
+                // to make the current type highlighted
+                $("button.btn.btn-default.dropdown-toggle").on("click", function (e) {
+                    $input = $(e.target).parent().parent().children().first().val();
+
+                    $(e.target).siblings().first().children().each(function (i, element) {
+                        let item = $(element).text();
+                        if ($input === item) {
+                            return $(element).children().first().addClass('hover')
+                        }
+                        $(element).children().first().removeClass()
+
+                    });
+                });
+
+                // to change the textbox next to type dropdown
+                $("ul.dropdown-menu.dropdown-menu-right").on("click", function (e) {
+                    $input = $(e.target).parent().parent().parent().parent().children().first();
+                    $input.val($(e.target).text());
+                });
+
+                // Input radio-group visual controls
+                $('.radio-group label').on('click', function (evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+
+                    if ($(this).hasClass('not-active'))
+                        $(this).removeClass('not-active');
+                    else
+                        $(this).addClass('not-active');
+
+                });
+
+                // Add answer
+                $('.addAnswerClick').on('click', function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    addAnswer($(e.target).parent().parent().children('.answers'));
+                });
+
+                // Input radio-group visual controls
+                $('i.trash').on('click', function (e) {
+                    swal({
+                        title: "Are you sure?",
+                        text: "Question will be removed completely from the system",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    })
+                        .then((willDelete) => {
+                            if (willDelete) {
+                                $(e.target).parent().parent().parent().remove()
+                                swal("Success!", "Question has been deleted successfully", "success")
+                            }
+                        });
+                });
+                // Input radio-group delete answer
+                $('i.trashAnswer').on('click', function (e) {
+                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
+                    if (hasAnswer) {
+                        swal({
+                            title: "Are you sure?",
+                            text: "Answer will be removed completely from the system",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        })
+                            .then((willDelete) => {
+                                temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                                if (willDelete) {
+                                    $(e.target).parent().parent().parent().parent().remove();
+                                    swal("Success!", "Answer has been deleted successfully", "success")
+                                }
+                                // run answers restructure function
+                                answersRestructure(temp)
+                            });
+                    } else {
+                        temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                        $(e.target).parent().parent().parent().parent().remove();
+                        // run answers restructure function
+                        answersRestructure(temp)
+                    }
+                });
+
+                // init tags
+                $('input[name=tags]').each((i, input) => {
+                    if (!$(input).hasClass('tagified')) {
+                        new Tagify(input);
+                        $(input).addClass('tagified')
+                    }
+                });
+
+                $('.save').on('click', (e) => {
+                    $target = $(e.target);
+                    // collect all data then pass it
+
                 });
             }
 
@@ -492,7 +627,7 @@
                     "      </span>\n" +
                     "    </div>\n" +
                     "<div class=\"panel-body\">\n" +
-                    "      <div class=\"input-group\">\n" +
+                    "      <div class=\"input-group1\">\n" +
                     "        <label for=\"input\">Answer:</label>\n" +
                     "        <input type=\"text\" class=\"form-control\" placeholder=\"Answer\"\n" +
                     "               aria-describedby=\"basic-addon1\" value=\"\">\n" +
@@ -656,7 +791,7 @@
                         let isDisabled = storeInDB ? '' : 'disabled';
                         return "" +
                             "<div class=\"col-md-1 pull-right inline\">\n" +
-                            "    <div class=\"btn btn-default\">Save</div>\n" +
+                            "    <div class=\"save btn btn-default\">Save</div>\n" +
                             "</div>\n" +
                             "<div class=\"col-md-2 pull-right inline text-right\">\n" +
                             "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 9px\">\n" +
@@ -756,7 +891,7 @@
                             "<div class=\"panel-body\">\n" +
 
                             // ANSWER
-                            "      <div class=\"input-group\">\n" +
+                            "      <div class=\"input-group1\">\n" +
                             "        <label for=\"input\">Answer:</label>\n" +
                             "        <input type=\"text\" class=\"form-control\" placeholder=\"Answer\"\n" +
                             "               aria-describedby=\"basic-addon1\" value=\"ANSWER_VALUE\">\n" +
@@ -805,18 +940,18 @@
                     function getTemplate(block_template, block) {
                         templateHTML =
                             "<li class=\"panel panel-default\">\n" +
-                            "    <div class=\"panel-heading\">\n" +
+                            "    <div class=\"panel-heading panel-collapsed\">\n" +
                             "        <div class=\"panel-title\">\n" +
                             "            <span class=\"moveable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-menu-hamburger\"></i></span>\n" +
                             "            <b>BLOCK_TEXT</b>\n" +
                             "        </div>\n" +
                             "        <span class=\"pull-right clickable\" style='color:#660ff2;margin-left:15px'><i class=\"trash glyphicon glyphicon-trash\"></i></span>\n" +
-                            "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"indicator glyphicon glyphicon-chevron-down\"></i></span>\n" +
+                            "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"indicator glyphicon glyphicon-chevron-up\"></i></span>\n" +
                             "        <div class=\"col-xs-11  col-sm-5 col-md-4 pull-right\" style=\"margin-top: -30px;margin-right:-9px\">\n" +
                             "            <div class=\"input-group\">\n" +
                             "                <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\" value=\"BLOCK_TYPE\">" +
                             "                <div class=\"input-group-btn\">\n" +
-                            "                    <button type=\"button\" class=\"blockType btn btn-default dropdown-toggle\" data-toggle=\"dropdown\"\n" + "" +
+                            "                    <button disabled type=\"button\" class=\"blockType btn btn-default dropdown-toggle\" data-toggle=\"dropdown\"\n" + "" +
                             "                            aria-haspopup=\"true\" aria-expanded=\"false\">" +
                             "                            Type <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                             "                    </button>\n" +
@@ -828,7 +963,7 @@
                             "        </div><!-- /.col-lg-3 -->\n" +
                             "    </div>\n" +
                             // Block text
-                            "    <div class=\"panel-body\">\n" +
+                            "    <div class=\"panel-body\" style='display:none;'>\n" +
                             "       <div class=\"input-group col-md-6\">\n" +
                             "         <span class=\"input-group-addon\">Question:</span>\n" +
                             "         <input type=\"text\" class=\"form-control\"\n" +
@@ -1039,7 +1174,6 @@
 
                 return cookUpBlock(blocks_templates[block_template]);
             }
-
 
             function render_page(assistantName, botVersion) {
                 $("#assistantName").html(

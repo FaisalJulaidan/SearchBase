@@ -14,8 +14,8 @@ def bot_controller(assistantID):
         return admin_services.render('admin/bot.html')
 
 
-# @bot_router.route("/test/<int:assistantID>", methods=['POST', 'GET', 'PUT'])
-@bot_router.route("/admin/assistant/<int:assistantID>/bot/data", methods=['GET', 'POST', 'PUT'])
+# @bot_router.route("/test/<int:assistantID>", methods=['POST', 'GET', 'PUT', 'DELETE'])
+@bot_router.route("/admin/assistant/<int:assistantID>/bot/data", methods=['GET', 'POST'])
 def bot(assistantID):
     # For all type of requests, get the assistant
     callback: Callback = assistant_services.getByID(assistantID)

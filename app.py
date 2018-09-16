@@ -138,7 +138,7 @@ def genDummyData():
         "validation": "Email"
       }))
     db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
-        "action": "Go To Specific Block",
+        "action": "Go To Next Block",
         "fileTypes": [
           "doc",
           "pdf"

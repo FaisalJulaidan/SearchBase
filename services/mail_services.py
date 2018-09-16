@@ -6,8 +6,6 @@ from itsdangerous import URLSafeTimedSerializer
 from models import Callback
 from threading import Thread
 from time import sleep  
-import string
-import random
 
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
@@ -51,10 +49,9 @@ def sendPasswordResetEmail(email, companyID):
     
     return Callback(True, 'Password reset email sent successfully to ' + email)
 
-def addedNewUserEmail(adminEmail, targetEmail):
+def addedNewUserEmail(adminEmail, targetEmail, password):
     try:
-        password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
-        link = "http://206.189.122.126/admin/changepassword"
+        link = "https://www.thesearchbase.com/admin/changepassword"
 
         send_email((targetEmail), 'You have been added to TheSearchBase', 
                'emails/account_invitation.html', password=password, adminEmail=adminEmail)

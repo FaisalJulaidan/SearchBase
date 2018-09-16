@@ -117,13 +117,12 @@ def genDummyData():
             "blockToGoId": 3
           },
           {
-            "action": "Go To Specific Block",
+            "action": "Go To Next Block",
             "answer": {"text": "No", "timesClicked": 0},
             "keywords": [
               "smoker",
               "sad"
-            ],
-            "blockToGoId": None
+            ]
           }
         ],
         "id": 2,

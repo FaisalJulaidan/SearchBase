@@ -117,11 +117,12 @@ function openSolution(link) {
 function renderBlock(block) {
     $("#qAnswers").remove();
     currentBlock = block;
+    console.log(block)
     switch (block.type) {
         case "Question":
             renderQuestion(block);
             break;
-        case "UserInput":
+        case "User Input":
             renderUserInput(block);
             break;
         case "File Upload":
@@ -209,7 +210,7 @@ async function submitAnswer(message, blockKeywords) {
     await sleep(400 + Math.floor(Math.random() * 900));
     removeThinkingGif();
 
-    if (currentBlock.type == "UserInput") { //validate user input
+    if (currentBlock.type == "User Input") { //validate user input
         if (!validateUserInput(message, currentBlock.validation)) {
             sendAssistantMessage("I am sorry but that was not in the format I think it should be...")
             await sleep(200);
@@ -218,7 +219,7 @@ async function submitAnswer(message, blockKeywords) {
     }
 
     if (currentBlock.storeInDB) {
-        if (currentBlock.type != "UserInput") {
+        if (currentBlock.type != "User Input") {
             collectedInformation.push({ "blockID": currentBlock.id, "input": message, "keywords": blockKeywords });
         } else {
             collectedInformation.push({ "blockID": currentBlock.id, "input": message, "keywords": [] });
@@ -245,7 +246,7 @@ async function submitAnswer(message, blockKeywords) {
                 getNextBlock(action, blockToGoId);
             }
         }
-    } else if (currentBlock.type == "UserInput" || currentBlock.type == "File Upload") {
+    } else if (currentBlock.type == "User Input" || currentBlock.type == "File Upload") {
         action = currentBlock.action;
 
         getNextBlock(action);
@@ -257,8 +258,7 @@ function getNextBlock(action, blockToGoId=undefined) {
     var targetBlock = undefined
 
     if (action == "Go To Next Block") {
-        var blockNumber = currentBlock.order + 1;
-        targetBlock = blocks[blockNumber];
+        targetBlock = blocks[currentBlock.order]; //order starts from 1 and array from 0 so it just needs the current .order
     }
     else if (action == "Go To Specific Block") {
         for (var i = 0; i < blocks.length; i++) {

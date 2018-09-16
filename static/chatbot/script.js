@@ -117,7 +117,7 @@ function openSolution(link) {
 function renderBlock(block) {
     $("#qAnswers").remove();
     currentBlock = block;
-    console.log(block)
+
     switch (block.type) {
         case "Question":
             renderQuestion(block);
@@ -324,8 +324,7 @@ function removeThinkingGif() {
 
 function validateUserInput(message, messageType) {
     var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    console.log("messageType: ", messageType)
-    console.log("!message.match(emailRegex): ", !message.match(emailRegex))
+
     if (messageType == "Email" && !message.match(emailRegex)) {
         return false;
     } else if (messageType == "FullName" && name.indexOf(' ') <= 0) {

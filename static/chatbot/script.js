@@ -117,11 +117,12 @@ function openSolution(link) {
 function renderBlock(block) {
     $("#qAnswers").remove();
     currentBlock = block;
+
     switch (block.type) {
         case "Question":
             renderQuestion(block);
             break;
-        case "UserInput":
+        case "User Input":
             renderUserInput(block);
             break;
         case "File Upload":
@@ -165,7 +166,7 @@ function renderUserInput(block) {
     document.getElementById("fileUploadDiv").style.display = "none";
     chatInputDiv.style = "display:block";
 
-    sendAssistantMessage(block.text)
+    sendAssistantMessage(block.content.text)
 }
 
 function renderFileUpload(block) {
@@ -173,7 +174,7 @@ function renderFileUpload(block) {
     document.getElementById("fileUploadDiv").style.display = "inline-block";
     chatInputDiv.style = "display:block";
 
-    sendAssistantMessage(block.text)
+    sendAssistantMessage(block.content.text)
 }
 
 function renderSolutions(block) {
@@ -181,13 +182,18 @@ function renderSolutions(block) {
     // However reaching to this block means you have to sendData() and get the solutions back
 }
 
-async function submitAnswer(message, blockKeywords) {
+async function submitAnswer(message, blockKeywords=undefined) {
     cancelScroll = false;
 
-    blockKeywords = blockKeywords.split(",")
     if (currentBlock.type == "File Upload") {
         //needs rework
         message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
+        if (!checkFileFormat(message)) {
+            sendUserMessage(message)
+            await sleep(350);
+            sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
+            return 0;
+        }
         //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
     }
 
@@ -197,6 +203,15 @@ async function submitAnswer(message, blockKeywords) {
             return 0;
         }
         $('#textMessage').val("");
+    }
+    
+    if (currentBlock.type == "User Input") { //validate user input
+        if (!validateUserInput(message, currentBlock.content.validation)) {
+            sendUserMessage(message)
+            await sleep(350);
+            sendAssistantMessage("I am sorry but that was not in the format I think it should be...")
+            return 0;
+        }
     }
 
     $("#qAnswers").remove();
@@ -209,17 +224,11 @@ async function submitAnswer(message, blockKeywords) {
     await sleep(400 + Math.floor(Math.random() * 900));
     removeThinkingGif();
 
-    if (currentBlock.type == "UserInput") { //validate user input
-        if (!validateUserInput(message, currentBlock.validation)) {
-            sendAssistantMessage("I am sorry but that was not in the format I think it should be...")
-            await sleep(200);
-            return 0;
-        }
-    }
-
     if (currentBlock.storeInDB) {
-        if (currentBlock.type != "UserInput") {
+        if (currentBlock.type == "Question" && blockKeywords !== undefined) {
+            blockKeywords = blockKeywords.split(",");
             collectedInformation.push({ "blockID": currentBlock.id, "input": message, "keywords": blockKeywords });
+            addKeywords(blockKeywords)
         } else {
             collectedInformation.push({ "blockID": currentBlock.id, "input": message, "keywords": [] });
         }
@@ -232,8 +241,6 @@ async function submitAnswer(message, blockKeywords) {
         removeThinkingGif();
     }
 
-    addKeywords(blockKeywords)
-
     var action = undefined;
     if (currentBlock.type == "Question") {
         var blockAnswers = currentBlock.content.answers;
@@ -245,8 +252,8 @@ async function submitAnswer(message, blockKeywords) {
                 getNextBlock(action, blockToGoId);
             }
         }
-    } else if (currentBlock.type == "UserInput" || currentBlock.type == "File Upload") {
-        action = currentBlock.action;
+    } else if (currentBlock.type == "User Input" || currentBlock.type == "File Upload") {
+        action = currentBlock.content.action;
 
         getNextBlock(action);
     }
@@ -257,8 +264,7 @@ function getNextBlock(action, blockToGoId=undefined) {
     var targetBlock = undefined
 
     if (action == "Go To Next Block") {
-        var blockNumber = currentBlock.order + 1;
-        targetBlock = blocks[blockNumber];
+        targetBlock = blocks[currentBlock.order]; //order starts from 1 and array from 0 so it just needs the current .order
     }
     else if (action == "Go To Specific Block") {
         for (var i = 0; i < blocks.length; i++) {
@@ -318,7 +324,7 @@ function removeThinkingGif() {
 
 function validateUserInput(message, messageType) {
     var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        
+
     if (messageType == "Email" && !message.match(emailRegex)) {
         return false;
     } else if (messageType == "FullName" && name.indexOf(' ') <= 0) {
@@ -375,6 +381,29 @@ function generateUserInputThanks() {
     return thanks
 }
 
+function checkFileFormat(message) {
+    var messageSplit = message.split(".");
+    var format = messageSplit[messageSplit.length - 1];
+    var allowedFormats = currentBlock.content.fileTypes;
+    var passes = false;
+    for (var i = 0; i < allowedFormats.length; i++) {
+        if (allowedFormats[i] === format) {
+            passes = true;
+        }
+    }
+    return passes;
+}
+
+function getAllowedFormatsString() {
+    var formats = "";
+    var allowedFormats = currentBlock.content.fileTypes;
+    for (var i = 0; i < allowedFormats.length; i++) {
+        formats += allowedFormats[i] + ", ";
+    }
+    formats = formats.slice(0, -2);
+    return formats;
+}
+
 function animateMessage(id) {
     var marginAnimate = "-=25px";
     if (id == "#thinkingGif") { marginAnimate = "-=25px"; }
@@ -411,6 +440,13 @@ function scrollTo(id) {
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function handleEnter(e) {
+    var keycode = (e.keyCode ? e.keyCode : e.which);
+    if (keycode == '13') {
+        submitAnswer('');
+    }
 }
 
 //compare arrays function

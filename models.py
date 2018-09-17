@@ -277,6 +277,7 @@ class Assistant(db.Model):
     Solutions = db.relationship('Solution', back_populates='Assistant')
     Statistics = db.relationship('Statistics', back_populates='Assistant')
     Blocks = db.relationship('Block', back_populates='Assistant')
+    UserInputs = db.relationship('UserInput', back_populates='Assistant')
 
     # Constraints:
     db.UniqueConstraint('CompanyID', 'Nickname', name='uix1_assistant')
@@ -404,7 +405,9 @@ class Block(db.Model):
 class UserInput(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Content = db.Column(JsonEncodedDict, nullable=False)
+    Data = db.Column(JsonEncodedDict, nullable=False)
+    FilePath = db.Column(db.String(), nullable=True, default=None)
+
 
     # SessionID = db.Column(db.Integer, nullable=False)
     # Input = db.Column(db.String(), nullable=False)
@@ -412,10 +415,9 @@ class UserInput(db.Model):
     # Keywords = db.Column(db.String(), nullable=False)
     # DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
-
     # Relationships:
-    # BlockID = db.Column(db.Integer, db.ForeignKey('block.ID', ondelete='SET NULL'), nullable=False)
-    # Block = db.relationship('Block', foreign_keys=[BlockID])
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='UserInputs')
 
     def __repr__(self):
         return '<UserInput {}>'.format(self.Input)

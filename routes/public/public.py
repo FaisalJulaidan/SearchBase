@@ -1,3 +1,5 @@
+import os
+from config import BaseConfig
 from datetime import timedelta
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from flask_api import status
@@ -7,6 +9,8 @@ from itsdangerous import URLSafeTimedSerializer
 from services import user_services, company_services, db_services, auth_services, mail_services,\
     assistant_services, bot_services, chatbot_services, solutions_services
 from models import secret_key
+from werkzeug.utils import secure_filename
+
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
 
@@ -41,13 +45,6 @@ def chatbot(assistantID):
         return helpers.jsonResponse(True, 200, "No Message", data)
 
     if request.method == "POST":
-        # solutions = db.session.query(Solution).filter(Solution.AssistantID == assistant.ID).all()
-        # ss = []
-        # for s in solutions:
-        #     ss.append(s.to_dict())
-        #
-        # return helpers.jsonResponse(True, 200, "Solution list is here!", {'sessionID': 1,'solutions':ss})
-
         data = request.get_json(silent=True)
         ch_callback: Callback = chatbot_services.processData(data)
 
@@ -63,6 +60,36 @@ def chatbot(assistantID):
             solutions.append(s.to_dict())
 
         return helpers.jsonResponse(True, 200, "Solution list is here!", {'sessionID': ch_callback.Data.ID, 'solutions':solutions})
+
+
+@public_router.route("/assistant/<int:sessionID>/file", methods=['POST'])
+def chatbot_upload_files(sessionID):
+    if request.method == "POST":
+        data = request.get_json(silent=True)
+        if request.method == 'POST':
+
+            # check if the post request has the file part
+            if 'file' not in request.files:
+                return helpers.jsonResponse(False, 404, "No file part")
+            file = request.files['file']
+
+            # if user does not select file, browser also
+            # submit an empty part without filename
+            if file.filename == '':
+                return helpers.jsonResponse(False, 404, "No selected file")
+
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(BaseConfig.UPLOAD_FOLDER, filename))
+
+            # if file and allowed_file(file.filename):
+            #     filename = secure_filename(file.filename)
+            #     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            #     return redirect(url_for('uploaded_file',
+            #                             filename=filename))
+
+            return helpers.jsonResponse(True, 200, "file uploaded successfully!!")
+
+
 
 @public_router.route("/", methods=['GET'])
 def indexpage():

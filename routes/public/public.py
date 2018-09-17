@@ -1,3 +1,5 @@
+import os
+from config import BaseConfig
 from datetime import timedelta
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from flask_api import status
@@ -65,11 +67,27 @@ def chatbot_upload_files(sessionID):
     if request.method == "POST":
         data = request.get_json(silent=True)
         if request.method == 'POST':
-            f = request.files['file']
-            f.save(secure_filename(f.filename))
-            return 'file uploaded successfully'
 
-        return helpers.jsonResponse(True, 200, "file uploaded successfully!!")
+            # check if the post request has the file part
+            if 'file' not in request.files:
+                return helpers.jsonResponse(False, 404, "No file part")
+            file = request.files['file']
+
+            # if user does not select file, browser also
+            # submit an empty part without filename
+            if file.filename == '':
+                return helpers.jsonResponse(False, 404, "No selected file")
+
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(BaseConfig.UPLOAD_FOLDER, filename))
+
+            # if file and allowed_file(file.filename):
+            #     filename = secure_filename(file.filename)
+            #     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            #     return redirect(url_for('uploaded_file',
+            #                             filename=filename))
+
+            return helpers.jsonResponse(True, 200, "file uploaded successfully!!")
 
 
 

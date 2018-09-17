@@ -46,8 +46,6 @@ def chatbot(assistantID):
 
     if request.method == "POST":
         data = request.get_json(silent=True)
-        # print(data)
-        print(data['collectedInformation'])
         ch_callback: Callback = chatbot_services.processData(assistant, data)
 
         if not ch_callback.Success:

@@ -404,7 +404,9 @@ class Block(db.Model):
 class UserInput(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Content = db.Column(JsonEncodedDict, nullable=False)
+    Data = db.Column(JsonEncodedDict, nullable=False)
+    FilePath = db.Column(db.String(), nullable=True, default=None)
+
 
     # SessionID = db.Column(db.Integer, nullable=False)
     # Input = db.Column(db.String(), nullable=False)
@@ -412,10 +414,9 @@ class UserInput(db.Model):
     # Keywords = db.Column(db.String(), nullable=False)
     # DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
-
     # Relationships:
-    # BlockID = db.Column(db.Integer, db.ForeignKey('block.ID', ondelete='SET NULL'), nullable=False)
-    # Block = db.relationship('Block', foreign_keys=[BlockID])
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='Blocks')
 
     def __repr__(self):
         return '<UserInput {}>'.format(self.Input)

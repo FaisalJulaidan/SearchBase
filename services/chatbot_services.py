@@ -6,7 +6,7 @@ from models import db, Callback, UserInput
 # Process chatbot data
 def processData(data: dict) -> Callback:
     try:
-        userInput = UserInput(Content=data)
+        # userInput = UserInput(Data=data)
         db.session.add(userInput)
     except Exception as exc:
         db.session.rollback()

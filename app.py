@@ -16,7 +16,7 @@ from cryptography.fernet import Fernet
 import urllib.request
 #from celery import Celery
 
-from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType
+from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution
 from services.mail_services import mail
 #, celery
 
@@ -192,9 +192,17 @@ def genDummyData():
     db.session.add(
         Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=20, ActiveBotsCap=10, InactiveBotsCap=30,
              AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
-
+    
     db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=5,  ActiveBotsCap=2, InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
+    db.session.add(Solution(SolutionID='plan_D48N4wxwAWEMOH', MajorTitle='Big Title 1', SecondaryTitle="Small Title 1", 
+                            ShortDiscription="A job at my little town",  Money="£56000", Keywords="horse, duck",
+                            URL="http://google.com", Assistant=reader_a))
+
+    db.session.add(Solution(SolutionID='plan_D48213AWEMOH', MajorTitle='Big Title 2', SecondaryTitle="Small Title 2", 
+                            ShortDiscription="A town at my little job",  Money="£56000", Keywords="dog, cat",
+                            URL="http://google.com", Assistant=reader_a))
 
 
     # Save all changes

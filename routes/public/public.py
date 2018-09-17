@@ -46,7 +46,7 @@ def chatbot(assistantID):
 
     if request.method == "POST":
         data = request.get_json(silent=True)
-        ch_callback: Callback = chatbot_services.processData(data)
+        ch_callback: Callback = chatbot_services.processData(assistant, data)
 
         if not ch_callback.Success:
             return helpers.jsonResponse(False, 404, ch_callback.Message)
@@ -80,6 +80,7 @@ def chatbot_upload_files(sessionID):
 
             filename = secure_filename(file.filename)
             file.save(os.path.join(BaseConfig.UPLOAD_FOLDER, filename))
+            print(file)
 
             # if file and allowed_file(file.filename):
             #     filename = secure_filename(file.filename)

@@ -5,7 +5,7 @@ from sqlalchemy import func
 from utilties import helpers
 
 
-def getBasedOnKeywords(assistant: Assistant, keywords: list, max=9999) -> Callback:
+def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Callback:
 
     # Get solutions
     solutions = db.session.query(Solution).filter(Solution.AssistantID == assistant.ID).all()
@@ -21,7 +21,6 @@ def getBasedOnKeywords(assistant: Assistant, keywords: list, max=9999) -> Callba
 
     # Sort dict based on value
     dic = dict(sorted(dic.items(), key=lambda x: x[1], reverse=True))
-    print(dic)
 
     # return the first 'max' solutions
     count = 1

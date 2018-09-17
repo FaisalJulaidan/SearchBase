@@ -277,6 +277,7 @@ class Assistant(db.Model):
     Solutions = db.relationship('Solution', back_populates='Assistant')
     Statistics = db.relationship('Statistics', back_populates='Assistant')
     Blocks = db.relationship('Block', back_populates='Assistant')
+    UserInputs = db.relationship('UserInput', back_populates='Assistant')
 
     # Constraints:
     db.UniqueConstraint('CompanyID', 'Nickname', name='uix1_assistant')
@@ -416,7 +417,7 @@ class UserInput(db.Model):
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='Blocks')
+    Assistant = db.relationship('Assistant', back_populates='UserInputs')
 
     def __repr__(self):
         return '<UserInput {}>'.format(self.Input)

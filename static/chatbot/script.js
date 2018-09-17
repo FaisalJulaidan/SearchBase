@@ -267,12 +267,15 @@ async function submitAnswer(message, blockKeywords=undefined) {
     removeThinkingGif();
 
     if (currentBlock.storeInDB) {
+        var information = {"blockID": currentBlock.id, "QuestionText": currentBlock.content.text, "input": message, "assistantID":assistantID}
         if (currentBlock.type == "Question" && blockKeywords !== undefined) {
             blockKeywords = blockKeywords.split(",");
-            collectedInformation.push({ "blockID": currentBlock.id, "QuestionText": currentBlock.content.text, "input": message, "keywords": blockKeywords });
+            information.push({ key: "keywords", value: blockKeywords })
+            collectedInformation.push(information);
             addKeywords(blockKeywords)
         } else {
-            collectedInformation.push({ "blockID": currentBlock.id, "QuestionText": currentBlock.content.text, "input": message, "keywords": [] });
+            information.push({ key: "keywords", value: [] })
+            collectedInformation.push(information);
         }
 
         sendAssistantMessage(generateUserInputThanks())

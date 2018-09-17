@@ -87,7 +87,7 @@ function sendData(){
     var solutions = [];
     params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": 5};
     console.log("Send data...");
-    console.log(params);
+
     $.ajax({
         contentType: 'application/json', //this is important
         url: '../assistant/' + assistantID +'/chatbot',
@@ -98,13 +98,10 @@ function sendData(){
 
         console.log("Solutions retrieved successfully!");
         var data = JSON.parse(res).data;
-        console.log(document.getElementById('fileUploadB').files);
         sessionID = data["sessionID"];
         solutions = data["solutions"];
         sendFile();
         displayReturnedSolutions(solutions);
-        console.log(solutions);
-        console.log(inputBlockID);
 
     }).fail(function (res) {
         console.log("Error in retrieving blocks.");
@@ -141,7 +138,6 @@ function sendFileForm() {
 
 function displayReturnedSolutions(solutions) {
     messageContainer = $("#messagesContainer");
-    console.log(solutions);
 
     for (var i = 0; i < solutions.length; i++) {
         messageContainer.append("<center><div class='chatProducts'><h5>" + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>" + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] + "</label><br><button onclick='BuyProduct(" + solutions[i]["URL"] + ")' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");

@@ -292,7 +292,7 @@ class Solution(db.Model):
     SolutionID = db.Column(db.String(128), nullable=False)
     MajorTitle = db.Column(db.String(128), nullable=False)
     SecondaryTitle = db.Column(db.String(128), nullable=False)
-    ShortDiscription = db.Column(db.String(128), nullable=False)
+    ShortDescription = db.Column(db.String(128), nullable=False)
     Money = db.Column(db.String(128), nullable=False)
     Keywords = db.Column(db.String(128), nullable=False)
     URL = db.Column(db.String(), nullable=False)

@@ -86,6 +86,7 @@ function sendData(){
     var solutions = [];
     params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": 5};
     console.log("Send data...");
+    console.log(params);
     $.ajax({
         contentType: 'application/json', //this is important
         url: '../assistant/' + assistantID +'/chatbot', // We still don't have this
@@ -265,6 +266,10 @@ function getNextBlock(action, blockToGoId=undefined) {
 
     if (action == "Go To Next Block") {
         targetBlock = blocks[currentBlock.order]; //order starts from 1 and array from 0 so it just needs the current .order
+        if (targetBlock === undefined) {
+            sendData()
+            return 0;
+        }
     }
     else if (action == "Go To Specific Block") {
         for (var i = 0; i < blocks.length; i++) {
@@ -274,7 +279,7 @@ function getNextBlock(action, blockToGoId=undefined) {
         }
     }
     else if (action == "Show Solutions") {
-        //send the request to server
+        sendData()
         return 0;
     }
 

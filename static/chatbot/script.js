@@ -163,7 +163,7 @@ function renderBlock(block) {
             renderQuestion(block);
             break;
         case "User Input":
-            renderUserInput(block);
+            renderUserInput(block); 
             break;
         case "File Upload":
             renderFileUpload(block);

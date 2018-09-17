@@ -289,7 +289,7 @@ class Assistant(db.Model):
 class Solution(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    SolutionID = db.Column(db.Integer, nullable=False)
+    SolutionID = db.Column(db.String(128), nullable=False)
     MajorTitle = db.Column(db.String(128), nullable=False)
     SecondaryTitle = db.Column(db.String(128), nullable=False)
     ShortDiscription = db.Column(db.String(128), nullable=False)

@@ -342,7 +342,7 @@ class Solution(db.Model):
     Assistant = db.relationship('Assistant', back_populates='Solutions')
 
     def __repr__(self):
-        return '<Solution {}>'.format(self.Name)
+        return '<Solution {}>'.format(self.MajorTitle)
 
 
 class Statistics(db.Model):

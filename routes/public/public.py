@@ -41,23 +41,28 @@ def chatbot(assistantID):
         return helpers.jsonResponse(True, 200, "No Message", data)
 
     if request.method == "POST":
-        solutions = db.session.query(Solution).filter(Solution.AssistantID == assistant.ID).all()
-        ss = []
-        for s in solutions:
-            ss.append(s.to_dict())
+        # solutions = db.session.query(Solution).filter(Solution.AssistantID == assistant.ID).all()
+        # ss = []
+        # for s in solutions:
+        #     ss.append(s.to_dict())
+        #
+        # return helpers.jsonResponse(True, 200, "Solution list is here!", {'sessionID': 1,'solutions':ss})
 
-        return helpers.jsonResponse(True, 200, "Solution list is here!", {'sessionID': 1,'solutions':ss})
-        # data = request.get_json(silent=True)
-        # callback: Callback = chatbot_services.processData(data)
-        #
-        # if not callback.Success:
-        #     return helpers.jsonResponse(False, 404, callback.Message)
-        #
-        # callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'])
-        # if not callback.Success:
-        #     return helpers.jsonResponse(False, 404, callback.Message)
-        #
-        # return helpers.jsonResponse(True, 200, "Solution list is here!", callback.Data)
+        data = request.get_json(silent=True)
+        ch_callback: Callback = chatbot_services.processData(data)
+
+        if not ch_callback.Success:
+            return helpers.jsonResponse(False, 404, ch_callback.Message)
+
+        s_callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'])
+        if not s_callback.Success:
+            return helpers.jsonResponse(False, 404, callback.Message)
+
+        solutions = []
+        for s in s_callback.Data:
+            solutions.append(s.to_dict())
+
+        return helpers.jsonResponse(True, 200, "Solution list is here!", {'sessionID': ch_callback.Data.ID, 'solutions':solutions})
 
 @public_router.route("/", methods=['GET'])
 def indexpage():

@@ -28,7 +28,7 @@ def getBasedOnKeywords(assistant: Assistant, keywords: list, max=9999) -> Callba
     result = []
     for key, value in dic.items():
         for s in solutions:
-            if s.ID == key:
+            if s.ID == key and value !=0:
                 result.append(s)
                 break
         if count == max:

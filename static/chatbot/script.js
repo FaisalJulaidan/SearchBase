@@ -35,7 +35,7 @@ function chatbotInit(assistantID) {
      $.ajax({
         url: '../assistant/' + assistantID +'/chatbot',
         type: "GET"
-    }).done(function (res) {
+    }).done(function (res) { 
 
         console.log("Blocks retrieved successfully!");
         var data = JSON.parse(res).data;

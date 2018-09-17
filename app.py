@@ -137,16 +137,16 @@ def genDummyData():
         "storeInDB": True,
         "validation": "Email"
       }))
-    # db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
-    #     "action": "Go To Next Block",
-    #     "fileTypes": [
-    #       "doc",
-    #       "pdf"
-    #     ],
-    #     "text": "Upload your CV",
-    #     "blockToGoID": None,
-    #     "storeInDB": True,
-    #   }))
+    db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
+        "action": "Go To Next Block",
+        "fileTypes": [
+        "doc",
+        "pdf"
+        ],
+        "text": "Upload your CV",
+        "blockToGoID": None,
+        "storeInDB": True,
+    }))
 
     # Create Roles
     db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))

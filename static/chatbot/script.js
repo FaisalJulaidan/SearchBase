@@ -89,7 +89,7 @@ function sendData(){
     console.log(params);
     $.ajax({
         contentType: 'application/json', //this is important
-        url: '../assistant/' + assistantID +'/chatbot', // We still don't have this
+        url: '../assistant/' + assistantID +'/chatbot',
         type: "POST",
         data: JSON.stringify(params)
 
@@ -99,6 +99,7 @@ function sendData(){
         var data = JSON.parse(res).data;
         sendFile(data["sessionID"]);
         solutions = data["solutions"];
+        console.log(document.getElementById('fileUploadB').file);
         displayReturnedSolutions(solutions);
         console.log(solutions);
         console.log(inputBlockID);
@@ -111,7 +112,7 @@ function sendData(){
 }
 
 function sendFile(sessionID) {
-    $("#fileUploadForm").onsubmit = function (event) {
+    $(document).on('submit', '#fileUploadForm', function () {
         event.preventDefault();
 
         var formData = new FormData();
@@ -124,21 +125,21 @@ function sendFile(sessionID) {
 
         xhr.onload = function () {
             if (xhr.status === 200) {
-                
+
             } else {
                 alert('An error occurred!');
             }
         };
 
         xhr.send(formData);
-    }
+    });
     $("#fileUploadForm").submit();
 }
 
 function displayReturnedSolutions(solutions) {
     messageContainer = $("#messagesContainer");
-    resultdic = {};
-    
+    console.log(solutions);
+
     delete resultdic[(temparray.length - 1).toString()];
     for (var i = 0; i < temparray.length - 1; i++) {
         resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");

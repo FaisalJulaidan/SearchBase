@@ -97,7 +97,9 @@ function sendData(){
 
         console.log("Solutions retrieved successfully!");
         var data = JSON.parse(res).data;
-        solutions = data.solutions;
+        solutions = data;
+        console.log(data)
+        console.log(solutions)
 
     }).fail(function (res) {
         console.log("Error in retrieving blocks.");

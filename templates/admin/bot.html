@@ -291,6 +291,7 @@
             blocks_templates = {};
             BlocksTypes = [];
             RemainingBlocks = 0;
+            BlocksOrder = [];
 
             function main() {
                 Promise.all([GET_data(), GET_options()]).then((res) => {
@@ -335,6 +336,18 @@
                 }
             }
 
+            function updateBlocksOrder() {
+                let panelList = $('#draggablePanelList');
+                BlocksOrder = [];
+                $('.blockPanel', panelList).each(function (index, elem) {
+                    let $listItem = $(elem), newIndex = $listItem.index();
+                    BlocksOrder.push({
+                        block: $listItem,
+                        order: newIndex + 1
+                    });
+                });
+            }
+
             function init_page() {
                 // to collapse and expand the panel
                 $(document).on('click', '.panel-heading', function (e) {
@@ -376,18 +389,15 @@
 
                 // to drag and drop the panels
                 let panelList = $('#draggablePanelList');
+
+                // init BlocksOrder
+                updateBlocksOrder();
+
                 panelList.sortable({
                     // Only make the .panel-heading child elements support dragging.
                     // Omit this to make then entire <li>...</li> draggable.
                     handle: '.panel-heading',
-                    update: function () {
-                        arr = [];
-                        $('.panel', panelList).each(function (index, elem) {
-                            var $listItem = $(elem), newIndex = $listItem.index();
-                            arr.push(buildQuestion($listItem, newIndex));
-                        });
-                        console.log(arr)
-                    }
+                    update: updateBlocksOrder
                 });
 
                 // to make the current type highlighted
@@ -435,16 +445,31 @@
                         title: "Are you sure?",
                         text: "Question will be removed completely from the system",
                         icon: "warning",
-                        buttons: true,
+                        button: {
+                            text: "Delete!",
+                            closeModal: false,
+                        },
                         dangerMode: true,
                     })
                         .then((willDelete) => {
                             if (willDelete) {
-                                $(e.target).parent().parent().parent().remove()
-                                swal("Success!", "Question has been deleted successfully", "success")
+                                let deletedBlockId = $(e.target).parent().parent().parent().attr('id');
+                                return $.ajax({
+                                    method: 'DELETE',
+                                    url: '/admin/assistant/bot/block/' + deletedBlockId
+                                });
                             }
-                        });
+                        })
+                        .then((res) => {
+                            res = JSON.parse(res);
+                            if (res.success) {
+                                $(e.target).parent().parent().parent().remove();
+                                swal("Success!", res.msg, "success");
+                                updateBlocksOrder();
+                            }
+                        })
                 });
+
                 // Input radio-group delete answer
                 $('i.trashAnswer').on('click', function (e) {
                     let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
@@ -646,15 +671,29 @@
                         title: "Are you sure?",
                         text: "Question will be removed completely from the system",
                         icon: "warning",
-                        buttons: true,
+                        button: {
+                            text: "Delete!",
+                            closeModal: false,
+                        },
                         dangerMode: true,
                     })
                         .then((willDelete) => {
                             if (willDelete) {
-                                $(e.target).parent().parent().parent().remove()
-                                swal("Success!", "Question has been deleted successfully", "success")
+                                let deletedBlockId = $(e.target).parent().parent().parent().attr('id');
+                                return $.ajax({
+                                    method: 'DELETE',
+                                    url: '/admin/assistant/bot/block/' + deletedBlockId
+                                });
                             }
-                        });
+                        })
+                        .then((res) => {
+                            res = JSON.parse(res);
+                            if (res.success) {
+                                $(e.target).parent().parent().parent().remove();
+                                swal("Success!", res.msg, "success");
+                                updateBlocksOrder();
+                            }
+                        })
                 });
                 // Input radio-group delete answer
                 $('i.trashAnswer').on('click', function (e) {
@@ -745,16 +784,31 @@
                         title: "Are you sure?",
                         text: "Question will be removed completely from the system",
                         icon: "warning",
-                        buttons: true,
+                        button: {
+                            text: "Delete!",
+                            closeModal: false,
+                        },
                         dangerMode: true,
                     })
                         .then((willDelete) => {
                             if (willDelete) {
-                                $(e.target).parent().parent().parent().remove()
-                                swal("Success!", "Question has been deleted successfully", "success")
+                                let deletedBlockId = $(e.target).parent().parent().parent().attr('id');
+                                return $.ajax({
+                                    method: 'DELETE',
+                                    url: '/admin/assistant/bot/block/' + deletedBlockId
+                                });
                             }
-                        });
+                        })
+                        .then((res) => {
+                            res = JSON.parse(res);
+                            if (res.success) {
+                                $(e.target).parent().parent().parent().remove();
+                                swal("Success!", res.msg, "success");
+                                updateBlocksOrder();
+                            }
+                        })
                 });
+
                 // Input radio-group delete answer
                 $('i.trashAnswer').on('click', function (e) {
                     let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
@@ -1194,6 +1248,7 @@
                     }
 
                     function getBlockContent(template, block) {
+                        template = template.replace('BLOCK_ID', block.id);
                         template = template.replace('BLOCK_TYPE', block.type);
                         template = template.replace('BLOCK_TEXT', block.content.text);
                         template = template.replace('BLOCK_TEXT_EDITABLE', block.content.text);
@@ -1205,7 +1260,7 @@
 
                     function getTemplate(block_template, block) {
                         templateHTML =
-                            "<li class=\"panel panel-default\">\n" +
+                            "<li class=\"panel blockPanel panel-default\" id='BLOCK_ID'>\n" +
                             "    <div class=\"panel-heading panel-collapsed\">\n" +
                             "        <div class=\"panel-title\">\n" +
                             "            <span class=\"moveable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-menu-hamburger\"></i></span>\n" +
@@ -1389,7 +1444,7 @@
                     function getTemplate(block_template) {
                         templateHTML =
                             // Block text
-                            "<div class=\"panel-body\">\n" +
+                            "<div class=\"panel-body\" >\n" +
                             "    <div class=\"input-group col-md-6\">\n" +
                             "         <span class=\"input-group-addon\">Question:</span>\n" +
                             "         <input type=\"text\" class=\"form-control\"\n" +

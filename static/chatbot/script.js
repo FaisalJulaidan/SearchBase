@@ -188,12 +188,12 @@ async function submitAnswer(message, blockKeywords=undefined) {
     if (currentBlock.type == "File Upload") {
         //needs rework
         message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
-        if (!checkFileFormat(message)) {
-            sendUserMessage(message)
-            await sleep(350);
-            sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
-            return 0;
-        }
+        // if (!checkFileFormat(message)) {
+        //     sendUserMessage(message)
+        //     await sleep(350);
+        //     sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
+        //     return 0;
+        // }
         //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
     }
 

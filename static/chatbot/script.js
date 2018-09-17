@@ -276,7 +276,7 @@ async function submitAnswer(message, blockKeywords=undefined) {
         } else {
             information.push({ key: "keywords", value: [] })
             collectedInformation.push(information);
-        }
+        } 
 
         sendAssistantMessage(generateUserInputThanks())
         await sleep(300);

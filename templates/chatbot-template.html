@@ -110,13 +110,13 @@
                         <div id="ChatInputDiv">
                             <!--<input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><input type="file" id="fileUploadB" size="10" /><img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />-->
                             <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage">
-                            <div id="fileUploadDiv" class="image-upload" style="display:none">
+                            <form id="fileUploadForm" class="image-upload" style="display:none" action="../assistant/0/file" method="post" >
                                 <label for="fileUploadB">
                                     <img src="https://www.thesearchbase.com/static/images/cloud-upload.png" />
                                 </label>
 
-                                <input hidden id="fileUploadB" type="file" />
-                            </div>
+                                <input name="file" hidden id="fileUploadB" type="file" />
+                            </form>
                             <img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitAnswer('')" />
                         </div>
                         <!-- </ul> -->

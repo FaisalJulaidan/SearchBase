@@ -97,7 +97,11 @@ function sendData(){
 
         console.log("Solutions retrieved successfully!");
         var data = JSON.parse(res).data;
-        solutions = data.solutions;
+        sendFile(data["sessionID"]);
+        solutions = data["solutions"];
+        displayReturnedSolutions(solutions);
+        console.log(solutions);
+        console.log(inputBlockID);
 
     }).fail(function (res) {
         console.log("Error in retrieving blocks.");
@@ -106,6 +110,42 @@ function sendData(){
     return solutions
 }
 
+function sendFile(sessionID) {
+    $("#fileUploadForm").onsubmit = function (event) {
+        event.preventDefault();
+
+        var formData = new FormData();
+        var fileInput = document.getElementById('fileUploadB');
+
+        formData.append('file', fileInput.file, fileInput.file.name);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', "../assistant/" + sessionID + "/file", true);
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                
+            } else {
+                alert('An error occurred!');
+            }
+        };
+
+        xhr.send(formData);
+    }
+    $("#fileUploadForm").submit();
+}
+
+function displayReturnedSolutions(solutions) {
+    messageContainer = $("#messagesContainer");
+    resultdic = {};
+    
+    delete resultdic[(temparray.length - 1).toString()];
+    for (var i = 0; i < temparray.length - 1; i++) {
+        resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
+        // messageContainer.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><label>"+resultdic[i][1]+"</label><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
+        messageContainer.append("<center><div class='chatProducts'><label>" + resultdic[i][1] + "</label><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + "</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
+    }
+}
 
 function openSolution(link) {
     window.open(link);
@@ -141,7 +181,7 @@ function renderBlock(block) {
 function renderQuestion(block) {
     var answerAppendString = "<div id='qAnswers'>";
     document.getElementById("textMessage").style.display = "inline-block";
-    document.getElementById("fileUploadDiv").style.display = "none";
+    document.getElementById("fileUploadForm").style.display = "none";
 
     var blockAnswers = block.content.answers;
     for (var i = 0; i < blockAnswers.length; i++) {
@@ -164,7 +204,7 @@ function renderQuestion(block) {
 function renderUserInput(block) {
     // make sure to validate user's input depends on block.content.validation
     document.getElementById("textMessage").style.display = "inline-block";
-    document.getElementById("fileUploadDiv").style.display = "none";
+    document.getElementById("fileUploadForm").style.display = "none";
     chatInputDiv.style = "display:block";
 
     sendAssistantMessage(block.content.text)
@@ -172,7 +212,7 @@ function renderUserInput(block) {
 
 function renderFileUpload(block) {
     document.getElementById("textMessage").style.display = "none";
-    document.getElementById("fileUploadDiv").style.display = "inline-block";
+    document.getElementById("fileUploadForm").style.display = "inline-block";
     chatInputDiv.style = "display:block";
 
     sendAssistantMessage(block.content.text)

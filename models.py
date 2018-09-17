@@ -365,15 +365,18 @@ class Block(db.Model):
 class UserInput(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    SessionID = db.Column(db.Integer, nullable=False)
-    Input = db.Column(db.String(), nullable=False)
-    QuestionText = db.Column(db.String(), nullable=False)
-    Keywords = db.Column(db.String(), nullable=False)
-    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+    Content = db.Column(JsonEncodedDict, nullable=False)
+
+    # SessionID = db.Column(db.Integer, nullable=False)
+    # Input = db.Column(db.String(), nullable=False)
+    # QuestionText = db.Column(db.String(), nullable=False)
+    # Keywords = db.Column(db.String(), nullable=False)
+    # DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+
 
     # Relationships:
-    BlockID = db.Column(db.Integer, db.ForeignKey('block.ID', ondelete='SET NULL'), nullable=False)
-    Block = db.relationship('Block', foreign_keys=[BlockID])
+    # BlockID = db.Column(db.Integer, db.ForeignKey('block.ID', ondelete='SET NULL'), nullable=False)
+    # Block = db.relationship('Block', foreign_keys=[BlockID])
 
     def __repr__(self):
         return '<UserInput {}>'.format(self.Input)

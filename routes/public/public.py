@@ -5,7 +5,7 @@ from utilties import helpers
 from models import Callback, Assistant
 from itsdangerous import URLSafeTimedSerializer
 from services import user_services, company_services, db_services, auth_services, mail_services,\
-    assistant_services, bot_services
+    assistant_services, bot_services, chatbot_services, solutions_services
 from models import secret_key
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
@@ -41,8 +41,18 @@ def chatbot(assistantID):
         return helpers.jsonResponse(True, 200, "No Message", data)
 
     if request.method == "POST":
-        print(request.get_json(silent=True))
-        return helpers.jsonResponse(True, 200, "!!!", None)
+
+        data = request.get_json(silent=True)
+        callback: Callback = chatbot_services.processData(data)
+
+        if not callback.Success:
+            return helpers.jsonResponse(False, 404, callback.Message)
+
+        callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 404, callback.Message)
+
+        return helpers.jsonResponse(True, 200, "Solution list is here!", callback.Data)
 
 @public_router.route("/", methods=['GET'])
 def indexpage():

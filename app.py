@@ -197,11 +197,11 @@ def genDummyData():
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
     db.session.add(Solution(SolutionID='plan_D48N4wxwAWEMOH', MajorTitle='Big Title 1', SecondaryTitle="Small Title 1", 
-                            ShortDiscription="A job at my little town",  Money="£56000", Keywords="horse, duck",
+                            ShortDescription="A job at my little town",  Money="£56000", Keywords="horse, duck",
                             URL="http://google.com", Assistant=reader_a))
 
     db.session.add(Solution(SolutionID='plan_D48213AWEMOH', MajorTitle='Big Title 2', SecondaryTitle="Small Title 2", 
-                            ShortDiscription="A town at my little job",  Money="£56000", Keywords="dog, cat",
+                            ShortDescription="A town at my little job",  Money="£56000", Keywords="dog, cat",
                             URL="http://google.com", Assistant=reader_a))
 
 

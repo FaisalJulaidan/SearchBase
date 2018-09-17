@@ -61,10 +61,11 @@ def addBlock(data: dict, assistant: Assistant) -> Callback:
         # Validate submitted block data
         json_utils.validateSchema(data, 'blocks/newBlock.json')
         block = data.get('block')
-        newBlock = Block(Type=BlockType(block['type']), Order=maxOrder + 1, Content=block['content'],
+        newBlock = Block(Type=BlockType(block['type']), Order=maxOrder + 1, Content=None,
                          StoreInDB=block['storeInDB'], Assistant=assistant)
         db.session.add(newBlock)
     except Exception as exc:
+        db.session.rollback()
         print(exc.args[0])
         return Callback(False, 'Error occurred while creating a new Block object', exc.args[0])
 

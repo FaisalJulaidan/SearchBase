@@ -219,7 +219,7 @@ function renderFileUpload(block) {
 }
 
 function renderSolutions(block) {
-    //Abdullah still did not finish a block of type solutions
+    // Abdullah still did not finish a block of type solutions
     // However reaching to this block means you have to sendData() and get the solutions back
     sendData();
 }
@@ -267,14 +267,14 @@ async function submitAnswer(message, blockKeywords=undefined) {
     removeThinkingGif();
 
     if (currentBlock.storeInDB) {
-        var information = {"blockID": currentBlock.id, "QuestionText": currentBlock.content.text, "input": message, "assistantID":assistantID}
+        var information = {"blockID": currentBlock.id, "QuestionText": currentBlock.content.text, "input": message}
         if (currentBlock.type == "Question" && blockKeywords !== undefined) {
             blockKeywords = blockKeywords.split(",");
-            information.push({ key: "keywords", value: blockKeywords })
+            information["keywords"] = blockKeywords
             collectedInformation.push(information);
             addKeywords(blockKeywords)
         } else {
-            information.push({ key: "keywords", value: [] })
+            information["keywords"] = []
             collectedInformation.push(information);
         } 
 

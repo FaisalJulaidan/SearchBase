@@ -10,6 +10,7 @@ var newPos = 0;
 var collectedInformation = [];
 var fileUpload = false;
 var params = undefined;
+var sessionID = 0;
 
 //scrolling setter
 $(window).scroll(function () {
@@ -97,9 +98,10 @@ function sendData(){
 
         console.log("Solutions retrieved successfully!");
         var data = JSON.parse(res).data;
-        sendFile(data["sessionID"]);
+        console.log(document.getElementById('fileUploadB').files);
+        sessionID = data["sessionID"];
         solutions = data["solutions"];
-        console.log(document.getElementById('fileUploadB').file);
+        sendFile();
         displayReturnedSolutions(solutions);
         console.log(solutions);
         console.log(inputBlockID);
@@ -111,29 +113,30 @@ function sendData(){
     return solutions
 }
 
-function sendFile(sessionID) {
-    $(document).on('submit', '#fileUploadForm', function () {
-        event.preventDefault();
-
-        var formData = new FormData();
-        var fileInput = document.getElementById('fileUploadB');
-
-        formData.append('file', fileInput.file, fileInput.file.name);
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', "../assistant/" + sessionID + "/file", true);
-
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-
-            } else {
-                alert('An error occurred!');
-            }
-        };
-
-        xhr.send(formData);
-    });
+function sendFile() {
     $("#fileUploadForm").submit();
+}
+
+function sendFileForm() {
+    var formData = new FormData();
+    var fileInput = document.getElementById('fileUploadB').files[0];
+
+    formData.append('file', fileInput, fileInput.name);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', "../assistant/" + sessionID + "/file", true);
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            console.log("File Sent");
+        } else {
+            alert('An error occurred!');
+        }
+    };
+
+    xhr.send(formData);
+
+    return false;
 }
 
 function displayReturnedSolutions(solutions) {

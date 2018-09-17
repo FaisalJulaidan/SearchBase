@@ -110,7 +110,7 @@
                         <div id="ChatInputDiv">
                             <!--<input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><input type="file" id="fileUploadB" size="10" /><img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />-->
                             <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage">
-                            <form id="fileUploadForm" class="image-upload" style="display:none" action="../assistant/0/file" method="post" >
+                            <form id="fileUploadForm" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
                                 <label for="fileUploadB">
                                     <img src="https://www.thesearchbase.com/static/images/cloud-upload.png" />
                                 </label>

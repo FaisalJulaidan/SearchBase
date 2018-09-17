@@ -193,7 +193,7 @@ function renderQuestion(block) {
     answerAppendString += "</div>"
     $("#optionsDiv").append(answerAppendString);
     chatInputDiv.style = "display:none";
-    
+
     sendAssistantMessage(block.content.text)
 
     checkOutsideElements();
@@ -231,12 +231,12 @@ async function submitAnswer(message, blockKeywords=undefined) {
     if (currentBlock.type == "File Upload") {
         //needs rework
         message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
-        // if (!checkFileFormat(message)) {
-        //     sendUserMessage(message)
-        //     await sleep(350);
-        //     sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
-        //     return 0;
-        // }
+        if (!checkFileFormat(message)) {
+            sendUserMessage(message)
+            await sleep(350);
+            sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
+            return 0;
+        }
         //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
     }
 
@@ -247,7 +247,7 @@ async function submitAnswer(message, blockKeywords=undefined) {
         }
         $('#textMessage').val("");
     }
-    
+
     if (currentBlock.type == "User Input") { //validate user input
         if (!validateUserInput(message, currentBlock.content.validation)) {
             sendUserMessage(message)
@@ -259,10 +259,10 @@ async function submitAnswer(message, blockKeywords=undefined) {
 
     $("#qAnswers").remove();
     chatInputDiv.style = "display:none";
-    
+
     sendUserMessage(message) //print user's message in the chatbox to appear like he is typing back
     await sleep(500);
-    
+
     putThinkingGif();
     await sleep(400 + Math.floor(Math.random() * 900));
     removeThinkingGif();
@@ -277,7 +277,7 @@ async function submitAnswer(message, blockKeywords=undefined) {
         } else {
             information["keywords"] = []
             collectedInformation.push(information);
-        } 
+        }
 
         sendAssistantMessage(generateUserInputThanks())
         await sleep(300);
@@ -505,7 +505,7 @@ Array.prototype.equals = function (array) {
     if (!array)
         return false;
 
-    // compare lengths - can save a lot of time 
+    // compare lengths - can save a lot of time
     if (this.length != array.length)
         return false;
 

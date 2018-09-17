@@ -12,6 +12,20 @@
 {% endblock %}
 {% block content %}
     <style>
+        .remainingBlocks {
+            border: 1px solid grey;
+            padding: 5px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+
+        .remainingBlocks > span {
+            background-color: #4B5B71;
+            padding: 5px;
+            border-radius: 5px;
+            color: white;
+        }
+
         .my-btn-default {
             background-color: #fff;
             border-color: #ccc;
@@ -90,6 +104,14 @@
             color: white;
         }
 
+        .addBlock {
+            font-size: 10pt;
+            padding: 5px;
+            background-color: #c4c4c4;
+            border-radius: 100%;
+            color: white;
+        }
+
         .tagify {
             -webkit-border-radius: 5px;
             -moz-border-radius: 5px;
@@ -103,6 +125,22 @@
             border-radius: 5px !important;
             margin-bottom: 10px;
         }
+
+        .selectBlockType {
+            display: inline-flex;
+        }
+
+        .type {
+            padding: 50px;
+            margin: 10px;
+            border: 1px solid #4906b573;
+            border-radius: 10px;
+            transition: box-shadow .3s;
+        }
+
+        .type:hover {
+            box-shadow: 0 0 11px rgba(33, 33, 33, .4);
+        }
     </style>
     <div class="right_col" role="main">
         <div class="page-title">
@@ -114,10 +152,17 @@
         <div class="clearfix"></div>
 
         <div class="x_panel">
-            <div class="x_title">
-                <h4>🤖 Bot Configuration</h4>
-                <small>Showing all questions and answers with its sort</small>
+            <div class="x_title" style="display: flow-root;">
+                <div class="pull-left">
+                    <h4>🤖 Bot Configuration</h4>
+                    <small>Showing all questions and answers with its sort</small>
+                </div>
+                <div class="pull-right remainingBlocks">
+                    <i class="addBlock clickable glyphicon glyphicon-plus"></i>
+                    Remaining Blocks <span>1</span>
+                </div>
             </div>
+
             <div class="x_conent">
                 <ul id="draggablePanelList" class="list-unstyled">
                     <li class="panel panel-default">
@@ -245,6 +290,7 @@
 
             blocks_templates = {};
             BlocksTypes = [];
+            RemainingBlocks = 0;
 
             function main() {
                 Promise.all([GET_data(), GET_options()]).then((res) => {
@@ -252,9 +298,20 @@
                     options = JSON.parse(res[1]).data;
                     init_blocks_templates(options.blockTypes);
                     BlocksTypes = options.types;
-                    render_page(data.assistant.name, options.botVersion);
+                    render_page(data.assistant.name, options.botVersion, data.remainingBlocks);
+                    RemainingBlocks = Number($('.remainingBlocks span').html());
                     render_blocks(data.blocks);
                     init_page();
+                });
+            }
+
+            function addNewBlock() {
+                Promise.all([GET_data(), GET_options()]).then((res) => {
+                    data = JSON.parse(res[0]).data;
+                    options = JSON.parse(res[1]).data;
+                    RemainingBlocks = Number($('.remainingBlocks span').html());
+                    render_blocks(data.blocks);
+                    init_added_block();
                 });
             }
 
@@ -425,7 +482,7 @@
                 });
 
                 // change type of block
-                $('.dropdown-menu.dropdown-menu-right > li').on('click', (e) => {
+                $('.panel-heading li').on('click', (e) => {
                     $target = $(e.target);
                     let isTargetType = $target.parent().parent().parent().children().first().text().includes('Type');
                     let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val()
@@ -459,6 +516,86 @@
                     $target = $(e.target);
                     // collect all data then pass it
 
+                });
+
+                $('.addBlock').on('click', (e) => {
+                    if (RemainingBlocks) {
+                        $container = $("<div></div>");
+                        for (const blockType of BlocksTypes)
+                            $container.append("<div class=\"type clickable\" onclick=\"swal.setActionValue({cancel:$(this).text()}); swal.close(); \">" + blockType + "</div>")
+                        swal({
+                            title: 'Select block type:',
+                            content: $container[0],
+                            button: {
+                                text: "Cancel",
+                                value: false,
+                                visible: true,
+                                closeModal: true,
+                            }
+                        }).then((blockType) => {
+                            if (blockType) {
+                                $.ajax({
+                                    method: 'POST',
+                                    url: 'bot/data',
+                                    contentType: "application/json",
+                                    data: (function () {
+                                        switch (blockType) {
+                                            case 'Question':
+                                                return JSON.stringify({
+                                                    block: {
+                                                        content: {
+                                                            text: "",
+                                                            answers: []
+                                                        },
+                                                        storeInDB: true,
+                                                        type: blockType,
+                                                    },
+                                                    botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                                                });
+                                            case 'User Input':
+                                                return JSON.stringify({
+                                                    block: {
+                                                        content: {
+                                                            action: "",
+                                                            text: "",
+                                                            validation: ""
+                                                        },
+                                                        storeInDB: true,
+                                                        type: blockType,
+                                                    },
+                                                    botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                                                });
+                                            case 'File Upload':
+                                                return JSON.stringify({
+                                                    block: {
+                                                        content: {
+                                                            action: "",
+                                                            text: "",
+                                                            fileTypes: []
+                                                        },
+                                                        storeInDB: true,
+                                                        type: blockType,
+                                                    },
+                                                    botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                                                });
+                                        }
+                                    })(),
+                                    success: function (res) {
+                                        res = JSON.parse(res);
+                                        $('.remainingBlocks span').html(res.remainingBlocks);
+                                        addNewBlock();
+                                        swal({
+                                            title: blockType + " added!",
+                                            text: res.msg,
+                                            icon: "success",
+                                            timer: 2000,
+                                            buttons: false
+                                        });
+                                    }
+                                });
+                            }
+                        })
+                    }
                 });
             }
 
@@ -558,7 +695,136 @@
                 $('.save').on('click', (e) => {
                     $target = $(e.target);
                     // collect all data then pass it
+                });
+            }
 
+            function init_added_block() {
+
+                // to make the current type highlighted
+                $("button.btn.btn-default.dropdown-toggle").on("click", function (e) {
+                    $input = $(e.target).parent().parent().children().first().val();
+
+                    $(e.target).siblings().first().children().each(function (i, element) {
+                        let item = $(element).text();
+                        if ($input === item) {
+                            return $(element).children().first().addClass('hover')
+                        }
+                        $(element).children().first().removeClass()
+
+                    });
+                });
+
+                // to change the textbox next to type dropdown
+                $("ul.dropdown-menu.dropdown-menu-right").on("click", function (e) {
+                    $input = $(e.target).parent().parent().parent().parent().children().first();
+                    $input.val($(e.target).text());
+                });
+
+                // Input radio-group visual controls
+                $('.radio-group label').on('click', function (evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+
+                    if ($(this).hasClass('not-active'))
+                        $(this).removeClass('not-active');
+                    else
+                        $(this).addClass('not-active');
+
+                });
+
+                // Add answer
+                $('.addAnswerClick').on('click', function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    addAnswer($(e.target).parent().parent().children('.answers'));
+                });
+
+                // Input radio-group visual controls
+                $('i.trash').on('click', function (e) {
+                    swal({
+                        title: "Are you sure?",
+                        text: "Question will be removed completely from the system",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    })
+                        .then((willDelete) => {
+                            if (willDelete) {
+                                $(e.target).parent().parent().parent().remove()
+                                swal("Success!", "Question has been deleted successfully", "success")
+                            }
+                        });
+                });
+                // Input radio-group delete answer
+                $('i.trashAnswer').on('click', function (e) {
+                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
+                    if (hasAnswer) {
+                        swal({
+                            title: "Are you sure?",
+                            text: "Answer will be removed completely from the system",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        })
+                            .then((willDelete) => {
+                                temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                                if (willDelete) {
+                                    $(e.target).parent().parent().parent().parent().remove();
+                                    swal("Success!", "Answer has been deleted successfully", "success")
+                                }
+                                // run answers restructure function
+                                answersRestructure(temp)
+                            });
+                    } else {
+                        temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                        $(e.target).parent().parent().parent().parent().remove();
+                        // run answers restructure function
+                        answersRestructure(temp)
+                    }
+                });
+
+                // init tags
+                $('input[name=tags]').each((i, input) => {
+                    if (!$(input).hasClass('tagified')) {
+                        new Tagify(input);
+                        $(input).addClass('tagified')
+                    }
+                });
+
+                // change type of block
+                $('.dropdown-menu.dropdown-menu-right > li').on('click', (e) => {
+                    $target = $(e.target);
+                    let isTargetType = $target.parent().parent().parent().children().first().text().includes('Type');
+                    let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val()
+
+                    if (isTargetType && hasData) {
+                        swal({
+                            title: "Are you sure?",
+                            text: "Old block will be removed completely from the system",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        })
+                            .then((willUpdate) => {
+                                if (willUpdate) {
+                                    let newTemplateName = $target.text();
+
+                                    $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
+                                    $blockBody.html(render_blocks_change(newTemplateName));
+                                    init_changed_block();
+                                }
+                            });
+                    } else {
+                        let newTemplateName = $target.text();
+                        $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
+                        $blockBody.html(render_blocks_change(newTemplateName));
+                        init_changed_block();
+                    }
+                });
+
+                $('.save').on('click', (e) => {
+                    $target = $(e.target);
+                    // collect all data then pass it
                 });
             }
 
@@ -1175,11 +1441,13 @@
                 return cookUpBlock(blocks_templates[block_template]);
             }
 
-            function render_page(assistantName, botVersion) {
+            function render_page(assistantName, botVersion, remainingBlocks) {
                 $("#assistantName").html(
                     "Assistant: " + assistantName +
                     "<span class=\"pull-right h5\">Bot version: " + botVersion + "</span>"
                 )
+
+                $('.remainingBlocks span').html(remainingBlocks);
             }
         }
     </script>

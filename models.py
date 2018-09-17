@@ -290,12 +290,11 @@ class Solution(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     SolutionID = db.Column(db.Integer, nullable=False)
-    Name = db.Column(db.String(128), nullable=False)
-    Brand = db.Column(db.String(128), nullable=False)
-    Model = db.Column(db.String(128), nullable=False)
-    Price = db.Column(db.String(128), nullable=False)
+    MajorTitle = db.Column(db.String(128), nullable=False)
+    SecondaryTitle = db.Column(db.String(128), nullable=False)
+    ShortDiscription = db.Column(db.String(128), nullable=False)
+    Money = db.Column(db.String(128), nullable=False)
     Keywords = db.Column(db.String(128), nullable=False)
-    Discount = db.Column(db.String(128), nullable=False)
     URL = db.Column(db.String(), nullable=False)
 
     # Relationships:

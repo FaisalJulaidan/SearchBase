@@ -192,9 +192,15 @@ def genDummyData():
     db.session.add(
         Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=20, ActiveBotsCap=10, InactiveBotsCap=30,
              AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
-
+    
     db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=5,  ActiveBotsCap=2, InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
+    db.session.add(Solution(SolutionID='plan_D48N4wxwAWEMOH', Name='name', MaxSolutions=100, MaxBlocks=5,  ActiveBotsCap=2, InactiveBotsCap=2,
+                        AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
+    #db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=5,  ActiveBotsCap=2, InactiveBotsCap=2,
+    #                    AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
 
     # Save all changes

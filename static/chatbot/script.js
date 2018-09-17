@@ -181,6 +181,7 @@ function renderFileUpload(block) {
 function renderSolutions(block) {
     //Abdullah still did not finish a block of type solutions
     // However reaching to this block means you have to sendData() and get the solutions back
+    sendData();
 }
 
 async function submitAnswer(message, blockKeywords=undefined) {
@@ -277,10 +278,6 @@ function getNextBlock(action, blockToGoId=undefined) {
                 targetBlock = blocks[i];
             }
         }
-    }
-    else if (action == "Show Solutions") {
-        sendData()
-        return 0;
     }
 
     if (currentBlock != undefined) { //check if its not trying to reload the same block

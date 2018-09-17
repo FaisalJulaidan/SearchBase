@@ -16,7 +16,7 @@ def getBasedOnKeywords(assistant: Assistant, keywords: list, max=9999) -> Callba
     # of keywords of each solution in the given keywords list
     dic = {}
     for s in solutions:
-        c = sum(k in keywords for k in s.Keywords.split[','])
+        c = sum(k in keywords for k in s.Keywords.split(','))
         dic[s.ID] = c
 
     # Sort dict based on value
@@ -28,7 +28,7 @@ def getBasedOnKeywords(assistant: Assistant, keywords: list, max=9999) -> Callba
     result = []
     for key, value in dic.items():
         for s in solutions:
-            if s['ID'] == key:
+            if s.ID == key:
                 result.append(s)
                 break
         if count == max:

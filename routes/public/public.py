@@ -2,7 +2,7 @@ from datetime import timedelta
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from flask_api import status
 from utilties import helpers
-from models import Callback, Assistant
+from models import Callback, Assistant, Solution, db
 from itsdangerous import URLSafeTimedSerializer
 from services import user_services, company_services, db_services, auth_services, mail_services,\
     assistant_services, bot_services, chatbot_services, solutions_services
@@ -41,18 +41,23 @@ def chatbot(assistantID):
         return helpers.jsonResponse(True, 200, "No Message", data)
 
     if request.method == "POST":
+        solutions = db.session.query(Solution).filter(Solution.AssistantID == assistant.ID).all()
+        ss = []
+        for s in solutions:
+            ss.append(s.to_dict())
 
-        data = request.get_json(silent=True)
-        callback: Callback = chatbot_services.processData(data)
-
-        if not callback.Success:
-            return helpers.jsonResponse(False, 404, callback.Message)
-
-        callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'])
-        if not callback.Success:
-            return helpers.jsonResponse(False, 404, callback.Message)
-
-        return helpers.jsonResponse(True, 200, "Solution list is here!", callback.Data)
+        return helpers.jsonResponse(True, 200, "Solution list is here!", ss)
+        # data = request.get_json(silent=True)
+        # callback: Callback = chatbot_services.processData(data)
+        #
+        # if not callback.Success:
+        #     return helpers.jsonResponse(False, 404, callback.Message)
+        #
+        # callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'])
+        # if not callback.Success:
+        #     return helpers.jsonResponse(False, 404, callback.Message)
+        #
+        # return helpers.jsonResponse(True, 200, "Solution list is here!", callback.Data)
 
 @public_router.route("/", methods=['GET'])
 def indexpage():

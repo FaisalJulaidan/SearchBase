@@ -288,14 +288,54 @@ class Assistant(db.Model):
 
 class Solution(db.Model):
 
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    SolutionID = db.Column(db.String(128), nullable=False)
-    MajorTitle = db.Column(db.String(128), nullable=False)
-    SecondaryTitle = db.Column(db.String(128), nullable=False)
-    ShortDescription = db.Column(db.String(128), nullable=False)
-    Money = db.Column(db.String(128), nullable=False)
-    Keywords = db.Column(db.String(128), nullable=False)
-    URL = db.Column(db.String(), nullable=False)
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
+                   supports_json=True,
+                   supports_dict=True,
+                   on_serialize=None,
+                   on_deserialize=None
+                   )
+    SolutionID = db.Column(db.String(128), nullable=False,
+                           supports_json=True,
+                           supports_dict=True,
+                           on_serialize=None,
+                           on_deserialize=None
+                           )
+    MajorTitle = db.Column(db.String(128), nullable=False,
+                           supports_json=True,
+                           supports_dict=True,
+                           on_serialize=None,
+                           on_deserialize=None
+                           )
+    SecondaryTitle = db.Column(db.String(128), nullable=False,
+                               supports_json=True,
+                               supports_dict=True,
+                               on_serialize=None,
+                               on_deserialize=None
+                               )
+    ShortDescription = db.Column(db.String(128), nullable=False,
+                                 supports_json=True,
+                                 supports_dict=True,
+                                 on_serialize=None,
+                                 on_deserialize=None
+                                 )
+    Money = db.Column(db.String(128), nullable=False,
+                      supports_json=True,
+                      supports_dict=True,
+                      on_serialize=None,
+                      on_deserialize=None
+                      )
+    Keywords = db.Column(db.String(128), nullable=False,
+                         supports_json=True,
+                         supports_dict=True,
+                         on_serialize=None,
+                         on_deserialize=None
+                         )
+    URL = db.Column(db.String(), nullable=False,
+                    supports_json=True,
+                    supports_dict=True,
+                    on_serialize=None,
+                    on_deserialize=None
+                    )
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID'), nullable=False)

@@ -1,6 +1,6 @@
-import sqlalchemy.exc
 from models import db, Callback, UserInput
 from utilties import helpers
+
 
 def getByQuestionID(questionID):
     try:

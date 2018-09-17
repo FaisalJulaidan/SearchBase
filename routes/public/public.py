@@ -4,13 +4,13 @@ from datetime import timedelta
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from flask_api import status
 from utilties import helpers
-from models import Callback, Assistant, Solution, db
+from models import Callback, Assistant, Solution, db, UserInput
 from itsdangerous import URLSafeTimedSerializer
 from services import user_services, company_services, db_services, auth_services, mail_services,\
     assistant_services, bot_services, chatbot_services, solutions_services
 from models import secret_key
 from werkzeug.utils import secure_filename
-
+import uuid
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
 
@@ -49,11 +49,11 @@ def chatbot(assistantID):
         ch_callback: Callback = chatbot_services.processData(assistant, data)
 
         if not ch_callback.Success:
-            return helpers.jsonResponse(False, 404, ch_callback.Message)
+            return helpers.jsonResponse(False, 400, ch_callback.Message)
 
         s_callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'])
         if not s_callback.Success:
-            return helpers.jsonResponse(False, 404, callback.Message)
+            return helpers.jsonResponse(False, 400, callback.Message)
 
         solutions = []
         for s in s_callback.Data:
@@ -64,23 +64,33 @@ def chatbot(assistantID):
 
 @public_router.route("/assistant/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(sessionID):
+    callback: Callback = chatbot_services.getBySessionID(sessionID)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 404, "Session not found.", None)
+    userInput: UserInput = callback.Data
+
     if request.method == "POST":
         data = request.get_json(silent=True)
         if request.method == 'POST':
 
-            # check if the post request has the file part
-            if 'file' not in request.files:
-                return helpers.jsonResponse(False, 404, "No file part")
-            file = request.files['file']
+            try:
+                # check if the post request has the file part
+                if 'file' not in request.files:
+                    return helpers.jsonResponse(False, 404, "No file part")
+                file = request.files['file']
 
-            # if user does not select file, browser also
-            # submit an empty part without filename
-            if file.filename == '':
-                return helpers.jsonResponse(False, 404, "No selected file")
+                # if user does not select file, browser also
+                # submit an empty part without filename
+                if file.filename == '':
+                    return helpers.jsonResponse(False, 404, "No selected file")
 
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(BaseConfig.UPLOAD_FOLDER, filename))
-            print(file)
+                filename = str(uuid.uuid4()) + '.' + secure_filename(file.filename).rsplit('.', 1)[1].lower()
+                file.save(os.path.join(BaseConfig.USER_FILES, filename))
+                userInput.FilePath = filename
+
+            except Exception as exc:
+                return helpers.jsonResponse(False, 404, "Couldn't save the file")
+
 
             # if file and allowed_file(file.filename):
             #     filename = secure_filename(file.filename)
@@ -88,6 +98,7 @@ def chatbot_upload_files(sessionID):
             #     return redirect(url_for('uploaded_file',
             #                             filename=filename))
 
+            db.session.commit()
             return helpers.jsonResponse(True, 200, "file uploaded successfully!!")
 
 

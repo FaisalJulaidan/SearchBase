@@ -196,11 +196,11 @@ def genDummyData():
     db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=5,  ActiveBotsCap=2, InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
-    db.session.add(Solution(SolutionID='plan_D48N4wxwAWEMOH', MajorTitle='Big Title 1', SecondaryTitle="Small Title 1", 
+    db.session.add(Solution(SolutionID='D48N4wxwAWEMOH', MajorTitle='Big Title 1', SecondaryTitle="Small Title 1",
                             ShortDescription="A job at my little town",  Money="£56000", Keywords="horse,duck",
                             URL="http://google.com", Assistant=reader_a))
 
-    db.session.add(Solution(SolutionID='plan_D48213AWEMOH', MajorTitle='Big Title 2', SecondaryTitle="Small Title 2", 
+    db.session.add(Solution(SolutionID='asd8213AWEMOH', MajorTitle='Big Title 2', SecondaryTitle="Small Title 2",
                             ShortDescription="A town at my little job",  Money="£56000", Keywords="dog,cat",
                             URL="http://google.com", Assistant=reader_a))
 

@@ -143,12 +143,11 @@ function displayReturnedSolutions(solutions) {
     messageContainer = $("#messagesContainer");
     console.log(solutions);
 
-    delete resultdic[(temparray.length - 1).toString()];
-    for (var i = 0; i < temparray.length - 1; i++) {
-        resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
-        // messageContainer.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><label>"+resultdic[i][1]+"</label><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
-        messageContainer.append("<center><div class='chatProducts'><label>" + resultdic[i][1] + "</label><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + "</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
+    for (var i = 0; i < solutions.length; i++) {
+        messageContainer.append("<center><div class='chatProducts'><h5>" + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>" + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] + "</label><br><button onclick='BuyProduct(" + solutions[i]["URL"] + ")' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
     }
+
+    SetRepeat();
 }
 
 function openSolution(link) {

@@ -228,10 +228,10 @@ async function submitAnswer(message, blockKeywords=undefined) {
     if (currentBlock.storeInDB) {
         if (currentBlock.type == "Question" && blockKeywords !== undefined) {
             blockKeywords = blockKeywords.split(",");
-            collectedInformation.push({ "blockID": currentBlock.id, "input": message, "keywords": blockKeywords });
+            collectedInformation.push({ "blockID": currentBlock.id, "QuestionText": currentBlock.content.text, "input": message, "keywords": blockKeywords });
             addKeywords(blockKeywords)
         } else {
-            collectedInformation.push({ "blockID": currentBlock.id, "input": message, "keywords": [] });
+            collectedInformation.push({ "blockID": currentBlock.id, "QuestionText": currentBlock.content.text, "input": message, "keywords": [] });
         }
 
         sendAssistantMessage(generateUserInputThanks())

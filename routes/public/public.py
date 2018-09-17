@@ -275,7 +275,7 @@ def signup():
         name = request.form.get("companyName", default=None)
         # size = request.form.get("companySize", default=None)
         url = request.form.get("websiteURL", default=None)
-        # phone = request.form.get("phoneNumber", default=None)
+        phone = request.form.get("phoneNumber", default=None)
 
         if not (fullname and email and password
                 and name and url):
@@ -287,7 +287,7 @@ def signup():
         surname = fullname.strip().split(" ")[1]
 
         # Signup new user
-        signup_callback: Callback = auth_services.signup(email.lower(), firstname, surname, password, name, url)
+        signup_callback: Callback = auth_services.signup(email.lower(), firstname, surname, password, name, phone, url)
         print(signup_callback.Success, signup_callback.Message)
         if not signup_callback.Success:
             print(signup_callback.Message)

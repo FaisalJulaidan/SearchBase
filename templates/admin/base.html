@@ -444,14 +444,17 @@
         $.ajax({
             method:'GET',
             url: '/admin/userData',
-            contentType: 'application/json'
+            dataType: "json"
         }).done(function (res) {
-            sessionStorage.setItem('id', res.id);
-            sessionStorage.setItem('firstname', res.firstname);
-            sessionStorage.setItem('surname', res.surname);
-            sessionStorage.setItem('email', res.email);
-            sessionStorage.setItem('stripeID', res.stripeID);
-            sessionStorage.setItem('subID', res.subID);
+            console.log(res.data);
+            sessionStorage.setItem('id', res.data.id);
+            sessionStorage.setItem('firstname', res.data.firstname);
+            sessionStorage.setItem('surname', res.data.surname);
+            sessionStorage.setItem('email', res.data.email);
+            sessionStorage.setItem('stripeID', res.data.stripeID);
+            sessionStorage.setItem('subID', res.data.subID);
+            sessionStorage.setItem('role', JSON.stringify(res.data.role));
+            console.log(JSON.parse(sessionStorage.getItem('role')));
         }).fail(function (err) {
             console.log(err)
         })

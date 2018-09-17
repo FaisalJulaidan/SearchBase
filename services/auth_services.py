@@ -1,16 +1,17 @@
 import sqlalchemy.exc
 
-from models import Callback, User, Company, db
+from models import Callback, User, Company, UserSettings, db
 from utilties import helpers
 from datetime import datetime
 from flask import session, escape
 from json import dumps
+import stripe
 
 from services import user_services, assistant_services, role_services, sub_services, company_services
 from utilties import helpers
 
 
-def signup(email, firstname, surname, password, companyName, companySize, companyPhoneNumber, websiteURL) -> Callback:
+def signup(email, firstname, surname, password, companyName, companyPhoneNumber, websiteURL) -> Callback:
 
     # Validate Email
     if not helpers.isValidEmail(email):
@@ -21,27 +22,32 @@ def signup(email, firstname, surname, password, companyName, companySize, compan
     if user:
         return Callback(False, 'User already exists.')
 
-    company = Company(Name=companyName, URL=websiteURL)
+    # Create a company plus the Stripe customer and link it with the company
+    company_callback: Callback = company_services.create(name=companyName, url=websiteURL, ownerEmail=email)
+    if not company_callback.Success:
+        return Callback(False, company_callback.Message)
+    company = company_callback.Data
 
     # Create owner, admin, user roles for the new company
     ownerRole: Callback = role_services.create('Owner', True, True, True, True, company)
     adminRole: Callback = role_services.create('Admin', True, True, True, False, company)
     userRole: Callback = role_services.create('User', True, False, False, False, company)
     if not (ownerRole.Success or adminRole.Success or userRole.Success) :
-        return Callback(False, 'Could create roles for the new user.')
+        return Callback(False, 'Could not create roles for the new user.')
 
     # Create a new user with its associated company and owner role
     user_callback = user_services.create(firstname, surname, email, password, companyPhoneNumber, company, ownerRole.Data)
 
+    # Create userSettings for this user
+    db.session.add(UserSettings(User=user_callback.Data))
+
     # Subscribe to basic plan with 14 trial days
-    sub_callback: Callback = sub_services.subscribe(email=email, planID='plan_D3lp2yVtTotk2f', trialDays=14)
+    sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lp2yVtTotk2f', trialDays=14)
 
     # If subscription failed, remove the new created company and user
     if not sub_callback.Success:
-        role_services.removeAllByCompany(company)
+        # Removing the company will cascade and remove the new created user and roles as well.
         company_services.removeByName(companyName)
-        user_services.removeByEmail(email)
-
         return sub_callback
 
     # ###############
@@ -81,12 +87,9 @@ def login(email: str, password_to_check: str) -> Callback:
     session['UserID'] = user.ID
     session['CompanyID'] = user.CompanyID
     session['UserEmail'] = user.Email
-    session['UserPlan'] = helpers.getPlanNickname(user.SubID)
+    session['UserPlan'] = helpers.getPlanNickname(user.Company.SubID)
     session['RoleID'] = user.RoleID
-    print("user: ", user)
-    print("user.SubID: ", user.SubID)
-    print("helpers.getPlanNickname(user.SubID): ", helpers.getPlanNickname(user.SubID))
-    print("session['UserPlan']: ", session['UserPlan'])
+    print(session)
 
     # Set LastAccess
     user.LastAccess = datetime.now()

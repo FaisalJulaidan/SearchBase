@@ -46,7 +46,7 @@ def chatbot(assistantID):
         for s in solutions:
             ss.append(s.to_dict())
 
-        return helpers.jsonResponse(True, 200, "Solution list is here!", ss)
+        return helpers.jsonResponse(True, 200, "Solution list is here!", {'sessionID': 1,'solutions':ss})
         # data = request.get_json(silent=True)
         # callback: Callback = chatbot_services.processData(data)
         #

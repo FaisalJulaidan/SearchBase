@@ -487,11 +487,7 @@
                     }
                 });
 
-                $('.save').on('click', (e) => {
-                    $target = $(e.target);
-                    // collect all data then pass it
-
-                });
+                $('.save').on('click', e => saveBlocks(e));
 
                 $('.addBlock').on('click', (e) => {
                     if (RemainingBlocks) {
@@ -654,10 +650,7 @@
                     }
                 });
 
-                $('.save').on('click', (e) => {
-                    $target = $(e.target);
-                    // collect all data then pass it
-                });
+                $('.save').on('click', e => saveBlocks(e));
             }
 
             function init_added_block() {
@@ -771,10 +764,7 @@
                     }
                 });
 
-                $('.save').on('click', (e) => {
-                    $target = $(e.target);
-                    // collect all data then pass it
-                });
+                $('.save').on('click', e => saveBlocks(e));
             }
 
             function deleteBlock(e) {
@@ -806,6 +796,141 @@
                             updateBlocksOrder();
                         }
                     })
+            }
+
+            function saveBlocks() {
+                // collect all data in its json form
+                class BlockTypeQuestions {
+                    constructor(text, answers, storeInDB, type, order, id) {
+                        this.Question = {
+                            block: {
+                                content: {
+                                    text: text,
+                                    answers: answers
+                                },
+                                storeInDB: storeInDB,
+                                type: type,
+                                order: order,
+                                id: id
+                            },
+                            botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1]
+                        }
+                    }
+                }
+
+                class BlockTypeUserInput {
+                    constructor(text, action, validation, storeInDB, type, order, id) {
+                        this.UserInput = {
+                            block: {
+                                content: {
+                                    action: action,
+                                    text: text,
+                                    validation: validation
+                                },
+                                storeInDB: storeInDB,
+                                type: type,
+                                order: order,
+                                id: id
+                            },
+                            botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1]
+                        }
+                    }
+                }
+
+                class BlockTypeFileUpload {
+                    constructor(text, action, fileTypes, storeInDB, type, order, id) {
+                        this.FileUpload = {
+                            block: {
+                                content: {
+                                    action: action,
+                                    text: text,
+                                    fileTypes: fileTypes
+                                },
+                                storeInDB: storeInDB,
+                                type: type,
+                                order: order,
+                                id: id
+                            },
+                            botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1]
+                        }
+                    }
+                }
+
+
+                blocksData = [];
+                for (const obj of BlocksOrder) {
+                    let $block = obj.block;
+                    let order = obj.order;
+
+                    let type = $block.children().first().children().last().children().children().val();
+                    if (type == 'Question') {
+                        let rowsOfAnswers = $block.children().last().find('div.answers').children();
+                        let answersArr = [];
+                        let saveInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+
+                        for (const row of rowsOfAnswers) {
+                            let $row = $(row);
+                            let answers = $row.children();
+                            for (const answer of answers) {
+                                let $answer = $(answer);
+                                let text = $answer.children().find('input.form-control').first().val();
+                                let action = $answer.children().find('input.form-control').last().val();
+                                let keywords = JSON.parse($answer.children().find('input.tagified').val())
+
+                                answersArr.push({
+                                    action: action,
+                                    answer: {
+                                        text: text
+                                    },
+                                    keywords: keywords
+                                });
+                            }
+                        }
+                        let text = $block.children().last().children().first().children().last().val();
+                        let id = +$block.attr('id');
+
+                        blocksData.push(new BlockTypeQuestions(text, answersArr, saveInDB, type, order, id));
+                    }
+
+                    if (type == 'User Input') {
+                        let action = $block.children().last().find('input.normalCursor').first().val();
+                        let validationn = $block.children().last().find('input.normalCursor').last().val();
+                        let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+                        let text = $block.children().last().children().first().children().last().val();
+                        let id = +$block.attr('id');
+
+                        blocksData.push(new BlockTypeUserInput(text, action, validationn, storeInDB, type, order, id));
+                    }
+
+                    if (type == 'File Upload') {
+                        let text = $block.children().last().children().first().children().last().val();
+                        let action = $block.children().last().find('input.normalCursor').first().val();
+
+                        let fileTypes = [];
+                        $block.children().last().children('.col-md-8').children().last().children().each((i, elem) => {
+                            if (!$(elem).hasClass('not-active'))
+                                fileTypes.push($(elem).text())
+                        });
+
+                        let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+                        let id = +$block.attr('id');
+
+                        blocksData.push(new BlockTypeFileUpload(text, action, fileTypes, storeInDB, type, order, id));
+                    }
+                }
+
+                console.log(blocksData)
+                $.ajax({
+                    method: 'PUT',
+                    url: 'bot/data',
+                    contentType: "application/json",
+                    data: blocksData,
+                    success: function (res) {
+                        res = JSON.parse(res);
+                        swal(res.msg);
+                        console.log(res)
+                    }
+                });
             }
 
             function addNewBlock() {

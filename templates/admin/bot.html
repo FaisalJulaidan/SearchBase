@@ -306,14 +306,12 @@
                 });
             }
 
-            function addNewBlock() {
-                Promise.all([GET_data(), GET_options()]).then((res) => {
-                    data = JSON.parse(res[0]).data;
-                    options = JSON.parse(res[1]).data;
-                    RemainingBlocks = Number($('.remainingBlocks span').html());
-                    render_blocks(data.blocks);
-                    init_added_block();
-                });
+            class BlocksTemplate {
+                constructor(args) {
+                    for (const arg of args) {
+                        this[Object.keys(arg)[0]] = Object.values(arg)[0]
+                    }
+                }
             }
 
             function init_blocks_templates(blockTypes) {
@@ -326,26 +324,6 @@
                     }
                     blocks_templates[blockType.name] = new BlocksTemplate(args);
                 }
-            }
-
-            class BlocksTemplate {
-                constructor(args) {
-                    for (const arg of args) {
-                        this[Object.keys(arg)[0]] = Object.values(arg)[0]
-                    }
-                }
-            }
-
-            function updateBlocksOrder() {
-                let panelList = $('#draggablePanelList');
-                BlocksOrder = [];
-                $('.blockPanel', panelList).each(function (index, elem) {
-                    let $listItem = $(elem), newIndex = $listItem.index();
-                    BlocksOrder.push({
-                        block: $listItem,
-                        order: newIndex + 1
-                    });
-                });
             }
 
             function init_page() {
@@ -440,35 +418,7 @@
                 });
 
                 // Input radio-group visual controls
-                $('i.trash').on('click', function (e) {
-                    swal({
-                        title: "Are you sure?",
-                        text: "Question will be removed completely from the system",
-                        icon: "warning",
-                        button: {
-                            text: "Delete!",
-                            closeModal: false,
-                        },
-                        dangerMode: true,
-                    })
-                        .then((willDelete) => {
-                            if (willDelete) {
-                                let deletedBlockId = $(e.target).parent().parent().parent().attr('id');
-                                return $.ajax({
-                                    method: 'DELETE',
-                                    url: '/admin/assistant/bot/block/' + deletedBlockId
-                                });
-                            }
-                        })
-                        .then((res) => {
-                            res = JSON.parse(res);
-                            if (res.success) {
-                                $(e.target).parent().parent().parent().remove();
-                                swal("Success!", res.msg, "success");
-                                updateBlocksOrder();
-                            }
-                        })
-                });
+                $('i.trash').on('click', e => deleteBlock(e));
 
                 // Input radio-group delete answer
                 $('i.trashAnswer').on('click', function (e) {
@@ -547,7 +497,7 @@
                     if (RemainingBlocks) {
                         $container = $("<div></div>");
                         for (const blockType of BlocksTypes)
-                            $container.append("<div class=\"type clickable\" onclick=\"swal.setActionValue({cancel:$(this).text()}); swal.close(); \">" + blockType + "</div>")
+                            $container.append("<div class=\"type clickable\" onclick=\"swal.setActionValue({cancel:$(this).text() }); swal.close(); \">" + blockType + "</div>")
                         swal({
                             title: 'Select block type:',
                             content: $container[0],
@@ -607,6 +557,7 @@
                                     })(),
                                     success: function (res) {
                                         res = JSON.parse(res);
+                                        console.log(res)
                                         $('.remainingBlocks span').html(res.remainingBlocks);
                                         addNewBlock();
                                         swal({
@@ -666,35 +617,8 @@
                 });
 
                 // Input radio-group visual controls
-                $('i.trash').on('click', function (e) {
-                    swal({
-                        title: "Are you sure?",
-                        text: "Question will be removed completely from the system",
-                        icon: "warning",
-                        button: {
-                            text: "Delete!",
-                            closeModal: false,
-                        },
-                        dangerMode: true,
-                    })
-                        .then((willDelete) => {
-                            if (willDelete) {
-                                let deletedBlockId = $(e.target).parent().parent().parent().attr('id');
-                                return $.ajax({
-                                    method: 'DELETE',
-                                    url: '/admin/assistant/bot/block/' + deletedBlockId
-                                });
-                            }
-                        })
-                        .then((res) => {
-                            res = JSON.parse(res);
-                            if (res.success) {
-                                $(e.target).parent().parent().parent().remove();
-                                swal("Success!", res.msg, "success");
-                                updateBlocksOrder();
-                            }
-                        })
-                });
+                $('i.trash').on('click', e => deleteBlock(e));
+
                 // Input radio-group delete answer
                 $('i.trashAnswer').on('click', function (e) {
                     let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
@@ -779,35 +703,7 @@
                 });
 
                 // Input radio-group visual controls
-                $('i.trash').on('click', function (e) {
-                    swal({
-                        title: "Are you sure?",
-                        text: "Question will be removed completely from the system",
-                        icon: "warning",
-                        button: {
-                            text: "Delete!",
-                            closeModal: false,
-                        },
-                        dangerMode: true,
-                    })
-                        .then((willDelete) => {
-                            if (willDelete) {
-                                let deletedBlockId = $(e.target).parent().parent().parent().attr('id');
-                                return $.ajax({
-                                    method: 'DELETE',
-                                    url: '/admin/assistant/bot/block/' + deletedBlockId
-                                });
-                            }
-                        })
-                        .then((res) => {
-                            res = JSON.parse(res);
-                            if (res.success) {
-                                $(e.target).parent().parent().parent().remove();
-                                swal("Success!", res.msg, "success");
-                                updateBlocksOrder();
-                            }
-                        })
-                });
+                $('i.trash').on('click', e => deleteBlock(e));
 
                 // Input radio-group delete answer
                 $('i.trashAnswer').on('click', function (e) {
@@ -846,7 +742,7 @@
                 });
 
                 // change type of block
-                $('.dropdown-menu.dropdown-menu-right > li').on('click', (e) => {
+                $('.panel-heading li').on('click', (e) => {
                     $target = $(e.target);
                     let isTargetType = $target.parent().parent().parent().children().first().text().includes('Type');
                     let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val()
@@ -879,6 +775,59 @@
                 $('.save').on('click', (e) => {
                     $target = $(e.target);
                     // collect all data then pass it
+                });
+            }
+
+            function deleteBlock(e) {
+                swal({
+                    title: "Are you sure?",
+                    text: "Question will be removed completely from the system",
+                    icon: "warning",
+                    button: {
+                        text: "Delete!",
+                        closeModal: false,
+                    },
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            let deletedBlockId = $(e.target).parent().parent().parent().attr('id');
+                            return $.ajax({
+                                method: 'DELETE',
+                                url: '/admin/assistant/bot/block/' + deletedBlockId
+                            });
+                        }
+                    })
+                    .then((res) => {
+                        res = JSON.parse(res);
+                        // todo: update number of remaining blocks
+                        if (res.success) {
+                            $(e.target).parent().parent().parent().remove();
+                            swal("Success!", res.msg, "success");
+                            updateBlocksOrder();
+                        }
+                    })
+            }
+
+            function addNewBlock() {
+                Promise.all([GET_data(), GET_options()]).then((res) => {
+                    data = JSON.parse(res[0]).data;
+                    options = JSON.parse(res[1]).data;
+                    RemainingBlocks = Number($('.remainingBlocks span').html());
+                    render_blocks(data.blocks);
+                    init_added_block();
+                });
+            }
+
+            function updateBlocksOrder() {
+                let panelList = $('#draggablePanelList');
+                BlocksOrder = [];
+                $('.blockPanel', panelList).each(function (index, elem) {
+                    let $listItem = $(elem), newIndex = $listItem.index();
+                    BlocksOrder.push({
+                        block: $listItem,
+                        order: newIndex + 1
+                    });
                 });
             }
 
@@ -1108,7 +1057,7 @@
                     }
 
                     function getSubmitElemnt(storeInDB, id) {
-                        let isDisabled = storeInDB ? '' : 'disabled';
+                        let isDisabled = block_template.alwaysStoreInDB ? '' : 'disabled';
                         return "" +
                             "<div class=\"col-md-1 pull-right inline\">\n" +
                             "    <div class=\"save btn btn-default\">Save</div>\n" +

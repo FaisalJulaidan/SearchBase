@@ -16,7 +16,7 @@ from cryptography.fernet import Fernet
 import urllib.request
 #from celery import Celery
 
-from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution
+from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution, UserInput
 from services.mail_services import mail
 #, celery
 
@@ -203,6 +203,8 @@ def genDummyData():
     db.session.add(Solution(SolutionID='asd8213AWEMOH', MajorTitle='Big Title 2', SecondaryTitle="Small Title 2",
                             ShortDescription="A town at my little job",  Money="£56000", Keywords="dog,sad",
                             URL="http://google.com", Assistant=reader_a))
+
+    #db.session.add(UserInput(Data={"collectedInformation": [{"blockID": 1, "QuestionText": "Do you smoke?", "input": "No", "keywords": ["smoker", "sad"]}, {"blockID": 2, "QuestionText": "What's your email?", "input": "sadsa@sdasda.asd", "keywords": []}, {"blockID": 3, "QuestionText": "Upload your CV", "input": "100_Attraction_Tips.pdf", "keywords": []}]}, FilePath="f4613860-b5b5-4365-973a-39483ce4aefe.pdf", AssistantID=reader_a))
 
 
     # Save all changes

@@ -228,7 +228,7 @@ async function submitAnswer(message, blockKeywords=undefined) {
 
     if (currentBlock.type == "File Upload") {
         //needs rework
-        message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
+        message = "&FILE_UPLOAD&"+document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
         if (!checkFileFormat(message)) {
             sendUserMessage(message)
             await sleep(350);

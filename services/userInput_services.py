@@ -2,16 +2,17 @@ from models import db, Callback, UserInput
 from utilties import helpers
 
 
-def getByQuestionID(questionID):
+def getByAssistantID(assistantID):
     try:
-
-        result = db.session.query(UserInput).get(questionID)
+        9
+        result = db.session.query(UserInput).filter(UserInput.AssistantID == assistantID).all()
+        print(result)
         if not result: raise Exception
 
-        return Callback(True, "Got user input by question id successfully.", result)
+        return Callback(True, "Got user input by assistant id successfully.", result)
 
     except Exception as exc:
 
-        print("getByQuestionID() Error: ", exc)
+        print("getByAssistantID() Error: ", exc)
 
         return Callback(False, 'Could not get the user input.')

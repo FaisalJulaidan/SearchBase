@@ -409,7 +409,7 @@ class UserInput(db.Model):
     Assistant = db.relationship('Assistant', back_populates='UserInputs')
 
     def __repr__(self):
-        return '<UserInput {}>'.format(self.Input)
+        return '<UserInput {}>'.format(self.ID)
 
 
 class Answer(db.Model):

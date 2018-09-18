@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, session
 from services import  admin_services, userInput_services
 from models import Callback, UserInput
+from config import BaseConfig
 
 userInput_router: Blueprint = Blueprint('userInput_router', __name__ , template_folder="../../templates")
 
@@ -10,20 +11,12 @@ userInput_router: Blueprint = Blueprint('userInput_router', __name__ , template_
 def admin_user_input(assistantID):
 
     if request.method == "GET":
-        # question_callback : Callback = questions_services.getByAssistantID(assistantID)
-        # if not question_callback.Success : return admin_services.render("admin/data-storage.html")
-        #
-        # data=[]
-        #
-        # for question in question_callback.Data:
-        #
-        #     userInput_callback : Callback = userInput_services.getByQuestionID(question.ID)
-        #     if not userInput_callback.Success : return admin_services.render("admin/data-storage.html")
-        #
-        #     userInputData = admin_services.convertForJinja(userInput_callback.Data)
-        #
-        #     data.append(userInputData)
-
-        return admin_services.render("admin/data-storage.html", data={})
-
+        userInput_callback : Callback = userInput_services.getByAssistantID(assistantID)
+        if not userInput_callback.Success : return admin_services.render("admin/data-storage.html")
+        result = []
+        for d in userInput_callback.Data:
+            result.append({'data': d.Data, 'filePath': d.FilePath})
+        print(result)
+        route = BaseConfig.USER_FILES
+        return admin_services.render("admin/data-storage.html", data=result, route=route)
 

@@ -80,7 +80,7 @@ def updateBot(bot, assistant: Assistant) -> Callback:
         json_utils.validateSchema(bot, 'bot.json')
     except Exception as exc:
         print(exc.args)
-        return Callback(False, "the submitted bot data does not doesn't follow the correct format")
+        return Callback(False, "The submitted bot data does not doesn't follow the correct format")
 
     callback: Callback = updateBlocks(bot['blocks'], assistant)
     if not callback.Success:

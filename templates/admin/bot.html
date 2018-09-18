@@ -375,7 +375,10 @@
                     // Only make the .panel-heading child elements support dragging.
                     // Omit this to make then entire <li>...</li> draggable.
                     handle: '.panel-heading',
-                    update: updateBlocksOrder
+                    update: function () {
+                        updateBlocksOrder();
+                        saveBlocks();
+                    }
                 });
 
                 // to make the current type highlighted
@@ -803,17 +806,14 @@
                 class BlockTypeQuestions {
                     constructor(text, answers, storeInDB, type, order, id) {
                         this.Question = {
-                            block: {
-                                content: {
-                                    text: text,
-                                    answers: answers
-                                },
-                                storeInDB: storeInDB,
-                                type: type,
-                                order: order,
-                                id: id
+                            content: {
+                                text: text,
+                                answers: answers
                             },
-                            botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1]
+                            storeInDB: storeInDB,
+                            type: type,
+                            order: order,
+                            id: id
                         }
                     }
                 }
@@ -821,18 +821,15 @@
                 class BlockTypeUserInput {
                     constructor(text, action, validation, storeInDB, type, order, id) {
                         this.UserInput = {
-                            block: {
-                                content: {
-                                    action: action,
-                                    text: text,
-                                    validation: validation
-                                },
-                                storeInDB: storeInDB,
-                                type: type,
-                                order: order,
-                                id: id
+                            content: {
+                                action: action ? action : 'Go To Next Block',
+                                text: text,
+                                validation: validation
                             },
-                            botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1]
+                            storeInDB: storeInDB,
+                            type: type,
+                            order: order,
+                            id: id
                         }
                     }
                 }
@@ -840,24 +837,25 @@
                 class BlockTypeFileUpload {
                     constructor(text, action, fileTypes, storeInDB, type, order, id) {
                         this.FileUpload = {
-                            block: {
-                                content: {
-                                    action: action,
-                                    text: text,
-                                    fileTypes: fileTypes
-                                },
-                                storeInDB: storeInDB,
-                                type: type,
-                                order: order,
-                                id: id
+                            content: {
+                                action: action ? action : 'Go To Next Block',
+                                text: text,
+                                fileTypes: fileTypes
                             },
-                            botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1]
+                            storeInDB: storeInDB,
+                            type: type,
+                            order: order,
+                            id: id
                         }
                     }
                 }
 
 
-                blocksData = [];
+                let botData = {
+                    botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                    blocks: []
+                };
+
                 for (const obj of BlocksOrder) {
                     let $block = obj.block;
                     let order = obj.order;
@@ -875,10 +873,16 @@
                                 let $answer = $(answer);
                                 let text = $answer.children().find('input.form-control').first().val();
                                 let action = $answer.children().find('input.form-control').last().val();
-                                let keywords = JSON.parse($answer.children().find('input.tagified').val())
+                                let keywords = (function () {
+                                    let keywordsArr = [];
+                                    $('tags').first().children('tag').each((i, tag) => {
+                                        keywordsArr.push($(tag).attr('value'))
+                                    });
+                                    return keywordsArr;
+                                })();
 
                                 answersArr.push({
-                                    action: action,
+                                    action: action ? action : 'Go To Next Block',
                                     answer: {
                                         text: text
                                     },
@@ -889,7 +893,7 @@
                         let text = $block.children().last().children().first().children().last().val();
                         let id = +$block.attr('id');
 
-                        blocksData.push(new BlockTypeQuestions(text, answersArr, saveInDB, type, order, id));
+                        botData.blocks.push(new BlockTypeQuestions(text, answersArr, saveInDB, type, order, id).Question);
                     }
 
                     if (type == 'User Input') {
@@ -899,7 +903,7 @@
                         let text = $block.children().last().children().first().children().last().val();
                         let id = +$block.attr('id');
 
-                        blocksData.push(new BlockTypeUserInput(text, action, validationn, storeInDB, type, order, id));
+                        botData.blocks.push(new BlockTypeUserInput(text, action, validationn, storeInDB, type, order, id).UserInput);
                     }
 
                     if (type == 'File Upload') {
@@ -915,20 +919,27 @@
                         let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                         let id = +$block.attr('id');
 
-                        blocksData.push(new BlockTypeFileUpload(text, action, fileTypes, storeInDB, type, order, id));
+                        botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, storeInDB, type, order, id).FileUpload);
                     }
                 }
-
-                console.log(blocksData)
                 $.ajax({
                     method: 'PUT',
                     url: 'bot/data',
                     contentType: "application/json",
-                    data: blocksData,
+                    data: JSON.stringify(botData),
                     success: function (res) {
                         res = JSON.parse(res);
-                        swal(res.msg);
-                        console.log(res)
+                        swal('Succes', res.msg, 'success');
+
+                        Promise.all([GET_data(), GET_options()]).then((res) => {
+                            data = JSON.parse(res[0]).data;
+                            options = JSON.parse(res[1]).data;
+                            render_blocks(data.blocks);
+                            init_added_block();
+                        });
+
+                    }, error: function (request, status, error) {
+                        swal('Error', JSON.parse(request.responseText).msg, 'error')
                     }
                 });
             }
@@ -1459,7 +1470,7 @@
                     function getSubmitElemnt(storeInDB, id) {
                         let isDisabled = storeInDB ? '' : 'disabled';
                         return "" +
-                            "<div class=\"col-md-1 pull-right inline\">\n" +
+                            "<div class=\"save col-md-1 pull-right inline\">\n" +
                             "    <div class=\"btn btn-default\">Save</div>\n" +
                             "</div>\n" +
                             "<div class=\"col-md-2 pull-right inline text-right\">\n" +

@@ -8,6 +8,9 @@
     "validation": {"enum": ["Email", "Telephone"]},
     "action": {"type": "string"}
     },
-  "required": ["text", "action", "blockToGoID", "validation"],
+  "required": [
+    "action",
+    "validation"
+  ],
   "additionalProperties": false
 }

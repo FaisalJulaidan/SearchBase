@@ -145,17 +145,19 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
 
 def deleteBlockByID(id) -> Callback:
     try:
-        if not db.session.query(exists().where(Block.ID == id)).scalar():
+        block: Block = db.session.query(Block).filter(Block.ID == id).first()
+        if not block:
             return Callback(False, "the block with id '" + str(id) + "' doesn't exist")
+        assistant: Assistant = block.Assistant
         db.session.query(Block).filter(Block.ID == id).delete()
     except Exception as exc:
         print(exc)
         db.session.rollback()
         return Callback(False, 'Block with id' + str(id) + " could not be removed.")
-        # Save
+    # Save
     db.session.commit()
-    return Callback(True, 'Block with id ' + str(id) + " has been removed successfully.")
-
+    return Callback(True, 'Block with id ' + str(id) + " has been removed successfully.",
+                    {"remainingBlocks": getRemainingBlocksByAssistant(assistant)})
 
 
 def isValidBlock(block: dict, blockType: str):

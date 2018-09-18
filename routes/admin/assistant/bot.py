@@ -14,8 +14,8 @@ def bot_controller(assistantID):
         return admin_services.render('admin/bot.html')
 
 
-# @bot_router.route("/test/<int:assistantID>", methods=['POST', 'GET', 'PUT', 'DELETE'])
-@bot_router.route("/admin/assistant/<int:assistantID>/bot/data", methods=['GET', 'POST'])
+# @bot_router.route("/test/bot/<int:assistantID>", methods=['POST', 'GET', 'PUT'])
+@bot_router.route("/admin/assistant/<int:assistantID>/bot/data", methods=['GET', 'POST', 'PUT'])
 def bot(assistantID):
     # For all type of requests, get the assistant
     callback: Callback = assistant_services.getByID(assistantID)
@@ -45,26 +45,26 @@ def bot(assistantID):
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
-# @bot_router.route("/test/<int:blockID>", methods=['DELETE'])
-@bot_router.route("/admin/assistant/bot/block/<int:blockID>", methods=['DELETE'])
+@bot_router.route("/test/block/<int:blockID>", methods=['DELETE'])
+# @bot_router.route("/admin/assistant/bot/block/<int:blockID>", methods=['DELETE'])
 def delete_block(blockID):
     if request.method == "DELETE":
 
-        # Get the user who is logged in and wants to delete.
-        callback: Callback = user_services.getByID(session.get('UserID', 0))
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, "Sorry, your account doesn't exist. Try again please!")
-        user: User = callback.Data
-
-        # Check if this user is authorised for such an operation.
-        if not user.Role.EditChatbots:
-            return helpers.jsonResponse(False, 401, "Sorry, You're not authorised for deleting blocks.")
+        # # Get the user who is logged in and wants to delete.
+        # callback: Callback = user_services.getByID(session.get('UserID', 0))
+        # if not callback.Success:
+        #     return helpers.jsonResponse(False, 400, "Sorry, your account doesn't exist. Try again please!")
+        # user: User = callback.Data
+        #
+        # # Check if this user is authorised for such an operation.
+        # if not user.Role.EditChatbots:
+        #     return helpers.jsonResponse(False, 401, "Sorry, You're not authorised for deleting blocks.")
 
         # Delete the block
         callback: Callback = bot_services.deleteBlockByID(blockID)
         if not callback.Success:
             return helpers.jsonResponse(False, 404, callback.Message, None)
-        return helpers.jsonResponse(True, 200, callback.Message)
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
 @bot_router.route("/admin/assistant/bot/options", methods=['GET'])

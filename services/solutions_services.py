@@ -1,6 +1,6 @@
 import sqlalchemy.exc
 
-from models import db,Callback,Product
+from models import db,Callback,Solution
 from sqlalchemy import func
 from utilties import helpers
 
@@ -9,7 +9,7 @@ def getByAssistantID(assistantID):
     try:
         if assistantID:
             # Get result and check if None then raise exception
-            result = db.session.query(Product).get(assistantID)
+            result = db.session.query(Solution).get(assistantID)
             if not result: raise Exception
 
             return Callback(True, 'Solutions have been successfully retrieved', result)
@@ -22,7 +22,7 @@ def getByAssistantID(assistantID):
 def deleteAllByAssistantID(assistantID):
 
     try:
-        db.session.query(Product).filter(Product.AssistantID == assistantID).delete()
+        db.session.query(Solution).filter(Solution.AssistantID == assistantID).delete()
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print("deleteAllByAssistantID Error: ", exc)
         db.session.rollback()
@@ -33,8 +33,8 @@ def deleteAllByAssistantID(assistantID):
 def createNew(assistantID, id, name, brand, model, price, keywords, discount, url):
     try:
         # Create a new user with its associated company and role
-        solution = Product(AssistantID=assistantID, ProductID=id, Name=name, Brand=brand,
-                    Model=model, Price=price, Keywords=keywords, Discount=discount, URL=url)
+        solution = Solution(AssistantID=assistantID, ProductID=id, Name=name, Brand=brand,
+                            Model=model, Price=price, Keywords=keywords, Discount=discount, URL=url)
         db.session.add(solution)
 
     except Exception as exc:
@@ -61,7 +61,7 @@ def countRecordsByAssistantID(assistantID):
     try:
         if assistantID:
             # Get result and check if None then raise exception
-            result = db.session.query(Product).get(assistantID).count()
+            result = db.session.query(Solution).get(assistantID).count()
             if not result: raise Exception
 
             return result

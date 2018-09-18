@@ -1,5 +1,8 @@
 from flask import Blueprint
 
+from .adminBasic.adminBasic import adminBasic_router
+adminBasic_router: Blueprint = adminBasic_router
+
 from .dashboard.dashboard import dashboard_router
 dashboard_router: Blueprint = dashboard_router
 
@@ -18,14 +21,14 @@ admin_api: Blueprint = admin_api
 from .assistant.settings import settings_router
 settings_router: Blueprint = settings_router
 
-from .assistant.products import products_router
-products_router: Blueprint = products_router
+from .assistant.solutions import solutions_router
+solutions_router: Blueprint = solutions_router
 
 from .subscription.sub import sub_router
 sub_router: Blueprint = sub_router
 
-from .assistant.questions import questions_router
-questions_router: Blueprint = questions_router
+from .assistant.assistantManager import assistantManager_router
+assistantManager_router: Blueprint = assistantManager_router
 
 from .assistant.analytics import analytics_router
 analytics_router: Blueprint = analytics_router

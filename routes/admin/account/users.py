@@ -1,8 +1,8 @@
 from flask import jsonify, json
-from services import user_services, admin_services, role_services, company_services
+from services import user_services, admin_services, role_services, company_services, mail_services
 from models import Callback, db, User, Company
 from flask import Blueprint, request, redirect, session
-from utilties import helpers
+from utilties import helpers, json_utils
 
 users_router: Blueprint = Blueprint('users_router', __name__, template_folder="../../templates")
 
@@ -15,20 +15,17 @@ def update_roles():
         # Get the admin user who is logged in and wants to edit.
         callback: Callback = user_services.getByID(session.get('UserID', 0))
         if not callback.Success:
-            return json.dumps({'success': False, 'msg': "Sorry, your account doesn't exist. Try again please!"}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "Sorry, your account doesn't exist. Try again please!")
         adminUser: User = callback.Data
 
         # Check if the admin user is authorised for such an operation.
         if not adminUser.Role.Name == 'Owner':
-            return json.dumps({'success': False, 'msg': "Sorry, You're not authorised. Only owners are"}), \
-                   401, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 401, "Sorry, You're not authorised. Only owners are")
 
         # New roles values
         values = request.form.get("data", default=None)
         if not values:
-            return json.dumps({'success': False, 'msg': "Please provide all required info for the roles."}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "Please provide all required info for the roles.")
         values = json.loads(values)
 
         try:
@@ -45,13 +42,10 @@ def update_roles():
 
         except Exception as e:
             db.session.rollback()
-            return json.dumps({'success': False, 'msg': "An error occurred! Try again please."}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "An error occurred! Try again please.")
 
         print("Success >> roles updated")
-        return json.dumps({'success':True, 'msg': "Roles updated successfully!"}),\
-               200,\
-               {'ContentType':'application/json'}
+        return helpers.jsonResponse(True, 200, "Roles updated successfully!")
 
 
 # Get all users for logged in company
@@ -79,14 +73,12 @@ def admin_users_add():
         # Get the admin user who is logged in and wants to create a new user.
         callback: Callback = user_services.getByID(session.get('UserID', 0))
         if not callback.Success:
-            return json.dumps({'success': False, 'msg': "Sorry, error occurred. Try again please!"}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "Sorry, error occurred. Try again please!")
         adminUser: User = callback.Data
 
         # Check if the admin user is authorised to create a new user.
         if not adminUser.Role.EditUsers:
-            return json.dumps({'success': False, 'msg': "Sorry, You're not authorised to create a user"}), \
-                   401, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 401, "Sorry, You're not authorised to create a user")
 
         # If authorised then complete the process
         # Get submitted user info
@@ -97,35 +89,34 @@ def admin_users_add():
 
         # Check if info valid
         if not helpers.isStringsLengthGreaterThanZero(firstname, surname, email, role):
-            return json.dumps({'success': False, 'msg': "Please provide all required info for the new user."}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "Please provide all required info for the new user.")
 
         # Validate the given email
         if not helpers.isValidEmail(email):
-            return json.dumps({'success': False, 'msg': "Please provide a valid email."}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "Please provide a valid email.")
 
         # Check if email is already used
         user: User = user_services.getByEmail(email).Data
         if user:
-            return json.dumps({'success': False, 'msg': 'Email is already on use.'}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "Email is already on use.")
 
         # Get the role to be assigned for the user
         callback: Callback = role_services.getByNameAndCompanyID(role, adminUser.Company.ID)
         if not callback.Success:
-            return json.dumps({'success': False, 'msg': role + " role does not exist."}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, role + " role does not exist.")
         role = callback.Data
 
         # Create the new user for the company
-        callback: Callback = user_services.create(firstname, surname, email, 'passwordToBeChanged',
+        callback: Callback = user_services.create(firstname, surname, email, 'passwordToBeChanged', "00000",
                                                   adminUser.Company, role, verified=True)
         if not callback.Success:
-            return json.dumps({'success': False, 'msg': " Sorry couldn't create the user. Try again!"}), \
+            return helpers.jsonResponse(False, 400, "Sorry couldn't create the user. Try again!")
+
+        email_callback : Callback = mail_services.addedNewUserEmail(session.get('UserEmail', "Error"), email)
+        if not email_callback.Success:
+            return json.dumps({'success': False, 'msg': " New user was created but could not send email with login information. Please delete and readd the user."}), \
                    400, {'ContentType': 'application/json'}
 
-        print('new user > success!')
         return json.dumps({'success': True, 'msg': " User has been created successfully!"}), \
                    200, {'ContentType': 'application/json'}
 
@@ -142,27 +133,23 @@ def update_user(userID):
         role = request.form.get("role", default='').strip()
 
         if not helpers.isStringsLengthGreaterThanZero(firstname, surname, email, role):
-            return json.dumps({'success': False, 'msg': "Please provide all required info for the new user."}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "Please provide all required info for the new user.")
 
         # Validate the given email
         if not helpers.isValidEmail(email):
-            return json.dumps({'success': False, 'msg': "Please provide a valid email."}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "Please provide a valid email.")
 
         # Get the user to be updated.
         if not userID: userID = 0
         callback: Callback = user_services.getByID(userID)
         if not callback.Success:
-            return json.dumps({'success': False, 'msg': "Sorry, but this user doesn't exist"}),\
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "Sorry, but this user doesn't exist")
         userToUpdate: User = callback.Data
 
         # Get the admin user who is logged in and wants to edit.
         callback: Callback = user_services.getByID(session.get('UserID', 0))
         if not callback.Success:
-            return json.dumps({'success': False, 'msg': "Sorry, you account doesn't exist. Try again please!"}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "Sorry, you account doesn't exist. Try again please!")
         adminUser: User = callback.Data
 
         # Check if the admin user is authorised for such an operation.
@@ -170,27 +157,22 @@ def update_user(userID):
                 userToUpdate.CompanyID != adminUser.CompanyID or \
                 userToUpdate.Role.Name == adminUser.Role.Name or \
                 userToUpdate.Role.Name == 'Owner':
-            return json.dumps({'success': False, 'msg': "Sorry, You're not authorised"}), \
-                   401, {'ContentType': 'application/json'}
-
+            return helpers.jsonResponse(False, 401, "Sorry, You're not authorised")
 
         # Get the role to be assigned for the userToUpdate
         callback: Callback = role_services.getByNameAndCompanyID(role, adminUser.Company.ID)
         if not callback.Success:
-            return json.dumps({'success': False, 'msg': role + " role does not exist."}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, role + " role does not exist.")
         role = callback.Data
 
         # Update the user (userToUpdate)
         callback: Callback = user_services.updateAsOwner(userToUpdate.ID, firstname, surname, email, role)
         if not callback.Success:
-            return json.dumps({'success': False, 'msg': " Sorry couldn't update the user. Please try again!"}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "Sorry couldn't update the user. Please try again!")
 
         print("Success >> user updated")
-        return json.dumps({'success':True, 'msg': "User updated successfully!"}),\
-               200,\
-               {'ContentType':'application/json'}
+        return helpers.jsonResponse(True, 200, "User updated successfully!")
+
 
 
 @users_router.route("/admin/user/<userID>", methods=['DELETE'])
@@ -201,15 +183,13 @@ def delete_user(userID):
         if not userID: userID = 0
         callback: Callback = user_services.getByID(userID)
         if not callback.Success:
-            return json.dumps({'success': False, 'msg': "Sorry, but this user doesn't exist"}),\
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "Sorry, but this user doesn't exist")
         userToBeDeleted: User = callback.Data
 
         # Get the admin user who is logged in and wants to delete.
         callback: Callback = user_services.getByID(session.get('UserID', 0))
         if not callback.Success:
-            return json.dumps({'success': False, 'msg': "Sorry, error occurred. Try again please!"}), \
-                   400, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 400, "Sorry, error occurred. Try again please!")
         adminUser: User = callback.Data
 
         # Check if the admin user is authorised for such an operation.
@@ -217,19 +197,14 @@ def delete_user(userID):
                 userToBeDeleted.CompanyID != adminUser.CompanyID or \
                 userToBeDeleted.Role.Name == adminUser.Role.Name or \
                 userToBeDeleted.Role.Name == 'Owner':
-            return json.dumps({'success': False, 'msg': "Sorry, You're not authorised"}), \
-                   401, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 401, "Sorry, You're not authorised")
 
         # Delete the user
         callback: Callback = user_services.removeByID(userToBeDeleted.ID)
         if not callback.Success:
-            return json.dumps({'success': False, 'msg': "Sorry, error occurred. Try again please!"}), \
-               500, {'ContentType': 'application/json'}
+            return helpers.jsonResponse(False, 500, "Sorry, error occurred. Try again please!")
 
         print("Success.  " + userID)
-
-        return json.dumps({'success':True, 'msg': "User deleted successfully!"}),\
-               200,\
-               {'ContentType':'application/json'}
+        return helpers.jsonResponse(True, 200, "User deleted successfully!")
 
 

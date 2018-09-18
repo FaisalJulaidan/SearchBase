@@ -4,33 +4,28 @@ from sqlalchemy import inspect
 import stripe
 import re
 
+
 def hashPass(password, salt=gensalt()):
     hashed = hashpw(bytes(password, 'utf-8'), salt)
     return hashed
 
-def redirectWithMessageAndAssistantID(function, assistantID, message):
-    return redirect(url_for("." + function, assistantID=assistantID, message=message))
-
-
-def checkForMessageWhenAssistantID():
-    try:
-        message = request.args["message"]
-    except:
-        message = " "
-    return message
 
 
 def redirectWithMessage(function, message):
-    return redirect(url_for("." + function, messages=message))
+    session["returnMessage"] = message
+    return redirect(url_for("." + function))
 
-
+def redirectWithMessageAndAssistantID(function, assistantID, message):
+    session["returnMessage"] = message
+    return redirect(url_for("." + function, assistantID=assistantID))
 
 def checkForMessage():
-    args = request.args
-    msg = " "
-    if len(args) > 0:
-        msg = args['messages']
-    return msg
+    message = session.get('returnMessage', "")
+    if message:
+        session["returnMessage"] = ""
+    return message
+
+
 
 
 def getPlanNickname(SubID=None):
@@ -85,6 +80,6 @@ def isStringsLengthGreaterThanZero(*args):
     return True
 
 
-def jsonResponse(success: bool, http_code: int, msg: str, data):
+def jsonResponse(success: bool, http_code: int, msg: str, data=None):
     return json.dumps({'success': success, 'code': http_code, 'msg': msg, 'data': data}),\
             http_code, {'ContentType': 'application/json'}

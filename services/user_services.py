@@ -2,9 +2,7 @@ import sqlalchemy.exc
 
 from models import db, Callback, User, Company, Role
 from utilties import helpers
-from flask import session
-from sqlalchemy.orm import Load
-
+from sqlalchemy.sql import exists, func
 
 
 def getByID(id) -> Callback:
@@ -71,11 +69,11 @@ def getAllByCompanyID_safe(companyID) -> Callback:
                         'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
 
-def create(firstname, surname, email, password, company: Company, role: Role, verified=False) -> Callback:
+def create(firstname, surname, email, password, phone, company: Company, role: Role, verified=False) -> Callback:
     try:
         # Create a new user with its associated company and role
         newUser = User(Firstname=firstname, Surname=surname, Email=email, Verified=verified,
-                    Password=helpers.hashPass(password), Company=company,
+                    Password=helpers.hashPass(password), PhoneNumber=phone, Company=company,
                     Role=role)
         db.session.add(newUser)
 
@@ -111,6 +109,7 @@ def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
     db.session.commit()
     return Callback(True, 'User has been edited successfully!')
 
+
 def changePasswordByID(userID, newPassword, currentPassword=None):
     user_callback : Callback = getByID(userID)
     if not user_callback.Success:
@@ -144,8 +143,9 @@ def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
 def removeByEmail(email) -> Callback:
 
     try:
-     db.session.query(User).filter(User.Email == email).delete()
-
+        if not db.session.query(exists().where(User.Email == email)).scalar():
+            return Callback(False, "The user with email '" + str(email) + "' doesn't exist")
+        db.session.query(User).filter(User.Email == email).delete()
     except Exception as exc:
         print(exc)
         db.session.rollback()
@@ -158,7 +158,9 @@ def removeByEmail(email) -> Callback:
 def removeByID(id) -> Callback:
 
     try:
-     db.session.query(User).filter(User.ID == id).delete()
+        if not db.session.query(exists().where(User.ID == id)).scalar():
+            return Callback(False, "the user with id '" + str(id) + "' doesn't exist")
+        db.session.query(User).filter(User.ID == id).delete()
 
     except Exception as exc:
         print(exc)

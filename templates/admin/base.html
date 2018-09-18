@@ -110,6 +110,7 @@
                                         <i class="fa fa-comments-o"></i> Assistants <span class="fa fa-chevron-down"></span>
                                     </a>
                                     <ul class="nav child_menu">
+                                        <li><a href="/admin/assistant/manage"><strong>Assistant Manager</strong></a></li>
                                         {% if assistants|length > 0 %}
                                         {% for assistant in assistants %}
                                         <li>
@@ -176,7 +177,7 @@
                                     </a>
                                     <ul class="nav child_menu">
                                         <li><a href="/admin/profile">Profile</a></li>
-                                        <li id="users"><a href="/admin/users">Additional Users</a></li>
+                                        <li id="users"><a href="/admin/users">User Management</a></li>
                                     </ul>
                                 </li>
                                 <li id="billing">
@@ -185,7 +186,7 @@
                                     </a>
                                     <ul class="nav child_menu">
                                         <li><a href="/admin/pricing">Pricing Tables</a></li>
-                                        <li><a href="/admin/adjustments">Adjustments</a></li>
+                                        <li><a href="/admin/adjustments">Plan Adjustments</a></li>
                                     </ul>
                                 </li>
 
@@ -297,6 +298,7 @@
                 </div>
             </div>
             <script>
+            //makes charts dissapear in analytics
                 window.onload = function (e) {
                     x = document.getElementsByClassName('right_col')[0]
                     y = document.getElementById('flash')
@@ -305,7 +307,7 @@
                 }
                 var prev_handler = window.onload;
             </script>
-            <div id="flash" hidden>
+            <!--<div id="flash" hidden>
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}
                 <div class="col-md-12">
@@ -323,6 +325,15 @@
                 </div>
                 {% endif %}
                 {% endwith %}
+            </div>-->
+            <div style="margin-left:233px" id="flash">
+                {% if returnMessage %}
+                <div class="col-md-12">
+                    <div class="alert alert-info" role="alert">
+                        {{ returnMessage }}
+                    </div>
+                </div>
+                {% endif %}
             </div>
             {% block content %}
             {% endblock %}
@@ -332,9 +343,8 @@
             {% block footer %}
             <footer>
                 <div class="pull-right">
-                    TheSearchBase 2018 All Rights Reserved.</a>
+                    <a>TheSearchBase 2018 All Rights Reserved.</a>
                 </div>
-                <div class="clearfix"></div>
             </footer>
             {% endblock %}
             <!-- /footer content -->
@@ -344,7 +354,8 @@
     <!-- jQuery -->
     {#
     <script src="/static/vendor/jquery/jquery-3.2.1.min.js"></script>#}
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+{#    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>#}
+    <script src="/static/jquery-2.2.4.js"></script>
     <!-- jQuery Tags Input -->
     <script src="/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
     <!-- Bootstrap -->

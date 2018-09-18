@@ -1,4 +1,5 @@
 import os
+from models import useEncryption
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -11,9 +12,9 @@ class BaseConfig(object):
     DEBUG = False
     TESTING = False
 
-    ALLOWED_IMAGE_EXTENSION = {'png', 'PNG', 'jpg', 'jpeg', 'JPG', 'JPEG'}
-    ALLOWED_PRODUCT_FILE_EXTENSIONS = {'json', 'JSON', 'xml', 'xml'}
-    ALLOWED_UPLOAD_FILE_EXTENSIONS = {'txt', 'pdf', 'doc', 'docx'}
+    ALLOWED_EXTENSIONS = {'png', 'jpg','json', 'xml','txt', 'pdf', 'doc', 'docx'}
+    UPLOAD_FOLDER = '/static/file_uploads/user_files'
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))
     PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
@@ -29,7 +30,7 @@ class BaseConfig(object):
     MAIL_USERNAME = 'thesearchbase@gmail.com'
     MAIL_PASSWORD = 'pilbvnczzdgxkyzy'
     MAIL_SUPPRESS_SEND = False
-
+    useEncryption = True
 
 
 class DevelopmentConfig(BaseConfig):

@@ -15,29 +15,60 @@
         </div>
         <div class="clearfix"></div>
         <div id="pasteDiv" class="row">
-            <li> Export to Excel</li>
+
+
+            <!-- Code for excel export of the data files-->
+            <!--<li> Export to Excel</li>
             <br />
             <button id="btnExport" onclick="fnExcelReport();"> EXPORT</button>
             <br>
             <iframe id="txtArea1" style="display:none"></iframe>
             <br />
+            <br />-->
+
+
+            <h2>Critical Data</h2>
             <br />
+            <div class="analytics_line">
+                <!-- First chart -->
+                <!-- chart for the most searched for sector-->
+                <div style="width:350px; height:200px;">
+                    <p>Most searched for Sector</p>
+                    <canvas id="mostSearchedSector" style="width:350px; height:0px;"></canvas>
+                </div>
+
+                <!-- Second chart -->
+                <!-- chart for the most searched for location-->
+                <div style="width:350px; height:200px;">
+                    <p>Most search for location</p>
+                    <canvas id="mostSearchedLocation" style="width:350px; height:0px;"></canvas>
+                </div>
+
+                <!-- Second chart -->
+                <!-- chart for the most searched for job/solution-->
+                <div style="width:350px; height:200px;">
+                    <p>Most returned solution</p>
+                    <canvas id="mostSearchedSolution" style="width:350px; height:0px;"></canvas>
+                </div>
+            </div>
+
+
             <h2>General Data</h2>
             <br />
             <div class="analytics_line">
                 <!-- First chart -->
                 <div style="width:350px; height:200px;">
-                    <canvas id="putcharthere1" style="width:350px; height:0px;"></canvas>
+                    <canvas id="assistantUsed" style="width:350px; height:0px;"></canvas>
                 </div>
 
                 <!-- Second chart -->
                 <div style="width:350px; height:200px;">
-                    <canvas id="putcharthere2" style="width:350px; height:0px;"></canvas>
+                    <canvas id="questionsAnswerd" style="width:350px; height:0px;"></canvas>
                 </div>
 
                 <!-- Third chart -->
                 <div style="width:350px; height:200px;">
-                    <canvas id="putcharthere3" style="width:350px; height:0px"></canvas>
+                    <canvas id="productsReturned" style="width:350px; height:0px"></canvas>
                 </div>
                 <div class="clearfix"></div>
             </div>
@@ -46,29 +77,32 @@
             <div class="analytics_line">
                 <!-- First chart -->
                 <div style="width:700px; height:300px;">
-                    <canvas id="putcharthere4" style="width:350px; height:0px;"></canvas>
+                    <canvas id="userOverTime" style="width:350px; height:0px;"></canvas>
+                </div>
+                <div class="clearfix"></div>
+
+                <div style="width:700px; height:300px;">
+                    <canvas id="userTimeSpent" style="width:350px; height:0px;"></canvas>
                 </div>
                 <div class="clearfix"></div>
             </div>
         </div>
     </div>
-    </div>
+</div>
     {% endblock %}
 
     {% block customJS %}
-    <script src="/static/js/cookies.js"></script>
-    <script src="/static/js/Chart.js"></script>
-    <script>
+<script asyn src="https://livegap.com/charts/js/webfont.js">
+</script>
+<script src="https://livegap.com/charts/js/Chart.min.js"></script>
+<script src="/static/js/Chart.js"></script>
+<script>
         var periods = [];
         //  Start of the chart code
         var totalOpened = [];
         var totalQuestionsAnswered = [];
         var totalProductsReturned = [];
         {%for item in data %}
-        console.log("{{item}}");
-        console.log("{{item['DateTime']}}");
-        console.log({{item['Opened']}});
-        console.log({{ item['ProductsReturned'] }});
         //check if its a monthly record
         if ("{{item['DateTime']}}".includes("-")) {
             periods.push("{{item['DateTime']}}");
@@ -77,28 +111,24 @@
             totalProductsReturned.push({{ item['ProductsReturned']}})
         }
         {% endfor %}
-        console.log(periods);
-        console.log(totalOpened);
-        console.log(totalQuestionsAnswered);
-        console.log(totalProductsReturned);
         var chartData = {
             labels: periods,
             datasets: [{
                 label: 'Assistant Used',
                 fill: true,
                 lineTension: 0.1,
-                backgroundColor: "rgb(255,0,0)",
-                borderColor: "rgb(255,0,0)",
+                backgroundColor: ["rgb(186,85,211)", "rgb(148,0,211)", "rgb(153,50,204)", "rgb(139,0,139)", "rgb(128, 0, 128)", "rgb(75,0,130)", "rgb(147,112,219)", "rgb(128,0,128)", "rgb(147,112,219)"],
+                borderColor: "rgb(255,255,255)",
                 borderCapStyle: 'butt',
                 borderDash: [],
                 borderDashOffset: 0.0,
                 borderJoinStyle: 'miter',
-                pointBorderColor: "rgba(75,192,192,1)",
-                pointBackgroundColor: "#fff",
+                //pointBorderColor: "rgba(75,192,192,1)",
+                //pointBackgroundColor: "#fff",
                 pointBorderWidth: 1,
                 pointHoverRadius: 5,
-                pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                pointHoverBorderColor: "rgba(220,220,220,1)",
+                //pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                //pointHoverBorderColor: "rgba(220,220,220,1)",
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
@@ -106,7 +136,7 @@
                 spanGaps: false
             }]
         }
-        var chartdiv = document.getElementById("putcharthere1").getContext("2d");
+        var chartdiv = document.getElementById("assistantUsed").getContext("2d");
         new Chart(chartdiv, {
             data: chartData,
             type: 'bar',
@@ -119,9 +149,9 @@
             datasets: [{
                 label: 'Questions Answered',
                 fill: true,
-                lineTension: 0.1,
-                backgroundColor: "rgb(0,191,255)",
-                borderColor: "rgb(0,191,255)",
+                lineTension: 1,
+                backgroundColor: ["rgb(186,85,211)", "rgb(148,0,211)", "rgb(153,50,204)", "rgb(139,0,139)", "rgb(128, 0, 128)", "rgb(75,0,130)", "rgb(147,112,219)", "rgb(128,0,128)", "rgb(147,112,219)"],
+                borderColor: "rgb(255,255,255)",
                 borderCapStyle: 'butt',
                 borderDash: [],
                 borderDashOffset: 0.0,
@@ -139,7 +169,7 @@
                 spanGaps: false
             }]
         }
-        var chartdiv = document.getElementById("putcharthere2").getContext("2d");
+        var chartdiv = document.getElementById("questionsAnswerd").getContext("2d");
         new Chart(chartdiv, {
             data: chartData,
             type: 'bar',
@@ -151,9 +181,9 @@
             datasets: [{
                 label: 'Products Returned',
                 fill: true,
-                lineTension: 0.1,
-                backgroundColor: "rgb(255,255,0)",
-                borderColor: "rgb(255,255,0)",
+                lineTension: 1,
+                backgroundColor: ["rgb(186,85,211)", "rgb(148,0,211)", "rgb(153,50,204)", "rgb(139,0,139)", "rgb(128, 0, 128)", "rgb(75,0,130)", "rgb(147,112,219)", "rgb(128,0,128)", "rgb(147,112,219)"],
+                borderColor: "rgb(255,255,255)",
                 borderCapStyle: 'butt',
                 borderDash: [],
                 borderDashOffset: 0.0,
@@ -171,26 +201,66 @@
                 spanGaps: false
             }]
         }
-        var chartdiv = document.getElementById("putcharthere3").getContext("2d");
+
+        var chartdiv = document.getElementById("productsReturned").getContext("2d");
         new Chart(chartdiv, {
             data: chartData,
             type: 'bar',
         });
 
-
-        //  Start of the chart code
-        var chartData = {
-            labels: [{% for item in data %}
+        //  users overtime chart
+            var chartData = {
+                labels: [{% for item in data %}
                 {%if ";" in item[0] %}
-                    "Week " + "{{item[0]}}".split(";")[1] + " of " + "{{item[0]}}".split(";")[0],
-                {% endif %}
-            {% endfor %}],
-            datasets: [{
-                label: 'Assistant Used',
+                "Week " + "{{item[0]}}".split(";")[1] + " of " + "{{item[0]}}".split(";")[0],
+                    {% endif %}
+                {% endfor %}],
+                datasets: [{
+                label: 'Users Overtime',
                 fill: false,
-                lineTension: 0.1,
-                backgroundColor: "rgb(50,205,50)",
-                borderColor: "rgb(50,205,50)",
+                lineTension: 0.3,
+                backgroundColor: "rgb(138,43,226)",
+                borderColor: "rgb(138,43,226)",
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgba(75,192,192,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 12,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 8,
+                pointRadius: 0,
+                pointHitRadius: 10,
+                data: [{% for item in data %}
+                    {%if ";" in item[0] %}
+                    { { item[1] } },
+                    {% endif %}
+                    {% endfor %}],
+                spanGaps: false
+            }]
+        }
+
+        var chartdiv = document.getElementById("userOverTime").getContext("2d");
+        new Chart(chartdiv, {
+            data: chartData,
+            type: 'line',
+        });
+
+        //  End of the chart code
+
+
+        //  Time spent by users chart
+        var chartData = {
+            labels: ['Sep','Oct','Nov','Dec','Jan'],
+            datasets: [{
+                label: 'Time Spent by users on Average (Time in seconds)',
+                fill: false,
+                lineTension: 0.3,
+                backgroundColor: "rgb(138,43,226)",
+                borderColor: "rgb(138,43,226)",
                 borderCapStyle: 'butt',
                 borderDash: [],
                 borderDashOffset: 0.0,
@@ -202,24 +272,134 @@
                 pointHoverBackgroundColor: "rgba(75,192,192,1)",
                 pointHoverBorderColor: "rgba(220,220,220,1)",
                 pointHoverBorderWidth: 2,
-                pointRadius: 1,
+                pointRadius: 0.5,
                 pointHitRadius: 10,
-                data: [{% for item in data %}
-                    {%if ";" in item[0] %}
-                        {{item[1]}},
-                    {% endif %}
-                {% endfor %}],
+                data: [20,5,100,90,30],
                 spanGaps: false
             }]
         }
-        var chartdiv = document.getElementById("putcharthere4").getContext("2d");
+
+        var chartdiv = document.getElementById("userTimeSpent").getContext("2d");
         new Chart(chartdiv, {
             data: chartData,
             type: 'line',
         });
-
         //  End of the chart code
 
+        //  Sector chart
+        var chartData = {
+            labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            datasets: [{
+                label: 'Most Searched for Sector',
+                fill: true,
+                lineTension: 0.3,
+                backgroundColor: ["rgb(186,85,211)", "rgb(148,0,211)", "rgb(153,50,204)", "rgb(139,0,139)", "rgb(128, 0, 128)", "rgb(75,0,130)", "rgb(147,112,219)", "rgb(128,0,128)", "rgb(147,112,219)"],
+                borderColor: "rgb(255,255,255)",
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgba(75,192,192,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 0.5,
+                pointHitRadius: 10,
+                data: [13, 22, 5, 25, 33, 12, 66, 43, 56, 69],
+                spanGaps: false
+            }]
+        }
+
+    var chartdiv = document.getElementById("mostSearchedSector").getContext("2d");
+        new Chart(chartdiv, {
+            data: chartData,
+            type: 'pie',
+        });
+
+        //  Location chart
+        var chartData = {
+            labels: [['Cardiff'], ['London'], ['Manchester'], ['Bristol'], ['Glasgow']],
+            datasets: [{
+                label: 'Most Searched for locations',
+                fill: true,
+                lineTension: 0.3,
+                backgroundColor: ["rgb(186,85,211)", "rgb(148,0,211)", "rgb(153,50,204)", "rgb(139,0,139)", "rgb(128, 0, 128)", "rgb(75,0,130)", "rgb(147,112,219)", "rgb(128,0,128)", "rgb(147,112,219)"],
+                borderColor: "rgb(255,255,255)",
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgb(255,255,255)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 0,
+                pointHoverRadius: 0,
+                pointHoverBackgroundColor: "rgb(255,255,255)",
+                pointHoverBorderColor: "rgb(255,255,255)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 0,
+                pointHitRadius: 10,
+                data: [14,14,13,13,15,16,14,16,18],
+                spanGaps: false
+            }]
+        }
+
+        var chartdiv = document.getElementById("mostSearchedLocation").getContext("2d");
+        new Chart(chartdiv, {
+            data: chartData,
+            type: 'polarArea',
+    });
+
+    //  Sector Chart
+    var chartData = {
+        labels: ['Technology'],
+        datasets: [{
+            label: 'Most retruned solutions',
+            fill: true,
+            lineTension: 0.3,
+            backgroundColor: ["rgb(186,85,211)", "rgb(148,0,211)", "rgb(153,50,204)", "rgb(139,0,139)", "rgb(128, 0, 128)", "rgb(75,0,130)", "rgb(147,112,219)", "rgb(128,0,128)", "rgb(147,112,219)"],
+            borderColor: "rgb(255,255,255)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgb(255,255,255)",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgb(255,255,255)",
+            pointHoverBorderColor: "rgb(255,255,255)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 0.5,
+            pointHitRadius: 10,
+            data: [13, 22, 5, 25],
+            spanGaps: false
+        }]
+    }
+
+    var chartdiv = document.getElementById("mostSearchedSolution").getContext("2d");
+    new Chart(chartdiv, {
+        data: chartData,
+        type: 'doughnut',
+    });
+
+
+    /*
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * */
 
         //Create table for Excel export
         var tableString = "<table><tr><th>Date</th><th>Assistant Opened</th><th>Questions Answered</th><th>Products Returned</th></tr>";
@@ -231,17 +411,6 @@
             tableString += "</tr>"
         {%endfor%}
         function fnExcelReport() {
-            // var tab_text="<table border='2px'><tr bgcolor='#87AFC6'>";
-            // var textRange; var j=0;
-            // tab = document.getElementById('headerTable'); // id of table
-            //
-            // for(j = 0 ; j < tab.rows.length ; j++)
-            // {
-            //     tab_text=tab_text+tab.rows[j].innerHTML+"</tr>";
-            //     //tab_text=tab_text+"</tr>";
-            // }
-            //
-            // tab_text=tab_text+"</table>";
             tab_text = tableString;
             tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//comment if u want links in your table
             tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // comment if u want images in your table
@@ -263,5 +432,5 @@
 
             return (sa);
         }
-    </script>
+</script>
     {% endblock %}

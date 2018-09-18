@@ -1,24 +1,52 @@
 from datetime import timedelta
 from flask import Blueprint, render_template, request, session, redirect, url_for
+from flask_api import status
 from utilties import helpers
-from models import User, Company, Role, Callback
+from models import Callback, Assistant
 from itsdangerous import URLSafeTimedSerializer
-from services import user_services, company_services, db_services, auth_services, mail_services
+from services import user_services, company_services, db_services, auth_services, mail_services,\
+    assistant_services, bot_services
+from models import secret_key
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 
+@public_router.route("/test", methods=['POST'])
+def t():
+    if request.method == "POST":
+        print(request.get_json(silent=True))
+        return helpers.jsonResponse(True, 200, "!!!", None)
+
+
+@public_router.route("/test-chatbot", methods=['GET'])
+def test_chatbot_page():
+    if request.method == "GET":
+        return render_template("test-chatbot.html")
+
+
+@public_router.route("/assistant/<int:assistantID>/chatbot", methods=['GET'])
+def chatbot(assistantID):
+    # For all type of requests, get the assistant
+    callback: Callback = assistant_services.getByID(assistantID)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+    assistant: Assistant = callback.Data
+
+    if request.method == "GET":
+        assistant: Assistant = callback.Data
+        # Get blocks for the chatbot to use
+        data: dict = bot_services.getChatbot(assistant)
+        return helpers.jsonResponse(True, 200, "No Message", data)
+
+    if request.method == "POST":
+        print(request.get_json(silent=True))
+        return helpers.jsonResponse(True, 200, "!!!", None)
+
 @public_router.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
-        print("Starting GET Request")
-        mail_callback : Callback = mail_services.sendVerificationEmail('evgeniy67@abv.bg', 'companyName', 'Faisal Julaidan')
-        print(mail_callback.Success, " ; ", mail_callback.Message)
-        mail_callback : Callback = mail_services.sendVerificationEmail('m.esteghamatdar@gmail.com', 'companyName', 'Faisal Julaidan')
-        print(mail_callback.Success, " ; ", mail_callback.Message)
-
         return render_template("index.html")
 
 
@@ -104,6 +132,38 @@ def sendEmail():
         return render_template("index.html")
 
 
+@public_router.route("/setencryptionkey<key>", methods=["GET"])
+def testing(key):
+    if "debug" in key:
+        serverRoute = "http://127.0.0.1:5000"
+        if "gT5-f" in key:
+            key = key.split("gT5-f")[1] + key.split("gT5-f")[0]
+            key = key.replace("gT5-f", "").replace("Pa-", "5o_n").replace("uF-r", "UbwF").replace("debug", "")
+    else:
+        serverRoute = "https://www.thesearchbase.com"
+    page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
+    text = page.read().decode("utf8")
+    part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')
+    page = urllib.request.urlopen(serverRoute + "/static/js/Chart.bundle.js")
+    text = page.read().decode("utf8")
+    part2 = text.split("GFoiWS$344wf43-cWzHOp")[1].split("Ye3Sv-FE-vWaIt3xWkbE6bsd7-jS")[0].replace('8B', '3J')
+    page = urllib.request.urlopen(serverRoute + "/static/css/admin.css")
+    text = page.read().decode("utf8")
+    part3 = text.split(".tic")[1].split("Icon")[0]
+    page = urllib.request.urlopen(serverRoute + "/static/css/themify-icons.css")
+    text = page.read().decode("utf8")
+    part4 = text.split("YbfEas-fUh")[1].split("TbCO")[0].replace('P-', '-G')
+    if not app.debug:
+        page = urllib.request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
+        text = page.read().decode("utf8")
+        part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
+    else:
+        part5 = ""
+    enckey = part1+part2+part3+part4+part5
+    enckey = (enckey+key).replace(" ", "")
+    secret_key = enckey
+    return "Done"
+
 @public_router.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == "GET":
@@ -131,6 +191,7 @@ def logout():
     session.pop('UserID', None)
     session.pop('UserEmail', None)
     session.pop('UserPlan', None)
+    session.pop('CompanyID', None)
     session.pop('Logged_in', False)
 
     return redirect(url_for('public_router.login'))
@@ -153,12 +214,12 @@ def signup():
 
         # Company info
         name = request.form.get("companyName", default=None)
-        size = request.form.get("companySize", default=None)
+        # size = request.form.get("companySize", default=None)
         url = request.form.get("websiteURL", default=None)
-        phone = request.form.get("phoneNumber", default=None)
+        # phone = request.form.get("phoneNumber", default=None)
 
         if not (fullname and email and password
-                and name and url and phone):
+                and name and url):
             print("Signup Error .1")
             return helpers.redirectWithMessage("signup", "Error in getting all input information.")
 
@@ -167,8 +228,7 @@ def signup():
         surname = fullname.strip().split(" ")[1]
 
         # Signup new user
-        signup_callback: Callback = auth_services.signup(email.lower(), firstname, surname, password,
-                                                         name, size, phone, url)
+        signup_callback: Callback = auth_services.signup(email.lower(), firstname, surname, password, name, url)
         print(signup_callback.Success, signup_callback.Message)
         if not signup_callback.Success:
             print(signup_callback.Message)
@@ -184,3 +244,64 @@ def signup():
                                         + '. Please contact TheSearchBaseStaff to activate your account.')
 
         return helpers.redirectWithMessage("login", "We have sent you a verification email. Please use it to complete the sign up process.")
+
+    
+## Error Handlers ##
+@public_router.errorhandler(status.HTTP_400_BAD_REQUEST)
+def bad_request(e):
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/400.html', error=e.description), status.HTTP_400_BAD_REQUEST
+    except:
+        print("Error without description")
+        return render_template('errors/400.html'), status.HTTP_400_BAD_REQUEST
+
+
+@public_router.errorhandler(status.HTTP_404_NOT_FOUND)
+def page_not_found(e):
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
+    except:
+        print("Error without description")
+        return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
+
+
+@public_router.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+def unsupported_media(e):
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/415.html', error=e.description), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+    except:
+        print("Error without description")
+        return render_template('errors/415.html'), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+
+
+@public_router.errorhandler(418)
+def im_a_teapot(e):
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/418.html', error=e.description), 418
+    except:
+        print("Error without description")
+        return render_template('errors/418.html'), 418
+
+
+@public_router.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
+def internal_server_error(e):
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/500.html', error=e.description), status.HTTP_500_INTERNAL_SERVER_ERROR
+    except:
+        print("Error without description")
+        return render_template('errors/500.html'), status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+@public_router.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
+def not_implemented(e):
+    try:
+        print("Error Handler:" + e.description)
+        return render_template('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
+    except:
+        print("Error without description")
+        return render_template('errors/501.html'), status.HTTP_501_NOT_IMPLEMENTED

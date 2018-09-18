@@ -20,6 +20,8 @@ isbnlib==3.6.8
 iso3166==0.8
 itsdangerous==0.24
 Jinja2==2.10
+jsonref==0.1
+jsonschema==2.6.0
 MarkupSafe==1.0
 py-moneyed==0.7.0
 pycparser==2.18
@@ -31,6 +33,7 @@ Shapely==1.6.4.post1
 simplejson==3.16.0
 six==1.11.0
 SQLAlchemy==1.2.10
+sqlalchemy_utils==0.33.3
 sqlathanor==0.3.0
 stripe==2.0.3
 urllib3==1.23

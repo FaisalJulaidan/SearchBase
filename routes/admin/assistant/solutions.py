@@ -1,11 +1,11 @@
 from flask import Blueprint, request, redirect, flash, session
 from services import solutions_services, admin_services, assistant_services, sub_services
-from models import Callback, Product
+from models import Callback, Solution
 from utilties import helpers
 
-products_router: Blueprint = Blueprint('products_router', __name__, template_folder="../../templates")
+solutions_router: Blueprint = Blueprint('Solutions_router', __name__, template_folder="../../templates")
 
-@products_router.route("/admin/assistant/<assistantID>/solutions", methods=['GET', 'POST'])
+@solutions_router.route("/admin/assistant/<assistantID>/solutions", methods=['GET', 'POST'])
 def admin_solutions(assistantID):
     if request.method == "GET":
 
@@ -15,7 +15,7 @@ def admin_solutions(assistantID):
         if not solutions_callback.Success: solutions_callback.Data = []
 
         #convert solutions to dics
-        if type(solutions_callback.Data) is Product:
+        if type(solutions_callback.Data) is Solution:
             solutions = [helpers.getDictFromSQLAlchemyObj(solutions_callback.Data)]
         else:
             solutions = helpers.getListFromSQLAlchemyList(solutions_callback.Data)
@@ -108,7 +108,7 @@ def admin_solutions(assistantID):
         return redirect("/admin/assistant/{}/solutions".format(assistantID))
 
 # TODO improve
-@products_router.route("/admin/assistant/<assistantID>/solutions/file", methods=['POST'])
+@solutions_router.route("/admin/assistant/<assistantID>/solutions/file", methods=['POST'])
 def admin_products_file_upload(assistantID):
     checkAssistantID(assistantID)
     if request.method == "POST":

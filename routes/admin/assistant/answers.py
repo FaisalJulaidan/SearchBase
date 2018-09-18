@@ -1,6 +1,6 @@
 from flask import Blueprint, request, flash
-from services import admin_services, questions_services, answer_services
-from models import Callback, Question
+from services import admin_services, answer_services
+from models import Callback
 from utilties import helpers
 from json import dumps
 
@@ -25,22 +25,22 @@ answers_router: Blueprint = Blueprint('answers_router', __name__, template_folde
 @answers_router.route("/admin/assistant/<assistantID>/answers", methods=['GET', 'POST'])
 def admin_answers(assistantID):
     if request.method == "GET":
-        callback: Callback = questions_services.getByAssistantID(assistantID)
-        if not callback.Success:
-            flash({'type': 'danger', 'msg': callback.Message})
-            return admin_services.render("admin/answers.html")
+        # callback: Callback = questions_services.getByAssistantID(assistantID)
+        # if not callback.Success:
+        #     flash({'type': 'danger', 'msg': callback.Message})
+        #     return admin_services.render("admin/answers.html")
+        #
+        # questions = helpers.getListFromSQLAlchemyList(callback.Data)
+        # answers = []
+        #
+        # for question in questions:
+        #     callback: Callback = answer_services.getByQuestionID(question['ID'])
+        #     if not callback.Success:
+        #         flash({'type': 'danger', 'msg': callback.Message})
+        #         return admin_services.render("admin/answers.html")
+        #     answers.append(helpers.getListFromSQLAlchemyList(callback.Data))
 
-        questions = helpers.getListFromSQLAlchemyList(callback.Data)
-        answers = []
-
-        for question in questions:
-            callback: Callback = answer_services.getByQuestionID(question['ID'])
-            if not callback.Success:
-                flash({'type': 'danger', 'msg': callback.Message})
-                return admin_services.render("admin/answers.html")
-            answers.append(helpers.getListFromSQLAlchemyList(callback.Data))
-
-        return admin_services.render("admin/answers.html", questions=questions, answers=answers)
+        return admin_services.render("admin/answers.html", questions={}, answers={})
 
     elif request.method == "POST":
         email = session.get('User')['Email']

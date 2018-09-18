@@ -202,8 +202,8 @@ def getOptions() -> dict:
             'alwaysStoreInDB': True
             },
             {
-                'name': BlockType.Solutions.value,
-                'maxSolutions': 5
+            'name': BlockType.Solutions.value,
+            'maxSolutions': 5
             },
         ]
     }

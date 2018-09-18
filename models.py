@@ -324,9 +324,9 @@ class Statistics(db.Model):
 
 
 class ValidationType(enum.Enum):
-
     Email = 'Email'
     Telephone = 'Telephone'
+    FullName = 'FullName'
 
 
 class BlockType(enum.Enum):

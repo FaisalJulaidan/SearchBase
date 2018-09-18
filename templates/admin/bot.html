@@ -557,8 +557,7 @@
                                     })(),
                                     success: function (res) {
                                         res = JSON.parse(res);
-                                        console.log(res)
-                                        $('.remainingBlocks span').html(res.remainingBlocks);
+                                        $('.remainingBlocks span').html(res.data.remainingBlocks);
                                         addNewBlock();
                                         swal({
                                             title: blockType + " added!",
@@ -800,7 +799,7 @@
                     })
                     .then((res) => {
                         res = JSON.parse(res);
-                        // todo: update number of remaining blocks
+                        $('.remainingBlocks span').html(res.data.remainingBlocks);
                         if (res.success) {
                             $(e.target).parent().parent().parent().remove();
                             swal("Success!", res.msg, "success");

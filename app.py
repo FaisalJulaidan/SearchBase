@@ -16,7 +16,7 @@ from cryptography.fernet import Fernet
 import urllib.request
 #from celery import Celery
 
-from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution
+from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution, ChatbotSession
 from services.mail_services import mail
 #, celery
 
@@ -204,6 +204,14 @@ def genDummyData():
                             ShortDescription="A town at my little job",  Money="£56000", Keywords="dog,sad",
                             URL="http://google.com", Assistant=reader_a))
 
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,18), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,15), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,6), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,5), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,1), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2017, 9,1), Assistant=reader_a))
 
     # Save all changes
     db.session.commit()

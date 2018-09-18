@@ -7,7 +7,7 @@ from utilties import helpers
 from models import Callback, Assistant, Solution, db, ChatbotSession
 from itsdangerous import URLSafeTimedSerializer
 from services import user_services, company_services, db_services, auth_services, mail_services,\
-    assistant_services, bot_services, chatbot_services, solutions_services
+    assistant_services, bot_services, chatbot_services, solutions_services,analytics_services
 from models import secret_key
 from werkzeug.utils import secure_filename
 import uuid
@@ -37,6 +37,7 @@ def chatbot(assistantID):
     if not callback.Success:
         return helpers.jsonResponse(False, 404, "Assistant not found.", None)
     assistant: Assistant = callback.Data
+    analytics_services.getActiveUsersInYear(assistant, days=2)
 
     if request.method == "GET":
         assistant: Assistant = callback.Data

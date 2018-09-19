@@ -329,7 +329,7 @@ class Solution(db.Model):
     TimesReturned = db.Column(db.Integer, nullable=False, default=0)
 
     # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID'), nullable=False)
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='Solutions')
 
     def __repr__(self):

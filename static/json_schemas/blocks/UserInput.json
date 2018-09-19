@@ -5,7 +5,7 @@
   "properties": {
     "text": {"type": "string"},
     "blockToGoID": {"type": ["number", "null"]},
-    "validation": {"enum": ["Email", "Telephone"]},
+    "validation": {"enum": ["Email", "Telephone",""]},
     "action": {"type": "string"}
     },
   "required": [

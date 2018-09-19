@@ -480,6 +480,7 @@
                                     $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
                                     $blockBody.html(render_blocks_change(newTemplateName));
                                     init_changed_block();
+                                    updateBlocksOrder();
                                 }
                             });
                     } else {
@@ -487,6 +488,7 @@
                         $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
                         $blockBody.html(render_blocks_change(newTemplateName));
                         init_changed_block();
+                        updateBlocksOrder();
                     }
                 });
 
@@ -757,6 +759,7 @@
                                     $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
                                     $blockBody.html(render_blocks_change(newTemplateName));
                                     init_changed_block();
+                                    updateBlocksOrder();
                                 }
                             });
                     } else {
@@ -764,6 +767,7 @@
                         $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
                         $blockBody.html(render_blocks_change(newTemplateName));
                         init_changed_block();
+                        updateBlocksOrder();
                     }
                 });
 
@@ -793,6 +797,7 @@
                     .then((res) => {
                         res = JSON.parse(res);
                         $('.remainingBlocks span').html(res.data.remainingBlocks);
+                        RemainingBlocks = res.data.remainingBlocks;
                         if (res.success) {
                             $(e.target).parent().parent().parent().remove();
                             swal("Success!", res.msg, "success");
@@ -864,6 +869,15 @@
                     if (type == 'Question') {
                         let rowsOfAnswers = $block.children().last().find('div.answers').children();
                         let answersArr = [];
+
+                        let id = +$block.attr('id');
+
+                        let text = (function () {
+                            let label = $block.children().last().find('.input-group').children().first().text();
+                            if (label.includes('Question'))
+                                return $block.children().last().find('.input-group').children().first().next().val();
+                        })();
+
                         let saveInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
 
                         for (const row of rowsOfAnswers) {
@@ -890,24 +904,30 @@
                                 });
                             }
                         }
-                        let text = $block.children().last().children().first().children().last().val();
-                        let id = +$block.attr('id');
 
                         botData.blocks.push(new BlockTypeQuestions(text, answersArr, saveInDB, type, order, id).Question);
                     }
 
                     if (type == 'User Input') {
+                        let text = (function () {
+                            let label = $block.children().last().find('.input-group').children().first().text();
+                            if (label.includes('Question'))
+                                return $block.children().last().find('.input-group').children().first().next().val();
+                        })();
                         let action = $block.children().last().find('input.normalCursor').first().val();
                         let validationn = $block.children().last().find('input.normalCursor').last().val();
                         let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
-                        let text = $block.children().last().children().first().children().last().val();
                         let id = +$block.attr('id');
 
                         botData.blocks.push(new BlockTypeUserInput(text, action, validationn, storeInDB, type, order, id).UserInput);
                     }
 
                     if (type == 'File Upload') {
-                        let text = $block.children().last().children().first().children().last().val();
+                        let text = (function () {
+                            let label = $block.children().last().find('.input-group').children().first().text();
+                            if (label.includes('Question'))
+                                return $block.children().last().find('.input-group').children().first().next().val();
+                        })();
                         let action = $block.children().last().find('input.normalCursor').first().val();
 
                         let fileTypes = [];
@@ -936,6 +956,7 @@
                             options = JSON.parse(res[1]).data;
                             render_blocks(data.blocks);
                             init_added_block();
+                            updateBlocksOrder();
                         });
 
                     }, error: function (request, status, error) {
@@ -951,6 +972,7 @@
                     RemainingBlocks = Number($('.remainingBlocks span').html());
                     render_blocks(data.blocks);
                     init_added_block();
+                    updateBlocksOrder();
                 });
             }
 

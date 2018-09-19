@@ -403,13 +403,6 @@ class ChatbotSession(db.Model):
     QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
 
 
-
-
-    # SessionID = db.Column(db.Integer, nullable=False)
-    # Input = db.Column(db.String(), nullable=False)
-    # QuestionText = db.Column(db.String(), nullable=False)
-    # Keywords = db.Column(db.String(), nullable=False)
-
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')

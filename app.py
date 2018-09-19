@@ -23,7 +23,8 @@ from services.mail_services import mail
 # Import all routers to register them as blueprints
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
     solutions_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
-    changePassword_router, answers_router, bot_router, emoji_router, adminBasic_router, assistantManager_router
+    changePassword_router, answers_router, bot_router, emoji_router, adminBasic_router,\
+    assistantManager_router, assistant_router
 
 from routes.public.routers import public_router, resetPassword_router
 from services import user_services, mail_services
@@ -33,6 +34,7 @@ app = Flask(__name__, static_folder='static')
 # Register Routes:
 app.register_blueprint(adminBasic_router)
 app.register_blueprint(assistantManager_router)
+app.register_blueprint(assistant_router)
 app.register_blueprint(dashboard_router)
 app.register_blueprint(public_router)
 app.register_blueprint(resetPassword_router)

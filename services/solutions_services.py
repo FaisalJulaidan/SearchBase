@@ -28,13 +28,15 @@ def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Call
     for key, value in dic.items():
         for s in solutions:
             if s.ID == key and value !=0:
+                # incrementing TimesReturned value for every returned solutions by +1
+                s.TimesReturned +=1
                 result.append(s)
                 break
         if count == max:
             break
         count += 1
-
-    print(result)
+        # Save
+        db.session.commit()
     return Callback(True, 'Solutions based on keywords retrieved successfully!!', result)
 
 

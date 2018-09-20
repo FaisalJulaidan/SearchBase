@@ -8,9 +8,10 @@
       "type": "object",
       "properties":{
         "type": {"enum": ["Question", "User Input", "File Upload", "Solutions"]},
-        "storeInDB": {"type": "boolean"}
-      },
-      "required": ["type", "storeInDB"],
+        "storeInDB": {"type": "boolean"},
+        "content": {"type": "object"}
+        },
+      "required": ["type", "storeInDB", "content"],
       "additionalProperties": false
     }
   },

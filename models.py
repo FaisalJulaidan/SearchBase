@@ -407,7 +407,7 @@ class ChatbotSession(db.Model):
     Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')
 
     def __repr__(self):
-        return '<UserInput {}>'.format(self.Input)
+        return '<ChatbotSession {}>'.format(self.Data)
 
 
 class Answer(db.Model):

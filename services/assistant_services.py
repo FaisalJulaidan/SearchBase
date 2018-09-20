@@ -45,24 +45,24 @@ def getAll(companyID) -> Callback:
 
     except Exception as exc:
         print(exc)
-        return Callback(True,
-                        'Could not get all assistants.')
+        return Callback(False,'Could not get all assistants.')
 
 
 def create(nickname, route, message, secondsUntilPopup, company: Company) -> Assistant or None:
     try:
-        callback = sub_services.getPlanByNickname(se)
-        assistant = Assistant(Nickname=nickname, Route=route, Message=message,
+        assistant = Assistant(Name=nickname, Route=route, Message=message,
                               SecondsUntilPopup=secondsUntilPopup,
                               Company=company)
-
         db.session.add(assistant)
-    except sqlalchemy.exc.SQLAlchemyError as exc:
+
+    except Exception as exc:
         print(exc)
         db.session.rollback()
-        return None
+        return Callback(False, 'Failed to create the assistant', None)
 
-    return assistant
+    # Save
+    db.session.commit()
+    return Callback(True, 'Assistant has ben created successfully!', assistant)
 
 
 def update(id, nickname, message, secondsUntilPopup)-> Callback:
@@ -72,14 +72,14 @@ def update(id, nickname, message, secondsUntilPopup)-> Callback:
                                                                        'SecondsUntilPopup': secondsUntilPopup})
         db.session.commit()
 
-        return Callback(True,
-                        nickname+' Updated Successfully')
+        return Callback(True, nickname+' Updated Successfully')
 
     except sqlalchemy.exc.SQLAlchemyError as exc:
         print(exc)
         db.session.rollback()
         return Callback(False,
                         "Couldn't update assistant "+nickname)
+
 
 def changeStatus(id, active):
     try:

@@ -30,11 +30,11 @@
     {%endif%}
 
     {%for record in data %}
-    currentLength = 0;
-    {%for value in record['data']['collectedInformation'] %}
-    currentLength++;
-    {% endfor %}
-    if (currentLength > maxLength) { maxLength = currentLength; }
+        currentLength = 0;
+        {%for value in record['data']['collectedInformation'] %}
+            currentLength++;
+        {% endfor %}
+        if (currentLength > maxLength) { maxLength = currentLength; }
     {%endfor%}
 
     var headings = "";
@@ -43,11 +43,11 @@
     }
 
     tableString = "<table id=\"tableSort\" class=\"table table-striped jambo_table bulk_action\"><thead>\
-                            <tr id=\"tableHeadingUIn\" class=\"headings\">"+ headings +"</tr></thead>\
+                            <tr id=\"tableHeadingUIn\" class=\"headings\"><th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Date and Time</th>"+ headings +"</tr></thead>\
                             <tbody id=\"tBodyUIn\">";
     var filename = undefined;
     {%for record in data %}
-        tableString += "<tr><td></td>"
+        tableString += "<tr><td>"+"{{record['dateTime']}}".split(".")[0]+"</td>"
         {%for value in record['data']['collectedInformation'] %}
             {%if '&FILE_UPLOAD&' in value['input'] %}
                 filename = "{{record['filePath']}}";

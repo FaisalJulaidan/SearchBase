@@ -5,7 +5,7 @@ from utilties import helpers
 def getByAssistantID(assistantID):
     try:
         9
-        result = db.session.query(ChatbotSession).filter(UserInput.AssistantID == assistantID).all()
+        result = db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID).all()
         print(result)
         if not result: raise Exception
 

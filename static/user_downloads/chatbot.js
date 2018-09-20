@@ -96,14 +96,10 @@ function OpenButtonHoverEnd() {
     }
 }
 
-function loadIframe(iframeName, url) {
-    var $iframe = $('#' + iframeName);
-    url = "https://thesearchbase.com/chatbot/" + url;
-    if ($iframe.length) {
-        $iframe.attr('src', url);
-        return false;
-    }
-    return true;
+function loadIframe(url) {
+    var $iframe = $('#' + "chatbotIframe");
+    url = "https://thesearchbase.com//chatbottemplate//" + url;
+    $iframe.attr('src', url);
 }
 
 function GetPopSettings(assistantID) {

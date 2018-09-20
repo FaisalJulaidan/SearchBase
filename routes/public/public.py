@@ -1,7 +1,7 @@
 import os
 from config import BaseConfig
 from datetime import timedelta
-from flask import Blueprint, render_template, request, session, redirect, url_for
+from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory
 from flask_api import status
 from utilties import helpers
 from models import Callback, Assistant, Solution, db, ChatbotSession
@@ -66,7 +66,7 @@ def chatbot(assistantID):
 @public_router.route("/assistant/<int:assistantID>/pagerequest", methods=['GET'])
 def assistant_pagerequest(assistantID):
     if request.method == "GET":
-        return public_router.send_static_file('user_downloads/TSBChatbot.html')
+        return send_from_directory('../static/user_downloads/', "TSBChatbot.html")
 
 @public_router.route("/assistant/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(sessionID):

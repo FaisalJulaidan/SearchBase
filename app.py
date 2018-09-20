@@ -29,7 +29,7 @@ from routes.admin.routers import dashboard_router, profile_router,  admin_api, s
 from routes.public.routers import public_router, resetPassword_router
 from services import user_services, mail_services
 
-app = Flask(__name__, static_folder='static', static_url_path='')
+app = Flask(__name__, static_folder='static')
 
 # Register Routes:
 app.register_blueprint(adminBasic_router)

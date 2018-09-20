@@ -66,7 +66,7 @@ def chatbot(assistantID):
 @public_router.route("/assistant/<int:assistantID>/pagerequest", methods=['GET'])
 def assistant_pagerequest(assistantID):
     if request.method == "GET":
-        return public_router.send_static_file('/static/user_downloads/TSBChatbot.html')
+        return public_router.send_static_file('user_downloads/TSBChatbot.html')
 
 @public_router.route("/assistant/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(sessionID):

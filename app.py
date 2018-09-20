@@ -110,7 +110,7 @@ def genDummyData():
     db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Assistant=reader_a, Content={
         "answers": [
           {
-            "action": "Go To Specific Block",
+            "action": "Go To Next Block",
             "answer":  {"text": "Yes", "timesClicked": 0},
             "keywords": [
               "smoker",

@@ -155,7 +155,7 @@
             <div class="x_title" style="display: flow-root;">
                 <div class="pull-left">
                     <h4>🤖 Bot Configuration</h4>
-                    <small>Showing all questions and answers with its sort</small>
+                    <small>Showing all questions and answers.</small>
                 </div>
                 <div class="pull-right remainingBlocks">
                     <i class="addBlock clickable glyphicon glyphicon-plus"></i>
@@ -332,7 +332,9 @@
                     if ($(e.target).is('a') ||
                         $(e.target).is('input.form-control') ||
                         $(e.target).is('i.trash') ||
-                        $(e.target).is('i.trashAnswer')
+                        $(e.target).is('i.trashAnswer') ||
+                        $(e.target).parent().parent().parent().parent().is('div.answers') ||
+                        $(e.target).parent().parent().parent().parent().is('div.row')
                     ) {
                         e.preventDefault();
                         return;
@@ -424,32 +426,7 @@
                 $('i.trash').on('click', e => deleteBlock(e));
 
                 // Input radio-group delete answer
-                $('i.trashAnswer').on('click', function (e) {
-                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
-                    if (hasAnswer) {
-                        swal({
-                            title: "Are you sure?",
-                            text: "Answer will be removed completely from the system",
-                            icon: "warning",
-                            buttons: true,
-                            dangerMode: true,
-                        })
-                            .then((willDelete) => {
-                                temp = $(e.target).parent().parent().parent().parent().parent().parent();
-                                if (willDelete) {
-                                    $(e.target).parent().parent().parent().parent().remove();
-                                    swal("Success!", "Answer has been deleted successfully", "success")
-                                }
-                                // run answers restructure function
-                                answersRestructure(temp)
-                            });
-                    } else {
-                        temp = $(e.target).parent().parent().parent().parent().parent().parent();
-                        $(e.target).parent().parent().parent().parent().remove();
-                        // run answers restructure function
-                        answersRestructure(temp)
-                    }
-                });
+                $('i.trashAnswer').on('click', e => deleteAnswer(e));
 
                 // init tags
                 $('input[name=tags]').each((i, input) => {
@@ -480,6 +457,7 @@
                                     $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
                                     $blockBody.html(render_blocks_change(newTemplateName));
                                     init_changed_block();
+                                    updateBlocksOrder();
                                 }
                             });
                     } else {
@@ -487,6 +465,7 @@
                         $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
                         $blockBody.html(render_blocks_change(newTemplateName));
                         init_changed_block();
+                        updateBlocksOrder();
                     }
                 });
 
@@ -618,32 +597,7 @@
                 $('i.trash').on('click', e => deleteBlock(e));
 
                 // Input radio-group delete answer
-                $('i.trashAnswer').on('click', function (e) {
-                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
-                    if (hasAnswer) {
-                        swal({
-                            title: "Are you sure?",
-                            text: "Answer will be removed completely from the system",
-                            icon: "warning",
-                            buttons: true,
-                            dangerMode: true,
-                        })
-                            .then((willDelete) => {
-                                temp = $(e.target).parent().parent().parent().parent().parent().parent();
-                                if (willDelete) {
-                                    $(e.target).parent().parent().parent().parent().remove();
-                                    swal("Success!", "Answer has been deleted successfully", "success")
-                                }
-                                // run answers restructure function
-                                answersRestructure(temp)
-                            });
-                    } else {
-                        temp = $(e.target).parent().parent().parent().parent().parent().parent();
-                        $(e.target).parent().parent().parent().parent().remove();
-                        // run answers restructure function
-                        answersRestructure(temp)
-                    }
-                });
+                $('i.trashAnswer').on('click', e => deleteAnswer(e));
 
                 // init tags
                 $('input[name=tags]').each((i, input) => {
@@ -701,32 +655,7 @@
                 $('i.trash').on('click', e => deleteBlock(e));
 
                 // Input radio-group delete answer
-                $('i.trashAnswer').on('click', function (e) {
-                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
-                    if (hasAnswer) {
-                        swal({
-                            title: "Are you sure?",
-                            text: "Answer will be removed completely from the system",
-                            icon: "warning",
-                            buttons: true,
-                            dangerMode: true,
-                        })
-                            .then((willDelete) => {
-                                temp = $(e.target).parent().parent().parent().parent().parent().parent();
-                                if (willDelete) {
-                                    $(e.target).parent().parent().parent().parent().remove();
-                                    swal("Success!", "Answer has been deleted successfully", "success")
-                                }
-                                // run answers restructure function
-                                answersRestructure(temp)
-                            });
-                    } else {
-                        temp = $(e.target).parent().parent().parent().parent().parent().parent();
-                        $(e.target).parent().parent().parent().parent().remove();
-                        // run answers restructure function
-                        answersRestructure(temp)
-                    }
-                });
+                $('i.trashAnswer').on('click', e => deleteAnswer(e));
 
                 // init tags
                 $('input[name=tags]').each((i, input) => {
@@ -757,6 +686,7 @@
                                     $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
                                     $blockBody.html(render_blocks_change(newTemplateName));
                                     init_changed_block();
+                                    updateBlocksOrder();
                                 }
                             });
                     } else {
@@ -764,6 +694,7 @@
                         $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
                         $blockBody.html(render_blocks_change(newTemplateName));
                         init_changed_block();
+                        updateBlocksOrder();
                     }
                 });
 
@@ -793,6 +724,7 @@
                     .then((res) => {
                         res = JSON.parse(res);
                         $('.remainingBlocks span').html(res.data.remainingBlocks);
+                        RemainingBlocks = res.data.remainingBlocks;
                         if (res.success) {
                             $(e.target).parent().parent().parent().remove();
                             swal("Success!", res.msg, "success");
@@ -864,6 +796,15 @@
                     if (type == 'Question') {
                         let rowsOfAnswers = $block.children().last().find('div.answers').children();
                         let answersArr = [];
+
+                        let id = +$block.attr('id');
+
+                        let text = (function () {
+                            let label = $block.children().last().find('.input-group').children().first().text();
+                            if (label.includes('Question'))
+                                return $block.children().last().find('.input-group').children().first().next().val();
+                        })();
+
                         let saveInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
 
                         for (const row of rowsOfAnswers) {
@@ -875,7 +816,7 @@
                                 let action = $answer.children().find('input.form-control').last().val();
                                 let keywords = (function () {
                                     let keywordsArr = [];
-                                    $('tags').first().children('tag').each((i, tag) => {
+                                    $answer.find('tags').children('tag').each((i, tag) => {
                                         keywordsArr.push($(tag).attr('value'))
                                     });
                                     return keywordsArr;
@@ -890,24 +831,30 @@
                                 });
                             }
                         }
-                        let text = $block.children().last().children().first().children().last().val();
-                        let id = +$block.attr('id');
 
                         botData.blocks.push(new BlockTypeQuestions(text, answersArr, saveInDB, type, order, id).Question);
                     }
 
                     if (type == 'User Input') {
+                        let text = (function () {
+                            let label = $block.children().last().find('.input-group').children().first().text();
+                            if (label.includes('Question'))
+                                return $block.children().last().find('.input-group').children().first().next().val();
+                        })();
                         let action = $block.children().last().find('input.normalCursor').first().val();
                         let validationn = $block.children().last().find('input.normalCursor').last().val();
                         let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
-                        let text = $block.children().last().children().first().children().last().val();
                         let id = +$block.attr('id');
 
                         botData.blocks.push(new BlockTypeUserInput(text, action, validationn, storeInDB, type, order, id).UserInput);
                     }
 
                     if (type == 'File Upload') {
-                        let text = $block.children().last().children().first().children().last().val();
+                        let text = (function () {
+                            let label = $block.children().last().find('.input-group').children().first().text();
+                            if (label.includes('Question'))
+                                return $block.children().last().find('.input-group').children().first().next().val();
+                        })();
                         let action = $block.children().last().find('input.normalCursor').first().val();
 
                         let fileTypes = [];
@@ -936,6 +883,7 @@
                             options = JSON.parse(res[1]).data;
                             render_blocks(data.blocks);
                             init_added_block();
+                            updateBlocksOrder();
                         });
 
                     }, error: function (request, status, error) {
@@ -951,48 +899,13 @@
                     RemainingBlocks = Number($('.remainingBlocks span').html());
                     render_blocks(data.blocks);
                     init_added_block();
-                });
-            }
-
-            function updateBlocksOrder() {
-                let panelList = $('#draggablePanelList');
-                BlocksOrder = [];
-                $('.blockPanel', panelList).each(function (index, elem) {
-                    let $listItem = $(elem), newIndex = $listItem.index();
-                    BlocksOrder.push({
-                        block: $listItem,
-                        order: newIndex + 1
-                    });
+                    updateBlocksOrder();
                 });
             }
 
             function init_answers_panels() {
-                $('i.trashAnswer').on('click', function (e) {
-                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
-                    if (hasAnswer) {
-                        swal({
-                            title: "Are you sure?",
-                            text: "Answer will be removed completely from the system",
-                            icon: "warning",
-                            buttons: true,
-                            dangerMode: true,
-                        })
-                            .then((willDelete) => {
-                                temp = $(e.target).parent().parent().parent().parent().parent().parent();
-                                if (willDelete) {
-                                    $(e.target).parent().parent().parent().parent().remove();
-                                    swal("Success!", "Answer has been deleted successfully", "success")
-                                }
-                                // run answers restructure function
-                                answersRestructure(temp)
-                            });
-                    } else {
-                        temp = $(e.target).parent().parent().parent().parent().parent().parent();
-                        $(e.target).parent().parent().parent().parent().remove();
-                        // run answers restructure function
-                        answersRestructure(temp)
-                    }
-                });
+                $('i.trashAnswer').on('click', e => deleteAnswer(e));
+
                 // init tags
                 $('input[name=tags]').each((i, input) => {
                     if (!$(input).hasClass('tagified')) {
@@ -1019,6 +932,32 @@
                     });
                 });
 
+            }
+
+            function deleteAnswer(e) {
+                let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
+                if (hasAnswer) {
+                    swal({
+                        title: "Are you sure?",
+                        text: "Answer will be removed completely from the system",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    })
+                        .then((willDelete) => {
+                            temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                            if (willDelete) {
+                                $(e.target).parent().parent().parent().parent().remove();
+                            }
+                            // run answers restructure function
+                            answersRestructure(temp)
+                        });
+                } else {
+                    temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                    $(e.target).parent().parent().parent().parent().remove();
+                    // run answers restructure function
+                    answersRestructure(temp)
+                }
             }
 
             function addAnswer(target) {
@@ -1051,7 +990,6 @@
                     "          </button>\n" +
                     "          <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
                     "<li><a>Go To Next Block</a></li>\n" +
-                    "<li><a>Go To Specific Block</a></li>\n" +
                     "          </ul>\n" +
                     "        </div><!-- /btn-group -->\n" +
                     "      </div><!-- /input-group -->\n" +
@@ -1087,7 +1025,6 @@
 
                 });
                 answersRestructure(target);
-                init_answers_panels();
             }
 
             function answersRestructure(target) {
@@ -1124,10 +1061,20 @@
                         rowSize = 1;
 
                     }
-
                 }
                 init_answers_panels();
+            }
 
+            function updateBlocksOrder() {
+                let panelList = $('#draggablePanelList');
+                BlocksOrder = [];
+                $('.blockPanel', panelList).each(function (index, elem) {
+                    let $listItem = $(elem), newIndex = $listItem.index();
+                    BlocksOrder.push({
+                        block: $listItem,
+                        order: newIndex + 1
+                    });
+                });
             }
 
             function GET_data() {
@@ -1259,13 +1206,13 @@
                                 rowSize++;
                             }
                             else {
-                                $answers.children().append($("<div class='row'></div>"));
+                                $answers.append($("<div class='row'></div>"));
 
                                 answerTemplate = $(getAnswerTemplate(actions));
                                 answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
                                 answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
                                 answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
-                                answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
+                                answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].answer.text);
                                 $answers.children().last().append(answerTemplate);
 
                                 rowSize = 1;
@@ -1584,7 +1531,7 @@
                 $("#assistantName").html(
                     "Assistant: " + assistantName +
                     "<span class=\"pull-right h5\">Bot version: " + botVersion + "</span>"
-                )
+                );
 
                 $('.remainingBlocks span').html(remainingBlocks);
             }

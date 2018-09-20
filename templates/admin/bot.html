@@ -889,7 +889,7 @@
                                 let action = $answer.children().find('input.form-control').last().val();
                                 let keywords = (function () {
                                     let keywordsArr = [];
-                                    $('tags').first().children('tag').each((i, tag) => {
+                                    $answer.find('tags').children('tag').each((i, tag) => {
                                         keywordsArr.push($(tag).attr('value'))
                                     });
                                     return keywordsArr;
@@ -1287,7 +1287,7 @@
                                 answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
                                 answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
                                 answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
-                                answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
+                                answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].answer.text);
                                 $answers.children().last().append(answerTemplate);
 
                                 rowSize = 1;

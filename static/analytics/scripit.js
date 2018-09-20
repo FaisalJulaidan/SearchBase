@@ -18,9 +18,9 @@ function getAnalytics(){
         popularSolutions = res.data.popularSolutions;
         totalReturnedSolutions = res.data.totalReturnedSolutions;
         timeSpentAvgOvertime = res.data.timeSpentAvgOvertime;
-        usersOvertime = res.data.usersOvertime;
+        // usersOvertime = res.data.usersOvertime;
         console.log(usersOvertime.reverse());
-        renderChartJS("line", "line-chart", ["2017-07-04T01:51:02-06:00", "2017-07-04T10:51:02-06:00"], usersOvertime.reverse(), "Total Number of Players Playing", "Date", "Players", "188,4,0", 0); // Number of players
+        // renderChartJS("line", "line-chart", ["2017-07-04T01:51:02-06:00", "2017-07-04T10:51:02-06:00"], usersOvertime.reverse(), "Total Number of Players Playing", "Date", "Players", "188,4,0", 0); // Number of players
         // loadGraphs()
 
     }).fail(function (res) {

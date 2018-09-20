@@ -111,7 +111,8 @@ def genDummyData():
         "answers": [
           {
             "action": "Go To Next Block",
-            "answer":  {"text": "Yes", "timesClicked": 0},
+            "text": "Yes",
+            "timesClicked": 0,
             "keywords": [
               "smoker",
               "sad"
@@ -120,7 +121,8 @@ def genDummyData():
           },
           {
             "action": "Go To Next Block",
-            "answer": {"text": "No", "timesClicked": 0},
+            "text": "No",
+            "timesClicked": 0,
             "keywords": [
               "smoker",
               "sad"

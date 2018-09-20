@@ -440,7 +440,7 @@
                 $('.panel-heading li').on('click', (e) => {
                     $target = $(e.target);
                     let isTargetType = $target.parent().parent().parent().children().first().text().includes('Type');
-                    let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val()
+                    let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val();
 
                     if (isTargetType && hasData) {
                         swal({
@@ -824,9 +824,7 @@
 
                                 answersArr.push({
                                     action: action ? action : 'Go To Next Block',
-                                    answer: {
-                                        text: text
-                                    },
+                                    text: text,
                                     keywords: keywords
                                 });
                             }
@@ -868,6 +866,7 @@
 
                         botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, storeInDB, type, order, id).FileUpload);
                     }
+                    console.log(botData)
                 }
                 $.ajax({
                     method: 'PUT',
@@ -1199,7 +1198,7 @@
                                 answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
                                 answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
                                 answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
-                                answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].answer.text);
+                                answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].text);
 
                                 $answers.children().last().append(answerTemplate);
 
@@ -1212,7 +1211,7 @@
                                 answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
                                 answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
                                 answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
-                                answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].answer.text);
+                                answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].text);
                                 $answers.children().last().append(answerTemplate);
 
                                 rowSize = 1;

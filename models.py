@@ -90,12 +90,11 @@ class Company(db.Model):
                         on_serialize=None,
                         on_deserialize=None
                         )
-    # Size = db.Column(db.String(60),
-    #                 supports_json=True,
-    #                 supports_dict=True,
-    #                 on_serialize=None,
-    #                 on_deserialize=None
-    #                 )
+
+    StripeID = db.Column(db.String(68), unique=True, nullable=False,)
+    SubID = db.Column(db.String(68), unique=True, default=None)
+
+    # Size = db.Column(db.String(60))
 
     # Relationships:
     Users = db.relationship('User', back_populates='Company', cascade="all, delete, delete-orphan")
@@ -156,18 +155,6 @@ class User(db.Model):
                          on_serialize=None,
                          on_deserialize=None
                          )
-    StripeID = db.Column(db.String(128), default=None, unique=True,
-                         supports_json=True,
-                         supports_dict=True,
-                         on_serialize=None,
-                         on_deserialize=None
-                         )
-    SubID = db.Column(db.String(64), default=None, unique=True,
-                      supports_json=True,
-                      supports_dict=True,
-                      on_serialize=None,
-                      on_deserialize=None
-                      )
     Verified = db.Column(db.Boolean(), nullable=False, default=False,
                          supports_json=True,
                          supports_dict=True,
@@ -204,6 +191,8 @@ class User(db.Model):
                            on_serialize=None,
                            on_deserialize=None
                            )
+
+    Settings = db.relationship("UserSettings", uselist=False, back_populates="User")
 
     def __repr__(self):
         return '<User {}>'.format(self.Email)
@@ -277,6 +266,7 @@ class Assistant(db.Model):
     Solutions = db.relationship('Solution', back_populates='Assistant')
     Statistics = db.relationship('Statistics', back_populates='Assistant')
     Blocks = db.relationship('Block', back_populates='Assistant')
+    UserInputs = db.relationship('UserInput', back_populates='Assistant')
 
     # Constraints:
     db.UniqueConstraint('CompanyID', 'Nickname', name='uix1_assistant')
@@ -288,22 +278,61 @@ class Assistant(db.Model):
 
 class Solution(db.Model):
 
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    SolutionID = db.Column(db.Integer, nullable=False)
-    Name = db.Column(db.String(128), nullable=False)
-    Brand = db.Column(db.String(128), nullable=False)
-    Model = db.Column(db.String(128), nullable=False)
-    Price = db.Column(db.String(128), nullable=False)
-    Keywords = db.Column(db.String(128), nullable=False)
-    Discount = db.Column(db.String(128), nullable=False)
-    URL = db.Column(db.String(), nullable=False)
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
+                   supports_json=True,
+                   supports_dict=True,
+                   on_serialize=None,
+                   on_deserialize=None
+                   )
+    SolutionID = db.Column(db.String(128), nullable=False,
+                           supports_json=True,
+                           supports_dict=True,
+                           on_serialize=None,
+                           on_deserialize=None
+                           )
+    MajorTitle = db.Column(db.String(128), nullable=False,
+                           supports_json=True,
+                           supports_dict=True,
+                           on_serialize=None,
+                           on_deserialize=None
+                           )
+    SecondaryTitle = db.Column(db.String(128), nullable=False,
+                               supports_json=True,
+                               supports_dict=True,
+                               on_serialize=None,
+                               on_deserialize=None
+                               )
+    ShortDescription = db.Column(db.String(128), nullable=False,
+                                 supports_json=True,
+                                 supports_dict=True,
+                                 on_serialize=None,
+                                 on_deserialize=None
+                                 )
+    Money = db.Column(db.String(128), nullable=False,
+                      supports_json=True,
+                      supports_dict=True,
+                      on_serialize=None,
+                      on_deserialize=None
+                      )
+    Keywords = db.Column(db.String(128), nullable=False,
+                         supports_json=True,
+                         supports_dict=True,
+                         on_serialize=None,
+                         on_deserialize=None
+                         )
+    URL = db.Column(db.String(), nullable=False,
+                    supports_json=True,
+                    supports_dict=True,
+                    on_serialize=None,
+                    on_deserialize=None
+                    )
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='Solutions')
 
     def __repr__(self):
-        return '<Solution {}>'.format(self.Name)
+        return '<Solution {}>'.format(self.MajorTitle)
 
 
 class Statistics(db.Model):
@@ -365,15 +394,19 @@ class Block(db.Model):
 class UserInput(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    SessionID = db.Column(db.Integer, nullable=False)
-    Input = db.Column(db.String(), nullable=False)
-    QuestionText = db.Column(db.String(), nullable=False)
-    Keywords = db.Column(db.String(), nullable=False)
-    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+    Data = db.Column(JsonEncodedDict, nullable=False)
+    FilePath = db.Column(db.String(), nullable=True, default=None)
+
+
+    # SessionID = db.Column(db.Integer, nullable=False)
+    # Input = db.Column(db.String(), nullable=False)
+    # QuestionText = db.Column(db.String(), nullable=False)
+    # Keywords = db.Column(db.String(), nullable=False)
+    # DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
     # Relationships:
-    BlockID = db.Column(db.Integer, db.ForeignKey('block.ID', ondelete='SET NULL'), nullable=False)
-    Block = db.relationship('Block', foreign_keys=[BlockID])
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='UserInputs')
 
     def __repr__(self):
         return '<UserInput {}>'.format(self.Input)
@@ -441,6 +474,19 @@ class Newsletter(db.Model):
     def __repr__(self):
         return '<Newsletters {}>'.format(self.Email)
 
+
+class UserSettings(db.Model):
+
+    ID = db.Column(db.Integer, db.ForeignKey("user.ID", ondelete='cascade'), primary_key=True, unique=True)
+    TrackingData = db.Column(db.Boolean, nullable=False, default=False)
+    TechnicalSupport = db.Column(db.Boolean, nullable=False, default=False)
+    AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
+
+    # Relationships:
+    User = db.relationship('User', back_populates='Settings')
+
+    def __repr__(self):
+        return '<UserSettings {}>'.format(self.ID)
 
 class Callback():
     def __init__(self, success: bool, message: str, data: str or dict or bool = None):

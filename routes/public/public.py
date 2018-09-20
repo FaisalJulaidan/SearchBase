@@ -1,12 +1,16 @@
+import os
+from config import BaseConfig
 from datetime import timedelta
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from flask_api import status
 from utilties import helpers
-from models import Callback, Assistant
+from models import Callback, Assistant, Solution, db, UserInput
 from itsdangerous import URLSafeTimedSerializer
 from services import user_services, company_services, db_services, auth_services, mail_services,\
-    assistant_services, bot_services
+    assistant_services, bot_services, chatbot_services, solutions_services
 from models import secret_key
+from werkzeug.utils import secure_filename
+import uuid
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
 
@@ -20,13 +24,13 @@ def t():
         return helpers.jsonResponse(True, 200, "!!!", None)
 
 
-@public_router.route("/test-chatbot", methods=['GET'])
-def test_chatbot_page():
+@public_router.route("/chatbottemplate/<assistantID>", methods=['GET'])
+def test_chatbot_page(assistantID):
     if request.method == "GET":
-        return render_template("test-chatbot.html")
+        return render_template("chatbot-template.html")
 
 
-@public_router.route("/assistant/<int:assistantID>/chatbot", methods=['GET'])
+@public_router.route("/assistant/<int:assistantID>/chatbot", methods=['GET', 'POST'])
 def chatbot(assistantID):
     # For all type of requests, get the assistant
     callback: Callback = assistant_services.getByID(assistantID)
@@ -41,8 +45,63 @@ def chatbot(assistantID):
         return helpers.jsonResponse(True, 200, "No Message", data)
 
     if request.method == "POST":
-        print(request.get_json(silent=True))
-        return helpers.jsonResponse(True, 200, "!!!", None)
+        data = request.get_json(silent=True)
+        ch_callback: Callback = chatbot_services.processData(assistant, data)
+
+        if not ch_callback.Success:
+            return helpers.jsonResponse(False, 400, ch_callback.Message)
+
+        s_callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'])
+        if not s_callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
+
+        solutions = []
+        for s in s_callback.Data:
+            solutions.append(s.to_dict())
+
+        return helpers.jsonResponse(True, 200, "Solution list is here!", {'sessionID': ch_callback.Data.ID, 'solutions':solutions})
+
+
+@public_router.route("/assistant/<int:sessionID>/file", methods=['POST'])
+def chatbot_upload_files(sessionID):
+    callback: Callback = chatbot_services.getBySessionID(sessionID)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 404, "Session not found.", None)
+    userInput: UserInput = callback.Data
+
+    if request.method == "POST":
+        data = request.get_json(silent=True)
+        if request.method == 'POST':
+
+            try:
+                # check if the post request has the file part
+                if 'file' not in request.files:
+                    return helpers.jsonResponse(False, 404, "No file part")
+                file = request.files['file']
+
+                # if user does not select file, browser also
+                # submit an empty part without filename
+                if file.filename == '':
+                    return helpers.jsonResponse(False, 404, "No selected file")
+
+                filename = str(uuid.uuid4()) + '.' + secure_filename(file.filename).rsplit('.', 1)[1].lower()
+                file.save(os.path.join(BaseConfig.USER_FILES, filename))
+                userInput.FilePath = filename
+
+            except Exception as exc:
+                return helpers.jsonResponse(False, 404, "Couldn't save the file")
+
+
+            # if file and allowed_file(file.filename):
+            #     filename = secure_filename(file.filename)
+            #     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            #     return redirect(url_for('uploaded_file',
+            #                             filename=filename))
+
+            db.session.commit()
+            return helpers.jsonResponse(True, 200, "file uploaded successfully!!")
+
+
 
 @public_router.route("/", methods=['GET'])
 def indexpage():
@@ -216,7 +275,7 @@ def signup():
         name = request.form.get("companyName", default=None)
         # size = request.form.get("companySize", default=None)
         url = request.form.get("websiteURL", default=None)
-        # phone = request.form.get("phoneNumber", default=None)
+        phone = request.form.get("phoneNumber", default=None)
 
         if not (fullname and email and password
                 and name and url):
@@ -228,7 +287,7 @@ def signup():
         surname = fullname.strip().split(" ")[1]
 
         # Signup new user
-        signup_callback: Callback = auth_services.signup(email.lower(), firstname, surname, password, name, url)
+        signup_callback: Callback = auth_services.signup(email.lower(), firstname, surname, password, name, phone, url)
         print(signup_callback.Success, signup_callback.Message)
         if not signup_callback.Success:
             print(signup_callback.Message)

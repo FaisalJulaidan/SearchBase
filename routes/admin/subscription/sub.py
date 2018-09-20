@@ -45,6 +45,19 @@ def admin_pay(planID):
         if not session.get('Logged_in', False):
             helpers.redirectWithMessage("login", "You must login first!")
 
+
+        # Get the user who is logged in.
+        callback: Callback = user_services.getByID(session.get('UserID', 0))
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, "Sorry, error occurred. Try again please!")
+        user: User = callback.Data
+
+        stripePlan_callback: Callback = sub_services.getStripePlan(planID)
+        print(stripePlan_callback.Success)
+        if not stripePlan_callback.Success:
+            return helpers.jsonResponse(False, 404, "This plan doesn't exist!", None)
+
+
         # Get Stripe from passed data. That's include the generated token using JavaScript
         data = request.get_json(silent=True)
         token = data['token']['id']
@@ -54,20 +67,17 @@ def admin_pay(planID):
         print(token)
         print(coupon)
 
-        if token is "Error":
-            return jsonify(error="No token provided to complete the payment!")
+        if token is "Error" or not token:
+            return helpers.jsonResponse(False, 404, "No token provided to complete the payment!", None)
 
-        sub_callback: Callback = sub_services.subscribe(email=session.get('UserEmail', 'Invalid Email'),
-                                                        planID=planID, token=token, coupon=coupon)
-
+        sub_callback: Callback = sub_services.subscribe(user.Company,planID=planID, token=token, coupon=coupon)
         if not sub_callback.Success:
-            return jsonify(error=sub_callback.Message)
+            return helpers.jsonResponse(False, 404, sub_callback.Message)
 
         # Set Plan session for logged in user
         session['UserPlan'] = sub_callback.Data['planNickname']
         print("You have successfully subscribed!")
-
-        return jsonify(success="You have successfully subscribed!", url="admin/pricing-tables.html")
+        return helpers.jsonResponse(True, 200, "You have successfully subscribed!", {"url": "admin/pricing-tables.html"})
 
 
 @sub_router.route("/admin/unsubscribe", methods=['POST'])
@@ -77,7 +87,13 @@ def unsubscribe():
         if not session.get('Logged_in', False):
             helpers.redirectWithMessage("login", "You must login first!")
 
-        unsubscribe_callback: Callback = sub_services.unsubscribe(session.get('UserEmail', 'InvalidEmail'))
+        # Get the user who is logged in.
+        callback: Callback = user_services.getByID(session.get('UserID', 0))
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, "Sorry, error occurred. Try again please!")
+        user: User = callback.Data
+
+        unsubscribe_callback: Callback = sub_services.unsubscribe(user.Company)
 
         if not unsubscribe_callback.Success:
             return jsonify(error=unsubscribe_callback.Message)

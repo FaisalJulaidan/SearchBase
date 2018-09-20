@@ -72,12 +72,11 @@
                                                 <tr>
                                                     <th>Delete</th>
                                                     <th>ID</th>
-                                                    <th>Data1</th>
-                                                    <th>Data2</th>
-                                                    <th>Data3</th>
-                                                    <th>Data4</th>
-                                                    <th>Price</th>
-                                                    <th>Keyword/Use</th>
+                                                    <th>Major Title</th>
+                                                    <th>Secondary Title</th>
+                                                    <th>Short Description</th>
+                                                    <th>Money</th>
+                                                    <th>Keywords</th>
                                                     <th>URL</th>
                                                 </tr>
                                             </thead>
@@ -129,8 +128,8 @@
         //        data[i].push("{{product}}");
         //    {%endif%}
         //{%endfor%}
-        data[i] = ['{{item["ID"]}}', '{{item["ProductID"]}}', '{{item["Name"]}}', '{{item["Brand"]}}',
-        '{{item["Model"]}}', '{{item["Price"]}}', '{{item["Keywords"]}}', '{{item["Discount"]}}', '{{item["URL"]}}']
+        data[i] = ['{{item["ID"]}}', '{{item["SolutionID"]}}', '{{item["MajorTitle"]}}', '{{item["SecondaryTitle"]}}',
+            '{{item["ShortDescription"]}}', '{{item["Money"]}}', '{{item["Keywords"]}}', '{{item["URL"]}}']
         i++;
     {%endfor%}
 

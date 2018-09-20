@@ -119,7 +119,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="pricing_footer">
-                                                    <a class="btn btn-info btn-block" role="button" href="subscribe/plan_D3lp2yVtTotk2f">Subscribe <span></span></a>
+                                                    <a class="btn btn-info btn-block" role="button" onclick="openSubForm('plan_D3lp2yVtTotk2f', 50);" >Subscribe <span></span></a>
                                                 </div>
                                             </div>
                                         </div>
@@ -175,7 +175,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="pricing_footer">
-                                                    <a class="btn btn-info btn-block" role="button" href="subscribe/plan_D3lp9R7ombKmSO">Subscribe <span></span></a>
+                                                    <a class="btn btn-info btn-block" role="button"  onclick="openSubForm('plan_D3lp9R7ombKmSO', 199);">Subscribe <span></span></a>
                                                 </div>
                                             </div>
                                         </div>
@@ -231,7 +231,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="pricing_footer">
-                                                    <a class="btn btn-info btn-block" role="button" href="subscribe/plan_D3lpeLZ3EV8IfA">Subscribe <span></span></a>
+                                                    <a class="btn btn-info btn-block" role="button" onclick="openSubForm('plan_D3lpeLZ3EV8IfA', 399);">Subscribe <span></span></a>
                                                 </div>
                                             </div>
                                         </div>
@@ -244,5 +244,63 @@
                 </div>
               </div>
             </div>
+
+        <!-- User Modal -->
+                <div class="modal fade" id="subModal" tabindex="-1" role="dialog" aria-labelledby="subModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+
+                      <div class="modal-header">
+                        <h3 class="modal-title" id="subModalLongTitle">Payment Information</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+
+                      <form id="subForm">
+
+                          <div class="modal-body">
+
+                                    <div class="form-group">
+                                      <label for="card-element"> Credit/Debit Card:</label>
+
+                                      <div id="card-element"></div>
+
+                                      <div id="card-errors" role="alert"></div>
+
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="inputSurname">Promo Code</label>
+                                      <input type="text" class="form-control" id="promo-code" name="promo-code" placeholder="50OFF">
+                                    </div>
+
+                          </div>
+
+                          <div class="modal-footer">
+                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                             <button id="payBtn" type="submit" class="btn btn-success">Pay</button>
+                          </div>
+                    </form>
+
+                    </div>
+                  </div>
+                 </div>
+            <!-- User Modal END -->
+
     </div>
+{% endblock %}
+
+{% block customJS %}
+
+<!-- SweetAlert Library -->
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://js.stripe.com/v2/"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="../../static/stripe/script.js"></script>
+
+<script type="text/javascript">
+
+
+</script>
 {% endblock %}

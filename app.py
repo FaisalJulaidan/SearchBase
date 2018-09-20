@@ -16,7 +16,7 @@ from cryptography.fernet import Fernet
 import urllib.request
 #from celery import Celery
 
-from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType
+from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution
 from services.mail_services import mail
 #, celery
 
@@ -90,8 +90,8 @@ def before_request():
 def genDummyData():
 
     # Companies creation
-    db.session.add(Company(Name='Aramco', URL='ff.com'))
-    db.session.add(Company(Name='Sabic', URL='ff.com'))
+    db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_DbgPyBCx0osKmr'))
+    db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly'))
 
     # Get Companies
     aramco = Company.query.filter(Company.Name == "Aramco").first()
@@ -114,16 +114,15 @@ def genDummyData():
               "smoker",
               "sad"
             ],
-            "blockToGoId": 3
+            "blockToGoId": 2
           },
           {
-            "action": "Go To Specific Block",
+            "action": "Go To Next Block",
             "answer": {"text": "No", "timesClicked": 0},
             "keywords": [
               "smoker",
               "sad"
-            ],
-            "blockToGoId": None
+            ]
           }
         ],
         "id": 2,
@@ -139,15 +138,15 @@ def genDummyData():
         "validation": "Email"
       }))
     db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
-        "action": "Go To Specific Block",
+        "action": "Go To Next Block",
         "fileTypes": [
-          "doc",
-          "pdf"
+        "doc",
+        "pdf"
         ],
         "text": "Upload your CV",
         "blockToGoID": None,
         "storeInDB": True,
-      }))
+    }))
 
     # Create Roles
     db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
@@ -193,9 +192,17 @@ def genDummyData():
     db.session.add(
         Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=20, ActiveBotsCap=10, InactiveBotsCap=30,
              AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
-
+    
     db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=5,  ActiveBotsCap=2, InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
+    db.session.add(Solution(SolutionID='D48N4wxwAWEMOH', MajorTitle='Big Title 1', SecondaryTitle="Small Title 1",
+                            ShortDescription="A job at my little town",  Money="£56000", Keywords="smoker,duck",
+                            URL="http://google.com", Assistant=reader_a))
+
+    db.session.add(Solution(SolutionID='asd8213AWEMOH', MajorTitle='Big Title 2', SecondaryTitle="Small Title 2",
+                            ShortDescription="A town at my little job",  Money="£56000", Keywords="dog,sad",
+                            URL="http://google.com", Assistant=reader_a))
 
 
     # Save all changes
@@ -920,7 +927,6 @@ if __name__ == "__main__":
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 
     app.config.from_object('config.DevelopmentConfig')
-    app.secret_key = 'KeYCatApP'
     app.config['SESSION_TYPE'] = 'filesystem'
 
     db.init_app(app)

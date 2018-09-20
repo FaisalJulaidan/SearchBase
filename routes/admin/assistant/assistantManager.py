@@ -6,7 +6,58 @@ from utilties import helpers
 assistantManager_router: Blueprint = Blueprint('assistantManager_router', __name__ , template_folder="../../templates")
 
 
-# get all assistants
+#@assistantManager_router("/admin/assistant/create", methods=['GET', 'POST'])
+#def admin_assistant_create():
+#    if request.method == "GET":
+#        return admin_services.render("admin/assistant-manager.html")
+
+#    elif request.method == "POST":
+#        email = session.get('User')['Email']
+#        assistants = get_assistants(email)
+#        # Return the user to the page if has reached the limit of assistants
+#        if type(assistants) is type([]) and assistants:
+#            chatbotCap = session['UserPlan']['Settings']['ActiveBotsCap'] + session['UserPlan']['Settings']['InactiveBotsCap']
+#            print(chatbotCap, " ", len(assistants))
+#            if len(assistants) >= chatbotCap:
+#                return redirectWithMessage("admin_assistant_create", "You have reached the limit of "+str(chatbotCap)+" assistants")
+#        #Check max number of active bots
+#        numberOfActiveBots = count_db("Assistants", " WHERE CompanyID=? AND Active=?", [session.get('User')['CompanyID'], "True"])
+#        print(session.get('UserPlan')['Settings'])
+#        if numberOfActiveBots >= session.get('UserPlan')['Settings']['ActiveBotsCap']:
+#            return redirectWithMessage("admin_assistant_create", "You have already reached the maximum amount of Active Assistants. Please deactivate one to proceed.")
+#        company = get_company(email)
+#        if company is None or "Error" in company:
+#            return redirectWithMessage("admin_assistant_create", "Error in getting company")
+#        else:
+#            nickname = request.form.get("nickname", default="Error")
+#            message = request.form.get("welcome-message", default="Error")
+#            autopopup = request.form.get("switch-autopop", default="off")
+#            popuptime = request.form.get("timeto-autopop", default="Error")
+
+#            if message is "Error" or nickname is "Error" or (popuptime is "Error" and autopopup is not "off"):
+#                return redirectWithMessage("admin_assistant_create", "Error in getting input information")
+#            else:
+#                if autopopup == "off":
+#                    secondsUntilPopup = "Off"
+#                else:
+#                    secondsUntilPopup = popuptime
+
+#                # Insert the new assistant to db
+#                newAssistant = insert_db("Assistants", ('CompanyID', 'Message', 'SecondsUntilPopup', 'Nickname'),
+#                                         (company[0], message, secondsUntilPopup, nickname))
+
+#                # Update the session to have the new added assistant
+#                session['UserAssistants'].append(newAssistant)
+#                session.modified = True
+
+
+#                if "Error" in newAssistant:
+#                    return redirectWithMessage("admin_assistant_create", "There was an error in creating your assistant")
+
+#                else:
+#                     return redirect("/admin/assistant/{}/settings".format(newAssistant['ID']))
+
+
 @assistantManager_router.route("/admin/assistant/manage", methods=["GET"])
 def assistant_manager():
 

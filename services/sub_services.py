@@ -2,29 +2,21 @@ from flask import jsonify
 import stripe
 
 
-from models import Callback, db, Role, Plan, User
+from models import Callback, db, Role, Plan, User, Company
 from services import assistant_services, user_services
 
 
-def unsubscribe(email) -> Callback:
-
-    # Get the user by email
-    callback: Callback = user_services.getByEmail(email)
-    if not callback.Success:
-        return jsonify(error='Could not find the logged in user to unsubscribe.')
-
-    # Set the User from the callback
-    user: User = callback.Data
+def unsubscribe(company: Company) -> Callback:
 
     try:
         # If user has no sub. already
-        if not user.SubID:
+        if not company.SubID:
             Callback(False, 'This account has no active subscription to unsubscribe')
 
         # Unsubscribe
-        stripeSub = stripe.Subscription.retrieve(user.SubID)
+        stripeSub = stripe.Subscription.retrieve(company.SubID)
         stripeSub.delete()
-        user.SubID = None
+        company.SubID = None
 
         # Save db changes
         db.session.commit()
@@ -36,7 +28,7 @@ def unsubscribe(email) -> Callback:
         return Callback(False, 'An error occurred while trying to unsubscribe')
 
 
-def subscribe(email, planID, trialDays=None, token=None, coupon=None) -> Callback:
+def subscribe(company: Company, planID, trialDays=None, token=None, coupon=None) -> Callback:
 
     # Get the Plan by ID
     plan_callback: Callback = getPlanByID(planID)
@@ -44,63 +36,55 @@ def subscribe(email, planID, trialDays=None, token=None, coupon=None) -> Callbac
         return Callback(False, 'Plan does not exist')
 
     # Validate Coupon
-    if coupon and not isCouponValid(coupon):
-        return Callback(False, 'Coupon is not valid!')
+    if len(coupon.strip()) == 0: coupon = None
+    if coupon:
+        coupon_callback: Callback = isCouponValid(coupon.strip())
+        if not coupon_callback.Success:
+            return coupon_callback
 
-    # Get the user by email
-    callback: Callback = user_services.getByEmail(email)
-    if not callback.Success:
-        print('Could not find the logged in user.')
-        return Callback(False, 'Could not find the logged in user to subscribe.')
-
-    # Set the User and Plan
-    user: User = callback.Data
+    # Set the Plan
     plan: Plan = plan_callback.Data
 
     try:
         # Check user if already has a StripeID
-        if user.StripeID:
-            customer = {'id': user.StripeID}
+        stripeID = company.StripeID
+        if not stripeID:
+            return Callback(False, "Sorry, your company doesn't have a Stripe ID to subscribe to a plan")
 
-        # If not, then create a new Stripe customer
-        else:
 
-            customer = stripe.Customer.create(
-                email=email
-            )
+        customer = stripe.Customer.retrieve(stripeID)
+        customer.source = token
+        customer.save()
+
+        print(customer['default_source'])
 
         # Subscribe to the  plan
         subscription = stripe.Subscription.create(
             customer=customer['id'],
             items=[{'plan': plan.ID}],
             trial_period_days=trialDays,
-            token=token,
             coupon=coupon
         )
+        print(3)
 
         # Get all company's assistants for activation
-        assistants_callback = assistant_services.getAll(user.CompanyID)
-        if not assistants_callback.Success:
-            # unsubscribe before return the error
-            unsubscribe(email)
-            return Callback(False, "Issue while dealing with user's assistants.")
 
         # If everything is OK, activate company's assistants
-        assistants = assistants_callback.Data
+        assistants = company.Assistants
         if assistants != 0:
             for assistant in assistants:
                 assistant.Active = True
 
         # Update user's StripeID & SubID
-        user.StripeID = customer['id']
-        user.SubID = subscription['id']
+        company.StripeID = customer['id']
+        company.SubID = subscription['id']
 
         # Save db changes
         db.session.commit()
 
-
     except Exception as e:
         db.session.rollback()
+        print(e)
         return Callback(False, 'An error occurred while subscribing with Stripe')
 
     return Callback(True, 'Subscribed successfully', {'stripeID': customer['id'],
@@ -142,7 +126,6 @@ def getStripePlan(planID) -> Callback:
 
         return Callback(True, 'No message.', result)
     except Exception as e:
-        db.session.rollback()
         return Callback(False, "This plan doesn't exist! Make sure the plan ID is correct.")
 
 
@@ -162,10 +145,12 @@ def getStripePlanNicknameBySubID(SubID):
         return Callback(False, 'Could not find plan nickname form Stripe')
 
 
-def isCouponValid(coupon):
+def isCouponValid(coupon) -> Callback:
     try:
-        stripe.Coupon.retrieve(str(coupon))
-        return True
+        coupon = stripe.Coupon.retrieve(str(coupon))
+        if not coupon['valid']:
+            return Callback(False, "Coupon has expired.")
+        return Callback(True, "Coupon is valid")
     except stripe.error.StripeError as e:
         print("coupon is not valid")
-        return False
+        return Callback(False, "coupon is not valid.")

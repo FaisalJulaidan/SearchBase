@@ -13,7 +13,6 @@ class BaseConfig(object):
     TESTING = False
 
     ALLOWED_EXTENSIONS = {'png', 'jpg','json', 'xml','txt', 'pdf', 'doc', 'docx'}
-    UPLOAD_FOLDER = '/static/file_uploads/user_files'
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))

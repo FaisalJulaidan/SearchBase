@@ -3,6 +3,8 @@ from services import user_services, admin_services, role_services, company_servi
 from models import Callback, db, User, Company
 from flask import Blueprint, request, redirect, session
 from utilties import helpers, json_utils
+import string
+import random
 
 users_router: Blueprint = Blueprint('users_router', __name__, template_folder="../../templates")
 
@@ -86,6 +88,7 @@ def admin_users_add():
         surname = request.form.get("surname", default='').strip()
         email = request.form.get("email", default='').strip()
         role = request.form.get("role", default='').strip()
+        password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
 
         # Check if info valid
         if not helpers.isStringsLengthGreaterThanZero(firstname, surname, email, role):
@@ -107,12 +110,12 @@ def admin_users_add():
         role = callback.Data
 
         # Create the new user for the company
-        callback: Callback = user_services.create(firstname, surname, email, 'passwordToBeChanged', "00000",
+        callback: Callback = user_services.create(firstname, surname, email, password, "00000",
                                                   adminUser.Company, role, verified=True)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry couldn't create the user. Try again!")
 
-        email_callback : Callback = mail_services.addedNewUserEmail(session.get('UserEmail', "Error"), email)
+        email_callback : Callback = mail_services.addedNewUserEmail(session.get('UserEmail', "Error"), email, password)
         if not email_callback.Success:
             return json.dumps({'success': False, 'msg': " New user was created but could not send email with login information. Please delete and readd the user."}), \
                    400, {'ContentType': 'application/json'}

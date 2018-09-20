@@ -535,3 +535,4 @@ __pycache__/
 *.db
 /static/file_uploads/user_files
 virtual
+venv

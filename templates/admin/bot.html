@@ -332,7 +332,9 @@
                     if ($(e.target).is('a') ||
                         $(e.target).is('input.form-control') ||
                         $(e.target).is('i.trash') ||
-                        $(e.target).is('i.trashAnswer')
+                        $(e.target).is('i.trashAnswer') ||
+                        $(e.target).parent().parent().parent().parent().is('div.answers') ||
+                        $(e.target).parent().parent().parent().parent().is('div.row')
                     ) {
                         e.preventDefault();
                         return;

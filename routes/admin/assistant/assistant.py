@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, session
-from services import statistics_services, assistant_services,admin_services, sub_services
-from models import Callback, Assistant
+from services import statistics_services, assistant_services,admin_services, sub_services, user_services
+from models import Callback, Assistant, User, Company, Plan
 from utilties import helpers
 
 assistant_router: Blueprint = Blueprint('assistant_router', __name__ , template_folder="../../templates")
@@ -12,26 +12,30 @@ def create_assistant_page():
     if request.method == "GET":
         return admin_services.render("admin/create-assistant.html")
 
-@assistant_router.route("/admin/assistant/", methods=['POST'])
-def assistant(assistantID):
+@assistant_router.route("/admin/assistant", methods=['POST'])
+def assistant():
     if request.method == "POST":
-        callback: Callback = sub_services.getPlanByNickname(session.get('UserPlan', 'er'))
+
+        # Get the admin user who is logged in and wants to create a new user.
+        callback: Callback = user_services.getByID(session.get('UserID', 0))
         if not callback.Success:
-            return helpers.jsonResponse(False, 401, "You have no plan to create assistant", None)
+            return redirect("login")
+        user: User = callback.Data
 
+        # TODO: do restrictions for assistant creation based on current user's plan
+        # callback: Callback = sub_services.getPlanByNickname(session.get('UserPlan', 'er'))
+        # if not callback.Success:
+        #     return helpers.jsonResponse(False, 401, "You have no plan to create assistant", None)
 
+        name = request.form.get("name", default='').strip()
+        welcomeMsg = request.form.get("welcome-message", default='').strip()
+        timePopup = request.form.get("timeto-autopop", default='').strip()
 
-
-        assistant: Assistant = callback.Data
-
-        if assistant.CompanyID != session.get('CompanyID', 0):
-            return helpers.jsonResponse(False, 401, "You'r not authorised to delete this assistant", None)
-
-        callback: Callback = assistant_services.removeByID(assistantID)
+        callback: Callback = assistant_services.create(name, None, welcomeMsg, timePopup, user.Company)
         if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message, None)
+            return helpers.jsonResponse(False, 400, "Couldn't create the assistant", None)
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data.ID)
 
-        return helpers.jsonResponse(True, 200, callback.Message, None)
 
 # get all assistants
 @assistant_router.route("/admin/assistants", methods=['GET'])

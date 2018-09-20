@@ -71,7 +71,7 @@ def assistant_pagerequest():
         return send_from_directory('static/user_downloads/', "TSBChatbot.html")
 
 @public_router.route("/userdownloads/<path:path>", methods=['GET'])
-def assistant_pagerequest(path):
+def assistant_userdownloads(path):
     if request.method == "GET":
         print("trying to return file")
         return send_from_directory('static/user_downloads/', "path")

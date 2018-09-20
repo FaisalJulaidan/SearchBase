@@ -23,10 +23,15 @@
 <script>
     var currentLength = 0;
     var maxLength = 0;
+    var tableString = "";
 
-    {%for record in data['data'] %}
+    {%if not data %}
+    $("#tBodyUIn").append("<h3>You currently have no data saved.</h3>");
+    {%endif%}
+
+    {%for record in data %}
     currentLength = 0;
-    {%for value in record[0]['collectedInformation'] %}
+    {%for value in record['data']['collectedInformation'] %}
     currentLength++;
     {% endfor %}
     if (currentLength > maxLength) { maxLength = currentLength; }
@@ -37,16 +42,15 @@
         headings += "<th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Data</th>";
     }
 
-    var tableHeading = $("#tableHeadingUIn");
-    var tableString = "<table id=\"tableSort\" class=\"table table-striped jambo_table bulk_action\"><thead>\
+    tableString = "<table id=\"tableSort\" class=\"table table-striped jambo_table bulk_action\"><thead>\
                             <tr id=\"tableHeadingUIn\" class=\"headings\">"+ headings +"</tr></thead>\
                             <tbody id=\"tBodyUIn\">";
     var filename = undefined;
-    {%for record in data['data'] %}
+    {%for record in data %}
     tableString += "<tr>"
-    {%for value in record[0]['collectedInformation'] %}
+    {%for value in record['data']['collectedInformation'] %}
     {%if '&FILE_UPLOAD&' in value['input'] %}
-    filename = "{{value['input']}}".replace('&amp;FILE_UPLOAD&amp;', '');
+    filename = "{{record['filePath']}}";
     console.log(filename);
     tableString += "<td><a href=\"/static"+"{{route}}".split("static")[1]+"/" + filename + "\" download=\"" + filename + "\">" + filename + "</a></td>"
     {%else%}

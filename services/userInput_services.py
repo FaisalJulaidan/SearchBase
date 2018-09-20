@@ -15,4 +15,4 @@ def getByAssistantID(assistantID):
 
         print("getByAssistantID() Error: ", exc)
 
-        return Callback(False, 'Could not get the user input.')
+        return Callback(False, 'Could not retrieve the data.')

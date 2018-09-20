@@ -12,7 +12,7 @@ def admin_user_input(assistantID):
 
     if request.method == "GET":
         userInput_callback : Callback = userInput_services.getByAssistantID(assistantID)
-        if not userInput_callback.Success : return admin_services.render("admin/data-storage.html")
+        if not userInput_callback.Success : return admin_services.render("admin/data-storage.html", data=[], route=[])
         result = []
         for d in userInput_callback.Data:
             result.append({'data': d.Data, 'filePath': d.FilePath})

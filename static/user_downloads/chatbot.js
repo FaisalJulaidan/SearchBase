@@ -97,13 +97,9 @@ function OpenButtonHoverEnd() {
 }
 
 function loadIframe(url) {
-    var iframe = $('#' + "chatbotIframe");
+    var $iframe = $('#' + "chatbotIframe");
     url = "https://thesearchbase.com//chatbottemplate//" + url;
-    if (iframe.length) {
-        iframe.attr('src', url);
-        return false;
-    }
-    return true;
+    $iframe.attr('src', url);
 }
 
 function GetPopSettings(assistantID) {

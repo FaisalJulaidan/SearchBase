@@ -206,14 +206,14 @@ def genDummyData():
                             ShortDescription="A town at my little job",  Money="£56000", Keywords="dog,sad",
                             URL="http://google.com", Assistant=reader_a, TimesReturned=10))
 
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,18), Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,15), Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,6), Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,5), Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,1), Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2017, 9,1), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,18),TimeSpent=120, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), TimeSpent=120, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), TimeSpent=127, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,15), TimeSpent=300, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,6), TimeSpent=50, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,5), TimeSpent=23, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,1), TimeSpent=67, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 7,1), TimeSpent=80, Assistant=reader_a))
 
     # Save all changes
     db.session.commit()

@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "chatbot session schema",
+  "type": "object",
+  "properties": {
+    "collectedInformation": {"type": "array", "items": {
+      "type": "object",
+      "properties":{
+        "blockID": {"type": "integer"},
+        "questionText": {"type": "string"},
+        "input": {"type": "string"},
+        "keywords": {"type": "array", "items": {"type": "string"}}
+        },
+      "required": ["blockID", "questionText", "input", "keywords"],
+      "additionalProperties": false
+      }
+    },
+    "keywords": {"type": "array", "items": {"type": "string"}},
+    "solutionsHighest": {"type": "integer"}
+  },
+  "required": ["collectedInformation", "keywords", "solutionsHighest"],
+  "additionalProperties": false
+}

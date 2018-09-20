@@ -26,14 +26,14 @@ function deleteUser(userID) {
         })
         .then((willDelete) => {
           if (willDelete) {
-
+            document.location = "admin/assistant/manage"
             $.ajax({
                 url: '/admin/user/' + userID,
                 type: "DELETE"
             }).done(function (res) {
                 console.log(res);
                 swal("Success!", "User has been deleted successfully", "success").then((value) => {
-                  document.location.reload()
+                  document.location = "admin/assistant/manage"
                 });
             }).fail(function (res) {
                 let resJson = JSON.parse(res.responseText);

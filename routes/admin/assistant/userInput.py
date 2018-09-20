@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, session
 from services import  admin_services, userInput_services
-from models import Callback, UserInput
+from models import Callback, ChatbotSession
 
 userInput_router: Blueprint = Blueprint('userInput_router', __name__ , template_folder="../../templates")
 

@@ -11,7 +11,7 @@ def getByID(id) -> Callback:
         return Callback(True,
                         "Got assistant by id successfully.",
                         result)
-    except (sqlalchemy.exc.SQLAlchemyError, KeyError) as exc:
+    except Exception as exc:
         print(exc)
         return Callback(False,
                         'Could not get the assistant by id.')
@@ -95,13 +95,14 @@ def changeStatus(id, active):
         db.session.rollback()
         return Callback(False, 'Sorry, Could not change the assistant\' status.')
 
-def removeByID(id) -> bool:
+
+def removeByID(id) -> Callback:
     try:
         db.session.query(Assistant).filter(Assistant.ID == id).delete()
         db.session.commit()
         return Callback(True, 'Assistant has been deleted.')
 
-    except sqlalchemy.exc.SQLAlchemyError as exc:
+    except Exception as exc:
         print("Error in assistant_services.removeByID(): ", exc)
         db.session.rollback()
         return Callback(False, 'Error in deleting assistant.')

@@ -14,9 +14,9 @@
                             <ul class="nav navbar-right panel_toolbox"></ul>
                             <div class="clearfix"></div>
                             <br>
-                            <form action="/admin/assistant/create" method="POST" enctype="multipart/form-data">
+                            <form id="assistantForm">
                                 <h4>
-                                    Enter a nickname for your assistant to easily identify it in the dashboard. Must be
+                                    Enter a name for your assistant to easily identify it in the dashboard. Must be
                                     unique.<span class="required">*</span>
                                 </h4>
                                 <div class="col-md-9 col-sm-9 col-xs-12">
@@ -80,10 +80,35 @@
 {% endblock %}
 
 {% block customJS %}
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
   <script>
       function switchchecked() {
           show = document.getElementById("switch-autopop").checked;
           document.getElementById("popup-time").hidden = !show;
       }
+
+       $(document).on('submit', '#assistantForm', function (e) {
+        e.preventDefault();
+        createAssistant(this);
+    });
+
+      function createAssistant(){
+        console.log("Create Assistant");
+        $.ajax({
+            url: '/admin/assistant',
+            type: "POST",
+            data: $('#assistantForm').serialize()
+        }).done(function (res) {
+            console.log(res);
+            swal("Success!", "User has been created successfully", "success").then((value) => {
+              {#document.location.reload()#}
+            });
+        }).fail(function (res) {
+            var resJson = JSON.parse(res.responseText);
+            swal("Error!", resJson.msg, "error").then((value) => {
+            });
+        });
+            }
   </script>
 {% endblock %}

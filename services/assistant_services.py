@@ -1,4 +1,5 @@
 import sqlalchemy.exc
+from services import sub_services
 from models import db, Company, Assistant,Callback
 from utilties import helpers
 
@@ -50,6 +51,7 @@ def getAll(companyID) -> Callback:
 
 def create(nickname, route, message, secondsUntilPopup, company: Company) -> Assistant or None:
     try:
+        callback = sub_services.getPlanByNickname(se)
         assistant = Assistant(Nickname=nickname, Route=route, Message=message,
                               SecondsUntilPopup=secondsUntilPopup,
                               Company=company)

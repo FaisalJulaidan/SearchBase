@@ -70,6 +70,12 @@ def assistant_pagerequest():
         print("trying to return file")
         return send_from_directory('static/user_downloads/', "TSBChatbot.html")
 
+@public_router.route("/userdownloads/<path:path>", methods=['GET'])
+def assistant_pagerequest(path):
+    if request.method == "GET":
+        print("trying to return file")
+        return send_from_directory('static/user_downloads/', "path")
+
 @public_router.route("/getpopupsettings/<assistantID>", methods=['GET'])
 def get_pop_settings(assistantID):
     if request.method == "GET":

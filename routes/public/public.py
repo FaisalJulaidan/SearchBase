@@ -64,12 +64,6 @@ def chatbot(assistantID):
 
         return helpers.jsonResponse(True, 200, "Solution list is here!", {'sessionID': ch_callback.Data.ID, 'solutions':solutions})
 
-@public_router.route("/assistant/pagerequest", methods=['GET'])
-def assistant_pagerequest():
-    if request.method == "GET":
-        print("trying to return file")
-        return send_from_directory('static/user_downloads/', "TSBChatbot.html")
-
 @public_router.route("/userdownloads/<path:path>", methods=['GET'])
 def assistant_userdownloads(path):
     if request.method == "GET":

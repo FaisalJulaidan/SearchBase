@@ -1,10 +1,37 @@
 from flask import Blueprint, render_template, request, redirect, session
-from services import statistics_services, assistant_services
+from services import statistics_services, assistant_services,admin_services, sub_services
 from models import Callback, Assistant
 from utilties import helpers
 
 assistant_router: Blueprint = Blueprint('assistant_router', __name__ , template_folder="../../templates")
 
+
+
+@assistant_router.route("/admin/assistant/create", methods=['GET'])
+def create_assistant_page():
+    if request.method == "GET":
+        return admin_services.render("admin/create-assistant.html")
+
+@assistant_router.route("/admin/assistant/", methods=['POST'])
+def assistant(assistantID):
+    if request.method == "POST":
+        callback: Callback = sub_services.getPlanByNickname(session.get('UserPlan', 'er'))
+        if not callback.Success:
+            return helpers.jsonResponse(False, 401, "You have no plan to create assistant", None)
+
+
+
+
+        assistant: Assistant = callback.Data
+
+        if assistant.CompanyID != session.get('CompanyID', 0):
+            return helpers.jsonResponse(False, 401, "You'r not authorised to delete this assistant", None)
+
+        callback: Callback = assistant_services.removeByID(assistantID)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+
+        return helpers.jsonResponse(True, 200, callback.Message, None)
 
 # get all assistants
 @assistant_router.route("/admin/assistants", methods=['GET'])
@@ -31,7 +58,7 @@ def admin_home():
 
 
 @assistant_router.route("/admin/assistant/<int:assistantID>", methods=['DELETE'])
-def assistantt(assistantID):
+def assistant_delete(assistantID):
     if request.method == "DELETE":
         callback: Callback = assistant_services.getByID(assistantID)
         if not callback.Success:

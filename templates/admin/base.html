@@ -375,6 +375,7 @@
     <script src="/static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
     <script src="/static/vendors/google-code-prettify/src/prettify.js"></script>
 
+
     <!-- Switchery -->
     <script src="/static/vendors/switchery/dist/switchery.min.js"></script>
     <!-- Select2 -->
@@ -389,29 +390,31 @@
     <script src="/static/vendors/starrr/dist/starrr.js"></script>
     <!-- Custom Theme Scripts -->
     <script src="/static/build/js/custom.min.js"></script>
+    <!-- SweetAlert Library -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 
     <script type="text/javascript">
-        var errTitle = $("#errorTitle")
-        var errText = $("#errorText")
-        var errShow = $("#showError")
-        var successTitle = $("#successTitle")
-        var successText = $("#successText")
-        var successShow = $("#successShow")
+        var errTitle = $("#errorTitle");
+        var errText = $("#errorText");
+        var errShow = $("#showError");
+        var successTitle = $("#successTitle");
+        var successText = $("#successText");
+        var successShow = $("#successShow");
         function alertError(name, text, type) {
-            if (type == 'success') {
+            if (type === 'success') {
                 // clear previous error message
-                successTitle.text('')
-                successText.html('')
-                successTitle.text(name)
-                successText.html(text)
+                successTitle.text('');
+                successText.html('');
+                successTitle.text(name);
+                successText.html(text);
                 successShow.click()
             } else {
                 // clear previous error message
-                errTitle.text('')
-                errText.html('')
-                errTitle.text(name)
-                errText.html(text)
+                errTitle.text('');
+                errText.html('');
+                errTitle.text(name);
+                errText.html(text);
                 errShow.click()
             }
         }

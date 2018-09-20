@@ -4,10 +4,10 @@ from datetime import timedelta
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from flask_api import status
 from utilties import helpers
-from models import Callback, Assistant, Solution, db, UserInput
+from models import Callback, Assistant, Solution, db, ChatbotSession
 from itsdangerous import URLSafeTimedSerializer
 from services import user_services, company_services, db_services, auth_services, mail_services,\
-    assistant_services, bot_services, chatbot_services, solutions_services
+    assistant_services, bot_services, chatbot_services, solutions_services,analytics_services
 from models import secret_key
 from werkzeug.utils import secure_filename
 import uuid
@@ -37,6 +37,7 @@ def chatbot(assistantID):
     if not callback.Success:
         return helpers.jsonResponse(False, 404, "Assistant not found.", None)
     assistant: Assistant = callback.Data
+    analytics_services.getPopularSolutions(assistant, 1)
 
     if request.method == "GET":
         assistant: Assistant = callback.Data
@@ -46,10 +47,6 @@ def chatbot(assistantID):
 
     if request.method == "POST":
         data = request.get_json(silent=True)
-        ch_callback: Callback = chatbot_services.processData(assistant, data)
-
-        if not ch_callback.Success:
-            return helpers.jsonResponse(False, 400, ch_callback.Message)
 
         s_callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'])
         if not s_callback.Success:
@@ -59,6 +56,11 @@ def chatbot(assistantID):
         for s in s_callback.Data:
             solutions.append(s.to_dict())
 
+        ch_callback: Callback = chatbot_services.processData(assistant, data, len(solutions))
+
+        if not ch_callback.Success:
+            return helpers.jsonResponse(False, 400, ch_callback.Message, ch_callback.Data)
+
         return helpers.jsonResponse(True, 200, "Solution list is here!", {'sessionID': ch_callback.Data.ID, 'solutions':solutions})
 
 
@@ -67,7 +69,7 @@ def chatbot_upload_files(sessionID):
     callback: Callback = chatbot_services.getBySessionID(sessionID)
     if not callback.Success:
         return helpers.jsonResponse(False, 404, "Session not found.", None)
-    userInput: UserInput = callback.Data
+    userInput: ChatbotSession = callback.Data
 
     if request.method == "POST":
         data = request.get_json(silent=True)

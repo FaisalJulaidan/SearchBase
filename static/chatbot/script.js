@@ -266,7 +266,7 @@ async function submitAnswer(message, blockKeywords=undefined) {
     removeThinkingGif();
 
     if (currentBlock.storeInDB) {
-        var information = {"blockID": currentBlock.id, "QuestionText": currentBlock.content.text, "input": message}
+        var information = {"blockID": currentBlock.id, "questionText": currentBlock.content.text, "input": message}
         if (currentBlock.type == "Question" && blockKeywords !== undefined) {
             blockKeywords = blockKeywords.split(",");
             information["keywords"] = blockKeywords

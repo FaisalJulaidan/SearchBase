@@ -61,17 +61,18 @@ def addBlock(data: dict, assistant: Assistant) -> Callback:
         # Validate submitted block data
         json_utils.validateSchema(data, 'blocks/newBlock.json')
         block = data.get('block')
-        newBlock = Block(Type=BlockType(block['type']), Order=maxOrder + 1, Content=None,
+        newBlock = Block(Type=BlockType(block['type']), Order=maxOrder + 1, Content=block['content'],
                          StoreInDB=block['storeInDB'], Assistant=assistant)
         db.session.add(newBlock)
     except Exception as exc:
-        db.session.rollback()
         print(exc.args[0])
         return Callback(False, 'Error occurred while creating a new Block object', exc.args[0])
 
     db.session.commit()
-    return Callback(True, 'Block added successfully!', {"newBlockID": newBlock.ID,
-                                                        "remainingBlocks": getRemainingBlocksByAssistant(assistant)})
+    return Callback(True, 'Block added successfully!', {
+        "newBlockID": newBlock.ID,
+        "remainingBlocks": getRemainingBlocksByAssistant(assistant)
+    })
 
 
 def updateBot(bot, assistant: Assistant) -> Callback:
@@ -79,7 +80,7 @@ def updateBot(bot, assistant: Assistant) -> Callback:
         json_utils.validateSchema(bot, 'bot.json')
     except Exception as exc:
         print(exc.args)
-        return Callback(False, "the submitted bot data does not doesn't follow the correct format")
+        return Callback(False, "The submitted bot data does not doesn't follow the correct format")
 
     callback: Callback = updateBlocks(bot['blocks'], assistant)
     if not callback.Success:
@@ -144,17 +145,19 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
 
 def deleteBlockByID(id) -> Callback:
     try:
-        if not db.session.query(exists().where(Block.ID == id)).scalar():
+        block: Block = db.session.query(Block).filter(Block.ID == id).first()
+        if not block:
             return Callback(False, "the block with id '" + str(id) + "' doesn't exist")
+        assistant: Assistant = block.Assistant
         db.session.query(Block).filter(Block.ID == id).delete()
     except Exception as exc:
         print(exc)
         db.session.rollback()
         return Callback(False, 'Block with id' + str(id) + " could not be removed.")
-        # Save
+    # Save
     db.session.commit()
-    return Callback(True, 'Block with id ' + str(id) + " has been removed successfully.")
-
+    return Callback(True, 'Block with id ' + str(id) + " has been removed successfully.",
+                    {"remainingBlocks": getRemainingBlocksByAssistant(assistant)})
 
 
 def isValidBlock(block: dict, blockType: str):
@@ -197,7 +200,10 @@ def getOptions() -> dict:
             'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
             'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH/1000000)) + 'MB',
             'alwaysStoreInDB': True
-
-            }
+            },
+            {
+            'name': BlockType.Solutions.value,
+            'maxSolutions': 5
+            },
         ]
     }

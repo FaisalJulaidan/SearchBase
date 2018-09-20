@@ -24,9 +24,9 @@
     var currentLength = 0;
     var maxLength = 0;
     var tableString = "";
-
+    console.log("{{data}}")
     {%if not data %}
-    $("#tBodyUIn").append("<h3>You currently have no data saved.</h3>");
+    $("#tBodyUIn").append("<h3>You currently have no data on record.</h3>");
     {%endif%}
 
     {%for record in data %}
@@ -47,17 +47,17 @@
                             <tbody id=\"tBodyUIn\">";
     var filename = undefined;
     {%for record in data %}
-    tableString += "<tr>"
-    {%for value in record['data']['collectedInformation'] %}
-    {%if '&FILE_UPLOAD&' in value['input'] %}
-    filename = "{{record['filePath']}}";
-    console.log(filename);
-    tableString += "<td><a href=\"/static"+"{{route}}".split("static")[1]+"/" + filename + "\" download=\"" + filename + "\">" + filename + "</a></td>"
-    {%else%}
-    tableString += "<td>{{value['input']}}</td>"
-    {%endif%}
-    {% endfor %}
-    tableString += "</tr>"
+        tableString += "<tr><td></td>"
+        {%for value in record['data']['collectedInformation'] %}
+            {%if '&FILE_UPLOAD&' in value['input'] %}
+                filename = "{{record['filePath']}}";
+                console.log(filename);
+                tableString += "<td><a href=\"/static"+"{{route}}".split("static")[1]+"/" + filename + "\" download=\"" + filename + "\">" + filename + "</a></td>"
+            {%else%}
+                tableString += "<td>{{value['input']}}</td>"
+            {%endif%}
+        {% endfor %}
+        tableString += "</tr>"
     {% endfor %}
 
     tableString += "</tbody></table>";

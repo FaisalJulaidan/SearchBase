@@ -11,7 +11,7 @@ function includeHTML() {
         if (file) {
             /*make an HTTP request using the attribute value as the file name:*/
             console.log("Getting chatbot from TheSearchBase");
-            xhttp = new XMLHttpRequest();
+            xhttp = new XDomainRequest();
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4) {
                     if (this.status == 200) { elmnt.innerHTML = this.responseText; }

@@ -11,6 +11,7 @@ from services import user_services, company_services, db_services, auth_services
 from models import secret_key
 from werkzeug.utils import secure_filename
 import uuid
+from flask_cors import CORS
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
 
@@ -63,11 +64,12 @@ def chatbot(assistantID):
 
         return helpers.jsonResponse(True, 200, "Solution list is here!", {'sessionID': ch_callback.Data.ID, 'solutions':solutions})
 
-@public_router.route("/assistant/pagerequest", methods=['GET'])
-def assistant_pagerequest():
-    if request.method == "GET":
-        print("trying to return file")
-        return send_from_directory('../static/user_downloads/', "TSBChatbot.html")
+#@public_router.route("/assistant/pagerequest", methods=['GET'])
+#@cross_origin()
+#def assistant_pagerequest():
+#    if request.method == "GET":
+#        print("trying to return file")
+#        return send_from_directory('../static/user_downloads/', "TSBChatbot.html")
 
 @public_router.route("/assistant/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(sessionID):

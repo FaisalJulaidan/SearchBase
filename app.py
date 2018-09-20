@@ -1,6 +1,6 @@
 #/usr/bin/python3.5
 from flask import Flask, redirect, request, render_template, jsonify, abort, escape, \
-    g, session
+    g, session, send_from_directory
 from werkzeug.utils import secure_filename
 from flask_api import status
 from datetime import datetime, timedelta
@@ -14,6 +14,7 @@ import stripe
 from urllib.request import urlopen
 from cryptography.fernet import Fernet
 import urllib.request
+from flask_cors import CORS
 #from celery import Celery
 
 from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution, ChatbotSession
@@ -30,7 +31,7 @@ from routes.public.routers import public_router, resetPassword_router
 from services import user_services, mail_services
 
 app = Flask(__name__, static_folder='static')
-
+CORS(app)
 # Register Routes:
 app.register_blueprint(adminBasic_router)
 app.register_blueprint(assistantManager_router)
@@ -52,6 +53,11 @@ app.register_blueprint(answers_router)
 app.register_blueprint(bot_router)
 app.register_blueprint(emoji_router)
 
+@app.route("/assistant/pagerequest", methods=['GET'])
+def assistant_pagerequest():
+    if request.method == "GET":
+        print("trying to return file")
+        return send_from_directory('static/user_downloads/', "TSBChatbot.html")
 
 # code to ensure user is logged in
 @app.before_request

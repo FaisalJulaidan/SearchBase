@@ -488,6 +488,7 @@ class UserSettings(db.Model):
     def __repr__(self):
         return '<UserSettings {}>'.format(self.ID)
 
+
 class Callback():
     def __init__(self, success: bool, message: str, data: str or dict or bool = None):
         self.Success: bool = success

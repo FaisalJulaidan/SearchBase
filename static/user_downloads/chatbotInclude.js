@@ -1,7 +1,7 @@
 function includeHTML() {
     console.log("Starting chatbot process")
     var z, i, elmnt, file, xhttp;
-    var link = "http://127.0.0.1:5000/assistant/pagerequest";
+    var link = "https://www.thesearchbase.com/assistant/pagerequest";
     /*loop through a collection of all HTML elements:*/
     z = document.getElementsByTagName("div");
     for (i = 0; i < z.length; i++) {

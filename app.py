@@ -16,14 +16,15 @@ from cryptography.fernet import Fernet
 import urllib.request
 #from celery import Celery
 
-from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution
+from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution, ChatbotSession
 from services.mail_services import mail
 #, celery
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
     solutions_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
-    changePassword_router, answers_router, bot_router, emoji_router, adminBasic_router, assistantManager_router
+    changePassword_router, answers_router, bot_router, emoji_router, adminBasic_router,\
+    assistantManager_router, assistant_router
 
 from routes.public.routers import public_router, resetPassword_router
 from services import user_services, mail_services
@@ -33,6 +34,7 @@ app = Flask(__name__, static_folder='static')
 # Register Routes:
 app.register_blueprint(adminBasic_router)
 app.register_blueprint(assistantManager_router)
+app.register_blueprint(assistant_router)
 app.register_blueprint(dashboard_router)
 app.register_blueprint(public_router)
 app.register_blueprint(resetPassword_router)
@@ -198,12 +200,20 @@ def genDummyData():
 
     db.session.add(Solution(SolutionID='D48N4wxwAWEMOH', MajorTitle='Big Title 1', SecondaryTitle="Small Title 1",
                             ShortDescription="A job at my little town",  Money="£56000", Keywords="smoker,duck",
-                            URL="http://google.com", Assistant=reader_a))
+                            URL="http://google.com", Assistant=reader_a, TimesReturned=2))
 
     db.session.add(Solution(SolutionID='asd8213AWEMOH', MajorTitle='Big Title 2', SecondaryTitle="Small Title 2",
                             ShortDescription="A town at my little job",  Money="£56000", Keywords="dog,sad",
-                            URL="http://google.com", Assistant=reader_a))
+                            URL="http://google.com", Assistant=reader_a, TimesReturned=10))
 
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,18), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,15), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,6), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,5), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,1), Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2017, 9,1), Assistant=reader_a))
 
     # Save all changes
     db.session.commit()

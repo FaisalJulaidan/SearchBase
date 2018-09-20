@@ -8,6 +8,8 @@
        {
          "type": "object",
          "properties": {
+           "text": {"type": "string"},
+           "timesClicked": {"type": "integer", "minimum": 0},
            "answer": {
              "type": "object",
              "properties": {

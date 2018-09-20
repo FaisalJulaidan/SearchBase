@@ -30,6 +30,9 @@ sub_router: Blueprint = sub_router
 from .assistant.assistantManager import assistantManager_router
 assistantManager_router: Blueprint = assistantManager_router
 
+from .assistant.assistant import assistant_router
+assistant_router: Blueprint = assistant_router
+
 from .assistant.analytics import analytics_router
 analytics_router: Blueprint = analytics_router
 

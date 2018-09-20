@@ -266,7 +266,7 @@ class Assistant(db.Model):
     Solutions = db.relationship('Solution', back_populates='Assistant')
     Statistics = db.relationship('Statistics', back_populates='Assistant')
     Blocks = db.relationship('Block', back_populates='Assistant')
-    UserInputs = db.relationship('UserInput', back_populates='Assistant')
+    ChatbotSessions = db.relationship('ChatbotSession', back_populates='Assistant')
 
     # Constraints:
     db.UniqueConstraint('CompanyID', 'Nickname', name='uix1_assistant')
@@ -326,9 +326,10 @@ class Solution(db.Model):
                     on_serialize=None,
                     on_deserialize=None
                     )
+    TimesReturned = db.Column(db.Integer, nullable=False, default=0)
 
     # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID'), nullable=False)
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='Solutions')
 
     def __repr__(self):
@@ -391,22 +392,20 @@ class Block(db.Model):
         return '<Block {}>'.format(self.Type)
 
 
-class UserInput(db.Model):
+class ChatbotSession(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Data = db.Column(JsonEncodedDict, nullable=False)
     FilePath = db.Column(db.String(), nullable=True, default=None)
+    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+    TimeSpent = db.Column(db.Integer, nullable=False, default=0)
+    SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
+    QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
 
-
-    # SessionID = db.Column(db.Integer, nullable=False)
-    # Input = db.Column(db.String(), nullable=False)
-    # QuestionText = db.Column(db.String(), nullable=False)
-    # Keywords = db.Column(db.String(), nullable=False)
-    # DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='UserInputs')
+    Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')
 
     def __repr__(self):
         return '<UserInput {}>'.format(self.Input)

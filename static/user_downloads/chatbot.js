@@ -98,7 +98,7 @@ function OpenButtonHoverEnd() {
 
 function loadIframe(url) {
     var $iframe = $('#' + "chatbotIframe");
-    url = "https://thesearchbase.com//chatbottemplate//" + url;
+    url = "https://thesearchbase.com/chatbottemplate/" + url;
     $iframe.attr('src', url);
 }
 
@@ -121,3 +121,5 @@ function GetPopSettings(assistantID) {
         console.log(res);
     });
 }
+
+LoadChatbot();

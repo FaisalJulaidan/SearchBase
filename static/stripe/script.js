@@ -1,6 +1,6 @@
 
 // Create a Stripe client.
-var stripe = Stripe('pk_test_e4Tq89P7ma1K8dAjdjQbGHmR');
+var stripe = Stripe('pk_live_aEpKnbQk6pq068UFOax8S51N');
 
 // Create an instance of Elements.
 var elements = stripe.elements();
@@ -124,14 +124,14 @@ function pay(planID, token) {
 
         }).done(function (res) {
 
-        console.log("Successful Payment");
-        swal({
-                  title: "Successful Payment",
-                  text: res.msg,
-                  icon: "success"
-        }).then((value) => {
-          document.location.reload()
-        });
+            console.log("Successful Payment");
+            swal({
+              title: "Successful Payment",
+              text: res.msg,
+              icon: "success"
+            }).then((value) => {
+              document.location.reload()
+            })
 
         }).fail(function (res) {
             let resJson = JSON.parse(res.responseText);

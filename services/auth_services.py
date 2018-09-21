@@ -42,11 +42,12 @@ def signup(email, firstname, surname, password, companyName, companyPhoneNumber,
     db.session.add(UserSettings(User=user_callback.Data))
 
     # Subscribe to basic plan with 14 trial days
-    sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lp2yVtTotk2f', trialDays=14)
+    sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lpeLZ3EV8IfA', trialDays=14)
 
     # If subscription failed, remove the new created company and user
     if not sub_callback.Success:
         # Removing the company will cascade and remove the new created user and roles as well.
+        print('remove company')
         company_services.removeByName(companyName)
         return sub_callback
 

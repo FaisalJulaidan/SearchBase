@@ -48,7 +48,8 @@ def create(name, url, ownerEmail) -> Company or None:
 
     # Save
     db.session.commit()
-    return newCompany
+    return Callback(True, "Company uas been created successfully.", newCompany)
+
 
 
 def removeByName(name) -> bool:
@@ -56,9 +57,10 @@ def removeByName(name) -> bool:
     try:
         db.session.query(Company).filter(Company.Name == name).delete()
     except Exception as exc:
+        db.session.rollback()
         print(exc)
         return False
-
+    db.session.commit()
     return True
 
 def getByEmail(email) -> Callback:
@@ -77,3 +79,16 @@ def getByCompanyID(id) -> Callback:
     if not result: return Callback(False, 'Could not retrieve company\'s data.')
     
     return Callback(True, 'Company was successfully retrieved.', result)
+
+
+def getByStripeID(id) -> Callback:
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(Company).filter(Company.StripeID == id).first()
+        if not result: raise Exception
+
+        return Callback(True, "Got company successfully.", result)
+
+    except Exception as exc:
+        print(exc)
+        return Callback(False, 'Could not get the assistant by nickname.')

@@ -6,15 +6,15 @@ from sqlalchemy.sql import exists, func, extract
 import random
 
 
-def getAnalytics(assistant, daysOvertime: int, topSolustions: int):
+def getAnalytics(assistant, periodSpace: int, topSolustions: int):
     id = assistant.ID
-    # 'usersOvertime': getUsersOvertime(id, daysOvertime)
     try:
         result = {
                   'popularSolutions': getPopularSolutions(id, topSolustions),
                   'totalReturnedSolutions': getTotalReturnedSolutions(id),
-                  'timeSpentAvgOvertime': getTimeSpentAvgOvertime(id, daysOvertime),
+                  'timeSpentAvgOvertime': getTimeSpentAvgOvertime(id, periodSpace),
                   'TotalQuestionsOverMonth':getTotalQuestionsOverMonth(id),
+                  'UsersOvertime': getUsersOvertime(id, periodSpace),
                   'TotalSolutionsOverMonth':getTotalSolutionsOverMonth(id)}
 
 
@@ -24,7 +24,7 @@ def getAnalytics(assistant, daysOvertime: int, topSolustions: int):
         return Callback(False, 'Error while finding analytics', e.args)
 
 
-def getUsersOvertime(assistantID, days):
+def getUsersOvertime(assistantID, periodSpace):
 
     oldestDate = db.session.query(func.min(ChatbotSession.DateTime)).first()[0]
     newestDate = db.session.query(func.max(ChatbotSession.DateTime)).first()[0]
@@ -39,7 +39,7 @@ def getUsersOvertime(assistantID, days):
     while True:
         print(2)
         current = now
-        now -= timedelta(days=days)
+        now -= timedelta(days=7 * periodSpace)
 
         print(3)
         if now > oldestDate:
@@ -59,7 +59,7 @@ def getUsersOvertime(assistantID, days):
                 break
     now = datetime.now()
     while True:
-        now += timedelta(days=days)
+        now += timedelta(days=7 * periodSpace)
         if now >= newestDate:
             if now < endOfYear:
                 result = [{'x': now.strftime('%Y-%m-%d'), 'y': random.randint(1,5)}] + result

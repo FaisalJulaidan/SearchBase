@@ -35,7 +35,7 @@ function chatbotInit(assistantID) {
      $.ajax({
         url: '../assistant/' + assistantID +'/chatbot',
         type: "GET"
-    }).done(function (res) { 
+    }).done(function (res) {
 
         console.log("Blocks retrieved successfully!");
         var data = JSON.parse(res).data;
@@ -163,7 +163,7 @@ function renderBlock(block) {
             renderQuestion(block);
             break;
         case "User Input":
-            renderUserInput(block); 
+            renderUserInput(block);
             break;
         case "File Upload":
             renderFileUpload(block);
@@ -184,7 +184,7 @@ function renderQuestion(block) {
 
     var blockAnswers = block.content.answers;
     for (var i = 0; i < blockAnswers.length; i++) {
-        answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"submitAnswer('" + toEmoticon(blockAnswers[i].answer.text) + "','" + blockAnswers[i].keywords + "')\">" + toEmoticon(blockAnswers[i].answer.text) + "</a>";
+        answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"submitAnswer('" + toEmoticon(blockAnswers[i].text) + "','" + blockAnswers[i].keywords + "')\">" + toEmoticon(blockAnswers[i].text) + "</a>";
     }
     //add skip button
     //answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"SkipQuestion()\">Skip Question</a>";
@@ -289,12 +289,13 @@ async function submitAnswer(message, blockKeywords=undefined) {
     if (currentBlock.type == "Question") {
         var blockAnswers = currentBlock.content.answers;
         for (var i = 0; i < blockAnswers.length; i++) {
-            if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].answer.text == message) {
+            if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].text == message) {
                 action = blockAnswers[i].action;
                 var blockToGoId = blockAnswers[i].blockToGoId;
 
                 getNextBlock(action, blockToGoId);
-            }
+            }        answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"submitAnswer('" + toEmoticon(blockAnswers[i].text) + "','" + blockAnswers[i].keywords + "')\">" + toEmoticon(blockAnswers[i].answer.text) + "</a>";
+
         }
     } else if (currentBlock.type == "User Input" || currentBlock.type == "File Upload") {
         action = currentBlock.content.action;

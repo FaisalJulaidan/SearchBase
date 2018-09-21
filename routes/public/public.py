@@ -18,11 +18,10 @@ CORS(public_router)
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 
-@public_router.route("/test", methods=['POST'])
+@public_router.route("/test", methods=['GET'])
 def t():
-    if request.method == "POST":
-        print(request.get_json(silent=True))
-        return helpers.jsonResponse(True, 200, "!!!", None)
+    if request.method == "GET":
+        return render_template("test-chatbot.html")
 
 
 @public_router.route("/chatbottemplate/<assistantID>", methods=['GET'])
@@ -67,7 +66,7 @@ def chatbot(assistantID):
 def assistant_userdownloads(path):
     if request.method == "GET":
         print("trying to return file")
-        return send_from_directory('static/user_downloads/', "path")
+        return send_from_directory('static/user_downloads/', path)
 
 @public_router.route("/getpopupsettings/<assistantID>", methods=['GET'])
 def get_pop_settings(assistantID):

@@ -289,7 +289,7 @@ async function submitAnswer(message, blockKeywords=undefined) {
     if (currentBlock.type == "Question") {
         var blockAnswers = currentBlock.content.answers;
         for (var i = 0; i < blockAnswers.length; i++) {
-            if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].answer.text == message) {
+            if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].text == message) {
                 action = blockAnswers[i].action;
                 var blockToGoId = blockAnswers[i].blockToGoId;
 

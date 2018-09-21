@@ -41,25 +41,25 @@ function loadGraphs(){
         labels: weeklyLabels,
         datasets: [{
             label: 'Users Overtime',
-            fill: false,
+            fill: true,
             lineTension: 0.3,
-            backgroundColor: "rgb(138,43,226)",
+            backgroundColor: "rgb(179,76,243)",
             borderColor: "rgb(138,43,226)",
             borderCapStyle: 'butt',
             borderDash: [],
             borderDashOffset: 0.0,
             borderJoinStyle: 'miter',
-            pointBorderColor: "rgba(75,192,192,1)",
-            pointBackgroundColor: "#fff",
-            pointBorderWidth: 1,
-            pointHoverRadius: 5,
-            pointHoverBackgroundColor: "rgba(75,192,192,1)",
-            pointHoverBorderColor: "rgba(220,220,220,1)",
-            pointHoverBorderWidth: 2,
-            pointRadius: 0.5,
+            pointBorderColor: "rgb(75,0,130)",
+            //pointBackgroundColor: "#fff",
+            pointBorderWidth: 0,
+            pointHoverRadius: 2,
+            //pointHoverBackgroundColor: "rgba(75,192,192,1)",
+            //pointHoverBorderColor: "rgba(220,220,220,1)",
+            //pointHoverBorderWidth: 2,
+            pointRadius: 0,
             pointHitRadius: 10,
             data: usersOvertime,
-            spanGaps: false
+            spanGaps: true
         }]
     };
 
@@ -67,33 +67,17 @@ function loadGraphs(){
 
     new Chart(document.getElementById("line-chart1").getContext("2d"), {
         type: 'line',
-        data: chartData
+        data: chartData,
+        options: {
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        fontSize: 7
+                    }
+                }]
+            }
+        }
     });
-    //  options: {
-    //      title: {
-    //          display: true,
-    //          text: 'Users Overtime'
-    //      },
-    //      scales: {
-    //       xAxes: [{
-    //          type: 'time',
-    //          position: 'bottom',
-    //          time: {
-    //            displayFormats: {'day': 'MM/YY'},
-    //            tooltipFormat: 'DD/MM/YY',
-    //            unit: 'year'
-    //           }
-    //        }],
-    //        yAxes: [{
-    //            ticks: {
-    //                max:10,
-    //                min: 0,
-    //                stepSize: 1
-    //            }
-    //        }]
-    //      }
-    //  }
-    //});
 
     //TOTAL QUESTIONS ANSWERED OVER TIME
 

@@ -269,6 +269,8 @@ def logout():
     session.pop('UserPlan', None)
     session.pop('CompanyID', None)
     session.pop('Logged_in', False)
+    session.clear()
+
 
     return redirect(url_for('public_router.login'))
 

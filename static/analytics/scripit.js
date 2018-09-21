@@ -4,6 +4,8 @@ let popularSolutions = undefined;
 let totalReturnedSolutions = undefined;
 let timeSpentAvgOvertime = undefined;
 let usersOvertime = undefined;
+let totalQuestionsOverMonth = undefined;
+let totalSolutionsOverMonth = undefined;
 
 function getAnalytics(){
     $.ajax({
@@ -18,10 +20,12 @@ function getAnalytics(){
         popularSolutions = res.data.popularSolutions;
         totalReturnedSolutions = res.data.totalReturnedSolutions;
         timeSpentAvgOvertime = res.data.timeSpentAvgOvertime;
+        totalQuestionsOverMonth = res.data.TotalQuestionsOverMonth;
+        totalSolutionsOverMonth = res.data.TotalSolutionsOverMonth;
         // usersOvertime = res.data.usersOvertime;
-        console.log(usersOvertime.reverse());
+        //console.log(usersOvertime.reverse());
         // renderChartJS("line", "line-chart", ["2017-07-04T01:51:02-06:00", "2017-07-04T10:51:02-06:00"], usersOvertime.reverse(), "Total Number of Players Playing", "Date", "Players", "188,4,0", 0); // Number of players
-        // loadGraphs()
+        loadGraphs()
 
     }).fail(function (res) {
         console.log("Error in retrieving analytics data.");
@@ -30,64 +34,127 @@ function getAnalytics(){
 }
 
 function loadGraphs(){
-     var chartData = {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June','July','August','September','October','November','December'],
-            datasets: [{
-                label: 'Users Overtime',
-                fill: false,
-                lineTension: 0.3,
-                backgroundColor: "rgb(138,43,226)",
-                borderColor: "rgb(138,43,226)",
-                borderCapStyle: 'butt',
-                borderDash: [],
-                borderDashOffset: 0.0,
-                borderJoinStyle: 'miter',
-                pointBorderColor: "rgba(75,192,192,1)",
-                pointBackgroundColor: "#fff",
-                pointBorderWidth: 1,
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                pointHoverBorderColor: "rgba(220,220,220,1)",
-                pointHoverBorderWidth: 2,
-                pointRadius: 0.5,
-                pointHitRadius: 10,
-                data: usersOvertime,
-                spanGaps: false
-            }]
-        };
+    // var chartData = {
+    //        labels: ['January', 'February', 'March', 'April', 'May', 'June','July','August','September','October','November','December'],
+    //        datasets: [{
+    //            label: 'Users Overtime',
+    //            fill: false,
+    //            lineTension: 0.3,
+    //            backgroundColor: "rgb(138,43,226)",
+    //            borderColor: "rgb(138,43,226)",
+    //            borderCapStyle: 'butt',
+    //            borderDash: [],
+    //            borderDashOffset: 0.0,
+    //            borderJoinStyle: 'miter',
+    //            pointBorderColor: "rgba(75,192,192,1)",
+    //            pointBackgroundColor: "#fff",
+    //            pointBorderWidth: 1,
+    //            pointHoverRadius: 5,
+    //            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+    //            pointHoverBorderColor: "rgba(220,220,220,1)",
+    //            pointHoverBorderWidth: 2,
+    //            pointRadius: 0.5,
+    //            pointHitRadius: 10,
+    //            data: usersOvertime,
+    //            spanGaps: false
+    //        }]
+    //    };
 
 
 
-    new Chart(document.getElementById("line-chart").getContext("2d"), {
-      type: 'line',
-      data: chartData
-      ,
-      options: {
-          title: {
-              display: true,
-              text: 'Users Overtime'
-          },
-          scales: {
-           xAxes: [{
-              type: 'time',
-              position: 'bottom',
-              time: {
-                displayFormats: {'day': 'MM/YY'},
-                tooltipFormat: 'DD/MM/YY',
-                unit: 'year'
-               }
-            }],
-            yAxes: [{
-                ticks: {
-                    max:10,
-                    min: 0,
-                    stepSize: 1
-                }
-            }]
-          }
-      }
+    //new Chart(document.getElementById("line-chart").getContext("2d"), {
+    //  type: 'line',
+    //  data: chartData
+    //  ,
+    //  options: {
+    //      title: {
+    //          display: true,
+    //          text: 'Users Overtime'
+    //      },
+    //      scales: {
+    //       xAxes: [{
+    //          type: 'time',
+    //          position: 'bottom',
+    //          time: {
+    //            displayFormats: {'day': 'MM/YY'},
+    //            tooltipFormat: 'DD/MM/YY',
+    //            unit: 'year'
+    //           }
+    //        }],
+    //        yAxes: [{
+    //            ticks: {
+    //                max:10,
+    //                min: 0,
+    //                stepSize: 1
+    //            }
+    //        }]
+    //      }
+    //  }
+    //});
+
+    //TOTAL QUESTIONS ANSWERED OVER TIME
+
+    var chartData = {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        datasets: [{
+            label: 'Total Questions Answered',
+            fill: false,
+            lineTension: 0.3,
+            backgroundColor: "rgb(138,43,226)",
+            borderColor: "rgb(138,43,226)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(75,192,192,1)",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 0.5,
+            pointHitRadius: 10,
+            data: totalQuestionsOverMonth,
+            spanGaps: false
+        }]
+    };
+    new Chart(document.getElementById("bar-chart1").getContext("2d"), {
+        type: 'bar',
+        data: chartData
     });
 
+    //TOTAL SOLUTIONS RETURNED OVER TIME
+
+    var chartData = {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        datasets: [{
+            label: 'Total Solutions Returned',
+            fill: false,
+            lineTension: 0.3,
+            backgroundColor: "rgb(138,43,226)",
+            borderColor: "rgb(138,43,226)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(75,192,192,1)",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 0.5,
+            pointHitRadius: 10,
+            data: totalSolutionsOverMonth,
+            spanGaps: false
+        }]
+    };
+    new Chart(document.getElementById("bar-chart2").getContext("2d"), {
+        type: 'bar',
+        data: chartData
+    });
 }
 
 
@@ -154,3 +221,6 @@ function renderChartJS(chartType, elemId, labels, data, title, xAxisLabel, yAxis
       });
    }
 }
+
+
+getAnalytics();

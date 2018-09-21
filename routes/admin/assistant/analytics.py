@@ -21,7 +21,7 @@ def admin_analytics_data(assistantID):
         assistant: Assistant = callback.Data
 
         if assistant.CompanyID != session.get('CompanyID', 0):
-            return helpers.jsonResponse(False, 401, "You'r not authorised to view this info", None)
+            return helpers.jsonResponse(False, 401, "You're not authorized to view this info", None)
 
         callback: Callback = analytics_services.getAnalytics(assistant, daysOvertime=1, topSolustions=5)
         if not callback.Success:

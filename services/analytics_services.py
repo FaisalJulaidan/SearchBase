@@ -2,7 +2,7 @@ import sqlalchemy.exc
 from models import db, Statistics, Callback, ChatbotSession, Assistant, Solution
 from datetime import datetime, timedelta
 from monthdelta import monthdelta
-from sqlalchemy.sql import exists, func
+from sqlalchemy.sql import exists, func, extract
 import random
 
 
@@ -14,7 +14,8 @@ def getAnalytics(assistant, daysOvertime: int, topSolustions: int):
                   'popularSolutions': getPopularSolutions(id, topSolustions),
                   'totalReturnedSolutions': getTotalReturnedSolutions(id),
                   'timeSpentAvgOvertime': getTimeSpentAvgOvertime(id, daysOvertime),
-                  'TotalQuestionsOverMonth':getTotalQuestionsOverMonth(id)}
+                  'TotalQuestionsOverMonth':getTotalQuestionsOverMonth(id),
+                  'TotalSolutionsOverMonth':getTotalSolutionsOverMonth(id)}
 
 
         return Callback(True, 'Analytics processed successfully.', result)
@@ -76,7 +77,7 @@ def getTotalQuestionsOverMonth(assistantID):
     result = []
     while True:
         current = now
-        now -= monthdelta(1)
+
         print(now.month)
 
 
@@ -86,11 +87,43 @@ def getTotalQuestionsOverMonth(assistantID):
         #     ChatbotSession.DateTime >= now).scalar()
         total = db.session.query(func.sum(ChatbotSession.QuestionsAnswered)).filter(
                 ChatbotSession.AssistantID == assistantID,
-                ChatbotSession.DateTime.month < current.month,
-                ChatbotSession.DateTime.month >= now.month).scalar()
+                extract('month', ChatbotSession.DateTime) == now.month,
+                ).scalar()
+        print(total)
         if not total:
             total = 0
         result.append(total)
+        now -= monthdelta(1)
+        if now.year < oldestDate.year:
+            break
+    print(result)
+    return result
+
+def getTotalSolutionsOverMonth(assistantID):
+
+    oldestDate = db.session.query(func.min(ChatbotSession.DateTime)).scalar()
+    now = datetime.now()
+
+    result = []
+    while True:
+        current = now
+
+        print("now.weekday():", now.weekday())
+
+
+        # total = db.session.query(func.sum(ChatbotSession.QuestionsAnswered)).filter(
+        #     ChatbotSession.AssistantID == assistantID,
+        #     ChatbotSession.DateTime < current,
+        #     ChatbotSession.DateTime >= now).scalar()
+        total = db.session.query(func.sum(ChatbotSession.SolutionsReturned)).filter(
+                ChatbotSession.AssistantID == assistantID,
+                extract('month', ChatbotSession.DateTime) == now.month,
+                ).scalar()
+        print(total)
+        if not total:
+            total = 0
+        result.append(total)
+        now -= monthdelta(1)
         if now.year < oldestDate.year:
             break
     print(result)

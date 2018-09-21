@@ -20,7 +20,25 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="">Title</h4>
-                    <canvas width="800" height="450" id="line-chart"></canvas >
+                    <canvas width="800" height="450" id="line-chart1"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="max-width: 40vw;display:inline-block;">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="">Total Questions Answered</h4>
+                    <canvas width="800" height="450" id="bar-chart1"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="max-width: 40vw;display:inline-block;margin-left:2.6vw;">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="">Total Solutions Returned</h4>
+                    <canvas width="800" height="450" id="bar-chart2"></canvas>
                 </div>
             </div>
         </div>
@@ -32,76 +50,76 @@
 
             <!-- Code for excel export of the data files-->
             <!--<li> Export to Excel</li>
-            <br />
-            <button id="btnExport" onclick="fnExcelReport();"> EXPORT</button>
-            <br>
-            <iframe id="txtArea1" style="display:none"></iframe>
-            <br />
-            <br />-->
+        <br />
+        <button id="btnExport" onclick="fnExcelReport();"> EXPORT</button>
+        <br>
+        <iframe id="txtArea1" style="display:none"></iframe>
+        <br />
+        <br />-->
 
 
 
 
 
-            <h2>Critical Data</h2>
-            <br />
-            <div class="analytics_line">
-                <!-- First chart -->
-                <!-- chart for the most searched for sector-->
-                <div style="width:350px; height:200px;">
-                    <p>Most searched for Sector</p>
-                    <canvas id="mostSearchedSector" style="width:350px; height:0px;"></canvas>
-                </div>
-
-                <!-- Second chart -->
-                <!-- chart for the most searched for location-->
-                <div style="width:350px; height:200px;">
-                    <p>Most search for location</p>
-                    <canvas id="mostSearchedLocation" style="width:350px; height:0px;"></canvas>
-                </div>
-
-                <!-- Second chart -->
-                <!-- chart for the most searched for job/solution-->
-                <div style="width:350px; height:200px;">
-                    <p>Most returned solution</p>
-                    <canvas id="mostSearchedSolution" style="width:350px; height:0px;"></canvas>
-                </div>
-            </div>
-
-
-            <h2>General Data</h2>
-            <br />
-            <div class="analytics_line">
-                <!-- First chart -->
-                <div style="width:350px; height:200px;">
-                    <canvas id="assistantUsed" style="width:350px; height:0px;"></canvas>
-                </div>
-
-                <!-- Second chart -->
-                <div style="width:350px; height:200px;">
-                    <canvas id="questionsAnswerd" style="width:350px; height:0px;"></canvas>
-                </div>
-
-                <!-- Third chart -->
-                <div style="width:350px; height:200px;">
-                    <canvas id="productsReturned" style="width:350px; height:0px"></canvas>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-            <h2>Users over time</h2>
-            <br />
-            <div class="analytics_line">
-                <!-- First chart -->
-                <div style="width:700px; height:300px;">
-                    <canvas id="userOverTime" style="width:350px; height:0px;"></canvas>
-                </div>
-                <div class="clearfix"></div>
-
-                <div style="width:700px; height:300px;">
-                    <canvas id="userTimeSpent" style="width:350px; height:0px;"></canvas>
-                </div>
-                <div class="clearfix"></div>
-            </div>
+{#            <h2>Critical Data</h2>#}
+{#            <br />#}
+{#            <div class="analytics_line">#}
+{#                <!-- First chart -->#}
+{#                <!-- chart for the most searched for sector-->#}
+{#                <div style="width:350px; height:200px;">#}
+{#                    <p>Most searched for Sector</p>#}
+{#                    <canvas id="mostSearchedSector" style="width:350px; height:0px;"></canvas>#}
+{#                </div>#}
+{##}
+{#                <!-- Second chart -->#}
+{#                <!-- chart for the most searched for location-->#}
+{#                <div style="width:350px; height:200px;">#}
+{#                    <p>Most search for location</p>#}
+{#                    <canvas id="mostSearchedLocation" style="width:350px; height:0px;"></canvas>#}
+{#                </div>#}
+{##}
+{#                <!-- Second chart -->#}
+{#                <!-- chart for the most searched for job/solution-->#}
+{#                <div style="width:350px; height:200px;">#}
+{#                    <p>Most returned solution</p>#}
+{#                    <canvas id="mostSearchedSolution" style="width:350px; height:0px;"></canvas>#}
+{#                </div>#}
+{#            </div>#}
+{##}
+{##}
+{#            <h2>General Data</h2>#}
+{#            <br />#}
+{#            <div class="analytics_line">#}
+{#                <!-- First chart -->#}
+{#                <div style="width:350px; height:200px;">#}
+{#                    <canvas id="assistantUsed" style="width:350px; height:0px;"></canvas>#}
+{#                </div>#}
+{##}
+{#                <!-- Second chart -->#}
+{#                <div style="width:350px; height:200px;">#}
+{#                    <canvas id="questionsAnswerd" style="width:350px; height:0px;"></canvas>#}
+{#                </div>#}
+{##}
+{#                <!-- Third chart -->#}
+{#                <div style="width:350px; height:200px;">#}
+{#                    <canvas id="productsReturned" style="width:350px; height:0px"></canvas>#}
+{#                </div>#}
+{#                <div class="clearfix"></div>#}
+{#            </div>#}
+{#            <h2>Users over time</h2>#}
+{#            <br />#}
+{#            <div class="analytics_line">#}
+{#                <!-- First chart -->#}
+{#                <div style="width:700px; height:300px;">#}
+{#                    <canvas id="userOverTime" style="width:350px; height:0px;"></canvas>#}
+{#                </div>#}
+{#                <div class="clearfix"></div>#}
+{##}
+{#                <div style="width:700px; height:300px;">#}
+{#                    <canvas id="userTimeSpent" style="width:350px; height:0px;"></canvas>#}
+{#                </div>#}
+{#                <div class="clearfix"></div>#}
+{#            </div>#}
         </div>
     </div>
 </div>
@@ -110,13 +128,12 @@
 {% block customJS %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.3/Chart.bundle.min.js"></script>
-<script src="Chart.Scatter.js"></script>
 
 <script src="/static/analytics/scripit.js"></script>
 <script>
          $(document).ready(function () {
             console.log("JS is working...");
-            getAnalytics();
+            //getAnalytics();
         });
 </script>
     {% endblock %}

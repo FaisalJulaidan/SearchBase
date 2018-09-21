@@ -1,6 +1,6 @@
 #/usr/bin/python3.5
 from flask import Flask, redirect, request, render_template, jsonify, abort, escape, \
-    g, session
+    g, session, send_from_directory
 from werkzeug.utils import secure_filename
 from flask_api import status
 from datetime import datetime, timedelta
@@ -30,7 +30,6 @@ from routes.public.routers import public_router, resetPassword_router
 from services import user_services, mail_services
 
 app = Flask(__name__, static_folder='static')
-
 # Register Routes:
 app.register_blueprint(adminBasic_router)
 app.register_blueprint(assistantManager_router)
@@ -52,7 +51,6 @@ app.register_blueprint(answers_router)
 app.register_blueprint(bot_router)
 app.register_blueprint(emoji_router)
 
-
 # code to ensure user is logged in
 @app.before_request
 def before_request():
@@ -61,6 +59,7 @@ def before_request():
     restrictedRoutes = ['/admin', 'admin/dashboard']
 
     # If the user try to visit one of the restricted routes without logging in he will be redirected
+    print(session.get('Logged_in', False))
     if any(route in currentURL for route in restrictedRoutes) and not session.get('Logged_in', False):
         return redirect('login')
 

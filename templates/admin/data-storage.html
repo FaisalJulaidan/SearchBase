@@ -21,45 +21,45 @@
 {% block customJS %}
 <script src="/static/js/sortTable.js"></script>
 <script>
-    var lastSessionID = 0;
     var currentLength = 0;
-    var headingsLength = 0;
-    var position = -1;
-    var data = []
+    var maxLength = 0;
+    var tableString = "";
+    console.log("{{data}}")
+    {%if not data %}
+    $("#tBodyUIn").append("<h3>You currently have no data on record.</h3>");
+    {%endif%}
 
     {%for record in data %}
+        currentLength = 0;
+        {%for value in record['data']['collectedInformation'] %}
+            currentLength++;
+        {% endfor %}
+        if (currentLength > maxLength) { maxLength = currentLength; }
+    {%endfor%}
 
-    if ({{ record["SessionID"] }} != lastSessionID) {
-        data.append(["{{record['Date']}}", "{{record['Recorded Data']}}&;&{{record['QuestionString']}}"]);
-        position++;
-        currentLength = 1;
-        lastSessionID = {{record["SessionID"]}};
-    } else {
-        data[position].append("{{record['Recorded Data']}}&;&{{record['QuestionString']}}")
-        currentLength++;
+    var headings = "";
+    for (var i = 0; i < maxLength; i++) {
+        headings += "<th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Data</th>";
     }
-    if (currentLength > headingsLength) { headingsLength = currentLength;}
-    {% endfor %}
-    console.log(data);
 
-
-
-    var tableHeading = $("#tableHeadingUIn");
-    var tableString = "<table id=\"tableSort\" class=\"table table-striped jambo_table bulk_action\"><thead>\
-                            <tr id=\"tableHeadingUIn\" class=\"headings\">\
-                                <th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Date</th>\
-                                <th style=\"cursor: pointer;\" onclick=\"sortTable(1)\" class=\"column-title\">SessionID</th>\
-                                <th style=\"cursor: pointer;\" onclick=\"sortTable(2)\" class=\"column-title\">Question</th>\
-                                <th style=\"cursor: pointer;\" onclick=\"sortTable(3)\" class=\"column-title\">Recorded Data</th>\
-                            </tr></thead>\
+    tableString = "<table id=\"tableSort\" class=\"table table-striped jambo_table bulk_action\"><thead>\
+                            <tr id=\"tableHeadingUIn\" class=\"headings\"><th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Date and Time</th>"+ headings +"</tr></thead>\
                             <tbody id=\"tBodyUIn\">";
+    var filename = undefined;
     {%for record in data %}
-    if ("{{record['Input']}}".includes(";")) {
-        tableString += "<tr><td>" + "{{record['DateTime']}}".split(" ")[0] + "</td><td>{{record['QuestionString']}}</td><td><a href=\"/" + "{{record['Input']}}".split(";")[1] + "\" download=\"" + "{{record['Input']}}".split(";")[0] + "\">" + "{{record['Input']}}".split(";")[0]+"</a></td></tr>";
-    } else {
-        tableString += "<tr><td>" + "{{record['DateTime']}}".split(" ")[0] + "</td><td>{{record['QuestionString']}}</td><td>{{record['Input']}}</td></tr>";
-    }
+        tableString += "<tr><td>"+"{{record['dateTime']}}".split(".")[0]+"</td>"
+        {%for value in record['data']['collectedInformation'] %}
+            {%if '&FILE_UPLOAD&' in value['input'] %}
+                filename = "{{record['filePath']}}";
+                console.log(filename);
+                tableString += "<td><a href=\"/static"+"{{route}}".split("static")[1]+"/" + filename + "\" download=\"" + filename + "\">" + filename + "</a></td>"
+            {%else%}
+                tableString += "<td>{{value['input']}}</td>"
+            {%endif%}
+        {% endfor %}
+        tableString += "</tr>"
     {% endfor %}
+
     tableString += "</tbody></table>";
     $("#tBodyUIn").append(tableString);
 

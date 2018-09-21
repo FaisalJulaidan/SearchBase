@@ -1,9 +1,40 @@
 from flask import Blueprint, render_template, request, redirect, session
-from services import statistics_services, assistant_services
-from models import Callback, Assistant
+from services import statistics_services, assistant_services,admin_services, sub_services, user_services
+from models import Callback, Assistant, User, Company, Plan
 from utilties import helpers
 
 assistant_router: Blueprint = Blueprint('assistant_router', __name__ , template_folder="../../templates")
+
+
+
+@assistant_router.route("/admin/assistant/create", methods=['GET'])
+def create_assistant_page():
+    if request.method == "GET":
+        return admin_services.render("admin/create-assistant.html")
+
+@assistant_router.route("/admin/assistant", methods=['POST'])
+def assistant():
+    if request.method == "POST":
+
+        # Get the admin user who is logged in and wants to create a new user.
+        callback: Callback = user_services.getByID(session.get('UserID', 0))
+        if not callback.Success:
+            return redirect("login")
+        user: User = callback.Data
+
+        # TODO: do restrictions for assistant creation based on current user's plan
+        # callback: Callback = sub_services.getPlanByNickname(session.get('UserPlan', 'er'))
+        # if not callback.Success:
+        #     return helpers.jsonResponse(False, 401, "You have no plan to create assistant", None)
+
+        name = request.form.get("name", default='').strip()
+        welcomeMsg = request.form.get("welcome-message", default='').strip()
+        timePopup = request.form.get("timeto-autopop", default='').strip()
+
+        callback: Callback = assistant_services.create(name, None, welcomeMsg, timePopup, user.Company)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, "Couldn't create the assistant", None)
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data.ID)
 
 
 # get all assistants
@@ -31,7 +62,7 @@ def admin_home():
 
 
 @assistant_router.route("/admin/assistant/<int:assistantID>", methods=['DELETE'])
-def assistantt(assistantID):
+def assistant_delete(assistantID):
     if request.method == "DELETE":
         callback: Callback = assistant_services.getByID(assistantID)
         if not callback.Success:

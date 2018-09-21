@@ -12,60 +12,13 @@
                     <div class="col-md-12">
                         <h3> Connecting your assistant. </h3>
                         <p>
-                            To Connect your assistant, you must paste the pre-made code into any part of your HTML
-                            source code between the.
+                            To Connect your assistant, you must paste the pre-made code into any part of your HTML source code.
                         </p>
                         <xmp>
-                            <div w3-include-html="https://thesearchbase.com/static/user_downloads/TSBChatbot.html"></div>
-                            <script type="text/javascript">function LoadChatbot() { GetPopSettings({{ assistantID }}); loadIframe("chatbotIframe", "{{companyID}}/{{assistantID}}"); } </script>
+                            <!--<div w3-include-html="https://www.thesearchbase.com/static/user_downloads/TSBChatbot.html"></div>-->
+                            <div w3-include-html="https://www.thesearchbase.com/assistant/pagerequest"></div>
+                            <script type="text/javascript">function LoadChatbot() { GetPopSettings({{ assistantID }}); loadIframe("{{assistantID}}"); } </script>
                             <script type="text/javascript" src="https://www.thesearchbase.com/static/user_downloads/chatbotInclude.js"></script>
-
-
-                            <div class="bottom_left" id="contents1">
-                                <div id="iframediv">
-                                    <div id="overChatbotIframe">
-                                        <a id="overChatbotIframeHeading">TheSearchBase</a>
-                                        <a id="overChatbotIframeCloseButton">X</a>
-                                    </div>
-                                    <!-- Will change this after the demo -->
-                                    <iframe frameBorder="0" id="chatbotIframe" src="https://thesearchbase.com/chatbot/{{companyID}}/{{assistantID}}"></iframe>
-                                </div>
-                                <div class="launch_btn_holder">
-                                    <div id="launch_button"></div>
-                                    <div id="launch_button_appendix"></div>
-                                </div>
-                            </div>
-
-                        </xmp>
-                        <p>
-                            Once you have copied this, past the lines below into the HTML page that you wish to use your assistant on and you're
-                            live!
-                        </p>
-                        <br />
-                        <h4> CSS </h4>
-                        <xmp>
-                            <link href="https://www.thesearchbase.com/static/css/style.css" rel="stylesheet">
-                            <link href="https://www.thesearchbase.com/static/pop-up/pop.css" rel="stylesheet">
-                            <link href="https://www.thesearchbase.com/static/css/responsive.css" rel="stylesheet">
-                        </xmp>
-                        <br />
-                        <h4> Javascript (This is used for analytics and the animation used in the bot) </h4>
-                        <xmp>
-                            <script type="text/javascript" src="https://www.thesearchbase.com/static/js/jquery-2.2.4.min.js"></script>
-                            <script type="text/javascript" src="https://www.thesearchbase.com/static/js/jQueryRotate.js"></script>
-                            <script type="text/javascript" src="https://www.thesearchbase.com/static/js/popper.min.js"></script>
-                            <script type="text/javascript" src="https://www.thesearchbase.com/static/js/bootstrap.min.js"></script>
-                            <script type="text/javascript" src="https://www.thesearchbase.com/static/js/plugins.js"></script>
-                            <script type="text/javascript" src="https://www.thesearchbase.com/static/js/slick.min.js"></script>
-                            <script type="text/javascript" src="https://www.thesearchbase.com/static/js/active.js"></script>
-                            <script type="text/javascript" src="https://www.thesearchbase.com/static/js/footer-reveal.min.js"></script>
-                            <script type="text/javascript" src="https://www.thesearchbase.com/static/user_downloads/chatbot.js"></script>
-                            <script type="text/javascript">$(document).ready(function (){GetPopSettings({{assistantID}})})</script>
-                        </xmp>
-                        <h4> Images for the assistant </h4>
-                        <xmp>
-                        <link href="https://www.thesearchbase.com/static/user_downloads/open-assistant-bar.png">
-                        <link href="https://www.thesearchbase.com/static/user_downloads/open-assistant-circle.png">
                         </xmp>
                     </div>
                 </div>

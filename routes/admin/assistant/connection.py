@@ -7,7 +7,4 @@ connection_router: Blueprint = Blueprint('connection_router', __name__, template
 @connection_router.route("/admin/assistant/<assistantID>/connect", methods=['GET'])
 def admin_connect(assistantID):
     if request.method == "GET":
-
-        companyID = session.get('CompanyID', None)
-
-        return admin_services.render("admin/connect.html", companyID=companyID, assistantID=assistantID)
+        return admin_services.render("admin/connect.html", assistantID=assistantID)

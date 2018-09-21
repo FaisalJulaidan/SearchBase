@@ -96,38 +96,30 @@ function OpenButtonHoverEnd() {
     }
 }
 
-function loadIframe(iframeName, url) {
-    var $iframe = $('#' + iframeName);
-    url = "https://thesearchbase.com/chatbot/" + url;
-    if ($iframe.length) {
-        $iframe.attr('src', url);
-        return false;
-    }
-    return true;
+function loadIframe(url) {
+    var $iframe = $('#' + "chatbotIframe");
+    url = "https://thesearchbase.com/chatbottemplate/" + url;
+    $iframe.attr('src', url);
 }
 
 function GetPopSettings(assistantID) {
-    var url = window.location.href;
-    params = "URL=" + url;
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "https://www.thesearchbase.com/getpopupsettings/" + assistantID, true);
-    xhttp.setRequestHeader("Access-Control-Allow-Origin", window.location.href);
-    xhttp.onreadystatechange = function () {
-        if (xhttp.readyState === 4) {
-            if (xhttp.status === 200) {
-                var data = xhttp.responseText;
-                autoPop = data.split("&&&")[0];
-                autoPop = autoPop.replace("\"", "");
-                if (autoPop != "Off") {
-                    setTimeout(openAssistant, parseInt(autoPop) * 1000);
-                }
-                var frameText = data.split("&&&")[1]
-                document.getElementById("overChatbotIframeHeading").innerHTML = frameText;
-            }
-            else {
-                console.error(xhttp.statusText);
-            }
-        }
-    };
     xhttp.send(params);
+    $.ajax({
+        url: "https://www.thesearchbase.com/getpopupsettings/" + assistantID,
+        type: "GET"
+    }).done(function (res) {
+
+        console.log("Pop settings retrieved successfully!");
+        var data = JSON.parse(res).data;
+
+        setTimeout(openAssistant, parseInt(data['SecondsUntilPopUp']) * 1000);
+        //var frameText = data.split("&&&")[1]
+        //document.getElementById("overChatbotIframeHeading").innerHTML = frameText;
+
+    }).fail(function (res) {
+        console.log("Error in retrieving pop settings.");
+        console.log(res);
+    });
 }
+
+LoadChatbot();

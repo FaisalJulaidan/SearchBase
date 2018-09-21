@@ -38,7 +38,6 @@ def chatbot(assistantID):
     if not callback.Success:
         return helpers.jsonResponse(False, 404, "Assistant not found.", None)
     assistant: Assistant = callback.Data
-    analytics_services.getPopularSolutions(assistant, 1)
 
     if request.method == "GET":
         assistant: Assistant = callback.Data

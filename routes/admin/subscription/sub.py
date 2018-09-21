@@ -1,10 +1,10 @@
 
 from flask import Blueprint, request, redirect, abort, render_template, session, jsonify
 from flask_api import status
-from services import admin_services, sub_services, user_services, assistant_services
+from services import admin_services, sub_services, user_services, assistant_services, company_services
 from utilties import helpers
 import stripe
-from models import Callback, User
+from models import db, Callback, User, Company
 
 
 sub_router: Blueprint = Blueprint('sub_router', __name__ ,template_folder="../../templates")
@@ -80,6 +80,11 @@ def admin_pay(planID):
         return helpers.jsonResponse(True, 200, "You have successfully subscribed!", {"url": "admin/pricing-tables.html"})
 
 
+@sub_router.route("/admin/adjustments", methods=['GET'])
+def admin_pricing_adjust():
+    return admin_services.render("admin/pricing-adjustments.html")
+
+
 @sub_router.route("/admin/unsubscribe", methods=['POST'])
 def unsubscribe():
     if request.method == 'POST':
@@ -96,14 +101,14 @@ def unsubscribe():
         unsubscribe_callback: Callback = sub_services.unsubscribe(user.Company)
 
         if not unsubscribe_callback.Success:
-            return jsonify(error=unsubscribe_callback.Message)
+            return helpers.jsonResponse(False, 400, unsubscribe_callback.Message)
 
         # Reaching to this point means unsubscribe successfully
         # Clear plan session
         session.pop('UserPlan')
 
         print(unsubscribe_callback.Message)
-        return jsonify(success=unsubscribe_callback.Message)
+        return helpers.jsonResponse(True, 200, unsubscribe_callback.Message)
 
 
 # Stripe Webhooks
@@ -118,33 +123,26 @@ def webhooks_subscription_cancelled():
             print("Webhooks: Customer ID")
             print(customerID)
 
-            # user = select_from_database_table("SELECT * FROM Users WHERE StripeID=?", [customerID])
-            user = query_db("SELECT * FROM Users WHERE StripeID=?", [customerID], one=True)
-            print(user)
+            # Get the admin user who is logged in and wants to create a new user.
+            callback: Callback = company_services.getByStripeID(customerID)
+            if not callback.Success:
+                return helpers.jsonResponse(False, 400, "Sorry, this customer doesn't exist in the system")
+            company: Company = callback.Data
 
-            if user:
+            company.SubID = None
+            db.session.commit()
 
-                update_table("UPDATE Users SET SubID=? WHERE StripeID=?;",
-                             [None, customerID])
+            # Deactivate assistants
+            assistants = company.Assistants
+            if len(assistants) > 0:
+                for assistant in assistants:
+                    assistant.Active = False
 
-                # TODO check company for errors
-                assistants = select_from_database_table("SELECT * FROM Assistants WHERE CompanyID=?", ['CompanyID'])
-
-                # Check if user has assistants to deactivate first
-                if len(assistants) > 0:
-                    for assistant in assistants:
-                        updateAssistant = update_table("UPDATE Assistants SET Active=? WHERE ID=?",
-                                                       ["False", assistant[0]])
-                        # TODO check update assistant for errors
-
-                return "Assistants for " + user['Email'] \
-                       + " account has been deactivated due to subscription cancellation"
-
-            else:
-                return "Webhooks Message: No User to unsubscribe"
+            print("Company with " + customerID + " has been unsubscribed successfully")
+            return helpers.jsonResponse(True, 200, "Company with " + customerID + " has been unsubscribed successfully")
 
         except Exception as e:
-            abort(status.HTTP_400_BAD_REQUEST, "Webhook error")
+            return helpers.jsonResponse(False, 400, "Sorry, error occurred with Webhooks...")
 
 
 

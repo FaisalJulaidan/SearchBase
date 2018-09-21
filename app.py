@@ -93,7 +93,7 @@ def before_request():
 def genDummyData():
 
     # Companies creation
-    db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_DbgPyBCx0osKmr'))
+    db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_00000000000000', SubID='sub_00000000000000'))
     db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly'))
 
     # Get Companies
@@ -224,23 +224,24 @@ def genDummyData():
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+# APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+#
+# DATABASE = APP_ROOT + "/database.db"
+#
+# PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
+# USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
 
-DATABASE = APP_ROOT + "/database.db"
-
-PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
-USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
-
-pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
-secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
 encryption = None
 
-stripe.api_key = secret_key
-
-stripe_keys = {
-    'secret_key': secret_key,
-    'publishable_key': pub_key
-}
+# pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
+# secret_key = 'sk_live_GchRkZzl77MEnpMCKBRiGodQ'
+#
+# stripe.api_key = secret_key
+#
+# stripe_keys = {
+#     'secret_key': secret_key,
+#     'publishable_key': pub_key
+# }
 
 # stripe.api_key = stripe_keys['secret_key']
 
@@ -459,9 +460,7 @@ def admin_templates():
 
 
 
-@app.route("/admin/adjustments", methods=['GET'])
-def admin_pricing_adjust():
-    return render("admin/pricing-adjustments.html")
+
 
 @app.route("/admin/cancellation/confirmation", methods=['GET'])
 def admin_plan_confirmation():

@@ -9,17 +9,11 @@ solutions_router: Blueprint = Blueprint('Solutions_router', __name__, template_f
 def admin_solutions(assistantID):
     if request.method == "GET":
 
-        solutions_callback: Callback = solutions_services.getByAssistantID(assistantID)
-
-        #if it coudnt find anything assume its empty
-        if not solutions_callback.Success: solutions_callback.Data = []
-        print(solutions_callback.Data)
-        #convert solutions to dics
-        if type(solutions_callback.Data) is Solution:
-            solutions = [helpers.getDictFromSQLAlchemyObj(solutions_callback.Data)]
-        else:
-            solutions = helpers.getListFromSQLAlchemyList(solutions_callback.Data)
-
+        solutions_callback: Callback = solutions_services.getAllByAssistantID(assistantID)
+        solutions = []
+        if solutions_callback.Success:
+            solutions = solutions_callback.Data
+        print(solutions)
         return admin_services.render("admin/solutions.html", data=solutions, id=assistantID)
 
     elif request.method == 'POST':

@@ -1,13 +1,13 @@
 ﻿{% extends "admin/base.html" %}
 
-{% block title %}Products{% endblock %}
+{% block title %}Solutions{% endblock %}
 
 {% block content %}
     <div class="right_col" role="main">
         <div class="">
             <div class="page-title">
                 <div class="title_left">
-                    <h3>Adding New Products</h3>
+                    <h3>Adding New Solutions</h3>
                 </div>
             </div>
             <div class="clearfix"></div>
@@ -22,7 +22,7 @@
                         <div class="x_panel">
                             <div class="x_content">
                                 <p class="text-muted font-13 m-b-30">
-                                    Database 1 - All of the products thats your bot scans for are listed below.
+                                    Database 1 - All of the solutions thats your bot scans for are listed below.
                                 </p>
 
                                 <!-- Start of welcome message -->
@@ -67,7 +67,7 @@
                                     </div>
 
                                     <form action="/admin/assistant/{{ id }}/solutions" method="post" enctype="multipart/form-data">
-                                        <table id="datatable" class="table table-striped table-bordered">
+                                        <table id="solutionsTable" class="table" cellspacing="0" width="100%">
                                             <thead>
                                                 <tr>
                                                     <th>Delete</th>
@@ -79,16 +79,28 @@
                                                     <th>Keywords</th>
                                                     <th>URL</th>
                                                 </tr>
-
-{#                                                {%for item in data%}#}
-{#                                                     <tr >#}
-{#                                                        <td><input required value="{{item["SolutionID"]}}" style="width: 50px;" padding="3px" margin="3px" type="text" name="product_ID" String(i)></td>#}
-{#                                                    </tr>#}
-{#                                                {% endfor %}#}
-
                                             </thead>
+
+
                                             <tbody id="tbody">
-                                            <!-- Row get inserted here -->
+                                                {%for item in data%}
+                                                   <tr data-rowid="{{ item['ID'] }}">
+                                                    <td id="cb" style="width: 30px;" type="checkbox" name="product_Delete"></td>\
+                                                    <td><input required value="{{ item['SolutionID'] }}" data-type="id" type="text" name="product_ID"></td>
+                                                    <td><input required value="{{ item['MajorTitle'] }}" data-type="majorTitle"type="text" name="product_Name" onchange='validateName(this)'></td>
+                                                    <td><input required value="{{ item['SecondaryTitle'] }}"  data-type="secondaryTitle" type="text" name="product_Brand" onchange='validate(this)'></td>
+                                                    <td><input required value="{{ item['ShortDescription'] }}" data-type="shortDescription" type="text" name="product_Model" onchange='validate(this)'></td>
+                                                    <td><input required value="{{ item['Money'] }}" data-type="money" type="text" name="product_Price" onchange='validate(this)'></td>
+                                                    <td><input required value="{{ item['Keywords'] }}"  data-type="keywords" type="text" name="product_Keywords" onchange='validate(this)'></td>
+                                                    <td><input required value="{{ item['URL'] }}" data-type="URL" type="text" name="product_Keywords" onchange='validate(this)'></td>
+                                                    <td>
+                                                       <button type="button" class="btn btn-primary"
+                                                            data-toggle="modal"
+                                                            onclick="fillSolutionForm({{ item['ID'] }}, edit=true)">Edit</button>
+                                                       <button type="button" class="btn btn-danger" onclick="deleteSolution({{ item['ID'] }})">Delete</button>
+                                                     </td>
+                                                    </tr>
+                                                {% endfor %}
                                             </tbody>
                                         </table>
                                         <button type="submit" class="btn btn-success" value="Send">
@@ -109,48 +121,207 @@
             </div>
         </div>
     </div>
-    <!-- Abdullah Hashim did below code to avoid error occured from custom.min.js file -->
-    <form id="demo-form2"></form>
+
+       <!-- Solution Modal -->
+                <div class="modal fade" id="solutionModal" tabindex="-1" role="dialog" aria-labelledby="solutionModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+
+                      <div class="modal-header">
+                        <h3 class="modal-title" id="solutionModalLongTitle">Solution Information</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+
+                      <form id="solutionForm">
+
+                          <div class="modal-body">
+
+                                    <div class="form-group">
+                                      <label for="inputID">ID</label>
+                                      <input type="text" class="form-control" name="inputId" placeholder="FS5894">
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="inputBigTitle">Major Title</label>
+                                      <input type="text" class="form-control" name="inputMajorTitle" placeholder="">
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="inputSecondaryTitle">Secondary Title</label>
+                                      <input type="text" class="form-control" name="inputSecondaryTitle" placeholder="">
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="inputSecondaryTitle">Short Description</label>
+                                      <input type="text" class="form-control" name="inputShortDescription" placeholder="">
+                                    </div>
+
+
+                                    <div class="form-group">
+                                      <label for="inputMoney">Money</label>
+                                      <input type="text" class="form-control" name="inputMoney" placeholder="">
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="inputKeywords">Keywords</label>
+                                      <input type="text" class="form-control" name="inputKeywords" placeholder="">
+                                    </div>
+
+
+                                    <div class="form-group">
+                                      <label for="inputURL">URL</label>
+                                      <input type="url" class="form-control" name="inputURL" placeholder="">
+                                    </div>
+
+
+
+
+                          </div>
+
+                          <div class="modal-footer">
+                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                             <button type="submit" class="btn btn-success">Submit</button>
+                          </div>
+                    </form>
+
+                    </div>
+                  </div>
+                </div>
+       <!-- Solution Modal END -->
+
+
 {% endblock %}
 
 {% block customJS %}
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
 <script>
-    // TODO:
-    // 1- validate the inputs that satisfies the validatitons (done)
-    // 2- when delete button is clicked, delete the row no need to save Updates (done)
+
+// Once the modal is closed, unbind all onSubmit handlers from the userForm
+$(document).on('hide.bs.modal', '#solutionModal', function (e) {
+    console.log('Unbind submit event.');
+    $(document).off('submit', '#solutionForm');
+});
+
+
+function fillSolutionForm(solID, edit=false){
+    var $form = $('form#solutionForm');
+    var $row = $('#solutionsTable tbody tr[data-data-rowid="' + solID + '"]');
+    console.log($row);
+
+    $('#solutionModal').modal('show');
+
+    if(edit){
+         // fill current user
+        console.log($form.find('input[name="inputID"]').val());
+        $form.find('input[name="inputId"]').val($row.find('td[data-type="id"]').text());
+        $form.find('input[name="inputMajorTitle"]').val($row.find('td[data-type="majorTitle"]').text());
+        $form.find('input[name="inputSecondaryTitle"]').val($row.find('td[data-type="secondaryTitle"]').text());
+        $form.find('input[name="inputShortDescription"]').val($row.find('td[data-type="shortDescription"]').text());
+        $form.find('input[name="inputMoney"]').val($row.find('td[data-type="money"]').text());
+        $form.find('input[name="inputKeywords"]').val($row.find('td[data-type="keywords"]').text());
+        $form.find('input[name="inputURL"]').val($row.find('td[data-type="URL"]').text());
+    }
+
+    // Bind the appropriate handlers depends on edit value
+    $(document).on('submit', '#solutionForm', function (e) {
+    e.preventDefault();
+    if (edit){submitEditSolForm(this,solid=solID, event=e)}
+    else {submitNewUserForm(this, event=e)}
+    })
+
+}
+
+
+
+
+
+function deleteSolution(solID) {
+    swal({
+          title: "Are you sure?",
+          text: "Solution will be removed completely from the system",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            document.location.reload()
+            $.ajax({
+                url: '/admin/solution/' + solID,
+                type: "DELETE"
+            }).done(function (res) {
+                console.log(res);
+                swal("Success!", "User has been deleted successfully", "success").then((value) => {
+                  document.location = "admin/assistant/manage"
+                });
+            }).fail(function (res) {
+                let resJson = JSON.parse(res.responseText);
+                swal("Error!", resJson.msg, "error").then((value) => {
+                  document.location.reload()
+                });
+            });
+
+          } else {
+            // When clicking the cancel button in the alert box
+          }
+        });
+ }
+
+
+function submitEditSolForm(form,solID, event) {
+    console.log('EDIT Solution.');
+     $.ajax({
+        url: '/admin/solution/' + solID,
+        type: "PUT",
+        data: form.serialize()
+    }).done(function (res) {
+        console.log(res);
+        swal("Success!", "Solution has been updated successfully", "success").then((value) => {
+          document.location.reload()
+        })
+    }).fail(function (res) {
+        let resJson = JSON.parse(res.responseText);
+        swal("Error!", resJson.msg, "error").then((value) => {
+        });
+    });
+}
+
 
     // data parsing
-    var numberOfProducts = 0;
-    console.log("{{data}}")
-    {%for item in data%}
-        numberOfProducts++;
-    {%endfor%}
-
-    var data = createArray(numberOfProducts);
-    var i = 0;
-
-    {%for item in data%}
-        data[i] = ['{{item["SolutionID"]}}', '{{item["MajorTitle"]}}', '{{item["SecondaryTitle"]}}',
-            '{{item["ShortDescription"]}}', '{{item["Money"]}}', '{{item["Keywords"]}}', '{{item["URL"]}}'];
-        i++;
-    {%endfor%}
-
-    console.log("{{data}}");
-    // first time rendering
-    i = 0;
-    for (var c = 0; c < data.length; c++) {
-        i++;
-        $("#tbody").append("<tr id=\"tr" + String(i) + "\">\
-        <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\
-        <td><input required value=\"" + data[c][0] + "\" style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\
-        <td><input required value=\"" + data[c][1] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\" onchange='validateName(this)'></td>\
-        <td><input required value=\"" + data[c][2] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\" onchange='validate(this)'></td>\
-        <td><input required value=\"" + data[c][3] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\" onchange='validate(this)'></td>\
-        <td><input required value=\"" + data[c][4] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\" onchange='validate(this)'></td>\
-        <td><input required value=\"" + data[c][5] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\" onchange='validate(this)'></td>\
-        <td><input required value=\"" + data[c][6] + "\" style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\" onchange='validate(this)'></td>\
-        </tr>");
-    }
+    {#var numberOfProducts = 0;#}
+    {#console.log("{{data}}")#}
+    {#{%for item in data%}#}
+    {#    numberOfProducts++;#}
+    {#{%endfor%}#}
+    {##}
+    {#var data = createArray(numberOfProducts);#}
+    {#var i = 0;#}
+    {##}
+    {#{%for item in data%}#}
+    {#    data[i] = ['{{item["SolutionID"]}}', '{{item["MajorTitle"]}}', '{{item["SecondaryTitle"]}}',#}
+    {#        '{{item["ShortDescription"]}}', '{{item["Money"]}}', '{{item["Keywords"]}}', '{{item["URL"]}}'];#}
+    {#    i++;#}
+    {#{%endfor%}#}
+    {##}
+    {#console.log("{{data}}");#}
+    {#// first time rendering#}
+    {#i = 0;#}
+    {#for (var c = 0; c < data.length; c++) {#}
+    {#    i++;#}
+    {#    $("#tbody").append("<tr id=\"tr" + String(i) + "\">\#}
+    {#    <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\#}
+    {#    <td><input required value=\"" + data[c][0] + "\" style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\#}
+    {#    <td><input required value=\"" + data[c][1] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\" onchange='validateName(this)'></td>\#}
+    {#    <td><input required value=\"" + data[c][2] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\" onchange='validate(this)'></td>\#}
+    {#    <td><input required value=\"" + data[c][3] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\" onchange='validate(this)'></td>\#}
+    {#    <td><input required value=\"" + data[c][4] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\" onchange='validate(this)'></td>\#}
+    {#    <td><input required value=\"" + data[c][5] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\" onchange='validate(this)'></td>\#}
+    {#    <td><input required value=\"" + data[c][6] + "\" style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\" onchange='validate(this)'></td>\#}
+    {#    </tr>");#}
+    {#}#}
 
     // events Listeners Functions
     //document.getElementById("addRow").addEventListener("click", AddRow);

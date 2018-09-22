@@ -211,7 +211,7 @@ def sendMarketingEmail():
 if __name__ == "__main__":
 
     print("Run the server...")
-    if os.environ['FLASK_ENV'] == 'production':
+    if os.environ.get('FLASK_ENV', None) == 'production':
         app.config.from_object('config.BaseConfig')
 
         db.init_app(app)
@@ -222,7 +222,7 @@ if __name__ == "__main__":
         # Run the app server
         app.run()
 
-    elif os.environ['FLASK_ENV'] == 'development' :
+    elif os.environ.get('FLASK_ENV', None) == 'development' :
         app.config.from_object('config.DevelopmentConfig')
 
         db.init_app(app)

@@ -323,6 +323,24 @@ def signup():
 
         return helpers.redirectWithMessage("login", "We have sent you a verification email. Please use it to complete the sign up process.")
 
+@public_router.route("/account/verify/<payload>", methods=['GET'])
+def verify_account(payload):
+    if request.method == "GET":
+        try:
+            data = verificationSigner.loads(payload)
+            email = data.split(";")[0]
+            print("email: ", email)
+            user_callback : Callback = user_services.verifyByEmail(email)
+            if not user_callback.Success: raise Exception(user_callback.Message)
+
+            return helpers.redirectWithMessage("login", "Your email has been verified. You can now access your account.")
+
+        except Exception as e:
+
+            print(e)
+            return helpers.redirectWithMessage("login", "Email verification link failed. Please contact Customer Support in order to resolve this.")
+
+
     
 ## Error Handlers ##
 @public_router.errorhandler(status.HTTP_400_BAD_REQUEST)

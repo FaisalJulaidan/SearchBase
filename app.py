@@ -767,84 +767,84 @@ def chatbot(companyID, assistantID):
             return jsonify(datastring)
 
 
-@app.route("/account/verify/<payload>", methods=['GET'])
-def verify_account(payload):
-    if request.method == "GET":
-        data = ""
-        try:
-            data = verificationSigner.loads(payload)
-            try:
-                email = data.split(";")[0]
-                companyName = data.split(";")[1]
+#@app.route("/account/verify/<payload>", methods=['GET'])
+#def verify_account(payload):
+#    if request.method == "GET":
+#        data = ""
+#        try:
+#            data = verificationSigner.loads(payload)
+#            try:
+#                email = data.split(";")[0]
+#                companyName = data.split(";")[1]
 
-                company = get_company(email)
-                # TODO check company
-                if company is None:
-                    # TODO handle better
-                    print("Verification failed due to invalid payload.")
-                    abort(status.HTTP_400_BAD_REQUEST)
-                elif "Error" in company:
-                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-                else:
-                    if company[1] != companyName:
-                        # TODO handle this
-                        abort(status.HTTP_400_BAD_REQUEST, "Company data doesn't match")
-                    else:
-                        users = query_db("SELECT * FROM Users")
-                        requestingUser = "Error"
-                        # If user exists
-                        for user in users:
-                            if user["Email"] == email:
-                                requestingUser = user
-                        if "Error" in requestingUser:
-                            abort(status.HTTP_400_BAD_REQUEST, "User not found!")
-                        updateUser = update_table("UPDATE Users SET Verified=? WHERE ID=?;", ["True", requestingUser["ID"]])
-                        # TODO check updateUser
+#                company = get_company(email)
+#                # TODO check company
+#                if company is None:
+#                    # TODO handle better
+#                    print("Verification failed due to invalid payload.")
+#                    abort(status.HTTP_400_BAD_REQUEST)
+#                elif "Error" in company:
+#                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+#                else:
+#                    if company[1] != companyName:
+#                        # TODO handle this
+#                        abort(status.HTTP_400_BAD_REQUEST, "Company data doesn't match")
+#                    else:
+#                        users = query_db("SELECT * FROM Users")
+#                        requestingUser = "Error"
+#                        # If user exists
+#                        for user in users:
+#                            if user["Email"] == email:
+#                                requestingUser = user
+#                        if "Error" in requestingUser:
+#                            abort(status.HTTP_400_BAD_REQUEST, "User not found!")
+#                        updateUser = update_table("UPDATE Users SET Verified=? WHERE ID=?;", ["True", requestingUser["ID"]])
+#                        # TODO check updateUser
                         
-                        users = query_db("SELECT * FROM Users")
-                        # If user exists
-                        user = "Error"
-                        for record in users:
-                            if record["Email"] == email:
-                                user = record
-                        if "Error" in user:
-                            abort(status.HTTP_400_BAD_REQUEST, "Target user not found!")
+#                        users = query_db("SELECT * FROM Users")
+#                        # If user exists
+#                        user = "Error"
+#                        for record in users:
+#                            if record["Email"] == email:
+#                                user = record
+#                        if "Error" in user:
+#                            abort(status.HTTP_400_BAD_REQUEST, "Target user not found!")
 
-                        # sending registration confirmation email to the user.
-                        msg = Message("Thank you for registering, {} {}".format(user["Firstname"], user["Surname"]),
-                                      sender="thesearchbase@gmail.com",
-                                      recipients=[email])
-                        msg.html = "<img src='https://thesearchbase.com/static/email_images/welcome.png' style='width:500px;height:228px;'><br /> \
-                                   <h4>Hi,</h4> <p>Thank you for registering with TheSearchBase!</p> \
-                                   <p>A whole new world of possibilities is ahead of you, we strive to be a platform that aims to make chat bot technology available to everyone. \
-                                   If you would like to know more about our start up story, check our <a href=https://www.thesearchbase.com/about> Story <a/> and see what we're all about. </p> \
-                                   <p>More Importantly, we would like you to use our platform and tell us what you think. If you could share your ideas or suggestions with our team, we would be very happy to collect your feedback</p> \
-                                   <p>As a final message, we would like to say, we thoroughly hope you enjoy using our platform and hope to see your chat bot revolutionise your company or idea.</p><br /> <p> Happy chatboting, </p><p>TheSearchbase Team</p> \
-                                   <img src='https://thesearchbase.com/static/email_images/footer_image.png' style='width:500px;height:228px;'>"
-                        mail.send(msg)
+#                        # sending registration confirmation email to the user.
+#                        msg = Message("Thank you for registering, {} {}".format(user["Firstname"], user["Surname"]),
+#                                      sender="thesearchbase@gmail.com",
+#                                      recipients=[email])
+#                        msg.html = "<img src='https://thesearchbase.com/static/email_images/welcome.png' style='width:500px;height:228px;'><br /> \
+#                                   <h4>Hi,</h4> <p>Thank you for registering with TheSearchBase!</p> \
+#                                   <p>A whole new world of possibilities is ahead of you, we strive to be a platform that aims to make chat bot technology available to everyone. \
+#                                   If you would like to know more about our start up story, check our <a href=https://www.thesearchbase.com/about> Story <a/> and see what we're all about. </p> \
+#                                   <p>More Importantly, we would like you to use our platform and tell us what you think. If you could share your ideas or suggestions with our team, we would be very happy to collect your feedback</p> \
+#                                   <p>As a final message, we would like to say, we thoroughly hope you enjoy using our platform and hope to see your chat bot revolutionise your company or idea.</p><br /> <p> Happy chatboting, </p><p>TheSearchbase Team</p> \
+#                                   <img src='https://thesearchbase.com/static/email_images/footer_image.png' style='width:500px;height:228px;'>"
+#                        mail.send(msg)
 
-                        return redirectWithMessage("login", "Thank you for verifying.")
+#                        return redirectWithMessage("login", "Thank you for verifying.")
 
-            except IndexError:
-                # TODO handle better
-                print("Verification failed due to invalid payload.")
-                abort(status.HTTP_400_BAD_REQUEST)
-        except BadSignature as e:
-            encodedData = e.payload
-            if encodedData is None:
-                msg = "Verification failed due to payload containing no data."
-                print(msg)
-                abort(status.HTTP_400_BAD_REQUEST, msg)
-            else:
-                msg = ""
-                try:
-                    verificationSigner.load_payload(encodedData)
-                    msg = "Verification failed, bad signature"
-                except:
-                    msg = "Verification failed"
-                finally:
-                    print(msg)
-                    abort(status.HTTP_400_BAD_REQUEST, msg)
+#            except IndexError:
+#                # TODO handle better
+#                print("Verification failed due to invalid payload.")
+#                abort(status.HTTP_400_BAD_REQUEST)
+#        except BadSignature as e:
+#            encodedData = e.payload
+#            if encodedData is None:
+#                msg = "Verification failed due to payload containing no data."
+#                print(msg)
+#                abort(status.HTTP_400_BAD_REQUEST, msg)
+#            else:
+#                msg = ""
+#                try:
+#                    verificationSigner.load_payload(encodedData)
+#                    msg = "Verification failed, bad signature"
+#                except:
+#                    msg = "Verification failed"
+#                finally:
+#                    print(msg)
+#                    abort(status.HTTP_400_BAD_REQUEST, msg)
 
 
 @app.route("/send/mailtop", methods=['GET', 'POST'])

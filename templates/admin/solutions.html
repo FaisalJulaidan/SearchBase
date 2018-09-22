@@ -79,6 +79,13 @@
                                                     <th>Keywords</th>
                                                     <th>URL</th>
                                                 </tr>
+
+{#                                                {%for item in data%}#}
+{#                                                     <tr >#}
+{#                                                        <td><input required value="{{item["SolutionID"]}}" style="width: 50px;" padding="3px" margin="3px" type="text" name="product_ID" String(i)></td>#}
+{#                                                    </tr>#}
+{#                                                {% endfor %}#}
+
                                             </thead>
                                             <tbody id="tbody">
                                             <!-- Row get inserted here -->
@@ -123,16 +130,12 @@
     var i = 0;
 
     {%for item in data%}
-        //{%for product in item%}
-        //    {%if product != None%}
-        //        data[i].push("{{product}}");
-        //    {%endif%}
-        //{%endfor%}
         data[i] = ['{{item["SolutionID"]}}', '{{item["MajorTitle"]}}', '{{item["SecondaryTitle"]}}',
             '{{item["ShortDescription"]}}', '{{item["Money"]}}', '{{item["Keywords"]}}', '{{item["URL"]}}'];
         i++;
     {%endfor%}
 
+    console.log("{{data}}");
     // first time rendering
     i = 0;
     for (var c = 0; c < data.length; c++) {
@@ -146,7 +149,6 @@
         <td><input required value=\"" + data[c][4] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\" onchange='validate(this)'></td>\
         <td><input required value=\"" + data[c][5] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\" onchange='validate(this)'></td>\
         <td><input required value=\"" + data[c][6] + "\" style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\" onchange='validate(this)'></td>\
-        <td><input required value=\"" + data[c][7] + "\" style=\"width: 200px;\" type=\"text\" name=\"product_URL" + String(i) + "\" onchange='validate(this)'></td>\
         </tr>");
     }
 
@@ -164,7 +166,6 @@
         <td><input required style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\" onchange='validate(this)' ></td>\
         <td><input required style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\" onchange='validate(this)' ></td>\
         <td><input required style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\" onchange='validate(this)' ></td>\
-        <td><input required style=\"width: 200px;\" type=\"text\" name=\"product_URL" + String(i) + "\" onchange='validate(this)' ></td>\
         </tr>");
     }
     function validate(element) {

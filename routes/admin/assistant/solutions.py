@@ -13,7 +13,7 @@ def admin_solutions(assistantID):
 
         #if it coudnt find anything assume its empty
         if not solutions_callback.Success: solutions_callback.Data = []
-
+        print(solutions_callback.Data)
         #convert solutions to dics
         if type(solutions_callback.Data) is Solution:
             solutions = [helpers.getDictFromSQLAlchemyObj(solutions_callback.Data)]

@@ -1,142 +1,510 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="description" content="">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <!-- Title -->
+        <title>Bot</title>
 
-    <!-- Title -->
-    <title>Bot</title>
+        <!-- Chrome, Firefox OS and Opera -->
+        <meta name="theme-color" content="#884BDF">
+        <!-- Windows Phone -->
+        <meta name="msapplication-navbutton-color" content="#884BDF">
+        <!-- iOS Safari -->
+        <meta name="apple-mobile-web-app-status-bar-style" content="#884BDF">
 
-    <!-- Chrome, Firefox OS and Opera -->
-    <meta name="theme-color" content="#884BDF">
-    <!-- Windows Phone -->
-    <meta name="msapplication-navbutton-color" content="#884BDF">
-    <!-- iOS Safari -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="#884BDF">
-
-    <!-- Icon images -->
-    <link rel="apple-touch-icon" sizes="57x57" href="/static/img/core-img/apple-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="/static/img/core-img/apple-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/static/img/core-img/apple-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/static/img/core-img/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/static/img/core-img/apple-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/static/img/core-img/apple-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/static/img/core-img/apple-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/static/img/core-img/apple-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/img/core-img/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/static/img/core-img/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/core-img/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/static/img/core-img/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/core-img/favicon-16x16.png">
-    <link rel="manifest" href="/static/img/core-img/manifest.json">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="/static/img/core-img/ms-icon-144x144.png">
-    <meta name="theme-color" content="#ffffff">
+        <!-- Icon images -->
+        <link rel="apple-touch-icon" sizes="57x57" href="/static/img/core-img/apple-icon-57x57.png">
+        <link rel="apple-touch-icon" sizes="60x60" href="/static/img/core-img/apple-icon-60x60.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="/static/img/core-img/apple-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="/static/img/core-img/apple-icon-76x76.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="/static/img/core-img/apple-icon-114x114.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="/static/img/core-img/apple-icon-120x120.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="/static/img/core-img/apple-icon-144x144.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="/static/img/core-img/apple-icon-152x152.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="/static/img/core-img/apple-icon-180x180.png">
+        <link rel="icon" type="image/png" sizes="192x192" href="/static/img/core-img/android-icon-192x192.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/static/img/core-img/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="96x96" href="/static/img/core-img/favicon-96x96.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/static/img/core-img/favicon-16x16.png">
+        <link rel="manifest" href="/static/img/core-img/manifest.json">
+        <meta name="msapplication-TileColor" content="#ffffff">
+        <meta name="msapplication-TileImage" content="/static/img/core-img/ms-icon-144x144.png">
+        <meta name="theme-color" content="#ffffff">
 
 
-    <!-- Pop-up Stylesheet -->
-    <!-- <link href="/static/pop-up/pop.css" rel="stylesheet"> -->
+        <!-- Pop-up Stylesheet -->
+        <!-- <link href="/static/pop-up/pop.css" rel="stylesheet"> -->
 
-    <!-- Responsive CSS -->
-    <link href="/static/css/responsive.css" rel="stylesheet">
+        <!-- Responsive CSS -->
+        <link href="/static/css/responsive.css" rel="stylesheet">
 
-    <!-- Core Stylesheet -->
-    <link href="/static/css/style.css" rel="stylesheet">
-    <!-- <link href="/static/css/main.css" rel="stylesheet"> -->
+        <!-- Core Stylesheet -->
+{#            <link href="/static/css/style.css" rel="stylesheet">#}
+        <!-- <link href="/static/css/main.css" rel="stylesheet"> -->
 
-    <!-- Responsive CSS -->
-    <link href="/static/css/responsive.css" rel="stylesheet">
-    <!-- Jquery-2.2.4 JS -->
-    <script src="/static/js/jquery-2.2.4.min.js"></script>
-    <!-- Popper js -->
-    <script src="/static/js/popper.min.js"></script>
-    <!-- Bootstrap-4 Beta JS -->
-    <script src="/static/js/bootstrap.min.js"></script>
-    <!-- All Plugins JS -->
-    <script src="/static/js/plugins.js"></script>
-    <!-- Slick Slider Js-->
-    <script src="/static/js/slick.min.js"></script>
-    <!-- Footer Reveal JS -->
-    <script src="/static/js/footer-reveal.min.js"></script>
-    <!-- Active JS -->
-    <!-- <script src="/static/js/active.js"></script> -->
+        <!-- Responsive CSS -->
+        <link href="/static/css/responsive.css" rel="stylesheet">
+        <!-- Jquery-2.2.4 JS -->
+        <script src="/static/js/jquery-2.2.4.min.js"></script>
+        <!-- Popper js -->
+        <script src="/static/js/popper.min.js"></script>
+        <!-- Bootstrap-4 Beta JS -->
+        <script src="/static/js/bootstrap.min.js"></script>
+        <!-- All Plugins JS -->
+        <script src="/static/js/plugins.js"></script>
+        <!-- Slick Slider Js-->
+        <script src="/static/js/slick.min.js"></script>
+        <!-- Footer Reveal JS -->
+        <script src="/static/js/footer-reveal.min.js"></script>
+        <!-- Active JS -->
+        <!-- <script src="/static/js/active.js"></script> -->
 
-    <!-- Emoji JS and CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css"/>
-    <!-- to use -> emojione.toImage(input) -> input = :emojiname: -> example -> emojione.toImage(:smile:) -->
-    <!-- phone emojis also work -->
-    <!-- :P :) or such are not suported -->
-    <!-- https://demos.emojione.com/latest/jstoshort.html to look at their :emoji: name -->
+        <!-- Emoji JS and CSS -->
+        <script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css"/>
+        <!-- to use -> emojione.toImage(input) -> input = :emojiname: -> example -> emojione.toImage(:smile:) -->
+        <!-- phone emojis also work -->
+        <!-- :P :) or such are not suported -->
+        <!-- https://demos.emojione.com/latest/jstoshort.html to look at their :emoji: name -->
 
-</head>
 
-<body id="chatbotBody">
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <!------ Include the above in your HEAD tag ---------->
 
-    <div class="top_right">
-        <img style="width:20px; height: 20px; margin: 10px; top: 0px; right: 0px; position: fixed;" src="/static/img/bg-img/Icons8-Windows-8-Computer-Hardware-Restart.ico" onclick="Reset()">
-    </div>
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+        <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+        <!------ Include the above in your HEAD tag ---------->
 
-    <div class="outerContainer">
-        <div class="innerContainer">
-            <div class="element">
-                <!-- <div class="chat-box">
-                <div class="open">Open
-                    <div class="box"> -->
-                <center>
-                    <ul id="messagesContainer">
-                        <!-- paste here the yeyo -->
-                    </ul>
-                </center>
-                <div id="separator">
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <div id="chatBottom"></div>
-                </div>
-                <footer id="chatFooter">
-                    <div id="bottomContainer">
-                        <div id="optionsDiv">
-                        </div>
-                        <!-- <ul> -->
-                        <div id="ChatInputDiv">
-                            <!--<input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><input type="file" id="fileUploadB" size="10" /><img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />-->
-                            <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage">
-                            <form id="fileUploadForm" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
-                                <label for="fileUploadB">
-                                    <img src="https://www.thesearchbase.com/static/images/cloud-upload.png" />
-                                </label>
+        <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
+        <link rel='stylesheet prefetch'
+              href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
+    </head>
+    <style>
+        html,body{
+            width: 100% !important;
+            height: 100% !important;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "proxima-nova", "Source Sans Pro", sans-serif;
+            font-size: 1em;
+            letter-spacing: 0.1px;
+            color: #32465a;
+            text-rendering: optimizeLegibility;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
+            -webkit-font-smoothing: antialiased;
 
-                                <input name="file" hidden id="fileUploadB" type="file" />
-                            </form>
-                            <img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitAnswer('')" />
-                        </div>
-                        <!-- </ul> -->
+            background: -webkit-linear-gradient(-135deg, #c850c0, #4158d0);
+            background: -o-linear-gradient(-135deg, #c850c0, #4158d0);
+            background: -moz-linear-gradient(-135deg, #c850c0, #4158d0);
+            background: linear-gradient(-135deg, #c850c0, #4158d0);
+        }
+
+        #frame {
+            width: 95%;
+            max-width: 1000px;
+            height: 92vh;
+            min-height: 300px;
+            max-height: 720px;
+            background: #E6EAEA;
+            border-radius: 5px;
+        }
+
+        @media screen and (max-width: 380px) {
+            #frame {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0px;
+            }
+
+            #frame .content .contact-profile {
+                border-top-left-radius: 0px;
+                border-top-right-radius: 0px;
+            }
+        }
+
+        #frame .content {
+            float: right;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @media screen and (max-width: 735px) {
+            #frame .content {
+                width: 100%;
+                min-width: 250px !important;
+            }
+        }
+
+        @media screen and (min-width: 900px) {
+            #frame .content {
+                width: 100%;
+            }
+        }
+
+        #frame .content .contact-profile {
+            width: 100%;
+            height: 60px;
+            line-height: 60px;
+            background: #f5f5f5;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        #frame .content .contact-profile img {
+            width: 40px;
+            border-radius: 50%;
+            float: left;
+            margin: 9px 12px 0 9px;
+            padding: 5px;
+        }
+
+        #frame .content .contact-profile p {
+            float: left;
+        }
+
+        #frame .content .contact-profile .social-media {
+            float: right;
+        }
+
+        #frame .content .contact-profile .social-media i {
+            margin-left: 14px;
+            cursor: pointer;
+        }
+
+        #frame .content .contact-profile .social-media i:nth-last-child(1) {
+            margin-right: 20px;
+        }
+
+        #frame .content .contact-profile .social-media i:hover {
+            color: #435f7a;
+        }
+
+        #frame .content .messages {
+            height: auto;
+            min-height: calc(100% - 93px);
+            max-height: calc(100% - 93px);
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+
+        @media screen and (max-width: 735px) {
+            #frame .content .messages {
+                max-height: calc(100% - 115px);
+            }
+        }
+
+        #frame .content .messages::-webkit-scrollbar {
+            width: 8px;
+            background: transparent;
+        }
+
+        #frame .content .messages::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        #frame .content .messages ul li {
+            display: inline-block;
+            clear: both;
+            float: left;
+            margin: 15px 15px 5px 15px;
+            width: calc(100% - 25px);
+            font-size: 0.9em;
+        }
+
+        #frame .content .messages ul li:nth-last-child(1) {
+            margin-bottom: 20px;
+        }
+
+        #frame .content .messages ul li.sent img {
+            margin: 6px 8px 0 0;
+        }
+
+        #frame .content .messages ul li.sent p {
+            background: #435f7a;
+            color: #f5f5f5;
+        }
+
+        #frame .content .messages ul li.replies img {
+            float: right;
+            margin: 6px 0 0 8px;
+        }
+
+        #frame .content .messages ul li.replies p {
+            background: #f5f5f5;
+            float: right;
+        }
+
+        #frame .content .messages ul li img {
+            width: 22px;
+            border-radius: 50%;
+            float: left;
+        }
+
+        #frame .content .messages ul li p {
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 205px;
+            line-height: 130%;
+        }
+
+        @media screen and (min-width: 735px) {
+            #frame .content .messages ul li p {
+                max-width: 300px;
+            }
+        }
+
+        #frame .content .message-input {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            z-index: 99;
+        }
+
+        #frame .content .message-input .wrap {
+            position: relative;
+        }
+
+        #frame .content .message-input .wrap input {
+            font-family: "proxima-nova", "Source Sans Pro", sans-serif;
+            float: left;
+            border: none;
+            width: calc(100% - 50px);
+            height: 40px;
+            padding: 11px 32px 10px 12px;
+            font-size: 0.8em;
+            color: #32465a;
+        }
+
+        @media screen and (max-width: 735px) {
+            #frame .content .message-input .wrap input {
+                padding: 11px 32px 10px 12px;
+            }
+        }
+
+        #frame .content .message-input .wrap input:focus {
+            outline: none;
+        }
+
+
+        #frame .content .message-input .wrap button {
+            float: right;
+            border: none;
+            width: 50px;
+            height: 40px;
+            padding: 12px 0;
+            cursor: pointer;
+            background: #32465a;
+            color: #f5f5f5;
+        }
+
+        #frame .content .message-input .wrap button:hover {
+            background: #435f7a;
+        }
+
+        #frame .content .message-input .wrap button:focus {
+            outline: none;
+        }
+
+        #frame .content .message-input .wrap button.answer {
+            float: inherit;
+            margin-left: 20px;
+            margin-right: 20px;
+            padding: 10px;
+            width: auto;
+        }
+
+        @media screen and (max-width: 735px) {
+            #frame .content .message-input .wrap button.answer {
+                margin-left: 5px;
+                margin-right: 5px;
+                padding: 10px;
+                width: auto;
+            }
+        }
+
+        #frame .content .message-input .wrap button.answer:focus {
+            outline: none;
+        }
+
+
+
+    </style>
+    <body id="chatbotBody">
+        <div id="frame">
+            <div class="content">
+                <div class="contact-profile">
+                    <img src="/static/img/core-img/favicon-96x96.png" alt=""/>
+                    <p>Bot</p>
+                    <div class="social-media">
+                        <i class="fa fa-refresh" aria-hidden="true"></i>
                     </div>
-                </footer>
+                </div>
+
+                <div class="messages">
+                    <ul>
+                        <li class="sent">
+                            <img src="https://cdn1.iconfinder.com/data/icons/social-messaging-productivity-1-1/128/gender-male2-512.png" alt=""/>
+                            <p>How the hell am I supposed to get a jury to believe you when I am not even sure that I do?!</p>
+                        </li>
+                        <li class="replies">
+                            <img src="/static/img/core-img/favicon-96x96.png" alt=""/>
+                            <p>When you're backed against the wall, break the god damn thing down.</p>
+                        </li>
+
+                    </ul>
+                </div>
+
+                <div class="message-input">
+{#                    for user input #}
+                    <div class="wrap">
+                        <input type="text" placeholder="Write your message..."/>
+                        <button class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                    </div>
+{#                    for questions #}
+{#                    <div class="wrap text-center" style="padding: 10px;">#}
+{#                        <button class="btn btn-primary answer">Answer 1</button>#}
+{#                        <button class="btn btn-primary answer">Answer 2</button>#}
+{#                        <button class="btn btn-primary answer">Answer 3</button>#}
+{#                    </div>#}
+
+                </div>
             </div>
         </div>
-    </div>
-    <!-- </div>
-    </div>
-    </div> -->
-    <script src="/static/chatbot/script.js"></script>
 
-    <script>
-        $(document).ready(function () {
-            console.log("JS is working...");
-            var hrefSplit = window.location.href.split("/")
-            chatbotInit(assistantID = hrefSplit[hrefSplit.length -1]);
-        });
-    </script>
-</body>
+        <script>
+            $(".messages").animate({scrollTop: $(document).height()}, "fast");
 
+            $("#profile-img").click(function () {
+                $("#status-options").toggleClass("active");
+            });
+
+            $(".expand-button").click(function () {
+                $("#profile").toggleClass("expanded");
+                $("#contacts").toggleClass("expanded");
+            });
+
+            $("#status-options ul li").click(function () {
+                $("#profile-img").removeClass();
+                $("#status-online").removeClass("active");
+                $("#status-away").removeClass("active");
+                $("#status-busy").removeClass("active");
+                $("#status-offline").removeClass("active");
+                $(this).addClass("active");
+
+                if ($("#status-online").hasClass("active")) {
+                    $("#profile-img").addClass("online");
+                } else if ($("#status-away").hasClass("active")) {
+                    $("#profile-img").addClass("away");
+                } else if ($("#status-busy").hasClass("active")) {
+                    $("#profile-img").addClass("busy");
+                } else if ($("#status-offline").hasClass("active")) {
+                    $("#profile-img").addClass("offline");
+                } else {
+                    $("#profile-img").removeClass();
+                }
+                ;
+
+                $("#status-options").removeClass("active");
+            });
+
+            function newMessage() {
+                message = $(".message-input input").val();
+                if ($.trim(message) == '') {
+                    return false;
+                }
+                $('<li class="sent"><img src="http://emilcarlsson.se/assets/mikeross.png" alt="" /><p>' + message + '</p></li>').appendTo($('.messages ul'));
+                $('.message-input input').val(null);
+                $('.contact.active .preview').html('<span>You: </span>' + message);
+                $(".messages").animate({scrollTop: $(document).height()}, "fast");
+            };
+
+            $('.submit').click(function () {
+                newMessage();
+            });
+
+            $(window).on('keydown', function (e) {
+                if (e.which == 13) {
+                    newMessage();
+                    return false;
+                }
+            });
+        </script>
+
+    </body>
 </html>
+
+{##}
+{#    <div class="top_right">#}
+{#        <img style="width:20px; height: 20px; margin: 10px; top: 0px; right: 0px; position: fixed;" src="/static/img/bg-img/Icons8-Windows-8-Computer-Hardware-Restart.ico" onclick="Reset()">#}
+{#    </div>#}
+{##}
+{#    <div class="outerContainer">#}
+{#        <div class="innerContainer">#}
+{#            <div class="element">#}
+{#                <!-- <div class="chat-box">#}
+{#                <div class="open">Open#}
+{#                    <div class="box"> -->#}
+{#                <center>#}
+{#                    <ul id="messagesContainer">#}
+{#                        <!-- paste here the yeyo -->#}
+{#                    </ul>#}
+{#                </center>#}
+{#                <div id="separator">#}
+{#                    <br>#}
+{#                    <br>#}
+{#                    <br>#}
+{#                    <br>#}
+{#                    <br>#}
+{#                    <br>#}
+{#                    <br>#}
+{#                    <div id="chatBottom"></div>#}
+{#                </div>#}
+{#                <footer id="chatFooter">#}
+{#                    <div id="bottomContainer">#}
+{#                        <div id="optionsDiv">#}
+{#                        </div>#}
+{#                        <!-- <ul> -->#}
+{#                        <div id="ChatInputDiv">#}
+{#                            <!--<input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><input type="file" id="fileUploadB" size="10" /><img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />-->#}
+{#                            <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage">#}
+{#                            <form id="fileUploadForm" class="image-upload" style="display:none" onsubmit="return sendFileForm();">#}
+{#                                <label for="fileUploadB">#}
+{#                                    <img src="https://www.thesearchbase.com/static/images/cloud-upload.png" />#}
+{#                                </label>#}
+{##}
+{#                                <input name="file" hidden id="fileUploadB" type="file" />#}
+{#                            </form>#}
+{#                            <img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitAnswer('')" />#}
+{#                        </div>#}
+{#                        <!-- </ul> -->#}
+{#                    </div>#}
+{#                </footer>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <!-- </div>#}
+{#    </div>#}
+{#    </div> -->#}
+{#    <script src="/static/chatbot/script.js"></script>#}
+{##}
+{#    <script>#}
+{#        $(document).ready(function () {#}
+{#            console.log("JS is working...");#}
+{#            var hrefSplit = window.location.href.split("/")#}
+{#            chatbotInit(assistantID = hrefSplit[hrefSplit.length -1]);#}
+{#        });#}
+{#    </script>#}

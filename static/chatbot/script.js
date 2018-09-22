@@ -35,7 +35,7 @@ function chatbotInit(assistantID) {
      $.ajax({
         url: '../assistant/' + assistantID +'/chatbot',
         type: "GET"
-    }).done(function (res) { 
+    }).done(function (res) {
 
         console.log("Blocks retrieved successfully!");
         var data = JSON.parse(res).data;
@@ -163,7 +163,7 @@ function renderBlock(block) {
             renderQuestion(block);
             break;
         case "User Input":
-            renderUserInput(block); 
+            renderUserInput(block);
             break;
         case "File Upload":
             renderFileUpload(block);
@@ -294,7 +294,8 @@ async function submitAnswer(message, blockKeywords=undefined) {
                 var blockToGoId = blockAnswers[i].blockToGoId;
 
                 getNextBlock(action, blockToGoId);
-            }
+            }        answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"submitAnswer('" + toEmoticon(blockAnswers[i].text) + "','" + blockAnswers[i].keywords + "')\">" + toEmoticon(blockAnswers[i].answer.text) + "</a>";
+
         }
     } else if (currentBlock.type == "User Input" || currentBlock.type == "File Upload") {
         action = currentBlock.content.action;

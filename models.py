@@ -354,6 +354,7 @@ class Statistics(db.Model):
 
 
 class ValidationType(enum.Enum):
+
     Email = 'Email'
     Telephone = 'Telephone'
     FullName = 'FullName'
@@ -408,7 +409,7 @@ class ChatbotSession(db.Model):
     Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')
 
     def __repr__(self):
-        return '<UserInput {}>'.format(self.ID)
+        return '<ChatbotSession {}>'.format(self.Data)
 
 
 class Answer(db.Model):

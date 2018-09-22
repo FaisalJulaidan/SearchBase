@@ -16,9 +16,7 @@
                         </p>
                         <xmp>
                             <!--<div w3-include-html="https://www.thesearchbase.com/static/user_downloads/TSBChatbot.html"></div>-->
-                            <div w3-include-html="https://www.thesearchbase.com/assistant/pagerequest"></div>
-                            <script type="text/javascript">function LoadChatbot() { GetPopSettings({{ assistantID }}); loadIframe("{{assistantID}}"); } </script>
-                            <script type="text/javascript" src="https://www.thesearchbase.com/static/user_downloads/chatbotInclude.js"></script>
+                            <script src="https://www.thesearchbase.com/userdownloads/integration.js" data-name="tsb-widget" data-id={{ assistantID }} async defer ></script>
                         </xmp>
                     </div>
                 </div>

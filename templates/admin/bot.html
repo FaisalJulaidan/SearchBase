@@ -12,6 +12,20 @@
 {% endblock %}
 {% block content %}
     <style>
+        .remainingBlocks {
+            border: 1px solid grey;
+            padding: 5px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+
+        .remainingBlocks > span {
+            background-color: #4B5B71;
+            padding: 5px;
+            border-radius: 5px;
+            color: white;
+        }
+
         .my-btn-default {
             background-color: #fff;
             border-color: #ccc;
@@ -89,6 +103,44 @@
             border-radius: 100%;
             color: white;
         }
+
+        .addBlock {
+            font-size: 10pt;
+            padding: 5px;
+            background-color: #c4c4c4;
+            border-radius: 100%;
+            color: white;
+        }
+
+        .tagify {
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .input-group1 > input {
+            -webkit-border-radius: 5px !important;
+            -moz-border-radius: 5px !important;
+            border-radius: 5px !important;
+            margin-bottom: 10px;
+        }
+
+        .selectBlockType {
+            display: inline-flex;
+        }
+
+        .type {
+            padding: 50px;
+            margin: 10px;
+            border: 1px solid #4906b573;
+            border-radius: 10px;
+            transition: box-shadow .3s;
+        }
+
+        .type:hover {
+            box-shadow: 0 0 11px rgba(33, 33, 33, .4);
+        }
     </style>
     <div class="right_col" role="main">
         <div class="page-title">
@@ -100,10 +152,17 @@
         <div class="clearfix"></div>
 
         <div class="x_panel">
-            <div class="x_title">
-                <h4>🤖 Bot Configuration</h4>
-                <small>Showing all questions and answers with its sort</small>
+            <div class="x_title" style="display: flow-root;">
+                <div class="pull-left">
+                    <h4>🤖 Bot Configuration</h4>
+                    <small>Showing all questions and answers.</small>
+                </div>
+                <div class="pull-right remainingBlocks">
+                    <i class="addBlock clickable glyphicon glyphicon-plus"></i>
+                    Remaining Blocks <span>1</span>
+                </div>
             </div>
+
             <div class="x_conent">
                 <ul id="draggablePanelList" class="list-unstyled">
                     <li class="panel panel-default">
@@ -219,8 +278,7 @@
 {% block customJS %}
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-checkbox/1.5.0/js/bootstrap-checkbox.js"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.js"></script>
+    <script src="/../../static/swal/sweetalert.min.js"></script>
     <script src="/../../static/tagify/tagify.js"></script>
 
     <script>
@@ -232,6 +290,8 @@
 
             blocks_templates = {};
             BlocksTypes = [];
+            RemainingBlocks = 0;
+            BlocksOrder = [];
 
             function main() {
                 Promise.all([GET_data(), GET_options()]).then((res) => {
@@ -239,10 +299,19 @@
                     options = JSON.parse(res[1]).data;
                     init_blocks_templates(options.blockTypes);
                     BlocksTypes = options.types;
-                    render_page(data.assistant.name, options.botVersion);
+                    render_page(data.assistant.name, options.botVersion, data.remainingBlocks);
+                    RemainingBlocks = Number($('.remainingBlocks span').html());
                     render_blocks(data.blocks);
                     init_page();
                 });
+            }
+
+            class BlocksTemplate {
+                constructor(args) {
+                    for (const arg of args) {
+                        this[Object.keys(arg)[0]] = Object.values(arg)[0]
+                    }
+                }
             }
 
             function init_blocks_templates(blockTypes) {
@@ -257,50 +326,60 @@
                 }
             }
 
-            class BlocksTemplate {
-                constructor(args) {
-                    for (const arg of args) {
-                        this[Object.keys(arg)[0]] = Object.values(arg)[0]
-                    }
-                }
-            }
-
             function init_page() {
-                // to collopse and expand the panel
+                // to collapse and expand the panel
                 $(document).on('click', '.panel-heading', function (e) {
                     if ($(e.target).is('a') ||
                         $(e.target).is('input.form-control') ||
                         $(e.target).is('i.trash') ||
-                        $(e.target).is('i.trashAnswer')
+                        $(e.target).is('i.trashAnswer') ||
+                        $(e.target).parent().parent().parent().parent().is('div.answers') ||
+                        $(e.target).parent().parent().parent().parent().is('div.row')
                     ) {
                         e.preventDefault();
                         return;
                     }
+
+                    e.stopPropagation();
+                    e.preventDefault();
+
                     let $this = $(this);
-                    if (!$this.hasClass('panel-collapsed')) {
-                        $this.parents('.panel').find('.panel-body').slideUp();
-                        $this.addClass('panel-collapsed');
-                        $this.find('i.indicator').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
-                    } else {
-                        $this.parents('.panel').find('.panel-body').slideDown();
+                    // open a panel
+                    if ($this.hasClass('panel-collapsed')) {
+                        // before open the current close all
+                        $('li > .panel-body').slideUp();
+                        $('li > .panel-heading').addClass('panel-collapsed');
+                        $('button.blockType').attr('disabled', '');
+                        $('i.indicator').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+
+                        // now open the $this
                         $this.removeClass('panel-collapsed');
+                        $this.parents('.panel').find('.panel-body').slideDown();
+                        $this.find('button.blockType').removeAttr('disabled');
                         $this.find('i.indicator').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+                    }
+                    // close a panel
+                    else {
+                        $this.addClass('panel-collapsed');
+                        $this.parents('.panel').find('.panel-body').slideUp();
+                        $this.find('button.blockType').attr('disabled', '');
+                        $this.find('i.indicator').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
                     }
                 });
 
                 // to drag and drop the panels
                 let panelList = $('#draggablePanelList');
+
+                // init BlocksOrder
+                updateBlocksOrder();
+
                 panelList.sortable({
                     // Only make the .panel-heading child elements support dragging.
                     // Omit this to make then entire <li>...</li> draggable.
                     handle: '.panel-heading',
                     update: function () {
-                        arr = [];
-                        $('.panel', panelList).each(function (index, elem) {
-                            var $listItem = $(elem), newIndex = $listItem.index();
-                            arr.push(buildQuestion($listItem, newIndex));
-                        });
-                        console.log(arr)
+                        updateBlocksOrder();
+                        saveBlocks();
                     }
                 });
 
@@ -344,48 +423,10 @@
                 });
 
                 // Input radio-group visual controls
-                $('i.trash').on('click', function (e) {
-                    swal({
-                        title: "Are you sure?",
-                        text: "Question will be removed completely from the system",
-                        icon: "warning",
-                        buttons: true,
-                        dangerMode: true,
-                    })
-                        .then((willDelete) => {
-                            if (willDelete) {
-                                $(e.target).parent().parent().parent().remove()
-                                swal("Success!", "Question has been deleted successfully", "success")
-                            }
-                        });
-                });
+                $('i.trash').on('click', e => deleteBlock(e));
+
                 // Input radio-group delete answer
-                $('i.trashAnswer').on('click', function (e) {
-                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
-                    if (hasAnswer) {
-                        swal({
-                            title: "Are you sure?",
-                            text: "Answer will be removed completely from the system",
-                            icon: "warning",
-                            buttons: true,
-                            dangerMode: true,
-                        })
-                            .then((willDelete) => {
-                                temp = $(e.target).parent().parent().parent().parent().parent().parent();
-                                if (willDelete) {
-                                    $(e.target).parent().parent().parent().parent().remove();
-                                    swal("Success!", "Answer has been deleted successfully", "success")
-                                }
-                                // run answers restructure function
-                                answersRestructure(temp)
-                            });
-                    } else {
-                        temp = $(e.target).parent().parent().parent().parent().parent().parent();
-                        $(e.target).parent().parent().parent().parent().remove();
-                        // run answers restructure function
-                        answersRestructure(temp)
-                    }
-                });
+                $('i.trashAnswer').on('click', e => deleteAnswer(e));
 
                 // init tags
                 $('input[name=tags]').each((i, input) => {
@@ -396,7 +437,236 @@
                 });
 
                 // change type of block
-                $('.dropdown-menu.dropdown-menu-right > li').on('click', (e) => {
+                $('.panel-heading li').on('click', (e) => {
+                    $target = $(e.target);
+                    let isTargetType = $target.parent().parent().parent().children().first().text().includes('Type');
+                    let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val();
+
+                    if (isTargetType && hasData) {
+                        swal({
+                            title: "Are you sure?",
+                            text: "Old block will be removed completely from the system",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        })
+                            .then((willUpdate) => {
+                                if (willUpdate) {
+                                    let newTemplateName = $target.text();
+
+                                    $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
+                                    $blockBody.html(render_blocks_change(newTemplateName));
+                                    init_changed_block();
+                                    updateBlocksOrder();
+                                }
+                            });
+                    } else {
+                        let newTemplateName = $target.text();
+                        $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
+                        $blockBody.html(render_blocks_change(newTemplateName));
+                        init_changed_block();
+                        updateBlocksOrder();
+                    }
+                });
+
+                $('.save').on('click', e => saveBlocks(e));
+
+                $('.addBlock').on('click', (e) => {
+                    if (RemainingBlocks) {
+                        $container = $("<div></div>");
+                        for (const blockType of BlocksTypes)
+                            $container.append("<div class=\"type clickable\" onclick=\"swal.setActionValue({cancel:$(this).text() }); swal.close(); \">" + blockType + "</div>")
+                        swal({
+                            title: 'Select block type:',
+                            content: $container[0],
+                            button: {
+                                text: "Cancel",
+                                value: false,
+                                visible: true,
+                                closeModal: true,
+                            }
+                        }).then((blockType) => {
+                            if (blockType) {
+                                $.ajax({
+                                    method: 'POST',
+                                    url: 'bot/data',
+                                    contentType: "application/json",
+                                    data: (function () {
+                                        switch (blockType) {
+                                            case 'Question':
+                                                return JSON.stringify({
+                                                    block: {
+                                                        content: {
+                                                            text: "",
+                                                            answers: []
+                                                        },
+                                                        storeInDB: true,
+                                                        type: blockType,
+                                                    },
+                                                    botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                                                });
+                                            case 'User Input':
+                                                return JSON.stringify({
+                                                    block: {
+                                                        content: {
+                                                            action: "",
+                                                            text: "",
+                                                            validation: ""
+                                                        },
+                                                        storeInDB: true,
+                                                        type: blockType,
+                                                    },
+                                                    botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                                                });
+                                            case 'File Upload':
+                                                return JSON.stringify({
+                                                    block: {
+                                                        content: {
+                                                            action: "",
+                                                            text: "",
+                                                            fileTypes: []
+                                                        },
+                                                        storeInDB: true,
+                                                        type: blockType,
+                                                    },
+                                                    botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                                                });
+                                        }
+                                    })(),
+                                    success: function (res) {
+                                        res = JSON.parse(res);
+                                        $('.remainingBlocks span').html(res.data.remainingBlocks);
+                                        addNewBlock();
+                                        swal({
+                                            title: blockType + " added!",
+                                            text: res.msg,
+                                            icon: "success",
+                                            timer: 2000,
+                                            buttons: false
+                                        });
+                                    }
+                                });
+                            }
+                        })
+                    }
+                });
+            }
+
+            function init_changed_block() {
+
+                // to make the current type highlighted
+                $("button.btn.btn-default.dropdown-toggle").on("click", function (e) {
+                    $input = $(e.target).parent().parent().children().first().val();
+
+                    $(e.target).siblings().first().children().each(function (i, element) {
+                        let item = $(element).text();
+                        if ($input === item) {
+                            return $(element).children().first().addClass('hover')
+                        }
+                        $(element).children().first().removeClass()
+
+                    });
+                });
+
+                // to change the textbox next to type dropdown
+                $("ul.dropdown-menu.dropdown-menu-right").on("click", function (e) {
+                    $input = $(e.target).parent().parent().parent().parent().children().first();
+                    $input.val($(e.target).text());
+                });
+
+                // Input radio-group visual controls
+                $('.radio-group label').on('click', function (evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+
+                    if ($(this).hasClass('not-active'))
+                        $(this).removeClass('not-active');
+                    else
+                        $(this).addClass('not-active');
+
+                });
+
+                // Add answer
+                $('.addAnswerClick').on('click', function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    addAnswer($(e.target).parent().parent().children('.answers'));
+                });
+
+                // Input radio-group visual controls
+                $('i.trash').on('click', e => deleteBlock(e));
+
+                // Input radio-group delete answer
+                $('i.trashAnswer').on('click', e => deleteAnswer(e));
+
+                // init tags
+                $('input[name=tags]').each((i, input) => {
+                    if (!$(input).hasClass('tagified')) {
+                        new Tagify(input);
+                        $(input).addClass('tagified')
+                    }
+                });
+
+                $('.save').on('click', e => saveBlocks(e));
+            }
+
+            function init_added_block() {
+
+                // to make the current type highlighted
+                $("button.btn.btn-default.dropdown-toggle").on("click", function (e) {
+                    $input = $(e.target).parent().parent().children().first().val();
+
+                    $(e.target).siblings().first().children().each(function (i, element) {
+                        let item = $(element).text();
+                        if ($input === item) {
+                            return $(element).children().first().addClass('hover')
+                        }
+                        $(element).children().first().removeClass()
+
+                    });
+                });
+
+                // to change the textbox next to type dropdown
+                $("ul.dropdown-menu.dropdown-menu-right").on("click", function (e) {
+                    $input = $(e.target).parent().parent().parent().parent().children().first();
+                    $input.val($(e.target).text());
+                });
+
+                // Input radio-group visual controls
+                $('.radio-group label').on('click', function (evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+
+                    if ($(this).hasClass('not-active'))
+                        $(this).removeClass('not-active');
+                    else
+                        $(this).addClass('not-active');
+
+                });
+
+                // Add answer
+                $('.addAnswerClick').on('click', function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    addAnswer($(e.target).parent().parent().children('.answers'));
+                });
+
+                // Input radio-group visual controls
+                $('i.trash').on('click', e => deleteBlock(e));
+
+                // Input radio-group delete answer
+                $('i.trashAnswer').on('click', e => deleteAnswer(e));
+
+                // init tags
+                $('input[name=tags]').each((i, input) => {
+                    if (!$(input).hasClass('tagified')) {
+                        new Tagify(input);
+                        $(input).addClass('tagified')
+                    }
+                });
+
+                // change type of block
+                $('.panel-heading li').on('click', (e) => {
                     $target = $(e.target);
                     let isTargetType = $target.parent().parent().parent().children().first().text().includes('Type');
                     let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val()
@@ -415,45 +685,226 @@
 
                                     $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
                                     $blockBody.html(render_blocks_change(newTemplateName));
-                                    init_page();
+                                    init_changed_block();
+                                    updateBlocksOrder();
                                 }
                             });
                     } else {
                         let newTemplateName = $target.text();
                         $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
                         $blockBody.html(render_blocks_change(newTemplateName));
-                        init_page();
+                        init_changed_block();
+                        updateBlocksOrder();
+                    }
+                });
+
+                $('.save').on('click', e => saveBlocks(e));
+            }
+
+            function deleteBlock(e) {
+                swal({
+                    title: "Are you sure?",
+                    text: "Block will be removed completely from the system",
+                    icon: "warning",
+                    button: {
+                        text: "Delete!",
+                        closeModal: false,
+                    },
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            let deletedBlockId = $(e.target).parent().parent().parent().attr('id');
+                            return $.ajax({
+                                method: 'DELETE',
+                                url: '/admin/assistant/bot/block/' + deletedBlockId
+                            });
+                        }
+                    })
+                    .then((res) => {
+                        res = JSON.parse(res);
+                        $('.remainingBlocks span').html(res.data.remainingBlocks);
+                        RemainingBlocks = res.data.remainingBlocks;
+                        if (res.success) {
+                            $(e.target).parent().parent().parent().remove();
+                            swal("Success!", res.msg, "success");
+                            updateBlocksOrder();
+                        }
+                    })
+            }
+
+            function saveBlocks() {
+                // collect all data in its json form
+                class BlockTypeQuestions {
+                    constructor(text, answers, storeInDB, type, order, id) {
+                        this.Question = {
+                            content: {
+                                text: text,
+                                answers: answers
+                            },
+                            storeInDB: storeInDB,
+                            type: type,
+                            order: order,
+                            id: id
+                        }
+                    }
+                }
+
+                class BlockTypeUserInput {
+                    constructor(text, action, validation, storeInDB, type, order, id) {
+                        this.UserInput = {
+                            content: {
+                                action: action ? action : 'Go To Next Block',
+                                text: text,
+                                validation: validation
+                            },
+                            storeInDB: storeInDB,
+                            type: type,
+                            order: order,
+                            id: id
+                        }
+                    }
+                }
+
+                class BlockTypeFileUpload {
+                    constructor(text, action, fileTypes, storeInDB, type, order, id) {
+                        this.FileUpload = {
+                            content: {
+                                action: action ? action : 'Go To Next Block',
+                                text: text,
+                                fileTypes: fileTypes
+                            },
+                            storeInDB: storeInDB,
+                            type: type,
+                            order: order,
+                            id: id
+                        }
+                    }
+                }
+
+
+                let botData = {
+                    botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                    blocks: []
+                };
+
+                for (const obj of BlocksOrder) {
+                    let $block = obj.block;
+                    let order = obj.order;
+
+                    let type = $block.children().first().children().last().children().children().val();
+                    if (type == 'Question') {
+                        let rowsOfAnswers = $block.children().last().find('div.answers').children();
+                        let answersArr = [];
+
+                        let id = +$block.attr('id');
+
+                        let text = (function () {
+                            let label = $block.children().last().find('.input-group').children().first().text();
+                            if (label.includes('Question'))
+                                return $block.children().last().find('.input-group').children().first().next().val();
+                        })();
+
+                        let saveInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+
+                        for (const row of rowsOfAnswers) {
+                            let $row = $(row);
+                            let answers = $row.children();
+                            for (const answer of answers) {
+                                let $answer = $(answer);
+                                let text = $answer.children().find('input.form-control').first().val();
+                                let action = $answer.children().find('input.form-control').last().val();
+                                let keywords = (function () {
+                                    let keywordsArr = [];
+                                    $answer.find('tags').children('tag').each((i, tag) => {
+                                        keywordsArr.push($(tag).attr('value'))
+                                    });
+                                    return keywordsArr;
+                                })();
+
+                                answersArr.push({
+                                    action: action ? action : 'Go To Next Block',
+                                    text: text,
+                                    keywords: keywords
+                                });
+                            }
+                        }
+
+                        botData.blocks.push(new BlockTypeQuestions(text, answersArr, saveInDB, type, order, id).Question);
+                    }
+
+                    if (type == 'User Input') {
+                        let text = (function () {
+                            let label = $block.children().last().find('.input-group').children().first().text();
+                            if (label.includes('Question'))
+                                return $block.children().last().find('.input-group').children().first().next().val();
+                        })();
+                        let action = $block.children().last().find('input.normalCursor').first().val();
+                        let validationn = $block.children().last().find('input.normalCursor').last().val();
+                        let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+                        let id = +$block.attr('id');
+
+                        botData.blocks.push(new BlockTypeUserInput(text, action, validationn, storeInDB, type, order, id).UserInput);
+                    }
+
+                    if (type == 'File Upload') {
+                        let text = (function () {
+                            let label = $block.children().last().find('.input-group').children().first().text();
+                            if (label.includes('Question'))
+                                return $block.children().last().find('.input-group').children().first().next().val();
+                        })();
+                        let action = $block.children().last().find('input.normalCursor').first().val();
+
+                        let fileTypes = [];
+                        $block.children().last().children('.col-md-8').children().last().children().each((i, elem) => {
+                            if (!$(elem).hasClass('not-active'))
+                                fileTypes.push($(elem).text())
+                        });
+
+                        let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+                        let id = +$block.attr('id');
+
+                        botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, storeInDB, type, order, id).FileUpload);
+                    }
+                    console.log(botData)
+                }
+                $.ajax({
+                    method: 'PUT',
+                    url: 'bot/data',
+                    contentType: "application/json",
+                    data: JSON.stringify(botData),
+                    success: function (res) {
+                        res = JSON.parse(res);
+                        swal('Succes', res.msg, 'success');
+
+                        Promise.all([GET_data(), GET_options()]).then((res) => {
+                            data = JSON.parse(res[0]).data;
+                            options = JSON.parse(res[1]).data;
+                            render_blocks(data.blocks);
+                            init_added_block();
+                            updateBlocksOrder();
+                        });
+
+                    }, error: function (request, status, error) {
+                        swal('Error', JSON.parse(request.responseText).msg, 'error')
                     }
                 });
             }
 
-            function init_answers_panels() {
-                $('i.trashAnswer').on('click', function (e) {
-                    let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
-                    if (hasAnswer) {
-                        swal({
-                            title: "Are you sure?",
-                            text: "Answer will be removed completely from the system",
-                            icon: "warning",
-                            buttons: true,
-                            dangerMode: true,
-                        })
-                            .then((willDelete) => {
-                                temp = $(e.target).parent().parent().parent().parent().parent().parent();
-                                if (willDelete) {
-                                    $(e.target).parent().parent().parent().parent().remove();
-                                    swal("Success!", "Answer has been deleted successfully", "success")
-                                }
-                                // run answers restructure function
-                                answersRestructure(temp)
-                            });
-                    } else {
-                        temp = $(e.target).parent().parent().parent().parent().parent().parent();
-                        $(e.target).parent().parent().parent().parent().remove();
-                        // run answers restructure function
-                        answersRestructure(temp)
-                    }
+            function addNewBlock() {
+                Promise.all([GET_data(), GET_options()]).then((res) => {
+                    data = JSON.parse(res[0]).data;
+                    options = JSON.parse(res[1]).data;
+                    RemainingBlocks = Number($('.remainingBlocks span').html());
+                    render_blocks(data.blocks);
+                    init_added_block();
+                    updateBlocksOrder();
                 });
+            }
+
+            function init_answers_panels() {
+                $('i.trashAnswer').on('click', e => deleteAnswer(e));
+
                 // init tags
                 $('input[name=tags]').each((i, input) => {
                     if (!$(input).hasClass('tagified')) {
@@ -482,6 +933,32 @@
 
             }
 
+            function deleteAnswer(e) {
+                let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
+                if (hasAnswer) {
+                    swal({
+                        title: "Are you sure?",
+                        text: "Answer will be removed completely from the system",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    })
+                        .then((willDelete) => {
+                            temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                            if (willDelete) {
+                                $(e.target).parent().parent().parent().parent().remove();
+                            }
+                            // run answers restructure function
+                            answersRestructure(temp)
+                        });
+                } else {
+                    temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                    $(e.target).parent().parent().parent().parent().remove();
+                    // run answers restructure function
+                    answersRestructure(temp)
+                }
+            }
+
             function addAnswer(target) {
                 let element = $("<div class=\"col-sm-4\">  <div class=\"panel panel-default\">\n" +
                     "    <div class=\"panel-heading\">\n" +
@@ -492,7 +969,7 @@
                     "      </span>\n" +
                     "    </div>\n" +
                     "<div class=\"panel-body\">\n" +
-                    "      <div class=\"input-group\">\n" +
+                    "      <div class=\"input-group1\">\n" +
                     "        <label for=\"input\">Answer:</label>\n" +
                     "        <input type=\"text\" class=\"form-control\" placeholder=\"Answer\"\n" +
                     "               aria-describedby=\"basic-addon1\" value=\"\">\n" +
@@ -512,7 +989,6 @@
                     "          </button>\n" +
                     "          <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
                     "<li><a>Go To Next Block</a></li>\n" +
-                    "<li><a>Go To Specific Block</a></li>\n" +
                     "          </ul>\n" +
                     "        </div><!-- /btn-group -->\n" +
                     "      </div><!-- /input-group -->\n" +
@@ -548,7 +1024,6 @@
 
                 });
                 answersRestructure(target);
-                init_answers_panels();
             }
 
             function answersRestructure(target) {
@@ -585,10 +1060,20 @@
                         rowSize = 1;
 
                     }
-
                 }
                 init_answers_panels();
+            }
 
+            function updateBlocksOrder() {
+                let panelList = $('#draggablePanelList');
+                BlocksOrder = [];
+                $('.blockPanel', panelList).each(function (index, elem) {
+                    let $listItem = $(elem), newIndex = $listItem.index();
+                    BlocksOrder.push({
+                        block: $listItem,
+                        order: newIndex + 1
+                    });
+                });
             }
 
             function GET_data() {
@@ -653,10 +1138,10 @@
                     }
 
                     function getSubmitElemnt(storeInDB, id) {
-                        let isDisabled = storeInDB ? '' : 'disabled';
+                        let isDisabled = block_template.alwaysStoreInDB ? '' : 'disabled';
                         return "" +
                             "<div class=\"col-md-1 pull-right inline\">\n" +
-                            "    <div class=\"btn btn-default\">Save</div>\n" +
+                            "    <div class=\"save btn btn-default\">Save</div>\n" +
                             "</div>\n" +
                             "<div class=\"col-md-2 pull-right inline text-right\">\n" +
                             "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 9px\">\n" +
@@ -713,20 +1198,20 @@
                                 answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
                                 answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
                                 answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
-                                answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].answer.text);
+                                answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].text);
 
                                 $answers.children().last().append(answerTemplate);
 
                                 rowSize++;
                             }
                             else {
-                                $answers.children().append($("<div class='row'></div>"));
+                                $answers.append($("<div class='row'></div>"));
 
                                 answerTemplate = $(getAnswerTemplate(actions));
                                 answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
                                 answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
                                 answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
-                                answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
+                                answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].text);
                                 $answers.children().last().append(answerTemplate);
 
                                 rowSize = 1;
@@ -756,7 +1241,7 @@
                             "<div class=\"panel-body\">\n" +
 
                             // ANSWER
-                            "      <div class=\"input-group\">\n" +
+                            "      <div class=\"input-group1\">\n" +
                             "        <label for=\"input\">Answer:</label>\n" +
                             "        <input type=\"text\" class=\"form-control\" placeholder=\"Answer\"\n" +
                             "               aria-describedby=\"basic-addon1\" value=\"ANSWER_VALUE\">\n" +
@@ -793,6 +1278,7 @@
                     }
 
                     function getBlockContent(template, block) {
+                        template = template.replace('BLOCK_ID', block.id);
                         template = template.replace('BLOCK_TYPE', block.type);
                         template = template.replace('BLOCK_TEXT', block.content.text);
                         template = template.replace('BLOCK_TEXT_EDITABLE', block.content.text);
@@ -804,19 +1290,19 @@
 
                     function getTemplate(block_template, block) {
                         templateHTML =
-                            "<li class=\"panel panel-default\">\n" +
-                            "    <div class=\"panel-heading\">\n" +
+                            "<li class=\"panel blockPanel panel-default\" id='BLOCK_ID'>\n" +
+                            "    <div class=\"panel-heading panel-collapsed\">\n" +
                             "        <div class=\"panel-title\">\n" +
                             "            <span class=\"moveable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-menu-hamburger\"></i></span>\n" +
                             "            <b>BLOCK_TEXT</b>\n" +
                             "        </div>\n" +
                             "        <span class=\"pull-right clickable\" style='color:#660ff2;margin-left:15px'><i class=\"trash glyphicon glyphicon-trash\"></i></span>\n" +
-                            "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"indicator glyphicon glyphicon-chevron-down\"></i></span>\n" +
+                            "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"indicator glyphicon glyphicon-chevron-up\"></i></span>\n" +
                             "        <div class=\"col-xs-11  col-sm-5 col-md-4 pull-right\" style=\"margin-top: -30px;margin-right:-9px\">\n" +
                             "            <div class=\"input-group\">\n" +
                             "                <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\" value=\"BLOCK_TYPE\">" +
                             "                <div class=\"input-group-btn\">\n" +
-                            "                    <button type=\"button\" class=\"blockType btn btn-default dropdown-toggle\" data-toggle=\"dropdown\"\n" + "" +
+                            "                    <button disabled type=\"button\" class=\"blockType btn btn-default dropdown-toggle\" data-toggle=\"dropdown\"\n" + "" +
                             "                            aria-haspopup=\"true\" aria-expanded=\"false\">" +
                             "                            Type <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                             "                    </button>\n" +
@@ -828,7 +1314,7 @@
                             "        </div><!-- /.col-lg-3 -->\n" +
                             "    </div>\n" +
                             // Block text
-                            "    <div class=\"panel-body\">\n" +
+                            "    <div class=\"panel-body\" style='display:none;'>\n" +
                             "       <div class=\"input-group col-md-6\">\n" +
                             "         <span class=\"input-group-addon\">Question:</span>\n" +
                             "         <input type=\"text\" class=\"form-control\"\n" +
@@ -887,7 +1373,7 @@
                         elements += cookUpBlock(blocks_templates[block.type], block)
                     $("#draggablePanelList").html(elements);
                 }
-                else $("#draggablePanelList").html("<h2>Sorry there are no blocks for this bot 🙁</h2>");
+                else $("#draggablePanelList").html("<h2>There are no blocks for this bot. Please click on the top right, and create them.</h2>");
             }
 
             function render_blocks_change(block_template) {
@@ -930,7 +1416,7 @@
                     function getSubmitElemnt(storeInDB, id) {
                         let isDisabled = storeInDB ? '' : 'disabled';
                         return "" +
-                            "<div class=\"col-md-1 pull-right inline\">\n" +
+                            "<div class=\"save col-md-1 pull-right inline\">\n" +
                             "    <div class=\"btn btn-default\">Save</div>\n" +
                             "</div>\n" +
                             "<div class=\"col-md-2 pull-right inline text-right\">\n" +
@@ -988,7 +1474,7 @@
                     function getTemplate(block_template) {
                         templateHTML =
                             // Block text
-                            "<div class=\"panel-body\">\n" +
+                            "<div class=\"panel-body\" >\n" +
                             "    <div class=\"input-group col-md-6\">\n" +
                             "         <span class=\"input-group-addon\">Question:</span>\n" +
                             "         <input type=\"text\" class=\"form-control\"\n" +
@@ -1040,12 +1526,13 @@
                 return cookUpBlock(blocks_templates[block_template]);
             }
 
-
-            function render_page(assistantName, botVersion) {
+            function render_page(assistantName, botVersion, remainingBlocks) {
                 $("#assistantName").html(
                     "Assistant: " + assistantName +
                     "<span class=\"pull-right h5\">Bot version: " + botVersion + "</span>"
-                )
+                );
+
+                $('.remainingBlocks span').html(remainingBlocks);
             }
         }
     </script>

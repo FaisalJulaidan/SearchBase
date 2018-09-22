@@ -75,7 +75,7 @@ def admin_users_add():
         # Get the admin user who is logged in and wants to create a new user.
         callback: Callback = user_services.getByID(session.get('UserID', 0))
         if not callback.Success:
-            return helpers.jsonResponse(False, 400, "Sorry, error occurred. Try again please!")
+            return redirect("login")
         adminUser: User = callback.Data
 
         # Check if the admin user is authorised to create a new user.

@@ -5,9 +5,12 @@
   "properties": {
     "text": {"type": "string"},
     "blockToGoID": {"type": ["number", "null"]},
-    "validation": {"enum": ["Email", "Telephone"]},
-    "action": {"type": "string"}
-    },
-  "required": ["text", "action", "blockToGoID", "validation"],
+    "validation": {"enum": ["Email", "Telephone",""]},
+    "action": {"enum": ["Show Solutions", "Go To Next Block", "Go To Specific Block"]}
+  },
+  "required": [
+    "action",
+    "validation"
+  ],
   "additionalProperties": false
 }

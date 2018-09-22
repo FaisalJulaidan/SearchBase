@@ -28,7 +28,7 @@
                                 <div class="col-md-12">
                                 <p class="lead">
                                 <p> Controlling your plan</p> 
-                                <button disabled  style="background-color:red; border-color: red;" class="btn btn-primary btn-sm" onclick="unsubscribeNow()" role="button">Cancel Subscription</button>
+                                <button id="unsubBtn" style="background-color:red; border-color: red;" class="btn btn-primary btn-sm" onclick="unsubscribeNow()" role="button">Cancel Subscription</button>
                         </div>
                       </div>
                 </div>
@@ -49,6 +49,11 @@
 <script type="text/javascript">
 
 
+    console.log(sessionStorage.getItem('subID'));
+    if(sessionStorage.getItem('subID') == 'null'){
+        document.getElementById("unsubBtn").disabled = true;
+    }
+
     function unsubscribeNow(){
 
         swal({
@@ -67,28 +72,21 @@
 
                 }).done(function( res ) {
                    console.log(res);
-
                    // When successfully unsubscribe
-                   if(res.success){
+                swal({
+                  title: "Successful...",
+                  text: res.msg,
+                  icon: "success"
+                 }).then((value) => {
+                    sessionStorage.setItem('subID', 'null')
+                    document.location.href = "/admin/dashboard"
+                 });
 
-                    swal(res.success)
-                    .then((value) => {
-                        sessionStorage.removeItem('subID')
-                        document.location.href = "/admin/dashboard"
-                    });
 
-                   // When error occurred
-                   } else if(res.error) {
+                 }).fail(function( res ) {
 
-                    swal(res.error)
-                    .then((value) => {
-
-                    });
-                   }
-
-                 }).fail(function( err ) {
-
-                   console.log(err)
+                    let resJson = JSON.parse(res.responseText);
+                    swal("Ooops!", resJson.msg, "error");
                  })
 
           } else {

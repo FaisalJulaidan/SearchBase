@@ -1,6 +1,7 @@
 import os
 from config import BaseConfig
 from datetime import timedelta
+from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory
 from flask import Blueprint, render_template, request, session, redirect, url_for, json
 from flask_api import status
 from utilties import helpers
@@ -11,17 +12,17 @@ from services import user_services, company_services, db_services, auth_services
 from models import secret_key
 from werkzeug.utils import secure_filename
 import uuid
+from flask_cors import CORS
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 
-@public_router.route("/test", methods=['POST'])
+@public_router.route("/test", methods=['GET'])
 def t():
-    if request.method == "POST":
-        print(request.get_json(silent=True))
-        return helpers.jsonResponse(True, 200, "!!!", None)
+    if request.method == "GET":
+        return render_template("test-chatbot.html")
 
 
 @public_router.route("/chatbottemplate/<assistantID>", methods=['GET'])
@@ -62,6 +63,21 @@ def chatbot(assistantID):
 
         return helpers.jsonResponse(True, 200, "Solution list is here!", {'sessionID': ch_callback.Data.ID, 'solutions':solutions})
 
+@public_router.route("/userdownloads/<path:path>", methods=['GET'])
+def assistant_userdownloads(path):
+    if request.method == "GET":
+        print("trying to return file")
+        return send_from_directory('static/user_downloads/', path)
+
+@public_router.route("/getpopupsettings/<assistantID>", methods=['GET'])
+def get_pop_settings(assistantID):
+    if request.method == "GET":
+        assistant_callback: Callback = assistant_services.getByID(assistantID)
+        if not assistant_callback.Success:
+            return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+
+        data = {"SecondsUntilPopUp": assistant_callback.Data.SecondsUntilPopup}
+        return helpers.jsonResponse(True, 200, "Pop up settings retrieved", data)
 
 @public_router.route("/assistant/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(sessionID):
@@ -253,6 +269,8 @@ def logout():
     session.pop('UserPlan', None)
     session.pop('CompanyID', None)
     session.pop('Logged_in', False)
+    session.clear()
+
 
     return redirect(url_for('public_router.login'))
 

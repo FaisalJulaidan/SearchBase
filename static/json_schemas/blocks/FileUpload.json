@@ -8,7 +8,10 @@
     "fileTypes": {"type": "array", "items": {"type": "string"}},
     "blockToGoID": {"type": ["integer", "null"]}
     },
-  "required": ["text", "action", "fileTypes", "blockToGoID"],
+  "required": [
+    "action",
+    "fileTypes"
+  ],
   "additionalProperties": false
 }
 

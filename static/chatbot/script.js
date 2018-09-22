@@ -184,7 +184,7 @@ function renderQuestion(block) {
 
     var blockAnswers = block.content.answers;
     for (var i = 0; i < blockAnswers.length; i++) {
-        answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"submitAnswer('" + toEmoticon(blockAnswers[i].answer.text) + "','" + blockAnswers[i].keywords + "')\">" + toEmoticon(blockAnswers[i].answer.text) + "</a>";
+        answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"submitAnswer('" + toEmoticon(blockAnswers[i].text) + "','" + blockAnswers[i].keywords + "')\">" + toEmoticon(blockAnswers[i].text) + "</a>";
     }
     //add skip button
     //answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"SkipQuestion()\">Skip Question</a>";
@@ -228,9 +228,9 @@ async function submitAnswer(message, blockKeywords=undefined) {
 
     if (currentBlock.type == "File Upload") {
         //needs rework
-        message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
+        message = "&FILE_UPLOAD&"+document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
         if (!checkFileFormat(message)) {
-            sendUserMessage(message)
+            sendUserMessage(message.replace("&FILE_UPLOAD&", ""))
             await sleep(350);
             sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
             return 0;
@@ -258,7 +258,7 @@ async function submitAnswer(message, blockKeywords=undefined) {
     $("#qAnswers").remove();
     chatInputDiv.style = "display:none";
 
-    sendUserMessage(message) //print user's message in the chatbox to appear like he is typing back
+    sendUserMessage(message.replace("&FILE_UPLOAD&", "")) //print user's message in the chatbox to appear like he is typing back
     await sleep(500);
 
     putThinkingGif();
@@ -289,7 +289,7 @@ async function submitAnswer(message, blockKeywords=undefined) {
     if (currentBlock.type == "Question") {
         var blockAnswers = currentBlock.content.answers;
         for (var i = 0; i < blockAnswers.length; i++) {
-            if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].answer.text == message) {
+            if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].text == message) {
                 action = blockAnswers[i].action;
                 var blockToGoId = blockAnswers[i].blockToGoId;
 

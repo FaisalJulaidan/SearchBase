@@ -65,14 +65,13 @@ def addBlock(data: dict, assistant: Assistant) -> Callback:
                          StoreInDB=block['storeInDB'], Assistant=assistant)
         db.session.add(newBlock)
     except Exception as exc:
+        db.session.rollback()
         print(exc.args[0])
         return Callback(False, 'Error occurred while creating a new Block object', exc.args[0])
 
     db.session.commit()
-    return Callback(True, 'Block added successfully!', {
-        "newBlockID": newBlock.ID,
-        "remainingBlocks": getRemainingBlocksByAssistant(assistant)
-    })
+    return Callback(True, 'Block added successfully!', {"newBlockID": newBlock.ID,
+                                                        "remainingBlocks": getRemainingBlocksByAssistant(assistant)})
 
 
 def updateBot(bot, assistant: Assistant) -> Callback:

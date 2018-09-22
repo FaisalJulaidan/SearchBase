@@ -1,6 +1,6 @@
 #/usr/bin/python3.5
 from flask import Flask, redirect, request, render_template, jsonify, abort, escape, \
-    g, session
+    g, session, send_from_directory
 from werkzeug.utils import secure_filename
 from flask_api import status
 from datetime import datetime, timedelta
@@ -30,7 +30,6 @@ from routes.public.routers import public_router, resetPassword_router
 from services import user_services, mail_services
 
 app = Flask(__name__, static_folder='static')
-
 # Register Routes:
 app.register_blueprint(adminBasic_router)
 app.register_blueprint(assistantManager_router)
@@ -52,7 +51,6 @@ app.register_blueprint(answers_router)
 app.register_blueprint(bot_router)
 app.register_blueprint(emoji_router)
 
-
 # code to ensure user is logged in
 @app.before_request
 def before_request():
@@ -61,6 +59,7 @@ def before_request():
     restrictedRoutes = ['/admin', 'admin/dashboard']
 
     # If the user try to visit one of the restricted routes without logging in he will be redirected
+    print(session.get('Logged_in', False))
     if any(route in currentURL for route in restrictedRoutes) and not session.get('Logged_in', False):
         return redirect('login')
 
@@ -92,7 +91,7 @@ def before_request():
 def genDummyData():
 
     # Companies creation
-    db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_DbgPyBCx0osKmr'))
+    db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_00000000000000', SubID='sub_00000000000000'))
     db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly'))
 
     # Get Companies
@@ -110,8 +109,9 @@ def genDummyData():
     db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Assistant=reader_a, Content={
         "answers": [
           {
-            "action": "Go To Specific Block",
-            "answer":  {"text": "Yes", "timesClicked": 0},
+            "action": "Go To Next Block",
+            "text": "Yes",
+            "timesClicked": 0,
             "keywords": [
               "smoker",
               "sad"
@@ -120,7 +120,8 @@ def genDummyData():
           },
           {
             "action": "Go To Next Block",
-            "answer": {"text": "No", "timesClicked": 0},
+            "text": "No",
+            "timesClicked": 0,
             "keywords": [
               "smoker",
               "sad"
@@ -195,7 +196,7 @@ def genDummyData():
         Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=20, ActiveBotsCap=10, InactiveBotsCap=30,
              AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
     
-    db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=5,  ActiveBotsCap=2, InactiveBotsCap=2,
+    db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=30,  ActiveBotsCap=2, InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
     db.session.add(Solution(SolutionID='D48N4wxwAWEMOH', MajorTitle='Big Title 1', SecondaryTitle="Small Title 1",
@@ -223,23 +224,24 @@ def genDummyData():
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+# APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+#
+# DATABASE = APP_ROOT + "/database.db"
+#
+# PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
+# USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
 
-DATABASE = APP_ROOT + "/database.db"
-
-PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
-USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
-
-pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
-secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
 encryption = None
 
-stripe.api_key = secret_key
-
-stripe_keys = {
-    'secret_key': secret_key,
-    'publishable_key': pub_key
-}
+# pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
+# secret_key = 'sk_live_GchRkZzl77MEnpMCKBRiGodQ'
+#
+# stripe.api_key = secret_key
+#
+# stripe_keys = {
+#     'secret_key': secret_key,
+#     'publishable_key': pub_key
+# }
 
 # stripe.api_key = stripe_keys['secret_key']
 
@@ -458,9 +460,7 @@ def admin_templates():
 
 
 
-@app.route("/admin/adjustments", methods=['GET'])
-def admin_pricing_adjust():
-    return render("admin/pricing-adjustments.html")
+
 
 @app.route("/admin/cancellation/confirmation", methods=['GET'])
 def admin_plan_confirmation():

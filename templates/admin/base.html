@@ -124,10 +124,10 @@
                                                 <li>
                                                     <a href="/admin/assistant/{{ assistant.ID }}/bot">Bot</a>
                                                 </li>
-                                                <li>
+                                                <!--<li>
                                                     <a href="/admin/assistant/{{ assistant.ID }}/questions">Questions <sub>(Temp)</sub></a>
                                                 </li>
-                                                <li><a href="/admin/assistant/{{ assistant.ID }}/answers">Answers <sub>(Temp)</sub></a></li>
+                                                <li><a href="/admin/assistant/{{ assistant.ID }}/answers">Answers <sub>(Temp)</sub></a></li>-->
                                                 <!--<li><a href="/admin/templates">Templates</a></li>-->
                                                 <li>
                                                     <a href="/admin/assistant/{{ assistant.ID }}/solutions">
@@ -146,7 +146,7 @@
                                                 </li>
                                                 <li>
                                                     <a href="/admin/assistant/{{ assistant.ID }}/connect">
-                                                        <i class="fa fa-plug"></i>Connection
+                                                        <i class="fa fa-plug"></i>Integration
                                                     </a>
                                                 </li>
                                             </ul>
@@ -354,7 +354,8 @@
     <!-- jQuery -->
     {#
     <script src="/static/vendor/jquery/jquery-3.2.1.min.js"></script>#}
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+{#    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>#}
+    <script src="/static/jquery-2.2.4.js"></script>
     <!-- jQuery Tags Input -->
     <script src="/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
     <!-- Bootstrap -->

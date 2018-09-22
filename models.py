@@ -357,6 +357,7 @@ class ValidationType(enum.Enum):
 
     Email = 'Email'
     Telephone = 'Telephone'
+    FullName = 'FullName'
 
 
 class BlockType(enum.Enum):
@@ -369,8 +370,8 @@ class BlockType(enum.Enum):
 class BlockAction(enum.Enum):
 
     GoToNextBlock = 'Go To Next Block'
-    GoToSpecificBlock = 'Go To Specific Block'
-    ShowSolutions = 'Show Solutions'
+    # GoToSpecificBlock = 'Go To Specific Block'
+    # ShowSolutions = 'Show Solutions'
 
 
 class Block(db.Model):
@@ -401,6 +402,7 @@ class ChatbotSession(db.Model):
     TimeSpent = db.Column(db.Integer, nullable=False, default=0)
     SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
     QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
+
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)

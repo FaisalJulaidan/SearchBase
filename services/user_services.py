@@ -1,5 +1,6 @@
 import sqlalchemy.exc
 
+from services import mail_services, company_services
 from models import db, Callback, User, Company, Role, UserSettings
 from utilties import helpers
 from sqlalchemy.sql import exists, func
@@ -179,6 +180,14 @@ def verifyByEmail(email: str):
     try:
         user = db.session.query(User).filter(User.Email == email).update({"Verified": True})
         if not user: raise Exception
+        
+        #send us mail
+        result = db.session.query(User).filter(User.Email == email).first()
+        company_callback = company_services.getByID(result.CompanyID)
+        companyName = "Error"
+        if company_callback : companyName = company_callback.Data.Name
+        mail_callback : Callback = mail_services.sendNewUserHasRegistered(result.Firstname + result.Surname, result.Email, companyName, result.PhoneNumber)
+        if not mail_callback.Success: print("Could not send signed up user email")
 
     except Exception as exc:
         print(exc)

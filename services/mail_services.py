@@ -15,24 +15,28 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
     try:
 
         payload = email + ";" + companyName
-        link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
+        link = "http://127.0.0.1:5000/account/verify/" + verificationSigner.dumps(payload)
 
         send_email((email), 'Account verification', 
                '/emails/verification.html', link = link)
-
-        # sending the registration confirmation email to us - needs template
-        #msg = Message("A new company has signed up!",
-        #              sender="thesearchbase@gmail.com",
-        #              recipients=["thesearchbase@gmail.com"])
-        #msg.html = "<p>Company name: " + companyName + " has signed up. <br>The admin's details are: <br>Name: " \
-        #           + fullname + " <br>Email: " + email + ".</p>"
-        #mail.send(msg)
 
     except Exception as e:
         print("sendVerificationEmail() Error: ", e)
         return Callback(False, 'Could not send a verification email to ' + email)
 
     return Callback(True, 'Verification email sent successfully to ' + email)
+
+def sendNewUserHasRegistered(name, email, companyName, tel):
+    try:
+
+        send_email(("thesearchbase@gmail.com"), companyName+' has signed up', 
+               '/emails/company_signup.html', name = name, email=email, companyName=companyName, tel=tel)
+
+    except Exception as e:
+        print("sendNewUserHasRegistered() Error: ", e)
+        return Callback(False, 'Could not send a signed up email')
+
+    return Callback(True, 'Signed up email sent successfully')
 
 def sendPasswordResetEmail(email, companyID):
     try:

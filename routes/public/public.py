@@ -1,8 +1,7 @@
 import os
 from config import BaseConfig
 from datetime import timedelta
-from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory
-from flask import Blueprint, render_template, request, session, redirect, url_for, json
+from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory, json
 from flask_api import status
 from utilties import helpers
 from models import Callback, Assistant, Solution, db, ChatbotSession

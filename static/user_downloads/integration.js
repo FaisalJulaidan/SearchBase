@@ -2,7 +2,7 @@
 
 var globalTSB = {
   id: undefined,
-  host: 'http://127.0.0.1:5000',
+  host: 'https://www.thesearchbase.com',
   files_path: '/userdownloads'
 };
 

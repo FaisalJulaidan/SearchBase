@@ -21,7 +21,7 @@ class BaseConfig(object):
 
     SECRET_KEY = os.urandom(24)
     CSRF_SESSION_KEY = os.urandom(24)
-
+    SESSION_TYPE = 'filesystem'
     # Mail Config
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465

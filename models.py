@@ -296,13 +296,13 @@ class Solution(db.Model):
                            on_serialize=None,
                            on_deserialize=None
                            )
-    SecondaryTitle = db.Column(db.String(128), nullable=False,
+    SecondaryTitle = db.Column(db.String(128), nullable=True,
                                supports_json=True,
                                supports_dict=True,
                                on_serialize=None,
                                on_deserialize=None
                                )
-    ShortDescription = db.Column(db.String(128), nullable=False,
+    ShortDescription = db.Column(db.String(128), nullable=True,
                                  supports_json=True,
                                  supports_dict=True,
                                  on_serialize=None,

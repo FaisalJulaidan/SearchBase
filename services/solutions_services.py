@@ -81,7 +81,7 @@ def update(solution: Solution, solId, majorTitle, money, URL, secTitle='', short
 
 def remove(solution: Solution) -> Callback:
     try:
-        solution.delete()
+        db.session.delete(solution)
 
     except Exception as exc:
         print(exc)
@@ -115,7 +115,8 @@ def getAllByAssistantID(assistantID):
                                   Solution.Money,
                                   Solution.Keywords,
                                   Solution.URL,
-                                  Solution.TimesReturned).filter(Solution.AssistantID == assistantID).all()
+                                  Solution.TimesReturned,
+                                  Solution.AssistantID).filter(Solution.AssistantID == assistantID).all()
         if not result: raise Exception
         return Callback(True, 'Solutions have been successfully retrieved', result)
     except Exception as exc:
@@ -135,11 +136,11 @@ def deleteAllByAssistantID(assistantID):
     return True
 
 
-def createNew(assistantID, id, name, brand, model, price, keywords, discount, url):
+def createNew(assistant, solId, majorTitle, money, url, secTitle='', shortDesc='', keywords=''):
     try:
         # Create a new user with its associated company and role
-        solution = Solution(AssistantID=assistantID, ProductID=id, Name=name, Brand=brand,
-                            Model=model, Price=price, Keywords=keywords, Discount=discount, URL=url)
+        solution = Solution(Aisstant=assistant, SolutionID=solId, MajorTitle=majorTitle, SecondaryTitle=secTitle,
+                            ShortDescription=shortDesc,Money=money, Keywords=keywords, URL=url, TimesReturned=0)
         db.session.add(solution)
 
     except Exception as exc:
@@ -148,7 +149,7 @@ def createNew(assistantID, id, name, brand, model, price, keywords, discount, ur
         return Callback(False, 'Sorry, Could not create the solution.')
     # Save
     db.session.commit()
-    return Callback(True, 'Solution has been created successfully!')
+    return Callback(True, 'Solution has been successfully created.')
 
 
 def bulkAdd(objects):

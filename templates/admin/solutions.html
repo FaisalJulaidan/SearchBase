@@ -107,11 +107,11 @@
                                         <button type="submit" class="btn btn-success" value="Send">
                                             Save Updates
                                         </button>
-                                        <button type="button" class="btn btn-success" id="addRow" value="Send" onclick="AddRow()">
-                                            Add Row
+                                        <button type="button" class="btn btn-success" id="addRow" value="Send" onclick="fillSolutionForm({{ item['ID'] }},edit=false)">
+                                            Add New
                                         </button>
                                         <button type="button" class="btn btn-success" id="removeRow" value="Send" onclick="RemoveRow()">
-                                            Delete Row
+                                            Delete All
                                         </button>
                                 </div>
                             </div>
@@ -228,8 +228,8 @@ function fillSolutionForm(solID, edit=false){
     // Bind the appropriate handlers depends on edit value
     $(document).on('submit', '#solutionForm', function (e) {
     e.preventDefault();
-    if (edit){submitEditSolForm(this,solid=solID, event=e)}
-    else {submitNewUserForm(this, event=e)}
+    if (edit){submitEditSolForm(this,solId=solID, event=e)}
+    else {submitNewSolForm(this, event=e)}
     })
 
 }
@@ -238,7 +238,7 @@ function fillSolutionForm(solID, edit=false){
 
 
 
-function deleteSolution(solID) {
+function deleteSolution(solId) {
     console.log('DELETE Solution.');
     swal({
           title: "Are you sure?",
@@ -254,13 +254,12 @@ function deleteSolution(solID) {
                 type: "DELETE"
             }).done(function (res) {
                 console.log(res);
-                swal("Success!", "User has been deleted successfully", "success").then((value) => {
+                swal("Success!", "User has been successfully deleted.", "success").then((value) => {
                 document.location.reload()
                 });
             }).fail(function (res) {
                 let resJson = JSON.parse(res.responseText);
                 swal("Error!", resJson.msg, "error").then((value) => {
-                  document.location.reload()
                 });
             });
 
@@ -270,8 +269,25 @@ function deleteSolution(solID) {
         });
  }
 
+function submitNewSolForm(form, event) {
+    console.log('EDIT Solution.');
+     $.ajax({
+        url: '/admin/assistant/' + assitantID +'/solution',
+        type: "POST",
+        data: $('#solutionForm').serialize()
+    }).done(function (res) {
+        console.log(res);
+        swal("Success!", "Solution has been successfully added.", "success").then((value) => {
+          document.location.reload()
+        })
+    }).fail(function (res) {
+        let resJson = JSON.parse(res.responseText);
+        swal("Error!", resJson.msg, "error").then((value) => {
+        });
+    });
+}
 
-function submitEditSolForm(form,solID, event) {
+function submitEditSolForm(form,solId, event) {
     console.log('EDIT Solution.');
      $.ajax({
         url: '/admin/solution/' + solID,
@@ -279,7 +295,7 @@ function submitEditSolForm(form,solID, event) {
         data: $('#solutionForm').serialize()
     }).done(function (res) {
         console.log(res);
-        swal("Success!", "Solution has been updated successfully", "success").then((value) => {
+        swal("Success!", "Solution has been successfully updated.", "success").then((value) => {
           document.location.reload()
         })
     }).fail(function (res) {
@@ -291,118 +307,87 @@ function submitEditSolForm(form,solID, event) {
 
 
 
-    // events Listeners Functions
-    //document.getElementById("addRow").addEventListener("click", AddRow);
-    function AddRow() {
-        console.log("adding row");
-        i++;
-        $("#tbody").append("<tr id=\"tr" + String(i) + "\">\
-        <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\
-        <td><input required style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\
-        <td><input required style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\" onchange='validate(this)'></td>\
-        <td><input required style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\" onchange='validate(this)' ></td>\
-        <td><input required style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\" onchange='validate(this)' ></td>\
-        <td><input required style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\" onchange='validate(this)' ></td>\
-        <td><input required style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\" onchange='validate(this)' ></td>\
-        <td><input required style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\" onchange='validate(this)' ></td>\
-        </tr>");
+// events Listeners Functions
+//document.getElementById("addRow").addEventListener("click", AddRow);
+function AddRow() {
+    console.log("adding row");
+    i++;
+    $("#tbody").append("<tr id=\"tr" + String(i) + "\">\
+    <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\
+    <td><input required style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\
+    <td><input required style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\" onchange='validate(this)'></td>\
+    <td><input required style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\" onchange='validate(this)' ></td>\
+    <td><input required style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\" onchange='validate(this)' ></td>\
+    <td><input required style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\" onchange='validate(this)' ></td>\
+    <td><input required style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\" onchange='validate(this)' ></td>\
+    <td><input required style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\" onchange='validate(this)' ></td>\
+    </tr>");
+}
+function validate(element) {
+    var elName = element.name
+    if ((elName).includes('product_Name')) {
+        var name = element.value
+        if (name.length < 2)
+            noPass(element,'Data1 should be more than 2 letters')
+        else
+            pass(element)
     }
-    function validate(element) {
-        var elName = element.name
-        if ((elName).includes('product_Name')) {
-            var name = element.value
-            if (name.length < 2)
-                noPass(element,'Data1 should be more than 2 letters')
-            else
-                pass(element)
-        }
-        else if ((elName).includes('product_Brand')) {
-            var brand = element.value
-            if (brand.length < 2)
-                noPass(element,'Data2 should be more than 2 letters')
-            else
-                pass(element)
-        }
-        else if ((elName).includes('product_Model')) {
-            var model = element.value
-            if (model.length < 2)
-                noPass(element,'Data3 should be more than 2 letters')
-            else
-                pass(element)
-        }
-        else if ((elName).includes('product_Price')) {
-            var price = element.value
-            // if there are more currencies we need to add it to the regex string
-            var regex =/^[$£€][\d\.,]+/
+    else if ((elName).includes('product_Brand')) {
+        var brand = element.value
+        if (brand.length < 2)
+            noPass(element,'Data2 should be more than 2 letters')
+        else
+            pass(element)
+    }
+    else if ((elName).includes('product_Model')) {
+        var model = element.value
+        if (model.length < 2)
+            noPass(element,'Data3 should be more than 2 letters')
+        else
+            pass(element)
+    }
+    else if ((elName).includes('product_Price')) {
+        var price = element.value
+        // if there are more currencies we need to add it to the regex string
+        var regex =/^[$£€][\d\.,]+/
 
-            if (regex.test(price))
-                pass(element)
-            else
-                noPass(element,'<h3>Price should be in this format <b>[currency][numbers]</b></h3> <br> <h4> Where the approved currencies are ($, £, and €) </h4> <br> <h5> E.g: <code>$3200.50    -    £250,000.50 - €4,000</code></h5>')
-        }
-        else if ((elName).includes('product_Keywords')) {
-            // TODO:
-            var keywords = element.value
-        }
-        else if ((elName).includes('product_Discount')) {
-            // TODO:
-            var discount = element.value
-        }
-        else if ((elName).includes('product_URL')) {
-            var userURL = element.value
-            var URLRegex = /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/;
+        if (regex.test(price))
+            pass(element)
+        else
+            noPass(element,'<h3>Price should be in this format <b>[currency][numbers]</b></h3> <br> <h4> Where the approved currencies are ($, £, and €) </h4> <br> <h5> E.g: <code>$3200.50    -    £250,000.50 - €4,000</code></h5>')
+    }
+    else if ((elName).includes('product_Keywords')) {
+        // TODO:
+        var keywords = element.value
+    }
+    else if ((elName).includes('product_Discount')) {
+        // TODO:
+        var discount = element.value
+    }
+    else if ((elName).includes('product_URL')) {
+        var userURL = element.value
+        var URLRegex = /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/;
 
-            if (userURL.match(URLRegex))
-                pass(element)
-            else
-                noPass(element,"Please enter your website URL correctly.")
-        }
-
-        // helping function
-        function pass(element) {
-            element.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
-            setTimeout(function () {
-                element.style.boxShadow=""
-                element.style.transition="box-shadow 1s ease-in-out"
-            }, 500);
-        }
-        function noPass(element,text) {
-            element.style.boxShadow="0 0 9px 0px #f44336"
-            alertError('Input Error',text)
-        }
+        if (userURL.match(URLRegex))
+            pass(element)
+        else
+            noPass(element,"Please enter your website URL correctly.")
     }
 
-    //document.getElementById("removeRow").addEventListener("click", RemoveRow);
-    function RemoveRow() {
-        var confirmDelete = confirm('Are you sure you want to delete this row?')
-        if (confirmDelete) {
-            for (var c = 1; c <= i; c++) {
-                try {
-                    if (document.getElementById("cb" + String(c)).checked) {
-                        document.getElementById("tr" + String(c)).remove();
-                        c--;
-                        for (var v = c; v <= i; v++) {
-                            document.getElementsByName("product_Delete" + String(v + 1))[0].setAttribute("name", "product_Delete" + String(v));
-                            document.getElementsByName("product_ID" + String(v + 1))[0].setAttribute("name", "product_ID" + String(v));
-                            document.getElementsByName("product_Name" + String(v + 1))[0].setAttribute("name", "product_Name" + String(v));
-                            document.getElementsByName("product_Brand" + String(v + 1))[0].setAttribute("name", "product_Brand" + String(v));
-                            document.getElementsByName("product_Model" + String(v + 1))[0].setAttribute("name", "product_Model" + String(v));
-                            document.getElementsByName("product_Discount" + String(v + 1))[0].setAttribute("name", "product_Discount" + String(v));
-                            document.getElementsByName("product_Price" + String(v + 1))[0].setAttribute("name", "product_Price" + String(v));
-                            document.getElementsByName("product_Keywords" + String(v + 1))[0].setAttribute("name", "product_Keywords" + String(v));
-                            document.getElementsByName("product_URL" + String(v + 1))[0].setAttribute("name", "product_URL" + String(v));
-                            i--;
-                        }
-                    }
-                }
-                catch (exx) {
-                    // console.log("Skip " + String(c));
-                    console.log(exx);
-                }
-            }
-            $("form>button[type=submit]").click()
-        }
+    // helping function
+    function pass(element) {
+        element.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+        setTimeout(function () {
+            element.style.boxShadow=""
+            element.style.transition="box-shadow 1s ease-in-out"
+        }, 500);
     }
+    function noPass(element,text) {
+        element.style.boxShadow="0 0 9px 0px #f44336"
+        alertError('Input Error',text)
+    }
+}
+
 
     //document.getElementById('uploadButton').addEventListener('click',uploadProductFile)
     function uploadProductFile() {

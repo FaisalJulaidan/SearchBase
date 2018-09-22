@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, flash, session
 from services import solutions_services, admin_services, assistant_services, sub_services, company_services
-from models import Callback, Solution, Company
+from models import Callback, Solution, Company, Assistant
 from utilties import helpers
 
 solutions_router: Blueprint = Blueprint('Solutions_router', __name__, template_folder="../../templates")
@@ -102,8 +102,8 @@ def admin_solutions(assistantID):
         return redirect("/admin/assistant/{}/solutions".format(assistantID))
 
 
-@solutions_router.route("/admin/solution/<solID>", methods=['PUT, DELETE'])
-def update_solution(solID):
+@solutions_router.route("/admin/solution/<solID>", methods=['PUT', 'DELETE'])
+def update_and_delete_solution(solID):
 
     # Get the admin user who is logged in and wants to edit and delete.
     callback: Callback = company_services.getByID(session.get('CompanyID', 0))
@@ -164,6 +164,40 @@ def update_solution(solID):
             return helpers.jsonResponse(False, 400, callback.Message)
 
         return helpers.jsonResponse(True, 200, "Solution successfully removed.")
+
+
+@solutions_router.route("/admin/assistant/<assistantID>/solution", methods=['POST'])
+def create_solution(assistantID):
+
+    callback: Callback = assistant_services.getByID(assistantID)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+    assistant: Assistant = callback.Data
+
+    if request.method == "POST":
+
+        # Solution info
+        id = request.form.get("inputId", default='').strip()
+        majorTitle = request.form.get("inputMajorTitle", default='').strip()
+        secondaryTitle = request.form.get("inputSecondaryTitle", default='').strip()
+        shortDescription = request.form.get("inputShortDescription", default='').strip()
+        money = request.form.get("inputMoney", default='').strip()
+        keywords = request.form.get("inputKeywords", default='').strip()
+        URL = request.form.get("inputURL", default='').strip()
+
+        if not helpers.isStringsLengthGreaterThanZero(id, majorTitle, money, URL):
+            return helpers.jsonResponse(False, 400, "Please provide all required info for the new solution.")
+
+        # TODO: add restriction to only add limited number of solution based on plan
+        ########## HERE ###########
+
+        # Create the solution
+        callback: Callback = solutions_services.createNew(assistant, majorTitle, money, URL,
+                                                       secondaryTitle, shortDescription, keywords)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+
+        return helpers.jsonResponse(True, 200, "Solution successfully added.")
 
 
 # TODO improve

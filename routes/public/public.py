@@ -31,6 +31,12 @@ def test_chatbot_page(assistantID):
         return render_template("chatbot-template.html")
 
 
+@public_router.route("/chatTest/<assistantID>", methods=['GET'])
+def test_chatbot_page1(assistantID):
+    if request.method == "GET":
+        return render_template("chatbot-template1.html")
+
+
 @public_router.route("/assistant/<int:assistantID>/chatbot", methods=['GET', 'POST'])
 def chatbot(assistantID):
     # For all type of requests, get the assistant
@@ -341,7 +347,7 @@ def verify_account(payload):
             return helpers.redirectWithMessage("login", "Email verification link failed. Please contact Customer Support in order to resolve this.")
 
 
-    
+
 ## Error Handlers ##
 @public_router.errorhandler(status.HTTP_400_BAD_REQUEST)
 def bad_request(e):

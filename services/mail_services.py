@@ -15,7 +15,7 @@ def sendVerificationEmail(email, companyName, fullname) -> Callback:
     try:
 
         payload = email + ";" + companyName
-        link = "http://127.0.0.1:5000/account/verify/" + verificationSigner.dumps(payload)
+        link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
 
         send_email((email), 'Account verification', 
                '/emails/verification.html', link = link)

@@ -92,7 +92,7 @@
                                     <div class="input-group" style="margin-bottom: 5px;">
                                         <label class="checkboxContainer" style="margin-bottom: 5px;">
                                             <strong>Tracking your data</strong>
-                                            {%if newsletters%}
+                                            {%if userSettings.TrackingData%}
                                             <input name="tracking" value="trackingON" type="checkbox" checked />
                                             {%else%}
                                             <input name="tracking" value="trackingON" type="checkbox" />
@@ -110,7 +110,7 @@
                                     <div class="input-group" style="margin-bottom: 5px;">
                                         <label class="checkboxContainer" style="margin-bottom: 5px;">
                                             <strong>Technical Support</strong>
-                                            {%if newsletters%}
+                                            {%if userSettings.TechnicalSupport%}
                                             <input name="techSupport" value="techSupportON" type="checkbox" checked />
                                             {%else%}
                                             <input name="techSupport" value="techSupportON" type="checkbox" />
@@ -125,7 +125,7 @@
                                     <div class="input-group" style="margin-bottom: 5px;">
                                         <label class="checkboxContainer" style="margin-bottom: 5px;">
                                             <strong>Account Specialist</strong>
-                                            {%if newsletters%}
+                                            {%if userSettings.AccountSpecialist%}
                                             <input name="accountSpecialist" value="accountSpecialistON" type="checkbox" checked />
                                             {%else%}
                                             <input name="accountSpecialist" value="accountSpecialistON" type="checkbox" />

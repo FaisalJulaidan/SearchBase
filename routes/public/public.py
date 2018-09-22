@@ -318,7 +318,7 @@ def signup():
 
         # If error while sending verification email
         if not mail_callback.Success:
-            helpers.redirectWithMessage('signup', 'Signed up successfully but > ' + mail_callback.Message
+            return helpers.redirectWithMessage('signup', 'Signed up successfully but > ' + mail_callback.Message
                                         + '. Please contact TheSearchBaseStaff to activate your account.')
 
         return helpers.redirectWithMessage("login", "We have sent you a verification email. Please use it to complete the sign up process.")

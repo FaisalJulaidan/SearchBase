@@ -41,7 +41,7 @@ def sendPasswordResetEmail(email, companyID):
         link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
         
         send_email((email), 'Password reset', 
-               '/emails/reset-password.html', link = link)
+               '/emails/reset_password.html', link = link)
 
     except Exception as e:
         print("sendPasswordResetEmail() Error: ", e)

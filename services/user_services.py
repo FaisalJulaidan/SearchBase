@@ -1,6 +1,6 @@
 import sqlalchemy.exc
 
-from models import db, Callback, User, Company, Role
+from models import db, Callback, User, Company, Role, UserSettings
 from utilties import helpers
 from sqlalchemy.sql import exists, func
 
@@ -216,5 +216,34 @@ def updateStripeID(email, cusID: str):
     db.session.commit()
     return Callback(True, 'StripeID is updated successfully')
 
+def createUpdateUserSettings(userID, trackingData, techSupport, accountSpecialist):
+    try:
+        result = db.session.query(UserSettings).filter(UserSettings.ID == userID).first()
+        if not result: 
+            newUser = UserSettings(ID=userID, TrackingData=trackingData, TechnicalSupport=techSupport, AccountSpecialist=accountSpecialist)
+            db.session.add(newUser)
+        else:
+            result.TrackingData = trackingData
+            result.TechnicalSupport = techSupport
+            result.AccountSpecialist = accountSpecialist
 
+        db.session.commit()
+        return Callback(True,
+                        'User settings were successfully updated.',
+                        result)
+    except Exception as exc:
+        print("user_services.getUserSettings() ERROR: ", exc)
+        return Callback(False,
+                        'User settings could not be updated.')
 
+def getUserSettings(userID):
+    try:
+        result = db.session.query(UserSettings).filter(UserSettings.ID == userID).first()
+
+        return Callback(True,
+                        'User settings were successfully retrieved.',
+                        result)
+    except Exception as exc:
+        print("user_services.getUserSettings() ERROR: ", exc)
+        return Callback(False,
+                        'User settings for this user does not exist.')

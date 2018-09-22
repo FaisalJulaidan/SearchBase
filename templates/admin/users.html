@@ -95,7 +95,7 @@
                             <table id="rolesTable" class="table" cellspacing="0" width="100%">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
+                                        <!--<th>ID</th>-->
                                         <th>Role</th>
                                         <th>Edit Chatbots</th>
                                         <th>Edit Users</th>
@@ -108,29 +108,29 @@
                                     {% if roles|length > 0 %}
                                     {% for role in roles %}
                                     <tr data-rowID={{ role.ID }}>
-                                        <td data-type="id">{{ role.ID }}</td>
+                                        <!--<td data-type="id">{{ role.ID }}</td>-->
                                         <td data-type="name">{{ role.Name }}</td>
                                         <td data-type="editChatbots">
                                             <label class="checkbox-inline">
-                                            <input type="checkbox" name="editChatbots" {% if role.EditChatbots %} checked {% endif %}>
+                                            <input type="checkbox" name="editChatbots" {% if role.EditChatbots %} checked {% endif %}{%if role.Name == 'Owner'%}onclick="return false;"{%endif%}>
                                             </label>
                                         </td>
 
                                         <td data-type="editUsers">
                                             <label class="checkbox-inline">
-                                            <input type="checkbox" name="editUsers" {% if role.EditUsers %} checked {% endif %}>
+                                            <input type="checkbox" name="editUsers" {% if role.EditUsers %} checked {% endif %}{%if role.Name == 'Owner'%}onclick="return false;"{%endif%}>
                                             </label>
                                         </td>
 
                                         <td data-type="deleteUsers">
                                             <label class="checkbox-inline">
-                                            <input type="checkbox" name="deleteUsers" {% if role.DeleteUsers %} checked {% endif %}>
+                                            <input type="checkbox" name="deleteUsers" {% if role.DeleteUsers %} checked {% endif %}{%if role.Name == 'Owner'%}onclick="return false;"{%endif%}>
                                             </label>
                                         </td>
 
                                         <td data-type="accessBilling">
                                             <label class="checkbox-inline">
-                                            <input type="checkbox"  name="accessBilling" {% if role.AccessBilling %} checked {% endif %}>
+                                            <input type="checkbox"  name="accessBilling" {% if role.AccessBilling %} checked {% endif %}{%if role.Name == 'Owner'%}onclick="return false;"{%endif%}>
                                             </label>
                                         </td>
                                     </tr>

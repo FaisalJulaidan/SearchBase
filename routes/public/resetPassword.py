@@ -11,7 +11,8 @@ verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y
 @resetPassword_router.route("/account/resetpassword", methods=["GET", "POST"])
 def reset_password():
     if request.method == "GET":
-        return render_template("accounts/resetpassword.html")
+        msg = helpers.checkForMessage()
+        return render_template("accounts/resetpassword.html", msg=msg)
     else:
          email = request.form.get("email", default="Error")
 
@@ -44,6 +45,6 @@ def reset_password_verify(payload):
         password = request.form.get("password", default="Error")
 
         changePassword_callback : Callback = user_services.changePasswordByEmail(email, password)
-        if not changePassword_callback.Success : return helpers.redirectWithMessage("reset_password_verify", changePassword_callback.Message)
+        if not changePassword_callback.Success : return helpers.redirectWithMessage("reset_password", changePassword_callback.Message + ". Please try again.")
 
         return helpers.redirectWithMessage("login", changePassword_callback.Message) 

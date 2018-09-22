@@ -1,10 +1,11 @@
 import sqlalchemy.exc
-
+import re
 from models import db,Callback,Solution, Assistant
-from sqlalchemy import func
+from sqlalchemy import func, exists
 from utilties import helpers
 
 
+# Scoring System
 def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Callback:
 
     # Get solutions
@@ -40,6 +41,57 @@ def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Call
     return Callback(True, 'Solutions based on keywords retrieved successfully!!', result)
 
 
+def getByID(id):
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(Solution).get(id)
+        if not result: raise Exception
+
+        return Callback(True, 'Solutions have been successfully retrieved', result)
+    except Exception as exc:
+        print("getByAssistantID Error: ", exc)
+        return Callback(False, 'Could not retrieve solutions for ID: ' + str(id))
+
+
+def update(solution: Solution, solId, majorTitle, money, URL, secTitle='', shortDesc='', keywords=''):
+    try:
+        # Validate the keywords address using a regex. (k,k) correct (k) correct (,k) incorrect
+        if len(keywords) > 0:
+            if not re.match("^([a-zA-Z]+|\\b,\\b)+$", keywords):
+                return Callback(False, "keyword doesn't follow the correct format ex. key1,key2...")
+
+        # Update solution
+        solution.SolutionID = solId
+        solution.MajorTitle = majorTitle
+        solution.SecondaryTitle = secTitle
+        solution.ShortDescription = shortDesc
+        solution.Money = money
+        solution.Keywords = keywords
+        solution.URL = URL
+
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Sorry, Could not create the solution')
+
+    # Save
+    db.session.commit()
+    return Callback(True, 'Solution has been successfully edited.')
+
+
+def remove(solution: Solution) -> Callback:
+    try:
+        solution.delete()
+
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, "Solution could not be removed.")
+    # Save
+    db.session.commit()
+    return Callback(True, "Solution with id has been successfully removed.")
+
+
 def getByAssistantID(assistantID):
     try:
         # Get result and check if None then raise exception
@@ -69,6 +121,7 @@ def getAllByAssistantID(assistantID):
     except Exception as exc:
         print("getByAssistantID Error: ", exc)
         return Callback(False, 'Could not retrieve solutions for ID: ' + str(assistantID))
+
 
 def deleteAllByAssistantID(assistantID):
 

@@ -66,7 +66,6 @@
                                         </div>
                                     </div>
 
-                                    <form action="/admin/assistant/{{ id }}/solutions" method="post" enctype="multipart/form-data">
                                         <table id="solutionsTable" class="table" cellspacing="0" width="100%">
                                             <thead>
                                                 <tr>
@@ -78,6 +77,7 @@
                                                     <th>Money</th>
                                                     <th>Keywords</th>
                                                     <th>URL</th>
+                                                    <th>Edit / Delete</th>
                                                 </tr>
                                             </thead>
 
@@ -85,14 +85,14 @@
                                             <tbody id="tbody">
                                                 {%for item in data%}
                                                    <tr data-rowid="{{ item['ID'] }}">
-                                                    <td id="cb" style="width: 30px;" type="checkbox" name="product_Delete"></td>\
-                                                    <td><input required value="{{ item['SolutionID'] }}" data-type="id" type="text" name="product_ID"></td>
-                                                    <td><input required value="{{ item['MajorTitle'] }}" data-type="majorTitle"type="text" name="product_Name" onchange='validateName(this)'></td>
-                                                    <td><input required value="{{ item['SecondaryTitle'] }}"  data-type="secondaryTitle" type="text" name="product_Brand" onchange='validate(this)'></td>
-                                                    <td><input required value="{{ item['ShortDescription'] }}" data-type="shortDescription" type="text" name="product_Model" onchange='validate(this)'></td>
-                                                    <td><input required value="{{ item['Money'] }}" data-type="money" type="text" name="product_Price" onchange='validate(this)'></td>
-                                                    <td><input required value="{{ item['Keywords'] }}"  data-type="keywords" type="text" name="product_Keywords" onchange='validate(this)'></td>
-                                                    <td><input required value="{{ item['URL'] }}" data-type="URL" type="text" name="product_Keywords" onchange='validate(this)'></td>
+                                                    <td data-type="deleteCheckBox"><input type="checkbox" ></td>\
+                                                    <td data-type="id" type="text"> {{ item['SolutionID'] }}</td>
+                                                    <td data-type="majorTitle"type="text"  onchange='validateName(this)'>{{ item['MajorTitle'] }} </td>
+                                                    <td data-type="secondaryTitle" type="text"  onchange='validate(this)'>{{ item['SecondaryTitle'] }}</td>
+                                                    <td data-type="shortDescription" type="text"  onchange='validate(this)'>{{ item['ShortDescription'] }}</td>
+                                                    <td data-type="money" type="text"  onchange='validate(this)'>{{ item['Money'] }}</td>
+                                                    <td data-type="keywords" type="text"  onchange='validate(this)'>{{ item['Keywords'] }}</td>
+                                                    <td data-type="URL" type="text" name="product_Keywords" onchange='validate(this)'>{{ item['URL'] }}</td>
                                                     <td>
                                                        <button type="button" class="btn btn-primary"
                                                             data-toggle="modal"
@@ -102,6 +102,7 @@
                                                     </tr>
                                                 {% endfor %}
                                             </tbody>
+
                                         </table>
                                         <button type="submit" class="btn btn-success" value="Send">
                                             Save Updates
@@ -112,7 +113,6 @@
                                         <button type="button" class="btn btn-success" id="removeRow" value="Send" onclick="RemoveRow()">
                                             Delete Row
                                         </button>
-                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -208,7 +208,7 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
 
 function fillSolutionForm(solID, edit=false){
     var $form = $('form#solutionForm');
-    var $row = $('#solutionsTable tbody tr[data-data-rowid="' + solID + '"]');
+    var $row = $('#solutionsTable tbody tr[data-rowid="' + solID + '"]');
     console.log($row);
 
     $('#solutionModal').modal('show');
@@ -239,6 +239,7 @@ function fillSolutionForm(solID, edit=false){
 
 
 function deleteSolution(solID) {
+    console.log('DELETE Solution.');
     swal({
           title: "Are you sure?",
           text: "Solution will be removed completely from the system",
@@ -248,14 +249,13 @@ function deleteSolution(solID) {
         })
         .then((willDelete) => {
           if (willDelete) {
-            document.location.reload()
             $.ajax({
                 url: '/admin/solution/' + solID,
                 type: "DELETE"
             }).done(function (res) {
                 console.log(res);
                 swal("Success!", "User has been deleted successfully", "success").then((value) => {
-                  document.location = "admin/assistant/manage"
+                document.location.reload()
                 });
             }).fail(function (res) {
                 let resJson = JSON.parse(res.responseText);
@@ -276,7 +276,7 @@ function submitEditSolForm(form,solID, event) {
      $.ajax({
         url: '/admin/solution/' + solID,
         type: "PUT",
-        data: form.serialize()
+        data: $('#solutionForm').serialize()
     }).done(function (res) {
         console.log(res);
         swal("Success!", "Solution has been updated successfully", "success").then((value) => {
@@ -290,38 +290,6 @@ function submitEditSolForm(form,solID, event) {
 }
 
 
-    // data parsing
-    {#var numberOfProducts = 0;#}
-    {#console.log("{{data}}")#}
-    {#{%for item in data%}#}
-    {#    numberOfProducts++;#}
-    {#{%endfor%}#}
-    {##}
-    {#var data = createArray(numberOfProducts);#}
-    {#var i = 0;#}
-    {##}
-    {#{%for item in data%}#}
-    {#    data[i] = ['{{item["SolutionID"]}}', '{{item["MajorTitle"]}}', '{{item["SecondaryTitle"]}}',#}
-    {#        '{{item["ShortDescription"]}}', '{{item["Money"]}}', '{{item["Keywords"]}}', '{{item["URL"]}}'];#}
-    {#    i++;#}
-    {#{%endfor%}#}
-    {##}
-    {#console.log("{{data}}");#}
-    {#// first time rendering#}
-    {#i = 0;#}
-    {#for (var c = 0; c < data.length; c++) {#}
-    {#    i++;#}
-    {#    $("#tbody").append("<tr id=\"tr" + String(i) + "\">\#}
-    {#    <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\#}
-    {#    <td><input required value=\"" + data[c][0] + "\" style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\#}
-    {#    <td><input required value=\"" + data[c][1] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\" onchange='validateName(this)'></td>\#}
-    {#    <td><input required value=\"" + data[c][2] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\" onchange='validate(this)'></td>\#}
-    {#    <td><input required value=\"" + data[c][3] + "\" style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\" onchange='validate(this)'></td>\#}
-    {#    <td><input required value=\"" + data[c][4] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\" onchange='validate(this)'></td>\#}
-    {#    <td><input required value=\"" + data[c][5] + "\" style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\" onchange='validate(this)'></td>\#}
-    {#    <td><input required value=\"" + data[c][6] + "\" style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\" onchange='validate(this)'></td>\#}
-    {#    </tr>");#}
-    {#}#}
 
     // events Listeners Functions
     //document.getElementById("addRow").addEventListener("click", AddRow);
@@ -483,29 +451,28 @@ function submitEditSolForm(form,solID, event) {
         return arrayRow;
     }
 
-    // Hide Extended Logic depending on user Plan
-    params = "";
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/admin/getadminpagesdata", true);
-    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xhttp.onreadystatechange = function () {
-        if (xhttp.readyState === 4) {
-            if (xhttp.status === 200) {
-                var responseString = xhttp.responseText
-
-                //get user's plan restrictions
-                restrictions = responseString.split("&&&")[2];
-                if (restrictions.includes("ImportDatabase:False")) {
-                    $("#productFileForm").hide();
-                }
-                //ACTIVATE THE PAGE
-            }
-            else {
-                console.error(xhttp.statusText);
-            }
-        }
-    };
-    xhttp.send(params);
+    {#// Hide Extended Logic depending on user Plan#}
+    {#params = "";#}
+    {#var xhttp = new XMLHttpRequest();#}
+    {#xhttp.open("POST", "/admin/getadminpagesdata", true);#}
+    {#xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");#}
+    {#xhttp.onreadystatechange = function () {#}
+    {#    if (xhttp.readyState === 4) {#}
+    {#        if (xhttp.status === 200) {#}
+    {#            var responseString = xhttp.responseText#}
+    {##}
+    {#            //get user's plan restrictions#}
+    {#            restrictions = responseString.split("&&&")[2];#}
+    {#            if (restrictions.includes("ImportDatabase:False")) {#}
+    {#                $("#productFileForm").hide();#}
+    {#            }#}
+    {#            //ACTIVATE THE PAGE#}
+    {#        }#}
+    {#        else {#}
+    {#            console.error(xhttp.statusText);#}
+    {#        }#}
+    {#    }#}
+    {#xhttp.send(params);#}
 
 </script>
 {% endblock %}

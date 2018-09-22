@@ -1,5 +1,7 @@
 import os
 from models import useEncryption
+from datetime import timedelta
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -8,7 +10,7 @@ class BaseConfig(object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'theNewDB.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    ENV = 'production'
+    ENV = 'development'
     DEBUG = False
     TESTING = False
 
@@ -18,6 +20,7 @@ class BaseConfig(object):
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))
     PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
     USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
 
     SECRET_KEY = os.urandom(24)
     CSRF_SESSION_KEY = os.urandom(24)
@@ -36,9 +39,10 @@ class DevelopmentConfig(BaseConfig):
     ENV = 'development'
     DEBUG = True
     TESTING = True
+    FAISAL= True
 
 
 class TestingConfig(BaseConfig):
-    ENV = 'development'
+    ENV = 'test'
     DEBUG = False
     TESTING = True

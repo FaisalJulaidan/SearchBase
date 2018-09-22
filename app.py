@@ -47,7 +47,6 @@ def before_request():
     restrictedRoutes = ['/admin', 'admin/dashboard']
 
     # If the user try to visit one of the restricted routes without logging in he will be redirected
-    print(session.get('Logged_in', False))
     if any(route in currentURL for route in restrictedRoutes) and not session.get('Logged_in', False):
         return redirect('login')
 

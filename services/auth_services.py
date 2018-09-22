@@ -53,7 +53,7 @@ def signup(email, firstname, surname, password, companyName, companyPhoneNumber,
 
     # ###############
     # Just for testing, But to be REMOVED because user has to verify this manually
-    user_services.verifyByEmail(email)
+    # user_services.verifyByEmail(email)
     # ###############
 
     # Return a callback with a message

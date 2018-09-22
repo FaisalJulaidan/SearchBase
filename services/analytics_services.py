@@ -15,7 +15,8 @@ def getAnalytics(assistant, periodSpace: int, topSolustions: int):
                   'timeSpentAvgOvertime': getTimeSpentAvgOvertime(id, periodSpace),
                   'TotalQuestionsOverMonth':getTotalQuestionsOverMonth(id),
                   'UsersOvertime': getUsersOvertime(id, periodSpace),
-                  'TotalSolutionsOverMonth':getTotalSolutionsOverMonth(id)}
+                  'TotalSolutionsOverMonth':getTotalSolutionsOverMonth(id),
+                  'TotalUsers': getTotalUsers(id)}
 
 
         return Callback(True, 'Analytics processed successfully.', result)
@@ -23,51 +24,55 @@ def getAnalytics(assistant, periodSpace: int, topSolustions: int):
         print(e)
         return Callback(False, 'Error while finding analytics', e.args)
 
-
 def getUsersOvertime(assistantID, periodSpace):
 
     oldestDate = db.session.query(func.min(ChatbotSession.DateTime)).first()[0]
     newestDate = db.session.query(func.max(ChatbotSession.DateTime)).first()[0]
-    print(oldestDate)
     now = datetime.now()
-    # print(now.split('-')[0])
-    # print(now.strftime('%Y-%m-%d'))
     result = []
-    print(1)
     begginingOfYear = datetime.strptime(str(now).split('-')[0]+"-01-01",'%Y-%m-%d')
     endOfYear = datetime.strptime(str(now).split('-')[0]+"-12-30",'%Y-%m-%d')
     while True:
-        print(2)
         current = now
         now -= timedelta(days=7 * periodSpace)
 
-        print(3)
-        if now > oldestDate:
-            print("ADDED")
+        if current >= oldestDate:
             result.append({'x': now.strftime('%Y-%m-%d'), 'y':db.session.query(ChatbotSession).filter(
                 ChatbotSession.AssistantID == assistantID,
                 ChatbotSession.DateTime < current,
                 ChatbotSession.DateTime >= now).count()})
         else:
-            print(4)
-            print(now, " ", datetime.strptime(str(now).split('-')[0]+"-01-01",'%Y-%m-%d'))
-            if now > begginingOfYear:
-                print(5)
-                result.append({'x':now.strftime('%Y-%m-%d'), 'y':random.randint(1,5)})
+            if current >= begginingOfYear:
+                #result.append({'x':now.strftime('%Y-%m-%d'), 'y':random.randint(420,500)}) random data for empty
+                result.append({'x':now.strftime('%Y-%m-%d'), 'y':0})
             else:
-                print(6)
                 break
     now = datetime.now()
     while True:
         now += timedelta(days=7 * periodSpace)
         if now >= newestDate:
-            if now < endOfYear:
-                result = [{'x': now.strftime('%Y-%m-%d'), 'y': random.randint(1,5)}] + result
+            if now <= endOfYear:
+                #result = [{'x': now.strftime('%Y-%m-%d'), 'y': random.randint(360,500)}] + result random data for empty
+                result = [{'x': now.strftime('%Y-%m-%d'), 'y':0}] + result
             else:
                 break
-    print(result)
     return result
 
+def getTotalUsersForCompany(assistants):
+    try:
+        totalClicks = 0
+
+        for assistant in assistants:
+            totalClicks += db.session.query(ChatbotSession).filter( ChatbotSession.AssistantID == assistant.ID, ChatbotSession.DateTime < datetime.now()).count()
+            
+        return Callback(True, 'Users successfully counted.', totalClicks)
+    except Exception as e:
+        print("analytics_services.getTotalUsersForCompany() ERROR: ", e)
+        return Callback(False, 'Error while counting Users.')
+
+def getTotalUsers(assistantID):
+
+    return db.session.query(ChatbotSession).filter( ChatbotSession.AssistantID == assistantID, ChatbotSession.DateTime < datetime.now()).count()
 
 def getTotalQuestionsOverMonth(assistantID):
 
@@ -78,8 +83,6 @@ def getTotalQuestionsOverMonth(assistantID):
     while True:
         current = now
 
-        print(now.month)
-
 
         # total = db.session.query(func.sum(ChatbotSession.QuestionsAnswered)).filter(
         #     ChatbotSession.AssistantID == assistantID,
@@ -89,15 +92,28 @@ def getTotalQuestionsOverMonth(assistantID):
                 ChatbotSession.AssistantID == assistantID,
                 extract('month', ChatbotSession.DateTime) == now.month,
                 ).scalar()
-        print(total)
         if not total:
             total = 0
-        result.append(total)
+        result.append([now.month, total])
         now -= monthdelta(1)
         if now.year < oldestDate.year:
             break
-    print(result)
-    return result
+    position = 0
+    returnArray = []
+    for i in range(12,0,-1):
+        if result[position][1] == 0:
+            del result[position]
+        if position >= len(result): 
+            returnArray.append(0)
+            continue
+        if not i == result[position][0]:
+            returnArray.append(0)
+        else:
+            returnArray.append(result[position][1])
+            result[position] = result[position][1]
+            position += 1
+    print(returnArray)
+    return returnArray
 
 def getTotalSolutionsOverMonth(assistantID):
 
@@ -108,8 +124,6 @@ def getTotalSolutionsOverMonth(assistantID):
     while True:
         current = now
 
-        print("now.weekday():", now.weekday())
-
 
         # total = db.session.query(func.sum(ChatbotSession.QuestionsAnswered)).filter(
         #     ChatbotSession.AssistantID == assistantID,
@@ -119,21 +133,48 @@ def getTotalSolutionsOverMonth(assistantID):
                 ChatbotSession.AssistantID == assistantID,
                 extract('month', ChatbotSession.DateTime) == now.month,
                 ).scalar()
-        print(total)
         if not total:
             total = 0
-        result.append(total)
+        result.append([now.month, total])
         now -= monthdelta(1)
         if now.year < oldestDate.year:
             break
-    print(result)
-    return result
+    position = 0
+    returnArray = []
+    for i in range(12,0,-1):
+        if result[position][1] == 0:
+            del result[position]
+        if position >= len(result): 
+            returnArray.append(0)
+            continue
+        if not i == result[position][0]:
+            returnArray.append(0)
+        else:
+            returnArray.append(result[position][1])
+            result[position] = result[position][1]
+            position += 1
+    print(returnArray)
+    return returnArray
 
 
 def getPopularSolutions(assistantID, top=5):
     return db.session.query(Solution.SolutionID, Solution.MajorTitle, Solution.TimesReturned).filter(Solution.AssistantID == assistantID)\
         .order_by(Solution.TimesReturned.desc()).limit(top).all()
 
+
+def getTotalReturnedSolutionsForCompany(assistants):
+    try:
+        total = 0
+
+        for assistant in assistants:
+            timersReturned = db.session.query(func.sum(Solution.TimesReturned)).filter(Solution.AssistantID == assistant.ID).first()[0]
+            if timersReturned:
+                total += timersReturned
+
+        return Callback(True, 'Solutions number retrieved', total)
+    except Exception as e:
+        print("analytics_services.getTotalReturnedSolutionsForCompany() ERROR: ", e)
+        return Callback(False, 'Error while counting solutions.')
 
 def getTotalReturnedSolutions(assistantID):
     return db.session.query(func.sum(Solution.TimesReturned)).filter(Solution.AssistantID == assistantID).first()[0]

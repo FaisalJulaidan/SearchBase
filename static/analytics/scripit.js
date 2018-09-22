@@ -6,6 +6,7 @@ let timeSpentAvgOvertime = undefined;
 let usersOvertime = undefined;
 let totalQuestionsOverMonth = undefined;
 let totalSolutionsOverMonth = undefined;
+let usersTotal = undefined;
 
 function getAnalytics(){
     $.ajax({
@@ -20,10 +21,11 @@ function getAnalytics(){
         popularSolutions = res.data.popularSolutions;
         totalReturnedSolutions = res.data.totalReturnedSolutions;
         timeSpentAvgOvertime = res.data.timeSpentAvgOvertime;
-        totalQuestionsOverMonth = res.data.TotalQuestionsOverMonth;
-        totalSolutionsOverMonth = res.data.TotalSolutionsOverMonth;
+        totalQuestionsOverMonth = res.data.TotalQuestionsOverMonth.reverse();
+        totalSolutionsOverMonth = res.data.TotalSolutionsOverMonth.reverse();
         console.log("res.data.usersOvertime: ", res.data.UsersOvertime);
         usersOvertime = res.data.UsersOvertime.reverse();
+        usersTotal = res.data.TotalUsers;
         //console.log(usersOvertime.reverse());
         // renderChartJS("line", "line-chart", ["2017-07-04T01:51:02-06:00", "2017-07-04T10:51:02-06:00"], usersOvertime.reverse(), "Total Number of Players Playing", "Date", "Players", "188,4,0", 0); // Number of players
         loadGraphs()
@@ -35,15 +37,15 @@ function getAnalytics(){
 }
 
 function loadGraphs(){
-    console.log(usersOvertime);
+    console.log("usersOvertime: ", usersOvertime);
     var weeklyLabels = getWeeklyLabels(usersOvertime)
     var chartData = {
         labels: weeklyLabels,
         datasets: [{
             label: 'Users Overtime',
             fill: true,
-            lineTension: 0.3,
-            backgroundColor: "rgb(179,76,243)",
+            lineTension: 0.2,
+            backgroundColor: "rgb(193,140,227, 0.5)",
             borderColor: "rgb(138,43,226)",
             borderCapStyle: 'butt',
             borderDash: [],
@@ -79,6 +81,9 @@ function loadGraphs(){
         }
     });
 
+    //TOTAL USERS
+    $("#totalUsersh1").html(usersTotal);
+
     //TOTAL QUESTIONS ANSWERED OVER TIME
 
     var chartData = {
@@ -87,7 +92,7 @@ function loadGraphs(){
             label: 'Total Questions Answered',
             fill: false,
             lineTension: 0.3,
-            backgroundColor: "rgb(138,43,226)",
+            backgroundColor: ["rgb(186,85,211)", "rgb(148,0,211)", "rgb(153,50,204)", "rgb(139,0,139)", "rgb(128, 0, 128)", "rgb(75,0,130)", "rgb(147,112,219)", "rgb(128,0,128)", "rgb(147,112,219)"],
             borderColor: "rgb(138,43,226)",
             borderCapStyle: 'butt',
             borderDash: [],
@@ -108,7 +113,16 @@ function loadGraphs(){
     };
     new Chart(document.getElementById("bar-chart1").getContext("2d"), {
         type: 'bar',
-        data: chartData
+        data: chartData,
+        options: { 
+            scales: {
+                xAxes: [{
+                    gridLines: {
+                        color: "rgba(0, 0, 0, 0)",
+                    }
+                }]
+            }
+        } 
     });
 
     //TOTAL SOLUTIONS RETURNED OVER TIME
@@ -119,7 +133,7 @@ function loadGraphs(){
             label: 'Total Solutions Returned',
             fill: false,
             lineTension: 0.3,
-            backgroundColor: "rgb(138,43,226)",
+            backgroundColor: ["rgb(186,85,211)", "rgb(148,0,211)", "rgb(153,50,204)", "rgb(139,0,139)", "rgb(128, 0, 128)", "rgb(75,0,130)", "rgb(147,112,219)", "rgb(128,0,128)", "rgb(147,112,219)"],
             borderColor: "rgb(138,43,226)",
             borderCapStyle: 'butt',
             borderDash: [],
@@ -140,7 +154,16 @@ function loadGraphs(){
     };
     new Chart(document.getElementById("bar-chart2").getContext("2d"), {
         type: 'bar',
-        data: chartData
+        data: chartData,
+        options: {
+            scales: {
+                xAxes: [{
+                    gridLines: {
+                        color: "rgba(0, 0, 0, 0)",
+                    }
+                }]
+            }
+        } 
     });
 }
 

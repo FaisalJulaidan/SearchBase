@@ -177,7 +177,8 @@ def removeByID(id) -> Callback:
 def verifyByEmail(email: str):
 
     try:
-        db.session.query(User).filter(User.Email == email).update({"Verified": True})
+        user = db.session.query(User).filter(User.Email == email).update({"Verified": True})
+        if not user: raise Exception
 
     except Exception as exc:
         print(exc)

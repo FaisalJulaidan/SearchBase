@@ -335,7 +335,7 @@ def verify_account(payload):
 
             return helpers.redirectWithMessage("login", "Your email has been verified. You can now access your account.")
 
-        except Exception(e):
+        except Exception as e:
 
             print(e)
             return helpers.redirectWithMessage("login", "Email verification link failed. Please contact Customer Support in order to resolve this.")

@@ -2,6 +2,7 @@ import os
 from config import BaseConfig
 from datetime import timedelta
 from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory
+from flask import Blueprint, render_template, request, session, redirect, url_for, json
 from flask_api import status
 from utilties import helpers
 from models import Callback, Assistant, Solution, db, ChatbotSession
@@ -14,15 +15,14 @@ import uuid
 from flask_cors import CORS
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
-CORS(public_router)
+
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 
-@public_router.route("/test", methods=['POST'])
+@public_router.route("/test", methods=['GET'])
 def t():
-    if request.method == "POST":
-        print(request.get_json(silent=True))
-        return helpers.jsonResponse(True, 200, "!!!", None)
+    if request.method == "GET":
+        return render_template("test-chatbot.html")
 
 
 @public_router.route("/chatbottemplate/<assistantID>", methods=['GET'])
@@ -38,7 +38,6 @@ def chatbot(assistantID):
     if not callback.Success:
         return helpers.jsonResponse(False, 404, "Assistant not found.", None)
     assistant: Assistant = callback.Data
-    # analytics_services.getPopularSolutions(assistant, 1)
 
     if request.method == "GET":
         assistant: Assistant = callback.Data
@@ -68,7 +67,7 @@ def chatbot(assistantID):
 def assistant_userdownloads(path):
     if request.method == "GET":
         print("trying to return file")
-        return send_from_directory('static/user_downloads/', "path")
+        return send_from_directory('static/user_downloads/', path)
 
 @public_router.route("/getpopupsettings/<assistantID>", methods=['GET'])
 def get_pop_settings(assistantID):
@@ -270,6 +269,8 @@ def logout():
     session.pop('UserPlan', None)
     session.pop('CompanyID', None)
     session.pop('Logged_in', False)
+    session.clear()
+
 
     return redirect(url_for('public_router.login'))
 
@@ -321,6 +322,24 @@ def signup():
                                         + '. Please contact TheSearchBaseStaff to activate your account.')
 
         return helpers.redirectWithMessage("login", "We have sent you a verification email. Please use it to complete the sign up process.")
+
+@public_router.route("/account/verify/<payload>", methods=['GET'])
+def verify_account(payload):
+    if request.method == "GET":
+        try:
+            data = verificationSigner.loads(payload)
+            email = data.split(";")[0]
+            print("email: ", email)
+            user_callback : Callback = user_services.verifyByEmail(email)
+            if not user_callback.Success: raise Exception(user_callback.Message)
+
+            return helpers.redirectWithMessage("login", "Your email has been verified. You can now access your account.")
+
+        except Exception as e:
+
+            print(e)
+            return helpers.redirectWithMessage("login", "Email verification link failed. Please contact Customer Support in order to resolve this.")
+
 
     
 ## Error Handlers ##

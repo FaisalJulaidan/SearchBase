@@ -11,7 +11,7 @@ def unsubscribe(company: Company) -> Callback:
     try:
         # If user has no sub. already
         if not company.SubID:
-            Callback(False, 'This account has no active subscription to unsubscribe')
+            return Callback(False, 'This account has no active subscription to unsubscribe')
 
         # Unsubscribe
         stripeSub = stripe.Subscription.retrieve(company.SubID)
@@ -24,11 +24,12 @@ def unsubscribe(company: Company) -> Callback:
         return Callback(True, 'You have unsubscribe successfully!')
 
     except Exception as e:
+        print(e)
         db.session.rollback()
         return Callback(False, 'An error occurred while trying to unsubscribe')
 
 
-def subscribe(company: Company, planID, trialDays=None, token=None, coupon=None) -> Callback:
+def subscribe(company: Company, planID, trialDays=None, token=None, coupon='') -> Callback:
 
     # Get the Plan by ID
     plan_callback: Callback = getPlanByID(planID)
@@ -48,15 +49,15 @@ def subscribe(company: Company, planID, trialDays=None, token=None, coupon=None)
     try:
         # Check user if already has a StripeID
         stripeID = company.StripeID
+        print(stripeID)
         if not stripeID:
             return Callback(False, "Sorry, your company doesn't have a Stripe ID to subscribe to a plan")
 
-
         customer = stripe.Customer.retrieve(stripeID)
-        customer.source = token
-        customer.save()
+        if token:
+            customer.source = token
+            customer.save()
 
-        print(customer['default_source'])
 
         # Subscribe to the  plan
         subscription = stripe.Subscription.create(
@@ -65,7 +66,6 @@ def subscribe(company: Company, planID, trialDays=None, token=None, coupon=None)
             trial_period_days=trialDays,
             coupon=coupon
         )
-        print(3)
 
         # Get all company's assistants for activation
 
@@ -148,6 +148,7 @@ def getStripePlanNicknameBySubID(SubID):
 def isCouponValid(coupon) -> Callback:
     try:
         coupon = stripe.Coupon.retrieve(str(coupon))
+        print(coupon)
         if not coupon['valid']:
             return Callback(False, "Coupon has expired.")
         return Callback(True, "Coupon is valid")

@@ -1,6 +1,6 @@
 import sqlalchemy.exc
 
-from services import mail_services, company_services
+from services import mail_services, company_services, role_services
 from models import db, Callback, User, Company, Role, UserSettings
 from utilities import helpers
 from sqlalchemy.sql import exists, func
@@ -256,3 +256,16 @@ def getUserSettings(userID):
         print("user_services.getUserSettings() ERROR: ", exc)
         return Callback(False,
                         'User settings for this user does not exist.')
+
+def getRolePermissions(userID):
+    try:
+        user_callback : Callback = getByID(userID)
+        if not user_callback.Success: raise Exception("User not found")
+
+        role_callback : Callback = role_services.getByID(user_callback.Data.RoleID)
+        if not user_callback.Success: raise Exception("Role not found")
+
+        return Callback(True, 'User Permissions have been retrieved', role_callback.Data)
+    except Exception as exc:
+        print("user_services.getRolePermissions() ERROR: ", exc)
+        return Callback(False, 'Coult not retrieve user\'s permissions.')

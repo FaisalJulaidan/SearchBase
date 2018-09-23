@@ -42,7 +42,7 @@ function chatbotInit(assistantID) {
         // Set assistant and blocks array
         assistant = data.assistant;
         blocks = data.blocks;
-
+        console.log(assistant)
         // Start the chatbot
         //console.log(blocks)
         start();
@@ -61,8 +61,15 @@ function chatbotInit(assistantID) {
 
 
 // This start the lunch the chatbot for the first time
-function start() {
+async function start() {
     // 1.Show the chatbot welcoming message assistant.message
+    showWelcomeMessage();
+
+    await sleep(300);
+    putThinkingGif();
+    await sleep(400);
+    removeThinkingGif();
+    await sleep(200);
 
     // 2.Show the first block in the blocks array then render it depends on its type
     renderBlock(blocks[0]);
@@ -346,6 +353,10 @@ function getNextBlock(action, blockToGoId = undefined) {
     }
 }
 
+function showWelcomeMessage() {
+    sendAssistantMessage(assistant.message)
+}
+
 function SetRepeat() {
     $("#optionsDiv").append("<div style='text-align: center;' onclick=\"Reset()\" id='qAnswers'><a class='answerOptions' style='width:400px;'>Search Again</a></div>");
     checkOutsideElements();
@@ -375,7 +386,7 @@ function sendAssistantMessage(message) {
 }
 
 function putThinkingGif() {
-    $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='/static/images/typing.gif'></li></div>")
+    $("#messagesContainer").append("<div class='tsbDiv' id='thinkingGif'><li class='TSBbot'><img src='/static/images/typing.gif'></li></div><br/>")
     animateMessage("#thinkingGif");
 }
 

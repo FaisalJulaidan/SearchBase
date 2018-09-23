@@ -1,9 +1,11 @@
 #/usr/bin/python3.5
 from flask import Flask, redirect, request, render_template, session
 from datetime import datetime
+from services import assistant_services, user_services
 import os
-from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution, ChatbotSession
+from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution, ChatbotSession, Callback
 from services.mail_services import mail
+from utilties import helpers
 
 
 # Import all routers to register them as blueprints
@@ -47,8 +49,31 @@ def before_request():
     restrictedRoutes = ['/admin', 'admin/dashboard']
 
     # If the user try to visit one of the restricted routes without logging in he will be redirected
-    if any(route in currentURL for route in restrictedRoutes) and not session.get('Logged_in', False):
-        return redirect('login')
+    if any(route in currentURL for route in restrictedRoutes):
+        print("Security Check For Restricted Routes")
+        if not session.get('Logged_in', False):
+            return redirect('login')
+
+        try:
+            print(request.view_args['assistantID'])
+            if request.view_args['assistantID']:
+                assistantID = int(request.view_args['assistantID'])
+
+                ownership_callback : Callback = assistant_services.checkOwnership(assistantID, session.get('CompanyID', None))
+                if not ownership_callback.Success: 
+                    session["returnMessage"] = ownership_callback.Message
+                    return redirect('login')
+
+                role_callback : Callback = user_services.getRolePermissions(session.get('UserID', None))
+                if not role_callback.Success:
+                    session["returnMessage"] = role_callback.Message
+                    return redirect('admin/dashboard')
+
+                if not role_callback.Data.EditChatbots:
+                    session["returnMessage"] = "Your company owner has not allowed you access to this feature."
+                    return redirect('admin/dashboard')
+        except:
+            pass
 
 
 # Generates dummy data for testing

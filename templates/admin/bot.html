@@ -751,12 +751,13 @@
                 }
 
                 class BlockTypeUserInput {
-                    constructor(text, action, validation, storeInDB, type, order, id) {
+                    constructor(text, action, validation, afterMessage, storeInDB, type, order, id) {
                         this.UserInput = {
                             content: {
                                 action: action ? action : 'Go To Next Block',
                                 text: text,
-                                validation: validation
+                                validation: validation,
+                                afterMessage: afterMessage
                             },
                             storeInDB: storeInDB,
                             type: type,
@@ -767,12 +768,13 @@
                 }
 
                 class BlockTypeFileUpload {
-                    constructor(text, action, fileTypes, storeInDB, type, order, id) {
+                    constructor(text, action, fileTypes, afterMessage, storeInDB, type, order, id) {
                         this.FileUpload = {
                             content: {
                                 action: action ? action : 'Go To Next Block',
                                 text: text,
-                                fileTypes: fileTypes
+                                fileTypes: fileTypes,
+                                afterMessage: afterMessage
                             },
                             storeInDB: storeInDB,
                             type: type,
@@ -800,6 +802,7 @@
                         let id = +$block.attr('id');
 
                         let text = (function () {
+                            //debugger
                             let label = $block.children().last().find('.input-group').children().first().text();
                             if (label.includes('Question'))
                                 return $block.children().last().find('.input-group').children().first().next().val();
@@ -812,7 +815,9 @@
                             let answers = $row.children();
                             for (const answer of answers) {
                                 let $answer = $(answer);
+
                                 let text = $answer.children().find('input.form-control').first().val();
+                                let afterMessage = $answer.children().find('input.form-control')[1].value;
                                 let action = $answer.children().find('input.form-control').last().val();
                                 let keywords = (function () {
                                     let keywordsArr = [];
@@ -825,7 +830,8 @@
                                 answersArr.push({
                                     action: action ? action : 'Go To Next Block',
                                     text: text,
-                                    keywords: keywords
+                                    keywords: keywords,
+                                    afterMessage: afterMessage
                                 });
                             }
                         }
@@ -841,10 +847,11 @@
                         })();
                         let action = $block.children().last().find('input.normalCursor').first().val();
                         let validationn = $block.children().last().find('input.normalCursor').last().val();
+                        let afterMessage = $block.children().last().children('.col-md-8').children().last().val();
                         let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                         let id = +$block.attr('id');
 
-                        botData.blocks.push(new BlockTypeUserInput(text, action, validationn, storeInDB, type, order, id).UserInput);
+                        botData.blocks.push(new BlockTypeUserInput(text, action, validationn, afterMessage, storeInDB, type, order, id).UserInput);
                     }
 
                     if (type == 'File Upload') {
@@ -856,17 +863,19 @@
                         let action = $block.children().last().find('input.normalCursor').first().val();
 
                         let fileTypes = [];
-                        $block.children().last().children('.col-md-8').children().last().children().each((i, elem) => {
+                        $block.children().last().children('.col-md-8').first().children().last().children().each((i, elem) => {
                             if (!$(elem).hasClass('not-active'))
                                 fileTypes.push($(elem).text())
                         });
 
+                        let afterMessage = $block.children().last().children('.col-md-8').children().last().val();
+
                         let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                         let id = +$block.attr('id');
 
-                        botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, storeInDB, type, order, id).FileUpload);
+                        botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, afterMessage, storeInDB, type, order, id).FileUpload);
                     }
-                    console.log(botData)
+                    //console.log(botData)
                 }
                 $.ajax({
                     method: 'PUT',
@@ -1193,12 +1202,13 @@
 
                         $answers.append($("<div class='row'></div>"));
                         for (let i = 0; i < answers.length; i++) {
-                            if (rowSize < 3) {
+                            if (rowSize <= 3) {
                                 answerTemplate = $(getAnswerTemplate(actions));
                                 answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
                                 answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
                                 answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
                                 answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].text);
+                                answerTemplate = answerTemplate.replace('AFTER_MESSAGE_VALUE', answers[i].afterMessage); 
 
                                 $answers.children().last().append(answerTemplate);
 
@@ -1206,13 +1216,6 @@
                             }
                             else {
                                 $answers.append($("<div class='row'></div>"));
-
-                                answerTemplate = $(getAnswerTemplate(actions));
-                                answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
-                                answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
-                                answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
-                                answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].text);
-                                $answers.children().last().append(answerTemplate);
 
                                 rowSize = 1;
                             }
@@ -1225,6 +1228,14 @@
                         return "Answers: <span class=\"addAnswerClick clickable\" style=\"margin-bottom: 10px\">\n" +
                             "<i class=\"addAnswer glyphicon glyphicon-plus\"></i>\n" +
                             "</span>"
+                    }
+
+                    function getAfterMessageInput(afterMessage) {
+                        return "<br /> <br />" +
+                            "<div class=\"input-group col-md-8\">\n" +
+                            "  <span class=\"input-group-addon\">After Message:</span>\n" +
+                            "  <input type='text' placeholder='Message to be sent after the question is answered' class='form-control' value='" + afterMessage + "'/>" +
+                            "</div>"
                     }
 
                     function getAnswerTemplate(actions) {
@@ -1250,6 +1261,10 @@
                             // Keywords
                             "      <label for=\"input\">Kewords:</label>\n" +
                             "      <input name='tags' value='KEYWORDS_VALUES'>\n" +
+
+                            // AFTER MESSAGES
+                            "      <label for='#input-after-message'>After Message:</label>\n" +
+                            "      <input class=\"form-control\" type='text' placeholder='Message to be sent after the question is answered' value='AFTER_MESSAGE_VALUE'/><br />"+
 
                             // ACTIONS
                             "      <label for=\".input-group\">Actions:</label>\n" +
@@ -1329,7 +1344,9 @@
                             "       BLOCK_ACTION" +
                             "       BLOCK_VALIDATION" +
                             "       BLOCK_FILE_TYPE" +
+                            "       BLOCK_AFTER_MESSAGE" +
                             "       BLOCK_SUBMIT" +
+
                             "    </div>\n" +
                             "</li>";
 
@@ -1353,11 +1370,15 @@
                         if (block_template.name == "Question") {
                             templateHTML = templateHTML.replace('BLOCK_ANSWERS', getAnswersElement(block_template.actions, block.content.answers));
                             templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', getAddAnswerButton());
+                            templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', '');
                         }
                         else {
                             templateHTML = templateHTML.replace('BLOCK_ANSWERS', '');
                             templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', '');
+                            templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', getAfterMessageInput(block.content.afterMessage))
                         }
+
+                        
 
                         return templateHTML;
                     }
@@ -1489,6 +1510,7 @@
                             "       BLOCK_ACTION" +
                             "       BLOCK_VALIDATION" +
                             "       BLOCK_FILE_TYPE" +
+                            "       BLOCK_AFTER_MESSAGE" +
                             getSubmitElemnt(true, 'x') +
                             "</div>\n";
                         if (block_template.name == "File Upload")
@@ -1510,10 +1532,12 @@
                         if (block_template.name == "Question") {
                             templateHTML = templateHTML.replace('BLOCK_ANSWERS', getAnswersElement(block_template.actions));
                             templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', getAddAnswerButton());
+                            templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', '')
                         }
                         else {
                             templateHTML = templateHTML.replace('BLOCK_ANSWERS', '');
                             templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', '');
+                            templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', getAfterMessageInput(block_template.afterMessage))
                         }
 
                         return templateHTML;

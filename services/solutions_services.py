@@ -1,10 +1,11 @@
 import sqlalchemy.exc
-
+import re
 from models import db,Callback,Solution, Assistant
-from sqlalchemy import func
+from sqlalchemy import func, exists
 from utilties import helpers
 
 
+# Scoring System
 def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Callback:
 
     # Get solutions
@@ -40,20 +41,88 @@ def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Call
     return Callback(True, 'Solutions based on keywords retrieved successfully!!', result)
 
 
-def getByAssistantID(assistantID):
-
+def getByID(id):
     try:
-        if assistantID:
-            # Get result and check if None then raise exception
-            result = db.session.query(Solution).get(assistantID)
-            if not result: raise Exception
+        # Get result and check if None then raise exception
+        result = db.session.query(Solution).get(id)
+        if not result: raise Exception
 
-            return Callback(True, 'Solutions have been successfully retrieved', result)
-        else:
-            raise Exception
+        return Callback(True, 'Solutions have been successfully retrieved', result)
     except Exception as exc:
         print("getByAssistantID Error: ", exc)
-        return Callback(False, 'Could not retrieve solutions for ID: ' + assistantID)
+        return Callback(False, 'Could not retrieve solutions for ID: ' + str(id))
+
+
+def update(solution: Solution, solId, majorTitle, money, URL, secTitle='', shortDesc='', keywords=''):
+    try:
+        # Validate the keywords address using a regex. (k,k) correct (k) correct (,k) incorrect
+        if len(keywords) > 0:
+            if not re.match("^([a-zA-Z]+|\\b,\\b)+$", keywords):
+                return Callback(False, "keyword doesn't follow the correct format ex. key1,key2...")
+
+        # Update solution
+        solution.SolutionID = solId
+        solution.MajorTitle = majorTitle
+        solution.SecondaryTitle = secTitle
+        solution.ShortDescription = shortDesc
+        solution.Money = money
+        solution.Keywords = keywords
+        solution.URL = URL
+
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Sorry, Could not create the solution')
+
+    # Save
+    db.session.commit()
+    return Callback(True, 'Solution has been successfully edited.')
+
+
+def remove(solution: Solution) -> Callback:
+    try:
+        db.session.delete(solution)
+
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, "Solution could not be removed.")
+    # Save
+    db.session.commit()
+    return Callback(True, "Solution with id has been successfully removed.")
+
+
+def getByAssistantID(assistantID):
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(Solution).get(assistantID)
+        if not result: raise Exception
+
+        return Callback(True, 'Solutions have been successfully retrieved', result)
+    except Exception as exc:
+        print("getByAssistantID Error: ", exc)
+        return Callback(False, 'Could not retrieve solutions for ID: ' + str(assistantID))
+
+
+def getAllByAssistantID(assistantID):
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(Solution.ID,
+                                  Solution.SolutionID,
+                                  Solution.MajorTitle,
+                                  Solution.SecondaryTitle,
+                                  Solution.ShortDescription,
+                                  Solution.Money,
+                                  Solution.Keywords,
+                                  Solution.URL,
+                                  Solution.TimesReturned,
+                                  Solution.AssistantID).filter(Solution.AssistantID == assistantID).all()
+        if not result: raise Exception
+        return Callback(True, 'Solutions have been successfully retrieved', result)
+    except Exception as exc:
+        print("getByAssistantID Error: ", exc)
+        return Callback(False, 'Could not retrieve solutions for ID: ' + str(assistantID))
+
 
 def deleteAllByAssistantID(assistantID):
 
@@ -66,11 +135,12 @@ def deleteAllByAssistantID(assistantID):
 
     return True
 
-def createNew(assistantID, id, name, brand, model, price, keywords, discount, url):
+
+def createNew(assistant, majorTitle, money, url, solId='',  secTitle='', shortDesc='', keywords=''):
     try:
         # Create a new user with its associated company and role
-        solution = Solution(AssistantID=assistantID, ProductID=id, Name=name, Brand=brand,
-                            Model=model, Price=price, Keywords=keywords, Discount=discount, URL=url)
+        solution = Solution(Assistant=assistant, SolutionID=solId, MajorTitle=majorTitle, SecondaryTitle=secTitle,
+                            ShortDescription=shortDesc,Money=money, Keywords=keywords, URL=url, TimesReturned=0)
         db.session.add(solution)
 
     except Exception as exc:
@@ -79,7 +149,8 @@ def createNew(assistantID, id, name, brand, model, price, keywords, discount, ur
         return Callback(False, 'Sorry, Could not create the solution.')
     # Save
     db.session.commit()
-    return Callback(True, 'Solution has been created successfully!')
+    return Callback(True, 'Solution has been successfully created.')
+
 
 def bulkAdd(objects):
     try:
@@ -92,6 +163,7 @@ def bulkAdd(objects):
     # Save
     db.session.commit()
     return Callback(True, 'Solutions has been created successfully!')
+
 
 def countRecordsByAssistantID(assistantID):
     try:
@@ -108,10 +180,12 @@ def countRecordsByAssistantID(assistantID):
         return 0
     return numberOfRecords
 
+
 def deleteByAssitantID(assistantID, message):
     deleteOldData : bool = deleteAllByAssistantID(assistantID)
     if not deleteOldData: 
         return helpers.redirectWithMessage("admin_solutions", message)
+
 
 def addOldByAssitantID(assistantID, message, currentSolutions):
     addOldSolutions_callback : Callback = bulkAdd(currentSolutions)

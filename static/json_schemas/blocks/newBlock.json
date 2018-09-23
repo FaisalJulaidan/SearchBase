@@ -6,11 +6,12 @@
     "botVersion": {"enum": ["1.0.0"]},
     "block": {
       "type": "object",
-      "properties":{
-        "type": {"enum": ["Question", "User Input", "File Upload", "Solutions"]},
-        "storeInDB": {"type": "boolean"},
-        "content": {"type": "object"}
-        },
+      "properties": {
+        "type": { "enum": [ "Question", "User Input", "File Upload", "Solutions" ] },
+        "storeInDB": { "type": "boolean" },
+        "content": { "type": "object" },
+        "afterMessage": { "type": "string" }
+      },
       "required": ["type", "storeInDB", "content"],
       "additionalProperties": false
     }

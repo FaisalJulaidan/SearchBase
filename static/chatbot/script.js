@@ -292,11 +292,29 @@ async function submitAnswer(message, blockKeywords = undefined) {
                 action = blockAnswers[i].action;
                 var blockToGoId = blockAnswers[i].blockToGoId;
 
+                if (blockAnswers[i].afterMessage) {
+
+                    sendAssistantMessage(blockAnswers[i].afterMessage);
+                    await sleep(400 + Math.floor(Math.random() * 300))
+                    putThinkingGif();
+                    await sleep(200 + Math.floor(Math.random() * 500));
+                    removeThinkingGif();
+                }
+
                 getNextBlock(action, blockToGoId);
             }
         }
     } else if (currentBlock.type == "User Input" || currentBlock.type == "File Upload") {
         action = currentBlock.content.action;
+
+        if (currentBlock.content.afterMessage) {
+
+            sendAssistantMessage(currentBlock.content.afterMessage);
+            await sleep(400 + Math.floor(Math.random() * 300))
+            putThinkingGif();
+            await sleep(200 + Math.floor(Math.random() * 500));
+            removeThinkingGif();
+        }
 
         getNextBlock(action);
     }

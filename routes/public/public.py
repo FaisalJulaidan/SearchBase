@@ -50,6 +50,7 @@ def chatbot(assistantID):
         return helpers.jsonResponse(True, 200, "No Message", data)
 
     if request.method == "POST":
+        # chatbot collected information
         data = request.get_json(silent=True)
 
         s_callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'])

@@ -1,6 +1,5 @@
-import sqlalchemy.exc
 from models import db, Callback, Newsletter
-from utilties import helpers
+
 
 def addNewsletterPerson(email):
     try:

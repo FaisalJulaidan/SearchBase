@@ -1,6 +1,7 @@
 from flask import Blueprint, request, redirect, flash
 from services import assistant_services,admin_services
 from models import Callback, Assistant
+from utilities import helpers
 
 settings_router: Blueprint = Blueprint('settings_router', __name__, template_folder="../../templates")
 
@@ -31,8 +32,7 @@ def admin_assistant_edit(assistantID):
         if not message or \
            not nickname or \
            (not popuptime and not autopopup):
-            flash({'type': 'danger', 'msg': 'Error in getting your inputs!'})
-            return redirect("/admin/assistant/{}/settings".format(assistantID))
+            return helpers.redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, 'Error in getting your inputs!')
         else:
             if not autopopup:
                 secondsUntilPopup = 0.0
@@ -43,8 +43,6 @@ def admin_assistant_edit(assistantID):
                                                            nickname=nickname, message=message,
                                                            secondsUntilPopup=secondsUntilPopup)
             if callback.Success:
-                flash({'type': 'success', 'msg': nickname + ' Updated Successfully'})
-                return redirect("/admin/assistant/{}/settings".format(assistantID))
+                return helpers.redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, nickname + ' Updated Successfully')
             else:
-                flash({'type': 'danger', 'msg': 'Error in updating ' + nickname})
-                return redirect("/admin/assistant/{}/settings".format(assistantID))
+                return helpers.redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, 'Error in updating ' + nickname)

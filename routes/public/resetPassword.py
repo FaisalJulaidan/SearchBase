@@ -1,7 +1,7 @@
-from services import admin_services, user_services, company_services, mail_services
+from services import user_services, company_services, mail_services
 from models import Callback
-from flask import Blueprint, request, redirect, render_template
-from utilties import helpers
+from flask import Blueprint, request, render_template
+from utilities import helpers
 from itsdangerous import URLSafeTimedSerializer
 
 resetPassword_router: Blueprint = Blueprint('resetPassword_router', __name__ ,template_folder="../../templates")

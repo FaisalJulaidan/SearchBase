@@ -1,8 +1,7 @@
 
-from flask import Blueprint, request, redirect, abort, render_template, session, jsonify
-from flask_api import status
-from services import admin_services, sub_services, user_services, assistant_services, company_services
-from utilties import helpers
+from flask import Blueprint, request, session
+from services import admin_services, sub_services, user_services, company_services
+from utilities import helpers
 import stripe
 from models import db, Callback, User, Company
 

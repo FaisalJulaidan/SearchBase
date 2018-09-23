@@ -1,9 +1,7 @@
-from flask import Blueprint, request, redirect, flash, session, json
-from services import admin_services, assistant_services, company_services, bot_services, user_services
-from models import db, Callback, Assistant, Block, User
-from utilties import helpers
-from sqlalchemy.sql import exists, func
-
+from flask import Blueprint, request, session
+from services import admin_services, assistant_services, bot_services, user_services
+from models import Callback, Assistant, User
+from utilities import helpers
 
 bot_router: Blueprint = Blueprint('bot_router', __name__, template_folder="../../templates")
 

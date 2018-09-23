@@ -1,16 +1,11 @@
 import os
 import sqlite3
 from contextlib import closing
-from flask import Blueprint
-from flask_sqlalchemy import SQLAlchemy
 
 import sqlalchemy.exc
 
-from utilties.helpers import *
-
 from models import Callback,\
-    Company,User, db, Role
-
+    Company, db
 
 APP_ROOT = os.path.dirname(os.path.dirname(__file__))
 DATABASE = APP_ROOT + "/database.db"

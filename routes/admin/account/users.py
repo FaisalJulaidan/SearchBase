@@ -1,8 +1,8 @@
-from flask import jsonify, json
-from services import user_services, admin_services, role_services, company_services, mail_services
-from models import Callback, db, User, Company
+from flask import json
+from services import user_services, admin_services, role_services, mail_services
+from models import Callback, db, User
 from flask import Blueprint, request, redirect, session
-from utilties import helpers, json_utils
+from utilities import helpers
 import string
 import random
 

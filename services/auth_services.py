@@ -1,14 +1,9 @@
-import sqlalchemy.exc
-
-from models import Callback, User, Company, UserSettings, db
-from utilties import helpers
+from models import Callback, User, UserSettings, db
 from datetime import datetime
-from flask import session, escape
-from json import dumps
-import stripe
+from flask import session
 
-from services import user_services, assistant_services, role_services, sub_services, company_services
-from utilties import helpers
+from services import user_services, role_services, sub_services, company_services
+from utilities import helpers
 
 
 def signup(email, firstname, surname, password, companyName, companyPhoneNumber, websiteURL) -> Callback:

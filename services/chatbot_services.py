@@ -1,6 +1,5 @@
-from services import solutions_services
 from models import db, Callback, ChatbotSession, Assistant
-from utilties import json_utils
+from utilities import json_utils
 
 
 

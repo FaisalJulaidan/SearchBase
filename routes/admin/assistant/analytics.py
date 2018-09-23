@@ -1,7 +1,7 @@
 from flask import Blueprint, request, session
 from services import analytics_services, admin_services, assistant_services
 from models import Callback, Assistant
-from utilties import helpers
+from utilities import helpers
 
 analytics_router: Blueprint = Blueprint('analytics_router', __name__, template_folder="../../templates")
 

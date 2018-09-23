@@ -1,8 +1,7 @@
 import sqlalchemy.exc
 
 from models import db,Callback,Solution, Assistant
-from sqlalchemy import func
-from utilties import helpers
+from utilities import helpers
 
 
 def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Callback:

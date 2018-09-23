@@ -1,7 +1,7 @@
-from flask import Blueprint, request, redirect, flash, session
-from services import solutions_services, admin_services, assistant_services, sub_services
+from flask import Blueprint, request, redirect, session
+from services import solutions_services, admin_services, assistant_services
 from models import Callback, Solution
-from utilties import helpers
+from utilities import helpers
 
 solutions_router: Blueprint = Blueprint('Solutions_router', __name__, template_folder="../../templates")
 
@@ -96,7 +96,7 @@ def admin_solutions(assistantID):
             #see if they have reached the limit of how many solutions they can have
             #if numberOfProducts > plan_callback.Data.MaxProducts:
             if numberOfProducts > 5:
-                return helpers.redirectWithMessageAndAssistantID("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP)+ ". Solutions after " + name + " have not been added.")
+                return helpers.redirectWithMessageAndAssistantID("admin_products", assistantID, "You have reached the maximum amount of solutions you can have: " + str(maxNOP) + ". Solutions after " + name + " have not been added.")
 
             print("New Record: ", assistantID, id, name, brand, model, price, keywords, discount, url)
             createSolution_callback : Callback = solutions_services.createNew(assistantID, id, name, brand, model, price, keywords, discount, url)
@@ -104,7 +104,7 @@ def admin_solutions(assistantID):
             if not createSolution_callback.Success:
                 solutions_services.deleteByAssitantID(assistantID, "Could not create one of the new solutions: "+id+" "+name+"." + str(i) + " records have been added after deletion of the old ones.")
                 solutions_services.addOldByAssitantID(assistantID, "Could not create on of the new solutions. Solutions have been emptied.", currentSolutions)
-                return helpers.redirectWithMessageAndAssistantID("admin_solutions", assistantID, "Could not create one of the new solutions: "+id+" "+name+". Reverting to old ones")
+                return helpers.redirectWithMessageAndAssistantID("admin_solutions", assistantID, "Could not create one of the new solutions: " + id + " " + name + ". Reverting to old ones")
         return redirect("/admin/assistant/{}/solutions".format(assistantID))
 
 # TODO improve

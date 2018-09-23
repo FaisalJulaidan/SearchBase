@@ -1,9 +1,11 @@
 #/usr/bin/python3.5
 from flask import Flask, redirect, request, render_template, session
 from datetime import datetime
+from services import assistant_services, user_services
 import os
 from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution, ChatbotSession
 from services.mail_services import mail
+from utilities import helpers
 
 
 # Import all routers to register them as blueprints
@@ -47,8 +49,31 @@ def before_request():
     restrictedRoutes = ['/admin', 'admin/dashboard']
 
     # If the user try to visit one of the restricted routes without logging in he will be redirected
-    if any(route in currentURL for route in restrictedRoutes) and not session.get('Logged_in', False):
-        return redirect('login')
+    if any(route in currentURL for route in restrictedRoutes):
+        print("Security Check For Restricted Routes")
+        if not session.get('Logged_in', False):
+            return redirect('login')
+
+        try:
+            print(request.view_args['assistantID'])
+            if request.view_args['assistantID']:
+                assistantID = int(request.view_args['assistantID'])
+
+                ownership_callback : Callback = assistant_services.checkOwnership(assistantID, session.get('CompanyID', None))
+                if not ownership_callback.Success: 
+                    session["returnMessage"] = ownership_callback.Message
+                    return redirect('login')
+
+                role_callback : Callback = user_services.getRolePermissions(session.get('UserID', None))
+                if not role_callback.Success:
+                    session["returnMessage"] = role_callback.Message
+                    return redirect('admin/dashboard')
+
+                if not role_callback.Data.EditChatbots:
+                    session["returnMessage"] = "Your company owner has not allowed you access to this feature."
+                    return redirect('admin/dashboard')
+        except:
+            pass
 
 
 # Generates dummy data for testing
@@ -80,7 +105,9 @@ def gen_dummy_data():
               "smoker",
               "sad"
             ],
-            "blockToGoId": 2
+            "blockToGoId": 2,
+            "afterMessage": ''
+
           },
           {
             "action": "Go To Next Block",
@@ -89,20 +116,21 @@ def gen_dummy_data():
             "keywords": [
               "smoker",
               "sad"
-            ]
+            ],
+            "blockToGoId": None,
+            "afterMessage": ''
           }
         ],
         "id": 2,
         "order": 2,
         "text": "Do you smoke?",
-        "storeInDB": True,
       }))
     db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Assistant=reader_a, Content={
         "action": "Go To Next Block",
         "text": "What's your email?",
-        "blockToGoID": 2,
-        "storeInDB": True,
-        "validation": "Email"
+        "blockToGoID": None,
+        "validation": "Email",
+        "afterMessage": ''
       }))
     db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
         "action": "Go To Next Block",
@@ -112,7 +140,13 @@ def gen_dummy_data():
         ],
         "text": "Upload your CV",
         "blockToGoID": None,
-        "storeInDB": True,
+        "afterMessage": ''
+    }))
+
+    db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Assistant=reader_a, Content={
+        "showTop": 2,
+        "action": "Go To Next Block",
+        "afterMessage": ''
     }))
 
     # Create Roles
@@ -211,7 +245,7 @@ def sendMarketingEmail():
 if __name__ == "__main__":
 
     print("Run the server...")
-    if os.environ['FLASK_ENV'] == 'production':
+    if os.environ.get('FLASK_ENV', None) == 'production':
         app.config.from_object('config.BaseConfig')
 
         db.init_app(app)
@@ -222,7 +256,7 @@ if __name__ == "__main__":
         # Run the app server
         app.run()
 
-    elif os.environ['FLASK_ENV'] == 'development' :
+    elif os.environ.get('FLASK_ENV', None) == 'development' :
         app.config.from_object('config.DevelopmentConfig')
 
         db.init_app(app)

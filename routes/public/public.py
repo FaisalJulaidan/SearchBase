@@ -1,18 +1,15 @@
 import os
 from config import BaseConfig
-from datetime import timedelta
-from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory
-from flask import Blueprint, render_template, request, session, redirect, url_for, json
+from flask import send_from_directory
+from flask import Blueprint, render_template, request, session, redirect, url_for
 from flask_api import status
-from utilties import helpers
-from models import Callback, Assistant, Solution, db, ChatbotSession
+from utilities import helpers
+from models import Callback, Assistant, db, ChatbotSession
 from itsdangerous import URLSafeTimedSerializer
-from services import user_services, company_services, db_services, auth_services, mail_services,\
-    assistant_services, bot_services, chatbot_services, solutions_services,analytics_services
-from models import secret_key
+from services import user_services, auth_services, mail_services,\
+    assistant_services, bot_services, chatbot_services, solutions_services
 from werkzeug.utils import secure_filename
 import uuid
-from flask_cors import CORS
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
 

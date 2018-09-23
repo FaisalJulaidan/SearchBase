@@ -1,11 +1,6 @@
-import sqlalchemy.exc
-
 from models import db, Callback, User, Company, Role
-from utilties import helpers
-from sqlalchemy.sql import exists, func
-
-
-
+from utilities import helpers
+from sqlalchemy.sql import exists
 
 
 def getByID(id) -> Callback:
@@ -76,8 +71,8 @@ def create(firstname, surname, email, password, phone, company: Company, role: R
     try:
         # Create a new user with its associated company and role
         newUser = User(Firstname=firstname, Surname=surname, Email=email, Verified=verified,
-                    Password=helpers.hashPass(password), PhoneNumber=phone, Company=company,
-                    Role=role)
+                       Password=helpers.hashPass(password), PhoneNumber=phone, Company=company,
+                       Role=role)
         db.session.add(newUser)
 
     except Exception as exc:

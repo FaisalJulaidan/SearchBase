@@ -312,7 +312,7 @@ def signup():
             return helpers.redirectWithMessage("signup", signup_callback.Message)
 
         # Send verification email
-        mail_callback: Callback = mail_services.sendVerificationEmail(email, name, fullname)
+        mail_callback: Callback = mail_services.sendVerificationEmail(email, name)
         print(mail_callback.Message)
 
         # If error while sending verification email

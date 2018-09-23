@@ -5,7 +5,7 @@ from services import assistant_services, user_services
 import os
 from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution, ChatbotSession, Callback
 from services.mail_services import mail
-from utilties import helpers
+from utilities import helpers
 
 
 # Import all routers to register them as blueprints

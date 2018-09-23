@@ -585,35 +585,21 @@
         }
     }
 
-    {#function submitAnswer1(CLIENT_USER, text) {#}
-    {#    // when a user click on an answer #}
-    {#    newMessage(CLIENT_USER, text);#}
-    {#    keywords.push(text);#}
-    {#    $messageInput = $(".message-input").first();#}
-    {#    // change $messageInput to next block#}
-    {##}
-    {# }#}
 
-        function newMessage(from, text, html=false) {
-            if (from == BOT_USER){
-                if (html)
-                    $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" />' + text + '</li>').appendTo($('.messages ul'));
-                else
-                    $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p>' + text + '</p></li>').appendTo($('.messages ul'));
-            }
-            else {
-                $('<li class="sent"><img src="https://cdn1.iconfinder.com/data/icons/social-messaging-productivity-1-1/128/gender-male2-512.png" alt="" /><p>' + text + '</p></li>').appendTo($('.messages ul'));
-            }
+    function newMessage(from, text, html = false) {
+        if (from == BOT_USER) {
+            if (html)
+                $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" />' + text + '</li>').appendTo($('.messages ul')).hide().fadeIn();
+            else
+                $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p>' + text + '</p></li>').appendTo($('.messages ul')).hide().fadeIn();
+        }
+        else {
+            $('<li class="sent"><img src="https://cdn1.iconfinder.com/data/icons/social-messaging-productivity-1-1/128/gender-male2-512.png" alt="" /><p>' + text + '</p></li>').appendTo($('.messages ul')).hide().fadeIn();
+        }
 
-            // message = $(".message-input input").val();
-            // if ($.trim(message) == '')
-            //     return false;
-
-            $('.message-input input').val(null);
-            {#$(".messages").animate({scrollTop: $(document).height()}, "fast");#}
-            scrollTo()
-        };
-
+        $('.message-input input').val(null);
+        scrollTo('end')
+    }
         function renderUserInput(block) {
             $messageInput = $(".message-input").first();
             $userInput = $("<div class=\"wrap\">\n" +

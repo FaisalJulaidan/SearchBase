@@ -701,6 +701,8 @@
                     sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
                     return 0;
                 }
+                // clear file-upload div
+                $(".message-input").first().html('');
                 //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
             }
 

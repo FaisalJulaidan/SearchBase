@@ -1,6 +1,6 @@
 from services import admin_services, user_services
 from models import Callback
-from flask import Blueprint, request, redirect, session
+from flask import Blueprint, request, session
 from utilities import helpers
 
 changePassword_router: Blueprint = Blueprint('changePassword_router', __name__ ,template_folder="../../templates")
@@ -16,6 +16,6 @@ def change_password():
         if currentPassword is "Error" or newPassword is "Error":
             return helpers.redirectWithMessage("change_password", "Could not retrieve all written information.")
         
-        changePassword_callback : Callback = user_services.changePasswordByID(session.get('UserID', None), newPassword, currentPassword)
+        changePassword_callback : Callback = user_services.changePasswordByID(session.get('userID', None), newPassword, currentPassword)
 
         return helpers.redirectWithMessage("change_password", changePassword_callback.Message)

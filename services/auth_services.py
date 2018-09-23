@@ -1,13 +1,8 @@
-import sqlalchemy.exc
-
-from models import Callback, User, Company, UserSettings, db
-from utilities import helpers
+from models import Callback, User, UserSettings, db
 from datetime import datetime
-from flask import session, escape
-from json import dumps
-import stripe
+from flask import session
 
-from services import user_services, assistant_services, role_services, sub_services, company_services
+from services import user_services, role_services, sub_services, company_services
 from utilities import helpers
 
 
@@ -63,22 +58,21 @@ def signup(email, firstname, surname, password, companyName, companyPhoneNumber,
 def login(email: str, password_to_check: str) -> Callback:
 
     # Login Exception Handling
-    errorMessage = "Your username or password did not match our records."
     if not (email or password_to_check):
         print("Invalid request: Email or password not received!")
-        return Callback(False, errorMessage)
+        return Callback(False, "You entered an incorrect username or password.")
 
     user_callback: Callback = user_services.getByEmail(email.lower())
     # If user is not found
     if not user_callback.Success:
         print("Invalid request: Email not found")
-        return Callback(False, errorMessage)
+        return Callback(False, "Email not found.")
 
     # Get the user from the callback object
     user: User = user_callback.Data
     if not helpers.hashPass(password_to_check, user.Password) == user.Password:
         print("Invalid request: Incorrect Password")
-        return Callback(False, errorMessage)
+        return Callback(False, "Incorrect Password.")
 
     if not user.Verified:
         print("Account is not verified!")

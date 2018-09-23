@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, session
+from flask import Blueprint, request, session
 from services import admin_services, analytics_services, assistant_services
 from models import Callback
 from utilities import helpers

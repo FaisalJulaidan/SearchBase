@@ -1,5 +1,5 @@
 from flask import Blueprint, request, session, jsonify, redirect
-from services import user_services, auth_services
+from services import user_services
 from utilities import json_utils
 from models import Callback, User
 admin_api: Blueprint = Blueprint('admin_api', __name__ ,template_folder="../../templates")

@@ -67,7 +67,7 @@ def create(nickname, route, message, secondsUntilPopup, company: Company) -> Ass
 
 def update(id, nickname, message, secondsUntilPopup)-> Callback:
     try:
-        db.session.query(Assistant).filter(Assistant.ID == id).update({'Name': nickname,
+        db.session.query(Assistant).filter(Assistant.ID == id).update({'Nickname': nickname,
                                                                        'Message': message,
                                                                        'SecondsUntilPopup': secondsUntilPopup})
         db.session.commit()
@@ -117,7 +117,7 @@ def checkOwnership(assistantID, companyID):
 
         #Check if the user is from the company that owns the assistant
         if companyID != assistant_callback.Data.CompanyID:
-            return Callback(False, 'You do not have ownership over the requested assistant.')
+            return Callback(False, 'Security check failed. Process terminated.')
 
         return Callback(True, 'Ownership check passed')
     except Exception as exc:

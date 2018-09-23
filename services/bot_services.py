@@ -1,13 +1,10 @@
-from flask import session
-from services import assistant_services
-from utilities import helpers
 from typing import List
 from config import BaseConfig
 from utilities import json_utils
 from sqlalchemy.sql import exists, func
 
 
-from models import db, Callback, User, Company, ValidationType, Assistant, Answer, Block, BlockType, BlockAction, Plan
+from models import db, Callback, ValidationType, Assistant, Block, BlockType, BlockAction, Plan
 
 bot_currentVersion = "1.0.0"
 

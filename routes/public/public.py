@@ -1,14 +1,13 @@
 import os
 from config import BaseConfig
-from datetime import timedelta
-from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory, json
+from flask import send_from_directory
+from flask import Blueprint, render_template, request, session, redirect, url_for
 from flask_api import status
 from utilities import helpers
-from models import Callback, Assistant, Solution, db, ChatbotSession
+from models import Callback, Assistant, db, ChatbotSession
 from itsdangerous import URLSafeTimedSerializer
-from services import user_services, company_services, db_services, auth_services, mail_services,\
-    assistant_services, bot_services, chatbot_services, solutions_services,analytics_services
-from models import secret_key
+from services import user_services, auth_services, mail_services,\
+    assistant_services, bot_services, chatbot_services, solutions_services
 from werkzeug.utils import secure_filename
 import uuid
 from flask_cors import CORS
@@ -28,6 +27,12 @@ def t():
 def test_chatbot_page(assistantID):
     if request.method == "GET":
         return render_template("chatbot-template.html")
+
+
+@public_router.route("/chatTest/<assistantID>", methods=['GET'])
+def test_chatbot_page1(assistantID):
+    if request.method == "GET":
+        return render_template("chatbot-template1.html")
 
 
 @public_router.route("/assistant/<int:assistantID>/chatbot", methods=['GET', 'POST'])
@@ -312,12 +317,12 @@ def signup():
             return helpers.redirectWithMessage("signup", signup_callback.Message)
 
         # Send verification email
-        mail_callback: Callback = mail_services.sendVerificationEmail(email, name)
+        mail_callback: Callback = mail_services.sendVerificationEmail(email, name, fullname)
         print(mail_callback.Message)
 
         # If error while sending verification email
         if not mail_callback.Success:
-            return helpers.redirectWithMessage('signup', 'Signed up successfully but > ' + mail_callback.Message
+            helpers.redirectWithMessage('signup', 'Signed up successfully but > ' + mail_callback.Message
                                         + '. Please contact TheSearchBaseStaff to activate your account.')
 
         return helpers.redirectWithMessage("login", "We have sent you a verification email. Please use it to complete the sign up process.")

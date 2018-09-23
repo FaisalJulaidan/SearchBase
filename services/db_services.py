@@ -9,8 +9,7 @@ import sqlalchemy.exc
 from utilities.helpers import *
 
 from models import Callback,\
-    Company,User, db, Role
-
+    Company, db
 
 APP_ROOT = os.path.dirname(os.path.dirname(__file__))
 DATABASE = APP_ROOT + "/database.db"

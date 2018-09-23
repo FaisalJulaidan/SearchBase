@@ -1,4 +1,3 @@
-from services import solutions_services
 from models import db, Callback, ChatbotSession, Assistant
 from utilities import json_utils
 

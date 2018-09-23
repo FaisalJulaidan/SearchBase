@@ -467,13 +467,38 @@
             sessionID = data["sessionID"];
             solutions = data["solutions"];
             sendFile();
-            displayReturnedSolutions(solutions);
+            return solutions;
+            {#displayReturnedSolutions(solutions);#}
 
         }).fail(function (res) {
             console.log("Error in retrieving blocks.");
             console.log(res);
         });
         return solutions
+    }
+    function sendDataSolutionsBlock(showTop) {
+        params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": showTop};
+
+        return $.ajax({
+            contentType: 'application/json', //this is important
+            url: '../assistant/' + assistantID + '/chatbot',
+            type: "POST",
+            data: JSON.stringify(params)
+
+        }).done(function (res) {
+
+            console.log("Solutions retrieved successfully!");
+            var data = JSON.parse(res).data;
+            sessionID = data["sessionID"];
+            solutions = data["solutions"];
+            sendFile();
+            return solutions;
+            {#displayReturnedSolutions(solutions);#}
+
+        }).fail(function (res) {
+            console.log("Error in retrieving blocks.");
+            console.log(res);
+        });
     }
 
     function sendFile() {
@@ -506,7 +531,7 @@
         messageContainer = $(".messages ul");
 
         for (var i = 0; i < solutions.length; i++) {
-            messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>" + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>" + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] + "</label><br><button onclick='BuyProduct(" + solutions[i]["URL"] + ")' class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center></li>");
+            messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>" + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>" + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] + "</label><br><button onclick=\"BuyProduct('" + solutions[i]["URL"] + "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center></li>");
         }
 
         SetRepeat();
@@ -628,7 +653,12 @@
         function renderSolutions(block) {
             // Abdullah still did not finish a block of type solutions
             // However reaching to this block means you have to sendData() and get the solutions back
-            sendData();
+
+            sendDataSolutionsBlock(block.content.showTop)
+                .then((solutions) => {
+                    solutions = JSON.parse(solutions);
+                    displayReturnedSolutions(solutions.data.solutions)
+                })
         }
 
         async function submitAnswer(message, blockKeywords = undefined) {
@@ -778,6 +808,7 @@
 
         // helper functions
         function sendUserMessage(message) {
+
             newMessage(CLIENT_USER, toEmoticon(message));
             {#$("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>" + toEmoticon(message) + "</li></div>");#}
             {#animateMessage("#newMessage");#}

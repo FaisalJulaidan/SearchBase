@@ -351,6 +351,15 @@
         cursor: pointer;
     }
 
+    .results {
+        display: inline-block;
+        padding: 10px 15px;
+        border-radius: 20px;
+        max-width: 205px;
+        line-height: 130%;
+        background: #f5f5f5;
+    }
+
 
 </style>
 <body id="chatbotBody">
@@ -539,10 +548,10 @@
     }
 
     function displayReturnedSolutions(solutions) {
-        messageContainer = $("#messagesContainer");
+        messageContainer = $(".messages ul");
 
         for (var i = 0; i < solutions.length; i++) {
-            messageContainer.append("<center><div class='chatProducts'><h5>" + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>" + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] + "</label><br><button onclick='BuyProduct(" + solutions[i]["URL"] + ")' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
+            messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>" + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>" + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] + "</label><br><button onclick='BuyProduct(" + solutions[i]["URL"] + ")' class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center></li>");
         }
 
         SetRepeat();

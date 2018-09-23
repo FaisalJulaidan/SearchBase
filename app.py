@@ -67,11 +67,11 @@ def before_request():
                 role_callback : Callback = user_services.getRolePermissions(session.get('UserID', None))
                 if not role_callback.Success:
                     session["returnMessage"] = role_callback.Message
-                    return redirect('admin_home')
+                    return redirect('admin/dashboard')
 
                 if not role_callback.Data.EditChatbots:
                     session["returnMessage"] = "Your company owner has not allowed you access to this feature."
-                    return redirect('admin_home')
+                    return redirect('admin/dashboard')
         except:
             pass
 

@@ -1,5 +1,4 @@
-﻿
-var assistant = null;
+﻿var assistant = null;
 var blocks = []; // Blocks ordered
 var currentBlock = undefined;
 var keywords = [];
@@ -32,8 +31,8 @@ jQuery.expr.filters.offscreen = function (el) {
 // the cahtbot conversational flow
 function chatbotInit(assistantID) {
     console.log("Chatbot Init...");
-     $.ajax({
-        url: '../assistant/' + assistantID +'/chatbot',
+    $.ajax({
+        url: '../assistant/' + assistantID + '/chatbot',
         type: "GET"
     }).done(function (res) {
 
@@ -83,14 +82,14 @@ function getBlock(id) {
 
 // This should send the data to the server, data such as keywords and inputs.
 // and get  the solutions back based on the sent data
-function sendData(){
+function sendData() {
     var solutions = [];
-    params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": 5};
+    params = { "collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": 5 };
     console.log("Send data...");
 
     $.ajax({
         contentType: 'application/json', //this is important
-        url: '../assistant/' + assistantID +'/chatbot',
+        url: '../assistant/' + assistantID + '/chatbot',
         type: "POST",
         data: JSON.stringify(params)
 
@@ -223,12 +222,12 @@ function renderSolutions(block) {
     sendData();
 }
 
-async function submitAnswer(message, blockKeywords=undefined) {
+async function submitAnswer(message, blockKeywords = undefined) {
     cancelScroll = false;
 
     if (currentBlock.type == "File Upload") {
         //needs rework
-        message = "&FILE_UPLOAD&"+document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
+        message = "&FILE_UPLOAD&" + document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
         if (!checkFileFormat(message)) {
             sendUserMessage(message.replace("&FILE_UPLOAD&", ""))
             await sleep(350);
@@ -266,7 +265,7 @@ async function submitAnswer(message, blockKeywords=undefined) {
     removeThinkingGif();
 
     if (currentBlock.storeInDB) {
-        var information = {"blockID": currentBlock.id, "questionText": currentBlock.content.text, "input": message}
+        var information = { "blockID": currentBlock.id, "questionText": currentBlock.content.text, "input": message }
         if (currentBlock.type == "Question" && blockKeywords !== undefined) {
             blockKeywords = blockKeywords.split(",");
             information["keywords"] = blockKeywords
@@ -294,8 +293,7 @@ async function submitAnswer(message, blockKeywords=undefined) {
                 var blockToGoId = blockAnswers[i].blockToGoId;
 
                 getNextBlock(action, blockToGoId);
-            }        answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"submitAnswer('" + toEmoticon(blockAnswers[i].text) + "','" + blockAnswers[i].keywords + "')\">" + toEmoticon(blockAnswers[i].answer.text) + "</a>";
-
+            }
         }
     } else if (currentBlock.type == "User Input" || currentBlock.type == "File Upload") {
         action = currentBlock.content.action;
@@ -305,7 +303,7 @@ async function submitAnswer(message, blockKeywords=undefined) {
 
 }
 
-function getNextBlock(action, blockToGoId=undefined) {
+function getNextBlock(action, blockToGoId = undefined) {
     var targetBlock = undefined
 
     if (action == "Go To Next Block") {

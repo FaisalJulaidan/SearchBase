@@ -1,6 +1,7 @@
 import sqlalchemy.exc
 
-from models import db, Callback, User, Company, Role
+from services import mail_services, company_services
+from models import db, Callback, User, Company, Role, UserSettings
 from utilties import helpers
 from sqlalchemy.sql import exists, func
 
@@ -179,6 +180,14 @@ def verifyByEmail(email: str):
     try:
         user = db.session.query(User).filter(User.Email == email).update({"Verified": True})
         if not user: raise Exception
+        
+        #send us mail
+        result = db.session.query(User).filter(User.Email == email).first()
+        company_callback = company_services.getByID(result.CompanyID)
+        companyName = "Error"
+        if company_callback : companyName = company_callback.Data.Name
+        mail_callback : Callback = mail_services.sendNewUserHasRegistered(result.Firstname + result.Surname, result.Email, companyName, result.PhoneNumber)
+        if not mail_callback.Success: print("Could not send signed up user email")
 
     except Exception as exc:
         print(exc)
@@ -216,5 +225,34 @@ def updateStripeID(email, cusID: str):
     db.session.commit()
     return Callback(True, 'StripeID is updated successfully')
 
+def createUpdateUserSettings(userID, trackingData, techSupport, accountSpecialist):
+    try:
+        result = db.session.query(UserSettings).filter(UserSettings.ID == userID).first()
+        if not result: 
+            newUser = UserSettings(ID=userID, TrackingData=trackingData, TechnicalSupport=techSupport, AccountSpecialist=accountSpecialist)
+            db.session.add(newUser)
+        else:
+            result.TrackingData = trackingData
+            result.TechnicalSupport = techSupport
+            result.AccountSpecialist = accountSpecialist
 
+        db.session.commit()
+        return Callback(True,
+                        'User settings were successfully updated.',
+                        result)
+    except Exception as exc:
+        print("user_services.getUserSettings() ERROR: ", exc)
+        return Callback(False,
+                        'User settings could not be updated.')
 
+def getUserSettings(userID):
+    try:
+        result = db.session.query(UserSettings).filter(UserSettings.ID == userID).first()
+
+        return Callback(True,
+                        'User settings were successfully retrieved.',
+                        result)
+    except Exception as exc:
+        print("user_services.getUserSettings() ERROR: ", exc)
+        return Callback(False,
+                        'User settings for this user does not exist.')

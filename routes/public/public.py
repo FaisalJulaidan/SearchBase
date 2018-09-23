@@ -1,8 +1,7 @@
 import os
 from config import BaseConfig
 from datetime import timedelta
-from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory
-from flask import Blueprint, render_template, request, session, redirect, url_for, json
+from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory, json
 from flask_api import status
 from utilties import helpers
 from models import Callback, Assistant, Solution, db, ChatbotSession
@@ -318,7 +317,7 @@ def signup():
 
         # If error while sending verification email
         if not mail_callback.Success:
-            helpers.redirectWithMessage('signup', 'Signed up successfully but > ' + mail_callback.Message
+            return helpers.redirectWithMessage('signup', 'Signed up successfully but > ' + mail_callback.Message
                                         + '. Please contact TheSearchBaseStaff to activate your account.')
 
         return helpers.redirectWithMessage("login", "We have sent you a verification email. Please use it to complete the sign up process.")

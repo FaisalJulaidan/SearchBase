@@ -9,7 +9,7 @@ def getUserAndCompany(email):
     if not user_callback.Success:
         print("Profile GET Request: Email not found")
         return Callback(False, "Profile GET Request: Email not found")
-    print(session.get('companyID', 0))
+
     company_callback : Callback = company_services.getByCompanyID(session.get('CompanyID', 0))
     if not company_callback.Success:
         print("Profile GET Request: Company not found")

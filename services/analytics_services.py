@@ -21,8 +21,15 @@ def getAnalytics(assistant, periodSpace: int, topSolustions: int):
 
         return Callback(True, 'Analytics processed successfully.', result)
     except Exception as e:
+        print("getPopularSolutions(id, topSolustions): ", getPopularSolutions(id, topSolustions))
+        print("getTotalReturnedSolutions(id): ", getTotalReturnedSolutions(id))
+        print("getTimeSpentAvgOvertime(id, periodSpace): ", getTimeSpentAvgOvertime(id, periodSpace))
+        print("getTotalQuestionsOverMonth(id): ", getTotalQuestionsOverMonth(id))
+        print("getUsersOvertime(id, periodSpace): ", getUsersOvertime(id, periodSpace))
+        print("getTotalSolutionsOverMonth(id): ", getTotalSolutionsOverMonth(id))
+        print("getTotalUsers(id): ", getTotalUsers(id))
         print(e)
-        return Callback(False, 'Error while finding analytics', e.args)
+        return Callback(False, 'Error while finding analytics')
 
 def getUsersOvertime(assistantID, periodSpace):
 
@@ -32,6 +39,9 @@ def getUsersOvertime(assistantID, periodSpace):
     result = []
     begginingOfYear = datetime.strptime(str(now).split('-')[0]+"-01-01",'%Y-%m-%d')
     endOfYear = datetime.strptime(str(now).split('-')[0]+"-12-30",'%Y-%m-%d')
+    if not oldestDate: 
+        oldestDate = begginingOfYear
+        newestDate = endOfYear
     while True:
         current = now
         now -= timedelta(days=7 * periodSpace)
@@ -101,6 +111,9 @@ def getTotalQuestionsOverMonth(assistantID):
     position = 0
     returnArray = []
     for i in range(12,0,-1):
+        if not result: 
+            returnArray.append(0)
+            continue
         if result[position][1] == 0:
             del result[position]
         if position >= len(result): 
@@ -142,6 +155,9 @@ def getTotalSolutionsOverMonth(assistantID):
     position = 0
     returnArray = []
     for i in range(12,0,-1):
+        if not result:
+            returnArray.append(0)
+            continue
         if result[position][1] == 0:
             del result[position]
         if position >= len(result): 

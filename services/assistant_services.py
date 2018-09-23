@@ -116,7 +116,6 @@ def checkOwnership(assistantID, companyID):
             return Callback(False, "Error in retrieving necessary information.")
 
         #Check if the user is from the company that owns the assistant
-        print(companyID, assistant_callback.Data.CompanyID)
         if companyID != assistant_callback.Data.CompanyID:
             return Callback(False, 'You do not have ownership over the requested assistant.')
 

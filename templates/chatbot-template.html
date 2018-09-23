@@ -229,22 +229,24 @@
     }
 
     #frame .content .messages ul li.sent img {
+        float: right;
         margin: 6px 8px 0 0;
     }
 
     #frame .content .messages ul li.sent p {
+        margin-right: 5px;
         background: #435f7a;
         color: #f5f5f5;
+        float: right;
     }
 
     #frame .content .messages ul li.replies img {
-        float: right;
         margin: 6px 0 0 8px;
     }
 
     #frame .content .messages ul li.replies p {
         background: #f5f5f5;
-        float: right;
+        margin-left: 5px;
     }
 
     #frame .content .messages ul li img {
@@ -346,9 +348,10 @@
         max-width: 205px;
         line-height: 130%;
         background-color: #BA68C8;
-        float: right;
+        float: left;
         color: white;
         cursor: pointer;
+        margin-left: 5px;
     }
 
     .results {
@@ -383,29 +386,6 @@
     </div>
 </div>
 
-<script>
-
-    {#function newMessage() {#}
-    {#    message = $(".message-input input").val();#}
-    {#    if ($.trim(message) == '')#}
-    {#        return false;#}
-    {##}
-    {#    $('<li class="sent"><img src="http://emilcarlsson.se/assets/mikeross.png" alt="" /><p>' + message + '</p></li>').appendTo($('.messages ul'));#}
-    {#    $('.message-input input').val(null);#}
-    {#    $(".messages").animate({scrollTop: $(document).height()}, "fast");#}
-    {# };#}
-    {##}
-    {#$('.submit').click(function () {#}
-    {#    newMessage();#}
-    {# });#}
-    {##}
-    {#$(window).on('keydown', function (e) {#}
-    {#    if (e.which == 13) {#}
-    {#        newMessage();#}
-    {#        return false;#}
-    {#    }#}
-    {# });#}
-</script>
 {#        <script src="/static/chatbot/script.js"></script>#}
 <script>
     var assistant = null;
@@ -413,33 +393,12 @@
     var currentBlock = undefined;
     var keywords = [];
     var cancelScroll = false;
-    var chatInputDiv = document.getElementById("ChatInputDiv");
-    var oldPos = 0;
-    var newPos = 0;
     var collectedInformation = [];
     var fileUpload = false;
     var params = undefined;
     var sessionID = 0;
     var BOT_USER = 'bot';
     var CLIENT_USER = 'user';
-
-    //scrolling setter
-    $(".messages").animate({scrollTop: $(document).height()}, "fast");
-
-    // $(window).scroll(function () {
-    //     newPos = $(window).scrollTop();
-    //     if (newPos + 3 < oldPos) {
-    //         $('html, body').stop();
-    //         cancelScroll = true;
-    //     }
-    //     oldPos = newPos;
-    // });
-    // jQuery.expr.filters.offscreen = function (el) {
-    //     var rect = el.getBoundingClientRect();
-    //     return (
-    //         (rect.x + rect.width) > window.innerWidth
-    //     );
-    // };
 
     // This function will get the blocks from the server by assistantID and set the blocks array to be used to create
     // the cahtbot conversational flow
@@ -460,10 +419,6 @@
             // Start the chatbot
             //console.log(blocks)
             start();
-
-            // Test
-            //console.log(blocks);
-            //console.log(assistant.name);
 
         }).fail(function (res) {
             console.log("Error in retrieving blocks.");
@@ -655,7 +610,8 @@
             //     return false;
 
             $('.message-input input').val(null);
-            $(".messages").animate({scrollTop: $(document).height()}, "fast");
+            {#$(".messages").animate({scrollTop: $(document).height()}, "fast");#}
+            scrollTo()
         };
 
         function renderUserInput(block) {
@@ -954,7 +910,7 @@
                 marginTop: marginAnimate
             }, "slow");
             if (!cancelScroll) {
-                scrollTo("chatBottom");
+                {#scrollTo("chatBottom");#}
             }
         }
 
@@ -978,7 +934,9 @@
             {#$('html, body').animate({#}
             {#    scrollTop: ($(id).offset().top)#}
             {# }, 2000);#}
-            $(".messages").animate({scrollTop: $(document).height()}, "fast");
+            $(".messages").animate({ scrollTop: $('.messages').prop("scrollHeight")}, "fast");
+
+            {#$(".messages").animate({scrollTop: $(document).height()}, "fast");#}
         }
 
         function sleep(ms) {

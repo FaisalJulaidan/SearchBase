@@ -622,7 +622,6 @@
             $('<li class="sent"><img src="https://cdn1.iconfinder.com/data/icons/social-messaging-productivity-1-1/128/gender-male2-512.png" alt="" /><p>' + text + '</p></li>').appendTo($('.messages ul')).hide().fadeIn();
         }
 
-        $('.message-input input').val(null);
         scrollTo('end')
     }
         function renderUserInput(block) {
@@ -662,7 +661,8 @@
         }
 
         async function submitAnswer(message, blockKeywords = undefined) {
-            cancelScroll = false;
+
+
 
             if (currentBlock.type == "File Upload") {
                 //needs rework
@@ -676,19 +676,27 @@
                 // clear file-upload div
                 $(".message-input").first().html('');
                 //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
-            }
 
-            if (message == "") { //been submited through Send button click
-                message = document.getElementById("textMessage").value;
-                if (message == "" || message.replace(/ /g, "") == "") {
-                    return 0;
-                }
-                $('#textMessage').val("");
+                if (currentBlock.content.afterMessage)
+                    sendAssistantMessage(currentBlock.content.afterMessage);
+                await sleep(300);
+
+                print();
+                getNextBlock(currentBlock.content.action);
             }
 
             if (currentBlock.type == "User Input") { //validate user input
+                if (message == "")
+                    message = document.getElementById("textMessage").value;
+
+                if (message == "" || message.replace(/ /g, "") == "")
+                    return 0;
+
+                $('#textMessage').val("");
+
+                print();
+
                 if (!validateUserInput(message, currentBlock.content.validation)) {
-                    sendUserMessage(message)
                     await sleep(350);
                     sendAssistantMessage("I am sorry but that was not in the format I think it should be...")
                     return 0;
@@ -696,69 +704,58 @@
                 else {
                     // clear user input div
                     $(".message-input").first().html('');
+                    if (currentBlock.content.afterMessage)
+                        sendAssistantMessage(currentBlock.content.afterMessage);
+                    await sleep(300);
+
                 }
+                getNextBlock(currentBlock.content.action);
             }
-
-            {#$("#qAnswers").remove();#}
-            {#chatInputDiv.style = "display:none";#}
-
-            {#sendUserMessage(message.replace("&FILE_UPLOAD&", "")) //print user's message in the chatbox to appear like he is typing back#}
-            {#await sleep(500);#}
-
-            {#putThinkingGif();#}
-            {#await sleep(400 + Math.floor(Math.random() * 900));#}
-            {#removeThinkingGif();#}
-
-            // print the selected answer
-            newMessage(CLIENT_USER, message);
-
-            if (currentBlock.storeInDB) {
-                var information = {
-                    "blockID": currentBlock.id,
-                    "questionText": currentBlock.content.text,
-                    "input": message
-                };
-                if (currentBlock.type == "Question" && blockKeywords !== undefined) {
-                    blockKeywords = blockKeywords.split(",");
-                    information["keywords"] = blockKeywords
-                    collectedInformation.push(information);
-                    addKeywords(blockKeywords)
-                } else {
-                    information["keywords"] = []
-                    collectedInformation.push(information);
-                }
-
-                sendAssistantMessage(generateUserInputThanks())
-                await sleep(300);
-
-                {#putThinkingGif();#}
-                {#await sleep(400 + Math.floor(Math.random() * 500));#}
-                {#removeThinkingGif();#}
-            }
-
-            var action = null;
-
-            if (blockKeywords)
-                blockKeywords = Boolean(blockKeywords.split) ? blockKeywords.split(',') : blockKeywords;
-
+            
             if (currentBlock.type == "Question") {
-                var blockAnswers = currentBlock.content.answers;
-
                 // clear answers div
                 $(".message-input").first().html('');
+                print();
+
+                var blockAnswers = currentBlock.content.answers;
 
                 for (var i = 0; i < blockAnswers.length; i++) {
                     if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].text == message) {
-                        action = blockAnswers[i].action;
+                        if (blockAnswers[i].afterMessage)
+                            sendAssistantMessage(blockAnswers[i].afterMessage);
+
+                        var action = blockAnswers[i].action;
                         var blockToGoId = blockAnswers[i].blockToGoId;
 
                         getNextBlock(action, blockToGoId);
                     }
                 }
-            } else if (currentBlock.type == "User Input" || currentBlock.type == "File Upload") {
-                action = currentBlock.content.action;
-                getNextBlock(action);
             }
+
+            function print() {
+                // print the selected answer
+                newMessage(CLIENT_USER, message);
+                if (blockKeywords)
+                    blockKeywords = Boolean(blockKeywords.split) ? blockKeywords.split(',') : blockKeywords;
+
+                if (currentBlock.storeInDB) {
+                    var information = {
+                        "blockID": currentBlock.id,
+                        "questionText": currentBlock.content.text,
+                        "input": message
+                    };
+                    if (currentBlock.type == "Question" && blockKeywords !== undefined) {
+                        information["keywords"] = blockKeywords
+                        collectedInformation.push(information);
+                        addKeywords(blockKeywords)
+                    } else {
+                        information["keywords"] = []
+                        collectedInformation.push(information);
+                    }
+                }
+
+            }
+            
 
         }
 

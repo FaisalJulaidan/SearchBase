@@ -16,6 +16,6 @@ def change_password():
         if currentPassword is "Error" or newPassword is "Error":
             return helpers.redirectWithMessage("change_password", "Could not retrieve all written information.")
         
-        changePassword_callback : Callback = user_services.changePasswordByID(session.get('userID', None), newPassword, currentPassword)
+        changePassword_callback : Callback = user_services.changePasswordByID(session.get('UserID', None), newPassword, currentPassword)
 
         return helpers.redirectWithMessage("change_password", changePassword_callback.Message)

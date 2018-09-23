@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, flash, session
-from services import solutions_services, admin_services, assistant_services, sub_services
-from models import Callback, Solution
+from services import solutions_services, admin_services, assistant_services, sub_services, company_services
+from models import Callback, Solution, Company, Assistant
 from utilties import helpers
 
 solutions_router: Blueprint = Blueprint('Solutions_router', __name__, template_folder="../../templates")
@@ -9,17 +9,11 @@ solutions_router: Blueprint = Blueprint('Solutions_router', __name__, template_f
 def admin_solutions(assistantID):
     if request.method == "GET":
 
-        solutions_callback: Callback = solutions_services.getByAssistantID(assistantID)
-
-        #if it coudnt find anything assume its empty
-        if not solutions_callback.Success: solutions_callback.Data = []
-        print(solutions_callback.Data)
-        #convert solutions to dics
-        if type(solutions_callback.Data) is Solution:
-            solutions = [helpers.getDictFromSQLAlchemyObj(solutions_callback.Data)]
-        else:
-            solutions = helpers.getListFromSQLAlchemyList(solutions_callback.Data)
-
+        solutions_callback: Callback = solutions_services.getAllByAssistantID(assistantID)
+        solutions = []
+        if solutions_callback.Success:
+            solutions = solutions_callback.Data
+        print(solutions)
         return admin_services.render("admin/solutions.html", data=solutions, id=assistantID)
 
     elif request.method == 'POST':
@@ -106,6 +100,105 @@ def admin_solutions(assistantID):
                 solutions_services.addOldByAssitantID(assistantID, "Could not create on of the new solutions. Solutions have been emptied.", currentSolutions)
                 return helpers.redirectWithMessageAndAssistantID("admin_solutions", assistantID, "Could not create one of the new solutions: "+id+" "+name+". Reverting to old ones")
         return redirect("/admin/assistant/{}/solutions".format(assistantID))
+
+
+@solutions_router.route("/admin/solution/<solID>", methods=['PUT', 'DELETE'])
+def update_and_delete_solution(solID):
+
+    # Get the admin user who is logged in and wants to edit and delete.
+    callback: Callback = company_services.getByID(session.get('CompanyID', 0))
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, "An error occurred. Please login again please")
+    company: Company = callback.Data
+
+    if request.method == "PUT":
+
+        # Solution info
+        id = request.form.get("inputId", default='').strip()
+        majorTitle = request.form.get("inputMajorTitle", default='').strip()
+        secondaryTitle = request.form.get("inputSecondaryTitle", default='').strip()
+        shortDescription = request.form.get("inputShortDescription", default='').strip()
+        money = request.form.get("inputMoney", default='').strip()
+        keywords = request.form.get("inputKeywords", default='').strip()
+        URL = request.form.get("inputURL", default='').strip()
+
+        if not helpers.isStringsLengthGreaterThanZero(majorTitle, money, URL):
+            return helpers.jsonResponse(False, 400, "Please provide all required info for the new solution.")
+
+        # Get the solution to be updated.
+        if not solID: solID = 0
+        callback: Callback = solutions_services.getByID(solID)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, "Sorry, this solution doesn't exist")
+        solution: Solution = callback.Data
+
+        # Check if the this user is owns that solution.
+        if not solution.Assistant.CompanyID == company.ID:
+            return helpers.jsonResponse(False, 401, "Sorry, You're not authorised")
+
+
+        # Update the solution
+        callback: Callback = solutions_services.update(solution, id, majorTitle, money, URL,
+                                                       secondaryTitle, shortDescription, keywords)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message,)
+
+        return helpers.jsonResponse(True, 200, "Solution successfully updated.")
+
+    if request.method == "DELETE":
+
+        # Get the solution to be updated.
+        if not solID: solID = 0
+        callback: Callback = solutions_services.getByID(solID)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, "Sorry, this solution doesn't exist")
+        solution: Solution = callback.Data
+
+        # Check if the this user is owns that solution.
+        if not solution.Assistant.CompanyID == company.ID:
+            return helpers.jsonResponse(False, 401, "Sorry, You're not authorised")
+
+        # Delete the solution
+        callback: Callback = solutions_services.remove(solution)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
+
+        return helpers.jsonResponse(True, 200, "Solution successfully removed.")
+
+
+@solutions_router.route("/admin/assistant/<assistantID>/solution", methods=['POST'])
+def create_solution(assistantID):
+
+    callback: Callback = assistant_services.getByID(assistantID)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+    assistant: Assistant = callback.Data
+
+    if request.method == "POST":
+
+        # Solution info
+        id = request.form.get("inputId", default='').strip()
+        majorTitle = request.form.get("inputMajorTitle", default='').strip()
+        secondaryTitle = request.form.get("inputSecondaryTitle", default='').strip()
+        shortDescription = request.form.get("inputShortDescription", default='').strip()
+        money = request.form.get("inputMoney", default='').strip()
+        keywords = request.form.get("inputKeywords", default='').strip()
+        URL = request.form.get("inputURL", default='').strip()
+
+        if not helpers.isStringsLengthGreaterThanZero(id, majorTitle, money, URL):
+            return helpers.jsonResponse(False, 400, "Please provide all required info for the new solution.")
+
+        # TODO: add restriction to only add limited number of solution based on plan
+        ########## HERE ###########
+
+        # Create the solution
+        callback: Callback = solutions_services.createNew(assistant, id, majorTitle, money, URL,
+                                                       secondaryTitle, shortDescription, keywords)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+
+        return helpers.jsonResponse(True, 200, "Solution successfully added.")
+
 
 # TODO improve
 @solutions_router.route("/admin/assistant/<assistantID>/solutions/file", methods=['POST'])

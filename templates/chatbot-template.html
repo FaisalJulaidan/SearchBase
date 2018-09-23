@@ -668,15 +668,15 @@
                 }
             }
 
-            {#$("#qAnswers").remove();#}
-            {#chatInputDiv.style = "display:none";#}
+            $("#qAnswers").remove();
+            chatInputDiv.style = "display:none";
 
-            {#sendUserMessage(message.replace("&FILE_UPLOAD&", "")) //print user's message in the chatbox to appear like he is typing back#}
-            {#await sleep(500);#}
+            sendUserMessage(message.replace("&FILE_UPLOAD&", "")) //print user's message in the chatbox to appear like he is typing back
+            await sleep(500);
 
-            {#putThinkingGif();#}
-            {#await sleep(400 + Math.floor(Math.random() * 900));#}
-            {#removeThinkingGif();#}
+            putThinkingGif();
+            await sleep(400 + Math.floor(Math.random() * 900));
+            removeThinkingGif();
 
             // print the selected answer
             newMessage(CLIENT_USER, message);
@@ -700,9 +700,9 @@
                 sendAssistantMessage(generateUserInputThanks())
                 await sleep(300);
 
-                {#putThinkingGif();#}
-                {#await sleep(400 + Math.floor(Math.random() * 500));#}
-                {#removeThinkingGif();#}
+                putThinkingGif();
+                await sleep(400 + Math.floor(Math.random() * 500));
+                removeThinkingGif();
             }
 
             var action = null;

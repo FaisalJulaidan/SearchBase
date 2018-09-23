@@ -1,7 +1,7 @@
 from flask import Blueprint, request, redirect, flash
 from services import assistant_services,admin_services
 from models import Callback, Assistant
-from utilties import helpers
+from utilities import helpers
 
 settings_router: Blueprint = Blueprint('settings_router', __name__, template_folder="../../templates")
 

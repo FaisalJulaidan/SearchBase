@@ -72,36 +72,37 @@
     <!-- https://demos.emojione.com/latest/jstoshort.html to look at their :emoji: name -->
 
 
-        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-        <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <!------ Include the above in your HEAD tag ---------->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!------ Include the above in your HEAD tag ---------->
 
-        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-        <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-        <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-        <!------ Include the above in your HEAD tag ---------->
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <!------ Include the above in your HEAD tag ---------->
 
-        <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
-        <link rel='stylesheet prefetch'
-              href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
-    </head>
-    <style>
-        html,body{
-            width: 100% !important;
-            height: 100% !important;
-        }
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: "proxima-nova", "Source Sans Pro", sans-serif;
-            font-size: 1em;
-            letter-spacing: 0.1px;
-            color: #32465a;
-            text-rendering: optimizeLegibility;
-            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
-            -webkit-font-smoothing: antialiased;
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
+    <link rel='stylesheet prefetch'
+          href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
+</head>
+<style>
+    html, body {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "proxima-nova", "Source Sans Pro", sans-serif;
+        font-size: 1em;
+        letter-spacing: 0.1px;
+        color: #32465a;
+        text-rendering: optimizeLegibility;
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
+        -webkit-font-smoothing: antialiased;
 
         background: -webkit-linear-gradient(-135deg, #c850c0, #4158d0);
         background: -o-linear-gradient(-135deg, #c850c0, #4158d0);
@@ -668,15 +669,15 @@
                 }
             }
 
-            $("#qAnswers").remove();
-            chatInputDiv.style = "display:none";
+            {#$("#qAnswers").remove();#}
+            {#chatInputDiv.style = "display:none";#}
 
-            sendUserMessage(message.replace("&FILE_UPLOAD&", "")) //print user's message in the chatbox to appear like he is typing back
-            await sleep(500);
+            {#sendUserMessage(message.replace("&FILE_UPLOAD&", "")) //print user's message in the chatbox to appear like he is typing back#}
+            {#await sleep(500);#}
 
-            putThinkingGif();
-            await sleep(400 + Math.floor(Math.random() * 900));
-            removeThinkingGif();
+            {#putThinkingGif();#}
+            {#await sleep(400 + Math.floor(Math.random() * 900));#}
+            {#removeThinkingGif();#}
 
             // print the selected answer
             newMessage(CLIENT_USER, message);
@@ -700,9 +701,9 @@
                 sendAssistantMessage(generateUserInputThanks())
                 await sleep(300);
 
-                putThinkingGif();
-                await sleep(400 + Math.floor(Math.random() * 500));
-                removeThinkingGif();
+                {#putThinkingGif();#}
+                {#await sleep(400 + Math.floor(Math.random() * 500));#}
+                {#removeThinkingGif();#}
             }
 
             var action = null;
@@ -975,67 +976,60 @@
     });
 </script>
 
-    </body>
+</body>
 </html>
 
-
-    <div class="top_right">
-        <img style="width:20px; height: 20px; margin: 10px; top: 0px; right: 0px; position: fixed;" src="/static/img/bg-img/Icons8-Windows-8-Computer-Hardware-Restart.ico" onclick="Reset()">
-    </div>
-
-    <div class="outerContainer">
-        <div class="innerContainer">
-            <div class="element">
-                <!-- <div class="chat-box">
-                <div class="open">Open
-                    <div class="box"> -->
-                <center>
-                    <ul id="messagesContainer">
-                        <!-- paste here the yeyo -->
-                    </ul>
-                </center>
-                <div id="separator">
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <div id="chatBottom"></div>
-                </div>
-                <footer id="chatFooter">
-                    <div id="bottomContainer">
-                        <div id="optionsDiv">
-                        </div>
-                        <!-- <ul> -->
-                        <div id="ChatInputDiv">
-                            <!--<input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><input type="file" id="fileUploadB" size="10" /><img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />-->
-                            <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage">
-                            <form id="fileUploadForm" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
-                                <label for="fileUploadB">
-                                    <img src="https://www.thesearchbase.com/static/images/cloud-upload.png" />
-                                </label>
-
-                                <input name="file" hidden id="fileUploadB" type="file" />
-                            </form>
-                            <img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitAnswer('')" />
-                        </div>
-                        <!-- </ul> -->
-                    </div>
-                </footer>
-            </div>
-        </div>
-    </div>
-    <!-- </div>
-    </div>
-    </div> -->
-    <script src="/static/chatbot/script.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            console.log("JS is working...");
-            var hrefSplit = window.location.href.split("/")
-            chatbotInit(assistantID = hrefSplit[hrefSplit.length -1]);
-        });
-    </script>
+{##}
+{#    <div class="top_right">#}
+{#        <img style="width:20px; height: 20px; margin: 10px; top: 0px; right: 0px; position: fixed;" src="/static/img/bg-img/Icons8-Windows-8-Computer-Hardware-Restart.ico" onclick="Reset()">#}
+{#    </div>#}
+{##}
+{#    <div class="outerContainer">#}
+{#        <div class="innerContainer">#}
+{#            <div class="element">#}
+{#                <!-- <div class="chat-box">#}
+{#                <div class="open">Open#}
+{#                    <div class="box"> -->#}
+{#                <center>#}
+{#                    <ul id="messagesContainer">#}
+{#                        <!-- paste here the yeyo -->#}
+{#                    </ul>#}
+{#                </center>#}
+{#                <div id="separator">#}
+{#                    <br>#}
+{#                    <br>#}
+{#                    <br>#}
+{#                    <br>#}
+{#                    <br>#}
+{#                    <br>#}
+{#                    <br>#}
+{#                    <div id="chatBottom"></div>#}
+{#                </div>#}
+{#                <footer id="chatFooter">#}
+{#                    <div id="bottomContainer">#}
+{#                        <div id="optionsDiv">#}
+{#                        </div>#}
+{#                        <!-- <ul> -->#}
+{#                        <div id="ChatInputDiv">#}
+{#                            <!--<input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><input type="file" id="fileUploadB" size="10" /><img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />-->#}
+{#                            <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage">#}
+{#                            <form id="fileUploadForm" class="image-upload" style="display:none" onsubmit="return sendFileForm();">#}
+{#                                <label for="fileUploadB">#}
+{#                                    <img src="https://www.thesearchbase.com/static/images/cloud-upload.png" />#}
+{#                                </label>#}
+{##}
+{#                                <input name="file" hidden id="fileUploadB" type="file" />#}
+{#                            </form>#}
+{#                            <img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitAnswer('')" />#}
+{#                        </div>#}
+{#                        <!-- </ul> -->#}
+{#                    </div>#}
+{#                </footer>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <!-- </div>#}
+{#    </div>#}
+{#    </div> -->#}
+{#    <script src="/static/chatbot/script.js"></script>#}
+{##}

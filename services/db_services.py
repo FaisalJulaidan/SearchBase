@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 import sqlalchemy.exc
 
-from utilties.helpers import *
+from utilities.helpers import *
 
 from models import Callback,\
     Company,User, db, Role

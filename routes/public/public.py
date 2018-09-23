@@ -3,7 +3,7 @@ from config import BaseConfig
 from datetime import timedelta
 from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory, json
 from flask_api import status
-from utilties import helpers
+from utilities import helpers
 from models import Callback, Assistant, Solution, db, ChatbotSession
 from itsdangerous import URLSafeTimedSerializer
 from services import user_services, company_services, db_services, auth_services, mail_services,\

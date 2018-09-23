@@ -1,5 +1,5 @@
 from models import db, Callback, ChatbotSession
-from utilties import helpers
+from utilities import helpers
 
 
 def getByAssistantID(assistantID):

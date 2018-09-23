@@ -1,7 +1,7 @@
 from flask import Blueprint, request, redirect, flash, session, json
 from services import admin_services, assistant_services, company_services, bot_services, user_services
 from models import db, Callback, Assistant, Block, User
-from utilties import helpers
+from utilities import helpers
 from sqlalchemy.sql import exists, func
 
 

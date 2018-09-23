@@ -2,7 +2,7 @@ import sqlalchemy.exc
 import re
 from models import db,Callback,Solution, Assistant
 from sqlalchemy import func, exists
-from utilties import helpers
+from utilities import helpers
 
 
 # Scoring System

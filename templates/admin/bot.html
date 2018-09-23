@@ -455,7 +455,7 @@
                                     let newTemplateName = $target.text();
 
                                     $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
-                                    $blockBody.html(render_blocks_change(newTemplateName));
+                                    $blockBody.html(render_blocks_change(newTemplateName, $blockBody));
                                     init_changed_block();
                                     updateBlocksOrder();
                                 }
@@ -463,7 +463,7 @@
                     } else {
                         let newTemplateName = $target.text();
                         $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
-                        $blockBody.html(render_blocks_change(newTemplateName));
+                        $blockBody.html(render_blocks_change(newTemplateName, $blockBody));
                         init_changed_block();
                         updateBlocksOrder();
                     }
@@ -525,6 +525,18 @@
                                                             action: "",
                                                             text: "",
                                                             fileTypes: []
+                                                        },
+                                                        storeInDB: true,
+                                                        type: blockType,
+                                                    },
+                                                    botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                                                });
+                                            case 'Solutions':
+                                                return JSON.stringify({
+                                                    block: {
+                                                        content: {
+                                                            afterMessage: "",
+                                                            showTop: 1,
                                                         },
                                                         storeInDB: true,
                                                         type: blockType,
@@ -684,7 +696,7 @@
                                     let newTemplateName = $target.text();
 
                                     $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
-                                    $blockBody.html(render_blocks_change(newTemplateName));
+                                    $blockBody.html(render_blocks_change(newTemplateName, $blockBody));
                                     init_changed_block();
                                     updateBlocksOrder();
                                 }
@@ -692,7 +704,7 @@
                     } else {
                         let newTemplateName = $target.text();
                         $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
-                        $blockBody.html(render_blocks_change(newTemplateName));
+                        $blockBody.html(render_blocks_change(newTemplateName, $blockBody));
                         init_changed_block();
                         updateBlocksOrder();
                     }
@@ -774,6 +786,21 @@
                                 action: action ? action : 'Go To Next Block',
                                 text: text,
                                 fileTypes: fileTypes,
+                                afterMessage: afterMessage
+                            },
+                            storeInDB: storeInDB,
+                            type: type,
+                            order: order,
+                            id: id
+                        }
+                    }
+                }
+
+                class BlockTypeSolutions {
+                    constructor(showTop, afterMessage, storeInDB, type, order, id) {
+                        this.Solutions = {
+                            content: {
+                                showTop: showTop,
                                 afterMessage: afterMessage
                             },
                             storeInDB: storeInDB,
@@ -875,6 +902,20 @@
 
                         botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, afterMessage, storeInDB, type, order, id).FileUpload);
                     }
+
+                    if (type == 'Solutions') {
+
+                        let showTop = +$block.children('div.panel-body').first().children('.topSolutions').first().children('input').first().val();
+                        let afterMessage = $block.children('div.panel-body').first().children('.afterMessage').first().children('input').first().val();
+                        let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+                        let id = +$block.attr('id');
+
+                        botData.blocks.push(new BlockTypeSolutions(showTop, afterMessage, storeInDB, type, order, id).Solutions);
+                    }
+
+
+
+
                     //console.log(botData)
                 }
                 $.ajax({
@@ -984,6 +1025,10 @@
                     "               aria-describedby=\"basic-addon1\" value=\"\">\n" +
                     "      </div>      <label for=\"input\">Kewords:</label>\n" +
                     "      <input name='tags' value=''>\n" +
+
+                    "      <label for='#input-after-message'>After Message:</label>\n" +
+                    "      <input class=\"form-control\" type='text' placeholder='Message to be sent after the question is answered' value=''/><br />"+
+
                     "      <label for=\".input-group\">Actions:</label>\n" +
                     "      <div class=\"input-group\">\n" +
                     "        <input type=\"text\" style=\"height: 34px\"\n" +
@@ -1112,6 +1157,16 @@
             function render_blocks(blocks) {
                 function cookUpBlock(block_template, block) {
 
+                    function getQuestionElement(){
+                        return "<div class=\"input-group col-md-6\">\n" +
+                            "         <span class=\"input-group-addon\">Question:</span>\n" +
+                            "         <input type=\"text\" class=\"form-control\"\n" +
+                            "           placeholder=\"Question\"\n" +
+                            "           aria-describedby=\"basic-addon1\"\n" +
+                            "           value=\"BLOCK_TEXT_EDITABLE\">\n" +
+                            "       </div>\n"
+                    }
+
                     function getActionElement(actions) {
                         return "" +
                             "<div class=\"input-group col-md-6\">\n" +
@@ -1123,10 +1178,19 @@
                             "           <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                             "       </button>\n" +
                             "       <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
-                            getDropdownEelement(actions) +
+                            getDropdownElement(actions) +
                             "       </ul>\n" +
                             "   </div><!-- /btn-group -->\n" +
                             "</div><!-- /input-group -->\n"
+                    }
+
+                    function getTopSolutionsElement() {
+                        return "" +
+                            "<div class=\"input-group col-sm-3 topSolutions\">\n" +
+                            "         <span class=\"input-group-addon\">Top:</span>\n" +
+                            "         <input type=\"number\" min=\"1\" class=\"form-control\"\n" +
+                            "         value=\"BLOCK_TOP_SOLUTION_EDITABLE\">\n" +
+                            "</div>\n"
                     }
 
                     function getValidationElement(validations) {
@@ -1140,13 +1204,13 @@
                             "           <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                             "       </button>\n" +
                             "       <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
-                            getDropdownEelement(validations) +
+                            getDropdownElement(validations) +
                             "       </ul>\n" +
                             "   </div><!-- /btn-group -->\n" +
                             "</div><!-- /input-group -->\n"
                     }
 
-                    function getSubmitElemnt(storeInDB, id) {
+                    function getSubmitElement(storeInDB, id) {
                         let isDisabled = block_template.alwaysStoreInDB ? '' : 'disabled';
                         return "" +
                             "<div class=\"col-md-1 pull-right inline\">\n" +
@@ -1163,7 +1227,7 @@
                             "</div>"
                     }
 
-                    function getDropdownEelement(items) {
+                    function getDropdownElement(items) {
                         let elements = '';
                         for (item of items)
                             elements += "<li><a>" + item + "</a></li>\n"
@@ -1191,7 +1255,7 @@
                             getRadioButtons(fileTypes, selectedFileTypes) +
                             "  </div>\n" +
                             "</div>" +
-                            "<small style='margin-top:-10px'>Max size: " + fileSize + "</small>"
+                            "<small style='margin-top:-10px'>Max size: " + fileSize + "</small><br /><br />"
                     }
 
                     function getAnswersElement(actions, answers) {
@@ -1231,8 +1295,8 @@
                     }
 
                     function getAfterMessageInput(afterMessage) {
-                        return "<br /> <br />" +
-                            "<div class=\"input-group col-md-8\">\n" +
+                        return "" +
+                            "<div class=\"input-group col-md-8 afterMessage\">\n" +
                             "  <span class=\"input-group-addon\">After Message:</span>\n" +
                             "  <input type='text' placeholder='Message to be sent after the question is answered' class='form-control' value='" + afterMessage + "'/>" +
                             "</div>"
@@ -1280,7 +1344,7 @@
                             "             <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                             "          </button>\n" +
                             "          <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
-                            getDropdownEelement(actions) +
+                            getDropdownElement(actions) +
                             "          </ul>\n" +
                             "        </div><!-- /btn-group -->\n" +
                             "      </div><!-- /input-group -->\n" +
@@ -1299,8 +1363,9 @@
                         template = template.replace('BLOCK_TEXT_EDITABLE', block.content.text);
                         template = template.replace('BLOCK_ACTION', block.content.action);
                         template = template.replace('BLOCK_VALIDATION', block.content.validation);
+                        template = template.replace('BLOCK_TOP_SOLUTION_EDITABLE', block.content.showTop);
 
-                        return template = template.replace('BLOCK_SUBMIT', getSubmitElemnt(block.storeInDB, block.id));
+                        return template = template.replace('BLOCK_SUBMIT', getSubmitElement(block.storeInDB, block.id));
                     }
 
                     function getTemplate(block_template, block) {
@@ -1309,7 +1374,7 @@
                             "    <div class=\"panel-heading panel-collapsed\">\n" +
                             "        <div class=\"panel-title\">\n" +
                             "            <span class=\"moveable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-menu-hamburger\"></i></span>\n" +
-                            "            <b>BLOCK_TEXT</b>\n" +
+                            "            <b class=\"title\">BLOCK_TEXT</b>\n" +
                             "        </div>\n" +
                             "        <span class=\"pull-right clickable\" style='color:#660ff2;margin-left:15px'><i class=\"trash glyphicon glyphicon-trash\"></i></span>\n" +
                             "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"indicator glyphicon glyphicon-chevron-up\"></i></span>\n" +
@@ -1322,7 +1387,7 @@
                             "                            Type <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                             "                    </button>\n" +
                             "                    <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
-                            getDropdownEelement(BlocksTypes) +
+                            getDropdownElement(BlocksTypes) +
                             "                    </ul>\n" +
                             "                </div><!-- /btn-group -->\n" +
                             "            </div><!-- /input-group -->\n" +
@@ -1330,56 +1395,61 @@
                             "    </div>\n" +
                             // Block text
                             "    <div class=\"panel-body\" style='display:none;'>\n" +
-                            "       <div class=\"input-group col-md-6\">\n" +
-                            "         <span class=\"input-group-addon\">Question:</span>\n" +
-                            "         <input type=\"text\" class=\"form-control\"\n" +
-                            "           placeholder=\"Question\"\n" +
-                            "           aria-describedby=\"basic-addon1\"\n" +
-                            "           value=\"BLOCK_TEXT_EDITABLE\">\n" +
-                            "       </div>\n" +
-
                             // placeholders
-                            "       BLOCK_ADD_ANSER_BUTTON" +
-                            "       BLOCK_ANSWERS" +
-                            "       BLOCK_ACTION" +
-                            "       BLOCK_VALIDATION" +
-                            "       BLOCK_FILE_TYPE" +
-                            "       BLOCK_AFTER_MESSAGE" +
-                            "       BLOCK_SUBMIT" +
+                            "       BLOCK_CONTENT" +
 
                             "    </div>\n" +
                             "</li>";
+                        
+                        var content = "";
+                        
+                        if (block_template.name == "Solutions"){
+                            content = getTopSolutionsElement() + getAfterMessageInput() +
+                                getSubmitElement(true, 'x');
+
+                        }
+
+                        if (block_template.name == "File Upload") {
+                            content = getQuestionElement() +
+                                getActionElement(block_template.actions) +
+                                getFileUpload(block_template.typesAllowed, block_template.fileMaxSize, block.content.fileTypes) +
+                                getAfterMessageInput(block.content.afterMessage) +
+                                getSubmitElement(true, 'x');
+                        }
 
 
-                        if (block_template.name == "File Upload")
-                            templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', getFileUpload(block_template.typesAllowed, block_template.fileMaxSize, block.content.fileTypes));
-                        else
-                            templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', '');
+                        if (block_template.name == "User Input"){
+                            content = getQuestionElement() +
+                                getActionElement(block_template.actions) +
+                                getValidationElement(block_template.validations) +
+                                getAfterMessageInput() +
+                                getSubmitElement(true, 'x');
 
-
-                        if (block_template.name == "File Upload" || block_template.name == "User Input")
-                            templateHTML = templateHTML.replace('BLOCK_ACTION', getActionElement(block_template.actions));
-                        else
-                            templateHTML = templateHTML.replace('BLOCK_ACTION', '');
-
-                        if (block_template.name == "User Input")
-                            templateHTML = templateHTML.replace('BLOCK_VALIDATION', getValidationElement(block_template.validations));
-                        else
-                            templateHTML = templateHTML.replace('BLOCK_VALIDATION', '');
+                        }
 
                         if (block_template.name == "Question") {
-                            templateHTML = templateHTML.replace('BLOCK_ANSWERS', getAnswersElement(block_template.actions, block.content.answers));
-                            templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', getAddAnswerButton());
-                            templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', '');
+                            content = getQuestionElement() +
+                                getAddAnswerButton() +
+                                getAnswersElement(block_template.actions, block.content.answers) +
+                                getSubmitElement(true, 'x');
                         }
-                        else {
-                            templateHTML = templateHTML.replace('BLOCK_ANSWERS', '');
-                            templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', '');
-                            templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', getAfterMessageInput(block.content.afterMessage))
-                        }
-
                         
+                        
+                        
+                        if (block_template.name == "Solutions"){
+                            templateHTML = templateHTML.replace('BLOCK_QUESTION_TEXT', '');
+                            templateHTML = templateHTML.replace('BLOCK_TOP_SOLUTIONS', getTopSolutionsElement());
+                            templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', getAfterMessageInput(block.content.afterMessage));
 
+                        }
+                        else
+                            templateHTML = templateHTML.replace('BLOCK_QUESTION_TEXT', getQuestionElement());
+                            templateHTML = templateHTML.replace('BLOCK_TOP_SOLUTIONS', '');
+
+
+
+                        templateHTML = templateHTML.replace('BLOCK_CONTENT', content);
+                        
                         return templateHTML;
                     }
 
@@ -1397,8 +1467,21 @@
                 else $("#draggablePanelList").html("<h2>There are no blocks for this bot. Please click on the top right, and create them.</h2>");
             }
 
-            function render_blocks_change(block_template) {
+            function render_blocks_change(block_template, $oldBlock) {
                 function cookUpBlock(block_template, block) {
+
+                    // empty the old block text
+                    console.log($oldBlock.parent().find('.title').text('...'));
+
+                       function getQuestionElement(){
+                        return "" +
+                           "<div class=\"input-group col-md-6\">\n" +
+                            "         <span class=\"input-group-addon\">Question:</span>\n" +
+                            "         <input type=\"text\" class=\"form-control\"\n" +
+                            "           placeholder=\"Question\"\n" +
+                            "           aria-describedby=\"basic-addon1\">\n" +
+                            " </div>\n"
+                    }
 
                     function getActionElement(actions) {
                         return "" +
@@ -1411,10 +1494,26 @@
                             "           <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                             "       </button>\n" +
                             "       <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
-                            getDropdownEelement(actions) +
+                            getDropdownElement(actions) +
                             "       </ul>\n" +
                             "   </div><!-- /btn-group -->\n" +
                             "</div><!-- /input-group -->\n"
+                    }
+
+                    function getTopSolutionsElement() {
+                        return "" +
+                            "<div class=\"input-group col-sm-3 topSolutions\">\n" +
+                            "         <span class=\"input-group-addon\">Top:</span>\n" +
+                            "         <input type=\"number\" min=\"1\" class=\"form-control\"\n" +
+                            "</div>\n"
+                    }
+
+                    function getAfterMessageInput(afterMessage) {
+                        return "" +
+                            "<div class=\"input-group col-md-8\">\n" +
+                            "  <span class=\"input-group-addon\">After Message:</span>\n" +
+                            "  <input type='text' placeholder='Message to be sent after the question is answered' class='form-control' value='" + afterMessage + "'/>" +
+                            "</div>"
                     }
 
                     function getValidationElement(validations) {
@@ -1428,13 +1527,13 @@
                             "           <span style=\"margin: 0\" class=\"caret\"></span>\n" +
                             "       </button>\n" +
                             "       <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
-                            getDropdownEelement(validations) +
+                            getDropdownElement(validations) +
                             "       </ul>\n" +
                             "   </div><!-- /btn-group -->\n" +
                             "</div><!-- /input-group -->\n"
                     }
 
-                    function getSubmitElemnt(storeInDB, id) {
+                    function getSubmitElement(storeInDB, id) {
                         let isDisabled = storeInDB ? '' : 'disabled';
                         return "" +
                             "<div class=\"save col-md-1 pull-right inline\">\n" +
@@ -1451,7 +1550,7 @@
                             "</div>"
                     }
 
-                    function getDropdownEelement(items) {
+                    function getDropdownElement(items) {
                         let elements = '';
                         for (item of items)
                             elements += "<li><a>" + item + "</a></li>\n"
@@ -1475,7 +1574,7 @@
                             getRadioButtons(fileTypes) +
                             "  </div>\n" +
                             "</div>" +
-                            "<small style='margin-top:-10px'>Max size: " + fileSize + "</small>"
+                            "<small style='margin-top:-10px'>Max size: " + fileSize + "</small><br /> <br />"
                     }
 
                     function getAnswersElement() {
@@ -1493,55 +1592,105 @@
                     }
 
                     function getTemplate(block_template) {
-                        templateHTML =
-                            // Block text
-                            "<div class=\"panel-body\" >\n" +
-                            "    <div class=\"input-group col-md-6\">\n" +
-                            "         <span class=\"input-group-addon\">Question:</span>\n" +
-                            "         <input type=\"text\" class=\"form-control\"\n" +
-                            "                placeholder=\"Question\"\n" +
-                            "                aria-describedby=\"basic-addon1\"\n" +
-                            "                value=''>\n" +
-                            "    </div>\n" +
+                        templateHTML = "";
 
-                            // placeholders
-                            "       BLOCK_ADD_ANSER_BUTTON" +
-                            "       BLOCK_ANSWERS" +
-                            "       BLOCK_ACTION" +
-                            "       BLOCK_VALIDATION" +
-                            "       BLOCK_FILE_TYPE" +
-                            "       BLOCK_AFTER_MESSAGE" +
-                            getSubmitElemnt(true, 'x') +
-                            "</div>\n";
-                        if (block_template.name == "File Upload")
-                            templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', getFileUpload(block_template.typesAllowed, block_template.fileMaxSize));
-                        else
-                            templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', '');
+                        if (block_template.name == "Solutions"){
+                            templateHTML = getTopSolutionsElement() + getAfterMessageInput() +
+                                getSubmitElement(true, 'x');
+
+                        }
+
+                        if (block_template.name == "File Upload") {
+                            templateHTML = getQuestionElement() +
+                                getActionElement(block_template.actions) +
+                                getFileUpload(block_template.typesAllowed, block_template.fileMaxSize) +
+                                getAfterMessageInput() +
+                                getSubmitElement(true, 'x');
+                        }
 
 
-                        if (block_template.name == "File Upload" || block_template.name == "User Input")
-                            templateHTML = templateHTML.replace('BLOCK_ACTION', getActionElement(block_template.actions));
-                        else
-                            templateHTML = templateHTML.replace('BLOCK_ACTION', '');
+                        if (block_template.name == "User Input"){
+                            templateHTML = getQuestionElement() +
+                                getActionElement(block_template.actions) +
+                                getValidationElement(block_template.validations) +
+                                getAfterMessageInput() +
+                                getSubmitElement(true, 'x');
 
-                        if (block_template.name == "User Input")
-                            templateHTML = templateHTML.replace('BLOCK_VALIDATION', getValidationElement(block_template.validations));
-                        else
-                            templateHTML = templateHTML.replace('BLOCK_VALIDATION', '');
+                        }
 
                         if (block_template.name == "Question") {
-                            templateHTML = templateHTML.replace('BLOCK_ANSWERS', getAnswersElement(block_template.actions));
-                            templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', getAddAnswerButton());
-                            templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', '')
-                        }
-                        else {
-                            templateHTML = templateHTML.replace('BLOCK_ANSWERS', '');
-                            templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', '');
-                            templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', getAfterMessageInput(block_template.afterMessage))
+                            templateHTML = getQuestionElement() +
+                                 getAddAnswerButton() +
+                                getAnswersElement(block_template.actions) +
+                                getSubmitElement(false, 'x');
+
+
                         }
 
                         return templateHTML;
                     }
+
+
+
+                    {#function getTemplate(block_template) {#}
+                    {#    templateHTML = "" +#}
+                    {#       // placeholders#}
+                    {#        "       BLOCK_QUESTION_TEXT" +#}
+                    {#        "       BLOCK_ADD_ANSER_BUTTON" +#}
+                    {#        "       BLOCK_TOP_SOLUTIONS" +#}
+                    {#        "       BLOCK_ANSWERS" +#}
+                    {#        "       BLOCK_ACTION" +#}
+                    {#        "       BLOCK_VALIDATION" +#}
+                    {#        "       BLOCK_FILE_TYPE" +#}
+                    {#        "       BLOCK_AFTER_MESSAGE" +#}
+                    {#        getSubmitElement(true, 'x');#}
+                    {##}
+                    {#    if (block_template.name == "Solutions"){#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_QUESTION_TEXT', '');#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', '');#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_ANSWERS', '');#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_ACTION', '');#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_VALIDATION', '');#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', '');#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', '');#}
+                    {##}
+                    {#        templateHTML = templateHTML.replace('BLOCK_TOP_SOLUTIONS', getTopSolutionsElement());#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', getAfterMessageInput(block_template.afterMessage));#}
+                    {##}
+                    {#    }#}
+                    {#    else#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_TOP_SOLUTIONS', '');#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_QUESTION_TEXT', getQuestionElement());#}
+                    {##}
+                    {#    if (block_template.name == "File Upload")#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', getFileUpload(block_template.typesAllowed, block_template.fileMaxSize));#}
+                    {#    else#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', '');#}
+                    {##}
+                    {##}
+                    {#    if (block_template.name == "File Upload" || block_template.name == "User Input")#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_ACTION', getActionElement(block_template.actions));#}
+                    {#    else#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_ACTION', '');#}
+                    {##}
+                    {#    if (block_template.name == "User Input")#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_VALIDATION', getValidationElement(block_template.validations));#}
+                    {#    else#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_VALIDATION', '');#}
+                    {##}
+                    {#    if (block_template.name == "Question") {#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_ANSWERS', getAnswersElement(block_template.actions));#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', getAddAnswerButton());#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', '')#}
+                    {#    }#}
+                    {#    else {#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_ANSWERS', '');#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', '');#}
+                    {#        templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', getAfterMessageInput(block_template.afterMessage))#}
+                    {#    }#}
+                    {##}
+                    {#    return templateHTML;#}
+                    {#}#}
 
 
                     return getTemplate(block_template, block);

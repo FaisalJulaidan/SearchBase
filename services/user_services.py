@@ -2,7 +2,7 @@ import sqlalchemy.exc
 
 from services import mail_services, company_services
 from models import db, Callback, User, Company, Role, UserSettings
-from utilties import helpers
+from utilities import helpers
 from sqlalchemy.sql import exists, func
 
 

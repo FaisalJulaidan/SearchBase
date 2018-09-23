@@ -1,14 +1,14 @@
 import sqlalchemy.exc
 
 from models import Callback, User, Company, UserSettings, db
-from utilties import helpers
+from utilities import helpers
 from datetime import datetime
 from flask import session, escape
 from json import dumps
 import stripe
 
 from services import user_services, assistant_services, role_services, sub_services, company_services
-from utilties import helpers
+from utilities import helpers
 
 
 def signup(email, firstname, surname, password, companyName, companyPhoneNumber, websiteURL) -> Callback:

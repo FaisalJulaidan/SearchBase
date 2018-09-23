@@ -1,7 +1,7 @@
 from services import admin_services, user_services
 from models import Callback
 from flask import Blueprint, request, redirect, session
-from utilties import helpers
+from utilities import helpers
 
 changePassword_router: Blueprint = Blueprint('changePassword_router', __name__ ,template_folder="../../templates")
 @changePassword_router.route("/admin/changepassword", methods=["GET", "POST"])

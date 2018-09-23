@@ -3,8 +3,9 @@
   "title": "Solutions block schema",
   "type": "object",
   "properties": {
-    "showHighest": {"type": "integer", "minimum": 1}
+    "showTop": {"type": "integer", "minimum": 1},
+    "afterMessage": {"type": "string"}
     },
-  "required": ["showHighest"],
+  "required": ["showTop", "afterMessage"],
   "additionalProperties": false
 }

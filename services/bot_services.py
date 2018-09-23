@@ -1,9 +1,9 @@
 from flask import session
 from services import assistant_services
-from utilties import helpers
+from utilities import helpers
 from typing import List
 from config import BaseConfig
-from utilties import json_utils
+from utilities import json_utils
 from sqlalchemy.sql import exists, func
 
 

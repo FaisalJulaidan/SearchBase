@@ -1,7 +1,7 @@
 from flask import Blueprint, request, redirect, session
 from services import admin_services, analytics_services, assistant_services
 from models import Callback
-from utilties import helpers
+from utilities import helpers
 
 
 dashboard_router: Blueprint = Blueprint('dashboard_router', __name__, template_folder="../../templates")

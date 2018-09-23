@@ -1,7 +1,7 @@
 from services import profile_services, admin_services, newsletter_services, user_services
 from models import Callback
 from flask import Blueprint, request, redirect, session
-from utilties import helpers
+from utilities import helpers
 
 profile_router: Blueprint = Blueprint('profile_router', __name__ ,template_folder="../../templates")
 

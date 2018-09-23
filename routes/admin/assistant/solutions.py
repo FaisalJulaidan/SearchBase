@@ -122,7 +122,7 @@ def update_and_delete_solution(solID):
         keywords = request.form.get("inputKeywords", default='').strip()
         URL = request.form.get("inputURL", default='').strip()
 
-        if not helpers.isStringsLengthGreaterThanZero(id, majorTitle, money, URL):
+        if not helpers.isStringsLengthGreaterThanZero(majorTitle, money, URL):
             return helpers.jsonResponse(False, 400, "Please provide all required info for the new solution.")
 
         # Get the solution to be updated.
@@ -138,7 +138,7 @@ def update_and_delete_solution(solID):
 
 
         # Update the solution
-        callback: Callback = solutions_services.update(solution, solID, majorTitle, money, URL,
+        callback: Callback = solutions_services.update(solution, id, majorTitle, money, URL,
                                                        secondaryTitle, shortDescription, keywords)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message,)
@@ -192,7 +192,7 @@ def create_solution(assistantID):
         ########## HERE ###########
 
         # Create the solution
-        callback: Callback = solutions_services.createNew(assistant, majorTitle, money, URL,
+        callback: Callback = solutions_services.createNew(assistant, id, majorTitle, money, URL,
                                                        secondaryTitle, shortDescription, keywords)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)

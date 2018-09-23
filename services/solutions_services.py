@@ -136,10 +136,10 @@ def deleteAllByAssistantID(assistantID):
     return True
 
 
-def createNew(assistant, solId, majorTitle, money, url, secTitle='', shortDesc='', keywords=''):
+def createNew(assistant, majorTitle, money, url, solId='',  secTitle='', shortDesc='', keywords=''):
     try:
         # Create a new user with its associated company and role
-        solution = Solution(Aisstant=assistant, SolutionID=solId, MajorTitle=majorTitle, SecondaryTitle=secTitle,
+        solution = Solution(Assistant=assistant, SolutionID=solId, MajorTitle=majorTitle, SecondaryTitle=secTitle,
                             ShortDescription=shortDesc,Money=money, Keywords=keywords, URL=url, TimesReturned=0)
         db.session.add(solution)
 

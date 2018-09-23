@@ -69,7 +69,7 @@
                                         <table id="solutionsTable" class="table" cellspacing="0" width="100%">
                                             <thead>
                                                 <tr>
-                                                    <th>Delete</th>
+{#                                                    <th>Delete</th>#}
                                                     <th>ID</th>
                                                     <th>Major Title</th>
                                                     <th>Secondary Title</th>
@@ -85,7 +85,7 @@
                                             <tbody id="tbody">
                                                 {%for item in data%}
                                                    <tr data-rowid="{{ item['ID'] }}">
-                                                    <td data-type="deleteCheckBox"><input type="checkbox" ></td>\
+{#                                                    <td data-type="deleteCheckBox"><input type="checkbox" ></td>\#}
                                                     <td data-type="id" type="text"> {{ item['SolutionID'] }}</td>
                                                     <td data-type="majorTitle"type="text"  onchange='validateName(this)'>{{ item['MajorTitle'] }} </td>
                                                     <td data-type="secondaryTitle" type="text"  onchange='validate(this)'>{{ item['SecondaryTitle'] }}</td>
@@ -104,13 +104,10 @@
                                             </tbody>
 
                                         </table>
-                                        <button type="submit" class="btn btn-success" value="Send">
-                                            Save Updates
-                                        </button>
-                                        <button type="button" class="btn btn-success" id="addRow" value="Send" onclick="fillSolutionForm({{ item['ID'] }},edit=false)">
+                                        <button type="button" class="btn btn-success" id="addRow" value="Send" onclick="fillSolutionForm(0, edit=false)">
                                             Add New
                                         </button>
-                                        <button type="button" class="btn btn-success" id="removeRow" value="Send" onclick="RemoveRow()">
+                                        <button type="button" class="btn btn-success" id="removeRow" value="Send" onclick="" disabled>
                                             Delete All
                                         </button>
                                 </div>
@@ -145,7 +142,7 @@
 
                                     <div class="form-group">
                                       <label for="inputBigTitle">Major Title</label>
-                                      <input type="text" class="form-control" name="inputMajorTitle" placeholder="">
+                                      <input required type="text" class="form-control" name="inputMajorTitle" placeholder="">
                                     </div>
 
                                     <div class="form-group">
@@ -161,7 +158,7 @@
 
                                     <div class="form-group">
                                       <label for="inputMoney">Money</label>
-                                      <input type="text" class="form-control" name="inputMoney" placeholder="">
+                                      <input required type="text" class="form-control" name="inputMoney" value="£0" placeholder="" onchange="validate(this)">
                                     </div>
 
                                     <div class="form-group">
@@ -172,7 +169,7 @@
 
                                     <div class="form-group">
                                       <label for="inputURL">URL</label>
-                                      <input type="url" class="form-control" name="inputURL" placeholder="">
+                                      <input required type="url" class="form-control" name="inputURL" placeholder="https://www.thesearchbase.com" onchange="validate(this)">
                                     </div>
 
 
@@ -198,6 +195,10 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 <script>
+
+
+
+var assistantID = window.location.pathname.split('/')[3];
 
 // Once the modal is closed, unbind all onSubmit handlers from the userForm
 $(document).on('hide.bs.modal', '#solutionModal', function (e) {
@@ -250,7 +251,7 @@ function deleteSolution(solId) {
         .then((willDelete) => {
           if (willDelete) {
             $.ajax({
-                url: '/admin/solution/' + solID,
+                url: '/admin/solution/' + solId,
                 type: "DELETE"
             }).done(function (res) {
                 console.log(res);
@@ -272,7 +273,7 @@ function deleteSolution(solId) {
 function submitNewSolForm(form, event) {
     console.log('EDIT Solution.');
      $.ajax({
-        url: '/admin/assistant/' + assitantID +'/solution',
+        url: '/admin/assistant/' + assistantID +'/solution',
         type: "POST",
         data: $('#solutionForm').serialize()
     }).done(function (res) {
@@ -306,31 +307,17 @@ function submitEditSolForm(form,solId, event) {
 }
 
 
-
-// events Listeners Functions
-//document.getElementById("addRow").addEventListener("click", AddRow);
-function AddRow() {
-    console.log("adding row");
-    i++;
-    $("#tbody").append("<tr id=\"tr" + String(i) + "\">\
-    <td><input id=\"cb" + String(i) + "\" style=\"width: 30px;\" type=\"checkbox\" name=\"product_Delete" + String(i) + "\"></td>\
-    <td><input required style=\"width: 50px;\" padding=\"3px\" margin=\"3px\" type=\"text\" name=\"product_ID" + String(i) + "\"></td>\
-    <td><input required style=\"width: 90px;\" type=\"text\" name=\"product_Name" + String(i) + "\" onchange='validate(this)'></td>\
-    <td><input required style=\"width: 90px;\" type=\"text\" name=\"product_Brand" + String(i) + "\" onchange='validate(this)' ></td>\
-    <td><input required style=\"width: 90px;\" type=\"text\" name=\"product_Model" + String(i) + "\" onchange='validate(this)' ></td>\
-    <td><input required style=\"width: 60px;\" type=\"text\" name=\"product_Discount" + String(i) + "\" onchange='validate(this)' ></td>\
-    <td><input required style=\"width: 60px;\" type=\"text\" name=\"product_Price" + String(i) + "\" onchange='validate(this)' ></td>\
-    <td><input required style=\"width: 250px;\" type=\"text\" name=\"product_Keywords" + String(i) + "\" onchange='validate(this)' ></td>\
-    </tr>");
-}
 function validate(element) {
-    var elName = element.name
-    if ((elName).includes('product_Name')) {
-        var name = element.value
-        if (name.length < 2)
-            noPass(element,'Data1 should be more than 2 letters')
+    console.log(element.name);
+    var elName = element.name;
+    if (elName === 'inputMoney') {
+        var price = element.value;
+        // if there are more currencies we need to add it to the regex string
+        var regex =/^[$£€][\d\.,]+/;
+        if (regex.test(price))
+            pass(element);
         else
-            pass(element)
+            noPass(element,'Price should be in this format "£1500" Where the approved currencies are ($, £, and €)')
     }
     else if ((elName).includes('product_Brand')) {
         var brand = element.value
@@ -346,16 +333,6 @@ function validate(element) {
         else
             pass(element)
     }
-    else if ((elName).includes('product_Price')) {
-        var price = element.value
-        // if there are more currencies we need to add it to the regex string
-        var regex =/^[$£€][\d\.,]+/
-
-        if (regex.test(price))
-            pass(element)
-        else
-            noPass(element,'<h3>Price should be in this format <b>[currency][numbers]</b></h3> <br> <h4> Where the approved currencies are ($, £, and €) </h4> <br> <h5> E.g: <code>$3200.50    -    £250,000.50 - €4,000</code></h5>')
-    }
     else if ((elName).includes('product_Keywords')) {
         // TODO:
         var keywords = element.value
@@ -364,27 +341,22 @@ function validate(element) {
         // TODO:
         var discount = element.value
     }
-    else if ((elName).includes('product_URL')) {
-        var userURL = element.value
+    else if (elName === 'inputURL') {
+        var userURL = element.value;
         var URLRegex = /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/;
 
         if (userURL.match(URLRegex))
-            pass(element)
+            pass(element);
         else
             noPass(element,"Please enter your website URL correctly.")
     }
 
     // helping function
     function pass(element) {
-        element.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
-        setTimeout(function () {
-            element.style.boxShadow=""
-            element.style.transition="box-shadow 1s ease-in-out"
-        }, 500);
     }
     function noPass(element,text) {
-        element.style.boxShadow="0 0 9px 0px #f44336"
-        alertError('Input Error',text)
+        swal("Error!", text, "error").then((value) => {
+        });
     }
 }
 

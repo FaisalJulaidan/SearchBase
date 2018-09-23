@@ -6,7 +6,8 @@
     "text": {"type": "string"},
     "action": {"enum": ["Show Solutions", "Go To Next Block", "Go To Specific Block"]},
     "fileTypes": {"type": "array", "items": {"type": "string"}},
-    "blockToGoID": {"type": ["integer", "null"]}
+    "blockToGoID": { "type": [ "integer", "null" ] },
+    "afterMessage": {"type": "string"}
     },
   "required": [
     "action",

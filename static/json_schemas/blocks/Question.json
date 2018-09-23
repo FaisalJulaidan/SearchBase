@@ -13,7 +13,8 @@
           "timesClicked": { "type": "integer", "minimum": 0 },
           "keywords": { "type": "array", "items": { "type": "string" } },
           "blockToGoID": { "type": [ "number",  "null" ] },
-          "action": { "enum": [ "Show Solutions", "Go To Next Block", "Go To Specific Block"] }
+          "action": { "enum": [ "Show Solutions", "Go To Next Block", "Go To Specific Block" ] },
+          "afterMessage": { "type": "string"}
         },
         "required": [
           "text",

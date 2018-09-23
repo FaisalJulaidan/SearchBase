@@ -6,7 +6,8 @@
     "text": {"type": "string"},
     "blockToGoID": {"type": ["number", "null"]},
     "validation": {"enum": ["Email", "Telephone",""]},
-    "action": {"enum": ["Show Solutions", "Go To Next Block", "Go To Specific Block"]}
+    "action": { "enum": [ "Show Solutions", "Go To Next Block", "Go To Specific Block" ] },
+    "afterMessage": {"type": "string"}
   },
   "required": [
     "action",

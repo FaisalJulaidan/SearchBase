@@ -9,7 +9,7 @@
 
             <p>All of the Data Collected</p>
 
-            <button onclick="fnExcelReport()">Export Excel</button>
+            <button onclick="fnExcelReport()" class="btn btn-success">Export Excel</button>
             <br />
             Note: You can click the column heading to sort it.
             <div id="tBodyUIn"></div>
@@ -21,12 +21,18 @@
 {% block customJS %}
 <script src="/static/js/sortTable.js"></script>
 <script>
+    //$('#tBodyUIn').qtip({
+    //    content: {
+    //        text: 'Tips plugin element'
+    //    }
+    //})
+
     var currentLength = 0;
     var maxLength = 0;
     var tableString = "";
     console.log("{{data}}")
     {%if not data %}
-    $("#tBodyUIn").append("<h3>All of the data collected from the bot convorsations will be stored here.</h3>");
+    $("#tBodyUIn").append("<h4>All of the data collected from the bot convorsations will be stored here.</h4>");
     {%endif%}
 
     {%for record in data %}
@@ -42,7 +48,7 @@
         headings += "<th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Data</th>";
     }
 
-    tableString = "<table id=\"tableSort\" class=\"table table-striped jambo_table bulk_action\"><thead>\
+    tableString = "<table id=\"tableSort\" class=\"table\" cellspacing=\"0\" width=\"100 %\"><thead>\
                             <tr id=\"tableHeadingUIn\" class=\"headings\"><th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Date and Time</th>"+ headings +"</tr></thead>\
                             <tbody id=\"tBodyUIn\">";
     var filename = undefined;

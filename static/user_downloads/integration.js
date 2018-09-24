@@ -116,7 +116,7 @@ function sleep(ms) {
 
 
     // Animations
-    $("#iframediv").hide();
+    document.getElementById("iframediv").style.display = "none"
 
     document.getElementById('chatbot-widget').addEventListener('click', e => {
         $chatbotWidget = $("#chatbot-widget");
@@ -127,9 +127,9 @@ function sleep(ms) {
             $("#chatbot-widget").hide();
         });
 
-        $iFrameDiv = $("#iframediv");
-        $iFrameDiv.show();
-        $iFrameDiv.animate({
+        iFrameDiv = document.getElementById("iframediv");
+        iFrameDiv.style.display = "block";
+        iFrameDiv.animate({
             height: '370px',
             opacity: '1',
         });

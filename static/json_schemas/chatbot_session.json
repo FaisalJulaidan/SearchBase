@@ -16,8 +16,8 @@
       }
     },
     "keywords": {"type": "array", "items": {"type": "string"}},
-    "solutionsHighest": {"type": "integer"}
+    "showTop": {"type": "integer"}
   },
-  "required": ["collectedInformation", "keywords", "solutionsHighest"],
+  "required": ["collectedInformation", "keywords", "showTop"],
   "additionalProperties": false
 }

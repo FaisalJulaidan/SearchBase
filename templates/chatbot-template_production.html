@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
     <!-- Title -->
     <title>Bot</title>
 
@@ -37,22 +38,34 @@
 
     <!-- Pop-up Stylesheet -->
     <!-- <link href="/static/pop-up/pop.css" rel="stylesheet"> -->
+
     <!-- Responsive CSS -->
     <link href="/static/css/responsive.css" rel="stylesheet">
 
     <!-- Core Stylesheet -->
-    {#
-    <link href="/static/css/style.css" rel="stylesheet">#}
+    {#            <link href="/static/css/style.css" rel="stylesheet">#}
     <!-- <link href="/static/css/main.css" rel="stylesheet"> -->
+
     <!-- Responsive CSS -->
     <link href="/static/css/responsive.css" rel="stylesheet">
-    <!-- Jquery-2.2.4 JS, Popper js, Bootstrap-4 Beta JS, All Plugins JS, Slick Slider Js, Footer Reveal JS -->
-    <script src="/static/user_downloads/chatbotJSMerge.min.js"></script>
+    <!-- Jquery-2.2.4 JS -->
+    <script src="/static/js/jquery-2.2.4.min.js"></script>
+    <!-- Popper js -->
+    <script src="/static/js/popper.min.js"></script>
+    <!-- Bootstrap-4 Beta JS -->
+    <script src="/static/js/bootstrap.min.js"></script>
+    <!-- All Plugins JS -->
+    <script src="/static/js/plugins.js"></script>
+    <!-- Slick Slider Js-->
+    <script src="/static/js/slick.min.js"></script>
+    <!-- Footer Reveal JS -->
+    <script src="/static/js/footer-reveal.min.js"></script>
     <!-- Active JS -->
     <!-- <script src="/static/js/active.js"></script> -->
+
     <!-- Emoji JS and CSS -->
     <script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css"/>
 
 
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
@@ -402,14 +415,13 @@
         return null
     }
 
-    // This should send the data to the server, data such as keywords and inputs.
-    // and get  the solutions back based on the sent data
+    // This should send the data to the server, without returning any solutions back
     function sendData() {
         var solutions = [];
-        params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": 5};
+        params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": 0};
         console.log("Send data...");
 
-        $.ajax({
+        return $.ajax({
             contentType: 'application/json', //this is important
             url: '../assistant/' + assistantID + '/chatbot',
             type: "POST",
@@ -417,22 +429,21 @@
 
         }).done(function (res) {
 
-            console.log("Solutions retrieved successfully!");
+            console.log("Data sent successfully!");
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
-            solutions = data["solutions"];
             sendFile();
-            return solutions;
-            {#displayReturnedSolutions(solutions);#}
+            return true;
 
         }).fail(function (res) {
             console.log("Error in retrieving blocks.");
             console.log(res);
+            return false
         });
-        return solutions
     }
+
     function sendDataSolutionsBlock(showTop) {
-        params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": showTop};
+        params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": showTop};
 
         return $.ajax({
             contentType: 'application/json', //this is important
@@ -448,7 +459,6 @@
             solutions = data["solutions"];
             sendFile();
             return solutions;
-            {#displayReturnedSolutions(solutions);#}
 
         }).fail(function (res) {
             console.log("Error in retrieving blocks.");
@@ -485,9 +495,21 @@
     function displayReturnedSolutions(solutions) {
         messageContainer = $(".messages ul");
 
-        for (var i = 0; i < solutions.length; i++) {
-            messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>" + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>" + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] + "</label><br><button onclick=\"BuyProduct('" + solutions[i]["URL"] + "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center></li>");
+        // If there is no solutions in the database show this message.
+        if (solutions.length === 0){
+            sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.")
+
+        } else {
+
+            for (var i = 0; i < solutions.length; i++) {
+                messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
+                    + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>"
+                    + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] +
+                    "</label><br><button onclick=\"BuyProduct('" + solutions[i]["URL"] +
+                    "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center></li>");
+            }
         }
+
 
         SetRepeat();
     }
@@ -615,7 +637,7 @@
         function renderSolutions(block) {
             $('.messages').css('height', '100%');
             $('.message-input').remove();
-            $('#presetAnswers').remove(); 
+            $('#presetAnswers').remove();
 
             sendDataSolutionsBlock(block.content.showTop)
                 .then((solutions) => {
@@ -765,23 +787,44 @@
         }
 
         function getNextBlock(action, blockToGoId = undefined) {
-            var targetBlock = undefined
+            var targetBlock = undefined;
 
             if (action == "Go To Next Block") {
                 targetBlock = blocks[currentBlock.order]; //order starts from 1 and array from 0 so it just needs the current .order
                 if (targetBlock === undefined) {
-                    sendData()
-                    return 0;
+                     console.log('1');
+                     sendData().then((isSuccess) => {
+                        if (isSuccess){
+                            sendAssistantMessage("Thank you for your input. We'll be in touch.");
+                        } else {
+                            sendAssistantMessage("Your input couldn't be processed. Please contact us.");
+                        }
+                        SetRepeat();
+
+                    })
                 }
-            }
-            // not yet implimented
-            else if (action == "Go To Specific Block") {
+            } else if (action == "Go To Specific Block") {
                 for (var i = 0; i < blocks.length; i++) {
                     if (blocks[i].id == blockToGoId) {
                         targetBlock = blocks[i];
                     }
                 }
+                 if (targetBlock === undefined) {
+                console.log('2');
+                sendData().then((isSuccess) => {
+                    if (isSuccess){
+                        sendAssistantMessage("Thank you for your input. We'll be in touch.");
+                    } else {
+                        sendAssistantMessage("Your input couldn't be processed. Please contact us.");
+                    }
+
+                    SetRepeat();
+                    return 0;
+                    })
+                }
             }
+
+
 
             if (currentBlock != undefined) { //check if its not trying to reload the same block
                 if (currentBlock != targetBlock) {
@@ -792,7 +835,7 @@
 
         function SetRepeat() {
             $("#optionsDiv").append("");
-            newMessage(BOT_USER, "<div class='endChat' onclick=\"Reset()\"><a class='answerOptions' style='width:400px;'>Search Again <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> </a></div>",true);
+            newMessage(BOT_USER, "<div class='endChat' onclick=\"Reset()\"><a class='' style='width:400px;'>Search Again <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> </a></div>",true);
             //checkOutsideElements();
         }
 

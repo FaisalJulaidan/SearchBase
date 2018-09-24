@@ -547,7 +547,7 @@
             $answersDiv = $("<div class='wrap text-center' style='padding:10px;'></div>");
 
             for (var i = 0; i < answers.length; i++) {
-                $answersDiv.append("<button class=\"btn btn-primary answer\" onclick=\"submitAnswer(this.innerText, '" + answers[i].keywords + "' )\" >" + answers[i].text + "</button>");
+                $answersDiv.append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText, '" + answers[i].keywords + "' )\" >" + answers[i].text + "</button>");
             }
             $messageInput.html($answersDiv);
 
@@ -622,7 +622,11 @@
                 message = "&FILE_UPLOAD&" + document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
                 if (!checkFileFormat(message)) {
                     sendUserMessage(message.replace("&FILE_UPLOAD&", ""));
-                    await sleep(350);
+
+                    putThinkingGif();
+                    await sleep(1000);
+                    removeThinkingGif();
+
                     sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
                     return 0;
                 }
@@ -633,7 +637,10 @@
 
                 if (currentBlock.content.afterMessage)
                     sendAssistantMessage(currentBlock.content.afterMessage);
+
+                putThinkingGif();
                 await sleep(1000);
+                removeThinkingGif();
 
                 print();
                 return getNextBlock(currentBlock.content.action);
@@ -649,6 +656,10 @@
                 $('#textMessage').val("");
 
                 print();
+
+                putThinkingGif();
+                await sleep(1000);
+                removeThinkingGif();
 
                 if (!validateUserInput(message, currentBlock.content.validation)) {
                     sendAssistantMessage("I am sorry but that was not in the format I think it should be...");
@@ -667,6 +678,10 @@
                 // clear answers div
                 $("#presetAnswers").first().html('');
                 print();
+
+                putThinkingGif();
+                await sleep(1000);
+                removeThinkingGif();
 
                 var blockAnswers = currentBlock.content.answers;
 
@@ -771,7 +786,7 @@
         }
 
         function putThinkingGif() {
-            $(".messages").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='/static/images/typing.gif'></li></div>");
+            $(".messages").append("<div class='tsbDiv' id='thinkingGif'><li class='TSBbot'><img src='/static/images/typing.gif'></li></div>");
             animateMessage("#thinkingGif");
         }
 

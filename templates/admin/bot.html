@@ -1419,6 +1419,7 @@
 
                     function getBlockContent(template, block) {
                         template = template.replace('BLOCK_ID', block.id);
+                        template = template.replace('BLOCK_ID_HEADER', block.id);
                         template = template.replace('BLOCK_TYPE', block.type);
 
 
@@ -1446,11 +1447,12 @@
 
                     function getTemplate(block_template, block) {
                         templateHTML =
+
                             "<li class=\"panel blockPanel panel-default\" id='BLOCK_ID'>\n" +
                             "    <div class=\"panel-heading panel-collapsed\">\n" +
                             "        <div class=\"panel-title\">\n" +
                             "            <span class=\"moveable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-menu-hamburger\"></i></span>\n" +
-                            "            <b class=\"title\">BLOCK_TEXT</b>\n" +
+                            "            <b class=\"id-header\">BLOCK_ID_HEADER - </b> <b class=\"title\">BLOCK_TEXT</b>\n" +
                             "        </div>\n" +
                             "        <span class=\"pull-right clickable\" style='color:#660ff2;margin-left:15px'><i class=\"trash glyphicon glyphicon-trash\"></i></span>\n" +
                             "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"indicator glyphicon glyphicon-chevron-up\"></i></span>\n" +
@@ -1536,7 +1538,7 @@
                     if (block_template.name == "Solutions"){
                         console.log($oldBlock.parent().find('.title').text('Solution Block'));
                     } else {
-                        console.log($oldBlock.parent().find('.title').text('...'));
+                        console.log($oldBlock.parent().find('.title').text('Please fill this block'));
                     }
 
 
@@ -1571,7 +1573,7 @@
                         return "" +
                             "<div class=\"input-group col-sm-3 topSolutions\">\n" +
                             "         <span class=\"input-group-addon\">Top:</span>\n" +
-                            "         <input type=\"number\" min=\"1\" value=\"1\" class=\"form-control\"\n" +
+                            "         <input type=\"number\" min=\"1\" value=\"1\" class=\"form-control\">\n" +
                             "</div>\n"
                     }
 

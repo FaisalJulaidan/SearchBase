@@ -67,7 +67,7 @@ def create(nickname, route, message, secondsUntilPopup, company: Company) -> Ass
 
 def update(id, nickname, message, secondsUntilPopup)-> Callback:
     try:
-        db.session.query(Assistant).filter(Assistant.ID == id).update({'Nickname': nickname,
+        db.session.query(Assistant).filter(Assistant.ID == id).update({'Name': nickname,
                                                                        'Message': message,
                                                                        'SecondsUntilPopup': secondsUntilPopup})
         db.session.commit()

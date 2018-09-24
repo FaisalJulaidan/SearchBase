@@ -328,6 +328,12 @@
         background: grey;
         cursor: pointer;
     }
+
+    #thinkingGif {
+        /*background: white;*/
+        width: 120px;
+        margin-top: 45px;
+    }
 </style>
 
 <body id="chatbotBody">
@@ -637,9 +643,11 @@
                 if (!checkFileFormat(message)) {
                     sendUserMessage(message.replace("&FILE_UPLOAD&", ""));
 
+                    await sleep(200);
                     putThinkingGif();
-                    await sleep(1000);
+                    await sleep(500);
                     removeThinkingGif();
+                    await sleep(100);
 
                     sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
                     return 0;
@@ -652,9 +660,11 @@
                 if (currentBlock.content.afterMessage)
                     sendAssistantMessage(currentBlock.content.afterMessage);
 
+                await sleep(200);
                 putThinkingGif();
-                await sleep(1000);
+                await sleep(500);
                 removeThinkingGif();
+                await sleep(100);
 
                 print();
                 return getNextBlock(currentBlock.content.action);
@@ -671,9 +681,11 @@
 
                 print();
 
+                await sleep(200);
                 putThinkingGif();
-                await sleep(1000);
+                await sleep(500);
                 removeThinkingGif();
+                await sleep(100);
 
                 if (!validateUserInput(message, currentBlock.content.validation)) {
                     sendAssistantMessage("I am sorry but that was not in the format I think it should be...");
@@ -693,9 +705,11 @@
                 $("#presetAnswers").first().html('');
                 print();
 
+                await sleep(200);
                 putThinkingGif();
-                await sleep(1000);
+                await sleep(500);
                 removeThinkingGif();
+                await sleep(100);
 
                 var blockAnswers = currentBlock.content.answers;
 

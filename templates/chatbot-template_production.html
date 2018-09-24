@@ -321,6 +321,7 @@
     <div class="content">
         <div class="messages">
             <ul></ul>
+            <div id="presetAnswers"></div>
             <div id="chatBottom"></div>
         </div>
 
@@ -542,7 +543,7 @@
         // }
 
         function showAnswers(answers) {
-            $messageInput = $(".message-input").first();
+            $messageInput = $("#presetAnswers").first();
             $answersDiv = $("<div class='wrap text-center' style='padding:10px;'></div>");
 
             for (var i = 0; i < answers.length; i++) {
@@ -550,8 +551,8 @@
             }
             $messageInput.html($answersDiv);
 
-            $('.messages').css('height', 'calc(100% - 55px)');
-            $('.message-input').css('height', '55px');
+            //$('.messages').css('height', 'calc(100% - 55px)');
+            //$('.message-input').css('height', '55px');
         }
     }
 
@@ -601,8 +602,9 @@
         }
 
         function renderSolutions(block) {
-            $('.messages').css('height','100%');
+            $('.messages').css('height', '100%');
             $('.message-input').remove();
+            $('#presetAnswers').remove(); 
 
             sendDataSolutionsBlock(block.content.showTop)
                 .then((solutions) => {
@@ -663,7 +665,7 @@
             
             if (currentBlock.type == "Question") {
                 // clear answers div
-                $(".message-input").first().html('');
+                $("#presetAnswers").first().html('');
                 print();
 
                 var blockAnswers = currentBlock.content.answers;

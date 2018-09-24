@@ -81,7 +81,7 @@ function sleep(ms) {
     iFrameDiv.style.opacity = '0';
 
     iFrameDiv.innerHTML = '<div class="contact-profile">\n' +
-        '        <img src="static/user_downloads/favicon-96x96.png" alt=""/>\n' +
+        '        <img src='+host+'"/static/user_downloads/favicon-96x96.png" alt=""/>\n' +
         '        <p>Bot</p>\n' +
         '\n' +
         '        <div class="social-media" id=\'closeIframe\'>\n' +

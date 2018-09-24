@@ -695,22 +695,22 @@
                 await sleep(200);
                 putThinkingGif();
                 await sleep(400 + Math.floor(Math.random() * 900));
-                removeThinkingGif();
-                await sleep(100);
+                //removeThinkingGif();
+                //await sleep(100);
 
-                var blockAnswers = currentBlock.content.answers;
+                //var blockAnswers = currentBlock.content.answers;
 
-                for (var i = 0; i < blockAnswers.length; i++) {
-                    if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].text == message) {
-                        if (blockAnswers[i].afterMessage)
-                            sendAssistantMessage(blockAnswers[i].afterMessage);
+                //for (var i = 0; i < blockAnswers.length; i++) {
+                //    if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].text == message) {
+                //        if (blockAnswers[i].afterMessage)
+                //            sendAssistantMessage(blockAnswers[i].afterMessage);
 
-                        var action = blockAnswers[i].action;
-                        var blockToGoId = blockAnswers[i].blockToGoId;
+                //        var action = blockAnswers[i].action;
+                //        var blockToGoId = blockAnswers[i].blockToGoId;
 
-                        return getNextBlock(action, blockToGoId);
-                    }
-                }
+                //        return getNextBlock(action, blockToGoId);
+                //    }
+                //}
             }
 
             function print() {

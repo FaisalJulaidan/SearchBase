@@ -119,7 +119,11 @@
                                                     </div>
                                                 </div>
                                                 <div class="pricing_footer">
+                                                    {% if currentPlan != 'basic' %}
                                                     <a class="btn btn-info btn-block" role="button" onclick="openSubForm('plan_D3lp2yVtTotk2f', 50);" >Subscribe <span></span></a>
+                                                    {% else %}
+                                                    <a class="btn btn-info btn-block" role="button" disabled >Current Plan <span></span></a>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -179,7 +183,11 @@
                                                     </div>
                                                 </div>
                                                 <div class="pricing_footer">
+                                                    {% if currentPlan != 'advanced' %}
                                                     <a class="btn btn-info btn-block" role="button"  onclick="openSubForm('plan_D3lp9R7ombKmSO', 199);">Subscribe <span></span></a>
+                                                    {% else %}
+                                                    <a class="btn btn-info btn-block" role="button" disabled >Current Plan <span></span></a>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -243,7 +251,11 @@
                                                     </div>
                                                 </div>
                                                 <div class="pricing_footer">
+                                                    {% if currentPlan != 'ultimate' %}
                                                     <a class="btn btn-info btn-block" role="button" onclick="openSubForm('plan_D3lpeLZ3EV8IfA', 399);">Subscribe <span></span></a>
+                                                    {% else %}
+                                                    <a class="btn btn-info btn-block" role="button" disabled >Current Plan <span></span></a>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>

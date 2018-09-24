@@ -185,17 +185,9 @@
     }
 
     #frame .content .messages {
-        height: auto;
-        min-height: calc(100% - 93px);
-        max-height: calc(100% - 93px);
+        height: calc(100% - 55px);
         overflow-y: scroll;
         overflow-x: hidden;
-    }
-
-    @media screen and (max-width: 735px) {
-        #frame .content .messages {
-            max-height: calc(100% - 115px);
-        }
     }
 
     #frame .content .messages::-webkit-scrollbar {
@@ -266,6 +258,7 @@
         bottom: 0;
         width: 100%;
         z-index: 99;
+        height: 55px;
     }
 
     #frame .content .message-input .wrap {
@@ -589,7 +582,10 @@
             for (var i = 0; i < answers.length; i++) {
                 $answersDiv.append("<button class=\"btn btn-primary answer\" onclick=\"submitAnswer(this.innerText, '" + answers[i].keywords + "' )\" >" + answers[i].text + "</button>");
             }
-            $messageInput.html($answersDiv)
+            $messageInput.html($answersDiv);
+
+            $('.messages').css('height', 'calc(100% - 55px)');
+            $('.message-input').css('height', '55px');
         }
     }
 
@@ -615,6 +611,9 @@
                 "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
                 "            </div>");
 
+            $('.messages').css('height','calc(100% - 40px)');
+            $('.message-input').css('height','40px');
+
             $messageInput.html($userInput);
             sendAssistantMessage(block.content.text)
         }
@@ -629,12 +628,15 @@
 
             $messageInput.html($fileUpload);
 
+            $('.messages').css('height','calc(100% - 40px)');
+            $('.message-input').css('height','40px');
+
             sendAssistantMessage(block.content.text)
         }
 
         function renderSolutions(block) {
-            // Abdullah still did not finish a block of type solutions
-            // However reaching to this block means you have to sendData() and get the solutions back
+            $('.messages').css('height','100%');
+            $('.message-input').remove();
 
             sendDataSolutionsBlock(block.content.showTop)
                 .then((solutions) => {

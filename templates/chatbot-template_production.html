@@ -350,7 +350,13 @@
         </div>
 
 
-        <div class="message-input"></div>
+        <div class="message-input">
+            <form id="fileUploadForm" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
+                <div class=\"wrap\">
+                    <input onkeypress="handleEnter(event)" id="fileUploadB" type="file" placeholder="Write your message..." style="background-color:  white;"/><button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -367,6 +373,7 @@
     var sessionID = 0;
     var BOT_USER = 'bot';
     var CLIENT_USER = 'user';
+    var chatInputDiv = document.getElementById("fileUploadForm");
 
     // This function will get the blocks from the server by assistantID and set the blocks array to be used to create
     // the cahtbot conversational flow
@@ -619,19 +626,20 @@
         }
 
         function renderFileUpload(block) {
-            $messageInput = $(".message-input").first();
-            $fileUpload = $("<div class=\"wrap\">\n" +
-                "<input onkeypress=\"handleEnter(event)\" id=\"fileUploadB\" type=\"file\" placeholder=\"Write your message...\" style=\"\n" +
-                "    background-color:  white;\n" + "\">" +
-                "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
-                "            </div>");
+            //$messageInput = $(".message-input").first();
+            //$fileUpload = $("<div class=\"wrap\">\n" +
+            //    "<input onkeypress=\"handleEnter(event)\" id=\"fileUploadB\" type=\"file\" placeholder=\"Write your message...\" style=\"\n" +
+            //    "    background-color:  white;\n" + "\">" +
+            //    "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
+            //    "            </div>");
 
-            $messageInput.html($fileUpload);
+            //$messageInput.html($fileUpload);
 
-            $('.messages').css('height','calc(100% - 40px)');
-            $('.message-input').css('height','40px');
+            //$('.messages').css('height','calc(100% - 40px)');
+            //$('.message-input').css('height','40px');
 
             sendAssistantMessage(block.content.text)
+            chatInputDiv.style = "display:block";
         }
 
         function renderSolutions(block) {
@@ -649,6 +657,8 @@
         async function submitAnswer(message, blockKeywords = undefined) {
 
 
+
+            chatInputDiv.style = "display:none";
 
             if (currentBlock.type == "File Upload") {
                 //needs rework
@@ -761,7 +771,7 @@
 
             function print() {
                 // print the selected answer
-                newMessage(CLIENT_USER, message);
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
                 if (blockKeywords)
                     blockKeywords = Boolean(blockKeywords.split) ? blockKeywords.split(',') : blockKeywords;
 
@@ -889,6 +899,28 @@
 
             return true;
         }
+
+    function sendFileForm() {
+        var formData = new FormData();
+        var fileInput = document.getElementById('fileUploadB').files[0];
+
+        formData.append('file', fileInput, fileInput.name);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', "../assistant/" + sessionID + "/file", true);
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                console.log("File Sent");
+            } else {
+                alert('An error occurred!');
+            }
+        };
+
+        xhr.send(formData);
+
+        return false;
+    }
 
         function addKeywords(blockKeywords) {
             var addIn = true;

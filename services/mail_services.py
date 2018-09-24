@@ -24,7 +24,7 @@ def sendVerificationEmail(email, companyName) -> Callback:
         print("sendVerificationEmail() Error: ", e)
         return Callback(False, 'Could not send a verification email to ' + email)
 
-    return Callback(True, 'Verification email sent successfully to ' + email)
+    return Callback(True, 'Verification email is on its way to ' + email)
 
 def sendNewUserHasRegistered(name, email, companyName, tel):
     try:
@@ -36,7 +36,7 @@ def sendNewUserHasRegistered(name, email, companyName, tel):
         print("sendNewUserHasRegistered() Error: ", e)
         return Callback(False, 'Could not send a signed up email')
 
-    return Callback(True, 'Signed up email sent successfully')
+    return Callback(True, 'Signed up email is on its way')
 
 def sendPasswordResetEmail(email, companyID):
     try:
@@ -51,7 +51,7 @@ def sendPasswordResetEmail(email, companyID):
         print("sendPasswordResetEmail() Error: ", e)
         return Callback(False, 'Could not send a password reset email to ' + email)
     
-    return Callback(True, 'Password reset email sent successfully to ' + email)
+    return Callback(True, 'Password reset email is on its way to ' + email)
 
 def addedNewUserEmail(adminEmail, targetEmail, password):
     try:
@@ -64,7 +64,7 @@ def addedNewUserEmail(adminEmail, targetEmail, password):
         print("addedNewUserEmail() Error: ", e)
         return Callback(False, 'Could not send email to ' + targetEmail)
     
-    return Callback(True, 'Email sent successfully to ' + targetEmail)
+    return Callback(True, 'Email sent is on its way to ' + targetEmail)
 
 #mailing
 def send_async_email(app, msg):

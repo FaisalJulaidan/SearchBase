@@ -36,7 +36,7 @@ def reset_password_verify(payload):
             if not company_callback.Data.ID is companyID: raise Exception
 
         except:
-            return helpers.redirectWithMessage("login", "The link you requested is invalid.")
+            return helpers.hardRedirectWithMessage("login", "The link you requested is invalid.")
 
         return render_template("accounts/set_resetpassword.html", email=email, payload=payload)
 
@@ -47,4 +47,4 @@ def reset_password_verify(payload):
         changePassword_callback : Callback = user_services.changePasswordByEmail(email, password)
         if not changePassword_callback.Success : return helpers.redirectWithMessage("reset_password", changePassword_callback.Message + ". Please try again.")
 
-        return helpers.redirectWithMessage("login", changePassword_callback.Message) 
+        return helpers.hardRedirectWithMessage("login", changePassword_callback.Message) 

@@ -646,7 +646,6 @@
                 // clear file-upload div
                 $(".message-input").first().html('');
                 //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
-                message = message.replace("&FILE_UPLOAD&", "");
 
                 if (currentBlock.content.afterMessage) {
                     sendAssistantMessage(currentBlock.content.afterMessage);

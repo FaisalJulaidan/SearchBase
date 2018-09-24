@@ -42,7 +42,8 @@ function sleep(ms) {
 
     // Tags to be added
     var styleTags = ['/style.css', '/pop.css', '/slick.css'];
-    var scriptTags = ['/jquery-2.2.4.min.js', '/jQueryRotate.js', '/active.js'];
+    //var scriptTags = ['/jquery-2.2.4.min.js', '/jQueryRotate.js', '/active.js'];
+    var scriptTags = ['/chatbotJSMerge.min.js'];
 
 
     // import font-awesome
@@ -80,8 +81,8 @@ function sleep(ms) {
     iFrameDiv.style.height = '0px';
     iFrameDiv.style.opacity = '0';
 
-    iFrameDiv.innerHTML = '<div class="contact-profile">\n' +
-        '        <img src="static/user_downloads/favicon-96x96.png" alt=""/>\n' +
+    iFrameDiv.innerHTML = '<div class="contact-profile" style="z-index: -1; position:relative;">\n' +
+        '        <img src='+host+'"/static/user_downloads/favicon-96x96.png" alt=""/>\n' +
         '        <p>Bot</p>\n' +
         '\n' +
         '        <div class="social-media" id=\'closeIframe\'>\n' +
@@ -115,7 +116,7 @@ function sleep(ms) {
 
 
     // Animations
-    $("#iframediv").hide();
+    document.getElementById("iframediv").style.display = "none"
 
     document.getElementById('chatbot-widget').addEventListener('click', e => {
         $chatbotWidget = $("#chatbot-widget");
@@ -126,9 +127,10 @@ function sleep(ms) {
             $("#chatbot-widget").hide();
         });
 
-        $iFrameDiv = $("#iframediv");
-        $iFrameDiv.show();
-        $iFrameDiv.animate({
+        iFrameDiv = document.getElementById("iframediv");
+        iFrameDiv.style.display = "block";
+        iFrameDiv = $("#iframediv");
+        iFrameDiv.animate({
             height: '370px',
             opacity: '1',
         });

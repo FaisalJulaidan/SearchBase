@@ -66,20 +66,20 @@
     <!-- Emoji JS and CSS -->
     <script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css"/>
-    <!-- to use -> emojione.toImage(input) -> input = :emojiname: -> example -> emojione.toImage(:smile:) -->
-    <!-- phone emojis also work -->
-    <!-- :P :) or such are not suported -->
-    <!-- https://demos.emojione.com/latest/jstoshort.html to look at their :emoji: name -->
 
 
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
     <!--already imported in client's page-->
     <!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
 
 
-
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
+    <link rel='stylesheet prefetch'
+          href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
 </head>
+
 <style>
     html, body {
         width: 100% !important;
@@ -313,7 +313,31 @@
         background: #f5f5f5;
     }
 
+    .answerOptions {
+        color: black;
+        padding: 5px 11px;
+        border: 1px solid #ddd;
+        border-radius: 500px;
+        margin: 5px;
+        background-color: #eeeeee;
+        text-align: center;
+    }
 
+    .answerOptions:hover {
+        color: #ffffff;
+        background: grey;
+        cursor: pointer;
+    }
+
+    #thinkingGif {
+        /*background: white;
+        width: 10px;*/
+        margin-top: 45px;
+    }
+
+    #thinkingGifIMG {
+        width: 72px;
+    }
 </style>
 
 <body id="chatbotBody">
@@ -321,6 +345,7 @@
     <div class="content">
         <div class="messages">
             <ul></ul>
+            <div id="presetAnswers"></div>
             <div id="chatBottom"></div>
         </div>
 
@@ -551,16 +576,16 @@
         // }
 
         function showAnswers(answers) {
-            $messageInput = $(".message-input").first();
+            $messageInput = $("#presetAnswers").first();
             $answersDiv = $("<div class='wrap text-center' style='padding:10px;'></div>");
 
             for (var i = 0; i < answers.length; i++) {
-                $answersDiv.append("<button class=\"btn btn-primary answer\" onclick=\"submitAnswer(this.innerText, '" + answers[i].keywords + "' )\" >" + answers[i].text + "</button>");
+                $answersDiv.append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText, '" + answers[i].keywords + "' )\" >" + answers[i].text + "</button>");
             }
             $messageInput.html($answersDiv);
 
-            $('.messages').css('height', 'calc(100% - 55px)');
-            $('.message-input').css('height', '55px');
+            //$('.messages').css('height', 'calc(100% - 55px)');
+            //$('.message-input').css('height', '55px');
         }
     }
 
@@ -610,8 +635,9 @@
         }
 
         function renderSolutions(block) {
-            $('.messages').css('height','100%');
+            $('.messages').css('height', '100%');
             $('.message-input').remove();
+            $('#presetAnswers').remove();
 
             sendDataSolutionsBlock(block.content.showTop)
                 .then((solutions) => {
@@ -629,7 +655,13 @@
                 message = "&FILE_UPLOAD&" + document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
                 if (!checkFileFormat(message)) {
                     sendUserMessage(message.replace("&FILE_UPLOAD&", ""));
-                    await sleep(350);
+
+                    await sleep(200);
+                    putThinkingGif();
+                    await sleep(400 + Math.floor(Math.random() * 900));
+                    removeThinkingGif();
+                    await sleep(100);
+
                     sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
                     return 0;
                 }
@@ -638,9 +670,21 @@
                 //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
                 message = message.replace("&FILE_UPLOAD&", "");
 
-                if (currentBlock.content.afterMessage)
+                if (currentBlock.content.afterMessage) {
                     sendAssistantMessage(currentBlock.content.afterMessage);
-                await sleep(300);
+
+                    await sleep(200);
+                    putThinkingGif();
+                    await sleep(400 + Math.floor(Math.random() * 300));
+                    removeThinkingGif();
+                    await sleep(100);
+                }
+
+                await sleep(200);
+                putThinkingGif();
+                await sleep(400 + Math.floor(Math.random() * 900));
+                removeThinkingGif();
+                await sleep(100);
 
                 print();
                 return getNextBlock(currentBlock.content.action);
@@ -657,6 +701,12 @@
 
                 print();
 
+                await sleep(200);
+                putThinkingGif();
+                await sleep(400 + Math.floor(Math.random() * 900));
+                removeThinkingGif();
+                await sleep(100);
+
                 if (!validateUserInput(message, currentBlock.content.validation)) {
                     sendAssistantMessage("I am sorry but that was not in the format I think it should be...");
                     return 0;
@@ -664,16 +714,30 @@
                 else {
                     // clear user input div
                     $(".message-input").first().html('');
-                    if (currentBlock.content.afterMessage)
+                    if (currentBlock.content.afterMessage) {
                         sendAssistantMessage(currentBlock.content.afterMessage);
+
+                        await sleep(200);
+                        putThinkingGif();
+                        await sleep(400 + Math.floor(Math.random() * 300));
+                        removeThinkingGif();
+                        await sleep(100);
+
+                    }
                 }
                 return getNextBlock(currentBlock.content.action);
             }
             
             if (currentBlock.type == "Question") {
                 // clear answers div
-                $(".message-input").first().html('');
+                $("#presetAnswers").first().html('');
                 print();
+
+                await sleep(200);
+                putThinkingGif();
+                await sleep(400 + Math.floor(Math.random() * 900));
+                removeThinkingGif();
+                await sleep(100);
 
                 var blockAnswers = currentBlock.content.answers;
 
@@ -681,6 +745,12 @@
                     if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].text == message) {
                         if (blockAnswers[i].afterMessage)
                             sendAssistantMessage(blockAnswers[i].afterMessage);
+
+                        await sleep(200);
+                        putThinkingGif();
+                        await sleep(400 + Math.floor(Math.random() * 300));
+                        removeThinkingGif();
+                        await sleep(100);
 
                         var action = blockAnswers[i].action;
                         var blockToGoId = blockAnswers[i].blockToGoId;
@@ -799,7 +869,7 @@
         }
 
         function putThinkingGif() {
-            $(".messages").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='/static/images/typing.gif'></li></div>");
+            $(".messages").append("<div class='tsbDiv' id='thinkingGif'><li class='TSBbot'><img id=\"thinkingGifIMG\" src='/static/images/typing.gif'></li></div>");
             animateMessage("#thinkingGif");
         }
 

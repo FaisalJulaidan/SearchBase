@@ -115,7 +115,7 @@ ul li {
     position: fixed;
     right: 10px;
     bottom: 25px;
-    z-index: -1; position:relative;
+    /*z-index: -1; position:relative;*/
 }
 
 #chatbot-widget {

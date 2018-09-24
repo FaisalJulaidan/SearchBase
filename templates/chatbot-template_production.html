@@ -352,8 +352,8 @@
 
         <div class="message-input">
             <form id="fileUploadForm" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
-                <div class=\"wrap\">
-                    <input onkeypress="handleEnter(event)" id="fileUploadB" type="file" placeholder="Write your message..." style="background-color:  white;"/><button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>
+                <div class="wrap">
+                    <input onkeypress="handleEnter(event)" id="fileUploadB" type="file" placeholder="Write your message..." style="background-color:  white;"/><button type="button" onclick="submitAnswer('')" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
                 </div>
             </form>
         </div>

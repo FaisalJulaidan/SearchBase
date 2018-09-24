@@ -370,7 +370,7 @@ class BlockType(enum.Enum):
 class BlockAction(enum.Enum):
 
     GoToNextBlock = 'Go To Next Block'
-    # GoToSpecificBlock = 'Go To Specific Block'
+    GoToSpecificBlock = 'Go To Specific Block'
     # ShowSolutions = 'Show Solutions'
 
 

@@ -42,7 +42,8 @@ function sleep(ms) {
 
     // Tags to be added
     var styleTags = ['/style.css', '/pop.css', '/slick.css'];
-    var scriptTags = ['/jquery-2.2.4.min.js', '/jQueryRotate.js', '/active.js'];
+    //var scriptTags = ['/jquery-2.2.4.min.js', '/jQueryRotate.js', '/active.js'];
+    var scriptTags = ['/chatbotJSMerge.min.js'];
 
 
     // import font-awesome

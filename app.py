@@ -143,10 +143,10 @@ def gen_dummy_data():
     #     "afterMessage": 'File is being uploaded...'
     # }))
 
-    # db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Assistant=reader_a, Content={
-    #     "showTop": 0,
-    #     "afterMessage": 'DONE!!!!',
-    # }))
+    db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Assistant=reader_a, Content={
+        "showTop": 5,
+        "afterMessage": 'DONE!!!!',
+    }))
 
     # Create Roles
     db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))

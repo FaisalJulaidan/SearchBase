@@ -25,7 +25,8 @@ stripe.api_key = secret_key
 
 @sub_router.route("/admin/pricing", methods=['GET'])
 def admin_pricing():
-    return admin_services.render("admin/pricing-tables.html", pub_key=pub_key)
+    currentPlan = session.get('UserPlan')
+    return admin_services.render("admin/pricing-tables.html", pub_key=pub_key, currentPlan=currentPlan)
 
 
 @sub_router.route("/admin/subscribe/<planID>", methods=['GET', 'POST'])

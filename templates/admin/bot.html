@@ -590,8 +590,16 @@
                 // to change the textbox next to type dropdown
                 $("ul.dropdown-menu.dropdown-menu-right").on("click", function (e) {
                     $input = $(e.target).parent().parent().parent().parent().children().first();
-                    $input.val($(e.target).text());
+                    let text = $(e.target).text();
+                    $input.val(text);
+                    if (text === "Go To Specific Block") {
+                        $input.parent().find(".blockToGoID").remove();
+                        $input.parent().append("<input type=\"number\" class=\"blockToGoID form-control\"/>");
+                    } else {
+                        $input.parent().find(".blockToGoID").remove();
+                    }
                 });
+
 
                 // Input radio-group visual controls
                 $('.radio-group label').on('click', function (evt) {
@@ -645,10 +653,17 @@
                     });
                 });
 
-                // to change the textbox next to type dropdown
+                 // to change the textbox next to type dropdown
                 $("ul.dropdown-menu.dropdown-menu-right").on("click", function (e) {
                     $input = $(e.target).parent().parent().parent().parent().children().first();
-                    $input.val($(e.target).text());
+                    let text = $(e.target).text();
+                    $input.val(text);
+                    if (text === "Go To Specific Block") {
+                        $input.parent().find(".blockToGoID").remove();
+                        $input.parent().append("<input type=\"number\" class=\"blockToGoID form-control\"/>");
+                    } else {
+                        $input.parent().find(".blockToGoID").remove();
+                    }
                 });
 
                 // Input radio-group visual controls
@@ -770,13 +785,15 @@
                 }
 
                 class BlockTypeUserInput {
-                    constructor(text, action, validation, afterMessage, storeInDB, type, order, id) {
+                    constructor(text, action, validation, blockToGoID, storeInDB, type, order, id, afterMessage="") {
                         this.UserInput = {
                             content: {
                                 action: action ? action : 'Go To Next Block',
                                 text: text,
                                 validation: validation,
-                                afterMessage: afterMessage
+                                afterMessage: afterMessage,
+                                blockToGoID: blockToGoID
+
                             },
                             storeInDB: storeInDB,
                             type: type,
@@ -787,13 +804,14 @@
                 }
 
                 class BlockTypeFileUpload {
-                    constructor(text, action, fileTypes, afterMessage, storeInDB, type, order, id) {
+                    constructor(text, action, fileTypes, blockToGoID, storeInDB, type, order, id, afterMessage="") {
                         this.FileUpload = {
                             content: {
                                 action: action ? action : 'Go To Next Block',
                                 text: text,
                                 fileTypes: fileTypes,
-                                afterMessage: afterMessage
+                                afterMessage: afterMessage,
+                                blockToGoID: blockToGoID
                             },
                             storeInDB: storeInDB,
                             type: type,
@@ -804,7 +822,7 @@
                 }
 
                 class BlockTypeSolutions {
-                    constructor(showTop, afterMessage, storeInDB, type, order, id) {
+                    constructor(showTop, storeInDB, type, order, id, afterMessage="") {
                         this.Solutions = {
                             content: {
                                 showTop: showTop,
@@ -850,9 +868,12 @@
                             for (const answer of answers) {
                                 let $answer = $(answer);
 
+
                                 let text = $answer.children().find('input.form-control').first().val();
                                 let afterMessage = $answer.children().find('input.form-control')[1].value;
-                                let action = $answer.children().find('input.form-control').last().val();
+                                let action = $answer.children().find('input.form-control')[2].value;
+                                let blockToGoID = 0;
+                                try { blockToGoID = +$answer.children().find('.blockToGoID')[0].value; } catch (e) { }
                                 let keywords = (function () {
                                     let keywordsArr = [];
                                     $answer.find('tags').children('tag').each((i, tag) => {
@@ -865,7 +886,8 @@
                                     action: action ? action : 'Go To Next Block',
                                     text: text,
                                     keywords: keywords,
-                                    afterMessage: afterMessage
+                                    afterMessage: afterMessage,
+                                    blockToGoID: blockToGoID
                                 });
                             }
                         }
@@ -880,12 +902,18 @@
                                 return $block.children().last().find('.input-group').children().first().next().val();
                         })();
                         let action = $block.children().last().find('input.normalCursor').first().val();
-                        let validationn = $block.children().last().find('input.normalCursor').last().val();
+                        let blockToGoID = 0;
+                        let validation = $block.children().last().find('input.normalCursor')[1].value;
+                        try {
+                            blockToGoID = +$block.children().last().find('.blockToGoID')[0].value;
+                        } catch (e) {
+                            blockToGoID = 0;
+                        }
                         let afterMessage = $block.children().last().children('.col-md-8').children().last().val();
                         let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                         let id = +$block.attr('id');
 
-                        botData.blocks.push(new BlockTypeUserInput(text, action, validationn, afterMessage, storeInDB, type, order, id).UserInput);
+                        botData.blocks.push(new BlockTypeUserInput(text, action, validation, blockToGoID, storeInDB, type, order, id, afterMessage).UserInput);
                     }
 
                     if (type == 'File Upload') {
@@ -895,6 +923,11 @@
                                 return $block.children().last().find('.input-group').children().first().next().val();
                         })();
                         let action = $block.children().last().find('input.normalCursor').first().val();
+
+                        let blockToGoID = 0;
+                        try {
+                            blockToGoID = +$block.children().last().find('.blockToGoID')[0].value;
+                        } catch (e) { }
 
                         let fileTypes = [];
                         $block.children().last().children('.col-md-8').first().children().last().children().each((i, elem) => {
@@ -907,7 +940,7 @@
                         let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                         let id = +$block.attr('id');
 
-                        botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, afterMessage, storeInDB, type, order, id).FileUpload);
+                        botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, blockToGoID, storeInDB, type, order, id, afterMessage).FileUpload);
                     }
 
                     if (type == 'Solutions') {
@@ -917,7 +950,7 @@
                         let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                         let id = +$block.attr('id');
 
-                        botData.blocks.push(new BlockTypeSolutions(showTop, afterMessage, storeInDB, type, order, id).Solutions);
+                        botData.blocks.push(new BlockTypeSolutions(showTop, storeInDB, type, order, id, afterMessage).Solutions);
                     }
 
 
@@ -969,11 +1002,24 @@
                         $(input).addClass('tagified')
                     }
                 });
-                // to change the textbox next to type dropdown
+
+
+
+               // to change the textbox next to type dropdown
                 $("ul.dropdown-menu.dropdown-menu-right").on("click", function (e) {
                     $input = $(e.target).parent().parent().parent().parent().children().first();
-                    $input.val($(e.target).text());
+                    let text = $(e.target).text();
+                    $input.val(text);
+                    if (text === "Go To Specific Block") {
+                        $input.parent().find(".blockToGoID").remove();
+                        $input.parent().append("<input type=\"number\" class=\"blockToGoID form-control\"/>");
+                    } else {
+                        $input.parent().find(".blockToGoID").remove();
+                    }
                 });
+
+
+
                 // to make the current type highlighted
                 $("button.btn.btn-default.dropdown-toggle").on("click", function (e) {
                     $input = $(e.target).parent().parent().children().first().val();
@@ -1050,6 +1096,7 @@
                     "          </button>\n" +
                     "          <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
                     "<li><a>Go To Next Block</a></li>\n" +
+                    "<li><a>Go To Specific Block</a></li>\n" +
                     "          </ul>\n" +
                     "        </div><!-- /btn-group -->\n" +
                     "      </div><!-- /input-group -->\n" +
@@ -1188,6 +1235,7 @@
                             getDropdownElement(actions) +
                             "       </ul>\n" +
                             "   </div><!-- /btn-group -->\n" +
+                            "    GOTO_ID_BLOCK"+
                             "</div><!-- /input-group -->\n"
                     }
 
@@ -1278,6 +1326,11 @@
                                 answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
                                 answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
                                 answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
+                                 if (answers[i].action == "Go To Specific Block") {
+                                    answerTemplate = answerTemplate.replace('GOTO_ID_INPUT', "<input type=\"number\" class=\"blockToGoID form-control\" value=\"" + answers[i].blockToGoID+"\"/>");
+                                } else {
+                                    answerTemplate = answerTemplate.replace('GOTO_ID_INPUT', "");
+                                }
                                 answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].text);
                                 answerTemplate = answerTemplate.replace('AFTER_MESSAGE_VALUE', answers[i].afterMessage); 
 
@@ -1354,6 +1407,7 @@
                             getDropdownElement(actions) +
                             "          </ul>\n" +
                             "        </div><!-- /btn-group -->\n" +
+                            "        GOTO_ID_INPUT"+
                             "      </div><!-- /input-group -->\n" +
 
                             "    </div>\n" +
@@ -1366,9 +1420,24 @@
                     function getBlockContent(template, block) {
                         template = template.replace('BLOCK_ID', block.id);
                         template = template.replace('BLOCK_TYPE', block.type);
-                        template = template.replace('BLOCK_TEXT', block.content.text);
+
+
+                        if(block.type === 'Solutions'){
+                           template = template.replace('BLOCK_TEXT', 'Solution Block');
+                        }
+                        else {
+                           template = template.replace('BLOCK_TEXT', block.content.text);
+                        }
+
                         template = template.replace('BLOCK_TEXT_EDITABLE', block.content.text);
                         template = template.replace('BLOCK_ACTION', block.content.action);
+
+                         if (block.content.action === "Go To Specific Block") {
+                            template = template.replace("GOTO_ID_BLOCK", "<input type=\"number\" class=\"blockToGoID form-control\" value=\"" + block.content.blockToGoID + "\"/>")
+                        } else {
+                            template = template.replace("GOTO_ID_BLOCK", "")
+                        }
+
                         template = template.replace('BLOCK_VALIDATION', block.content.validation);
                         template = template.replace('BLOCK_TOP_SOLUTION_EDITABLE', block.content.showTop);
 
@@ -1411,7 +1480,7 @@
                         var content = "";
                         
                         if (block_template.name == "Solutions"){
-                            content = getTopSolutionsElement() + getAfterMessageInput() +
+                            content = getTopSolutionsElement() + getAfterMessageInput(block.content.afterMessage) +
                                 getSubmitElement(true, 'x');
 
                         }
@@ -1429,7 +1498,7 @@
                             content = getQuestionElement() +
                                 getActionElement(block_template.actions) +
                                 getValidationElement(block_template.validations) +
-                                getAfterMessageInput() +
+                                getAfterMessageInput(block.content.afterMessage) +
                                 getSubmitElement(true, 'x');
 
                         }
@@ -1440,20 +1509,6 @@
                                 getAnswersElement(block_template.actions, block.content.answers) +
                                 getSubmitElement(true, 'x');
                         }
-                        
-                        
-                        
-                        if (block_template.name == "Solutions"){
-                            templateHTML = templateHTML.replace('BLOCK_QUESTION_TEXT', '');
-                            templateHTML = templateHTML.replace('BLOCK_TOP_SOLUTIONS', getTopSolutionsElement());
-                            templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', getAfterMessageInput(block.content.afterMessage));
-
-                        }
-                        else
-                            templateHTML = templateHTML.replace('BLOCK_QUESTION_TEXT', getQuestionElement());
-                            templateHTML = templateHTML.replace('BLOCK_TOP_SOLUTIONS', '');
-
-
 
                         templateHTML = templateHTML.replace('BLOCK_CONTENT', content);
                         
@@ -1477,8 +1532,13 @@
             function render_blocks_change(block_template, $oldBlock) {
                 function cookUpBlock(block_template, block) {
 
-                    // empty the old block text
-                    console.log($oldBlock.parent().find('.title').text('...'));
+                     // empty the old block text
+                    if (block_template.name == "Solutions"){
+                        console.log($oldBlock.parent().find('.title').text('Solution Block'));
+                    } else {
+                        console.log($oldBlock.parent().find('.title').text('...'));
+                    }
+
 
                        function getQuestionElement(){
                         return "" +
@@ -1511,11 +1571,11 @@
                         return "" +
                             "<div class=\"input-group col-sm-3 topSolutions\">\n" +
                             "         <span class=\"input-group-addon\">Top:</span>\n" +
-                            "         <input type=\"number\" min=\"1\" class=\"form-control\"\n" +
+                            "         <input type=\"number\" min=\"1\" value=\"1\" class=\"form-control\"\n" +
                             "</div>\n"
                     }
 
-                    function getAfterMessageInput(afterMessage) {
+                    function getAfterMessageInput(afterMessage="") {
                         return "" +
                             "<div class=\"input-group col-md-8\">\n" +
                             "  <span class=\"input-group-addon\">After Message:</span>\n" +
@@ -1636,69 +1696,6 @@
 
                         return templateHTML;
                     }
-
-
-
-                    {#function getTemplate(block_template) {#}
-                    {#    templateHTML = "" +#}
-                    {#       // placeholders#}
-                    {#        "       BLOCK_QUESTION_TEXT" +#}
-                    {#        "       BLOCK_ADD_ANSER_BUTTON" +#}
-                    {#        "       BLOCK_TOP_SOLUTIONS" +#}
-                    {#        "       BLOCK_ANSWERS" +#}
-                    {#        "       BLOCK_ACTION" +#}
-                    {#        "       BLOCK_VALIDATION" +#}
-                    {#        "       BLOCK_FILE_TYPE" +#}
-                    {#        "       BLOCK_AFTER_MESSAGE" +#}
-                    {#        getSubmitElement(true, 'x');#}
-                    {##}
-                    {#    if (block_template.name == "Solutions"){#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_QUESTION_TEXT', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ANSWERS', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ACTION', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_VALIDATION', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', '');#}
-                    {##}
-                    {#        templateHTML = templateHTML.replace('BLOCK_TOP_SOLUTIONS', getTopSolutionsElement());#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', getAfterMessageInput(block_template.afterMessage));#}
-                    {##}
-                    {#    }#}
-                    {#    else#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_TOP_SOLUTIONS', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_QUESTION_TEXT', getQuestionElement());#}
-                    {##}
-                    {#    if (block_template.name == "File Upload")#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', getFileUpload(block_template.typesAllowed, block_template.fileMaxSize));#}
-                    {#    else#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', '');#}
-                    {##}
-                    {##}
-                    {#    if (block_template.name == "File Upload" || block_template.name == "User Input")#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ACTION', getActionElement(block_template.actions));#}
-                    {#    else#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ACTION', '');#}
-                    {##}
-                    {#    if (block_template.name == "User Input")#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_VALIDATION', getValidationElement(block_template.validations));#}
-                    {#    else#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_VALIDATION', '');#}
-                    {##}
-                    {#    if (block_template.name == "Question") {#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ANSWERS', getAnswersElement(block_template.actions));#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', getAddAnswerButton());#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', '')#}
-                    {#    }#}
-                    {#    else {#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ANSWERS', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', getAfterMessageInput(block_template.afterMessage))#}
-                    {#    }#}
-                    {##}
-                    {#    return templateHTML;#}
-                    {#}#}
-
 
                     return getTemplate(block_template, block);
                 }

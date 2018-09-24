@@ -2,7 +2,8 @@ var globalTSB = {
     id: undefined,
     // host: 'https://www.thesearchbase.com',
     host: 'http://localhost:5000',
-    files_path: '/userdownloads'
+    files_path: '/userdownloads',
+    iframe_route: '/chatbottemplate_production'
 };
 
 
@@ -33,21 +34,29 @@ function sleep(ms) {
     // Config
     var host = globalTSB.host;
     var files_path = globalTSB.files_path;
+    var iframe_route = globalTSB.iframe_route;
     var integration_file = host + files_path + 'integration.js';
     var id = document.querySelector('script[data-name="tsb-widget"][data-id]').getAttribute('data-id');
     globalTSB.id = id;
 
-    // Tags to be added
-    var styleTags = ['/style.css', '/pop.css', '/bootstrap.min.css', '/slick.css'];
-    var scriptTags = ['/jquery-2.2.4.min.js', '/jQueryRotate.js', '/popper.min.js',
-        '/bootstrap.min.js', '/plugins.js', '/slick.min.js', '/active.js', '/footer-reveal.min.js'];
 
+    // Tags to be added
+    var styleTags = ['/style.css', '/pop.css', '/slick.css'];
+    var scriptTags = ['/jquery-2.2.4.min.js', '/jQueryRotate.js', '/active.js'];
+
+
+    // import font-awesome
+    styleLink = document.createElement("link");
+    styleLink.rel = "stylesheet prefetch";
+    styleLink.type = "text/css";
+    styleLink.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css";
+    document.getElementsByTagName('head')[0].appendChild(styleLink);
 
     // create style tags
     var styleLink = undefined;
     for (var i = 0; i < styleTags.length; i++) {
         styleLink = document.createElement("link");
-        styleLink.rel = "stylesheet";
+        styleLink.rel = "stylesheet prefetch";
         styleLink.type = "text/css";
         styleLink.href = host + files_path + styleTags[i];
         styleLink.media = "all";
@@ -55,32 +64,40 @@ function sleep(ms) {
     }
 
 
-    // Create chatbot div
-    // var div = document.createElement('div');
-    // div.id = 'chatbotWidget';
-    //
-    //
-    //
-    // div.innerHTML = ' <div id="iframediv" style="opacity: 1">' +
-    //         '            <div id="overChatbotIframe">\n' +
-    //         '                <a id="overChatbotIframeHeading">TheSearchBase</a>\n' +
-    //         '                <a id="overChatbotIframeCloseButton">X</a>\n' +
-    //         '            </div>\n' +
-    //         '            <iframe frameBorder="0" id="chatbotIframe" src="'+ host +"/chatbottemplate_production/" + id + '" ></iframe>\n' +
-    //         '        </div>\n' +
-    //
-    //         '        <div class="launch_btn_holder">\n' +
-    //         '            <div id="launch_button"></div>\n' +
-    //         '            <div id="launch_button_appendix">' +
-    //         '        </div>\n';
-    //
-    // document.getElementsByTagName('body')[0].appendChild(div);
+    // Build The Chatbot Button and iFrame //
+    // Create chatbot button div
+    var btnDiv = document.createElement('div');
+    btnDiv.id = 'chatbot-widget';
 
-    // Set images for open chatbot buttons
-    // document.getElementById('launch_button')
-    //     .style.backgroundImage = "url('" + host + files_path + "/open-assistant-circle.png')";
-    // document.getElementById('launch_button_appendix')
-    //     .style.backgroundImage = "url('" + host + files_path + "/open-assistant-bar.png')";
+    btnDiv.innerHTML = ' <div class="circle">\n' +
+        '               <i class="fa fa-cloud"></i>\n' +
+        '             </div>';
+
+    // Create chatbot iFrame div
+    var iFrameDiv = document.createElement('div');
+    iFrameDiv.id = 'iframediv';
+    iFrameDiv.style.width = '320px';
+    iFrameDiv.style.height = '380px';
+    iFrameDiv.style.opacity = '0';
+
+    iFrameDiv.innerHTML = '<div class="contact-profile">\n' +
+        '        <img src="static/user_downloads/favicon-96x96.png" alt=""/>\n' +
+        '        <p>Bot</p>\n' +
+        '\n' +
+        '        <div class="social-media" id=\'closeIframe\'>\n' +
+        '            <i class="fa fa-close" aria-hidden="true"></i>\n' +
+        '        </div>\n' +
+        '\n' +
+        '        <div id=\'refreshIframe\' class="social-media" >\n' +
+        '            <i class="fa fa-refresh" aria-hidden="true"></i>\n' +
+        '        </div>\n' +
+        '    </div>\n' +
+        '    <iframe frameborder="0" id="chatbotIframe" src=\"' + host  + iframe_route + '/' + id + '\"></iframe>';
+
+    // Add the two divs to the page dom
+    document.getElementsByTagName('body')[0].appendChild(btnDiv);
+    document.getElementsByTagName('body')[0].appendChild(iFrameDiv);
+    // === ==== ==== ===== ==== ==== ====
 
 
     // Create script tags
@@ -96,27 +113,34 @@ function sleep(ms) {
         await sleep(100);
     }
 
+
+    // Animations
     $("#iframediv").hide();
 
-    $("#chatbot-widget").on('click', () => {
-        $("#chatbot-widget").animate({
+    document.getElementById('chatbot-widget').addEventListener('click', e => {
+        $chatbotWidget = $("#chatbot-widget");
+        $chatbotWidget.animate({
             height: '0px',
             opacity: '0',
         }, 500, () => {
             $("#chatbot-widget").hide();
-        })
+        });
 
-        $("#iframediv").show();
-        $("#iframediv").animate({
+        $iFrameDiv = $("#iframediv");
+        $iFrameDiv.show();
+        $iFrameDiv.animate({
             height: '300px',
             opacity: '1',
         });
     });
 
-    $("#closeIframe").on('click', () => {
-        $("#chatbot-widget").show();
-        $("#chatbot-widget").css('height','auto');
-        $("#chatbot-widget").animate({
+
+    document.getElementById('closeIframe').addEventListener('click', e => {
+
+        $chatbotWidget = $("#chatbot-widget");
+        $chatbotWidget.show();
+        $chatbotWidget.css('height','auto');
+        $chatbotWidget.animate({
             opacity: '1',
         });
 
@@ -126,7 +150,13 @@ function sleep(ms) {
         }, 500, () => {
             $("#iframediv").hide();
         })
-    })
+    });
+
+    // Reset the iframe
+     document.getElementById('refreshIframe').addEventListener('click', e => {
+       document.getElementById('chatbotIframe').src = host  + iframe_route + '/' + id;
+    });
+
 
 
 })(this);

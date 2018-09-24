@@ -64,7 +64,7 @@ ul li {
     background: #f5f5f5;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
-    border: 1px grey solid;
+    /*border: 1px grey solid;*/
 }
 
 .contact-profile img {
@@ -103,7 +103,7 @@ ul li {
     overflow: hidden;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
-    border: 1px grey solid;
+    /*border: 1px grey solid;*/
     border-top: none;
     margin-top: -1px;
 
@@ -112,9 +112,59 @@ ul li {
 /*iFrame styling*/
 #iframediv {
     opacity: 1;
-    position: absolute;
+    position: fixed;
     right: 10px;
     bottom: 25px;
+}
+
+#chatbot-widget {
+    opacity: 1;
+    position: fixed;
+    right: 10px;
+    bottom: 0px;
+    z-index: 100;
+}
+
+.box {
+    background-color: #4B5B71;
+    width: 300px;
+    height: 40px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+
+.box > h5 {
+    margin: 0;
+    margin-left: 20px;
+}
+
+.box > i {
+    margin-left: 130px;
+}
+
+.circle {
+    background-color: #4B5B71;
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    margin-bottom: 10px;
+}
+
+.circle > h5 {
+    margin: 0;
+    margin-left: 20px;
+}
+
+.circle > i {
+    margin-left: 15px;
+    font-size: large;
+    Z
 }
 
 #overChatbotIframeCloseButton {

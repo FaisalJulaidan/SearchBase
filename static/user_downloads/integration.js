@@ -55,8 +55,7 @@ function sleep(ms) {
     }
 
 
-    //
-    // // Create chatbot div
+    // Create chatbot div
     // var div = document.createElement('div');
     // div.id = 'chatbotWidget';
     //
@@ -85,17 +84,49 @@ function sleep(ms) {
 
 
     // Create script tags
-    // var script = undefined;
-    // for(i=0; i<scriptTags.length; i++) {
-    //
-    //   script = document.createElement('script');
-    //   script.type = "text/javascript";
-    //   script.language = "javascript";
-    //   script.src = host + files_path + scriptTags[i];
-    //
-    //   document.getElementsByTagName('body')[0].appendChild(script);
-    //  await sleep(100);
-    // }
+    var script = undefined;
+    for (i = 0; i < scriptTags.length; i++) {
+
+        script = document.createElement('script');
+        script.type = "text/javascript";
+        script.language = "javascript";
+        script.src = host + files_path + scriptTags[i];
+
+        document.getElementsByTagName('body')[0].appendChild(script);
+        await sleep(100);
+    }
+
+    $("#iframediv").hide();
+
+    $("#chatbot-widget").on('click', () => {
+        $("#chatbot-widget").animate({
+            height: '0px',
+            opacity: '0',
+        }, 500, () => {
+            $("#chatbot-widget").hide();
+        })
+
+        $("#iframediv").show();
+        $("#iframediv").animate({
+            height: '300px',
+            opacity: '1',
+        });
+    });
+
+    $("#closeIframe").on('click', () => {
+        $("#chatbot-widget").show();
+        $("#chatbot-widget").css('height','auto');
+        $("#chatbot-widget").animate({
+            opacity: '1',
+        });
+
+        $("#iframediv").animate({
+            height: '0px',
+            opacity: '0',
+        }, 500, () => {
+            $("#iframediv").hide();
+        })
+    })
 
 
 })(this);

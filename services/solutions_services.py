@@ -41,6 +41,22 @@ def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Call
     return Callback(True, 'Solutions based on keywords retrieved successfully!!', result)
 
 
+def createNew(assistant, majorTitle, money, url, solId='',  secTitle='', shortDesc='', keywords=''):
+    try:
+        # Create a new user with its associated company and role
+        solution = Solution(Assistant=assistant, SolutionID=solId, MajorTitle=majorTitle, SecondaryTitle=secTitle,
+                            ShortDescription=shortDesc,Money=money, Keywords=keywords, URL=url, TimesReturned=0)
+        db.session.add(solution)
+
+    except Exception as exc:
+        print("createNew Error: ", exc)
+        db.session.rollback()
+        return Callback(False, 'Sorry, Could not create the solution.')
+    # Save
+    db.session.commit()
+    return Callback(True, 'Solution has been successfully created.')
+
+
 def getByID(id):
     try:
         # Get result and check if None then raise exception
@@ -136,20 +152,6 @@ def deleteAllByAssistantID(assistantID):
     return True
 
 
-def createNew(assistant, majorTitle, money, url, solId='',  secTitle='', shortDesc='', keywords=''):
-    try:
-        # Create a new user with its associated company and role
-        solution = Solution(Assistant=assistant, SolutionID=solId, MajorTitle=majorTitle, SecondaryTitle=secTitle,
-                            ShortDescription=shortDesc,Money=money, Keywords=keywords, URL=url, TimesReturned=0)
-        db.session.add(solution)
-
-    except Exception as exc:
-        print("createNew Error: ", exc)
-        db.session.rollback()
-        return Callback(False, 'Sorry, Could not create the solution.')
-    # Save
-    db.session.commit()
-    return Callback(True, 'Solution has been successfully created.')
 
 
 def bulkAdd(objects):

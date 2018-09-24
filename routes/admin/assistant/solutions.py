@@ -177,7 +177,7 @@ def create_solution(assistantID):
     if request.method == "POST":
 
         # Solution info
-        id = request.form.get("inputId", default='').strip()
+        solutionsID = request.form.get("inputId", default='').strip()
         majorTitle = request.form.get("inputMajorTitle", default='').strip()
         secondaryTitle = request.form.get("inputSecondaryTitle", default='').strip()
         shortDescription = request.form.get("inputShortDescription", default='').strip()
@@ -185,15 +185,25 @@ def create_solution(assistantID):
         keywords = request.form.get("inputKeywords", default='').strip()
         URL = request.form.get("inputURL", default='').strip()
 
-        if not helpers.isStringsLengthGreaterThanZero(id, majorTitle, money, URL):
-            return helpers.jsonResponse(False, 400, "Please provide all required info for the new solution.")
+
+
+
+        if not helpers.isStringsLengthGreaterThanZero(majorTitle, money, URL):
+            msg = "Please provide all required info for the new solution."
+            if not majorTitle or len(majorTitle) < 0:
+                msg = "Major title is required."
+            elif not money or len(money) < 0:
+                msg = "Money/Price is required."
+            elif not URL or len(URL) < 0:
+                msg = "URL is required."
+            return helpers.jsonResponse(False, 400, msg)
 
         # TODO: add restriction to only add limited number of solution based on plan
         ########## HERE ###########
 
         # Create the solution
-        callback: Callback = solutions_services.createNew(assistant, id, majorTitle, money, URL,
-                                                       secondaryTitle, shortDescription, keywords)
+        callback: Callback = solutions_services.createNew(assistant, majorTitle, money, URL,
+                                                       solutionsID, secondaryTitle, shortDescription, keywords)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)
 

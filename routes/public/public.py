@@ -48,17 +48,22 @@ def chatbot(assistantID):
         data: dict = bot_services.getChatbot(assistant)
         return helpers.jsonResponse(True, 200, "No Message", data)
 
+    # Process sent data coming from the chatbot
     if request.method == "POST":
+
         # chatbot collected information
         data = request.get_json(silent=True)
-
-        s_callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'])
-        if not s_callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message)
-
         solutions = []
-        for s in s_callback.Data:
-            solutions.append(s.to_dict())
+
+        # If showTop is 0 then return nothing and don't even call solutions_services
+        if data['showTop'] > 0:
+            s_callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'], data['showTop'])
+            if not s_callback.Success:
+                return helpers.jsonResponse(False, 400, callback.Message)
+
+            # Convert SQLAlchemy objects to dict
+            for s in s_callback.Data:
+                solutions.append(s.to_dict())
 
         ch_callback: Callback = chatbot_services.processData(assistant, data, len(solutions))
 

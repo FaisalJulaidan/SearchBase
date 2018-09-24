@@ -66,20 +66,20 @@
     <!-- Emoji JS and CSS -->
     <script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css"/>
+    <!-- to use -> emojione.toImage(input) -> input = :emojiname: -> example -> emojione.toImage(:smile:) -->
+    <!-- phone emojis also work -->
+    <!-- :P :) or such are not suported -->
+    <!-- https://demos.emojione.com/latest/jstoshort.html to look at their :emoji: name -->
 
 
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
     <!--already imported in client's page-->
     <!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
 
 
-    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
-    <link rel='stylesheet prefetch'
-          href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
-</head>
 
+</head>
 <style>
     html, body {
         width: 100% !important;
@@ -390,14 +390,13 @@
         return null
     }
 
-    // This should send the data to the server, data such as keywords and inputs.
-    // and get  the solutions back based on the sent data
+    // This should send the data to the server, without returning any solutions back
     function sendData() {
         var solutions = [];
-        params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": 5};
+        params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": 0};
         console.log("Send data...");
 
-        $.ajax({
+        return $.ajax({
             contentType: 'application/json', //this is important
             url: '../assistant/' + assistantID + '/chatbot',
             type: "POST",
@@ -405,22 +404,21 @@
 
         }).done(function (res) {
 
-            console.log("Solutions retrieved successfully!");
+            console.log("Data sent successfully!");
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
-            solutions = data["solutions"];
             sendFile();
-            return solutions;
-            {#displayReturnedSolutions(solutions);#}
+            return true;
 
         }).fail(function (res) {
             console.log("Error in retrieving blocks.");
             console.log(res);
+            return false
         });
-        return solutions
     }
+
     function sendDataSolutionsBlock(showTop) {
-        params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": showTop};
+        params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": showTop};
 
         return $.ajax({
             contentType: 'application/json', //this is important
@@ -436,7 +434,6 @@
             solutions = data["solutions"];
             sendFile();
             return solutions;
-            {#displayReturnedSolutions(solutions);#}
 
         }).fail(function (res) {
             console.log("Error in retrieving blocks.");
@@ -473,9 +470,21 @@
     function displayReturnedSolutions(solutions) {
         messageContainer = $(".messages ul");
 
-        for (var i = 0; i < solutions.length; i++) {
-            messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>" + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>" + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] + "</label><br><button onclick=\"BuyProduct('" + solutions[i]["URL"] + "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center></li>");
+        // If there is no solutions in the database show this message.
+        if (solutions.length === 0){
+            sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.")
+
+        } else {
+
+            for (var i = 0; i < solutions.length; i++) {
+                messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
+                    + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>"
+                    + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] +
+                    "</label><br><button onclick=\"BuyProduct('" + solutions[i]["URL"] +
+                    "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center></li>");
+            }
         }
+
 
         SetRepeat();
     }
@@ -709,23 +718,44 @@
         }
 
         function getNextBlock(action, blockToGoId = undefined) {
-            var targetBlock = undefined
+            var targetBlock = undefined;
 
             if (action == "Go To Next Block") {
                 targetBlock = blocks[currentBlock.order]; //order starts from 1 and array from 0 so it just needs the current .order
                 if (targetBlock === undefined) {
-                    sendData()
-                    return 0;
+                     console.log('1');
+                     sendData().then((isSuccess) => {
+                        if (isSuccess){
+                            sendAssistantMessage("Thank you for your input. We'll be in touch.");
+                        } else {
+                            sendAssistantMessage("Your input couldn't be processed. Please contact us.");
+                        }
+                        SetRepeat();
+
+                    })
                 }
-            }
-            // not yet implimented
-            else if (action == "Go To Specific Block") {
+            } else if (action == "Go To Specific Block") {
                 for (var i = 0; i < blocks.length; i++) {
                     if (blocks[i].id == blockToGoId) {
                         targetBlock = blocks[i];
                     }
                 }
+                 if (targetBlock === undefined) {
+                console.log('2');
+                sendData().then((isSuccess) => {
+                    if (isSuccess){
+                        sendAssistantMessage("Thank you for your input. We'll be in touch.");
+                    } else {
+                        sendAssistantMessage("Your input couldn't be processed. Please contact us.");
+                    }
+
+                    SetRepeat();
+                    return 0;
+                    })
+                }
             }
+
+
 
             if (currentBlock != undefined) { //check if its not trying to reload the same block
                 if (currentBlock != targetBlock) {

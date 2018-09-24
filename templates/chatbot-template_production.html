@@ -470,7 +470,8 @@
         }).fail(function (res) {
             console.log("Error in retrieving blocks.");
             console.log(res);
-        });
+            });
+        sendFile();
     }
 
     function sendFile() {
@@ -803,7 +804,8 @@
                 targetBlock = blocks[currentBlock.order]; //order starts from 1 and array from 0 so it just needs the current .order
                 if (targetBlock === undefined) {
                      console.log('1');
-                     sendData().then((isSuccess) => {
+                    sendData().then((isSuccess) => {
+                        console.log("isSuccess: ", isSuccess)
                         if (isSuccess){
                             sendAssistantMessage("Thank you for your input. We'll be in touch.");
                         } else {
@@ -815,6 +817,9 @@
                 }
             } else if (action == "Go To Specific Block") {
                 for (var i = 0; i < blocks.length; i++) {
+                    console.log("blockToGoId: ", blockToGoId)
+                    console.log("blocks[i].id: ", blocks[i].id)
+                    console.log("blocks: ", blocks)
                     if (blocks[i].id == blockToGoId) {
                         targetBlock = blocks[i];
                     }

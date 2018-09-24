@@ -28,11 +28,10 @@ def test_chatbot_page(assistantID):
     if request.method == "GET":
         return render_template("chatbot-template.html")
 
-
-@public_router.route("/chatTest/<assistantID>", methods=['GET'])
-def test_chatbot_page1(assistantID):
+@public_router.route("/chatbottemplate_production/<assistantID>", methods=['GET'])
+def test_chatbot_page2(assistantID):
     if request.method == "GET":
-        return render_template("chatbot-template1.html")
+        return render_template("chatbot-template_production.html")
 
 
 @public_router.route("/assistant/<int:assistantID>/chatbot", methods=['GET', 'POST'])

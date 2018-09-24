@@ -116,7 +116,10 @@ ul li{
 
 /*iFrame styling*/
 #iframediv {
-    opacity: 0;
+    opacity: 1;
+    position: absolute;
+    right: 10px;
+    bottom: 73px;
 }
 
 #overChatbotIframeCloseButton {
@@ -146,7 +149,7 @@ ul li{
 }
 
 #chatbotIframe, #overChatbotIframe {
-    box-shadow: 3px 3px 5px grey;
+    /*box-shadow: 3px 3px 5px grey;*/
 }
 
 #overChatbotIframe {

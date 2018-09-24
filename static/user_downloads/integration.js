@@ -2,7 +2,8 @@
 
 var globalTSB = {
   id: undefined,
-  host: 'https://www.thesearchbase.com',
+  // host: 'https://www.thesearchbase.com',
+  host: 'http://localhost:5000',
   files_path: '/userdownloads'
 };
 
@@ -41,7 +42,7 @@ function sleep(ms) {
   // Tags to be added
   var styleTags = ['/style.css', '/pop.css', '/responsive.css', '/bootstrap.min.css', '/slick.css'];
   var scriptTags = [ '/jquery-2.2.4.min.js', '/jQueryRotate.js', '/popper.min.js',
-      '/bootstrap.min.js', '/plugins.js', '/slick.min.js', '/active.js', '/footer-reveal.min.js', '/chatbot.js'];
+      '/bootstrap.min.js', '/plugins.js', '/slick.min.js', '/active.js', '/footer-reveal.min.js'];
 
 
   // create style tags
@@ -56,45 +57,47 @@ function sleep(ms) {
   }
 
 
-
-  // Create chatbot div
-  var div = document.createElement('div');
-  div.id = 'chatbotWidget';
-
-  div.innerHTML = ' <div id="iframediv">' +
-          '            <div id="overChatbotIframe">\n' +
-          '                <a id="overChatbotIframeHeading">TheSearchBase</a>\n' +
-          '                <a id="overChatbotIframeCloseButton">X</a>\n' +
-          '            </div>\n' +
-          '            <iframe frameBorder="0" id="chatbotIframe" src="'+ host +'"/chatbottemplate/"' + id + '" ></iframe>\n' +
-          '        </div>\n' +
-
-          '        <div class="launch_btn_holder">\n' +
-          '            <div id="launch_button"></div>\n' +
-          '            <div id="launch_button_appendix">' +
-          '        </div>\n';
-
-  document.getElementsByTagName('body')[0].appendChild(div);
+  //
+  // // Create chatbot div
+  // var div = document.createElement('div');
+  // div.id = 'chatbotWidget';
+  //
+  //
+  //
+  // div.innerHTML = ' <div id="iframediv" style="opacity: 1">' +
+  //         '            <div id="overChatbotIframe">\n' +
+  //         '                <a id="overChatbotIframeHeading">TheSearchBase</a>\n' +
+  //         '                <a id="overChatbotIframeCloseButton">X</a>\n' +
+  //         '            </div>\n' +
+  //         '            <iframe frameBorder="0" id="chatbotIframe" src="'+ host +"/chatbottemplate_production/" + id + '" ></iframe>\n' +
+  //         '        </div>\n' +
+  //
+  //         '        <div class="launch_btn_holder">\n' +
+  //         '            <div id="launch_button"></div>\n' +
+  //         '            <div id="launch_button_appendix">' +
+  //         '        </div>\n';
+  //
+  // document.getElementsByTagName('body')[0].appendChild(div);
 
   // Set images for open chatbot buttons
-  document.getElementById('launch_button')
-      .style.backgroundImage = "url('" + host + files_path + "/open-assistant-circle.png')";
-  document.getElementById('launch_button_appendix')
-      .style.backgroundImage = "url('" + host + files_path + "/open-assistant-bar.png')";
+  // document.getElementById('launch_button')
+  //     .style.backgroundImage = "url('" + host + files_path + "/open-assistant-circle.png')";
+  // document.getElementById('launch_button_appendix')
+  //     .style.backgroundImage = "url('" + host + files_path + "/open-assistant-bar.png')";
 
 
   // Create script tags
-  var script = undefined;
-  for(i=0; i<scriptTags.length; i++) {
-
-    script = document.createElement('script');
-    script.type = "text/javascript";
-    script.language = "javascript";
-    script.src = host + files_path + scriptTags[i];
-
-    document.getElementsByTagName('body')[0].appendChild(script);
-    await sleep(100);
-  }
+  // var script = undefined;
+  // for(i=0; i<scriptTags.length; i++) {
+  //
+  //   script = document.createElement('script');
+  //   script.type = "text/javascript";
+  //   script.language = "javascript";
+  //   script.src = host + files_path + scriptTags[i];
+  //
+  //   document.getElementsByTagName('body')[0].appendChild(script);
+  //  await sleep(100);
+  // }
 
 
 

@@ -82,7 +82,8 @@ def gen_dummy_data():
               "smoker",
               "sad"
             ],
-            "blockToGoId": 2
+            "blockToGoId": None,
+            "afterMessage": ''
           },
           {
             "action": "Go To Next Block",
@@ -91,7 +92,10 @@ def gen_dummy_data():
             "keywords": [
               "smoker",
               "sad"
-            ]
+            ],
+            "blockToGoId": None,
+            "afterMessage": ''
+
           }
         ],
         "id": 2,
@@ -101,10 +105,12 @@ def gen_dummy_data():
     db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Assistant=reader_a, Content={
         "action": "Go To Next Block",
         "text": "What's your email?",
-        "blockToGoID": 2,
+        "blockToGoID": None,
         "storeInDB": True,
-        "validation": "Email"
-      }))
+        "validation": "Email",
+        "afterMessage": 'Your input is being processed...'
+
+    }))
     db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
         "action": "Go To Next Block",
         "fileTypes": [
@@ -113,6 +119,7 @@ def gen_dummy_data():
         ],
         "text": "Upload your CV",
         "blockToGoID": None,
+        "afterMessage": 'File is being uploaded...'
     }))
 
     db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Assistant=reader_a, Content={

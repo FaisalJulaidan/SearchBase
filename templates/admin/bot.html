@@ -400,7 +400,14 @@
                 // to change the textbox next to type dropdown
                 $("ul.dropdown-menu.dropdown-menu-right").on("click", function (e) {
                     $input = $(e.target).parent().parent().parent().parent().children().first();
-                    $input.val($(e.target).text());
+                    let text = $(e.target).text();
+                    $input.val(text);
+                    if (text === "Go To Specific Block") {
+                        $input.parent().find(".blockToGoID").remove();
+                        $input.parent().append("<input type=\"number\" class=\"blockToGoID form-control\"/>");
+                    } else {
+                        $input.parent().find(".blockToGoID").remove();
+                    }
                 });
 
                 // Input radio-group visual controls

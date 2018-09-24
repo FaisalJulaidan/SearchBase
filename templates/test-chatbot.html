@@ -3,12 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>Test Chatbot</title>
+    <link rel='stylesheet prefetch'
+          href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
 </head>
 <body>
 
-Let's test chatbot
+{#<div id="chatbot-widget">#}
+{#    <div class="box">#}
+{#        <h5>Click to chat</h5>#}
+{#        <i class="fa fa-chevron-down"></i>#}
+{#    </div>#}
+{#</div>#}
 
-<script src="https://www.thesearchbase.com/userdownloads/integration.js" data-name="tsb-widget" data-id="1" async defer ></script>
+<div id="chatbot-widget">
+    <div class="circle">
+        <i class="fa fa-cloud"></i>
+    </div>
+</div>
+
+<div id="iframediv" style="height: 325px;width: 300px; opacity: 0;">
+    <div class="contact-profile">
+        <img src="/static/img/core-img/favicon-96x96.png" alt=""/>
+        <p>Bot</p>
+
+        <div class="social-media" id='closeIframe'>
+            <i class="fa fa-close" aria-hidden="true"></i>
+        </div>
+
+        <div class="social-media" onclick="document.getElementById('chatbotIframe').contentWindow.Reset();">
+            <i class="fa fa-refresh" aria-hidden="true"></i>
+        </div>
+    </div>
+    <iframe frameborder="0" id="chatbotIframe" src="http://localhost:5000/chatbottemplate_production/1"></iframe>
+</div>
+
+
+<script src="http://localhost:5000/userdownloads/integration.js" data-name="tsb-widget" data-id="1" async
+        defer></script>
+
+<script>
+</script>
 
 </body>
 

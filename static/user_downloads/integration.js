@@ -77,7 +77,7 @@ function sleep(ms) {
     var iFrameDiv = document.createElement('div');
     iFrameDiv.id = 'iframediv';
     iFrameDiv.style.width = '320px';
-    iFrameDiv.style.height = '380px';
+    iFrameDiv.style.height = '0px';
     iFrameDiv.style.opacity = '0';
 
     iFrameDiv.innerHTML = '<div class="contact-profile">\n' +
@@ -129,7 +129,7 @@ function sleep(ms) {
         $iFrameDiv = $("#iframediv");
         $iFrameDiv.show();
         $iFrameDiv.animate({
-            height: '300px',
+            height: '370px',
             opacity: '1',
         });
     });

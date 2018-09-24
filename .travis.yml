@@ -5,6 +5,7 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
+  - export FLASK_ENV=production
 # command to run tests
 script:
-  - make build
+  - python app.py

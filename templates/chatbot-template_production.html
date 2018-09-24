@@ -648,8 +648,15 @@
                 //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
                 message = message.replace("&FILE_UPLOAD&", "");
 
-                if (currentBlock.content.afterMessage)
+                if (currentBlock.content.afterMessage) {
                     sendAssistantMessage(currentBlock.content.afterMessage);
+
+                    await sleep(200);
+                    putThinkingGif();
+                    await sleep(400 + Math.floor(Math.random() * 300));
+                    removeThinkingGif();
+                    await sleep(100);
+                }
 
                 await sleep(200);
                 putThinkingGif();
@@ -685,8 +692,16 @@
                 else {
                     // clear user input div
                     $(".message-input").first().html('');
-                    if (currentBlock.content.afterMessage)
+                    if (currentBlock.content.afterMessage) {
                         sendAssistantMessage(currentBlock.content.afterMessage);
+
+                        await sleep(200);
+                        putThinkingGif();
+                        await sleep(400 + Math.floor(Math.random() * 300));
+                        removeThinkingGif();
+                        await sleep(100);
+
+                    }
                 }
                 return getNextBlock(currentBlock.content.action);
             }
@@ -708,6 +723,12 @@
                     if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].text == message) {
                         if (blockAnswers[i].afterMessage)
                             sendAssistantMessage(blockAnswers[i].afterMessage);
+
+                        await sleep(200);
+                        putThinkingGif();
+                        await sleep(400 + Math.floor(Math.random() * 300));
+                        removeThinkingGif();
+                        await sleep(100);
 
                         var action = blockAnswers[i].action;
                         var blockToGoId = blockAnswers[i].blockToGoId;

@@ -112,18 +112,6 @@
         {#border-radius: 5px;#}
     }
 
-    @media screen and (max-width: 380px) {
-        #frame {
-            width: 100%;
-            height: 100%;
-            border-radius: 0px;
-        }
-
-        #frame .content .contact-profile {
-            border-top-left-radius: 0px;
-            border-top-right-radius: 0px;
-        }
-    }
 
     #frame .content {
         float: right;
@@ -133,18 +121,6 @@
         position: relative;
     }
 
-    @media screen and (max-width: 735px) {
-        #frame .content {
-            width: 100%;
-            {#min-width: 250px !important;#}
-        }
-    }
-
-    @media screen and (min-width: 900px) {
-        #frame .content {
-            width: 100%;
-        }
-    }
 
     #frame .content .contact-profile {
         width: 100%;
@@ -247,11 +223,6 @@
         line-height: 130%;
     }
 
-    @media screen and (min-width: 735px) {
-        #frame .content .messages ul li p {
-            max-width: 300px;
-        }
-    }
 
     #frame .content .message-input {
         position: absolute;
@@ -653,7 +624,7 @@
                 //needs rework
                 message = "&FILE_UPLOAD&" + document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
                 if (!checkFileFormat(message)) {
-                    sendUserMessage(message.replace("&FILE_UPLOAD&", ""))
+                    sendUserMessage(message.replace("&FILE_UPLOAD&", ""));
                     await sleep(350);
                     sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
                     return 0;
@@ -661,6 +632,7 @@
                 // clear file-upload div
                 $(".message-input").first().html('');
                 //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
+                message = message.replace("&FILE_UPLOAD&", "");
 
                 if (currentBlock.content.afterMessage)
                     sendAssistantMessage(currentBlock.content.afterMessage);

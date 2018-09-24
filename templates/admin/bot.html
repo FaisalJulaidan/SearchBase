@@ -1212,7 +1212,6 @@
                     }
 
                     function getActionElement(actions) {
-                        console.log("actions: ", actions)
                         return "" +
                             "<div class=\"input-group col-md-6\">\n" +
                             "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
@@ -1226,6 +1225,7 @@
                             getDropdownElement(actions) +
                             "       </ul>\n" +
                             "   </div><!-- /btn-group -->\n" +
+                            "    GOTO_ID_BLOCK"+
                             "</div><!-- /input-group -->\n"
                     }
 
@@ -1413,6 +1413,11 @@
                         template = template.replace('BLOCK_TEXT', block.content.text);
                         template = template.replace('BLOCK_TEXT_EDITABLE', block.content.text);
                         template = template.replace('BLOCK_ACTION', block.content.action);
+                        if (block.content.action == "Go To Specific Block") {
+                            template = template.replace("GOTO_ID_BLOCK", "<input type=\"number\" class=\"blockToGoID form-control\" value=\"" + block.content.blockToGoID + "\"/>")
+                        } else {
+                            template = template.replace("GOTO_ID_BLOCK", "")
+                        }
                         template = template.replace('BLOCK_VALIDATION', block.content.validation);
                         template = template.replace('BLOCK_TOP_SOLUTION_EDITABLE', block.content.showTop);
 

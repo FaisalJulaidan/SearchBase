@@ -536,7 +536,7 @@
                                                     block: {
                                                         content: {
                                                             afterMessage: "",
-                                                            showTop: 1,
+                                                            showTop: 1
                                                         },
                                                         storeInDB: true,
                                                         type: blockType,
@@ -763,7 +763,7 @@
                 }
 
                 class BlockTypeUserInput {
-                    constructor(text, action, validation, afterMessage, storeInDB, type, order, id) {
+                    constructor(text, action, validation, storeInDB, type, order, id, afterMessage="") {
                         this.UserInput = {
                             content: {
                                 action: action ? action : 'Go To Next Block',
@@ -780,7 +780,7 @@
                 }
 
                 class BlockTypeFileUpload {
-                    constructor(text, action, fileTypes, afterMessage, storeInDB, type, order, id) {
+                    constructor(text, action, fileTypes, storeInDB, type, order, id, afterMessage="") {
                         this.FileUpload = {
                             content: {
                                 action: action ? action : 'Go To Next Block',
@@ -797,7 +797,7 @@
                 }
 
                 class BlockTypeSolutions {
-                    constructor(showTop, afterMessage, storeInDB, type, order, id) {
+                    constructor(showTop, storeInDB, type, order, id, afterMessage="") {
                         this.Solutions = {
                             content: {
                                 showTop: showTop,
@@ -878,7 +878,7 @@
                         let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                         let id = +$block.attr('id');
 
-                        botData.blocks.push(new BlockTypeUserInput(text, action, validationn, afterMessage, storeInDB, type, order, id).UserInput);
+                        botData.blocks.push(new BlockTypeUserInput(text, action, validationn, storeInDB, type, order, id, afterMessage).UserInput);
                     }
 
                     if (type == 'File Upload') {
@@ -900,7 +900,7 @@
                         let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                         let id = +$block.attr('id');
 
-                        botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, afterMessage, storeInDB, type, order, id).FileUpload);
+                        botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, storeInDB, type, order, id, afterMessage).FileUpload);
                     }
 
                     if (type == 'Solutions') {
@@ -910,7 +910,7 @@
                         let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                         let id = +$block.attr('id');
 
-                        botData.blocks.push(new BlockTypeSolutions(showTop, afterMessage, storeInDB, type, order, id).Solutions);
+                        botData.blocks.push(new BlockTypeSolutions(showTop, storeInDB, type, order, id, afterMessage).Solutions);
                     }
 
 
@@ -1359,7 +1359,13 @@
                     function getBlockContent(template, block) {
                         template = template.replace('BLOCK_ID', block.id);
                         template = template.replace('BLOCK_TYPE', block.type);
-                        template = template.replace('BLOCK_TEXT', block.content.text);
+
+                       if(block.type === 'Solutions'){
+                           template = template.replace('BLOCK_TEXT', 'Solution Block');
+                        }
+                        else {
+                           template = template.replace('BLOCK_TEXT', block.content.text);
+                       }
                         template = template.replace('BLOCK_TEXT_EDITABLE', block.content.text);
                         template = template.replace('BLOCK_ACTION', block.content.action);
                         template = template.replace('BLOCK_VALIDATION', block.content.validation);
@@ -1404,7 +1410,7 @@
                         var content = "";
                         
                         if (block_template.name == "Solutions"){
-                            content = getTopSolutionsElement() + getAfterMessageInput() +
+                            content = getTopSolutionsElement() + getAfterMessageInput(block.content.afterMessage) +
                                 getSubmitElement(true, 'x');
 
                         }
@@ -1422,7 +1428,7 @@
                             content = getQuestionElement() +
                                 getActionElement(block_template.actions) +
                                 getValidationElement(block_template.validations) +
-                                getAfterMessageInput() +
+                                getAfterMessageInput(block.content.afterMessage) +
                                 getSubmitElement(true, 'x');
 
                         }
@@ -1434,19 +1440,6 @@
                                 getSubmitElement(true, 'x');
                         }
                         
-                        
-                        
-                        if (block_template.name == "Solutions"){
-                            templateHTML = templateHTML.replace('BLOCK_QUESTION_TEXT', '');
-                            templateHTML = templateHTML.replace('BLOCK_TOP_SOLUTIONS', getTopSolutionsElement());
-                            templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', getAfterMessageInput(block.content.afterMessage));
-
-                        }
-                        else
-                            templateHTML = templateHTML.replace('BLOCK_QUESTION_TEXT', getQuestionElement());
-                            templateHTML = templateHTML.replace('BLOCK_TOP_SOLUTIONS', '');
-
-
 
                         templateHTML = templateHTML.replace('BLOCK_CONTENT', content);
                         
@@ -1471,7 +1464,14 @@
                 function cookUpBlock(block_template, block) {
 
                     // empty the old block text
-                    console.log($oldBlock.parent().find('.title').text('...'));
+
+                    if (block_template.name == "Solutions"){
+                        console.log($oldBlock.parent().find('.title').text('Solution Block'));
+                    } else {
+                        console.log($oldBlock.parent().find('.title').text('...'));
+                    }
+
+
 
                        function getQuestionElement(){
                         return "" +
@@ -1504,11 +1504,11 @@
                         return "" +
                             "<div class=\"input-group col-sm-3 topSolutions\">\n" +
                             "         <span class=\"input-group-addon\">Top:</span>\n" +
-                            "         <input type=\"number\" min=\"1\" class=\"form-control\"\n" +
+                            "         <input type=\"number\" min=\"1\" value=\"1\" class=\"form-control\">\n" +
                             "</div>\n"
                     }
 
-                    function getAfterMessageInput(afterMessage) {
+                    function getAfterMessageInput(afterMessage="") {
                         return "" +
                             "<div class=\"input-group col-md-8\">\n" +
                             "  <span class=\"input-group-addon\">After Message:</span>\n" +
@@ -1620,78 +1620,13 @@
 
                         if (block_template.name == "Question") {
                             templateHTML = getQuestionElement() +
-                                 getAddAnswerButton() +
+                                getAddAnswerButton() +
                                 getAnswersElement(block_template.actions) +
                                 getSubmitElement(false, 'x');
-
-
                         }
 
                         return templateHTML;
                     }
-
-
-
-                    {#function getTemplate(block_template) {#}
-                    {#    templateHTML = "" +#}
-                    {#       // placeholders#}
-                    {#        "       BLOCK_QUESTION_TEXT" +#}
-                    {#        "       BLOCK_ADD_ANSER_BUTTON" +#}
-                    {#        "       BLOCK_TOP_SOLUTIONS" +#}
-                    {#        "       BLOCK_ANSWERS" +#}
-                    {#        "       BLOCK_ACTION" +#}
-                    {#        "       BLOCK_VALIDATION" +#}
-                    {#        "       BLOCK_FILE_TYPE" +#}
-                    {#        "       BLOCK_AFTER_MESSAGE" +#}
-                    {#        getSubmitElement(true, 'x');#}
-                    {##}
-                    {#    if (block_template.name == "Solutions"){#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_QUESTION_TEXT', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ANSWERS', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ACTION', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_VALIDATION', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', '');#}
-                    {##}
-                    {#        templateHTML = templateHTML.replace('BLOCK_TOP_SOLUTIONS', getTopSolutionsElement());#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', getAfterMessageInput(block_template.afterMessage));#}
-                    {##}
-                    {#    }#}
-                    {#    else#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_TOP_SOLUTIONS', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_QUESTION_TEXT', getQuestionElement());#}
-                    {##}
-                    {#    if (block_template.name == "File Upload")#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', getFileUpload(block_template.typesAllowed, block_template.fileMaxSize));#}
-                    {#    else#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_FILE_TYPE', '');#}
-                    {##}
-                    {##}
-                    {#    if (block_template.name == "File Upload" || block_template.name == "User Input")#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ACTION', getActionElement(block_template.actions));#}
-                    {#    else#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ACTION', '');#}
-                    {##}
-                    {#    if (block_template.name == "User Input")#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_VALIDATION', getValidationElement(block_template.validations));#}
-                    {#    else#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_VALIDATION', '');#}
-                    {##}
-                    {#    if (block_template.name == "Question") {#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ANSWERS', getAnswersElement(block_template.actions));#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', getAddAnswerButton());#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', '')#}
-                    {#    }#}
-                    {#    else {#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ANSWERS', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_ADD_ANSER_BUTTON', '');#}
-                    {#        templateHTML = templateHTML.replace('BLOCK_AFTER_MESSAGE', getAfterMessageInput(block_template.afterMessage))#}
-                    {#    }#}
-                    {##}
-                    {#    return templateHTML;#}
-                    {#}#}
-
 
                     return getTemplate(block_template, block);
                 }

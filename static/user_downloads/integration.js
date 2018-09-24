@@ -81,7 +81,7 @@ function sleep(ms) {
     iFrameDiv.style.height = '0px';
     iFrameDiv.style.opacity = '0';
 
-    iFrameDiv.innerHTML = '<div class="contact-profile">\n' +
+    iFrameDiv.innerHTML = '<div class="contact-profile" style="z-index: -1; position:relative;">\n' +
         '        <img src='+host+'"/static/user_downloads/favicon-96x96.png" alt=""/>\n' +
         '        <p>Bot</p>\n' +
         '\n' +

@@ -129,6 +129,7 @@ function sleep(ms) {
 
         iFrameDiv = document.getElementById("iframediv");
         iFrameDiv.style.display = "block";
+        iFrameDiv = $("#iframediv");
         iFrameDiv.animate({
             height: '370px',
             opacity: '1',

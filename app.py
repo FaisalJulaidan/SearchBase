@@ -265,7 +265,7 @@ if __name__ == "__main__":
         print('Reinitialize the database...')
         db.drop_all()
         db.create_all()
-        gen_dummy_data()
+        # gen_dummy_data()
         print('Development mode running...')
 
         # Run the app server

@@ -442,7 +442,7 @@
             console.log("Data sent successfully!");
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
-            sendFile();
+            {#sendFile();#}
             return true;
 
         }).fail(function (res) {
@@ -467,7 +467,7 @@
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
             solutions = data["solutions"];
-            sendFile();
+            {#sendFile();#}
             return solutions;
 
         }).fail(function (res) {
@@ -821,7 +821,6 @@
                 for (var i = 0; i < blocks.length; i++) {
                     console.log("blockToGoId: ", blockToGoId)
                     console.log("blocks[i].id: ", blocks[i].id)
-                    console.log("blocks: ", blocks)
                     if (blocks[i].id == blockToGoId) {
                         targetBlock = blocks[i];
                     }

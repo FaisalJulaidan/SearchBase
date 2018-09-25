@@ -353,6 +353,7 @@ class Statistics(db.Model):
 
 class ValidationType(enum.Enum):
 
+    Ignore = 'Ignore'
     Email = 'Email'
     Telephone = 'Telephone'
     FullName = 'FullName'

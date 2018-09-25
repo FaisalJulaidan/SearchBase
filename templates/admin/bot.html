@@ -1,0 +1,1726 @@
+{% extends "admin/base.html" %}
+
+
+{% block title %}Bot{% endblock %}
+{% block headlinks %}
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/awesome-bootstrap-checkbox/1.0.1/awesome-bootstrap-checkbox.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.css" />
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" />
+<link rel="stylesheet" href="/../../static/tagify/tagify.css">
+{% endblock %}
+{% block content %}
+<style>
+    .remainingBlocks {
+        border: 1px solid grey;
+        padding: 5px;
+        margin-top: 10px;
+        border-radius: 5px;
+    }
+
+        .remainingBlocks > span {
+            background-color: #4B5B71;
+            padding: 5px;
+            border-radius: 5px;
+            color: white;
+        }
+
+    .my-btn-default {
+        background-color: #fff;
+        border-color: #ccc;
+        color: black;
+    }
+
+    .normalCursor {
+        cursor: default !important;
+        background-color: #fff !important;
+    }
+
+    .clickable {
+        cursor: pointer;
+    }
+
+    .moveable {
+        margin-left: -5px;
+        padding: 5px;
+        cursor: move;
+    }
+
+    .panel-heading span {
+        margin-top: -20px;
+        font-size: 15px;
+    }
+
+    .btn-default.focus, .btn-default:focus {
+        background-color: #fff;
+        border: 1px solid #ccc;
+    }
+
+    a.hover {
+        background-color: #f5f5f5;
+        border-color: #ccc;
+        text-decoration: none;
+    }
+
+    .radio-group label {
+        overflow: hidden;
+    }
+
+    .radio-group input {
+        /* This is on purpose for accessibility. Using display: hidden is evil.
+            This makes things keyboard friendly right out tha box! */
+        height: 1px;
+        width: 1px;
+        position: absolute;
+        top: -20px;
+    }
+
+    .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .radio-group .not-active {
+        background-color: #f5f5f5;
+        color: black;
+        border: 1px solid #ccc;
+    }
+
+    .abc-checkbox-info input[type="checkbox"]:checked + label::before, .abc-checkbox-info input[type="radio"]:checked + label::before {
+        background-color: #660ff2;
+        border-color: #a88ad9;
+    }
+
+    .form-control {
+        height: 34px;
+    }
+
+    .addAnswer {
+        font-size: 10pt;
+        padding: 5px;
+        background-color: #c4c4c4;
+        border-radius: 100%;
+        color: white;
+    }
+
+    .addBlock {
+        font-size: 10pt;
+        padding: 5px;
+        background-color: #c4c4c4;
+        border-radius: 100%;
+        color: white;
+    }
+
+    .tagify {
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+    .input-group1 > input {
+        -webkit-border-radius: 5px !important;
+        -moz-border-radius: 5px !important;
+        border-radius: 5px !important;
+        margin-bottom: 10px;
+    }
+
+    .selectBlockType {
+        display: inline-flex;
+    }
+
+    .type {
+        padding: 50px;
+        margin: 10px;
+        border: 1px solid #4906b573;
+        border-radius: 10px;
+        transition: box-shadow .3s;
+    }
+
+        .type:hover {
+            box-shadow: 0 0 11px rgba(33, 33, 33, .4);
+        }
+</style>
+<div class="right_col" role="main">
+    <div class="page-title">
+        <div class="title_left">
+            <h3 id="assistantName"></h3>
+        </div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="x_panel">
+        <div class="x_title" style="display: flow-root;">
+            <div class="pull-left">
+                <h4>🤖 Bot Configuration</h4>
+                <small>Showing all questions and answers.</small>
+            </div>
+            <div class="pull-right remainingBlocks">
+                <i class="addBlock clickable glyphicon glyphicon-plus"></i>
+                Remaining Blocks <span>1</span>
+            </div>
+        </div>
+
+        <div class="x_conent">
+            <ul id="draggablePanelList" class="list-unstyled">
+                <li class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            <span class="moveable" style="color:#660ff2">
+                                <i class="glyphicon glyphicon-menu-hamburger"></i>
+                            </span>
+                            <b>Do you smoke?</b>
+                        </div>
+                        <span class="pull-right clickable" style="color:#660ff2;margin-left:15px">
+                            <i class="trash glyphicon glyphicon-trash"></i>
+                        </span>
+                        <span class="pull-right clickable" style="color:#660ff2">
+                            <i class="indicator glyphicon glyphicon-chevron-down"></i>
+                        </span>
+                        <div class="col-xs-11  col-sm-5 col-md-4 pull-right"
+                             style="margin-top: -30px;margin-right:-9px">
+                            <div class="input-group">
+                                <input type="text" style="height: 34px" class="form-control normalCursor"
+                                       disabled="" aria-label="..." value="Question">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Type
+                                        <span style="margin: 0" class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li><a>User Input</a></li>
+                                        <li><a>Question</a></li>
+                                        <li><a>File Upload</a></li>
+                                    </ul>
+                                </div><!-- /btn-group -->
+                            </div><!-- /input-group -->
+                        </div><!-- /.col-lg-3 -->
+                    </div>
+                    <div class="panel-body">
+                        <div class="input-group col-md-6">
+                            <span class="input-group-addon">Question:</span>
+                            <input type="text" class="form-control" placeholder="Question"
+                                   aria-describedby="basic-addon1" value="Do you smoke?">
+                        </div>
+                        Answers: <span class=" clickable" style="margin-bottom: 10px">
+                            <i class="addAnswer glyphicon glyphicon-plus"></i>
+                        </span>
+                        <div class="answers" style="margin-top:10px;">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">Answer -1</h3>
+                                            <span class="pull-right clickable"
+                                                  style="color:#660ff2;margin-left:15px">
+                                                <i class="trashAnswer glyphicon glyphicon-trash"></i>
+                                            </span>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="input-group">
+                                                <label for="input">Answer:</label>
+                                                <input type="text" class="form-control" placeholder="Answer"
+                                                       aria-describedby="basic-addon1" value="Yes I do">
+                                            </div>
+
+                                            <label for="input">Kewords:</label>
+                                            <input name='tags' value=''>
+
+
+                                            <label for=".input-group">Actions:</label>
+                                            <div class="input-group">
+                                                <input type="text" style="height: 34px"
+                                                       class="form-control normalCursor"
+                                                       disabled="" aria-label="..." value="Question">
+                                                <div class="input-group-btn">
+                                                    <button type="button"
+                                                            class="btn btn-default dropdown-toggle"
+                                                            data-toggle="dropdown" aria-haspopup="true"
+                                                            aria-expanded="false">
+                                                        Type
+                                                        <span style="margin: 0" class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-right">
+                                                        <li><a>User Input</a></li>
+                                                        <li><a>Question</a></li>
+                                                        <li><a>File Upload</a></li>
+                                                    </ul>
+                                                </div><!-- /btn-group -->
+                                            </div><!-- /input-group -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-1 pull-right inline">
+                            <div class="btn btn-default">Save</div>
+                        </div>
+                        <div class="col-md-2 pull-right inline text-right">
+                            <div class="form-check abc-checkbox abc-checkbox-info abc-checkbox-circle"
+                                 style="margin-top: 9px">
+                                <input class="form-check-input" id="1" type="checkbox" checked="">
+                                <label class="form-check-label" for="1"
+                                       style="padding-left: 10px;padding-top: 2px; text-align: -webkit-auto;">
+                                    Save in DB
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Abdullah Hashim did below code to avoid error occured from custom.min.js file -->
+<form id="demo-form2"></form>
+{% endblock %}
+
+{% block customJS %}
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-checkbox/1.5.0/js/bootstrap-checkbox.js"></script>
+<script src="/../../static/swal/sweetalert.min.js"></script>
+<script src="/../../static/tagify/tagify.js"></script>
+
+<script>
+    var blocksNumber = 0;
+    window.onload = function () {
+        if (prev_handler)
+            prev_handler();
+
+        main();
+
+        blocks_templates = {};
+        BlocksTypes = [];
+        RemainingBlocks = 0;
+        BlocksOrder = [];
+
+        function main() {
+            Promise.all([GET_data(), GET_options()]).then((res) => {
+                data = JSON.parse(res[0]).data;
+                options = JSON.parse(res[1]).data;
+                init_blocks_templates(options.blockTypes);
+                BlocksTypes = options.types;
+                render_page(data.assistant.name, options.botVersion, data.remainingBlocks);
+                RemainingBlocks = Number($('.remainingBlocks span').html());
+                render_blocks(data.blocks);
+                init_page();
+            });
+        }
+
+        class BlocksTemplate {
+            constructor(args) {
+                for (const arg of args) {
+                    this[Object.keys(arg)[0]] = Object.values(arg)[0]
+                }
+            }
+        }
+
+        function init_blocks_templates(blockTypes) {
+            for (const blockType of blockTypes) {
+                args = [];
+                for (const key of Object.keys(blockType)) {
+                    args.push({
+                        [key]: blockType.valueOf(key)[key]
+                    })
+                }
+                blocks_templates[blockType.name] = new BlocksTemplate(args);
+            }
+        }
+
+        function init_page() {
+            // to collapse and expand the panel
+            $(document).on('click', '.panel-heading', function (e) {
+                if ($(e.target).is('a') ||
+                    $(e.target).is('input.form-control') ||
+                    $(e.target).is('i.trash') ||
+                    $(e.target).is('i.trashAnswer') ||
+                    $(e.target).parent().parent().parent().parent().is('div.answers') ||
+                    $(e.target).parent().parent().parent().parent().is('div.row')
+                ) {
+                    e.preventDefault();
+                    return;
+                }
+
+                e.stopPropagation();
+                e.preventDefault();
+
+                let $this = $(this);
+                // open a panel
+                if ($this.hasClass('panel-collapsed')) {
+                    // before open the current close all
+                    $('li > .panel-body').slideUp();
+                    $('li > .panel-heading').addClass('panel-collapsed');
+                    $('button.blockType').attr('disabled', '');
+                    $('i.indicator').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+
+                    // now open the $this
+                    $this.removeClass('panel-collapsed');
+                    $this.parents('.panel').find('.panel-body').slideDown();
+                    $this.find('button.blockType').removeAttr('disabled');
+                    $this.find('i.indicator').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+                }
+                // close a panel
+                else {
+                    $this.addClass('panel-collapsed');
+                    $this.parents('.panel').find('.panel-body').slideUp();
+                    $this.find('button.blockType').attr('disabled', '');
+                    $this.find('i.indicator').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+                }
+            });
+
+            // to drag and drop the panels
+            let panelList = $('#draggablePanelList');
+
+            // init BlocksOrder
+            updateBlocksOrder();
+
+            panelList.sortable({
+                // Only make the .panel-heading child elements support dragging.
+                // Omit this to make then entire <li>...</li> draggable.
+                handle: '.panel-heading',
+                update: function () {
+                    updateBlocksOrder();
+                    saveBlocks();
+                }
+            });
+
+            // to make the current type highlighted
+            $("button.btn.btn-default.dropdown-toggle").on("click", function (e) {
+                $input = $(e.target).parent().parent().children().first().val();
+
+                $(e.target).siblings().first().children().each(function (i, element) {
+                    let item = $(element).text();
+                    if ($input === item) {
+                        return $(element).children().first().addClass('hover')
+                    }
+                    $(element).children().first().removeClass()
+
+                });
+            });
+
+            // to change the textbox next to type dropdown
+            $("ul.dropdown-menu.dropdown-menu-right").on("click", function (e) {
+                $input = $(e.target).parent().parent().parent().parent().children().first();
+                let text = $(e.target).text();
+                $input.val(text);
+                if (text === "Go To Specific Block") {
+                    $input.parent().find(".blockToGoID").remove();
+                    $input.parent().append("<input type=\"number\" min=\"1\" max=\"" + blocksNumber + "\" class=\"blockToGoID form-control\"/>");
+                } else {
+                    $input.parent().find(".blockToGoID").remove();
+                }
+            });
+
+            // Input radio-group visual controls
+            $('.radio-group label').on('click', function (evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
+
+                if ($(this).hasClass('not-active'))
+                    $(this).removeClass('not-active');
+                else
+                    $(this).addClass('not-active');
+
+            });
+
+            // Add answer
+            $('.addAnswerClick').on('click', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                addAnswer($(e.target).parent().parent().children('.answers'));
+            });
+
+            // Input radio-group visual controls
+            $('i.trash').on('click', e => deleteBlock(e));
+
+            // Input radio-group delete answer
+            $('i.trashAnswer').on('click', e => deleteAnswer(e));
+
+            // init tags
+            $('input[name=tags]').each((i, input) => {
+                if (!$(input).hasClass('tagified')) {
+                    new Tagify(input);
+                    $(input).addClass('tagified')
+                }
+            });
+
+            // change type of block
+            $('.panel-heading li').on('click', (e) => {
+                $target = $(e.target);
+                let isTargetType = $target.parent().parent().parent().children().first().text().includes('Type');
+                let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val();
+
+                if (isTargetType && hasData) {
+                    swal({
+                        title: "Are you sure?",
+                        text: "Old block will be removed completely from the system",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    })
+                        .then((willUpdate) => {
+                            if (willUpdate) {
+                                let newTemplateName = $target.text();
+
+                                $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
+                                $blockBody.html(render_blocks_change(newTemplateName, $blockBody));
+                                init_changed_block();
+                                updateBlocksOrder();
+                            }
+                        });
+                } else {
+                    let newTemplateName = $target.text();
+                    $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
+                    $blockBody.html(render_blocks_change(newTemplateName, $blockBody));
+                    init_changed_block();
+                    updateBlocksOrder();
+                }
+            });
+
+            $('.save').on('click', e => saveBlocks(e));
+
+            $('.addBlock').on('click', (e) => {
+                if (RemainingBlocks) {
+                    $container = $("<div></div>");
+                    for (const blockType of BlocksTypes)
+                        $container.append("<div class=\"type clickable\" onclick=\"swal.setActionValue({cancel:$(this).text() }); swal.close(); \">" + blockType + "</div>")
+                    swal({
+                        title: 'Select block type:',
+                        content: $container[0],
+                        button: {
+                            text: "Cancel",
+                            value: false,
+                            visible: true,
+                            closeModal: true,
+                        }
+                    }).then((blockType) => {
+                        if (blockType) {
+                            $.ajax({
+                                method: 'POST',
+                                url: 'bot/data',
+                                contentType: "application/json",
+                                data: (function () {
+                                    switch (blockType) {
+                                        case 'Question':
+                                            return JSON.stringify({
+                                                block: {
+                                                    content: {
+                                                        text: "",
+                                                        answers: []
+                                                    },
+                                                    storeInDB: true,
+                                                    type: blockType,
+                                                },
+                                                botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                                            });
+                                        case 'User Input':
+                                            return JSON.stringify({
+                                                block: {
+                                                    content: {
+                                                        action: "",
+                                                        text: "",
+                                                        validation: ""
+                                                    },
+                                                    storeInDB: true,
+                                                    type: blockType,
+                                                },
+                                                botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                                            });
+                                        case 'File Upload':
+                                            return JSON.stringify({
+                                                block: {
+                                                    content: {
+                                                        action: "",
+                                                        text: "",
+                                                        fileTypes: []
+                                                    },
+                                                    storeInDB: true,
+                                                    type: blockType,
+                                                },
+                                                botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                                            });
+                                        case 'Solutions':
+                                            return JSON.stringify({
+                                                block: {
+                                                    content: {
+                                                        afterMessage: "",
+                                                        showTop: 1,
+                                                    },
+                                                    storeInDB: true,
+                                                    type: blockType,
+                                                },
+                                                botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                                            });
+                                    }
+                                })(),
+                                success: function (res) {
+                                    res = JSON.parse(res);
+                                    $('.remainingBlocks span').html(res.data.remainingBlocks);
+                                    addNewBlock();
+                                    swal({
+                                        title: blockType + " added!",
+                                        text: res.msg,
+                                        icon: "success",
+                                        timer: 2000,
+                                        buttons: false
+                                    });
+                                }
+                            });
+                        }
+                    })
+                }
+            });
+        }
+
+        function init_changed_block() {
+
+            // to make the current type highlighted
+            $("button.btn.btn-default.dropdown-toggle").on("click", function (e) {
+                $input = $(e.target).parent().parent().children().first().val();
+
+                $(e.target).siblings().first().children().each(function (i, element) {
+                    let item = $(element).text();
+                    if ($input === item) {
+                        return $(element).children().first().addClass('hover')
+                    }
+                    $(element).children().first().removeClass()
+
+                });
+            });
+
+            // to change the textbox next to type dropdown
+            $("ul.dropdown-menu.dropdown-menu-right").on("click", function (e) {
+                $input = $(e.target).parent().parent().parent().parent().children().first();
+                let text = $(e.target).text();
+                $input.val(text);
+                if (text === "Go To Specific Block") {
+                    $input.parent().find(".blockToGoID").remove();
+                    $input.parent().append("<input type=\"number\" min=\"1\" max=\"" + blocksNumber + "\" class=\"blockToGoID form-control\"/>");
+                } else {
+                    $input.parent().find(".blockToGoID").remove();
+                }
+            });
+
+
+            // Input radio-group visual controls
+            $('.radio-group label').on('click', function (evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
+
+                if ($(this).hasClass('not-active'))
+                    $(this).removeClass('not-active');
+                else
+                    $(this).addClass('not-active');
+
+            });
+
+            // Add answer
+            $('.addAnswerClick').on('click', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                addAnswer($(e.target).parent().parent().children('.answers'));
+            });
+
+            // Input radio-group visual controls
+            $('i.trash').on('click', e => deleteBlock(e));
+
+            // Input radio-group delete answer
+            $('i.trashAnswer').on('click', e => deleteAnswer(e));
+
+            // init tags
+            $('input[name=tags]').each((i, input) => {
+                if (!$(input).hasClass('tagified')) {
+                    new Tagify(input);
+                    $(input).addClass('tagified')
+                }
+            });
+
+            $('.save').on('click', e => saveBlocks(e));
+        }
+
+        function init_added_block() {
+
+            // to make the current type highlighted
+            $("button.btn.btn-default.dropdown-toggle").on("click", function (e) {
+                $input = $(e.target).parent().parent().children().first().val();
+
+                $(e.target).siblings().first().children().each(function (i, element) {
+                    let item = $(element).text();
+                    if ($input === item) {
+                        return $(element).children().first().addClass('hover')
+                    }
+                    $(element).children().first().removeClass()
+
+                });
+            });
+
+            // to change the textbox next to type dropdown
+            $("ul.dropdown-menu.dropdown-menu-right").on("click", function (e) {
+                $input = $(e.target).parent().parent().parent().parent().children().first();
+                let text = $(e.target).text();
+                $input.val(text);
+                if (text === "Go To Specific Block") {
+                    $input.parent().find(".blockToGoID").remove();
+                    $input.parent().append("<input type=\"number\" min=\"1\" max=\"" + blocksNumber + "\" class=\"blockToGoID form-control\"/>");
+                } else {
+                    $input.parent().find(".blockToGoID").remove();
+                }
+            });
+
+            // Input radio-group visual controls
+            $('.radio-group label').on('click', function (evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
+
+                if ($(this).hasClass('not-active'))
+                    $(this).removeClass('not-active');
+                else
+                    $(this).addClass('not-active');
+
+            });
+
+            // Add answer
+            $('.addAnswerClick').on('click', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                addAnswer($(e.target).parent().parent().children('.answers'));
+            });
+
+            // Input radio-group visual controls
+            $('i.trash').on('click', e => deleteBlock(e));
+
+            // Input radio-group delete answer
+            $('i.trashAnswer').on('click', e => deleteAnswer(e));
+
+            // init tags
+            $('input[name=tags]').each((i, input) => {
+                if (!$(input).hasClass('tagified')) {
+                    new Tagify(input);
+                    $(input).addClass('tagified')
+                }
+            });
+
+            // change type of block
+            $('.panel-heading li').on('click', (e) => {
+                $target = $(e.target);
+                let isTargetType = $target.parent().parent().parent().children().first().text().includes('Type');
+                let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val()
+
+                if (isTargetType && hasData) {
+                    swal({
+                        title: "Are you sure?",
+                        text: "Old block will be removed completely from the system",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    })
+                        .then((willUpdate) => {
+                            if (willUpdate) {
+                                let newTemplateName = $target.text();
+
+                                $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
+                                $blockBody.html(render_blocks_change(newTemplateName, $blockBody));
+                                init_changed_block();
+                                updateBlocksOrder();
+                            }
+                        });
+                } else {
+                    let newTemplateName = $target.text();
+                    $blockBody = $target.parent().parent().parent().parent().parent().parent().siblings().last();
+                    $blockBody.html(render_blocks_change(newTemplateName, $blockBody));
+                    init_changed_block();
+                    updateBlocksOrder();
+                }
+            });
+
+            $('.save').on('click', e => saveBlocks(e));
+        }
+
+        function deleteBlock(e) {
+            swal({
+                title: "Are you sure?",
+                text: "Block will be removed completely from the system",
+                icon: "warning",
+                button: {
+                    text: "Delete!",
+                    closeModal: false,
+                },
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        let deletedBlockId = $(e.target).parent().parent().parent().attr('id');
+                        return $.ajax({
+                            method: 'DELETE',
+                            url: '/admin/assistant/bot/block/' + deletedBlockId
+                        });
+                    }
+                })
+                .then((res) => {
+                    res = JSON.parse(res);
+                    $('.remainingBlocks span').html(res.data.remainingBlocks);
+                    RemainingBlocks = res.data.remainingBlocks;
+                    if (res.success) {
+                        $(e.target).parent().parent().parent().remove();
+                        swal("Success!", res.msg, "success");
+                        updateBlocksOrder();
+                    }
+                })
+        }
+
+        function saveBlocks() {
+            // collect all data in its json form
+            class BlockTypeQuestions {
+                constructor(text, answers, storeInDB, type, order, id) {
+                    this.Question = {
+                        content: {
+                            text: text,
+                            answers: answers
+                        },
+                        storeInDB: storeInDB,
+                        type: type,
+                        order: order,
+                        id: id
+                    }
+                }
+            }
+
+            class BlockTypeUserInput {
+                constructor(text, action, validation, blockToGoID, storeInDB, type, order, id, afterMessage = "") {
+                    this.UserInput = {
+                        content: {
+                            action: action ? action : 'Go To Next Block',
+                            text: text,
+                            validation: validation,
+                            afterMessage: afterMessage,
+                            blockToGoID: blockToGoID
+
+                        },
+                        storeInDB: storeInDB,
+                        type: type,
+                        order: order,
+                        id: id
+                    }
+                }
+            }
+
+            class BlockTypeFileUpload {
+                constructor(text, action, fileTypes, blockToGoID, storeInDB, type, order, id, afterMessage = "") {
+                    this.FileUpload = {
+                        content: {
+                            action: action ? action : 'Go To Next Block',
+                            text: text,
+                            fileTypes: fileTypes,
+                            afterMessage: afterMessage,
+                            blockToGoID: blockToGoID
+                        },
+                        storeInDB: storeInDB,
+                        type: type,
+                        order: order,
+                        id: id
+                    }
+                }
+            }
+
+            class BlockTypeSolutions {
+                constructor(showTop, storeInDB, type, order, id, afterMessage = "") {
+                    this.Solutions = {
+                        content: {
+                            showTop: showTop,
+                            afterMessage: afterMessage
+                        },
+                        storeInDB: storeInDB,
+                        type: type,
+                        order: order,
+                        id: id
+                    }
+                }
+            }
+
+
+            let botData = {
+                botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
+                blocks: []
+            };
+
+            for (const obj of BlocksOrder) {
+                let $block = obj.block;
+                let order = obj.order;
+
+                let type = $block.children().first().children().last().children().children().val();
+                if (type == 'Question') {
+                    let rowsOfAnswers = $block.children().last().find('div.answers').children();
+                    let answersArr = [];
+
+                    let id = +$block.attr('id');
+
+                    let text = (function () {
+                        //debugger
+                        let label = $block.children().last().find('.input-group').children().first().text();
+                        if (label.includes('Question'))
+                            return $block.children().last().find('.input-group').children().first().next().val();
+                    })();
+
+                    let saveInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+
+                    for (const row of rowsOfAnswers) {
+                        let $row = $(row);
+                        let answers = $row.children();
+                        for (const answer of answers) {
+                            let $answer = $(answer);
+
+
+                            let text = $answer.children().find('input.form-control').first().val();
+                            let afterMessage = $answer.children().find('input.form-control')[1].value;
+                            let action = $answer.children().find('input.form-control')[2].value;
+                            let blockToGoID = 0;
+                            try { blockToGoID = +$answer.children().find('.blockToGoID')[0].value; } catch (e) { }
+                            let keywords = (function () {
+                                let keywordsArr = [];
+                                $answer.find('tags').children('tag').each((i, tag) => {
+                                    keywordsArr.push($(tag).attr('value'))
+                                });
+                                return keywordsArr;
+                            })();
+
+                            answersArr.push({
+                                action: action ? action : 'Go To Next Block',
+                                text: text,
+                                keywords: keywords,
+                                afterMessage: afterMessage,
+                                blockToGoID: blockToGoID
+                            });
+                        }
+                    }
+
+                    botData.blocks.push(new BlockTypeQuestions(text, answersArr, saveInDB, type, order, id).Question);
+                }
+
+                if (type == 'User Input') {
+                    let text = (function () {
+                        let label = $block.children().last().find('.input-group').children().first().text();
+                        if (label.includes('Question'))
+                            return $block.children().last().find('.input-group').children().first().next().val();
+                    })();
+                    let action = $block.children().last().find('input.normalCursor').first().val();
+                    let blockToGoID = 0;
+                    let validation = $block.children().last().find('input.normalCursor')[1].value;
+                    try {
+                        blockToGoID = +$block.children().last().find('.blockToGoID')[0].value;
+                    } catch (e) {
+                        blockToGoID = 0;
+                    }
+                    let afterMessage = $block.children().last().children('.col-md-8').children().last().val();
+                    let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+                    let id = +$block.attr('id');
+
+                    botData.blocks.push(new BlockTypeUserInput(text, action, validation, blockToGoID, storeInDB, type, order, id, afterMessage).UserInput);
+                }
+
+                if (type == 'File Upload') {
+                    let text = (function () {
+                        let label = $block.children().last().find('.input-group').children().first().text();
+                        if (label.includes('Question'))
+                            return $block.children().last().find('.input-group').children().first().next().val();
+                    })();
+                    let action = $block.children().last().find('input.normalCursor').first().val();
+
+                    let blockToGoID = 0;
+                    try {
+                        blockToGoID = +$block.children().last().find('.blockToGoID')[0].value;
+                    } catch (e) { }
+
+                    let fileTypes = [];
+                    $block.children().last().children('.col-md-8').first().children().last().children().each((i, elem) => {
+                        if (!$(elem).hasClass('not-active'))
+                            fileTypes.push($(elem).text())
+                    });
+
+                    let afterMessage = $block.children().last().children('.col-md-8').children().last().val();
+
+                    let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+                    let id = +$block.attr('id');
+
+                    botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, blockToGoID, storeInDB, type, order, id, afterMessage).FileUpload);
+                }
+
+                if (type == 'Solutions') {
+
+                    let showTop = +$block.children('div.panel-body').first().children('.topSolutions').first().children('input').first().val();
+                    let afterMessage = $block.children('div.panel-body').first().children('.afterMessage').first().children('input').first().val();
+                    let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+                    let id = +$block.attr('id');
+
+                    botData.blocks.push(new BlockTypeSolutions(showTop, storeInDB, type, order, id, afterMessage).Solutions);
+                }
+
+
+
+
+                //console.log(botData)
+            }
+            $.ajax({
+                method: 'PUT',
+                url: 'bot/data',
+                contentType: "application/json",
+                data: JSON.stringify(botData),
+                success: function (res) {
+                    res = JSON.parse(res);
+                    swal('Succes', res.msg, 'success');
+
+                    Promise.all([GET_data(), GET_options()]).then((res) => {
+                        data = JSON.parse(res[0]).data;
+                        options = JSON.parse(res[1]).data;
+                        render_blocks(data.blocks);
+                        init_added_block();
+                        updateBlocksOrder();
+                    });
+
+                }, error: function (request, status, error) {
+                    swal('Error', JSON.parse(request.responseText).msg, 'error')
+                }
+            });
+        }
+
+        function addNewBlock() {
+            Promise.all([GET_data(), GET_options()]).then((res) => {
+                data = JSON.parse(res[0]).data;
+                options = JSON.parse(res[1]).data;
+                RemainingBlocks = Number($('.remainingBlocks span').html());
+                render_blocks(data.blocks);
+                init_added_block();
+                updateBlocksOrder();
+            });
+        }
+
+        function init_answers_panels() {
+            $('i.trashAnswer').on('click', e => deleteAnswer(e));
+
+            // init tags
+            $('input[name=tags]').each((i, input) => {
+                if (!$(input).hasClass('tagified')) {
+                    new Tagify(input);
+                    $(input).addClass('tagified')
+                }
+            });
+
+
+
+            // to change the textbox next to type dropdown
+            $("ul.dropdown-menu.dropdown-menu-right").on("click", function (e) {
+                $input = $(e.target).parent().parent().parent().parent().children().first();
+                let text = $(e.target).text();
+                $input.val(text);
+                if (text === "Go To Specific Block") {
+                    $input.parent().find(".blockToGoID").remove();
+                    $input.parent().append("<input type=\"number\" class=\"blockToGoID min=\"1\" max=\"" + blocksNumber + "\" form-control\"/>");
+                } else {
+                    $input.parent().find(".blockToGoID").remove();
+                }
+            });
+
+
+
+            // to make the current type highlighted
+            $("button.btn.btn-default.dropdown-toggle").on("click", function (e) {
+                $input = $(e.target).parent().parent().children().first().val();
+
+                $(e.target).siblings().first().children().each(function (i, element) {
+                    let item = $(element).text();
+                    if ($input === item) {
+                        return $(element).children().first().addClass('hover')
+                    }
+                    $(element).children().first().removeClass()
+
+                });
+            });
+
+        }
+
+        function deleteAnswer(e) {
+            let hasAnswer = $(e.target).parent().parent().parent().children().last().children().first().children().last().val();
+            if (hasAnswer) {
+                swal({
+                    title: "Are you sure?",
+                    text: "Answer will be removed completely from the system",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                        if (willDelete) {
+                            $(e.target).parent().parent().parent().parent().remove();
+                        }
+                        // run answers restructure function
+                        answersRestructure(temp)
+                    });
+            } else {
+                temp = $(e.target).parent().parent().parent().parent().parent().parent();
+                $(e.target).parent().parent().parent().parent().remove();
+                // run answers restructure function
+                answersRestructure(temp)
+            }
+        }
+
+        function addAnswer(target) {
+            let element = $("<div class=\"col-sm-4\">  <div class=\"panel panel-default\">\n" +
+                "    <div class=\"panel-heading\">\n" +
+                "      <h3 class=\"panel-title\"></h3>\n" +
+                "      <span class=\"pull-right clickable\"\n" +
+                " style=\"color:#660ff2;margin-left:15px\">\n" +
+                "        <i class=\"trashAnswer glyphicon glyphicon-trash\"></i>\n" +
+                "      </span>\n" +
+                "    </div>\n" +
+                "<div class=\"panel-body\">\n" +
+                "      <div class=\"input-group1\">\n" +
+                "        <label for=\"input\">Answer:</label>\n" +
+                "        <input type=\"text\" class=\"form-control\" placeholder=\"Answer\"\n" +
+                "               aria-describedby=\"basic-addon1\" value=\"\">\n" +
+                "      </div>      <label for=\"input\">Kewords:</label>\n" +
+                "      <input name='tags' value=''>\n" +
+
+                "      <label for='#input-after-message'>After Message:</label>\n" +
+                "      <input class=\"form-control\" type='text' placeholder='Message to be sent after the question is answered' value=''/><br />" +
+
+                "      <label for=\".input-group\">Actions:</label>\n" +
+                "      <div class=\"input-group\">\n" +
+                "        <input type=\"text\" style=\"height: 34px\"\n" +
+                "               class=\"form-control normalCursor\"\n" +
+                "               disabled=\"\" aria-label=\"...\" value=\"\">\n" +
+                "        <div class=\"input-group-btn\">\n" +
+                "          <button type=\"button\"\n" +
+                "                  class=\"btn btn-default dropdown-toggle\"\n" +
+                "                  data-toggle=\"dropdown\" aria-haspopup=\"true\"\n" +
+                "                  aria-expanded=\"false\"> Action\n" +
+                "             <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                "          </button>\n" +
+                "          <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                "<li><a>Go To Next Block</a></li>\n" +
+                "<li><a>Go To Specific Block</a></li>\n" +
+                "          </ul>\n" +
+                "        </div><!-- /btn-group -->\n" +
+                "      </div><!-- /input-group -->\n" +
+                "    </div>\n" +
+                "  </div>\n" +
+                "</div></div></div>");
+
+            let rows = $(target).children();
+            let isAdded = false;
+            rows.each((i, row) => {
+                let rowChildrenLength = $(row).children().length;
+                if (rowChildrenLength < 3) {
+                    $(row).append(element);
+                    isAdded = true
+                }
+            });
+            if (!isAdded) {
+                $answers = $(rows).parent();
+                $answers.append("<div class='row'></div>");
+
+                $answers.children().last().append(element);
+            }
+
+            // Input radio-group visual controls
+            $('.radio-group label').on('click', function (evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
+
+                if ($(this).hasClass('not-active'))
+                    $(this).removeClass('not-active');
+                else
+                    $(this).addClass('not-active');
+
+            });
+            answersRestructure(target);
+        }
+
+        function answersRestructure(target) {
+            let rows = $(target).children();
+
+            // push all in array
+            let answersElements = [];
+            rows.each((i, row) => {
+                let $rowChildren = $(row).children();
+                $rowChildren.each((i, answer) => {
+                    answersElements.push(answer)
+                })
+            });
+
+            // clear .answers
+            $answers = $(rows).parent();
+            $answers.html('');
+
+            function appendAnswerElement(i) {
+                $(answersElements[i]).find('.panel-title').html(`Answer- ${(i + 1)}`);
+                $answers.children().last().append(answersElements[i]);
+            }
+
+            let rowSize = 0;
+            $answers.append("<div class='row'></div>");
+            for (let i = 0; i < answersElements.length; i++) {
+                if (rowSize < 3) {
+                    appendAnswerElement(i);
+                    rowSize++;
+                }
+                else {
+                    $answers.append("<div class='row'></div>");
+                    appendAnswerElement(i);
+                    rowSize = 1;
+
+                }
+            }
+            init_answers_panels();
+        }
+
+        function updateBlocksOrder() {
+            let panelList = $('#draggablePanelList');
+            BlocksOrder = [];
+            $('.blockPanel', panelList).each(function (index, elem) {
+                let $listItem = $(elem), newIndex = $listItem.index();
+                BlocksOrder.push({
+                    block: $listItem,
+                    order: newIndex + 1
+                });
+            });
+        }
+
+        function GET_data() {
+            return $.ajax({
+                url: 'bot/data',
+                type: "GET"
+            }).done(function (res) {
+            }).fail(function (res) {
+                let resJson = JSON.parse(res.responseText);
+                console.log(resJson)
+            });
+
+        }
+
+        function GET_options() {
+            return $.ajax({
+                url: '/admin/assistant/bot/options',
+                type: "GET"
+            }).done(function () {
+            }).fail(function (res) {
+                let resJson = JSON.parse(res.responseText);
+                console.log(resJson)
+            });
+
+        }
+
+        function render_blocks(blocks) {
+            console.log("blocks: ", blocks)
+            blocksNumber = blocks.length;
+            function cookUpBlock(block_template, block) {
+
+                function getQuestionElement() {
+                    return "<div class=\"input-group col-md-6\">\n" +
+                        "         <span class=\"input-group-addon\">Question:</span>\n" +
+                        "         <input type=\"text\" class=\"form-control\"\n" +
+                        "           placeholder=\"Question\"\n" +
+                        "           aria-describedby=\"basic-addon1\"\n" +
+                        "           value=\"BLOCK_TEXT_EDITABLE\">\n" +
+                        "       </div>\n"
+                }
+
+                function getActionElement(actions) {
+                    return "" +
+                        "<div class=\"input-group col-md-6\">\n" +
+                        "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
+                        "          value=\"BLOCK_ACTION\">\n" +
+                        "   <div class=\"input-group-btn\">\n" +
+                        "       <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
+                        "               data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Action\n" +
+                        "           <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                        "       </button>\n" +
+                        "       <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                        getDropdownElement(actions) +
+                        "       </ul>\n" +
+                        "   </div><!-- /btn-group -->\n" +
+                        "    GOTO_ID_BLOCK" +
+                        "</div><!-- /input-group -->\n"
+                }
+
+                function getTopSolutionsElement() {
+                    return "" +
+                        "<div class=\"input-group col-sm-3 topSolutions\">\n" +
+                        "         <span class=\"input-group-addon\">Top:</span>\n" +
+                        "         <input type=\"number\" min=\"1\" class=\"form-control\"\n" +
+                        "         value=\"BLOCK_TOP_SOLUTION_EDITABLE\">\n" +
+                        "</div>\n"
+                }
+
+                function getValidationElement(validations) {
+                    return "" +
+                        "<div class=\"input-group col-md-6\">\n" +
+                        "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
+                        "          value=\"BLOCK_VALIDATION\">\n" +
+                        "   <div class=\"input-group-btn\">\n" +
+                        "       <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
+                        "               data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Validation\n" +
+                        "           <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                        "       </button>\n" +
+                        "       <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                        getDropdownElement(validations) +
+                        "       </ul>\n" +
+                        "   </div><!-- /btn-group -->\n" +
+                        "</div><!-- /input-group -->\n"
+                }
+
+                function getSubmitElement(storeInDB, id) {
+                    let isDisabled = block_template.alwaysStoreInDB ? '' : 'disabled';
+                    return "" +
+                        "<div class=\"col-md-1 pull-right inline\">\n" +
+                        "    <div class=\"save btn btn-default\">Save</div>\n" +
+                        "</div>\n" +
+                        "<div class=\"col-md-2 pull-right inline text-right\">\n" +
+                        "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 9px\">\n" +
+                        "        <input class=\"form-check-input\" id=\"" + id + "\" type=\"checkbox\" checked=\"\" " + isDisabled + ">\n" +
+                        "        <label class=\"form-check-label\" for=\"" + id + "\"\n" +
+                        "               style=\"padding-left: 10px;padding-top: 2px; text-align: -webkit-auto;\">\n" +
+                        "            Save in DB\n" +
+                        "        </label>\n" +
+                        "    </div>\n" +
+                        "</div>"
+                }
+
+                function getDropdownElement(items) {
+                    let elements = '';
+                    for (item of items)
+                        elements += "<li><a>" + item + "</a></li>\n"
+                    return elements
+                }
+
+                function getRadioButtons(fileTypes, selectedFileTypes) {
+                    let elements = '';
+                    for (fileType of fileTypes) {
+                        if (selectedFileTypes.includes(fileType)) {
+                            elements += "<label class=\"btn my-btn-default btn-sm\" >" + fileType +
+                                "<input type=\"radio\" value=\"" + fileType + "\" name=\"fileType\"></label>";
+                        } else
+                            elements += "<label class=\"btn my-btn-default btn-sm not-active\" >" + fileType +
+                                "<input type=\"radio\" value=\"" + fileType + "\" name=\"fileType\"></label>"
+                    }
+                    return elements
+                }
+
+                function getFileUpload(fileTypes, fileSize, selectedFileTypes) {
+                    return "" +
+                        "<div class=\"input-group col-md-8\">\n" +
+                        "  <span class=\"input-group-addon\">File Type:</span>\n" +
+                        "  <div class=\"btn-group radio-group\">\n" +
+                        getRadioButtons(fileTypes, selectedFileTypes) +
+                        "  </div>\n" +
+                        "</div>" +
+                        "<small style='margin-top:-10px'>Max size: " + fileSize + "</small><br /><br />"
+                }
+
+                function getAnswersElement(actions, answers) {
+                    //////////////////////// Generate answers templates
+                    let rowSize = 0;
+
+                    let $answers = $("<div class='answers' style='margin-top:10px'></div>");
+
+                    $answers.append($("<div class='row'></div>"));
+                    for (let i = 0; i < answers.length; i++) {
+                        if (rowSize <= 3) {
+                            answerTemplate = $(getAnswerTemplate(actions));
+                            answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
+                            answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
+                            answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
+                            if (answers[i].action == "Go To Specific Block") {
+                                answerTemplate = answerTemplate.replace('GOTO_ID_INPUT', "<input type=\"number\" min=\"1\" max=\"" + blocksNumber + "\" class=\"blockToGoID form-control\" value=\"" + answers[i].blockToGoID + "\"/>");
+                            } else {
+                                answerTemplate = answerTemplate.replace('GOTO_ID_INPUT', "");
+                            }
+                            answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].text);
+                            answerTemplate = answerTemplate.replace('AFTER_MESSAGE_VALUE', answers[i].afterMessage);
+
+                            $answers.children().last().append(answerTemplate);
+
+                            rowSize++;
+                        }
+                        else {
+                            $answers.append($("<div class='row'></div>"));
+
+                            rowSize = 1;
+                        }
+                    }
+
+                    return $answers[0].outerHTML;
+                }
+
+                function getAddAnswerButton() {
+                    return "Answers: <span class=\"addAnswerClick clickable\" style=\"margin-bottom: 10px\">\n" +
+                        "<i class=\"addAnswer glyphicon glyphicon-plus\"></i>\n" +
+                        "</span>"
+                }
+
+                function getAfterMessageInput(afterMessage) {
+                    return "" +
+                        "<div class=\"input-group col-md-8 afterMessage\">\n" +
+                        "  <span class=\"input-group-addon\">After Message:</span>\n" +
+                        "  <input type='text' placeholder='Message to be sent after the question is answered' class='form-control' value='" + afterMessage + "'/>" +
+                        "</div>"
+                }
+
+                function getAnswerTemplate(actions) {
+                    // make the rows here then return div.answers with all answers
+                    return "" +
+                        "<div class=\"col-sm-4\">" +
+                        "  <div class=\"panel panel-default\">\n" +
+                        "    <div class=\"panel-heading\">\n" +
+                        "      <h3 class=\"panel-title\">ANSWER_NUMBER</h3>\n" +
+                        "      <span class=\"pull-right clickable\"\n style=\"color:#660ff2;margin-left:15px\">\n" +
+                        "        <i class=\"trashAnswer glyphicon glyphicon-trash\"></i>\n" +
+                        "      </span>\n" +
+                        "    </div>\n" +
+                        "<div class=\"panel-body\">\n" +
+
+                        // ANSWER
+                        "      <div class=\"input-group1\">\n" +
+                        "        <label for=\"input\">Answer:</label>\n" +
+                        "        <input type=\"text\" class=\"form-control\" placeholder=\"Answer\"\n" +
+                        "               aria-describedby=\"basic-addon1\" value=\"ANSWER_VALUE\">\n" +
+                        "      </div>" +
+
+                        // Keywords
+                        "      <label for=\"input\">Kewords:</label>\n" +
+                        "      <input name='tags' value='KEYWORDS_VALUES'>\n" +
+
+                        // AFTER MESSAGES
+                        "      <label for='#input-after-message'>After Message:</label>\n" +
+                        "      <input class=\"form-control\" type='text' placeholder='Message to be sent after the question is answered' value='AFTER_MESSAGE_VALUE'/><br />" +
+
+                        // ACTIONS
+                        "      <label for=\".input-group\">Actions:</label>\n" +
+                        "      <div class=\"input-group\">\n" +
+                        "        <input type=\"text\" style=\"height: 34px\"\n" +
+                        "               class=\"form-control normalCursor\"\n" +
+                        "               disabled=\"\" aria-label=\"...\" value=\"ANSWER_ACTION\">\n" +
+                        "        <div class=\"input-group-btn\">\n" +
+                        "          <button type=\"button\"\n" +
+                        "                  class=\"btn btn-default dropdown-toggle\"\n" +
+                        "                  data-toggle=\"dropdown\" aria-haspopup=\"true\"\n" +
+                        "                  aria-expanded=\"false\"> Action\n" +
+                        "             <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                        "          </button>\n" +
+                        "          <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                        getDropdownElement(actions) +
+                        "          </ul>\n" +
+                        "        </div><!-- /btn-group -->\n" +
+                        "        GOTO_ID_INPUT" +
+                        "      </div><!-- /input-group -->\n" +
+
+                        "    </div>\n" +
+                        "  </div>\n" +
+                        "</div>" +
+                        "</div>" +
+                        "</div>"
+                }
+
+                function getBlockContent(template, block) {
+                    template = template.replace('BLOCK_ID', block.id);
+                    template = template.replace('BLOCK_ID_HEADER', block.id);
+                    template = template.replace('BLOCK_TYPE', block.type);
+
+
+                    if (block.type === 'Solutions') {
+                        template = template.replace('BLOCK_TEXT', 'Solution Block');
+                    }
+                    else {
+                        template = template.replace('BLOCK_TEXT', block.content.text);
+                    }
+
+                    template = template.replace('BLOCK_TEXT_EDITABLE', block.content.text);
+                    template = template.replace('BLOCK_ACTION', block.content.action);
+
+                    if (block.content.action === "Go To Specific Block") {
+                        template = template.replace("GOTO_ID_BLOCK", "<input type=\"number\" class=\"blockToGoID form-control\" min=\"1\" max=\"" + blocksNumber + "\" value=\"" + block.content.blockToGoID + "\"/>")
+                    } else {
+                        template = template.replace("GOTO_ID_BLOCK", "")
+                    }
+
+                    template = template.replace('BLOCK_VALIDATION', block.content.validation);
+                    template = template.replace('BLOCK_TOP_SOLUTION_EDITABLE', block.content.showTop);
+
+                    return template = template.replace('BLOCK_SUBMIT', getSubmitElement(block.storeInDB, block.id));
+                }
+
+                function getTemplate(block_template, block) {
+                    templateHTML =
+
+                        "<li class=\"panel blockPanel panel-default\" id='BLOCK_ID'>\n" +
+                        "    <div class=\"panel-heading panel-collapsed\">\n" +
+                        "        <div class=\"panel-title\">\n" +
+                        "            <span class=\"moveable\" style='color:#660ff2'><i class=\"glyphicon glyphicon-menu-hamburger\"></i></span>\n" +
+                        "            <b class=\"id-header\">BLOCK_ID_HEADER - </b> <b class=\"title\">BLOCK_TEXT</b>\n" +
+                        "        </div>\n" +
+                        "        <span class=\"pull-right clickable\" style='color:#660ff2;margin-left:15px'><i class=\"trash glyphicon glyphicon-trash\"></i></span>\n" +
+                        "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"indicator glyphicon glyphicon-chevron-up\"></i></span>\n" +
+                        "        <div class=\"col-xs-11  col-sm-5 col-md-4 pull-right\" style=\"margin-top: -30px;margin-right:-9px\">\n" +
+                        "            <div class=\"input-group\">\n" +
+                        "                <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\" value=\"BLOCK_TYPE\">" +
+                        "                <div class=\"input-group-btn\">\n" +
+                        "                    <button disabled type=\"button\" class=\"blockType btn btn-default dropdown-toggle\" data-toggle=\"dropdown\"\n" + "" +
+                        "                            aria-haspopup=\"true\" aria-expanded=\"false\">" +
+                        "                            Type <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                        "                    </button>\n" +
+                        "                    <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                        getDropdownElement(BlocksTypes) +
+                        "                    </ul>\n" +
+                        "                </div><!-- /btn-group -->\n" +
+                        "            </div><!-- /input-group -->\n" +
+                        "        </div><!-- /.col-lg-3 -->\n" +
+                        "    </div>\n" +
+                        // Block text
+                        "    <div class=\"panel-body\" style='display:none;'>\n" +
+                        // placeholders
+                        "       BLOCK_CONTENT" +
+
+                        "    </div>\n" +
+                        "</li>";
+
+                    var content = "";
+
+                    if (block_template.name == "Solutions") {
+                        content = getTopSolutionsElement() + getAfterMessageInput(block.content.afterMessage) +
+                            getSubmitElement(true, 'x');
+
+                    }
+
+                    if (block_template.name == "File Upload") {
+                        content = getQuestionElement() +
+                            getActionElement(block_template.actions) +
+                            getFileUpload(block_template.typesAllowed, block_template.fileMaxSize, block.content.fileTypes) +
+                            getAfterMessageInput(block.content.afterMessage) +
+                            getSubmitElement(true, 'x');
+                    }
+
+
+                    if (block_template.name == "User Input") {
+                        content = getQuestionElement() +
+                            getActionElement(block_template.actions) +
+                            getValidationElement(block_template.validations) +
+                            getAfterMessageInput(block.content.afterMessage) +
+                            getSubmitElement(true, 'x');
+
+                    }
+
+                    if (block_template.name == "Question") {
+                        content = getQuestionElement() +
+                            getAddAnswerButton() +
+                            getAnswersElement(block_template.actions, block.content.answers) +
+                            getSubmitElement(true, 'x');
+                    }
+
+                    templateHTML = templateHTML.replace('BLOCK_CONTENT', content);
+
+                    return templateHTML;
+                }
+
+                blockHTML = getTemplate(block_template, block);
+                return blockHTML = getBlockContent(blockHTML, block)
+                // generate block then feed it
+            }
+
+            if (blocks.length) {
+                let elements = '';
+                for (block of blocks)
+                    elements += cookUpBlock(blocks_templates[block.type], block)
+                $("#draggablePanelList").html(elements);
+            }
+            else $("#draggablePanelList").html("<h2>There are no blocks for this bot. Please click on the top right, and create them.</h2>");
+        }
+
+        function render_blocks_change(block_template, $oldBlock) {
+            function cookUpBlock(block_template, block) {
+
+                // empty the old block text
+                if (block_template.name == "Solutions") {
+                    console.log($oldBlock.parent().find('.title').text('Solution Block'));
+                } else {
+                    console.log($oldBlock.parent().find('.title').text('Please fill this block'));
+                }
+
+
+                function getQuestionElement() {
+                    return "" +
+                        "<div class=\"input-group col-md-6\">\n" +
+                        "         <span class=\"input-group-addon\">Question:</span>\n" +
+                        "         <input type=\"text\" class=\"form-control\"\n" +
+                        "           placeholder=\"Question\"\n" +
+                        "           aria-describedby=\"basic-addon1\">\n" +
+                        " </div>\n"
+                }
+
+                function getActionElement(actions) {
+                    return "" +
+                        "<div class=\"input-group col-md-6\">\n" +
+                        "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
+                        "          value=\"\">\n" +
+                        "   <div class=\"input-group-btn\">\n" +
+                        "       <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
+                        "               data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Action\n" +
+                        "           <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                        "       </button>\n" +
+                        "       <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                        getDropdownElement(actions) +
+                        "       </ul>\n" +
+                        "   </div><!-- /btn-group -->\n" +
+                        "</div><!-- /input-group -->\n"
+                }
+
+                function getTopSolutionsElement() {
+                    return "" +
+                        "<div class=\"input-group col-sm-3 topSolutions\">\n" +
+                        "         <span class=\"input-group-addon\">Top:</span>\n" +
+                        "         <input type=\"number\" min=\"1\" value=\"1\" class=\"form-control\">\n" +
+                        "</div>\n"
+                }
+
+                function getAfterMessageInput(afterMessage = "") {
+                    return "" +
+                        "<div class=\"input-group col-md-8\">\n" +
+                        "  <span class=\"input-group-addon\">After Message:</span>\n" +
+                        "  <input type='text' placeholder='Message to be sent after the question is answered' class='form-control' value='" + afterMessage + "'/>" +
+                        "</div>"
+                }
+
+                function getValidationElement(validations) {
+                    return "" +
+                        "<div class=\"input-group col-md-6\">\n" +
+                        "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
+                        "          value=\"\">\n" +
+                        "   <div class=\"input-group-btn\">\n" +
+                        "       <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
+                        "               data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Validation\n" +
+                        "           <span style=\"margin: 0\" class=\"caret\"></span>\n" +
+                        "       </button>\n" +
+                        "       <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
+                        getDropdownElement(validations) +
+                        "       </ul>\n" +
+                        "   </div><!-- /btn-group -->\n" +
+                        "</div><!-- /input-group -->\n"
+                }
+
+                function getSubmitElement(storeInDB, id) {
+                    let isDisabled = storeInDB ? '' : 'disabled';
+                    return "" +
+                        "<div class=\"save col-md-1 pull-right inline\">\n" +
+                        "    <div class=\"btn btn-default\">Save</div>\n" +
+                        "</div>\n" +
+                        "<div class=\"col-md-2 pull-right inline text-right\">\n" +
+                        "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 9px\">\n" +
+                        "        <input class=\"form-check-input\" id=\"" + id + "\" type=\"checkbox\" checked=\"\" " + isDisabled + ">\n" +
+                        "        <label class=\"form-check-label\" for=\"" + id + "\"\n" +
+                        "               style=\"padding-left: 10px;padding-top: 2px; text-align: -webkit-auto;\">\n" +
+                        "            Save in DB\n" +
+                        "        </label>\n" +
+                        "    </div>\n" +
+                        "</div>"
+                }
+
+                function getDropdownElement(items) {
+                    let elements = '';
+                    for (item of items)
+                        elements += "<li><a>" + item + "</a></li>\n"
+                    return elements
+                }
+
+                function getRadioButtons(fileTypes) {
+                    let elements = '';
+                    for (fileType of fileTypes)
+                        elements += "<label class=\"btn my-btn-default btn-sm not-active\" >" + fileType +
+                            "<input type=\"radio\" value=\"" + fileType + "\" name=\"fileType\"></label>"
+
+                    return elements
+                }
+
+                function getFileUpload(fileTypes, fileSize) {
+                    return "" +
+                        "<div class=\"input-group col-md-8\">\n" +
+                        "  <span class=\"input-group-addon\">File Type:</span>\n" +
+                        "  <div class=\"btn-group radio-group\">\n" +
+                        getRadioButtons(fileTypes) +
+                        "  </div>\n" +
+                        "</div>" +
+                        "<small style='margin-top:-10px'>Max size: " + fileSize + "</small><br /> <br />"
+                }
+
+                function getAnswersElement() {
+                    //////////////////////// Generate answers templates
+                    let rowSize = 0;
+                    let $answers = $("<div class='answers' style='margin-top:10px'></div>");
+                    $answers.append($("<div class='row'></div>"));
+                    return $answers[0].outerHTML;
+                }
+
+                function getAddAnswerButton() {
+                    return "Answers: <span class=\"addAnswerClick clickable\" style=\"margin-bottom: 10px\">\n" +
+                        "<i class=\"addAnswer glyphicon glyphicon-plus\"></i>\n" +
+                        "</span>"
+                }
+
+                function getTemplate(block_template) {
+                    templateHTML = "";
+
+                    if (block_template.name == "Solutions") {
+                        templateHTML = getTopSolutionsElement() + getAfterMessageInput() +
+                            getSubmitElement(true, 'x');
+
+                    }
+
+                    if (block_template.name == "File Upload") {
+                        templateHTML = getQuestionElement() +
+                            getActionElement(block_template.actions) +
+                            getFileUpload(block_template.typesAllowed, block_template.fileMaxSize) +
+                            getAfterMessageInput() +
+                            getSubmitElement(true, 'x');
+                    }
+
+
+                    if (block_template.name == "User Input") {
+                        templateHTML = getQuestionElement() +
+                            getActionElement(block_template.actions) +
+                            getValidationElement(block_template.validations) +
+                            getAfterMessageInput() +
+                            getSubmitElement(true, 'x');
+
+                    }
+
+                    if (block_template.name == "Question") {
+                        templateHTML = getQuestionElement() +
+                            getAddAnswerButton() +
+                            getAnswersElement(block_template.actions) +
+                            getSubmitElement(false, 'x');
+
+
+                    }
+
+                    return templateHTML;
+                }
+
+                return getTemplate(block_template, block);
+            }
+
+            return cookUpBlock(blocks_templates[block_template]);
+        }
+
+        function render_page(assistantName, botVersion, remainingBlocks) {
+            $("#assistantName").html(
+                "Assistant: " + assistantName +
+                "<span class=\"pull-right h5\">Bot version: " + botVersion + "</span>"
+            );
+
+            $('.remainingBlocks span').html(remainingBlocks);
+        }
+    }
+</script>
+{% endblock %}

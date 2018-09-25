@@ -101,14 +101,14 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
             ids.append(id)
         else:
             return Callback(False, "two blocks shouldn't have the same id."
-                                   " Check block with id '" + str(id) + "'")
+                                   " Check block with id '" + str(order) + "'")
 
         # Make sure each question has a unique order value >> 'order': 1
         if order not in orders:
             orders.append(order)
         else:
             return Callback(False, "two questions shouldn't have the same order value."
-                                   " Check question with id '" + str(id) + "'")
+                                   " Check question with id '" + str(order) + "'")
 
     # Make sure order values are consecutive  e.g. [1,2,3] (correct), [1,2,4] (incorrect)
     numOfBlocks = len(blocks)

@@ -353,7 +353,7 @@
         <div class="message-input">
             <form id="fileUploadForm" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
                 <div class="wrap">
-                    <input onkeypress="handleEnter(event)" id="fileUploadB" type="file" placeholder="Write your message..." style="background-color:  white;"/><button type="button" onclick="submitAnswer('')" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                    <input name="file" onkeypress="handleEnter(event)" id="fileUploadB" type="file" placeholder="Write your message..." style="background-color:  white;"/><button type="button" onclick="submitAnswer('')" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
                 </div>
             </form>
         </div>
@@ -446,7 +446,8 @@
             console.log("Error in retrieving blocks.");
             console.log(res);
             return false
-        });
+            });
+        sendFile();
     }
 
     function sendDataSolutionsBlock(showTop) {
@@ -689,12 +690,6 @@
                     removeThinkingGif();
                     await sleep(100);
                 }
-
-                await sleep(200);
-                putThinkingGif();
-                await sleep(400 + Math.floor(Math.random() * 900));
-                removeThinkingGif();
-                await sleep(100);
 
                 print();
                 console.log(" currentBlock: ", currentBlock)

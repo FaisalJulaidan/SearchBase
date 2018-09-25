@@ -801,22 +801,10 @@
 
         function getNextBlock(action, blockToGoId = undefined) {
             var targetBlock = undefined;
-
+            // 1
             if (action == "Go To Next Block") {
                 targetBlock = blocks[currentBlock.order]; //order starts from 1 and array from 0 so it just needs the current .order
-                if (targetBlock === undefined) {
-                     console.log('1');
-                    sendData().then((isSuccess) => {
-                        console.log("isSuccess: ", isSuccess)
-                        if (isSuccess){
-                            sendAssistantMessage("Thank you for your input. We'll be in touch.");
-                        } else {
-                            sendAssistantMessage("Your input couldn't be processed. Please contact us.");
-                        }
-                        SetRepeat();
 
-                    })
-                }
             } else if (action == "Go To Specific Block") {
                 for (var i = 0; i < blocks.length; i++) {
                     console.log("blockToGoId: ", blockToGoId)
@@ -825,22 +813,22 @@
                         targetBlock = blocks[i];
                     }
                 }
-                 if (targetBlock === undefined) {
-                console.log('2');
-                sendData().then((isSuccess) => {
-                    if (isSuccess){
-                        sendAssistantMessage("Thank you for your input. We'll be in touch.");
-                    } else {
-                        sendAssistantMessage("Your input couldn't be processed. Please contact us.");
-                    }
-
-                    SetRepeat();
-                    return 0;
-                    })
-                }
             }
 
+            // 2
+            if (targetBlock === undefined) {
+            console.log('2');
+            sendData().then((isSuccess) => {
+                if (isSuccess){
+                    sendAssistantMessage("Thank you for your input. We'll be in touch.");
+                } else {
+                    sendAssistantMessage("Your input couldn't be processed. Please contact us.");
+                }
 
+                SetRepeat();
+                return 0;
+                })
+            }
 
             if (currentBlock != undefined) { //check if its not trying to reload the same block
                 if (currentBlock != targetBlock) {

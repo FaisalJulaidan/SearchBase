@@ -259,6 +259,7 @@ def gen_static_data():
     db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=30, ActiveBotsCap=2,
                         InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+    db.session.commit()
 
 
 if __name__ == "__main__":
@@ -270,7 +271,6 @@ if __name__ == "__main__":
         db.init_app(app)
         mail.init_app(app)
         app.app_context().push()
-        gen_static_data()
 
         print('Production mode running...')
 

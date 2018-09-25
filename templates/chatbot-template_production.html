@@ -427,6 +427,7 @@
 
     // This should send the data to the server, without returning any solutions back
     function sendData() {
+        putThinkingGif();
         var solutions = [];
         params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": 0};
         console.log("Send data...");
@@ -438,7 +439,7 @@
             data: JSON.stringify(params)
 
         }).done(function (res) {
-
+            removeThinkingGif();
             console.log("Data sent successfully!");
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
@@ -446,6 +447,7 @@
             return true;
 
         }).fail(function (res) {
+            removeThinkingGif();
             console.log("Error in retrieving blocks.");
             console.log(res);
             return false
@@ -453,6 +455,7 @@
     }
 
     function sendDataSolutionsBlock(showTop) {
+        putThinkingGif();
         params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": showTop};
 
         return $.ajax({
@@ -462,6 +465,7 @@
             data: JSON.stringify(params)
 
         }).done(function (res) {
+            removeThinkingGif();
 
             console.log("Solutions retrieved successfully!");
             var data = JSON.parse(res).data;
@@ -471,6 +475,7 @@
             return solutions;
 
         }).fail(function (res) {
+            removeThinkingGif();
             console.log("Error in retrieving blocks.");
             console.log(res);
             });

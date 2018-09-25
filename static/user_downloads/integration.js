@@ -1,7 +1,7 @@
 var globalTSB = {
     id: undefined,
     host: 'https://www.thesearchbase.com',
-    //host: 'http://localhost:5000',
+    // host: 'http://localhost:5000',
     files_path: '/userdownloads',
     iframe_route: '/chatbottemplate_production'
 };
@@ -101,7 +101,7 @@ window.onload = (async function (global) {
         '    <iframe frameborder="0" id="TSB-chatbotIframe" src=\"\"></iframe>';
 
     // Add the container and two  divs to the page dom
-    document.getElementsByTagName('body')[0].prepend(container);
+    document.getElementsByTagName('body')[0].appendChild(container);
     document.getElementById('TSB-container').appendChild(btnDiv);
     document.getElementById('TSB-container').appendChild(iFrameDiv);
     // === ==== ==== ===== ==== ==== ====

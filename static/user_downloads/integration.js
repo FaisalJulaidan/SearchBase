@@ -111,6 +111,7 @@ window.onload = (async function (global) {
 
     // Create script tags
     var script = undefined;
+    var popOpen = false;
     for (i = 0; i < scriptTags.length; i++) {
 
         script = document.createElement('script');
@@ -132,42 +133,47 @@ window.onload = (async function (global) {
 
     // Open iframe
     document.getElementById('TSB-chatbot-widget').addEventListener('click', e => {
-        $chatbotWidget = $("#TSB-chatbot-widget");
-        $chatbotWidget.animate({
-            height: '0px',
-            opacity: '0',
-        }, 500, () => {
-            $("#TSB-chatbot-widget").hide();
-        });
+        if (!popOpen) {
+            $chatbotWidget = $("#TSB-chatbot-widget");
+            $chatbotWidget.animate({
+                height: '0px',
+                opacity: '0',
+            }, 500, () => {
+                $("#TSB-chatbot-widget").hide();
+            });
 
-        iFrameDiv = document.getElementById("TSB-iframediv");
-        iFrameDiv.style.display = "block";
-        iFrameDiv = $("#TSB-iframediv");
-        iFrameDiv.animate({
-            height: '370px',
-            opacity: '1',
-        });
+            iFrameDiv = document.getElementById("TSB-iframediv");
+            iFrameDiv.style.display = "block";
+            iFrameDiv = $("#TSB-iframediv");
+            iFrameDiv.animate({
+                height: '370px',
+                opacity: '1',
+            });
 
-        reloadIframe();
+            reloadIframe();
+            popOpen = true;
+        }
 
     });
 
 
     document.getElementById('TSB-closeIframe').addEventListener('click', e => {
+        if (popOpen) {
+            $chatbotWidget = $("#TSB-chatbot-widget");
+            $chatbotWidget.show();
+            $chatbotWidget.css('height', 'auto');
+            $chatbotWidget.animate({
+                opacity: '1',
+            });
 
-        $chatbotWidget = $("#TSB-chatbot-widget");
-        $chatbotWidget.show();
-        $chatbotWidget.css('height','auto');
-        $chatbotWidget.animate({
-            opacity: '1',
-        });
-
-        $("#TSB-iframediv").animate({
-            height: '0px',
-            opacity: '0',
-        }, 500, () => {
-            $("#TSB-iframediv").hide();
-        })
+            $("#TSB-iframediv").animate({
+                height: '0px',
+                opacity: '0',
+            }, 500, () => {
+                $("#TSB-iframediv").hide();
+            })
+            popOpen = false;
+        }
     });
 
     // Reset the iframe
@@ -196,9 +202,11 @@ window.onload = (async function (global) {
      }
 
      getPopupSettings().then(e => {
-         if(popupSec){
-             setTimeout(function(){
-                 document.getElementById('TSB-chatbot-widget').click()
+         if(popupSec && !popOpen){
+             setTimeout(function () {
+                 if (!popOpen) {
+                     document.getElementById('TSB-chatbot-widget').click();
+                 }
              }, popupSec * 1000);
         }
      });

@@ -688,6 +688,12 @@
 
                 newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
 
+                await sleep(200);
+                putThinkingGif();
+                await sleep(500 + Math.floor(Math.random() * 900));
+                removeThinkingGif();
+                await sleep(200);
+
                 print();
 
                 if (currentBlock.content.afterMessage) {
@@ -758,14 +764,15 @@
 
                 for (var i = 0; i < blockAnswers.length; i++) {
                     if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].text == message) {
-                        if (blockAnswers[i].afterMessage)
+                        if (blockAnswers[i].afterMessage) {
                             sendAssistantMessage(blockAnswers[i].afterMessage);
 
-                        await sleep(200);
-                        putThinkingGif();
-                        await sleep(500 + Math.floor(Math.random() * 900));
-                        removeThinkingGif();
-                        await sleep(200);
+                            await sleep(200);
+                            putThinkingGif();
+                            await sleep(500 + Math.floor(Math.random() * 900));
+                            removeThinkingGif();
+                            await sleep(200);
+                        }
 
                         var action = blockAnswers[i].action;
                         var blockToGoId = blockAnswers[i].blockToGoID;

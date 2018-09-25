@@ -614,9 +614,10 @@
         scrollTo('end')
     }
         function renderUserInput(block) {
-            chatInputDiv.style = "display:block;"
+            chatInputDiv.style = "display:block;";
+            document.getElementById('fileUploadForm').style.display = 'none';
             $messageInput = $(".message-input").last();
-            $userInput = $("<div class=\"wrap\">\n" +
+            $userInput = $("<div class=\"wrap\" style=\"margin-top: 15px;min-height: 40px; background-color: white;\">\n" +
                 "                <input onkeypress=\"handleEnter(event)\" " +
                 "            id='textMessage' type=\"text\" placeholder=\"Write your message...\"/>\n" +
                 "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
@@ -641,15 +642,16 @@
             //$('.messages').css('height','calc(100% - 40px)');
             //$('.message-input').css('height','40px');
 
-            sendAssistantMessage(block.content.text)
+            sendAssistantMessage(block.content.text);
             chatInputDiv.style = "display:block";
+            document.getElementById('fileUploadForm').style.display = 'block';
         }
 
         function renderSolutions(block) {
             $('.messages').css('height', '100%');
-            //$('.message-input').remove();
+            $('.message-input').remove();
             $('#presetAnswers').remove();
-            chatInputDiv.style = "display:none;"
+            chatInputDiv.style = "display:none;";
 
             sendDataSolutionsBlock(block.content.showTop)
                 .then((solutions) => {
@@ -660,9 +662,8 @@
 
         async function submitAnswer(message, blockKeywords = undefined) {
 
-
-
             chatInputDiv.style = "display:none";
+            document.getElementById('fileUploadForm').style.display = 'none';
 
             if (currentBlock.type == "File Upload") {
                 //needs rework

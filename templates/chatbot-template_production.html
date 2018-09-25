@@ -407,7 +407,8 @@
     // This start the lunch the chatbot for the first time
     function start() {
         // 1.Show the chatbot welcoming message assistant.message
-        sendAssistantMessage(welcomeMessage);
+        if (welcomeMessage) { sendAssistantMessage(welcomeMessage); }
+
         // 2.Show the first block in the blocks array then render it depends on its type
         renderBlock(blocks[0]);
     }
@@ -441,7 +442,6 @@
             console.log("Data sent successfully!");
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
-            console.log("ye?")
             sendFile();
             return true;
 
@@ -467,7 +467,6 @@
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
             solutions = data["solutions"];
-            console.log("2yeye")
             sendFile();
             return solutions;
 
@@ -478,18 +477,15 @@
     }
 
     function sendFile() {
-        console.log("we there?")
         $("#fileUploadForm").submit();
     }
 
     function sendFileForm() {
-        console.log("Im called")
+        if (document.getElementById('fileUploadB').files.length == 0) { return false; }
         var formData = new FormData();
         var fileInput = document.getElementById('fileUploadB').files[0];
-        if (!fileInput) { return false;}
         formData.append('file', fileInput, fileInput.name);
-
-        console.log("reached here")
+        
         var xhr = new XMLHttpRequest();
         xhr.open('POST', "../assistant/" + sessionID + "/file", true);
 
@@ -880,8 +876,8 @@
             {#document.getElementById('newMessage').id = 'oldMessage';#}
         }
 
-        function putThinkingGif() {
-            $(".messages").append("<div class='tsbDiv' id='thinkingGif'><li class='TSBbot'><img id=\"thinkingGifIMG\" src='/static/images/typingDots.gif'></li></div>");
+    function putThinkingGif() {
+            $(".messages ul").append('<li id="thinkingGif" class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p><img style="width:27px" id=\"thinkingGifIMG\" src="/static/images/typingDots.gif"></p></li>');
             animateMessage("#thinkingGif");
         }
 

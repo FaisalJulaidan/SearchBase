@@ -246,7 +246,7 @@ def testing(key):
         part5 = ""
     enckey = part1+part2+part3+part4+part5
     enckey = (enckey+key).replace(" ", "")
-    secret_key = enckey
+    BaseConfig.SECRET_KEY_DB = enckey
     return "Done"
 
 @public_router.route("/login", methods=['GET', 'POST'])

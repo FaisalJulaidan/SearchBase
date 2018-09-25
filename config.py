@@ -1,5 +1,4 @@
 import os
-from models import useEncryption
 from datetime import timedelta
 
 
@@ -23,6 +22,7 @@ class BaseConfig(object):
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
 
     SECRET_KEY = os.urandom(24)
+    SECRET_KEY_DB = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
     CSRF_SESSION_KEY = os.urandom(24)
     SESSION_TYPE = 'filesystem'
     # Mail Config
@@ -32,7 +32,7 @@ class BaseConfig(object):
     MAIL_USERNAME = 'thesearchbase@gmail.com'
     MAIL_PASSWORD = 'pilbvnczzdgxkyzy'
     MAIL_SUPPRESS_SEND = False
-    useEncryption = True
+    USE_ENCRYPTION = True
 
 
 class DevelopmentConfig(BaseConfig):

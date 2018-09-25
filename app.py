@@ -3,7 +3,7 @@ from flask import Flask, redirect, request, render_template, session
 from datetime import datetime
 from services import assistant_services, user_services
 import os
-from models import db, Role, Company, Assistant, Plan, Statistics, Answer, ValidationType, Block, BlockType, Solution, ChatbotSession, Callback
+from models import db, Role, Company, Assistant, Plan, Statistics, ValidationType, Block, BlockType, Solution, ChatbotSession, Callback
 from services.mail_services import mail
 from utilities import helpers
 
@@ -11,7 +11,7 @@ from utilities import helpers
 # Import all routers to register them as blueprints
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
     solutions_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
-    changePassword_router, answers_router, bot_router, emoji_router, adminBasic_router,\
+    changePassword_router, bot_router, emoji_router, adminBasic_router,\
     assistantManager_router, assistant_router
 
 from routes.public.routers import public_router, resetPassword_router
@@ -36,7 +36,6 @@ app.register_blueprint(connection_router)
 app.register_blueprint(userInput_router)
 app.register_blueprint(changePassword_router)
 app.register_blueprint(users_router)
-app.register_blueprint(answers_router)
 app.register_blueprint(bot_router)
 app.register_blueprint(emoji_router)
 
@@ -240,6 +239,27 @@ def sendMarketingEmail():
         mail.send(msg)
         return render_template("index.html")
 
+def gen_static_data():
+
+    # Plans
+    db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic', MaxSolutions=600, MaxBlocks=20, ActiveBotsCap=2,
+                        InactiveBotsCap=3,
+                        AdditionalUsersCap=5, ExtendedLogic=False, ImportDatabase=False, CompanyNameOnChatbot=False))
+
+    db.session.add(
+        Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate', MaxSolutions=5000, MaxBlocks=20, ActiveBotsCap=4,
+             InactiveBotsCap=8,
+             AdditionalUsersCap=10, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
+    db.session.add(
+        Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=20, ActiveBotsCap=10,
+             InactiveBotsCap=30,
+             AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
+    db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=30, ActiveBotsCap=2,
+                        InactiveBotsCap=2,
+                        AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
 
 if __name__ == "__main__":
 
@@ -250,8 +270,10 @@ if __name__ == "__main__":
         db.init_app(app)
         mail.init_app(app)
         app.app_context().push()
+        gen_static_data()
 
         print('Production mode running...')
+
         # Run the app server
         app.run()
 
@@ -265,7 +287,8 @@ if __name__ == "__main__":
         print('Reinitialize the database...')
         db.drop_all()
         db.create_all()
-        # gen_dummy_data()
+        gen_static_data()
+        gen_dummy_data()
         print('Development mode running...')
 
         # Run the app server

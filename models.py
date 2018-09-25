@@ -5,6 +5,7 @@ from sqlalchemy.ext import mutable
 from datetime import datetime
 import enum
 import json
+from config import BaseConfig
 
 from sqlalchemy_utils import EncryptedType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
@@ -14,9 +15,6 @@ db = initialize_flask_sqlathanor(db)
 
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
-
-secret_key = 's23ecg5e5%$G$4wg4bbw65b653hh65h%^Gbf'
-useEncryption = False
 
 
 # Activate Foreign Keys
@@ -60,15 +58,15 @@ class Company(db.Model):
                    on_serialize=None,
                    on_deserialize=None
                    )
-    if useEncryption:
-        Name = db.Column(EncryptedType(db.String(80), secret_key, AesEngine, 'pkcs5'),
+    if BaseConfig.USE_ENCRYPTION:
+        Name = db.Column(EncryptedType(db.String(80), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'),
                          nullable=False,
                          supports_json=True,
                          supports_dict=True,
                          on_serialize=None,
                          on_deserialize=None
                          )
-        URL = db.Column(EncryptedType(db.String(250), secret_key, AesEngine, 'pkcs5'),
+        URL = db.Column(EncryptedType(db.String(250), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'),
                         nullable=False,
                         supports_json=True,
                         supports_dict=True,
@@ -109,21 +107,21 @@ class User(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
                  )
-    if useEncryption:
-        Firstname = db.Column(EncryptedType(db.String(64), secret_key, AesEngine, 'pkcs5'), nullable=False)
-        Surname = db.Column(EncryptedType(db.String(64), secret_key, AesEngine, 'pkcs5'), nullable=False,
+    if BaseConfig.USE_ENCRYPTION:
+        Firstname = db.Column(EncryptedType(db.String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
+        Surname = db.Column(EncryptedType(db.String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False,
                             supports_json=True,
                             supports_dict=True,
                             on_serialize=None,
                             on_deserialize=None
                             )
-        Email = db.Column(EncryptedType(db.String(64), secret_key, AesEngine, 'pkcs5'), nullable=False, unique=True,
+        Email = db.Column(EncryptedType(db.String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False, unique=True,
                           supports_json=True,
                           supports_dict=True,
                           on_serialize=None,
                           on_deserialize=None
                           )
-        PhoneNumber = db.Column(EncryptedType(db.String(30), secret_key, AesEngine, 'pkcs5'),
+        PhoneNumber = db.Column(EncryptedType(db.String(30), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'),
                                 supports_json=True,
                                 supports_dict=True,
                                 on_serialize=None,
@@ -410,37 +408,6 @@ class ChatbotSession(db.Model):
 
     def __repr__(self):
         return '<ChatbotSession {}>'.format(self.Data)
-
-
-class Answer(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Text = db.Column(db.String(), nullable=False)
-    Keywords = db.Column(db.String(), nullable=False)
-    TimesClicked = db.Column(db.Integer, nullable=False, default=0)
-
-    # Relationships:
-    BlockID = db.Column(db.Integer, db.ForeignKey('block.ID', ondelete='SET NULL'), nullable=False)
-    Block = db.relationship('Block', foreign_keys=[BlockID])
-
-    def __repr__(self):
-        return '<Answer {}>'.format(self.Text)
-
-
-class UserFiles(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    SessionID = db.Column(db.Integer, nullable=False)
-    Name = db.Column(db.String(), nullable=False)
-    URL = db.Column(db.String(), nullable=False, unique=True)
-    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now )
-
-    # Relationships:
-    BlockID = db.Column(db.Integer, db.ForeignKey('block.ID', ondelete='SET NULL'), nullable=False)
-    Block = db.relationship('Block', foreign_keys=[BlockID])
-
-    def __repr__(self):
-        return '<UserFiles {}>'.format(self.Name)
 
 
 class Plan(db.Model):

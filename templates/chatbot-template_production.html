@@ -481,7 +481,7 @@
     function sendFileForm() {
         var formData = new FormData();
         var fileInput = document.getElementById('fileUploadB').files[0];
-
+        if (!fileInput) { return false;}
         formData.append('file', fileInput, fileInput.name);
 
         var xhr = new XMLHttpRequest();

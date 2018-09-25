@@ -9,7 +9,7 @@ def processData(assistant: Assistant, data: dict, solutionsReturned: int) -> Cal
         json_utils.validateSchema(data, 'chatbot_session.json')
     except Exception as exc:
         print(exc.args)
-        return Callback(False, "The submitted chatbot data does not doesn't follow the correct format."
+        return Callback(False, "The submitted chatbot data doesn't follow the correct format."
                                " Please check /static/json_schema/chatbot_session.json", exc.args[0])
     try:
 

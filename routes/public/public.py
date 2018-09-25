@@ -56,7 +56,7 @@ def chatbot(assistantID):
         data = request.get_json(silent=True)
         solutions = []
 
-        # If showTop is 0 then return nothing and don't even call solutions_services
+        # If showTop is 0 then skip below return nothing and don't even call solutions_services
         if data['showTop'] > 0:
             s_callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'], data['showTop'])
             if not s_callback.Success:

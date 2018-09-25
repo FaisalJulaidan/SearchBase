@@ -12,7 +12,7 @@
         </div>
         <div class="clearfix"></div>
 
-        <p style="font-weight: bolder;font-size: 16px;color: #de0d0d;">{{message}}</p>
+        <p style="font-weight: bolder;font-size: 16px;color: #de0d0d;">{{returnMessage}}</p>
 
         <div class="row">
             <div class="col-md-12 col-sm-12 col-xs-12">
@@ -73,10 +73,10 @@
                                         class="form-control" form="signupForm" title="Note:" required
                                         style="border-radius:4px" onchange="changeQuestion()">
                                     <!-- print all questions that is classified as userInfoRetrieval -->
-                                    {% for row in msg %}
-                                    {% if row[0].split(";")[1] != "userInfoRetrieval" and row[0].split(";")[1] != "fileUpload" %}
-                                    <option value="{{ row[0] }}">{{ row[0].split(";")[0] }}</option>
-                                    {% endif %}
+                                    {% for question in questions %}
+                                        {% if question.Type == "userInfoRetrieval" %}
+                                            <option value="{{ question.ID }}">{{ question.Question }}</option>
+                                        {% endif %}
                                     {% endfor %}
                                 </select>
                             </div>
@@ -95,7 +95,7 @@
                         <p id="load_text">Loading...</p>
 
                         <form enctype="multipart/form-data" style="text-align:center"
-                              action="/admin/assistant/{{ id }}/answers" method="POST"
+                              action="/admin/assistant/{{ assistantID }}/answers" method="POST"
                               id="answersForm">
 
                             <div id="pasteForm">
@@ -130,27 +130,21 @@
         obj[ decodeURIComponent( pair[0] ) ] = decodeURIComponent( pair[1] );
       } return obj;
     }
-    var success = searchToObject().res
+    var success = searchToObject().res;
     if (success) {
         alertError('Success',(success-1)+' answers were added','success')
     }
 
-    $("#question-select").popover({ trigger: 'hover', title: 'Note:', content: "Make sure to press submit to save data.",placement:'top',width:"200px" })
+    $("#question-select").popover({ trigger: 'hover', title: 'Note:', content: "Make sure to press submit to save data.",placement:'top',width:"200px" });
 
     var numberOfQuestions = 0;
-    {%for item in msg %}
+    var data = [];
+
+    {%for answer in answers %}
+        data.push({{ answer|tojson|safe }});
         numberOfQuestions++;
     {%endfor%}
-    var data = createArray(numberOfQuestions);
-    var i = 0;
-    {%for item in msg %}
-        {%for answer in item%}
-            {%if answer != None %}
-                data[i].push("{{answer}}");
-            {%endif%}
-        {%endfor%}
-        i++;
-    {%endfor%}
+
     var e = document.getElementById("question-select");
     var questionPos = e.selectedIndex;
     var squestion = e.options[e.selectedIndex].value;
@@ -159,38 +153,40 @@
 
     function getDatabaseData() {
         currentNumOfAnswers = 0;
+        debugger
         for (var j = 0; j < data.length; j++) {
-            var questionSelect = document.getElementById("question-select")
-            if (data[j][0] == questionSelect.options[questionSelect.selectedIndex].value
+            var questionSelect = document.getElementById("question-select");
+            if (
+                data[j][0] ==
             &&  data[j][0].split(";")[1] != "userInfoRetrieval") {
-                var indexOfRows = 0
-                var keywordsArr = []
+                var indexOfRows = 0;
+                var keywordsArr = [];
                 for (var b = 1; b < data[j].length + 1; b++) {
 
-                    if (b == data[j].length) break
+                    if (b == data[j].length) break;
 
                     // if there is no answers
-                    if (data[j][b] == "") break
+                    if (data[j][b] == "") break;
 
                     var answerArr = data[j][b].split(";");
-                    var pnameValue = answerArr[0]
-                    var keywordValue = answerArr[1]
-                    var actionValue = answerArr[2]
+                    var pnameValue = answerArr[0];
+                    var keywordValue = answerArr[1];
+                    var actionValue = answerArr[2];
 
-                    var i = (currentNumOfAnswers+1)
-                    var pname = 'pname'+i
-                    var keyword = 'keyword'+i
-                    var action = 'action'+i
+                    var i = (currentNumOfAnswers+1);
+                    var pname = 'pname'+i;
+                    var keyword = 'keyword'+i;
+                    var action = 'action'+i;
 
-                    keywordsArr.push(keywordValue)
+                    keywordsArr.push(keywordValue);
 
-                    // go through infinite loop untill we add the element
+                    // go through infinite loop until we add the element
                     while (true) {
                         // if there is a row
                         if ( $("#pasteForm>.row:eq("+indexOfRows+")")[0] ) {
-                            var rowChildrenCount = $("#pasteForm>.row:eq("+indexOfRows+")").children().length
+                            var rowChildrenCount = $("#pasteForm>.row:eq("+indexOfRows+")").children().length;
                             if (rowChildrenCount < 3) {
-                                $("#pasteForm>.row:eq("+indexOfRows+")").append(cookUpPanel(pname,keyword,action,i,pnameValue,keywordValue,actionValue))
+                                $("#pasteForm>.row:eq("+indexOfRows+")").append(cookUpPanel(pname,keyword,action,i,pnameValue,keywordValue,actionValue));
                                 break
                             }
                             else indexOfRows++
@@ -199,8 +195,8 @@
                             // if there is no a row? then  add new one
                             // and add the element immediatly since it will be empty row
                             // it means no need to check if the children is less than 3
-                            $("#pasteForm").append("<div class='row'></div>")
-                            $("#pasteForm>.row:eq("+indexOfRows+")").append(cookUpPanel(pname,keyword,action,i,pnameValue,keywordValue,actionValue))
+                            $("#pasteForm").append("<div class='row'></div>");
+                            $("#pasteForm>.row:eq("+indexOfRows+")").append(cookUpPanel(pname,keyword,action,i,pnameValue,keywordValue,actionValue));
                             break
                         }
                     }
@@ -214,33 +210,33 @@
                 }
 
                 // init taggled library
-                $("[id^=keyword]").each((i,element)=> {
-                    var isTaggled = $(element).children()[1]
-                    keywords = keywordsArr[i].split(',')
+                $("[id^=keyword]").each(function(i,element){
+                    var isTaggled = $(element).children()[1];
+                    keywords = keywordsArr[i].split(',');
                     // if there is not keywords
-                    keywords[0]? true : keywords=[]
+                    keywords[0] ? true : keywords=[];
                     console.log(keywords);
                     if (!isTaggled)
                         new Taggle(element.id, {
                             tags: keywords,
                             hiddenInputName: 'keywords'+element.id.split('keyword')[1]
                         });
-                })
+                });
                 $("#number-of-answers").val(currentNumOfAnswers);
             }
         }
     }
 
     function changeNumOfAnswers(inputEl) {
-        var inputNumOfAnswers = inputEl.value
+        var inputNumOfAnswers = inputEl.value;
         if (inputNumOfAnswers <= 0){
-            inputEl.parentElement.style.boxShadow="0 0 9px 0px #f44336"
+            inputEl.parentElement.style.boxShadow="0 0 9px 0px #f44336";
             $(inputEl).val('');
             return alertError('Input Error','Number of answers should be greater than 0')
         }else {
-            inputEl.parentElement.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+            inputEl.parentElement.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)";
             setTimeout(function () {
-                inputEl.parentElement.style.boxShadow=""
+                inputEl.parentElement.style.boxShadow="";
                 inputEl.parentElement.style.transition="box-shadow 2s ease-in-out"
             }, 500);
             checkAnswersPanels(inputNumOfAnswers)
@@ -248,27 +244,27 @@
     }
     function checkAnswersPanels(inputNumOfAnswers) {
         if (inputNumOfAnswers > currentNumOfAnswers) {
-            var elements = []
+            var elements = [];
             while (inputNumOfAnswers > currentNumOfAnswers) {
-                var i = (currentNumOfAnswers+1)
+                var i = (currentNumOfAnswers+1);
                 console.log(i);
-                var pname = 'pname'+i
-                var keyword = 'keyword'+i
-                var action = 'action'+i
+                var pname = 'pname'+i;
+                var keyword = 'keyword'+i;
+                var action = 'action'+i;
 
-                elements.push(cookUpPanel(pname,keyword,action,i))
+                elements.push(cookUpPanel(pname,keyword,action,i));
                 currentNumOfAnswers++
             }
 
-            var indexOfRows = 0
+            var indexOfRows = 0;
             for (var [index, element] of elements.entries()) {
                 // go through infinite loop untill we add the element
                 while (true) {
                     // if there is a row
                     if ( $("#pasteForm>.row:eq("+indexOfRows+")")[0] ) {
-                        var rowChildrenCount = $("#pasteForm>.row:eq("+indexOfRows+")").children().length
+                        var rowChildrenCount = $("#pasteForm>.row:eq("+indexOfRows+")").children().length;
                         if (rowChildrenCount < 3) {
-                            $("#pasteForm>.row:eq("+indexOfRows+")").append(element)
+                            $("#pasteForm>.row:eq("+indexOfRows+")").append(element);
                             break
                         }
                         else
@@ -278,8 +274,8 @@
                         // if there is no a row? then  add new one
                         // and add the element immediatly since it will be empty row
                         // it means no need to check if the children is less than 3
-                        $("#pasteForm").append("<div class='row'></div>")
-                        $("#pasteForm>.row:eq("+indexOfRows+")").append(element)
+                        $("#pasteForm").append("<div class='row'></div>");
+                        $("#pasteForm>.row:eq("+indexOfRows+")").append(element);
                         break
                     }
                 }
@@ -297,7 +293,7 @@
         else if (inputNumOfAnswers < currentNumOfAnswers) {
             while (inputNumOfAnswers < currentNumOfAnswers) {
                 // remove panels by one panel
-                var rows = $(".col-sm-4.col-xs-12")
+                var rows = $(".col-sm-4.col-xs-12");
                 rows[rows.length - 1].remove();
                 currentNumOfAnswers--;
             }
@@ -305,9 +301,9 @@
     }
     function cookUpPanel(pname,keyword,action,i, pnameValue, keywordValue, actionValue) {
         // actions
-        var options = ""
+        var options = "";
         {%for item in msg %}
-            options = options + "<option value=\"Go to: " + "{{item[0]}}".split(";")[0] + "\">Go to: "+ "{{item[0]}}".split(";")[0] + "</option>"
+            options = options + "<option value=\"Go to: " + "{{item[0]}}".split(";")[0] + "\">Go to: "+ "{{item[0]}}".split(";")[0] + "</option>";
         {% endfor %}
 
 
@@ -440,13 +436,15 @@
     xhttp.onreadystatechange = function () {
         if (xhttp.readyState === 4) {
             if (xhttp.status === 200) {
-                var responseString = xhttp.responseText
+                var restrictions = JSON.parse(xhttp.responseText);
+
+                // TODO:
+                // not included
+                // abdullah, faisal need to add this restriction to db
 
                 //get user's plan restrictions
-                restrictions = responseString.split("&&&")[2];
-                if (restrictions.includes("ExtendedLogic:False")) {
+                if (restrictions.ExtendedLogic)
                     extendedLogicAllowed = false;
-                }
                 //ACTIVATE THE PAGE
                 $("#load_text").hide();
                 getDatabaseData();

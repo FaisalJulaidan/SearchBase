@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "User Input block schema",
+  "type": "object",
+  "properties": {
+    "text": {"type": "string"},
+    "blockToGoID": {"type": ["number", "null"]},
+    "validation": {"enum": ["Email", "Telephone",""]},
+    "action": { "enum": ["Go To Next Block", "Go To Specific Block" ] },
+    "afterMessage": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "validation"
+  ],
+  "additionalProperties": false
+}

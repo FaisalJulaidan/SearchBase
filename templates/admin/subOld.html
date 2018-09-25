@@ -1,0 +1,117 @@
+﻿{% extends "admin/base.html" %}
+
+{% block title %}Pay Page{% endblock %}
+
+
+{% block content %}
+
+
+<link rel="stylesheet" type="text/css" href="../../static/pay/css/base.css" data-rel-css="">
+
+<link rel="stylesheet" type="text/css" href="../../static/stripe/style.css" data-rel-css="">
+
+<!-- Stripe -->
+
+
+
+<div class="right_col" role="main" style="margin-top:0">
+
+    <div class="page-title">
+      <div class="title_left">
+        <h3>Enter your payment details</h3>
+      </div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>
+                        This is the last step to finish your payment
+                        <small>
+                            Tip: Check all of your data is correct.
+                        </small>
+                    </h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <main>
+                    <form id="stripe_form">
+
+                      <div class="form-row">
+                        <label for="card-element" style="font-size: 15px; font-weight: 200">
+                          Credit/Debit Card:
+                        </label>
+                        <div id="card-element">
+                          <!-- A Stripe Element will be inserted here. -->
+                        </div>
+
+                        <!-- Used to display form errors. -->
+                        <div id="card-errors" role="alert"></div>
+                      </div>
+
+                        <br>
+
+
+                      <div class="input-group">
+                          <span class="input-group-addon">Promo Code</span>
+                          <input type="text" class="form-control" id="promo-code" style="border-style:solid">
+                      </div>
+
+
+
+
+                    </form>
+                        <button type="button" id="stripe_button" onclick="submit();">Submit Payment {{ plan['amount']/100 }} GBP</button>
+
+                    </main>
+
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+</div>
+{% endblock %}
+
+{% block customJS %}
+
+<!-- SweetAlert Library -->
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://js.stripe.com/v2/"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="../../static/stripe/script.js"></script>
+
+<script type="text/javascript">
+
+
+    if (sessionStorage.getItem('subID') != 'null'){
+      swal({
+          title: "Are you sure?",
+          text: "You will lose your active subscription.",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+      }).then((willDelete) => {
+        if (willDelete) {
+
+        } else {
+        document.location.href = '/admin/pricing'
+        }
+        });
+    }
+
+
+
+</script>
+{% endblock %}

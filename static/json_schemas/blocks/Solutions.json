@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Solutions block schema",
+  "type": "object",
+  "properties": {
+    "showTop": {"type": "integer", "minimum": 1},
+    "afterMessage": {"type": "string"}
+    },
+  "required": ["showTop", "afterMessage"],
+  "additionalProperties": false
+}

@@ -14,14 +14,13 @@
                             <ul class="nav navbar-right panel_toolbox"></ul>
                             <div class="clearfix"></div>
                             <br>
-                            <form action="/admin/assistant/create" method="POST" enctype="multipart/form-data">
+                            <form id="assistantForm">
                                 <h4>
-                                    Enter a nickname for your assistant to easily identify it in the dashboard. Must be
-                                    unique.<span class="required">*</span>
+                                    Enter a name for your assistant to easily identify it in the dashboard
                                 </h4>
                                 <div class="col-md-9 col-sm-9 col-xs-12">
-                                    <input name="nickname" type="text"
-                                           id="nickname"
+                                    <input name="name" type="text"
+                                           id="name"
                                            required="required" class="form-control col-md-5 col-xs-10">
                                 </div>
                                 <br>
@@ -62,17 +61,13 @@
                                     <input name="timeto-autopop" style="width:50px"
                                            class="form-control col-md-5 col-xs-10"
                                            id="bot_time" type="text"
-                                           {% if autopop !='Off' %}
-                                           value="{{ autopop }}"
-                                           {% else %}
-                                           value="6"
-                                           {% endif %}>
+                                            value='0' min="1">
+                                    <br>
                                     <br>
                                     <br>
                                 </div>
 
                                 <!-- Submit button -->
-                                <p style="text-align:center;">{{msg}}</p>
                                 <button class="btn btn-success">Submit</button>
                             </form>
 
@@ -85,10 +80,42 @@
 {% endblock %}
 
 {% block customJS %}
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
   <script>
       function switchchecked() {
           show = document.getElementById("switch-autopop").checked;
-          document.getElementById("popup-time").hidden = !show;
+          popupDiv = document.getElementById("popup-time");
+          time = document.getElementById("bot_time");
+          popupDiv.hidden = !show;
+          if (!show){
+              time.value = 0
+          }
+          console.log(time.value);
       }
+
+       $(document).on('submit', '#assistantForm', function (e) {
+        e.preventDefault();
+        createAssistant(this);
+    });
+
+      function createAssistant(){
+        console.log("Create Assistant");
+        $.ajax({
+            url: '/admin/assistant',
+            type: "POST",
+            dataType: "json",
+            data: $('#assistantForm').serialize()
+        }).done(function (res) {
+            console.log(res);
+            swal("Success!", "User has been created successfully", "success").then((value) => {
+              document.location = "/admin/assistant/" + res.data + "/settings"
+            });
+        }).fail(function (res) {
+            var resJson = JSON.parse(res.responseText);
+            swal("Error!", resJson.msg, "error").then((value) => {
+            });
+        });
+            }
   </script>
 {% endblock %}

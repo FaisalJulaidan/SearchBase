@@ -1,0 +1,435 @@
+﻿{% extends "admin/base.html" %}
+
+{% block title %}Solutions{% endblock %}
+
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>Adding New Solutions</h3>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="clearfix"></div>
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="x_panel">
+                            <div class="x_content">
+                                <p class="text-muted font-13 m-b-30">
+                                    Database 1 - All of the solutions thats your bot scans for are listed below.
+                                </p>
+
+                                <!-- Start of welcome message -->
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <div class="x_panel">
+                                            <div class="x_title">
+                                                <h2>Upload an existing database that you have
+                                                    <small>File Types: XML, JSON (coming soon)</small>
+                                                </h2>
+                                                <ul class="nav navbar-right panel_toolbox"></ul>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <br/>
+                                                <form id="productFileForm" name="productFileForm"
+                                                      enctype="multipart/form-data">
+
+                                                    <div class="form-group">
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                                               for="">
+                                                            Upload your existing database for an automatic scan <span
+                                                                class="required">*</span>
+                                                        </label>
+                                                        <br/>
+                                                        <br/>
+                                                        <div>
+                                                            <label for="productFile">Choose file to
+                                                                upload</label><br>
+                                                            <input type="file" id="productFile" name="productFile">
+                                                        </div>
+                                                        <br/>
+                                                        <button id="uploadButton" class="btn btn-success"
+                                                                type="button" value="submit" onclick="uploadProductFile()">
+                                                            Upload Database
+                                                        </button>
+                                                </form>
+
+                                                <table class="table" id="tableExample"></table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                        <table id="solutionsTable" class="table" cellspacing="0" width="100%">
+                                            <thead>
+                                                <tr>
+{#                                                    <th>Delete</th>#}
+                                                    <th>ID</th>
+                                                    <th>Major Title</th>
+                                                    <th>Secondary Title</th>
+                                                    <th>Short Description</th>
+                                                    <th>Money</th>
+                                                    <th>Keywords</th>
+                                                    <th>URL</th>
+                                                    <th>Edit / Delete</th>
+                                                </tr>
+                                            </thead>
+
+
+                                            <tbody id="tbody">
+                                                {%for item in data%}
+                                                   <tr data-rowid="{{ item['ID'] }}">
+{#                                                    <td data-type="deleteCheckBox"><input type="checkbox" ></td>\#}
+                                                    <td data-type="id" type="text"> {{ item['SolutionID'] }}</td>
+                                                    <td data-type="majorTitle"type="text"  onchange='validateName(this)'>{{ item['MajorTitle'] }} </td>
+                                                    <td data-type="secondaryTitle" type="text"  onchange='validate(this)'>{{ item['SecondaryTitle'] }}</td>
+                                                    <td data-type="shortDescription" type="text"  onchange='validate(this)'>{{ item['ShortDescription'] }}</td>
+                                                    <td data-type="money" type="text"  onchange='validate(this)'>{{ item['Money'] }}</td>
+                                                    <td data-type="keywords" type="text"  onchange='validate(this)'>{{ item['Keywords'] }}</td>
+                                                    <td data-type="URL" type="text" name="product_Keywords" onchange='validate(this)'>{{ item['URL'] }}</td>
+                                                    <td>
+                                                       <button type="button" class="btn btn-primary"
+                                                            data-toggle="modal"
+                                                            onclick="fillSolutionForm({{ item['ID'] }}, edit=true)">Edit</button>
+                                                       <button type="button" class="btn btn-danger" onclick="deleteSolution({{ item['ID'] }})">Delete</button>
+                                                     </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                        <button type="button" class="btn btn-success" id="addRow" value="Send" onclick="fillSolutionForm(0, edit=false)">
+                                            Add New
+                                        </button>
+                                        <button type="button" class="btn btn-success" id="removeRow" value="Send" onclick="" disabled>
+                                            Delete All
+                                        </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+       <!-- Solution Modal -->
+                <div class="modal fade" id="solutionModal" tabindex="-1" role="dialog" aria-labelledby="solutionModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+
+                      <div class="modal-header">
+                        <h3 class="modal-title" id="solutionModalLongTitle">Solution Information</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+
+                      <form id="solutionForm">
+
+                          <div class="modal-body">
+
+                                    <div class="form-group">
+                                      <label for="inputID">ID</label>
+                                      <input type="text" class="form-control" name="inputId" placeholder="FS5894">
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="inputBigTitle">Major Title</label>
+                                      <input  type="text" class="form-control" name="inputMajorTitle" placeholder="">
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="inputSecondaryTitle">Secondary Title</label>
+                                      <input type="text" class="form-control" name="inputSecondaryTitle" placeholder="">
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="inputSecondaryTitle">Short Description</label>
+                                      <input type="text" class="form-control" name="inputShortDescription" placeholder="">
+                                    </div>
+
+
+                                    <div class="form-group">
+                                      <label for="inputMoney">Money</label>
+                                      <input  type="text" class="form-control" name="inputMoney" value="£0" placeholder="" onchange="validate(this)">
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="inputKeywords">Keywords</label>
+                                      <input type="text" class="form-control" name="inputKeywords" placeholder="">
+                                    </div>
+
+
+                                    <div class="form-group">
+                                      <label for="inputURL">URL</label>
+                                      <input  type="url" class="form-control" name="inputURL" placeholder="https://www.thesearchbase.com" onchange="validate(this)">
+                                    </div>
+
+
+
+
+                          </div>
+
+                          <div class="modal-footer">
+                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                             <button type="submit" class="btn btn-success">Submit</button>
+                          </div>
+                    </form>
+
+                    </div>
+                  </div>
+                </div>
+       <!-- Solution Modal END -->
+
+
+{% endblock %}
+
+{% block customJS %}
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+
+
+
+var assistantID = window.location.pathname.split('/')[3];
+
+// Once the modal is closed, unbind all onSubmit handlers from the userForm
+$(document).on('hide.bs.modal', '#solutionModal', function (e) {
+    console.log('Unbind submit event.');
+    $(document).off('submit', '#solutionForm');
+});
+
+
+function fillSolutionForm(solID, edit=false){
+    var $form = $('form#solutionForm');
+    var $row = $('#solutionsTable tbody tr[data-rowid="' + solID + '"]');
+    console.log($row);
+
+    $('#solutionModal').modal('show');
+
+    if(edit){
+         // fill current user
+        console.log($form.find('input[name="inputID"]').val());
+        $form.find('input[name="inputId"]').val($row.find('td[data-type="id"]').text());
+        $form.find('input[name="inputMajorTitle"]').val($row.find('td[data-type="majorTitle"]').text());
+        $form.find('input[name="inputSecondaryTitle"]').val($row.find('td[data-type="secondaryTitle"]').text());
+        $form.find('input[name="inputShortDescription"]').val($row.find('td[data-type="shortDescription"]').text());
+        $form.find('input[name="inputMoney"]').val($row.find('td[data-type="money"]').text());
+        $form.find('input[name="inputKeywords"]').val($row.find('td[data-type="keywords"]').text());
+        $form.find('input[name="inputURL"]').val($row.find('td[data-type="URL"]').text());
+    }
+
+    // Bind the appropriate handlers depends on edit value
+    $(document).on('submit', '#solutionForm', function (e) {
+    e.preventDefault();
+    if (edit){submitEditSolForm(this,solId=solID, event=e)}
+    else {submitNewSolForm(this, event=e)}
+    })
+
+}
+
+
+
+
+
+function deleteSolution(solId) {
+    console.log('DELETE Solution.');
+    swal({
+          title: "Are you sure?",
+          text: "Solution will be removed completely from the system",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            $.ajax({
+                url: '/admin/solution/' + solId,
+                type: "DELETE"
+            }).done(function (res) {
+                console.log(res);
+                swal("Success!", "User has been successfully deleted.", "success").then((value) => {
+                document.location.reload()
+                });
+            }).fail(function (res) {
+                let resJson = JSON.parse(res.responseText);
+                swal("Error!", resJson.msg, "error").then((value) => {
+                });
+            });
+
+          } else {
+            // When clicking the cancel button in the alert box
+          }
+        });
+ }
+
+function submitNewSolForm(form, event) {
+    console.log('EDIT Solution.');
+     $.ajax({
+        url: '/admin/assistant/' + assistantID +'/solution',
+        type: "POST",
+        data: $('#solutionForm').serialize()
+    }).done(function (res) {
+        console.log(res);
+        swal("Success!", "Solution has been successfully added.", "success").then((value) => {
+          document.location.reload()
+        })
+    }).fail(function (res) {
+        let resJson = JSON.parse(res.responseText);
+        swal("Error!", resJson.msg, "error").then((value) => {
+        });
+    });
+}
+
+function submitEditSolForm(form,solId, event) {
+    console.log('EDIT Solution.');
+     $.ajax({
+        url: '/admin/solution/' + solID,
+        type: "PUT",
+        data: $('#solutionForm').serialize()
+    }).done(function (res) {
+        console.log(res);
+        swal("Success!", "Solution has been successfully updated.", "success").then((value) => {
+          document.location.reload()
+        })
+    }).fail(function (res) {
+        let resJson = JSON.parse(res.responseText);
+        swal("Error!", resJson.msg, "error").then((value) => {
+        });
+    });
+}
+
+
+function validate(element) {
+    console.log(element.name);
+    var elName = element.name;
+    if (elName === 'inputMoney') {
+        var price = element.value;
+        // if there are more currencies we need to add it to the regex string
+        var regex =/^[$£€][\d\.,]+/;
+        if (regex.test(price))
+            pass(element);
+        else
+            noPass(element,'Price should be in this format "£1500" Where the approved currencies are ($, £, and €)')
+    }
+    else if ((elName).includes('product_Brand')) {
+        var brand = element.value
+        if (brand.length < 2)
+            noPass(element,'Data2 should be more than 2 letters')
+        else
+            pass(element)
+    }
+    else if ((elName).includes('product_Model')) {
+        var model = element.value
+        if (model.length < 2)
+            noPass(element,'Data3 should be more than 2 letters')
+        else
+            pass(element)
+    }
+    else if ((elName).includes('product_Keywords')) {
+        // TODO:
+        var keywords = element.value
+    }
+    else if ((elName).includes('product_Discount')) {
+        // TODO:
+        var discount = element.value
+    }
+    else if (elName === 'inputURL') {
+        var userURL = element.value;
+        var URLRegex = /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/;
+
+        if (userURL.match(URLRegex))
+            pass(element);
+        else
+            noPass(element,"Please enter your website URL correctly.")
+    }
+
+    // helping function
+    function pass(element) {
+    }
+    function noPass(element,text) {
+        swal("Error!", text, "error").then((value) => {
+        });
+    }
+}
+
+
+    //document.getElementById('uploadButton').addEventListener('click',uploadProductFile)
+    function uploadProductFile() {
+        // TODO: validate the type of product before update
+        // 1- if submit without adding file (done)
+        // 2- submit with a wroung dataType (done)
+        // 3- if there is backend response show it
+        if ($("#productFile").val()) {
+            if ($("#productFile").val().includes('json')
+            ||  $("#productFile").val().includes('xml') ) {
+                var form = document.forms.namedItem("productFileForm");
+                formData = new FormData(form);
+                var xhttp = new XMLHttpRequest();
+                var msg = "";
+                xhttp.open("POST", "/admin/assistant/{{ id }}/solutions/file", true); // true is asynchronous
+                xhttp.onreadystatechange = function () {
+                    if (xhttp.readyState === 4) {
+                        if (xhttp.status === 200) {
+                            msg = xhttp.responseText;
+                            window.location.reload();
+                        }
+                        else {
+                            console.error(xhttp.statusText);
+                            msg = "Error: " + xhttp.status;
+                        }
+                        console.log(msg);
+                    }
+                };
+                xhttp.send(formData);
+                return false;
+            }
+            else
+                alertError('Upload File Error','<h2>Data Type must be <b>json</b> or <b>xml</b></h2>')
+        }
+        else
+            alertError('Upload File Error','<h2>There is no file to upload</h2>')
+    }
+
+
+    // helping functions
+    function createArray(rows) {
+        var arrayRow = [];
+        for (var i = 0; i < rows; i++) {
+            arrayRow[i] = [];
+        }
+        return arrayRow;
+    }
+
+    {#// Hide Extended Logic depending on user Plan#}
+    {#params = "";#}
+    {#var xhttp = new XMLHttpRequest();#}
+    {#xhttp.open("POST", "/admin/getadminpagesdata", true);#}
+    {#xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");#}
+    {#xhttp.onreadystatechange = function () {#}
+    {#    if (xhttp.readyState === 4) {#}
+    {#        if (xhttp.status === 200) {#}
+    {#            var responseString = xhttp.responseText#}
+    {##}
+    {#            //get user's plan restrictions#}
+    {#            restrictions = responseString.split("&&&")[2];#}
+    {#            if (restrictions.includes("ImportDatabase:False")) {#}
+    {#                $("#productFileForm").hide();#}
+    {#            }#}
+    {#            //ACTIVATE THE PAGE#}
+    {#        }#}
+    {#        else {#}
+    {#            console.error(xhttp.statusText);#}
+    {#        }#}
+    {#    }#}
+    {#xhttp.send(params);#}
+
+</script>
+{% endblock %}

@@ -14,7 +14,7 @@
 <link rel="stylesheet" type="text/css" href="../../static/pay/css/example2.css" data-rel-css="" />
 
 
-<!-- Abdullah Hashim did below code to avoid error occured from custom.min.js file -->
+<!-- Abdullah Hashim did below code to avoid error occurred from custom.min.js file -->
 <!-- <form id="demo-form2"></form> -->
 
 
@@ -44,7 +44,7 @@
                 <div class="x_content">
                     <main>
                         <div class="cell example example2" style="margin: 0 25%">
-                            <form action="/admin/check-out/{{plan['id']}}" method="post">
+                            <form action="/admin/subscribe/{{plan['id']}}" method="post">
 
                                 <div data-locale-reversible>
                                   <div class="row">
@@ -176,21 +176,23 @@
 <script type="text/javascript">
 
 
+    if (sessionStorage.getItem('subID') != 'null'){
+      swal({
+          title: "Are you sure?",
+          text: "You will lose your active subscription.",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+      }).then((willDelete) => {
+        if (willDelete) {
 
-    swal({
-      title: "Are you sure?",
-      text: "You will lose your active subscription.",
-      icon: "warning",
-      buttons: true,
-      dangerMode: true,
-    })
-    .then((willDelete) => {
-      if (willDelete) {
-
-      } else {
+        } else {
         document.location.href = '/admin/pricing'
-      }
-    });
+        }
+        });
+    }
+
+
 
 
     /*

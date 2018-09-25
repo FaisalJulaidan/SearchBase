@@ -9,7 +9,7 @@
 
             <p>All of the Data Collected</p>
 
-            <button onclick="fnExcelReport()">Export Excel</button>
+            <button onclick="fnExcelReport()" class="btn btn-success">Export Excel</button>
             <br />
             Note: You can click the column heading to sort it.
             <div id="tBodyUIn"></div>
@@ -21,22 +21,51 @@
 {% block customJS %}
 <script src="/static/js/sortTable.js"></script>
 <script>
-    var tableHeading = $("#tableHeadingUIn");
-    var tableString = "<table id=\"tableSort\" class=\"table table-striped jambo_table bulk_action\"><thead>\
-                            <tr id=\"tableHeadingUIn\" class=\"headings\">\
-                                <th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Date</th>\
-                                <th style=\"cursor: pointer;\" onclick=\"sortTable(1)\" class=\"column-title\">SessionID</th>\
-                                <th style=\"cursor: pointer;\" onclick=\"sortTable(2)\" class=\"column-title\">Question</th>\
-                                <th style=\"cursor: pointer;\" onclick=\"sortTable(3)\" class=\"column-title\">Recorded Data</th>\
-                            </tr></thead>\
-                            <tbody id=\"tBodyUIn\">";
+    //$('#tBodyUIn').qtip({
+    //    content: {
+    //        text: 'Tips plugin element'
+    //    }
+    //})
+
+    var currentLength = 0;
+    var maxLength = 0;
+    var tableString = "";
+    console.log("{{data}}")
+    {%if not data %}
+    $("#tBodyUIn").append("<h4>All of the data collected from the bot convorsations will be stored here.</h4>");
+    {%endif%}
+
     {%for record in data %}
-    if ("{{record[3]}}".includes(";")) {
-        tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td><a href=\"/" + "{{record[3]}}".split(";")[1] + "\" download=\"" + "{{record[3]}}".split(";")[0] +"\">" + "{{record[3]}}".split(";")[0]+"</a></td></tr>";
-    } else {
-        tableString += "<tr><td>{{record[2]}}</td><td>{{record[4]}}</td><td>{{record[5]}}</td><td>{{record[3]}}</td></tr>";
+        currentLength = 0;
+        {%for value in record['data']['collectedInformation'] %}
+            currentLength++;
+        {% endfor %}
+        if (currentLength > maxLength) { maxLength = currentLength; }
+    {%endfor%}
+
+    var headings = "";
+    for (var i = 0; i < maxLength; i++) {
+        headings += "<th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Data</th>";
     }
+
+    tableString = "<table id=\"tableSort\" class=\"table\" cellspacing=\"0\" width=\"100 %\"><thead>\
+                            <tr id=\"tableHeadingUIn\" class=\"headings\"><th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Date and Time</th>"+ headings +"</tr></thead>\
+                            <tbody id=\"tBodyUIn\">";
+    var filename = undefined;
+    {%for record in data %}
+        tableString += "<tr><td>"+"{{record['dateTime']}}".split(".")[0]+"</td>"
+        {%for value in record['data']['collectedInformation'] %}
+            {%if '&FILE_UPLOAD&' in value['input'] %}
+                filename = "{{record['filePath']}}";
+                console.log(filename);
+                tableString += "<td><a href=\"/static"+"{{route}}".split("static")[1]+"/" + filename + "\" download=\"" + filename + "\">" + filename + "</a></td>"
+            {%else%}
+                tableString += "<td>{{value['input']}}</td>"
+            {%endif%}
+        {% endfor %}
+        tableString += "</tr>"
     {% endfor %}
+
     tableString += "</tbody></table>";
     $("#tBodyUIn").append(tableString);
 
@@ -44,8 +73,8 @@
 
     function fnExcelReport() {
         tab_text = tableString;
-        tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//comment if u want links in your table
-        tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // comment if u want images in your table
+        tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//comment if you want links in the table
+        tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // comment if you want images in the table
         tab_text = tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // comment if you want input params
 
         var ua = window.navigator.userAgent;

@@ -35,6 +35,8 @@ window.onload = (async function (global) {
     var host = globalTSB.host;
     var files_path = globalTSB.files_path;
     var iframe_route = globalTSB.iframe_route;
+    var popupSec = undefined;
+
     var integration_file = host + files_path + 'integration.js';
     var id = document.querySelector('script[data-name="tsb-widget"][data-id]').getAttribute('data-id');
     globalTSB.id = id;
@@ -172,6 +174,36 @@ window.onload = (async function (global) {
      document.getElementById('TSB-refreshIframe').addEventListener('click', e => {
        reloadIframe()
     });
+
+     // Popup
+     function getPopupSettings(){
+        return new Promise(function(resolve, reject){
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', host + '/getpopupsettings/' + id);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    popupSec = JSON.parse(xhr.responseText).data.SecondsUntilPopUp;
+                    return resolve(true);
+                }
+                else {
+                    console.log(xhr.status);
+                    reject(false);
+                }
+            };
+            xhr.send();
+        });
+
+     }
+
+     getPopupSettings().then(e => {
+         if(popupSec){
+             setTimeout(function(){
+                 document.getElementById('TSB-chatbot-widget').click()
+             }, popupSec * 1000);
+        }
+     });
+
+
 
 
 

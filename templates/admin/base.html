@@ -301,6 +301,7 @@
                     </div>
                 </div>
             </div>
+            {% block naughtyScript %}
             <script>
             //makes charts dissapear in analytics
                 window.onload = function (e) {
@@ -311,6 +312,7 @@
                 }
                 var prev_handler = window.onload;
             </script>
+            {% endblock %}
             <!--<div id="flash" hidden>
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}

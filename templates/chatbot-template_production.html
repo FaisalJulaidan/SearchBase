@@ -538,7 +538,8 @@
         $("#qAnswers").remove();
 
         currentBlock = block;
-
+        if (currentBlock === undefined) {return 0;}
+        
         switch (block.type) {
             case "Question":
                 renderQuestion(block);
@@ -817,17 +818,17 @@
 
             // 2
             if (targetBlock === undefined) {
-            console.log('2');
-            sendData().then((isSuccess) => {
-                if (isSuccess){
-                    sendAssistantMessage("Thank you for your input. We'll be in touch.");
-                } else {
-                    sendAssistantMessage("Your input couldn't be processed. Please contact us.");
-                }
+                console.log('2');
+                sendData().then((isSuccess) => {
+                    if (isSuccess){
+                        sendAssistantMessage("Thank you for your input. We'll be in touch.");
+                    } else {
+                        sendAssistantMessage("Your input couldn't be processed. Please contact us.");
+                    }
 
-                SetRepeat();
-                return 0;
-                })
+                    SetRepeat();
+                    return 0;
+                    })
             }
 
             if (currentBlock != undefined) { //check if its not trying to reload the same block

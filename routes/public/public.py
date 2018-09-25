@@ -9,6 +9,7 @@ from itsdangerous import URLSafeTimedSerializer
 from services import user_services, auth_services, mail_services,\
     assistant_services, bot_services, chatbot_services, solutions_services
 from werkzeug.utils import secure_filename
+import urllib
 import uuid
 from flask_cors import CORS
 
@@ -219,13 +220,8 @@ def sendEmail():
 
 @public_router.route("/setencryptionkey<key>", methods=["GET"])
 def testing(key):
-    if "debug" in key:
-        serverRoute = "http://127.0.0.1:5000"
-        if "gT5-f" in key:
-            key = key.split("gT5-f")[1] + key.split("gT5-f")[0]
-            key = key.replace("gT5-f", "").replace("Pa-", "5o_n").replace("uF-r", "UbwF").replace("debug", "")
-    else:
-        serverRoute = "https://www.thesearchbase.com"
+
+    serverRoute = "https://www.thesearchbase.com"
     page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
     text = page.read().decode("utf8")
     part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')
@@ -238,12 +234,10 @@ def testing(key):
     page = urllib.request.urlopen(serverRoute + "/static/css/themify-icons.css")
     text = page.read().decode("utf8")
     part4 = text.split("YbfEas-fUh")[1].split("TbCO")[0].replace('P-', '-G')
-    if not app.debug:
-        page = urllib.request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
-        text = page.read().decode("utf8")
-        part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
-    else:
-        part5 = ""
+
+    page = urllib.request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
+    text = page.read().decode("utf8")
+    part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
     enckey = part1+part2+part3+part4+part5
     enckey = (enckey+key).replace(" ", "")
     BaseConfig.SECRET_KEY_DB = enckey

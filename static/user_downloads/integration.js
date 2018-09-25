@@ -12,7 +12,7 @@ function sleep(ms) {
 }
 
 
-(async function (global) {
+window.onload = (async function (global) {
 
     // Add array index of for old browsers (IE<9)
     if (!Array.prototype.indexOf) {
@@ -41,7 +41,7 @@ function sleep(ms) {
 
 
     // Tags to be added
-    var styleTags = ['/style.css', '/pop.css', '/slick.css'];
+    var styleTags = ['/pop.css'];
     //var scriptTags = ['/jquery-2.2.4.min.js', '/jQueryRotate.js', '/active.js'];
     var scriptTags = ['/chatbotJSMerge.min.js'];
 
@@ -66,38 +66,44 @@ function sleep(ms) {
 
 
     // Build The Chatbot Button and iFrame //
+    var container = document.createElement('div');
+    container.id = 'TSB-container';
     // Create chatbot button div
     var btnDiv = document.createElement('div');
-    btnDiv.id = 'chatbot-widget';
+    btnDiv.id = 'TSB-chatbot-widget';
 
-    btnDiv.innerHTML = ' <div class="circle">\n' +
+    btnDiv.innerHTML = ' <div class="TSB-circle">\n' +
         '               <i class="fa fa-cloud"></i>\n' +
         '             </div>';
 
+
+
+
     // Create chatbot iFrame div
     var iFrameDiv = document.createElement('div');
-    iFrameDiv.id = 'iframediv';
+    iFrameDiv.id = 'TSB-iframediv';
     iFrameDiv.style.width = '320px';
     iFrameDiv.style.height = '0px';
     iFrameDiv.style.opacity = '0';
 
-    iFrameDiv.innerHTML = '<div class="contact-profile" style="z-index: -1; position:relative;">\n' +
+    iFrameDiv.innerHTML = '<div class="TSB-contact-profile">\n' +
         '        <img src=\"'+host+'/static/user_downloads/favicon-96x96.png\" alt=""/>\n' +
-        '        <p>Bot</p>\n' +
+        '        <p class="TSB-bot-title">Bot</p>\n' +
         '\n' +
-        '        <div class="social-media" id=\'closeIframe\'>\n' +
+        '        <div class="TSB-social-media" id=\'TSB-closeIframe\'>\n' +
         '            <i class="fa fa-close" aria-hidden="true"></i>\n' +
         '        </div>\n' +
         '\n' +
-        '        <div id=\'refreshIframe\' class="social-media" >\n' +
+        '        <div id=\'TSB-refreshIframe\' class="TSB-social-media" >\n' +
         '            <i class="fa fa-refresh" aria-hidden="true"></i>\n' +
         '        </div>\n' +
         '    </div>\n' +
-        '    <iframe frameborder="0" id="chatbotIframe" src=\"' + host  + iframe_route + '/' + id + '\"></iframe>';
+        '    <iframe frameborder="0" id="TSB-chatbotIframe" src=\"\"></iframe>';
 
-    // Add the two divs to the page dom
-    document.getElementsByTagName('body')[0].appendChild(btnDiv);
-    document.getElementsByTagName('body')[0].appendChild(iFrameDiv);
+    // Add the container and two  divs to the page dom
+    document.getElementsByTagName('body')[0].prepend(container);
+    document.getElementById('TSB-container').appendChild(btnDiv);
+    document.getElementById('TSB-container').appendChild(iFrameDiv);
     // === ==== ==== ===== ==== ==== ====
 
 
@@ -116,47 +122,55 @@ function sleep(ms) {
 
 
     // Animations
-    document.getElementById("iframediv").style.display = "none"
+    function reloadIframe(){
+      document.getElementById('TSB-chatbotIframe').src = host  + iframe_route + '/' + id;
+    }
 
-    document.getElementById('chatbot-widget').addEventListener('click', e => {
-        $chatbotWidget = $("#chatbot-widget");
+    document.getElementById("TSB-iframediv").style.display = "none";
+
+    // Open iframe
+    document.getElementById('TSB-chatbot-widget').addEventListener('click', e => {
+        $chatbotWidget = $("#TSB-chatbot-widget");
         $chatbotWidget.animate({
             height: '0px',
             opacity: '0',
         }, 500, () => {
-            $("#chatbot-widget").hide();
+            $("#TSB-chatbot-widget").hide();
         });
 
-        iFrameDiv = document.getElementById("iframediv");
+        iFrameDiv = document.getElementById("TSB-iframediv");
         iFrameDiv.style.display = "block";
-        iFrameDiv = $("#iframediv");
+        iFrameDiv = $("#TSB-iframediv");
         iFrameDiv.animate({
             height: '370px',
             opacity: '1',
         });
+
+        reloadIframe();
+
     });
 
 
-    document.getElementById('closeIframe').addEventListener('click', e => {
+    document.getElementById('TSB-closeIframe').addEventListener('click', e => {
 
-        $chatbotWidget = $("#chatbot-widget");
+        $chatbotWidget = $("#TSB-chatbot-widget");
         $chatbotWidget.show();
         $chatbotWidget.css('height','auto');
         $chatbotWidget.animate({
             opacity: '1',
         });
 
-        $("#iframediv").animate({
+        $("#TSB-iframediv").animate({
             height: '0px',
             opacity: '0',
         }, 500, () => {
-            $("#iframediv").hide();
+            $("#TSB-iframediv").hide();
         })
     });
 
     // Reset the iframe
-     document.getElementById('refreshIframe').addEventListener('click', e => {
-       document.getElementById('chatbotIframe').src = host  + iframe_route + '/' + id;
+     document.getElementById('TSB-refreshIframe').addEventListener('click', e => {
+       reloadIframe()
     });
 
 

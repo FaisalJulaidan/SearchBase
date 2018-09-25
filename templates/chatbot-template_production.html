@@ -371,6 +371,7 @@
     var fileUpload = false;
     var params = undefined;
     var sessionID = 0;
+    var welcomeMessage = "";
     var BOT_USER = 'bot';
     var CLIENT_USER = 'user';
     var chatInputDiv = document.getElementById("fileUploadForm");
@@ -390,7 +391,7 @@
             // Set assistant and blocks array
             assistant = data.assistant;
             blocks = data.blocks;
-
+            welcomeMessage = assistant.Message
             // Start the chatbot
             //console.log(blocks)
             start();
@@ -405,7 +406,7 @@
     // This start the lunch the chatbot for the first time
     function start() {
         // 1.Show the chatbot welcoming message assistant.message
-
+        sendAssistantMessage(welcomeMessage);
         // 2.Show the first block in the blocks array then render it depends on its type
         renderBlock(blocks[0]);
     }
@@ -674,9 +675,9 @@
 
                     await sleep(200);
                     putThinkingGif();
-                    await sleep(400 + Math.floor(Math.random() * 900));
+                    await sleep(500 + Math.floor(Math.random() * 900));
                     removeThinkingGif();
-                    await sleep(100);
+                    await sleep(200);
 
                     sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
                     chatInputDiv.style = "display:block";
@@ -695,9 +696,9 @@
 
                     await sleep(200);
                     putThinkingGif();
-                    await sleep(400 + Math.floor(Math.random() * 300));
+                    await sleep(500 + Math.floor(Math.random() * 900));
                     removeThinkingGif();
-                    await sleep(100);
+                    await sleep(200);
                 }
                 return getNextBlock(currentBlock.content.action, currentBlock.content.BlockToGoId);
             }
@@ -717,9 +718,9 @@
 
                 await sleep(200);
                 putThinkingGif();
-                await sleep(400 + Math.floor(Math.random() * 900));
+                await sleep(500 + Math.floor(Math.random() * 900));
                 removeThinkingGif();
-                await sleep(100);
+                await sleep(200);
 
                 if (!validateUserInput(message, currentBlock.content.validation)) {
                     sendAssistantMessage("I am sorry but that was not in the format I think it should be...");
@@ -733,9 +734,9 @@
 
                         await sleep(200);
                         putThinkingGif();
-                        await sleep(400 + Math.floor(Math.random() * 300));
+                        await sleep(500 + Math.floor(Math.random() * 900));
                         removeThinkingGif();
-                        await sleep(100);
+                        await sleep(200);
 
                     }
                 }
@@ -750,9 +751,9 @@
 
                 await sleep(200);
                 putThinkingGif();
-                await sleep(400 + Math.floor(Math.random() * 900));
+                await sleep(500 + Math.floor(Math.random() * 900));
                 removeThinkingGif();
-                await sleep(100);
+                await sleep(200);
 
                 var blockAnswers = currentBlock.content.answers;
 
@@ -763,9 +764,9 @@
 
                         await sleep(200);
                         putThinkingGif();
-                        await sleep(400 + Math.floor(Math.random() * 300));
+                        await sleep(500 + Math.floor(Math.random() * 900));
                         removeThinkingGif();
-                        await sleep(100);
+                        await sleep(200);
 
                         var action = blockAnswers[i].action;
                         var blockToGoId = blockAnswers[i].blockToGoID;

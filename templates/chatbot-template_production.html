@@ -439,6 +439,7 @@
             console.log("Data sent successfully!");
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
+            console.log("ye?")
             sendFile();
             return true;
 
@@ -447,7 +448,6 @@
             console.log(res);
             return false
             });
-        sendFile();
     }
 
     function sendDataSolutionsBlock(showTop) {
@@ -465,6 +465,7 @@
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
             solutions = data["solutions"];
+            console.log("2yeye")
             sendFile();
             return solutions;
 
@@ -472,19 +473,21 @@
             console.log("Error in retrieving blocks.");
             console.log(res);
             });
-        sendFile();
     }
 
     function sendFile() {
+        console.log("we there?")
         $("#fileUploadForm").submit();
     }
 
     function sendFileForm() {
+        console.log("Im called")
         var formData = new FormData();
         var fileInput = document.getElementById('fileUploadB').files[0];
         if (!fileInput) { return false;}
         formData.append('file', fileInput, fileInput.name);
 
+        console.log("reached here")
         var xhr = new XMLHttpRequest();
         xhr.open('POST', "../assistant/" + sessionID + "/file", true);
 
@@ -613,7 +616,7 @@
         scrollTo('end')
     }
         function renderUserInput(block) {
-            $messageInput = $(".message-input").first();
+            $messageInput = $(".message-input").last();
             $userInput = $("<div class=\"wrap\">\n" +
                 "                <input onkeypress=\"handleEnter(event)\" " +
                 "            id='textMessage' type=\"text\" placeholder=\"Write your message...\"/>\n" +
@@ -623,7 +626,7 @@
             $('.messages').css('height','calc(100% - 40px)');
             $('.message-input').css('height','40px');
 
-            $messageInput.html($userInput);
+            $messageInput.append($userInput);
             sendAssistantMessage(block.content.text)
         }
 
@@ -646,7 +649,7 @@
 
         function renderSolutions(block) {
             $('.messages').css('height', '100%');
-            $('.message-input').remove();
+            //$('.message-input').remove();
             $('#presetAnswers').remove();
 
             sendDataSolutionsBlock(block.content.showTop)
@@ -678,7 +681,7 @@
                     return 0;
                 }
                 // clear file-upload div
-                $(".message-input").first().html('');
+                //$(".message-input").last().html('');
                 //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
 
                 if (currentBlock.content.afterMessage) {
@@ -719,7 +722,7 @@
                 }
                 else {
                     // clear user input div
-                    $(".message-input").first().html('');
+                    //$(".message-input").last().html('');
                     if (currentBlock.content.afterMessage) {
                         sendAssistantMessage(currentBlock.content.afterMessage);
 

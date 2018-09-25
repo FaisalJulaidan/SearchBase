@@ -282,6 +282,7 @@
     <script src="/../../static/tagify/tagify.js"></script>
 
     <script>
+        var blocksNumber = 0;
         window.onload = function () {
             if (prev_handler)
                 prev_handler();
@@ -404,7 +405,7 @@
                     $input.val(text);
                     if (text === "Go To Specific Block") {
                         $input.parent().find(".blockToGoID").remove();
-                        $input.parent().append("<input type=\"number\" class=\"blockToGoID form-control\"/>");
+                        $input.parent().append("<input type=\"number\" min=\"1\" max=\"" + blocksNumber +"\" class=\"blockToGoID form-control\"/>");
                     } else {
                         $input.parent().find(".blockToGoID").remove();
                     }
@@ -594,7 +595,7 @@
                     $input.val(text);
                     if (text === "Go To Specific Block") {
                         $input.parent().find(".blockToGoID").remove();
-                        $input.parent().append("<input type=\"number\" class=\"blockToGoID form-control\"/>");
+                        $input.parent().append("<input type=\"number\" min=\"1\" max=\"" + blocksNumber +"\" class=\"blockToGoID form-control\"/>");
                     } else {
                         $input.parent().find(".blockToGoID").remove();
                     }
@@ -660,7 +661,7 @@
                     $input.val(text);
                     if (text === "Go To Specific Block") {
                         $input.parent().find(".blockToGoID").remove();
-                        $input.parent().append("<input type=\"number\" class=\"blockToGoID form-control\"/>");
+                        $input.parent().append("<input type=\"number\" min=\"1\" max=\"" + blocksNumber +"\" class=\"blockToGoID form-control\"/>");
                     } else {
                         $input.parent().find(".blockToGoID").remove();
                     }
@@ -1012,7 +1013,7 @@
                     $input.val(text);
                     if (text === "Go To Specific Block") {
                         $input.parent().find(".blockToGoID").remove();
-                        $input.parent().append("<input type=\"number\" class=\"blockToGoID form-control\"/>");
+                        $input.parent().append("<input type=\"number\" class=\"blockToGoID min=\"1\" max=\"" + blocksNumber +"\" form-control\"/>");
                     } else {
                         $input.parent().find(".blockToGoID").remove();
                     }
@@ -1209,6 +1210,8 @@
             }
 
             function render_blocks(blocks) {
+                console.log("blocks: ", blocks)
+                blocksNumber = blocks.length;
                 function cookUpBlock(block_template, block) {
 
                     function getQuestionElement(){
@@ -1327,7 +1330,7 @@
                                 answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
                                 answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
                                  if (answers[i].action == "Go To Specific Block") {
-                                    answerTemplate = answerTemplate.replace('GOTO_ID_INPUT', "<input type=\"number\" class=\"blockToGoID form-control\" value=\"" + answers[i].blockToGoID+"\"/>");
+                                    answerTemplate = answerTemplate.replace('GOTO_ID_INPUT', "<input type=\"number\" min=\"1\" max=\""+blocksNumber+"\" class=\"blockToGoID form-control\" value=\"" + answers[i].blockToGoID+"\"/>");
                                 } else {
                                     answerTemplate = answerTemplate.replace('GOTO_ID_INPUT', "");
                                 }
@@ -1434,7 +1437,7 @@
                         template = template.replace('BLOCK_ACTION', block.content.action);
 
                          if (block.content.action === "Go To Specific Block") {
-                            template = template.replace("GOTO_ID_BLOCK", "<input type=\"number\" class=\"blockToGoID form-control\" value=\"" + block.content.blockToGoID + "\"/>")
+                            template = template.replace("GOTO_ID_BLOCK", "<input type=\"number\" class=\"blockToGoID form-control\" min=\"1\" max=\"" + blocksNumber +"\" value=\"" + block.content.blockToGoID + "\"/>")
                         } else {
                             template = template.replace("GOTO_ID_BLOCK", "")
                         }

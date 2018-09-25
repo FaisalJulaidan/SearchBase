@@ -288,7 +288,7 @@ if __name__ == "__main__":
         db.drop_all()
         db.create_all()
         gen_static_data()
-        gen_dummy_data()
+        # gen_dummy_data()
         print('Development mode running...')
 
         # Run the app server

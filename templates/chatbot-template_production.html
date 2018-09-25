@@ -353,7 +353,7 @@
         <div class="message-input">
             <form id="fileUploadForm" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
                 <div class="wrap">
-                    <input onkeypress="handleEnter(event)" id="fileUploadB" type="file" placeholder="Write your message..." style="background-color:  white;"/><button type="button" onclick="submitAnswer('')" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                    <input name="file" onkeypress="handleEnter(event)" id="fileUploadB" type="file" placeholder="Write your message..." style="background-color:  white;"/><button type="button" onclick="submitAnswer('')" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
                 </div>
             </form>
         </div>
@@ -439,6 +439,7 @@
             console.log("Data sent successfully!");
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
+            console.log("ye?")
             sendFile();
             return true;
 
@@ -446,7 +447,7 @@
             console.log("Error in retrieving blocks.");
             console.log(res);
             return false
-        });
+            });
     }
 
     function sendDataSolutionsBlock(showTop) {
@@ -464,25 +465,29 @@
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
             solutions = data["solutions"];
+            console.log("2yeye")
             sendFile();
             return solutions;
 
         }).fail(function (res) {
             console.log("Error in retrieving blocks.");
             console.log(res);
-        });
+            });
     }
 
     function sendFile() {
+        console.log("we there?")
         $("#fileUploadForm").submit();
     }
 
     function sendFileForm() {
+        console.log("Im called")
         var formData = new FormData();
         var fileInput = document.getElementById('fileUploadB').files[0];
-
+        if (!fileInput) { return false;}
         formData.append('file', fileInput, fileInput.name);
 
+        console.log("reached here")
         var xhr = new XMLHttpRequest();
         xhr.open('POST', "../assistant/" + sessionID + "/file", true);
 
@@ -611,7 +616,7 @@
         scrollTo('end')
     }
         function renderUserInput(block) {
-            $messageInput = $(".message-input").first();
+            $messageInput = $(".message-input").last();
             $userInput = $("<div class=\"wrap\">\n" +
                 "                <input onkeypress=\"handleEnter(event)\" " +
                 "            id='textMessage' type=\"text\" placeholder=\"Write your message...\"/>\n" +
@@ -621,7 +626,7 @@
             $('.messages').css('height','calc(100% - 40px)');
             $('.message-input').css('height','40px');
 
-            $messageInput.html($userInput);
+            $messageInput.append($userInput);
             sendAssistantMessage(block.content.text)
         }
 
@@ -644,7 +649,7 @@
 
         function renderSolutions(block) {
             $('.messages').css('height', '100%');
-            $('.message-input').remove();
+            //$('.message-input').remove();
             $('#presetAnswers').remove();
 
             sendDataSolutionsBlock(block.content.showTop)
@@ -676,7 +681,7 @@
                     return 0;
                 }
                 // clear file-upload div
-                $(".message-input").first().html('');
+                //$(".message-input").last().html('');
                 //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
 
                 if (currentBlock.content.afterMessage) {
@@ -689,14 +694,9 @@
                     await sleep(100);
                 }
 
-                await sleep(200);
-                putThinkingGif();
-                await sleep(400 + Math.floor(Math.random() * 900));
-                removeThinkingGif();
-                await sleep(100);
-
                 print();
-                return getNextBlock(currentBlock.content.action);
+                console.log(" currentBlock: ", currentBlock)
+                return getNextBlock(currentBlock.content.action, currentBlock.content.BlockToGoId);
             }
 
             if (currentBlock.type == "User Input") { //validate user input
@@ -722,7 +722,7 @@
                 }
                 else {
                     // clear user input div
-                    $(".message-input").first().html('');
+                    //$(".message-input").last().html('');
                     if (currentBlock.content.afterMessage) {
                         sendAssistantMessage(currentBlock.content.afterMessage);
 
@@ -734,7 +734,8 @@
 
                     }
                 }
-                return getNextBlock(currentBlock.content.action);
+                console.log(" currentBlock: ", currentBlock)
+                return getNextBlock(currentBlock.content.action, currentBlock.content.BlockToGoId);
             }
             
             if (currentBlock.type == "Question") {
@@ -762,8 +763,9 @@
                         await sleep(100);
 
                         var action = blockAnswers[i].action;
-                        var blockToGoId = blockAnswers[i].blockToGoId;
-
+                        var blockToGoId = blockAnswers[i].blockToGoID;
+                        console.log(" blockAnswers[i].blockToGoId: ", blockAnswers[i].blockToGoId)
+                        console.log(" blockAnswers: ", blockAnswers)
                         return getNextBlock(action, blockToGoId);
                     }
                 }
@@ -803,7 +805,8 @@
                 targetBlock = blocks[currentBlock.order]; //order starts from 1 and array from 0 so it just needs the current .order
                 if (targetBlock === undefined) {
                      console.log('1');
-                     sendData().then((isSuccess) => {
+                    sendData().then((isSuccess) => {
+                        console.log("isSuccess: ", isSuccess)
                         if (isSuccess){
                             sendAssistantMessage("Thank you for your input. We'll be in touch.");
                         } else {
@@ -815,6 +818,9 @@
                 }
             } else if (action == "Go To Specific Block") {
                 for (var i = 0; i < blocks.length; i++) {
+                    console.log("blockToGoId: ", blockToGoId)
+                    console.log("blocks[i].id: ", blocks[i].id)
+                    console.log("blocks: ", blocks)
                     if (blocks[i].id == blockToGoId) {
                         targetBlock = blocks[i];
                     }

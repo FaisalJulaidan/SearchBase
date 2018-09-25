@@ -77,7 +77,7 @@
 
     <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
     <link rel='stylesheet prefetch'
-          href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
 </head>
 
 <style>
@@ -255,7 +255,7 @@
         float: right;
         border: none;
         width: 50px;
-        height: 40px;
+        /*height: 40px;*/
         padding: 12px 0;
         cursor: pointer;
         background: #32465a;
@@ -352,8 +352,8 @@
 
         <div class="message-input">
             <form id="fileUploadForm" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
-                <div class="wrap">
-                    <input name="file" onkeypress="handleEnter(event)" id="fileUploadB" type="file" placeholder="Write your message..." style="background-color:  white;"/><button type="button" onclick="submitAnswer('')" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                <div class="wrap" style="margin-top: 15px;min-height: 40px; background-color: white;">
+                    <label style="background-color: white;width: 84.37%;" for="fileUploadB"><i style="font-size: 30px;margin: 6px 0px 0px 10px;" class="fa fa-paperclip"></i></label><input hidden name="file" onkeypress="handleEnter(event)" id="fileUploadB" type="file" placeholder="Upload your file..." style="background-color: white;" /><button type="button" onclick="submitAnswer('')" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
                 </div>
             </form>
         </div>
@@ -616,6 +616,7 @@
         scrollTo('end')
     }
         function renderUserInput(block) {
+            chatInputDiv.style = "display:block;"
             $messageInput = $(".message-input").last();
             $userInput = $("<div class=\"wrap\">\n" +
                 "                <input onkeypress=\"handleEnter(event)\" " +
@@ -624,7 +625,6 @@
                 "            </div>");
 
             $('.messages').css('height','calc(100% - 40px)');
-            $('.message-input').css('height','40px');
 
             $messageInput.append($userInput);
             sendAssistantMessage(block.content.text)
@@ -651,6 +651,7 @@
             $('.messages').css('height', '100%');
             //$('.message-input').remove();
             $('#presetAnswers').remove();
+            chatInputDiv.style = "display:none;"
 
             sendDataSolutionsBlock(block.content.showTop)
                 .then((solutions) => {
@@ -678,11 +679,16 @@
                     await sleep(100);
 
                     sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
+                    chatInputDiv.style = "display:block";
                     return 0;
                 }
                 // clear file-upload div
                 //$(".message-input").last().html('');
                 //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
+
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+
+                print();
 
                 if (currentBlock.content.afterMessage) {
                     sendAssistantMessage(currentBlock.content.afterMessage);
@@ -693,9 +699,6 @@
                     removeThinkingGif();
                     await sleep(100);
                 }
-
-                print();
-                console.log(" currentBlock: ", currentBlock)
                 return getNextBlock(currentBlock.content.action, currentBlock.content.BlockToGoId);
             }
 
@@ -707,6 +710,8 @@
                     return 0;
 
                 $('#textMessage').val("");
+
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
 
                 print();
 
@@ -734,13 +739,13 @@
 
                     }
                 }
-                console.log(" currentBlock: ", currentBlock)
                 return getNextBlock(currentBlock.content.action, currentBlock.content.BlockToGoId);
             }
             
             if (currentBlock.type == "Question") {
                 // clear answers div
                 $("#presetAnswers").first().html('');
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
                 print();
 
                 await sleep(200);
@@ -764,8 +769,6 @@
 
                         var action = blockAnswers[i].action;
                         var blockToGoId = blockAnswers[i].blockToGoID;
-                        console.log(" blockAnswers[i].blockToGoId: ", blockAnswers[i].blockToGoId)
-                        console.log(" blockAnswers: ", blockAnswers)
                         return getNextBlock(action, blockToGoId);
                     }
                 }
@@ -773,7 +776,6 @@
 
             function print() {
                 // print the selected answer
-                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
                 if (blockKeywords)
                     blockKeywords = Boolean(blockKeywords.split) ? blockKeywords.split(',') : blockKeywords;
 

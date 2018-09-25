@@ -698,7 +698,7 @@
 
                 print();
                 console.log(" currentBlock: ", currentBlock)
-                return getNextBlock(currentBlock.content.action, blockToGoId);
+                return getNextBlock(currentBlock.content.action, currentBlock.content.BlockToGoId);
             }
 
             if (currentBlock.type == "User Input") { //validate user input
@@ -737,7 +737,7 @@
                     }
                 }
                 console.log(" currentBlock: ", currentBlock)
-                return getNextBlock(currentBlock.content.action, blockToGoId);
+                return getNextBlock(currentBlock.content.action, currentBlock.content.BlockToGoId);
             }
             
             if (currentBlock.type == "Question") {
@@ -765,7 +765,7 @@
                         await sleep(100);
 
                         var action = blockAnswers[i].action;
-                        var blockToGoId = blockAnswers[i].blockToGoId;
+                        var blockToGoId = blockAnswers[i].blockToGoID;
                         console.log(" blockAnswers[i].blockToGoId: ", blockAnswers[i].blockToGoId)
                         console.log(" blockAnswers: ", blockAnswers)
                         return getNextBlock(action, blockToGoId);

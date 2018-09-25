@@ -6,12 +6,10 @@
     z-index: 999999999999999999999999999999999999999999999999999999999999999999999999999999999990987;
 }
 
-/*#TSB-container {*/
-  /*all: initial; !* blocking inheritance for all properties *!*/
-/*}*/
-/*#TSB-container * {*/
-  /*all: unset; !* allowing inheritance within #mydiv *!*/
-/*}*/
+#TSB-chatbot-widget {
+
+}
+
 .TSB-bot-title {
     font-family: Cabin, Helvetica, Arial, sans-serif;
 }

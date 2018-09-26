@@ -35,6 +35,8 @@
     .normalCursor {
         cursor: default !important;
         background-color: #fff !important;
+        width: 120px;
+        margin-left: 104px;
     }
 
     .clickable {
@@ -1497,8 +1499,8 @@
 
                     if (block_template.name == "File Upload") {
                         content = getQuestionElement() +
-                            getActionElement(block_template.actions) +
                             getFileUpload(block_template.typesAllowed, block_template.fileMaxSize, block.content.fileTypes) +
+                            getActionElement(block_template.actions) +
                             getAfterMessageInput(block.content.afterMessage) +
                             getSubmitElement(true, 'x');
                     }
@@ -1679,8 +1681,8 @@
 
                     if (block_template.name == "File Upload") {
                         templateHTML = getQuestionElement() +
-                            getActionElement(block_template.actions) +
                             getFileUpload(block_template.typesAllowed, block_template.fileMaxSize) +
+                            getActionElement(block_template.actions) +
                             getAfterMessageInput() +
                             getSubmitElement(true, 'x');
                     }

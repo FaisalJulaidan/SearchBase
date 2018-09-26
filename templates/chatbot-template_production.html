@@ -375,6 +375,7 @@
     var BOT_USER = 'bot';
     var CLIENT_USER = 'user';
     var chatInputDiv = document.getElementById("fileUploadForm");
+    var thinkingGifLife = 1200 + Math.floor(Math.random() * 1500);
 
     // This function will get the blocks from the server by assistantID and set the blocks array to be used to create
     // the cahtbot conversational flow
@@ -679,7 +680,7 @@
 
                     await sleep(200);
                     putThinkingGif();
-                    await sleep(500 + Math.floor(Math.random() * 900));
+                    await sleep(thinkingGifLife);
                     removeThinkingGif();
                     await sleep(200);
 
@@ -695,7 +696,7 @@
 
                 await sleep(200);
                 putThinkingGif();
-                await sleep(500 + Math.floor(Math.random() * 900));
+                await sleep(thinkingGifLife);
                 removeThinkingGif();
                 await sleep(200);
 
@@ -706,11 +707,11 @@
 
                     await sleep(200);
                     putThinkingGif();
-                    await sleep(500 + Math.floor(Math.random() * 900));
+                    await sleep(thinkingGifLife);
                     removeThinkingGif();
                     await sleep(200);
                 }
-                return getNextBlock(currentBlock.content.action, currentBlock.content.BlockToGoId);
+                return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
             }
 
             if (currentBlock.type == "User Input") { //validate user input
@@ -728,7 +729,7 @@
 
                 await sleep(200);
                 putThinkingGif();
-                await sleep(500 + Math.floor(Math.random() * 900));
+                await sleep(thinkingGifLife);
                 removeThinkingGif();
                 await sleep(200);
 
@@ -744,14 +745,12 @@
 
                         await sleep(200);
                         putThinkingGif();
-                        await sleep(500 + Math.floor(Math.random() * 900));
+                        await sleep(thinkingGifLife);
                         removeThinkingGif();
                         await sleep(200);
 
                     }
                 }
-                console.log("currentBlock: ", currentBlock)
-                console.log("currentBlock.content.blockToGoID: ", currentBlock.content.blockToGoID)
                 return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
             }
             
@@ -763,7 +762,7 @@
 
                 await sleep(200);
                 putThinkingGif();
-                await sleep(500 + Math.floor(Math.random() * 900));
+                await sleep(thinkingGifLife);
                 removeThinkingGif();
                 await sleep(200);
 
@@ -776,7 +775,7 @@
 
                             await sleep(200);
                             putThinkingGif();
-                            await sleep(500 + Math.floor(Math.random() * 900));
+                            await sleep(thinkingGifLife);
                             removeThinkingGif();
                             await sleep(200);
                         }
@@ -822,8 +821,6 @@
 
             } else if (action == "Go To Specific Block") {
                 for (var i = 0; i < blocks.length; i++) {
-                    console.log("blockToGoId: ", blockToGoId)
-                    console.log("blocks[i].id: ", currentBlock.order)
                     if (blocks[i].order == blockToGoId) {
                         targetBlock = blocks[i];
                     }
@@ -832,7 +829,6 @@
 
             // 2
             if (targetBlock === undefined) {
-                console.log('2');
                 sendData().then((isSuccess) => {
                     if (isSuccess){
                         sendAssistantMessage("Thank you for your input. We'll be in touch.");

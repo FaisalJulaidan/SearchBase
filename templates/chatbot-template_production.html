@@ -750,6 +750,10 @@
 
                     }
                 }
+                console.log("currentBlock: ", currentBlock)
+                console.log("currentBlock.content.BlockToGoId: ", currentBlock.content.BlockToGoId)
+                console.log("currentBlock.content.blocktogoid: ", currentBlock.content.blocktogoid)
+                console.log("currentBlock.properties: ", currentBlock.properties)
                 return getNextBlock(currentBlock.content.action, currentBlock.content.BlockToGoId);
             }
             

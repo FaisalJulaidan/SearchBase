@@ -1,11 +1,12 @@
 var globalTSB = {
     id: undefined,
     host: 'https://www.thesearchbase.com',
-    // host: 'http://localhost:5000',
+    //host: 'http://localhost:5000',
     files_path: '/userdownloads',
     iframe_route: '/chatbottemplate_production'
 };
 
+var fullLoad = { "jquery": false, "popupsettings": false };
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -186,7 +187,8 @@ window.onload = (async function (global) {
         return new Promise(function(resolve, reject){
             var xhr = new XMLHttpRequest();
             xhr.open('GET', host + '/getpopupsettings/' + id);
-            xhr.onload = function() {
+            xhr.onload = function () {
+                fullLoad["popupsettings"] = true;
                 if (xhr.status === 200) {
                     popupSec = JSON.parse(xhr.responseText).data.SecondsUntilPopUp;
                     return resolve(true);
@@ -201,17 +203,41 @@ window.onload = (async function (global) {
 
      }
 
-     getPopupSettings().then(e => {
-         if(popupSec && !popOpen){
-             setTimeout(function () {
-                 if (!popOpen) {
-                     document.getElementById('TSB-chatbot-widget').click();
-                 }
-             }, popupSec * 1000);
+    getPopupSettings();
+    
+    var interval = setInterval(checkForFullLoad, 500);
+
+    function checkForFullLoad() {
+        try {
+            $("#TSB-container"); //check if jquery has loaded
+            fullLoad["jquery"] = true;
+        } catch (error) { console.log(error); }
+        if (fullLoad["jquery"] && fullLoad["popupsettings"]) {
+            console.log("Got in?")
+            fadein(document.getElementById("TSB-container"));
+            clearInterval(interval);
+
+            setTimeout(function () {
+                if (!popOpen) {
+                    document.getElementById('TSB-chatbot-widget').click();
+                }
+            }, popupSec * 1000);
         }
-     });
+    }
 
-
+    function fadein(element) {
+        var op = 0.1;  // initial opacity
+        element.style.opacity = op;
+        element.style.display = 'block';
+        var timer = setInterval(function () {
+            if (op >= 1) {
+                clearInterval(timer);
+            }
+            element.style.opacity = op;
+            element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+            op += op * 0.1;
+        }, 10);
+    }
 
 
 

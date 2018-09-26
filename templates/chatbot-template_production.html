@@ -375,6 +375,7 @@
     var BOT_USER = 'bot';
     var CLIENT_USER = 'user';
     var chatInputDiv = document.getElementById("fileUploadForm");
+    var thinkingGifLife = 1200 + Math.floor(Math.random() * 1500);
 
     // This function will get the blocks from the server by assistantID and set the blocks array to be used to create
     // the cahtbot conversational flow
@@ -427,6 +428,7 @@
 
     // This should send the data to the server, without returning any solutions back
     function sendData() {
+        putThinkingGif();
         var solutions = [];
         params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": 0};
         console.log("Send data...");
@@ -438,7 +440,7 @@
             data: JSON.stringify(params)
 
         }).done(function (res) {
-
+            removeThinkingGif();
             console.log("Data sent successfully!");
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
@@ -446,6 +448,7 @@
             return true;
 
         }).fail(function (res) {
+            removeThinkingGif();
             console.log("Error in retrieving blocks.");
             console.log(res);
             return false
@@ -453,6 +456,7 @@
     }
 
     function sendDataSolutionsBlock(showTop) {
+        putThinkingGif();
         params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": showTop};
 
         return $.ajax({
@@ -462,6 +466,7 @@
             data: JSON.stringify(params)
 
         }).done(function (res) {
+            removeThinkingGif();
 
             console.log("Solutions retrieved successfully!");
             var data = JSON.parse(res).data;
@@ -471,6 +476,7 @@
             return solutions;
 
         }).fail(function (res) {
+            removeThinkingGif();
             console.log("Error in retrieving blocks.");
             console.log(res);
             });
@@ -674,7 +680,7 @@
 
                     await sleep(200);
                     putThinkingGif();
-                    await sleep(500 + Math.floor(Math.random() * 900));
+                    await sleep(thinkingGifLife);
                     removeThinkingGif();
                     await sleep(200);
 
@@ -690,7 +696,7 @@
 
                 await sleep(200);
                 putThinkingGif();
-                await sleep(500 + Math.floor(Math.random() * 900));
+                await sleep(thinkingGifLife);
                 removeThinkingGif();
                 await sleep(200);
 
@@ -701,11 +707,11 @@
 
                     await sleep(200);
                     putThinkingGif();
-                    await sleep(500 + Math.floor(Math.random() * 900));
+                    await sleep(thinkingGifLife);
                     removeThinkingGif();
                     await sleep(200);
                 }
-                return getNextBlock(currentBlock.content.action, currentBlock.content.BlockToGoId);
+                return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
             }
 
             if (currentBlock.type == "User Input") { //validate user input
@@ -723,7 +729,7 @@
 
                 await sleep(200);
                 putThinkingGif();
-                await sleep(500 + Math.floor(Math.random() * 900));
+                await sleep(thinkingGifLife);
                 removeThinkingGif();
                 await sleep(200);
 
@@ -739,13 +745,13 @@
 
                         await sleep(200);
                         putThinkingGif();
-                        await sleep(500 + Math.floor(Math.random() * 900));
+                        await sleep(thinkingGifLife);
                         removeThinkingGif();
                         await sleep(200);
 
                     }
                 }
-                return getNextBlock(currentBlock.content.action, currentBlock.content.BlockToGoId);
+                return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
             }
             
             if (currentBlock.type == "Question") {
@@ -756,7 +762,7 @@
 
                 await sleep(200);
                 putThinkingGif();
-                await sleep(500 + Math.floor(Math.random() * 900));
+                await sleep(thinkingGifLife);
                 removeThinkingGif();
                 await sleep(200);
 
@@ -769,7 +775,7 @@
 
                             await sleep(200);
                             putThinkingGif();
-                            await sleep(500 + Math.floor(Math.random() * 900));
+                            await sleep(thinkingGifLife);
                             removeThinkingGif();
                             await sleep(200);
                         }
@@ -815,8 +821,6 @@
 
             } else if (action == "Go To Specific Block") {
                 for (var i = 0; i < blocks.length; i++) {
-                    console.log("blockToGoId: ", blockToGoId)
-                    console.log("blocks[i].id: ", currentBlock.order)
                     if (blocks[i].order == blockToGoId) {
                         targetBlock = blocks[i];
                     }
@@ -825,7 +829,6 @@
 
             // 2
             if (targetBlock === undefined) {
-                console.log('2');
                 sendData().then((isSuccess) => {
                     if (isSuccess){
                         sendAssistantMessage("Thank you for your input. We'll be in touch.");

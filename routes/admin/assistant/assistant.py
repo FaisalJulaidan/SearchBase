@@ -10,7 +10,7 @@ assistant_router: Blueprint = Blueprint('assistant_router', __name__ , template_
 @assistant_router.route("/admin/assistant/create", methods=['GET'])
 def create_assistant_page():
     if request.method == "GET":
-        return admin_services.render("admin/create-assistant.html", templates={'names': ["recruitment"]})
+        return admin_services.render("admin/create-assistant.html", templates={'names': ["recruitment", "newjjjj"]})
 
 @assistant_router.route("/admin/assistant", methods=['POST'])
 def assistant():

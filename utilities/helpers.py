@@ -11,24 +11,24 @@ def hashPass(password, salt=gensalt()):
 
 
 
-def hardRedirectWithMessage(function, message):
+def hardRedirectWithMessage(route, message):
     session["returnMessage"] = message
-    return redirect(function)
+    return redirect(route)
 
-def redirectWithMessage(function, message):
+def redirectWithMessage(route, message):
     session["returnMessage"] = message
-    if "/" in function:
-        return redirect(function)
+    if "/" in route:
+        return redirect(route)
     else:
-        return redirect(url_for("." + function))
+        return redirect(url_for("." + route))
 
-def redirectWithMessageAndAssistantID(function, assistantID, message):
+def redirectWithMessageAndAssistantID(route, assistantID, message):
     session["returnMessage"] = message
-    return redirect(url_for("." + function, assistantID=assistantID))
-    if "/" in function:
-        return redirect(function)
+    return redirect(url_for("." + route, assistantID=assistantID))
+    if "/" in route:
+        return redirect(route)
     else:
-        return redirect(url_for("." + function, assistantID=assistantID))
+        return redirect(url_for("." + route, assistantID=assistantID))
 
 def checkForMessage():
     message = session.get('returnMessage', "")

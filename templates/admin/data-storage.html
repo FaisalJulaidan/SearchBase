@@ -78,15 +78,15 @@
 
     var headings = "";
     for (var i = 0; i < maxLength; i++) {
-        headings += "<th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Data</th>";
+        headings += "<th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Input "+(i+1)+"</th>";
     }
 
     tableString = "<table id=\"tableSort\" class=\"table\" cellspacing=\"0\" width=\"100 %\"><thead>\
-                            <tr id=\"tableHeadingUIn\" class=\"headings\"><th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Date and Time</th>"+ headings +"</tr></thead>\
+                            <tr id=\"tableHeadingUIn\" class=\"headings\"><th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Date and Time</th>"+ headings +"<th>Action</th></tr></thead>\
                             <tbody id=\"tBodyUIn\">";
     var filename = undefined;
     {%for record in data %}
-        tableString += "<tr><td>"+"{{record['dateTime']}}".split(".")[0]+"</td>"
+        tableString += "<tr id='tableRecord{{record['id']}}'><td>"+"{{record['dateTime']}}".split(".")[0]+"</td>"
         {%for value in record['data']['collectedInformation'] %}
             {%if '&FILE_UPLOAD&' in value['input'] %}
                 filename = "{{record['filePath']}}";
@@ -95,7 +95,7 @@
                 tableString += "<td><a class=\"tds\">{{value['input']}}<span>{{value['questionText']}}</span></a></td>"
             {%endif%}
         {% endfor %}
-        tableString += "</tr>"
+        tableString += "<td><a type='button' style='cursor: pointer;' onclick='deleteRecord({{record['id']}})'>Delete</a></td></tr>"
     {% endfor %}
 
     tableString += "</tbody></table>";
@@ -124,6 +124,24 @@
             sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
 
         return (sa);
+    }
+
+    function deleteRecord(recordID) {
+        $("#tableRecord" + recordID).children().last().text('...');
+        $.ajax({
+            url: '/admin/assistant/{{assistantID}}/'+recordID+'/delete',
+            type: "GET"
+        }).done(function (res) {
+            if (res === "True") {
+                console.log("Record deleted");
+                $("#tableRecord" + recordID).remove();
+            }
+        }).fail(function (res) {
+            console.log("Error in deleting record.");
+            console.log(res);
+            $("#tableRecord" + recordID).children().last().text('Delete');
+            alertError('Error', 'Error in deleting record')
+        });
     }
 </script>
 {% endblock %}

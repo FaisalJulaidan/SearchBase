@@ -49,7 +49,6 @@ def before_request():
 
     # If the user try to visit one of the restricted routes without logging in he will be redirected
     if any(route in currentURL for route in restrictedRoutes):
-        print("Security Check For Restricted Routes")
         if not session.get('Logged_in', False):
             return redirect('login')
         try:

@@ -124,12 +124,6 @@ window.onload = (async function (global) {
         await sleep(100);
     }
 
-
-    // Animations
-    function reloadIframe(){
-      document.getElementById('TSB-chatbotIframe').src = host  + iframe_route + '/' + id;
-    }
-
     document.getElementById("TSB-iframediv").style.display = "none";
 
     // Open iframe
@@ -150,8 +144,6 @@ window.onload = (async function (global) {
                 height: '370px',
                 opacity: '1',
             });
-
-            reloadIframe();
             popOpen = true;
         }
 
@@ -175,11 +167,6 @@ window.onload = (async function (global) {
             })
             popOpen = false;
         }
-    });
-
-    // Reset the iframe
-     document.getElementById('TSB-refreshIframe').addEventListener('click', e => {
-       reloadIframe()
     });
 
      // Popup
@@ -215,6 +202,7 @@ window.onload = (async function (global) {
         if (fullLoad["jquery"] && fullLoad["popupsettings"]) {
             fadein(document.getElementById("TSB-container"));
             clearInterval(interval);
+            document.getElementById('TSB-chatbotIframe').src = host + iframe_route + '/' + id;
 
             setTimeout(function () {
                 if (!popOpen) {

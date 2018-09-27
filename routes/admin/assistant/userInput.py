@@ -15,6 +15,7 @@ def admin_user_input(assistantID):
         if not userInput_callback.Success : return admin_services.render("admin/data-storage.html", data=[], route=[])
         result = []
         for d in userInput_callback.Data:
+            print({'data': d.Data, 'filePath': d.FilePath, "dateTime": d.DateTime})
             result.append({'data': d.Data, 'filePath': d.FilePath, "dateTime": d.DateTime})
         print(result)
         route = BaseConfig.USER_FILES

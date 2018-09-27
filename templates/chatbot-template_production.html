@@ -350,8 +350,8 @@
         </div>
 
 
-        <div class="message-input">
-            <form id="fileUploadForm" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
+        <div class="message-input" id="message-input">
+            <form id="fileUploadForm" action="/" method="get" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
                 <div class="wrap" style="margin-top: 15px;min-height: 40px; background-color: white;">
                     <label style="background-color: white;width: 84.37%;" for="fileUploadB"><i style="font-size: 30px;margin: 6px 0px 0px 10px;" class="fa fa-paperclip"></i></label><input hidden name="file" onkeypress="handleEnter(event)" id="fileUploadB" type="file" placeholder="Upload your file..." style="background-color: white;" /><button type="button" onclick="submitAnswer('')" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
                 </div>
@@ -374,8 +374,9 @@
     var welcomeMessage = "";
     var BOT_USER = 'bot';
     var CLIENT_USER = 'user';
-    var chatInputDiv = document.getElementById("fileUploadForm");
-    var thinkingGifLife = 1200 + Math.floor(Math.random() * 1500);
+    var chatInputDiv = document.getElementById("message-input");
+    var fileUploadForm = document.getElementById('fileUploadForm');
+    var thinkingGifLife = 800 + Math.floor(Math.random() * 1200);
 
     // This function will get the blocks from the server by assistantID and set the blocks array to be used to create
     // the cahtbot conversational flow
@@ -394,14 +395,12 @@
             blocks = data.blocks;
             welcomeMessage = assistant.message
             // Start the chatbot
-            console.log(assistant)
-            console.log(welcomeMessage)
             start();
 
         }).fail(function (res) {
             console.log("Error in retrieving blocks.");
             console.log(res);
-        });
+            });
     }
 
 
@@ -444,7 +443,7 @@
             console.log("Data sent successfully!");
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
-            {#sendFile();#}
+            sendFile();
             return true;
 
         }).fail(function (res) {
@@ -472,7 +471,7 @@
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
             solutions = data["solutions"];
-            {#sendFile();#}
+            sendFile();
             return solutions;
 
         }).fail(function (res) {
@@ -483,7 +482,8 @@
     }
 
     function sendFile() {
-        $("#fileUploadForm").submit();
+        console.log("init form")
+        sendFileForm();
     }
 
     function sendFileForm() {
@@ -502,7 +502,7 @@
                 alert('An error occurred!');
             }
         };
-
+        
         xhr.send(formData);
 
         return false;
@@ -622,7 +622,7 @@
     }
         function renderUserInput(block) {
             chatInputDiv.style = "display:block;";
-            document.getElementById('fileUploadForm').style.display = 'none';
+            fileUploadForm.style.display = 'none';
             $messageInput = $(".message-input").last();
             $userInput = $("<div class=\"wrap\" style=\"margin-top: 15px;min-height: 40px; background-color: white;\">\n" +
                 "                <input onkeypress=\"handleEnter(event)\" " +
@@ -651,12 +651,12 @@
 
             sendAssistantMessage(block.content.text);
             chatInputDiv.style = "display:block";
-            document.getElementById('fileUploadForm').style.display = 'block';
+            fileUploadForm.style.display = 'block';
         }
 
         function renderSolutions(block) {
             $('.messages').css('height', '100%');
-            $('.message-input').remove();
+            $('.message-input').hide();
             $('#presetAnswers').remove();
             chatInputDiv.style = "display:none;";
 
@@ -670,7 +670,7 @@
         async function submitAnswer(message, blockKeywords = undefined) {
 
             chatInputDiv.style = "display:none";
-            document.getElementById('fileUploadForm').style.display = 'none';
+            fileUploadForm.style.display = 'none';
 
             if (currentBlock.type == "File Upload") {
                 //needs rework
@@ -686,6 +686,7 @@
 
                     sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
                     chatInputDiv.style = "display:block";
+                    fileUploadForm.style.display = 'block';
                     return 0;
                 }
                 // clear file-upload div
@@ -735,6 +736,7 @@
 
                 if (!validateUserInput(message, currentBlock.content.validation)) {
                     sendAssistantMessage("I am sorry but that was not in the format I think it should be...");
+                    chatInputDiv.style = "display:block";
                     return 0;
                 }
                 else {
@@ -897,28 +899,6 @@
 
             return true;
         }
-
-        function sendFileForm() {
-        var formData = new FormData();
-        var fileInput = document.getElementById('fileUploadB').files[0];
-
-        formData.append('file', fileInput, fileInput.name);
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', "../assistant/" + sessionID + "/file", true);
-
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                console.log("File Sent");
-            } else {
-                alert('An error occurred!');
-            }
-        };
-
-        xhr.send(formData);
-
-        return false;
-    }
 
         function addKeywords(blockKeywords) {
             var addIn = true;
@@ -1084,58 +1064,3 @@
 
 </body>
 </html>
-
-{##}
-{#    <div class="top_right">#}
-{#        <img style="width:20px; height: 20px; margin: 10px; top: 0px; right: 0px; position: fixed;" src="/static/img/bg-img/Icons8-Windows-8-Computer-Hardware-Restart.ico" onclick="Reset()">#}
-{#    </div>#}
-{##}
-{#    <div class="outerContainer">#}
-{#        <div class="innerContainer">#}
-{#            <div class="element">#}
-{#                <!-- <div class="chat-box">#}
-{#                <div class="open">Open#}
-{#                    <div class="box"> -->#}
-{#                <center>#}
-{#                    <ul id="messagesContainer">#}
-{#                        <!-- paste here the yeyo -->#}
-{#                    </ul>#}
-{#                </center>#}
-{#                <div id="separator">#}
-{#                    <br>#}
-{#                    <br>#}
-{#                    <br>#}
-{#                    <br>#}
-{#                    <br>#}
-{#                    <br>#}
-{#                    <br>#}
-{#                    <div id="chatBottom"></div>#}
-{#                </div>#}
-{#                <footer id="chatFooter">#}
-{#                    <div id="bottomContainer">#}
-{#                        <div id="optionsDiv">#}
-{#                        </div>#}
-{#                        <!-- <ul> -->#}
-{#                        <div id="ChatInputDiv">#}
-{#                            <!--<input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><input type="file" id="fileUploadB" size="10" /><img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />-->#}
-{#                            <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage">#}
-{#                            <form id="fileUploadForm" class="image-upload" style="display:none" onsubmit="return sendFileForm();">#}
-{#                                <label for="fileUploadB">#}
-{#                                    <img src="https://www.thesearchbase.com/static/images/cloud-upload.png" />#}
-{#                                </label>#}
-{##}
-{#                                <input name="file" hidden id="fileUploadB" type="file" />#}
-{#                            </form>#}
-{#                            <img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitAnswer('')" />#}
-{#                        </div>#}
-{#                        <!-- </ul> -->#}
-{#                    </div>#}
-{#                </footer>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
-{#    <!-- </div>#}
-{#    </div>#}
-{#    </div> -->#}
-{#    <script src="/static/chatbot/script.js"></script>#}
-{##}

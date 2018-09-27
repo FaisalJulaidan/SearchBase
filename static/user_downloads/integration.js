@@ -211,9 +211,8 @@ window.onload = (async function (global) {
         try {
             $("#TSB-container"); //check if jquery has loaded
             fullLoad["jquery"] = true;
-        } catch (error) { console.log(error); }
+        } catch (error) { }
         if (fullLoad["jquery"] && fullLoad["popupsettings"]) {
-            console.log("Got in?")
             fadein(document.getElementById("TSB-container"));
             clearInterval(interval);
 

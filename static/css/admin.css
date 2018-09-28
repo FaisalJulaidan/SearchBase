@@ -1,8 +1,18 @@
 /*Edit Icon Button*/
 
 body {
-    background-color: #fafbfe;
+    background-color: #F7F7F7;
 }
+
+html,body { height:100%; }
+
+.main_container{margin-top: -20px}
+
+.right_col{height:100%;}
+
+.left_col{margin-bottom:-50px;}
+
+
 
 .editIcon {
     width: 12px;

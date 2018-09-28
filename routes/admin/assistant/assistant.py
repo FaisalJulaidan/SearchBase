@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, session
-from services import statistics_services, assistant_services,admin_services, user_services
+from services import statistics_services, assistant_services,admin_services, user_services, bot_services
 from models import Callback, Assistant, User
 from utilities import helpers
 
@@ -10,7 +10,7 @@ assistant_router: Blueprint = Blueprint('assistant_router', __name__ , template_
 @assistant_router.route("/admin/assistant/create", methods=['GET'])
 def create_assistant_page():
     if request.method == "GET":
-        return admin_services.render("admin/create-assistant.html")
+        return admin_services.render("admin/create-assistant.html", templates={'names': ["recruitment", "newjjjj"]})
 
 @assistant_router.route("/admin/assistant", methods=['POST'])
 def assistant():
@@ -30,11 +30,21 @@ def assistant():
         name = request.form.get("name", default='').strip()
         welcomeMsg = request.form.get("welcome-message", default='').strip()
         timePopup = request.form.get("timeto-autopop", default='').strip()
+        templateName = request.form.get("template-name", default='').strip()
 
-        callback: Callback = assistant_services.create(name, None, welcomeMsg, timePopup, user.Company)
-        if not callback.Success:
+        assistant_callback: Callback = assistant_services.create(name, None, welcomeMsg, timePopup, user.Company)
+        if not assistant_callback.Success:
             return helpers.jsonResponse(False, 400, "Couldn't create the assistant", None)
-        return helpers.jsonResponse(True, 200, callback.Message, callback.Data.ID)
+
+        if 'none' not in templateName:
+            print('create assistant with template')
+            callback_bot: Callback = bot_services.genBotViaTemplate(assistant_callback.Data, templateName)
+            if not callback_bot.Success:
+                # if template has an error remove the created assistant
+                assistant_services.removeByID(assistant_callback.Data.ID)
+                return helpers.jsonResponse(False, 400, "Error with the selected template.", callback_bot.Message)
+
+        return helpers.jsonResponse(True, 200, callback.Message, {'id': assistant_callback.Data.ID})
 
 
 # get all assistants

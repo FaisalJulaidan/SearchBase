@@ -10,8 +10,11 @@
     "afterMessage": {"type": "string"}
   },
   "required": [
+    "text",
     "action",
-    "validation"
+    "validation",
+    "afterMessage",
+    "blockToGoID"
   ],
   "additionalProperties": false
 }

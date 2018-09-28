@@ -19,7 +19,9 @@
         "required": [
           "text",
           "keywords",
-          "action"
+          "action",
+          "afterMessage",
+          "blockToGoID"
         ],
         "additionalProperties": false
       }

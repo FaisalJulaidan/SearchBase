@@ -32,6 +32,7 @@ window.onload = (async function (global) {
     }
 
 
+
     // Config
     var host = globalTSB.host;
     var files_path = globalTSB.files_path;
@@ -41,6 +42,15 @@ window.onload = (async function (global) {
     var integration_file = host + files_path + 'integration.js';
     var id = document.querySelector('script[data-name="tsb-widget"][data-id]').getAttribute('data-id');
     globalTSB.id = id;
+
+    function clickToShowColor() {
+        var script = document.getElementsByTagName('script')[0];
+        return {
+            icon: script.getAttribute('data-icon'),
+            circle: script.getAttribute('data-circle')
+        };
+    }
+
 
 
     // Tags to be added
@@ -75,7 +85,7 @@ window.onload = (async function (global) {
     var btnDiv = document.createElement('div');
     btnDiv.id = 'TSB-chatbot-widget';
 
-    btnDiv.innerHTML = ' <div class="TSB-circle">\n' +
+    btnDiv.innerHTML = ' <div class="TSB-circle" style="background-color: '+ clickToShowColor().circle +'; color: '+clickToShowColor().icon+'; ">\n' +
         '               <i class="fa fa-cloud"></i>\n' +
         '             </div>';
 
@@ -204,7 +214,7 @@ window.onload = (async function (global) {
      }
 
     getPopupSettings();
-    
+
     var interval = setInterval(checkForFullLoad, 500);
 
     function checkForFullLoad() {

@@ -264,20 +264,20 @@
                     $('li > .panel-body').slideUp();
                     $('li > .panel-heading').addClass('panel-collapsed');
                     $('button.blockType').attr('disabled', '');
-                    $('i.indicator').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+                    $('i.indicator').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
 
                     // now open the $this
                     $this.removeClass('panel-collapsed');
                     $this.parents('.panel').find('.panel-body').slideDown();
                     $this.find('button.blockType').removeAttr('disabled');
-                    $this.find('i.indicator').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+                    $this.find('i.indicator').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
                 }
                 // close a panel
                 else {
                     $this.addClass('panel-collapsed');
                     $this.parents('.panel').find('.panel-body').slideUp();
                     $this.find('button.blockType').attr('disabled', '');
-                    $this.find('i.indicator').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+                    $this.find('i.indicator').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
                 }
             });
 
@@ -805,6 +805,7 @@
                                 afterMessage: afterMessage,
                                 blockToGoID: blockToGoID
                             });
+                            console.log("answersArr: ", answersArr)
                         }
                     }
 
@@ -1243,28 +1244,26 @@
 
                     $answers.append($("<div class='row'></div>"));
                     for (let i = 0; i < answers.length; i++) {
-                        if (rowSize <= 3) {
-                            answerTemplate = $(getAnswerTemplate(actions));
-                            answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
-                            answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
-                            answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
-                            if (answers[i].action == "Go To Specific Block") {
-                                answerTemplate = answerTemplate.replace('GOTO_ID_INPUT', "<input type=\"number\" min=\"1\" max=\"" + blocksNumber + "\" class=\"blockToGoID form-control\" value=\"" + answers[i].blockToGoID + "\"/>");
-                            } else {
-                                answerTemplate = answerTemplate.replace('GOTO_ID_INPUT', "");
-                            }
-                            answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].text);
-                            answerTemplate = answerTemplate.replace('AFTER_MESSAGE_VALUE', answers[i].afterMessage);
-
-                            $answers.children().last().append(answerTemplate);
-
-                            rowSize++;
-                        }
-                        else {
+                        if (rowSize >= 3) {
                             $answers.append($("<div class='row'></div>"));
 
-                            rowSize = 1;
+                            rowSize = 0;
                         }
+                        answerTemplate = $(getAnswerTemplate(actions));
+                        answerTemplate.find('.panel-title').html(`Answer- ${(i + 1)}`);
+                        answerTemplate = answerTemplate[0].outerHTML.replace('KEYWORDS_VALUES', answers[i].keywords.join(', '));
+                        answerTemplate = answerTemplate.replace('ANSWER_ACTION', answers[i].action);
+                        if (answers[i].action == "Go To Specific Block") {
+                            answerTemplate = answerTemplate.replace('GOTO_ID_INPUT', "<input type=\"number\" min=\"1\" max=\"" + blocksNumber + "\" class=\"blockToGoID form-control\" value=\"" + answers[i].blockToGoID + "\"/>");
+                        } else {
+                            answerTemplate = answerTemplate.replace('GOTO_ID_INPUT', "");
+                        }
+                        answerTemplate = answerTemplate.replace('ANSWER_VALUE', answers[i].text);
+                        answerTemplate = answerTemplate.replace('AFTER_MESSAGE_VALUE', answers[i].afterMessage);
+
+                        $answers.children().last().append(answerTemplate);
+
+                        rowSize++;
                     }
 
                     return $answers[0].outerHTML;
@@ -1305,7 +1304,7 @@
                         "      </div>" +
 
                         // Keywords
-                        "      <label for=\"input\">Kewords:</label>\n" +
+                        "      <label for=\"input\">Keywords:</label>\n" +
                         "      <input name='tags' value='KEYWORDS_VALUES'>\n" +
 
                         // AFTER MESSAGES
@@ -1377,8 +1376,8 @@
                         "            <b class=\"id-header\">BLOCK_ID_HEADER - </b> <b class=\"title\">BLOCK_TEXT</b>\n" +
                         "        </div>\n" +
                         "        <span class=\"pull-right clickable\" style='color:#660ff2;margin-left:15px'><i class=\"trash glyphicon glyphicon-trash\"></i></span>\n" +
-                        "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"indicator glyphicon glyphicon-chevron-up\"></i></span>\n" +
-                        "        <div class=\"col-xs-11  col-sm-5 col-md-4 pull-right\" style=\"margin-top: -30px;margin-right:-9px\">\n" +
+                        "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"indicator glyphicon glyphicon-chevron-down\"></i></span>\n" +
+                        "        <div class=\"col-xs-11  col-sm-5 col-md-4 pull-right\" style=\"margin-top: -30px;\">\n" +
                         "            <div class=\"input-group\">\n" +
                         "                <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor questionTypeInput\" disabled aria-label=\"...\" value=\"BLOCK_TYPE\">" +
                         "                <div class=\"input-group-btn\">\n" +

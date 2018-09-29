@@ -44,10 +44,12 @@ app.register_blueprint(emoji_router)
 #8 hour periodic timer
 def eightHourTimer():
     mail_services.notifyNewRecordsForLastXHours(8)
+    threading.Timer(10, eightHourTimer).start()
 
-    threading.Timer(28800, eightHourTimer).start()
+def startTimer():
+    threading.Timer(10, eightHourTimer).start()
 
-threading.Timer(28800, eightHourTimer).start()
+startTimer()
 
 # Code to ensure user is logged in
 @app.before_request

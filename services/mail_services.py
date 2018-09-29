@@ -3,10 +3,10 @@ import sqlalchemy.exc
 from flask import Flask, render_template, current_app
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
-from models import Callback, db
+from models import Callback, db, Newsletter
 from threading import Thread
 from time import sleep  
-from services import user_services, assistant_services
+from services import user_services, assistant_services, analytics_services, newsletter_services
 from datetime import datetime
 
 
@@ -71,21 +71,32 @@ def addedNewUserEmail(adminEmail, targetEmail, password):
 #NOTIFICATIONS
 def notifyNewRecordsForLastXHours(hours):
     try:
-        newsletters = db.session.query(Newsletter)
+        print("0")
+        newsletters_callback : Callback = newsletter_services.getAll()
+        if not newsletters_callback.Success: raise Exception("newsletters_callback: ", newsletters_callback.Message)
+
         for record in newsletters:
+            print("1")
             user_callback : Callback = user_services.getByEmail(record.Email)
-            if not user_callback: raise Exception(user_callback.Message)
+            if not user_callback.Success: raise Exception("user_callback: ", user_callback.Message)
+            print("2")
 
             assistants_callback : Callback = assistant_services.getAll(user_callback.Data.CompanyID)
-            if not assistants_callback: raise Exception(assistants_callback.Message)
+            if not assistants_callback.Success: raise Exception("assistants_callback: ", assistants_callback.Message)
+            print("3")
 
             for assistant in assistants_callback.Data:
-                sessions = db.session.query(ChatbotSession).filter(
-                    ChatbotSession.AssistantID == assistant.ID,
-                    ChatbotSession.DateTime < datetime.now(),
-                    ChatbotSession.DateTime >= datetime.now() - timedelta(hours = hours))
-                sendRecords_callback : Callback = sendNewRecordsNotification(record.Email, sessions)
-                if not sendRecords_callback: raise Exception(sendRecords_callback.Message)
+                print("4")
+                records_callback : Callback = analytics_services.getAllRecordsByAssistantID(hours, assistant.ID)
+                if not records_callback.Success: raise Exception("records_callback: ", sendRecords_callback.Message)
+                print("5")
+
+                if not records_callback.Data: continue
+                print("6")
+
+                sendRecords_callback : Callback = sendNewRecordsNotification(record.Email, records_callback.Data)
+                if not sendRecords_callback.Success: raise Exception("sendRecords_callback: ", sendRecords_callback.Message)
+                print("7")
 
     except Exception as e:
         print("mail_services.notifyNewRecordsForLastXHours() ERROR: ", e)
@@ -93,13 +104,13 @@ def notifyNewRecordsForLastXHours(hours):
 def sendNewRecordsNotification(reciever, data):
     try:
         send_email((reciever), 'Your new data', 
-               'emails/account_invitation.html', data=data)
+               'emails/company_signup.html', data=data)
 
     except:
         print("addedNewUserEmail() Error: ", e)
-        return Callback(False, 'Could not send email to ' + targetEmail)
+        return Callback(False, 'Could not send email to ' + reciever)
     
-    return Callback(True, 'Email sent is on its way to ' + targetEmail)
+    return Callback(True, 'Email sent and it\'s on its way to ' + reciever)
 
 #SEND CODE
 def send_async_email(app, msg):

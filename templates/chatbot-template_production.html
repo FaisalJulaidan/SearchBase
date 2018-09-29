@@ -516,7 +516,7 @@
         var formData = new FormData();
         var fileInput = document.getElementById('fileUploadB').files[0];
         formData.append('file', fileInput, fileInput.name);
-        
+
         var xhr = new XMLHttpRequest();
         xhr.open('POST', "../assistant/" + sessionID + "/file", true);
 
@@ -527,7 +527,7 @@
                 alert('An error occurred!');
             }
         };
-        
+
         xhr.send(formData);
 
         return false;
@@ -622,7 +622,7 @@
             $answersDiv = $("<div class='wrap text-center' style='padding:10px;'></div>");
 
             for (var i = 0; i < answers.length; i++) {
-                $answersDiv.append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText, '" + answers[i].keywords + "' )\" >" + answers[i].text + "</button>");
+                $answersDiv.append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText)\" >" + answers[i].text + "</button>");
             }
             $messageInput.html($answersDiv);
 
@@ -695,7 +695,7 @@
 
     }
 
-    async function submitAnswer(message, blockKeywords = undefined) {
+    async function submitAnswer(message) {
 
         chatInputDiv.style = "display:none";
         fileUploadForm.style.display = 'none';
@@ -820,7 +820,7 @@
             var blockAnswers = currentBlock.content.answers;
 
             for (var i = 0; i < blockAnswers.length; i++) {
-                if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].text == message) {
+                if (blockAnswers[i].text == message) {
                     if (blockAnswers[i].afterMessage) {
                         sendAssistantMessage(blockAnswers[i].afterMessage);
 
@@ -883,11 +883,11 @@
                     sendAssistantMessage(currentBlock.afterMessage);
                     } else {
                     sendAssistantMessage("We apologise, your input couldn't be processed. Please contact us.");
-                    }
+                  }
                 });
 
              // End chat
-             SetRepeat();
+             // SetRepeat();
              return 0;
         }
 

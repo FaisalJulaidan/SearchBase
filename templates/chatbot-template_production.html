@@ -804,7 +804,7 @@
             }
             return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
         }
-
+        var blockKeywords = undefined
         if (currentBlock.type == "Question") {
             // clear answers div
             $("#presetAnswers").first().html('');
@@ -831,6 +831,7 @@
                         await sleep(200);
                     }
 
+                    blockKeywords = blockAnswers[i].keywords;
                     var action = blockAnswers[i].action;
                     var blockToGoId = blockAnswers[i].blockToGoID;
                     return getNextBlock(action, blockToGoId);

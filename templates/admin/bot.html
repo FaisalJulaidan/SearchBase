@@ -933,7 +933,7 @@
                 $input.val(text);
                 if (text === "Go To Specific Block") {
                     $input.parent().find(".blockToGoID").remove();
-                    $input.parent().append("<input type=\"number\" class=\"blockToGoID min=\"1\" max=\"" + blocksNumber + "\" form-control\"/>");
+                    $input.parent().append("<input type=\"number\" class=\"blockToGoID form-control\" min=\"1\" max=\"" + blocksNumber + "\" form-control\"/>");
                 } else {
                     $input.parent().find(".blockToGoID").remove();
                 }
@@ -1275,7 +1275,7 @@
                         "</span>"
                 }
 
-                function getAfterMessageInput(afterMessage) {
+                function getAfterMessageInput(afterMessage="") {
                     return "" +
                         "<div class=\"input-group col-md-8 afterMessage\">\n" +
                         "  <span class=\"input-group-addon\">After Message:</span>\n" +

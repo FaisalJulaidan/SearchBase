@@ -28,6 +28,12 @@
         text-decoration: none;
         border-radius:5px;
     }
+
+    #tableSort{
+      overflow-y:scroll;
+      height:1000px;
+      display:block;
+    }
 </style>
 {%endblock%}
 
@@ -87,8 +93,9 @@
                             <tbody id=\"tBodyUIn\">";
     var filename = undefined;
     {%for record in data %}
-        tableString += "<td><a type='button' style='cursor: pointer;' onclick='deleteRecord({{record['id']}})'>Delete</a></td></tr>"
-        tableString += "<tr id='tableRecord{{record['id']}}'><td>"+"{{record['dateTime']}}".split(".")[0]+"</td>"
+        tableString += "<tr id='tableRecord{{record['id']}}'>"
+        tableString += "<td><a type='button' style='cursor: pointer;' onclick='deleteRecord({{record['id']}})'>Delete</a></td>"
+        tableString += "<td>"+"{{record['dateTime']}}".split(":")[0] + ":" + "{{record['dateTime']}}".split(":")[1] +"</td>"
         {%for value in record['data']['collectedInformation'] %}
             {%if '&FILE_UPLOAD&' in value['input'] %}
                 filename = "{{record['filePath']}}";
@@ -97,6 +104,7 @@
                 tableString += "<td><a class=\"tds\">{{value['input']}}<span>{{value['questionText']}}</span></a></td>"
             {%endif%}
         {% endfor %}
+        tableString += "</tr>"
     {% endfor %}
 
     tableString += "</tbody></table>";

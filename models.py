@@ -1,20 +1,23 @@
 from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Enum, event, ForeignKey, types
+from sqlalchemy import Enum, event, ForeignKey, types, String, VARCHAR
 from sqlalchemy.ext import mutable
 from datetime import datetime
 import enum
 import json
 from config import BaseConfig
 
+
 from sqlalchemy_utils import EncryptedType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
-db = SQLAlchemy(model_class=FlaskBaseModel)
-db = initialize_flask_sqlathanor(db)
 
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
+
+
+db = SQLAlchemy(model_class=FlaskBaseModel)
+db = initialize_flask_sqlathanor(db)
 
 
 # Activate Foreign Keys
@@ -115,7 +118,7 @@ class User(db.Model):
                             on_serialize=None,
                             on_deserialize=None
                             )
-        Email = db.Column(EncryptedType(db.String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False, unique=True,
+        Email = db.Column(EncryptedType(String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False,
                           supports_json=True,
                           supports_dict=True,
                           on_serialize=None,
@@ -192,6 +195,8 @@ class User(db.Model):
 
     Settings = db.relationship("UserSettings", uselist=False, back_populates="User")
 
+    # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
+
     def __repr__(self):
         return '<User {}>'.format(self.Email)
 
@@ -242,7 +247,7 @@ class Role(db.Model):
     Users = db.relationship('User', back_populates="Role")
 
     # Constraints:
-    db.UniqueConstraint('Name', 'CompanyID', name='uix1_role')
+    __table_args__ = (db.UniqueConstraint('Name', 'CompanyID', name='uix1_role'),)
 
     def __repr__(self):
         return '<Role {}>'.format(self.Name)
@@ -267,7 +272,7 @@ class Assistant(db.Model):
     ChatbotSessions = db.relationship('ChatbotSession', back_populates='Assistant')
 
     # Constraints:
-    db.UniqueConstraint('CompanyID', 'Nickname', name='uix1_assistant')
+    __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
 
 
     def __repr__(self):
@@ -318,7 +323,7 @@ class Solution(db.Model):
                          on_serialize=None,
                          on_deserialize=None
                          )
-    URL = db.Column(db.String(), nullable=False,
+    URL = db.Column(db.String(200), nullable=False,
                     supports_json=True,
                     supports_dict=True,
                     on_serialize=None,
@@ -386,7 +391,7 @@ class Block(db.Model):
     Assistant = db.relationship('Assistant', back_populates='Blocks')
 
     # Constraints:
-    db.UniqueConstraint('AssistantID', 'Order', name='uix1_question')
+    __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)
 
     def __repr__(self):
         return '<Block {}>'.format(self.Type)
@@ -396,7 +401,7 @@ class ChatbotSession(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Data = db.Column(JsonEncodedDict, nullable=False)
-    FilePath = db.Column(db.String(), nullable=True, default=None)
+    FilePath = db.Column(db.String(250), nullable=True, default=None)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     TimeSpent = db.Column(db.Integer, nullable=False, default=0)
     SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
@@ -413,8 +418,8 @@ class ChatbotSession(db.Model):
 
 class Plan(db.Model):
 
-    ID = db.Column(db.String(), primary_key=True, unique=True)
-    Nickname = db.Column(db.String(), nullable=False, unique=True)
+    ID = db.Column(db.String(25), primary_key=True, unique=True)
+    Nickname = db.Column(db.String(40), nullable=False, unique=True)
     MaxSolutions = db.Column(db.Integer, nullable=False, default=0)
     MaxBlocks = db.Column(db.Integer, nullable=False, default=0)
     ActiveBotsCap = db.Column(db.Integer, nullable=False, default=0)
@@ -434,7 +439,7 @@ class Plan(db.Model):
 class Newsletter(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Email = db.Column(db.String(), nullable=False, unique=True)
+    Email = db.Column(db.String(64), nullable=False, unique=True)
 
     # Relationships:
     ###
@@ -464,4 +469,3 @@ class Callback():
         self.Data: str or dict or bool = data
     pass
     # if success else 'Error: ' + message
-

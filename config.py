@@ -6,12 +6,6 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class BaseConfig(object):
 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'Production.db')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-    ENV = 'development'
-    DEBUG = False
-    TESTING = False
 
     ALLOWED_EXTENSIONS = {'png', 'jpg','json', 'xml','txt', 'pdf', 'doc', 'docx'}
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
@@ -35,11 +29,26 @@ class BaseConfig(object):
     USE_ENCRYPTION = True
 
 
+class ProductionConfig(BaseConfig):
+    ENV = 'production'
+    DEBUG = False
+    TESTING = False
+
+    # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'Production.db')
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Test1234@localhost/' + os.path.join(basedir, 'MySQLProduction.db')
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
+
 class DevelopmentConfig(BaseConfig):
     ENV = 'development'
     DEBUG = True
     TESTING = True
-    FAISAL= True
+
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'Development.db')
+    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@localhost/' + os.path.join(basedir, 'MySQLDevelopment.db')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class TestingConfig(BaseConfig):

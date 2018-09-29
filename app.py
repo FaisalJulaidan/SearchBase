@@ -5,8 +5,12 @@ from services import assistant_services, user_services, mail_services
 import os
 from models import db, Role, Company, Assistant, Plan, Statistics, ValidationType, Block, BlockType, Solution, ChatbotSession, Callback
 from services.mail_services import mail
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand, command
+from sqlalchemy_utils import create_database, database_exists
 from utilities import helpers
 import time, threading
+import config
 
 
 # Import all routers to register them as blueprints
@@ -19,6 +23,15 @@ from routes.public.routers import public_router, resetPassword_router
 from services import user_services, mail_services
 
 app = Flask(__name__, static_folder='static')
+
+# Server Setup
+db.init_app(app)
+mail.init_app(app)
+app.app_context().push()
+
+migrate = Migrate(app, db)
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
 
 # Register Routes:
 app.register_blueprint(adminBasic_router)
@@ -68,6 +81,7 @@ def before_request():
 
     # If the user try to visit one of the restricted routes without logging in he will be redirected
     if any(route in currentURL for route in restrictedRoutes):
+        print("Security Check For Restricted Routes")
         if not session.get('Logged_in', False):
             return redirect('login')
         try:
@@ -75,7 +89,7 @@ def before_request():
             if request.view_args['assistantID']:
                 assistantID = int(request.view_args['assistantID'])
                 ownership_callback : Callback = assistant_services.checkOwnership(assistantID, session.get('CompanyID', None))
-            if not ownership_callback.Success:
+            if not ownership_callback.Success: 
                 session["returnMessage"] = ownership_callback.Message
                 return redirect('login')
                 role_callback : Callback = user_services.getRolePermissions(session.get('UserID', None))
@@ -197,6 +211,7 @@ def gen_dummy_data():
     user_services.create(firstname='firstname', surname='lastname', email='e6@e.com', password='123', phone='4344423', company=sabic,
                          role=user_sabic, verified=True)
 
+
     # Plans
     db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic', MaxSolutions=600, MaxBlocks=20, ActiveBotsCap=2, InactiveBotsCap=3,
                         AdditionalUsersCap=5, ExtendedLogic=False, ImportDatabase=False, CompanyNameOnChatbot=False))
@@ -208,7 +223,7 @@ def gen_dummy_data():
     db.session.add(
         Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=20, ActiveBotsCap=10, InactiveBotsCap=30,
              AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
-
+    
     db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=30,  ActiveBotsCap=2, InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
@@ -233,30 +248,8 @@ def gen_dummy_data():
     db.session.commit()
 
 
-@app.route("/admin/cancellation/confirmation", methods=['GET'])
-def admin_plan_confirmation():
-    return render("admin/cancellation_confirmation.html")
-
-
-@app.route('/admin/thanks', methods=['GET'])
-def admin_thanks():
-    return render('admin/thank-you.html')
-
-
-@app.route("/send/mailtop", methods=['GET', 'POST'])
-def sendMarketingEmail():
-    if request.method == "GET":
-        return render_template("index.html")
-    if request.method == "POST":
-        userEmail = request.form.get("user_email", default="Error")
-        msg = Message(userEmail + " Has sent you mail!",
-                      sender=userEmail,
-                      recipients=["thesearchbase@gmail.com"])
-        msg.body = userEmail + " Has registerd their Interest for your product"
-        mail.send(msg)
-        return render_template("index.html")
-
-def gen_static_data():
+@manager.command
+def seed():
 
     # Plans
     db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic', MaxSolutions=600, MaxBlocks=100, ActiveBotsCap=2,
@@ -278,34 +271,34 @@ def gen_static_data():
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
     db.session.commit()
 
+
 if __name__ == "__main__":
 
     print("Run the server...")
     if os.environ['FLASK_ENV'] == 'production':
-        app.config.from_object('config.BaseConfig')
 
-        db.init_app(app)
-        mail.init_app(app)
-        app.app_context().push()
-
+        app.config.from_object('config.ProductionConfig')
         print('Production mode running...')
+        url = config.ProductionConfig.SQLALCHEMY_DATABASE_URI
+        if not database_exists(url):
+            create_database(url)
+            db.create_all()
+            seed()
 
 
         send_updates()
         # Run the app server
-        app.run()
+        manager.run()
 
     elif os.environ['FLASK_ENV'] == 'development' :
         app.config.from_object('config.DevelopmentConfig')
-        db.init_app(app)
-        mail.init_app(app)
-        app.app_context().push()
 
         print('Reinitialize the database...')
+
         db.drop_all()
         db.create_all()
-        # gen_static_data()
         gen_dummy_data()
+
         print('Development mode running...')
 
 
@@ -316,3 +309,5 @@ if __name__ == "__main__":
         print("Please set FLASK_ENV first to either 'production' or 'development' \r\n "
               "ex. in Windows >set FLASK_ENV=development, in Linux/Mac >export FLASK_ENV=development \r\n"
               "then run the server >python app.py")
+
+

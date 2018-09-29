@@ -130,7 +130,6 @@ class User(db.Model):
                                 on_serialize=None,
                                 on_deserialize=None
                                 )
-        New = db.Column(db.String(64), nullable=False)
     else:
         Firstname = db.Column(db.String(64), nullable=False)
         Surname = db.Column(db.String(64), nullable=False,
@@ -455,6 +454,7 @@ class UserSettings(db.Model):
     TrackingData = db.Column(db.Boolean, nullable=False, default=False)
     TechnicalSupport = db.Column(db.Boolean, nullable=False, default=False)
     AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
+    UserInputNotifications = db.Column(db.Boolean, nullable=False, default=False)
 
     # Relationships:
     User = db.relationship('User', back_populates='Settings')

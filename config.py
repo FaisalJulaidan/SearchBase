@@ -36,7 +36,6 @@ class ProductionConfig(BaseConfig):
 
     # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'Production.db')
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Test1234@localhost/MySQLProduction.db'
-
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

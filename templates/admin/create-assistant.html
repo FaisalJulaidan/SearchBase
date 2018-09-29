@@ -15,10 +15,9 @@
                             <div class="clearfix"></div>
                             <br>
                             <form id="assistantForm">
-                                <h4>
-                                    Enter a name for your assistant to easily identify it in the dashboard
-                                </h4>
                                 <div class="col-md-9 col-sm-9 col-xs-12">
+                                    <h3>Assistant Name:</h3>
+                                    <h4>Enter a name for your assistant to easily identify it in the dashboard</h4>
                                     <input name="name" type="text"
                                            id="name"
                                            required="required" class="form-control col-md-5 col-xs-10">
@@ -26,49 +25,59 @@
                                 <br>
                                 <br>
                                 <br>
-                                <h4>Enter your welcome message <span class="required">*</span></h4>
+
                                 <div class="col-md-9 col-sm-9 col-xs-12">
+                                    <h3>Welcome Message:</h3>
+                                    <h4>Enter your welcome message <span class="required">*</span></h4>
                                     <input name="welcome-message" type="text"
                                            id="welcome-message"
                                            required="required" class="form-control col-md-5 col-xs-10">
                                 </div>
-                                <br>
-                                <br>
-                                <br>
 
-                                <!--<h4>Select the assistant category.</h4>
-        <select id="category-select">
-            <option value="recruitment">Recruitment</option>
-            <option value="property">Property</option>
-        </select>
-        <br>
-        <br>
-        <br>-->
 
-                                <h4>Would you like the assistant to automatically open for the user?</h4>
-                                <label class="switch">
+                                <div class="col-md-9 col-sm-9 col-xs-12">
+                                    <h3>Assistant Template:</h3>
+                                    <h4>Select the assistant template.</h4>
+                                    <select id="template-name" name="template-name" class="form-control col-md-5 col-xs-10">
+                                        <option>none</option>
+                                        {% for name in templates.names %}
+                                            <option value="{{ name }}">{{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+
+                                <div class="col-md-9 col-sm-9 col-xs-12">
+                                    <h3>Assistant Automatic Popup Time:</h3>
+                                    <h4>Would you like the assistant to automatically open for the user?</h4>
+                                    <label class="switch">
                                     <input id="switch-autopop" name="switch-autopop" type="checkbox"
                                            onclick="switchchecked()">
                                     <span class="slider round"></span>
-                                </label>
-                                <br>
-                                <br>
-                                <div id="popup-time" hidden>
-                                    <h4>
-                                        How long should the chat bot wait before opening?
-                                        <small> *Time in Seconds</small>
-                                    </h4>
-                                    <input name="timeto-autopop" style="width:50px"
-                                           class="form-control col-md-5 col-xs-10"
-                                           id="bot_time" type="text"
-                                            value='0' min="1">
-                                    <br>
-                                    <br>
-                                    <br>
+                                    </label>
+
+                                    <div id="popup-time" hidden>
+                                        <h4>
+                                            How long should the chat bot wait before opening?
+                                            <small> *Time in Seconds</small>
+                                        </h4>
+                                        <input name="timeto-autopop" style="width:50px; margin-bottom: 30px;"
+                                               class="form-control col-md-5 col-xs-10"
+                                               id="bot_time" type="text"
+                                                value='0' min="1">
+
+                                    </div>
                                 </div>
 
+
+
                                 <!-- Submit button -->
-                                <button class="btn btn-success">Submit</button>
+                                <br />
+                                <br />
+                                <br />
+                                <div class="col-md-9 col-sm-9 col-xs-12">
+                                    <button class="btn btn-success">Submit</button>
+                                </div>
                             </form>
 
                         </div>
@@ -109,7 +118,7 @@
         }).done(function (res) {
             console.log(res);
             swal("Success!", "User has been created successfully", "success").then((value) => {
-              document.location = "/admin/assistant/" + res.data + "/settings"
+              document.location = "/admin/assistant/" + res.data.id + "/settings"
             });
         }).fail(function (res) {
             var resJson = JSON.parse(res.responseText);

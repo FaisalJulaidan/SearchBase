@@ -1,7 +1,6 @@
 import os
 from config import BaseConfig
-from flask import send_from_directory
-from flask import Blueprint, render_template, request, session, redirect, url_for
+from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory
 from flask_api import status
 from utilities import helpers
 from models import Callback, Assistant, db, ChatbotSession
@@ -54,6 +53,38 @@ def chatbot(assistantID):
 
         # chatbot collected information
         data = request.get_json(silent=True)
+        # solutions = []
+        #
+        # # If showTop is 0 then skip below return nothing and don't even call solutions_services
+        # if data['showTop'] > 0:
+        #     s_callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'], data['showTop'])
+        #     if not s_callback.Success:
+        #         return helpers.jsonResponse(False, 400, callback.Message)
+        #
+        #     # Convert SQLAlchemy objects to dict
+        #     if s_callback.Data:
+        #         for s in s_callback.Data:
+        #             solutions.append(s.to_dict())
+
+        ch_callback: Callback = chatbot_services.processData(assistant, data)
+
+        if not ch_callback.Success:
+            return helpers.jsonResponse(False, 400, ch_callback.Message, ch_callback.Data)
+
+        return helpers.jsonResponse(True, 200, "Collected data is successfully processed", {'sessionID': ch_callback.Data.ID})
+
+
+@public_router.route("/assistant/<int:assistantID>/chatbot/solutions", methods=['POST'])
+def getSolutions_forChatbot(assistantID):
+    # For all type of requests, get the assistant
+    callback: Callback = assistant_services.getByID(assistantID)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+    assistant: Assistant = callback.Data
+
+    if request.method == "POST":
+        # chatbot collected information
+        data = request.get_json(silent=True)
         solutions = []
 
         # If showTop is 0 then skip below return nothing and don't even call solutions_services
@@ -63,15 +94,13 @@ def chatbot(assistantID):
                 return helpers.jsonResponse(False, 400, callback.Message)
 
             # Convert SQLAlchemy objects to dict
-            for s in s_callback.Data:
-                solutions.append(s.to_dict())
+            if s_callback.Data:
+                for s in s_callback.Data:
+                    solutions.append(s.to_dict())
 
-        ch_callback: Callback = chatbot_services.processData(assistant, data, len(solutions))
 
-        if not ch_callback.Success:
-            return helpers.jsonResponse(False, 400, ch_callback.Message, ch_callback.Data)
+        return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions':solutions})
 
-        return helpers.jsonResponse(True, 200, "Solution list is here!", {'sessionID': ch_callback.Data.ID, 'solutions':solutions})
 
 @public_router.route("/userdownloads/<path:path>", methods=['GET'])
 def assistant_userdownloads(path):

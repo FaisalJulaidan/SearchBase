@@ -2,12 +2,39 @@ from typing import List
 from config import BaseConfig
 from utilities import json_utils
 from sqlalchemy.sql import exists, func
+from os.path import join, dirname
+import json
 
 
 from models import db, Callback, ValidationType, Assistant, Block, BlockType, BlockAction, Plan
 
 bot_currentVersion = "1.0.0"
 
+
+# Generate a bot using an already built template
+def genBotViaTemplate(assistant: Assistant, tempName: str):
+
+    try:
+        # Get json template
+        relative_path = join('static/bot_templates', tempName + '.json')
+        absolute_path = join(BaseConfig.APP_ROOT, relative_path)
+        data = json.load(open(absolute_path))
+
+        # Validate submitted block data
+
+        json_utils.validateSchema(data, 'botTemplate.json')
+        counter = 1
+        for block in data.get('bot')['blocks']:
+            db.session.add(Block(Type=BlockType(block['type']), Order=counter, Content=block['content'],
+                         StoreInDB=block['storeInDB'], Assistant=assistant))
+            counter += 1
+
+    except Exception as exc:
+        print(exc)
+        return Callback(False, 'Error while generating a bot via a template')
+    # Save
+    db.session.commit()
+    return Callback(True, 'Bot was successfully generated via a template')
 
 # Get the chatbot for the public to use
 def getChatbot(assistant: Assistant) -> dict:
@@ -199,7 +226,8 @@ def getOptions() -> dict:
             },
             {
             'name': BlockType.Solutions.value,
-            'maxSolutions': 5
+            'maxSolutions': 5,
+            'actions': [a.value for a in BlockAction],
             },
         ]
     }

@@ -12,6 +12,9 @@
 {% endblock %}
 {% block content %}
 <style>
+    .main_container {
+        margin: 0;
+    }
     .remainingBlocks {
         border: 1px solid grey;
         padding: 5px;
@@ -141,6 +144,16 @@
         .type:hover {
             box-shadow: 0 0 11px rgba(33, 33, 33, .4);
         }
+
+    .questionTypeInput {
+        width: 120px !important;
+        float:right !important;
+    }
+
+    .input-group-btn .btn{
+        margin-right:-2px;
+        margin-left: -2px;
+    }
 </style>
 <div class="right_col" role="main">
     <div class="page-title">
@@ -165,112 +178,7 @@
 
         <div class="x_conent">
             <ul id="draggablePanelList" class="list-unstyled">
-                <li class="panel panel-default">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            <span class="moveable" style="color:#660ff2">
-                                <i class="glyphicon glyphicon-menu-hamburger"></i>
-                            </span>
-                            <b>Do you smoke?</b>
-                        </div>
-                        <span class="pull-right clickable" style="color:#660ff2;margin-left:15px">
-                            <i class="trash glyphicon glyphicon-trash"></i>
-                        </span>
-                        <span class="pull-right clickable" style="color:#660ff2">
-                            <i class="indicator glyphicon glyphicon-chevron-down"></i>
-                        </span>
-                        <div class="col-xs-11  col-sm-5 col-md-4 pull-right"
-                             style="margin-top: -30px;margin-right:-9px">
-                            <div class="input-group">
-                                <input type="text" style="height: 34px" class="form-control normalCursor"
-                                       disabled="" aria-label="..." value="Question">
-                                <div class="input-group-btn">
-                                    <button type="button" class="btn btn-default dropdown-toggle"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Type
-                                        <span style="margin: 0" class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <li><a>User Input</a></li>
-                                        <li><a>Question</a></li>
-                                        <li><a>File Upload</a></li>
-                                    </ul>
-                                </div><!-- /btn-group -->
-                            </div><!-- /input-group -->
-                        </div><!-- /.col-lg-3 -->
-                    </div>
-                    <div class="panel-body">
-                        <div class="input-group col-md-6">
-                            <span class="input-group-addon">Question:</span>
-                            <input type="text" class="form-control" placeholder="Question"
-                                   aria-describedby="basic-addon1" value="Do you smoke?">
-                        </div>
-                        Answers: <span class=" clickable" style="margin-bottom: 10px">
-                            <i class="addAnswer glyphicon glyphicon-plus"></i>
-                        </span>
-                        <div class="answers" style="margin-top:10px;">
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <h3 class="panel-title">Answer -1</h3>
-                                            <span class="pull-right clickable"
-                                                  style="color:#660ff2;margin-left:15px">
-                                                <i class="trashAnswer glyphicon glyphicon-trash"></i>
-                                            </span>
-                                        </div>
-                                        <div class="panel-body">
-                                            <div class="input-group">
-                                                <label for="input">Answer:</label>
-                                                <input type="text" class="form-control" placeholder="Answer"
-                                                       aria-describedby="basic-addon1" value="Yes I do">
-                                            </div>
-
-                                            <label for="input">Kewords:</label>
-                                            <input name='tags' value=''>
-
-
-                                            <label for=".input-group">Actions:</label>
-                                            <div class="input-group">
-                                                <input type="text" style="height: 34px"
-                                                       class="form-control normalCursor"
-                                                       disabled="" aria-label="..." value="Question">
-                                                <div class="input-group-btn">
-                                                    <button type="button"
-                                                            class="btn btn-default dropdown-toggle"
-                                                            data-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false">
-                                                        Type
-                                                        <span style="margin: 0" class="caret"></span>
-                                                    </button>
-                                                    <ul class="dropdown-menu dropdown-menu-right">
-                                                        <li><a>User Input</a></li>
-                                                        <li><a>Question</a></li>
-                                                        <li><a>File Upload</a></li>
-                                                    </ul>
-                                                </div><!-- /btn-group -->
-                                            </div><!-- /input-group -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-1 pull-right inline">
-                            <div class="btn btn-default">Save</div>
-                        </div>
-                        <div class="col-md-2 pull-right inline text-right">
-                            <div class="form-check abc-checkbox abc-checkbox-info abc-checkbox-circle"
-                                 style="margin-top: 9px">
-                                <input class="form-check-input" id="1" type="checkbox" checked="">
-                                <label class="form-check-label" for="1"
-                                       style="padding-left: 10px;padding-top: 2px; text-align: -webkit-auto;">
-                                    Save in DB
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </li>
+                <h5>Fetching questions...</h5>
             </ul>
         </div>
     </div>
@@ -828,10 +736,12 @@
             }
 
             class BlockTypeSolutions {
-                constructor(showTop, storeInDB, type, order, id, afterMessage = "") {
+                constructor(showTop, storeInDB, type, order, id, action, blockToGoID, afterMessage = "") {
                     this.Solutions = {
                         content: {
                             showTop: showTop,
+                            action: action,
+                            blockToGoID: blockToGoID,
                             afterMessage: afterMessage
                         },
                         storeInDB: storeInDB,
@@ -954,9 +864,13 @@
                     let showTop = +$block.children('div.panel-body').first().children('.topSolutions').first().children('input').first().val();
                     let afterMessage = $block.children('div.panel-body').first().children('.afterMessage').first().children('input').first().val();
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+                    let action = $block.children().last().find('input.action').first().val();
                     let id = +$block.attr('id');
+                    let blockToGoID = 0;
+                    try { blockToGoID = +$block.children().last().find('.blockToGoID')[0].value; }
+                    catch (e) { blockToGoID = 0;}
 
-                    botData.blocks.push(new BlockTypeSolutions(showTop, storeInDB, type, order, id, afterMessage).Solutions);
+                    botData.blocks.push(new BlockTypeSolutions(showTop, storeInDB, type, order, id, action, blockToGoID, afterMessage).Solutions);
                 }
 
 
@@ -1215,7 +1129,7 @@
         }
 
         function render_blocks(blocks) {
-            console.log("blocks: ", blocks)
+
             blocksNumber = blocks.length;
             function cookUpBlock(block_template, block) {
 
@@ -1232,7 +1146,7 @@
                 function getActionElement(actions) {
                     return "" +
                         "<div class=\"input-group col-md-6\">\n" +
-                        "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
+                        "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor action\" disabled aria-label=\"...\"\n" +
                         "          value=\"BLOCK_ACTION\">\n" +
                         "   <div class=\"input-group-btn\">\n" +
                         "       <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
@@ -1466,7 +1380,7 @@
                         "        <span class=\"pull-right clickable\" style='color:#660ff2'><i class=\"indicator glyphicon glyphicon-chevron-up\"></i></span>\n" +
                         "        <div class=\"col-xs-11  col-sm-5 col-md-4 pull-right\" style=\"margin-top: -30px;margin-right:-9px\">\n" +
                         "            <div class=\"input-group\">\n" +
-                        "                <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\" value=\"BLOCK_TYPE\">" +
+                        "                <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor questionTypeInput\" disabled aria-label=\"...\" value=\"BLOCK_TYPE\">" +
                         "                <div class=\"input-group-btn\">\n" +
                         "                    <button disabled type=\"button\" class=\"blockType btn btn-default dropdown-toggle\" data-toggle=\"dropdown\"\n" + "" +
                         "                            aria-haspopup=\"true\" aria-expanded=\"false\">" +
@@ -1491,14 +1405,15 @@
 
                     if (block_template.name == "Solutions") {
                         content = getTopSolutionsElement() + getAfterMessageInput(block.content.afterMessage) +
+                            getActionElement(block_template.actions) +
                             getSubmitElement(true, 'x');
 
                     }
 
                     if (block_template.name == "File Upload") {
                         content = getQuestionElement() +
-                            getActionElement(block_template.actions) +
                             getFileUpload(block_template.typesAllowed, block_template.fileMaxSize, block.content.fileTypes) +
+                            getActionElement(block_template.actions) +
                             getAfterMessageInput(block.content.afterMessage) +
                             getSubmitElement(true, 'x');
                     }
@@ -1563,7 +1478,7 @@
                 function getActionElement(actions) {
                     return "" +
                         "<div class=\"input-group col-md-6\">\n" +
-                        "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
+                        "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor action\" disabled aria-label=\"...\"\n" +
                         "          value=\"\">\n" +
                         "   <div class=\"input-group-btn\">\n" +
                         "       <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
@@ -1673,14 +1588,15 @@
 
                     if (block_template.name == "Solutions") {
                         templateHTML = getTopSolutionsElement() + getAfterMessageInput() +
+                            getActionElement(block_template.actions) +
                             getSubmitElement(true, 'x');
 
                     }
 
                     if (block_template.name == "File Upload") {
                         templateHTML = getQuestionElement() +
-                            getActionElement(block_template.actions) +
                             getFileUpload(block_template.typesAllowed, block_template.fileMaxSize) +
+                            getActionElement(block_template.actions) +
                             getAfterMessageInput() +
                             getSubmitElement(true, 'x');
                     }
@@ -1703,7 +1619,6 @@
 
 
                     }
-
                     return templateHTML;
                 }
 

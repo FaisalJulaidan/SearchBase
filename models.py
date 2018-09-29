@@ -464,4 +464,3 @@ class Callback():
         self.Data: str or dict or bool = data
     pass
     # if success else 'Error: ' + message
-

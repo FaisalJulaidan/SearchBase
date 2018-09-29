@@ -40,24 +40,37 @@
                     </fieldset>
 
                 </div>
-                <div class="x_panel" style="height:400px;">
+                <div class="x_panel" style="height:500px;">
                     <div class="col-md-12">
                         <legend class="h3">Connecting your assistant.</legend>
                         <p>
                             To Connect your assistant, you must paste the pre-made code into any part of your HTML source code.
                         </p>
 
-                        <xmp style="margin-left:0px"><script src="https://www.thesearchbase.com/userdownloads/integration.js" data-name="tsb-widget" data-id={{ assistantID }} data-icon="#fff" data-circle="#4B5B71" async defer></script></xmp>
+                        <strong>
+                            <textarea style="width:600px; height:90px;" id="URL_id" readonly>
+<script src="https://www.thesearchbase.com/userdownloads/integration.js" data-name="tsb-widget" data-id={{ assistantID }} data-icon="#fff" data-circle="#4B5B71" async defer></script></textarea>
+                        </strong>
+                        <br />
+                        <br />
+
 
                         <p> To deploy your assistant, simply copy the line above and paste it in the page in which you would like your bot to operate in.</p>
-                        <p><strong>
-                        For better performance, paste the line of code within the elements within the code of your website.
-                        <xmp style="margin-left:-200px">
-                            <body>
-                                <The line above goes here>
-                            </body>
-                        </xmp>
-                        </strong>
+
+                        <button onclick="copyURL()" class="btn btn-success">Copy URL</button>
+                        <br />
+                        <br />
+                        <br />
+
+                        <p>
+                            <strong>
+                                For better performance, paste the line of code within the elements within the code of your website.
+                                <xmp style="margin-left:-200px">
+                                    <body>
+                                        <The line above goes here>
+                                    </body>
+                                </xmp>
+                            </strong>
                         </p>
                     </div>
                 </div>
@@ -91,4 +104,20 @@
         }
 
     </script>
+
+    <script>
+        function copyURL() {
+            /* Get the text field */
+            var copyText = document.getElementById("URL_id");
+
+            /* Select the text field */
+            copyText.select();
+
+            /* Copy the text inside the text field */
+            document.execCommand("copy");
+        }
+
+    </script>
+
+
 {% endblock %}

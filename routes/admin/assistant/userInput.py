@@ -28,3 +28,11 @@ def admin_record_delete(assistantID, recordID):
         deleteRecord_callback : Callback = userInput_services.deleteByID(recordID)
 
         return str(deleteRecord_callback.Success)
+
+@userInput_router.route("/admin/assistant/<assistantID>/deleteAll", methods=["GET"])
+def admin_record_delete_all(assistantID):
+
+    if request.method == "GET":
+        deleteRecords_callback : Callback = userInput_services.deleteAll(assistantID)
+
+        return helpers.redirectWithMessageAndAssistantID("admin_user_input", assistantID, deleteRecords_callback.Message)

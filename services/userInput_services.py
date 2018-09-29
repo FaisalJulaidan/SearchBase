@@ -18,10 +18,6 @@ def getByAssistantID(assistantID):
 
 def deleteByID(id):
     try:
-        record: ChatbotSession = db.session.query(ChatbotSession).filter(ChatbotSession.ID == id).first()
-        if not record:
-            return Callback(False, "the doesn't exist")
-
         db.session.query(ChatbotSession).filter(ChatbotSession.ID == id).delete()
     except Exception as exc:
         print("userInput_services.deleteByID() Error: ", exc)
@@ -29,4 +25,15 @@ def deleteByID(id):
         return Callback(False, 'Record could not be removed.')
     # Save
     db.session.commit()
-    return Callback(True, 'Block has been removed successfully.')
+    return Callback(True, 'Record has been removed successfully.')
+
+def deleteAll(assistantID):
+    try:
+        db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID).delete()
+    except Exception as exc:
+        print("userInput_services.deleteAll() Error: ", exc)
+        db.session.rollback()
+        return Callback(False, 'Records could not be removed.')
+    # Save
+    db.session.commit()
+    return Callback(True, 'Records have been removed successfully.')

@@ -3,9 +3,11 @@ import sqlalchemy.exc
 from flask import Flask, render_template, current_app
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
-from models import Callback
+from models import Callback, db
 from threading import Thread
 from time import sleep  
+from services import user_services, assistant_services
+from datetime import datetime
 
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
@@ -66,7 +68,40 @@ def addedNewUserEmail(adminEmail, targetEmail, password):
     
     return Callback(True, 'Email sent is on its way to ' + targetEmail)
 
-#mailing
+#NOTIFICATIONS
+def notifyNewRecordsForLastXHours(hours):
+    try:
+        newsletters = db.session.query(Newsletter)
+        for record in newsletters:
+            user_callback : Callback = user_services.getByEmail(record.Email)
+            if not user_callback: raise Exception(user_callback.Message)
+
+            assistants_callback : Callback = assistant_services.getAll(user_callback.Data.CompanyID)
+            if not assistants_callback: raise Exception(assistants_callback.Message)
+
+            for assistant in assistants_callback.Data:
+                sessions = db.session.query(ChatbotSession).filter(
+                    ChatbotSession.AssistantID == assistant.ID,
+                    ChatbotSession.DateTime < datetime.now(),
+                    ChatbotSession.DateTime >= datetime.now() - timedelta(hours = hours))
+                sendRecords_callback : Callback = sendNewRecordsNotification(record.Email, sessions)
+                if not sendRecords_callback: raise Exception(sendRecords_callback.Message)
+
+    except Exception as e:
+        print("mail_services.notifyNewRecordsForLastXHours() ERROR: ", e)
+
+def sendNewRecordsNotification(reciever, data):
+    try:
+        send_email((reciever), 'Your new data', 
+               'emails/account_invitation.html', data=data)
+
+    except:
+        print("addedNewUserEmail() Error: ", e)
+        return Callback(False, 'Could not send email to ' + targetEmail)
+    
+    return Callback(True, 'Email sent is on its way to ' + targetEmail)
+
+#SEND CODE
 def send_async_email(app, msg):
     with app.app_context():
         #uncomment bellow to add delay

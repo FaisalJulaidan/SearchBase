@@ -1,11 +1,12 @@
 #/usr/bin/python3.5
 from flask import Flask, redirect, request, render_template, session
 from datetime import datetime
-from services import assistant_services, user_services
+from services import assistant_services, user_services, mail_services
 import os
 from models import db, Role, Company, Assistant, Plan, Statistics, ValidationType, Block, BlockType, Solution, ChatbotSession, Callback
 from services.mail_services import mail
 from utilities import helpers
+import time, threading
 
 
 # Import all routers to register them as blueprints
@@ -39,6 +40,14 @@ app.register_blueprint(users_router)
 app.register_blueprint(bot_router)
 app.register_blueprint(emoji_router)
 
+
+#8 hour periodic timer
+def eightHourTimer():
+    mail_services.notifyNewRecordsForLastXHours(8)
+
+    threading.Timer(28800, eightHourTimer).start()
+
+threading.Timer(28800, eightHourTimer).start()
 
 # Code to ensure user is logged in
 @app.before_request

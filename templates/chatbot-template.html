@@ -397,8 +397,12 @@
     var fileUpload = false;
     var params = undefined;
     var sessionID = 0;
+    var welcomeMessage = "";
     var BOT_USER = 'bot';
     var CLIENT_USER = 'user';
+    var chatInputDiv = document.getElementById("message-input");
+    var fileUploadForm = document.getElementById('fileUploadForm');
+    var thinkingGifLife = 800 + Math.floor(Math.random() * 1200);
 
     // This function will get the blocks from the server by assistantID and set the blocks array to be used to create
     // the cahtbot conversational flow
@@ -415,21 +419,21 @@
             // Set assistant and blocks array
             assistant = data.assistant;
             blocks = data.blocks;
-
+            welcomeMessage = assistant.message
             // Start the chatbot
-            //console.log(blocks)
             start();
 
         }).fail(function (res) {
             console.log("Error in retrieving blocks.");
             console.log(res);
-        });
+            });
     }
 
 
     // This start the lunch the chatbot for the first time
     function start() {
         // 1.Show the chatbot welcoming message assistant.message
+        if (welcomeMessage) { sendAssistantMessage(welcomeMessage); }
 
         // 2.Show the first block in the blocks array then render it depends on its type
         renderBlock(blocks[0]);
@@ -447,37 +451,12 @@
         return null
     }
 
-    // This should send the data to the server, data such as keywords and inputs.
-    // and get  the solutions back based on the sent data
+    // This should send the data to the server, without returning any solutions back
     function sendData() {
+        putThinkingGif();
         var solutions = [];
-        params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": 5};
+        params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": 0};
         console.log("Send data...");
-
-        $.ajax({
-            contentType: 'application/json', //this is important
-            url: '../assistant/' + assistantID + '/chatbot',
-            type: "POST",
-            data: JSON.stringify(params)
-
-        }).done(function (res) {
-
-            console.log("Solutions retrieved successfully!");
-            var data = JSON.parse(res).data;
-            sessionID = data["sessionID"];
-            solutions = data["solutions"];
-            sendFile();
-            return solutions;
-            {#displayReturnedSolutions(solutions);#}
-
-        }).fail(function (res) {
-            console.log("Error in retrieving blocks.");
-            console.log(res);
-        });
-        return solutions
-    }
-    function sendDataSolutionsBlock(showTop) {
-        params = {"collectedInformation": collectedInformation, "keywords": keywords, "solutionsHighest": showTop};
 
         return $.ajax({
             contentType: 'application/json', //this is important
@@ -486,6 +465,33 @@
             data: JSON.stringify(params)
 
         }).done(function (res) {
+            removeThinkingGif();
+            console.log("Data sent successfully!");
+            var data = JSON.parse(res).data;
+            sessionID = data["sessionID"];
+            sendFile();
+            return true;
+
+        }).fail(function (res) {
+            removeThinkingGif();
+            console.log("Error in retrieving blocks.");
+            console.log(res);
+            return false
+            });
+    }
+
+    function sendDataSolutionsBlock(showTop) {
+        putThinkingGif();
+        params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": showTop};
+
+        return $.ajax({
+            contentType: 'application/json', //this is important
+            url: '../assistant/' + assistantID + '/chatbot',
+            type: "POST",
+            data: JSON.stringify(params)
+
+        }).done(function (res) {
+            removeThinkingGif();
 
             console.log("Solutions retrieved successfully!");
             var data = JSON.parse(res).data;
@@ -493,22 +499,23 @@
             solutions = data["solutions"];
             sendFile();
             return solutions;
-            {#displayReturnedSolutions(solutions);#}
 
         }).fail(function (res) {
+            removeThinkingGif();
             console.log("Error in retrieving blocks.");
             console.log(res);
-        });
+            });
     }
 
     function sendFile() {
-        $("#fileUploadForm").submit();
+        console.log("init form")
+        sendFileForm();
     }
 
     function sendFileForm() {
+        if (document.getElementById('fileUploadB').files.length == 0) { return false; }
         var formData = new FormData();
         var fileInput = document.getElementById('fileUploadB').files[0];
-
         formData.append('file', fileInput, fileInput.name);
 
         var xhr = new XMLHttpRequest();
@@ -530,9 +537,21 @@
     function displayReturnedSolutions(solutions) {
         messageContainer = $(".messages ul");
 
-        for (var i = 0; i < solutions.length; i++) {
-            messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>" + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>" + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] + "</label><br><button onclick=\"BuyProduct('" + solutions[i]["URL"] + "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center></li>");
+        // If there is no solutions in the database show this message.
+        if (solutions.length === 0){
+            sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.")
+
+        } else {
+
+            for (var i = 0; i < solutions.length; i++) {
+                messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
+                    + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>"
+                    + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] +
+                    "</label><br><button onclick=\"openSolution('" + solutions[i]["URL"] +
+                    "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center></li>");
+            }
         }
+
 
         SetRepeat();
     }
@@ -551,6 +570,7 @@
         $("#qAnswers").remove();
 
         currentBlock = block;
+        if (currentBlock === undefined) {return 0;}
 
         switch (block.type) {
             case "Question":
@@ -599,14 +619,16 @@
         // }
 
         function showAnswers(answers) {
-            $messageInput = $(".message-input").first();
+            $messageInput = $("#presetAnswers").first();
             $answersDiv = $("<div class='wrap text-center' style='padding:10px;'></div>");
 
             for (var i = 0; i < answers.length; i++) {
-                $answersDiv.append("<button class=\"btn btn-primary answer\" onclick=\"submitAnswer(this.innerText, '" + answers[i].keywords + "' )\" >" + answers[i].text + "</button>");
+                $answersDiv.append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText, '" + answers[i].keywords + "' )\" >" + answers[i].text + "</button>");
             }
+            $messageInput.html($answersDiv);
 
-            $messageInput.html($answersDiv)
+            //$('.messages').css('height', 'calc(100% - 55px)');
+            //$('.message-input').css('height', '55px');
         }
     }
 
@@ -625,33 +647,44 @@
         scrollTo('end')
     }
         function renderUserInput(block) {
-            $messageInput = $(".message-input").first();
-            $userInput = $("<div class=\"wrap\">\n" +
+            chatInputDiv.style = "display:block;";
+            fileUploadForm.style.display = 'none';
+            $messageInput = $(".message-input").last();
+            $userInput = $("<div class=\"wrap\" style=\"margin-top: 15px;min-height: 40px; background-color: white;\">\n" +
                 "                <input onkeypress=\"handleEnter(event)\" " +
                 "            id='textMessage' type=\"text\" placeholder=\"Write your message...\"/>\n" +
                 "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
                 "            </div>");
 
-            $messageInput.html($userInput);
+            $('.messages').css('height','calc(100% - 40px)');
+
+            $messageInput.append($userInput);
             sendAssistantMessage(block.content.text)
         }
 
         function renderFileUpload(block) {
-            $messageInput = $(".message-input").first();
-            $fileUpload = $("<div class=\"wrap\">\n" +
-                "<input onkeypress=\"handleEnter(event)\" id=\"fileUploadB\" type=\"file\" placeholder=\"Write your message...\" style=\"\n" +
-                "    background-color:  white;\n" + "\">" +
-                "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
-                "            </div>");
+            //$messageInput = $(".message-input").first();
+            //$fileUpload = $("<div class=\"wrap\">\n" +
+            //    "<input onkeypress=\"handleEnter(event)\" id=\"fileUploadB\" type=\"file\" placeholder=\"Write your message...\" style=\"\n" +
+            //    "    background-color:  white;\n" + "\">" +
+            //    "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
+            //    "            </div>");
 
-            $messageInput.html($fileUpload);
+            //$messageInput.html($fileUpload);
 
-            sendAssistantMessage(block.content.text)
+            //$('.messages').css('height','calc(100% - 40px)');
+            //$('.message-input').css('height','40px');
+
+            sendAssistantMessage(block.content.text);
+            chatInputDiv.style = "display:block";
+            fileUploadForm.style.display = 'block';
         }
 
         function renderSolutions(block) {
-            // Abdullah still did not finish a block of type solutions
-            // However reaching to this block means you have to sendData() and get the solutions back
+            $('.messages').css('height', '100%');
+            $('.message-input').hide();
+            $('#presetAnswers').remove();
+            chatInputDiv.style = "display:none;";
 
             sendDataSolutionsBlock(block.content.showTop)
                 .then((solutions) => {
@@ -662,27 +695,50 @@
 
         async function submitAnswer(message, blockKeywords = undefined) {
 
-
+            chatInputDiv.style = "display:none";
+            fileUploadForm.style.display = 'none';
 
             if (currentBlock.type == "File Upload") {
                 //needs rework
                 message = "&FILE_UPLOAD&" + document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
                 if (!checkFileFormat(message)) {
-                    sendUserMessage(message.replace("&FILE_UPLOAD&", ""))
-                    await sleep(350);
+                    sendUserMessage(message.replace("&FILE_UPLOAD&", ""));
+
+                    await sleep(200);
+                    putThinkingGif();
+                    await sleep(thinkingGifLife);
+                    removeThinkingGif();
+                    await sleep(200);
+
                     sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
+                    chatInputDiv.style = "display:block";
+                    fileUploadForm.style.display = 'block';
                     return 0;
                 }
                 // clear file-upload div
-                $(".message-input").first().html('');
+                //$(".message-input").last().html('');
                 //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
 
-                if (currentBlock.content.afterMessage)
-                    sendAssistantMessage(currentBlock.content.afterMessage);
-                await sleep(300);
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+
+                await sleep(200);
+                putThinkingGif();
+                await sleep(thinkingGifLife);
+                removeThinkingGif();
+                await sleep(200);
 
                 print();
-                getNextBlock(currentBlock.content.action);
+
+                if (currentBlock.content.afterMessage) {
+                    sendAssistantMessage(currentBlock.content.afterMessage);
+
+                    await sleep(200);
+                    putThinkingGif();
+                    await sleep(thinkingGifLife);
+                    removeThinkingGif();
+                    await sleep(200);
+                }
+                return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
             }
 
             if (currentBlock.type == "User Input") { //validate user input
@@ -694,47 +750,73 @@
 
                 $('#textMessage').val("");
 
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+
                 print();
 
+                await sleep(200);
+                putThinkingGif();
+                await sleep(thinkingGifLife);
+                removeThinkingGif();
+                await sleep(200);
+
                 if (!validateUserInput(message, currentBlock.content.validation)) {
-                    await sleep(350);
-                    sendAssistantMessage("I am sorry but that was not in the format I think it should be...")
+                    sendAssistantMessage("I am sorry but that was not in the format I think it should be...");
+                    chatInputDiv.style = "display:block";
                     return 0;
                 }
                 else {
                     // clear user input div
-                    $(".message-input").first().html('');
-                    if (currentBlock.content.afterMessage)
+                    //$(".message-input").last().html('');
+                    if (currentBlock.content.afterMessage) {
                         sendAssistantMessage(currentBlock.content.afterMessage);
-                    await sleep(300);
 
+                        await sleep(200);
+                        putThinkingGif();
+                        await sleep(thinkingGifLife);
+                        removeThinkingGif();
+                        await sleep(200);
+
+                    }
                 }
-                getNextBlock(currentBlock.content.action);
+                return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
             }
-            
+
             if (currentBlock.type == "Question") {
                 // clear answers div
-                $(".message-input").first().html('');
+                $("#presetAnswers").first().html('');
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
                 print();
+
+                await sleep(200);
+                putThinkingGif();
+                await sleep(thinkingGifLife);
+                removeThinkingGif();
+                await sleep(200);
 
                 var blockAnswers = currentBlock.content.answers;
 
                 for (var i = 0; i < blockAnswers.length; i++) {
                     if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].text == message) {
-                        if (blockAnswers[i].afterMessage)
+                        if (blockAnswers[i].afterMessage) {
                             sendAssistantMessage(blockAnswers[i].afterMessage);
 
-                        var action = blockAnswers[i].action;
-                        var blockToGoId = blockAnswers[i].blockToGoId;
+                            await sleep(200);
+                            putThinkingGif();
+                            await sleep(thinkingGifLife);
+                            removeThinkingGif();
+                            await sleep(200);
+                        }
 
-                        getNextBlock(action, blockToGoId);
+                        var action = blockAnswers[i].action;
+                        var blockToGoId = blockAnswers[i].blockToGoID;
+                        return getNextBlock(action, blockToGoId);
                     }
                 }
             }
 
             function print() {
                 // print the selected answer
-                newMessage(CLIENT_USER, message);
                 if (blockKeywords)
                     blockKeywords = Boolean(blockKeywords.split) ? blockKeywords.split(',') : blockKeywords;
 
@@ -755,27 +837,36 @@
                 }
 
             }
-            
+
 
         }
 
         function getNextBlock(action, blockToGoId = undefined) {
-            var targetBlock = undefined
-
+            var targetBlock = undefined;
+            // 1
             if (action == "Go To Next Block") {
                 targetBlock = blocks[currentBlock.order]; //order starts from 1 and array from 0 so it just needs the current .order
-                if (targetBlock === undefined) {
-                    sendData()
-                    return 0;
-                }
-            }
-            // not yet implimented
-            else if (action == "Go To Specific Block") {
+
+            } else if (action == "Go To Specific Block") {
                 for (var i = 0; i < blocks.length; i++) {
-                    if (blocks[i].id == blockToGoId) {
+                    if (blocks[i].order == blockToGoId) {
                         targetBlock = blocks[i];
                     }
                 }
+            }
+
+            // 2
+            if (targetBlock === undefined) {
+                sendData().then((isSuccess) => {
+                    if (isSuccess){
+                        sendAssistantMessage("Thank you for your input. We'll be in touch.");
+                    } else {
+                        sendAssistantMessage("Your input couldn't be processed. Please contact us.");
+                    }
+
+                    SetRepeat();
+                    return 0;
+                    })
             }
 
             if (currentBlock != undefined) { //check if its not trying to reload the same block
@@ -787,19 +878,12 @@
 
         function SetRepeat() {
             $("#optionsDiv").append("");
-            newMessage(BOT_USER, "<div class='endChat' onclick=\"Reset()\"><a class='answerOptions' style='width:400px;'>Search Again <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> </a></div>",true);
+            newMessage(BOT_USER, "<div class='endChat' onclick=\"Reset()\"><a class='' style='width:400px;'>Search Again <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> </a></div>",true);
             //checkOutsideElements();
         }
 
         function Reset() {
-            cancelScroll = false;
-            $(".messages ul").children().remove();
-            $(".message-input").first().html('');
-
-            keywords = [];
-            collectedInformation = [];
-            fileUpload = false;
-            start();
+           window.location.reload()
         }
 
 
@@ -819,8 +903,8 @@
             {#document.getElementById('newMessage').id = 'oldMessage';#}
         }
 
-        function putThinkingGif() {
-            $(".messages").append("<div class='tsbDiv'><li class='TSBbot' id='thinkingGif'><img src='/static/images/typing.gif'></li></div>");
+    function putThinkingGif() {
+            $(".messages ul").append('<li id="thinkingGif" class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p><img style="width:27px" id=\"thinkingGifIMG\" src="/static/images/typingDots.gif"></p></li>');
             animateMessage("#thinkingGif");
         }
 
@@ -1004,60 +1088,7 @@
     });
 </script>
 
+
 </body>
 </html>
 
-{##}
-{#    <div class="top_right">#}
-{#        <img style="width:20px; height: 20px; margin: 10px; top: 0px; right: 0px; position: fixed;" src="/static/img/bg-img/Icons8-Windows-8-Computer-Hardware-Restart.ico" onclick="Reset()">#}
-{#    </div>#}
-{##}
-{#    <div class="outerContainer">#}
-{#        <div class="innerContainer">#}
-{#            <div class="element">#}
-{#                <!-- <div class="chat-box">#}
-{#                <div class="open">Open#}
-{#                    <div class="box"> -->#}
-{#                <center>#}
-{#                    <ul id="messagesContainer">#}
-{#                        <!-- paste here the yeyo -->#}
-{#                    </ul>#}
-{#                </center>#}
-{#                <div id="separator">#}
-{#                    <br>#}
-{#                    <br>#}
-{#                    <br>#}
-{#                    <br>#}
-{#                    <br>#}
-{#                    <br>#}
-{#                    <br>#}
-{#                    <div id="chatBottom"></div>#}
-{#                </div>#}
-{#                <footer id="chatFooter">#}
-{#                    <div id="bottomContainer">#}
-{#                        <div id="optionsDiv">#}
-{#                        </div>#}
-{#                        <!-- <ul> -->#}
-{#                        <div id="ChatInputDiv">#}
-{#                            <!--<input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><input type="file" id="fileUploadB" size="10" /><img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />-->#}
-{#                            <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage">#}
-{#                            <form id="fileUploadForm" class="image-upload" style="display:none" onsubmit="return sendFileForm();">#}
-{#                                <label for="fileUploadB">#}
-{#                                    <img src="https://www.thesearchbase.com/static/images/cloud-upload.png" />#}
-{#                                </label>#}
-{##}
-{#                                <input name="file" hidden id="fileUploadB" type="file" />#}
-{#                            </form>#}
-{#                            <img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitAnswer('')" />#}
-{#                        </div>#}
-{#                        <!-- </ul> -->#}
-{#                    </div>#}
-{#                </footer>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
-{#    <!-- </div>#}
-{#    </div>#}
-{#    </div> -->#}
-{#    <script src="/static/chatbot/script.js"></script>#}
-{##}

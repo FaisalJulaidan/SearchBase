@@ -130,6 +130,7 @@ class User(db.Model):
                                 on_serialize=None,
                                 on_deserialize=None
                                 )
+        New = db.Column(db.String(64), nullable=False)
     else:
         Firstname = db.Column(db.String(64), nullable=False)
         Surname = db.Column(db.String(64), nullable=False,

@@ -34,3 +34,12 @@ def removeNewsletterPerson(email):
     
     db.session.commit()
     return Callback(True, email + ' has been unsubsribed from newsletters.')
+
+def getAll():
+    try:
+        result = db.session.query(Newsletter).all()
+    except Exception as e:
+        print("newsletter_services.getAll ERROR: ", e)
+        return Callback(False, "Error in getting newsletters: ")
+
+    return Callback(True, "Newsletters retrieved", result)

@@ -1,11 +1,12 @@
 #/usr/bin/python3.5
 from flask import Flask, redirect, request, render_template, session
 from datetime import datetime
-from services import assistant_services, user_services
+from services import assistant_services, user_services, mail_services
 import os
 from models import db, Role, Company, Assistant, Plan, Statistics, ValidationType, Block, BlockType, Solution, ChatbotSession, Callback
 from services.mail_services import mail
 from utilities import helpers
+import time, threading
 
 
 # Import all routers to register them as blueprints
@@ -39,6 +40,24 @@ app.register_blueprint(users_router)
 app.register_blueprint(bot_router)
 app.register_blueprint(emoji_router)
 
+sendNotifications = False
+
+def asyncNotifications(app):
+    with app.app_context():
+        for i in range(28800, 0, -1):
+            time.sleep(1)
+        mail_services.notifyNewRecordsForLastXHours(8)
+        global sendNotifications
+        sendNotifications = False
+        send_updates()
+
+def send_updates():
+    global sendNotifications
+    if not sendNotifications:
+        sendNotifications = True
+        thr = threading.Thread(target=asyncNotifications, args=[app])
+        thr.start()
+
 
 # Code to ensure user is logged in
 @app.before_request
@@ -49,7 +68,6 @@ def before_request():
 
     # If the user try to visit one of the restricted routes without logging in he will be redirected
     if any(route in currentURL for route in restrictedRoutes):
-        print("Security Check For Restricted Routes")
         if not session.get('Logged_in', False):
             return redirect('login')
         try:
@@ -57,7 +75,7 @@ def before_request():
             if request.view_args['assistantID']:
                 assistantID = int(request.view_args['assistantID'])
                 ownership_callback : Callback = assistant_services.checkOwnership(assistantID, session.get('CompanyID', None))
-            if not ownership_callback.Success: 
+            if not ownership_callback.Success:
                 session["returnMessage"] = ownership_callback.Message
                 return redirect('login')
                 role_callback : Callback = user_services.getRolePermissions(session.get('UserID', None))
@@ -190,7 +208,7 @@ def gen_dummy_data():
     db.session.add(
         Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=20, ActiveBotsCap=10, InactiveBotsCap=30,
              AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
-    
+
     db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=30,  ActiveBotsCap=2, InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
@@ -260,7 +278,6 @@ def gen_static_data():
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
     db.session.commit()
 
-
 if __name__ == "__main__":
 
     print("Run the server...")
@@ -273,12 +290,13 @@ if __name__ == "__main__":
 
         print('Production mode running...')
 
+
+        send_updates()
         # Run the app server
         app.run()
 
     elif os.environ['FLASK_ENV'] == 'development' :
         app.config.from_object('config.DevelopmentConfig')
-
         db.init_app(app)
         mail.init_app(app)
         app.app_context().push()
@@ -290,11 +308,11 @@ if __name__ == "__main__":
         gen_dummy_data()
         print('Development mode running...')
 
+
+        send_updates()
         # Run the app server
         app.run()
     else:
         print("Please set FLASK_ENV first to either 'production' or 'development' \r\n "
               "ex. in Windows >set FLASK_ENV=development, in Linux/Mac >export FLASK_ENV=development \r\n"
               "then run the server >python app.py")
-
-

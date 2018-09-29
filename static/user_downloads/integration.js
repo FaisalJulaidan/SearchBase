@@ -231,6 +231,7 @@ window.onload = (async function (global) {
         if (fullLoad["jquery"] && fullLoad["popupsettings"]) {
             fadein(document.getElementById("TSB-container"));
             clearInterval(interval);
+            document.getElementById('TSB-chatbotIframe').src = host + iframe_route + '/' + id;
 
             setTimeout(function () {
                 if (!popOpen) {

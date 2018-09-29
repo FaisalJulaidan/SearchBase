@@ -1,7 +1,6 @@
 import os
 from config import BaseConfig
-from flask import send_from_directory
-from flask import Blueprint, render_template, request, session, redirect, url_for
+from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory
 from flask_api import status
 from utilities import helpers
 from models import Callback, Assistant, db, ChatbotSession

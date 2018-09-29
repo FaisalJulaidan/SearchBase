@@ -4,8 +4,11 @@
   "type": "object",
   "properties": {
     "showTop": {"type": "integer", "minimum": 1},
+    "action": { "enum": ["Go To Next Block", "Go To Specific Block", "End Chat" ] },
+    "blockToGoID": { "type": [ "number",  "null" ] },
     "afterMessage": {"type": "string"}
+
     },
-  "required": ["showTop", "afterMessage"],
+  "required": ["showTop", "action", "afterMessage", "blockToGoID"],
   "additionalProperties": false
 }

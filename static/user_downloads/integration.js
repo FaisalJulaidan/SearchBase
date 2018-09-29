@@ -6,7 +6,7 @@ var globalTSB = {
     iframe_route: '/chatbottemplate_production'
 };
 
-var fullLoad = { "jquery": false, "popupsettings": false };
+var fullLoad = { "jquery": false, "popupsettings": false, "iframe": false };
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -137,7 +137,12 @@ window.onload = (async function (global) {
 
     // Animations
     function reloadIframe(){
-      document.getElementById('TSB-chatbotIframe').src = host  + iframe_route + '/' + id;
+        console.log(fullLoad["iframe"]);
+      if(!fullLoad["iframe"])  {
+          document.getElementById('TSB-chatbotIframe').src = host  + iframe_route + '/' + id;
+          fullLoad["iframe"] = true;
+      }
+
     }
 
     document.getElementById("TSB-iframediv").style.display = "none";
@@ -182,13 +187,14 @@ window.onload = (async function (global) {
                 opacity: '0',
             }, 500, () => {
                 $("#TSB-iframediv").hide();
-            })
+            });
             popOpen = false;
         }
     });
 
     // Reset the iframe
      document.getElementById('TSB-refreshIframe').addEventListener('click', e => {
+       fullLoad["iframe"] = false;
        reloadIframe()
     });
 

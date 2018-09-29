@@ -4,7 +4,7 @@
   "type": "object",
   "properties": {
     "text": {"type": "string"},
-    "action": {"enum": ["Go To Next Block", "Go To Specific Block"]},
+    "action": {"enum": ["Go To Next Block", "Go To Specific Block", "End Chat"]},
     "fileTypes": {"type": "array", "items": {"type": "string"}},
     "blockToGoID": { "type": [ "integer", "null" ] },
     "afterMessage": {"type": "string"}

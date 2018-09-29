@@ -16,8 +16,9 @@
       }
     },
     "keywords": {"type": "array", "items": {"type": "string"}},
-    "showTop": {"type": "integer"}
+    "showTop": {"type": "integer"},
+    "solutionsReturned": {"type": "integer"}
   },
-  "required": ["collectedInformation", "keywords", "showTop"],
+  "required": ["collectedInformation", "keywords", "showTop", "solutionsReturned"],
   "additionalProperties": false
 }

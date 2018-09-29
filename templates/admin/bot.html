@@ -736,10 +736,12 @@
             }
 
             class BlockTypeSolutions {
-                constructor(showTop, storeInDB, type, order, id, afterMessage = "") {
+                constructor(showTop, storeInDB, type, order, id, action, blockToGoID, afterMessage = "") {
                     this.Solutions = {
                         content: {
                             showTop: showTop,
+                            action: action,
+                            blockToGoID: blockToGoID,
                             afterMessage: afterMessage
                         },
                         storeInDB: storeInDB,
@@ -862,9 +864,13 @@
                     let showTop = +$block.children('div.panel-body').first().children('.topSolutions').first().children('input').first().val();
                     let afterMessage = $block.children('div.panel-body').first().children('.afterMessage').first().children('input').first().val();
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+                    let action = $block.children().last().find('input.action').first().val();
                     let id = +$block.attr('id');
+                    let blockToGoID = 0;
+                    try { blockToGoID = +$block.children().last().find('.blockToGoID')[0].value; }
+                    catch (e) { blockToGoID = 0;}
 
-                    botData.blocks.push(new BlockTypeSolutions(showTop, storeInDB, type, order, id, afterMessage).Solutions);
+                    botData.blocks.push(new BlockTypeSolutions(showTop, storeInDB, type, order, id, action, blockToGoID, afterMessage).Solutions);
                 }
 
 
@@ -1123,7 +1129,7 @@
         }
 
         function render_blocks(blocks) {
-            console.log("blocks: ", blocks)
+
             blocksNumber = blocks.length;
             function cookUpBlock(block_template, block) {
 
@@ -1140,7 +1146,7 @@
                 function getActionElement(actions) {
                     return "" +
                         "<div class=\"input-group col-md-6\">\n" +
-                        "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
+                        "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor action\" disabled aria-label=\"...\"\n" +
                         "          value=\"BLOCK_ACTION\">\n" +
                         "   <div class=\"input-group-btn\">\n" +
                         "       <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
@@ -1399,6 +1405,7 @@
 
                     if (block_template.name == "Solutions") {
                         content = getTopSolutionsElement() + getAfterMessageInput(block.content.afterMessage) +
+                            getActionElement(block_template.actions) +
                             getSubmitElement(true, 'x');
 
                     }
@@ -1471,7 +1478,7 @@
                 function getActionElement(actions) {
                     return "" +
                         "<div class=\"input-group col-md-6\">\n" +
-                        "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor\" disabled aria-label=\"...\"\n" +
+                        "   <input type=\"text\" style=\"height: 34px\" class=\"form-control normalCursor action\" disabled aria-label=\"...\"\n" +
                         "          value=\"\">\n" +
                         "   <div class=\"input-group-btn\">\n" +
                         "       <button type=\"button\" class=\"btn btn-default dropdown-toggle\"\n" +
@@ -1581,6 +1588,7 @@
 
                     if (block_template.name == "Solutions") {
                         templateHTML = getTopSolutionsElement() + getAfterMessageInput() +
+                            getActionElement(block_template.actions) +
                             getSubmitElement(true, 'x');
 
                     }

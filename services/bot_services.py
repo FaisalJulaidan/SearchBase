@@ -226,7 +226,8 @@ def getOptions() -> dict:
             },
             {
             'name': BlockType.Solutions.value,
-            'maxSolutions': 5
+            'maxSolutions': 5,
+            'actions': [a.value for a in BlockAction],
             },
         ]
     }

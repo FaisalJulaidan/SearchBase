@@ -4,7 +4,7 @@ from utilities import json_utils
 
 
 # Process chatbot data
-def processData(assistant: Assistant, data: dict, solutionsReturned: int) -> Callback:
+def processData(assistant: Assistant, data: dict) -> Callback:
     try:
         json_utils.validateSchema(data, 'chatbot_session.json')
     except Exception as exc:
@@ -17,7 +17,7 @@ def processData(assistant: Assistant, data: dict, solutionsReturned: int) -> Cal
         collectedInformation = data['collectedInformation']
         chatbotSession = ChatbotSession(Data={'collectedInformation': collectedInformation},
                                    TimeSpent=44,
-                                   SolutionsReturned=solutionsReturned,
+                                   SolutionsReturned=data['solutionsReturned'],
                                    QuestionsAnswered=len(collectedInformation),
                                    Assistant=assistant)
         db.session.add(chatbotSession)

@@ -101,8 +101,8 @@ def gen_dummy_data():
               "smoker",
               "sad"
             ],
-            "blockToGoId": None,
-            "afterMessage": ''
+            "blockToGoId": 0,
+            "afterMessage": 'Yesss!!'
           },
           {
             "action": "Go To Next Block",
@@ -112,13 +112,11 @@ def gen_dummy_data():
               "smoker",
               "sad"
             ],
-            "blockToGoId": None,
-            "afterMessage": ''
+            "blockToGoId": 1,
+            "afterMessage": 'NOOOO!!'
 
           }
         ],
-        "id": 2,
-        "order": 2,
         "text": "Do you smoke?",
       }))
     db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Assistant=reader_a, Content={
@@ -128,7 +126,6 @@ def gen_dummy_data():
         "storeInDB": True,
         "validation": "Email",
         "afterMessage": 'Your input is being processed...'
-
     }))
 
     db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
@@ -145,6 +142,8 @@ def gen_dummy_data():
     db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Assistant=reader_a, Content={
         "showTop": 5,
         "afterMessage": 'DONE!!!!',
+        "action": "End Chat",
+        "blockToGoID": 0
     }))
 
     # Create Roles

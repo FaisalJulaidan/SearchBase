@@ -75,7 +75,7 @@ def notifyNewRecordsForLastXHours(hours):
         newsletters_callback : Callback = newsletter_services.getAll()
         if not newsletters_callback.Success: raise Exception("newsletters_callback: ", newsletters_callback.Message)
 
-        for record in newsletters:
+        for record in newsletters_callback.Data:
             print("1")
             user_callback : Callback = user_services.getByEmail(record.Email)
             if not user_callback.Success: raise Exception("user_callback: ", user_callback.Message)
@@ -87,14 +87,15 @@ def notifyNewRecordsForLastXHours(hours):
 
             for assistant in assistants_callback.Data:
                 print("4")
-                records_callback : Callback = analytics_services.getAllRecordsByAssistantID(hours, assistant.ID)
-                if not records_callback.Success: raise Exception("records_callback: ", sendRecords_callback.Message)
+                records_callback : Callback = analytics_services.getAllRecordsByAssistantIDInTheLast(hours, assistant.ID)
+                if not records_callback.Success: raise Exception("records_callback: ", records_callback.Message)
                 print("5")
 
+                print(records_callback.Data)
                 if not records_callback.Data: continue
                 print("6")
 
-                sendRecords_callback : Callback = sendNewRecordsNotification(record.Email, records_callback.Data)
+                sendRecords_callback : Callback = sendNewRecordsNotification(record.Email, {"assistantName": assistant.Name, "data": records_callback.Data, "assistantID": assistant.ID})
                 if not sendRecords_callback.Success: raise Exception("sendRecords_callback: ", sendRecords_callback.Message)
                 print("7")
 
@@ -104,7 +105,7 @@ def notifyNewRecordsForLastXHours(hours):
 def sendNewRecordsNotification(reciever, data):
     try:
         send_email((reciever), 'Your new data', 
-               'emails/company_signup.html', data=data)
+               'emails/user_notification.html', data=data)
 
     except:
         print("addedNewUserEmail() Error: ", e)

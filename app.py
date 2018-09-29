@@ -40,16 +40,27 @@ app.register_blueprint(users_router)
 app.register_blueprint(bot_router)
 app.register_blueprint(emoji_router)
 
+sendNotifications = False
 
-#8 hour periodic timer
-def eightHourTimer():
-    mail_services.notifyNewRecordsForLastXHours(8)
-    threading.Timer(10, eightHourTimer).start()
+def asyncCall(app):
+    print("here 1")
+    with app.app_context():
+        print("here 2")
+        for i in range(20, -1, -1):
+            print("i: ", i)
+            time.sleep(1)
+        mail_services.notifyNewRecordsForLastXHours(8)
+        global sendNotifications
+        sendNotifications = False
+        send_updates()
 
-def startTimer():
-    threading.Timer(10, eightHourTimer).start()
+def send_updates():
+    global sendNotifications
+    if not sendNotifications:
+        sendNotifications = True
+        thr = threading.Thread(target=asyncCall, args=[app])
+        thr.start()
 
-startTimer()
 
 # Code to ensure user is logged in
 @app.before_request
@@ -283,7 +294,9 @@ if __name__ == "__main__":
         app.app_context().push()
 
         print('Production mode running...')
+        
 
+        send_updates()
         # Run the app server
         app.run()
 
@@ -300,12 +313,15 @@ if __name__ == "__main__":
         # gen_static_data()
         gen_dummy_data()
         print('Development mode running...')
+        
 
+        send_updates()
         # Run the app server
         app.run()
     else:
         print("Please set FLASK_ENV first to either 'production' or 'development' \r\n "
               "ex. in Windows >set FLASK_ENV=development, in Linux/Mac >export FLASK_ENV=development \r\n"
               "then run the server >python app.py")
+
 
 

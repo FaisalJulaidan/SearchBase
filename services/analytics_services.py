@@ -220,12 +220,12 @@ def getTimeSpentAvgOvertime(assistantID, days):
 def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
 
     try:
-        sessions = db.session.query(ChatbotSession, hours).filter(
+        sessions = db.session.query(ChatbotSession).filter(
             ChatbotSession.AssistantID == assistantID,
             ChatbotSession.DateTime < datetime.now(),
-            ChatbotSession.DateTime >= datetime.now() - timedelta(hours = hours))
+            ChatbotSession.DateTime >= datetime.now() - timedelta(hours = hours)).count()
     except Exception as e:
-        print("analytics_services.getAllRecordsByAssistantID() ERROR: ", e)
+        print("analytics_services.getAllRecordsByAssistantIDInTheLast() ERROR: ", e)
         return Callback(False, "Error in returning records")
 
-    return Callback(False, "Records retrieved", sessions)
+    return Callback(True, "Records retrieved", sessions)

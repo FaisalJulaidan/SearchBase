@@ -28,14 +28,27 @@ class BaseConfig(object):
     MAIL_SUPPRESS_SEND = False
     USE_ENCRYPTION = True
 
+    JOBS = [
+        {
+            'id': 'notify',
+            'func': 'services.mail_services:notifyNewRecordsForLastXHours',
+            'args': (8,),
+            'trigger': 'interval',
+            'seconds': 10
+        }
+    ]
+
+    SCHEDULER_API_ENABLED = True
+
 
 class ProductionConfig(BaseConfig):
     ENV = 'production'
     DEBUG = False
     TESTING = False
 
-    # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'Production.db')
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Test1234@localhost/MySQLProduction.db'
+    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Test1234@localhost/MySQLProduction.db'
+    # More secure approach
+    SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
@@ -45,8 +58,8 @@ class DevelopmentConfig(BaseConfig):
     DEBUG = True
     TESTING = True
 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'Development.db')
     # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@localhost/MySQLDevelopment.db)
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'Development.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

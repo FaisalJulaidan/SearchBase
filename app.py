@@ -11,6 +11,8 @@ from sqlalchemy_utils import create_database, database_exists
 from utilities import helpers
 import time, threading
 import config
+from flask_apscheduler import APScheduler
+
 
 
 # Import all routers to register them as blueprints
@@ -26,12 +28,15 @@ app = Flask(__name__, static_folder='static')
 
 # Server Setup
 db.init_app(app)
+db.app = app
 mail.init_app(app)
-app.app_context().push()
+mail.app = app
 
 migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
+scheduler = APScheduler()
+
 
 # Register Routes:
 app.register_blueprint(adminBasic_router)
@@ -55,21 +60,21 @@ app.register_blueprint(emoji_router)
 
 sendNotifications = False
 
-def asyncNotifications(app):
-    with app.app_context():
-        for i in range(28800, 0, -1):
-            time.sleep(1)
-        mail_services.notifyNewRecordsForLastXHours(8)
-        global sendNotifications
-        sendNotifications = False
-        send_updates()
-
-def send_updates():
-    global sendNotifications
-    if not sendNotifications:
-        sendNotifications = True
-        thr = threading.Thread(target=asyncNotifications, args=[app])
-        thr.start()
+# def asyncNotifications(app):
+#     with app.app_context():
+#         for i in range(28800, 0, -1):
+#             time.sleep(1)
+#         mail_services.notifyNewRecordsForLastXHours(8)
+#         global sendNotifications
+#         sendNotifications = False
+#         send_updates()
+#
+# def send_updates():
+#     global sendNotifications
+#     if not sendNotifications:
+#         sendNotifications = True
+#         thr = threading.Thread(target=asyncNotifications, args=[app])
+#         thr.start()
 
 
 # Code to ensure user is logged in
@@ -248,7 +253,7 @@ def gen_dummy_data():
     db.session.commit()
 
 
-@manager.command
+# @manager.command
 def seed():
 
     # Plans
@@ -274,19 +279,26 @@ def seed():
 
 if __name__ == "__main__":
 
+
+
+    app.app_context().push()
+
+
     print("Run the server...")
     if os.environ['FLASK_ENV'] == 'production':
 
         app.config.from_object('config.ProductionConfig')
         print('Production mode running...')
-        url = config.ProductionConfig.SQLALCHEMY_DATABASE_URI
+        # url = config.ProductionConfig.SQLALCHEMY_DATABASE_URI
+        url = os.environ['SQLALCHEMY_DATABASE_URI']
+
         if not database_exists(url):
             create_database(url)
             db.create_all()
             seed()
 
 
-        send_updates()
+        # send_updates()
         # Run the app server
         manager.run()
 
@@ -299,12 +311,14 @@ if __name__ == "__main__":
         db.create_all()
         gen_dummy_data()
 
+        scheduler.init_app(app)
+        # scheduler.start()
+
         print('Development mode running...')
 
-
-        send_updates()
+        # send_updates()
         # Run the app server
-        app.run()
+        app.run(threaded = True)
     else:
         print("Please set FLASK_ENV first to either 'production' or 'development' \r\n "
               "ex. in Windows >set FLASK_ENV=development, in Linux/Mac >export FLASK_ENV=development \r\n"

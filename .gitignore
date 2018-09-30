@@ -532,3 +532,5 @@ __pycache__/
 # End of https://www.gitignore.io/api/macos,linux,python,windows,pycharm,visualstudio
 
 .db
+*.db
+/static/file_uploads/user_files

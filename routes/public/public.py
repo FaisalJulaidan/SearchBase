@@ -252,7 +252,7 @@ def testing(key):
     print("Starting key retrieval")
     serverRoute = "http://www.thesearchbase.com"
     print("Part 0.1")
-    page = urllib.request.urlopen("../static/js/sortTable.js")
+    page = urllib.request.urlopen("http://www.thesearchbase.com/static/js/sortTable.js")
     print("Part 0.2")
     text = page.read().decode("utf8")
     print("Part 0.3")

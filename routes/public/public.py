@@ -250,18 +250,16 @@ def sendEmail():
 @public_router.route("/setencryptionkey<key>", methods=["GET"])
 def testing(key):
     print("Starting key retrieval")
-    serverRoute = "http://www.thesearchbase.com"
+    serverRoute = "http://206.189.122.126"
     print("Part 0.1")
-    #page = urllib.request.urlopen("http://www.thesearchbase.com/static/js/sortTable.js")
-    #print("Part 0.2")
-    #text = page.read().decode("utf8")
-    text = "FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-SrlLaYxpTrEFEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT"
+    page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
+    print("Part 0.2")
+    text = page.read().decode("utf8")
     print("Part 0.3")
     part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')
     print("Part 1 set")
-    #page = urllib.request.urlopen(serverRoute + "/static/js/Chart.bundle.js")
-    #text = page.read().decode("utf8")
-    text = "GFoiWS$344wf43-cWzHOpHWc8BAcYe3Sv-FE-vWaIt3xWkbE6bsd7-jS"
+    page = urllib.request.urlopen(serverRoute + "/static/js/Chart.bundle.js")
+    text = page.read().decode("utf8")
     part2 = text.split("GFoiWS$344wf43-cWzHOp")[1].split("Ye3Sv-FE-vWaIt3xWkbE6bsd7-jS")[0].replace('8B', '3J')
     print("Part 2 set")
     page = urllib.request.urlopen(serverRoute + "/static/css/admin.css")

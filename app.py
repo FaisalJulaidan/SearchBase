@@ -281,6 +281,7 @@ if __name__ == "__main__":
         print('Production mode running...')
         url = os.environ['SQLALCHEMY_DATABASE_URI']
         if not database_exists(url):
+            print('Create database and tables...')
             create_database(url)
             db.create_all()
             seed()

@@ -45,9 +45,6 @@ class ProductionConfig(BaseConfig):
     ENV = 'production'
     DEBUG = False
     TESTING = False
-
-    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Test1234@localhost/MySQLProduction.db'
-    # More secure approach
     SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -58,7 +55,10 @@ class DevelopmentConfig(BaseConfig):
     DEBUG = True
     TESTING = True
 
-    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@localhost/MySQLDevelopment.db)
+    # MySQL
+    # SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
+
+    # SQLite
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'Development.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

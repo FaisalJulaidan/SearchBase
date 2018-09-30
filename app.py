@@ -293,6 +293,7 @@ if __name__ == "__main__":
         url = os.environ['SQLALCHEMY_DATABASE_URI']
 
         if not database_exists(url):
+            print('Create db tables')
             create_database(url)
             db.create_all()
             seed()
@@ -318,7 +319,8 @@ if __name__ == "__main__":
 
         # send_updates()
         # Run the app server
-        app.run(threaded = True)
+        # app.run(threaded = True)
+        manager.run()
     else:
         print("Please set FLASK_ENV first to either 'production' or 'development' \r\n "
               "ex. in Windows >set FLASK_ENV=development, in Linux/Mac >export FLASK_ENV=development \r\n"

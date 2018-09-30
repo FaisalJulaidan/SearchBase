@@ -103,9 +103,8 @@
         width: 100%;
         height: 100%;
         background: #E6EAEA;
-        {#border-radius: 5px;#}
+    {#border-radius: 5px;#}
     }
-
 
     #frame .content {
         float: right;
@@ -114,7 +113,6 @@
         overflow: hidden;
         position: relative;
     }
-
 
     #frame .content .contact-profile {
         width: 100%;
@@ -216,7 +214,6 @@
         max-width: 205px;
         line-height: 130%;
     }
-
 
     #frame .content .message-input {
         position: absolute;
@@ -351,9 +348,15 @@
 
 
         <div class="message-input" id="message-input">
-            <form id="fileUploadForm" action="/" method="get" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
+            <form id="fileUploadForm" action="/" method="get" class="image-upload" style="display:none"
+                  onsubmit="return sendFileForm();">
                 <div class="wrap" style="margin-top: 15px;min-height: 40px; background-color: white;">
-                    <label style="background-color: white;width: 84.37%;" for="fileUploadB"><i style="font-size: 30px;margin: 6px 0px 0px 10px;" class="fa fa-paperclip"></i></label><input hidden name="file" onkeypress="handleEnter(event)" id="fileUploadB" type="file" placeholder="Upload your file..." style="background-color: white;" /><button type="button" onclick="submitAnswer('')" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                    <label style="background-color: white;width: 84.37%;" for="fileUploadB"><i
+                            style="font-size: 30px;margin: 6px 0px 0px 10px;" class="fa fa-paperclip"></i></label><input
+                        hidden name="file" onkeypress="handleEnter(event)" id="fileUploadB" type="file"
+                        placeholder="Upload your file..." style="background-color: white;"/>
+                    <button type="button" onclick="submitAnswer('')" class="submit"><i class="fa fa-paper-plane"
+                                                                                       aria-hidden="true"></i></button>
                 </div>
             </form>
         </div>
@@ -400,14 +403,16 @@
         }).fail(function (res) {
             console.log("Error in retrieving blocks.");
             console.log(res);
-            });
+        });
     }
 
 
     // This start the lunch the chatbot for the first time
     function start() {
         // 1.Show the chatbot welcoming message assistant.message
-        if (welcomeMessage) { sendAssistantMessage(welcomeMessage); }
+        if (welcomeMessage) {
+            sendAssistantMessage(welcomeMessage);
+        }
 
         // 2.Show the first block in the blocks array then render it depends on its type
         renderBlock(blocks[0]);
@@ -429,7 +434,12 @@
     function sendData() {
         putThinkingGif();
         var solutions = [];
-        params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": 0, solutionsReturned: solutions.length};
+        params = {
+            "collectedInformation": collectedInformation,
+            "keywords": keywords,
+            "showTop": 0,
+            solutionsReturned: solutions.length
+        };
         console.log("Send data...");
 
         return $.ajax({
@@ -451,7 +461,7 @@
             console.log("Error in retrieving blocks.");
             console.log(res);
             return false
-            });
+        });
     }
 
     function sendDataSolutionsBlock(showTop) {
@@ -478,7 +488,7 @@
             removeThinkingGif();
             console.log("Error in retrieving blocks.");
             console.log(res);
-            });
+        });
     }
 
     function getSolutions(showTop) {
@@ -512,7 +522,9 @@
     }
 
     function sendFileForm() {
-        if (document.getElementById('fileUploadB').files.length == 0) { return false; }
+        if (document.getElementById('fileUploadB').files.length == 0) {
+            return false;
+        }
         var formData = new FormData();
         var fileInput = document.getElementById('fileUploadB').files[0];
         formData.append('file', fileInput, fileInput.name);
@@ -537,7 +549,7 @@
         messageContainer = $(".messages ul");
 
         // If there is no solutions in the database show this message.
-        if (solutions.length === 0){
+        if (solutions.length === 0) {
             sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.")
 
         } else {
@@ -568,7 +580,9 @@
         $("#qAnswers").remove();
 
         currentBlock = block;
-        if (currentBlock === undefined) {return 0;}
+        if (currentBlock === undefined) {
+            return 0;
+        }
 
         switch (block.type) {
             case "Question":
@@ -626,8 +640,33 @@
             }
             $messageInput.html($answersDiv);
 
-            //$('.messages').css('height', 'calc(100% - 55px)');
-            //$('.message-input').css('height', '55px');
+            $answersDiv.append($("<div class='row'></div>"));
+
+            {##}
+            {#for (var i = 0; i < answers.length; i++) {#}
+            {#    $answersDiv.children().last()#}
+            {#        .append(getColSpan(answers.length));#}
+            {#    $answersDiv.children().children().last()#}
+            {#        .append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText)\" >" + answers[i].text + "</button>");#}
+            {# }#}
+            {##}
+            {##}
+            {#function getColSpan(index) {#}
+            {#    switch (index) {#}
+            {#        case 1:#}
+            {#            return $("<div class='col-sm-12'></div>");#}
+            {#        case 2:#}
+            {#            return $("<div class='col-sm-6'></div>");#}
+            {#        case 3:#}
+            {#            return $("<div class='col-sm-4'></div>");#}
+            {#        case 4:#}
+            {#            return $("<div class='col-sm-3'></div>");#}
+            {#        case 6:#}
+            {#            return $("<div class='col-sm-2'></div>");#}
+            {#        default:#}
+            {#            return $("<div class='col-sm-1'></div>");#}
+            {#    }#}
+            {# }#}
         }
     }
 
@@ -656,7 +695,8 @@
             "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
             "            </div>");
 
-        $('.messages').css('height','calc(100% - 40px)');
+
+        $('.messages').css('height', 'calc(100% - 40px)');
 
         $messageInput.append($userInput);
         sendAssistantMessage(block.content.text)
@@ -686,11 +726,11 @@
         $('#presetAnswers').hide();
         chatInputDiv.style = "display:none;";
 
-         getSolutions(block.content.showTop)
-        .then((solutions) => {
-            solutions = JSON.parse(solutions);
-            displayReturnedSolutions(solutions.data.solutions)
-        })
+        getSolutions(block.content.showTop)
+            .then((solutions) => {
+                solutions = JSON.parse(solutions);
+                displayReturnedSolutions(solutions.data.solutions)
+            })
 
 
     }
@@ -879,24 +919,23 @@
                 }
             }
         } else if (action === "End Chat") {
-              sendData().then((isSuccess) => {
-                    if (isSuccess){
+            sendData().then((isSuccess) => {
+                if (isSuccess) {
                     sendAssistantMessage(currentBlock.afterMessage);
-                    } else {
+                } else {
                     sendAssistantMessage("We apologise, your input couldn't be processed. Please contact us.");
-                  }
-                });
+                }
+            });
 
-             // End chat
-             // SetRepeat();
-             sendAssistantMessage("Thank you for completing the chatbot.");
-             return 0;
+            // End chat
+            // SetRepeat();
+            return 0;
         }
 
         // If not end chat and there is no next block
         if (targetBlock === undefined) {
             sendData().then((isSuccess) => {
-                if (isSuccess){
+                if (isSuccess) {
                     {#sendAssistantMessage("Thank you for your input. We'll be in touch.");#}
                 } else {
                     sendAssistantMessage("We apologise, your input couldn't be processed. Please contact us.");
@@ -904,7 +943,7 @@
 
                 SetRepeat();
                 return 0;
-                })
+            })
         }
 
         // If there is next block but not same as the current block
@@ -918,12 +957,12 @@
 
     function SetRepeat() {
         $("#optionsDiv").append("");
-        newMessage(BOT_USER, "<div class='endChat' onclick=\"Reset()\"><a class='' style='width:400px;'>Search Again <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> </a></div>",true);
+        newMessage(BOT_USER, "<div class='endChat' onclick=\"Reset()\"><a class='' style='width:400px;'>Search Again <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> </a></div>", true);
         //checkOutsideElements();
     }
 
     function Reset() {
-       window.location.reload()
+        window.location.reload()
     }
 
 
@@ -944,9 +983,9 @@
     }
 
     function putThinkingGif() {
-            $(".messages ul").append('<li id="thinkingGif" class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p><img style="width:27px" id=\"thinkingGifIMG\" src="/static/images/typingDots.gif"></p></li>');
-            animateMessage("#thinkingGif");
-        }
+        $(".messages ul").append('<li id="thinkingGif" class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p><img style="width:27px" id=\"thinkingGifIMG\" src="/static/images/typingDots.gif"></p></li>');
+        animateMessage("#thinkingGif");
+    }
 
     function removeThinkingGif() {
         $("#thinkingGif").remove();
@@ -1039,7 +1078,7 @@
     function animateMessage(id) {
         var marginAnimate = "-=25px";
         if (id == "#thinkingGif") {
-            marginAnimate = "-=25px";
+            marginAnimate = "-=15px";
         }
         else if (id == "#newMessage") {
             marginAnimate = "-=35px";
@@ -1072,7 +1111,7 @@
         {#$('html, body').animate({#}
         {#    scrollTop: ($(id).offset().top)#}
         {# }, 2000);#}
-        $(".messages").animate({ scrollTop: $('.messages').prop("scrollHeight")}, "fast");
+        $(".messages").animate({scrollTop: $('.messages').prop("scrollHeight")}, "fast");
 
         {#$(".messages").animate({scrollTop: $(document).height()}, "fast");#}
     }

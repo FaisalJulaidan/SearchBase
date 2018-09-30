@@ -319,8 +319,7 @@ if __name__ == "__main__":
 
         # send_updates()
         # Run the app server
-        # app.run(threaded = True)
-        manager.run()
+        app.run(threaded = True)
     else:
         print("Please set FLASK_ENV first to either 'production' or 'development' \r\n "
               "ex. in Windows >set FLASK_ENV=development, in Linux/Mac >export FLASK_ENV=development \r\n"

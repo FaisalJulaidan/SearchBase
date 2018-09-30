@@ -8,60 +8,70 @@
 
         <div class="row">
             <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel" style="height:850px;">
-                    <div class="col-md-12">
-                        <h3> Connecting your assistant. </h3>
-                        <p>
-                            To Connect your assistant, you must paste the pre-made code into any part of your HTML
-                            source code between the.
-                        </p>
-                        <xmp>
+                <div class="x_panel">
+                    <style>
+                        legend {
+                            padding: 3px 6px;
+                        }
 
-                            <div class="bottom_left" id="contents1">
-                                <div id="iframediv">
-                                    <div id="overChatbotIframe">
-                                        <a id="overChatbotIframeHeading">TheSearchBase</a>
-                                        <a id="overChatbotIframeCloseButton">X</a>
-                                    </div>
-                                    <!-- Will change this after the demo -->
-                                    <iframe frameBorder="0" id="chatbotIframe" src="https://thesearchbase.com/chatbot/{{company}}/{{assistantID}}"></iframe>
-                                </div>
-                                <div class="launch_btn_holder">
-                                    <div id="launch_button"></div>
-                                    <div id="launch_button_appendix"></div>
-                                </div>
+                        input {
+                            margin: .4rem;
+                        }
+
+                    </style>
+                    <fieldset>
+                        <legend class="h3">Choose circle and icon colors</legend>
+
+                        <div style="display: -webkit-inline-box;">
+
+                            <div style="margin: 10px">
+                                <input type="color" id="icon" name="color"
+                                       value="#ffffff"/>
+                                <label for="icon">Icon</label>
                             </div>
 
-                        </xmp>
+                            <div style="margin: 10px">
+                                <input type="color" id="circle" name="color"
+                                       value="#4B5B71"/>
+                                <label for="circle">Circle</label>
+                            </div>
+                        </div>
+
+                    </fieldset>
+
+                </div>
+                <div class="x_panel" style="height:500px;">
+                    <div class="col-md-12">
+                        <legend class="h3">Connecting your assistant.</legend>
                         <p>
-                            Once you have pasted this, into the HTML page that you wish to use your assistant on, you're
-                            live.
+                            To Connect your assistant, you must paste the pre-made code into any part of your HTML source code.
                         </p>
+
+                        <strong>
+                            <textarea style="width:600px; height:90px;" id="URL_id" readonly>
+<script src="https://www.thesearchbase.com/userdownloads/integration.js" data-name="tsb-widget" data-id={{ assistantID }} data-icon="#fff" data-circle="#4B5B71" async defer></script></textarea>
+                        </strong>
                         <br />
-                        <h4> CSS </h4>
-                        <xmp>
-                            <link href="https://www.thesearchbase.com/static/css/style.css" rel="stylesheet">
-                            <link href="https://www.thesearchbase.com/static/pop-up/pop.css" rel="stylesheet">
-                            <link href="https://www.thesearchbase.com/static/css/responsive.css" rel="stylesheet">
-                        </xmp>
                         <br />
-                        <h4> Javascript (This is used for analytics and the animation used in the bot) </h4>
-                        <xmp>
-                            <script async src="https://www.thesearchbase.com/static/user_downloads/chatbot.js"></script>
-                            <script src="https://www.thesearchbase.com/static/js/popper.min.js"></script>
-                            <script src="https://www.thesearchbase.com/static/js/bootstrap.min.js"></script>
-                            <script src="https://www.thesearchbase.com/static/js/plugins.js"></script>
-                            <script src="https://www.thesearchbase.com/static/js/slick.min.js"></script>
-                            <script src="https://www.thesearchbase.com/static/js/footer-reveal.min.js"></script>
-                            <script src="https://www.thesearchbase.com/static/js/active.js"></script>
-                            <script src="https://www.thesearchbase.com/static/js/jquery-2.2.4.min.js"></script>
-                            <script type="text/javascript" src="https://www.thesearchbase.com/static/js/jQueryRotate.js"></script>
-                        </xmp>
-                        <h4> Images for the assistant </h4>
-                        <xmp>
-                        <link href="https://www.thesearchbase.com/static/user_downloads/open-assistant-bar.png">
-                        <link href="https://www.thesearchbase.com/static/user_downloads/open-assistant-circle.png">
-                        </xmp>
+
+
+                        <p> To deploy your assistant, simply copy the line above and paste it in the page in which you would like your bot to operate in.</p>
+
+                        <button onclick="copyURL()" class="btn btn-success">Copy URL</button>
+                        <br />
+                        <br />
+                        <br />
+
+                        <p>
+                            <strong>
+                                For better performance, paste the line of code within the elements within the code of your website.
+                                <xmp style="margin-left:-200px">
+                                    <body>
+                                        <The line above goes here>
+                                    </body>
+                                </xmp>
+                            </strong>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -69,4 +79,45 @@
         <!-- /top tiles -->
         <br/>
     </div>
+{% endblock %}
+
+
+{% block customJS %}
+    <script>
+        window.onload = function () {
+            if (prev_handler)
+                prev_handler();
+
+            let $script = $('<script src=\"https://www.thesearchbase.com/userdownloads/integration.js\" data-name=\"tsb-widget\" data-id={{ assistantID }} data-icon="#fff" data-circle="#4B5B71" async defer>');
+
+            $('input#icon').on('change', (e) => {
+                $script.attr('data-icon', $('input#icon').val());
+                $('#URL_id').first().text($script[0].outerHTML)
+            })
+
+            $('input#circle').on('change', (e) => {
+                $script.attr('data-circle', $('input#circle').val());
+                $('#URL_id').first().text($script[0].outerHTML)
+            })
+
+
+        }
+
+    </script>
+
+    <script>
+        function copyURL() {
+            /* Get the text field */
+            var copyText = document.getElementById("URL_id");
+
+            /* Select the text field */
+            copyText.select();
+
+            /* Copy the text inside the text field */
+            document.execCommand("copy");
+        }
+
+    </script>
+
+
 {% endblock %}

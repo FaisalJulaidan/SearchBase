@@ -13,8 +13,8 @@
         font-size: 14px;
     }
     .welcome-thumb {
-        width: 50%;
-        bottom: -100px;
+        width: 40%;
+        bottom: -50px;
         right: 50px;
     }
     .video-area {
@@ -55,10 +55,10 @@
     .welcome-thumb {
         width: 50%;
         bottom: -100px;
-        right: 0;
+        right: 25%;
     }
     .wellcome-heading {
-        margin-bottom: 70px;
+        margin-bottom: 0;
     }
     .single-special {
         padding: 30px 10px;
@@ -107,22 +107,6 @@
     .clients-feedback-area .slick-slide.slick-current img {
         width: 90px !important;
         height: 90px !important;
-    }
-}
-
-@media(max-width: 767px) {
-
-    #iframediv{
-        margin: 0px;
-    }
-
-    .bottom_left, #iframediv, #overChatbotIframe, #chatbotIframe{
-        width:100%;
-
-    }
-
-    #chatbotIframe {
-        height: 450px;
     }
 }
 

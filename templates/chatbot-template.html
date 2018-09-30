@@ -1,0 +1,1094 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <!-- Title -->
+    <title>Bot</title>
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#884BDF">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#884BDF">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="#884BDF">
+
+    <!-- Icon images -->
+    <link rel="apple-touch-icon" sizes="57x57" href="/static/img/core-img/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/static/img/core-img/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/static/img/core-img/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/static/img/core-img/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/static/img/core-img/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/static/img/core-img/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/static/img/core-img/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/img/core-img/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/img/core-img/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/img/core-img/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/core-img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/static/img/core-img/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/core-img/favicon-16x16.png">
+    <link rel="manifest" href="/static/img/core-img/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/static/img/core-img/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Pop-up Stylesheet -->
+    <!-- <link href="/static/pop-up/pop.css" rel="stylesheet"> -->
+
+    <!-- Responsive CSS -->
+    <link href="/static/css/responsive.css" rel="stylesheet">
+
+    <!-- Core Stylesheet -->
+    {#            <link href="/static/css/style.css" rel="stylesheet">#}
+    <!-- <link href="/static/css/main.css" rel="stylesheet"> -->
+
+    <!-- Responsive CSS -->
+    <link href="/static/css/responsive.css" rel="stylesheet">
+    <!-- Jquery-2.2.4 JS -->
+    <script src="/static/js/jquery-2.2.4.min.js"></script>
+    <!-- Popper js -->
+    <script src="/static/js/popper.min.js"></script>
+    <!-- Bootstrap-4 Beta JS -->
+    <script src="/static/js/bootstrap.min.js"></script>
+    <!-- All Plugins JS -->
+    <script src="/static/js/plugins.js"></script>
+    <!-- Slick Slider Js-->
+    <script src="/static/js/slick.min.js"></script>
+    <!-- Footer Reveal JS -->
+    <script src="/static/js/footer-reveal.min.js"></script>
+    <!-- Active JS -->
+    <!-- <script src="/static/js/active.js"></script> -->
+
+    <!-- Emoji JS and CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css"/>
+    <!-- to use -> emojione.toImage(input) -> input = :emojiname: -> example -> emojione.toImage(:smile:) -->
+    <!-- phone emojis also work -->
+    <!-- :P :) or such are not suported -->
+    <!-- https://demos.emojione.com/latest/jstoshort.html to look at their :emoji: name -->
+
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!------ Include the above in your HEAD tag ---------->
+
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <!------ Include the above in your HEAD tag ---------->
+
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
+    <link rel='stylesheet prefetch'
+          href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
+</head>
+<style>
+    html, body {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "proxima-nova", "Source Sans Pro", sans-serif;
+        font-size: 1em;
+        letter-spacing: 0.1px;
+        color: #32465a;
+        text-rendering: optimizeLegibility;
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
+        -webkit-font-smoothing: antialiased;
+
+        background: -webkit-linear-gradient(-135deg, #c850c0, #4158d0);
+        background: -o-linear-gradient(-135deg, #c850c0, #4158d0);
+        background: -moz-linear-gradient(-135deg, #c850c0, #4158d0);
+        background: linear-gradient(-135deg, #c850c0, #4158d0);
+    }
+
+    #frame {
+        width: 95%;
+        max-width: 1000px;
+        height: 92vh;
+        min-height: 300px;
+        max-height: 720px;
+        background: #E6EAEA;
+        border-radius: 5px;
+    }
+
+    @media screen and (max-width: 380px) {
+        #frame {
+            width: 100%;
+            height: 100vh;
+            border-radius: 0px;
+        }
+
+        #frame .content .contact-profile {
+            border-top-left-radius: 0px;
+            border-top-right-radius: 0px;
+        }
+    }
+
+    #frame .content {
+        float: right;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    @media screen and (max-width: 735px) {
+        #frame .content {
+            width: 100%;
+            min-width: 250px !important;
+        }
+    }
+
+    @media screen and (min-width: 900px) {
+        #frame .content {
+            width: 100%;
+        }
+    }
+
+    #frame .content .contact-profile {
+        width: 100%;
+        height: 60px;
+        line-height: 60px;
+        background: #f5f5f5;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+
+    #frame .content .contact-profile img {
+        width: 40px;
+        border-radius: 50%;
+        float: left;
+        margin: 9px 12px 0 9px;
+        padding: 5px;
+    }
+
+    #frame .content .contact-profile p {
+        float: left;
+    }
+
+    #frame .content .contact-profile .social-media {
+        float: right;
+    }
+
+    #frame .content .contact-profile .social-media i {
+        margin-left: 14px;
+        cursor: pointer;
+    }
+
+    #frame .content .contact-profile .social-media i:nth-last-child(1) {
+        margin-right: 20px;
+    }
+
+    #frame .content .contact-profile .social-media i:hover {
+        color: #435f7a;
+    }
+
+    #frame .content .messages {
+        height: auto;
+        min-height: calc(100% - 93px);
+        max-height: calc(100% - 93px);
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+
+    @media screen and (max-width: 735px) {
+        #frame .content .messages {
+            max-height: calc(100% - 115px);
+        }
+    }
+
+    #frame .content .messages::-webkit-scrollbar {
+        width: 8px;
+        background: transparent;
+    }
+
+    #frame .content .messages::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    #frame .content .messages ul li {
+        display: inline-block;
+        clear: both;
+        float: left;
+        margin: 15px 15px 5px 15px;
+        width: calc(100% - 25px);
+        font-size: 0.9em;
+    }
+
+    #frame .content .messages ul li:nth-last-child(1) {
+        margin-bottom: 20px;
+    }
+
+    #frame .content .messages ul li.sent img {
+        float: right;
+        margin: 6px 8px 0 0;
+    }
+
+    #frame .content .messages ul li.sent p {
+        margin-right: 5px;
+        background: #435f7a;
+        color: #f5f5f5;
+        float: right;
+    }
+
+    #frame .content .messages ul li.replies img {
+        margin: 6px 0 0 8px;
+    }
+
+    #frame .content .messages ul li.replies p {
+        background: #f5f5f5;
+        margin-left: 5px;
+    }
+
+    #frame .content .messages ul li img {
+        width: 22px;
+        border-radius: 50%;
+        float: left;
+    }
+
+    #frame .content .messages ul li p {
+        display: inline-block;
+        padding: 10px 15px;
+        border-radius: 20px;
+        max-width: 205px;
+        line-height: 130%;
+    }
+
+    @media screen and (min-width: 735px) {
+        #frame .content .messages ul li p {
+            max-width: 300px;
+        }
+    }
+
+    #frame .content .message-input {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        z-index: 99;
+    }
+
+    #frame .content .message-input .wrap {
+        position: relative;
+    }
+
+    #frame .content .message-input .wrap input {
+        font-family: "proxima-nova", "Source Sans Pro", sans-serif;
+        float: left;
+        border: none;
+        width: calc(100% - 50px);
+        height: 40px;
+        padding: 11px 32px 10px 12px;
+        font-size: 0.8em;
+        color: #32465a;
+    }
+
+    @media screen and (max-width: 735px) {
+        #frame .content .message-input .wrap input {
+            padding: 11px 32px 10px 12px;
+        }
+    }
+
+    #frame .content .message-input .wrap input:focus {
+        outline: none;
+    }
+
+    #frame .content .message-input .wrap button {
+        float: right;
+        border: none;
+        width: 50px;
+        height: 40px;
+        padding: 12px 0;
+        cursor: pointer;
+        background: #32465a;
+        color: #f5f5f5;
+    }
+
+    #frame .content .message-input .wrap button:hover {
+        background: #435f7a;
+    }
+
+    #frame .content .message-input .wrap button:focus {
+        outline: none;
+    }
+
+    #frame .content .message-input .wrap button.answer {
+        float: inherit;
+        margin-left: 20px;
+        margin-right: 20px;
+        padding: 10px;
+        width: auto;
+    }
+
+    @media screen and (max-width: 735px) {
+        #frame .content .message-input .wrap button.answer {
+            margin-left: 5px;
+            margin-right: 5px;
+            padding: 10px;
+            width: auto;
+        }
+    }
+
+    #frame .content .message-input .wrap button.answer:focus {
+        outline: none;
+    }
+
+    .endChat {
+        display: inline-block;
+        padding: 10px 15px;
+        border-radius: 20px;
+        max-width: 205px;
+        line-height: 130%;
+        background-color: #BA68C8;
+        float: left;
+        color: white;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .results {
+        display: inline-block;
+        padding: 10px 15px;
+        border-radius: 20px;
+        max-width: 205px;
+        line-height: 130%;
+        background: #f5f5f5;
+    }
+
+
+</style>
+<body id="chatbotBody">
+<div id="frame">
+    <div class="content">
+        <div class="contact-profile">
+            <img src="/static/img/core-img/favicon-96x96.png" alt=""/>
+            <p>Bot</p>
+            <div class="social-media" onclick="Reset()">
+                <i class="fa fa-refresh" aria-hidden="true"></i>
+            </div>
+        </div>
+
+        <div class="messages">
+            <ul></ul>
+            <div id="chatBottom"></div>
+        </div>
+
+
+        <div class="message-input"></div>
+    </div>
+</div>
+
+{#        <script src="/static/chatbot/script.js"></script>#}
+<script>
+    var assistant = null;
+    var blocks = []; // Blocks ordered
+    var currentBlock = undefined;
+    var keywords = [];
+    var cancelScroll = false;
+    var collectedInformation = [];
+    var fileUpload = false;
+    var params = undefined;
+    var sessionID = 0;
+    var welcomeMessage = "";
+    var BOT_USER = 'bot';
+    var CLIENT_USER = 'user';
+    var chatInputDiv = document.getElementById("message-input");
+    var fileUploadForm = document.getElementById('fileUploadForm');
+    var thinkingGifLife = 800 + Math.floor(Math.random() * 1200);
+
+    // This function will get the blocks from the server by assistantID and set the blocks array to be used to create
+    // the cahtbot conversational flow
+    function chatbotInit(assistantID) {
+        console.log("Chatbot Init...");
+        $.ajax({
+            url: '../assistant/' + assistantID + '/chatbot',
+            type: "GET"
+        }).done(function (res) {
+
+            console.log("Blocks retrieved successfully!");
+            var data = JSON.parse(res).data;
+
+            // Set assistant and blocks array
+            assistant = data.assistant;
+            blocks = data.blocks;
+            welcomeMessage = assistant.message
+            // Start the chatbot
+            start();
+
+        }).fail(function (res) {
+            console.log("Error in retrieving blocks.");
+            console.log(res);
+            });
+    }
+
+
+    // This start the lunch the chatbot for the first time
+    function start() {
+        // 1.Show the chatbot welcoming message assistant.message
+        if (welcomeMessage) { sendAssistantMessage(welcomeMessage); }
+
+        // 2.Show the first block in the blocks array then render it depends on its type
+        renderBlock(blocks[0]);
+    }
+
+
+    // Get block by id
+    function getBlock(id) {
+        for (var i = 0, l = blocks.length; i < l; i++) {
+            if (blocks[i].id === id) {
+                return blocks[i]
+            }
+        }
+        // If nothing found return null
+        return null
+    }
+
+    // This should send the data to the server, without returning any solutions back
+    function sendData() {
+        putThinkingGif();
+        var solutions = [];
+        params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": 0};
+        console.log("Send data...");
+
+        return $.ajax({
+            contentType: 'application/json', //this is important
+            url: '../assistant/' + assistantID + '/chatbot',
+            type: "POST",
+            data: JSON.stringify(params)
+
+        }).done(function (res) {
+            removeThinkingGif();
+            console.log("Data sent successfully!");
+            var data = JSON.parse(res).data;
+            sessionID = data["sessionID"];
+            sendFile();
+            return true;
+
+        }).fail(function (res) {
+            removeThinkingGif();
+            console.log("Error in retrieving blocks.");
+            console.log(res);
+            return false
+            });
+    }
+
+    function sendDataSolutionsBlock(showTop) {
+        putThinkingGif();
+        params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": showTop};
+
+        return $.ajax({
+            contentType: 'application/json', //this is important
+            url: '../assistant/' + assistantID + '/chatbot',
+            type: "POST",
+            data: JSON.stringify(params)
+
+        }).done(function (res) {
+            removeThinkingGif();
+
+            console.log("Solutions retrieved successfully!");
+            var data = JSON.parse(res).data;
+            sessionID = data["sessionID"];
+            solutions = data["solutions"];
+            sendFile();
+            return solutions;
+
+        }).fail(function (res) {
+            removeThinkingGif();
+            console.log("Error in retrieving blocks.");
+            console.log(res);
+            });
+    }
+
+    function sendFile() {
+        console.log("init form")
+        sendFileForm();
+    }
+
+    function sendFileForm() {
+        if (document.getElementById('fileUploadB').files.length == 0) { return false; }
+        var formData = new FormData();
+        var fileInput = document.getElementById('fileUploadB').files[0];
+        formData.append('file', fileInput, fileInput.name);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', "../assistant/" + sessionID + "/file", true);
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                console.log("File Sent");
+            } else {
+                alert('An error occurred!');
+            }
+        };
+
+        xhr.send(formData);
+
+        return false;
+    }
+
+    function displayReturnedSolutions(solutions) {
+        messageContainer = $(".messages ul");
+
+        // If there is no solutions in the database show this message.
+        if (solutions.length === 0){
+            sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.")
+
+        } else {
+
+            for (var i = 0; i < solutions.length; i++) {
+                messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
+                    + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>"
+                    + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] +
+                    "</label><br><button onclick=\"openSolution('" + solutions[i]["URL"] +
+                    "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center></li>");
+            }
+        }
+
+
+        SetRepeat();
+    }
+
+    function openSolution(link) {
+        window.open(link);
+    }
+
+
+    // Blocks Renderer //
+    // --------------- //
+
+    function renderBlock(block) {
+        // to remove old questions
+        // needs fix
+        $("#qAnswers").remove();
+
+        currentBlock = block;
+        if (currentBlock === undefined) {return 0;}
+
+        switch (block.type) {
+            case "Question":
+                renderQuestion(block);
+                break;
+            case "User Input":
+                renderUserInput(block);
+                break;
+            case "File Upload":
+                renderFileUpload(block);
+                break;
+            case "Solutions":
+                renderSolutions(block);
+                break;
+            default:
+                console.log("Block type is not recognised!!!")
+        }
+    }
+
+    // This function will render a block of type Questions with its answers to the chatbot.
+    function renderQuestion(block) {
+        // to show the message from bot_user
+        newMessage(BOT_USER, block.content.text);
+        // to show answers related to question_block
+        showAnswers(block.content.answers);
+
+        // var answerAppendString = "<div id='qAnswers'>";
+        // document.getElementById("textMessage").style.display = "inline-block";
+        // document.getElementById("fileUploadForm").style.display = "none";
+        //
+        // var blockAnswers = block.content.answers;
+        // for (var i = 0; i < blockAnswers.length; i++) {
+        //     answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"submitAnswer('" + toEmoticon(blockAnswers[i].text) + "','" + blockAnswers[i].keywords + "')\">" + toEmoticon(blockAnswers[i].text) + "</a>";
+        // }
+        //add skip button
+        //answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"SkipQuestion()\">Skip Question</a>";
+        // answerAppendString += "</div>";
+        // $("#optionsDiv").append(answerAppendString);
+        // chatInputDiv.style = "display:none";
+        //
+        // sendAssistantMessage(block.content.text);
+
+        // checkOutsideElements();
+        // if (!cancelScroll) {
+        //     scrollTo("chatBottom");
+        // }
+
+        function showAnswers(answers) {
+            $messageInput = $("#presetAnswers").first();
+            $answersDiv = $("<div class='wrap text-center' style='padding:10px;'></div>");
+
+            for (var i = 0; i < answers.length; i++) {
+                $answersDiv.append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText, '" + answers[i].keywords + "' )\" >" + answers[i].text + "</button>");
+            }
+            $messageInput.html($answersDiv);
+
+            //$('.messages').css('height', 'calc(100% - 55px)');
+            //$('.message-input').css('height', '55px');
+        }
+    }
+
+
+    function newMessage(from, text, html = false) {
+        if (from == BOT_USER) {
+            if (html)
+                $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" />' + text + '</li>').appendTo($('.messages ul')).hide().fadeIn();
+            else
+                $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p>' + text + '</p></li>').appendTo($('.messages ul')).hide().fadeIn();
+        }
+        else {
+            $('<li class="sent"><img src="https://cdn1.iconfinder.com/data/icons/social-messaging-productivity-1-1/128/gender-male2-512.png" alt="" /><p>' + text + '</p></li>').appendTo($('.messages ul')).hide().fadeIn();
+        }
+
+        scrollTo('end')
+    }
+        function renderUserInput(block) {
+            chatInputDiv.style = "display:block;";
+            fileUploadForm.style.display = 'none';
+            $messageInput = $(".message-input").last();
+            $userInput = $("<div class=\"wrap\" style=\"margin-top: 15px;min-height: 40px; background-color: white;\">\n" +
+                "                <input onkeypress=\"handleEnter(event)\" " +
+                "            id='textMessage' type=\"text\" placeholder=\"Write your message...\"/>\n" +
+                "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
+                "            </div>");
+
+            $('.messages').css('height','calc(100% - 40px)');
+
+            $messageInput.append($userInput);
+            sendAssistantMessage(block.content.text)
+        }
+
+        function renderFileUpload(block) {
+            //$messageInput = $(".message-input").first();
+            //$fileUpload = $("<div class=\"wrap\">\n" +
+            //    "<input onkeypress=\"handleEnter(event)\" id=\"fileUploadB\" type=\"file\" placeholder=\"Write your message...\" style=\"\n" +
+            //    "    background-color:  white;\n" + "\">" +
+            //    "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
+            //    "            </div>");
+
+            //$messageInput.html($fileUpload);
+
+            //$('.messages').css('height','calc(100% - 40px)');
+            //$('.message-input').css('height','40px');
+
+            sendAssistantMessage(block.content.text);
+            chatInputDiv.style = "display:block";
+            fileUploadForm.style.display = 'block';
+        }
+
+        function renderSolutions(block) {
+            $('.messages').css('height', '100%');
+            $('.message-input').hide();
+            $('#presetAnswers').remove();
+            chatInputDiv.style = "display:none;";
+
+            sendDataSolutionsBlock(block.content.showTop)
+                .then((solutions) => {
+                    solutions = JSON.parse(solutions);
+                    displayReturnedSolutions(solutions.data.solutions)
+                })
+        }
+
+        async function submitAnswer(message, blockKeywords = undefined) {
+
+            chatInputDiv.style = "display:none";
+            fileUploadForm.style.display = 'none';
+
+            if (currentBlock.type == "File Upload") {
+                //needs rework
+                message = "&FILE_UPLOAD&" + document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
+                if (!checkFileFormat(message)) {
+                    sendUserMessage(message.replace("&FILE_UPLOAD&", ""));
+
+                    await sleep(200);
+                    putThinkingGif();
+                    await sleep(thinkingGifLife);
+                    removeThinkingGif();
+                    await sleep(200);
+
+                    sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
+                    chatInputDiv.style = "display:block";
+                    fileUploadForm.style.display = 'block';
+                    return 0;
+                }
+                // clear file-upload div
+                //$(".message-input").last().html('');
+                //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
+
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+
+                await sleep(200);
+                putThinkingGif();
+                await sleep(thinkingGifLife);
+                removeThinkingGif();
+                await sleep(200);
+
+                print();
+
+                if (currentBlock.content.afterMessage) {
+                    sendAssistantMessage(currentBlock.content.afterMessage);
+
+                    await sleep(200);
+                    putThinkingGif();
+                    await sleep(thinkingGifLife);
+                    removeThinkingGif();
+                    await sleep(200);
+                }
+                return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
+            }
+
+            if (currentBlock.type == "User Input") { //validate user input
+                if (message == "")
+                    message = document.getElementById("textMessage").value;
+
+                if (message == "" || message.replace(/ /g, "") == "")
+                    return 0;
+
+                $('#textMessage').val("");
+
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+
+                print();
+
+                await sleep(200);
+                putThinkingGif();
+                await sleep(thinkingGifLife);
+                removeThinkingGif();
+                await sleep(200);
+
+                if (!validateUserInput(message, currentBlock.content.validation)) {
+                    sendAssistantMessage("I am sorry but that was not in the format I think it should be...");
+                    chatInputDiv.style = "display:block";
+                    return 0;
+                }
+                else {
+                    // clear user input div
+                    //$(".message-input").last().html('');
+                    if (currentBlock.content.afterMessage) {
+                        sendAssistantMessage(currentBlock.content.afterMessage);
+
+                        await sleep(200);
+                        putThinkingGif();
+                        await sleep(thinkingGifLife);
+                        removeThinkingGif();
+                        await sleep(200);
+
+                    }
+                }
+                return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
+            }
+
+            if (currentBlock.type == "Question") {
+                // clear answers div
+                $("#presetAnswers").first().html('');
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+                print();
+
+                await sleep(200);
+                putThinkingGif();
+                await sleep(thinkingGifLife);
+                removeThinkingGif();
+                await sleep(200);
+
+                var blockAnswers = currentBlock.content.answers;
+
+                for (var i = 0; i < blockAnswers.length; i++) {
+                    if (blockAnswers[i].keywords.equals(blockKeywords) && blockAnswers[i].text == message) {
+                        if (blockAnswers[i].afterMessage) {
+                            sendAssistantMessage(blockAnswers[i].afterMessage);
+
+                            await sleep(200);
+                            putThinkingGif();
+                            await sleep(thinkingGifLife);
+                            removeThinkingGif();
+                            await sleep(200);
+                        }
+
+                        var action = blockAnswers[i].action;
+                        var blockToGoId = blockAnswers[i].blockToGoID;
+                        return getNextBlock(action, blockToGoId);
+                    }
+                }
+            }
+
+            function print() {
+                // print the selected answer
+                if (blockKeywords)
+                    blockKeywords = Boolean(blockKeywords.split) ? blockKeywords.split(',') : blockKeywords;
+
+                if (currentBlock.storeInDB) {
+                    var information = {
+                        "blockID": currentBlock.id,
+                        "questionText": currentBlock.content.text,
+                        "input": message
+                    };
+                    if (currentBlock.type == "Question" && blockKeywords !== undefined) {
+                        information["keywords"] = blockKeywords
+                        collectedInformation.push(information);
+                        addKeywords(blockKeywords)
+                    } else {
+                        information["keywords"] = []
+                        collectedInformation.push(information);
+                    }
+                }
+
+            }
+
+
+        }
+
+        function getNextBlock(action, blockToGoId = undefined) {
+            var targetBlock = undefined;
+            // 1
+            if (action == "Go To Next Block") {
+                targetBlock = blocks[currentBlock.order]; //order starts from 1 and array from 0 so it just needs the current .order
+
+            } else if (action == "Go To Specific Block") {
+                for (var i = 0; i < blocks.length; i++) {
+                    if (blocks[i].order == blockToGoId) {
+                        targetBlock = blocks[i];
+                    }
+                }
+            }
+
+            // 2
+            if (targetBlock === undefined) {
+                sendData().then((isSuccess) => {
+                    if (isSuccess){
+                        sendAssistantMessage("Thank you for your input. We'll be in touch.");
+                    } else {
+                        sendAssistantMessage("Your input couldn't be processed. Please contact us.");
+                    }
+
+                    SetRepeat();
+                    return 0;
+                    })
+            }
+
+            if (currentBlock != undefined) { //check if its not trying to reload the same block
+                if (currentBlock != targetBlock) {
+                    renderBlock(targetBlock);
+                }
+            }
+        }
+
+        function SetRepeat() {
+            $("#optionsDiv").append("");
+            newMessage(BOT_USER, "<div class='endChat' onclick=\"Reset()\"><a class='' style='width:400px;'>Search Again <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> </a></div>",true);
+            //checkOutsideElements();
+        }
+
+        function Reset() {
+           window.location.reload()
+        }
+
+
+        // helper functions
+        function sendUserMessage(message) {
+
+            newMessage(CLIENT_USER, toEmoticon(message));
+            {#$("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>" + toEmoticon(message) + "</li></div>");#}
+            {#animateMessage("#newMessage");#}
+            {#document.getElementById('newMessage').id = 'oldMessage';#}
+        }
+
+        function sendAssistantMessage(message) {
+            newMessage(BOT_USER, toEmoticon(message));
+            {#$("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + toEmoticon(message) + "</li></div>");#}
+            {#animateMessage("#newMessage");#}
+            {#document.getElementById('newMessage').id = 'oldMessage';#}
+        }
+
+    function putThinkingGif() {
+            $(".messages ul").append('<li id="thinkingGif" class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p><img style="width:27px" id=\"thinkingGifIMG\" src="/static/images/typingDots.gif"></p></li>');
+            animateMessage("#thinkingGif");
+        }
+
+        function removeThinkingGif() {
+            $("#thinkingGif").remove();
+        }
+
+        function validateUserInput(message, messageType) {
+            var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+            if (messageType == "Email" && !message.match(emailRegex)) {
+                return false;
+            } else if (messageType == "FullName" && name.indexOf(' ') <= 0) {
+                return false;
+            } else if (messageType == "Telephone" && !/^[0-9]*$/.test(message)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        function addKeywords(blockKeywords) {
+            var addIn = true;
+
+            for (var c = 0; c < blockKeywords.length; c++) {
+                addIn = true;
+
+                for (var i = 0; i < keywords.length; i++) {
+                    if (blockKeywords[c] == keywords[i]) {
+                        addIn = false;
+                        break;
+                    }
+                }
+
+                if (addIn) {
+                    keywords.push(blockKeywords[c]);
+                }
+            }
+        }
+
+        function generateUserInputThanks() {
+            var thanks = "";
+            switch (Math.round(Math.random() * 6)) {
+                case 0:
+                    thanks = "Thanks 😁";
+                    break;
+                case 1:
+                    thanks = "Thank you 😃";
+                    break;
+                case 2:
+                    thanks = "I'll remember that 😉";
+                    break;
+                case 3:
+                    thanks = "Just one of the things that make you cool 😎";
+                    break;
+                case 4:
+                    thanks = "Let me just write it down ✍️😊";
+                    break;
+                case 5:
+                    thanks = "Give me a second to operate that information 😷";
+                    break;
+                case 6:
+                    thanks = "Thanks 👊";
+                    break;
+            }
+            return thanks
+        }
+
+        function checkFileFormat(message) {
+            var messageSplit = message.split(".");
+            var format = messageSplit[messageSplit.length - 1];
+            var allowedFormats = currentBlock.content.fileTypes;
+            var passes = false;
+            for (var i = 0; i < allowedFormats.length; i++) {
+                if (allowedFormats[i] === format) {
+                    passes = true;
+                }
+            }
+            return passes;
+        }
+
+        function getAllowedFormatsString() {
+            var formats = "";
+            var allowedFormats = currentBlock.content.fileTypes;
+            for (var i = 0; i < allowedFormats.length; i++) {
+                formats += allowedFormats[i] + ", ";
+            }
+            formats = formats.slice(0, -2);
+            return formats;
+        }
+
+        function animateMessage(id) {
+            var marginAnimate = "-=25px";
+            if (id == "#thinkingGif") {
+                marginAnimate = "-=25px";
+            }
+            else if (id == "#newMessage") {
+                marginAnimate = "-=35px";
+            }
+            $(id).animate({
+                marginTop: marginAnimate
+            }, "slow");
+            if (!cancelScroll) {
+                {#scrollTo("chatBottom");#}
+            }
+        }
+
+        function toEmoticon(message) {
+            return emojione.toImage(message);
+        }
+
+        function checkOutsideElements() {
+            var offScreenElements = $(':offscreen');
+            for (var z = 0; z < offScreenElements.length; z++) {
+                var elementID = offScreenElements[z].outerHTML.split("id=\"")[1].split("\"")[0];
+                $("<br><br>").insertBefore("#" + elementID);
+                checkOutsideElements();
+                return 0;
+            }
+        }
+
+        function scrollTo(id) {
+            {#$('html, body').stop();#}
+            {#id = "#" + id#}
+            {#$('html, body').animate({#}
+            {#    scrollTop: ($(id).offset().top)#}
+            {# }, 2000);#}
+            $(".messages").animate({ scrollTop: $('.messages').prop("scrollHeight")}, "fast");
+
+            {#$(".messages").animate({scrollTop: $(document).height()}, "fast");#}
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function handleEnter(e) {
+            var keycode = (e.keyCode ? e.keyCode : e.which);
+            if (keycode == '13') {
+                submitAnswer('');
+            }
+        }
+
+        //compare arrays function
+        // Warn if overriding existing method
+        if (Array.prototype.equals)
+            console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
+        // attach the .equals method to Array's prototype to call it on any array
+        Array.prototype.equals = function (array) {
+            // if the other array is a falsy value, return
+            if (!array)
+                return false;
+
+            // compare lengths - can save a lot of time
+            if (this.length != array.length)
+                return false;
+
+            for (var i = 0, l = this.length; i < l; i++) {
+                // Check if we have nested arrays
+                if (this[i] instanceof Array && array[i] instanceof Array) {
+                    // recurse into the nested arrays
+                    if (!this[i].equals(array[i]))
+                        return false;
+                }
+                else if (this[i] != array[i]) {
+                    // Warning - two different object instances will never be equal: {x:20} != {x:20}
+                    return false;
+                }
+            }
+            return true;
+        }
+        // Hide method from for-in loops
+        Object.defineProperty(Array.prototype, "equals", {enumerable: false});
+
+</script>
+<script>
+    $(document).ready(function () {
+        console.log("JS is working...");
+        var hrefSplit = window.location.href.split("/");
+        chatbotInit(assistantID = hrefSplit[hrefSplit.length - 1]);
+    });
+</script>
+
+
+</body>
+</html>
+

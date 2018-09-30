@@ -4,7 +4,7 @@
  * @author Gregory Wild-Smith <gregory@wild-smith.com>
  * @copyright 2014 Gregory Wild-Smith
  * @license MIT
- * @homepage https://github.com/abritinthebay/datejs
+ * @dashboard https://github.com/abritinthebay/datejs
  */
 /* 
  * DateJS Culture String File
@@ -191,7 +191,7 @@ Date.CultureStrings.lang = "sr-Cyrl-CS";
  * @author Gregory Wild-Smith <gregory@wild-smith.com>
  * @copyright 2014 Gregory Wild-Smith
  * @license MIT
- * @homepage https://github.com/abritinthebay/datejs
+ * @dashboard https://github.com/abritinthebay/datejs
  */(function () {
 	var $D = Date;
 	var lang = Date.CultureStrings ? Date.CultureStrings.lang : null;

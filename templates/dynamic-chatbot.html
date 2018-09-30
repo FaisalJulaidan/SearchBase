@@ -108,7 +108,16 @@
                         </div>
                         <!-- <ul> -->
                         <div id="ChatInputDiv">
-                            <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><input type="file" id="fileUploadB" size="10" /><img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />
+                            <!--<input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage"><input type="file" id="fileUploadB" size="10" /><img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />-->
+                            <input placeholder="Please enter your message here..." onkeypress="handleEnter(event)" id="textMessage">
+                            <div id="fileUploadDiv" class="image-upload" style="display:none">
+                                <label for="fileUploadB">
+                                    <img src="https://www.thesearchbase.com/static/images/cloud-upload.png" />
+                                </label>
+
+                                <input hidden id="fileUploadB" type="file" />
+                            </div>
+                            <img src="/static/img/core-img/send.png" id="messageSubmitB" onclick="submitMessage('')" />
                         </div>
                         <!-- </ul> -->
                     </div>
@@ -134,6 +143,7 @@
     var fileUploads = []
     var currentFileURL = "";
     var fileUploadQuestion = false;
+    var questionID = 0;
 
     $(window).scroll(function ()
     {
@@ -167,8 +177,6 @@
         {%endfor%}
         i++;
     {% endfor %}
-    var questionNumber = 0;
-    var questionN = 0;
     // document.getElementById("submitMessage").addEventListener("click", );
 
     $("#messagesContainer").append("<div class='tsbDiv'><li class='TSBbot'>" + emojione.toImage("{{message}}") + "</li></div><br><br>");
@@ -192,7 +200,7 @@
         cancelScroll = false;
         if (questionType == "fileUpload") {
             message = document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
-            fileUploads.push(currentFileURL + ":::" + (questionN + 1) + ":::" + message);
+            fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
         }
         if (message == "")
         {
@@ -224,8 +232,8 @@
         }
         await sleep(400 + Math.floor(Math.random() * 900));
         $("#thinkingGif").remove();
-        if (question[0].split(";")[1] == "both" || question[0].split(";")[1] == "userInfoRetrieval") {
-            collectedInformation.push((questionN + 1) + ";" + message);
+        if (questionType == "both" || questionType == "userInfoRetrieval") {
+            collectedInformation.push(questionID + ";" + message);
             var thanks = "";
             switch (Math.round(Math.random() * 6)) {
                 case 0:
@@ -282,24 +290,6 @@
             }
         }
         getNextQuestion("Next Question by Order");
-        /*$("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>I apologise but I need an answer from the showed ones in order to get you the best match</li></div>");
-        $("#newMessage").animate({
-            marginTop: "-=35px"
-        }, "slow");
-        if(!cancelScroll){
-            scrollTo("chatBottom");
-        }
-        document.getElementById('newMessage').id = 'oldMessage';
-        var answers = "<div id='qAnswers'>";
-        for(var i=1; i<data[questionN].length; i++){
-            answers+="<a class='answerOptions' id='option"+i+"' onclick=\"submitMessage('"+emojione.toImage(data[questionN][i].split(";")[0]+"')\">"+data[questionN][i].split(";")[0])+"</a>"
-        }
-        answers+="</div>"
-        $("#optionsDiv").append(answers);
-        checkOutsideElements();
-        if(!cancelScroll){
-            scrollTo("chatBottom");
-        }*/
     }
     function SkipQuestion() {
         questionsAnswered--;
@@ -311,11 +301,12 @@
         $("#qAnswers").remove();
         if (question == undefined) {
             question = data[0];
+            questionID = parseInt(question[0].split(";")[2])
         } else if (action.includes("Go to: ")) {
             for (var i = 0; i < data.length; i++) {
                 if (action.split(": ")[1] == data[i][0].split(";")[0]) {
                     question = data[i];
-                    questionN = i;
+                    questionID = parseInt(question[0].split(";")[2])
                 }
             }
         } else if (action == "Get Solutions") {
@@ -332,7 +323,6 @@
             for (var i = 0; i < data.length; i++) {
                 if (question == data[i]) {
                     question = data[i + 1];
-                    questionN++;
                     if (question == undefined) {
                         questionsAnswered--;
                         sendData();
@@ -343,6 +333,7 @@
                         }
                         return 0;
                     }
+                    questionID = parseInt(question[0].split(";")[2])
                     break;
                 }
             }
@@ -358,15 +349,12 @@
             showChatBox = false;
         }
         if (questionType == "fileUpload") {
-            console.log("true");
             document.getElementById("textMessage").style.display = "none";
-            document.getElementById("fileUploadB").style.display = "inline-block";
-            console.log(document.getElementById("textMessage").display);
+            document.getElementById("fileUploadDiv").style.display = "inline-block";
             showChatBox = true;
         } else {
-            console.log("false");
             document.getElementById("textMessage").style.display = "inline-block";
-            document.getElementById("fileUploadB").style.display = "none";
+            document.getElementById("fileUploadDiv").style.display = "none";
         }
         for (var i = 1; i < question.length; i++)
         {
@@ -376,9 +364,9 @@
             answers += "<a class='answerOptions' id='option" + i + "' onclick=\"submitMessage('" + emojione.toImage(question[i].split(";")[0]) + "')\">" + emojione.toImage(question[i].split(";")[0]) + "</a>";
             showChatBox = false;
         }
-        if (questionN == 2) {
-            answers += "<a class='answerOptions' id='option" + i + "' onclick=\"SkipQuestion()\">Skip Question</a>";
-        }
+        //if (questionID == 2) {
+        //    answers += "<a class='answerOptions' id='option" + i + "' onclick=\"SkipQuestion()\">Skip Question</a>";
+        //}
         answers += "</div>"
         $("#optionsDiv").append(answers);
         if (showChatBox)
@@ -413,11 +401,10 @@
         keywords = [];
         collectedInformation = [];
         questionsAnswered = 0;
-        questionNumber = 0;
-        questionN = -1;
         question = undefined;
         fileUploads = [];
         fileUploadQuestion = false;
+        questionID = 0;
         getNextQuestion("Next Question by Order");
     }
     function handleEnter(e)
@@ -511,25 +498,22 @@
                     $("#thinkingGif").remove();
                     var data = xhttp.responseText;
                     cRD = $("#messagesContainer");
-                    if (returnProducts) {
-                        if (data == "We could not find anything that matched your search criteria. Please try different filter options.") {
-                            cRD.append("<br><br><br><lable class='chatProducts'>We could not find<br>anything that matched your seach criteria. Please try different filter options.</lable><br><br><br>");
+                    if (!data.includes("&&&")) {
+                        cRD.append("<br><br><br><label class='chatProducts'>" + emojione.toImage(data) + "</label><br><br><br>");
+                    } else if (returnProducts) {
+                        resultdic = {};
+                        var temparray = data.split("&&&");
+                        for (var i = 0; i < temparray.length; i++) {
+                            resultdic[i] = temparray[i].split("|||");
                         }
-                        else {
-                            resultdic = {};
-                            var temparray = data.split("&&&");
-                            for (var i = 0; i < temparray.length; i++) {
-                                resultdic[i] = temparray[i].split("|||");
-                            }
-                            delete resultdic[(temparray.length - 1).toString()];
-                            for (var i = 0; i < temparray.length - 1; i++) {
-                                resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
-                                // cRD.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><lable>"+resultdic[i][1]+"</lable><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
-                                cRD.append("<center><div class='chatProducts'><lable>" + resultdic[i][1] + "</lable><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + " Square feet</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
-                            }
+                        delete resultdic[(temparray.length - 1).toString()];
+                        for (var i = 0; i < temparray.length - 1; i++) {
+                            resultdic[i][4] = resultdic[i][4].replace("\\u00a3", "£");
+                            // cRD.append("<div class='chatProducts'><img src=\""+resultdic[i][8]+"\"><br><label>"+resultdic[i][1]+"</label><br><label>"+resultdic[i][2]+"</label><br><label>"+resultdic[i][4]+"</label><br><label>"+resultdic[i][3]+" Square feet</label><br><button onclick='BuyProduct(resultdic["+i+"][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div><br>");
+                            cRD.append("<center><div class='chatProducts'><label>" + resultdic[i][1] + "</label><br><label>" + resultdic[i][2] + "</label><br><label>" + resultdic[i][4] + "</label><br><label>" + resultdic[i][3] + "</label><br><button onclick='BuyProduct(resultdic[" + i + "][7])' class='chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center><br>");
                         }
                     } else {
-                        cRD.append("<br><br><br><lable class='chatProducts'>" + emojione.toImage("Thank you for<br> your information. We will be in touch. :grin:") + "</lable><br><br><br>"); 
+                        cRD.append("<br><br><br><label class='chatProducts'>Woops!<br> Something went wrong. Sorry about that!</label><br><br><br>");
                     }
                 }
                 else

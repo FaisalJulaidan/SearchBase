@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Questions of predefined answers  response schema",
+  "type": "object",
+  "properties": {
+    "text": {"type": "string"},
+    "answers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string" },
+          "timesClicked": { "type": "integer", "minimum": 0 },
+          "keywords": { "type": "array", "items": { "type": "string" } },
+          "blockToGoID": { "type": [ "number",  "null" ] },
+          "action": { "enum": ["Go To Next Block", "Go To Specific Block", "End Chat" ] },
+          "afterMessage": { "type": "string"}
+        },
+        "required": [
+          "text",
+          "keywords",
+          "action",
+          "afterMessage",
+          "blockToGoID"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["text", "answers"],
+  "additionalProperties": false
+}

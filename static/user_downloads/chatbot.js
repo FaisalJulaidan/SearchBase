@@ -3,21 +3,28 @@ var degreeInRadians = 2 * Math.PI / 360;
 var realX = 0;
 var realY = 0;
 var opened = false;
-var frame = document.getElementById("iframediv");
-var but = document.getElementById("launch_button");
-var butAp = document.getElementById("launch_button_appendix");
-var closeBut = document.getElementById("overChatbotIframeCloseButton");
+var frame = undefined;
+var but = undefined;
+var butAp = undefined;
+var closeBut = undefined;
+var btn_text = undefined;
 var hoovered = false;
-var btn_text = $("#launch_button_appendix");
 var autoPop = "";
-
-$("#launch_button_appendix").rotate({
-    animateTo: 90,
-});
 
 
 $(document).ready(function () {
+    frame = document.getElementById("iframediv");
+    but = document.getElementById("launch_button");
+    butAp = document.getElementById("launch_button_appendix");
+    closeBut = document.getElementById("overChatbotIframeCloseButton");
     frame.style = "display:none";
+    btn_text = $("#launch_button_appendix");
+    console.log(btn_text);
+
+    btn_text.rotate({
+    animateTo: 90
+    });
+
     but.addEventListener("click", openAssistant);
     butAp.addEventListener("click", openAssistant);
     closeBut.addEventListener("click", closeAssistant);
@@ -29,13 +36,21 @@ $(document).ready(function () {
     $(document).on("mouseleave", ".launch_btn_holder", function () {
         OpenButtonHoverEnd();
     });
-    GetPopSettings();
+
+
+
+
+    loadIframe(globalTSB.host, globalTSB.id);
+    GetPopSettings(globalTSB.host, globalTSB.id);
+
 });
+
+
 
 
 function openAssistant() {
     if (!opened) {
-        frame.style = "display:block";
+        frame.style.display = "block";
         //$("#iframediv").fadeIn("slow", function () {
         //    // Animation complete
         //});
@@ -43,23 +58,26 @@ function openAssistant() {
             marginBottom: "+=35px",
             opacity: 1
         }, 400);
-        but.style = "display:none";
-        butAp.style = "display:none";
+        but.style.display = "none";
+        butAp.style.display= "none";
         opened = true;
     }
 }
 
 function closeAssistant() {
+            console.log('aaaaa');
+
     if (opened) {
         $("#iframediv").animate({
             marginBottom: "-=35px",
             opacity: 0
         }, 400);
         setTimeout(function () {
-            frame.style = "display:none";
-            but.style = "display:inline-block";
-            butAp.style = "display:inline-block";
+            frame.style.display = "display:none";
+            but.style.display = "inline-block";
+            butAp.style.display = "inline-block";
             opened = false;
+
         }, 400);
     }
 }
@@ -97,26 +115,28 @@ function OpenButtonHoverEnd() {
     }
 }
 
-function GetPopSettings() {
-    var url = window.location.href;
-    params = "URL=" + url;
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "https://www.thesearchbase.com/getpopupsettings", true);
-    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xhttp.onreadystatechange = function () {
-        if (xhttp.readyState === 4) {
-            if (xhttp.status === 200) {
-                var data = xhttp.responseText;
-                autoPop = data;
-                autoPop = autoPop.replace("\"", "");
-                if (autoPop != "Off") {
-                    setTimeout(openAssistant, parseInt(autoPop) * 1000);
-                }
-            }
-            else {
-                console.error(xhttp.statusText);
-            }
-        }
-    };
-    xhttp.send(params);
+function loadIframe(host, id) {
+    var $iframe = $('#' + "chatbotIframe");
+    url = host + "/chatbottemplate/" + id;
+    $iframe.attr('src', url);
 }
+
+function GetPopSettings(host, id) {
+    $.ajax({
+        url: host + "/getpopupsettings/" + id,
+        type: "GET"
+    }).done(function (res) {
+
+        console.log("Pop settings retrieved successfully!");
+        var data = JSON.parse(res).data;
+
+        setTimeout(openAssistant, parseInt(data['SecondsUntilPopUp']) * 1000);
+        //var frameText = data.split("&&&")[1]
+        //document.getElementById("overChatbotIframeHeading").innerHTML = frameText;
+
+    }).fail(function (res) {
+        console.log("Error in retrieving pop settings.");
+        console.log(res);
+    });
+}
+

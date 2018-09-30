@@ -1,8 +1,18 @@
 ﻿{% extends "admin/base.html" %}
 
+
 {% block title %}Analytics{% endblock %}
 
 {% block content %}
+<style>
+    .MainChartDiv {
+        
+    }
+
+    .SecondaryChartDiv {
+        
+    }
+</style>
 <div class="right_col" role="main">
     <div class="">
         <div class="page-title">
@@ -14,245 +24,184 @@
             </div>
         </div>
         <div class="clearfix"></div>
-        <div id="pasteDiv" class="row">
-            <li> Export to Excel</li>
-            <br />
-            <button id="btnExport" onclick="fnExcelReport();"> EXPORT</button>
-            <br>
-            <iframe id="txtArea1" style="display:none"></iframe>
-            <br />
-            <br />
-            <h2>General Data</h2>
-            <br />
-            <div class="analytics_line">
-                <!-- First chart -->
-                <div style="width:350px; height:200px;">
-                    <canvas id="putcharthere1" style="width:350px; height:0px;"></canvas>
-                </div>
 
-                <!-- Second chart -->
-                <div style="width:350px; height:200px;">
-                    <canvas id="putcharthere2" style="width:350px; height:0px;"></canvas>
-                </div>
 
-                <!-- Third chart -->
-                <div style="width:350px; height:200px;">
-                    <canvas id="putcharthere3" style="width:350px; height:0px"></canvas>
+        <div class="row" style="width: 72%; display:inline-block">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="">Users Overtime</h4>
+                    <canvas width="800" height="450" id="line-chart1"></canvas>
                 </div>
-                <div class="clearfix"></div>
-            </div>
-            <h2>Users over time</h2>
-            <br />
-            <div class="analytics_line">
-                <!-- First chart -->
-                <div style="width:700px; height:300px;">
-                    <canvas id="putcharthere4" style="width:350px; height:0px;"></canvas>
-                </div>
-                <div class="clearfix"></div>
             </div>
         </div>
+
+
+        <!-- Small -->
+
+        <div style="float:right; width:25%; height:auto">
+
+        <div style="width: 70%;height:25%; display:inline-block">
+            <div class="row">
+                <div class="card" style="height:100%">
+                    <div class="card-body">
+                        <h4 class="">Total Users </h4>
+                        <h1 id="totalUsersh1" style="text-align: center; margin-top: 45px; font-size:70px; color: #6610f2; ">0</h1>
+
+                        <canvas id="line-chart1"></canvas>
+                    </div>
+                </div>
+            </div>
+            <br />
+
+            <!--<div class="row">
+                <div class="card" style="height:100%">
+                    <div class="card-body">
+                or total active users
+                        <h4 class="">Avg. Time spent<small> (seconds)</small></h4>
+                        <h1>0</h1>
+                        <canvas id="line-chart1"></canvas>
+                    </div>
+                </div>
+            </div>-->
+        </div>
+            </div>
+
+        <!-- Small -->
+
+
+
+
+
+        <br />
+
+        <div class="row" style="width: 49.47%; display: inline-block;">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="">Total Questions Answered</h4>
+                        
+                    <canvas width="800" height="450" id="bar-chart1"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="width: 49.47%; display: inline-block; margin-left: 1%;">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="">Total Solutions Returned</h4>
+                    <canvas width="800" height="450" id="bar-chart2"></canvas>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div id="pasteDiv" class="row">
+
+
+            <!-- Code for excel export of the data files-->
+            <!--<li> Export to Excel</li>
+        <br />
+        <button id="btnExport" onclick="fnExcelReport();"> EXPORT</button>
+        <br>
+        <iframe id="txtArea1" style="display:none"></iframe>
+        <br />
+        <br />-->
+            {#            <h2>Critical Data</h2>#}
+            {#            <br />#}
+            {#            <div class="analytics_line">
+                #}
+                {#                <!-- First chart -->#}
+                {#                <!-- chart for the most searched for sector-->#}
+                {#                <div style="width:350px; height:200px;">
+                    #}
+                    {#                    <p>Most searched for Sector</p>#}
+                    {#                    <canvas id="mostSearchedSector" style="width:350px; height:0px;"></canvas>#}
+                    {#
+                </div>#}
+                {##}
+                {#                <!-- Second chart -->#}
+                {#                <!-- chart for the most searched for location-->#}
+                {#                <div style="width:350px; height:200px;">
+                    #}
+                    {#                    <p>Most search for location</p>#}
+                    {#                    <canvas id="mostSearchedLocation" style="width:350px; height:0px;"></canvas>#}
+                    {#
+                </div>#}
+                {##}
+                {#                <!-- Second chart -->#}
+                {#                <!-- chart for the most searched for job/solution-->#}
+                {#                <div style="width:350px; height:200px;">
+                    #}
+                    {#                    <p>Most returned solution</p>#}
+                    {#                    <canvas id="mostSearchedSolution" style="width:350px; height:0px;"></canvas>#}
+                    {#
+                </div>#}
+                {#
+            </div>#}
+            {##}
+            {##}
+            {#            <h2>General Data</h2>#}
+            {#            <br />#}
+            {#            <div class="analytics_line">
+                #}
+                {#                <!-- First chart -->#}
+                {#                <div style="width:350px; height:200px;">
+                    #}
+                    {#                    <canvas id="assistantUsed" style="width:350px; height:0px;"></canvas>#}
+                    {#
+                </div>#}
+                {##}
+                {#                <!-- Second chart -->#}
+                {#                <div style="width:350px; height:200px;">
+                    #}
+                    {#                    <canvas id="questionsAnswerd" style="width:350px; height:0px;"></canvas>#}
+                    {#
+                </div>#}
+                {##}
+                {#                <!-- Third chart -->#}
+                {#                <div style="width:350px; height:200px;">
+                    #}
+                    {#                    <canvas id="productsReturned" style="width:350px; height:0px"></canvas>#}
+                    {#
+                </div>#}
+                {#                <div class="clearfix"></div>#}
+                {#
+            </div>#}
+            {#            <h2>Users over time</h2>#}
+            {#            <br />#}
+            {#            <div class="analytics_line">
+                #}
+                {#                <!-- First chart -->#}
+                {#                <div style="width:700px; height:300px;">
+                    #}
+                    {#                    <canvas id="userOverTime" style="width:350px; height:0px;"></canvas>#}
+                    {#
+                </div>#}
+                {#                <div class="clearfix"></div>#}
+                {##}
+                {#                <div style="width:700px; height:300px;">
+                    #}
+                    {#                    <canvas id="userTimeSpent" style="width:350px; height:0px;"></canvas>#}
+                    {#
+                </div>#}
+                {#                <div class="clearfix"></div>#}
+                {#
+            </div>#}
+        </div>
     </div>
+</div>
     {% endblock %}
+    {% block naughtyScript %}
+    {% endblock %}
+{% block customJS %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.3/Chart.bundle.min.js"></script>
 
-    {% block customJS %}
-    <script src="/static/js/cookies.js"></script>
-    <script src="/static/js/Chart.js"></script>
-    <script>
-        var periods = [];
-        //  Start of the chart code
-        var totalOpened = [];
-        var totalQuestionsAnswered = [];
-        var totalProductsReturned = [];
-        {%for item in data %}
-        //check if its a monthly record
-        if ("{{item[0]}}".includes("-")) {
-            periods.push("{{item[0]}}");
-            totalOpened.push({{item[1]}})
-            totalQuestionsAnswered.push({{item[2]}})
-            totalProductsReturned.push({{item[3]}})
-        }
-        {%endfor%}
-        var chartData = {
-            labels: periods,
-            datasets: [{
-                label: 'Assistant Used',
-                fill: true,
-                lineTension: 0.1,
-                backgroundColor: "rgb(255,0,0)",
-                borderColor: "rgb(255,0,0)",
-                borderCapStyle: 'butt',
-                borderDash: [],
-                borderDashOffset: 0.0,
-                borderJoinStyle: 'miter',
-                pointBorderColor: "rgba(75,192,192,1)",
-                pointBackgroundColor: "#fff",
-                pointBorderWidth: 1,
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                pointHoverBorderColor: "rgba(220,220,220,1)",
-                pointHoverBorderWidth: 2,
-                pointRadius: 1,
-                pointHitRadius: 10,
-                data: totalOpened,
-                spanGaps: false
-            }]
-        }
-        var chartdiv = document.getElementById("putcharthere1").getContext("2d");
-        new Chart(chartdiv, {
-            data: chartData,
-            type: 'bar',
-        });
-
-        //  End of the chart code
-
-        var chartData = {
-            labels: periods,
-            datasets: [{
-                label: 'Questions Answered',
-                fill: true,
-                lineTension: 0.1,
-                backgroundColor: "rgb(0,191,255)",
-                borderColor: "rgb(0,191,255)",
-                borderCapStyle: 'butt',
-                borderDash: [],
-                borderDashOffset: 0.0,
-                borderJoinStyle: 'miter',
-                pointBorderColor: "rgba(75,192,192,1)",
-                pointBackgroundColor: "#fff",
-                pointBorderWidth: 1,
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                pointHoverBorderColor: "rgba(220,220,220,1)",
-                pointHoverBorderWidth: 2,
-                pointRadius: 1,
-                pointHitRadius: 10,
-                data: totalQuestionsAnswered,
-                spanGaps: false
-            }]
-        }
-        var chartdiv = document.getElementById("putcharthere2").getContext("2d");
-        new Chart(chartdiv, {
-            data: chartData,
-            type: 'bar',
-        });
-
-
-        var chartData = {
-            labels: periods,
-            datasets: [{
-                label: 'Products Returned',
-                fill: true,
-                lineTension: 0.1,
-                backgroundColor: "rgb(255,255,0)",
-                borderColor: "rgb(255,255,0)",
-                borderCapStyle: 'butt',
-                borderDash: [],
-                borderDashOffset: 0.0,
-                borderJoinStyle: 'miter',
-                pointBorderColor: "rgba(75,192,192,1)",
-                pointBackgroundColor: "#fff",
-                pointBorderWidth: 1,
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                pointHoverBorderColor: "rgba(220,220,220,1)",
-                pointHoverBorderWidth: 2,
-                pointRadius: 1,
-                pointHitRadius: 10,
-                data: totalProductsReturned,
-                spanGaps: false
-            }]
-        }
-        var chartdiv = document.getElementById("putcharthere3").getContext("2d");
-        new Chart(chartdiv, {
-            data: chartData,
-            type: 'bar',
-        });
-
-
-        //  Start of the chart code
-        var chartData = {
-            labels: [{% for item in data %}
-                {%if ";" in item[0] %}
-                    "Week " + "{{item[0]}}".split(";")[1] + " of " + "{{item[0]}}".split(";")[0],
-                {% endif %}
-            {% endfor %}],
-            datasets: [{
-                label: 'Assistant Used',
-                fill: false,
-                lineTension: 0.1,
-                backgroundColor: "rgb(50,205,50)",
-                borderColor: "rgb(50,205,50)",
-                borderCapStyle: 'butt',
-                borderDash: [],
-                borderDashOffset: 0.0,
-                borderJoinStyle: 'miter',
-                pointBorderColor: "rgba(75,192,192,1)",
-                pointBackgroundColor: "#fff",
-                pointBorderWidth: 1,
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                pointHoverBorderColor: "rgba(220,220,220,1)",
-                pointHoverBorderWidth: 2,
-                pointRadius: 1,
-                pointHitRadius: 10,
-                data: [{% for item in data %}
-                    {%if ";" in item[0] %}
-                        {{item[1]}},
-                    {% endif %}
-                {% endfor %}],
-                spanGaps: false
-            }]
-        }
-        var chartdiv = document.getElementById("putcharthere4").getContext("2d");
-        new Chart(chartdiv, {
-            data: chartData,
-            type: 'line',
-        });
-
-        //  End of the chart code
-
-
-        //Create table for Excel export
-        var tableString = "<table><tr><th>Date</th><th>Assistant Opened</th><th>Questions Answered</th><th>Products Returned</th></tr>";
-        {% for item in data %}
-            tableString += "<tr>"
-            {%for value in item%}
-                tableString += "<td>{{value}}</td>"
-            {%endfor%}
-            tableString += "</tr>"
-        {%endfor%}
-        function fnExcelReport() {
-            // var tab_text="<table border='2px'><tr bgcolor='#87AFC6'>";
-            // var textRange; var j=0;
-            // tab = document.getElementById('headerTable'); // id of table
-            //
-            // for(j = 0 ; j < tab.rows.length ; j++)
-            // {
-            //     tab_text=tab_text+tab.rows[j].innerHTML+"</tr>";
-            //     //tab_text=tab_text+"</tr>";
-            // }
-            //
-            // tab_text=tab_text+"</table>";
-            tab_text = tableString;
-            tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//comment if u want links in your table
-            tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // comment if u want images in your table
-            tab_text = tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // comment if you want input params
-
-            var ua = window.navigator.userAgent;
-            var msie = ua.indexOf("MSIE ");
-
-            if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
-            {
-                txtArea1.document.open("txt/html", "replace");
-                txtArea1.document.write(tab_text);
-                txtArea1.document.close();
-                txtArea1.focus();
-                sa = txtArea1.document.execCommand("SaveAs", true, "Say Thanks to Sumit.xls");
-            }
-            else                 //other browser not tested on IE 11
-                sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
-
-            return (sa);
-        }
-    </script>
+<script src="/static/analytics/scripit.js"></script>
+<script>
+    $(document).ready(function () {
+        console.log("JS is working...");
+        //getAnalytics();
+    });
+</script>
     {% endblock %}

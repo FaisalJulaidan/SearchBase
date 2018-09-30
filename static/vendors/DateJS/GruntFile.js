@@ -31,7 +31,7 @@ var banner = "/** \n" +
 			" * @author <%= pkg.author.name %> <<%= pkg.author.email %>>\n" +
 			" * @copyright <%= grunt.template.today('yyyy') %> <%= pkg.author.name %>\n" +
 			" * @license <%= pkg.license %>\n" +
-			" * @homepage <%= pkg.homepage %>\n" +
+			" * @dashboard <%= pkg.dashboard %>\n" +
 			" */";
 
 module.exports = function(grunt) {

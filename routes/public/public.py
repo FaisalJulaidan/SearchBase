@@ -292,7 +292,7 @@ def login():
 
         email: str = request.form.get("email", default=None)
         password_to_check :str = request.form.get("password", default=None)
-
+        print("password_to_check: ", password_to_check)
         callback: Callback = auth_services.login(email,password_to_check)
 
         if callback.Success:

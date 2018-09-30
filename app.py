@@ -292,7 +292,6 @@ if __name__ == "__main__":
             seed()
 
 
-        # send_updates()
         # Run the app server
         manager.run()
 
@@ -315,7 +314,6 @@ if __name__ == "__main__":
 
         print('Development mode running...')
 
-        # send_updates()
         # Run the app server
         app.run(threaded = True)
     else:

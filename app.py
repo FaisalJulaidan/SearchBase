@@ -3,14 +3,11 @@ from flask import Flask, redirect, request, render_template, session
 from datetime import datetime
 from services import assistant_services, user_services, mail_services
 import os
-from models import db, Role, Company, Assistant, Plan, Statistics, ValidationType, Block, BlockType, Solution, ChatbotSession, Callback
+from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solution, ChatbotSession, Callback
 from services.mail_services import mail
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand, command
 from sqlalchemy_utils import create_database, database_exists
-from utilities import helpers
-import time, threading
-import config
 from flask_apscheduler import APScheduler
 
 
@@ -22,17 +19,9 @@ from routes.admin.routers import dashboard_router, profile_router,  admin_api, s
     assistantManager_router, assistant_router
 
 from routes.public.routers import public_router, resetPassword_router
-from services import user_services, mail_services
 
 app = Flask(__name__, static_folder='static')
-
 db.app = app
-#mail.app = app
-
-migrate = Migrate(app, db)
-manager = Manager(app)
-manager.add_command('db', MigrateCommand)
-scheduler = APScheduler()
 
 
 # Register Routes:
@@ -276,10 +265,11 @@ def seed():
 
 if __name__ == "__main__":
 
-
-
-    app.app_context().push()
-
+    # Server Setup
+    migrate = Migrate(app, db)
+    manager = Manager(app)
+    manager.add_command('db', MigrateCommand)
+    scheduler = APScheduler()
 
     print("Run the server...")
     if os.environ['FLASK_ENV'] == 'production':
@@ -321,7 +311,7 @@ if __name__ == "__main__":
         gen_dummy_data()
 
         scheduler.init_app(app)
-        # scheduler.start()
+        scheduler.start()
 
         print('Development mode running...')
 

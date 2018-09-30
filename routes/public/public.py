@@ -251,8 +251,11 @@ def sendEmail():
 def testing(key):
     print("Starting key retrieval")
     serverRoute = "http://www.thesearchbase.com"
+    print("Part 0.1")
     page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
+    print("Part 0.2")
     text = page.read().decode("utf8")
+    print("Part 0.3")
     part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')
     print("Part 1 set")
     page = urllib.request.urlopen(serverRoute + "/static/js/Chart.bundle.js")

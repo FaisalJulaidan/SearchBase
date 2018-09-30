@@ -114,24 +114,25 @@ def sendNewRecordsNotification(reciever, data):
     return Callback(True, 'Email sent and it\'s on its way to ' + reciever)
 
 
-def async(f):
-    def wrapper(*args, **kwargs):
-        thr = Thread(target=f, args=args, kwargs=kwargs)
-        thr.start()
-    return wrapper
+#def async(f):
+#    def wrapper(*args, **kwargs):
+#        thr = Thread(target=f, args=args, kwargs=kwargs)
+#        thr.start()
+#    return wrapper
 
 
 #SEND CODE
-# @async
+#@async
 def send_async_email(app, msg):
     with app.app_context():
         print('====> sending async')
         mail.send(msg)
 
 def send_email(to, subject, template, **kwargs):
-    # app = current_app._get_current_object()
+    app = current_app._get_current_object()
     msg = Message(subject, recipients=[to], sender="thesearchbase@gmail.com")
     msg.html = render_template(template, **kwargs)
-    thr = Thread(target=send_async_email, args=[mail.app, msg])
+    thr = Thread(target=send_async_email, args=[app, msg])
     thr.start()
+    return thr
     # send_async_email(app, msg)

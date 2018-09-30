@@ -26,11 +26,8 @@ from services import user_services, mail_services
 
 app = Flask(__name__, static_folder='static')
 
-# Server Setup
-db.init_app(app)
 db.app = app
-mail.init_app(app)
-mail.app = app
+#mail.app = app
 
 migrate = Migrate(app, db)
 manager = Manager(app)
@@ -291,6 +288,12 @@ if __name__ == "__main__":
         print('Production mode running...')
         # url = config.ProductionConfig.SQLALCHEMY_DATABASE_URI
         url = os.environ['SQLALCHEMY_DATABASE_URI']
+        
+        # Server Setup
+        db.init_app(app)
+        mail.init_app(app)
+        app.app_context().push()
+
 
         if not database_exists(url):
             print('Create db tables')
@@ -307,6 +310,11 @@ if __name__ == "__main__":
         app.config.from_object('config.DevelopmentConfig')
 
         print('Reinitialize the database...')
+        
+        # Server Setup
+        db.init_app(app)
+        mail.init_app(app)
+        app.app_context().push()
 
         db.drop_all()
         db.create_all()

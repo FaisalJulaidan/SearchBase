@@ -110,7 +110,6 @@ class db_services:
                 with app.open_resource(APP_ROOT + '/sql/devseed.sql', mode='r') as f:
                     db.cursor().executescript(f.read())
                     # Create and store a hashed password for "test" user
-                    hash = hashPass("test")
                     update("UPDATE Users SET Password=? WHERE ID=?", [hash, 1])
                 db.commit()
                 print("Test Data Inserted...")

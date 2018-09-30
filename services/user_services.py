@@ -77,7 +77,7 @@ def create(firstname, surname, email, password, phone, company: Company, role: R
     try:
         # Create a new user with its associated company and role
         newUser = User(Firstname=firstname, Surname=surname, Email=email, Verified=verified,
-                    Password=helpers.hashPass(password), PhoneNumber=phone, Company=company,
+                    Password=password, PhoneNumber=phone, Company=company,
                     Role=role)
         db.session.add(newUser)
 
@@ -120,10 +120,10 @@ def changePasswordByID(userID, newPassword, currentPassword=None):
         return Callback(False, "Could not find user's records")
 
     if currentPassword is not None:
-        if not helpers.hashPass(currentPassword, user_callback.Data.Password) == user_callback.Data.Password:
+        if not currentPassword == user_callback.Data.Password:
             return Callback(False, "Incorrect Password.")
 
-    user_callback.Data.Password = helpers.hashPass(newPassword)
+    user_callback.Data.Password = newPassword
     db.session.commit()
 
     return Callback(True, "Password has been changed.")
@@ -135,10 +135,10 @@ def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
         return Callback(False, "Could not find user's records")
 
     if currentPassword is not None:
-        if not helpers.hashPass(currentPassword, user_callback.Data.Password) == user_callback.Data.Password:
+        if not currentPassword == user_callback.Data.Password:
             return Callback(False, "Incorrect Password.")
 
-    user_callback.Data.Password = helpers.hashPass(newPassword)
+    user_callback.Data.Password = newPassword
     db.session.commit()
 
     return Callback(True, "Password has been changed.")

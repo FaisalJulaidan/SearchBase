@@ -26,7 +26,13 @@ from services import user_services, mail_services
 
 app = Flask(__name__, static_folder='static')
 
+db.app = app
+#mail.app = app
 
+migrate = Migrate(app, db)
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
+scheduler = APScheduler()
 
 
 # Register Routes:
@@ -270,17 +276,36 @@ def seed():
 
 if __name__ == "__main__":
 
+
+
+    app.app_context().push()
+        
     # Server Setup
     db.init_app(app)
     mail.init_app(app)
-
-    migrate = Migrate(app, db)
-    manager = Manager(app)
-    manager.add_command('db', MigrateCommand)
-    scheduler = APScheduler()
     app.app_context().push()
 
-    if os.environ['FLASK_ENV'] == 'development' :
+
+    print("Run the server...")
+    if os.environ['FLASK_ENV'] == 'production':
+
+        app.config.from_object('config.ProductionConfig')
+        print('Production mode running...')
+        # url = config.ProductionConfig.SQLALCHEMY_DATABASE_URI
+        url = os.environ['SQLALCHEMY_DATABASE_URI']
+
+        if not database_exists(url):
+            print('Create db tables')
+            create_database(url)
+            db.create_all()
+            seed()
+
+
+        # send_updates()
+        # Run the app server
+        manager.run()
+
+    elif os.environ['FLASK_ENV'] == 'development' :
         app.config.from_object('config.DevelopmentConfig')
 
         print('Reinitialize the database...')
@@ -296,26 +321,7 @@ if __name__ == "__main__":
 
         # send_updates()
         # Run the app server
-        print("Run the server...")
         app.run(threaded = True)
-
-    elif os.environ['FLASK_ENV'] == 'production':
-
-        app.config.from_object('config.ProductionConfig')
-        print('Production mode running...')
-        url = os.environ['SQLALCHEMY_DATABASE_URI']
-
-        if not database_exists(url):
-            print('Create db tables')
-            create_database(url)
-            db.create_all()
-            seed()
-
-
-        # send_updates()
-        # Run the app server
-        print("Run the server...")
-        manager.run()
     else:
         print("Please set FLASK_ENV first to either 'production' or 'development' \r\n "
               "ex. in Windows >set FLASK_ENV=development, in Linux/Mac >export FLASK_ENV=development \r\n"

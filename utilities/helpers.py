@@ -8,8 +8,8 @@ import re
 def hashPass(password, salt=gensalt()):
     print("password: ", password)
     print("bytes(password, 'utf-8'): ", bytes(password, 'utf-8'))
-    print("hashpw(bytes(password, 'utf-8'), salt): ", hashpw(bytes(password, 'utf-8'), salt))
-    hashed = hashpw(bytes(password, 'utf-8'), salt)
+    print("hashpw(bytes(password, 'utf-8'), salt): ", hashpw(password.encode('utf-8'), salt))
+    hashed = hashpw(password.encode('utf-8'), salt)
     return hashed
 
 

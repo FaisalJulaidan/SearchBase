@@ -454,6 +454,7 @@ class UserSettings(db.Model):
     TrackingData = db.Column(db.Boolean, nullable=False, default=False)
     TechnicalSupport = db.Column(db.Boolean, nullable=False, default=False)
     AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
+    UserInputNotifications = db.Column(db.Boolean, nullable=False, default=False)
 
     # Relationships:
     User = db.relationship('User', back_populates='Settings')

@@ -279,7 +279,7 @@ if __name__ == "__main__":
 
         app.config.from_object('config.ProductionConfig')
         print('Production mode running...')
-        url = config.ProductionConfig.SQLALCHEMY_DATABASE_URI
+        url = os.environ['SQLALCHEMY_DATABASE_URI']
         if not database_exists(url):
             create_database(url)
             db.create_all()

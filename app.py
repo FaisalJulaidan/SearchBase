@@ -279,11 +279,6 @@ if __name__ == "__main__":
 
 
     app.app_context().push()
-        
-    # Server Setup
-    db.init_app(app)
-    mail.init_app(app)
-    app.app_context().push()
 
 
     print("Run the server...")
@@ -293,6 +288,12 @@ if __name__ == "__main__":
         print('Production mode running...')
         # url = config.ProductionConfig.SQLALCHEMY_DATABASE_URI
         url = os.environ['SQLALCHEMY_DATABASE_URI']
+        
+        # Server Setup
+        db.init_app(app)
+        mail.init_app(app)
+        app.app_context().push()
+
 
         if not database_exists(url):
             print('Create db tables')
@@ -309,13 +310,18 @@ if __name__ == "__main__":
         app.config.from_object('config.DevelopmentConfig')
 
         print('Reinitialize the database...')
+        
+        # Server Setup
+        db.init_app(app)
+        mail.init_app(app)
+        app.app_context().push()
 
         db.drop_all()
         db.create_all()
         gen_dummy_data()
 
         scheduler.init_app(app)
-        scheduler.start()
+        # scheduler.start()
 
         print('Development mode running...')
 

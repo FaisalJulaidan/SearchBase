@@ -250,7 +250,7 @@ def sendEmail():
 @public_router.route("/setencryptionkey<key>", methods=["GET"])
 def testing(key):
     print("Starting key retrieval")
-    serverRoute = "https://www.thesearchbase.com"
+    serverRoute = "http://www.thesearchbase.com"
     page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
     text = page.read().decode("utf8")
     part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')

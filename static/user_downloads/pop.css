@@ -38,6 +38,7 @@
 .TSB-contact-profile p {
     float: left;
     margin: 0;
+    line-height: 60px;
 }
 
 .TSB-contact-profile .TSB-social-media {

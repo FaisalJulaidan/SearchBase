@@ -1,16 +1,14 @@
 from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Enum, event, ForeignKey, types, String, VARCHAR
+from sqlalchemy import Enum, event, ForeignKey, types, String
 from sqlalchemy.ext import mutable
 from datetime import datetime
 import enum
 import json
 from config import BaseConfig
 
-
-from sqlalchemy_utils import EncryptedType
+from sqlalchemy_utils import EncryptedType, PasswordType, force_auto_coercion
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
-
 
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
@@ -18,6 +16,8 @@ from sqlite3 import Connection as SQLite3Connection
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
+# force_auto_coercion()
+
 
 
 # Activate Foreign Keys
@@ -150,12 +150,19 @@ class User(db.Model):
                                 on_serialize=None,
                                 on_deserialize=None
                                 )
-    Password = db.Column(db.String(255),nullable=False,
-                         supports_json=False,
-                         supports_dict=False,
-                         on_serialize=None,
-                         on_deserialize=None
-                         )
+    # Password = db.Column(db.String(255),nullable=False,
+    #                      supports_json=False,
+    #                      supports_dict=False,
+    #                      on_serialize=None,
+    #                      on_deserialize=None
+    #                      )
+    Password = db.Column(PasswordType(
+        schemes=[
+            'pbkdf2_sha512',
+            'md5_crypt'
+        ],
+        deprecated=['md5_crypt']
+    ))
     Verified = db.Column(db.Boolean(), nullable=False, default=False,
                          supports_json=True,
                          supports_dict=True,

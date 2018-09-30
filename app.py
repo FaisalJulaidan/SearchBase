@@ -3,14 +3,13 @@ from flask import Flask, redirect, request, render_template, session
 from datetime import datetime
 from services import assistant_services, user_services, mail_services
 import os
-from models import db, Role, Company, Assistant, Plan, Statistics, ValidationType, Block, BlockType, Solution, ChatbotSession, Callback
+from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solution, ChatbotSession, Callback
 from services.mail_services import mail
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand, command
 from sqlalchemy_utils import create_database, database_exists
-from utilities import helpers
-import time, threading
-import config
+from flask_apscheduler import APScheduler
+
 
 
 # Import all routers to register them as blueprints
@@ -20,18 +19,10 @@ from routes.admin.routers import dashboard_router, profile_router,  admin_api, s
     assistantManager_router, assistant_router
 
 from routes.public.routers import public_router, resetPassword_router
-from services import user_services, mail_services
 
 app = Flask(__name__, static_folder='static')
+db.app = app
 
-# Server Setup
-db.init_app(app)
-mail.init_app(app)
-app.app_context().push()
-
-migrate = Migrate(app, db)
-manager = Manager(app)
-manager.add_command('db', MigrateCommand)
 
 # Register Routes:
 app.register_blueprint(adminBasic_router)
@@ -55,21 +46,21 @@ app.register_blueprint(emoji_router)
 
 sendNotifications = False
 
-def asyncNotifications(app):
-    with app.app_context():
-        for i in range(28800, 0, -1):
-            time.sleep(1)
-        mail_services.notifyNewRecordsForLastXHours(8)
-        global sendNotifications
-        sendNotifications = False
-        send_updates()
-
-def send_updates():
-    global sendNotifications
-    if not sendNotifications:
-        sendNotifications = True
-        thr = threading.Thread(target=asyncNotifications, args=[app])
-        thr.start()
+# def asyncNotifications(app):
+#     with app.app_context():
+#         for i in range(28800, 0, -1):
+#             time.sleep(1)
+#         mail_services.notifyNewRecordsForLastXHours(8)
+#         global sendNotifications
+#         sendNotifications = False
+#         send_updates()
+#
+# def send_updates():
+#     global sendNotifications
+#     if not sendNotifications:
+#         sendNotifications = True
+#         thr = threading.Thread(target=asyncNotifications, args=[app])
+#         thr.start()
 
 
 # Code to ensure user is logged in
@@ -248,7 +239,7 @@ def gen_dummy_data():
     db.session.commit()
 
 
-@manager.command
+# @manager.command
 def seed():
 
     # Plans
@@ -274,20 +265,34 @@ def seed():
 
 if __name__ == "__main__":
 
+    # Server Setup
+    migrate = Migrate(app, db)
+    manager = Manager(app)
+    manager.add_command('db', MigrateCommand)
+    scheduler = APScheduler()
+
     print("Run the server...")
     if os.environ['FLASK_ENV'] == 'production':
 
         app.config.from_object('config.ProductionConfig')
         print('Production mode running...')
-        url = config.ProductionConfig.SQLALCHEMY_DATABASE_URI
+        # url = config.ProductionConfig.SQLALCHEMY_DATABASE_URI
+        url = os.environ['SQLALCHEMY_DATABASE_URI']
+        
+        # Server Setup
+        db.init_app(app)
+        mail.init_app(app)
+        app.app_context().push()
+
+
         if not database_exists(url):
-            print('Create db and tables...')
+            print('Create db tables')
             create_database(url)
             db.create_all()
             seed()
 
 
-        send_updates()
+        # send_updates()
         # Run the app server
         manager.run()
 
@@ -295,17 +300,24 @@ if __name__ == "__main__":
         app.config.from_object('config.DevelopmentConfig')
 
         print('Reinitialize the database...')
+        
+        # Server Setup
+        db.init_app(app)
+        mail.init_app(app)
+        app.app_context().push()
 
         db.drop_all()
         db.create_all()
         gen_dummy_data()
 
+        scheduler.init_app(app)
+        scheduler.start()
+
         print('Development mode running...')
 
-
-        send_updates()
+        # send_updates()
         # Run the app server
-        app.run()
+        app.run(threaded = True)
     else:
         print("Please set FLASK_ENV first to either 'production' or 'development' \r\n "
               "ex. in Windows >set FLASK_ENV=development, in Linux/Mac >export FLASK_ENV=development \r\n"

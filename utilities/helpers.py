@@ -5,9 +5,15 @@ import stripe
 import re
 
 
-def hashPass(password, salt=gensalt()):
-    hashed = hashpw(bytes(password, 'utf-8'), salt)
-    return hashed
+# def hashPass(password, salt=gensalt()):
+#     print("password: ", password)
+#     print("bytes(password, 'utf-8'): ", bytes(password, 'utf8'))
+#     print("type(bytes(password, 'utf-8')): ", type(bytes(password, 'utf8')))
+#     print("password.encode('utf8'): ", password.encode('utf8'))
+#     print("type(password.encode('utf8')): ", type(password.encode('utf8')))
+#     print("hashpw(bytes(password, 'utf-8'), salt): ", hashpw(password.encode('utf8'), salt))
+#     hashed = hashpw(password.encode('utf8'), salt)
+#     return hashed
 
 
 

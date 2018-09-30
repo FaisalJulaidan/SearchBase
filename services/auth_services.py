@@ -70,7 +70,7 @@ def login(email: str, password_to_check: str) -> Callback:
 
     # Get the user from the callback object
     user: User = user_callback.Data
-    if not helpers.hashPass(password_to_check, user.Password) == user.Password:
+    if not password_to_check == user.Password:
         print("Invalid request: Incorrect Password")
         return Callback(False, "Incorrect Password.")
 

@@ -5,9 +5,9 @@ from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from models import Callback, db, Newsletter
 from threading import Thread
-from time import sleep  
+from time import sleep
 from services import user_services, assistant_services, analytics_services, newsletter_services
-from datetime import datetime
+
 
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
@@ -107,19 +107,25 @@ def sendNewRecordsNotification(reciever, data):
         send_email((reciever), 'Your new data', 
                'emails/user_notification.html', data=data)
 
-    except:
+    except Exception as e:
         print("addedNewUserEmail() Error: ", e)
         return Callback(False, 'Could not send email to ' + reciever)
     
     return Callback(True, 'Email sent and it\'s on its way to ' + reciever)
 
+
+#def async(f):
+#    def wrapper(*args, **kwargs):
+#        thr = Thread(target=f, args=args, kwargs=kwargs)
+#        thr.start()
+#    return wrapper
+
+
 #SEND CODE
+#@async
 def send_async_email(app, msg):
     with app.app_context():
-        #uncomment bellow to add delay
-        #for i in range(*seconds int*, -1, -1):
-        #    sleep(1)
-
+        print('====> sending async')
         mail.send(msg)
 
 def send_email(to, subject, template, **kwargs):
@@ -129,3 +135,4 @@ def send_email(to, subject, template, **kwargs):
     thr = Thread(target=send_async_email, args=[app, msg])
     thr.start()
     return thr
+    # send_async_email(app, msg)

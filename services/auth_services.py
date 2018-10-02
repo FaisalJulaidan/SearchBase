@@ -60,19 +60,19 @@ def login(email: str, password_to_check: str) -> Callback:
     # Login Exception Handling
     if not (email or password_to_check):
         print("Invalid request: Email or password not received!")
-        return Callback(False, "You entered an incorrect username or password.")
+        return Callback(False, "Email or password not received. Please try again")
 
     user_callback: Callback = user_services.getByEmail(email.lower())
     # If user is not found
     if not user_callback.Success:
         print("Invalid request: Email not found")
-        return Callback(False, "Email not found.")
+        return Callback(False, "Record with the current email or password was not found")
 
     # Get the user from the callback object
     user: User = user_callback.Data
     if not password_to_check == user.Password:
         print("Invalid request: Incorrect Password")
-        return Callback(False, "Incorrect Password.")
+        return Callback(False, "Record with the current email or password was not found")
 
     if not user.Verified:
         print("Account is not verified!")

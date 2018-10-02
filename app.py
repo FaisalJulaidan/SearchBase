@@ -80,7 +80,7 @@ def before_request():
             if request.view_args['assistantID']:
                 assistantID = int(request.view_args['assistantID'])
                 ownership_callback : Callback = assistant_services.checkOwnership(assistantID, session.get('CompanyID', None))
-            if not ownership_callback.Success: 
+            if not ownership_callback.Success:
                 session["returnMessage"] = ownership_callback.Message
                 return redirect('login')
                 role_callback : Callback = user_services.getRolePermissions(session.get('UserID', None))
@@ -214,7 +214,7 @@ def gen_dummy_data():
     db.session.add(
         Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=20, ActiveBotsCap=10, InactiveBotsCap=30,
              AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
-    
+
     db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=30,  ActiveBotsCap=2, InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
@@ -270,7 +270,6 @@ if __name__ == "__main__":
     manager = Manager(app)
     manager.add_command('db', MigrateCommand)
     scheduler = APScheduler()
-
     print("Run the server...")
     if os.environ['FLASK_ENV'] == 'production':
 
@@ -278,7 +277,10 @@ if __name__ == "__main__":
         print('Production mode running...')
         # url = config.ProductionConfig.SQLALCHEMY_DATABASE_URI
         url = os.environ['SQLALCHEMY_DATABASE_URI']
-        
+
+
+        print("DELETE ME ", BaseConfig.SECRET_KEY_DB)
+
         # Server Setup
         db.init_app(app)
         mail.init_app(app)
@@ -291,7 +293,6 @@ if __name__ == "__main__":
             db.create_all()
             seed()
 
-
         # Run the app server
         manager.run()
 
@@ -299,7 +300,7 @@ if __name__ == "__main__":
         app.config.from_object('config.DevelopmentConfig')
 
         print('Reinitialize the database...')
-        
+
         # Server Setup
         db.init_app(app)
         mail.init_app(app)
@@ -320,5 +321,3 @@ if __name__ == "__main__":
         print("Please set FLASK_ENV first to either 'production' or 'development' \r\n "
               "ex. in Windows >set FLASK_ENV=development, in Linux/Mac >export FLASK_ENV=development \r\n"
               "then run the server >python app.py")
-
-

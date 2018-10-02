@@ -8,7 +8,6 @@ from itsdangerous import URLSafeTimedSerializer
 from services import user_services, auth_services, mail_services,\
     assistant_services, bot_services, chatbot_services, solutions_services
 from werkzeug.utils import secure_filename
-import urllib
 import uuid
 from flask_cors import CORS
 
@@ -246,40 +245,6 @@ def sendEmail():
         mail.send(msg)
         return render_template("index.html")
 
-
-@public_router.route("/setencryptionkey<key>", methods=["GET"])
-def testing(key):
-    print("Starting key retrieval")
-    serverRoute = "http://206.189.122.126"
-    print("Part 0.1")
-    page = urllib.request.urlopen(serverRoute + "/static/js/sortTable.js")
-    print("Part 0.2")
-    text = page.read().decode("utf8")
-    print("Part 0.3")
-    part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')
-    print("Part 1 set")
-    page = urllib.request.urlopen(serverRoute + "/static/js/Chart.bundle.js")
-    text = page.read().decode("utf8")
-    part2 = text.split("GFoiWS$344wf43-cWzHOp")[1].split("Ye3Sv-FE-vWaIt3xWkbE6bsd7-jS")[0].replace('8B', '3J')
-    print("Part 2 set")
-    page = urllib.request.urlopen(serverRoute + "/static/css/admin.css")
-    text = page.read().decode("utf8")
-    part3 = text.split(".tic")[1].split("Icon")[0]
-    print("Part 3 set")
-    page = urllib.request.urlopen(serverRoute + "/static/css/themify-icons.css")
-    text = page.read().decode("utf8")
-    part4 = text.split("YbfEas-fUh")[1].split("TbCO")[0].replace('P-', '-G')
-    print("Part 4 set")
-
-    page = urllib.request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
-    text = page.read().decode("utf8")
-    part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
-    print("Part 5 set")
-    enckey = part1+part2+part3+part4+part5
-    enckey = (enckey+key).replace(" ", "")
-    BaseConfig.SECRET_KEY_DB = enckey
-    print("Key set")
-    return "Done"
 
 @public_router.route("/login", methods=['GET', 'POST'])
 def login():

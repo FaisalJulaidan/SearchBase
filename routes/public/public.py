@@ -292,7 +292,6 @@ def login():
 
         email: str = request.form.get("email", default=None)
         password_to_check :str = request.form.get("password", default=None)
-        print("password_to_check: ", password_to_check)
         callback: Callback = auth_services.login(email,password_to_check)
 
         if callback.Success:
@@ -382,7 +381,7 @@ def verify_account(payload):
             return helpers.redirectWithMessage("login", "Email verification link failed. Please contact Customer Support in order to resolve this.")
 
 
-    
+
 ## Error Handlers ##
 @public_router.errorhandler(status.HTTP_400_BAD_REQUEST)
 def bad_request(e):

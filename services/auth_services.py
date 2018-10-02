@@ -60,7 +60,7 @@ def login(email: str, password_to_check: str) -> Callback:
     # Login Exception Handling
     if not (email or password_to_check):
         print("Invalid request: Email or password not received!")
-        return Callback(False, "Email or password not received. Please try again")
+        return Callback(False, "Email or password not received. Please try age")
 
     user_callback: Callback = user_services.getByEmail(email.lower())
     # If user is not found
@@ -85,7 +85,6 @@ def login(email: str, password_to_check: str) -> Callback:
     session['UserEmail'] = user.Email
     session['UserPlan'] = helpers.getPlanNickname(user.Company.SubID)
     session['RoleID'] = user.RoleID
-    print(session)
 
     # Set LastAccess
     user.LastAccess = datetime.now()

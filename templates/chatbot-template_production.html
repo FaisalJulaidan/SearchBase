@@ -153,9 +153,14 @@
     }
 
     #frame .content .messages {
-        height: calc(100% - 55px);
         overflow-y: scroll;
+        position: absolute;
+        /* width: 100%; */
+        top: 0;
+        left: 0;
+        bottom: 0;
         overflow-x: hidden;
+        right: -17px;
     }
 
     #frame .content .messages::-webkit-scrollbar {
@@ -345,7 +350,6 @@
             <div id="presetAnswers"></div>
             <div id="chatBottom"></div>
         </div>
-
 
         <div class="message-input" id="message-input">
             <form id="fileUploadForm" action="/" method="get" class="image-upload" style="display:none"

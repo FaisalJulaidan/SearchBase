@@ -262,7 +262,6 @@ def seed():
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
     db.session.commit()
 
-
 if __name__ == "__main__":
 
     # Server Setup
@@ -279,7 +278,6 @@ if __name__ == "__main__":
         url = os.environ['SQLALCHEMY_DATABASE_URI']
 
 
-        print("DELETE ME ", BaseConfig.SECRET_KEY_DB)
 
         # Server Setup
         db.init_app(app)
@@ -292,7 +290,8 @@ if __name__ == "__main__":
             create_database(url)
             db.create_all()
             seed()
-
+            
+        print("DELETE ME ", BaseConfig.SECRET_KEY_DB)
         # Run the app server
         manager.run()
 

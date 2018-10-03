@@ -279,8 +279,6 @@ if __name__ == "__main__":
         url = os.environ['SQLALCHEMY_DATABASE_URI']
 
 
-        print("DELETE ME ", BaseConfig.SECRET_KEY_DB)
-
         # Server Setup
         db.init_app(app)
         mail.init_app(app)

@@ -1062,7 +1062,7 @@
         var allowedFormats = currentBlock.content.fileTypes;
         var passes = false;
         for (var i = 0; i < allowedFormats.length; i++) {
-            if (allowedFormats[i] === format) {
+            if (allowedFormats[i].toLowerCase() === format.toLowerCase()) {
                 passes = true;
             }
         }

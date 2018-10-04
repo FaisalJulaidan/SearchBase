@@ -6,9 +6,10 @@ import os
 from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solution, ChatbotSession, Callback
 from services.mail_services import mail
 from flask_script import Manager
-from flask_migrate import Migrate, MigrateCommand, command
+from flask_migrate import Migrate, MigrateCommand, init, migrate, upgrade
 from sqlalchemy_utils import create_database, database_exists
 from flask_apscheduler import APScheduler
+
 
 
 
@@ -22,7 +23,6 @@ from routes.public.routers import public_router, resetPassword_router
 
 app = Flask(__name__, static_folder='static')
 db.app = app
-
 
 # Register Routes:
 app.register_blueprint(adminBasic_router)
@@ -266,24 +266,22 @@ def seed():
 if __name__ == "__main__":
 
     # Server Setup
-    migrate = Migrate(app, db)
+    db.app = app
+    migrate_var = Migrate(app, db)
     manager = Manager(app)
     manager.add_command('db', MigrateCommand)
     scheduler = APScheduler()
+
     print("Run the server...")
     if os.environ['FLASK_ENV'] == 'production':
 
         app.config.from_object('config.ProductionConfig')
-        print('Production mode running...')
-        # url = config.ProductionConfig.SQLALCHEMY_DATABASE_URI
         url = os.environ['SQLALCHEMY_DATABASE_URI']
-
 
         # Server Setup
         db.init_app(app)
         mail.init_app(app)
         app.app_context().push()
-
 
         if not database_exists(url):
             print('Create db tables')
@@ -292,7 +290,12 @@ if __name__ == "__main__":
             seed()
 
         # Run the app server
-        manager.run()
+        if os.environ['DB_MIGRATION'] == 'yes':
+            print('Database migration mode...')
+            manager.run()
+        else:
+            print('Production mode running...')
+            app.run()
 
     elif os.environ['FLASK_ENV'] == 'development' :
         app.config.from_object('config.DevelopmentConfig')
@@ -309,12 +312,13 @@ if __name__ == "__main__":
         gen_dummy_data()
 
         scheduler.init_app(app)
-        scheduler.start()
-
-        print('Development mode running...')
+        # scheduler.start()
 
         # Run the app server
+        print('Development mode running...')
         app.run(threaded = True)
+    elif os.environ['FLASK_ENV'] == 'development':
+        manager.run()
     else:
         print("Please set FLASK_ENV first to either 'production' or 'development' \r\n "
               "ex. in Windows >set FLASK_ENV=development, in Linux/Mac >export FLASK_ENV=development \r\n"

@@ -147,7 +147,7 @@
 
                     <div class="wrap-input100 validate-input" data-validate="Required">
                         <input class="input100" type="password" id="password" name="password" autocomplete="new-password"
-                               placeholder="Password" onchange="validatePassword(this);">
+                               placeholder="Password" onchange="validatePassword(this);" onkeyup="checkPasswordWithoutAlert()">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-lock" aria-hidden="true"></i>
@@ -285,21 +285,43 @@
           url:false,
           name:false,
           email:false,
-        //   emailConf:false,
           password:false,
           passwordConf:false,
           phone: false,
           TAPP: false
         }
 
-        // Terms and Privacy Policy checkbox
-        function checkCheckbox() {
-            inputs.TAPP = $('#TAPPCheckbox').prop('checked');
+        //check if all inputs are good to go
+        document.onkeyup=checkForSubmitButton;
+
+        function checkForSubmitButton(){
+          var pass = true;
+          for (var c in inputs){
+            if (inputs.hasOwnProperty(c)) {
+              //key is c, value is inputs[c]
+              console.log(c, "  ", inputs[c]);
+              if(!inputs[c]){ pass = false;}
+            }
+          }
+          if(pass){
+            submit.classList.add('login100-form-btn');
+            submit.classList.remove('login100-form-btn-disabled');
+            submit.disabled = false;
+          } else {
+            submit.classList.remove('login100-form-btn');
+            submit.classList.add('login100-form-btn-disabled');
+            submit.disabled = true;
+          }
         }
 
         // Password popover init
         $('#password').popover({ trigger: 'focus', title: 'Password Constrains 🔑', content: "At least 6 characters long & upper and lower case letters and numbers",placement:'top' })
         $('#email').popover({ trigger: 'focus', title: 'Valid Email 📮', content: "Valid email is required: example@abc.com",placement:'top' })
+
+        function checkCheckbox(){
+          inputs.TAPP=$('#TAPPCheckbox').prop('checked');
+          checkForSubmitButton();
+        }
 
         function submitForm() {
             var form = document.forms["signupForm"];
@@ -316,11 +338,12 @@
             //    return false;
             //  }
 
-            if (!inputs.TAPP) {
+            // Terms and Privacy Policy checkbox
+            if (!$('#TAPPCheckbox').prop('checked')) {
                 alertError('Terms & Privacy Policy', 'Please agree to our Terms & Privacy Policy. You can read them by clicking on the bold text.');
                 return false;
             }
-          return true;
+            return true;
         }
         // onkeyup check validty without alert
         function checkPasswordWithoutAlert() {
@@ -330,26 +353,13 @@
 
             if (password.value == passwordConf.value){
                 // sucess
-                submit.disabled = false
-                submit.classList.remove('login100-form-btn-disabled');
-                submit.classList.add('login100-form-btn');
                 passwordConf.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
                 inputs.passwordConf = true
             }else{
                 // fail
                 passwordConf.style.boxShadow="0 0 9px 0px #f44336"
-                submit.disabled = true
                 inputs.passwordConf = false
             }
-
-            for (var input of Object.entries(inputs)){
-                if (!input[1]){
-                    submit.classList.add('login100-form-btn-disabled');
-                    submit.classList.remove('login100-form-btn');
-                    break
-                }
-            }
-
         }
         // onchange check validty with an alert
         function checkPassword() {
@@ -357,22 +367,12 @@
             passwordConf = document.getElementById('confirmpassword')
             submit = document.getElementById("submit")
             if (password.value == passwordConf.value){
-                submit.disabled = false
-                submit.classList.remove('login100-form-btn-disabled');
-                submit.classList.add('login100-form-btn');
                 passwordConf.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
                 inputs.passwordConf = true
             }else{
                 alertError('Password Matching Error','Please match your passwords')
                 submit.disabled = true
                 inputs.passwordConf = false
-            }
-            for (var input of Object.entries(inputs)){
-                if (!input[1]){
-                    submit.classList.add('login100-form-btn-disabled');
-                    submit.classList.remove('login100-form-btn');
-                    break
-                }
             }
         }
 
@@ -423,23 +423,23 @@
           if (password.length >= 6) {
             if (password.match(/^(?=.*[a-z|A-Z])(?=.*[A-Z])(?=.*\d).+$/) != null) {
               // sucess
-              passwordElement.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
+              inputs.password = true;
+              passwordElement.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)";
               //give ability to confirm password
-              $("#confirmpassword").removeAttr('disabled','')
-              $("#confirmpassword").css('cursor','')
-              $("#confirmpassword").removeClass('btn')
-              return inputs.password = true;
+              $("#confirmpassword").removeAttr('disabled','');
+              $("#confirmpassword").css('cursor','');
+              $("#confirmpassword").removeClass('btn');
             }
             else{
-              passwordElement.style.boxShadow="0 0 9px 0px #f44336"
-              alertError('Password Error','Passwords must contain at least 1 lower and upper case letter. And 1 number.')
-              return inputs.password = false
+              inputs.password = false;
+              passwordElement.style.boxShadow="0 0 9px 0px #f44336";
+              alertError('Password Error','Passwords must contain at least 1 lower and upper case letter. And 1 number.');
             }
           }
           else{
-            passwordElement.style.boxShadow="0 0 9px 0px #f44336"
-            alertError('Password Error','Passwords must be at least 6 characters long.')
-            return inputs.password = false
+            inputs.password = false;
+            passwordElement.style.boxShadow="0 0 9px 0px #f44336";
+            alertError('Password Error','Passwords must be at least 6 characters long.');
           }
         }
 
@@ -450,12 +450,13 @@
             var name = nameSelector.value
 
             if (name.indexOf(' ') <= 0) {
+              inputs.name = false;
               nameSelector.style.boxShadow="0 0 9px 0px #f44336"
               alertError('Name Error','Please enter your full name or leave a space between your first and last name.')
-              return inputs.name = false;
+              return 0;
             }else {
+              inputs.name = true;
               nameSelector.style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
-              return inputs.name = true;
             }
         }
 
@@ -466,12 +467,12 @@
             var userURL = document.getElementById('websiteURL').value;
 
             if (!userURL.match(URLRegex)) {
+              inputs.url = false;
               document.getElementById("websiteURL").style.boxShadow="0 0 9px 0px #f44336"
               alertError('URL Error',"Please enter your website URL correctly.")
-              return inputs.url = false;
             }else {
+              inputs.url = true;
               document.getElementById("websiteURL").style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
-              return inputs.url = true;
             }
         }
 
@@ -482,17 +483,17 @@
             var userEmail = document.getElementById(email).value;
 
             if (!userEmail.match(emailRegex)) {
+              inputs.email = false
               document.getElementById("email").style.boxShadow="0 0 9px 0px #f44336"
               alertError('Email Error',"Please enter your email address correctly.  example@abc.com")
-              return inputs.email = false;
             }else {
               //success
+              inputs.email = true
               document.getElementById("email").style.boxShadow="0 0 9px 0px rgba(100, 185, 110, 1)"
               // give ability to confirm email
               $("#confirmemail").removeAttr('disabled','')
               $("#confirmemail").css('cursor','')
               $("#confirmemail").removeClass('btn')
-              return inputs.email = true;
             }
 
         }

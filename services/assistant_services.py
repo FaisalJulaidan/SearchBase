@@ -48,9 +48,9 @@ def getAll(companyID) -> Callback:
         return Callback(False,'Could not get all assistants.')
 
 
-def create(nickname, route, message, secondsUntilPopup, company: Company) -> Assistant or None:
+def create(nickname, route, message, topBarText, secondsUntilPopup, company: Company) -> Assistant or None:
     try:
-        assistant = Assistant(Name=nickname, Route=route, Message=message,
+        assistant = Assistant(Name=nickname, Route=route, Message=message, TopBarText=topBarText,
                               SecondsUntilPopup=secondsUntilPopup,
                               Company=company)
         db.session.add(assistant)
@@ -65,10 +65,11 @@ def create(nickname, route, message, secondsUntilPopup, company: Company) -> Ass
     return Callback(True, 'Assistant has ben created successfully!', assistant)
 
 
-def update(id, nickname, message, secondsUntilPopup)-> Callback:
+def update(id, nickname, message, topBarText, secondsUntilPopup)-> Callback:
     try:
         db.session.query(Assistant).filter(Assistant.ID == id).update({'Name': nickname,
                                                                        'Message': message,
+                                                                       'TopBarText': topBarText,
                                                                        'SecondsUntilPopup': secondsUntilPopup})
         db.session.commit()
 

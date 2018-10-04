@@ -84,6 +84,23 @@
                                     </div>
                                     <!-- end of first check box-->
                                     <!-- text information-->
+                                    <br />
+                                    <div class="input-group" style="margin-bottom: 5px;">
+                                        <label class="checkboxContainer" style="margin-bottom: 5px;">
+                                            <strong>Statistical Notifications - 8 hour period</strong>
+                                            {%if userSettings.UserInputNotifications%}
+                                            <input name="notifications" value="notificationsON" type="checkbox" checked />
+                                            {%else%}
+                                            <input name="notifications" value="notificationsON" type="checkbox" />
+                                            {%endif%}
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+                                    <p>
+                                        If allowed we will send you the number of new user records your assistants have stored every 8 hours.
+                                    </p>
+                                    <br />
+
                                     <p><strong>Erasing data</strong></p>
                                     <p>If you decide to stop using our platform, we will simply delete your information after a year of inactivity.</p>
 

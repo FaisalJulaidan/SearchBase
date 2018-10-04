@@ -38,6 +38,7 @@ window.onload = (async function (global) {
     var files_path = globalTSB.files_path;
     var iframe_route = globalTSB.iframe_route;
     var popupSec = undefined;
+    var topBarText = "";
 
     var integration_file = host + files_path + 'integration.js';
     var id = document.querySelector('script[data-name="tsb-widget"][data-id]').getAttribute('data-id');
@@ -86,7 +87,7 @@ window.onload = (async function (global) {
     btnDiv.id = 'TSB-chatbot-widget';
 
     btnDiv.innerHTML = ' <div class="TSB-circle" style="background-color: '+ clickToShowColor().circle +'; color: '+clickToShowColor().icon+'; ">\n' +
-        '               <i class="fa fa-cloud"></i>\n' +
+        '               <i class="fa fa-comments"></i>\n' +
         '             </div>';
 
 
@@ -101,7 +102,7 @@ window.onload = (async function (global) {
 
     iFrameDiv.innerHTML = '<div class="TSB-contact-profile">\n' +
         '        <img src=\"'+host+'/static/user_downloads/favicon-96x96.png\" alt=""/>\n' +
-        '        <p class="TSB-bot-title">Bot</p>\n' +
+        '        <p id="tsb-bot-header" class="TSB-bot-title">Bot</p>\n' +
         '\n' +
         '        <div class="TSB-social-media" id=\'TSB-closeIframe\'>\n' +
         '            <i class="fa fa-close" aria-hidden="true"></i>\n' +
@@ -195,6 +196,7 @@ window.onload = (async function (global) {
                 fullLoad["popupsettings"] = true;
                 if (xhr.status === 200) {
                     popupSec = JSON.parse(xhr.responseText).data.SecondsUntilPopUp;
+                    topBarText = JSON.parse(xhr.responseText).data.TopBarText;
                     return resolve(true);
                 }
                 else {
@@ -217,6 +219,7 @@ window.onload = (async function (global) {
             fullLoad["jquery"] = true;
         } catch (error) { }
         if (fullLoad["jquery"] && fullLoad["popupsettings"]) {
+            $("#tsb-bot-header")[0].innerHTML = topBarText;
             fadein(document.getElementById("TSB-container"));
             clearInterval(interval);
             document.getElementById('TSB-chatbotIframe').src = host + iframe_route + '/' + id;

@@ -39,7 +39,6 @@ def getByEmail(email) -> User or None:
         return Callback(False,
                         'User with email ' + email + ' does not exist.')
 
-
 def getAllByCompanyID(companyID) -> Callback:
     try:
         # Get result and check if None then raise exception
@@ -225,16 +224,17 @@ def updateStripeID(email, cusID: str):
     db.session.commit()
     return Callback(True, 'StripeID is updated successfully')
 
-def createUpdateUserSettings(userID, trackingData, techSupport, accountSpecialist):
+def createUpdateUserSettings(userID, trackingData, techSupport, accountSpecialist, notifications):
     try:
         result = db.session.query(UserSettings).filter(UserSettings.ID == userID).first()
         if not result: 
-            newUser = UserSettings(ID=userID, TrackingData=trackingData, TechnicalSupport=techSupport, AccountSpecialist=accountSpecialist)
+            newUser = UserSettings(ID=userID, TrackingData=trackingData, TechnicalSupport=techSupport, AccountSpecialist=accountSpecialist, UserInputNotifications=notifications)
             db.session.add(newUser)
         else:
             result.TrackingData = trackingData
             result.TechnicalSupport = techSupport
             result.AccountSpecialist = accountSpecialist
+            result.UserInputNotifications = notifications
 
         db.session.commit()
         return Callback(True,
@@ -244,6 +244,17 @@ def createUpdateUserSettings(userID, trackingData, techSupport, accountSpecialis
         print("user_services.getUserSettings() ERROR: ", exc)
         return Callback(False,
                         'User settings could not be updated.')
+    
+def getAllUserSettings():
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(UserSettings).all()
+
+        return Callback(True,
+                        'Records successfully retrieved',
+                        result)
+    except Exception as exc:
+        return Callback(False, 'Error in getting records')
 
 def getUserSettings(userID):
     try:

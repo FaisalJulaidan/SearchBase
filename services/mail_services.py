@@ -72,12 +72,13 @@ def addedNewUserEmail(adminEmail, targetEmail, password):
 def notifyNewRecordsForLastXHours(hours):
     try:
         print("0")
-        newsletters_callback : Callback = newsletter_services.getAll()
-        if not newsletters_callback.Success: raise Exception("newsletters_callback: ", newsletters_callback.Message)
+        userSettings_callback : Callback = user_services.getAllUserSettings()
+        if not userSettings_callback.Success: raise Exception("userSettings_callback: ", userSettings_callback.Message)
 
-        for record in newsletters_callback.Data:
+        for record in userSettings_callback.Data:
+            if not record.UserInputNotifications: continue
             print("1")
-            user_callback : Callback = user_services.getByEmail(record.Email)
+            user_callback : Callback = user_services.getByID(record.ID)
             if not user_callback.Success: raise Exception("user_callback: ", user_callback.Message)
             print("2")
 

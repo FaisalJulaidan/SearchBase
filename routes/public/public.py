@@ -147,7 +147,7 @@ def get_pop_settings(assistantID):
         if not assistant_callback.Success:
             return helpers.jsonResponse(False, 404, "Assistant not found.", None)
 
-        data = {"SecondsUntilPopUp": assistant_callback.Data.SecondsUntilPopup}
+        data = {"SecondsUntilPopUp": assistant_callback.Data.SecondsUntilPopup, "TopBarText": assistant_callback.Data.TopBarText}
         return helpers.jsonResponse(True, 200, "Pop up settings retrieved", data)
 
 @public_router.route("/assistant/<int:sessionID>/file", methods=['POST'])

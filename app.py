@@ -1,4 +1,4 @@
-#/usr/bin/python3.6
+#/usr/bin/python3.5
 from flask import Flask, redirect, request, render_template, session
 from datetime import datetime
 from services import assistant_services, user_services, mail_services

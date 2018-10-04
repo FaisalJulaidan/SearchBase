@@ -95,7 +95,7 @@ window.onload = (async function (global) {
     // Create chatbot iFrame div
     var iFrameDiv = document.createElement('div');
     iFrameDiv.id = 'TSB-iframediv';
-    iFrameDiv.style.width = '320px';
+    iFrameDiv.style.width = '400px';
     iFrameDiv.style.height = '0px';
     iFrameDiv.style.opacity = '0';
 
@@ -153,7 +153,7 @@ window.onload = (async function (global) {
             iFrameDiv.style.display = "block";
             iFrameDiv = $("#TSB-iframediv");
             iFrameDiv.animate({
-                height: '370px',
+                height: '530px',
                 opacity: '1'
             });
             popOpen = true;

@@ -9,6 +9,7 @@ from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand, command
 from sqlalchemy_utils import create_database, database_exists
 from flask_apscheduler import APScheduler
+from utilities import helpers
 
 
 
@@ -76,20 +77,16 @@ def before_request():
         if not session.get('Logged_in', False):
             return redirect('login')
         try:
-            print(request.view_args['assistantID'])
             if request.view_args['assistantID']:
                 assistantID = int(request.view_args['assistantID'])
                 ownership_callback : Callback = assistant_services.checkOwnership(assistantID, session.get('CompanyID', None))
-            if not ownership_callback.Success:
-                session["returnMessage"] = ownership_callback.Message
-                return redirect('login')
+                if not ownership_callback.Success:
+                    return helpers.hardRedirectWithMessage("login", ownership_callback.Message)
                 role_callback : Callback = user_services.getRolePermissions(session.get('UserID', None))
-            if not role_callback.Success:
-                session["returnMessage"] = role_callback.Message
-                return redirect('admin/dashboard')
-            if not role_callback.Data.EditChatbots:
-                session["returnMessage"] = "Your company owner has not allowed you access to this feature."
-                return redirect('admin/dashboard')
+                if not role_callback.Success:
+                    return helpers.hardRedirectWithMessage("admin/dashboard", role_callback.Message)
+                if not role_callback.Data.EditChatbots:
+                    return helpers.hardRedirectWithMessage("admin/dashboard", "Your company owner has not allowed you access to this feature.")
         except:
             pass
 
@@ -262,7 +259,6 @@ def seed():
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
     db.session.commit()
 
-
 if __name__ == "__main__":
 
     # Server Setup
@@ -279,6 +275,7 @@ if __name__ == "__main__":
         url = os.environ['SQLALCHEMY_DATABASE_URI']
 
 
+
         # Server Setup
         db.init_app(app)
         mail.init_app(app)
@@ -291,6 +288,7 @@ if __name__ == "__main__":
             db.create_all()
             seed()
 
+        print("DELETE ME ", BaseConfig.SECRET_KEY_DB)
         # Run the app server
         manager.run()
 

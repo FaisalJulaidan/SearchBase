@@ -805,7 +805,6 @@
                                 afterMessage: afterMessage,
                                 blockToGoID: blockToGoID
                             });
-                            console.log("answersArr: ", answersArr)
                         }
                     }
 
@@ -1018,6 +1017,7 @@
                 "          <ul class=\"dropdown-menu dropdown-menu-right\">\n" +
                 "<li><a>Go To Next Block</a></li>\n" +
                 "<li><a>Go To Specific Block</a></li>\n" +
+                "<li><a>End Chat</a></li>\n" +
                 "          </ul>\n" +
                 "        </div><!-- /btn-group -->\n" +
                 "      </div><!-- /input-group -->\n" +
@@ -1112,7 +1112,7 @@
             }).done(function (res) {
             }).fail(function (res) {
                 let resJson = JSON.parse(res.responseText);
-                console.log(resJson)
+                //console.log(resJson)
             });
 
         }
@@ -1124,7 +1124,7 @@
             }).done(function () {
             }).fail(function (res) {
                 let resJson = JSON.parse(res.responseText);
-                console.log(resJson)
+                //console.log(resJson)
             });
 
         }
@@ -1458,9 +1458,11 @@
 
                 // empty the old block text
                 if (block_template.name == "Solutions") {
-                    console.log($oldBlock.parent().find('.title').text('Solution Block'));
+                    //console.log($oldBlock.parent().find('.title').text('Solution Block'));
+                    $oldBlock.parent().find('.title').text('Solution Block');
                 } else {
-                    console.log($oldBlock.parent().find('.title').text('Please fill this block'));
+                    //console.log($oldBlock.parent().find('.title').text('Please fill this block'));
+                    $oldBlock.parent().find('.title').text('Please fill this block');
                 }
 
 

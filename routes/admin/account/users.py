@@ -22,7 +22,7 @@ def update_roles():
 
         # Check if the admin user is authorised for such an operation.
         if not adminUser.Role.Name == 'Owner':
-            return helpers.jsonResponse(False, 401, "Sorry, You're not authorised. Only owners are")
+            return helpers.jsonResponse(False, 401, "Sorry, You're not authorised. Only owners are allowed to edit user's permissions.")
 
         # New roles values
         values = request.form.get("data", default=None)
@@ -156,10 +156,7 @@ def update_user(userID):
         adminUser: User = callback.Data
 
         # Check if the admin user is authorised for such an operation.
-        if (not adminUser.Role.EditUsers) or \
-                userToUpdate.CompanyID != adminUser.CompanyID or \
-                userToUpdate.Role.Name == adminUser.Role.Name or \
-                userToUpdate.Role.Name == 'Owner':
+        if not adminUser.Role.EditUsers:
             return helpers.jsonResponse(False, 401, "Sorry, You're not authorised")
 
         # Get the role to be assigned for the userToUpdate
@@ -196,10 +193,7 @@ def delete_user(userID):
         adminUser: User = callback.Data
 
         # Check if the admin user is authorised for such an operation.
-        if (not adminUser.Role.DeleteUsers) or\
-                userToBeDeleted.CompanyID != adminUser.CompanyID or \
-                userToBeDeleted.Role.Name == adminUser.Role.Name or \
-                userToBeDeleted.Role.Name == 'Owner':
+        if not adminUser.Role.DeleteUsers:
             return helpers.jsonResponse(False, 401, "Sorry, You're not authorised")
 
         # Delete the user
@@ -209,5 +203,3 @@ def delete_user(userID):
 
         print("Success.  " + userID)
         return helpers.jsonResponse(True, 200, "User deleted successfully!")
-
-

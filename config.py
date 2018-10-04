@@ -43,6 +43,7 @@ def set_encrypt_key(key):
 
 class BaseConfig(object):
 
+
     ALLOWED_EXTENSIONS = {'png', 'jpg','json', 'xml','txt', 'pdf', 'doc', 'docx'}
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
@@ -83,6 +84,7 @@ class ProductionConfig(BaseConfig):
     TESTING = False
     SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 
 
 class DevelopmentConfig(BaseConfig):

@@ -32,8 +32,9 @@ def assistant():
         welcomeMsg = request.form.get("welcome-message", default='').strip()
         timePopup = request.form.get("timeto-autopop", default='').strip()
         templateName = request.form.get("template-name", default='').strip()
+        topBarText = request.form.get("top-bar-text", default='').strip()
 
-        assistant_callback: Callback = assistant_services.create(name, None, welcomeMsg, timePopup, user.Company)
+        assistant_callback: Callback = assistant_services.create(name, None, welcomeMsg, topBarText, timePopup, user.Company)
         if not assistant_callback.Success:
             return helpers.jsonResponse(False, 400, "Couldn't create the assistant", None)
 

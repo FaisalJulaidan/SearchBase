@@ -33,6 +33,17 @@
                                            id="welcome-message"
                                            required="required" class="form-control col-md-5 col-xs-10">
                                 </div>
+                                <br>
+                                <br>
+                                <br>
+
+                                <div class="col-md-9 col-sm-9 col-xs-12">
+                                    <h3>Header Tittle:</h3>
+                                    <h4>Enter short text for chat header <span class="required">*</span></h4>
+                                    <input name="top-bar-text" type="text"
+                                           id="top-bar-text"
+                                           required="required" class="form-control col-md-5 col-xs-10">
+                                </div>
 
 
                                 <div class="col-md-9 col-sm-9 col-xs-12">
@@ -41,7 +52,7 @@
                                     <select id="template-name" name="template-name" class="form-control col-md-5 col-xs-10">
                                         <option>none</option>
                                         {% for name in templates.names %}
-                                            <option value="{{ name }}">{{ name }}</option>
+                                        <option value="{{ name }}">{{ name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -51,9 +62,9 @@
                                     <h3>Assistant Automatic Popup Time:</h3>
                                     <h4>Would you like the assistant to automatically open for the user?</h4>
                                     <label class="switch">
-                                    <input id="switch-autopop" name="switch-autopop" type="checkbox"
-                                           onclick="switchchecked()">
-                                    <span class="slider round"></span>
+                                        <input id="switch-autopop" name="switch-autopop" type="checkbox"
+                                               onclick="switchchecked()">
+                                        <span class="slider round"></span>
                                     </label>
 
                                     <div id="popup-time" hidden>
@@ -64,7 +75,7 @@
                                         <input name="timeto-autopop" style="width:50px; margin-bottom: 30px;"
                                                class="form-control col-md-5 col-xs-10"
                                                id="bot_time" type="text"
-                                                value='0' min="1">
+                                               value='0' min="1">
 
                                     </div>
                                 </div>

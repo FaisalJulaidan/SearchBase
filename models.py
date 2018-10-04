@@ -266,6 +266,7 @@ class Assistant(db.Model):
     Name = db.Column(db.String(128),nullable=False)
     Route = db.Column(db.String(64), unique=True)
     Message = db.Column(db.String(500), nullable=False)
+    TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0 )
     Active = db.Column(db.Boolean(), nullable=False, default=False)
 

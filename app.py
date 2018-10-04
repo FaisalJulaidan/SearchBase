@@ -107,11 +107,11 @@ def gen_dummy_data():
     sabic = Company.query.filter(Company.Name == "Sabic").first()
 
     # Create Assistatns for Aramco and Sabic companies
-    reader_a = Assistant(Name="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco)
-    helper_a = Assistant(Name="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=aramco)
+    reader_a = Assistant(Name="Reader", Message="Hey there", TopBarText="Bot 1", SecondsUntilPopup=1, Active=True, Company=aramco)
+    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Bot 1", SecondsUntilPopup=1, Active=True, Company=aramco)
 
-    reader_s = Assistant(Name="Reader", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic)
-    helper_s = Assistant(Name="Helper", Message="Hey there", SecondsUntilPopup=1, Active=True, Company=sabic)
+    reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Bot 1", SecondsUntilPopup=1, Active=True, Company=sabic)
+    helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Bot 1", SecondsUntilPopup=1, Active=True, Company=sabic)
 
     # Create Blocks
     db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Assistant=reader_a, Content={

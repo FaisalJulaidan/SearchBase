@@ -16,21 +16,24 @@ def admin_assistant_edit(assistantID):
                                          message=assistant.Message,
                                          autopop=assistant.SecondsUntilPopup,
                                          nickname=assistant.Name,
+                                         topBarText=assistant.TopBarText,
                                          active=assistant.Active,
                                          id=assistant.ID)
         else:
             print(callback.Message)
-            return redirect('login')
+            return helpers.redirectWithMessageAndAssistantID('admin_assistant_edit', assistantID, callback.Message)
 
     elif request.method == "POST":
         nickname = request.form.get("nickname", default=False)
         message = request.form.get("welcome-message", default=False)
         autopopup = request.form.get("switch-autopop", default=False) # true / false
         popuptime = request.form.get("timeto-autopop", default=False) # float 1.0
+        topBarText = request.form.get("top-bar-text", default=False)
 
 
         if not message or \
            not nickname or \
+           not topBarText or \
            (not popuptime and not autopopup):
             return helpers.redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, 'Error in getting your inputs!')
         else:
@@ -40,7 +43,7 @@ def admin_assistant_edit(assistantID):
                 secondsUntilPopup = popuptime
 
             callback: Callback = assistant_services.update(id=assistantID,
-                                                           nickname=nickname, message=message,
+                                                           nickname=nickname, message=message, topBarText = topBarText,
                                                            secondsUntilPopup=secondsUntilPopup)
             if callback.Success:
                 return helpers.redirectWithMessageAndAssistantID("admin_assistant_edit", assistantID, nickname + ' Updated Successfully')

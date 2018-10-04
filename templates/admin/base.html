@@ -472,21 +472,29 @@
         })
 
         //insure no image emojis are put inspect
-        $(document).ready(function () {
-            console.log("LOADED")
-            var collection = document.getElementsByTagName("div");
-            for (var i=0;i<collection.length;i++)
-            {
-               collection[i].addEventListener("click", convertEmojisInInputs, false);
-               console.log("ADDED FIRST SUBMIT")
-            }
-            function convertEmojisInInputs(){
-              var inputs = document.getElementsByTagName("input");
-              for (var i=0; i<inputs.length; i++){
-                  inputs[i].value = emojione.toShort(inputs[i].value);
-              }
+        function convertEmojisInInputs(){
+          console.log("EXECUTE")
+          var inputs = document.getElementsByTagName("input");
+          for (var i=0; i<inputs.length; i++){
+              inputs[i].value = emojione.toShort(inputs[i].value);
+          }
+        }
+        $(document).click(function(e) {
+            if (e.button == 0) {
+                var collection = document.getElementsByTagName("input");
+                for (var i=0;i<collection.length;i++)
+                {
+                  //console.log(hasClass(collection[i], "save")
+                  if(!collection[i].disabled){
+                   collection[i].addEventListener("change", convertEmojisInInputs, true);
+                  }
+                }
             }
         });
+        function hasClass(element, className) {
+          console.log(element.className)
+            return (' ' + element.className + ' ').indexOf(' ' + className+ ' ') > -1;
+        }
     </script>
 
 

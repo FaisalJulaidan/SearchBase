@@ -400,6 +400,8 @@
     <!-- SweetAlert Library -->
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css" />
 
     <script type="text/javascript">
         var errTitle = $("#errorTitle");
@@ -468,6 +470,23 @@
         }).fail(function (err) {
             console.log(err)
         })
+
+        //insure no image emojis are put inspect
+        $(document).ready(function () {
+            console.log("LOADED")
+            var collection = document.getElementsByTagName("div");
+            for (var i=0;i<collection.length;i++)
+            {
+               collection[i].addEventListener("click", convertEmojisInInputs, false);
+               console.log("ADDED FIRST SUBMIT")
+            }
+            function convertEmojisInInputs(){
+              var inputs = document.getElementsByTagName("input");
+              for (var i=0; i<inputs.length; i++){
+                  inputs[i].value = emojione.toShort(inputs[i].value);
+              }
+            }
+        });
     </script>
 
 

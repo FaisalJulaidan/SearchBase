@@ -87,7 +87,7 @@ window.onload = (async function (global) {
     btnDiv.id = 'TSB-chatbot-widget';
 
     btnDiv.innerHTML = ' <div class="TSB-circle" style="background-color: '+ clickToShowColor().circle +'; color: '+clickToShowColor().icon+'; ">\n' +
-        '               <i class="fa fa-comment"></i>\n' +
+        '               <i class="fa fa-comments"></i>\n' +
         '             </div>';
 
 

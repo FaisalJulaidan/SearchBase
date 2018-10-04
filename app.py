@@ -289,7 +289,6 @@ if __name__ == "__main__":
             db.create_all()
             seed()
 
-        print("DELETE ME ", BaseConfig.SECRET_KEY_DB)
         # Run the app server
         manager.run()
 

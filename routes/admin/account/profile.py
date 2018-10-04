@@ -32,6 +32,7 @@ def profilePage():
         newsletters = request.form.get("newsletters", default="Error")
         tracking = request.form.get("tracking", default="")
         techSupport = request.form.get("techSupport", default="")
+        notifications = request.form.get("notifications", default="")
         accountSpecialist = request.form.get("accountSpecialist", default="")
 
         if names is "Error" and newEmail is "error" and companyName is "Error":
@@ -61,8 +62,9 @@ def profilePage():
         tracking = bool(tracking)
         techSupport = bool(techSupport)
         accountSpecialist = bool(accountSpecialist)
+        notifications = bool(notifications)
 
-        userSettings_callback : Callback = user_services.createUpdateUserSettings(userID, tracking, techSupport, accountSpecialist)
+        userSettings_callback : Callback = user_services.createUpdateUserSettings(userID, tracking, techSupport, accountSpecialist, notifications)
         if not userSettings_callback.Success: return helpers.redirectWithMessage("profilePage", userSettings_callback.Message + " Company, User information and newsletters has been updated.")
 
         return helpers.redirectWithMessage("profilePage", "Records have been updated.")

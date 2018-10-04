@@ -79,10 +79,10 @@ def before_request():
         try:
             if request.view_args['assistantID']:
                 assistantID = int(request.view_args['assistantID'])
-                ownership_callback : Callback = assistant_services.checkOwnership(assistantID, session.get('CompanyID', None))
+                ownership_callback = assistant_services.checkOwnership(assistantID, session.get('CompanyID', None))
                 if not ownership_callback.Success:
                     return helpers.hardRedirectWithMessage("login", ownership_callback.Message)
-                role_callback : Callback = user_services.getRolePermissions(session.get('UserID', None))
+                role_callback = user_services.getRolePermissions(session.get('UserID', None))
                 if not role_callback.Success:
                     return helpers.hardRedirectWithMessage("admin/dashboard", role_callback.Message)
                 if not role_callback.Data.EditChatbots:

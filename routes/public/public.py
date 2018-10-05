@@ -21,7 +21,7 @@ verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y
 def t():
     if request.method == "GET":
         return render_template("test-chatbot.html")
-    
+
 @public_router.route("/setencryptionkey<key>", methods=['GET'])
 def set_encrypt_key(key):
     print("Starting key retrieval")
@@ -377,65 +377,3 @@ def verify_account(payload):
 
             print(e)
             return helpers.redirectWithMessage("login", "Email verification link failed. Please contact Customer Support in order to resolve this.")
-
-
-
-## Error Handlers ##
-@public_router.errorhandler(status.HTTP_400_BAD_REQUEST)
-def bad_request(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/400.html', error=e.description), status.HTTP_400_BAD_REQUEST
-    except:
-        print("Error without description")
-        return render_template('errors/400.html'), status.HTTP_400_BAD_REQUEST
-
-
-@public_router.errorhandler(status.HTTP_404_NOT_FOUND)
-def page_not_found(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
-    except:
-        print("Error without description")
-        return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
-
-
-@public_router.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-def unsupported_media(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/415.html', error=e.description), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
-    except:
-        print("Error without description")
-        return render_template('errors/415.html'), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
-
-
-@public_router.errorhandler(418)
-def im_a_teapot(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/418.html', error=e.description), 418
-    except:
-        print("Error without description")
-        return render_template('errors/418.html'), 418
-
-
-@public_router.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
-def internal_server_error(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/500.html', error=e.description), status.HTTP_500_INTERNAL_SERVER_ERROR
-    except:
-        print("Error without description")
-        return render_template('errors/500.html'), status.HTTP_500_INTERNAL_SERVER_ERROR
-
-
-@public_router.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
-def not_implemented(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
-    except:
-        print("Error without description")
-        return render_template('errors/501.html'), status.HTTP_501_NOT_IMPLEMENTED

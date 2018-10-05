@@ -12,8 +12,8 @@ def getByID(id) -> Callback:
         print(exc)
         db.session.rollback()
         return Callback(False, 'Could not get the assistant by id.')
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()
 
 
 def getByName(nickname) -> Callback:
@@ -30,8 +30,8 @@ def getByName(nickname) -> Callback:
         db.session.rollback()
         return Callback(False,
                         'Could not get the assistant by nickname.')
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()
 
 
 
@@ -49,8 +49,8 @@ def getAll(companyID) -> Callback:
         print(exc)
         db.session.rollback()
         return Callback(False,'Could not get all assistants.')
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()
 
 
 def create(nickname, route, message, topBarText, secondsUntilPopup, company: Company) -> Assistant or None:
@@ -66,8 +66,8 @@ def create(nickname, route, message, topBarText, secondsUntilPopup, company: Com
         print(exc)
         db.session.rollback()
         return Callback(False, 'Failed to create the assistant', None)
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()
 
 
 def update(id, nickname, message, topBarText, secondsUntilPopup)-> Callback:
@@ -84,8 +84,8 @@ def update(id, nickname, message, topBarText, secondsUntilPopup)-> Callback:
         db.session.rollback()
         return Callback(False,
                         "Couldn't update assistant "+nickname)
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()
 
 
 
@@ -104,8 +104,8 @@ def changeStatus(id, active):
         print("Error in assistant_services.changeStatus(): ", exc)
         db.session.rollback()
         return Callback(False, 'Sorry, Could not change the assistant\' status.')
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()
 
 
 def removeByID(id) -> Callback:
@@ -118,8 +118,8 @@ def removeByID(id) -> Callback:
         print("Error in assistant_services.removeByID(): ", exc)
         db.session.rollback()
         return Callback(False, 'Error in deleting assistant.')
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()
 
 def checkOwnership(assistantID, companyID):
     try:
@@ -136,5 +136,5 @@ def checkOwnership(assistantID, companyID):
         print("Error in assistant_services.checkOwnership(): ", exc)
         db.session.rollback()
         return Callback(False, 'Error in verifying ownership over assistant.')
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()

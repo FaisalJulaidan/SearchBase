@@ -23,8 +23,8 @@ def getByID(id) -> Company or None:
         return Callback(False,
                         'Company with ID ' + str(id) + ' does not exist')
 
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()
 
 
 def getAll() -> list:
@@ -33,8 +33,8 @@ def getAll() -> list:
     except:
         db.session.rollback()
         return None
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()
 
 
 
@@ -59,9 +59,8 @@ def create(name, url, ownerEmail) -> Company or None:
         print(exc)
         db.session.rollback()
         return Callback(False, "Couldn't create a company entity.")
-    finally:
-        db.session.close()
-    # Save
+    # finally:
+    #     db.session.close()
 
 
 
@@ -75,8 +74,8 @@ def removeByName(name) -> bool:
         db.session.rollback()
         print(exc)
         return False
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()
 
 def getByEmail(email) -> Callback:
     try:
@@ -91,8 +90,8 @@ def getByEmail(email) -> Callback:
         print("company_services.getByEmail() ERROR: ", exc)
         db.session.rollback()
         return Callback(False, 'Company could not be retrieved')
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()
 
 def getByCompanyID(id) -> Callback:
     try:
@@ -104,8 +103,8 @@ def getByCompanyID(id) -> Callback:
         db.session.rollback()
         print("company_services.getByCompanyID() ERROR: ", exc)
         return Callback(False, 'Company could not be retrieved')
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()
 
 
 def getByStripeID(id) -> Callback:
@@ -120,5 +119,5 @@ def getByStripeID(id) -> Callback:
         print(exc)
         db.session.rollback()
         return Callback(False, 'Could not get the assistant by nickname.')
-    finally:
-        db.session.close()
+    # finally:
+    #     db.session.close()

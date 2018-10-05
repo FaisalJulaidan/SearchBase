@@ -1,21 +1,19 @@
-import sqlalchemy.exc
-from services import sub_services
-from models import db, Company, Assistant,Callback
-from utilities import helpers
+from models import db, Company, Assistant, Callback
+
 
 def getByID(id) -> Callback:
     try:
         # Get result and check if None then raise exception
         result = db.session.query(Assistant).get(id)
         if not result: raise Exception
+        return Callback(True, "Got assistant by id successfully.", result)
 
-        return Callback(True,
-                        "Got assistant by id successfully.",
-                        result)
     except Exception as exc:
         print(exc)
-        return Callback(False,
-                        'Could not get the assistant by id.')
+        db.session.rollback()
+        return Callback(False, 'Could not get the assistant by id.')
+    finally:
+        db.session.close()
 
 
 def getByName(nickname) -> Callback:
@@ -29,8 +27,12 @@ def getByName(nickname) -> Callback:
                         result)
     except Exception as exc:
         print(exc)
+        db.session.rollback()
         return Callback(False,
                         'Could not get the assistant by nickname.')
+    finally:
+        db.session.close()
+
 
 
 def getAll(companyID) -> Callback:
@@ -45,7 +47,10 @@ def getAll(companyID) -> Callback:
 
     except Exception as exc:
         print(exc)
+        db.session.rollback()
         return Callback(False,'Could not get all assistants.')
+    finally:
+        db.session.close()
 
 
 def create(nickname, route, message, topBarText, secondsUntilPopup, company: Company) -> Assistant or None:
@@ -54,15 +59,15 @@ def create(nickname, route, message, topBarText, secondsUntilPopup, company: Com
                               SecondsUntilPopup=secondsUntilPopup,
                               Company=company)
         db.session.add(assistant)
-
+        # Save
+        db.session.commit()
+        return Callback(True, 'Assistant has ben created successfully!', assistant)
     except Exception as exc:
         print(exc)
         db.session.rollback()
         return Callback(False, 'Failed to create the assistant', None)
-
-    # Save
-    db.session.commit()
-    return Callback(True, 'Assistant has ben created successfully!', assistant)
+    finally:
+        db.session.close()
 
 
 def update(id, nickname, message, topBarText, secondsUntilPopup)-> Callback:
@@ -72,14 +77,16 @@ def update(id, nickname, message, topBarText, secondsUntilPopup)-> Callback:
                                                                        'TopBarText': topBarText,
                                                                        'SecondsUntilPopup': secondsUntilPopup})
         db.session.commit()
-
         return Callback(True, nickname+' Updated Successfully')
 
-    except sqlalchemy.exc.SQLAlchemyError as exc:
+    except Exception as exc:
         print(exc)
         db.session.rollback()
         return Callback(False,
                         "Couldn't update assistant "+nickname)
+    finally:
+        db.session.close()
+
 
 
 def changeStatus(id, active):
@@ -97,6 +104,8 @@ def changeStatus(id, active):
         print("Error in assistant_services.changeStatus(): ", exc)
         db.session.rollback()
         return Callback(False, 'Sorry, Could not change the assistant\' status.')
+    finally:
+        db.session.close()
 
 
 def removeByID(id) -> Callback:
@@ -109,6 +118,8 @@ def removeByID(id) -> Callback:
         print("Error in assistant_services.removeByID(): ", exc)
         db.session.rollback()
         return Callback(False, 'Error in deleting assistant.')
+    finally:
+        db.session.close()
 
 def checkOwnership(assistantID, companyID):
     try:
@@ -116,11 +127,14 @@ def checkOwnership(assistantID, companyID):
         if not assistant_callback.Success: 
             return Callback(False, "Error in retrieving necessary information.")
 
-        #Check if the user is from the company that owns the assistant
+        # Check if the user is from the company that owns the assistant
         if companyID != assistant_callback.Data.CompanyID:
             return Callback(False, 'Security check failed. Process terminated.')
 
         return Callback(True, 'Ownership check passed')
     except Exception as exc:
         print("Error in assistant_services.checkOwnership(): ", exc)
+        db.session.rollback()
         return Callback(False, 'Error in verifying ownership over assistant.')
+    finally:
+        db.session.close()

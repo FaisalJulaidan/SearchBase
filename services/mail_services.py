@@ -19,54 +19,54 @@ def sendVerificationEmail(email, companyName) -> Callback:
         payload = email + ";" + companyName
         link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
 
-        send_email((email), 'Account verification', 
+        send_email((email), 'Account verification',
                '/emails/verification.html', link = link)
+
+        return Callback(True, 'Verification email is on its way to ' + email)
 
     except Exception as e:
         print("sendVerificationEmail() Error: ", e)
         return Callback(False, 'Could not send a verification email to ' + email)
 
-    return Callback(True, 'Verification email is on its way to ' + email)
-
 def sendNewUserHasRegistered(name, email, companyName, tel):
     try:
 
-        send_email(("thesearchbase@gmail.com"), companyName+' has signed up', 
+        send_email(("thesearchbase@gmail.com"), companyName+' has signed up',
                '/emails/company_signup.html', name = name, email=email, companyName=companyName, tel=tel)
+
+        return Callback(True, 'Signed up email is on its way')
 
     except Exception as e:
         print("sendNewUserHasRegistered() Error: ", e)
         return Callback(False, 'Could not send a signed up email')
 
-    return Callback(True, 'Signed up email is on its way')
-
 def sendPasswordResetEmail(email, companyID):
     try:
-              
+
         payload = email + ";" + str(companyID)
         link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
-        
-        send_email((email), 'Password reset', 
+
+        send_email((email), 'Password reset',
                '/emails/reset_password.html', link = link)
+
+        return Callback(True, 'Password reset email is on its way to ' + email)
 
     except Exception as e:
         print("sendPasswordResetEmail() Error: ", e)
         return Callback(False, 'Could not send a password reset email to ' + email)
-    
-    return Callback(True, 'Password reset email is on its way to ' + email)
 
 def addedNewUserEmail(adminEmail, targetEmail, password):
     try:
         link = "https://www.thesearchbase.com/admin/changepassword"
 
-        send_email((targetEmail), 'You have been added to TheSearchBase', 
+        send_email((targetEmail), 'You have been added to TheSearchBase',
                'emails/account_invitation.html', password=password, adminEmail=adminEmail)
+
+        return Callback(True, 'Email sent is on its way to ' + targetEmail)
 
     except:
         print("addedNewUserEmail() Error: ", e)
         return Callback(False, 'Could not send email to ' + targetEmail)
-    
-    return Callback(True, 'Email sent is on its way to ' + targetEmail)
 
 #NOTIFICATIONS
 def notifyNewRecordsForLastXHours(hours):
@@ -105,14 +105,14 @@ def notifyNewRecordsForLastXHours(hours):
 
 def sendNewRecordsNotification(reciever, data):
     try:
-        send_email((reciever), 'Your new data', 
+        send_email((reciever), 'Your new data',
                'emails/user_notification.html', data=data)
+
+        return Callback(True, 'Email sent and it\'s on its way to ' + reciever)
 
     except Exception as e:
         print("addedNewUserEmail() Error: ", e)
         return Callback(False, 'Could not send email to ' + reciever)
-    
-    return Callback(True, 'Email sent and it\'s on its way to ' + reciever)
 
 
 #def async(f):

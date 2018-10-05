@@ -16,24 +16,29 @@ def getByAssistantID(assistantID):
 
         return Callback(False, 'Could not retrieve the data.')
 
+    finally:
+        db.session.close()
+        
 def deleteByID(id):
     try:
         db.session.query(ChatbotSession).filter(ChatbotSession.ID == id).delete()
+        db.session.commit()
+        return Callback(True, 'Record has been removed successfully.')
     except Exception as exc:
         print("userInput_services.deleteByID() Error: ", exc)
         db.session.rollback()
         return Callback(False, 'Record could not be removed.')
-    # Save
-    db.session.commit()
-    return Callback(True, 'Record has been removed successfully.')
+    finally:
+        db.session.close()
 
 def deleteAll(assistantID):
     try:
         db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID).delete()
+        db.session.commit()
+        return Callback(True, 'Records have been removed successfully.')
     except Exception as exc:
         print("userInput_services.deleteAll() Error: ", exc)
         db.session.rollback()
         return Callback(False, 'Records could not be removed.')
-    # Save
-    db.session.commit()
-    return Callback(True, 'Records have been removed successfully.')
+    finally:
+        db.session.close()

@@ -33,8 +33,13 @@ def signup(email, firstname, surname, password, companyName, companyPhoneNumber,
     # Create a new user with its associated company and owner role
     user_callback = user_services.create(firstname, surname, email, password, companyPhoneNumber, company, ownerRole.Data)
 
-    # Create userSettings for this user
-    db.session.add(UserSettings(User=user_callback.Data))
+    try:
+        # Create userSettings for this user
+        db.session.add(UserSettings(User=user_callback.Data))
+    except Exception as e:
+        db.session.rollback()
+    finally:
+        db.session.close()
 
     # Subscribe to basic plan with 14 trial days
     sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lpeLZ3EV8IfA', trialDays=14)
@@ -56,40 +61,44 @@ def signup(email, firstname, surname, password, companyName, companyPhoneNumber,
 
 
 def login(email: str, password_to_check: str) -> Callback:
+    try:
+        # Login Exception Handling
+        if not (email or password_to_check):
+            print("Invalid request: Email or password not received!")
+            return Callback(False, "Email or password not received. Please try age")
 
-    # Login Exception Handling
-    if not (email or password_to_check):
-        print("Invalid request: Email or password not received!")
-        return Callback(False, "Email or password not received. Please try age")
+        user_callback: Callback = user_services.getByEmail(email.lower())
+        # If user is not found
+        if not user_callback.Success:
+            print("Invalid request: Email not found")
+            return Callback(False, "Record with the current email or password was not found")
 
-    user_callback: Callback = user_services.getByEmail(email.lower())
-    # If user is not found
-    if not user_callback.Success:
-        print("Invalid request: Email not found")
-        return Callback(False, "Record with the current email or password was not found")
+        # Get the user from the callback object
+        user: User = user_callback.Data
+        if not password_to_check == user.Password:
+            print("Invalid request: Incorrect Password")
+            return Callback(False, "Record with the current email or password was not found")
 
-    # Get the user from the callback object
-    user: User = user_callback.Data
-    if not password_to_check == user.Password:
-        print("Invalid request: Incorrect Password")
-        return Callback(False, "Record with the current email or password was not found")
+        if not user.Verified:
+            print("Account is not verified!")
+            return Callback(False, "Account is not verified.")
 
-    if not user.Verified:
-        print("Account is not verified!")
-        return Callback(False, "Account is not verified.")
+        # If all the tests are valid then do login process
+        session['Logged_in'] = True
+        session['UserID'] = user.ID
+        session['CompanyID'] = user.CompanyID
+        session['UserEmail'] = user.Email
+        session['UserPlan'] = helpers.getPlanNickname(user.Company.SubID)
+        session['RoleID'] = user.RoleID
 
-    # If all the tests are valid then do login process
-    session['Logged_in'] = True
-    session['UserID'] = user.ID
-    session['CompanyID'] = user.CompanyID
-    session['UserEmail'] = user.Email
-    session['UserPlan'] = helpers.getPlanNickname(user.Company.SubID)
-    session['RoleID'] = user.RoleID
+        # Set LastAccess
+        user.LastAccess = datetime.now()
 
-    # Set LastAccess
-    user.LastAccess = datetime.now()
+        # Save db changes
+        db.session.commit()
 
-    # Save db changes
-    db.session.commit()
-
-    return Callback(True, "Login Successful")
+        return Callback(True, "Login Successful")
+    except Exception as e:
+        db.session.rollback()
+    finally:
+        db.session.close()

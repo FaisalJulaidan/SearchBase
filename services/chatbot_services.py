@@ -30,7 +30,7 @@ def processData(assistant: Assistant, data: dict) -> Callback:
         db.session.rollback()
         return Callback(False, "An error occurred while processing chatbot data.")
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def getBySessionID(sessionID) -> Callback:
@@ -44,7 +44,7 @@ def getBySessionID(sessionID) -> Callback:
         db.session.rollback()
         return Callback(False, 'Could not get the user input.')
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 
@@ -64,7 +64,7 @@ def addFilePath(sessionID: int, path: str):
         return Callback(False, 'Could not add the given file path')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 

@@ -16,7 +16,7 @@ def getByAssistantID(id) -> Statistics:
         return Callback(False, "Could not retrieve statistic")
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 def getTotalAll(assistants) -> Callback:
     answered = 0
@@ -38,4 +38,4 @@ def getTotalAll(assistants) -> Callback:
                         "Error: Couldn't get total numbers for all assistants")
 
     # finally:
-    #     db.session.close()
+       # db.session.close()

@@ -18,7 +18,7 @@ def create(name, editChatbots: bool, editUsers: bool, deleteUsers: bool, accessB
         return Callback(False, 'Sorry, Could not create the role.', )
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def getByNameAndCompanyID(name: str, companyID: int) -> Callback:
@@ -36,7 +36,7 @@ def getByNameAndCompanyID(name: str, companyID: int) -> Callback:
                         'Role could not be retrieved.')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def getAllByCompanyID(companyID: int) -> Callback:
@@ -54,7 +54,7 @@ def getAllByCompanyID(companyID: int) -> Callback:
                         'Roles with company ID ' + str(companyID) + ' could not be retrieved.')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def removeAllByCompany(company: Company) -> Callback:
@@ -70,7 +70,7 @@ def removeAllByCompany(company: Company) -> Callback:
         return Callback(False, 'Role could not be removed.')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def getByID(id) -> Role or None:
@@ -84,7 +84,7 @@ def getByID(id) -> Role or None:
         return Callback(False, 'Role with id ' + str(id) + ' does not exist')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def getByName(name) -> Role or None:
@@ -98,4 +98,4 @@ def getByName(name) -> Role or None:
         return Callback(False, 'Role ' + str(name) + ' does not exist')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()

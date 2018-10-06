@@ -47,7 +47,7 @@ def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Call
         return Callback(False, 'Solutions could not be retrieved at this time')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def createNew(assistant, majorTitle, money, url, solId='',  secTitle='', shortDesc='', keywords=''):
@@ -66,7 +66,7 @@ def createNew(assistant, majorTitle, money, url, solId='',  secTitle='', shortDe
         return Callback(False, 'Sorry, Could not create the solution.')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def getByID(id):
@@ -82,7 +82,7 @@ def getByID(id):
         return Callback(False, 'Could not retrieve solutions for ID: ' + str(id))
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def update(solution: Solution, solId, majorTitle, money, URL, secTitle='', shortDesc='', keywords=''):
@@ -110,7 +110,7 @@ def update(solution: Solution, solId, majorTitle, money, URL, secTitle='', short
         return Callback(False, 'Sorry, Could not create the solution')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def remove(solution: Solution) -> Callback:
@@ -126,7 +126,7 @@ def remove(solution: Solution) -> Callback:
         return Callback(False, "Solution could not be removed.")
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def getByAssistantID(assistantID):
@@ -143,7 +143,7 @@ def getByAssistantID(assistantID):
         return Callback(False, 'Could not retrieve solutions for ID: ' + str(assistantID))
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def getAllByAssistantID(assistantID):
@@ -167,7 +167,7 @@ def getAllByAssistantID(assistantID):
         return Callback(False, 'Could not retrieve solutions for ID: ' + str(assistantID))
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def deleteAllByAssistantID(assistantID):
@@ -182,7 +182,7 @@ def deleteAllByAssistantID(assistantID):
         return False
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 
@@ -198,7 +198,7 @@ def bulkAdd(objects):
         return Callback(False, 'Sorry, Could not create the solutions.')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def countRecordsByAssistantID(assistantID):
@@ -218,7 +218,7 @@ def countRecordsByAssistantID(assistantID):
         return 0
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def deleteByAssitantID(assistantID, message):

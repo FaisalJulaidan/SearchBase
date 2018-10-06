@@ -15,7 +15,7 @@ def addNewsletterPerson(email):
         return Callback(False, 'Couldnot register' + email+ ' for newsletters.')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 def checkForNewsletter(email):
     try:
@@ -30,7 +30,7 @@ def checkForNewsletter(email):
         return Callback(False, email + ' is not registered for newsletters')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 def removeNewsletterPerson(email):
     try:
@@ -44,7 +44,7 @@ def removeNewsletterPerson(email):
         return Callback(False, 'Couldnot unsubsribe' + email+ ' from newsletters.')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 def getAll():
     try:
@@ -57,4 +57,4 @@ def getAll():
         return Callback(False, "Error in getting newsletters: ")
 
     # finally:
-    #     db.session.close()
+       # db.session.close()

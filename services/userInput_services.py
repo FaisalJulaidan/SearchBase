@@ -17,7 +17,7 @@ def getByAssistantID(assistantID):
         return Callback(False, 'Could not retrieve the data.')
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
         
 def deleteByID(id):
     try:
@@ -29,7 +29,7 @@ def deleteByID(id):
         db.session.rollback()
         return Callback(False, 'Record could not be removed.')
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 def deleteAll(assistantID):
     try:
@@ -41,4 +41,4 @@ def deleteAll(assistantID):
         db.session.rollback()
         return Callback(False, 'Records could not be removed.')
     # finally:
-    #     db.session.close()
+       # db.session.close()

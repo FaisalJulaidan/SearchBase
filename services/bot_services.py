@@ -36,7 +36,7 @@ def genBotViaTemplate(assistant: Assistant, tempName: str):
         db.session.rollback()
         return Callback(False, 'Error while generating a bot via a template')
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 # Get the chatbot for the public to use
 def getChatbot(assistant: Assistant) -> dict:
@@ -67,7 +67,7 @@ def getBlocks(assistant: Assistant) -> List[dict]:
         print("getBlocks ERROR:", e)
         db.session.rollback()
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def getBlocksCountByAssistant(assistant: Assistant):
@@ -76,7 +76,7 @@ def getBlocksCountByAssistant(assistant: Assistant):
     except Exception as e:
         db.session.rollback()
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def getRemainingBlocksByAssistant(assistant: Assistant):
@@ -86,7 +86,7 @@ def getRemainingBlocksByAssistant(assistant: Assistant):
     except Exception as e:
         db.session.rollback()
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def addBlock(data: dict, assistant: Assistant) -> Callback:
@@ -117,7 +117,7 @@ def addBlock(data: dict, assistant: Assistant) -> Callback:
         return Callback(False, 'Error occurred while creating a new Block object', exc.args[0])
 
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def updateBot(bot, assistant: Assistant) -> Callback:
@@ -195,7 +195,7 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
     except Exception as e:
         db.session.rollback()
     # finally:
-    #     db.session.close()
+       # db.session.close()
     return Callback(True, "Blocks updated successfully")
 
 
@@ -216,7 +216,7 @@ def deleteBlockByID(id) -> Callback:
         db.session.rollback()
         return Callback(False, 'Block with id' + str(id) + " could not be removed.")
     # finally:
-    #     db.session.close()
+       # db.session.close()
 
 
 def isValidBlock(block: dict, blockType: str):

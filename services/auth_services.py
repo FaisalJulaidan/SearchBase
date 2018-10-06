@@ -65,7 +65,7 @@ def login(email: str, password_to_check: str) -> Callback:
         # Login Exception Handling
         if not (email or password_to_check):
             print("Invalid request: Email or password not received!")
-            return Callback(False, "Email or password not received. Please try age")
+            return Callback(False, "Email or password not received. Please try again")
 
         user_callback: Callback = user_services.getByEmail(email.lower())
         # If user is not found
@@ -100,5 +100,6 @@ def login(email: str, password_to_check: str) -> Callback:
         return Callback(True, "Login Successful")
     except Exception as e:
         db.session.rollback()
+        return Callback(False, "Error while logging in.")
     # finally:
        # db.session.close()

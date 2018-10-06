@@ -28,8 +28,8 @@ def getUserAndCompany(email):
         db.session.rollback()
         return Callback(False, "Error in loooking for user and company")
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def updateUser(firstname, secondname, newEmail, userID):
     try:
@@ -48,8 +48,8 @@ def updateUser(firstname, secondname, newEmail, userID):
         db.session.rollback()
         return Callback(False, "User could not be updated")
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def updateCompany(companyName, companyID):
     try:
@@ -66,5 +66,5 @@ def updateCompany(companyName, companyID):
         db.session.rollback()
         return Callback(False, "Company cold not be updated")
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()

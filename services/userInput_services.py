@@ -16,8 +16,8 @@ def getByAssistantID(assistantID):
 
         return Callback(False, 'Could not retrieve the data.')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
         
 def deleteByID(id):
     try:
@@ -28,8 +28,8 @@ def deleteByID(id):
         print("userInput_services.deleteByID() Error: ", exc)
         db.session.rollback()
         return Callback(False, 'Record could not be removed.')
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def deleteAll(assistantID):
     try:
@@ -40,5 +40,5 @@ def deleteAll(assistantID):
         print("userInput_services.deleteAll() Error: ", exc)
         db.session.rollback()
         return Callback(False, 'Records could not be removed.')
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()

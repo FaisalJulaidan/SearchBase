@@ -38,7 +38,6 @@ def set_encrypt_key(key):
     enckey = part1+part2+part3+part4+part5
     enckey = (enckey+key).replace(" ", "")
     print("Key set")
-    print("DELETE ME : ", enckey)
     return enckey
 
 

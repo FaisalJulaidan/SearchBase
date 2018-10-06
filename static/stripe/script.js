@@ -91,7 +91,10 @@ $(document).on('hide.bs.modal', '#subModal', function (e) {
 
 
  function stripeTokenHandler(planID) {
-        card.mount('#card-element');
+
+        el = $('#card-element')[0];
+        card.mount(el)
+     console.log(card)
         stripe.createToken(card).then(function (result) {
         if (result.error) {
             // Inform the user if there was an error.

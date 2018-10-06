@@ -76,9 +76,13 @@
 
 
     <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
-    <link rel='stylesheet prefetch'
     <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
+    {#    <link rel="stylesheet" href="/static/chatbot/styles.css">#}
 </head>
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+      integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
 
 <style>
     html, body {
@@ -103,9 +107,7 @@
         width: 100%;
         height: 100%;
         background: #E6EAEA;
-        {#border-radius: 5px;#}
     }
-
 
     #frame .content {
         float: right;
@@ -114,7 +116,6 @@
         overflow: hidden;
         position: relative;
     }
-
 
     #frame .content .contact-profile {
         width: 100%;
@@ -155,7 +156,8 @@
     }
 
     #frame .content .messages {
-        height: calc(100% - 55px);
+        padding-top: 10px;
+        height: calc(100% - 40px);
         overflow-y: scroll;
         overflow-x: hidden;
     }
@@ -180,6 +182,11 @@
 
     #frame .content .messages ul li:nth-last-child(1) {
         margin-bottom: 20px;
+    }
+
+    #frame .content .messages ul li {
+        margin-top: 20px;
+        opacity: 0.3;
     }
 
     #frame .content .messages ul li.sent img {
@@ -217,13 +224,12 @@
         line-height: 130%;
     }
 
-
     #frame .content .message-input {
         position: absolute;
         bottom: 0;
         width: 100%;
         z-index: 99;
-        height: 55px;
+        height: 40px;
     }
 
     #frame .content .message-input .wrap {
@@ -255,27 +261,29 @@
         float: right;
         border: none;
         width: 50px;
-        /*height: 40px;*/
+        height: 40px;
         padding: 12px 0;
         cursor: pointer;
         background: #32465a;
         color: #f5f5f5;
     }
 
-    #frame .content .message-input .wrap button:hover {
+    #frame .content .message-input button:hover {
         background: #435f7a;
     }
 
-    #frame .content .message-input .wrap button:focus {
+    #frame .content .message-input button:focus {
         outline: none;
     }
 
-    #frame .content .message-input .wrap button.answer {
+    #frame .content .message-input button.answer {
         float: inherit;
-        margin-left: 20px;
-        margin-right: 20px;
-        padding: 10px;
-        width: auto;
+        position: relative;
+        left: 50%;
+        background-color: #435f7a;
+        border-color: #5087b8;
+        transform: translateX(-100%);
+        line-height: 0;
     }
 
     @media screen and (max-width: 735px) {
@@ -338,29 +346,37 @@
     #thinkingGifIMG {
         width: 72px;
     }
-</style>
 
+</style>
 <body id="chatbotBody">
 <div id="frame">
     <div class="content">
         <div class="messages">
             <ul></ul>
-            <div id="presetAnswers"></div>
-            <div id="chatBottom"></div>
         </div>
 
 
         <div class="message-input" id="message-input">
-            <form id="fileUploadForm" action="/" method="get" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
-                <div class="wrap" style="margin-top: 15px;min-height: 40px; background-color: white;">
-                    <label style="background-color: white;width: 84.37%;" for="fileUploadB"><i style="font-size: 30px;margin: 6px 0px 0px 10px;" class="fa fa-paperclip"></i></label><input hidden name="file" onkeypress="handleEnter(event)" id="fileUploadB" type="file" placeholder="Upload your file..." style="background-color: white;" /><button type="button" onclick="submitAnswer('')" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
-                </div>
-            </form>
+            {#            <form id="fileUploadForm" #}
+            {#                  action="/" #}
+            {#                  method="get" #}
+            {#                  class="image-upload" #}
+            {#                  style="display:none"#}
+            {#                  onsubmit="return sendFileForm();">#}
+            {#                <div class="wrap" style="margin-top: 15px;min-height: 40px; background-color: white;">#}
+            {#                    <label style="background-color: white;width: 84.37%;" for="fileUploadB"><i#}
+            {#                            style="font-size: 30px;margin: 6px 0px 0px 10px;" class="fa fa-paperclip"></i></label><input#}
+            {#                        hidden name="file" onkeypress="handleEnter(event)" id="fileUploadB" type="file"#}
+            {#                        placeholder="Upload your file..." style="background-color: white;"/>#}
+            {#                    <button type="button" onclick="submitAnswer('')" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>#}
+            {#                </div>#}
+            {#            </form>#}
         </div>
     </div>
 </div>
 
-{#        <script src="/static/chatbot/script.js"></script>#}
+{#<script src="/static/chatbot/script.js"></script>#}
+
 <script>
     var assistant = null;
     var blocks = []; // Blocks ordered
@@ -372,11 +388,12 @@
     var params = undefined;
     var sessionID = 0;
     var welcomeMessage = "";
-    var BOT_USER = 'bot';
-    var CLIENT_USER = 'user';
     var chatInputDiv = document.getElementById("message-input");
     var fileUploadForm = document.getElementById('fileUploadForm');
     var thinkingGifLife = 800 + Math.floor(Math.random() * 1200);
+
+    let BOT_USER = 'bot';
+    let CLIENT_USER = 'user';
 
     // This function will get the blocks from the server by assistantID and set the blocks array to be used to create
     // the cahtbot conversational flow
@@ -400,19 +417,20 @@
         }).fail(function (res) {
             console.log("Error in retrieving blocks.");
             console.log(res);
-            });
+        });
     }
 
-
     // This start the lunch the chatbot for the first time
-    function start() {
+    async function start() {
         // 1.Show the chatbot welcoming message assistant.message
-        if (welcomeMessage) { sendAssistantMessage(welcomeMessage); }
+        if (welcomeMessage) {
+            newMessage(BOT_USER, welcomeMessage);
+            await sleep(750)
+        }
 
         // 2.Show the first block in the blocks array then render it depends on its type
         renderBlock(blocks[0]);
     }
-
 
     // Get block by id
     function getBlock(id) {
@@ -427,9 +445,14 @@
 
     // This should send the data to the server, without returning any solutions back
     function sendData() {
-        putThinkingGif();
+        thinkGIF()
         var solutions = [];
-        params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": 0, solutionsReturned: solutions.length};
+        params = {
+            "collectedInformation": collectedInformation,
+            "keywords": keywords,
+            "showTop": 0,
+            solutionsReturned: solutions.length
+        };
         console.log("Send data...");
 
         return $.ajax({
@@ -439,7 +462,6 @@
             data: JSON.stringify(params)
 
         }).done(function (res) {
-            removeThinkingGif();
             console.log("Data sent successfully!");
             var data = JSON.parse(res).data;
             sessionID = data["sessionID"];
@@ -451,7 +473,7 @@
             console.log("Error in retrieving blocks.");
             console.log(res);
             return false
-            });
+        });
     }
 
     function sendDataSolutionsBlock(showTop) {
@@ -478,11 +500,10 @@
             removeThinkingGif();
             console.log("Error in retrieving blocks.");
             console.log(res);
-            });
+        });
     }
 
     function getSolutions(showTop) {
-        putThinkingGif();
         params = {"keywords": keywords, "showTop": showTop};
 
         return $.ajax({
@@ -492,8 +513,6 @@
             data: JSON.stringify(params)
 
         }).done(function (res) {
-            removeThinkingGif();
-
             console.log("Solutions retrieved successfully!");
             var data = JSON.parse(res).data;
             solutions = data["solutions"];
@@ -512,7 +531,9 @@
     }
 
     function sendFileForm() {
-        if (document.getElementById('fileUploadB').files.length == 0) { return false; }
+        if (document.getElementById('fileUploadB').files.length == 0) {
+            return false;
+        }
         var formData = new FormData();
         var fileInput = document.getElementById('fileUploadB').files[0];
         formData.append('file', fileInput, fileInput.name);
@@ -533,12 +554,12 @@
         return false;
     }
 
-    function displayReturnedSolutions(solutions) {
+    async function displayReturnedSolutions(solutions) {
         messageContainer = $(".messages ul");
 
         // If there is no solutions in the database show this message.
-        if (solutions.length === 0){
-            sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.")
+        if (solutions.length === 0) {
+            await newMessage(BOT_USER, "Sorry, we couldn't find any solutions based on your input.")
 
         } else {
 
@@ -554,21 +575,14 @@
         submitAnswer('');
     }
 
-    function openSolution(link) {
-        window.open(link);
-    }
-
 
     // Blocks Renderer //
     // --------------- //
-
     function renderBlock(block) {
-        // to remove old questions
-        // needs fix
-        $("#qAnswers").remove();
-
         currentBlock = block;
-        if (currentBlock === undefined) {return 0;}
+        if (currentBlock === undefined) {
+            return 0;
+        }
 
         switch (block.type) {
             case "Question":
@@ -586,154 +600,107 @@
             default:
                 console.log("Block type is not recognised!!!")
         }
-    }
 
-    // This function will render a block of type Questions with its answers to the chatbot.
-    function renderQuestion(block) {
-        $('#presetAnswers').show();
-        // to show the message from bot_user
-        newMessage(BOT_USER, block.content.text);
-        // to show answers related to question_block
-        showAnswers(block.content.answers);
+        // This function will render a block of type Questions with its answers to the chatbot.
+        async function renderQuestion(block) {
+            $('#message-input').show();
 
-        // var answerAppendString = "<div id='qAnswers'>";
-        // document.getElementById("textMessage").style.display = "inline-block";
-        // document.getElementById("fileUploadForm").style.display = "none";
-        //
-        // var blockAnswers = block.content.answers;
-        // for (var i = 0; i < blockAnswers.length; i++) {
-        //     answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"submitAnswer('" + toEmoticon(blockAnswers[i].text) + "','" + blockAnswers[i].keywords + "')\">" + toEmoticon(blockAnswers[i].text) + "</a>";
-        // }
-        //add skip button
-        //answerAppendString += "<a class='answerOptions' id='option" + i + "' onclick=\"SkipQuestion()\">Skip Question</a>";
-        // answerAppendString += "</div>";
-        // $("#optionsDiv").append(answerAppendString);
-        // chatInputDiv.style = "display:none";
-        //
-        // sendAssistantMessage(block.content.text);
+            // to show the message from bot_user
+            await newMessage(BOT_USER, block.content.text);
+            // to show answers related to question_block
+            showAnswers(block.content.answers);
 
-        // checkOutsideElements();
-        // if (!cancelScroll) {
-        //     scrollTo("chatBottom");
-        // }
+            function showAnswers(answers) {
+                $messageInput = $("#message-input").first();
+                $answersDiv = $("<div class='row text-center' style='height:100%; padding:0 10px 10px'></div>");
 
-        function showAnswers(answers) {
-            $messageInput = $("#presetAnswers").first();
-            $answersDiv = $("<div class='wrap text-center' style='padding:10px;'></div>");
+                for (var i = 0; i < answers.length; i++) {
+                    $answersDiv.append("<button class=\"btn btn-primary answer\" onclick=\"submitAnswer(this.innerText, '" + answers[i].keywords + "' )\" >" + answers[i].text + "</button>");
+                    // $answersDiv.append("<div class='col-xs-2'><button class=\"btn btn-primary answer\" onclick=\"submitAnswer(this.innerText, '" + answers[i].keywords + "' )\" >" + answers[i].text + "</button></div>");
+                }
+                $messageInput.html($answersDiv);
 
-            for (var i = 0; i < answers.length; i++) {
-                $answersDiv.append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText)\" >" + answers[i].text + "</button>");
+                $('.message-input').css('height', '40px');
+                $('.messages').css('height', 'calc(100% - 40px)');
             }
-            $messageInput.html($answersDiv);
+        }
 
-            //$('.messages').css('height', 'calc(100% - 55px)');
-            //$('.message-input').css('height', '55px');
+        async function renderUserInput(block) {
+            // {#chatInputDiv.style = "display:block;";#}
+            // {#fileUploadForm.style.display = 'none';#}
+
+            $messageInput = $(".message-input").last();
+            $userInput = $("<div class=\"wrap\" style=\"background-color: white;\">\n" +
+                "           <input onkeypress=\"handleEnter(event)\" " +
+                "                  id='textMessage' type=\"text\" placeholder=\"Write your message...\"/>\n" +
+                "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
+                "            </div>");
+
+            $messageInput.css('height', '40px');
+            $('.messages').css('height', 'calc(100% - 40px)');
+
+            // show input field
+            $messageInput.append($userInput);
+
+            // show block text
+            await newMessage(BOT_USER, toEmoticon(block.content.text));
+        }
+
+        async function renderFileUpload(block) {
+            $messageInput = $(".message-input").first();
+            $fileUpload = $("<div class=\"wrap\">\n" +
+                "<input onkeypress=\"handleEnter(event)\" id=\"fileUploadB\" type=\"file\" placeholder=\"Write your message...\" style=\"\n" +
+                "    background-color:  white;\n" + "\">" +
+                "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
+                "            </div>");
+
+            $messageInput.html($fileUpload);
+
+            $('.messages').css('height', 'calc(100% - 40px)');
+            $('.message-input').css('height', '40px');
+
+            await newMessage(BOT_USER, block.content.text);
+        }
+
+        function renderSolutions(block) {
+            $('.messages').css('height', '100%');
+            $('.message-input').hide();
+
+            getSolutions(block.content.showTop)
+                .then((solutions) => {
+                    solutions = JSON.parse(solutions);
+                    displayReturnedSolutions(solutions.data.solutions)
+                })
+
+
         }
     }
 
-
-    function newMessage(from, text, html = false) {
-        if (from == BOT_USER) {
-            if (html)
-                $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" />' + text + '</li>').appendTo($('.messages ul')).hide().fadeIn();
-            else
-                $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p>' + text + '</p></li>').appendTo($('.messages ul')).hide().fadeIn();
-        }
-        else {
-            $('<li class="sent"><img src="https://cdn1.iconfinder.com/data/icons/social-messaging-productivity-1-1/128/gender-male2-512.png" alt="" /><p>' + text + '</p></li>').appendTo($('.messages ul')).hide().fadeIn();
-        }
-
-        scrollTo('end')
-    }
-
-    function renderUserInput(block) {
-        chatInputDiv.style = "display:block;";
-        fileUploadForm.style.display = 'none';
-        $messageInput = $(".message-input").last();
-        $userInput = $("<div class=\"wrap\" style=\"margin-top: 15px;min-height: 40px; background-color: white;\">\n" +
-            "                <input onkeypress=\"handleEnter(event)\" " +
-            "            id='textMessage' type=\"text\" placeholder=\"Write your message...\"/>\n" +
-            "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
-            "            </div>");
-
-        $('.messages').css('height','calc(100% - 40px)');
-
-        $messageInput.append($userInput);
-        sendAssistantMessage(block.content.text)
-    }
-
-    function renderFileUpload(block) {
-        //$messageInput = $(".message-input").first();
-        //$fileUpload = $("<div class=\"wrap\">\n" +
-        //    "<input onkeypress=\"handleEnter(event)\" id=\"fileUploadB\" type=\"file\" placeholder=\"Write your message...\" style=\"\n" +
-        //    "    background-color:  white;\n" + "\">" +
-        //    "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
-        //    "            </div>");
-
-        //$messageInput.html($fileUpload);
-
-        //$('.messages').css('height','calc(100% - 40px)');
-        //$('.message-input').css('height','40px');
-
-        sendAssistantMessage(block.content.text);
-        chatInputDiv.style = "display:block";
-        fileUploadForm.style.display = 'block';
-    }
-
-    function renderSolutions(block) {
-        $('.messages').css('height', '100%');
-        $('.message-input').hide();
-        $('#presetAnswers').hide();
-        chatInputDiv.style = "display:none;";
-
-         getSolutions(block.content.showTop)
-        .then((solutions) => {
-            solutions = JSON.parse(solutions);
-            displayReturnedSolutions(solutions.data.solutions)
-        })
-
-
-    }
-
+    // Response from user //
     async function submitAnswer(message) {
-
-        chatInputDiv.style = "display:none";
-        fileUploadForm.style.display = 'none';
-
+        // chatInputDiv.style = "display:none";#}
+        // fileUploadForm.style.display = 'none';#}
 
         if (currentBlock.type == "Solutions") {
-            await sleep(200);
-            putThinkingGif();
-            await sleep(thinkingGifLife);
-            removeThinkingGif();
-            await sleep(200);
+            await thinkGIF();
 
             if (currentBlock.content.afterMessage) {
-                sendAssistantMessage(currentBlock.content.afterMessage);
+                newMessage(BOT_USER, currentBlock.content.afterMessage);
 
-                await sleep(200);
-                putThinkingGif();
-                await sleep(thinkingGifLife);
-                removeThinkingGif();
-                await sleep(200);
+                await thinkGIF();
             }
             return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
         }
-
 
         if (currentBlock.type == "File Upload") {
             //needs rework
             message = "&FILE_UPLOAD&" + document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
             if (!checkFileFormat(message)) {
-                sendUserMessage(message.replace("&FILE_UPLOAD&", ""));
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
 
-                await sleep(200);
-                putThinkingGif();
-                await sleep(thinkingGifLife);
-                removeThinkingGif();
-                await sleep(200);
+                await thinkGIF();
 
-                sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
+                newMessage(BOT_USER, "That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
                 chatInputDiv.style = "display:block";
                 fileUploadForm.style.display = 'block';
                 return 0;
@@ -744,22 +711,13 @@
 
             newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
 
-            await sleep(200);
-            putThinkingGif();
-            await sleep(thinkingGifLife);
-            removeThinkingGif();
-            await sleep(200);
-
+            await thinkGIF();
             print();
 
             if (currentBlock.content.afterMessage) {
-                sendAssistantMessage(currentBlock.content.afterMessage);
+                newMessage(BOT_USER, currentBlock.content.afterMessage);
 
-                await sleep(200);
-                putThinkingGif();
-                await sleep(thinkingGifLife);
-                removeThinkingGif();
-                await sleep(200);
+                await thinkGIF();
             }
             return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
         }
@@ -768,67 +726,54 @@
             if (message == "")
                 message = document.getElementById("textMessage").value;
 
-            if (message == "" || message.replace(/ /g, "") == "")
-                return 0;
+            if (message == "" || message.replace(/ /g, "") == "") return 0;
+
 
             $('#textMessage').val("");
 
-            newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+            // print user's text
+            await newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+
 
             print();
 
-            await sleep(200);
-            putThinkingGif();
-            await sleep(thinkingGifLife);
-            removeThinkingGif();
-            await sleep(200);
+            await thinkGIF();
 
-            if (!validateUserInput(message, currentBlock.content.validation)) {
-                sendAssistantMessage("I am sorry but that was not in the format I think it should be...");
-                chatInputDiv.style = "display:block";
-                return 0;
-            }
+            if (!validateUserInput(message, currentBlock.content.validation))
+                return await newMessage(BOT_USER, "I am sorry but that was not in the format I think it should be...");
+
             else {
                 // clear user input div
                 //$(".message-input").last().html('');
+                $("#message-input").first().html('');
+                // print after message
                 if (currentBlock.content.afterMessage) {
-                    sendAssistantMessage(currentBlock.content.afterMessage);
-
-                    await sleep(200);
-                    putThinkingGif();
-                    await sleep(thinkingGifLife);
-                    removeThinkingGif();
-                    await sleep(200);
-
+                    await newMessage(BOT_USER, currentBlock.content.afterMessage);
+                    console.log(1);
                 }
             }
             return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
+
         }
+
         var blockKeywords = undefined
         if (currentBlock.type == "Question") {
             // clear answers div
-            $("#presetAnswers").first().html('');
+            $("#message-input").first().html('');
             newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
             print();
 
-            await sleep(200);
-            putThinkingGif();
-            await sleep(thinkingGifLife);
-            removeThinkingGif();
-            await sleep(200);
+            await thinkGIF();
 
             var blockAnswers = currentBlock.content.answers;
 
             for (var i = 0; i < blockAnswers.length; i++) {
                 if (blockAnswers[i].text == message) {
                     if (blockAnswers[i].afterMessage) {
-                        sendAssistantMessage(blockAnswers[i].afterMessage);
+                        newMessage(BOT_USER, blockAnswers[i].afterMessage);
 
-                        await sleep(200);
-                        putThinkingGif();
-                        await sleep(thinkingGifLife);
-                        removeThinkingGif();
-                        await sleep(200);
+                        await thinkGIF();
+
                     }
 
                     blockKeywords = blockAnswers[i].keywords;
@@ -862,10 +807,21 @@
 
         }
 
-
     }
 
-    function getNextBlock(action, blockToGoId = undefined) {
+    async function thinkGIF() {
+        await sleep(200);
+        newMessage(BOT_USER, '<img id=\'thinkingGif\' style="width:27px" id="thinkingGifIMG" src="/static/images/typingDots.gif">', false, true);
+        await sleep(thinkingGifLife);
+        $("#thinkingGif").parent().parent().animate({
+            opacity: 0
+        }, 200, () => {
+            $("#thinkingGif").parent().parent().remove()
+        })
+        await sleep(400);
+    }
+
+    async function getNextBlock(action, blockToGoId = undefined) {
         var targetBlock = undefined;
 
         // Get next block based on action of the current block
@@ -879,31 +835,31 @@
                 }
             }
         } else if (action === "End Chat") {
-              sendData().then((isSuccess) => {
-                    if (isSuccess){
-                    sendAssistantMessage(currentBlock.afterMessage);
-                    } else {
-                    sendAssistantMessage("We apologise, your input couldn't be processed. Please contact us.");
-                  }
-                });
+            sendData().then(async (isSuccess) => {
+                if (isSuccess) {
+                    await newMessage(BOT_USER, currentBlock.afterMessage);
+                } else {
+                    await newMessage(BOT_USER, "We apologise, your input couldn't be processed. Please contact us.");
+                }
+            });
 
-             // End chat
-             // SetRepeat();
-             return 0;
+            // End chat
+            // SetRepeat();
+            return 0;
         }
 
         // If not end chat and there is no next block
         if (targetBlock === undefined) {
             sendData().then((isSuccess) => {
-                if (isSuccess){
-                    {#sendAssistantMessage("Thank you for your input. We'll be in touch.");#}
+                if (isSuccess) {
+                    // newMessage(BOT_USER,("Thank you for your input. We'll be in touch.");#}
                 } else {
-                    sendAssistantMessage("We apologise, your input couldn't be processed. Please contact us.");
+                    newMessage(BOT_USER, "We apologise, your input couldn't be processed. Please contact us.");
                 }
 
                 SetRepeat();
                 return 0;
-                })
+            })
         }
 
         // If there is next block but not same as the current block
@@ -914,41 +870,57 @@
         }
     }
 
-
     function SetRepeat() {
         $("#optionsDiv").append("");
-        newMessage(BOT_USER, "<div class='endChat' onclick=\"Reset()\"><a class='' style='width:400px;'>Search Again <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> </a></div>",true);
+        newMessage(BOT_USER, "<div class='endChat' onclick=\"Reset()\"><a class='' style='width:400px;'>Search Again <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> </a></div>", true);
         //checkOutsideElements();
     }
 
     function Reset() {
-       window.location.reload()
+        window.location.reload()
     }
 
-
-    // helper functions
-    function sendUserMessage(message) {
-
-        newMessage(CLIENT_USER, toEmoticon(message));
-        {#$("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>" + toEmoticon(message) + "</li></div>");#}
-        {#animateMessage("#newMessage");#}
-        {#document.getElementById('newMessage').id = 'oldMessage';#}
-    }
-
-    function sendAssistantMessage(message) {
-        newMessage(BOT_USER, toEmoticon(message));
-        {#$("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + toEmoticon(message) + "</li></div>");#}
-        {#animateMessage("#newMessage");#}
-        {#document.getElementById('newMessage').id = 'oldMessage';#}
-    }
-
-    function putThinkingGif() {
-            $(".messages ul").append('<li id="thinkingGif" class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p><img style="width:27px" id=\"thinkingGifIMG\" src="/static/images/typingDots.gif"></p></li>');
-            animateMessage("#thinkingGif");
+    async function newMessage(from, text, html = false, isGif = false) {
+        if (from == BOT_USER) {
+            if (html) {
+                return new Promise(resolve => {
+                    $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" />' + text + '</li>')
+                        .appendTo($('.messages ul')).hide().animate({
+                        opacity: 1,
+                        marginTop: '0px'
+                    }, 400, () => resolve(scrollTo()));
+                });
+            }
+            else
+                return new Promise(resolve => {
+                    $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p>' + text + '</p></li>')
+                        .appendTo($('.messages ul')).animate({
+                        opacity: 1,
+                        marginTop: '0px'
+                    }, 400, () => resolve(scrollTo()));
+                })
+        }
+        else {
+            return new Promise(resolve => {
+                $('<li class="sent"><img src="https://cdn1.iconfinder.com/data/icons/social-messaging-productivity-1-1/128/gender-male2-512.png" alt="" /><p>' + text + '</p></li>')
+                    .appendTo($('.messages ul')).animate({
+                    opacity: 1,
+                    marginTop: '0px'
+                }, 400, () => resolve(scrollTo()));
+            });
         }
 
-    function removeThinkingGif() {
-        $("#thinkingGif").remove();
+
+        function scrollTo(id) {
+            // {#$('html, body').stop();#}
+            // {#id = "#" + id#}
+            // {#$('html, body').animate({#}
+            // {#    scrollTop: ($(id).offset().top)#}
+            // {# }, 2000);#}
+            $(".messages").animate({scrollTop: $('.messages').prop("scrollHeight")}, "fast");
+
+            // $(".messages").animate({scrollTop: $(document).height()}, "fast");#}
+        }
     }
 
     function validateUserInput(message, messageType) {
@@ -1035,22 +1007,6 @@
         return formats;
     }
 
-    function animateMessage(id) {
-        var marginAnimate = "-=25px";
-        if (id == "#thinkingGif") {
-            marginAnimate = "-=25px";
-        }
-        else if (id == "#newMessage") {
-            marginAnimate = "-=35px";
-        }
-        $(id).animate({
-            marginTop: marginAnimate
-        }, "slow");
-        if (!cancelScroll) {
-            {#scrollTo("chatBottom");#}
-        }
-    }
-
     function toEmoticon(message) {
         return emojione.toImage(message);
     }
@@ -1065,17 +1021,6 @@
         }
     }
 
-    function scrollTo(id) {
-        {#$('html, body').stop();#}
-        {#id = "#" + id#}
-        {#$('html, body').animate({#}
-        {#    scrollTop: ($(id).offset().top)#}
-        {# }, 2000);#}
-        $(".messages").animate({ scrollTop: $('.messages').prop("scrollHeight")}, "fast");
-
-        {#$(".messages").animate({scrollTop: $(document).height()}, "fast");#}
-    }
-
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -1085,6 +1030,10 @@
         if (keycode == '13') {
             submitAnswer('');
         }
+    }
+
+    function openSolution(link) {
+        window.open(link);
     }
 
     //compare arrays function

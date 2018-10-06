@@ -32,7 +32,7 @@ def getByID(id) -> Callback:
 def getByEmail(email) -> User or None:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(User).filter(User.Email == email).first()
+        result = db.session.query(User).filter(User.Email == email.lower()).first()
         if not result: raise Exception
 
         return Callback(True,
@@ -88,7 +88,7 @@ def getAllByCompanyID_safe(companyID) -> Callback:
 def create(firstname, surname, email, password, phone, company: Company, role: Role, verified=False) -> Callback:
     try:
         # Create a new user with its associated company and role
-        newUser = User(Firstname=firstname, Surname=surname, Email=email, Verified=verified,
+        newUser = User(Firstname=firstname, Surname=surname, Email=email.lower(), Verified=verified,
                     Password=password, PhoneNumber=phone, Company=company,
                     Role=role)
         db.session.add(newUser)
@@ -115,7 +115,7 @@ def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
         # Update user
         user.Firstname = firstname
         user.Surname = surname
-        user.Email = email
+        user.Email = email.lower()
         user.Role = role
 
         db.session.commit()
@@ -156,7 +156,7 @@ def changePasswordByID(userID, newPassword, currentPassword=None):
 
 def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
     try:
-        user_callback : Callback = getByEmail(userEmail)
+        user_callback : Callback = getByEmail(userEmail.lower())
         if not user_callback.Success:
             return Callback(False, "Could not find user's records")
 
@@ -180,7 +180,7 @@ def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
 def removeByEmail(email) -> Callback:
 
     try:
-        if not db.session.query(exists().where(User.Email == email)).scalar():
+        if not db.session.query(exists().where(User.Email == email.lower())).scalar():
             return Callback(False, "The user with email '" + str(email) + "' doesn't exist")
         db.session.query(User).filter(User.Email == email).delete()
 
@@ -218,7 +218,7 @@ def removeByID(id) -> Callback:
 def verifyByEmail(email: str):
 
     try:
-        user = db.session.query(User).filter(User.Email == email).update({"Verified": True})
+        user = db.session.query(User).filter(User.Email == email.lower()).update({"Verified": True})
         if not user: raise Exception
 
         #send us mail
@@ -244,7 +244,7 @@ def verifyByEmail(email: str):
 def updateSubID(email, subID: str):
 
     try:
-        db.session.query(User).filter(User.Email == email).update({"SubID": subID})
+        db.session.query(User).filter(User.Email == email.lower()).update({"SubID": subID})
 
         db.session.commit()
         return Callback(True, 'SubID is updated successfully')
@@ -261,7 +261,7 @@ def updateSubID(email, subID: str):
 def updateStripeID(email, cusID: str):
 
     try:
-        db.session.query(User).filter(User.Email == email).update({"StripeID": (cusID)})
+        db.session.query(User).filter(User.Email == email.lower()).update({"StripeID": (cusID)})
 
         db.session.commit()
         return Callback(True, 'StripeID is updated successfully')

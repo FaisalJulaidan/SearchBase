@@ -38,8 +38,8 @@ def signup(email, firstname, surname, password, companyName, companyPhoneNumber,
         db.session.add(UserSettings(User=user_callback.Data))
     except Exception as e:
         db.session.rollback()
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
     # Subscribe to basic plan with 14 trial days
     sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lpeLZ3EV8IfA', trialDays=14)
@@ -100,5 +100,5 @@ def login(email: str, password_to_check: str) -> Callback:
         return Callback(True, "Login Successful")
     except Exception as e:
         db.session.rollback()
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()

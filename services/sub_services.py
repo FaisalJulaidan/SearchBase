@@ -28,8 +28,8 @@ def unsubscribe(company: Company) -> Callback:
         db.session.rollback()
         return Callback(False, 'An error occurred while trying to unsubscribe')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def subscribe(company: Company, planID, trialDays=None, token=None, coupon='') -> Callback:
@@ -105,8 +105,8 @@ def subscribe(company: Company, planID, trialDays=None, token=None, coupon='') -
         print(e)
         return Callback(False, 'An error occurred while subscribing with Stripe')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def getPlanByID(planID) -> Callback:
@@ -121,8 +121,8 @@ def getPlanByID(planID) -> Callback:
         db.session.rollback()
         return Callback(False, 'Could not find a plan with ID ' + planID)
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def getPlanByNickname(nickname) -> Callback:
     try:
@@ -136,8 +136,8 @@ def getPlanByNickname(nickname) -> Callback:
         db.session.rollback()
         return Callback(False, 'Could not find a plan with ' + nickname + ' nickname')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def getStripePlan(planID) -> Callback:
     try:
@@ -150,8 +150,8 @@ def getStripePlan(planID) -> Callback:
         db.session.rollback()
         return Callback(False, "This plan doesn't exist! Make sure the plan ID is correct.")
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def getStripePlanNicknameBySubID(SubID):
     try:
@@ -168,8 +168,8 @@ def getStripePlanNicknameBySubID(SubID):
         db.session.rollback()
         return Callback(False, 'Could not find plan nickname form Stripe')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def isCouponValid(coupon) -> Callback:
     try:
@@ -183,5 +183,5 @@ def isCouponValid(coupon) -> Callback:
         db.session.rollback()
         return Callback(False, "coupon is not valid.")
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()

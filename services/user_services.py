@@ -26,8 +26,8 @@ def getByID(id) -> Callback:
         return Callback(False,
                         'User with ID ' + str(id) + ' does not exist')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def getByEmail(email) -> User or None:
     try:
@@ -43,8 +43,8 @@ def getByEmail(email) -> User or None:
         return Callback(False,
                         'User with email ' + email + ' does not exist.')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def getAllByCompanyID(companyID) -> Callback:
     try:
@@ -60,8 +60,8 @@ def getAllByCompanyID(companyID) -> Callback:
         return Callback(False,
                         'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def getAllByCompanyID_safe(companyID) -> Callback:
     try:
@@ -82,8 +82,8 @@ def getAllByCompanyID_safe(companyID) -> Callback:
         return Callback(False,
                         'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def create(firstname, surname, email, password, phone, company: Company, role: Role, verified=False) -> Callback:
     try:
@@ -100,8 +100,8 @@ def create(firstname, surname, email, password, phone, company: Company, role: R
         print(exc)
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
@@ -126,8 +126,8 @@ def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
     # Save
 
 
@@ -151,8 +151,8 @@ def changePasswordByID(userID, newPassword, currentPassword=None):
         db.session.rollback()
         return Callback(False, "Error in updating password")
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
     try:
@@ -174,8 +174,8 @@ def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
         db.session.rollback()
         return Callback(False, "Error in changing password")
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def removeByEmail(email) -> Callback:
 
@@ -192,8 +192,8 @@ def removeByEmail(email) -> Callback:
         db.session.rollback()
         return Callback(False, 'User with email ' + email + " could not be removed.")
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def removeByID(id) -> Callback:
@@ -211,8 +211,8 @@ def removeByID(id) -> Callback:
         db.session.rollback()
         return Callback(False, 'User with id ' + str(id) + " could not be removed.")
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def verifyByEmail(email: str):
@@ -237,8 +237,8 @@ def verifyByEmail(email: str):
         db.session.rollback()
         return Callback(False, 'Could not verify account with email  ' + email)
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def updateSubID(email, subID: str):
@@ -254,8 +254,8 @@ def updateSubID(email, subID: str):
         db.session.rollback()
         return Callback(False, 'Could not update subID for ' + email)
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def updateStripeID(email, cusID: str):
@@ -271,8 +271,8 @@ def updateStripeID(email, cusID: str):
         db.session.rollback()
         return Callback(False, 'Could not update subID for ' + email)
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def createUpdateUserSettings(userID, trackingData, techSupport, accountSpecialist, notifications):
     try:
@@ -296,8 +296,8 @@ def createUpdateUserSettings(userID, trackingData, techSupport, accountSpecialis
         return Callback(False,
                         'User settings could not be updated.')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def getAllUserSettings():
     try:
@@ -311,8 +311,8 @@ def getAllUserSettings():
         db.session.rollback()
         return Callback(False, 'Error in getting records')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def getUserSettings(userID):
     try:
@@ -327,8 +327,8 @@ def getUserSettings(userID):
         return Callback(False,
                         'User settings for this user does not exist.')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def getRolePermissions(userID):
     try:
@@ -344,5 +344,5 @@ def getRolePermissions(userID):
         db.session.rollback()
         return Callback(False, 'Coult not retrieve user\'s permissions.')
 
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()

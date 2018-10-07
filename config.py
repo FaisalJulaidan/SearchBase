@@ -53,9 +53,12 @@ class BaseConfig(object):
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
 
     SECRET_KEY = os.urandom(24)
-    SECRET_KEY_DB = set_encrypt_key(os.environ['ENCRYPT_KEY'])
     CSRF_SESSION_KEY = os.urandom(24)
     SESSION_TYPE = 'filesystem'
+
+    USE_ENCRYPTION = False
+    SECRET_KEY_DB = "FakeKey"
+
     # Mail Config
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465
@@ -63,7 +66,6 @@ class BaseConfig(object):
     MAIL_USERNAME = 'thesearchbase@gmail.com'
     MAIL_PASSWORD = 'pilbvnczzdgxkyzy'
     MAIL_SUPPRESS_SEND = False
-    USE_ENCRYPTION = True
 
     JOBS = [
         {
@@ -82,6 +84,10 @@ class ProductionConfig(BaseConfig):
     ENV = 'production'
     DEBUG = False
     TESTING = False
+
+    USE_ENCRYPTION = True
+    SECRET_KEY_DB = set_encrypt_key('kkk')
+
     SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -98,6 +104,7 @@ class DevelopmentConfig(BaseConfig):
     # SQLite
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'Development.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 
 
 class TestingConfig(BaseConfig):

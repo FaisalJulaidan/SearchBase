@@ -1,21 +1,153 @@
-from bcrypt import hashpw, gensalt
-from flask import request, redirect, url_for, session, render_template, json
+from flask import redirect, url_for, session, render_template, json
+from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solution, ChatbotSession
+from services import assistant_services, user_services
+from datetime import datetime
 from sqlalchemy import inspect
 import stripe
 import re
 
 
-# def hashPass(password, salt=gensalt()):
-#     print("password: ", password)
-#     print("bytes(password, 'utf-8'): ", bytes(password, 'utf8'))
-#     print("type(bytes(password, 'utf-8')): ", type(bytes(password, 'utf8')))
-#     print("password.encode('utf8'): ", password.encode('utf8'))
-#     print("type(password.encode('utf8')): ", type(password.encode('utf8')))
-#     print("hashpw(bytes(password, 'utf-8'), salt): ", hashpw(password.encode('utf8'), salt))
-#     hashed = hashpw(password.encode('utf8'), salt)
-#     return hashed
+# Generates dummy data for testing
+def gen_dummy_data():
 
+    # Companies creation
+    db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_00000000000000', SubID='sub_00000000000000'))
+    db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly'))
 
+    # Get Companies
+    aramco = Company.query.filter(Company.Name == "Aramco").first()
+    sabic = Company.query.filter(Company.Name == "Sabic").first()
+
+    # Create Assistatns for Aramco and Sabic companies
+    reader_a = Assistant(Name="Reader", Message="Hey there", TopBarText="Bot 1", SecondsUntilPopup=1, Active=True, Company=aramco)
+    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Bot 1", SecondsUntilPopup=1, Active=True, Company=aramco)
+
+    reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Bot 1", SecondsUntilPopup=1, Active=True, Company=sabic)
+    helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Bot 1", SecondsUntilPopup=1, Active=True, Company=sabic)
+
+    # Create Blocks
+    db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Assistant=reader_a, Content={
+        "answers": [
+          {
+            "action": "Go To Next Block",
+            "text": "Yes",
+            "timesClicked": 0,
+            "keywords": [
+              "smoker",
+              "sad"
+            ],
+            "blockToGoId": 0,
+            "afterMessage": 'Yesss!!'
+          },
+          {
+            "action": "Go To Next Block",
+            "text": "No",
+            "timesClicked": 0,
+            "keywords": [
+              "smoker",
+              "sad"
+            ],
+            "blockToGoId": 1,
+            "afterMessage": 'NOOOO!!'
+
+          }
+        ],
+        "text": "Do you smoke?",
+      }))
+    db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Assistant=reader_a, Content={
+        "action": "Go To Next Block",
+        "text": "What's your email?",
+        "blockToGoID": None,
+        "storeInDB": True,
+        "validation": "Email",
+        "afterMessage": 'Your input is being processed...'
+    }))
+
+    db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
+        "action": "Go To Next Block",
+        "fileTypes": [
+        "doc",
+        "pdf"
+        ],
+        "text": "Upload your CV",
+        "blockToGoID": None,
+        "afterMessage": 'File is being uploaded...'
+    }))
+
+    db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Assistant=reader_a, Content={
+        "showTop": 5,
+        "afterMessage": 'DONE!!!!',
+        "action": "End Chat",
+        "blockToGoID": 0
+    }))
+
+    # Create Roles
+    db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="Admin", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="User", Company= aramco, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
+
+    db.session.add(Role(Name="Owner", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="Admin", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="User", Company= sabic, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
+
+    # Get Roles
+    owner_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "Owner").first()
+    admin_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "Admin").first()
+    user_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "User").first()
+
+    owner_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "Owner").first()
+    admin_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "Admin").first()
+    user_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "User").first()
+
+    # Create Users
+    user_services.create(firstname='Ahmad', surname='Hadi', email='aa@aa.com', password='123', phone='4344423',
+                         company=aramco, role=owner_aramco, verified=True)
+    user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='4344423', company=aramco,
+                         role=admin_aramco, verified=True)
+    user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', phone='4344423', company=aramco,
+                         role=user_aramco, verified=True)
+
+    user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', phone='4344423', company=sabic,
+                         role=owner_sabic, verified=True)
+    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='4344423', company=sabic,
+                         role=admin_sabic, verified=True)
+    user_services.create(firstname='firstname', surname='lastname', email='e6@e.com', password='123', phone='4344423', company=sabic,
+                         role=user_sabic, verified=True)
+
+    # Plans
+    db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic', MaxSolutions=600, MaxBlocks=20, ActiveBotsCap=2, InactiveBotsCap=3,
+                        AdditionalUsersCap=5, ExtendedLogic=False, ImportDatabase=False, CompanyNameOnChatbot=False))
+
+    db.session.add(
+        Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate', MaxSolutions=5000, MaxBlocks=20, ActiveBotsCap=4, InactiveBotsCap=8,
+             AdditionalUsersCap=10, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
+    db.session.add(
+        Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=20, ActiveBotsCap=10, InactiveBotsCap=30,
+             AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
+    db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=30,  ActiveBotsCap=2, InactiveBotsCap=2,
+                        AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
+    db.session.add(Solution(SolutionID='D48N4wxwAWEMOH', MajorTitle='Big Title 1', SecondaryTitle="Small Title 1",
+                            ShortDescription="A job at my little town",  Money="£56000", Keywords="smoker,duck",
+                            URL="http://google.com", Assistant=reader_a, TimesReturned=2))
+
+    db.session.add(Solution(SolutionID='asd8213AWEMOH', MajorTitle='Big Title 2', SecondaryTitle="Small Title 2",
+                            ShortDescription="A town at my little job",  Money="£56000", Keywords="dog,sad",
+                            URL="http://google.com", Assistant=reader_a, TimesReturned=10))
+
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,18), SolutionsReturned=40, QuestionsAnswered=25, TimeSpent=120, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), SolutionsReturned=55, QuestionsAnswered=25, TimeSpent=120, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), SolutionsReturned=12, QuestionsAnswered=28, TimeSpent=127, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,15), SolutionsReturned=64, QuestionsAnswered=45, TimeSpent=300, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,6), SolutionsReturned=11, QuestionsAnswered=12, TimeSpent=50, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,5), SolutionsReturned=636, QuestionsAnswered=5, TimeSpent=23, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,1), SolutionsReturned=84, QuestionsAnswered=22, TimeSpent=67, Assistant=reader_a))
+    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 7,1), SolutionsReturned=123, QuestionsAnswered=17, TimeSpent=80, Assistant=reader_a))
+
+    # Save all changes
+    db.session.commit()
 
 def hardRedirectWithMessage(route, message):
     session["returnMessage"] = message
@@ -41,8 +173,6 @@ def checkForMessage():
     if message:
         session["returnMessage"] = ""
     return message
-
-
 
 
 def getPlanNickname(SubID=None):

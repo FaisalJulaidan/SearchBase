@@ -45,10 +45,14 @@ $( document ).ready(function() {
       }
     });
 
-
+    $(document).on('click', 'a.subBtn', function () {
+        $subBtn = $(this);
+        openSubForm($subBtn.attr('data-planID'), $subBtn.attr('data-price'));
+    });
 
 
     function openSubForm(planId, price){
+        console.log(planId, price);
         function showForm() {
 
              $('#subModal').modal('show');
@@ -77,7 +81,7 @@ $( document ).ready(function() {
 
                    showForm()
                 } else {
-                    document.location.href = '/admin/pricing'
+                    // document.location.href = '/admin/pricing'
                 }
             });
         } else {showForm()}

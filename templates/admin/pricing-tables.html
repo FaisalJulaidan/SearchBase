@@ -120,7 +120,7 @@
                                                 </div>
                                                 <div class="pricing_footer">
                                                     {% if currentPlan != 'basic' %}
-                                                    <a class="btn btn-info btn-block" role="button" onclick="openSubForm('plan_D3lp2yVtTotk2f', 50);" >Subscribe <span></span></a>
+                                                    <a data-planID="plan_D3lp2yVtTotk2f" data-price="50" class="btn btn-info btn-block subBtn" role="button">Subscribe <span></span></a>
                                                     {% else %}
                                                     <a class="btn btn-info btn-block" role="button" disabled >Current Plan <span></span></a>
                                                     {% endif %}
@@ -184,7 +184,7 @@
                                                 </div>
                                                 <div class="pricing_footer">
                                                     {% if currentPlan != 'advanced' %}
-                                                    <a class="btn btn-info btn-block" role="button"  onclick="openSubForm('plan_D3lp9R7ombKmSO', 199);">Subscribe <span></span></a>
+                                                    <a data-planID="plan_D3lp9R7ombKmSO" data-price="199" class="btn btn-info btn-block subBtn" role="button">Subscribe <span></span></a>
                                                     {% else %}
                                                     <a class="btn btn-info btn-block" role="button" disabled >Current Plan <span></span></a>
                                                     {% endif %}
@@ -252,7 +252,7 @@
                                                 </div>
                                                 <div class="pricing_footer">
                                                     {% if currentPlan != 'ultimate' %}
-                                                    <a class="btn btn-info btn-block" role="button" onclick="openSubForm('plan_D3lpeLZ3EV8IfA', 399);">Subscribe <span></span></a>
+                                                    <a  data-planID="plan_D3lpeLZ3EV8IfA" data-price="399" class="btn btn-info btn-block subBtn" role="button">Subscribe <span></span></a>
                                                     {% else %}
                                                     <a class="btn btn-info btn-block" role="button" disabled >Current Plan <span></span></a>
                                                     {% endif %}
@@ -322,8 +322,8 @@
 <script src="https://js.stripe.com/v2/"></script>
 <script src="https://js.stripe.com/v3/"></script>
 <script type="text/javascript">
-    const stripe = Stripe({{ stripe_pubKey }});
-    console.log({{ stripe_pubKey }})
+    const stripe = Stripe('{{ stripe_pubKey }}');
+    console.log('{{ stripe_pubKey }}')
 </script>
 <script src="../../static/stripe/script.js"></script>
 

@@ -22,9 +22,8 @@ from routes.admin.routers import dashboard_router, profile_router,  admin_api, s
 from routes.public.routers import public_router, resetPassword_router
 
 app = Flask(__name__, static_folder='static')
-app.secret_key = os.urandom(24)
 db.app = app
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 
 
 # Register Routes:
@@ -161,7 +160,6 @@ def not_implemented(e):
         return render_template('errors/501.html'), status.HTTP_501_NOT_IMPLEMENTED
 
 
-# if __name__ == "__main__":
 
 # Server Setup
 migrate_var = Migrate(app, db)

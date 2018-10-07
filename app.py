@@ -162,59 +162,60 @@ def not_implemented(e):
 
 
 if __name__ == "__main__":
+    pass
+
+# Server Setup
+migrate_var = Migrate(app, db)
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
+scheduler = APScheduler()
+
+print("Run the server...")
+if os.environ['FLASK_ENV'] == 'production':
+
+    app.config.from_object('config.ProductionConfig')
+    url = os.environ['SQLALCHEMY_DATABASE_URI']
 
     # Server Setup
-    migrate_var = Migrate(app, db)
-    manager = Manager(app)
-    manager.add_command('db', MigrateCommand)
-    scheduler = APScheduler()
+    app.config['SECRET_KEY_DB'] = config.set_encrypt_key() # IMPORTANT!
+    db.init_app(app)
+    mail.init_app(app)
+    app.app_context().push()
 
-    print("Run the server...")
-    if os.environ['FLASK_ENV'] == 'production':
-
-        app.config.from_object('config.ProductionConfig')
-        url = os.environ['SQLALCHEMY_DATABASE_URI']
-
-        # Server Setup
-        app.config['SECRET_KEY_DB'] = config.set_encrypt_key() # IMPORTANT!
-        db.init_app(app)
-        mail.init_app(app)
-        app.app_context().push()
-
-        if not database_exists(url):
-            print('Create db tables')
-            create_database(url)
-            db.create_all()
-            seed()
-
-        # Run the app server
-        if os.environ['DB_MIGRATION'] == 'yes':
-            print('Database migration mode...')
-            manager.run()
-        else:
-            print('Production mode running...')
-            app.run()
-
-    elif os.environ['FLASK_ENV'] == 'development':
-        app.config.from_object('config.DevelopmentConfig')
-
-        # Server Setup
-        print("Use Encryption:", app.config['USE_ENCRYPTION'])
-        print("Secret DB Key:", app.config['SECRET_KEY_DB'])
-        db.init_app(app)
-        mail.init_app(app)
-        app.app_context().push()
-
-        print('Reinitialize the database...')
-        db.drop_all()
+    if not database_exists(url):
+        print('Create db tables')
+        create_database(url)
         db.create_all()
-        helpers.gen_dummy_data()
+        seed()
 
-        scheduler.init_app(app)
-        # scheduler.start()
-
-        # Run the app server
-        print('Development mode running...')
-        app.run(threaded = True)
+    # Run the app server
+    if os.environ['DB_MIGRATION'] == 'yes':
+        print('Database migration mode...')
+        manager.run()
     else:
-        print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")
+        print('Production mode running...')
+        app.run()
+
+elif os.environ['FLASK_ENV'] == 'development':
+    app.config.from_object('config.DevelopmentConfig')
+
+    # Server Setup
+    print("Use Encryption:", app.config['USE_ENCRYPTION'])
+    print("Secret DB Key:", app.config['SECRET_KEY_DB'])
+    db.init_app(app)
+    mail.init_app(app)
+    app.app_context().push()
+
+    print('Reinitialize the database...')
+    db.drop_all()
+    db.create_all()
+    helpers.gen_dummy_data()
+
+    scheduler.init_app(app)
+    # scheduler.start()
+
+    # Run the app server
+    print('Development mode running...')
+    app.run(threaded = True)
+else:
+    print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")

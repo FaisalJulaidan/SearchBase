@@ -24,6 +24,7 @@ from routes.public.routers import public_router, resetPassword_router
 app = Flask(__name__, static_folder='static')
 app.secret_key = os.urandom(24)
 db.app = app
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
 # Register Routes:

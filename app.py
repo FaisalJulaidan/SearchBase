@@ -210,6 +210,6 @@ elif os.environ['FLASK_ENV'] == 'development':
 
     # Run the app server
     print('Development mode running...')
-    # app.run(threaded = True)
+    app.run(threaded = True)
 else:
     print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")

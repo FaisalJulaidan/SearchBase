@@ -147,8 +147,8 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
                 return Callback(False, "the block of id '" + str(id) + "' doesn't exist in the database")
         except Exception as e:
             db.session.rollback()
-        finally:
-            db.session.close()
+        #finally:
+        #    db.session.close()
 
 
         # Make sure each question has a unique id

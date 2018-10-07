@@ -3,6 +3,18 @@ from flask import Blueprint, request
 
 adminBasic_router: Blueprint = Blueprint('adminBasic_router', __name__ ,template_folder="../../templates")
 
+#Tools
+@adminBasic_router.route("/admin/emoji-converter", methods=['GET'])
+def admin_emoji():
+    if request.method == "GET":
+        return admin_services.render("admin/emoji.html")
+
+@adminBasic_router.route("/admin/assistanttools", methods=['GET'])
+def admin_assistant_tools():
+    if request.method == "GET":
+        return admin_services.render("admin/assistantTools.html")
+
+
 #Support pages
 @adminBasic_router.route("/admin/support/general", methods=['GET'])
 def admin_general_support():
@@ -32,6 +44,7 @@ def admin_support_integration():
 def admin_support_billing():
     if request.method == "GET":
         return admin_services.render("admin/support/billing.html")
+
 
 #Billing
 @adminBasic_router.route("/admin/adjustments", methods=['GET'])

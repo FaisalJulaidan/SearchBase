@@ -25,7 +25,6 @@ app = Flask(__name__, static_folder='static')
 db.app = app
 
 
-
 # Register Routes:
 app.register_blueprint(adminBasic_router)
 app.register_blueprint(assistantManager_router)
@@ -158,7 +157,6 @@ def not_implemented(e):
     except:
         print("Error without description")
         return render_template('errors/501.html'), status.HTTP_501_NOT_IMPLEMENTED
-
 
 
 # Server Setup

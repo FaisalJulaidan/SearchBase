@@ -8,7 +8,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
 
 #needs to be above basicconfig
-def set_encrypt_key(key):
+def set_encrypt_key():
     print("Starting key retrieval")
 
     page = request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
@@ -29,8 +29,9 @@ def set_encrypt_key(key):
     part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
     print("Part 5 set")
 
-    enckey = part1+part2+part3+part4+part5
-    enckey = (enckey+key).replace(" ", "")
+    part6 = text.split("sMpAp-4BaOln")[1]
+
+    enckey = (part1+part2+part3+part4+part5+part6).replace(" ", "")
     print("Key set")
     return enckey
 
@@ -47,7 +48,7 @@ class BaseConfig(object):
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
 
     SECRET_KEY = os.urandom(24)
-    SECRET_KEY_DB = set_encrypt_key(os.environ['ENCRYPT_KEY'])
+    SECRET_KEY_DB = set_encrypt_key()
     CSRF_SESSION_KEY = os.urandom(24)
     SESSION_TYPE = 'filesystem'
     # Mail Config

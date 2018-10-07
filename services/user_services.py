@@ -222,11 +222,11 @@ def verifyByEmail(email: str):
         if not user: raise Exception
 
         #send us mail
-        result = db.session.query(User).filter(User.Email == email).first()
-        company_callback = company_services.getByID(result.CompanyID)
+        user = db.session.query(User).filter(User.Email == email.lower()).first()
+        company_callback = company_services.getByID(user.CompanyID)
         companyName = "Error"
         if company_callback : companyName = company_callback.Data.Name
-        mail_callback : Callback = mail_services.sendNewUserHasRegistered(result.Firstname + result.Surname, result.Email, companyName, result.PhoneNumber)
+        mail_callback : Callback = mail_services.sendNewUserHasRegistered(user.Firstname + user.Surname, user.Email, companyName, user.PhoneNumber)
         if not mail_callback.Success: print("Could not send signed up user email")
 
         db.session.commit()

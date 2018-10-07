@@ -199,11 +199,11 @@ def contactpage():
 
 
 
-# Sitemap route
-@public_router.route('/robots.txt')
-@public_router.route('/sitemap.xml')
-def static_from_root():
-    return send_from_directory(app.static_folder, request.path[1:])
+# # Sitemap route
+# @public_router.route('/robots.txt')
+# @public_router.route('/sitemap.xml')
+# def static_from_root():
+#     return send_from_directory(app.static_folder, request.path[1:])
 
 
 # Terms and conditions page route

@@ -7,9 +7,11 @@ from dotenv import load_dotenv
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
 
-#needs to be above basicconfig
+
+# Needs to be above BaseConfig
 def set_encrypt_key():
-    print("Starting key retrieval")
+    print("===< Setting DB Secret Key >===")
+    print("Starting key retrieval...")
 
     page = request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
     text = page.read().decode("utf8")
@@ -38,7 +40,6 @@ def set_encrypt_key():
 
 class BaseConfig(object):
 
-
     ALLOWED_EXTENSIONS = {'png', 'jpg','json', 'xml','txt', 'pdf', 'doc', 'docx'}
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
@@ -48,9 +49,15 @@ class BaseConfig(object):
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
 
     SECRET_KEY = os.urandom(24)
-    SECRET_KEY_DB = set_encrypt_key()
     CSRF_SESSION_KEY = os.urandom(24)
     SESSION_TYPE = 'filesystem'
+
+    USE_ENCRYPTION = True
+    SECRET_KEY_DB = 'FakeKey'
+    SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
     # Mail Config
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465
@@ -58,7 +65,6 @@ class BaseConfig(object):
     MAIL_USERNAME = 'thesearchbase@gmail.com'
     MAIL_PASSWORD = 'pilbvnczzdgxkyzy'
     MAIL_SUPPRESS_SEND = False
-    USE_ENCRYPTION = True
 
     JOBS = [
         {
@@ -77,8 +83,7 @@ class ProductionConfig(BaseConfig):
     ENV = 'production'
     DEBUG = False
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    USE_ENCRYPTION = True
 
 
 
@@ -86,13 +91,7 @@ class DevelopmentConfig(BaseConfig):
     ENV = 'development'
     DEBUG = True
     TESTING = True
-
-    # MySQL
-    # SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
-
-    # SQLite
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'Development.db')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    USE_ENCRYPTION = False
 
 
 class TestingConfig(BaseConfig):

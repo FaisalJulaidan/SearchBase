@@ -1,32 +1,26 @@
-
-from flask import Blueprint, request, redirect, abort, render_template, session, jsonify
-from flask_api import status
-from services import admin_services, sub_services, user_services, assistant_services, company_services
-from utilities import helpers
+import os
 import stripe
+from flask import Blueprint, request, session
+from services import admin_services, sub_services, user_services, company_services
+from utilities import helpers
 from models import db, Callback, User, Company
 
 
-sub_router: Blueprint = Blueprint('sub_router', __name__ ,template_folder="../../templates")
-
-pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
-secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
-encryption = None
+sub_router: Blueprint = Blueprint('sub_router', __name__, template_folder="../../templates")
 
 stripe_keys = {
-    'secret_key': secret_key,
-    'publishable_key': pub_key
+  'secret_key': os.environ['STRIPE_SECRET_KEY'],
+  'publishable_key': os.environ['STRIPE_PUBLISHABLE_KEY']
 }
 
-stripe.api_key = secret_key
-
+stripe.api_key = stripe_keys['secret_key']
 
 
 
 @sub_router.route("/admin/pricing", methods=['GET'])
 def admin_pricing():
     currentPlan = session.get('UserPlan')
-    return admin_services.render("admin/pricing-tables.html", pub_key=pub_key, currentPlan=currentPlan)
+    return admin_services.render("admin/pricing-tables.html", stripe_pubKey=stripe_keys['publishable_key'], currentPlan=currentPlan)
 
 
 @sub_router.route("/admin/subscribe/<planID>", methods=['GET', 'POST'])

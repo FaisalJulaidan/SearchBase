@@ -22,6 +22,7 @@ from routes.admin.routers import dashboard_router, profile_router,  admin_api, s
 from routes.public.routers import public_router, resetPassword_router
 
 app = Flask(__name__, static_folder='static')
+app.secret_key = os.urandom(24)
 db.app = app
 
 

@@ -72,8 +72,8 @@ def getUsersOvertime(assistantID, periodSpace):
     except Exception as e:
         db.session.rollback()
         return Callback(False, 'getUsersOvertime error')
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def getTotalUsersForCompany(assistants):
@@ -88,8 +88,8 @@ def getTotalUsersForCompany(assistants):
         db.session.rollback()
         print("analytics_services.getTotalUsersForCompany() ERROR: ", e)
         return Callback(False, 'Error while counting Users.')
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def getTotalUsers(assistantID):
@@ -100,8 +100,8 @@ def getTotalUsers(assistantID):
         db.session.rollback()
         print("getTotalUsers ERROR: ", e)
         return Callback(False, 'getTotalUsers error')
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def getTotalQuestionsOverMonth(assistantID):
@@ -151,8 +151,8 @@ def getTotalQuestionsOverMonth(assistantID):
         db.session.rollback()
         print("getTotalQuestionsOverMonth ERROR: ", e)
         return Callback(False, 'getTotalQuestionsOverMonth error')
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def getTotalSolutionsOverMonth(assistantID):
     try:
@@ -201,8 +201,8 @@ def getTotalSolutionsOverMonth(assistantID):
         print("getTotalSolutionsOverMonth ERROR: ", e)
         db.session.rollback()
         return Callback(False, 'getTotalSolutionsOverMonth error')
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def getPopularSolutions(assistantID, top=5):
@@ -213,8 +213,8 @@ def getPopularSolutions(assistantID, top=5):
         print("getPopularSolutions ERROR: ", e)
         db.session.rollback()
         return Callback(False, 'getPopularSolutions error')
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def getTotalReturnedSolutionsForCompany(assistants):
@@ -231,8 +231,8 @@ def getTotalReturnedSolutionsForCompany(assistants):
         db.session.rollback()
         print("analytics_services.getTotalReturnedSolutionsForCompany() ERROR: ", e)
         return Callback(False, 'Error while counting solutions.')
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 def getTotalReturnedSolutions(assistantID):
     try:
@@ -241,8 +241,8 @@ def getTotalReturnedSolutions(assistantID):
         db.session.rollback()
         print("getTotalReturnedSolutions ERROR: ", e)
         return Callback(False, 'getTotalReturnedSolutions error')
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def getTimeSpentAvgOvertime(assistantID, days):
@@ -269,8 +269,8 @@ def getTimeSpentAvgOvertime(assistantID, days):
         db.session.rollback()
         print("getTimeSpentAvgOvertime ERROR: ", e)
         return Callback(False, 'getTimeSpentAvgOvertime error')
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()
 
 
 def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
@@ -284,5 +284,5 @@ def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
         db.session.rollback()
         print("analytics_services.getAllRecordsByAssistantIDInTheLast() ERROR: ", e)
         return Callback(False, "Error in returning records")
-    finally:
-        db.session.close()
+    # finally:
+       # db.session.close()

@@ -1,0 +1,81 @@
+﻿{% extends "admin/base.html" %}
+
+{% block title %}Assistant Tools{% endblock %}
+
+{% block content %}
+<div class="right_col" role="main">
+    <!-- top tiles -->
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel" style="height:600px;">
+                <div class="col-md-12">
+                    <div class="jumbotron text-xs-center">
+                        <h1 class="display-3">Assistant Tools</h1>
+                        <p class="lead">
+                            <strong>Create link</strong> which you can put
+                            inside your text
+                        </p>
+                        <label>Please insure to insert <strong>http://</strong> or <strong>https://</strong> in the beggining of the link</label>
+                        <hr>
+                        <input type="text" id="clickLink_input" placeholder="Text" class="form-control col-md-5 col-xs-10">
+                        <br />
+                        <br />
+                        <br />
+                        <input type="text" id="clickLink_link" placeholder="Link" class="form-control col-md-5 col-xs-10">
+                        <br />
+                        <br />
+                        <br />
+                        <label id="clickLink_output">Result</label>
+                        <br />
+                        <br />
+                        <p class="lead">
+                            <button id="clickLink_convert" onclick="convertLink()" class="btn btn-success">
+                                Convert
+                            </button>
+                        </p>
+                        <h4>Paste the output inside your text to create a link for the user.</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /top tiles -->
+    <br />
+</div>
+{% endblock %}
+
+{% block customJS %}
+<!-- Emoji JS and CSS -->
+<script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css" />
+<!-- to use -> emojione.toImage(input) -> input = :emojiname: -> example -> emojione.toImage(:smile:) -->
+<!-- phone emojis also work -->
+<!-- :P :) or such are not suported -->
+<!-- https://demos.emojione.com/latest/jstoshort.html to look at their :emoji: name -->
+
+<script>
+    function convertLink() {
+        var input = document.getElementById('clickLink_input').value;
+        var link = document.getElementById('clickLink_link').value;
+        var output = "<xmp><a href=\'"+link+"\' target=\\\'_blank\\\'>"+input+"</a></xmp>";
+        document.getElementById('clickLink_output').innerHTML = output;
+    }
+</script>
+
+<!-- Jquery-2.2.4 JS -->
+<script src="/static/js/jquery-2.2.4.min.js"></script>
+<!-- Popper js -->
+<script src="/static/js/popper.min.js"></script>
+<!-- Bootstrap-4 Beta JS -->
+<script src="/static/js/bootstrap.min.js"></script>
+<!-- All Plugins JS -->
+<script src="/static/js/plugins.js"></script>
+<!-- Slick Slider Js-->
+<script src="/static/js/slick.min.js"></script>
+<!-- Footer Reveal JS -->
+<script src="/static/js/footer-reveal.min.js"></script>
+<!-- Active JS -->
+<script src="/static/js/active.js"></script>
+
+{% endblock %}

@@ -16,7 +16,7 @@ from utilities import helpers
 # Import all routers to register them as blueprints
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
     solutions_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
-    changePassword_router, bot_router, emoji_router, adminBasic_router,\
+    changePassword_router, bot_router, adminBasic_router,\
     assistantManager_router, assistant_router
 
 from routes.public.routers import public_router, resetPassword_router
@@ -43,7 +43,6 @@ app.register_blueprint(userInput_router)
 app.register_blueprint(changePassword_router)
 app.register_blueprint(users_router)
 app.register_blueprint(bot_router)
-app.register_blueprint(emoji_router)
 
 
 # Code to ensure user is logged in
@@ -211,6 +210,6 @@ elif os.environ['FLASK_ENV'] == 'development':
 
     # Run the app server
     print('Development mode running...')
-    # app.run(threaded = True)
+    #app.run(threaded = True)
 else:
     print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")

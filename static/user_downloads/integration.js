@@ -96,7 +96,6 @@ window.onload = (async function (global) {
     // Create chatbot iFrame div
     var iFrameDiv = document.createElement('div');
     iFrameDiv.id = 'TSB-iframediv';
-    iFrameDiv.style.width = '400px';
     iFrameDiv.style.height = '0px';
     iFrameDiv.style.opacity = '0';
 
@@ -154,7 +153,7 @@ window.onload = (async function (global) {
             iFrameDiv.style.display = "block";
             iFrameDiv = $("#TSB-iframediv");
             iFrameDiv.animate({
-                height: '530px',
+                height: "530px",
                 opacity: '1'
             });
             popOpen = true;
@@ -247,5 +246,11 @@ window.onload = (async function (global) {
     }
 
 
+    // Chatbot box width responsiveness
+    const phones = window.matchMedia('(min-width:461px)').matches;
+    iFrameDiv.style.width = $(window).width() - 41 + 'px';
+    if (phones) {
+        iFrameDiv.style.width = "460px";
+    }
 
 })(this);

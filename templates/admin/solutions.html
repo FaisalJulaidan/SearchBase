@@ -214,6 +214,7 @@ function fillSolutionForm(solID, edit=false){
 
     $('#solutionModal').modal('show');
 
+
     if(edit){
          // fill current user
         console.log($form.find('input[name="inputID"]').val());
@@ -224,6 +225,8 @@ function fillSolutionForm(solID, edit=false){
         $form.find('input[name="inputMoney"]').val($row.find('td[data-type="money"]').text());
         $form.find('input[name="inputKeywords"]').val($row.find('td[data-type="keywords"]').text());
         $form.find('input[name="inputURL"]').val($row.find('td[data-type="URL"]').text());
+    } else {
+        $form.trigger("reset");
     }
 
     // Bind the appropriate handlers depends on edit value

@@ -1,7 +1,7 @@
 var globalTSB = {
     id: undefined,
-    host: 'https://www.thesearchbase.com',
-    //host: 'http://localhost:5000',
+    // host: 'https://www.thesearchbase.com',
+    host: 'http://localhost:5000',
     files_path: '/userdownloads',
     iframe_route: '/chatbottemplate_production'
 };
@@ -248,7 +248,7 @@ window.onload = (async function (global) {
 
     // Chatbot box width responsiveness
     const phones = window.matchMedia('(min-width:461px)').matches;
-    iFrameDiv.style.width = $(window).width() - 41 + 'px';
+    iFrameDiv.style.width = window.screen.width - 41 + 'px';
     if (phones) {
         iFrameDiv.style.width = "460px";
     }

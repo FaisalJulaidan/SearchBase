@@ -138,13 +138,14 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
     orders = []
     ids = []
     for block in blocks:
+        # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
         order = block.get('order')
         id = block.get('id')
 
         try:
             # Make sure all submitted questions exist in the database
             if not db.session.query(exists().where(Block.ID == id)).scalar():
-                return Callback(False, "the block of id '" + str(id) + "' doesn't exist in the database")
+                return Callback(False, "the block of id '" + str(order) + "' doesn't exist in the database")
         except Exception as e:
             db.session.rollback()
         #finally:
@@ -206,15 +207,17 @@ def deleteBlockByID(id) -> Callback:
             return Callback(False, "the block with id '" + str(id) + "' doesn't exist")
         assistant: Assistant = block.Assistant
         db.session.query(Block).filter(Block.ID == id).delete()
+        # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
+        blockID = block.Order
 
         # Save
         db.session.commit()
-        return Callback(True, 'Block with id ' + str(id) + " has been removed successfully.",
+        return Callback(True, 'Block with id ' + str(blockID) + " has been removed successfully.",
                         {"remainingBlocks": getRemainingBlocksByAssistant(assistant)})
     except Exception as exc:
         print(exc)
         db.session.rollback()
-        return Callback(False, 'Block with id' + str(id) + " could not be removed.")
+        return Callback(False, 'Block with id' + str(blockID) + " could not be removed.")
     # finally:
        # db.session.close()
 
@@ -225,8 +228,8 @@ def isValidBlock(block: dict, blockType: str):
         json_utils.validateSchema(block.get('content'), 'blocks/' + blockType + '.json')
     except Exception as exc:
         print(exc.args[0])
-
-        blockID = block.get('id')
+        # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
+        blockID = block.get('order')
         blockType = block.get('type')
         msg = "Block data doesn't follow the correct format"
 

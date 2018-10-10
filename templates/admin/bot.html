@@ -195,6 +195,25 @@
 <script src="/../../static/tagify/tagify.js"></script>
 
 <script>
+
+
+    var entityMap = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+      '/': '&#x2F;',
+      '`': '&#x60;',
+      '=': '&#x3D;'
+    };
+
+    function escapeHtml (string) {
+      return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+        return entityMap[s];
+      });
+    }
+
     var blocksNumber = 0;
     window.onload = function () {
         if (prev_handler)
@@ -1279,7 +1298,7 @@
                     return "" +
                         "<div class=\"input-group col-md-8 afterMessage\">\n" +
                         "  <span class=\"input-group-addon\">After Message:</span>\n" +
-                        "  <input type='text' placeholder='Message to be sent after the question is answered' class='form-control' value='" + afterMessage + "'/>" +
+                        "  <input type='text' placeholder='Message to be sent after the question is answered' class='form-control' value='" + escapeHtml(afterMessage) + "'/>" +
                         "</div>"
                 }
 
@@ -1505,7 +1524,7 @@
                     return "" +
                         "<div class=\"input-group col-md-8\">\n" +
                         "  <span class=\"input-group-addon\">After Message:</span>\n" +
-                        "  <input type='text' placeholder='Message to be sent after the question is answered' class='form-control' value='" + afterMessage + "'/>" +
+                        "  <input type='text' placeholder='Message to be sent after the question is answered' class='form-control' value=\'" + escapeHtml(afterMessage) + "\'/>" +
                         "</div>"
                 }
 

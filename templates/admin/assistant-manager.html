@@ -27,17 +27,15 @@
                        <table id="usersTable" class="table" cellspacing="0" width="100%">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
                                     <th>Assistant Name</th>
                                     <th>Status</th>
-                                    <th>Activate / Deactivate</th>
+                                    <th><center>Action</center></th>
                                 </tr>
                             </thead>
                             <tbody>
 
                                 {% for assistant in assistants %}
                                 <tr data-rowID={{ assistant['ID'] }}>
-                                    <td data-type="assistant_id">{{ assistant['ID'] }}</td>
                                     <td data-type="assistant_name">{{ assistant['Name'] }}</td>
                                     {%if assistant['Active']%}
                                     <td data-type="assistant_status">Active</td>
@@ -45,6 +43,7 @@
                                     <td data-type="assistant_status">Inactive</td>
                                     {%endif%}
                                     <td>
+                                      <center>
                                         {% if userRole['EditChatbots'] %}
 
                                         {%if assistant['Active']%}
@@ -64,6 +63,7 @@
                                         <button style="background-color:red; border-color: red;" class="btn btn-primary" disabled>Delete</button>
 
                                         {% endif %}
+                                      </center>
                                     </td>
                                 </tr>
                                 {% endfor %}

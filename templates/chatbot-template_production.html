@@ -770,6 +770,8 @@
 
             print();
 
+            addKeywords(message.replace(/ /g, " ").split(" "))
+
             await sleep(200);
             putThinkingGif();
             await sleep(thinkingGifLife);

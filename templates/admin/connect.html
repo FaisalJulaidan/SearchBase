@@ -59,6 +59,9 @@
 
                         <button onclick="copyURL()" class="btn btn-success">Copy URL</button>
                         <br />
+                        <button onclick="testIntegration()" class="btn btn-success">Test Assistant Pop Up</button>
+                        <div id="integratePaste"></div>
+                        <h5>The pop up will appear after the time set just like it would on your website.</h5>
                         <br />
                         <br />
 
@@ -71,7 +74,6 @@
                                     </body>
                                 </xmp>
                             </strong>
-                        <>
                         <strong>Note: </strong>It is important to notify users about their use with the chatbot. You can do this by adding this in your 'terms & conditions' <br />
                             page or by asking them through the chatbot that they are happy for you to collect their data.
                         </p>
@@ -108,9 +110,6 @@
 
         }
 
-    </script>
-
-    <script>
         function copyURL() {
             /* Get the text field */
             var copyText = document.getElementById("URL_id");
@@ -122,6 +121,28 @@
             document.execCommand("copy");
         }
 
+        var script = undefined;
+        function testIntegration(){
+            var paste = document.getElementById("URL_id").value;
+            // console.log(paste);
+            //document.getElementById("integratePaste").innerHTML = "";
+            // document.getElementById("integratePaste").append(paste);
+            try{
+              document.getElementsByTagName('body').lastChild.remove();
+            } catch{
+              
+            }
+            console.log(paste.split("data-icon=\"")[1].split("\"")[0])
+            $("#TSB-container").remove();
+            script = document.createElement('script');
+            script.src = 'https://www.thesearchbase.com/userdownloads/integration.js';
+            script.setAttribute("data-name", "tsb-widget");
+            script.setAttribute("data-id", "{{ assistantID }}");
+            script.setAttribute("data-icon", paste.split("data-icon=\"")[1].split("\"")[0]);
+            script.setAttribute("data-circle", paste.split("data-circle=\"")[1].split("\"")[0]);
+            script.type = 'text/javascript';
+            document.getElementsByTagName('body')[0].appendChild(script);
+        }
     </script>
 
 

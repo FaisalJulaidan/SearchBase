@@ -39,7 +39,6 @@ def assistant():
             return helpers.jsonResponse(False, 400, "Couldn't create the assistant", None)
 
         if 'none' not in templateName:
-            print('create assistant with template')
             callback_bot: Callback = bot_services.genBotViaTemplate(assistant_callback.Data, templateName)
             if not callback_bot.Success:
                 # if template has an error remove the created assistant

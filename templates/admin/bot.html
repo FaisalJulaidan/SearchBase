@@ -15,6 +15,8 @@
     .main_container {
         margin: 0;
     }
+
+
     .remainingBlocks {
         border: 1px solid grey;
         padding: 5px;
@@ -22,12 +24,12 @@
         border-radius: 5px;
     }
 
-        .remainingBlocks > span {
-            background-color: #4B5B71;
-            padding: 5px;
-            border-radius: 5px;
-            color: white;
-        }
+    .remainingBlocks > span {
+        background-color: #4B5B71;
+        padding: 5px;
+        border-radius: 5px;
+        color: white;
+    }
 
     .my-btn-default {
         background-color: #fff;
@@ -141,19 +143,48 @@
         transition: box-shadow .3s;
     }
 
-        .type:hover {
-            box-shadow: 0 0 11px rgba(33, 33, 33, .4);
-        }
+    .type:hover {
+        box-shadow: 0 0 11px rgba(33, 33, 33, .4);
+    }
 
     .questionTypeInput {
         width: 120px !important;
         float:right !important;
     }
 
+    /* Upload file button */
+    .uplaodBtn {
+        margin-top: 10px;
+        margin-right: 5px;
+    }
+
     .input-group-btn .btn{
         margin-right:-2px;
         margin-left: -2px;
     }
+
+    .btn-file {
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-file input[type=file] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        min-width: 100%;
+        min-height: 100%;
+        font-size: 100px;
+        text-align: right;
+        filter: alpha(opacity=0);
+        opacity: 0;
+        outline: none;
+        background: white;
+        cursor: inherit;
+        display: block;
+    }
+
+
+
 </style>
 <div class="right_col" role="main">
     <div class="page-title">
@@ -173,6 +204,16 @@
             <div class="pull-right remainingBlocks">
                 <i class="addBlock clickable glyphicon glyphicon-plus"></i>
                 Remaining Blocks <span>1</span>
+            </div>
+            <div class="pull-right">
+                <div class="btn-group uplaodBtn">
+                <a id="uploadAction" class="btn btn-default">Click to Upload External Template (JSON)
+                </a>
+                <label class="btn btn-primary">
+                    Browse&hellip; <input id="selectTemplateFile" type="file" style="display: none;">
+                </label>
+
+            </div>
             </div>
         </div>
 
@@ -214,10 +255,75 @@
       });
     }
 
+
+
+
+
     var blocksNumber = 0;
     window.onload = function () {
         if (prev_handler)
             prev_handler();
+
+
+         // Upload template function
+        document.getElementById('uploadAction').addEventListener('click', () => {
+         let files = document.getElementById('selectTemplateFile').files;
+         console.log(files);
+         if (files.length <= 0) {
+            return false;
+         }
+         // Read the JSON file, parse it and formatted as data of type JSON
+         let fr = new FileReader();
+         let formatted = undefined;
+         fr.onload = function(e) {
+         console.log(e);
+         let result = JSON.parse(e.target.result);
+         formatted = JSON.stringify(result);
+         };
+        fr.readAsText(files.item(0));
+
+        // Warn user that his/her current blocks will be overriden
+        swal({
+          title: "Are you sure?",
+          text: "You will lose all your current blocks if you have ones.",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+               $.post({
+                  method: 'POST',
+                  url: 'bot/template',
+                  contentType: "application/json",
+                  dataType: "json",
+                  data: formatted
+
+
+                }).done(function( res ) {
+                   console.log(res);
+                   // When successful
+                swal({
+                  title: "Successful...",
+                  text: res.msg,
+                  icon: "success"
+                 }).then((value) => {
+                    document.location.reload();
+                 });
+
+                 }).fail(function( res ) {
+
+                    let resJson = JSON.parse(res.responseText);
+                    swal("Ooops!", resJson.msg, "error");
+                 })
+
+          } else {
+            // When clicking the cancel button in the alert box
+          }
+        });
+    });
+        // End upload template function
+
 
         main();
 

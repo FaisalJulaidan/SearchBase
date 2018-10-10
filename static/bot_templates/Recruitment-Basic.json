@@ -226,7 +226,7 @@
                 },
                 "storeInDB": true,
                 "type": "User Input",
-                "order": 8
+                "orde": 8
             },
             {
                 "content": {

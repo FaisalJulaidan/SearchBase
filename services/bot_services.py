@@ -11,6 +11,46 @@ from models import db, Callback, ValidationType, Assistant, Block, BlockType, Bl
 bot_currentVersion = "1.0.0"
 
 
+
+def genBotViaTemplateUplaod(assistant: Assistant, data: dict):
+
+    try:
+        # Validate submitted block data
+        json_utils.validateSchema(data, 'botTemplate.json')
+        print(data.get('bot')['blocks'][0])
+        if not deleteAllBlock(assistant).Success:
+            return Callback(False, 'Error in deleting blocks')
+
+        counter = 1
+        for block in data.get('bot')['blocks']:
+            db.session.add(Block(Type=BlockType(block['type']), Order=counter, Content=block['content'],
+                         StoreInDB=block['storeInDB'], Assistant=assistant))
+            counter += 1
+        # Save
+        db.session.commit()
+        return Callback(True, 'Template was successfully uploaded')
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Error while uploading a bot via a template')
+    # finally:
+       # db.session.close()
+
+
+def deleteAllBlock(assistant: Assistant) -> Callback:
+    try:
+        db.session.query(Block).filter(Block.AssistantID == assistant.ID).delete()
+        db.session.commit()
+        return Callback(True, 'Blocks has been deleted.')
+
+    except Exception as exc:
+        print("Error in deleteAllBlock(): ", exc)
+        db.session.rollback()
+        return Callback(False, 'Error in deleting blocks.')
+    # finally:
+    # db.session.close()
+
+
 # Generate a bot using an already built template
 def genBotViaTemplate(assistant: Assistant, tempName: str):
 

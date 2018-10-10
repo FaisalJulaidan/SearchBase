@@ -144,7 +144,7 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
         try:
             # Make sure all submitted questions exist in the database
             if not db.session.query(exists().where(Block.ID == id)).scalar():
-                return Callback(False, "the block of id '" + str(id) + "' doesn't exist in the database")
+                return Callback(False, "The block you tried to update doesn't exist in the database")
         except Exception as e:
             db.session.rollback()
         #finally:

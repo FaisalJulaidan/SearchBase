@@ -865,6 +865,7 @@
                     }
 
                     blockKeywords = blockAnswers[i].keywords;
+                    print()
                     var action = blockAnswers[i].action;
                     var blockToGoId = blockAnswers[i].blockToGoID;
                     return getNextBlock(action, blockToGoId);
@@ -1002,18 +1003,7 @@
         var addIn = true;
 
         for (var c = 0; c < blockKeywords.length; c++) {
-            addIn = true;
-
-            for (var i = 0; i < keywords.length; i++) {
-                if (blockKeywords[c] == keywords[i]) {
-                    addIn = false;
-                    break;
-                }
-            }
-
-            if (addIn) {
-                keywords.push(blockKeywords[c]);
-            }
+            keywords.push(blockKeywords[c]);
         }
     }
 

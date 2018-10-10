@@ -219,7 +219,9 @@ window.onload = (async function (global) {
         } catch (error) { }
         if (fullLoad["jquery"] && fullLoad["popupsettings"]) {
             $("#tsb-bot-header")[0].innerHTML = topBarText;
+
             fadein(document.getElementById("TSB-container"));
+
             clearInterval(interval);
             document.getElementById('TSB-chatbotIframe').src = host + iframe_route + '/' + id;
 

@@ -306,7 +306,9 @@
                 swal({
                   title: "Successful...",
                   text: res.msg,
-                  icon: "success"
+                  icon: "success",
+                  timer: 800,
+                  buttons: false
                  }).then((value) => {
                     document.location.reload();
                  });
@@ -599,7 +601,7 @@
                                         title: blockType + " added!",
                                         text: res.msg,
                                         icon: "success",
-                                        timer: 2000,
+                                        timer: 800,
                                         buttons: false
                                     });
                                 }
@@ -800,7 +802,14 @@
                     RemainingBlocks = res.data.remainingBlocks;
                     if (res.success) {
                         $(e.target).parent().parent().parent().remove();
-                        swal("Success!", res.msg, "success");
+                        //swal("Success!", res.msg, "success", timer: 800, buttons: false);
+                        swal({
+                            title: "Success!",
+                            text: res.msg,
+                            icon: "success",
+                            timer: 800,
+                            buttons: false
+                        });
                         updateBlocksOrder();
                     }
                 })
@@ -1010,7 +1019,14 @@
                 data: JSON.stringify(botData),
                 success: function (res) {
                     res = JSON.parse(res);
-                    swal('Succes', res.msg, 'success');
+                    //swal('Succes', res.msg, 'success');
+                    swal({
+                        title: "Success!",
+                        text: res.msg,
+                        icon: "success",
+                        timer: 800,
+                        buttons: false
+                    });
 
                     Promise.all([GET_data(), GET_options()]).then((res) => {
                         data = JSON.parse(res[0]).data;

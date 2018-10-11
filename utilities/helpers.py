@@ -3,8 +3,20 @@ from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solutio
 from services import assistant_services, user_services
 from datetime import datetime
 from sqlalchemy import inspect
+from hashids import Hashids
+from config import BaseConfig
 import stripe
 import re
+
+hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
+
+
+def encrypt_id(id):
+    return hashids.encrypt(id)
+
+
+def decrypt_id(id):
+    return hashids.decrypt(id)
 
 
 # Generates dummy data for testing

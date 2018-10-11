@@ -21,6 +21,7 @@ Flask-Script==2.0.6
 Flask-SQLAlchemy==2.3.2
 Flask-Validator==1.2.3
 gunicorn==19.7.1
+hashids==1.2.0
 idna==2.7
 isbnlib==3.6.8
 iso3166==0.8
@@ -42,7 +43,6 @@ python-editor==1.0.3
 pytz==2017.2
 PyYAML==3.13
 requests==2.19.1
-Shapely==1.6.4.post1
 simplejson==3.16.0
 six==1.11.0
 SQLAlchemy==1.2.10

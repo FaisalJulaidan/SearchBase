@@ -57,6 +57,8 @@ class BaseConfig(object):
     SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # Hashids Salt
+    HASH_IDS_SALT = 'b9iLXiAa'
 
     # Mail Config
     MAIL_SERVER = 'smtp.gmail.com'

@@ -86,6 +86,8 @@ def notifyNewRecordsForLastXHours(hours):
             if not assistants_callback.Success: raise Exception("assistants_callback: ", assistants_callback.Message)
             print("3")
 
+            information = []
+
             for assistant in assistants_callback.Data:
                 print("4")
                 records_callback : Callback = analytics_services.getAllRecordsByAssistantIDInTheLast(hours, assistant.ID)
@@ -96,9 +98,11 @@ def notifyNewRecordsForLastXHours(hours):
                 if not records_callback.Data: continue
                 print("6")
 
-                sendRecords_callback : Callback = sendNewRecordsNotification(record.Email, {"assistantName": assistant.Name, "data": records_callback.Data, "assistantID": assistant.ID})
-                if not sendRecords_callback.Success: raise Exception("sendRecords_callback: ", sendRecords_callback.Message)
-                print("7")
+                information.append({"assistantName": assistant.Name, "data": records_callback.Data, "assistantID": assistant.ID})
+
+            sendRecords_callback : Callback = sendNewRecordsNotification(record.Email, information)
+            if not sendRecords_callback.Success: raise Exception("sendRecords_callback: ", sendRecords_callback.Message)
+            print("7")
 
     except Exception as e:
         print("mail_services.notifyNewRecordsForLastXHours() ERROR: ", e)

@@ -1,7 +1,7 @@
 var globalTSB = {
     id: undefined,
-    host: 'https://www.thesearchbase.com',
-    // host: 'http://localhost:5000',
+    //host: 'https://www.thesearchbase.com',
+     host: 'http://localhost:5000',
     files_path: '/userdownloads',
     iframe_route: '/chatbottemplate_production'
 };
@@ -247,6 +247,23 @@ window.onload = (async function (global) {
         }, 10);
     }
 
+    // window.onbeforeunload = function(){
+    //    // document.getElementById('TSB-chatbotIframe').contentWindow.onbeforeunload = function () {
+    //    //      debugger;
+    //    //  };
+    //    document.getElementById('TSB-chatbotIframe').contentWindow.onunload = function () {
+    //         debugger;
+    //     };
+    // }
+    //
+    // window.onunload = function(){
+    //    // document.getElementById('TSB-chatbotIframe').contentWindow.onbeforeunload = function () {
+    //    //      debugger;
+    //    //  };
+    //    document.getElementById('TSB-chatbotIframe').contentWindow.onunload = function () {
+    //         debugger;
+    //     };
+    // }
 
     // Chatbot box width responsiveness
     const phones = window.matchMedia('(min-width:461px)').matches;

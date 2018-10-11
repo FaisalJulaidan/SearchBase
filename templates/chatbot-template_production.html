@@ -347,33 +347,33 @@
     {#    #frame .content {#}
     {#        width: 100%;#}
     {#        min-width: 250px !important;#}
-    {#    }#}
+    {#    }
     {##}
     {#    #frame .content .messages {#}
     {#        max-height: calc(100% - 115px);#}
-    {#    }#}
+    {#    }
     {##}
     {#    #frame .content .messages ul li p {#}
     {#        max-width: 300px;#}
-    {#    }#}
+    {#    }
     {##}
     {#    #frame .content .message-input .wrap input {#}
     {#        padding: 11px 32px 10px 12px;#}
-    {#    }#}
+    {#    }
     {##}
     {#   #frame .content .message-input .wrap button.answer {#}
     {#        margin-left: 5px;#}
     {#        margin-right: 5px;#}
     {#        padding: 10px;#}
     {#        width: auto;#}
-    {#    }#}
-    {#}#}
+    {#    }
+    {#}
     {##}
     {#@media screen and (min-width: 900px) {#}
     {#    #frame .content {#}
     {#        width: 100%;#}
-    {#    }#}
-    {#}#}
+    {#    }
+    {#}
 
 
 
@@ -422,6 +422,15 @@
     var chatInputDiv = document.getElementById("message-input");
     var fileUploadForm = document.getElementById('fileUploadForm');
     var thinkingGifLife = 800 + Math.floor(Math.random() * 1200);
+    var sentOnClose = false;
+
+    window.onbeforeunload = function(){ sendOnCloseData(); }
+
+    //window.onunload = function(){ sendOnCloseData(); }
+
+    function sendOnCloseData(){
+        if(!sentOnClose){ sendData(); sentOnClose = true;}
+    }
 
     // This function will get the blocks from the server by assistantID and set the blocks array to be used to create
     // the cahtbot conversational flow
@@ -505,6 +514,7 @@
             return false
         });
     }
+
 
     function sendDataSolutionsBlock(showTop) {
         putThinkingGif();
@@ -807,8 +817,7 @@
             newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
 
             print();
-
-            addKeywords(message.replace(/ /g, " ").split(" "))
+            addKeywords(message.replace(/ /g, " ").split(" "));
 
             await sleep(200);
             putThinkingGif();
@@ -842,18 +851,24 @@
             // clear answers div
             $("#presetAnswers").first().html('');
             newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
-            print();
 
-            await sleep(200);
-            putThinkingGif();
-            await sleep(thinkingGifLife);
-            removeThinkingGif();
             await sleep(200);
 
             var blockAnswers = currentBlock.content.answers;
 
             for (var i = 0; i < blockAnswers.length; i++) {
                 if (blockAnswers[i].text == message) {
+                    blockKeywords = blockAnswers[i].keywords;
+                    print()
+                    var action = blockAnswers[i].action;
+                    var blockToGoId = blockAnswers[i].blockToGoID;
+
+                    await sleep(200);
+                    putThinkingGif();
+                    await sleep(thinkingGifLife);
+                    removeThinkingGif();
+                    await sleep(200);
+
                     if (blockAnswers[i].afterMessage) {
                         sendAssistantMessage(blockAnswers[i].afterMessage);
 
@@ -863,14 +878,9 @@
                         removeThinkingGif();
                         await sleep(200);
                     }
-
-                    blockKeywords = blockAnswers[i].keywords;
-                    print()
-                    var action = blockAnswers[i].action;
-                    var blockToGoId = blockAnswers[i].blockToGoID;
-                    return getNextBlock(action, blockToGoId);
                 }
             }
+            return getNextBlock(action, blockToGoId);
         }
 
         function print() {

@@ -1,7 +1,7 @@
 var globalTSB = {
     id: undefined,
-    //host: 'https://www.thesearchbase.com',
-     host: 'http://localhost:5000',
+    host: 'https://www.thesearchbase.com',
+    //host: 'http://localhost:5000',
     files_path: '/userdownloads',
     iframe_route: '/chatbottemplate_production'
 };

@@ -6,10 +6,29 @@ from utilities import helpers
 bot_router: Blueprint = Blueprint('bot_router', __name__, template_folder="../../templates")
 
 
-@bot_router.route("/admin/assistant/<int:assistantID>/bot", methods=['GET', 'POST'])
+@bot_router.route("/admin/assistant/<int:assistantID>/bot", methods=['GET'])
 def bot_controller(assistantID):
     if request.method == "GET":
         return admin_services.render('admin/bot.html')
+
+
+@bot_router.route("/admin/assistant/<int:assistantID>/bot/template", methods=['POST'])
+def bot_templateUpload(assistantID):
+
+    # Get the assistant
+    callback: Callback = assistant_services.getByID(assistantID)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+    assistant: Assistant = callback.Data
+
+    # Upload the template
+    if request.method == "POST":
+        data = request.get_json(silent=True)
+        callback: Callback = bot_services.genBotViaTemplateUplaod(assistant, data)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, "Please make sure the file follow the correct format.",
+                                        callback.Message)
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
 # @bot_router.route("/test/bot/<int:assistantID>", methods=['POST', 'GET', 'PUT'])

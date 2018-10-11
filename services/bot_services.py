@@ -11,6 +11,46 @@ from models import db, Callback, ValidationType, Assistant, Block, BlockType, Bl
 bot_currentVersion = "1.0.0"
 
 
+
+def genBotViaTemplateUplaod(assistant: Assistant, data: dict):
+
+    try:
+        # Validate submitted block data
+        json_utils.validateSchema(data, 'botTemplate.json')
+        print(data.get('bot')['blocks'][0])
+        if not deleteAllBlock(assistant).Success:
+            return Callback(False, 'Error in deleting blocks')
+
+        counter = 1
+        for block in data.get('bot')['blocks']:
+            db.session.add(Block(Type=BlockType(block['type']), Order=counter, Content=block['content'],
+                         StoreInDB=block['storeInDB'], Assistant=assistant))
+            counter += 1
+        # Save
+        db.session.commit()
+        return Callback(True, 'Template was successfully uploaded')
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Error while uploading a bot via a template')
+    # finally:
+       # db.session.close()
+
+
+def deleteAllBlock(assistant: Assistant) -> Callback:
+    try:
+        db.session.query(Block).filter(Block.AssistantID == assistant.ID).delete()
+        db.session.commit()
+        return Callback(True, 'Blocks has been deleted.')
+
+    except Exception as exc:
+        print("Error in deleteAllBlock(): ", exc)
+        db.session.rollback()
+        return Callback(False, 'Error in deleting blocks.')
+    # finally:
+    # db.session.close()
+
+
 # Generate a bot using an already built template
 def genBotViaTemplate(assistant: Assistant, tempName: str):
 
@@ -138,13 +178,14 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
     orders = []
     ids = []
     for block in blocks:
+        # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
         order = block.get('order')
         id = block.get('id')
 
         try:
             # Make sure all submitted questions exist in the database
             if not db.session.query(exists().where(Block.ID == id)).scalar():
-                return Callback(False, "The block you tried to update doesn't exist in the database")
+                return Callback(False, "the block of id '" + str(order) + "' doesn't exist in the database")
         except Exception as e:
             db.session.rollback()
         #finally:
@@ -206,15 +247,17 @@ def deleteBlockByID(id) -> Callback:
             return Callback(False, "the block with id '" + str(id) + "' doesn't exist")
         assistant: Assistant = block.Assistant
         db.session.query(Block).filter(Block.ID == id).delete()
+        # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
+        blockID = block.Order
 
         # Save
         db.session.commit()
-        return Callback(True, 'Block with id ' + str(id) + " has been removed successfully.",
+        return Callback(True, 'Block with id ' + str(blockID) + " has been removed successfully.",
                         {"remainingBlocks": getRemainingBlocksByAssistant(assistant)})
     except Exception as exc:
         print(exc)
         db.session.rollback()
-        return Callback(False, 'Block with id' + str(id) + " could not be removed.")
+        return Callback(False, 'Block with id' + str(blockID) + " could not be removed.")
     # finally:
        # db.session.close()
 
@@ -225,8 +268,8 @@ def isValidBlock(block: dict, blockType: str):
         json_utils.validateSchema(block.get('content'), 'blocks/' + blockType + '.json')
     except Exception as exc:
         print(exc.args[0])
-
-        blockID = block.get('id')
+        # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
+        blockID = block.get('order')
         blockType = block.get('type')
         msg = "Block data doesn't follow the correct format"
 

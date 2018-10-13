@@ -463,7 +463,7 @@
 
         // Validation for the website URL
         function validateURL(websiteURL) {
-            var URLRegex = /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/;
+            var URLRegex = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
             var userURL = document.getElementById('websiteURL').value;
 
             if (!userURL.match(URLRegex)) {

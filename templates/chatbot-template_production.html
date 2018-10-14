@@ -483,6 +483,8 @@
 
     // This should send the data to the server, without returning any solutions back
     function sendData() {
+        if (sentOnClose) { return 0; }
+        sentOnClose = true;
         putThinkingGif();
         var solutions = [];
         params = {
@@ -691,7 +693,7 @@
         fileUploadForm.style.display = 'none';
         $messageInput = $(".message-input").last();
         $userInput = $("<div class=\"wrap\" style=\"margin-top: 15px;min-height: 40px; background-color: white;\">\n" +
-            "                <input onkeypress=\"handleEnter(event)\" " +
+            "                <input onkeypress=\"handleEnter(event)\" autocomplete=\"off\"" +
             "            id='textMessage' type=\"text\" placeholder=\"Write your message...\"/>\n" +
             "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
             "            </div>");

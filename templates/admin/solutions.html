@@ -216,7 +216,7 @@ function fillSolutionForm(solID, edit=false){
 
 
     if(edit){
-         // fill current user
+        // fill current user
         console.log($form.find('input[name="inputID"]').val());
         $form.find('input[name="inputId"]').val($row.find('td[data-type="id"]').text());
         $form.find('input[name="inputMajorTitle"]').val($row.find('td[data-type="majorTitle"]').text());
@@ -294,7 +294,7 @@ function submitNewSolForm(form, event) {
 function submitEditSolForm(form,solId, event) {
     console.log('EDIT Solution.');
      $.ajax({
-        url: '/admin/solution/' + solID,
+        url: '/admin/solution/' + solId,
         type: "PUT",
         data: $('#solutionForm').serialize()
     }).done(function (res) {

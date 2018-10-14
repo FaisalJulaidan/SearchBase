@@ -399,7 +399,7 @@ class Block(db.Model):
     Assistant = db.relationship('Assistant', back_populates='Blocks')
 
     # Constraints:
-    __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)
+    # __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)
 
     def __repr__(self):
         return '<Block {}>'.format(self.Type)

@@ -4,6 +4,9 @@ from utilities import json_utils
 from sqlalchemy.sql import exists, func
 from os.path import join, dirname
 import json
+from sqlalchemy.exc import IntegrityError as sqlalchemyIE
+from sqlite3 import IntegrityError as sqlite3IE
+from pymysql import IntegrityError as pymysqlIE
 
 
 from models import db, Callback, ValidationType, Assistant, Block, BlockType, BlockAction, Plan
@@ -217,8 +220,6 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
         return Callback(False, "The number of submitted blocks isn't equivalent to what stored in the database")
 
     try:
-        # ------------------------- #
-        # Validate each block's content depends on its type
         for block in blocks:
             callback: Callback = isValidBlock(block, str(BlockType(block.get('type')).name))
             if not callback.Success:
@@ -226,18 +227,20 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
 
             # Update the block
             oldBlock: Block = db.session.query(Block).filter(Block.ID == block.get('id')).first()
-            oldBlock.Order = block.get('order')
             oldBlock.Type = BlockType(block.get('type'))
             oldBlock.Content = block.get('content')
             oldBlock.StoreInDB = block.get('storeInDB')
+            oldBlock.Order = block.get('order')
 
         # Save
         db.session.commit()
     except Exception as e:
         db.session.rollback()
+        print(e)
+        return Callback(False, "Error occurred while updating blocks.")
     # finally:
        # db.session.close()
-    return Callback(True, "Blocks updated successfully")
+    return Callback(True, "Blocks updated successfully.")
 
 
 def deleteBlockByID(id) -> Callback:

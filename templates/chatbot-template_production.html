@@ -942,7 +942,7 @@
         if (targetBlock === undefined) {
             sendData().then((isSuccess) => {
                 if (isSuccess) {
-                    {#sendAssistantMessage("Thank you for your input. We'll be in touch.");#}
+                    // sendAssistantMessage("Thank you for your input. We'll be in touch.");
                 } else {
                     sendAssistantMessage("We apologise, your input couldn't be processed. Please contact us.");
                 }
@@ -976,16 +976,16 @@
     function sendUserMessage(message) {
 
         newMessage(CLIENT_USER, toEmoticon(message));
-        {#$("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>" + toEmoticon(message) + "</li></div>");#}
-        {#animateMessage("#newMessage");#}
-        {#document.getElementById('newMessage').id = 'oldMessage';#}
+        // $("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>" + toEmoticon(message) + "</li></div>");
+        // animateMessage("#newMessage");#}
+        // document.getElementById('newMessage').id = 'oldMessage';
     }
 
     function sendAssistantMessage(message) {
         newMessage(BOT_USER, toEmoticon(message));
-        {#$("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + toEmoticon(message) + "</li></div>");#}
-        {#animateMessage("#newMessage");#}
-        {#document.getElementById('newMessage').id = 'oldMessage';#}
+        // $("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + toEmoticon(message) + "</li></div>");#}
+        // animateMessage("#newMessage");#}
+        // document.getElementById('newMessage').id = 'oldMessage';#}
     }
 
     function putThinkingGif() {
@@ -1082,7 +1082,7 @@
             marginTop: marginAnimate
         }, "slow");
         if (!cancelScroll) {
-            {#scrollTo("chatBottom");#}
+            // scrollTo("chatBottom");
         }
     }
 
@@ -1101,14 +1101,14 @@
     }
 
     function scrollTo(id) {
-        {#$('html, body').stop();#}
-        {#id = "#" + id#}
-        {#$('html, body').animate({#}
-        {#    scrollTop: ($(id).offset().top)#}
-        {# }, 2000);#}
+        /* $('html, body').stop();
+        id = "#" + id
+        $('html, body').animate({
+            scrollTop: ($(id).offset().top)
+         }, 2000); */
         $(".messages").animate({scrollTop: $('.messages').prop("scrollHeight")}, "fast");
 
-        {#$(".messages").animate({scrollTop: $(document).height()}, "fast");#}
+        // $(".messages").animate({scrollTop: $(document).height()}, "fast");
     }
 
     function sleep(ms) {

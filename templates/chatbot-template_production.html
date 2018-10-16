@@ -740,6 +740,14 @@
 
     async function submitAnswer(message) {
 
+        if (currentBlock.type == "User Input") { //validate user input
+            if (message == "")
+                message = document.getElementById("textMessage").value;
+
+            if (message == "" || message.replace(/ /g, "") == "")
+                return 0;
+        }
+
         chatInputDiv.style = "display:none";
         fileUploadForm.style.display = 'none';
 

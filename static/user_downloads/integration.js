@@ -222,15 +222,17 @@ window.onload = (function (global) {
             $("#TSB-container"); //check if jquery has loaded
             fullLoad["jquery"] = true;
         } catch (error) { }
+
         if (fullLoad["jquery"] && fullLoad["popupsettings"]) {
             $("#tsb-bot-header")[0].innerHTML = topBarText;
+
 
             fadein(document.getElementById("TSB-container"));
 
             clearInterval(interval);
-            document.getElementById('TSB-chatbotIframe').src = host + iframe_route + '/' + id;
-
+            
             setTimeout(function () {
+                document.getElementById('TSB-chatbotIframe').src = host + iframe_route + '/' + id;
                 if (!popOpen) {
                     document.getElementById('TSB-chatbot-widget').click();
                 }

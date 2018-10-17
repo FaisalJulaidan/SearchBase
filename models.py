@@ -394,6 +394,7 @@ class Block(db.Model):
     Order = db.Column(db.Integer, nullable=False)
     Content = db.Column(JsonEncodedDict, nullable=False)
     StoreInDB = db.Column(db.Boolean(), nullable=False, default=True)
+    Skippable = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)

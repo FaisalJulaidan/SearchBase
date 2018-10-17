@@ -236,7 +236,10 @@
 <script src="/../../static/tagify/tagify.js"></script>
 
 <script>
-
+    String.prototype.replaceAll = function (search, replacement) {
+        var target = this;
+        return target.replace(new RegExp(search, 'g'), replacement);
+    };
 
     var entityMap = {
       '&': '&amp;',
@@ -818,13 +821,14 @@
         function saveBlocks() {
             // collect all data in its json form
             class BlockTypeQuestions {
-                constructor(text, answers, storeInDB, type, order, id) {
+                constructor(text, answers, storeInDB, isSkippable, type, order, id) {
                     this.Question = {
                         content: {
                             text: text,
                             answers: answers
                         },
                         storeInDB: storeInDB,
+                        isSkippable: isSkippable,
                         type: type,
                         order: order,
                         id: id
@@ -833,7 +837,7 @@
             }
 
             class BlockTypeUserInput {
-                constructor(text, action, validation, blockToGoID, storeInDB, type, order, id, afterMessage = "") {
+                constructor(text, action, validation, blockToGoID, storeInDB, isSkippable, type, order, id, afterMessage = "") {
                     this.UserInput = {
                         content: {
                             action: action ? action : 'Go To Next Block',
@@ -844,6 +848,7 @@
 
                         },
                         storeInDB: storeInDB,
+                        isSkippable: isSkippable,
                         type: type,
                         order: order,
                         id: id
@@ -852,7 +857,7 @@
             }
 
             class BlockTypeFileUpload {
-                constructor(text, action, fileTypes, blockToGoID, storeInDB, type, order, id, afterMessage = "") {
+                constructor(text, action, fileTypes, blockToGoID, storeInDB, isSkippable, type, order, id, afterMessage = "") {
                     this.FileUpload = {
                         content: {
                             action: action ? action : 'Go To Next Block',
@@ -862,6 +867,7 @@
                             blockToGoID: blockToGoID
                         },
                         storeInDB: storeInDB,
+                        isSkippable: isSkippable,
                         type: type,
                         order: order,
                         id: id
@@ -870,7 +876,7 @@
             }
 
             class BlockTypeSolutions {
-                constructor(showTop, storeInDB, type, order, id, action, blockToGoID, afterMessage = "") {
+                constructor(showTop, storeInDB, isSkippable, type, order, id, action, blockToGoID, afterMessage = "") {
                     this.Solutions = {
                         content: {
                             showTop: showTop,
@@ -879,6 +885,7 @@
                             afterMessage: afterMessage
                         },
                         storeInDB: storeInDB,
+                        isSkippable: isSkippable,
                         type: type,
                         order: order,
                         id: id
@@ -902,6 +909,8 @@
                     let answersArr = [];
 
                     let id = +$block.attr('id');
+                    console.log("Question ", document.getElementById('skippable' + order).checked)
+                    let isSkippable = document.getElementById('skippable' + order).checked;
 
                     let text = (function () {
                         //debugger
@@ -911,7 +920,6 @@
                     })();
 
                     let saveInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
-
                     for (const row of rowsOfAnswers) {
                         let $row = $(row);
                         let answers = $row.children();
@@ -942,7 +950,7 @@
                         }
                     }
 
-                    botData.blocks.push(new BlockTypeQuestions(text, answersArr, saveInDB, type, order, id).Question);
+                    botData.blocks.push(new BlockTypeQuestions(text, answersArr, saveInDB, isSkippable, type, order, id).Question);
                 }
 
                 if (type == 'User Input') {
@@ -962,8 +970,10 @@
                     let afterMessage = $block.children().last().children('.col-md-8').children().last().val();
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let id = +$block.attr('id');
+                    console.log("User Input ", document.getElementById('skippable' + order).checked)
+                    let isSkippable = document.getElementById('skippable' + order).checked;
 
-                    botData.blocks.push(new BlockTypeUserInput(text, action, validation, blockToGoID, storeInDB, type, order, id, afterMessage).UserInput);
+                    botData.blocks.push(new BlockTypeUserInput(text, action, validation, blockToGoID, storeInDB, isSkippable, type, order, id, afterMessage).UserInput);
                 }
 
                 if (type == 'File Upload') {
@@ -989,8 +999,10 @@
 
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let id = +$block.attr('id');
+                    console.log("File Upload ", document.getElementById('skippable' + order).checked)
+                    let isSkippable = document.getElementById('skippable' + order).checked;
 
-                    botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, blockToGoID, storeInDB, type, order, id, afterMessage).FileUpload);
+                    botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, blockToGoID, storeInDB, isSkippable, type, order, id, afterMessage).FileUpload);
                 }
 
                 if (type == 'Solutions') {
@@ -1000,11 +1012,13 @@
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let action = $block.children().last().find('input.action').first().val();
                     let id = +$block.attr('id');
+                    console.log("Solutions ", document.getElementById('skippable' + order).checked)
+                    let isSkippable = document.getElementById('skippable' + order).checked;
                     let blockToGoID = 0;
                     try { blockToGoID = +$block.children().last().find('.blockToGoID')[0].value; }
                     catch (e) { blockToGoID = 0;}
 
-                    botData.blocks.push(new BlockTypeSolutions(showTop, storeInDB, type, order, id, action, blockToGoID, afterMessage).Solutions);
+                    botData.blocks.push(new BlockTypeSolutions(showTop, storeInDB, isSkippable, type, order, id, action, blockToGoID, afterMessage).Solutions);
                 }
 
 
@@ -1329,19 +1343,31 @@
                         "</div><!-- /input-group -->\n"
                 }
 
-                function getSubmitElement(storeInDB, id) {
+                function getSubmitElement(storeInDB, isSkippable, id) {
                     let isDisabled = block_template.alwaysStoreInDB ? '' : 'disabled';
+                    let skip = ""
+                    if (isSkippable) { skip="checked" }
                     return "" +
                         "<div class=\"col-md-1 pull-right inline\">\n" +
                         "    <div class=\"save btn btn-default\">Save</div>\n" +
                         "</div>\n" +
                         "<div class=\"col-md-2 pull-right inline text-right\">\n" +
                         "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 9px\">\n" +
-                        "        <input class=\"form-check-input\" id=\"" + id + "\" type=\"checkbox\" checked=\"\" " + isDisabled + ">\n" +
+                        "        <input class=\"form-check-input\" id=\"" + id + "\" type=\"checkbox\" checked=\"" + isDisabled + "\" >\n" +
+                    //    "        <input class=\"form-check-input\" id=\"" + id + "\" type=\"checkbox\" checked=\"\" " + isDisabled + ">\n" +
                         "        <label class=\"form-check-label\" for=\"" + id + "\"\n" +
                         "               style=\"padding-left: 10px;padding-top: 2px; text-align: -webkit-auto;\">\n" +
                         "            Save in DB\n" +
                         "        </label>\n" +
+                        "    </div>\n" +
+                        "</div>"+
+                        "<div class=\"col-md-2 pull-right inline text-right\">\n" +
+                        "        <input id=\"skippable" + id + "\" type=\"checkbox\" " + skip + ">\n" +
+                        "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 9px\">\n" +
+                        //"        <label class=\"form-check-label\" for=\"" + id + "\"\n" +
+                        //"               style=\"padding-left: 10px;padding-top: 2px; text-align: -webkit-auto;\">\n" +
+                        //"            Allow Skip\n" +
+                        //"        </label>\n" +
                         "    </div>\n" +
                         "</div>"
                 }
@@ -1480,8 +1506,8 @@
                 }
 
                 function getBlockContent(template, block) {
-                    template = template.replace('BLOCK_ID', block.id);
-                    template = template.replace('BLOCK_ID_HEADER', block.order);
+                    template = template.replaceAll('BLOCK_ID_HEADER', block.order);
+                    template = template.replaceAll('BLOCK_ID', block.id);
                     template = template.replace('BLOCK_TYPE', block.type);
 
 
@@ -1504,7 +1530,7 @@
                     template = template.replace('BLOCK_VALIDATION', block.content.validation);
                     template = template.replace('BLOCK_TOP_SOLUTION_EDITABLE', block.content.showTop);
 
-                    return template = template.replace('BLOCK_SUBMIT', getSubmitElement(block.storeInDB, block.id));
+                    return template = template.replace('BLOCK_SUBMIT', getSubmitElement(block.storeInDB, block.isSkippable, block.id));
                 }
 
                 function getTemplate(block_template, block) {
@@ -1546,7 +1572,7 @@
                     if (block_template.name == "Solutions") {
                         content = getTopSolutionsElement() + getAfterMessageInput(block.content.afterMessage) +
                             getActionElement(block_template.actions) +
-                            getSubmitElement(true, 'x');
+                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
 
                     }
 
@@ -1555,7 +1581,7 @@
                             getFileUpload(block_template.typesAllowed, block_template.fileMaxSize, block.content.fileTypes) +
                             getActionElement(block_template.actions) +
                             getAfterMessageInput(block.content.afterMessage) +
-                            getSubmitElement(true, 'x');
+                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
                     }
 
 
@@ -1564,7 +1590,7 @@
                             getActionElement(block_template.actions) +
                             getValidationElement(block_template.validations) +
                             getAfterMessageInput(block.content.afterMessage) +
-                            getSubmitElement(true, 'x');
+                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
 
                     }
 
@@ -1572,7 +1598,7 @@
                         content = getQuestionElement() +
                             getAddAnswerButton() +
                             getAnswersElement(block_template.actions, block.content.answers) +
-                            getSubmitElement(true, 'x');
+                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
                     }
 
                     templateHTML = templateHTML.replace('BLOCK_CONTENT', content);
@@ -1667,19 +1693,30 @@
                         "</div><!-- /input-group -->\n"
                 }
 
-                function getSubmitElement(storeInDB, id) {
+                function getSubmitElement(storeInDB, isSkippable, id) {
                     let isDisabled = storeInDB ? '' : 'disabled';
+                    let skip = ""
+                    if (isSkippable) { skip = "checked" }
                     return "" +
                         "<div class=\"save col-md-1 pull-right inline\">\n" +
                         "    <div class=\"btn btn-default\">Save</div>\n" +
                         "</div>\n" +
                         "<div class=\"col-md-2 pull-right inline text-right\">\n" +
                         "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 9px\">\n" +
-                        "        <input class=\"form-check-input\" id=\"" + id + "\" type=\"checkbox\" checked=\"\" " + isDisabled + ">\n" +
+                        "        <input class=\"form-check-input\" id=\"" + id + "\" type=\"checkbox\" checked=\"" + isDisabled + "\" >\n" +
                         "        <label class=\"form-check-label\" for=\"" + id + "\"\n" +
                         "               style=\"padding-left: 10px;padding-top: 2px; text-align: -webkit-auto;\">\n" +
                         "            Save in DB\n" +
                         "        </label>\n" +
+                        "    </div>\n" +
+                        "</div>" +
+                        "<div class=\"col-md-2 pull-right inline text-right\">\n" +
+                        "        <input id=\"skippable" + id + "\" type=\"checkbox\" " + skip + " >\n" +
+                        "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 9px\">\n" +
+                        //"        <label class=\"form-check-label\" for=\"" + id + "\"\n" +
+                        //"               style=\"padding-left: 10px;padding-top: 2px; text-align: -webkit-auto;\">\n" +
+                        //"            Allow Skip\n" +
+                        //"        </label>\n" +
                         "    </div>\n" +
                         "</div>"
                 }
@@ -1731,7 +1768,7 @@
                     if (block_template.name == "Solutions") {
                         templateHTML = getTopSolutionsElement() + getAfterMessageInput() +
                             getActionElement(block_template.actions) +
-                            getSubmitElement(true, 'x');
+                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
 
                     }
 
@@ -1740,7 +1777,7 @@
                             getFileUpload(block_template.typesAllowed, block_template.fileMaxSize) +
                             getActionElement(block_template.actions) +
                             getAfterMessageInput() +
-                            getSubmitElement(true, 'x');
+                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
                     }
 
 
@@ -1749,7 +1786,7 @@
                             getActionElement(block_template.actions) +
                             getValidationElement(block_template.validations) +
                             getAfterMessageInput() +
-                            getSubmitElement(true, 'x');
+                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
 
                     }
 
@@ -1757,13 +1794,13 @@
                         templateHTML = getQuestionElement() +
                             getAddAnswerButton() +
                             getAnswersElement(block_template.actions) +
-                            getSubmitElement(false, 'x');
+                            getSubmitElement(false, false, 'BLOCK_ID_HEADER');
 
 
                     }
                     return templateHTML;
                 }
-
+                
                 return getTemplate(block_template, block);
             }
 

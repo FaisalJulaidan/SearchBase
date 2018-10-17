@@ -268,6 +268,7 @@ class Assistant(db.Model):
     Message = db.Column(db.String(500), nullable=False)
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
+    Config = db.Column(JsonEncodedDict, nullable=True)
     Active = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
@@ -393,13 +394,14 @@ class Block(db.Model):
     Order = db.Column(db.Integer, nullable=False)
     Content = db.Column(JsonEncodedDict, nullable=False)
     StoreInDB = db.Column(db.Boolean(), nullable=False, default=True)
+    Skippable = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='Blocks')
 
     # Constraints:
-    __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)
+    # __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)
 
     def __repr__(self):
         return '<Block {}>'.format(self.Type)

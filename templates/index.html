@@ -53,23 +53,23 @@
 
 
     <script type="text/javascript">
-        var lg = document.getElementById('bigScreen')
-        var sm = document.getElementById('smallScreen')
+        var lg = document.getElementById('bigScreen');
+        var sm = document.getElementById('smallScreen');
 
         if (window.innerWidth < 991) {
-            lg.style.display = 'none'
+            lg.style.display = 'none';
             sm.style.display = ''
         } else {
-            sm.style.display = 'none'
+            sm.style.display = 'none';
             lg.style.display = ''
         }
 
-        window.addEventListener('resize', () => {
+        window.addEventListener('resize', function () {
             if (window.innerWidth < 991) {
-                lg.style.display = 'none'
+                lg.style.display = 'none';
                 sm.style.display = ''
             } else {
-                sm.style.display = 'none'
+                sm.style.display = 'none';
                 lg.style.display = ''
             }
         })

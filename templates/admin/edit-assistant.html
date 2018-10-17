@@ -112,7 +112,7 @@
                                     <div class="col-md-12">
                                         <p class="lead">
                                         <p> Warning: Deleting your assistant will delete everything associated with it!</p>
-                                        <a style="background-color:red; border-color: red;" class="btn btn-primary btn-sm" href="/admin/assistant/delete/{{id}}" role="button">Delete Assistant</a>
+                                        <a style="background-color:red; border-color: red;" class="btn btn-primary btn-sm" onclick="deleteAssistant({{id}})" role="button">Delete Assistant</a>
                                     </div>
                                 </div>
                             </form>
@@ -152,7 +152,7 @@
                     }).done(function (res) {
                         console.log(res);
                         swal("Success!", "Assistant has been deleted successfully", "success").then((value) => {
-                          document.location.reload()
+                          document.location = '/admin/assistant/manage'
                         });
                     }).fail(function (res) {
                         let resJson = JSON.parse(res.responseText);

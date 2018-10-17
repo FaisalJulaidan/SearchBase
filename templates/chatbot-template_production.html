@@ -668,6 +668,9 @@
         for (var i = 0; i < answers.length; i++) {
             $answersDiv.append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText)\" >" + emojione.toImage(answers[i].text) + "</button>");
         }
+        if (currentBlock.isSkippable) {
+            $answersDiv.append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText)\" >Skip</button>");
+        }
         $messageInput.html($answersDiv);
 
         $answersDiv.append($("<div class='row'></div>"));
@@ -751,6 +754,8 @@
 
         chatInputDiv.style = "display:none";
         fileUploadForm.style.display = 'none';
+        // clear answers div
+        $("#presetAnswers").first().html('');
 
         if (message.toLowerCase() === "skip" && currentBlock.isSkippable) {
             skipBlock();
@@ -863,8 +868,6 @@
         }
         var blockKeywords = undefined
         if (currentBlock.type == "Question") {
-            // clear answers div
-            $("#presetAnswers").first().html('');
             newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
 
             await sleep(200);

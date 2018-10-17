@@ -347,7 +347,9 @@
 
 
 
-
+    .replies {
+      margin-top: 40px;
+    }
     /* {# @media screen and (max-width: 735px) {#}
     {#    #frame .content {#}
     {#        width: 100%;#}
@@ -707,11 +709,13 @@
                 if (html)
                     $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" />' + emojione.toImage(text) + '</li>')
                     .appendTo($('.messages ul')).animate({
-                      opacity: 1,
-                      marginTop: "50px"
+                      marginTop: "5px"
                     })
                 else
-                    $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p>' + emojione.toImage(text) + '</p></li>').appendTo($('.messages ul')).hide().fadeIn();
+                    $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p>' + emojione.toImage(text) + '</p></li>')
+                    .appendTo($('.messages ul')).animate({
+                      marginTop: "5px"
+                    })
             }
             else {
                 $('<li class="sent"><img src="https://cdn1.iconfinder.com/data/icons/social-messaging-productivity-1-1/128/gender-male2-512.png" alt="" /><p>' + emojione.toImage(text) + '</p></li>').appendTo($('.messages ul')).hide().fadeIn();

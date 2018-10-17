@@ -1,0 +1,44 @@
+﻿{% extends "admin/base.html" %}
+
+{% block title %}Labels{% endblock %}
+
+{% block content %}
+<style>
+</style>
+<div class="right_col" role="main">
+    <!-- top tiles -->
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel" style="height:600px;">
+                <div class="pull-left">
+                    <button class="btn btn-primary">Add Label</button>
+                </div>
+
+                <table>
+                    {%if data%}
+                    <tr>
+                        <th>Name</th>
+                        <th>Colour</th>
+                    </tr>
+                    {%for record in data%}
+                    <tr>
+                        <td>{{record['Text']}}</td>
+                        <td>{{record['Colour']}}</td>
+                    </tr>
+                    {%endfor%}
+                    {%endif%}
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- /top tiles -->
+    <br />
+</div>
+{% endblock %}
+
+{% block customJS %}
+<script>
+    console.log("{{data}}");
+</script>
+{% endblock %}

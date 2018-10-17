@@ -406,6 +406,14 @@ class Block(db.Model):
     def __repr__(self):
         return '<Block {}>'.format(self.Type)
 
+class BlockLabel(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Text = db.Column(db.String(128), nullable=False)
+    Colour = db.Column(db.String(128), nullable=False)
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False,)
+
+    def __repr__(self):
+        return '<BlockLabel {}>'.format(self.Text)
 
 class ChatbotSession(db.Model):
 

@@ -182,6 +182,11 @@
         cursor: inherit;
         display: block;
     }
+    #label-div{
+        margin-top:10px;
+        margin-right:10px;
+    }
+
 
 
 
@@ -197,29 +202,38 @@
 
     <div class="x_panel">
         <div class="x_title" style="display: flow-root;">
+
             <div class="pull-left">
                 <h4>🤖 Bot Configuration</h4>
                 <small>Showing all questions and answers.</small>
             </div>
+
             <div class="pull-right remainingBlocks">
                 <i class="addBlock clickable glyphicon glyphicon-plus"></i>
                 Remaining Blocks <span>1</span>
             </div>
+
             <div class="pull-right">
                 <div class="btn-group uplaodBtn">
-                <a id="uploadAction" class="btn btn-default">Click to Upload External Template (JSON)
-                </a>
-                <label class="btn btn-primary">
-                    Browse&hellip; <input id="selectTemplateFile" type="file" style="display: none;">
-                </label>
+                    <a id="uploadAction" class="btn btn-default">Click to Upload External Template (JSON)</a>
+                    <label class="btn btn-primary">
+                        Browse&hellip; <input id="selectTemplateFile" type="file" style="display: none;">
+                    </label>
 
+                </div>
             </div>
+
+            <div class="pull-right">
+                <div id="label-div">
+                    <a href="/admin/question-labels" class="btn btn-primary" style="background-color:#32b0e8;border-color:#1481b1">Labels</a>
+                </div>
             </div>
+
         </div>
 
         <div class="x_conent">
             <ul id="draggablePanelList" class="list-unstyled">
-                <h5>Fetching questions...</h5>
+                <h3>Fetching questions...</h3>
             </ul>
         </div>
     </div>

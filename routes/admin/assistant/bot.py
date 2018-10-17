@@ -1,6 +1,6 @@
 from flask import Blueprint, request, session
-from services import admin_services, assistant_services, bot_services, user_services
-from models import Callback, Assistant, User
+from services import admin_services, assistant_services, bot_services, user_services, questionLabels_services
+from models import Callback, Assistant, User, BlockLabel
 from utilities import helpers
 
 bot_router: Blueprint = Blueprint('bot_router', __name__, template_folder="../../templates")
@@ -90,3 +90,15 @@ def delete_block(blockID):
 def get_botFeatures():
     if request.method == "GET":
         return helpers.jsonResponse(True, 200, "These are the options the bot provide.", bot_services.getOptions())
+
+
+@bot_router.route("/admin/question-labels", methods=['GET', 'POST'])
+def question_labels():
+    if request.method == "GET":
+        labels : Callback = questionLabels_services.getByCompanyID(session.get('CompanyID', 0))
+        if not labels.Success:
+            return admin_services.render('admin/block-labels.html')
+
+        labels = admin_services.convertForJinja(labels.Data, BlockLabel)
+
+        return admin_services.render('admin/block-labels.html', data=labels.Data)

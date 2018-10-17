@@ -702,6 +702,7 @@
         $('.messages').css('height', 'calc(100% - 40px)');
 
         $messageInput.append($userInput);
+        $("#textMessage").focus();
         sendAssistantMessage(block.content.text)
     }
 
@@ -751,6 +752,10 @@
         chatInputDiv.style = "display:none";
         fileUploadForm.style.display = 'none';
 
+        if (message.toLowerCase() === "skip" && currentBlock.isSkippable) {
+            skipBlock();
+            return 0;
+        }
 
         if (currentBlock.type == "Solutions") {
             await sleep(200);
@@ -917,6 +922,10 @@
         }
 
 
+    }
+
+    function skipBlock() {
+        getNextBlock("Go To Next Block");
     }
 
     function getNextBlock(action, blockToGoId = undefined) {

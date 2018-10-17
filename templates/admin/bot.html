@@ -909,7 +909,6 @@
                     let answersArr = [];
 
                     let id = +$block.attr('id');
-                    console.log("Question ", document.getElementById('skippable' + order).checked)
                     let isSkippable = document.getElementById('skippable' + order).checked;
 
                     let text = (function () {
@@ -970,7 +969,6 @@
                     let afterMessage = $block.children().last().children('.col-md-8').children().last().val();
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let id = +$block.attr('id');
-                    console.log("User Input ", document.getElementById('skippable' + order).checked)
                     let isSkippable = document.getElementById('skippable' + order).checked;
 
                     botData.blocks.push(new BlockTypeUserInput(text, action, validation, blockToGoID, storeInDB, isSkippable, type, order, id, afterMessage).UserInput);
@@ -999,7 +997,6 @@
 
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let id = +$block.attr('id');
-                    console.log("File Upload ", document.getElementById('skippable' + order).checked)
                     let isSkippable = document.getElementById('skippable' + order).checked;
 
                     botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, blockToGoID, storeInDB, isSkippable, type, order, id, afterMessage).FileUpload);
@@ -1012,8 +1009,7 @@
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let action = $block.children().last().find('input.action').first().val();
                     let id = +$block.attr('id');
-                    console.log("Solutions ", document.getElementById('skippable' + order).checked)
-                    let isSkippable = document.getElementById('skippable' + order).checked;
+                    let isSkippable = false;
                     let blockToGoID = 0;
                     try { blockToGoID = +$block.children().last().find('.blockToGoID')[0].value; }
                     catch (e) { blockToGoID = 0;}
@@ -1024,7 +1020,6 @@
 
 
 
-                //console.log(botData)
             }
             $.ajax({
                 method: 'PUT',
@@ -1346,7 +1341,9 @@
                 function getSubmitElement(storeInDB, isSkippable, id) {
                     let isDisabled = block_template.alwaysStoreInDB ? '' : 'disabled';
                     let skip = ""
-                    if (isSkippable) { skip="checked" }
+                    let hideit = ""
+                    if (isSkippable) { skip = "checked" }
+                    if (id == "dontshow") { hideit = "hidden"}
                     return "" +
                         "<div class=\"col-md-1 pull-right inline\">\n" +
                         "    <div class=\"save btn btn-default\">Save</div>\n" +
@@ -1361,7 +1358,7 @@
                         "        </label>\n" +
                         "    </div>\n" +
                         "</div>"+
-                        "<div class=\"col-md-2 pull-right inline text-right\">\n" +
+                        "<div " + hideit+" class=\"col-md-2 pull-right inline text-right\">\n" +
                         "        <input id=\"skippable" + id + "\" type=\"checkbox\" " + skip + ">\n" +
                         "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 9px\">\n" +
                         //"        <label class=\"form-check-label\" for=\"" + id + "\"\n" +
@@ -1529,7 +1526,6 @@
 
                     template = template.replace('BLOCK_VALIDATION', block.content.validation);
                     template = template.replace('BLOCK_TOP_SOLUTION_EDITABLE', block.content.showTop);
-
                     return template = template.replace('BLOCK_SUBMIT', getSubmitElement(block.storeInDB, block.isSkippable, block.id));
                 }
 
@@ -1568,11 +1564,10 @@
                         "</li>";
 
                     var content = "";
-
                     if (block_template.name == "Solutions") {
                         content = getTopSolutionsElement() + getAfterMessageInput(block.content.afterMessage) +
                             getActionElement(block_template.actions) +
-                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
+                            getSubmitElement(true, block.isSkippable, 'dontshow');
 
                     }
 
@@ -1581,7 +1576,7 @@
                             getFileUpload(block_template.typesAllowed, block_template.fileMaxSize, block.content.fileTypes) +
                             getActionElement(block_template.actions) +
                             getAfterMessageInput(block.content.afterMessage) +
-                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
+                            getSubmitElement(true, block.isSkippable, 'BLOCK_ID_HEADER');
                     }
 
 
@@ -1590,7 +1585,7 @@
                             getActionElement(block_template.actions) +
                             getValidationElement(block_template.validations) +
                             getAfterMessageInput(block.content.afterMessage) +
-                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
+                            getSubmitElement(true, block.isSkippable, 'BLOCK_ID_HEADER');
 
                     }
 
@@ -1598,14 +1593,13 @@
                         content = getQuestionElement() +
                             getAddAnswerButton() +
                             getAnswersElement(block_template.actions, block.content.answers) +
-                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
+                            getSubmitElement(true, block.isSkippable, 'BLOCK_ID_HEADER');
                     }
 
                     templateHTML = templateHTML.replace('BLOCK_CONTENT', content);
 
                     return templateHTML;
                 }
-
                 blockHTML = getTemplate(block_template, block);
                 return blockHTML = getBlockContent(blockHTML, block)
                 // generate block then feed it
@@ -1769,6 +1763,7 @@
                         templateHTML = getTopSolutionsElement() + getAfterMessageInput() +
                             getActionElement(block_template.actions) +
                             getSubmitElement(true, false, 'BLOCK_ID_HEADER');
+                        templateHTML.replaceAll("skippable", "\" hidden \"");
 
                     }
 

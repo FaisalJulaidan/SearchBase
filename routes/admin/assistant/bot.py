@@ -44,10 +44,6 @@ def bot(assistantID):
         assistant: Assistant = callback.Data
         # Get bot data (Blocks, Assistant...)
         data: dict = bot_services.getBot(assistant)
-        data = {"data" : data}
-        labels : Callback = blockLabels_services.getByCompanyID(session.get('CompanyID', 0))
-        if labels.Success: data["labels"] = admin_services.convertForJinja(labels.Data, BlockLabel)
-        else: data["labels"] = []
 
         return helpers.jsonResponse(True, 200, "No Message", data)
 
@@ -68,6 +64,19 @@ def bot(assistantID):
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
+
+@bot_router.route("/admin/labels/get", methods=['GET'])
+def get_labels():
+    if request.method == "GET":
+
+        labels_callback : Callback = blockLabels_services.getByCompanyID(session.get('CompanyID', 0))
+        if labels_callback.Success: 
+            labels_callback : Callback = admin_services.convertForJinja(labels_callback.Data, BlockLabel)
+            if labels_callback.Success: 
+                return helpers.jsonResponse(True, 200, labels_callback.Message, labels_callback.Data)
+
+        labels = []
+        return helpers.jsonResponse(True, 200, labels_callback.Message, labels)
 
 # @bot_router.route("/test/block/<int:blockID>", methods=['DELETE'])
 @bot_router.route("/admin/assistant/bot/block/<int:blockID>", methods=['DELETE'])

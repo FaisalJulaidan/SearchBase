@@ -271,10 +271,74 @@
         return entityMap[s];
       });
     }
+    
+    var accountLabels = [];
 
+    function getLabels() {
+        $.ajax({
+            method: 'GET',
+            url: '/admin/labels/get',
+            contentType: "application/json",
+            success: function (res) {
+                res = JSON.parse(res);
+                //swal('Succes', res.msg, 'success');
+                accountLabels = res.data;
 
+            }, error: function (request, status, error) {
+                swal('Error', "Labels could not be retrieved at this time", 'error')
+            }
+        });
+    }
 
+    getLabels();
 
+    var blockLabels = [];
+
+    function editLabel(labelID, blockID) {
+        let label = undefined;
+
+        for (var i; i < accountLabels.length; i++) {
+            if (accountLabels[i]['ID'] == labelID) {
+                label = accountLabels[i]
+            }
+        }
+
+        if (blockID in blockLabels) {
+            if (blockLabels[blockID].includes(labelID)) {
+                for (var i; i < blockLabels[blockID]; i++) {
+                    if (blockLabels[blockID] == labelID) {
+                        blockLabels[blockID].splice(i, 1);
+                        console.log(blockLabels);
+                    }
+                }
+            } else {
+                blockLabels[blockID].push(labelID);
+            }
+        } else {
+            blockLabels[blockID] = [labelID];
+        }
+    }
+
+    function getBlockLabels(labelIDs) {
+        let labelArray = [];
+        
+        for (var i; i < labelIDs.length; i++) {
+            for (var c; c < accountLabels.length; c++) {
+                if (accountLabels[c]['ID'] == labelIDs[i]) {
+                    labelArray.push(accountLabels[c])
+                }
+            }
+        }
+        return labelArray;
+    }
+
+    function labelsArrayToString(labelArray) {
+        let string = "";
+        for (var i; i < labelArray.length; i++) {
+            string += "<span class='label " + labelArray[i]['Colour'] +"'>"+labelArray[i]['Text']+"</span>";
+        }
+        return string;
+    }
 
     var blocksNumber = 0;
     window.onload = function () {
@@ -566,6 +630,8 @@
                                                         answers: []
                                                     },
                                                     storeInDB: true,
+                                                    isSkippable: false,
+                                                    labels: [],
                                                     type: blockType,
                                                 },
                                                 botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
@@ -579,6 +645,8 @@
                                                         validation: ""
                                                     },
                                                     storeInDB: true,
+                                                    isSkippable: false,
+                                                    labels: [],
                                                     type: blockType,
                                                 },
                                                 botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
@@ -592,6 +660,8 @@
                                                         fileTypes: []
                                                     },
                                                     storeInDB: true,
+                                                    isSkippable: false,
+                                                    labels: [],
                                                     type: blockType,
                                                 },
                                                 botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
@@ -604,6 +674,7 @@
                                                         showTop: 1,
                                                     },
                                                     storeInDB: true,
+                                                    labels: [],
                                                     type: blockType,
                                                 },
                                                 botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
@@ -835,7 +906,7 @@
         function saveBlocks() {
             // collect all data in its json form
             class BlockTypeQuestions {
-                constructor(text, answers, storeInDB, isSkippable, type, order, id) {
+                constructor(text, answers, storeInDB, isSkippable, type, order, labels, id) {
                     this.Question = {
                         content: {
                             text: text,
@@ -845,13 +916,14 @@
                         isSkippable: isSkippable,
                         type: type,
                         order: order,
+                        labels: labels,
                         id: id
                     }
                 }
             }
 
             class BlockTypeUserInput {
-                constructor(text, action, validation, blockToGoID, storeInDB, isSkippable, type, order, id, afterMessage = "") {
+                constructor(text, action, validation, blockToGoID, storeInDB, isSkippable, type, order, labels, id, afterMessage = "") {
                     this.UserInput = {
                         content: {
                             action: action ? action : 'Go To Next Block',
@@ -865,13 +937,14 @@
                         isSkippable: isSkippable,
                         type: type,
                         order: order,
+                        labels: labels,
                         id: id
                     }
                 }
             }
 
             class BlockTypeFileUpload {
-                constructor(text, action, fileTypes, blockToGoID, storeInDB, isSkippable, type, order, id, afterMessage = "") {
+                constructor(text, action, fileTypes, blockToGoID, storeInDB, isSkippable, type, order, labels, id, afterMessage = "") {
                     this.FileUpload = {
                         content: {
                             action: action ? action : 'Go To Next Block',
@@ -884,13 +957,14 @@
                         isSkippable: isSkippable,
                         type: type,
                         order: order,
+                        labels: labels,
                         id: id
                     }
                 }
             }
 
             class BlockTypeSolutions {
-                constructor(showTop, storeInDB, isSkippable, type, order, id, action, blockToGoID, afterMessage = "") {
+                constructor(showTop, storeInDB, isSkippable, type, order, labels, id, action, blockToGoID, afterMessage = "") {
                     this.Solutions = {
                         content: {
                             showTop: showTop,
@@ -902,6 +976,7 @@
                         isSkippable: isSkippable,
                         type: type,
                         order: order,
+                        labels: labels,
                         id: id
                     }
                 }
@@ -1520,6 +1595,8 @@
                     template = template.replaceAll('BLOCK_ID_HEADER', block.order);
                     template = template.replaceAll('BLOCK_ID', block.id);
                     template = template.replace('BLOCK_TYPE', block.type);
+                    console.log("block: ", block)
+                    template = template.replaceAll('BLOCK_LABELS', labelsArrayToString(getBlockLabels(block.labels)));
 
 
                     if (block.type === 'Solutions') {
@@ -1651,11 +1728,12 @@
                         " </div>\n"
                 }
 
-                function getBlockLabelElement(){
-                  return "" +
+                function getBlockLabelElement() {
+                    let stringReturn = "" +
                         "<div class=\"input-group col-md-6\">\n" +
-                              "" +
+                        "<label>Labels: </label><div id='labelPasteDivBLOCK_ID_HEADER'>BLOCK_LABELS</div>" +
                         "</div><!-- /input-group -->\n"
+                    return stringReturn
                 }
 
                 function getActionElement(actions) {
@@ -1779,9 +1857,9 @@
 
                 function getTemplate(block_template) {
                     templateHTML = "";
-
+                    console.log(block_template)
                     if (block_template.name == "Solutions") {
-                        templateHTML = getTopSolutionsElement() +  getBlockLabelElement() + getAfterMessageInput() +
+                        templateHTML = getBlockLabelElement() + getTopSolutionsElement() +  getAfterMessageInput() +
                             getActionElement(block_template.actions) +
                             getSubmitElement(true, false, 'BLOCK_ID_HEADER');
                         templateHTML.replaceAll("skippable", "\" hidden \"");
@@ -1789,7 +1867,7 @@
                     }
 
                     if (block_template.name == "File Upload") {
-                        templateHTML = getQuestionElement() + getBlockLabelElement() +
+                        templateHTML = getBlockLabelElement() + getQuestionElement() + 
                             getFileUpload(block_template.typesAllowed, block_template.fileMaxSize) +
                             getActionElement(block_template.actions) +
                             getAfterMessageInput() +
@@ -1798,7 +1876,7 @@
 
 
                     if (block_template.name == "User Input") {
-                        templateHTML = getQuestionElement() + getBlockLabelElement() +
+                        templateHTML = getBlockLabelElement() + getQuestionElement() + 
                             getActionElement(block_template.actions) +
                             getValidationElement(block_template.validations) +
                             getAfterMessageInput() +
@@ -1807,7 +1885,7 @@
                     }
 
                     if (block_template.name == "Question") {
-                        templateHTML = getQuestionElement() + getBlockLabelElement() +
+                        templateHTML = getBlockLabelElement() + getQuestionElement() + 
                             getAddAnswerButton() +
                             getAnswersElement(block_template.actions) +
                             getSubmitElement(false, false, 'BLOCK_ID_HEADER');

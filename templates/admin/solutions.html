@@ -258,7 +258,7 @@ function deleteSolution(solId) {
                 type: "DELETE"
             }).done(function (res) {
                 console.log(res);
-                swal("Success!", "User has been successfully deleted.", "success").then((value) => {
+                swal("Success!", "Solution has been successfully deleted.", "success").then((value) => {
                 document.location.reload()
                 });
             }).fail(function (res) {

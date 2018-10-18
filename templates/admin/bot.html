@@ -225,7 +225,7 @@
 
             <div class="pull-right">
                 <div id="label-div">
-                    <a href="/admin/question-labels" class="btn btn-primary" style="background-color:#32b0e8;border-color:#1481b1">Labels</a>
+                    <a href="/admin/block-labels" class="btn btn-primary" style="background-color:#32b0e8;border-color:#1481b1">Labels</a>
                 </div>
             </div>
 
@@ -1651,6 +1651,13 @@
                         " </div>\n"
                 }
 
+                function getBlockLabelElement(){
+                  return "" +
+                        "<div class=\"input-group col-md-6\">\n" +
+                              "" +
+                        "</div><!-- /input-group -->\n"
+                }
+
                 function getActionElement(actions) {
                     return "" +
                         "<div class=\"input-group col-md-6\">\n" +
@@ -1774,7 +1781,7 @@
                     templateHTML = "";
 
                     if (block_template.name == "Solutions") {
-                        templateHTML = getTopSolutionsElement() + getAfterMessageInput() +
+                        templateHTML = getTopSolutionsElement() +  getBlockLabelElement() + getAfterMessageInput() +
                             getActionElement(block_template.actions) +
                             getSubmitElement(true, false, 'BLOCK_ID_HEADER');
                         templateHTML.replaceAll("skippable", "\" hidden \"");
@@ -1782,7 +1789,7 @@
                     }
 
                     if (block_template.name == "File Upload") {
-                        templateHTML = getQuestionElement() +
+                        templateHTML = getQuestionElement() + getBlockLabelElement() +
                             getFileUpload(block_template.typesAllowed, block_template.fileMaxSize) +
                             getActionElement(block_template.actions) +
                             getAfterMessageInput() +
@@ -1791,7 +1798,7 @@
 
 
                     if (block_template.name == "User Input") {
-                        templateHTML = getQuestionElement() +
+                        templateHTML = getQuestionElement() + getBlockLabelElement() +
                             getActionElement(block_template.actions) +
                             getValidationElement(block_template.validations) +
                             getAfterMessageInput() +
@@ -1800,7 +1807,7 @@
                     }
 
                     if (block_template.name == "Question") {
-                        templateHTML = getQuestionElement() +
+                        templateHTML = getQuestionElement() + getBlockLabelElement() +
                             getAddAnswerButton() +
                             getAnswersElement(block_template.actions) +
                             getSubmitElement(false, false, 'BLOCK_ID_HEADER');
@@ -1809,7 +1816,7 @@
                     }
                     return templateHTML;
                 }
-                
+
                 return getTemplate(block_template, block);
             }
 

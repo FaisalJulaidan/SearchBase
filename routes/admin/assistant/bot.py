@@ -1,5 +1,5 @@
 from flask import Blueprint, request, session
-from services import admin_services, assistant_services, bot_services, user_services, questionLabels_services
+from services import admin_services, assistant_services, bot_services, user_services, blockLabels_services
 from models import Callback, Assistant, User, BlockLabel
 from utilities import helpers
 
@@ -44,6 +44,11 @@ def bot(assistantID):
         assistant: Assistant = callback.Data
         # Get bot data (Blocks, Assistant...)
         data: dict = bot_services.getBot(assistant)
+        data = {"data" : data}
+        labels : Callback = blockLabels_services.getByCompanyID(session.get('CompanyID', 0))
+        if labels.Success: data["labels"] = admin_services.convertForJinja(labels.Data, BlockLabel)
+        else: data["labels"] = []
+
         return helpers.jsonResponse(True, 200, "No Message", data)
 
     # Add a block
@@ -92,13 +97,52 @@ def get_botFeatures():
         return helpers.jsonResponse(True, 200, "These are the options the bot provide.", bot_services.getOptions())
 
 
-@bot_router.route("/admin/question-labels", methods=['GET', 'POST'])
+@bot_router.route("/admin/block-labels", methods=['GET', 'POST'])
 def question_labels():
     if request.method == "GET":
-        labels : Callback = questionLabels_services.getByCompanyID(session.get('CompanyID', 0))
+        labels : Callback = blockLabels_services.getByCompanyID(session.get('CompanyID', 0))
         if not labels.Success:
             return admin_services.render('admin/block-labels.html')
 
         labels = admin_services.convertForJinja(labels.Data, BlockLabel)
 
         return admin_services.render('admin/block-labels.html', data=labels.Data)
+
+@bot_router.route("/admin/block-labels/add", methods=['POST'])
+def question_labels_add():
+    if request.method == "POST":
+
+        labelText = request.form.get("text", default='').strip()
+        labelColour = request.form.get("colour", default='').strip()
+
+        if not labelText or not labelColour:
+            return helpers.jsonResponse(False, 400, "Could not retrieve all inputs.")
+
+        addLabel_callback : Callback = blockLabels_services.addLabel(labelText, labelColour, session.get('CompanyID', 0))
+        if not addLabel_callback.Success:
+            return helpers.jsonResponse(False, 400, addLabel_callback.Message, None)
+
+        return helpers.jsonResponse(True, 200, "Label successfully added.")
+
+@bot_router.route("/admin/block-labels/edit", methods=['POST'])
+def question_labels_edit():
+    if request.method == "POST":
+
+        labelText = request.form.get("text", default=None).strip()
+        labelColour = request.form.get("colour", default=None).strip()
+
+        addLabel_callback : Callback = blockLabels_services.addLabel(labelText, labelColour, session.get('CompanyID', 0))
+        if not addLabel_callback.Success:
+            return helpers.jsonResponse(False, 400, addLabel_callback.Message)
+
+        return helpers.jsonResponse(True, 200, "Label successfully added.")
+
+@bot_router.route("/admin/block-labels/delete/<labID>", methods=['DELETE'])
+def question_labels_delete(labID):
+    if request.method == "DELETE":
+
+        deleteLabel_callback : Callback = blockLabels_services.deleteByID(int(labID))
+        if not deleteLabel_callback.Success:
+            return helpers.jsonResponse(False, 400, deleteLabel_callback.Message)
+
+        return helpers.jsonResponse(True, 200, "Label successfully deleted.")

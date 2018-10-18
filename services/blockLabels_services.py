@@ -26,7 +26,7 @@ def addLabel(text, colour, companyID):
         db.session.rollback()
         return Callback(False, 'Failed to create the label')
 
-def deleteLabelByID(id):
+def deleteByID(id):
     try:
         db.session.query(BlockLabel).filter(BlockLabel.ID == id).delete()
         db.session.commit()
@@ -37,7 +37,7 @@ def deleteLabelByID(id):
         db.session.rollback()
         return Callback(False, 'Error in deleting label.')
 
-def deleteLabelByCompanyID(companyID):
+def deleteAllByCompanyID(companyID):
     try:
         db.session.query(BlockLabel).filter(BlockLabel.CompanyID == companyID).delete()
         db.session.commit()

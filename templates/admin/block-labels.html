@@ -12,19 +12,19 @@
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="x_panel" style="height:600px;">
                 <div class="pull-left">
-                    <button class="btn btn-primary">Add Label</button>
+                    <button type="button" class="btn btn-success" id="addRow" value="Send" onclick="fillLabelForm(0, edit=false)">Add Label</button>
                 </div>
 
-                <table>
+                <table id="labelsTable">
                     {%if data%}
                     <tr>
-                        <th>Name</th>
-                        <th>Colour</th>
+                        <th>Label</th>
+                        <th>Action</th>
                     </tr>
                     {%for record in data%}
-                    <tr>
-                        <td>{{record['Text']}}</td>
-                        <td>{{record['Colour']}}</td>
+                    <tr data-rowid="{{record['ID']}}">
+                        <td data-type="label"><span class="label {{record['Colour']}}">{{record['Text']}}</span></td>
+                        <td><button disabled onclick="fillLabelForm('{{record['ID']}}', true)">Edit</button><button onclick="deleteLabel({{record['ID']}})">Delete</button>
                     </tr>
                     {%endfor%}
                     {%endif%}
@@ -35,10 +35,155 @@
     <!-- /top tiles -->
     <br />
 </div>
+
+<!-- Label Modal -->
+         <div class="modal fade" id="labelModal" tabindex="-1" role="dialog" aria-labelledby="labelModalCenterTitle" aria-hidden="true">
+           <div class="modal-dialog modal-dialog-centered" role="document">
+             <div class="modal-content">
+
+               <div class="modal-header">
+                 <h3 class="modal-title" id="labelModalLongTitle">Label Information</h3>
+                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                   <span aria-hidden="true">&times;</span>
+                 </button>
+               </div>
+
+               <form id="labelForm">
+
+                   <div class="modal-body">
+
+                             <div class="form-group">
+                               <label for="text">Label Name</label>
+                               <input  type="text" class="form-control" name="text" placeholder="Name">
+                             </div>
+
+                             <div class="form-group">
+                               <label for="colour">Colour</label>
+                               <select name="colour" class="form-control">
+                                 <option value="label-default">Grey</option>
+                                 <option value="label-primary">Blue</option>
+                                 <option value="label-success">Green</option>
+                                 <option value="label-info">Light Blue</option>
+                                 <option value="label-warning">Orange</option>
+                                 <option value="label-danger">Red</option>
+                               </select>
+                             </div>
+
+                   </div>
+
+                   <div class="modal-footer">
+                      <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-success">Submit</button>
+                   </div>
+             </form>
+
+             </div>
+           </div>
+         </div>
+<!-- Label Modal END -->
+
 {% endblock %}
 
 {% block customJS %}
 <script>
-    console.log("{{data}}");
+
+// Once the modal is closed, unbind all onSubmit handlers from the userForm
+$(document).on('hide.bs.modal', '#labelModal', function (e) {
+    console.log('Unbind submit event.');
+    $(document).off('submit', '#labelForm');
+});
+
+function fillLabelForm(labID, edit=false){
+    var $form = $('form#labelForm');
+    var $row = $('#labelsTable tr[data-rowid=' + labID + ']');
+    console.log("row", $row);
+
+    $('#labelModal').modal('show');
+
+
+    if(edit){
+        // fill current user
+        console.log("row: ", $row.find('td[data-type="label"]').text());
+        $form.find('input[name="text"]').val($row.find('td[data-type="label"]').text());
+        $form.find('input[name="colour"]').val($row.find('td[data-type="colour"]').text());
+    } else {
+        $form.trigger("reset");
+    }
+
+    // Bind the appropriate handlers depends on edit value
+    $(document).on('submit', '#labelForm', function (e) {
+    e.preventDefault();
+    if (edit){submitEditLabelForm(this,labID=labID, event=e)}
+    else {submitNewLabelForm(this, event=e)}
+    })
+
+}
+
+function deleteLabel(labID) {
+    console.log('DELETE Label.');
+    swal({
+          title: "Are you sure?",
+          text: "Label will be completely removed from the system",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            $.ajax({
+                url: '/admin/block-labels/delete/' + labID,
+                type: "DELETE"
+            }).done(function (res) {
+                console.log(res);
+                swal("Success!", "Label has been successfully deleted.", "success").then((value) => {
+                document.location.reload()
+                });
+            }).fail(function (res) {
+                let resJson = JSON.parse(res.responseText);
+                swal("Error!", resJson.msg, "error").then((value) => {
+                });
+            });
+
+          } else {
+            // When clicking the cancel button in the alert box
+          }
+        });
+ }
+
+function submitNewLabelForm(form, event) {
+    console.log('EDIT Label.');
+     $.ajax({
+        url: '/admin/block-labels/add',
+        type: "POST",
+        data: $('#labelForm').serialize()
+    }).done(function (res) {
+        console.log(res);
+        swal("Success!", "Label has been successfully added.", "success").then((value) => {
+          document.location.reload()
+        })
+    }).fail(function (res) {
+        let resJson = JSON.parse(res.responseText);
+        swal("Error!", resJson.msg, "error").then((value) => {
+        });
+    });
+}
+
+function submitEditLabelForm(form,labID, event) {
+    console.log('EDIT Label.');
+     $.ajax({
+        url: '/admin/solution/' + labID,
+        type: "PUT",
+        data: $('#labelForm').serialize()
+    }).done(function (res) {
+        console.log(res);
+        swal("Success!", "Label has been successfully updated.", "success").then((value) => {
+          document.location.reload()
+        })
+    }).fail(function (res) {
+        let resJson = JSON.parse(res.responseText);
+        swal("Error!", resJson.msg, "error").then((value) => {
+        });
+    });
+}
 </script>
 {% endblock %}

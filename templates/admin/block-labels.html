@@ -32,7 +32,7 @@ i{
                     </tr>
                     {%for record in data%}
                     <tr data-rowid="{{record['ID']}}">
-                        <td class="hi" data-type="label"><span class="label {{record['Colour']}}">{{record['Text']}}</center></td>
+                        <td class="hi" data-type="label"><span class="label{{record['Colour']}}">{{record['Text']}}</span></td>
                         <td><center><i onclick="fillLabelForm('{{record['ID']}}', true)" class="fa fa-edit"></i><i onclick="deleteLabel({{record['ID']}})" class="fa fa-trash"></i></center></td>
                     </tr>
                     {%endfor%}

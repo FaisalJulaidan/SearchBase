@@ -330,19 +330,51 @@
 
     var blockLabels = [];
 
+
+    function toggleLabel(div, labelID, blockID) {
+        let checkEle = $(div).children('.fa-check');
+      
+        if(checkEle.css("display") === "none"){
+            checkEle.css("display", "inline-block");
+        } else {
+            checkEle.css("display", "none");
+        }
+
+        editLabel(labelID, blockID)
+    }
+
+
     function populateLabels(blockID){
         let labelArray = getLabelsFromBlockLabels(blockID);
         let string = "";
+        let hideCheck = "none";
         for (var i=0; i < accountLabels.length; i++) {
             for(var c=0; c < labelArray.length; c++){
                 if(accountLabels[i]['ID'] == labelArray[c]){
-                    //mark the span as clicked
+                    hideCheck = "inline-block";
                 }
             }
-            string += "<div class=\"editLabelContainer\" onclick='editLabel("+accountLabels[i]['ID']+","+blockID+")'><span class='label " + accountLabels[i]['Colour'] +"'>"+accountLabels[i]['Text']+"</span></div>";
+            string += "<div class=\"editLabelContainer\" onclick='toggleLabel(this, "+accountLabels[i]['ID']+","+blockID+" )'><span class='label " + accountLabels[i]['Colour'] +"'>"+accountLabels[i]['Text']+"</span><i style=\"display:"+hideCheck+"\" class=\"fa fa-check\"></i></div>";
         }
         $("#labelPickerDiv").empty();
         $("#labelPickerDiv").append(string);
+    }
+
+     function editLabel(labelID, blockID) {
+        if (blockID in blockLabels) {
+            if (blockLabels[blockID].includes(labelID)) {
+                for (var i=0; i < blockLabels[blockID].length; i++) {
+                    if (blockLabels[blockID][i] == labelID) {
+                        blockLabels[blockID].splice(i, 1);
+                    }
+                }
+            } else {
+                blockLabels[blockID].push(labelID);
+            }
+        } else {
+            blockLabels[blockID] = [labelID];
+        }
+        updateLabelsForBlock(blockID);
     }
 
     function fillLabelForm(blockID){
@@ -358,6 +390,7 @@
         });
 
     }
+
 
     function openLabelPicker(blockID){
         fillLabelForm(blockID);
@@ -375,22 +408,7 @@
         }
     }
 
-    function editLabel(labelID, blockID) {
-        if (blockID in blockLabels) {
-            if (blockLabels[blockID].includes(labelID)) {
-                for (var i=0; i < blockLabels[blockID].length; i++) {
-                    if (blockLabels[blockID][i] == labelID) {
-                        blockLabels[blockID].splice(i, 1);
-                    }
-                }
-            } else {
-                blockLabels[blockID].push(labelID);
-            }
-        } else {
-            blockLabels[blockID] = [labelID];
-        }
-        updateLabelsForBlock(blockID);
-    }
+
 
     function clearLabelsForBlock(blockID){
         try{
@@ -430,6 +448,7 @@
             returnString += labelArray[i].toString() + ",";
         }
         returnString = returnString.slice(0, -1);
+        console.log(returnString)
         return returnString;
     }
 

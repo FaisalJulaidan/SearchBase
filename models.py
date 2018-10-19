@@ -387,7 +387,7 @@ class BlockAction(enum.Enum):
     EndChat = 'End Chat'
 
 
-# An association table to add a many to many relationship between Blocks & BlockLabels
+# # An association table to add a many to many relationship between Blocks & BlockLabels
 # BlocksLabels = db.Table('BlocksLabels', db.Base.metadata,
 #     db.Column('BlockID', db.Integer, ForeignKey('Block.id')),
 #     db.Column('LabelID', db.Integer, ForeignKey('BlockLabel.id'))
@@ -409,7 +409,6 @@ class Block(db.Model):
     Assistant = db.relationship('Assistant', back_populates='Blocks')
 
     # Labels = db.relationship('BlockLabel', back_populates='Blocks', secondary=BlocksLabels)
-
 
     # Constraints:
     # __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)

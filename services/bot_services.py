@@ -27,7 +27,7 @@ def genBotViaTemplateUplaod(assistant: Assistant, data: dict):
         counter = 1
         for block in data.get('bot')['blocks']:
             db.session.add(Block(Type=BlockType(block['type']), Order=counter, Content=block['content'],
-                         StoreInDB=block['storeInDB'], Assistant=assistant))
+                         StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Assistant=assistant))
             counter += 1
         # Save
         db.session.commit()
@@ -69,7 +69,7 @@ def genBotViaTemplate(assistant: Assistant, tempName: str):
         counter = 1
         for block in data.get('bot')['blocks']:
             db.session.add(Block(Type=BlockType(block['type']), Order=counter, Content=block['content'],
-                         StoreInDB=block['storeInDB'], Assistant=assistant))
+                         StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Assistant=assistant))
             counter += 1
         # Save
         db.session.commit()
@@ -104,7 +104,7 @@ def getBlocks(assistant: Assistant) -> List[dict]:
         blocks = []
         for block in result:
             blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,
-                           'content': block.Content, 'storeInDB': block.StoreInDB})
+                           'content': block.Content, 'storeInDB': block.StoreInDB, 'labels': block.Labels, 'isSkippable': block.Skippable})
         return blocks
     except Exception as e:
         print("getBlocks ERROR:", e)
@@ -146,8 +146,9 @@ def addBlock(data: dict, assistant: Assistant) -> Callback:
         # Validate submitted block data
         json_utils.validateSchema(data, 'blocks/newBlock.json')
         block = data.get('block')
+        print(block)
         newBlock = Block(Type=BlockType(block['type']), Order=maxOrder + 1, Content=block['content'],
-                         StoreInDB=block['storeInDB'], Assistant=assistant)
+                         StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Labels=block['labels'], Assistant=assistant)
         db.session.add(newBlock)
 
         db.session.commit()
@@ -156,7 +157,7 @@ def addBlock(data: dict, assistant: Assistant) -> Callback:
                                                                 assistant)})
     except Exception as exc:
         db.session.rollback()
-        print(exc.args[0])
+        print("bot_services.addBlock ERROR: ", exc)
         return Callback(False, 'Error occurred while creating a new Block object', exc.args[0])
 
     # finally:
@@ -191,6 +192,7 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
                 return Callback(False, "the block of id '" + str(order) + "' doesn't exist in the database")
         except Exception as e:
             db.session.rollback()
+            return Callback(False, "Error while dealing with block id '" + str(order) + "'")
         #finally:
         #    db.session.close()
 
@@ -230,7 +232,10 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
             oldBlock.Type = BlockType(block.get('type'))
             oldBlock.Content = block.get('content')
             oldBlock.StoreInDB = block.get('storeInDB')
+            oldBlock.Skippable = block.get('isSkippable')
             oldBlock.Order = block.get('order')
+            oldBlock.Labels = block.get('labels')
+            oldBlock.Labels = block.get('labels')
 
         # Save
         db.session.commit()
@@ -313,5 +318,3 @@ def getOptions() -> dict:
             },
         ]
     }
-
-

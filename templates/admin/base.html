@@ -437,7 +437,7 @@
             if (xhttp.readyState === 4) {
                 if (xhttp.status === 200) {
                     res = JSON.parse(xhttp.responseText)
-                    console.log(res)
+                    //console.log(res)
                     document.getElementById("userWelcomeName").innerHTML = res.name
                     document.getElementById("userDropdownLabel").innerHTML = res.name
                     if (!res.EditChatbots)
@@ -459,7 +459,7 @@
             url: '/admin/userData',
             dataType: "json"
         }).done(function (res) {
-            console.log(res.data);
+            //console.log(res.data);
             sessionStorage.setItem('id', res.data.id);
             sessionStorage.setItem('firstname', res.data.firstname);
             sessionStorage.setItem('surname', res.data.surname);
@@ -467,7 +467,7 @@
             sessionStorage.setItem('stripeID', res.data.stripeID);
             sessionStorage.setItem('subID', res.data.subID);
             sessionStorage.setItem('role', JSON.stringify(res.data.role));
-            console.log(JSON.parse(sessionStorage.getItem('role')));
+            //console.log(JSON.parse(sessionStorage.getItem('role')));
         }).fail(function (err) {
             console.log(err)
         })
@@ -482,7 +482,7 @@
         }
         $(document).click(function(e) {
             if (e.button == 0) {
-                var collection = document.getElementsByTagName("input");
+                var collection = $("input[type=text]");
                 for (var i=0;i<collection.length;i++)
                 {
                   //console.log(hasClass(collection[i], "save")
@@ -493,7 +493,7 @@
             }
         });
         function hasClass(element, className) {
-          console.log(element.className)
+          //console.log(element.className)
             return (' ' + element.className + ' ').indexOf(' ' + className+ ' ') > -1;
         }
     </script>

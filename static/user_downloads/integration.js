@@ -8,12 +8,14 @@ var globalTSB = {
 
 var fullLoad = { "jquery": false, "popupsettings": false, "iframe": false };
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+// function sleep(ms) {
+//     return new Promise(function(resolve) {
+//         return setTimeout(resolve, ms);
+//     });
+// }
 
 
-window.onload = (async function (global) {
+window.onload = (function (global) {
 
     // Add array index of for old browsers (IE<9)
     if (!Array.prototype.indexOf) {
@@ -120,6 +122,13 @@ window.onload = (async function (global) {
     // === ==== ==== ===== ==== ==== ====
 
 
+    script = document.createElement('script');
+    script.type = "text/javascript";
+    script.language = "javascript";
+    script.src = "https://cdn.polyfill.io/v2/polyfill.min.js";
+    document.getElementsByTagName('body')[0].appendChild(script);
+
+
     // Create script tags
     var script = undefined;
     var popOpen = false;
@@ -131,21 +140,22 @@ window.onload = (async function (global) {
         script.src = host + files_path + scriptTags[i];
 
         document.getElementsByTagName('body')[0].appendChild(script);
-        await sleep(100);
+        // sleep(100);
     }
+
 
 
 
     document.getElementById("TSB-iframediv").style.display = "none";
 
     // Open iframe
-    document.getElementById('TSB-chatbot-widget').addEventListener('click', e => {
+    document.getElementById('TSB-chatbot-widget').addEventListener('click', function (e) {
         if (!popOpen) {
             $chatbotWidget = $("#TSB-chatbot-widget");
             $chatbotWidget.animate({
                 height: '0px',
                 opacity: '0',
-            }, 500, () => {
+            }, 500, function () {
                 $("#TSB-chatbot-widget").hide();
             });
 
@@ -162,7 +172,7 @@ window.onload = (async function (global) {
     });
 
 
-    document.getElementById('TSB-closeIframe').addEventListener('click', e => {
+    document.getElementById('TSB-closeIframe').addEventListener('click', function (e) {
         if (popOpen) {
             $chatbotWidget = $("#TSB-chatbot-widget");
             $chatbotWidget.show();
@@ -174,7 +184,7 @@ window.onload = (async function (global) {
             $("#TSB-iframediv").animate({
                 height: '0px',
                 opacity: '0',
-            }, 500, () => {
+            }, 500, function () {
                 $("#TSB-iframediv").hide();
             });
             popOpen = false;
@@ -182,30 +192,25 @@ window.onload = (async function (global) {
     });
 
     // Reset the iframe
-     document.getElementById('TSB-refreshIframe').addEventListener('click', e => {
-          document.getElementById('TSB-chatbotIframe').src = host  + iframe_route + '/' + id;
-    });
+     document.getElementById('TSB-refreshIframe').addEventListener('click', function (e) {
+         document.getElementById('TSB-chatbotIframe').src = host + iframe_route + '/' + id;
+     });
 
      // Popup
      function getPopupSettings(){
-        return new Promise(function(resolve, reject){
-            var xhr = new XMLHttpRequest();
+          var xhr = new XMLHttpRequest();
             xhr.open('GET', host + '/getpopupsettings/' + id);
             xhr.onload = function () {
                 fullLoad["popupsettings"] = true;
                 if (xhr.status === 200) {
                     popupSec = JSON.parse(xhr.responseText).data.SecondsUntilPopUp;
                     topBarText = JSON.parse(xhr.responseText).data.TopBarText;
-                    return resolve(true);
                 }
                 else {
                     console.log(xhr.status);
-                    reject(false);
                 }
             };
             xhr.send();
-        });
-
      }
 
     getPopupSettings();
@@ -217,15 +222,17 @@ window.onload = (async function (global) {
             $("#TSB-container"); //check if jquery has loaded
             fullLoad["jquery"] = true;
         } catch (error) { }
+
         if (fullLoad["jquery"] && fullLoad["popupsettings"]) {
             $("#tsb-bot-header")[0].innerHTML = topBarText;
+
 
             fadein(document.getElementById("TSB-container"));
 
             clearInterval(interval);
-            document.getElementById('TSB-chatbotIframe').src = host + iframe_route + '/' + id;
-
+            
             setTimeout(function () {
+                document.getElementById('TSB-chatbotIframe').src = host + iframe_route + '/' + id;
                 if (!popOpen) {
                     document.getElementById('TSB-chatbot-widget').click();
                 }

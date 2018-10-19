@@ -498,7 +498,6 @@
 
 
                 }).done(function( res ) {
-                   console.log(res);
                    // When successful
                 swal({
                   title: "Successful...",
@@ -1714,9 +1713,10 @@
                     template = template.replaceAll('BLOCK_ID_HEADER', block.order);
                     template = template.replaceAll('BLOCK_ID', block.id);
                     template = template.replace('BLOCK_TYPE', block.type);
-                    let curBlockLabels = parseInt(block.labels.split(","));
+                    let curBlockLabels = block.labels.split(",");
+                    clearLabelsForBlock(block.id);
                     for(var i=0; i<curBlockLabels.length;i++){
-                        editLabel(curBlockLabels[i], block.id);
+                        editLabel(parseInt(curBlockLabels[i]), block.id);
                     }
                     template = template.replaceAll('BLOCK_LABELS', labelsArrayToString(getBlockLabels(getLabelsFromBlockLabels(block.id))));
 

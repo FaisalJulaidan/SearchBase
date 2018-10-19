@@ -1,6 +1,6 @@
 from flask import Blueprint, request, session
-from services import admin_services, assistant_services, bot_services, user_services
-from models import Callback, Assistant, User
+from services import admin_services, assistant_services, bot_services, user_services, blockLabels_services
+from models import Callback, Assistant, User, BlockLabel
 from utilities import helpers
 
 bot_router: Blueprint = Blueprint('bot_router', __name__, template_folder="../../templates")
@@ -44,6 +44,7 @@ def bot(assistantID):
         assistant: Assistant = callback.Data
         # Get bot data (Blocks, Assistant...)
         data: dict = bot_services.getBot(assistant)
+
         return helpers.jsonResponse(True, 200, "No Message", data)
 
     # Add a block
@@ -63,6 +64,21 @@ def bot(assistantID):
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
+
+@bot_router.route("/admin/labels/get", methods=['GET'])
+def get_labels():
+    if request.method == "GET":
+
+        labels_callback : Callback = blockLabels_services.getByCompanyID(session.get('CompanyID', 0))
+        if labels_callback.Success:
+            print(1)
+            labels_callback : Callback = admin_services.convertForJinja(labels_callback.Data, BlockLabel)
+            if labels_callback.Success:
+                print(2)
+                return helpers.jsonResponse(True, 200, labels_callback.Message, labels_callback.Data)
+        print(3)
+        labels = []
+        return helpers.jsonResponse(True, 200, labels_callback.Message, labels)
 
 # @bot_router.route("/test/block/<int:blockID>", methods=['DELETE'])
 @bot_router.route("/admin/assistant/bot/block/<int:blockID>", methods=['DELETE'])
@@ -90,3 +106,54 @@ def delete_block(blockID):
 def get_botFeatures():
     if request.method == "GET":
         return helpers.jsonResponse(True, 200, "These are the options the bot provide.", bot_services.getOptions())
+
+
+@bot_router.route("/admin/block-labels", methods=['GET', 'POST'])
+def question_labels():
+    if request.method == "GET":
+        labels : Callback = blockLabels_services.getByCompanyID(session.get('CompanyID', 0))
+        if not labels.Success:
+            return admin_services.render('admin/block-labels.html')
+
+        labels = admin_services.convertForJinja(labels.Data, BlockLabel)
+
+        return admin_services.render('admin/block-labels.html', data=labels.Data)
+
+@bot_router.route("/admin/block-labels/add", methods=['POST'])
+def question_labels_add():
+    if request.method == "POST":
+
+        labelText = request.form.get("text", default='').strip()
+        labelColour = request.form.get("colour", default='').strip()
+
+        if not labelText or not labelColour:
+            return helpers.jsonResponse(False, 400, "Could not retrieve all inputs.")
+
+        addLabel_callback : Callback = blockLabels_services.addLabel(labelText, labelColour, session.get('CompanyID', 0))
+        if not addLabel_callback.Success:
+            return helpers.jsonResponse(False, 400, addLabel_callback.Message, None)
+
+        return helpers.jsonResponse(True, 200, "Label successfully added.")
+
+@bot_router.route("/admin/block-labels/edit/<labelID>", methods=['POST'])
+def question_labels_edit(labelID):
+    if request.method == "POST":
+
+        labelText = request.form.get("text", default=None).strip()
+        labelColour = request.form.get("colour", default=None).strip()
+
+        editLabel_callback : Callback = blockLabels_services.editLabelByID(labelID, labelText, labelColour)
+        if not editLabel_callback.Success:
+            return helpers.jsonResponse(False, 400, editLabel_callback.Message)
+
+        return helpers.jsonResponse(True, 200, editLabel_callback.Message)
+
+@bot_router.route("/admin/block-labels/delete/<labID>", methods=['DELETE'])
+def question_labels_delete(labID):
+    if request.method == "DELETE":
+
+        deleteLabel_callback : Callback = blockLabels_services.deleteByID(int(labID))
+        if not deleteLabel_callback.Success:
+            return helpers.jsonResponse(False, 400, deleteLabel_callback.Message)
+
+        return helpers.jsonResponse(True, 200, "Label successfully deleted.")

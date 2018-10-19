@@ -917,6 +917,7 @@
                     } else {
                         sendAssistantMessage("We apologise, your input couldn't be processed. Please contact us.");
                     }
+                    SetRepeat();
                 });
 
                 // End chat
@@ -949,7 +950,7 @@
 
         function SetRepeat() {
             $("#optionsDiv").append("");
-            newMessage(BOT_USER, "<div class='endChat' onclick=\"Reset()\"><a class='' style='width:400px;'>Search Again <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> </a></div>", true);
+            newMessage(BOT_USER, "<div class='endChat' onclick=\"Reset()\"><a class='' style='width:400px;'>Start Again <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> </a></div>", true);
             //checkOutsideElements();
         }
 

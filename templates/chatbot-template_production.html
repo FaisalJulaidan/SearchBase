@@ -535,7 +535,11 @@
         }
 
         function skipBlock() {
-            getNextBlock("Go To Next Block");
+            if(currentBlock.content.action){
+                getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
+            } else {
+                getNextBlock("Go To Next Block");
+            }
         }
 
         function renderFileUpload(block) {
@@ -740,8 +744,9 @@
                 if (message == "")
                     message = document.getElementById("textMessage").value;
 
-                if (message == "" || message.replace(/ /g, "") == "")
+                if (message == "" || message.replace(/ /g, "") == ""){
                     return 0;
+                }
             }
 
             chatInputDiv.style = "display:none";
@@ -750,6 +755,10 @@
             $("#presetAnswers").first().html('');
 
             if (message.toLowerCase() === "skip" && currentBlock.isSkippable) {
+                console.log("currentBlock: ", currentBlock);
+                console.log("currentBlock.isSkippable: ", currentBlock.isSkippable);
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+                $('#textMessage').val("");
                 skipBlock();
                 return 0;
             }

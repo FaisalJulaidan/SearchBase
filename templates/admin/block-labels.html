@@ -32,7 +32,7 @@ i{
                     </tr>
                     {%for record in data%}
                     <tr data-rowid="{{record['ID']}}">
-                        <td class="hi" data-type="label"><span class="label{{record['Colour']}}">{{record['Text']}}</span></td>
+                        <td class="hi" data-type="label"><span class="label {{record['Colour']}}">{{record['Text']}}</span></td>
                         <td><center><i onclick="fillLabelForm('{{record['ID']}}', true)" class="fa fa-edit"></i><i onclick="deleteLabel({{record['ID']}})" class="fa fa-trash"></i></center></td>
                     </tr>
                     {%endfor%}
@@ -99,22 +99,18 @@ i{
 
 // Once the modal is closed, unbind all onSubmit handlers from the userForm
 $(document).on('hide.bs.modal', '#labelModal', function (e) {
-    console.log('Unbind submit event.');
     $(document).off('submit', '#labelForm');
 });
 
 function fillLabelForm(labID, edit=false){
     var $form = $('form#labelForm');
     var $row = $('#tableSort tr[data-rowid=' + labID + ']');
-    console.log(labID, "   ", edit);
 
     $('#labelModal').modal('show');
 
 
     if(edit){
         // fill current user
-        console.log("row: ", $row.find('td[data-type="label"] span'));
-        console.log("row: ", $row.find('td[data-type="label"] span')[0].getAttribute('class').split("label ")[1]);
         $form.find('input[name="text"]').val($row.find('td[data-type="label"]').text());
         $('.form-group select option[value="'+$row.find('td[data-type="label"] span')[0].getAttribute('class').split("label ")[1]+'"]').attr('selected', 'selected');
         //$form.find('input[name="colour"]').val();
@@ -132,7 +128,6 @@ function fillLabelForm(labID, edit=false){
 }
 
 function deleteLabel(labID) {
-    console.log('DELETE Label.');
     swal({
           title: "Are you sure?",
           text: "Label will be completely removed from the system",
@@ -163,7 +158,6 @@ function deleteLabel(labID) {
  }
 
 function submitNewLabelForm(form, event) {
-    console.log('EDIT Label.');
      $.ajax({
         url: '/admin/block-labels/add',
         type: "POST",
@@ -181,7 +175,6 @@ function submitNewLabelForm(form, event) {
 }
 
 function submitEditLabelForm(form,labID, event) {
-    console.log('EDIT Label.');
      $.ajax({
         url: "/admin/block-labels/edit/"+labID,
         type: "POST",

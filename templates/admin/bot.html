@@ -333,7 +333,7 @@
 
     function toggleLabel(div, labelID, blockID) {
         let checkEle = $(div).children('.fa-check');
-      
+
         if(checkEle.css("display") === "none"){
             checkEle.css("display", "inline-block");
         } else {
@@ -349,6 +349,7 @@
         let string = "";
         let hideCheck = "none";
         for (var i=0; i < accountLabels.length; i++) {
+            hideCheck = "none";
             for(var c=0; c < labelArray.length; c++){
                 if(accountLabels[i]['ID'] == labelArray[c]){
                     hideCheck = "inline-block";
@@ -448,7 +449,6 @@
             returnString += labelArray[i].toString() + ",";
         }
         returnString = returnString.slice(0, -1);
-        console.log(returnString)
         return returnString;
     }
 
@@ -1477,10 +1477,9 @@
         }
 
         function render_blocks(blocks) {
-
             blocksNumber = blocks.length;
             function cookUpBlock(block_template, block) {
-
+                //blockLabels = [];
                 function getQuestionElement() {
                     return "<div class=\"input-group col-md-6\">\n" +
                         "         <span class=\"input-group-addon\">Question:</span>\n" +
@@ -1711,11 +1710,11 @@
                     template = template.replaceAll('BLOCK_ID_HEADER', block.order);
                     template = template.replaceAll('BLOCK_ID', block.id);
                     template = template.replace('BLOCK_TYPE', block.type);
-                    let curBlockLabels = block.labels.split(",")
+                    let curBlockLabels = parseInt(block.labels.split(","));
                     for(var i=0; i<curBlockLabels.length;i++){
                         editLabel(curBlockLabels[i], block.id);
                     }
-                    template = template.replaceAll('BLOCK_LABELS', labelsArrayToString(getBlockLabels(curBlockLabels)));
+                    template = template.replaceAll('BLOCK_LABELS', labelsArrayToString(getBlockLabels(getLabelsFromBlockLabels(block.id))));
 
 
                     if (block.type === 'Solutions') {
@@ -1828,6 +1827,7 @@
         function render_blocks_change(block_template, $oldBlock) {
             function cookUpBlock(block_template, block) {
                 // empty the old block text
+                //blockLabels = [];
                 if (block_template.name == "Solutions") {
                     $oldBlock.parent().find('.title').text('Solution Block');
                 } else {

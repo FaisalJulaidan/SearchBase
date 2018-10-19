@@ -215,15 +215,16 @@
                 Remaining Blocks <span>1</span>
             </div>
 
-            <div class="pull-right">
-                <div class="btn-group uplaodBtn">
-                    <a id="uploadAction" class="btn btn-default">Click to Upload External Template (JSON)</a>
-                    <label class="btn btn-primary">
-                        Browse&hellip; <input id="selectTemplateFile" type="file" style="display: none;">
-                    </label>
-
-                </div>
-            </div>
+              {#  Upload JSON file #}
+{#            <div class="pull-right">#}
+{#                <div class="btn-group uplaodBtn">#}
+{#                    <a id="uploadAction" class="btn btn-default">Click to Upload External Template (JSON)</a>#}
+{#                    <label class="btn btn-primary">#}
+{#                        Browse&hellip; <input id="selectTemplateFile" type="file" style="display: none;">#}
+{#                    </label>#}
+{##}
+{#                </div>#}
+{#            </div>#}
 
             <div class="pull-right">
                 <div id="label-div">
@@ -362,7 +363,9 @@
             prev_handler();
 
 
+        {#  Upload JSON file #}
          // Upload template function
+        /*
         document.getElementById('uploadAction').addEventListener('click', () => {
          let files = document.getElementById('selectTemplateFile').files;
          console.log(files);
@@ -421,6 +424,7 @@
           }
         });
     });
+        */
         // End upload template function
 
 

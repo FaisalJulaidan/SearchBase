@@ -387,6 +387,13 @@ class BlockAction(enum.Enum):
     EndChat = 'End Chat'
 
 
+# An association table to add a many to many relationship between Blocks & BlockLabels
+# BlocksLabels = db.Table('BlocksLabels', db.Base.metadata,
+#     db.Column('BlockID', db.Integer, ForeignKey('Block.id')),
+#     db.Column('LabelID', db.Integer, ForeignKey('BlockLabel.id'))
+# )
+
+
 class Block(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
@@ -401,6 +408,9 @@ class Block(db.Model):
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='Blocks')
 
+    # Labels = db.relationship('BlockLabel', back_populates='Blocks', secondary=BlocksLabels)
+
+
     # Constraints:
     # __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)
 
@@ -412,6 +422,9 @@ class BlockLabel(db.Model):
     Text = db.Column(db.String(128), nullable=False)
     Colour = db.Column(db.String(128), nullable=False)
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False,)
+
+    # Relationships:
+    # Blocks = db.relationship('Block', back_populates='Labels', secondary=BlocksLabels)
 
     def __repr__(self):
         return '<BlockLabel {}>'.format(self.Text)

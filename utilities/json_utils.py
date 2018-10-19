@@ -9,6 +9,7 @@ def validateSchema(data, schema_file):
     """ Checks whether the given data matches the schema """
 
     schema = _load_json_schema(schema_file)
+    print("not here")
     return validate(data, schema)
 
 

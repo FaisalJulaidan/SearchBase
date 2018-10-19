@@ -186,8 +186,22 @@
         margin-top:10px;
         margin-right:10px;
     }
-    .labelPasteDiv{
-        margin-left: 27px;
+    .editLabelContainer{
+        height: 38px;
+        padding: 8px 9px;
+        /* margin: 10px 0; */
+        border-radius: 6px;
+    }
+    .editLabelContainer:hover {
+        background-color: #dadada;
+        cursor:pointer;
+    }
+    #labelPickerDiv{
+        max-height: 370px;
+        overflow-y: auto;
+    }
+    .customLabel{
+        margin-right: 5px;
     }
 
 
@@ -242,6 +256,27 @@
     </div>
 </div>
 
+<!-- add label form -->
+<div class="modal fade" id="labelModal" tabindex="-1" role="dialog" aria-labelledby="labelModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="width:200px;margin-top:100px;" role="document">
+    <div class="modal-content">
+
+      <form id="labelForm">
+
+          <div id="labelPickerDiv" class="modal-body">
+
+          </div>
+
+          <div class="modal-footer">
+             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+             <button type="submit" class="btn btn-success">Done</button>
+          </div>
+    </form>
+
+    </div>
+  </div>
+</div>
+
 <!-- Abdullah Hashim did below code to avoid error occured from custom.min.js file -->
 <form id="demo-form2"></form>
 {% endblock %}
@@ -284,9 +319,7 @@
             contentType: "application/json",
             success: function (res) {
                 res = JSON.parse(res);
-                //swal('Succes', res.msg, 'success');
                 accountLabels = res.data;
-
             }, error: function (request, status, error) {
                 swal('Error', "Labels could not be retrieved at this time", 'error')
             }
@@ -297,21 +330,57 @@
 
     var blockLabels = [];
 
-    function editLabel(labelID, blockID) {
-        let label = undefined;
-
-        for (var i; i < accountLabels.length; i++) {
-            if (accountLabels[i]['ID'] == labelID) {
-                label = accountLabels[i]
+    function populateLabels(blockID){
+        let labelArray = getLabelsFromBlockLabels(blockID);
+        let string = "";
+        for (var i=0; i < accountLabels.length; i++) {
+            for(var c=0; c < labelArray.length; c++){
+                if(accountLabels[i]['ID'] == labelArray[c]){
+                    //mark the span as clicked
+                }
             }
+            string += "<div class=\"editLabelContainer\" onclick='editLabel("+accountLabels[i]['ID']+","+blockID+")'><span class='label " + accountLabels[i]['Colour'] +"'>"+accountLabels[i]['Text']+"</span></div>";
         }
+        $("#labelPickerDiv").empty();
+        $("#labelPickerDiv").append(string);
+    }
 
+    function fillLabelForm(blockID){
+        var $form = $('form#labelForm');
+
+        populateLabels(blockID);
+
+        $('#labelModal').modal('show');
+
+        $(document).on('submit', '#labelForm', function (e) {
+            e.preventDefault();
+            $('#labelModal').modal('hide');
+        });
+
+    }
+
+    function openLabelPicker(blockID){
+        fillLabelForm(blockID);
+    }
+
+    function getLabelsFromBlockLabels(blockID){
+        try{
+            if(blockID in blockLabels){
+                return blockLabels[blockID];
+            } else {
+                return [];
+            }
+        } catch {
+            return [];
+        }
+    }
+
+    function editLabel(labelID, blockID) {
         if (blockID in blockLabels) {
             if (blockLabels[blockID].includes(labelID)) {
-                for (var i; i < blockLabels[blockID]; i++) {
-                    if (blockLabels[blockID] == labelID) {
+                for (var i=0; i < blockLabels[blockID].length; i++) {
+                    if (blockLabels[blockID][i] == labelID) {
                         blockLabels[blockID].splice(i, 1);
-                        console.log(blockLabels);
                     }
                 }
             } else {
@@ -320,13 +389,25 @@
         } else {
             blockLabels[blockID] = [labelID];
         }
+        updateLabelsForBlock(blockID);
+    }
+
+    function clearLabelsForBlock(blockID){
+        try{
+            blockLabels[blockID] = [];
+            updateLabelsForBlock(blockID);
+        } catch {}
+    }
+
+    function updateLabelsForBlock(blockID){
+        $("#labelPasteDiv"+blockID).html(labelsArrayToString(getBlockLabels(getLabelsFromBlockLabels(blockID))));
     }
 
     function getBlockLabels(labelIDs) {
         let labelArray = [];
 
-        for (var i; i < labelIDs.length; i++) {
-            for (var c; c < accountLabels.length; c++) {
+        for (var i=0; i < labelIDs.length; i++) {
+            for (var c=0; c < accountLabels.length; c++) {
                 if (accountLabels[c]['ID'] == labelIDs[i]) {
                     labelArray.push(accountLabels[c])
                 }
@@ -337,24 +418,19 @@
 
     function labelsArrayToString(labelArray) {
         let string = "";
-        for (var i; i < labelArray.length; i++) {
-            string += "<span class='label " + labelArray[i]['Colour'] +"'>"+labelArray[i]['Text']+"</span>";
+        for (var i=0; i < labelArray.length; i++) {
+            string += "<span class='label " + labelArray[i]['Colour'] +" customLabel'>"+labelArray[i]['Text']+"</span>";
         }
-        string = string.slice(0, -1);
         return string;
     }
 
     function blockLabelsArrayToSendString(labelArray){
         let returnString = "";
-        for (var i; i < labelArray.length; i++) {
-            string += labelArray[i].toString() + ",";
+        for (var i=0; i < labelArray.length; i++) {
+            returnString += labelArray[i].toString() + ",";
         }
-
-        return string;
-    }
-
-    function openLabelPicker(blockID){
-        console.log(blockID);
+        returnString = returnString.slice(0, -1);
+        return returnString;
     }
 
     var blocksNumber = 0;
@@ -368,7 +444,6 @@
         /*
         document.getElementById('uploadAction').addEventListener('click', () => {
          let files = document.getElementById('selectTemplateFile').files;
-         console.log(files);
          if (files.length <= 0) {
             return false;
          }
@@ -376,7 +451,6 @@
          let fr = new FileReader();
          let formatted = undefined;
          fr.onload = function(e) {
-         console.log(e);
          let result = JSON.parse(e.target.result);
          formatted = JSON.stringify(result);
          };
@@ -589,9 +663,10 @@
             $('.panel-heading li').on('click', (e) => {
                 $target = $(e.target);
                 let isTargetType = $target.parent().parent().parent().children().first().text().includes('Type');
-                let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val();
+                //let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val();
 
-                if (isTargetType && hasData) {
+
+                if (isTargetType) {
                     swal({
                         title: "Are you sure?",
                         text: "Old block will be removed completely from the system",
@@ -852,9 +927,9 @@
             $('.panel-heading li').on('click', (e) => {
                 $target = $(e.target);
                 let isTargetType = $target.parent().parent().parent().children().first().text().includes('Type');
-                let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val()
+                //let hasData = $target.parent().parent().parent().parent().parent().parent().siblings().last().children().first().children().last().val()
 
-                if (isTargetType && hasData) {
+                if (isTargetType) {
                     swal({
                         title: "Are you sure?",
                         text: "Old block will be removed completely from the system",
@@ -926,7 +1001,7 @@
         function saveBlocks() {
             // collect all data in its json form
             class BlockTypeQuestions {
-                constructor(text, answers, storeInDB, isSkippable, type, order, labels, id) {
+                constructor(text, answers, storeInDB, isSkippable, type, order, id, labels) {
                     this.Question = {
                         content: {
                             text: text,
@@ -943,7 +1018,7 @@
             }
 
             class BlockTypeUserInput {
-                constructor(text, action, validation, blockToGoID, storeInDB, isSkippable, type, order, labels, id, afterMessage = "") {
+                constructor(text, action, validation, blockToGoID, storeInDB, isSkippable, type, order, id, labels, afterMessage = "") {
                     this.UserInput = {
                         content: {
                             action: action ? action : 'Go To Next Block',
@@ -964,7 +1039,7 @@
             }
 
             class BlockTypeFileUpload {
-                constructor(text, action, fileTypes, blockToGoID, storeInDB, isSkippable, type, order, labels, id, afterMessage = "") {
+                constructor(text, action, fileTypes, blockToGoID, storeInDB, isSkippable, type, order, id, labels, afterMessage = "") {
                     this.FileUpload = {
                         content: {
                             action: action ? action : 'Go To Next Block',
@@ -984,7 +1059,7 @@
             }
 
             class BlockTypeSolutions {
-                constructor(showTop, storeInDB, isSkippable, type, order, labels, id, action, blockToGoID, afterMessage = "") {
+                constructor(showTop, storeInDB, isSkippable, type, order, id, labels, action, blockToGoID, afterMessage = "") {
                     this.Solutions = {
                         content: {
                             showTop: showTop,
@@ -1007,24 +1082,22 @@
                 botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
                 blocks: []
             };
-
             for (const obj of BlocksOrder) {
                 let $block = obj.block;
                 let order = obj.order;
 
-                let type = $block.children().first().children().last().children().children().val();
+                let type = $block.find(".questionTypeInput")[0].value;
                 if (type == 'Question') {
                     let rowsOfAnswers = $block.children().last().find('div.answers').children();
                     let answersArr = [];
 
                     let id = +$block.attr('id');
+                    let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
                     let isSkippable = document.getElementById('skippable' + order).checked;
 
                     let text = (function () {
                         //debugger
-                        let label = $block.children().last().find('.input-group').children().first().text();
-                        if (label.includes('Question'))
-                            return $block.children().last().find('.input-group').children().first().next().val();
+                        return $block.find(".questionText").val();
                     })();
 
                     let saveInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
@@ -1057,15 +1130,12 @@
                             });
                         }
                     }
-
-                    botData.blocks.push(new BlockTypeQuestions(text, answersArr, saveInDB, isSkippable, type, order, id).Question);
+                    botData.blocks.push(new BlockTypeQuestions(text, answersArr, saveInDB, isSkippable, type, order, id, labels).Question);
                 }
 
                 if (type == 'User Input') {
                     let text = (function () {
-                        let label = $block.children().last().find('.input-group').children().first().text();
-                        if (label.includes('Question'))
-                            return $block.children().last().find('.input-group').children().first().next().val();
+                        return $block.find(".questionText").val();
                     })();
                     let action = $block.children().last().find('input.normalCursor').first().val();
                     let blockToGoID = 0;
@@ -1078,16 +1148,15 @@
                     let afterMessage = $block.children().last().children('.col-md-8').children().last().val();
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let id = +$block.attr('id');
+                    let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
                     let isSkippable = document.getElementById('skippable' + order).checked;
 
-                    botData.blocks.push(new BlockTypeUserInput(text, action, validation, blockToGoID, storeInDB, isSkippable, type, order, id, afterMessage).UserInput);
+                    botData.blocks.push(new BlockTypeUserInput(text, action, validation, blockToGoID, storeInDB, isSkippable, type, order, id, labels, afterMessage).UserInput);
                 }
 
                 if (type == 'File Upload') {
                     let text = (function () {
-                        let label = $block.children().last().find('.input-group').children().first().text();
-                        if (label.includes('Question'))
-                            return $block.children().last().find('.input-group').children().first().next().val();
+                        return $block.find(".questionText").val();
                     })();
                     let action = $block.children().last().find('input.normalCursor').first().val();
 
@@ -1106,9 +1175,10 @@
 
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let id = +$block.attr('id');
+                    let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
                     let isSkippable = document.getElementById('skippable' + order).checked;
 
-                    botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, blockToGoID, storeInDB, isSkippable, type, order, id, afterMessage).FileUpload);
+                    botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, blockToGoID, storeInDB, isSkippable, type, order, id, labels, afterMessage).FileUpload);
                 }
 
                 if (type == 'Solutions') {
@@ -1118,12 +1188,13 @@
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let action = $block.children().last().find('input.action').first().val();
                     let id = +$block.attr('id');
+                    let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
                     let isSkippable = false;
                     let blockToGoID = 0;
                     try { blockToGoID = +$block.children().last().find('.blockToGoID')[0].value; }
                     catch (e) { blockToGoID = 0;}
 
-                    botData.blocks.push(new BlockTypeSolutions(showTop, storeInDB, isSkippable, type, order, id, action, blockToGoID, afterMessage).Solutions);
+                    botData.blocks.push(new BlockTypeSolutions(showTop, storeInDB, isSkippable, type, order, id, labels, action, blockToGoID, afterMessage).Solutions);
                 }
 
 
@@ -1371,7 +1442,6 @@
             }).done(function (res) {
             }).fail(function (res) {
                 let resJson = JSON.parse(res.responseText);
-                //console.log(resJson)
             });
 
         }
@@ -1383,7 +1453,6 @@
             }).done(function () {
             }).fail(function (res) {
                 let resJson = JSON.parse(res.responseText);
-                //console.log(resJson)
             });
 
         }
@@ -1396,7 +1465,7 @@
                 function getQuestionElement() {
                     return "<div class=\"input-group col-md-6\">\n" +
                         "         <span class=\"input-group-addon\">Question:</span>\n" +
-                        "         <input type=\"text\" class=\"form-control\"\n" +
+                        "         <input type=\"text\" class=\"form-control questionText\"\n" +
                         "           placeholder=\"Question\"\n" +
                         "           aria-describedby=\"basic-addon1\"\n" +
                         "           value=\"BLOCK_TEXT_EDITABLE\">\n" +
@@ -1623,8 +1692,11 @@
                     template = template.replaceAll('BLOCK_ID_HEADER', block.order);
                     template = template.replaceAll('BLOCK_ID', block.id);
                     template = template.replace('BLOCK_TYPE', block.type);
-                    console.log("block: ", block)
-                    template = template.replaceAll('BLOCK_LABELS', labelsArrayToString(getBlockLabels(block.labels)));
+                    let curBlockLabels = block.labels.split(",")
+                    for(var i=0; i<curBlockLabels.length;i++){
+                        editLabel(curBlockLabels[i], block.id);
+                    }
+                    template = template.replaceAll('BLOCK_LABELS', labelsArrayToString(getBlockLabels(curBlockLabels)));
 
 
                     if (block.type === 'Solutions') {
@@ -1736,22 +1808,20 @@
 
         function render_blocks_change(block_template, $oldBlock) {
             function cookUpBlock(block_template, block) {
-
                 // empty the old block text
                 if (block_template.name == "Solutions") {
-                    //console.log($oldBlock.parent().find('.title').text('Solution Block'));
                     $oldBlock.parent().find('.title').text('Solution Block');
                 } else {
-                    //console.log($oldBlock.parent().find('.title').text('Please fill this block'));
                     $oldBlock.parent().find('.title').text('Please fill this block');
                 }
 
+                clearLabelsForBlock($oldBlock.parent().find(".id-header").text().split(" ")[0]);
 
                 function getQuestionElement() {
                     return "" +
                         "<div class=\"input-group col-md-6\">\n" +
                         "         <span class=\"input-group-addon\">Question:</span>\n" +
-                        "         <input type=\"text\" class=\"form-control\"\n" +
+                        "         <input type=\"text\" class=\"form-control questionText\"\n" +
                         "           placeholder=\"Question\"\n" +
                         "           aria-describedby=\"basic-addon1\">\n" +
                         " </div>\n"
@@ -1760,7 +1830,7 @@
                 function getBlockLabelElement() {
                     let stringReturn = "" +
                         "<div class=\"input-group col-md-6\">\n" +
-                        "<label>Labels: </label><div id='labelPasteDivBLOCK_ID_HEADER'>BLOCK_LABELS</div>" +
+                        "<label style='cursor: pointer;' onclick='openLabelPicker("+$oldBlock.parent().find(".id-header").text().split(" ")[0]+")'>Labels <i class=\"fa fa-edit\"></i></label>" +
                         "</div><!-- /input-group -->\n"
                     return stringReturn
                 }
@@ -1886,11 +1956,10 @@
 
                 function getTemplate(block_template) {
                     templateHTML = "";
-                    console.log(block_template)
                     if (block_template.name == "Solutions") {
                         templateHTML = getBlockLabelElement() + getTopSolutionsElement() +  getAfterMessageInput() +
                             getActionElement(block_template.actions) +
-                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
+                            getSubmitElement(true, false, $oldBlock.parent().find(".id-header").text().split(" ")[0]);
                         templateHTML.replaceAll("skippable", "\" hidden \"");
 
                     }
@@ -1900,7 +1969,7 @@
                             getFileUpload(block_template.typesAllowed, block_template.fileMaxSize) +
                             getActionElement(block_template.actions) +
                             getAfterMessageInput() +
-                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
+                            getSubmitElement(true, false, $oldBlock.parent().find(".id-header").text().split(" ")[0]);
                     }
 
 
@@ -1909,7 +1978,7 @@
                             getActionElement(block_template.actions) +
                             getValidationElement(block_template.validations) +
                             getAfterMessageInput() +
-                            getSubmitElement(true, false, 'BLOCK_ID_HEADER');
+                            getSubmitElement(true, false, $oldBlock.parent().find(".id-header").text().split(" ")[0]);
 
                     }
 
@@ -1917,17 +1986,15 @@
                         templateHTML = getBlockLabelElement() + getQuestionElement() +
                             getAddAnswerButton() +
                             getAnswersElement(block_template.actions) +
-                            getSubmitElement(false, false, 'BLOCK_ID_HEADER');
+                            getSubmitElement(false, false, $oldBlock.parent().find(".id-header").text().split(" ")[0]);
 
 
                     }
                     return templateHTML;
                 }
-
                 return getTemplate(block_template, block);
             }
-
-            return cookUpBlock(blocks_templates[block_template]);
+            return cookUpBlock(blocks_templates[block_template], $);
         }
 
         function render_page(assistantName, botVersion, remainingBlocks) {

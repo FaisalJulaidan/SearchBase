@@ -234,6 +234,7 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
             oldBlock.StoreInDB = block.get('storeInDB')
             oldBlock.Skippable = block.get('isSkippable')
             oldBlock.Order = block.get('order')
+            oldBlock.Labels = block.get('labels')
 
         # Save
         db.session.commit()

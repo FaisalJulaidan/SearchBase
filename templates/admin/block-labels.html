@@ -6,6 +6,12 @@
 <style>
 i{
     cursor:pointer;
+    margin-right: 10px;
+}
+#sortTable{
+  overflow-y:scroll;
+  height:1000px;
+  display:block;
 }
 </style>
 <div class="right_col" role="main">
@@ -17,17 +23,17 @@ i{
                 <div class="pull-left">
                     <button type="button" class="btn btn-success" id="addRow" value="Send" onclick="fillLabelForm(0, edit=false)">Add Label</button>
                 </div>
-
-                <table id="labelsTable">
+                <br />
+                <table id="tableSort" class="table" cellspacing="0" width="100%">
                     {%if data%}
-                    <tr>
-                        <th>Label</th>
-                        <th>Action</th>
+                    <tr id="tableHeadingUIn" class="headings">
+                        <th style="cursor: pointer;" onclick="sortTable(0)" class="column-title">Label</th>
+                        <th class="column-title"><center>Action</center></th>
                     </tr>
                     {%for record in data%}
                     <tr data-rowid="{{record['ID']}}">
-                        <td class="hi" data-type="label"><span class="label {{record['Colour']}}">{{record['Text']}}</span></td>
-                        <td><i onclick="fillLabelForm('{{record['ID']}}', true)" class="fa fa-edit"></i><i onclick="deleteLabel({{record['ID']}})" class="fa fa-trash"></i></td>
+                        <td class="hi" data-type="label"><span class="label {{record['Colour']}}">{{record['Text']}}</center></td>
+                        <td><center><i onclick="fillLabelForm('{{record['ID']}}', true)" class="fa fa-edit"></i><i onclick="deleteLabel({{record['ID']}})" class="fa fa-trash"></i></center></td>
                     </tr>
                     {%endfor%}
                     {%endif%}
@@ -88,6 +94,7 @@ i{
 {% endblock %}
 
 {% block customJS %}
+<script src="/static/js/sortTable.js"></script>
 <script>
 
 // Once the modal is closed, unbind all onSubmit handlers from the userForm
@@ -98,7 +105,7 @@ $(document).on('hide.bs.modal', '#labelModal', function (e) {
 
 function fillLabelForm(labID, edit=false){
     var $form = $('form#labelForm');
-    var $row = $('#labelsTable tr[data-rowid=' + labID + ']');
+    var $row = $('#tableSort tr[data-rowid=' + labID + ']');
     console.log(labID, "   ", edit);
 
     $('#labelModal').modal('show');
@@ -190,5 +197,6 @@ function submitEditLabelForm(form,labID, event) {
         });
     });
 }
+sortTable(0);
 </script>
 {% endblock %}

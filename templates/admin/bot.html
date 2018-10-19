@@ -3,6 +3,7 @@
 
 {% block title %}Bot{% endblock %}
 {% block headlinks %}
+<link rel="stylesheet" type="text/css" href="/static/css/checkbox.css">
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/awesome-bootstrap-checkbox/1.0.1/awesome-bootstrap-checkbox.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.css" />
@@ -1562,7 +1563,10 @@
                         "    </div>\n" +
                         "</div>"+
                         "<div " + hideit+" class=\"col-md-2 pull-right inline text-right\">\n" +
+                        "<label class=\"checkboxContainer\" style=\"margin-top: 9px;\">"+
+                        "<a>Skippable</a>"+
                         "        <input id=\"skippable" + id + "\" type=\"checkbox\" " + skip + ">\n" +
+                        "<span class=\"checkmark\"></span></label>"+
                         "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 9px\">\n" +
                         //"        <label class=\"form-check-label\" for=\"" + id + "\"\n" +
                         //"               style=\"padding-left: 10px;padding-top: 2px; text-align: -webkit-auto;\">\n" +

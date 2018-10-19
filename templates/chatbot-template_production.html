@@ -506,6 +506,11 @@
             for (var i = 0; i < answers.length; i++) {
                 $answersDiv.append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText)\" >" + emojione.toImage(answers[i].text) + "</button>");
             }
+
+            if (currentBlock.isSkippable) {
+                $answersDiv.append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText)\" >Skip</button>");
+            }
+
             $messageInput.html($answersDiv);
 
             $answersDiv.append($("<div class='row'></div>"));
@@ -520,12 +525,17 @@
             fileUploadForm.style.display = 'none';
             $messageInput = $(".message-input").last();
             $userInput = $("<div class=\"wrap\" style=\"margin-top: 15px;min-height: 40px; background-color: white;\">\n" +
-                "                <input onkeypress=\"handleEnter(event)\" " +
+                "                <input autocomplete=\"off\" onkeypress=\"handleEnter(event)\" " +
                 "            id='textMessage' type=\"text\" placeholder=\"Write your message...\"/>\n" +
                 "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
                 "            </div>");
             $('.messages').css('height', 'calc(100% - 40px)');
             $messageInput.append($userInput);
+            $("#textMessage").focus();
+        }
+
+        function skipBlock() {
+            getNextBlock("Go To Next Block");
         }
 
         function renderFileUpload(block) {
@@ -726,9 +736,23 @@
 
         async function submitAnswer(message) {
 
+            if(currentBlock.type == "User Input"){
+                if (message == "")
+                    message = document.getElementById("textMessage").value;
+
+                if (message == "" || message.replace(/ /g, "") == "")
+                    return 0;
+            }
+
             chatInputDiv.style = "display:none";
             fileUploadForm.style.display = 'none';
+            // clear answers div
+            $("#presetAnswers").first().html('');
 
+            if (message.toLowerCase() === "skip" && currentBlock.isSkippable) {
+                skipBlock();
+                return 0;
+            }
 
             if (currentBlock.type == "Solutions") {
                 await sleep(200);
@@ -794,11 +818,6 @@
             }
 
             if (currentBlock.type == "User Input") { //validate user input
-                if (message == "")
-                    message = document.getElementById("textMessage").value;
-
-                if (message == "" || message.replace(/ /g, "") == "")
-                    return 0;
 
                 $('#textMessage').val("");
 
@@ -836,8 +855,6 @@
             }
             var blockKeywords = undefined
             if (currentBlock.type == "Question") {
-                // clear answers div
-                $("#presetAnswers").first().html('');
                 newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
 
                 await sleep(200);
@@ -847,6 +864,10 @@
                 for (var i = 0; i < blockAnswers.length; i++) {
                     if (blockAnswers[i].text == message) {
                         blockKeywords = blockAnswers[i].keywords;
+                        if(blockKeywords){
+                            addKeywords(blockKeywords);
+                        }
+                        console.log(6)
                         print()
                         var action = blockAnswers[i].action;
                         var blockToGoId = blockAnswers[i].blockToGoID;
@@ -873,20 +894,25 @@
 
             function print() {
                 // print the selected answer
-                if (blockKeywords)
+                if (blockKeywords){
+                    console.log(1)
                     blockKeywords = Boolean(blockKeywords.split) ? blockKeywords.split(',') : blockKeywords;
+                }
 
                 if (currentBlock.storeInDB) {
+                    console.log(2)
                     var information = {
                         "blockID": currentBlock.id,
                         "questionText": currentBlock.content.text,
                         "input": message
                     };
+                    console.log(3)
                     if (currentBlock.type == "Question" && blockKeywords !== undefined) {
+                        console.log(4)
                         information["keywords"] = blockKeywords
                         collectedInformation.push(information);
-                        addKeywords(blockKeywords)
                     } else {
+                        console.log(5)
                         information["keywords"] = []
                         collectedInformation.push(information);
                     }

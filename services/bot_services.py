@@ -64,7 +64,7 @@ def genBotViaTemplate(assistant: Assistant, tempName: str):
         data = json.load(open(absolute_path))
 
         # Validate submitted block data
-        
+
         json_utils.validateSchema(data, 'botTemplate.json')
         counter = 1
         for block in data.get('bot')['blocks']:
@@ -148,7 +148,7 @@ def addBlock(data: dict, assistant: Assistant) -> Callback:
         block = data.get('block')
         print(block)
         newBlock = Block(Type=BlockType(block['type']), Order=maxOrder + 1, Content=block['content'],
-                         StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Labels=None, Assistant=assistant)
+                         StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Labels=block['labels'], Assistant=assistant)
         db.session.add(newBlock)
 
         db.session.commit()
@@ -316,5 +316,3 @@ def getOptions() -> dict:
             },
         ]
     }
-
-

@@ -70,11 +70,13 @@ def get_labels():
     if request.method == "GET":
 
         labels_callback : Callback = blockLabels_services.getByCompanyID(session.get('CompanyID', 0))
-        if labels_callback.Success: 
+        if labels_callback.Success:
+            print(1)
             labels_callback : Callback = admin_services.convertForJinja(labels_callback.Data, BlockLabel)
-            if labels_callback.Success: 
+            if labels_callback.Success:
+                print(2)
                 return helpers.jsonResponse(True, 200, labels_callback.Message, labels_callback.Data)
-
+        print(3)
         labels = []
         return helpers.jsonResponse(True, 200, labels_callback.Message, labels)
 
@@ -133,18 +135,18 @@ def question_labels_add():
 
         return helpers.jsonResponse(True, 200, "Label successfully added.")
 
-@bot_router.route("/admin/block-labels/edit", methods=['POST'])
-def question_labels_edit():
+@bot_router.route("/admin/block-labels/edit/<labelID>", methods=['POST'])
+def question_labels_edit(labelID):
     if request.method == "POST":
 
         labelText = request.form.get("text", default=None).strip()
         labelColour = request.form.get("colour", default=None).strip()
 
-        addLabel_callback : Callback = blockLabels_services.addLabel(labelText, labelColour, session.get('CompanyID', 0))
-        if not addLabel_callback.Success:
-            return helpers.jsonResponse(False, 400, addLabel_callback.Message)
+        editLabel_callback : Callback = blockLabels_services.editLabelByID(labelID, labelText, labelColour)
+        if not editLabel_callback.Success:
+            return helpers.jsonResponse(False, 400, editLabel_callback.Message)
 
-        return helpers.jsonResponse(True, 200, "Label successfully added.")
+        return helpers.jsonResponse(True, 200, editLabel_callback.Message)
 
 @bot_router.route("/admin/block-labels/delete/<labID>", methods=['DELETE'])
 def question_labels_delete(labID):

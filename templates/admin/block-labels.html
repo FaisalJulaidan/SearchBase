@@ -4,6 +4,9 @@
 
 {% block content %}
 <style>
+i{
+    cursor:pointer;
+}
 </style>
 <div class="right_col" role="main">
     <!-- top tiles -->
@@ -23,8 +26,8 @@
                     </tr>
                     {%for record in data%}
                     <tr data-rowid="{{record['ID']}}">
-                        <td data-type="label"><span class="label {{record['Colour']}}">{{record['Text']}}</span></td>
-                        <td><button disabled onclick="fillLabelForm('{{record['ID']}}', true)">Edit</button><button onclick="deleteLabel({{record['ID']}})">Delete</button>
+                        <td class="hi" data-type="label"><span class="label {{record['Colour']}}">{{record['Text']}}</span></td>
+                        <td><i onclick="fillLabelForm('{{record['ID']}}', true)" class="fa fa-edit"></i><i onclick="deleteLabel({{record['ID']}})" class="fa fa-trash"></i></td>
                     </tr>
                     {%endfor%}
                     {%endif%}
@@ -96,16 +99,18 @@ $(document).on('hide.bs.modal', '#labelModal', function (e) {
 function fillLabelForm(labID, edit=false){
     var $form = $('form#labelForm');
     var $row = $('#labelsTable tr[data-rowid=' + labID + ']');
-    console.log("row", $row);
+    console.log(labID, "   ", edit);
 
     $('#labelModal').modal('show');
 
 
     if(edit){
         // fill current user
-        console.log("row: ", $row.find('td[data-type="label"]').text());
+        console.log("row: ", $row.find('td[data-type="label"] span'));
+        console.log("row: ", $row.find('td[data-type="label"] span')[0].getAttribute('class').split("label ")[1]);
         $form.find('input[name="text"]').val($row.find('td[data-type="label"]').text());
-        $form.find('input[name="colour"]').val($row.find('td[data-type="colour"]').text());
+        $('.form-group select option[value="'+$row.find('td[data-type="label"] span')[0].getAttribute('class').split("label ")[1]+'"]').attr('selected', 'selected');
+        //$form.find('input[name="colour"]').val();
     } else {
         $form.trigger("reset");
     }
@@ -171,8 +176,8 @@ function submitNewLabelForm(form, event) {
 function submitEditLabelForm(form,labID, event) {
     console.log('EDIT Label.');
      $.ajax({
-        url: '/admin/solution/' + labID,
-        type: "PUT",
+        url: "/admin/block-labels/edit/"+labID,
+        type: "POST",
         data: $('#labelForm').serialize()
     }).done(function (res) {
         console.log(res);

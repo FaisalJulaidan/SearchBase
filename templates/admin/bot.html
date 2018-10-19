@@ -186,7 +186,9 @@
         margin-top:10px;
         margin-right:10px;
     }
-
+    .labelPasteDiv{
+        margin-left: 27px;
+    }
 
 
 
@@ -271,7 +273,7 @@
         return entityMap[s];
       });
     }
-    
+
     var accountLabels = [];
 
     function getLabels() {
@@ -321,7 +323,7 @@
 
     function getBlockLabels(labelIDs) {
         let labelArray = [];
-        
+
         for (var i; i < labelIDs.length; i++) {
             for (var c; c < accountLabels.length; c++) {
                 if (accountLabels[c]['ID'] == labelIDs[i]) {
@@ -337,7 +339,21 @@
         for (var i; i < labelArray.length; i++) {
             string += "<span class='label " + labelArray[i]['Colour'] +"'>"+labelArray[i]['Text']+"</span>";
         }
+        string = string.slice(0, -1);
         return string;
+    }
+
+    function blockLabelsArrayToSendString(labelArray){
+        let returnString = "";
+        for (var i; i < labelArray.length; i++) {
+            string += labelArray[i].toString() + ",";
+        }
+
+        return string;
+    }
+
+    function openLabelPicker(blockID){
+        console.log(blockID);
     }
 
     var blocksNumber = 0;
@@ -631,7 +647,7 @@
                                                     },
                                                     storeInDB: true,
                                                     isSkippable: false,
-                                                    labels: [],
+                                                    labels: blockLabelsArrayToSendString([]),
                                                     type: blockType,
                                                 },
                                                 botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
@@ -646,7 +662,7 @@
                                                     },
                                                     storeInDB: true,
                                                     isSkippable: false,
-                                                    labels: [],
+                                                    labels: blockLabelsArrayToSendString([]),
                                                     type: blockType,
                                                 },
                                                 botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
@@ -661,7 +677,7 @@
                                                     },
                                                     storeInDB: true,
                                                     isSkippable: false,
-                                                    labels: [],
+                                                    labels: blockLabelsArrayToSendString([]),
                                                     type: blockType,
                                                 },
                                                 botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
@@ -674,7 +690,7 @@
                                                         showTop: 1,
                                                     },
                                                     storeInDB: true,
-                                                    labels: [],
+                                                    labels: blockLabelsArrayToSendString([]),
                                                     type: blockType,
                                                 },
                                                 botVersion: $('#assistantName > span').text().split(':')[1].split(' ')[1],
@@ -1383,6 +1399,14 @@
                         "       </div>\n"
                 }
 
+                function getBlockLabelElement() {
+                    let stringReturn = "" +
+                        "<div class=\"input-group col-md-6\">\n" +
+                        "<label style='cursor: pointer;' onclick='openLabelPicker(BLOCK_ID_HEADER)'>Labels <i class=\"fa fa-edit\"></i></label>" +
+                        "</div><!-- /input-group -->\n"
+                    return stringReturn
+                }
+
                 function getActionElement(actions) {
                     return "" +
                         "<div class=\"input-group col-md-6\">\n" +
@@ -1645,6 +1669,7 @@
                         "                </div><!-- /btn-group -->\n" +
                         "            </div><!-- /input-group -->\n" +
                         "        </div><!-- /.col-lg-3 -->\n" +
+                        "<div class='labelPasteDiv' id='labelPasteDivBLOCK_ID_HEADER'>BLOCK_LABELS</div>"+
                         "    </div>\n" +
                         // Block text
                         "    <div class=\"panel-body\" style='display:none;'>\n" +
@@ -1656,14 +1681,14 @@
 
                     var content = "";
                     if (block_template.name == "Solutions") {
-                        content = getTopSolutionsElement() + getAfterMessageInput(block.content.afterMessage) +
+                        content = getBlockLabelElement() + getTopSolutionsElement() + getAfterMessageInput(block.content.afterMessage) +
                             getActionElement(block_template.actions) +
                             getSubmitElement(true, block.isSkippable, 'dontshow');
 
                     }
 
                     if (block_template.name == "File Upload") {
-                        content = getQuestionElement() +
+                        content = getBlockLabelElement() + getQuestionElement() +
                             getFileUpload(block_template.typesAllowed, block_template.fileMaxSize, block.content.fileTypes) +
                             getActionElement(block_template.actions) +
                             getAfterMessageInput(block.content.afterMessage) +
@@ -1672,7 +1697,7 @@
 
 
                     if (block_template.name == "User Input") {
-                        content = getQuestionElement() +
+                        content = getBlockLabelElement() + getQuestionElement() +
                             getActionElement(block_template.actions) +
                             getValidationElement(block_template.validations) +
                             getAfterMessageInput(block.content.afterMessage) +
@@ -1681,7 +1706,7 @@
                     }
 
                     if (block_template.name == "Question") {
-                        content = getQuestionElement() +
+                        content = getBlockLabelElement() + getQuestionElement() +
                             getAddAnswerButton() +
                             getAnswersElement(block_template.actions, block.content.answers) +
                             getSubmitElement(true, block.isSkippable, 'BLOCK_ID_HEADER');
@@ -1867,7 +1892,7 @@
                     }
 
                     if (block_template.name == "File Upload") {
-                        templateHTML = getBlockLabelElement() + getQuestionElement() + 
+                        templateHTML = getBlockLabelElement() + getQuestionElement() +
                             getFileUpload(block_template.typesAllowed, block_template.fileMaxSize) +
                             getActionElement(block_template.actions) +
                             getAfterMessageInput() +
@@ -1876,7 +1901,7 @@
 
 
                     if (block_template.name == "User Input") {
-                        templateHTML = getBlockLabelElement() + getQuestionElement() + 
+                        templateHTML = getBlockLabelElement() + getQuestionElement() +
                             getActionElement(block_template.actions) +
                             getValidationElement(block_template.validations) +
                             getAfterMessageInput() +
@@ -1885,7 +1910,7 @@
                     }
 
                     if (block_template.name == "Question") {
-                        templateHTML = getBlockLabelElement() + getQuestionElement() + 
+                        templateHTML = getBlockLabelElement() + getQuestionElement() +
                             getAddAnswerButton() +
                             getAnswersElement(block_template.actions) +
                             getSubmitElement(false, false, 'BLOCK_ID_HEADER');

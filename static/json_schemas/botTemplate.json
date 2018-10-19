@@ -14,6 +14,7 @@
             "type": {"enum": ["Question", "User Input", "File Upload", "Solutions"]},
             "order": {"type": "integer", "minimum": 1},
             "storeInDB": {"type": "boolean"},
+            "labels": {"type": "string"},
             "content": {"type": "object"}
           },
           "required": ["type", "order", "content", "storeInDB"],

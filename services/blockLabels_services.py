@@ -26,6 +26,18 @@ def addLabel(text, colour, companyID):
         db.session.rollback()
         return Callback(False, 'Failed to create the label')
 
+def editLabelByID(id, text, colour):
+    try:
+        db.session.query(BlockLabel).filter(BlockLabel.ID == id).update({'Text': text, 'Colour': colour})
+        db.session.commit()
+        return Callback(True, 'Label updated successfully')
+
+    except Exception as exc:
+        print("blockLabels_services.editLabelByID ERROR: ", exc)
+        db.session.rollback()
+        return Callback(False, "Couldn't update label ")
+
+
 def deleteByID(id):
     try:
         db.session.query(BlockLabel).filter(BlockLabel.ID == id).delete()

@@ -1722,7 +1722,7 @@
                     template = template.replace('BLOCK_TYPE', block.type);
                     let curBlockLabels = block.labels.split(",");
                     clearLabelsForBlock(block.id);
-                    for (var i = 0; i < curBlockLabels.length; i++){
+                    for (var i = 0; i < curBlockLabels.length; i++){ 
                         let value = parseInt(curBlockLabels[i]);
                         console.log("value:   ", value)
                         if (!isNaN(value)) {

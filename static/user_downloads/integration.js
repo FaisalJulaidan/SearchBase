@@ -1,7 +1,6 @@
 var globalTSB = {
     id: undefined,
-    host: 'https://www.thesearchbase.com',
-    // host: 'http://localhost:5000',
+    host: undefined,
     files_path: '/userdownloads',
     iframe_route: '/chatbottemplate_production'
 };
@@ -36,7 +35,10 @@ window.onload = (function (global) {
 
 
     // Config
-    var host = globalTSB.host;
+    var scriptTag = document.querySelector('script[data-name="tsb-widget"][data-id]');
+    var full_host = scriptTag.getAttribute('src').split('/');
+
+    var host = full_host[1] + '//' + full_host[2];
     var files_path = globalTSB.files_path;
     var iframe_route = globalTSB.iframe_route;
     var popupSec = undefined;
@@ -44,7 +46,11 @@ window.onload = (function (global) {
 
     var integration_file = host + files_path + 'integration.js';
     var id = document.querySelector('script[data-name="tsb-widget"][data-id]').getAttribute('data-id');
+
+
+
     globalTSB.id = id;
+    globalTSB.host = host;
 
     function clickToShowColor() {
         var script = document.getElementsByTagName('script')[0];
@@ -88,10 +94,9 @@ window.onload = (function (global) {
     var btnDiv = document.createElement('div');
     btnDiv.id = 'TSB-chatbot-widget';
 
-    btnDiv.innerHTML = ' <div class="TSB-circle" style="background-color: '+ clickToShowColor().circle +'; color: '+clickToShowColor().icon+'; ">\n' +
+    btnDiv.innerHTML = ' <div class="TSB-circle" style="background-color: '+ scriptTag.getAttribute("data-circle") +'; color: '+ scriptTag.getAttribute("data-icon")+'; ">\n' +
         '               <i class="fa fa-comments"></i>\n' +
         '             </div>';
-
 
 
 

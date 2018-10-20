@@ -49,7 +49,7 @@
 
                         <strong>
                             <textarea style="width:600px; height:90px;" id="URL_id" readonly>
-<script src="https://www.thesearchbase.com/userdownloads/integration.js" data-name="tsb-widget" data-id={{ assistantID }} data-icon="#fff" data-circle="#4B5B71" async defer></script></textarea>
+                            </textarea>
                         </strong>
                         <br />
                         <br />
@@ -57,9 +57,9 @@
 
                         <p> To deploy your assistant, simply copy the line above and paste it in the page in which you would like your bot to operate in.</p>
 
-                        <button onclick="copyURL()" class="btn btn-success">Copy URL</button>
+                        <button  id="copyURLBtn" class="btn btn-success">Copy URL</button>
                         <br />
-                        <button onclick="testIntegration()" class="btn btn-success">Test Assistant Pop Up</button>
+                        <button  id="testIntegrationBtn" class="btn btn-success">Test Assistant Pop Up</button>
                         <div id="integratePaste"></div>
                         <h5>The pop up will appear after the time set just like it would on your website.</h5>
                         <br />
@@ -95,7 +95,12 @@
             if (prev_handler)
                 prev_handler();
 
-            let $script = $('<script src=\"https://www.thesearchbase.com/userdownloads/integration.js\" data-name=\"tsb-widget\" data-id={{ assistantID }} data-icon="#fff" data-circle="#4B5B71" async defer>');
+            var colon = "";
+            if (window.location.port !== "")
+                colon = ":";
+
+            let $script = $('<script src=\"' + window.location.protocol + '//' + window.location.hostname + colon  + window.location.port +
+                '/userdownloads/integration.js\" data-name=\"tsb-widget\" data-id={{ assistantID }} data-icon="#fff" data-circle="#4B5B71" async defer>');
 
             $('input#icon').on('change', (e) => {
                 $script.attr('data-icon', $('input#icon').val());
@@ -107,10 +112,12 @@
                 $('#URL_id').first().text($script[0].outerHTML)
             })
 
+            // paste the script tag inside textarea tag
+            document.getElementById("URL_id").innerHTML = $script.prop('outerHTML');
 
-        }
 
-        function copyURL() {
+
+            function copyURL() {
             /* Get the text field */
             var copyText = document.getElementById("URL_id");
 
@@ -119,30 +126,29 @@
 
             /* Copy the text inside the text field */
             document.execCommand("copy");
+            }
+            {#.appendTo(document.body)#}
+            //var script = undefined;
+            function testIntegration() {
+                var $script = $(document.getElementById("URL_id").value);
+
+                console.log($script);
+                try {
+                    document.getElementsByTagName('body').lastChild.remove();
+                } catch {
+                }
+
+
+                $("#TSB-container").remove();
+                $script.appendTo(document.body);
+
+            }
+
+            document.getElementById('testIntegrationBtn').addEventListener('click', testIntegration);
+            document.getElementById('copyURLBtn').addEventListener('click', copyURL);
         }
 
-        var script = undefined;
-        function testIntegration(){
-            var paste = document.getElementById("URL_id").value;
-            // console.log(paste);
-            //document.getElementById("integratePaste").innerHTML = "";
-            // document.getElementById("integratePaste").append(paste);
-            try{
-              document.getElementsByTagName('body').lastChild.remove();
-            } catch{
-              
-            }
-            console.log(paste.split("data-icon=\"")[1].split("\"")[0])
-            $("#TSB-container").remove();
-            script = document.createElement('script');
-            script.src = 'https://www.thesearchbase.com/userdownloads/integration.js';
-            script.setAttribute("data-name", "tsb-widget");
-            script.setAttribute("data-id", "{{ assistantID }}");
-            script.setAttribute("data-icon", paste.split("data-icon=\"")[1].split("\"")[0]);
-            script.setAttribute("data-circle", paste.split("data-circle=\"")[1].split("\"")[0]);
-            script.type = 'text/javascript';
-            document.getElementsByTagName('body')[0].appendChild(script);
-        }
+
     </script>
 
 

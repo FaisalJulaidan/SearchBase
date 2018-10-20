@@ -409,14 +409,19 @@
         fillLabelForm(blockID);
     }
 
-    function getLabelsFromBlockLabels(blockID){
+    function getLabelsFromBlockLabels(blockID) {
+        console.log("Retrieving Labels for ", blockID)
+        console.log("All stored Labels: ", blockLabels)
         try{
-            if(blockID in blockLabels){
+            if (blockID in blockLabels) {
+                console.log("Found ", blockLabels[blockID])
                 return blockLabels[blockID];
             } else {
+                console.log("Found Nothing")
                 return [];
             }
         } catch {
+            console.log("Found Nothing")
             return [];
         }
     }

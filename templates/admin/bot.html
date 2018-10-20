@@ -1848,7 +1848,7 @@
                     $oldBlock.parent().find('.title').text('Please fill this block');
                 }
 
-                clearLabelsForBlock($oldBlock.parent().find(".id-header").text().split(" ")[0]);
+                clearLabelsForBlock(parseInt($oldBlock.parent().attr('id')));
 
                 function getQuestionElement() {
                     return "" +

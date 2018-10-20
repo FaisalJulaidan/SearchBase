@@ -1119,7 +1119,7 @@
 
                     let id = +$block.attr('id');
                     let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
-                    let isSkippable = document.getElementById('skippable' + order).checked;
+                    let isSkippable = document.getElementById('skippable' + id).checked;
 
                     let text = (function () {
                         //debugger
@@ -1202,7 +1202,7 @@
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let id = +$block.attr('id');
                     let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
-                    let isSkippable = document.getElementById('skippable' + order).checked;
+                    let isSkippable = document.getElementById('skippable' + id).checked;
 
                     botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, blockToGoID, storeInDB, isSkippable, type, order, id, labels, afterMessage).FileUpload);
                 }

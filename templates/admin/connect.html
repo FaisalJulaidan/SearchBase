@@ -132,11 +132,12 @@
             function testIntegration() {
                 var $script = $(document.getElementById("URL_id").value);
 
-                console.log($script);
-                try {
-                    document.getElementsByTagName('body').lastChild.remove();
-                } catch {
+                // delete the old added script tag if exists
+                if(document.querySelector('script[data-name="tsb-widget"][data-id]')) {
+                    console.log("Delete old");
+                    document.querySelector('script[data-name="tsb-widget"][data-id]').remove();
                 }
+
 
 
                 $("#TSB-container").remove();

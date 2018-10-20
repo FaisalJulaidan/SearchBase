@@ -351,7 +351,8 @@
     }
 
 
-    function populateLabels(blockID){
+    function populateLabels(blockID) {
+        console.log("Populating Labels...")
         let labelArray = getLabelsFromBlockLabels(blockID);
         let string = "";
         let hideCheck = "none";
@@ -364,6 +365,7 @@
             }
             string += "<div class=\"editLabelContainer\" onclick='toggleLabel(this, "+accountLabels[i]['ID']+","+blockID+" )'><span class='label " + accountLabels[i]['Colour'] +"'>"+accountLabels[i]['Text']+"</span><i style=\"display:"+hideCheck+"\" class=\"fa fa-check\"></i></div>";
         }
+        console.log("Populate String to append: ", string)
         $("#labelPickerDiv").empty();
         $("#labelPickerDiv").append(string);
     }
@@ -373,13 +375,16 @@
             if (blockLabels[blockID].includes(labelID)) {
                 for (var i=0; i < blockLabels[blockID].length; i++) {
                     if (blockLabels[blockID][i] == labelID) {
+                        console.log("Removed Label ", blockLabels[blockID][i], " for block ", blockID);
                         blockLabels[blockID].splice(i, 1);
                     }
                 }
             } else {
+                console.log("Added Label ", labelID, " for block ", blockID);
                 blockLabels[blockID].push(labelID);
             }
         } else {
+            console.log("Created Label Array with value", labelID, " for block ", blockID);
             blockLabels[blockID] = [labelID];
         }
         updateLabelsForBlock(blockID);
@@ -1119,6 +1124,7 @@
 
                     let id = +$block.attr('id');
                     let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
+                    console.log("Question will send labels: ", labels)
                     let isSkippable = document.getElementById('skippable' + order).checked;
 
                     let text = (function () {
@@ -1175,6 +1181,7 @@
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let id = +$block.attr('id');
                     let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
+                    console.log("User Input will send in labels: ", labels)
                     let isSkippable = document.getElementById('skippable' + order).checked;
 
                     botData.blocks.push(new BlockTypeUserInput(text, action, validation, blockToGoID, storeInDB, isSkippable, type, order, id, labels, afterMessage).UserInput);
@@ -1202,6 +1209,7 @@
                     let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let id = +$block.attr('id');
                     let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
+                    console.log("File Upload will send in labels: ", labels)
                     let isSkippable = document.getElementById('skippable' + order).checked;
 
                     botData.blocks.push(new BlockTypeFileUpload(text, action, fileTypes, blockToGoID, storeInDB, isSkippable, type, order, id, labels, afterMessage).FileUpload);
@@ -1215,6 +1223,7 @@
                     let action = $block.children().last().find('input.action').first().val();
                     let id = +$block.attr('id');
                     let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
+                    console.log("Solutions will send in labels: ", labels)
                     let isSkippable = false;
                     let blockToGoID = 0;
                     try { blockToGoID = +$block.children().last().find('.blockToGoID')[0].value; }

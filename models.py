@@ -402,7 +402,7 @@ class Block(db.Model):
     Content = db.Column(JsonEncodedDict, nullable=False)
     StoreInDB = db.Column(db.Boolean(), nullable=False, default=True)
     Skippable = db.Column(db.Boolean(), nullable=False, default=False)
-    Labels = db.Column(db.String(64), default="")
+    Labels = db.Column(db.String(64), nullable=False, default="")
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)

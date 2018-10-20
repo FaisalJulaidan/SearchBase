@@ -37,8 +37,9 @@ window.onload = (function (global) {
     // Config
     var scriptTag = document.querySelector('script[data-name="tsb-widget"][data-id]');
     var full_host = scriptTag.getAttribute('src').split('/');
-
-    var host = full_host[1] + '//' + full_host[2];
+    var host = full_host[0] + '//' + full_host[2];
+    console.log(host);
+    
     var files_path = globalTSB.files_path;
     var iframe_route = globalTSB.iframe_route;
     var popupSec = undefined;

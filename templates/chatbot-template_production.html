@@ -395,14 +395,14 @@
             <div class="message-input" id="message-input">
                 <form id="fileUploadForm" action="/" method="get" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
                     <div class="wrap" style="margin-top: 15px;min-height: 40px; background-color: white;">
-                        <label style="background-color: white;width: 84.37%;" for="fileUploadB">
+                        <label style="background-color: white;width: 10%;float:left" for="fileUploadB">
                             <i style="font-size: 30px;margin: 6px 0px 0px 10px;" class="fa fa-paperclip"></i>
                         </label>
-                        <input hidden name="file" onkeypress="handleEnter(event)" id="fileUploadB" type="file" placeholder="Upload your file..."
-                            style="background-color: white;" />
+                        <input hidden name="file" onkeypress="handleEnter(event)" id="fileUploadB" type="file" style="background-color: white;" onchange="fileUploadNameUpdate()"/>
                         <button type="button" onclick="submitAnswer('')" class="submit">
                             <i class="fa fa-paper-plane" aria-hidden="true"></i>
                         </button>
+                        <input onkeypress="handleEnter(event)" autocomplete="off" style="width:79%" id="displayFileName" type="text" placeholder="Upload your file..."/>
                     </div>
                 </form>
             </div>
@@ -431,7 +431,11 @@
         window.onbeforeunload = function () { sendOnCloseData(); }
 
         function sendOnCloseData() {
-            if (!sentOnClose) { sendData(); sentOnClose = true; }
+            if (!sentOnClose && collectedInformation.length != 0) { sendData(); sentOnClose = true; }
+        }
+
+        function fileUploadNameUpdate() {
+            $("#displayFileName").val($("#fileUploadB").val());
         }
 
         // This function will get the blocks from the server by assistantID and set the blocks array to be used to create
@@ -521,8 +525,8 @@
             newMessage(BOT_USER, block.content.text);
 
             //Show userinpt field
-            chatInputDiv.style = "display:block;";
             fileUploadForm.style.display = 'none';
+            chatInputDiv.style = "display:block;";
             $messageInput = $(".message-input").last();
             $userInput = $("<div class=\"wrap\" style=\"margin-top: 15px;min-height: 40px; background-color: white;\">\n" +
                 "                <input autocomplete=\"off\" onkeypress=\"handleEnter(event)\" " +
@@ -535,11 +539,20 @@
         }
 
         function skipBlock() {
-            if(currentBlock.content.action){
-                getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
-            } else {
-                getNextBlock("Go To Next Block");
+            var action = undefined;
+            var blockToGoId = undefined;
+
+            if (currentBlock.type == "Question") {
+                action = currentBlock.content.answers[0].action;
+                blockToGoId = currentBlock.content.answers[0].blockToGoID;
             }
+            else if (currentBlock.content.action) {
+                action = currentBlock.content.action;
+                blockToGoId = currentBlock.content.blockToGoID;
+            } else {
+                action = "Go To Next Block";
+            }
+            getNextBlock(action, blockToGoId);
         }
 
         function renderFileUpload(block) {
@@ -558,7 +571,6 @@
             //Show message from bot_user
             newMessage(BOT_USER, block.content.text);
             //Show file upload form
-            chatInputDiv.style = "display:block";
             fileUploadForm.style.display = 'block';
         }
 
@@ -755,8 +767,6 @@
             $("#presetAnswers").first().html('');
 
             if (message.toLowerCase() === "skip" && currentBlock.isSkippable) {
-                console.log("currentBlock: ", currentBlock);
-                console.log("currentBlock.isSkippable: ", currentBlock.isSkippable);
                 newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
                 $('#textMessage').val("");
                 skipBlock();
@@ -785,6 +795,12 @@
 
             if (currentBlock.type == "File Upload") {
                 //needs rework
+                if ($("#displayFileName").val().toLowerCase() === "skip" && currentBlock.isSkippable) {
+                    newMessage(CLIENT_USER, $("#displayFileName").val());
+                    $('#displayFileName').val("");
+                    skipBlock();
+                    return 0;
+                }
                 message = "&FILE_UPLOAD&" + document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
                 if (!checkFileFormat(message)) {
                     sendUserMessage(message.replace("&FILE_UPLOAD&", ""));
@@ -795,6 +811,7 @@
                     removeThinkingGif();
                     await sleep(200);
 
+                    $('#displayFileName').val("");
                     sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
                     chatInputDiv.style = "display:block";
                     fileUploadForm.style.display = 'block';
@@ -876,7 +893,6 @@
                         if(blockKeywords){
                             addKeywords(blockKeywords);
                         }
-                        console.log(6)
                         print()
                         var action = blockAnswers[i].action;
                         var blockToGoId = blockAnswers[i].blockToGoID;
@@ -904,24 +920,19 @@
             function print() {
                 // print the selected answer
                 if (blockKeywords){
-                    console.log(1)
                     blockKeywords = Boolean(blockKeywords.split) ? blockKeywords.split(',') : blockKeywords;
                 }
 
                 if (currentBlock.storeInDB) {
-                    console.log(2)
                     var information = {
                         "blockID": currentBlock.id,
                         "questionText": currentBlock.content.text,
                         "input": message
                     };
-                    console.log(3)
                     if (currentBlock.type == "Question" && blockKeywords !== undefined) {
-                        console.log(4)
                         information["keywords"] = blockKeywords
                         collectedInformation.push(information);
                     } else {
-                        console.log(5)
                         information["keywords"] = []
                         collectedInformation.push(information);
                     }

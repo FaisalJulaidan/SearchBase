@@ -431,7 +431,10 @@ class BlockLabel(db.Model):
 class ChatbotSession(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Data = db.Column(JsonEncodedDict, nullable=False)
+    if BaseConfig.USE_ENCRYPTION:
+        Data = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
+    else:
+        Data = db.Column(JsonEncodedDict, nullable=False)
     FilePath = db.Column(db.String(250), nullable=True, default=None)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     TimeSpent = db.Column(db.Integer, nullable=False, default=0)

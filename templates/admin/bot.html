@@ -619,6 +619,7 @@
                 // Omit this to make then entire <li>...</li> draggable.
                 handle: '.panel-heading',
                 update: function () {
+                    console.log("Update")
                     updateBlocksOrder();
                     saveBlocks();
                 }
@@ -1451,14 +1452,33 @@
 
         function updateBlocksOrder() {
             let panelList = $('#draggablePanelList');
+            let inputsArray = document.getElementsByClassName("blockToGoID form-control");
             BlocksOrder = [];
             $('.blockPanel', panelList).each(function (index, elem) {
                 let $listItem = $(elem), newIndex = $listItem.index();
+                let currentOrder = parseInt($listItem.text().split(" -")[0]);
+                let newOrder = index + 1;
+                if (newOrder != currentOrder) {
+                    for (var i = 0; i < inputsArray.length; i++) {
+                        if (!inputsArray[i].value.includes("99999999999999")) {
+                            if (parseInt(inputsArray[i].value) === currentOrder) {
+                                inputsArray[i].value = newOrder.toString() + "99999999999999";
+                            }
+                        }
+                    }
+                }
+
                 BlocksOrder.push({
                     block: $listItem,
-                    order: newIndex + 1
+                    order: newOrder
                 });
             });
+
+            for (var i = 0; i < inputsArray.length; i++) {
+                if (inputsArray[i].value.includes("99999999999999")) {
+                    inputsArray[i].value = inputsArray[i].value.replace("99999999999999", "");
+                }
+            }
         }
 
         function GET_data() {

@@ -572,6 +572,7 @@
             newMessage(BOT_USER, block.content.text);
             //Show file upload form
             fileUploadForm.style.display = 'block';
+            chatInputDiv.style = "display:block";
         }
 
         function renderSolutions(block) {
@@ -840,6 +841,7 @@
                     removeThinkingGif();
                     await sleep(200);
                 }
+                $('#displayFileName').val("");
                 return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
             }
 

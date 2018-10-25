@@ -37,28 +37,28 @@
                                                 <div class="clearfix"></div>
                                             </div>
                                             <div class="x_content">
-                                                <br/>
                                                 <form id="productFileForm" name="productFileForm"
                                                       enctype="multipart/form-data">
 
                                                     <div class="form-group">
-                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12"
-                                                               for="">
-                                                            Upload your existing database for an automatic scan <span
-                                                                class="required">*</span>
-                                                        </label>
-                                                        <br/>
-                                                        <br/>
                                                         <div>
-                                                            <label for="productFile">Choose file to
-                                                                upload</label><br>
-                                                            <input type="file" id="productFile" name="productFile">
+                                                            <label class="btn btn-success" for="productFile">Choose file to
+                                                                upload</label><br><br />
+                                                            <input type="file" id="productFile" name="solutionsFile" onchange="$('#fileDisplay').val($('#productFile').val())" style="display:none;"/>
+                                                            File: <input id="fileDisplay" style="border-style:none;cursor:auto;width:95%;" readonly/>
+                                                            <br />
+                                                            <br />
+                                                            File Type:
+                                                            <select name="fileType">
+                                                                <option value="RBDXML">RBD Xml File</option>
+                                                            </select>
                                                         </div>
                                                         <br/>
                                                         <button id="uploadButton" class="btn btn-success"
                                                                 type="button" value="submit" onclick="uploadProductFile()">
                                                             Upload Database
                                                         </button>
+                                                    </div>
                                                 </form>
 
                                                 <table class="table" id="tableExample"></table>

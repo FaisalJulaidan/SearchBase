@@ -3,6 +3,8 @@ from services import solutions_services, admin_services, assistant_services, sub
 from models import Callback, Solution, Company, Assistant
 from utilities import helpers
 
+import xml.etree.ElementTree as ET
+
 solutions_router: Blueprint = Blueprint('Solutions_router', __name__, template_folder="../../templates")
 
 @solutions_router.route("/admin/assistant/<assistantID>/solutions", methods=['GET', 'POST'])
@@ -210,82 +212,110 @@ def create_solution(assistantID):
 # TODO improve
 @solutions_router.route("/admin/assistant/<assistantID>/solutions/file", methods=['POST'])
 def admin_products_file_upload(assistantID):
-    checkAssistantID(assistantID)
     if request.method == "POST":
-        if not session['UserPlan']['Settings']['ImportDatabase']:
-            return "You do not have access to uploading database feature."
-        msg = ""
-        if 'productFile' not in request.files:
-            msg = "Error no file given."
+        fileType = request.form.get("fileType", default=None)
+        file = request.files.get("solutionsFile", default=None)
+
+        if not fileType or not file:
+            return "File Type or Uploaded File could not be retrieved"
+
+        if fileType == "RBDXML":
+            print("FILE: ", file)
+            print("FILE NAME: ", file.filename)
+            tree = ET.parse(file)
+            print("TREE: ", tree)
+            root = tree.getroot()
+            print("ROOT: ", root)
+            for child in root:
+                print("TAG: ", child.tag, " ATTRIB: ", child.attrib)
+                for child1 in child:
+                    print("TAG: ", child1.tag, " ATTRIB: ", child1.attrib)
+            #https://pypi.org/project/xmljson/     to json
+            #https://docs.python.org/3/library/xml.etree.elementtree.html   handle xml
+            return "OK"
         else:
-            email = session.get('User')['Email']
-            company = get_company(email)
-            if company is None or "Error" in company:
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-                # TODO handle this better
-            else:
-                assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
-                                                       [assistantID, company[0]])
-                if assistant is None:
-                    abort(status.HTTP_404_NOT_FOUND)
-                elif "Error" in assistant:
-                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-                else:
-                    productFile = request.files["productFile"]
-                    if productFile.filename == "":
-                        msg = "Error no filename"
-                    elif productFile and allowed_product_file(productFile.filename):
-                        ext = productFile.filename.rsplit('.', 1)[1].lower()
-                        if not os.path.isdir(PRODUCT_FILES):
-                            os.makedirs(PRODUCT_FILES)
-                        filename = secure_filename(productFile.filename)
-                        filepath = os.path.join(PRODUCT_FILES, filename)
-                        productFile.save(filepath)
+            return "Please insure you have selected the right File Type option"
 
-                        if str(ext).lower() == "json":
-                            json_file = open(PRODUCT_FILES + "/" + productFile.filename, "r")
-                            data = load(json_file)
 
-                            for i in range(0, len(data)):
-                                id = data[i]["ProductID"]
-                                name = data[i]["ProductName"]
-                                brand = data[i]["ProductBrand"]
-                                model = data[i]["ProductModel"]
-                                price = data[i]["ProductPrice"]
-                                keywords = data[i]["ProductKeywords"]
-                                discount = data[i]["ProductDiscount"]
-                                url = data[i]["ProductURL"]
-                                insertProduct = insert_into_database_table(
-                                    "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) VALUES (?,?,?,?,?,?,?,?,?);",
-                                    (assistantID, id, name, brand, model, price, keywords, discount, url))
-                                # TODO check insertProduct for errors
-                        elif str(ext).lower() == "xml":
-                            xmldoc = minidom.parse(PRODUCT_FILES + "/" + productFile.filename)
-                            productList = xmldoc.getElementsByTagName("product")
-                            for product in productList:
-                                try:
-                                    id = product.getElementsByTagName("ProductID")[0].childNodes[0].data
-                                    name = product.getElementsByTagName("ProductName")[0].childNodes[0].data
-                                    brand = product.getElementsByTagName("ProductBrand")[0].childNodes[0].data
-                                    model = product.getElementsByTagName("ProductModel")[0].childNodes[0].data
-                                    price = product.getElementsByTagName("ProductPrice")[0].childNodes[0].data
-                                    keywords = product.getElementsByTagName("ProductKeywords")[0].childNodes[0].data
-                                    discount = product.getElementsByTagName("ProductDiscount")[0].childNodes[0].data
-                                    url = product.getElementsByTagName("ProductURL")[0].childNodes[0].data
-                                    insertProduct = insert_into_database_table(
-                                        "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) VALUES (?,?,?,?,?,?,?,?,?);",
-                                        (assistantID, id, name, brand, model, price, keywords, discount, url))
-                                    # TODO check insertProduct for errors
-                                except IndexError:
-                                    msg = "Invalid xml file"
-                                    print(msg)
-                        else:
-                            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-                        os.remove(PRODUCT_FILES + "/" + productFile.filename)
-                    else:
-                        msg = "Error not allowed that type of file."
-                        print(msg)
-                return msg
+
+
+
+
+        #if not session['UserPlan']['Settings']['ImportDatabase']:
+        #    return "You do not have access to uploading database feature."
+        #msg = ""
+        #if 'productFile' not in request.files:
+        #    msg = "Error no file given."
+        #else:
+        #    email = session.get('User')['Email']
+        #    company = get_company(email)
+        #    if company is None or "Error" in company:
+        #        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+        #        # TODO handle this better
+        #    else:
+        #        assistant = select_from_database_table("SELECT * FROM Assistants WHERE ID=? AND CompanyID=?",
+        #                                               [assistantID, company[0]])
+        #        if assistant is None:
+        #            abort(status.HTTP_404_NOT_FOUND)
+        #        elif "Error" in assistant:
+        #            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+        #        else:
+        #            productFile = request.files["productFile"]
+        #            if productFile.filename == "":
+        #                msg = "Error no filename"
+        #            elif productFile and allowed_product_file(productFile.filename):
+        #                ext = productFile.filename.rsplit('.', 1)[1].lower()
+        #                if not os.path.isdir(PRODUCT_FILES):
+        #                    os.makedirs(PRODUCT_FILES)
+        #                filename = secure_filename(productFile.filename)
+        #                filepath = os.path.join(PRODUCT_FILES, filename)
+        #                productFile.save(filepath)
+
+        #                if str(ext).lower() == "json":
+        #                    json_file = open(PRODUCT_FILES + "/" + productFile.filename, "r")
+        #                    data = load(json_file)
+
+        #                    for i in range(0, len(data)):
+        #                        id = data[i]["ProductID"]
+        #                        name = data[i]["ProductName"]
+        #                        brand = data[i]["ProductBrand"]
+        #                        model = data[i]["ProductModel"]
+        #                        price = data[i]["ProductPrice"]
+        #                        keywords = data[i]["ProductKeywords"]
+        #                        discount = data[i]["ProductDiscount"]
+        #                        url = data[i]["ProductURL"]
+        #                        insertProduct = insert_into_database_table(
+        #                            "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) VALUES (?,?,?,?,?,?,?,?,?);",
+        #                            (assistantID, id, name, brand, model, price, keywords, discount, url))
+        #                        # TODO check insertProduct for errors
+        #                elif str(ext).lower() == "xml":
+        #                    xmldoc = minidom.parse(PRODUCT_FILES + "/" + productFile.filename)
+        #                    productList = xmldoc.getElementsByTagName("product")
+        #                    for product in productList:
+        #                        try:
+        #                            id = product.getElementsByTagName("ProductID")[0].childNodes[0].data
+        #                            name = product.getElementsByTagName("ProductName")[0].childNodes[0].data
+        #                            brand = product.getElementsByTagName("ProductBrand")[0].childNodes[0].data
+        #                            model = product.getElementsByTagName("ProductModel")[0].childNodes[0].data
+        #                            price = product.getElementsByTagName("ProductPrice")[0].childNodes[0].data
+        #                            keywords = product.getElementsByTagName("ProductKeywords")[0].childNodes[0].data
+        #                            discount = product.getElementsByTagName("ProductDiscount")[0].childNodes[0].data
+        #                            url = product.getElementsByTagName("ProductURL")[0].childNodes[0].data
+        #                            insertProduct = insert_into_database_table(
+        #                                "INSERT INTO Products (AssistantID, ProductID, Name, Brand, Model, Price, Keywords, Discount, URL) VALUES (?,?,?,?,?,?,?,?,?);",
+        #                                (assistantID, id, name, brand, model, price, keywords, discount, url))
+        #                            # TODO check insertProduct for errors
+        #                        except IndexError:
+        #                            msg = "Invalid xml file"
+        #                            print(msg)
+        #                else:
+        #                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        #                os.remove(PRODUCT_FILES + "/" + productFile.filename)
+        #            else:
+        #                msg = "Error not allowed that type of file."
+        #                print(msg)
+        #        return msg
 
 

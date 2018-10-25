@@ -19,7 +19,6 @@ def adminPagesData():
                 "EditUsers": user.Role.EditUsers
             })
         else:
-            print(callback.Message)
             return redirect('login')
     else:
         return redirect('login')
@@ -42,7 +41,6 @@ def getUserData():
                 "role": user.Role.to_dict()
             })
         else:
-            print(callback.Message)
             return redirect('login')
     else:
         return redirect('login')

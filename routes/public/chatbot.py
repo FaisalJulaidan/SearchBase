@@ -85,19 +85,15 @@ def getSolutions_forChatbot(assistantIDAsHash):
             s_callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'], data['showTop'])
             if not s_callback.Success:
                 return helpers.jsonResponse(False, 400, s_callback.Message)
+            if s_callback.Data and len(s_callback.Data) > 0:
+                solutions = helpers.getListFromSQLAlchemyList(s_callback.Data)
 
-            # Convert SQLAlchemy objects to dict
-            if s_callback.Data:
-                for s in s_callback.Data:
-                    solutions.append(s.to_dict())
-
-        return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions':solutions})
+        return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions': solutions})
 
 
 @chatbot_router.route("/userdownloads/<path:path>", methods=['GET'])
 def assistant_userdownloads(path):
     if request.method == "GET":
-        print("trying to return file")
         return send_from_directory('static/user_downloads/', path)
 
 

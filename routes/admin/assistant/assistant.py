@@ -62,13 +62,13 @@ def admin_home():
             if assistants: assistants = helpers.getListFromSQLAlchemyList(assistants)
             else: assistants = []
 
-            print(assistants)
+
             return render_template("admin/dashboard.html",
                                    totalClicks=callback.Data.ProductsReturned,
                                    loadedAnswers=callback.Data.QuestionsAnswered,
                                    assistants=assistants)
         else:
-            print(callback.Message)
+
             return redirect('login')
 
 

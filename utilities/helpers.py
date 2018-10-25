@@ -31,11 +31,11 @@ def gen_dummy_data():
     sabic = Company.query.filter(Company.Name == "Sabic").first()
 
     # Create Assistatns for Aramco and Sabic companies
-    reader_a = Assistant(Name="Reader", Message="Hey there", TopBarText="Bot 1", SecondsUntilPopup=1, Active=True, Company=aramco)
-    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Bot 1", SecondsUntilPopup=1, Active=True, Company=aramco)
+    reader_a = Assistant(Name="Reader", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
+    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
 
-    reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Bot 1", SecondsUntilPopup=1, Active=True, Company=sabic)
-    helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Bot 1", SecondsUntilPopup=1, Active=True, Company=sabic)
+    reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
+    helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
 
     # Create Blocks
     db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Assistant=reader_a, Content={
@@ -141,6 +141,7 @@ def gen_dummy_data():
     db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=30,  ActiveBotsCap=2, InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
+    # Solutions
     db.session.add(Solution(SolutionID='D48N4wxwAWEMOH', MajorTitle='Big Title 1', SecondaryTitle="Small Title 1",
                             ShortDescription="A job at my little town",  Money="£56000", Keywords="smoker,duck",
                             URL="http://google.com", Assistant=reader_a, TimesReturned=2))
@@ -149,6 +150,7 @@ def gen_dummy_data():
                             ShortDescription="A town at my little job",  Money="£56000", Keywords="dog,sad",
                             URL="http://google.com", Assistant=reader_a, TimesReturned=10))
 
+    # Chatbot Sessions
     db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,18), SolutionsReturned=40, QuestionsAnswered=25, TimeSpent=120, Assistant=reader_a))
     db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), SolutionsReturned=55, QuestionsAnswered=25, TimeSpent=120, Assistant=reader_a))
     db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), SolutionsReturned=12, QuestionsAnswered=28, TimeSpent=127, Assistant=reader_a))
@@ -161,9 +163,11 @@ def gen_dummy_data():
     # Save all changes
     db.session.commit()
 
+
 def hardRedirectWithMessage(route, message):
     session["returnMessage"] = message
     return redirect(route)
+
 
 def redirectWithMessage(route, message):
     session["returnMessage"] = message
@@ -171,6 +175,7 @@ def redirectWithMessage(route, message):
         return redirect(route)
     else:
         return redirect(url_for("." + route))
+
 
 def redirectWithMessageAndAssistantID(route, assistantID, message):
     session["returnMessage"] = message

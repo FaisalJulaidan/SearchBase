@@ -32,7 +32,6 @@ def admin_pay(planID):
             helpers.redirectWithMessage('admin_pricing', 'This plan does not exist! Make sure the plan ID '
                                         + planID + ' is correct.')
 
-        print(stripePlan_callback.Data)
         return admin_services.render("admin/sub.html", plan=stripePlan_callback.Data)
 
     if request.method == 'POST':
@@ -48,7 +47,6 @@ def admin_pay(planID):
         user: User = callback.Data
 
         stripePlan_callback: Callback = sub_services.getStripePlan(planID)
-        print(stripePlan_callback.Success)
         if not stripePlan_callback.Success:
             return helpers.jsonResponse(False, 404, "This plan doesn't exist!", None)
 
@@ -58,9 +56,9 @@ def admin_pay(planID):
         token = data['token']['id']
         coupon = data['coupon']
 
-        print(">>>>>>>>>>>")
-        print(token)
-        print(coupon)
+        # print(">>>>>>>>>>>")
+        # print(token)
+        # print(coupon)
 
         if token is "Error" or not token:
             return helpers.jsonResponse(False, 404, "No token provided to complete the payment!", None)
@@ -71,7 +69,6 @@ def admin_pay(planID):
 
         # Set Plan session for logged in user
         session['UserPlan'] = sub_callback.Data['planNickname']
-        print("You have successfully subscribed!")
         return helpers.jsonResponse(True, 200, "You have successfully subscribed!", {"url": "admin/pricing-tables.html"})
 
 
@@ -102,7 +99,6 @@ def unsubscribe():
         # Clear plan session
         session.pop('UserPlan')
 
-        print(unsubscribe_callback.Message)
         return helpers.jsonResponse(True, 200, unsubscribe_callback.Message)
 
 

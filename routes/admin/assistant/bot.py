@@ -71,12 +71,9 @@ def get_labels():
 
         labels_callback : Callback = blockLabels_services.getByCompanyID(session.get('CompanyID', 0))
         if labels_callback.Success:
-            print(1)
             labels_callback : Callback = admin_services.convertForJinja(labels_callback.Data, BlockLabel)
             if labels_callback.Success:
-                print(2)
                 return helpers.jsonResponse(True, 200, labels_callback.Message, labels_callback.Data)
-        print(3)
         labels = []
         return helpers.jsonResponse(True, 200, labels_callback.Message, labels)
 

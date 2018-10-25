@@ -160,7 +160,6 @@ def signup():
 
         if not (fullname and email and password
                 and name and url):
-            print("Signup Error .1")
             return helpers.redirectWithMessage("signup", "Error in getting all input information.")
 
         # Split fullname
@@ -169,14 +168,12 @@ def signup():
 
         # Signup new user
         signup_callback: Callback = auth_services.signup(email.lower(), firstname, surname, password, name, phone, url)
-        print(signup_callback.Success, signup_callback.Message)
         if not signup_callback.Success:
             print(signup_callback.Message)
             return helpers.redirectWithMessage("signup", signup_callback.Message)
 
         # Send verification email
         mail_callback: Callback = mail_services.sendVerificationEmail(email, name)
-        print(mail_callback.Message)
 
         # If error while sending verification email
         if not mail_callback.Success:
@@ -191,13 +188,11 @@ def verify_account(payload):
         try:
             data = verificationSigner.loads(payload)
             email = data.split(";")[0]
-            print("email: ", email)
             user_callback : Callback = user_services.verifyByEmail(email)
             if not user_callback.Success: raise Exception(user_callback.Message)
 
             return helpers.redirectWithMessage("login", "Your email has been verified. You can now access your account.")
 
         except Exception as e:
-
             print(e)
             return helpers.redirectWithMessage("login", "Email verification link failed. Please contact Customer Support in order to resolve this.")

@@ -80,7 +80,6 @@ def login(email: str, password_to_check: str) -> Callback:
             return Callback(False, "Record with the current email or password was not found")
 
         if not user.Verified:
-            print("Account is not verified!")
             return Callback(False, "Account is not verified.")
 
         # If all the tests are valid then do login process

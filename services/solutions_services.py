@@ -149,20 +149,11 @@ def getByAssistantID(assistantID):
 def getAllByAssistantID(assistantID):
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(Solution.ID,
-                                  Solution.SolutionID,
-                                  Solution.MajorTitle,
-                                  Solution.SecondaryTitle,
-                                  Solution.ShortDescription,
-                                  Solution.Money,
-                                  Solution.Keywords,
-                                  Solution.URL,
-                                  Solution.TimesReturned,
-                                  Solution.AssistantID).filter(Solution.AssistantID == assistantID).all()
+        result = db.session.query(Solution).filter(Solution.AssistantID == assistantID).all()
         if not result: raise Exception
         return Callback(True, 'Solutions have been successfully retrieved', result)
     except Exception as exc:
-        print("getByAssistantID Error: ", exc)
+        print("getAllByAssistantID Error: ", exc)
         db.session.rollback()
         return Callback(False, 'Could not retrieve solutions for ID: ' + str(assistantID))
 

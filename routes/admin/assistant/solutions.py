@@ -12,7 +12,7 @@ def admin_solutions(assistantID):
         solutions_callback: Callback = solutions_services.getAllByAssistantID(assistantID)
         solutions = []
         if solutions_callback.Success:
-            solutions = solutions_callback.Data
+            solutions = helpers.getListFromSQLAlchemyList(solutions_callback.Data)
         print(solutions)
         return admin_services.render("admin/solutions.html", data=solutions, id=assistantID)
 

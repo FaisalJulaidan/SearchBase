@@ -4,6 +4,15 @@ from models import Callback, Solution, Company, Assistant
 from utilities import helpers
 
 import xml.etree.ElementTree as ET
+from json import dumps
+from collections import OrderedDict
+from xmljson import BadgerFish
+#from lxml.html import Element, tostring
+from xml.etree.ElementTree import fromstring, tostring
+from lxml import etree
+
+parser = etree.XMLParser(recover=True)
+bf = BadgerFish(dict_type=OrderedDict)
 
 solutions_router: Blueprint = Blueprint('Solutions_router', __name__, template_folder="../../templates")
 
@@ -220,18 +229,13 @@ def admin_products_file_upload(assistantID):
             return "File Type or Uploaded File could not be retrieved"
 
         if fileType == "RBDXML":
-            print("FILE: ", file)
-            print("FILE NAME: ", file.filename)
             tree = ET.parse(file)
-            print("TREE: ", tree)
             root = tree.getroot()
-            print("ROOT: ", root)
-            for child in root:
-                print("TAG: ", child.tag, " ATTRIB: ", child.attrib)
-                for child1 in child:
-                    print("TAG: ", child1.tag, " ATTRIB: ", child1.attrib)
             #https://pypi.org/project/xmljson/     to json
             #https://docs.python.org/3/library/xml.etree.elementtree.html   handle xml
+            xmlstr = tostring(root, encoding='utf8', method='xml')
+            jsonstr = dumps(bf.data(fromstring(xmlstr, parser=parser)))
+            print(jsonstr)
             return "OK"
         else:
             return "Please insure you have selected the right File Type option"

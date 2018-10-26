@@ -142,13 +142,13 @@ def gen_dummy_data():
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
     # Solutions
-    db.session.add(Solution(SolutionID='D48N4wxwAWEMOH', MajorTitle='Big Title 1', SecondaryTitle="Small Title 1",
-                            ShortDescription="A job at my little town",  Money="£56000", Keywords="smoker,duck",
-                            URL="http://google.com", Assistant=reader_a, TimesReturned=2))
-
-    db.session.add(Solution(SolutionID='asd8213AWEMOH', MajorTitle='Big Title 2', SecondaryTitle="Small Title 2",
-                            ShortDescription="A town at my little job",  Money="£56000", Keywords="dog,sad",
-                            URL="http://google.com", Assistant=reader_a, TimesReturned=10))
+    # db.session.add(Solution(SolutionID='D48N4wxwAWEMOH', MajorTitle='Big Title 1', SecondaryTitle="Small Title 1",
+    #                         ShortDescription="A job at my little town",  Money="£56000", Keywords="smoker,duck",
+    #                         URL="http://google.com", Assistant=reader_a, TimesReturned=2))
+    #
+    # db.session.add(Solution(SolutionID='asd8213AWEMOH', MajorTitle='Big Title 2', SecondaryTitle="Small Title 2",
+    #                         ShortDescription="A town at my little job",  Money="£56000", Keywords="dog,sad",
+    #                         URL="http://google.com", Assistant=reader_a, TimesReturned=10))
 
     # Chatbot Sessions
     db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,18), SolutionsReturned=40, QuestionsAnswered=25, TimeSpent=120, Assistant=reader_a))

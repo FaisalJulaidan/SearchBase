@@ -9,14 +9,12 @@ solutions_router: Blueprint = Blueprint('Solutions_router', __name__, template_f
 @solutions_router.route("/admin/assistant/<assistantID>/solutions", methods=['GET', 'POST'])
 def admin_solutions(assistantID):
     if request.method == "GET":
+        solutions_callback: Callback = solutions_services.getFirstByAssistantID(assistantID)
+        if not solutions_callback.Success: return admin_services.render("admin/solutions.html", data="", id=assistantID)
+        
+        print("solutions_callback.Data: ", solutions_callback.Data)
 
-        # solutions_callback: Callback = solutions_services.getAllByAssistantID(assistantID)
-        # solutions = []
-        # if solutions_callback.Success:
-        #     solutions = solutions_callback.Data
-        # print(solutions)
-        # return admin_services.render("admin/solutions.html", data=solutions, id=assistantID)
-        return admin_services.render("admin/solutions.html", id=assistantID)
+        return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID)
 
     # elif request.method == 'POST':
     #     companyID = session.get('CompanyID', None)
@@ -211,7 +209,6 @@ def create_solution(assistantID):
 
 #https://pypi.org/project/xmljson/     to json
 #https://docs.python.org/3/library/xml.etree.elementtree.html   handle xml
-# TODO improve
 @solutions_router.route("/admin/assistant/<assistantID>/solutions/file", methods=['POST'])
 def admin_products_file_upload(assistantID):
     if request.method == "POST":
@@ -225,7 +222,6 @@ def admin_products_file_upload(assistantID):
             jsonstr_callback : Callback = solutions_services.convertXMLtoJSON(file)
             if not jsonstr_callback.Success: return jsonstr_callback.Message
 
-            print(jsonstr_callback.Data)
             saveJson_callback : Callback = solutions_services.createUpdateJSONByAssistantID(assistantID, jsonstr_callback.Data)
 
             return saveJson_callback.Message

@@ -66,55 +66,11 @@
                                         </div>
                                     </div>
 
+                                    <h2>Raw Data:</h2>
                                     <div id="solutionsTableDiv">
 
                                     </div>
-                                    <!-- <div>
-                                        <table id="solutionsTable" class="table" cellspacing="0" width="100%">
-                                            <thead>
-                                                <tr>
-{#                                                    <th>Delete</th>#}
-                                                    <th>ID</th>
-                                                    <th>Major Title</th>
-                                                    <th>Secondary Title</th>
-                                                    <th>Short Description</th>
-                                                    <th>Money</th>
-                                                    <th>Keywords</th>
-                                                    <th>URL</th>
-                                                    <th>Edit / Delete</th>
-                                                </tr>
-                                            </thead>
 
-
-                                            <tbody id="tbody">
-                                                {%for item in data%}
-                                                   <tr data-rowid="{{ item['ID'] }}">
-{#                                                    <td data-type="deleteCheckBox"><input type="checkbox" ></td>\#}
-                                                    <td data-type="id" type="text"> {{ item['SolutionID'] }}</td>
-                                                    <td data-type="majorTitle"type="text"  onchange='validateName(this)'>{{ item['MajorTitle'] }} </td>
-                                                    <td data-type="secondaryTitle" type="text"  onchange='validate(this)'>{{ item['SecondaryTitle'] }}</td>
-                                                    <td data-type="shortDescription" type="text"  onchange='validate(this)'>{{ item['ShortDescription'] }}</td>
-                                                    <td data-type="money" type="text"  onchange='validate(this)'>{{ item['Money'] }}</td>
-                                                    <td data-type="keywords" type="text"  onchange='validate(this)'>{{ item['Keywords'] }}</td>
-                                                    <td data-type="URL" type="text" name="product_Keywords" onchange='validate(this)'>{{ item['URL'] }}</td>
-                                                    <td>
-                                                       <button type="button" class="btn btn-primary"
-                                                            data-toggle="modal"
-                                                            onclick="fillSolutionForm({{ item['ID'] }}, edit=true)">Edit</button>
-                                                       <button type="button" class="btn btn-danger" onclick="deleteSolution({{ item['ID'] }})">Delete</button>
-                                                     </td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-
-                                        </table>
-                                        <button type="button" class="btn btn-success" id="addRow" value="Send" onclick="fillSolutionForm(0, edit=false)">
-                                            Add New
-                                        </button>
-                                        <button type="button" class="btn btn-success" id="removeRow" value="Send" onclick="" disabled>
-                                            Delete All
-                                        </button>
-                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -201,7 +157,10 @@
 
 <script>
 
-
+    String.prototype.replaceAll = function (search, replacement) {
+        var target = this;
+        return target.split(search).join(replacement);
+    };
 
 var assistantID = window.location.pathname.split('/')[3];
 
@@ -210,164 +169,17 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
     console.log('Unbind submit event.');
     $(document).off('submit', '#solutionForm');
 });
+    $("#solutionsTableDiv").append("{{data.Content}}");
+    //console.log("{{data.Content}}".replace("&#39;", "\""))
+    //var json = jQuery.parseJSON("{{data.Content}}".replaceAll("&#39;", "\\\"").replaceAll("None", "\"\""));
+    //var json = JSON.parse("{{data.Content}}".replaceAll("&#39;", "\"").replaceAll("None", "\"None\"").replaceAll(/(?:\r\n|\r|\n)/g, '\\n').replaceAll("•	", " "))
+    //console.log("json: ", json);
 
-
-// function fillSolutionForm(solID, edit=false){
-//     var $form = $('form#solutionForm');
-//     var $row = $('#solutionsTable tbody tr[data-rowid="' + solID + '"]');
-//     console.log($row);
-//
-//     $('#solutionModal').modal('show');
-//
-//
-//     if(edit){
-//         // fill current user
-//         console.log($form.find('input[name="inputID"]').val());
-//         $form.find('input[name="inputId"]').val($row.find('td[data-type="id"]').text());
-//         $form.find('input[name="inputMajorTitle"]').val($row.find('td[data-type="majorTitle"]').text());
-//         $form.find('input[name="inputSecondaryTitle"]').val($row.find('td[data-type="secondaryTitle"]').text());
-//         $form.find('input[name="inputShortDescription"]').val($row.find('td[data-type="shortDescription"]').text());
-//         $form.find('input[name="inputMoney"]').val($row.find('td[data-type="money"]').text());
-//         $form.find('input[name="inputKeywords"]').val($row.find('td[data-type="keywords"]').text());
-//         $form.find('input[name="inputURL"]').val($row.find('td[data-type="URL"]').text());
-//     } else {
-//         $form.trigger("reset");
-//     }
-//
-//     // Bind the appropriate handlers depends on edit value
-//     $(document).on('submit', '#solutionForm', function (e) {
-//     e.preventDefault();
-//     if (edit){submitEditSolForm(this,solId=solID, event=e)}
-//     else {submitNewSolForm(this, event=e)}
-//     })
-//
-// }
-
-
-
-
-
-// function deleteSolution(solId) {
-//     console.log('DELETE Solution.');
-//     swal({
-//           title: "Are you sure?",
-//           text: "Solution will be removed completely from the system",
-//           icon: "warning",
-//           buttons: true,
-//           dangerMode: true,
-//         })
-//         .then((willDelete) => {
-//           if (willDelete) {
-//             $.ajax({
-//                 url: '/admin/solution/' + solId,
-//                 type: "DELETE"
-//             }).done(function (res) {
-//                 console.log(res);
-//                 swal("Success!", "Solution has been successfully deleted.", "success").then((value) => {
-//                 document.location.reload()
-//                 });
-//             }).fail(function (res) {
-//                 let resJson = JSON.parse(res.responseText);
-//                 swal("Error!", resJson.msg, "error").then((value) => {
-//                 });
-//             });
-//
-//           } else {
-//             // When clicking the cancel button in the alert box
-//           }
-//         });
-//  }
-//
-// function submitNewSolForm(form, event) {
-//     console.log('EDIT Solution.');
-//      $.ajax({
-//         url: '/admin/assistant/' + assistantID +'/solution',
-//         type: "POST",
-//         data: $('#solutionForm').serialize()
-//     }).done(function (res) {
-//         console.log(res);
-//         swal("Success!", "Solution has been successfully added.", "success").then((value) => {
-//           document.location.reload()
-//         })
-//     }).fail(function (res) {
-//         let resJson = JSON.parse(res.responseText);
-//         swal("Error!", resJson.msg, "error").then((value) => {
-//         });
-//     });
-// }
-//
-// function submitEditSolForm(form,solId, event) {
-//     console.log('EDIT Solution.');
-//      $.ajax({
-//         url: '/admin/solution/' + solId,
-//         type: "PUT",
-//         data: $('#solutionForm').serialize()
-//     }).done(function (res) {
-//         console.log(res);
-//         swal("Success!", "Solution has been successfully updated.", "success").then((value) => {
-//           document.location.reload()
-//         })
-//     }).fail(function (res) {
-//         let resJson = JSON.parse(res.responseText);
-//         swal("Error!", resJson.msg, "error").then((value) => {
-//         });
-//     });
-// }
-//
-//
-// function validate(element) {
-//     console.log(element.name);
-//     var elName = element.name;
-//     if (elName === 'inputMoney') {
-//         var price = element.value;
-//         // if there are more currencies we need to add it to the regex string
-//         var regex =/^[$£€][\d\.,]+/;
-//         if (regex.test(price))
-//             pass(element);
-//         else
-//             noPass(element,'Price should be in this format "£1500" Where the approved currencies are ($, £, and €)')
-//     }
-//     else if ((elName).includes('product_Brand')) {
-//         var brand = element.value
-//         if (brand.length < 2)
-//             noPass(element,'Data2 should be more than 2 letters')
-//         else
-//             pass(element)
-//     }
-//     else if ((elName).includes('product_Model')) {
-//         var model = element.value
-//         if (model.length < 2)
-//             noPass(element,'Data3 should be more than 2 letters')
-//         else
-//             pass(element)
-//     }
-//     else if ((elName).includes('product_Keywords')) {
-//         // TODO:
-//         var keywords = element.value
-//     }
-//     else if ((elName).includes('product_Discount')) {
-//         // TODO:
-//         var discount = element.value
-//     }
-//     else if (elName === 'inputURL') {
-//         var userURL = element.value;
-//         var URLRegex = /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/;
-//
-//         if (userURL.match(URLRegex))
-//             pass(element);
-//         else
-//             noPass(element,"Please enter your website URL correctly.")
-//     }
-//
-//     // helping function
-//     function pass(element) {
-//     }
-//     function noPass(element,text) {
-//         swal("Error!", text, "error").then((value) => {
-//         });
-//     }
-// }
-
+    //{%for record in data.Content %}
+    //{%for recordA in record %}
+    //console.log("{{recordA}}")
+    //{% endfor %}
+    //{% endfor %}
 
     //document.getElementById('uploadButton').addEventListener('click',uploadProductFile)
     function uploadProductFile() {
@@ -415,29 +227,6 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
         }
         return arrayRow;
     }
-
-    {#// Hide Extended Logic depending on user Plan#}
-    {#params = "";#}
-    {#var xhttp = new XMLHttpRequest();#}
-    {#xhttp.open("POST", "/admin/getadminpagesdata", true);#}
-    {#xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");#}
-    {#xhttp.onreadystatechange = function () {#}
-    {#    if (xhttp.readyState === 4) {#}
-    {#        if (xhttp.status === 200) {#}
-    {#            var responseString = xhttp.responseText#}
-    {##}
-    {#            //get user's plan restrictions#}
-    {#            restrictions = responseString.split("&&&")[2];#}
-    {#            if (restrictions.includes("ImportDatabase:False")) {#}
-    {#                $("#productFileForm").hide();#}
-    {#            }#}
-    {#            //ACTIVATE THE PAGE#}
-    {#        }#}
-    {#        else {#}
-    {#            console.error(xhttp.statusText);#}
-    {#        }#}
-    {#    }#}
-    {#xhttp.send(params);#}
 
 </script>
 {% endblock %}

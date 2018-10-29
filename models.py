@@ -294,22 +294,8 @@ class Solution(db.Model):
     #TimesReturned = db.Column(db.Integer, nullable=False, default=0)
 
     if BaseConfig.USE_ENCRYPTION:
-        # SolutionID = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        # MajorTitle = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        # SecondaryTitle = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
-        # ShortDescription = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
-        # Money = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        # Keywords = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        # URL = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
         Content = db.Column(JsonEncodedDict, nullable=False)
     else:
-        # SolutionID = db.Column(db.String(128), nullable=False)
-        # MajorTitle = db.Column(db.String(128), nullable=False)
-        # SecondaryTitle = db.Column(db.String(128), nullable=True)
-        # ShortDescription = db.Column(db.String(128), nullable=True)
-        # Money = db.Column(db.String(128), nullable=False)
-        # Keywords = db.Column(db.String(128), nullable=False)
-        # URL = db.Column(db.String(200), nullable=False)
         Content = db.Column(JsonEncodedDict, nullable=False)
 
     # Relationships:
@@ -317,7 +303,7 @@ class Solution(db.Model):
     Assistant = db.relationship('Assistant', back_populates='Solutions')
 
     def __repr__(self):
-        return '<Solution {}>'.format(self.MajorTitle)
+        return '<Solution {}>'.format(self.ID)
 
 
 class Statistics(db.Model):

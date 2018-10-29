@@ -37,6 +37,62 @@ def gen_dummy_data():
     reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
     helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
 
+    ## Create Blocks
+    #db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Assistant=reader_a, Content={
+    #    "answers": [
+    #      {
+    #        "action": "Go To Next Block",
+    #        "text": "Yes",
+    #        "timesClicked": 0,
+    #        "keywords": [
+    #          "smoker",
+    #          "sad"
+    #        ],
+    #        "blockToGoId": 0,
+    #        "afterMessage": 'Yesss!!'
+    #      },
+    #      {
+    #        "action": "Go To Next Block",
+    #        "text": "No",
+    #        "timesClicked": 0,
+    #        "keywords": [
+    #          "smoker",
+    #          "sad"
+    #        ],
+    #        "blockToGoId": 1,
+    #        "afterMessage": 'NOOOO!!'
+
+    #      }
+    #    ],
+    #    "text": "Do you smoke?",
+    #  }))
+    #db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Assistant=reader_a, Content={
+    #    "action": "Go To Next Block",
+    #    "text": "What's your email?",
+    #    "blockToGoID": None,
+    #    "storeInDB": True,
+    #    "validation": "Email",
+    #    "afterMessage": 'Your input is being processed...'
+    #}))
+
+    #db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
+    #    "action": "Go To Next Block",
+    #    "fileTypes": [
+    #    "doc",
+    #    "pdf"
+    #    ],
+    #    "text": "Upload your CV",
+    #    "blockToGoID": None,
+    #    "afterMessage": 'File is being uploaded...'
+    #}))
+
+    #db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Assistant=reader_a, Content={
+    #    "showTop": 5,
+    #    "afterMessage": 'DONE!!!!',
+    #    "action": "End Chat",
+    #    "blockToGoID": 0
+    #}))
+
     # Create Blocks
     db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Assistant=reader_a, Content={
         "answers": [
@@ -66,25 +122,6 @@ def gen_dummy_data():
         ],
         "text": "Do you smoke?",
       }))
-    db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Assistant=reader_a, Content={
-        "action": "Go To Next Block",
-        "text": "What's your email?",
-        "blockToGoID": None,
-        "storeInDB": True,
-        "validation": "Email",
-        "afterMessage": 'Your input is being processed...'
-    }))
-
-    db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
-        "action": "Go To Next Block",
-        "fileTypes": [
-        "doc",
-        "pdf"
-        ],
-        "text": "Upload your CV",
-        "blockToGoID": None,
-        "afterMessage": 'File is being uploaded...'
-    }))
 
     db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Assistant=reader_a, Content={
         "showTop": 5,

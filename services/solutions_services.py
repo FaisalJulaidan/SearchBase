@@ -9,12 +9,7 @@ import xml.etree.ElementTree as ET
 from json import dumps
 from collections import OrderedDict
 from xmljson import BadgerFish
-#from lxml.html import Element, tostring
-from xml.etree.ElementTree import fromstring, tostring
 from lxml import etree
-
-parser = etree.XMLParser(recover=True)
-bf = BadgerFish(dict_type=OrderedDict)
 
         ## Create a dict with keys as solution ids and values as the number occurrences
         ## of keywords of each solution in the given keywords list
@@ -54,16 +49,9 @@ def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Call
         
         #print(solution.Content)
         #print(dumps(solution.Content))
-        print(dumps(solution.Content).split("DBID")[1])
         #print(solution.Content["{http://tempuri.org/JSExport.xsd}JobShopExport"])
         matches = loopThroughAllJSON(solution.Content, {"command":"get solutions", "value":keywords}, solution.Content)
         print(matches)
-        #for key,value in solution.Content.items():
-        #    print("key: ", key)
-        #    for keyt,valuet in solution.Content[key].items():
-        #        print("keyt: ", keyt)
-        #        for keyv,valuet in solution.Content[key][keyt].items():
-        #            print("keyvv: ", keyv)
 
         result = []
         return Callback(True, 'Solutions based on keywords retrieved successfully!!', result)
@@ -96,28 +84,26 @@ def actOnJSONItem(action, item, result, original):
     try:
         if action["command"] == "print":
             print("JSON Item: ", item)
-        #elif action["command"] == "count matches keywords":
-        #    for keyword in action["value"]:
-        #        if type(keyword) is str: keyword = keyword.lower()
-        #        if type(item) is str: item = item.lower()
-        #        if keyword in item:
-        #            if result[item]:
-        #                result[item] += 1
-        #            else:
-        #                result[item] = 1
         elif action["command"] == "get solutions":
             if type(item) is int:
                 oristr = dumps(original)
                 #item = oristr.split("DBID=\""+str(item)+"\"")[1].split("Desc=\"")[1]
-                #print(item)
+                try:
+                    item = oristr.split('DBID": '+str(item)+', "@Desc": "')[1].split('"')[0]
+                except:
+                    pass
             if type(item) is str: 
                 item = item.lower()
                 #print(item)
-                if "developer" in item:
-                    if "developer" in result:
-                        result["developer"] += 1
-                    else:
-                        result["developer"] = 1
+                for keyword in action["value"]:
+                    keyword = str(keyword)
+                    if keyword in item:
+                        print("ITEM: ", item)
+                        print("KEYWORD: ", keyword)
+                        if keyword in result:
+                            result[keyword] += 1
+                        else:
+                            result[keyword] = 1
         return result
     except Exception as exc:
         print("solutions_services.actOnJSONItem ERROR: ", exc)
@@ -312,12 +298,18 @@ def convertXMLtoJSON(xmlfile):
     try:
         #read the file
         tree = ET.parse(xmlfile)
+        print("TREE")
         #get start and all of xml in written format
         root = tree.getroot()
+        print("ROOT")
         #convert to string
-        xmlstr = tostring(root, encoding='utf8', method='xml')
+        xmlstr = ET.tostring(root, encoding='utf8', method='xml')
+        print("XMLSTR")
         #convert to json
-        jsonstr = bf.data(fromstring(xmlstr, parser=parser))
+        parser = etree.XMLParser(recover=True)
+        bf = BadgerFish(dict_type=OrderedDict)
+        jsonstr = bf.data(ET.fromstring(xmlstr, parser=parser))
+        print("JSONSTR")
 
         return Callback(True, "File has been converted", jsonstr)
     except Exception as exc:

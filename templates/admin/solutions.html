@@ -170,16 +170,6 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
     $(document).off('submit', '#solutionForm');
 });
     $("#solutionsTableDiv").append("{{data.Content}}");
-    //console.log("{{data.Content}}".replace("&#39;", "\""))
-    //var json = jQuery.parseJSON("{{data.Content}}".replaceAll("&#39;", "\\\"").replaceAll("None", "\"\""));
-    //var json = JSON.parse("{{data.Content}}".replaceAll("&#39;", "\"").replaceAll("None", "\"None\"").replaceAll(/(?:\r\n|\r|\n)/g, '\\n').replaceAll("•	", " "))
-    //console.log("json: ", json);
-
-    //{%for record in data.Content %}
-    //{%for recordA in record %}
-    //console.log("{{recordA}}")
-    //{% endfor %}
-    //{% endfor %}
 
     //document.getElementById('uploadButton').addEventListener('click',uploadProductFile)
     function uploadProductFile() {

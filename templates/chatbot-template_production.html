@@ -723,12 +723,13 @@
                     var location = solutions[i]["data"]["@Loc"];
                     if(location === 0){ location= "-"; }
                     var createdOn = solutions[i]["data"]["@CreatedOn"];
-                    if(createdOn === 0){ createdOn= "-"; }
+                    if (createdOn === 0) { createdOn = "-"; }
+                    var URL = "https://www.cpsgroupuk.com/job-search/_" + String(solutions[i]["data"]["@DBID"]);
                     messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
                         + title + "</h5><br><label>" + term + "</label><br><p>"
                         + location + "</p><br><label>Created:<br>" + createdOn + "</label>"+
-                        // "<br><button onclick=\"openLink('" + solutions[i]["URL"] +
-                        // "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button>"+
+                         "<br><br><button onclick=\"openLink('" + URL +
+                         "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>Apply</span></button>"+
                         "</div></center></li>");
                 }
             }

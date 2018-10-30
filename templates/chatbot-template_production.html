@@ -725,8 +725,8 @@
                     var createdOn = solutions[i]["data"]["@CreatedOn"];
                     if(createdOn === 0){ createdOn= "-"; }
                     messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
-                        + title + "</h5><label>" + term + "</label><br><p>"
-                        + location + "</p><br><label>Created: " + createdOn + "</label>"+
+                        + title + "</h5><br><label>" + term + "</label><br><p>"
+                        + location + "</p><br><label>Created:<br>" + createdOn + "</label>"+
                         // "<br><button onclick=\"openLink('" + solutions[i]["URL"] +
                         // "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button>"+
                         "</div></center></li>");

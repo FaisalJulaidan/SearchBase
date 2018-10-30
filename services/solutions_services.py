@@ -38,6 +38,12 @@ from lxml import etree
         #    # Save
         #    db.session.commit()
 
+def getSolutionsSortKey(item):
+    result = 0
+    for key,value in item["matches"].items():
+        result += value
+    return result
+
 # Scoring System
 def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Callback:
 
@@ -46,32 +52,40 @@ def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Call
         solution = db.session.query(Solution).filter(Solution.AssistantID == assistant.ID).first()
         if not solution:
             return Callback(True, "There are no solutions associated with this assistant", None)
-        
-        #print(solution.Content)
-        #print(dumps(solution.Content))
-        #print(solution.Content["{http://tempuri.org/JSExport.xsd}JobShopExport"])
-        matches = loopThroughAllJSON(solution.Content, {"command":"get solutions", "value":keywords}, solution.Content)
-        print(matches)
 
-        result = []
+        result = getSolutions(solution.Content, keywords)
+        result = sorted(result, key=getSolutionsSortKey, reverse=True)
+        for c in result:
+            print(c["matches"])
+        result = result[0:max]
         return Callback(True, 'Solutions based on keywords retrieved successfully!!', result)
     except Exception as exc:
         print("solutions_services.getBasedOnKeywords() ERROR: ", exc)
         return Callback(False, 'Solutions could not be retrieved at this time')
 
-    # finally:
-       # db.session.close()
+def getSolutions(content, keywords):
+    try:
+        jobs = content["{http://tempuri.org/JSExport.xsd}JobShopExport"]["{http://tempuri.org/JSExport.xsd}Jobs"]["{http://tempuri.org/JSExport.xsd}Job"]
+        result = []
+        matches = ""
+        for value in jobs:
+            matches = loopThroughAllJSON(value, {"command":"get solutions", "value":keywords}, content, {})
+            if matches:
+                result.append({"data": value, "matches": matches})
+        return result
+    except Exception as exc:
+        print("solutions_services.getSolutions ERROR: ", exc)
+        return result
 
 def loopThroughAllJSON(item, action, original, result={}):
     try:
-        #print("Type: ", type(item))
         if type(item) is dict or type(item) is MutableDict:
             for key,value in item.items():
-                result = actOnJSONItem(action, key, original, result)
+                #result = actOnJSONItem(action, key, original, result)
                 loopThroughAllJSON(item[key], action, original, result)
         elif type(item) is list:
             for value in item:
-                result = actOnJSONItem(action, value, original, result)
+                #result = actOnJSONItem(action, value, original, result)
                 loopThroughAllJSON(value, action, original, result)
         else:
             result = actOnJSONItem(action, item, original, result)
@@ -80,30 +94,26 @@ def loopThroughAllJSON(item, action, original, result={}):
         print("solutions_services.loopThroughAllJSON ERROR: ", exc)
         return result
 
-def actOnJSONItem(action, item, result, original):
+def actOnJSONItem(action, item, original, result):
     try:
-        if action["command"] == "print":
-            print("JSON Item: ", item)
-        elif action["command"] == "get solutions":
-            if type(item) is int:
-                oristr = dumps(original)
-                #item = oristr.split("DBID=\""+str(item)+"\"")[1].split("Desc=\"")[1]
-                try:
-                    item = oristr.split('DBID": '+str(item)+', "@Desc": "')[1].split('"')[0]
-                except:
-                    pass
-            if type(item) is str: 
-                item = item.lower()
-                #print(item)
-                for keyword in action["value"]:
-                    keyword = str(keyword)
-                    if keyword in item:
-                        print("ITEM: ", item)
-                        print("KEYWORD: ", keyword)
-                        if keyword in result:
-                            result[keyword] += 1
-                        else:
-                            result[keyword] = 1
+        # if action["command"] == "print":
+        #     print("JSON Item: ", item)
+        # elif action["command"] == "get solutions":
+        if type(item) is int:
+            oristr = dumps(original)
+            try:
+                item = oristr.split('DBID": '+str(item)+', "@Desc": "')[1].split('"')[0]
+            except:
+                pass
+        if type(item) is str:
+            item = item.lower()
+            for keyword in action["value"]:
+                keyword = str(keyword)
+                if keyword in item:
+                    if keyword in result:
+                        result[keyword] += 1
+                    else:
+                        result[keyword] = 1
         return result
     except Exception as exc:
         print("solutions_services.actOnJSONItem ERROR: ", exc)

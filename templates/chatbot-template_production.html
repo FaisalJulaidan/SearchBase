@@ -585,6 +585,7 @@
             getSolutions(block.content.showTop)
                 .then((solutions) => {
                     solutions = JSON.parse(solutions);
+                    console.log("1: ", solutions)
                     displayReturnedSolutions(solutions.data.solutions)
                 })
         }
@@ -673,6 +674,7 @@
                 removeThinkingGif();
                 console.log("Error in retrieving solutions.");
                 console.log(res);
+                return [];
             });
         }
 
@@ -706,7 +708,7 @@
 
         function displayReturnedSolutions(solutions) {
             messageContainer = $(".messages ul");
-
+            console.log(solutions)
             // If there is no solutions in the database show this message.
             if (solutions.length === 0) {
                 sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.")
@@ -714,11 +716,20 @@
             } else {
 
                 for (var i = 0; i < solutions.length; i++) {
+                    var title = solutions[i]["data"]["@Title"];
+                    if(title === 0){ title= "-"; }
+                    var term = solutions[i]["data"]["@Term"];
+                    if(term === 0){ term= "-"; }
+                    var location = solutions[i]["data"]["@Loc"];
+                    if(location === 0){ location= "-"; }
+                    var createdOn = solutions[i]["data"]["@CreatedOn"];
+                    if(createdOn === 0){ createdOn= "-"; }
                     messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
-                        + emojione.toImage(solutions[i]["MajorTitle"]) + "</h5><label>" + emojione.toImage(solutions[i]["SecondaryTitle"]) + "</label><br><p>"
-                        + emojione.toImage(solutions[i]["ShortDescription"]) + "</p><br><label>" + emojione.toImage(solutions[i]["Money"]) +
-                        "</label><br><button onclick=\"openLink('" + emojione.toImage(solutions[i]["URL"]) +
-                        "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center></li>");
+                        + title + "</h5><label>" + term + "</label><br><p>"
+                        + location + "</p><br><label>Created: " + createdOn + "</label>"+
+                        // "<br><button onclick=\"openLink('" + solutions[i]["URL"] +
+                        // "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button>"+
+                        "</div></center></li>");
                 }
             }
             // submit answer automatically

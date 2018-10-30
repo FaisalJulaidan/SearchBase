@@ -11,6 +11,9 @@ from collections import OrderedDict
 from xmljson import BadgerFish
 from lxml import etree
 
+
+import time #used for checking code execution time
+
         ## Create a dict with keys as solution ids and values as the number occurrences
         ## of keywords of each solution in the given keywords list
         #dic = {}
@@ -49,15 +52,25 @@ def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Call
 
     try:
         # Get solutions
+        t0 = time.time()
         solution = db.session.query(Solution).filter(Solution.AssistantID == assistant.ID).first()
         if not solution:
             return Callback(True, "There are no solutions associated with this assistant", None)
+        t2 = time.time()
 
         result = getSolutions(solution.Content, keywords)
+        t3 = time.time()
+
         result = sorted(result, key=getSolutionsSortKey, reverse=True)
-        for c in result:
-            print(c["matches"])
+        # for c in result:
+        #     print(c["matches"])
         result = result[0:max]
+        t5 = time.time()
+
+        print("Time to get JSON from DB: ", t2-t0)
+        print("Time to get solutions from JSON: ", t3-t2)
+        print("Total Time: ", t5-t0)
+
         return Callback(True, 'Solutions based on keywords retrieved successfully!!', result)
     except Exception as exc:
         print("solutions_services.getBasedOnKeywords() ERROR: ", exc)
@@ -68,8 +81,9 @@ def getSolutions(content, keywords):
         jobs = content["{http://tempuri.org/JSExport.xsd}JobShopExport"]["{http://tempuri.org/JSExport.xsd}Jobs"]["{http://tempuri.org/JSExport.xsd}Job"]
         result = []
         matches = ""
+        originalString = dumps(content).split("SysKeys")[1]
         for value in jobs:
-            matches = loopThroughAllJSON(value, {"command":"get solutions", "value":keywords}, content, {})
+            matches = loopThroughAllJSON(value, {"command":"get solutions", "value":keywords}, originalString, {})
             if matches:
                 result.append({"data": value, "matches": matches})
         return result
@@ -77,51 +91,84 @@ def getSolutions(content, keywords):
         print("solutions_services.getSolutions ERROR: ", exc)
         return result
 
-def loopThroughAllJSON(item, action, original, result={}):
+def loopThroughAllJSON(item, action, originalString="", result={}):
     try:
         if type(item) is dict or type(item) is MutableDict:
             for key,value in item.items():
-                #result = actOnJSONItem(action, key, original, result)
-                loopThroughAllJSON(item[key], action, original, result)
+                result = actOnJSONItem(action, key, originalString, result)
+                loopThroughAllJSON(item[key], action, originalString, result)
         elif type(item) is list:
             for value in item:
-                #result = actOnJSONItem(action, value, original, result)
-                loopThroughAllJSON(value, action, original, result)
+                result = actOnJSONItem(action, value, originalString, result)
+                loopThroughAllJSON(value, action, originalString, result)
         else:
-            result = actOnJSONItem(action, item, original, result)
+            result = actOnJSONItem(action, item, originalString, result)
         return result
     except Exception as exc:
         print("solutions_services.loopThroughAllJSON ERROR: ", exc)
         return result
 
-def actOnJSONItem(action, item, original, result):
+def actOnJSONItem(action, item, originalString, result):
     try:
-        # if action["command"] == "print":
-        #     print("JSON Item: ", item)
-        # elif action["command"] == "get solutions":
-        if type(item) is int:
-            oristr = dumps(original)
-            try:
-                item = oristr.split('DBID": '+str(item)+', "@Desc": "')[1].split('"')[0]
-            except:
-                pass
-        if type(item) is str:
-            item = item.lower()
-            for keyword in action["value"]:
-                keyword = str(keyword)
-                if keyword in item:
-                    if keyword in result:
-                        result[keyword] += 1
-                    else:
-                        result[keyword] = 1
+        if action["command"] == "print":
+            print("JSON Item: ", item)
+        elif action["command"] == "get solutions":
+            if type(item) is int:
+                try:
+                    item = originalString.split('DBID": '+str(item)+', "@Desc": "')[1].split('"')[0]
+                except:
+                    pass
+            if type(item) is str:
+                item = item.lower()
+                for keyword in action["value"]:
+                    keyword = str(keyword).lower()
+                    if keyword in item:
+                        if keyword in result:
+                            result[keyword] += 1
+                        else:
+                            result[keyword] = 1
         return result
     except Exception as exc:
         print("solutions_services.actOnJSONItem ERROR: ", exc)
         return result
 
+def replaceIDsWithDataRBD(content):
+    jobs = content["{http://tempuri.org/JSExport.xsd}JobShopExport"]["{http://tempuri.org/JSExport.xsd}Jobs"]["{http://tempuri.org/JSExport.xsd}Job"]
+    IDsString = dumps(content).split("SysKeys")[1]
+
+    result = convertionLoopRDB(jobs, IDsString)
+    content["{http://tempuri.org/JSExport.xsd}JobShopExport"]["{http://tempuri.org/JSExport.xsd}Jobs"]["{http://tempuri.org/JSExport.xsd}Job"] = result
+
+    return content
+
+def convertionLoopRDB(item, IDsString):
+    try:
+        if type(item) is dict or type(item) is MutableDict or type(item) is OrderedDict:
+            for key,value in item.items():
+                item[key] = convertionLoopRDB(value, IDsString)
+        elif type(item) is list:
+            for value in item:
+                item[item.index(value)] = convertionLoopRDB(value, IDsString)
+        else:
+            print(type(item))
+            print("ITEM: ", item)
+            if type(item) is int:
+                try:
+                    item = IDsString.split('DBID": '+str(item)+', "@Desc": "')[1].split('"')[0]
+                except Exception as exc:
+                    print(exc)
+                    pass
+            print("ITEM: ", item)
+        return item
+    except Exception as exc:
+        print("solutions_services.loopThroughAllJSON ERROR: ", exc)
+        return item
+
 def createNew(assistantID, content):
     try:
         # Create a new user with its associated company and role
+        content = replaceIDsWithDataRBD(content)
+        #print(content)
         solution = Solution(AssistantID=assistantID, Content=content)
         db.session.add(solution)
 

@@ -85,10 +85,8 @@ def getSolutions_forChatbot(assistantIDAsHash):
             s_callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'], data['showTop'])
             if not s_callback.Success:
                 return helpers.jsonResponse(False, 400, s_callback.Message)
-            if s_callback.Data and len(s_callback.Data) > 0:
-                solutions = helpers.getListFromSQLAlchemyList(s_callback.Data)
-
-        return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions': solutions})
+            print("3: ", s_callback.Data)
+        return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions': s_callback.Data})
 
 
 @chatbot_router.route("/userdownloads/<path:path>", methods=['GET'])

@@ -4,6 +4,7 @@ from models import db,Callback,Solution, Assistant
 from sqlalchemy import func, exists
 from utilities import helpers
 from sqlalchemy.ext.mutable import MutableDict
+from services import userInput_services
 
 import xml.etree.ElementTree as ET
 from json import dumps
@@ -375,3 +376,16 @@ def createUpdateJSONByAssistantID(assistantID, content):
         print("solutions_services.createUpdateJSONByAssistantID ERROR: ", exc)
         db.session.rollback()
         return Callback(False, 'Could not update solutions file')
+
+def sendJobAlerts(assistantID):
+    try:
+        userInput_callback : Callback = userInput_services.getByAssistantID(assistantID)
+        if not userInput_callback.Success: raise Exception("Error in retrieving user input")
+
+        print(userInput_callback.Data)
+
+        return Callback(True, 'Job Alerts have been sent')
+
+    except Exception as exc:
+        print("solutions_services.sendJobAlerts ERROR: ", exc)
+        return Callback(False, 'Could not send job alerts')

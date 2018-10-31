@@ -3,75 +3,98 @@
 {% block title %}Solutions{% endblock %}
 
 {% block content %}
-    <div class="right_col" role="main">
-        <div class="">
-            <div class="page-title">
-                <div class="title_left">
-                    <h3>Adding New Solutions</h3>
-                </div>
+<link rel="stylesheet" type="text/css" href="/static/css/checkbox.css">
+<div class="right_col" role="main">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3>Adding New Solutions</h3>
             </div>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="row">
             <div class="clearfix"></div>
-
+        </div>
+        <div class="x_content">
+            <div class="clearfix"></div>
             <div class="row">
-                <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-                <div class="clearfix"></div>
-                <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <div class="x_panel">
-                            <div class="x_content">
-                                <p class="text-muted font-13 m-b-30">
-                                    Database 1 - All of the solutions thats your bot scans for are listed below.
-                                </p>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_content">
+                            <p class="text-muted font-13 m-b-30">
+                                Database 1 - All of the solutions thats your bot scans for are listed below.
+                            </p>
 
-                                <!-- Start of welcome message -->
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <div class="x_panel">
-                                            <div class="x_title">
-                                                <h2>Upload an existing database that you have
-                                                    <small>File Types: XML, JSON (coming soon)</small>
-                                                </h2>
-                                                <ul class="nav navbar-right panel_toolbox"></ul>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <form id="productFileForm" name="productFileForm"
-                                                      enctype="multipart/form-data">
+                            <!-- Start of welcome message -->
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            <h2>
+                                                Upload an existing database that you have
+                                                <small>File Types: XML, JSON (coming soon)</small>
+                                            </h2>
+                                            <ul class="nav navbar-right panel_toolbox"></ul>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <form id="productFileForm" name="productFileForm"
+                                                  enctype="multipart/form-data">
 
-                                                    <div class="form-group">
-                                                        <div>
-                                                            <label class="btn btn-success" for="productFile">Choose file to
-                                                                upload</label><br><br />
-                                                            <input type="file" id="productFile" name="solutionsFile" onchange="$('#fileDisplay').val($('#productFile').val())" style="display:none;"/>
-                                                            File: <input id="fileDisplay" style="border-style:none;cursor:auto;width:95%;" readonly/>
-                                                            <br />
-                                                            <br />
-                                                            File Type:
-                                                            <select name="fileType">
-                                                                <option value="RBDXML">RBD Xml File</option>
-                                                            </select>
-                                                        </div>
-                                                        <br/>
-                                                        <button id="uploadButton" class="btn btn-success"
-                                                                type="button" value="submit" onclick="uploadProductFile()">
-                                                            Upload Database
-                                                        </button>
+                                                <div class="form-group">
+                                                    <div>
+                                                        <label class="btn btn-success" for="productFile">
+                                                            Choose file to
+                                                            upload
+                                                        </label><br><br />
+                                                        <input type="file" id="productFile" name="solutionsFile" onchange="$('#fileDisplay').val($('#productFile').val())" style="display:none;" />
+                                                        File: <input id="fileDisplay" style="border-style:none;cursor:auto;width:95%;" readonly />
+                                                        <br />
+                                                        <br />
+                                                        File Type:
+                                                        <select name="fileType">
+                                                            <option value="RBDXML">RBD Xml File</option>
+                                                        </select>
                                                     </div>
-                                                </form>
-
-                                                <table class="table" id="tableExample"></table>
+                                                    <br />
+                                                    <button id="uploadButton" class="btn btn-success"
+                                                            type="button" value="submit" onclick="uploadProductFile()">
+                                                        Upload Database
+                                                    </button>
+                                                </div>
+                                            </form>
+                                            <br /><br />
+                                            <div id="jobAlertsDiv">
+                                                <h3>Job Alerts</h3>
+                                                <p>
+                                                    You can send emails to your clients when a new job suited for them has been added to your records.<br />
+                                                    This can be done manually by clicking the button bellow or by ticking the box which will check<br />
+                                                    and send them every time you update your data.
+                                                </p>
+                                                <label class="btn btn-success">Send Jobs</label>
+                                                <p id="sendJobsMessage"></p>
+                                                <br />
+                                                <h4>Send Automatically</h4>
+                                                <div class="input-group" style="margin-bottom: 5px;">
+                                                    <label class="checkboxContainer" style="margin-bottom: 5px;">
+                                                        On data update
+                                                        
+                                                        <input name="jobAlerts" value="jobAlerts" type="checkbox" {%if false%}checked{%endif%}/>
+                                                        
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <h2>Raw Data:</h2>
-                                    <div id="solutionsTableDiv">
-
-                                    </div>
+                                <h2>Raw Data:</h2>
+                                <div id="solutionsTableDiv">
 
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -79,77 +102,76 @@
             </div>
         </div>
     </div>
+</div>
 
-       <!-- Solution Modal -->
-                <div class="modal fade" id="solutionModal" tabindex="-1" role="dialog" aria-labelledby="solutionModalCenterTitle" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
+<!-- Solution Modal -->
+<div class="modal fade" id="solutionModal" tabindex="-1" role="dialog" aria-labelledby="solutionModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
 
-                      <div class="modal-header">
-                        <h3 class="modal-title" id="solutionModalLongTitle">Solution Information</h3>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
+            <div class="modal-header">
+                <h3 class="modal-title" id="solutionModalLongTitle">Solution Information</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
 
-                      <form id="solutionForm">
+            <form id="solutionForm">
 
-                          <div class="modal-body">
+                <div class="modal-body">
 
-                                    <div class="form-group">
-                                      <label for="inputID">ID</label>
-                                      <input type="text" class="form-control" name="inputId" placeholder="FS5894">
-                                    </div>
-
-                                    <div class="form-group">
-                                      <label for="inputBigTitle">Major Title</label>
-                                      <input  type="text" class="form-control" name="inputMajorTitle" placeholder="">
-                                    </div>
-
-                                    <div class="form-group">
-                                      <label for="inputSecondaryTitle">Secondary Title</label>
-                                      <input type="text" class="form-control" name="inputSecondaryTitle" placeholder="">
-                                    </div>
-
-                                    <div class="form-group">
-                                      <label for="inputSecondaryTitle">Short Description</label>
-                                      <input type="text" class="form-control" name="inputShortDescription" placeholder="">
-                                    </div>
-
-
-                                    <div class="form-group">
-                                      <label for="inputMoney">Money</label>
-                                      <input  type="text" class="form-control" name="inputMoney" value="£0" placeholder="" onchange="validate(this)">
-                                    </div>
-
-                                    <div class="form-group">
-                                      <label for="inputKeywords">Keywords</label>
-                                      <input type="text" class="form-control" name="inputKeywords" placeholder="">
-                                    </div>
-
-
-                                    <div class="form-group">
-                                      <label for="inputURL">URL</label>
-                                      <input  type="url" class="form-control" name="inputURL" placeholder="https://www.thesearchbase.com" onchange="validate(this)">
-                                    </div>
-
-
-
-
-                          </div>
-
-                          <div class="modal-footer">
-                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                             <button type="submit" class="btn btn-success">Submit</button>
-                          </div>
-                    </form>
-
+                    <div class="form-group">
+                        <label for="inputID">ID</label>
+                        <input type="text" class="form-control" name="inputId" placeholder="FS5894">
                     </div>
-                  </div>
+
+                    <div class="form-group">
+                        <label for="inputBigTitle">Major Title</label>
+                        <input type="text" class="form-control" name="inputMajorTitle" placeholder="">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputSecondaryTitle">Secondary Title</label>
+                        <input type="text" class="form-control" name="inputSecondaryTitle" placeholder="">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputSecondaryTitle">Short Description</label>
+                        <input type="text" class="form-control" name="inputShortDescription" placeholder="">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="inputMoney">Money</label>
+                        <input type="text" class="form-control" name="inputMoney" value="£0" placeholder="" onchange="validate(this)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputKeywords">Keywords</label>
+                        <input type="text" class="form-control" name="inputKeywords" placeholder="">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="inputURL">URL</label>
+                        <input type="url" class="form-control" name="inputURL" placeholder="https://www.thesearchbase.com" onchange="validate(this)">
+                    </div>
+
+
+
+
                 </div>
-       <!-- Solution Modal END -->
 
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Submit</button>
+                </div>
+            </form>
 
+        </div>
+    </div>
+</div>
+<!-- Solution Modal END -->
 {% endblock %}
 
 {% block customJS %}

@@ -82,7 +82,7 @@ def getSolutions_forChatbot(assistantIDAsHash):
 
         # If showTop is 0 then skip below return nothing and don't even call solutions_services
         if data['showTop'] > 0:
-            s_callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'], data['showTop'])
+            s_callback = solutions_services.getBasedOnKeywords(assistant.ID, data['keywords'], data['showTop'])
             if not s_callback.Success:
                 return helpers.jsonResponse(False, 400, s_callback.Message)
             print("3: ", s_callback.Data)

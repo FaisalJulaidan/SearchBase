@@ -4,7 +4,7 @@ from models import db,Callback,Solution, Assistant
 from sqlalchemy import func, exists
 from utilities import helpers
 from sqlalchemy.ext.mutable import MutableDict
-from services import userInput_services
+from services import userInput_services, mail_services
 
 import xml.etree.ElementTree as ET
 from json import dumps
@@ -22,12 +22,12 @@ def getSolutionsSortKey(item):
     return result
 
 # Scoring System
-def getBasedOnKeywords(assistant: Assistant, keywords: list, max=999999) -> Callback:
+def getBasedOnKeywords(assistantID, keywords: list, max=999999) -> Callback:
 
     try:
         # Get solutions
         t0 = time.time()
-        solution = db.session.query(Solution).filter(Solution.AssistantID == assistant.ID).first()
+        solution = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
         if not solution:
             return Callback(True, "There are no solutions associated with this assistant", None)
         t2 = time.time()
@@ -385,11 +385,24 @@ def sendSolutionsAlerts(assistantID):
         filterEmails_callback : Callback = userInput_services.filterForContainEmails(userInput_callback.Data)
         if not filterEmails_callback.Success: raise Exception("Error in filtering for emails")
 
-        for record in filterEmails_callback.Data:
-            record = userInput_services.userInputToKeywords(record)
-            #getBasedOnKeywords(assistant, data['keywords'], data['showTop'])
+        errors = 0
 
-        return Callback(True, 'Alerts have been sent')
+        for record in filterEmails_callback.Data:
+            print("RECORD: ", record)
+            keywords = []
+            for inputs in record["record"]:
+                keywords += inputs['keywords']
+            print("KEYWORDS: ", keywords)
+            solutions_callback : Callback = getBasedOnKeywords(assistantID, keywords, 5)
+            if not solutions_callback.Success: raise Exception("Error in getting solutions")
+            if not solutions_callback.Data: continue
+
+            sendMail_callback : Callback = mail_services.sendSolutionAlert(record, solutions_callback.Data)
+            if not sendMail_callback.Success: errors += 1
+
+        if errors > 0: return Callback(True, 'Alerts have been sent however there was an error with sending the email to ' + str(errors) + " users.")
+
+        return Callback(True, 'Alerts have been sent.')
 
     except Exception as exc:
         print("solutions_services.sendJobAlerts ERROR: ", exc)

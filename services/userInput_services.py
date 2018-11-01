@@ -34,19 +34,6 @@ def filterForContainEmails(records):
 
         return Callback(False, 'Could not filter the data.')
 
-def userInputToKeywords(record):
-    try:
-        result = []
-        print(record)
-
-        return Callback(True, "Data has been filtered.", result)
-
-    except Exception as exc:
-
-        print("userInput_services.userInputToKeywords ERROR: ", exc)
-
-        return Callback(False, 'Could not filter the data.')
-        
 def deleteByID(id):
     try:
         db.session.query(ChatbotSession).filter(ChatbotSession.ID == id).delete()

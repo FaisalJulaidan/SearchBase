@@ -74,6 +74,14 @@ def gen_dummy_data():
         "validation": "Email",
         "afterMessage": 'Your input is being processed...'
     }))
+    db.session.add(Block(Type=BlockType.UserInput, Order=3, StoreInDB=True, Assistant=reader_a, Content={
+        "action": "Go To Next Block",
+        "text": "Give me some input",
+        "blockToGoID": None,
+        "storeInDB": True,
+        "validation": "Ignore",
+        "afterMessage": 'Your input is being processed...'
+    }))
 
     #db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
     #    "action": "Go To Next Block",

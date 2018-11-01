@@ -71,10 +71,11 @@ def addedNewUserEmail(adminEmail, targetEmail, password):
 def sendSolutionAlert(record, solutions):
     try:
         targetEmail = record["email"]
+        userData = record["record"]
+        solutions = solutions
 
-
-        send_email((targetEmail), 'You have been added to TheSearchBase',
-               'emails/account_invitation.html', password=password, adminEmail=adminEmail)
+        send_email((targetEmail), 'You have new job matches',
+               'emails/solution_alert.html', userData = userData, solutions=solutions)
 
         return Callback(True, 'Email sent is on its way to ' + targetEmail)
 

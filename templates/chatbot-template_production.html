@@ -40,9 +40,6 @@
     <!-- Pop-up Stylesheet -->
     <!-- <link href="/static/pop-up/pop.css" rel="stylesheet"> -->
 
-    <!-- Responsive CSS -->
-    <link href="/static/css/responsive.css" rel="stylesheet">
-
     <!-- Core Stylesheet -->
     <!-- <link href="/static/css/style.css" rel="stylesheet"> -->
     <!-- <link href="/static/css/main.css" rel="stylesheet"> -->
@@ -593,6 +590,9 @@
         // This should send the data to the server, without returning any solutions back
         function sendData() {
             sentOnClose = true;
+            console.log(1)
+            console.log(collectedInformation)
+            console.log(collectedInformation.length)
             if (collectedInformation.length == 0) {
                 return false
             }
@@ -630,6 +630,9 @@
 
 
         function sendDataSolutionsBlock(showTop) {
+            console.log(2)
+            console.log(collectedInformation)
+            console.log(collectedInformation.length)
             putThinkingGif();
             params = { "collectedInformation": collectedInformation, "keywords": keywords, "showTop": showTop };
 
@@ -942,7 +945,6 @@
                 if (blockKeywords){
                     blockKeywords = Boolean(blockKeywords.split) ? blockKeywords.split(',') : blockKeywords;
                 }
-
                 if (currentBlock.storeInDB) {
                     var information = {
                         "blockID": currentBlock.id,
@@ -950,12 +952,13 @@
                         "input": message
                     };
                     if (currentBlock.type == "Question" && blockKeywords !== undefined) {
-                        information["keywords"] = blockKeywords
-                        collectedInformation.push(information);
-                    } else {
-                        information["keywords"] = []
-                        collectedInformation.push(information);
+                        information["keywords"] = blockKeywords;
+                    } else if (currentBlock.type == "User Input"){
+                        information["keywords"] = message.replace(/ /g, " ").split(" ");
+                    }else {
+                        information["keywords"] = [];
                     }
+                    collectedInformation.push(information);
                 }
 
             }

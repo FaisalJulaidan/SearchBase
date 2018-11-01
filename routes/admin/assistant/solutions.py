@@ -14,7 +14,12 @@ def admin_solutions(assistantID):
         
         print("solutions_callback.Data: ", solutions_callback.Data)
 
-        return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID)
+        checkForAlerts_callback : Callback = solutions_services.checkAutomaticSolutionAlerts(assistantID)
+        if not checkForAlerts_callback.Success:
+          return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID)
+
+        
+        return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID, alerts=checkForAlerts_callback.Data)
 
 
 @solutions_router.route("/admin/solution/<solID>", methods=['PUT', 'DELETE'])
@@ -136,6 +141,12 @@ def admin_products_file_upload(assistantID):
             if not jsonstr_callback.Success: return jsonstr_callback.Message
 
             saveJson_callback : Callback = solutions_services.createUpdateJSONByAssistantID(assistantID, jsonstr_callback.Data)
+            if saveJson_callback.Success:
+                checkForAlerts_callback : Callback = solutions_services.checkAutomaticSolutionAlerts(assistantID)
+                if checkForAlerts_callback.Success:
+                    if checkForAlerts_callback.Data:
+                        sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(assistantID)
+                        return saveJson_callback.Message + ". " + sendAlerts_callback.Message
 
             return saveJson_callback.Message
         else:
@@ -155,14 +166,11 @@ def admin_send_solution_alerts(assistantID):
 def admin_set_automatic_solution_alert(assistantID, setTo):
 
     if request.method == "POST":
-        print(setTo)
-        print(type(setTo))
-        if setTo is "true": setTo = True
-        else: setTo = False
-        
-        print()
-        print(setTo)
-        print(type(setTo))
+
+        if setTo == "true": 
+            setTo = True
+        else: 
+            setTo = False
 
         setAutomaticSolutionAlerts_callback : Callback = solutions_services.switchAutomaticSolutionAlerts(assistantID, setTo)
         

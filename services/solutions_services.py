@@ -128,7 +128,6 @@ def convertionLoopRDB(item, IDsString):
                 try:
                     item = IDsString.split('DBID": '+str(item)+', "@Desc": "')[1].split('"')[0]
                 except Exception as exc:
-                    print(exc)
                     pass
         return item
     except Exception as exc:
@@ -404,7 +403,7 @@ def switchAutomaticSolutionAlerts(assistantID, setTo):
         result = getSolutionByAssistantID(assistantID)
         if not result.Success: raise Exception("Could not find alerts record")
 
-        result.automaticSolutionAlerts = setTo
+        result.Data.automaticSolutionAlerts = setTo
 
         db.session.commit()
 
@@ -414,3 +413,14 @@ def switchAutomaticSolutionAlerts(assistantID, setTo):
         print("solutions_services.switchAutomaticSolutionAlerts ERROR: ", exc)
         db.session.rollback()
         return Callback(False, 'Could not set automatic alerts at this time. Please insure you have a database connected or uploaded')
+
+def checkAutomaticSolutionAlerts(assistantID):
+    try:
+        result = getSolutionByAssistantID(assistantID)
+        if not result.Success: raise Exception("Could not find alerts record")
+
+        return Callback(True, 'Automatic alerts have been retrieved.', result.Data.automaticSolutionAlerts)
+
+    except Exception as exc:
+        print("solutions_services.checkAutomaticSolutionAlerts ERROR: ", exc)
+        return Callback(False, 'Could not retrieve automatic alerts at this time')

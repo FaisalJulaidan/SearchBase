@@ -64,8 +64,22 @@ def addedNewUserEmail(adminEmail, targetEmail, password):
 
         return Callback(True, 'Email sent is on its way to ' + targetEmail)
 
-    except:
+    except Exception as e:
         print("addedNewUserEmail() Error: ", e)
+        return Callback(False, 'Could not send email to ' + targetEmail)
+
+def sendSolutionAlert(record, solutions):
+    try:
+        targetEmail = record["email"]
+
+
+        send_email((targetEmail), 'You have been added to TheSearchBase',
+               'emails/account_invitation.html', password=password, adminEmail=adminEmail)
+
+        return Callback(True, 'Email sent is on its way to ' + targetEmail)
+
+    except Exception as e:
+        print("mail_services.sendSolutionAlert ERROR: ", e)
         return Callback(False, 'Could not send email to ' + targetEmail)
 
 #NOTIFICATIONS

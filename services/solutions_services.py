@@ -377,15 +377,20 @@ def createUpdateJSONByAssistantID(assistantID, content):
         db.session.rollback()
         return Callback(False, 'Could not update solutions file')
 
-def sendJobAlerts(assistantID):
+def sendSolutionsAlerts(assistantID):
     try:
         userInput_callback : Callback = userInput_services.getByAssistantID(assistantID)
         if not userInput_callback.Success: raise Exception("Error in retrieving user input")
 
-        print(userInput_callback.Data)
+        filterEmails_callback : Callback = userInput_services.filterForContainEmails(userInput_callback.Data)
+        if not filterEmails_callback.Success: raise Exception("Error in filtering for emails")
 
-        return Callback(True, 'Job Alerts have been sent')
+        for record in filterEmails_callback.Data:
+            record = userInput_services.userInputToKeywords(record)
+            #getBasedOnKeywords(assistant, data['keywords'], data['showTop'])
+
+        return Callback(True, 'Alerts have been sent')
 
     except Exception as exc:
         print("solutions_services.sendJobAlerts ERROR: ", exc)
-        return Callback(False, 'Could not send job alerts')
+        return Callback(False, 'Could not send alerts at this time')

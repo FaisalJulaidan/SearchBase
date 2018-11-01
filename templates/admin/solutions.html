@@ -72,19 +72,20 @@
                                                     This can be done manually by clicking the button bellow or by ticking the box which will check<br />
                                                     and send them every time you update your data.
                                                 </p>
-                                                <label class="btn btn-success">Send Jobs</label>
-                                                <p id="sendJobsMessage"></p>
+                                                <label class="btn btn-success" onclick="sendSolutionAlerts()">Send Jobs</label>
+                                                <p id="sendSolutionsMessage"></p>
                                                 <br />
                                                 <h4>Send Automatically</h4>
                                                 <div class="input-group" style="margin-bottom: 5px;">
                                                     <label class="checkboxContainer" style="margin-bottom: 5px;">
                                                         On data update
                                                         
-                                                        <input name="jobAlerts" value="jobAlerts" type="checkbox" {%if false%}checked{%endif%}/>
+                                                        <input name="jobAlerts" value="jobAlerts" type="checkbox" {%if false%}checked{%endif%} onchange="changeAutoSolutionAlerts()"/>
                                                         
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </div>
+                                                <p id="checkboxMessage"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -229,6 +230,29 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
         else
             alertError('Upload File Error','<h2>There is no file to upload</h2>')
     }
+
+    function sendSolutionAlerts() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/admin/assistant/{{ id }}/sendSolutionAlerts", true); // true is asynchronous
+        xhttp.onreadystatechange = function () {
+            if (xhttp.readyState === 4) {
+                if (xhttp.status === 200) {
+                    msg = xhttp.responseText;
+                    $("#sendSolutionsMessage").text(msg);
+                }
+                else {
+                    console.error(xhttp.statusText);
+                    msg = "Error: " + xhttp.status;
+                    $("#sendSolutionsMessage").text(msg);
+                }
+                console.log(msg);
+            }
+        };
+        xhttp.send();
+    }
+
+
+
 
 
     // helping functions

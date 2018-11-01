@@ -66,14 +66,14 @@ def gen_dummy_data():
     #    ],
     #    "text": "Do you smoke?",
     #  }))
-    #db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Assistant=reader_a, Content={
-    #    "action": "Go To Next Block",
-    #    "text": "What's your email?",
-    #    "blockToGoID": None,
-    #    "storeInDB": True,
-    #    "validation": "Email",
-    #    "afterMessage": 'Your input is being processed...'
-    #}))
+    db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Assistant=reader_a, Content={
+        "action": "Go To Next Block",
+        "text": "What's your email?",
+        "blockToGoID": None,
+        "storeInDB": True,
+        "validation": "Email",
+        "afterMessage": 'Your input is being processed...'
+    }))
 
     #db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
     #    "action": "Go To Next Block",
@@ -92,36 +92,6 @@ def gen_dummy_data():
     #    "action": "End Chat",
     #    "blockToGoID": 0
     #}))
-
-    # Create Blocks
-    db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Assistant=reader_a, Content={
-        "answers": [
-          {
-            "action": "Go To Next Block",
-            "text": "Yes",
-            "timesClicked": 0,
-            "keywords": [
-              "smoker",
-              "sad"
-            ],
-            "blockToGoId": 0,
-            "afterMessage": 'Yesss!!'
-          },
-          {
-            "action": "Go To Next Block",
-            "text": "No",
-            "timesClicked": 0,
-            "keywords": [
-              "smoker",
-              "sad"
-            ],
-            "blockToGoId": 1,
-            "afterMessage": 'NOOOO!!'
-
-          }
-        ],
-        "text": "Do you smoke?",
-      }))
 
     db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Assistant=reader_a, Content={
         "showTop": 5,
@@ -177,25 +147,6 @@ def gen_dummy_data():
 
     db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=30,  ActiveBotsCap=2, InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
-
-    # Solutions
-    # db.session.add(Solution(SolutionID='D48N4wxwAWEMOH', MajorTitle='Big Title 1', SecondaryTitle="Small Title 1",
-    #                         ShortDescription="A job at my little town",  Money="£56000", Keywords="smoker,duck",
-    #                         URL="http://google.com", Assistant=reader_a, TimesReturned=2))
-    #
-    # db.session.add(Solution(SolutionID='asd8213AWEMOH', MajorTitle='Big Title 2', SecondaryTitle="Small Title 2",
-    #                         ShortDescription="A town at my little job",  Money="£56000", Keywords="dog,sad",
-    #                         URL="http://google.com", Assistant=reader_a, TimesReturned=10))
-
-    # Chatbot Sessions
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,18), SolutionsReturned=40, QuestionsAnswered=25, TimeSpent=120, Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), SolutionsReturned=55, QuestionsAnswered=25, TimeSpent=120, Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,16), SolutionsReturned=12, QuestionsAnswered=28, TimeSpent=127, Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,15), SolutionsReturned=64, QuestionsAnswered=45, TimeSpent=300, Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,6), SolutionsReturned=11, QuestionsAnswered=12, TimeSpent=50, Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,5), SolutionsReturned=636, QuestionsAnswered=5, TimeSpent=23, Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 9,1), SolutionsReturned=84, QuestionsAnswered=22, TimeSpent=67, Assistant=reader_a))
-    db.session.add(ChatbotSession(Data={'f':3}, DateTime=datetime(2018, 7,1), SolutionsReturned=123, QuestionsAnswered=17, TimeSpent=80, Assistant=reader_a))
 
     # Save all changes
     db.session.commit()

@@ -592,6 +592,10 @@
 
         // This should send the data to the server, without returning any solutions back
         function sendData() {
+            sentOnClose = true;
+            if (collectedInformation.length == 0) {
+                return false
+            }
             putThinkingGif();
             var solutions = [];
             params = {
@@ -710,8 +714,10 @@
             messageContainer = $(".messages ul");
             console.log(solutions)
             // If there is no solutions in the database show this message.
-            if (solutions.length === 0) {
-                sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.")
+            if (solutions == null) {
+                sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.");
+            } else if (solutions.length === 0) {
+                sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.");
 
             } else {
 

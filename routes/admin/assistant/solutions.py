@@ -122,8 +122,6 @@ def create_solution(assistantID):
         return helpers.jsonResponse(True, 200, "Solution successfully added.")
 
 
-#https://pypi.org/project/xmljson/     to json
-#https://docs.python.org/3/library/xml.etree.elementtree.html   handle xml
 @solutions_router.route("/admin/assistant/<assistantID>/solutions/file", methods=['POST'])
 def admin_products_file_upload(assistantID):
     if request.method == "POST":
@@ -142,3 +140,13 @@ def admin_products_file_upload(assistantID):
             return saveJson_callback.Message
         else:
             return "Please insure you have selected the right File Type option"
+
+
+@solutions_router.route("/admin/assistant/<assistantID>/sendSolutionAlerts", methods=['POST'])
+def admin_send_solution_alerts(assistantID):
+
+    if request.method == "POST":
+
+        sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(assistantID)
+
+        return sendAlerts_callback.Message

@@ -150,3 +150,20 @@ def admin_send_solution_alerts(assistantID):
         sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(assistantID)
 
         return sendAlerts_callback.Message
+
+@solutions_router.route("/admin/assistant/<assistantID>/automaticSolutionAlerts/<setTo>", methods=['POST'])
+def admin_set_automatic_solution_alert(assistantID, setTo):
+
+    if request.method == "POST":
+        print(setTo)
+        print(type(setTo))
+        if setTo is "true": setTo = True
+        else: setTo = False
+        
+        print()
+        print(setTo)
+        print(type(setTo))
+
+        setAutomaticSolutionAlerts_callback : Callback = solutions_services.switchAutomaticSolutionAlerts(assistantID, setTo)
+        
+        return setAutomaticSolutionAlerts_callback.Message

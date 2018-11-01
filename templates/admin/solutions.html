@@ -82,7 +82,7 @@
                                                     <label class="checkboxContainer" style="margin-bottom: 5px;">
                                                         On data update
 
-                                                        <input name="jobAlerts" value="jobAlerts" type="checkbox" {%if false%}checked{%endif%} onchange="changeAutoSolutionAlerts()"/>
+                                                        <input id="automaticSolutionAlertsCheckbox" name="jobAlerts" value="jobAlerts" type="checkbox" {%if false%}checked{%endif%} onchange="changeAutoSolutionAlerts()"/>
 
                                                         <span class="checkmark"></span>
                                                     </label>
@@ -254,9 +254,34 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
         xhttp.send();
     }
 
+    function changeAutoSolutionAlerts() {
+        var state = document.getElementById("automaticSolutionAlertsCheckbox").checked;
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/admin/assistant/{{ id }}/automaticSolutionAlerts/" + state, true); // true is asynchronous
+        xhttp.onreadystatechange = function () {
+            if (xhttp.readyState === 4) {
+                if (xhttp.status === 200) {
+                    msg = xhttp.responseText;
+                    $("#checkboxMessage").text(msg);
+                    setTimeout(removeTextboxesText, 3000)
+                    if(msg == 'Could not set automatic alerts at this time. Please insure you have a database connected or uploaded'){ document.getElementById("automaticSolutionAlertsCheckbox").checked = !state;}
+                }
+                else {
+                    console.error(xhttp.statusText);
+                    msg = "Error: " + xhttp.status;
+                    $("#checkboxMessage").text(msg);
+                    document.getElementById("automaticSolutionAlertsCheckbox").checked = !state;
+                    setTimeout(removeTextboxesText, 3000)
+                }
+                console.log(msg);
+            }
+        };
+        xhttp.send();
+    }
 
-
-
+    function removeTextboxesText() {
+        $("#checkboxMessage").text("");
+    }
 
     // helping functions
     function createArray(rows) {

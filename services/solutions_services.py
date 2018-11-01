@@ -124,15 +124,12 @@ def convertionLoopRDB(item, IDsString):
             for value in item:
                 item[item.index(value)] = convertionLoopRDB(value, IDsString)
         else:
-            print(type(item))
-            print("ITEM: ", item)
             if type(item) is int:
                 try:
                     item = IDsString.split('DBID": '+str(item)+', "@Desc": "')[1].split('"')[0]
                 except Exception as exc:
                     print(exc)
                     pass
-            print("ITEM: ", item)
         return item
     except Exception as exc:
         print("solutions_services.loopThroughAllJSON ERROR: ", exc)
@@ -329,25 +326,21 @@ def convertXMLtoJSON(xmlfile):
     try:
         #read the file
         tree = ET.parse(xmlfile)
-        print("TREE")
         #get start and all of xml in written format
         root = tree.getroot()
-        print("ROOT")
         #convert to string
         xmlstr = ET.tostring(root, encoding='utf8', method='xml')
-        print("XMLSTR")
         #convert to json
         parser = etree.XMLParser(recover=True)
         bf = BadgerFish(dict_type=OrderedDict)
         jsonstr = bf.data(ET.fromstring(xmlstr, parser=parser))
-        print("JSONSTR")
 
         return Callback(True, "File has been converted", jsonstr)
     except Exception as exc:
         print("solutions_services.convertXMLtoJSON ERROR: ", exc)
         return Callback(False, "An error occured while converting xml file")
 
-def getJSONByAssistantID(assistantID):
+def getSolutionByAssistantID(assistantID):
     try:
         # Get result and check if None then raise exception
         result = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
@@ -356,14 +349,14 @@ def getJSONByAssistantID(assistantID):
         return Callback(True, 'JSON has been successfully retrieved', result)
 
     except Exception as exc:
-        print("solutions_services.getJSONByAssistantID ERROR/EMPTY: ", exc)
+        print("solutions_services.getSolutionByAssistantID ERROR/EMPTY: ", exc)
         db.session.rollback()
         return Callback(False, 'Could not retrieve JSON')
 
 def createUpdateJSONByAssistantID(assistantID, content):
     try:
         # Get result and check if None then raise exception
-        result = getJSONByAssistantID(assistantID)
+        result = getSolutionByAssistantID(assistantID)
         if not result.Success: createNew(assistantID, content)
 
         result.Content = content
@@ -388,11 +381,9 @@ def sendSolutionsAlerts(assistantID):
         errors = 0
 
         for record in filterEmails_callback.Data:
-            print("RECORD: ", record)
             keywords = []
             for inputs in record["record"]:
                 keywords += inputs['keywords']
-            print("KEYWORDS: ", keywords)
             solutions_callback : Callback = getBasedOnKeywords(assistantID, keywords, 5)
             if not solutions_callback.Success: raise Exception("Error in getting solutions")
             if not solutions_callback.Data: continue
@@ -407,3 +398,19 @@ def sendSolutionsAlerts(assistantID):
     except Exception as exc:
         print("solutions_services.sendJobAlerts ERROR: ", exc)
         return Callback(False, 'Could not send alerts at this time')
+
+def switchAutomaticSolutionAlerts(assistantID, setTo):
+    try:
+        result = getSolutionByAssistantID(assistantID)
+        if not result.Success: raise Exception("Could not find alerts record")
+
+        result.automaticSolutionAlerts = setTo
+
+        db.session.commit()
+
+        return Callback(True, 'Automatic alerts have been set.')
+
+    except Exception as exc:
+        print("solutions_services.switchAutomaticSolutionAlerts ERROR: ", exc)
+        db.session.rollback()
+        return Callback(False, 'Could not set automatic alerts at this time. Please insure you have a database connected or uploaded')

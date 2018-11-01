@@ -291,12 +291,11 @@ class Assistant(db.Model):
 class Solution(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    #TimesReturned = db.Column(db.Integer, nullable=False, default=0)
-
     if BaseConfig.USE_ENCRYPTION:
         Content = db.Column(JsonEncodedDict, nullable=False)
     else:
         Content = db.Column(JsonEncodedDict, nullable=False)
+    automaticSolutionAlerts = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)

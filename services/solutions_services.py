@@ -411,7 +411,7 @@ def sendSolutionsAlerts(assistantID):
         return Callback(True, 'Alerts have been sent.')
 
     except Exception as exc:
-        print("solutions_services.sendJobAlerts ERROR: ", exc)
+        print("solutions_services.sendSolutionsAlerts ERROR: ", exc)
         return Callback(False, 'Could not send alerts at this time')
 
 def switchAutomaticSolutionAlerts(assistantID, setTo):

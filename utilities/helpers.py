@@ -66,7 +66,7 @@ def gen_dummy_data():
     #    ],
     #    "text": "Do you smoke?",
     #  }))
-    db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Assistant=reader_a, Content={
+    db.session.add(Block(Type=BlockType.UserInput, Order=1, StoreInDB=True, Assistant=reader_a, Content={
         "action": "Go To Next Block",
         "text": "What's your email?",
         "blockToGoID": None,
@@ -74,7 +74,7 @@ def gen_dummy_data():
         "validation": "Email",
         "afterMessage": 'Your input is being processed...'
     }))
-    db.session.add(Block(Type=BlockType.UserInput, Order=3, StoreInDB=True, Assistant=reader_a, Content={
+    db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Assistant=reader_a, Content={
         "action": "Go To Next Block",
         "text": "Give me some input",
         "blockToGoID": None,
@@ -101,7 +101,7 @@ def gen_dummy_data():
     #    "blockToGoID": 0
     #}))
 
-    db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Assistant=reader_a, Content={
+    db.session.add(Block(Type=BlockType.Solutions, Order=3, StoreInDB=True, Assistant=reader_a, Content={
         "showTop": 5,
         "afterMessage": 'DONE!!!!',
         "action": "End Chat",

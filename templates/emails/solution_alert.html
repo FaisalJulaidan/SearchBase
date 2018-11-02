@@ -105,9 +105,11 @@
                                                                                 <br>
                                                                                 <label>Created:<br>{{solution["data"]["@CreatedOn"]}}</label>
                                                                                 <br><br>
-                                                                                <a href="https://www.cpsgroupuk.com/job-search/_{{solution["data"]["@DBID"]}}"
+                                                                                {%if solution["solutionsLink"]["Success"]%}
+                                                                                <a href="solution["solutionsLink"]["webLink"]{{solution["data"][solution["solutionsLink"]["solutionsRef"]]}}"
                                                                                 class='btn btn-primary chatProducts_button'
                                                                                 style='vertical-align:middle'><span>Apply</span></a>
+                                                                                {%endif%}
                                                                             </div>
                                                                         </center>
                                                                     </li>

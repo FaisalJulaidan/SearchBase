@@ -424,6 +424,7 @@
         var fileUploadForm = document.getElementById('fileUploadForm');
         var thinkingGifLife = 800 + Math.floor(Math.random() * 1200);
         var sentOnClose = false;
+        var solutionsLinkRecord = undefined;
 
         window.onbeforeunload = function () { sendOnCloseData(); }
 
@@ -675,6 +676,7 @@
                 console.log("Solutions retrieved successfully!");
                 var data = JSON.parse(res).data;
                 solutions = data["solutions"];
+                solutionsLinkRecord = data["solutionsLink"];
                 return solutions;
 
             }).fail(function (res) {
@@ -727,19 +729,28 @@
                 for (var i = 0; i < solutions.length; i++) {
                     var title = solutions[i]["data"]["@Title"];
                     if(title === 0){ title= "-"; }
+
                     var term = solutions[i]["data"]["@Term"];
                     if(term === 0){ term= "-"; }
+
                     var location = solutions[i]["data"]["@Loc"];
                     if(location === 0){ location= "-"; }
+
                     var createdOn = solutions[i]["data"]["@CreatedOn"];
                     if (createdOn === 0) { createdOn = "-"; }
-                    var URL = "https://www.cpsgroupuk.com/job-search/_" + String(solutions[i]["data"]["@DBID"]);
-                    messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
+
+                    var appendString = "<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
                         + title + "</h5><br><label>" + term + "</label><br><p>"
-                        + location + "</p><br><label>Created:<br>" + createdOn + "</label>"+
-                         "<br><br><button onclick=\"openLink('" + URL +
+                        + location + "</p><br><label>Created:<br>" + createdOn + "</label>"
+
+                    if (solutionsLinkRecord["Success"]){
+                        var URL = solutionsLinkRecord["webLink"] + String(solutions[i]["data"][solutionsLinkRecord["solutionsRef"]]);
+                        appendString += "<br><br><button onclick=\"openLink('" + URL +
                          "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>Apply</span></button>"+
-                        "</div></center></li>");
+                        "</div></center></li>"
+                    }
+
+                    messageContainer.append(appendString);
                 }
             }
             // submit answer automatically

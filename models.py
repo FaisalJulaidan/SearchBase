@@ -296,6 +296,8 @@ class Solution(db.Model):
     else:
         Content = db.Column(JsonEncodedDict, nullable=False)
     Type = db.Column(db.String(64), nullable=False)
+    WebLink = db.Column(db.String(128), nullable=True)
+    IDReference = db.Column(db.String(64), nullable=True)
     automaticSolutionAlerts = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:

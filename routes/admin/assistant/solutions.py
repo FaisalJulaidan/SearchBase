@@ -11,7 +11,7 @@ def admin_solutions(assistantID):
     if request.method == "GET":
         solutions_callback: Callback = solutions_services.getFirstByAssistantID(assistantID)
         if not solutions_callback.Success: return admin_services.render("admin/solutions.html", data="", id=assistantID)
-        
+
         return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID)
 
 
@@ -145,6 +145,19 @@ def admin_products_file_upload(assistantID):
         else:
             return "Please insure you have selected the right File Type option"
 
+@solutions_router.route("/admin/assistant/<assistantID>/saveSolutionWebLink", methods=['POST'])
+def admin_save_solution_web_link(assistantID):
+
+    if request.method == "POST":
+
+        webLink = request.form.get("webLink", default=None).strip()
+        solutionsRef = request.form.get("solutionsRef", default=None).strip()
+
+        if not webLink or not solutionsRef: return "Input was not retrieved correctly. Please try again"
+
+        updateLinkAndRef_callback : Callback = solutions_services.updateSolutionsLinkAndRef(assistantID, webLink, solutionsRef)
+
+        return updateLinkAndRef_callback.Message
 
 @solutions_router.route("/admin/assistant/<assistantID>/sendSolutionAlerts", methods=['POST'])
 def admin_send_solution_alerts(assistantID):
@@ -160,11 +173,11 @@ def admin_set_automatic_solution_alert(assistantID, setTo):
 
     if request.method == "POST":
 
-        if setTo == "true": 
+        if setTo == "true":
             setTo = True
-        else: 
+        else:
             setTo = False
 
         setAutomaticSolutionAlerts_callback : Callback = solutions_services.switchAutomaticSolutionAlerts(assistantID, setTo)
-        
+
         return setAutomaticSolutionAlerts_callback.Message

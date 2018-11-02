@@ -356,7 +356,7 @@ def createUpdateJSONByAssistantID(assistantID, content, type):
     try:
         # Get result and check if None then raise exception
         result = getSolutionByAssistantID(assistantID)
-        if not result.Success: createNew(assistantID, content)
+        if not result.Success: createNew(assistantID, content, type)
 
         result.Data.Type = type
         result.Data.Content = content
@@ -425,3 +425,21 @@ def checkAutomaticSolutionAlerts(assistantID):
     except Exception as exc:
         print("solutions_services.checkAutomaticSolutionAlerts ERROR: ", exc)
         return Callback(False, 'Could not retrieve automatic alerts at this time')
+
+
+def updateSolutionsLinkAndRef(assistantID, webLink, solutionsRef):
+    try:
+        result = getSolutionByAssistantID(assistantID)
+        if not result.Success: raise Exception("Could not find alerts record")
+
+        result.Data.WebLink = webLink
+        result.Data.IDReference = solutionsRef
+
+        db.session.commit()
+
+        return Callback(True, 'Solutions Link and Reference have been updated.', result.Data.automaticSolutionAlerts)
+
+    except Exception as exc:
+        print("solutions_services.updateSolutionsLinkAndRef ERROR: ", exc)
+        db.session.rollback()
+        return Callback(False, 'Could not update the solutions\' Link and Reference')

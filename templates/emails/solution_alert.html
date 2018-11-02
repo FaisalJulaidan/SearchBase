@@ -115,12 +115,12 @@
                                                                                     <!-- Job created on -->
                                                                                     <li class="list-group-item">{{solution["data"]["@CreatedOn"]}}</li>
                                                                                 </ul>
-                                                                                {%if solution["solutionsLink"]["Success"]%}
+                                                                                {%if solutionsLink["Success"] == True%}
                                                                                 <div class="card-body">
                                                                                     <!-- Links to apply -->
-                                                                                    <a href="solution["solutionsLink"]["webLink"]{{solution["data"][solution["solutionsLink"]["solutionsRef"]]}}" class="card-link">Apply</a>
+                                                                                    <a href="{{solutionsLink["webLink"]}}{{solution["data"][solutionsLink["solutionsRef"]]}}" class="card-link">Apply</a>
                                                                                     <!-- Link to view the job -->
-                                                                                    <a href="solution["solutionsLink"]["webLink"]{{solution["data"][solution["solutionsLink"]["solutionsRef"]]}}" class="card-link">View</a>
+                                                                                    <a href="{{solutionsLink["webLink"]}}{{solution["data"][solutionsLink["solutionsRef"]]}}" class="card-link">View</a>
                                                                                 </div>
                                                                                 {%endif%}
                                                                         </div>

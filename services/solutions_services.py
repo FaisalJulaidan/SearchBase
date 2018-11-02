@@ -380,6 +380,15 @@ def sendSolutionsAlerts(assistantID):
 
         errorsNumber = 0
 
+
+        getSolutionRecord_callback : Callback = getSolutionByAssistantID(assistantID)
+        if not getSolutionRecord_callback.Success:
+            solutionsLink = {"Success" : False}
+        elif not getSolutionRecord_callback.Data.WebLink or not getSolutionRecord_callback.Data.IDReference:
+            solutionsLink = {"Success" : False}
+        else:
+            solutionsLink = {"Success" : True, "webLink" : getSolutionRecord_callback.Data.WebLink, "solutionsRef" : getSolutionRecord_callback.Data.IDReference}
+
         for record in filterEmails_callback.Data:
             keywords = []
             for inputs in record["record"]:
@@ -388,7 +397,7 @@ def sendSolutionsAlerts(assistantID):
             if not solutions_callback.Success: raise Exception("Error in getting solutions")
             if not solutions_callback.Data: continue
 
-            sendMail_callback : Callback = mail_services.sendSolutionAlert(record, solutions_callback.Data)
+            sendMail_callback : Callback = mail_services.sendSolutionAlert(record, solutions_callback.Data, solutionsLink)
             if not sendMail_callback.Success: errorsNumber += 1
 
         if errorsNumber > 0: return Callback(True, 'Alerts have been sent however there was an error with sending the email to ' + str(errorsNumber) + " users.")

@@ -12,14 +12,7 @@ def admin_solutions(assistantID):
         solutions_callback: Callback = solutions_services.getFirstByAssistantID(assistantID)
         if not solutions_callback.Success: return admin_services.render("admin/solutions.html", data="", id=assistantID)
         
-        print("solutions_callback.Data: ", solutions_callback.Data)
-
-        checkForAlerts_callback : Callback = solutions_services.checkAutomaticSolutionAlerts(assistantID)
-        if not checkForAlerts_callback.Success:
-          return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID)
-
-        
-        return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID, alerts=checkForAlerts_callback.Data)
+        return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID)
 
 
 @solutions_router.route("/admin/solution/<solID>", methods=['PUT', 'DELETE'])
@@ -136,11 +129,11 @@ def admin_products_file_upload(assistantID):
         if not fileType or not file:
             return "File Type or Uploaded File could not be retrieved"
 
-        if fileType == "RBDXML":
+        if fileType == "RDBXML":
             jsonstr_callback : Callback = solutions_services.convertXMLtoJSON(file)
             if not jsonstr_callback.Success: return jsonstr_callback.Message
 
-            saveJson_callback : Callback = solutions_services.createUpdateJSONByAssistantID(assistantID, jsonstr_callback.Data)
+            saveJson_callback : Callback = solutions_services.createUpdateJSONByAssistantID(assistantID, jsonstr_callback.Data, fileType)
             if saveJson_callback.Success:
                 checkForAlerts_callback : Callback = solutions_services.checkAutomaticSolutionAlerts(assistantID)
                 if checkForAlerts_callback.Success:

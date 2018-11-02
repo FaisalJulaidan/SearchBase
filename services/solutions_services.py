@@ -134,12 +134,12 @@ def convertionLoopRDB(item, IDsString):
         print("solutions_services.loopThroughAllJSON ERROR: ", exc)
         return item
 
-def createNew(assistantID, content):
+def createNew(assistantID, content, type):
     try:
         # Create a new user with its associated company and role
         content = replaceIDsWithDataRBD(content)
         #print(content)
-        solution = Solution(AssistantID=assistantID, Content=content)
+        solution = Solution(AssistantID=assistantID, Type=type, Content=content)
         db.session.add(solution)
 
         db.session.commit()
@@ -352,13 +352,14 @@ def getSolutionByAssistantID(assistantID):
         db.session.rollback()
         return Callback(False, 'Could not retrieve JSON')
 
-def createUpdateJSONByAssistantID(assistantID, content):
+def createUpdateJSONByAssistantID(assistantID, content, type):
     try:
         # Get result and check if None then raise exception
         result = getSolutionByAssistantID(assistantID)
         if not result.Success: createNew(assistantID, content)
 
-        result.Content = content
+        result.Data.Type = type
+        result.Data.Content = content
 
         db.session.commit()
 

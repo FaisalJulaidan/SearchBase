@@ -295,6 +295,7 @@ class Solution(db.Model):
         Content = db.Column(JsonEncodedDict, nullable=False)
     else:
         Content = db.Column(JsonEncodedDict, nullable=False)
+    Type = db.Column(db.String(64), nullable=False)
     automaticSolutionAlerts = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:

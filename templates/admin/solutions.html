@@ -3,6 +3,11 @@
 {% block title %}Solutions{% endblock %}
 
 {% block content %}
+<style>
+    input{
+        width:300px!important;
+    }
+</style>
 <link rel="stylesheet" type="text/css" href="/static/css/checkbox.css">
 <div class="right_col" role="main">
     <div class="">
@@ -54,7 +59,7 @@
                                                         <br />
                                                         File Type:
                                                         <select name="fileType">
-                                                            <option value="RBDXML">RBD Xml File</option>
+                                                            <option value="RDBXML">RDB Xml File</option>
                                                         </select>
                                                     </div>
                                                     <br />
@@ -66,7 +71,23 @@
                                                     <h4 id="uploadDatabaseMessage"></h4>
                                                 </div>
                                             </form>
-                                            <br /><br />
+                                            <form>
+                                                <h3>Job Links</h3>
+                                                <p>
+                                                    In order to be able to direct users to your solutions at your home website we will need some input from you.<br />
+                                                    We would need the page part that holds all the solutions and then the solution reference. For example that<br />
+                                                    can be http://mycoolwebsite.com/jobs/*jobID* . To create the bridge between us we would need that information<br />
+                                                    input in the bellow boxes. To do that just <b>contact us and we will fill them for you</b>. Alternatively you can try<br />
+                                                    finding them on your own. To do that please provide us with the link (ex. "http://mycoolwebsite.com/jobs/") and<br />
+                                                    then the reference to the jobID which you can find in your upload file or Raw Data bellow. For example: "@jobID" : C2143.<br />
+                                                </p>
+                                                <input class="form-control" placeholder="First part of the link" />
+                                                <br />
+                                                <input class="form-control" placeholder="Solution ID Reference" />
+                                                <br />
+                                                <label class="btn btn-success" onclick="saveJobLink()">Save</label>
+                                            </form>
+                                            <br />
                                             <div id="jobAlertsDiv">
                                                 <h3>Job Alerts</h3>
                                                 <p>
@@ -76,13 +97,12 @@
                                                 </p>
                                                 <label class="btn btn-success" onclick="sendSolutionAlerts()">Send Jobs</label>
                                                 <p id="sendSolutionsMessage"></p>
-                                                <br />
                                                 <h4>Send Automatically</h4>
                                                 <div class="input-group" style="margin-bottom: 5px;">
                                                     <label class="checkboxContainer" style="margin-bottom: 5px;">
                                                         On data update
 
-                                                        <input id="automaticSolutionAlertsCheckbox" name="jobAlerts" value="jobAlerts" type="checkbox" {%if alerts%}checked{%endif%} onchange="changeAutoSolutionAlerts()"/>
+                                                        <input id="automaticSolutionAlertsCheckbox" name="jobAlerts" value="jobAlerts" type="checkbox" {%if data.automaticSolutionAlerts%}checked{%endif%} onchange="changeAutoSolutionAlerts()" />
 
                                                         <span class="checkmark"></span>
                                                     </label>
@@ -94,7 +114,7 @@
                                 </div>
 
                                 <h2>Raw Data:</h2>
-                                <div id="solutionsTableDiv">
+                                <div id="solutionsDiv">
 
                                 </div>
 
@@ -194,7 +214,7 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
     console.log('Unbind submit event.');
     $(document).off('submit', '#solutionForm');
 });
-    $("#solutionsTableDiv").append("{{data.Content}}");
+    $("#solutionsDiv").append("{{data.Content}}");
 
     //document.getElementById('uploadButton').addEventListener('click',uploadProductFile)
     function uploadProductFile() {

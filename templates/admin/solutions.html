@@ -295,11 +295,13 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
                 if (xhttp.status === 200) {
                     msg = xhttp.responseText;
                     $("#sendSolutionsMessage").text(msg);
+                    setTimeout(function(){$("#sendSolutionsMessage").text("")}, 2000);
                 }
                 else {
                     console.error(xhttp.statusText);
                     msg = "Error: " + xhttp.status;
                     $("#sendSolutionsMessage").text(msg);
+                    setTimeout(function(){$("#sendSolutionsMessage").text("")}, 2000);
                 }
                 console.log(msg);
             }

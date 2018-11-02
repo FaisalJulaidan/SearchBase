@@ -7,7 +7,12 @@
     <!-- Some CSS style sheets that are being imported -->
     <link rel="stylesheet" href="https://thesearchbase.com/static/email_assets/css/foundation.css" />
     <link rel="stylesheet" href="https://thesearchbase.com/static/email_assets/css/foundation-emails.css" />
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous" />
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
 </head>
 
@@ -16,7 +21,7 @@
     <table class="body" data-made-with-foundation="">
         <tr>
             <td class="float-center" align="center" valign="top">
-                <center data-parsed="">
+                <div data-parsed="">
                     <table class="spacer float-center">
                         <tbody>
                             <tr>
@@ -93,25 +98,31 @@
                                                             <th>
                                                                 <p class="text-center">
                                                                     {%for solution in solutions%}
+                                                                        <!-- This is where the jobs are being templated -->
 
-                                                                    <li class="text-center">
-                                                                        <center class='results'>
-                                                                            <div class='chatProducts'>
-                                                                                <h5>{{solution["data"]["@Title"]}}</h5>
-                                                                                <br>
-                                                                                <label>{{solution["data"]["@Term"]}}</label>
-                                                                                <br>
-                                                                                <p>{{solution["data"]["@Loc"]}}</p>
-                                                                                <br>
-                                                                                <label>Created:<br>{{solution["data"]["@CreatedOn"]}}</label>
-                                                                                <br><br>
-                                                                                <a href="https://www.cpsgroupuk.com/job-search/_{{solution["data"]["@DBID"]}}"
-                                                                                class='btn btn-primary chatProducts_button'
-                                                                                style='vertical-align:middle'><span>Apply</span></a>
-                                                                            </div>
-                                                                        </center>
-                                                                    </li>
-
+                                                                            <div class="card" style="width: 18rem;">
+                                                                                <!-- Later if we want to add an image, uncomment this -->
+                                                                                <!--<img class="card-img-top" src="..." alt="Card image cap" />-->
+                                                                                <div class="card-body">
+                                                                                    <h5 class="card-title">{{solution["data"]["@Title"]}}</h5>
+                                                                                    <p class="card-text">Job Description:</p>
+                                                                                </div>
+                                                                                <ul class="list-group list-group-flush">
+                                                                                    <!-- Job Type -->
+                                                                                    <li class="list-group-item">{{solution["data"]["@Term"]}}</li>
+                                                                                    <!-- Job Location -->
+                                                                                    <li class="list-group-item">{{solution["data"]["@Loc"]}}</li>
+                                                                                    <!-- Job created on -->
+                                                                                    <li class="list-group-item">{{solution["data"]["@CreatedOn"]}}</li>
+                                                                                </ul>
+                                                                                <div class="card-body">
+                                                                                    <!-- Links to apply -->
+                                                                                    <a href="https://www.cpsgroupuk.com/job-search/_{{solution["data"]["@DBID"]}}" class="card-link">Apply</a>
+                                                                                    <!-- Link to view the job -->
+                                                                                    <a href="https://www.cpsgroupuk.com/job-search/_{{solution["data"]["@DBID"]}}" class="card-link">View</a>
+                                                                                </div>
+                                                                        </div>
+                                                                    </p>
                                                                     {%endfor%}
                                                                 </p>
                                                             </th>
@@ -122,6 +133,7 @@
                                             </tr>
                                         </tbody>
                                     </table>
+
                                     <table class="row collapsed footer">
                                         <tbody>
                                             <tr>

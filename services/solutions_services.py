@@ -378,7 +378,7 @@ def sendSolutionsAlerts(assistantID):
         filterEmails_callback : Callback = userInput_services.filterForContainEmails(userInput_callback.Data)
         if not filterEmails_callback.Success: raise Exception("Error in filtering for emails")
 
-        errors = 0
+        errorsNumber = 0
 
         for record in filterEmails_callback.Data:
             keywords = []
@@ -389,9 +389,9 @@ def sendSolutionsAlerts(assistantID):
             if not solutions_callback.Data: continue
 
             sendMail_callback : Callback = mail_services.sendSolutionAlert(record, solutions_callback.Data)
-            if not sendMail_callback.Success: errors += 1
+            if not sendMail_callback.Success: errorsNumber += 1
 
-        if errors > 0: return Callback(True, 'Alerts have been sent however there was an error with sending the email to ' + str(errors) + " users.")
+        if errorsNumber > 0: return Callback(True, 'Alerts have been sent however there was an error with sending the email to ' + str(errorsNumber) + " users.")
 
         return Callback(True, 'Alerts have been sent.')
 

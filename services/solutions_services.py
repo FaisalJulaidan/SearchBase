@@ -113,7 +113,7 @@ def replaceIDsWithDataRBD(content):
     result = convertionLoopRDB(jobs, IDsString)
     for key in content.keys():
         for key1 in content[key].keys():
-            for key2, value in content[key][key1].items():
+            for key2 in content[key][key1].keys():
                 content[key][key1][key2] = result
                 break
             break

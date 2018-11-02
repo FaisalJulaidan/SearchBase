@@ -52,7 +52,7 @@ def getBasedOnKeywords(assistantID, keywords: list, max=999999) -> Callback:
 
 def getSolutions(content, keywords):
     try:
-        jobs = content["{http://tempuri.org/JSExport.xsd}JobShopExport"]["{http://tempuri.org/JSExport.xsd}Jobs"]["{http://tempuri.org/JSExport.xsd}Job"]
+        jobs = next(iter(next(iter(next(iter(content.values())).values())).values())) # GETS the first value of the dict which is the first value of a dict which is the first value of a dict
         result = []
         matches = ""
         originalString = dumps(content).split("SysKeys")[1]
@@ -107,11 +107,17 @@ def actOnJSONItem(action, item, originalString, result):
         return result
 
 def replaceIDsWithDataRBD(content):
-    jobs = content["{http://tempuri.org/JSExport.xsd}JobShopExport"]["{http://tempuri.org/JSExport.xsd}Jobs"]["{http://tempuri.org/JSExport.xsd}Job"]
+    jobs = next(iter(next(iter(next(iter(content.values())).values())).values())) # GETS the first value of the dict which is the first value of a dict which is the first value of a dict
     IDsString = dumps(content).split("SysKeys")[1]
 
     result = convertionLoopRDB(jobs, IDsString)
-    content["{http://tempuri.org/JSExport.xsd}JobShopExport"]["{http://tempuri.org/JSExport.xsd}Jobs"]["{http://tempuri.org/JSExport.xsd}Job"] = result
+    for key in content.keys():
+        for key1 in content[key].keys():
+            for key2, value in content[key][key1].items():
+                content[key][key1][key2] = result
+                break
+            break
+        break
 
     return content
 

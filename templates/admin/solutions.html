@@ -250,7 +250,6 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
                             console.error(xhttp.statusText);
                             msg = "Error: " + xhttp.status;
                         }
-                        console.log(msg);
                     }
                 };
                 xhttp.send(formData);
@@ -281,7 +280,6 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
                     $("#saveLinkMessage").text(msg);
                     setTimeout(function(){$("#saveLinkMessage").text("")}, 2000);
                 }
-                console.log(msg);
             }
         };
         xhttp.send(formData);
@@ -303,7 +301,6 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
                     $("#sendSolutionsMessage").text(msg);
                     setTimeout(function(){$("#sendSolutionsMessage").text("")}, 2000);
                 }
-                console.log(msg);
             }
         };
         xhttp.send();
@@ -328,7 +325,6 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
                     document.getElementById("automaticSolutionAlertsCheckbox").checked = !state;
                     setTimeout(removeTextboxesText, 3000)
                 }
-                console.log(msg);
             }
         };
         xhttp.send();

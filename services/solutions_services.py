@@ -362,7 +362,7 @@ def createUpdateJSONByAssistantID(assistantID, content, type):
             return Callback(True, 'Solutions file has been added')
 
         result.Data.Type = type
-        result.Data.Content = content
+        result.Data.Content = replaceIDsWithDataRBD(content)
 
         db.session.commit()
 

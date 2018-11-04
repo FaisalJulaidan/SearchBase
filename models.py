@@ -292,7 +292,7 @@ class Solution(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     if BaseConfig.USE_ENCRYPTION:
-        Content = db.Column(JsonEncodedDict, nullable=False)
+        Content = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
     else:
         Content = db.Column(JsonEncodedDict, nullable=False)
     Type = db.Column(db.String(64), nullable=False)

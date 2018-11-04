@@ -340,10 +340,7 @@ def getSolutionByAssistantID(assistantID):
     try:
         # Get result and check if None then raise exception
         print("assistantID: ", assistantID)
-        result = db.session.query(Solution).filter(Solution.AssistantID == assistantID)
-        print("RESULT: ", result)
-        print("RESULT.all()", result.all())
-        print("RESULT.first()", result.first())
+        result = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
         print(2)
         if not result: 
             print(3)
@@ -359,6 +356,7 @@ def getSolutionByAssistantID(assistantID):
 def createUpdateJSONByAssistantID(assistantID, content, type):
     try:
         # Get result and check if None then raise exception
+        #db.session.query(Solution).filter(Solution.AssistantID == assistantID).delete()
         result = getSolutionByAssistantID(assistantID)
         if not result.Success: 
             createNew(assistantID, content, type)

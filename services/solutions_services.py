@@ -353,7 +353,9 @@ def createUpdateJSONByAssistantID(assistantID, content, type):
     try:
         # Get result and check if None then raise exception
         result = getSolutionByAssistantID(assistantID)
-        if not result.Success: createNew(assistantID, content, type)
+        if not result.Success: 
+            createNew(assistantID, content, type)
+            return Callback(True, 'Solutions file has been added')
 
         result.Data.Type = type
         result.Data.Content = content

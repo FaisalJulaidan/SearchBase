@@ -339,10 +339,13 @@ def convertXMLtoJSON(xmlfile):
 def getSolutionByAssistantID(assistantID):
     try:
         # Get result and check if None then raise exception
+        print(1)
         result = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
+        print(2)
         if not result: 
+            print(3)
             raise Exception
-
+        print("RESULT: ", result)
         return Callback(True, 'JSON has been successfully retrieved', result)
 
     except Exception as exc:

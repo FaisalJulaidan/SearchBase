@@ -342,6 +342,7 @@ def getSolutionByAssistantID(assistantID):
         print("assistantID: ", assistantID)
         result = db.session.query(Solution).filter(Solution.AssistantID == assistantID)
         print("RESULT: ", result)
+        print("RESULT.all()", result.all())
         print("RESULT.first()", result.first())
         print(2)
         if not result: 

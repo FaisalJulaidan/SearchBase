@@ -16,9 +16,24 @@ def getByAssistantID(assistantID):
 
         return Callback(False, 'Could not retrieve the data.')
 
-    # finally:
-       # db.session.close()
-        
+def filterForContainEmails(records):
+    try:
+        result = []
+        for record in records:
+            record = record.Data["collectedInformation"]
+            for question in record:
+                if "@" in question["input"]:
+                    result.append({"record" : record, "email" : question["input"]})
+                    break
+
+        return Callback(True, "Data has been filtered.", result)
+
+    except Exception as exc:
+
+        print("userInput_services.filterForContainEmails ERROR: ", exc)
+
+        return Callback(False, 'Could not filter the data.')
+
 def deleteByID(id):
     try:
         db.session.query(ChatbotSession).filter(ChatbotSession.ID == id).delete()

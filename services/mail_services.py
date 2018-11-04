@@ -64,45 +64,51 @@ def addedNewUserEmail(adminEmail, targetEmail, password):
 
         return Callback(True, 'Email sent is on its way to ' + targetEmail)
 
-    except:
+    except Exception as e:
         print("addedNewUserEmail() Error: ", e)
+        return Callback(False, 'Could not send email to ' + targetEmail)
+
+def sendSolutionAlert(record, solutions, solutionsLink):
+    try:
+        targetEmail = record["email"]
+        userData = record["record"]
+        solutionsRecords = solutions
+
+        send_email((targetEmail), 'You have new job matches',
+               'emails/solution_alert.html', userData = userData, solutions=solutionsRecords, solutionsLink=solutionsLink)
+
+        return Callback(True, 'Email sent is on its way to ' + targetEmail)
+
+    except Exception as e:
+        print("mail_services.sendSolutionAlert ERROR: ", e)
         return Callback(False, 'Could not send email to ' + targetEmail)
 
 #NOTIFICATIONS
 def notifyNewRecordsForLastXHours(hours):
     try:
-        print("0")
         userSettings_callback : Callback = user_services.getAllUserSettings()
         if not userSettings_callback.Success: raise Exception("userSettings_callback: ", userSettings_callback.Message)
 
         for record in userSettings_callback.Data:
             if not record.UserInputNotifications: continue
-            print("1")
             user_callback : Callback = user_services.getByID(record.ID)
             if not user_callback.Success: raise Exception("user_callback: ", user_callback.Message)
-            print("2")
 
             assistants_callback : Callback = assistant_services.getAll(user_callback.Data.CompanyID)
             if not assistants_callback.Success: raise Exception("assistants_callback: ", assistants_callback.Message)
-            print("3")
 
             information = []
 
             for assistant in assistants_callback.Data:
-                print("4")
                 records_callback : Callback = analytics_services.getAllRecordsByAssistantIDInTheLast(hours, assistant.ID)
                 if not records_callback.Success: raise Exception("records_callback: ", records_callback.Message)
-                print("5")
 
-                print(records_callback.Data)
                 if not records_callback.Data: continue
-                print("6")
 
                 information.append({"assistantName": assistant.Name, "data": records_callback.Data, "assistantID": assistant.ID})
 
             sendRecords_callback : Callback = sendNewRecordsNotification(record.Email, information)
             if not sendRecords_callback.Success: raise Exception("sendRecords_callback: ", sendRecords_callback.Message)
-            print("7")
 
     except Exception as e:
         print("mail_services.notifyNewRecordsForLastXHours() ERROR: ", e)
@@ -134,10 +140,13 @@ def send_async_email(app, msg):
         mail.send(msg)
 
 def send_email(to, subject, template, **kwargs):
-    app = current_app._get_current_object()
-    msg = Message(subject, recipients=[to], sender="thesearchbase@gmail.com")
-    msg.html = render_template(template, **kwargs)
-    thr = Thread(target=send_async_email, args=[app, msg])
-    thr.start()
-    return thr
+    try:
+        app = current_app._get_current_object()
+        msg = Message(subject, recipients=[to], sender="thesearchbase@gmail.com")
+        msg.html = render_template(template, **kwargs)
+        thr = Thread(target=send_async_email, args=[app, msg])
+        thr.start()
+        return thr
+    except Exception as e:
+        print("mail_services.send_email() ERROR / TEMPLATE ERROR: ", e)
     # send_async_email(app, msg)

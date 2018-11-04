@@ -619,7 +619,6 @@
                 // Omit this to make then entire <li>...</li> draggable.
                 handle: '.panel-heading',
                 update: function () {
-                    console.log("Update")
                     updateBlocksOrder();
                     saveBlocks();
                 }
@@ -1127,7 +1126,8 @@
                         return $block.find(".questionText").val();
                     })();
 
-                    let saveInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
+                    let saveInDB = document.getElementById("storeInDB"+id).checked;
+                    console.log("STORE IN DB: ", saveInDB)
                     for (const row of rowsOfAnswers) {
                         let $row = $(row);
                         let answers = $row.children();
@@ -1173,8 +1173,8 @@
                         blockToGoID = 0;
                     }
                     let afterMessage = $block.children().last().children('.col-md-8').children().last().val();
-                    let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let id = +$block.attr('id');
+                    let storeInDB = document.getElementById("storeInDB"+id).checked;
                     let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
                     let isSkippable = document.getElementById('skippable' + id).checked;
 
@@ -1200,8 +1200,8 @@
 
                     let afterMessage = $block.children().last().children('.col-md-8').children().last().val();
 
-                    let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let id = +$block.attr('id');
+                    let storeInDB = document.getElementById("storeInDB"+id).checked;
                     let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
                     let isSkippable = document.getElementById('skippable' + id).checked;
 
@@ -1212,9 +1212,9 @@
 
                     let showTop = +$block.children('div.panel-body').first().children('.topSolutions').first().children('input').first().val();
                     let afterMessage = $block.children('div.panel-body').first().children('.afterMessage').first().children('input').first().val();
-                    let storeInDB = $block.children().last().children().last().children().children().first().val() ? true : false;
                     let action = $block.children().last().find('input.action').first().val();
                     let id = +$block.attr('id');
+                    let storeInDB = true;
                     let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
                     let isSkippable = false;
                     let blockToGoID = 0;
@@ -1581,9 +1581,9 @@
                         "</div>\n" +
                         "<div class=\"col-md-2 pull-right inline text-right\">\n" +
                         "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 9px\">\n" +
-                        "        <input class=\"form-check-input\" id=\"" + id + "\" type=\"checkbox\" checked=\"" + isDisabled + "\" >\n" +
+                        "        <input class=\"form-check-input\" id=\"storeInDB" + id + "\" type=\"checkbox\" checked=\"" + isDisabled + "\" >\n" +
                     //    "        <input class=\"form-check-input\" id=\"" + id + "\" type=\"checkbox\" checked=\"\" " + isDisabled + ">\n" +
-                        "        <label class=\"form-check-label\" for=\"" + id + "\"\n" +
+                        "        <label class=\"form-check-label\" for=\"storeInDB" + id + "\"\n" +
                         "               style=\"padding-left: 10px;padding-top: 2px; text-align: -webkit-auto;\">\n" +
                         "            Save in DB\n" +
                         "        </label>\n" +
@@ -1742,7 +1742,7 @@
                     template = template.replace('BLOCK_TYPE', block.type);
                     let curBlockLabels = block.labels.split(",");
                     clearLabelsForBlock(block.id);
-                    for (var i = 0; i < curBlockLabels.length; i++){ 
+                    for (var i = 0; i < curBlockLabels.length; i++){
                         let value = parseInt(curBlockLabels[i]);
                         if (!isNaN(value)) {
                             editLabel(value, block.id);
@@ -1948,8 +1948,8 @@
                         "</div>\n" +
                         "<div class=\"col-md-2 pull-right inline text-right\">\n" +
                         "    <div class=\"form-check abc-checkbox abc-checkbox-info abc-checkbox-circle\" style=\"margin-top: 9px\">\n" +
-                        "        <input class=\"form-check-input\" id=\"" + id + "\" type=\"checkbox\" checked=\"" + isDisabled + "\" >\n" +
-                        "        <label class=\"form-check-label\" for=\"" + id + "\"\n" +
+                        "        <input class=\"form-check-input\" id=\"storeInDB" + id + "\" type=\"checkbox\" checked=\"" + isDisabled + "\" >\n" +
+                        "        <label class=\"form-check-label\" for=\"storeInDB" + id + "\"\n" +
                         "               style=\"padding-left: 10px;padding-top: 2px; text-align: -webkit-auto;\">\n" +
                         "            Save in DB\n" +
                         "        </label>\n" +

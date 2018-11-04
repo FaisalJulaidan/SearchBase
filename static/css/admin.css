@@ -10,7 +10,7 @@ html,body { height:100%; }
 
 .right_col{height:100%;}
 
-.left_col{margin-bottom:-50px;}
+.left_col{margin-bottom:-50px;border-radius: 0 0 5px;}
 
 
 

@@ -82,13 +82,19 @@ def getSolutions_forChatbot(assistantIDAsHash):
 
         # If showTop is 0 then skip below return nothing and don't even call solutions_services
         if data['showTop'] > 0:
-            s_callback = solutions_services.getBasedOnKeywords(assistant, data['keywords'], data['showTop'])
+            s_callback = solutions_services.getBasedOnKeywords(assistant.ID, data['keywords'], data['showTop'])
             if not s_callback.Success:
                 return helpers.jsonResponse(False, 400, s_callback.Message)
-            if s_callback.Data and len(s_callback.Data) > 0:
-                solutions = helpers.getListFromSQLAlchemyList(s_callback.Data)
+            print("3: ", s_callback.Data)
 
-        return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions': solutions})
+        getSolutionRecord_callback : Callback = solutions_services.getSolutionByAssistantID(assistant.ID)
+        if not getSolutionRecord_callback.Success:
+            return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions': s_callback.Data, "solutionsLink" : {"Success" : False}})
+        if not getSolutionRecord_callback.Data.WebLink or not getSolutionRecord_callback.Data.IDReference:
+            return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions': s_callback.Data, "solutionsLink" : {"Success" : False}})
+
+        return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions': s_callback.Data, "solutionsLink" : {"Success" : True,
+        "webLink" : getSolutionRecord_callback.Data.WebLink, "solutionsRef" : getSolutionRecord_callback.Data.IDReference}})
 
 
 @chatbot_router.route("/userdownloads/<path:path>", methods=['GET'])

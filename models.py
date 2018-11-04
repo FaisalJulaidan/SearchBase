@@ -291,31 +291,21 @@ class Assistant(db.Model):
 class Solution(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    TimesReturned = db.Column(db.Integer, nullable=False, default=0)
-
     if BaseConfig.USE_ENCRYPTION:
-        SolutionID = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        MajorTitle = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        SecondaryTitle = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
-        ShortDescription = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
-        Money = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        Keywords = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        URL = db.Column(EncryptedType(db.String(128), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
+        Content = db.Column(JsonEncodedDict, nullable=False)
     else:
-        SolutionID = db.Column(db.String(128), nullable=False)
-        MajorTitle = db.Column(db.String(128), nullable=False)
-        SecondaryTitle = db.Column(db.String(128), nullable=True)
-        ShortDescription = db.Column(db.String(128), nullable=True)
-        Money = db.Column(db.String(128), nullable=False)
-        Keywords = db.Column(db.String(128), nullable=False)
-        URL = db.Column(db.String(200), nullable=False)
+        Content = db.Column(JsonEncodedDict, nullable=False)
+    Type = db.Column(db.String(64), nullable=False)
+    WebLink = db.Column(db.String(128), nullable=True)
+    IDReference = db.Column(db.String(64), nullable=True)
+    automaticSolutionAlerts = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='Solutions')
 
     def __repr__(self):
-        return '<Solution {}>'.format(self.MajorTitle)
+        return '<Solution {}>'.format(self.ID)
 
 
 class Statistics(db.Model):

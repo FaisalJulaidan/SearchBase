@@ -1,0 +1,195 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width" />
+
+    <!-- Some CSS style sheets that are being imported -->
+    <link rel="stylesheet" href="https://thesearchbase.com/static/email_assets/css/foundation.css" />
+    <link rel="stylesheet" href="https://thesearchbase.com/static/email_assets/css/foundation-emails.css" />
+
+    {#    We will need to have a look at this at some point, since the scripts are not calling the styles needed #}
+
+    {#    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>#}
+    {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"  crossorigin="anonymous"></script>#}
+    {#    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"  crossorigin="anonymous"></script>#}
+
+</head>
+
+<body>
+    <!-- <style> -->
+    <table class="body" data-made-with-foundation="">
+        <tr>
+            <td class="float-center" align="center" valign="top">
+                <div data-parsed="">
+                    <table class="spacer float-center">
+                        <tbody>
+                            <tr>
+                                <td height="16px" style="font-size:16px;line-height:16px;">&#xA0;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table align="center" class="container header float-center">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table class="row collapse">
+                                        <tbody>
+                                            <tr>
+                                                <th class="small-12 large-12 columns first last">
+                                                    <table>
+                                                        <tr>
+                                                            <!-- This will be a small header that i need to make -->
+                                                            <th> <img src="http://thesearchbase.com/static/email_assets/images/tsb_150x_30.png" alt="" /> </th>
+                                                            <th class="expander"></th>
+                                                        </tr>
+                                                    </table>
+                                                </th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table align="center" class="container body-drip float-center">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table class="spacer">
+                                        <tbody>
+                                            <tr>
+                                                <td height="16px" style="font-size:16px;line-height:16px;">&#xA0;</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <!-- This will be the compnay logo -->
+                                    <center data-parsed=""> <img src="http://thesearchbase.com/static/email_assets/images/tsb_120X120.png" alt="" align="center" class="float-center" /> </center>
+                                    <table class="spacer">
+                                        <tbody>
+                                            <tr>
+                                                <td height="16px" style="font-size:16px;line-height:16px;">&#xA0;</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="row">
+                                        <tbody>
+                                            <tr>
+                                                <th class="small-12 large-12 columns first last">
+                                                    <table>
+                                                        <tr>
+                                                            <th>
+                                                                <h4 class="text-center">We found matches with your requirements</h4>
+                                                            </th>
+                                                            <th class="expander"></th>
+                                                        </tr>
+                                                    </table>
+                                                </th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <hr />
+                                    <table class="row">
+                                        <tbody>
+                                            <tr>
+                                                <th class="small-12 large-12 columns first last">
+                                                    <table>
+                                                        <tr>
+                                                            <th>
+                                                                <p class="text-center">
+                                                                    {%for solution in solutions%}
+                                                                        <!-- This is where the jobs are being templated -->
+
+                                                                            <div class="card" style="width: 18rem; border:1px solid black; border-radius: 25px;">
+                                                                                <!-- Later if we want to add an image, uncomment this -->
+                                                                                <!--<img class="card-img-top" src="..." alt="Card image cap" />-->
+                                                                                <div class="card-body">
+                                                                                    <h5 class="card-title">{{solution["data"]["@Title"]}}</h5>
+                                                                                    <p class="card-text">Job Description:</p>
+                                                                                </div>
+                                                                                <ul class="list-group list-group-flush">
+                                                                                    <!-- Job Type -->
+                                                                                    <li class="list-group-item">{{solution["data"]["@Term"]}}</li>
+                                                                                    <!-- Job Location -->
+                                                                                    <li class="list-group-item">{{solution["data"]["@Loc"]}}</li>
+                                                                                    <!-- Job created on -->
+                                                                                    <li class="list-group-item">{{solution["data"]["@CreatedOn"]}}</li>
+                                                                                </ul>
+                                                                                {%if solutionsLink["Success"] == True%}
+                                                                                <div class="card-body">
+                                                                                    <!-- Links to apply -->
+                                                                                    <a href="{{solutionsLink["webLink"]}}{{solution["data"][solutionsLink["solutionsRef"]]}}" class="card-link">View</a>
+                                                                                    <!-- Link to view the job -->
+                                                                                    <!-- Uncomment when we add apply feature -->
+                                                                                    <!--<a href="{{solutionsLink["webLink"]}}{{solution["data"][solutionsLink["solutionsRef"]]}}" class="card-link">Apply</a>-->
+                                                                                    <br />
+                                                                                    <br />
+                                                                                </div>
+                                                                              
+                                                                                {%endif%}
+                                                                        </div>
+                                                                    </p>
+                                                                    {%endfor%}
+                                                                </p>
+                                                            </th>
+                                                            <th class="expander"></th>
+                                                        </tr>
+                                                    </table>
+                                                </th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="row collapsed footer">
+                                        <tbody>
+                                            <tr>
+                                                <th class="small-12 large-12 columns first last">
+                                                    <table>
+                                                        <tr>
+                                                            <th>
+                                                                <table class="spacer">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td height="16px" style="font-size:16px;line-height:16px;">&#xA0;</td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                                <p class="text-center">Copyright TheSearchBase Ltd 2018. All rights reserved.<br /> <a href="mailto:thesearchbase@gmail.com?subject=Enquiry">thesearchbase@gmail.com</a> | <a href="https://www.thesearchbase.com/admin/profile">Manage Email Notifications</a> | <a href="https://www.thesearchbase.com/admin/profile">Unsubscribe</a></p>
+                                                                <center data-parsed="">
+                                                                    <table align="center" class="menu float-center">
+                                                                        <tr>
+                                                                            <td>
+                                                                                <table>
+                                                                                    <tr>
+                                                                                        <!-- Linkedin -->
+                                                                                        <th class="menu-item float-center">
+                                                                                            <a href="https://www.linkedin.com/company/thesearchbase/"><img src="http://thesearchbase.com/static/email_assets/images/square-linkedin-512.png" alt="" /></a>
+                                                                                        </th>
+                                                                                        <!-- Angel.co -->
+                                                                                        <th class="menu-item float-center">
+                                                                                            <a href="https://angel.co/thesearchbase"><img src="http://thesearchbase.com/static/email_assets/images/peace_large.jpg" alt="" /></a>
+                                                                                        </th>
+                                                                                    </tr>
+                                                                                </table>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </center>
+                                                            </th>
+                                                            <th class="expander"></th>
+                                                        </tr>
+                                                    </table>
+                                                </th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </center>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

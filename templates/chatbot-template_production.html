@@ -40,9 +40,6 @@
     <!-- Pop-up Stylesheet -->
     <!-- <link href="/static/pop-up/pop.css" rel="stylesheet"> -->
 
-    <!-- Responsive CSS -->
-    <link href="/static/css/responsive.css" rel="stylesheet">
-
     <!-- Core Stylesheet -->
     <!-- <link href="/static/css/style.css" rel="stylesheet"> -->
     <!-- <link href="/static/css/main.css" rel="stylesheet"> -->
@@ -427,6 +424,7 @@
         var fileUploadForm = document.getElementById('fileUploadForm');
         var thinkingGifLife = 800 + Math.floor(Math.random() * 1200);
         var sentOnClose = false;
+        var solutionsLinkRecord = undefined;
 
         window.onbeforeunload = function () { sendOnCloseData(); }
 
@@ -585,12 +583,20 @@
             getSolutions(block.content.showTop)
                 .then((solutions) => {
                     solutions = JSON.parse(solutions);
+                    console.log("1: ", solutions)
                     displayReturnedSolutions(solutions.data.solutions)
                 })
         }
 
         // This should send the data to the server, without returning any solutions back
         function sendData() {
+            sentOnClose = true;
+            console.log(1)
+            console.log(collectedInformation)
+            console.log(collectedInformation.length)
+            if (collectedInformation.length == 0) {
+                return false
+            }
             putThinkingGif();
             var solutions = [];
             params = {
@@ -625,6 +631,9 @@
 
 
         function sendDataSolutionsBlock(showTop) {
+            console.log(2)
+            console.log(collectedInformation)
+            console.log(collectedInformation.length)
             putThinkingGif();
             params = { "collectedInformation": collectedInformation, "keywords": keywords, "showTop": showTop };
 
@@ -667,12 +676,14 @@
                 console.log("Solutions retrieved successfully!");
                 var data = JSON.parse(res).data;
                 solutions = data["solutions"];
+                solutionsLinkRecord = data["solutionsLink"];
                 return solutions;
 
             }).fail(function (res) {
                 removeThinkingGif();
                 console.log("Error in retrieving solutions.");
                 console.log(res);
+                return [];
             });
         }
 
@@ -706,19 +717,40 @@
 
         function displayReturnedSolutions(solutions) {
             messageContainer = $(".messages ul");
-
+            console.log(solutions)
             // If there is no solutions in the database show this message.
-            if (solutions.length === 0) {
-                sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.")
+            if (solutions == null) {
+                sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.");
+            } else if (solutions.length === 0) {
+                sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.");
 
             } else {
 
                 for (var i = 0; i < solutions.length; i++) {
-                    messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
-                        + emojione.toImage(solutions[i]["MajorTitle"]) + "</h5><label>" + emojione.toImage(solutions[i]["SecondaryTitle"]) + "</label><br><p>"
-                        + emojione.toImage(solutions[i]["ShortDescription"]) + "</p><br><label>" + emojione.toImage(solutions[i]["Money"]) +
-                        "</label><br><button onclick=\"openLink('" + emojione.toImage(solutions[i]["URL"]) +
-                        "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center></li>");
+                    var title = solutions[i]["data"]["@Title"];
+                    if(title === 0){ title= "-"; }
+
+                    var term = solutions[i]["data"]["@Term"];
+                    if(term === 0){ term= "-"; }
+
+                    var location = solutions[i]["data"]["@Loc"];
+                    if(location === 0){ location= "-"; }
+
+                    var createdOn = solutions[i]["data"]["@CreatedOn"];
+                    if (createdOn === 0) { createdOn = "-"; }
+
+                    var appendString = "<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
+                        + title + "</h5><br><label>" + term + "</label><br><p>"
+                        + location + "</p><br><label>Created:<br>" + createdOn + "</label>"
+
+                    if (solutionsLinkRecord["Success"]){
+                        var URL = solutionsLinkRecord["webLink"] + String(solutions[i]["data"][solutionsLinkRecord["solutionsRef"]]);
+                        appendString += "<br><br><button onclick=\"openLink('" + URL +
+                         "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>Apply</span></button>"+
+                        "</div></center></li>"
+                    }
+
+                    messageContainer.append(appendString);
                 }
             }
             // submit answer automatically
@@ -924,7 +956,6 @@
                 if (blockKeywords){
                     blockKeywords = Boolean(blockKeywords.split) ? blockKeywords.split(',') : blockKeywords;
                 }
-
                 if (currentBlock.storeInDB) {
                     var information = {
                         "blockID": currentBlock.id,
@@ -932,12 +963,13 @@
                         "input": message
                     };
                     if (currentBlock.type == "Question" && blockKeywords !== undefined) {
-                        information["keywords"] = blockKeywords
-                        collectedInformation.push(information);
-                    } else {
-                        information["keywords"] = []
-                        collectedInformation.push(information);
+                        information["keywords"] = blockKeywords;
+                    } else if (currentBlock.type == "User Input"){
+                        information["keywords"] = message.replace(/ /g, " ").split(" ");
+                    }else {
+                        information["keywords"] = [];
                     }
+                    collectedInformation.push(information);
                 }
 
             }

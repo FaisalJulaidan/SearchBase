@@ -123,6 +123,7 @@ def replaceIDsWithDataRBD(content):
 
 def convertionLoopRDB(item, IDsString):
     try:
+        print("Starting id convertion loop")
         if type(item) is dict or type(item) is MutableDict or type(item) is OrderedDict:
             for key,value in item.items():
                 item[key] = convertionLoopRDB(value, IDsString)
@@ -130,6 +131,8 @@ def convertionLoopRDB(item, IDsString):
             for value in item:
                 item[item.index(value)] = convertionLoopRDB(value, IDsString)
         else:
+            print("item: ", item)
+            print("type(item): ", type(item))
             if type(item) is int:
                 try:
                     item = IDsString.split('DBID": '+str(item)+', "@Desc": "')[1].split('"')[0]

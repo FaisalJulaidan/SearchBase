@@ -340,7 +340,8 @@ def getSolutionByAssistantID(assistantID):
     try:
         # Get result and check if None then raise exception
         result = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
-        if not result: raise Exception
+        if not result: 
+            raise Exception
 
         return Callback(True, 'JSON has been successfully retrieved', result)
 

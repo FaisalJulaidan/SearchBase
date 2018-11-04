@@ -1,6 +1,6 @@
 from typing import List
 from config import BaseConfig
-from utilities import json_utils
+from utilities import json_utils, helpers
 from sqlalchemy.sql import exists, func
 from os.path import join, dirname
 import json
@@ -83,7 +83,7 @@ def genBotViaTemplate(assistant: Assistant, tempName: str):
 
 # Get the chatbot for the public to use
 def getChatbot(assistant: Assistant) -> dict:
-    return {'assistant': {'id': assistant.ID, 'name': assistant.Name, 'message': assistant.Message,
+    return {'assistant': {'id': helpers.encrypt_id(assistant.ID), 'name': assistant.Name, 'message': assistant.Message,
                           'secondsUntilPopup': assistant.SecondsUntilPopup, 'active': assistant.Active},
             'blocks': getBlocks(assistant)}
 

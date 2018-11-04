@@ -340,7 +340,7 @@ def getSolutionByAssistantID(assistantID):
     try:
         # Get result and check if None then raise exception
         print("assistantID: ", assistantID)
-        result = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
+        result = db.session.query(Solution)
         print(2)
         if not result: 
             print(3)

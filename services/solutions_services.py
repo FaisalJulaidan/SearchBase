@@ -31,24 +31,38 @@ def getBasedOnKeywords(assistantID, keywords: list, max=999999) -> Callback:
         if not solution:
             return Callback(True, "There are no solutions associated with this assistant", None)
         t2 = time.time()
+        print("Time to get JSON from DB: ", t2-t0)
 
         result = getSolutions(solution.Content, keywords)
         t3 = time.time()
+        print("Time to get solutions from JSON: ", t3-t2)
 
         result = sorted(result, key=getSolutionsSortKey, reverse=True)
-        # for c in result:
-        #     print(c["matches"])
+
         result = result[0:max]
+
+        filterSolutionValues(result)
+
         t5 = time.time()
 
-        print("Time to get JSON from DB: ", t2-t0)
-        print("Time to get solutions from JSON: ", t3-t2)
         print("Total Time: ", t5-t0)
 
         return Callback(True, 'Solutions based on keywords retrieved successfully!!', result)
     except Exception as exc:
         print("solutions_services.getBasedOnKeywords() ERROR: ", exc)
         return Callback(False, 'Solutions could not be retrieved at this time')
+
+def filterSolutionValues(records):
+    try:
+        result = []
+        print("RECORDS: ", records)
+
+
+
+        return Callback(True, 'Solution values have been filtered successfully!!', result)
+    except Exception as exc:
+        print("solutions_services.filterSolutionValues() ERROR: ", exc)
+        return Callback(False, 'Solution values could not be filtered at this time')
 
 def getSolutions(content, keywords):
     try:
@@ -123,7 +137,6 @@ def replaceIDsWithDataRBD(content):
 
 def convertionLoopRDB(item, IDsString):
     try:
-        print("Starting id convertion loop")
         if type(item) is dict or type(item) is MutableDict or type(item) is OrderedDict:
             for key,value in item.items():
                 item[key] = convertionLoopRDB(value, IDsString)
@@ -131,8 +144,6 @@ def convertionLoopRDB(item, IDsString):
             for value in item:
                 item[item.index(value)] = convertionLoopRDB(value, IDsString)
         else:
-            print("item: ", item)
-            print("type(item): ", type(item))
             if type(item) is int:
                 try:
                     item = IDsString.split('DBID": '+str(item)+', "@Desc": "')[1].split('"')[0]
@@ -147,7 +158,6 @@ def createNew(assistantID, content, type):
     try:
         # Create a new user with its associated company and role
         content = replaceIDsWithDataRBD(content)
-        #print(content)
         solution = Solution(AssistantID=assistantID, Type=type, Content=content)
         db.session.add(solution)
 
@@ -324,15 +334,22 @@ def addOldByAssitantID(assistantID, message, currentSolutions):
 def convertXMLtoJSON(xmlfile):
     try:
         #read the file
+        print(1)
         tree = ET.parse(xmlfile)
         #get start and all of xml in written format
+        print(2)
         root = tree.getroot()
         #convert to string
+        print(3)
         xmlstr = ET.tostring(root, encoding='utf8', method='xml')
         #convert to json
+        print(4)
         parser = etree.XMLParser(recover=True)
+        print(5)
         bf = BadgerFish(dict_type=OrderedDict)
+        print(6)
         jsonstr = bf.data(ET.fromstring(xmlstr, parser=parser))
+        print(7)
 
         return Callback(True, "File has been converted", jsonstr)
     except Exception as exc:

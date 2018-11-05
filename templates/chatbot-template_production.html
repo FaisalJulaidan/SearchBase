@@ -675,6 +675,7 @@
 
                 console.log("Solutions retrieved successfully!");
                 var data = JSON.parse(res).data;
+                console.log("Data: ", data)
                 solutions = data["solutions"];
                 solutionsLinkRecord = data["solutionsLink"];
                 return solutions;

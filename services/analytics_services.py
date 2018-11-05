@@ -17,6 +17,11 @@ def getAnalytics(assistant, periodSpace: int, topSolustions: int):
                   'UsersOvertime': getUsersOvertime(id, periodSpace),
                   'TotalSolutionsOverMonth':getTotalSolutionsOverMonth(id),
                   'TotalUsers': getTotalUsers(id)}
+        #result = {
+        #          'TotalQuestionsOverMonth':getTotalQuestionsOverMonth(id),
+        #          'UsersOvertime': getUsersOvertime(id, periodSpace),
+        #          'TotalSolutionsOverMonth':getTotalSolutionsOverMonth(id),
+        #          'TotalUsers': getTotalUsers(id)}
 
 
         return Callback(True, 'Analytics processed successfully.', result)

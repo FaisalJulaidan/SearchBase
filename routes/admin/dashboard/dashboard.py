@@ -26,11 +26,11 @@ def admin_home():
         if not totalClicks_callback.Success: 
             return admin_services.render("admin/dashboard.html")
 
-        totalSolutions_callback : Callback = analytics_services.getTotalReturnedSolutionsForCompany(assistants)
-        if not totalSolutions_callback.Success: 
-            return admin_services.render("admin/dashboard.html")
+        #totalSolutions_callback : Callback = analytics_services.getTotalReturnedSolutionsForCompany(assistants)
+        #if not totalSolutions_callback.Success: 
+            #return admin_services.render("admin/dashboard.html")
 
-        return admin_services.render("admin/dashboard.html", totalClicks = totalClicks_callback.Data, totalSolutions = totalSolutions_callback.Data)
+        return admin_services.render("admin/dashboard.html", totalClicks = totalClicks_callback.Data, totalSolutions = 0)
 
 
     # c_callback: Callback = company_services.getByID(1)

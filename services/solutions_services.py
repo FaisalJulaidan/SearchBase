@@ -22,7 +22,7 @@ def getSolutionsSortKey(item):
     return result
 
 # Scoring System
-def getBasedOnKeywords(assistantID, keywords: list, max=999999) -> Callback:
+def getBasedOnKeywords(assistantID, keywords: list, solutionsRecord, max=999999) -> Callback:
 
     try:
         # Get solutions
@@ -41,7 +41,7 @@ def getBasedOnKeywords(assistantID, keywords: list, max=999999) -> Callback:
 
         result = result[0:max]
 
-        filterSolutionValues(result)
+        result = filterSolutionValues(result, solutionsRecord)
 
         t5 = time.time()
 
@@ -52,13 +52,31 @@ def getBasedOnKeywords(assistantID, keywords: list, max=999999) -> Callback:
         print("solutions_services.getBasedOnKeywords() ERROR: ", exc)
         return Callback(False, 'Solutions could not be retrieved at this time')
 
-def filterSolutionValues(records):
+def filterSolutionValues(records, solutionsRecord):
     try:
         result = []
-        print("RECORDS: ", records)
+        for record in records:
+            title = record["data"]["@Title"]
+            if title == 0 or title is None: title = "-"
 
 
+            term = record["data"]["@Term"]
+            if term == 0 or term is None: term = "-"
 
+
+            location = record["data"]["@Loc"]
+            if location == 0 or location is None: locaton = "-"
+
+
+            createdOn = record["data"]["@CreatedOn"]
+            if createdOn == 0 or createdOn is None: createdOn = "-"
+
+            URL = None
+            if solutionsRecord.Success:
+                if solutionsRecord.Data.WebLink or solutionsRecord.Data.IDReference:
+                    URL = solutionsRecord.Data.WebLink + str(record["data"][solutionsRecord.Data.IDReference])
+
+            result.append({"displayData" : [title, term, location, createdOn], "buttonURL" : URL})
         return Callback(True, 'Solution values have been filtered successfully!!', result)
     except Exception as exc:
         print("solutions_services.filterSolutionValues() ERROR: ", exc)
@@ -360,7 +378,7 @@ def getSolutionByAssistantID(assistantID):
     try:
         # Get result and check if None then raise exception
         result = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
-        if not result: 
+        if not result:
             raise Exception
         return Callback(True, 'JSON has been successfully retrieved', result)
 
@@ -374,7 +392,7 @@ def createUpdateJSONByAssistantID(assistantID, content, type):
         # Get result and check if None then raise exception
         #db.session.query(Solution).filter(Solution.AssistantID == assistantID).delete()
         result = getSolutionByAssistantID(assistantID)
-        if not result.Success: 
+        if not result.Success:
             createNew(assistantID, content, type)
             return Callback(True, 'Solutions file has been added')
 

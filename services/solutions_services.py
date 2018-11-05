@@ -41,7 +41,7 @@ def getBasedOnKeywords(assistantID, keywords: list, solutionsRecord, max=999999)
 
         result = result[0:max]
 
-        result = filterSolutionValues(result, solutionsRecord)
+        result = filterSolutionValues(result, solutionsRecord).Data
 
         t5 = time.time()
 
@@ -71,12 +71,16 @@ def filterSolutionValues(records, solutionsRecord):
             createdOn = record["data"]["@CreatedOn"]
             if createdOn == 0 or createdOn is None: createdOn = "-"
 
+            description = record["data"]["$"]
+            if description == 0 or description is None: description = None
+
             URL = None
             if solutionsRecord.Success:
                 if solutionsRecord.Data.WebLink or solutionsRecord.Data.IDReference:
                     URL = solutionsRecord.Data.WebLink + str(record["data"][solutionsRecord.Data.IDReference])
 
-            result.append({"displayData" : [title, term, location, createdOn], "buttonURL" : URL})
+            result.append({"displayData" : [title, term, location, createdOn], "buttonURL" : URL, "description" : description})
+        print("RESULT: ", result)
         return Callback(True, 'Solution values have been filtered successfully!!', result)
     except Exception as exc:
         print("solutions_services.filterSolutionValues() ERROR: ", exc)

@@ -80,7 +80,7 @@ def filterSolutionValues(records, solutionsRecord):
                     URL = solutionsRecord.Data.WebLink + str(record["data"][solutionsRecord.Data.IDReference])
 
             result.append({"displayData" : [title, term, location, createdOn], "buttonURL" : URL, "description" : description})
-        print("RESULT: ", result)
+            
         return Callback(True, 'Solution values have been filtered successfully!!', result)
     except Exception as exc:
         print("solutions_services.filterSolutionValues() ERROR: ", exc)

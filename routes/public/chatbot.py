@@ -18,7 +18,10 @@ def getAssistantByHashID(hashID):
         return helpers.jsonResponse(False, 404, "Assistant not found.", None)
 
     assistant = getAssistant(assistantID[0])
-    if not assistant.Active:
+
+    #check if its deactivated excluding on test page
+    requestHeader = str(request.headers.get("Referer"))
+    if not assistant.Active and (("connect" not in requestHeader or "/admin/assistant/" not in requestHeader) and ("chatbottemplate_production" not in requestHeader)):
         return helpers.jsonResponse(False, 404, "Assistant is not active.", None)
 
     return assistant

@@ -89,6 +89,7 @@ def getSolutions_forChatbot(assistantIDAsHash):
 
         # If showTop is 0 then skip below return nothing and don't even call solutions_services
         if data['showTop'] > 0:
+            getSolutionRecord_callback : Callback = solutions_services.getSolutionByAssistantID(assistant.ID)
 
             s_callback = solutions_services.getBasedOnKeywords(assistantID=assistant.ID, keywords=data['keywords'], solutionsRecord=getSolutionRecord_callback, max=data['showTop'])
             if not s_callback.Success:

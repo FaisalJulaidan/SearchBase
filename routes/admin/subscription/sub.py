@@ -1,32 +1,26 @@
-
-from flask import Blueprint, request, redirect, abort, render_template, session, jsonify
-from flask_api import status
-from services import admin_services, sub_services, user_services, assistant_services, company_services
-from utilities import helpers
+import os
 import stripe
+from flask import Blueprint, request, session
+from services import admin_services, sub_services, user_services, company_services
+from utilities import helpers
 from models import db, Callback, User, Company
 
 
-sub_router: Blueprint = Blueprint('sub_router', __name__ ,template_folder="../../templates")
-
-pub_key = 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
-secret_key = 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
-encryption = None
+sub_router: Blueprint = Blueprint('sub_router', __name__, template_folder="../../templates")
 
 stripe_keys = {
-    'secret_key': secret_key,
-    'publishable_key': pub_key
+  'secret_key': os.environ['STRIPE_SECRET_KEY'],
+  'publishable_key': os.environ['STRIPE_PUBLISHABLE_KEY']
 }
 
-stripe.api_key = secret_key
-
+stripe.api_key = stripe_keys['secret_key']
 
 
 
 @sub_router.route("/admin/pricing", methods=['GET'])
 def admin_pricing():
     currentPlan = session.get('UserPlan')
-    return admin_services.render("admin/pricing-tables.html", pub_key=pub_key, currentPlan=currentPlan)
+    return admin_services.render("admin/pricing-tables.html", stripe_pubKey=stripe_keys['publishable_key'], currentPlan=currentPlan)
 
 
 @sub_router.route("/admin/subscribe/<planID>", methods=['GET', 'POST'])
@@ -38,7 +32,6 @@ def admin_pay(planID):
             helpers.redirectWithMessage('admin_pricing', 'This plan does not exist! Make sure the plan ID '
                                         + planID + ' is correct.')
 
-        print(stripePlan_callback.Data)
         return admin_services.render("admin/sub.html", plan=stripePlan_callback.Data)
 
     if request.method == 'POST':
@@ -54,7 +47,6 @@ def admin_pay(planID):
         user: User = callback.Data
 
         stripePlan_callback: Callback = sub_services.getStripePlan(planID)
-        print(stripePlan_callback.Success)
         if not stripePlan_callback.Success:
             return helpers.jsonResponse(False, 404, "This plan doesn't exist!", None)
 
@@ -64,9 +56,9 @@ def admin_pay(planID):
         token = data['token']['id']
         coupon = data['coupon']
 
-        print(">>>>>>>>>>>")
-        print(token)
-        print(coupon)
+        # print(">>>>>>>>>>>")
+        # print(token)
+        # print(coupon)
 
         if token is "Error" or not token:
             return helpers.jsonResponse(False, 404, "No token provided to complete the payment!", None)
@@ -77,7 +69,6 @@ def admin_pay(planID):
 
         # Set Plan session for logged in user
         session['UserPlan'] = sub_callback.Data['planNickname']
-        print("You have successfully subscribed!")
         return helpers.jsonResponse(True, 200, "You have successfully subscribed!", {"url": "admin/pricing-tables.html"})
 
 
@@ -108,7 +99,6 @@ def unsubscribe():
         # Clear plan session
         session.pop('UserPlan')
 
-        print(unsubscribe_callback.Message)
         return helpers.jsonResponse(True, 200, unsubscribe_callback.Message)
 
 

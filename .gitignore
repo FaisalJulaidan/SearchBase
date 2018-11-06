@@ -536,3 +536,4 @@ __pycache__/
 /static/file_uploads/user_files
 virtual
 venv
+/Development.db-journal

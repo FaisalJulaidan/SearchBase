@@ -28,10 +28,14 @@ def unsubscribe(company: Company) -> Callback:
         db.session.rollback()
         return Callback(False, 'An error occurred while trying to unsubscribe')
 
+    # finally:
+       # db.session.close()
+
 
 def subscribe(company: Company, planID, trialDays=None, token=None, coupon='') -> Callback:
 
     # Get the Plan by ID
+    print("1")
     plan_callback: Callback = getPlanByID(planID)
     if not plan_callback.Success:
         return Callback(False, 'Plan does not exist')
@@ -43,21 +47,25 @@ def subscribe(company: Company, planID, trialDays=None, token=None, coupon='') -
         if not coupon_callback.Success:
             return coupon_callback
 
+    print("2")
     # Set the Plan
     plan: Plan = plan_callback.Data
 
     try:
         # Check user if already has a StripeID
+        print("2.1")
         stripeID = company.StripeID
         print(stripeID)
         if not stripeID:
             return Callback(False, "Sorry, your company doesn't have a Stripe ID to subscribe to a plan")
 
+        print("2.2")
         customer = stripe.Customer.retrieve(stripeID)
         if token:
             customer.source = token
             customer.save()
 
+        print("3")
 
         # Subscribe to the  plan
         subscription = stripe.Subscription.create(
@@ -67,29 +75,38 @@ def subscribe(company: Company, planID, trialDays=None, token=None, coupon='') -
             coupon=coupon
         )
 
+        print("4")
         # Get all company's assistants for activation
 
         # If everything is OK, activate company's assistants
         assistants = company.Assistants
+
+        print("4.1")
         if assistants != 0:
             for assistant in assistants:
                 assistant.Active = True
 
+        print("5")
         # Update user's StripeID & SubID
         company.StripeID = customer['id']
+        print("6")
         company.SubID = subscription['id']
 
+        print("7")
         # Save db changes
         db.session.commit()
+
+        return Callback(True, 'Subscribed successfully', {'stripeID': customer['id'],
+                                                      'subID': subscription['id'],
+                                                      'planNickname': plan.Nickname})
 
     except Exception as e:
         db.session.rollback()
         print(e)
         return Callback(False, 'An error occurred while subscribing with Stripe')
 
-    return Callback(True, 'Subscribed successfully', {'stripeID': customer['id'],
-                                                      'subID': subscription['id'],
-                                                      'planNickname': plan.Nickname})
+    # finally:
+       # db.session.close()
 
 
 def getPlanByID(planID) -> Callback:
@@ -104,6 +121,8 @@ def getPlanByID(planID) -> Callback:
         db.session.rollback()
         return Callback(False, 'Could not find a plan with ID ' + planID)
 
+    # finally:
+       # db.session.close()
 
 def getPlanByNickname(nickname) -> Callback:
     try:
@@ -117,6 +136,8 @@ def getPlanByNickname(nickname) -> Callback:
         db.session.rollback()
         return Callback(False, 'Could not find a plan with ' + nickname + ' nickname')
 
+    # finally:
+       # db.session.close()
 
 def getStripePlan(planID) -> Callback:
     try:
@@ -126,8 +147,11 @@ def getStripePlan(planID) -> Callback:
 
         return Callback(True, 'No message.', result)
     except Exception as e:
+        db.session.rollback()
         return Callback(False, "This plan doesn't exist! Make sure the plan ID is correct.")
 
+    # finally:
+       # db.session.close()
 
 def getStripePlanNicknameBySubID(SubID):
     try:
@@ -144,6 +168,8 @@ def getStripePlanNicknameBySubID(SubID):
         db.session.rollback()
         return Callback(False, 'Could not find plan nickname form Stripe')
 
+    # finally:
+       # db.session.close()
 
 def isCouponValid(coupon) -> Callback:
     try:
@@ -152,6 +178,10 @@ def isCouponValid(coupon) -> Callback:
         if not coupon['valid']:
             return Callback(False, "Coupon has expired.")
         return Callback(True, "Coupon is valid")
-    except stripe.error.StripeError as e:
+    except Exception as e:
         print("coupon is not valid")
+        db.session.rollback()
         return Callback(False, "coupon is not valid.")
+
+    # finally:
+       # db.session.close()

@@ -266,7 +266,9 @@ class Assistant(db.Model):
     Name = db.Column(db.String(128),nullable=False)
     Route = db.Column(db.String(64), unique=True)
     Message = db.Column(db.String(500), nullable=False)
-    SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0 )
+    TopBarText = db.Column(db.String(64), nullable=False)
+    SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
+    Config = db.Column(JsonEncodedDict, nullable=True)
     Active = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
@@ -288,62 +290,24 @@ class Assistant(db.Model):
 
 class Solution(db.Model):
 
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
-                   supports_json=True,
-                   supports_dict=True,
-                   on_serialize=None,
-                   on_deserialize=None
-                   )
-    SolutionID = db.Column(db.String(128), nullable=False,
-                           supports_json=True,
-                           supports_dict=True,
-                           on_serialize=None,
-                           on_deserialize=None
-                           )
-    MajorTitle = db.Column(db.String(128), nullable=False,
-                           supports_json=True,
-                           supports_dict=True,
-                           on_serialize=None,
-                           on_deserialize=None
-                           )
-    SecondaryTitle = db.Column(db.String(128), nullable=True,
-                               supports_json=True,
-                               supports_dict=True,
-                               on_serialize=None,
-                               on_deserialize=None
-                               )
-    ShortDescription = db.Column(db.String(128), nullable=True,
-                                 supports_json=True,
-                                 supports_dict=True,
-                                 on_serialize=None,
-                                 on_deserialize=None
-                                 )
-    Money = db.Column(db.String(128), nullable=False,
-                      supports_json=True,
-                      supports_dict=True,
-                      on_serialize=None,
-                      on_deserialize=None
-                      )
-    Keywords = db.Column(db.String(128), nullable=False,
-                         supports_json=True,
-                         supports_dict=True,
-                         on_serialize=None,
-                         on_deserialize=None
-                         )
-    URL = db.Column(db.String(200), nullable=False,
-                    supports_json=True,
-                    supports_dict=True,
-                    on_serialize=None,
-                    on_deserialize=None
-                    )
-    TimesReturned = db.Column(db.Integer, nullable=False, default=0)
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    if BaseConfig.USE_ENCRYPTION:
+        Content = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
+        RequiredFilters = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
+    else:
+        Content = db.Column(JsonEncodedDict, nullable=False)
+        RequiredFilters = db.Column(JsonEncodedDict, nullable=True)
+    Type = db.Column(db.String(64), nullable=False)
+    WebLink = db.Column(db.String(128), nullable=True)
+    IDReference = db.Column(db.String(64), nullable=True)
+    automaticSolutionAlerts = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='Solutions')
 
     def __repr__(self):
-        return '<Solution {}>'.format(self.MajorTitle)
+        return '<Solution {}>'.format(self.ID)
 
 
 class Statistics(db.Model):
@@ -385,6 +349,13 @@ class BlockAction(enum.Enum):
     EndChat = 'End Chat'
 
 
+# # An association table to add a many to many relationship between Blocks & BlockLabels
+# BlocksLabels = db.Table('BlocksLabels', db.Base.metadata,
+#     db.Column('BlockID', db.Integer, ForeignKey('Block.id')),
+#     db.Column('LabelID', db.Integer, ForeignKey('BlockLabel.id'))
+# )
+
+
 class Block(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
@@ -392,22 +363,40 @@ class Block(db.Model):
     Order = db.Column(db.Integer, nullable=False)
     Content = db.Column(JsonEncodedDict, nullable=False)
     StoreInDB = db.Column(db.Boolean(), nullable=False, default=True)
+    Skippable = db.Column(db.Boolean(), nullable=False, default=False)
+    Labels = db.Column(db.String(64), nullable=False, default="")
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='Blocks')
 
+    # Labels = db.relationship('BlockLabel', back_populates='Blocks', secondary=BlocksLabels)
+
     # Constraints:
-    __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)
+    # __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)
 
     def __repr__(self):
         return '<Block {}>'.format(self.Type)
 
+class BlockLabel(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Text = db.Column(db.String(128), nullable=False)
+    Colour = db.Column(db.String(128), nullable=False)
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False,)
+
+    # Relationships:
+    # Blocks = db.relationship('Block', back_populates='Labels', secondary=BlocksLabels)
+
+    def __repr__(self):
+        return '<BlockLabel {}>'.format(self.Text)
 
 class ChatbotSession(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Data = db.Column(JsonEncodedDict, nullable=False)
+    if BaseConfig.USE_ENCRYPTION:
+        Data = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
+    else:
+        Data = db.Column(JsonEncodedDict, nullable=False)
     FilePath = db.Column(db.String(250), nullable=True, default=None)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     TimeSpent = db.Column(db.Integer, nullable=False, default=0)

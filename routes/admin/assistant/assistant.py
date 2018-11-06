@@ -32,13 +32,13 @@ def assistant():
         welcomeMsg = request.form.get("welcome-message", default='').strip()
         timePopup = request.form.get("timeto-autopop", default='').strip()
         templateName = request.form.get("template-name", default='').strip()
+        topBarText = request.form.get("top-bar-text", default='').strip()
 
-        assistant_callback: Callback = assistant_services.create(name, None, welcomeMsg, timePopup, user.Company)
+        assistant_callback: Callback = assistant_services.create(name, None, welcomeMsg, topBarText, timePopup, user.Company)
         if not assistant_callback.Success:
             return helpers.jsonResponse(False, 400, "Couldn't create the assistant", None)
 
         if 'none' not in templateName:
-            print('create assistant with template')
             callback_bot: Callback = bot_services.genBotViaTemplate(assistant_callback.Data, templateName)
             if not callback_bot.Success:
                 # if template has an error remove the created assistant
@@ -62,13 +62,13 @@ def admin_home():
             if assistants: assistants = helpers.getListFromSQLAlchemyList(assistants)
             else: assistants = []
 
-            print(assistants)
+
             return render_template("admin/dashboard.html",
                                    totalClicks=callback.Data.ProductsReturned,
                                    loadedAnswers=callback.Data.QuestionsAnswered,
                                    assistants=assistants)
         else:
-            print(callback.Message)
+
             return redirect('login')
 
 

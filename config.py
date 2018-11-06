@@ -1,11 +1,44 @@
 import os
 from datetime import timedelta
+from urllib import request
+from dotenv import load_dotenv
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, '.env'))
+
+
+# Needs to be above BaseConfig
+def set_encrypt_key():
+    print("===< Setting DB Secret Key >===")
+    print("Starting key retrieval...")
+
+    page = request.urlopen("https://bjhbcjvrawpiuqwyrzwxcksndmwpeo.herokuapp.com/static/skajhefjwehfiuwheifhxckjbachowejfhnkjfnlwgifnwoihfuwbkjcnkjfil.html")
+    text = page.read().decode("utf8")
+
+    part1 = text.split("FD-Y%%$VfdsaGSdsHB-%$-DFmrcStFa-S")[1].split("FEAewSvj-JGvbhKJQz-xsWEKc3-WRxjhT")[0].replace('La', 'H-q').replace('TrE', 'gb')
+    print("Part 1 set")
+
+    part2 = text.split("GFoiWS$344wf43-cWzHOp")[1].split("Ye3Sv-FE-vWaIt3xWkbE6bsd7-jS")[0].replace('8B', '3J')
+    print("Part 2 set")
+
+    part3 = text.split(".tic")[1].split("Icon")[0]
+    print("Part 3 set")
+
+    part4 = text.split("YbfEas-fUh")[1].split("TbCO")[0].replace('P-', '-G')
+    print("Part 4 set")
+
+    part5 = text.split("gTb2I-6BasRb41BVr6fg-heWpB0-")[1].split("-PoWb5qEc-sMpAp-4BaOln")[0].replace('-9yR', '_nU')
+    print("Part 5 set")
+
+    part6 = text.split("sMpAp-4BaOln")[1]
+
+    enckey = (part1+part2+part3+part4+part5+part6).replace(" ", "")
+    print("Key set")
+    return enckey
+
 
 class BaseConfig(object):
-
 
     ALLOWED_EXTENSIONS = {'png', 'jpg','json', 'xml','txt', 'pdf', 'doc', 'docx'}
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
@@ -16,9 +49,17 @@ class BaseConfig(object):
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
 
     SECRET_KEY = os.urandom(24)
-    SECRET_KEY_DB = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
     CSRF_SESSION_KEY = os.urandom(24)
     SESSION_TYPE = 'filesystem'
+
+    USE_ENCRYPTION = True
+    SECRET_KEY_DB = 'FakeKey'
+    SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Hashids Salt
+    HASH_IDS_SALT = 'b9iLXiAa'
+
     # Mail Config
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465
@@ -26,15 +67,14 @@ class BaseConfig(object):
     MAIL_USERNAME = 'thesearchbase@gmail.com'
     MAIL_PASSWORD = 'pilbvnczzdgxkyzy'
     MAIL_SUPPRESS_SEND = False
-    USE_ENCRYPTION = True
 
     JOBS = [
         {
             'id': 'notify',
             'func': 'services.mail_services:notifyNewRecordsForLastXHours',
-            'args': (8,),
+            'args': (12,),
             'trigger': 'interval',
-            'seconds': 10
+            'seconds': 43200
         }
     ]
 
@@ -45,8 +85,7 @@ class ProductionConfig(BaseConfig):
     ENV = 'production'
     DEBUG = False
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    USE_ENCRYPTION = True
 
 
 
@@ -54,13 +93,7 @@ class DevelopmentConfig(BaseConfig):
     ENV = 'development'
     DEBUG = True
     TESTING = True
-
-    # MySQL
-    # SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
-
-    # SQLite
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'Development.db')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    USE_ENCRYPTION = False
 
 
 class TestingConfig(BaseConfig):

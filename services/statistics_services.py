@@ -5,7 +5,18 @@ from models import db, Company, Statistics, Callback
 from services import user_services, db_services
 
 def getByAssistantID(id) -> Statistics:
-    return db.session.query(Statistics).get(id)
+    try:
+        query = db.session.query(Statistics).get(id)
+
+        return Callback(True, "Statistic has been retrieved", query) #CHANGED
+
+    except Exception as exc:
+        print("statistics_services.getByAssistantID ERROR: ", exc)
+        db.session.rollback()
+        return Callback(False, "Could not retrieve statistic")
+
+    # finally:
+       # db.session.close()
 
 def getTotalAll(assistants) -> Callback:
     answered = 0
@@ -22,5 +33,9 @@ def getTotalAll(assistants) -> Callback:
 
     except Exception as exc:
         print(exc)
+        db.session.rollback()
         return Callback(False,
                         "Error: Couldn't get total numbers for all assistants")
+
+    # finally:
+       # db.session.close()

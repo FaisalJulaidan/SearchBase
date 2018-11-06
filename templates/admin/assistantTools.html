@@ -1,6 +1,6 @@
 ﻿{% extends "admin/base.html" %}
 
-{% block title %}Emoji Converter{% endblock %}
+{% block title %}Assistant Tools{% endblock %}
 
 {% block content %}
 <div class="right_col" role="main">
@@ -11,22 +11,30 @@
             <div class="x_panel" style="height:600px;">
                 <div class="col-md-12">
                     <div class="jumbotron text-xs-center">
-                        <h1 class="display-3">Emoji Converter</h1>
+                        <h1 class="display-3">Assistant Tools</h1>
                         <p class="lead">
-                            <strong>Enter the emoji you have copied underneath</strong> to find its
-                            text equivalent
+                            <strong>Create link</strong> which you can put
+                            inside your text
                         </p>
+                        <label>Please insure to insert <strong>http://</strong> or <strong>https://</strong> in the beggining of the link</label>
                         <hr>
-                        <input type="text" id="emoji_input"> <label id="emoji_output"></label>
+                        <input type="text" id="clickLink_input" placeholder="Text" class="form-control col-md-5 col-xs-10">
+                        <br />
+                        <br />
+                        <br />
+                        <input type="text" id="clickLink_link" placeholder="Link" class="form-control col-md-5 col-xs-10">
+                        <br />
+                        <br />
+                        <br />
+                        <label id="clickLink_output">Result</label>
                         <br />
                         <br />
                         <p class="lead">
-                            <button id="emoji_convert" onclick="convert()" class="btn btn-success">
+                            <button id="clickLink_convert" onclick="convertLink()" class="btn btn-success">
                                 Convert
                             </button>
                         </p>
-                        <h3>We have now automated this process and emojis will be automatically converted while you are typing in any of the pages.</h3>
-                        <h4>Need some inspiration? Look for Emojies <strong><a href="https://www.emojicopy.com/"> here</a></strong> </h4>
+                        <h4>Paste the output inside your text to create a link for the user.</h4>
                     </div>
                 </div>
             </div>
@@ -47,10 +55,11 @@
 <!-- https://demos.emojione.com/latest/jstoshort.html to look at their :emoji: name -->
 
 <script>
-    function convert() {
-        var input = document.getElementById('emoji_input').value;
-        var output = emojione.toShort(input);
-        document.getElementById('emoji_output').innerHTML = output;
+    function convertLink() {
+        var input = document.getElementById('clickLink_input').value;
+        var link = document.getElementById('clickLink_link').value;
+        var output = "<xmp><a href=\'"+link+"\' target=\\\'_blank\\\'>"+input+"</a></xmp>";
+        document.getElementById('clickLink_output').innerHTML = output;
     }
 </script>
 

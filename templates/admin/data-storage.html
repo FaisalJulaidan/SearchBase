@@ -69,10 +69,11 @@
     var currentLength = 0;
     var maxLength = 0;
     var tableString = "";
-    console.log("{{data}}")
-    {%if not data %}
-    $("#tBodyUIn").append("<h4>All of the data collected from the bot convorsations will be stored here.</h4>");
-    {%endif%}
+    console.log("data: {{data}}")
+    {%if not data%}
+    $("#tBodyUIn").append("<h3>You currently do not have any data.</h3>");
+
+    {%else%}
 
     {%for record in data %}
         currentLength = 0;
@@ -84,7 +85,7 @@
 
     var headings = "";
     for (var i = 0; i < maxLength; i++) {
-        headings += "<th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Input "+(i+2)+"</th>";
+        headings += "<th style=\"cursor: pointer;\" onclick=\"sortTable(0)\" class=\"column-title\">Input "+(i+1)+"</th>";
     }
 
     tableString = "<table id=\"tableSort\" class=\"table\" cellspacing=\"0\" width=\"100 %\"><thead>\
@@ -111,6 +112,8 @@
     $("#tBodyUIn").append(tableString);
 
     sortTable(1);
+
+    {% endif %}
 
     function fnExcelReport() {
         tab_text = tableString;

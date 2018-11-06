@@ -165,6 +165,7 @@
                                 <li>
                                     <a><i class="fa fa-wrench"></i> Tools <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
+                                        <li><a href="/admin/assistanttools">Assistant Tools</a></li>
                                         <li><a href="/admin/emoji-converter">Emoji Converter</a></li>
                                     </ul>
                                 </li>
@@ -400,6 +401,8 @@
     <!-- SweetAlert Library -->
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css" />
 
     <script type="text/javascript">
         var errTitle = $("#errorTitle");
@@ -434,7 +437,7 @@
             if (xhttp.readyState === 4) {
                 if (xhttp.status === 200) {
                     res = JSON.parse(xhttp.responseText)
-                    console.log(res)
+                    //console.log(res)
                     document.getElementById("userWelcomeName").innerHTML = res.name
                     document.getElementById("userDropdownLabel").innerHTML = res.name
                     if (!res.EditChatbots)
@@ -456,7 +459,7 @@
             url: '/admin/userData',
             dataType: "json"
         }).done(function (res) {
-            console.log(res.data);
+            //console.log(res.data);
             sessionStorage.setItem('id', res.data.id);
             sessionStorage.setItem('firstname', res.data.firstname);
             sessionStorage.setItem('surname', res.data.surname);
@@ -464,10 +467,35 @@
             sessionStorage.setItem('stripeID', res.data.stripeID);
             sessionStorage.setItem('subID', res.data.subID);
             sessionStorage.setItem('role', JSON.stringify(res.data.role));
-            console.log(JSON.parse(sessionStorage.getItem('role')));
+            //console.log(JSON.parse(sessionStorage.getItem('role')));
         }).fail(function (err) {
             console.log(err)
         })
+
+        //insure no image emojis are put inspect
+        function convertEmojisInInputs(){
+          console.log("EXECUTE")
+          var inputs = document.getElementsByTagName("input");
+          for (var i=0; i<inputs.length; i++){
+              inputs[i].value = emojione.toShort(inputs[i].value);
+          }
+        }
+        $(document).click(function(e) {
+            if (e.button == 0) {
+                var collection = $("input[type=text]");
+                for (var i=0;i<collection.length;i++)
+                {
+                  //console.log(hasClass(collection[i], "save")
+                  if(!collection[i].disabled){
+                   collection[i].addEventListener("change", convertEmojisInInputs, true);
+                  }
+                }
+            }
+        });
+        function hasClass(element, className) {
+          //console.log(element.className)
+            return (' ' + element.className + ' ').indexOf(' ' + className+ ' ') > -1;
+        }
     </script>
 
 

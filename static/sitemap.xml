@@ -4,61 +4,62 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
 
 
 <url>
   <loc>https://www.thesearchbase.com/</loc>
-  <lastmod>2018-07-24T11:24:38+00:00</lastmod>
+  <lastmod>2018-10-08T00:09:18+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
   <loc>https://www.thesearchbase.com/features</loc>
-  <lastmod>2018-07-24T11:24:38+00:00</lastmod>
+  <lastmod>2018-10-08T00:09:18+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.thesearchbase.com/dataRetrieval</loc>
-  <lastmod>2018-07-24T11:24:38+00:00</lastmod>
+  <lastmod>2018-10-08T00:09:18+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.thesearchbase.com/dataCollection</loc>
-  <lastmod>2018-07-24T11:24:38+00:00</lastmod>
+  <lastmod>2018-10-08T00:09:18+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.thesearchbase.com/pricing</loc>
-  <lastmod>2018-07-24T11:24:38+00:00</lastmod>
-  <priority>1.0</priority>
+  <lastmod>2018-10-08T00:09:18+00:00</lastmod>
+  <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.thesearchbase.com/login</loc>
-  <lastmod>2018-07-24T11:24:38+00:00</lastmod>
+  <lastmod>2018-10-08T00:09:18+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.thesearchbase.com/signup</loc>
-  <lastmod>2018-07-24T11:24:38+00:00</lastmod>
-  <priority>1.00</priority>
+  <lastmod>2018-10-08T00:09:18+00:00</lastmod>
+  <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.thesearchbase.com/about</loc>
-  <lastmod>2018-07-24T11:24:38+00:00</lastmod>
+  <lastmod>2018-10-08T00:09:18+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.thesearchbase.com/termsandconditions</loc>
-  <lastmod>2018-07-24T11:24:38+00:00</lastmod>
+  <lastmod>2018-10-08T00:09:18+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.thesearchbase.com/privacy</loc>
-  <lastmod>2018-07-24T11:24:38+00:00</lastmod>
+  <lastmod>2018-10-08T00:09:18+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.thesearchbase.com/account/resetpassword</loc>
-  <lastmod>2018-07-24T11:24:38+00:00</lastmod>
+  <lastmod>2018-10-08T00:09:18+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 

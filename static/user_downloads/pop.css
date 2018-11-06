@@ -38,6 +38,7 @@
 .TSB-contact-profile p {
     float: left;
     margin: 0;
+    line-height: 60px;
 }
 
 .TSB-contact-profile .TSB-social-media {
@@ -75,6 +76,11 @@
     position: fixed;
     right: 10px;
     bottom: 25px;
+    box-shadow: 2px 2px 7px 2.5px #888888;
+    border-radius: 6px;
+    opacity: 1;
+    display: block;
+    margin-right: 15px;
     /*z-index: -1; position:relative;*/
 }
 
@@ -86,24 +92,6 @@
     z-index: 99999999999999999999999999999999999999999999999999999999;
 }
 
-/*.box {*/
-    /*background-color: #4B5B71;*/
-    /*width: 300px;*/
-    /*height: 40px;*/
-    /*color: white;*/
-    /*display: flex;*/
-    /*align-items: center;*/
-    /*justify-content: left;*/
-/*}*/
-
-/*.box > h5 {*/
-    /*margin: 0;*/
-    /*margin-left: 20px;*/
-/*}*/
-
-/*.box > i {*/
-    /*margin-left: 130px;*/
-/*}*/
 
 .TSB-circle {
     background-color: #4B5B71;
@@ -126,30 +114,3 @@
     margin-left: 15px;
     font-size: large;
 }
-
-/*#overChatbotIframeCloseButton {*/
-    /*width: 67px;*/
-    /*height: 31px;*/
-    /*position: relative;*/
-    /*right: 0.5px;*/
-    /*background-color: #9023dc;*/
-    /*padding: 22.5px;*/
-    /*font-size: 25px;*/
-    /*text-align: center;*/
-    /*vertical-align: middle;*/
-    /*line-height: 0px;*/
-    /*border-top-right-radius: 10px;*/
-    /*color: white;*/
-    /*float: right;*/
-/*}*/
-
-/*#overChatbotIframeImg {*/
-    /*margin-left: 10px;*/
-    /*width: 62px;*/
-/*}*/
-
-/*#overChatbotIframeHeading {*/
-    /*margin-left: 12px;*/
-    /*margin-top: 20px;*/
-    /*font-size: 30px;*/
-/*}*/

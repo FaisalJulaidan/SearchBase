@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="description" content="">
@@ -39,11 +40,8 @@
     <!-- Pop-up Stylesheet -->
     <!-- <link href="/static/pop-up/pop.css" rel="stylesheet"> -->
 
-    <!-- Responsive CSS -->
-    <link href="/static/css/responsive.css" rel="stylesheet">
-
     <!-- Core Stylesheet -->
-    {#            <link href="/static/css/style.css" rel="stylesheet">#}
+    <!-- <link href="/static/css/style.css" rel="stylesheet"> -->
     <!-- <link href="/static/css/main.css" rel="stylesheet"> -->
 
     <!-- Responsive CSS -->
@@ -65,7 +63,7 @@
 
     <!-- Emoji JS and CSS -->
     <script src="https://cdn.jsdelivr.net/npm/emojione@3.1.4/lib/js/emojione.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emojione@3.1.4/extras/css/emojione.min.css" />
 
 
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
@@ -76,16 +74,12 @@
 
 
     <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
-    {#    <link rel="stylesheet" href="/static/chatbot/styles.css">#}
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
 </head>
 
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
-      integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-
-
 <style>
-    html, body {
+    html,
+    body {
         width: 100% !important;
         height: 100% !important;
     }
@@ -107,6 +101,10 @@
         width: 100%;
         height: 100%;
         background: #E6EAEA;
+            {
+            #border-radius: 5px;
+            #
+        }
     }
 
     #frame .content {
@@ -156,10 +154,14 @@
     }
 
     #frame .content .messages {
-        padding-top: 10px;
-        height: calc(100% - 40px);
         overflow-y: scroll;
+        position: absolute;
+        /* width: 100%; */
+        top: 0;
+        left: 0;
+        bottom: 0;
         overflow-x: hidden;
+        right: -17px;
     }
 
     #frame .content .messages::-webkit-scrollbar {
@@ -182,11 +184,6 @@
 
     #frame .content .messages ul li:nth-last-child(1) {
         margin-bottom: 20px;
-    }
-
-    #frame .content .messages ul li {
-        margin-top: 20px;
-        opacity: 0.3;
     }
 
     #frame .content .messages ul li.sent img {
@@ -229,7 +226,7 @@
         bottom: 0;
         width: 100%;
         z-index: 99;
-        height: 40px;
+        height: 55px;
     }
 
     #frame .content .message-input .wrap {
@@ -261,29 +258,27 @@
         float: right;
         border: none;
         width: 50px;
-        height: 40px;
+        /*height: 40px;*/
         padding: 12px 0;
         cursor: pointer;
         background: #32465a;
         color: #f5f5f5;
     }
 
-    #frame .content .message-input button:hover {
+    #frame .content .message-input .wrap button:hover {
         background: #435f7a;
     }
 
-    #frame .content .message-input button:focus {
+    #frame .content .message-input .wrap button:focus {
         outline: none;
     }
 
-    #frame .content .message-input button.answer {
+    #frame .content .message-input .wrap button.answer {
         float: inherit;
-        position: relative;
-        left: 50%;
-        background-color: #435f7a;
-        border-color: #5087b8;
-        transform: translateX(-100%);
-        line-height: 0;
+        margin-left: 20px;
+        margin-right: 20px;
+        padding: 10px;
+        width: auto;
     }
 
     @media screen and (max-width: 735px) {
@@ -347,734 +342,905 @@
         width: 72px;
     }
 
+
+
+    .replies {
+      margin-top: 40px;
+    }
+    /* {# @media screen and (max-width: 735px) {#}
+    {#    #frame .content {#}
+    {#        width: 100%;#}
+    {#        min-width: 250px !important;#}
+    {#    }
+    {##}
+    {#    #frame .content .messages {#}
+    {#        max-height: calc(100% - 115px);#}
+    {#    }
+    {##}
+    {#    #frame .content .messages ul li p {#}
+    {#        max-width: 300px;#}
+    {#    }
+    {##}
+    {#    #frame .content .message-input .wrap input {#}
+    {#        padding: 11px 32px 10px 12px;#}
+    {#    }
+    {##}
+    {#   #frame .content .message-input .wrap button.answer {#}
+    {#        margin-left: 5px;#}
+    {#        margin-right: 5px;#}
+    {#        padding: 10px;#}
+    {#        width: auto;#}
+    {#    }
+    {#}
+    {##}
+    {#@media screen and (min-width: 900px) {#}
+    {#    #frame .content {#}
+    {#        width: 100%;#}
+    {#    }
+    {#} */
 </style>
+
 <body id="chatbotBody">
-<div id="frame">
-    <div class="content">
-        <div class="messages">
-            <ul></ul>
-        </div>
+    <div id="frame">
+        <div class="content">
+            <div class="messages">
+                <ul></ul>
+                <div id="presetAnswers"></div>
+                <div id="chatBottom"></div>
+            </div>
 
-
-        <div class="message-input" id="message-input">
-            {#            <form id="fileUploadForm" #}
-            {#                  action="/" #}
-            {#                  method="get" #}
-            {#                  class="image-upload" #}
-            {#                  style="display:none"#}
-            {#                  onsubmit="return sendFileForm();">#}
-            {#                <div class="wrap" style="margin-top: 15px;min-height: 40px; background-color: white;">#}
-            {#                    <label style="background-color: white;width: 84.37%;" for="fileUploadB"><i#}
-            {#                            style="font-size: 30px;margin: 6px 0px 0px 10px;" class="fa fa-paperclip"></i></label><input#}
-            {#                        hidden name="file" onkeypress="handleEnter(event)" id="fileUploadB" type="file"#}
-            {#                        placeholder="Upload your file..." style="background-color: white;"/>#}
-            {#                    <button type="button" onclick="submitAnswer('')" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>#}
-            {#                </div>#}
-            {#            </form>#}
+            <div class="message-input" id="message-input">
+                <form id="fileUploadForm" action="/" method="get" class="image-upload" style="display:none" onsubmit="return sendFileForm();">
+                    <div class="wrap" style="margin-top: 15px;min-height: 40px; background-color: white;">
+                        <label style="background-color: white;width: 10%;float:left" for="fileUploadB">
+                            <i style="font-size: 30px;margin: 6px 0px 0px 10px;" class="fa fa-paperclip"></i>
+                        </label>
+                        <input hidden name="file" onkeypress="handleEnter(event)" id="fileUploadB" type="file" style="background-color: white;" onchange="fileUploadNameUpdate()"/>
+                        <button type="button" onclick="submitAnswer('')" class="submit">
+                            <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                        </button>
+                        <input onkeypress="handleEnter(event)" autocomplete="off" style="width:79%" id="displayFileName" type="text" placeholder="Upload your file..."/>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-{#<script src="/static/chatbot/script.js"></script>#}
+    <!-- <script src="/static/chatbot/script.js"></script> -->
+    <script>
+        var assistant = null;
+        var blocks = []; // Blocks ordered
+        var currentBlock = undefined;
+        var keywords = [];
+        var cancelScroll = false;
+        var collectedInformation = [];
+        var fileUpload = false;
+        var params = undefined;
+        var sessionID = 0;
+        var welcomeMessage = "";
+        var BOT_USER = 'bot';
+        var CLIENT_USER = 'user';
+        var chatInputDiv = document.getElementById("message-input");
+        var fileUploadForm = document.getElementById('fileUploadForm');
+        var thinkingGifLife = 800 + Math.floor(Math.random() * 1200);
+        var sentOnClose = false;
+        var solutionsLinkRecord = undefined;
 
-<script>
-    var assistant = null;
-    var blocks = []; // Blocks ordered
-    var currentBlock = undefined;
-    var keywords = [];
-    var cancelScroll = false;
-    var collectedInformation = [];
-    var fileUpload = false;
-    var params = undefined;
-    var sessionID = 0;
-    var welcomeMessage = "";
-    var chatInputDiv = document.getElementById("message-input");
-    var fileUploadForm = document.getElementById('fileUploadForm');
-    var thinkingGifLife = 800 + Math.floor(Math.random() * 1200);
+        window.onbeforeunload = function () { sendOnCloseData(); }
 
-    let BOT_USER = 'bot';
-    let CLIENT_USER = 'user';
-
-    // This function will get the blocks from the server by assistantID and set the blocks array to be used to create
-    // the cahtbot conversational flow
-    function chatbotInit(assistantID) {
-        console.log("Chatbot Init...");
-        $.ajax({
-            url: '../assistant/' + assistantID + '/chatbot',
-            type: "GET"
-        }).done(function (res) {
-
-            console.log("Blocks retrieved successfully!");
-            var data = JSON.parse(res).data;
-
-            // Set assistant and blocks array
-            assistant = data.assistant;
-            blocks = data.blocks;
-            welcomeMessage = assistant.message
-            // Start the chatbot
-            start();
-
-        }).fail(function (res) {
-            console.log("Error in retrieving blocks.");
-            console.log(res);
-        });
-    }
-
-    // This start the lunch the chatbot for the first time
-    async function start() {
-        // 1.Show the chatbot welcoming message assistant.message
-        if (welcomeMessage) {
-            newMessage(BOT_USER, welcomeMessage);
-            await sleep(750)
+        function sendOnCloseData() {
+            if (!sentOnClose && collectedInformation.length != 0) { sendData(); sentOnClose = true; }
         }
 
-        // 2.Show the first block in the blocks array then render it depends on its type
-        renderBlock(blocks[0]);
-    }
-
-    // Get block by id
-    function getBlock(id) {
-        for (var i = 0, l = blocks.length; i < l; i++) {
-            if (blocks[i].id === id) {
-                return blocks[i]
-            }
-        }
-        // If nothing found return null
-        return null
-    }
-
-    // This should send the data to the server, without returning any solutions back
-    function sendData() {
-        thinkGIF()
-        var solutions = [];
-        params = {
-            "collectedInformation": collectedInformation,
-            "keywords": keywords,
-            "showTop": 0,
-            solutionsReturned: solutions.length
-        };
-        console.log("Send data...");
-
-        return $.ajax({
-            contentType: 'application/json', //this is important
-            url: '../assistant/' + assistantID + '/chatbot',
-            type: "POST",
-            data: JSON.stringify(params)
-
-        }).done(function (res) {
-            console.log("Data sent successfully!");
-            var data = JSON.parse(res).data;
-            sessionID = data["sessionID"];
-            sendFile();
-            return true;
-
-        }).fail(function (res) {
-            removeThinkingGif();
-            console.log("Error in retrieving blocks.");
-            console.log(res);
-            return false
-        });
-    }
-
-    function sendDataSolutionsBlock(showTop) {
-        putThinkingGif();
-        params = {"collectedInformation": collectedInformation, "keywords": keywords, "showTop": showTop};
-
-        return $.ajax({
-            contentType: 'application/json', //this is important
-            url: '../assistant/' + assistantID + '/chatbot',
-            type: "POST",
-            data: JSON.stringify(params)
-
-        }).done(function (res) {
-            removeThinkingGif();
-
-            console.log("Solutions retrieved successfully!");
-            var data = JSON.parse(res).data;
-            sessionID = data["sessionID"];
-            solutions = data["solutions"];
-            sendFile();
-            return solutions;
-
-        }).fail(function (res) {
-            removeThinkingGif();
-            console.log("Error in retrieving blocks.");
-            console.log(res);
-        });
-    }
-
-    function getSolutions(showTop) {
-        params = {"keywords": keywords, "showTop": showTop};
-
-        return $.ajax({
-            contentType: 'application/json', //this is important
-            url: '../assistant/' + assistantID + '/chatbot/solutions',
-            type: "POST",
-            data: JSON.stringify(params)
-
-        }).done(function (res) {
-            console.log("Solutions retrieved successfully!");
-            var data = JSON.parse(res).data;
-            solutions = data["solutions"];
-            return solutions;
-
-        }).fail(function (res) {
-            removeThinkingGif();
-            console.log("Error in retrieving solutions.");
-            console.log(res);
-        });
-    }
-
-    function sendFile() {
-        console.log("init form")
-        sendFileForm();
-    }
-
-    function sendFileForm() {
-        if (document.getElementById('fileUploadB').files.length == 0) {
-            return false;
-        }
-        var formData = new FormData();
-        var fileInput = document.getElementById('fileUploadB').files[0];
-        formData.append('file', fileInput, fileInput.name);
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', "../assistant/" + sessionID + "/file", true);
-
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                console.log("File Sent");
-            } else {
-                alert('An error occurred!');
-            }
-        };
-
-        xhr.send(formData);
-
-        return false;
-    }
-
-    async function displayReturnedSolutions(solutions) {
-        messageContainer = $(".messages ul");
-
-        // If there is no solutions in the database show this message.
-        if (solutions.length === 0) {
-            await newMessage(BOT_USER, "Sorry, we couldn't find any solutions based on your input.")
-
-        } else {
-
-            for (var i = 0; i < solutions.length; i++) {
-                messageContainer.append("<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
-                    + solutions[i]["MajorTitle"] + "</h5><label>" + solutions[i]["SecondaryTitle"] + "</label><br><p>"
-                    + solutions[i]["ShortDescription"] + "</p><br><label>" + solutions[i]["Money"] +
-                    "</label><br><button onclick=\"openSolution('" + solutions[i]["URL"] +
-                    "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>View </span></button></div></center></li>");
-            }
-        }
-        // submit answer automatically
-        submitAnswer('');
-    }
-
-
-    // Blocks Renderer //
-    // --------------- //
-    function renderBlock(block) {
-        currentBlock = block;
-        if (currentBlock === undefined) {
-            return 0;
+        function fileUploadNameUpdate() {
+            $("#displayFileName").val($("#fileUploadB").val());
         }
 
-        switch (block.type) {
-            case "Question":
-                renderQuestion(block);
-                break;
-            case "User Input":
-                renderUserInput(block);
-                break;
-            case "File Upload":
-                renderFileUpload(block);
-                break;
-            case "Solutions":
-                renderSolutions(block);
-                break;
-            default:
-                console.log("Block type is not recognised!!!")
+        // This function will get the blocks from the server by assistantID and set the blocks array to be used to create
+        // the cahtbot conversational flow
+        function chatbotInit(assistantID) {
+            console.log("Chatbot Init...");
+            $.ajax({
+                url: '../assistant/' + assistantID + '/chatbot',
+                type: "GET"
+            }).done(function (res) {
+
+                console.log("Blocks retrieved successfully!");
+                var data = JSON.parse(res).data;
+
+                // Set assistant and blocks array
+                assistant = data.assistant;
+                blocks = data.blocks;
+                welcomeMessage = assistant.message
+                // Start the chatbot
+                start();
+
+            }).fail(function (res) {
+                console.log("Error in retrieving blocks.");
+                console.log(res);
+            });
         }
 
-        // This function will render a block of type Questions with its answers to the chatbot.
-        async function renderQuestion(block) {
-            $('#message-input').show();
+        // This start the lunch the chatbot for the first time
+        function start() {
+            // 1.Show the chatbot welcoming message assistant.message
+            if (welcomeMessage)
+                newMessage(BOT_USER, toEmoticon(welcomeMessage));
 
-            // to show the message from bot_user
-            await newMessage(BOT_USER, block.content.text);
-            // to show answers related to question_block
-            showAnswers(block.content.answers);
+            // 2.Show the first block in the blocks array then render it depends on its type
+            renderBlock(blocks[0]);
+        }
 
-            function showAnswers(answers) {
-                $messageInput = $("#message-input").first();
-                $answersDiv = $("<div class='row text-center' style='height:100%; padding:0 10px 10px'></div>");
+        // Blocks Renderer //
+        function renderBlock(block) {
+            currentBlock = block;
+            if (currentBlock === undefined)
+                return 0;
 
-                for (var i = 0; i < answers.length; i++) {
-                    $answersDiv.append("<button class=\"btn btn-primary answer\" onclick=\"submitAnswer(this.innerText, '" + answers[i].keywords + "' )\" >" + answers[i].text + "</button>");
-                    // $answersDiv.append("<div class='col-xs-2'><button class=\"btn btn-primary answer\" onclick=\"submitAnswer(this.innerText, '" + answers[i].keywords + "' )\" >" + answers[i].text + "</button></div>");
-                }
-                $messageInput.html($answersDiv);
-
-                $('.message-input').css('height', '40px');
-                $('.messages').css('height', 'calc(100% - 40px)');
+            switch (block.type) {
+                case "Question":
+                    renderQuestion(block);
+                    break;
+                case "User Input":
+                    renderUserInput(block);
+                    break;
+                case "File Upload":
+                    renderFileUpload(block);
+                    break;
+                case "Solutions":
+                    renderSolutions(block);
+                    break;
+                default:
+                    console.log("Block type is not recognised!!!")
             }
         }
 
-        async function renderUserInput(block) {
-            // {#chatInputDiv.style = "display:block;";#}
-            // {#fileUploadForm.style.display = 'none';#}
+        function renderQuestion(block) {
+            $('#presetAnswers').show();
+            //Show message from bot_user
+            newMessage(BOT_USER, block.content.text);
 
+            //Show answers related to question_block
+            answers = block.content.answers;
+            $messageInput = $("#presetAnswers").first();
+            $answersDiv = $("<div class='wrap text-center' style='padding:10px;'></div>");
+
+            for (var i = 0; i < answers.length; i++) {
+                $answersDiv.append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText)\" >" + emojione.toImage(answers[i].text) + "</button>");
+            }
+
+            if (currentBlock.isSkippable) {
+                $answersDiv.append("<button class=\"answerOptions\" onclick=\"submitAnswer(this.innerText)\" >Skip</button>");
+            }
+
+            $messageInput.html($answersDiv);
+
+            $answersDiv.append($("<div class='row'></div>"));
+        }
+
+        function renderUserInput(block) {
+            //Show message from bot_user
+            newMessage(BOT_USER, block.content.text);
+
+            //Show userinpt field
+            fileUploadForm.style.display = 'none';
+            chatInputDiv.style = "display:block;";
             $messageInput = $(".message-input").last();
-            $userInput = $("<div class=\"wrap\" style=\"background-color: white;\">\n" +
-                "           <input onkeypress=\"handleEnter(event)\" " +
-                "                  id='textMessage' type=\"text\" placeholder=\"Write your message...\"/>\n" +
+            $userInput = $("<div class=\"wrap\" style=\"margin-top: 15px;min-height: 40px; background-color: white;\">\n" +
+                "                <input autocomplete=\"off\" onkeypress=\"handleEnter(event)\" " +
+                "            id='textMessage' type=\"text\" placeholder=\"Write your message...\"/>\n" +
                 "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
                 "            </div>");
-
-            $messageInput.css('height', '40px');
             $('.messages').css('height', 'calc(100% - 40px)');
-
-            // show input field
             $messageInput.append($userInput);
-
-            // show block text
-            await newMessage(BOT_USER, toEmoticon(block.content.text));
+            $("#textMessage").focus();
         }
 
-        async function renderFileUpload(block) {
-            $messageInput = $(".message-input").first();
-            $fileUpload = $("<div class=\"wrap\">\n" +
-                "<input onkeypress=\"handleEnter(event)\" id=\"fileUploadB\" type=\"file\" placeholder=\"Write your message...\" style=\"\n" +
-                "    background-color:  white;\n" + "\">" +
-                "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
-                "            </div>");
+        function skipBlock() {
+            var action = undefined;
+            var blockToGoId = undefined;
 
-            $messageInput.html($fileUpload);
+            if (currentBlock.type == "Question") {
+                action = currentBlock.content.answers[0].action;
+                blockToGoId = currentBlock.content.answers[0].blockToGoID;
+            }
+            else if (currentBlock.content.action) {
+                action = currentBlock.content.action;
+                blockToGoId = currentBlock.content.blockToGoID;
+            } else {
+                action = "Go To Next Block";
+            }
+            getNextBlock(action, blockToGoId);
+        }
 
-            $('.messages').css('height', 'calc(100% - 40px)');
-            $('.message-input').css('height', '40px');
+        function renderFileUpload(block) {
+            //$messageInput = $(".message-input").first();
+            //$fileUpload = $("<div class=\"wrap\">\n" +
+            //    "<input onkeypress=\"handleEnter(event)\" id=\"fileUploadB\" type=\"file\" placeholder=\"Write your message...\" style=\"\n" +
+            //    "    background-color:  white;\n" + "\">" +
+            //    "                <button onclick=\"submitAnswer('')\" class=\"submit\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></button>\n" +
+            //    "            </div>");
 
-            await newMessage(BOT_USER, block.content.text);
+            //$messageInput.html($fileUpload);
+
+            //$('.messages').css('height','calc(100% - 40px)');
+            //$('.message-input').css('height','40px');
+
+            //Show message from bot_user
+            newMessage(BOT_USER, block.content.text);
+            //Show file upload form
+            fileUploadForm.style.display = 'block';
+            chatInputDiv.style = "display:block";
         }
 
         function renderSolutions(block) {
             $('.messages').css('height', '100%');
+            // Hide all inputs to show final solutions
             $('.message-input').hide();
-
+            $('#presetAnswers').hide();
+            chatInputDiv.style = "display:none;";
+            // make request to retrive solutions
             getSolutions(block.content.showTop)
                 .then((solutions) => {
                     solutions = JSON.parse(solutions);
+                    console.log("1: ", solutions)
                     displayReturnedSolutions(solutions.data.solutions)
                 })
-
-
-        }
-    }
-
-    // Response from user //
-    async function submitAnswer(message) {
-        // chatInputDiv.style = "display:none";#}
-        // fileUploadForm.style.display = 'none';#}
-
-        if (currentBlock.type == "Solutions") {
-            await thinkGIF();
-
-            if (currentBlock.content.afterMessage) {
-                newMessage(BOT_USER, currentBlock.content.afterMessage);
-
-                await thinkGIF();
-            }
-            return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
         }
 
-        if (currentBlock.type == "File Upload") {
-            //needs rework
-            message = "&FILE_UPLOAD&" + document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
-            if (!checkFileFormat(message)) {
-                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
-
-                await thinkGIF();
-
-                newMessage(BOT_USER, "That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
-                chatInputDiv.style = "display:block";
-                fileUploadForm.style.display = 'block';
-                return 0;
+        // This should send the data to the server, without returning any solutions back
+        function sendData() {
+            sentOnClose = true;
+            console.log(1)
+            console.log(collectedInformation)
+            console.log(collectedInformation.length)
+            if (collectedInformation.length == 0) {
+                return false
             }
-            // clear file-upload div
-            //$(".message-input").last().html('');
-            //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
+            putThinkingGif();
+            var solutions = [];
+            params = {
+                "collectedInformation": collectedInformation,
+                "keywords": keywords,
+                "showTop": 0,
+                solutionsReturned: solutions.length
+            };
+            console.log("Send data...");
 
-            newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+            return $.ajax({
+                contentType: 'application/json', //this is important
+                url: '../assistant/' + assistantID + '/chatbot',
+                type: "POST",
+                data: JSON.stringify(params)
 
-            await thinkGIF();
-            print();
+            }).done(function (res) {
+                removeThinkingGif();
+                console.log("Data sent successfully!");
+                var data = JSON.parse(res).data;
+                sessionID = data["sessionID"];
+                sendFile();
+                return true;
 
-            if (currentBlock.content.afterMessage) {
-                newMessage(BOT_USER, currentBlock.content.afterMessage);
-
-                await thinkGIF();
-            }
-            return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
+            }).fail(function (res) {
+                removeThinkingGif();
+                console.log("Error in retrieving blocks.");
+                console.log(res);
+                return false
+            });
         }
 
-        if (currentBlock.type == "User Input") { //validate user input
-            if (message == "")
-                message = document.getElementById("textMessage").value;
 
-            if (message == "" || message.replace(/ /g, "") == "") return 0;
+        function sendDataSolutionsBlock(showTop) {
+            console.log(2)
+            console.log(collectedInformation)
+            console.log(collectedInformation.length)
+            putThinkingGif();
+            params = { "collectedInformation": collectedInformation, "keywords": keywords, "showTop": showTop };
 
+            return $.ajax({
+                contentType: 'application/json', //this is important
+                url: '../assistant/' + assistantID + '/chatbot',
+                type: "POST",
+                data: JSON.stringify(params)
 
-            $('#textMessage').val("");
+            }).done(function (res) {
+                removeThinkingGif();
 
-            // print user's text
-            await newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+                console.log("Solutions retrieved successfully!");
+                var data = JSON.parse(res).data;
+                sessionID = data["sessionID"];
+                solutions = data["solutions"];
+                sendFile();
+                return solutions;
 
+            }).fail(function (res) {
+                removeThinkingGif();
+                console.log("Error in retrieving blocks.");
+                console.log(res);
+            });
+        }
 
-            print();
+        function getSolutions(showTop) {
+            putThinkingGif();
+            params = { "keywords": keywords, "showTop": showTop };
 
-            await thinkGIF();
+            return $.ajax({
+                contentType: 'application/json', //this is important
+                url: '../assistant/' + assistantID + '/chatbot/solutions',
+                type: "POST",
+                data: JSON.stringify(params)
 
-            if (!validateUserInput(message, currentBlock.content.validation))
-                return await newMessage(BOT_USER, "I am sorry but that was not in the format I think it should be...");
+            }).done(function (res) {
+                removeThinkingGif();
 
-            else {
-                // clear user input div
-                //$(".message-input").last().html('');
-                $("#message-input").first().html('');
-                // print after message
-                if (currentBlock.content.afterMessage) {
-                    await newMessage(BOT_USER, currentBlock.content.afterMessage);
-                    console.log(1);
+                console.log("Solutions retrieved successfully!");
+                var data = JSON.parse(res).data;
+                console.log("Data: ", data)
+                solutions = data["solutions"];
+                solutionsLinkRecord = data["solutionsLink"];
+                return solutions;
+
+            }).fail(function (res) {
+                removeThinkingGif();
+                console.log("Error in retrieving solutions.");
+                console.log(res);
+                return [];
+            });
+        }
+
+        function sendFile() {
+            sendFileForm();
+        }
+
+        function sendFileForm() {
+            if (document.getElementById('fileUploadB').files.length == 0) {
+                return false;
+            }
+            var formData = new FormData();
+            var fileInput = document.getElementById('fileUploadB').files[0];
+            formData.append('file', fileInput, fileInput.name);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', "../assistant/" + sessionID + "/file", true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    console.log("File Sent");
+                } else {
+                    alert('An error occurred!');
                 }
-            }
-            return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
+            };
 
+            xhr.send(formData);
+
+            return false;
         }
 
-        var blockKeywords = undefined
-        if (currentBlock.type == "Question") {
-            // clear answers div
-            $("#message-input").first().html('');
-            newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
-            print();
+        function displayReturnedSolutions(solutions) {
+            messageContainer = $(".messages ul");
+            console.log(solutions)
+            // If there is no solutions in the database show this message.
+            if (solutions == null) {
+                sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.");
+            } else if (solutions.length === 0) {
+                sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.");
 
-            await thinkGIF();
+            } else {
 
-            var blockAnswers = currentBlock.content.answers;
+                for (var i = 0; i < solutions.length; i++) {
+                    var title = solutions[i]["data"]["@Title"];
+                    if(title === 0){ title= "-"; }
 
-            for (var i = 0; i < blockAnswers.length; i++) {
-                if (blockAnswers[i].text == message) {
-                    if (blockAnswers[i].afterMessage) {
-                        newMessage(BOT_USER, blockAnswers[i].afterMessage);
+                    var term = solutions[i]["data"]["@Term"];
+                    if(term === 0){ term= "-"; }
 
-                        await thinkGIF();
+                    var location = solutions[i]["data"]["@Loc"];
+                    if(location === 0){ location= "-"; }
 
+                    var createdOn = solutions[i]["data"]["@CreatedOn"];
+                    if (createdOn === 0) { createdOn = "-"; }
+
+                    var appendString = "<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
+                        + title + "</h5><br><label>" + term + "</label><br><p>"
+                        + location + "</p><br><label>Created:<br>" + createdOn + "</label>"
+
+                    if (solutionsLinkRecord["Success"]){
+                        var URL = solutionsLinkRecord["webLink"] + String(solutions[i]["data"][solutionsLinkRecord["solutionsRef"]]);
+                        appendString += "<br><br><button onclick=\"openLink('" + URL +
+                         "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>Apply</span></button>"+
+                        "</div></center></li>"
                     }
 
-                    blockKeywords = blockAnswers[i].keywords;
-                    var action = blockAnswers[i].action;
-                    var blockToGoId = blockAnswers[i].blockToGoID;
-                    return getNextBlock(action, blockToGoId);
+                    messageContainer.append(appendString);
                 }
             }
+            // submit answer automatically
+            submitAnswer('');
         }
 
-        function print() {
-            // print the selected answer
-            if (blockKeywords)
-                blockKeywords = Boolean(blockKeywords.split) ? blockKeywords.split(',') : blockKeywords;
-
-            if (currentBlock.storeInDB) {
-                var information = {
-                    "blockID": currentBlock.id,
-                    "questionText": currentBlock.content.text,
-                    "input": message
-                };
-                if (currentBlock.type == "Question" && blockKeywords !== undefined) {
-                    information["keywords"] = blockKeywords
-                    collectedInformation.push(information);
-                    addKeywords(blockKeywords)
-                } else {
-                    information["keywords"] = []
-                    collectedInformation.push(information);
-                }
-            }
-
+        function openLink(link) {
+            window.open(link);
         }
 
-    }
+        // This function will render a block of type Questions with its answers to the chatbot.
 
-    async function thinkGIF() {
-        await sleep(200);
-        newMessage(BOT_USER, '<img id=\'thinkingGif\' style="width:27px" id="thinkingGifIMG" src="/static/images/typingDots.gif">', false, true);
-        await sleep(thinkingGifLife);
-        $("#thinkingGif").parent().parent().animate({
-            opacity: 0
-        }, 200, () => {
-            $("#thinkingGif").parent().parent().remove()
-        })
-        await sleep(400);
-    }
-
-    async function getNextBlock(action, blockToGoId = undefined) {
-        var targetBlock = undefined;
-
-        // Get next block based on action of the current block
-        if (action === "Go To Next Block") {
-            targetBlock = blocks[currentBlock.order]; //order starts from 1 and array from 0 so it just needs the current .order
-
-        } else if (action === "Go To Specific Block") {
-            for (var i = 0; i < blocks.length; i++) {
-                if (blocks[i].order === blockToGoId) {
-                    targetBlock = blocks[i];
-                }
-            }
-        } else if (action === "End Chat") {
-            sendData().then(async (isSuccess) => {
-                if (isSuccess) {
-                    await newMessage(BOT_USER, currentBlock.afterMessage);
-                } else {
-                    await newMessage(BOT_USER, "We apologise, your input couldn't be processed. Please contact us.");
-                }
-            });
-
-            // End chat
-            // SetRepeat();
-            return 0;
-        }
-
-        // If not end chat and there is no next block
-        if (targetBlock === undefined) {
-            sendData().then((isSuccess) => {
-                if (isSuccess) {
-                    // newMessage(BOT_USER,("Thank you for your input. We'll be in touch.");#}
-                } else {
-                    newMessage(BOT_USER, "We apologise, your input couldn't be processed. Please contact us.");
-                }
-
-                SetRepeat();
-                return 0;
-            })
-        }
-
-        // If there is next block but not same as the current block
-        if (currentBlock != undefined) { //check if its not trying to reload the same block
-            if (currentBlock != targetBlock) {
-                renderBlock(targetBlock);
-            }
-        }
-    }
-
-    function SetRepeat() {
-        $("#optionsDiv").append("");
-        newMessage(BOT_USER, "<div class='endChat' onclick=\"Reset()\"><a class='' style='width:400px;'>Search Again <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> </a></div>", true);
-        //checkOutsideElements();
-    }
-
-    function Reset() {
-        window.location.reload()
-    }
-
-    async function newMessage(from, text, html = false, isGif = false) {
-        if (from == BOT_USER) {
-            if (html) {
-                return new Promise(resolve => {
-                    $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" />' + text + '</li>')
-                        .appendTo($('.messages ul')).hide().animate({
-                        opacity: 1,
-                        marginTop: '0px'
-                    }, 400, () => resolve(scrollTo()));
-                });
-            }
-            else
-                return new Promise(resolve => {
-                    $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p>' + text + '</p></li>')
-                        .appendTo($('.messages ul')).animate({
-                        opacity: 1,
-                        marginTop: '0px'
-                    }, 400, () => resolve(scrollTo()));
-                })
-        }
-        else {
-            return new Promise(resolve => {
-                $('<li class="sent"><img src="https://cdn1.iconfinder.com/data/icons/social-messaging-productivity-1-1/128/gender-male2-512.png" alt="" /><p>' + text + '</p></li>')
+        function newMessage(from, text, html = false) {
+            if (from == BOT_USER) {
+                if (html)
+                    $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" />' + emojione.toImage(text) + '</li>')
                     .appendTo($('.messages ul')).animate({
-                    opacity: 1,
-                    marginTop: '0px'
-                }, 400, () => resolve(scrollTo()));
-            });
+                      marginTop: "5px"
+                    })
+                else
+                    $('<li class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p>' + emojione.toImage(text) + '</p></li>')
+                    .appendTo($('.messages ul')).animate({
+                      marginTop: "5px"
+                    })
+            }
+            else {
+                $('<li class="sent"><img src="https://cdn1.iconfinder.com/data/icons/social-messaging-productivity-1-1/128/gender-male2-512.png" alt="" /><p>' + emojione.toImage(text) + '</p></li>').appendTo($('.messages ul')).hide().fadeIn();
+            }
+
+            scrollTo('end')
         }
 
+        async function submitAnswer(message) {
+
+            if(currentBlock.type == "User Input"){
+                if (message == "")
+                    message = document.getElementById("textMessage").value;
+
+                if (message == "" || message.replace(/ /g, "") == ""){
+                    return 0;
+                }
+            }
+
+            chatInputDiv.style = "display:none";
+            fileUploadForm.style.display = 'none';
+            // clear answers div
+            $("#presetAnswers").first().html('');
+
+            if (message.toLowerCase() === "skip" && currentBlock.isSkippable) {
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+                $('#textMessage').val("");
+                skipBlock();
+                return 0;
+            }
+
+            if (currentBlock.type == "Solutions") {
+                await sleep(200);
+                putThinkingGif();
+                await sleep(thinkingGifLife);
+                removeThinkingGif();
+                await sleep(200);
+
+                if (currentBlock.content.afterMessage) {
+                    sendAssistantMessage(currentBlock.content.afterMessage);
+
+                    await sleep(200);
+                    putThinkingGif();
+                    await sleep(thinkingGifLife);
+                    removeThinkingGif();
+                    await sleep(200);
+                }
+                return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
+            }
+
+
+            if (currentBlock.type == "File Upload") {
+                //needs rework
+                if ($("#displayFileName").val().toLowerCase() === "skip" && currentBlock.isSkippable) {
+                    newMessage(CLIENT_USER, $("#displayFileName").val());
+                    $('#displayFileName').val("");
+                    skipBlock();
+                    return 0;
+                }
+                message = "&FILE_UPLOAD&" + document.getElementById("fileUploadB").value.split("\\")[document.getElementById("fileUploadB").value.split("\\").length - 1];
+                if (!checkFileFormat(message)) {
+                    sendUserMessage(message.replace("&FILE_UPLOAD&", ""));
+
+                    await sleep(200);
+                    putThinkingGif();
+                    await sleep(thinkingGifLife);
+                    removeThinkingGif();
+                    await sleep(200);
+
+                    $('#displayFileName').val("");
+                    sendAssistantMessage("That did not match the allowed file types I've been given. They are " + getAllowedFormatsString() + ".")
+                    chatInputDiv.style = "display:block";
+                    fileUploadForm.style.display = 'block';
+                    return 0;
+                }
+                // clear file-upload div
+                //$(".message-input").last().html('');
+                //fileUploads.push(currentFileURL + ":::" + questionID + ":::" + message);
+
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+
+                await sleep(200);
+                putThinkingGif();
+                await sleep(thinkingGifLife);
+                removeThinkingGif();
+                await sleep(200);
+
+                print();
+
+                if (currentBlock.content.afterMessage) {
+                    sendAssistantMessage(currentBlock.content.afterMessage);
+
+                    await sleep(200);
+                    putThinkingGif();
+                    await sleep(thinkingGifLife);
+                    removeThinkingGif();
+                    await sleep(200);
+                }
+                $('#displayFileName').val("");
+                return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
+            }
+
+            if (currentBlock.type == "User Input") { //validate user input
+
+                $('#textMessage').val("");
+
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+
+                print();
+                addKeywords(message.replace(/ /g, " ").split(" "));
+
+                await sleep(200);
+                putThinkingGif();
+                await sleep(thinkingGifLife);
+                removeThinkingGif();
+                await sleep(200);
+
+                if (!validateUserInput(message, currentBlock.content.validation)) {
+                    sendAssistantMessage("I am sorry but that was not in the format I think it should be...");
+                    chatInputDiv.style = "display:block";
+                    return 0;
+                }
+                else {
+                    // clear user input div
+                    //$(".message-input").last().html('');
+                    if (currentBlock.content.afterMessage) {
+                        sendAssistantMessage(currentBlock.content.afterMessage);
+
+                        await sleep(200);
+                        putThinkingGif();
+                        await sleep(thinkingGifLife);
+                        removeThinkingGif();
+                        await sleep(200);
+
+                    }
+                }
+                return getNextBlock(currentBlock.content.action, currentBlock.content.blockToGoID);
+            }
+            var blockKeywords = undefined
+            if (currentBlock.type == "Question") {
+                newMessage(CLIENT_USER, message.replace("&FILE_UPLOAD&", ""));
+
+                await sleep(200);
+
+                var blockAnswers = currentBlock.content.answers;
+
+                for (var i = 0; i < blockAnswers.length; i++) {
+                    if (blockAnswers[i].text == message) {
+                        blockKeywords = blockAnswers[i].keywords;
+                        if(blockKeywords){
+                            addKeywords(blockKeywords);
+                        }
+                        print()
+                        var action = blockAnswers[i].action;
+                        var blockToGoId = blockAnswers[i].blockToGoID;
+
+                        await sleep(200);
+                        putThinkingGif();
+                        await sleep(thinkingGifLife);
+                        removeThinkingGif();
+                        await sleep(200);
+
+                        if (blockAnswers[i].afterMessage) {
+                            sendAssistantMessage(blockAnswers[i].afterMessage);
+
+                            await sleep(200);
+                            putThinkingGif();
+                            await sleep(thinkingGifLife);
+                            removeThinkingGif();
+                            await sleep(200);
+                        }
+                    }
+                }
+                return getNextBlock(action, blockToGoId);
+            }
+
+            function print() {
+                // print the selected answer
+                if (blockKeywords){
+                    blockKeywords = Boolean(blockKeywords.split) ? blockKeywords.split(',') : blockKeywords;
+                }
+                if (currentBlock.storeInDB) {
+                    var information = {
+                        "blockID": currentBlock.id,
+                        "questionText": currentBlock.content.text,
+                        "input": message
+                    };
+                    if (currentBlock.type == "Question" && blockKeywords !== undefined) {
+                        information["keywords"] = blockKeywords;
+                    } else if (currentBlock.type == "User Input"){
+                        information["keywords"] = message.replace(/ /g, " ").split(" ");
+                    }else {
+                        information["keywords"] = [];
+                    }
+                    collectedInformation.push(information);
+                }
+
+            }
+
+
+        }
+
+        function getNextBlock(action, blockToGoId = undefined) {
+            var targetBlock = undefined;
+
+            // Get next block based on action of the current block
+            if (action === "Go To Next Block") {
+                targetBlock = blocks[currentBlock.order]; //order starts from 1 and array from 0 so it just needs the current .order
+
+            } else if (action === "Go To Specific Block") {
+                for (var i = 0; i < blocks.length; i++) {
+                    if (blocks[i].order === blockToGoId) {
+                        targetBlock = blocks[i];
+                    }
+                }
+            } else if (action === "End Chat") {
+                sendData().then((isSuccess) => {
+                    if (isSuccess) {
+                        sendAssistantMessage(currentBlock.afterMessage);
+                    } else {
+                        sendAssistantMessage("We apologise, your input couldn't be processed. Please contact us.");
+                    }
+                    SetRepeat();
+                });
+
+                // End chat
+                sendAssistantMessage("Thank you for completing the chatbot.");
+                return 0;
+            }
+
+            // If not end chat and there is no next block
+            if (targetBlock === undefined) {
+                sendData().then((isSuccess) => {
+                    if (isSuccess) {
+                        // {#sendAssistantMessage("Thank you for your input. We'll be in touch.");#}
+                    } else {
+                        sendAssistantMessage("We apologise, your input couldn't be processed. Please contact us.");
+                    }
+
+                    SetRepeat();
+                    return 0;
+                })
+            }
+
+            // If there is next block but not same as the current block
+            if (currentBlock != undefined) { //check if its not trying to reload the same block
+                if (currentBlock != targetBlock) {
+                    renderBlock(targetBlock);
+                }
+            }
+        }
+
+
+        function SetRepeat() {
+            $("#optionsDiv").append("");
+            newMessage(BOT_USER, "<div class='endChat' onclick=\"Reset()\"><a class='' style='width:400px;'>Start Again <i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> </a></div>", true);
+            //checkOutsideElements();
+        }
+
+        function Reset() {
+            window.location.reload()
+        }
+
+
+        // helper functions
+        function sendUserMessage(message) {
+
+            newMessage(CLIENT_USER, toEmoticon(message));
+            {#$("#messagesContainer").append("<div class='ucDiv'><li id='newMessage' class='userChat'>" + toEmoticon(message) + "</li></div>"); #}
+            {#animateMessage("#newMessage"); #}
+            {#document.getElementById('newMessage').id = 'oldMessage'; #}
+        }
+
+        function sendAssistantMessage(message) {
+            newMessage(BOT_USER, toEmoticon(message));
+            {#$("#messagesContainer").append("<div class='tsbDiv'><li id='newMessage' class='TSBbot'>" + toEmoticon(message) + "</li></div>"); #}
+            {#animateMessage("#newMessage"); #}
+            {#document.getElementById('newMessage').id = 'oldMessage'; #}
+        }
+
+        function putThinkingGif() {
+            $(".messages ul").append('<li id="thinkingGif" class="replies"><img src="/static/img/core-img/favicon-96x96.png" alt="" /><p><img style="width:27px" id=\"thinkingGifIMG\" src="/static/images/typingDots.gif"></p></li>');
+            animateMessage("#thinkingGif");
+        }
+
+        function removeThinkingGif() {
+            $("#thinkingGif").remove();
+        }
+
+        function validateUserInput(message, messageType) {
+            var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+            if (messageType == "Email" && !message.match(emailRegex)) {
+                return false;
+            } else if (messageType == "FullName" && name.indexOf(' ') <= 0) {
+                return false;
+            } else if (messageType == "Telephone" && !/^[0-9]*$/.test(message)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        function addKeywords(blockKeywords) {
+            var addIn = true;
+
+            for (var c = 0; c < blockKeywords.length; c++) {
+                keywords.push(blockKeywords[c]);
+            }
+        }
+
+        function generateUserInputThanks() {
+            var thanks = "";
+            switch (Math.round(Math.random() * 6)) {
+                case 0:
+                    thanks = "Thanks 😁";
+                    break;
+                case 1:
+                    thanks = "Thank you 😃";
+                    break;
+                case 2:
+                    thanks = "I'll remember that 😉";
+                    break;
+                case 3:
+                    thanks = "Just one of the things that make you cool 😎";
+                    break;
+                case 4:
+                    thanks = "Let me just write it down ✍️😊";
+                    break;
+                case 5:
+                    thanks = "Give me a second to operate that information 😷";
+                    break;
+                case 6:
+                    thanks = "Thanks 👊";
+                    break;
+            }
+            return thanks
+        }
+
+        function checkFileFormat(message) {
+            var messageSplit = message.split(".");
+            var format = messageSplit[messageSplit.length - 1];
+            var allowedFormats = currentBlock.content.fileTypes;
+            var passes = false;
+            for (var i = 0; i < allowedFormats.length; i++) {
+                if (allowedFormats[i].toLowerCase() === format.toLowerCase()) {
+                    passes = true;
+                }
+            }
+            return passes;
+        }
+
+        function getAllowedFormatsString() {
+            var formats = "";
+            var allowedFormats = currentBlock.content.fileTypes;
+            for (var i = 0; i < allowedFormats.length; i++) {
+                formats += allowedFormats[i] + ", ";
+            }
+            formats = formats.slice(0, -2);
+            return formats;
+        }
+
+        function animateMessage(id) {
+            var marginAnimate = "-=25px";
+            if (id == "#thinkingGif") {
+                marginAnimate = "-=15px";
+            }
+            else if (id == "#newMessage") {
+                marginAnimate = "-=35px";
+            }
+            $(id).animate({
+                marginTop: marginAnimate
+            }, "slow");
+            if (!cancelScroll) {
+                {#scrollTo("chatBottom"); #}
+            }
+        }
+
+        function toEmoticon(message) {
+            return emojione.toImage(message);
+        }
+
+        function checkOutsideElements() {
+            var offScreenElements = $(':offscreen');
+            for (var z = 0; z < offScreenElements.length; z++) {
+                var elementID = offScreenElements[z].outerHTML.split("id=\"")[1].split("\"")[0];
+                $("<br><br>").insertBefore("#" + elementID);
+                checkOutsideElements();
+                return 0;
+            }
+        }
 
         function scrollTo(id) {
             // {#$('html, body').stop();#}
             // {#id = "#" + id#}
             // {#$('html, body').animate({#}
             // {#    scrollTop: ($(id).offset().top)#}
-            // {# }, 2000);#}
-            $(".messages").animate({scrollTop: $('.messages').prop("scrollHeight")}, "fast");
+            // {#}, 2000);#}
 
-            // $(".messages").animate({scrollTop: $(document).height()}, "fast");#}
-        }
-    }
+            $(".messages").animate({ scrollTop: $('.messages').prop("scrollHeight") }, "fast");
 
-    function validateUserInput(message, messageType) {
-        var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-        if (messageType == "Email" && !message.match(emailRegex)) {
-            return false;
-        } else if (messageType == "FullName" && name.indexOf(' ') <= 0) {
-            return false;
-        } else if (messageType == "Telephone" && !/^[0-9]*$/.test(message)) {
-            return false;
+            // {#$(".messages").animate({scrollTop: $(document).height()}, "fast");#}
         }
 
-        return true;
-    }
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
 
-    function addKeywords(blockKeywords) {
-        var addIn = true;
+        function handleEnter(e) {
+            var keycode = (e.keyCode ? e.keyCode : e.which);
+            if (keycode == '13') {
+                submitAnswer('');
+            }
+        }
 
-        for (var c = 0; c < blockKeywords.length; c++) {
-            addIn = true;
+        //compare arrays function
+        // Warn if overriding existing method
+        if (Array.prototype.equals)
+            console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
+        // attach the .equals method to Array's prototype to call it on any array
+        Array.prototype.equals = function (array) {
+            // if the other array is a falsy value, return
+            if (!array)
+                return false;
 
-            for (var i = 0; i < keywords.length; i++) {
-                if (blockKeywords[c] == keywords[i]) {
-                    addIn = false;
-                    break;
+            // compare lengths - can save a lot of time
+            if (this.length != array.length)
+                return false;
+
+            for (var i = 0, l = this.length; i < l; i++) {
+                // Check if we have nested arrays
+                if (this[i] instanceof Array && array[i] instanceof Array) {
+                    // recurse into the nested arrays
+                    if (!this[i].equals(array[i]))
+                        return false;
+                }
+                else if (this[i] != array[i]) {
+                    // Warning - two different object instances will never be equal: {x:20} != {x:20}
+                    return false;
                 }
             }
+            return true;
+        }
+        // Hide method from for-in loops
+        Object.defineProperty(Array.prototype, "equals", { enumerable: false });
 
-            if (addIn) {
-                keywords.push(blockKeywords[c]);
+        // Get block by id
+        function getBlock(id) {
+            for (var i = 0, l = blocks.length; i < l; i++) {
+                if (blocks[i].id === id) {
+                    return blocks[i]
+                }
             }
+            // If nothing found return null
+            return null
         }
-    }
-
-    function generateUserInputThanks() {
-        var thanks = "";
-        switch (Math.round(Math.random() * 6)) {
-            case 0:
-                thanks = "Thanks 😁";
-                break;
-            case 1:
-                thanks = "Thank you 😃";
-                break;
-            case 2:
-                thanks = "I'll remember that 😉";
-                break;
-            case 3:
-                thanks = "Just one of the things that make you cool 😎";
-                break;
-            case 4:
-                thanks = "Let me just write it down ✍️😊";
-                break;
-            case 5:
-                thanks = "Give me a second to operate that information 😷";
-                break;
-            case 6:
-                thanks = "Thanks 👊";
-                break;
-        }
-        return thanks
-    }
-
-    function checkFileFormat(message) {
-        var messageSplit = message.split(".");
-        var format = messageSplit[messageSplit.length - 1];
-        var allowedFormats = currentBlock.content.fileTypes;
-        var passes = false;
-        for (var i = 0; i < allowedFormats.length; i++) {
-            if (allowedFormats[i] === format) {
-                passes = true;
-            }
-        }
-        return passes;
-    }
-
-    function getAllowedFormatsString() {
-        var formats = "";
-        var allowedFormats = currentBlock.content.fileTypes;
-        for (var i = 0; i < allowedFormats.length; i++) {
-            formats += allowedFormats[i] + ", ";
-        }
-        formats = formats.slice(0, -2);
-        return formats;
-    }
-
-    function toEmoticon(message) {
-        return emojione.toImage(message);
-    }
-
-    function checkOutsideElements() {
-        var offScreenElements = $(':offscreen');
-        for (var z = 0; z < offScreenElements.length; z++) {
-            var elementID = offScreenElements[z].outerHTML.split("id=\"")[1].split("\"")[0];
-            $("<br><br>").insertBefore("#" + elementID);
-            checkOutsideElements();
-            return 0;
-        }
-    }
-
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    function handleEnter(e) {
-        var keycode = (e.keyCode ? e.keyCode : e.which);
-        if (keycode == '13') {
-            submitAnswer('');
-        }
-    }
-
-    function openSolution(link) {
-        window.open(link);
-    }
-
-    //compare arrays function
-    // Warn if overriding existing method
-    if (Array.prototype.equals)
-        console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
-    // attach the .equals method to Array's prototype to call it on any array
-    Array.prototype.equals = function (array) {
-        // if the other array is a falsy value, return
-        if (!array)
-            return false;
-
-        // compare lengths - can save a lot of time
-        if (this.length != array.length)
-            return false;
-
-        for (var i = 0, l = this.length; i < l; i++) {
-            // Check if we have nested arrays
-            if (this[i] instanceof Array && array[i] instanceof Array) {
-                // recurse into the nested arrays
-                if (!this[i].equals(array[i]))
-                    return false;
-            }
-            else if (this[i] != array[i]) {
-                // Warning - two different object instances will never be equal: {x:20} != {x:20}
-                return false;
-            }
-        }
-        return true;
-    }
-    // Hide method from for-in loops
-    Object.defineProperty(Array.prototype, "equals", {enumerable: false});
-
-</script>
-<script>
-    $(document).ready(function () {
-        console.log("JS is working...");
-        var hrefSplit = window.location.href.split("/");
-        chatbotInit(assistantID = hrefSplit[hrefSplit.length - 1]);
-    });
-</script>
+    </script>
+    <script>
+        $(document).ready(function () {
+            console.log("JS is working...");
+            var hrefSplit = window.location.href.split("/");
+            chatbotInit(assistantID = hrefSplit[hrefSplit.length - 1]);
+        });
+    </script>
 
 </body>
+
 </html>

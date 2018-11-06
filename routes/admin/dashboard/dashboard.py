@@ -18,22 +18,19 @@ def admin_home():
         #user: User = callback.Data
         chatbots_callback : Callback = assistant_services.getAll(session.get('CompanyID', None))
         if not chatbots_callback.Success: 
-            print("1")
             return admin_services.render("admin/dashboard.html")
 
         assistants = chatbots_callback.Data
 
         totalClicks_callback : Callback = analytics_services.getTotalUsersForCompany(assistants)
         if not totalClicks_callback.Success: 
-            print("2")
             return admin_services.render("admin/dashboard.html")
 
-        totalSolutions_callback : Callback = analytics_services.getTotalReturnedSolutionsForCompany(assistants)
-        if not totalSolutions_callback.Success: 
-            print("3")
-            return admin_services.render("admin/dashboard.html")
+        #totalSolutions_callback : Callback = analytics_services.getTotalReturnedSolutionsForCompany(assistants)
+        #if not totalSolutions_callback.Success: 
+            #return admin_services.render("admin/dashboard.html")
 
-        return admin_services.render("admin/dashboard.html", totalClicks = totalClicks_callback.Data, totalSolutions = totalSolutions_callback.Data)
+        return admin_services.render("admin/dashboard.html", totalClicks = totalClicks_callback.Data, totalSolutions = 0)
 
 
     # c_callback: Callback = company_services.getByID(1)

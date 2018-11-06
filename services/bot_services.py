@@ -1,14 +1,57 @@
 from typing import List
 from config import BaseConfig
-from utilities import json_utils
+from utilities import json_utils, helpers
 from sqlalchemy.sql import exists, func
 from os.path import join, dirname
 import json
+from sqlalchemy.exc import IntegrityError as sqlalchemyIE
+from sqlite3 import IntegrityError as sqlite3IE
+from pymysql import IntegrityError as pymysqlIE
 
 
 from models import db, Callback, ValidationType, Assistant, Block, BlockType, BlockAction, Plan
 
 bot_currentVersion = "1.0.0"
+
+
+
+def genBotViaTemplateUplaod(assistant: Assistant, data: dict):
+
+    try:
+        # Validate submitted block data
+        json_utils.validateSchema(data, 'botTemplate.json')
+        print(data.get('bot')['blocks'][0])
+        if not deleteAllBlock(assistant).Success:
+            return Callback(False, 'Error in deleting blocks')
+
+        counter = 1
+        for block in data.get('bot')['blocks']:
+            db.session.add(Block(Type=BlockType(block['type']), Order=counter, Content=block['content'],
+                         StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Assistant=assistant))
+            counter += 1
+        # Save
+        db.session.commit()
+        return Callback(True, 'Template was successfully uploaded')
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Error while uploading a bot via a template')
+    # finally:
+       # db.session.close()
+
+
+def deleteAllBlock(assistant: Assistant) -> Callback:
+    try:
+        db.session.query(Block).filter(Block.AssistantID == assistant.ID).delete()
+        db.session.commit()
+        return Callback(True, 'Blocks has been deleted.')
+
+    except Exception as exc:
+        print("Error in deleteAllBlock(): ", exc)
+        db.session.rollback()
+        return Callback(False, 'Error in deleting blocks.')
+    # finally:
+    # db.session.close()
 
 
 # Generate a bot using an already built template
@@ -26,19 +69,21 @@ def genBotViaTemplate(assistant: Assistant, tempName: str):
         counter = 1
         for block in data.get('bot')['blocks']:
             db.session.add(Block(Type=BlockType(block['type']), Order=counter, Content=block['content'],
-                         StoreInDB=block['storeInDB'], Assistant=assistant))
+                         StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Assistant=assistant))
             counter += 1
-
+        # Save
+        db.session.commit()
+        return Callback(True, 'Bot was successfully generated via a template')
     except Exception as exc:
         print(exc)
+        db.session.rollback()
         return Callback(False, 'Error while generating a bot via a template')
-    # Save
-    db.session.commit()
-    return Callback(True, 'Bot was successfully generated via a template')
+    # finally:
+       # db.session.close()
 
 # Get the chatbot for the public to use
 def getChatbot(assistant: Assistant) -> dict:
-    return {'assistant': {'id': assistant.ID, 'name': assistant.Name, 'message': assistant.Message,
+    return {'assistant': {'id': helpers.encrypt_id(assistant.ID), 'name': assistant.Name, 'message': assistant.Message,
                           'secondsUntilPopup': assistant.SecondsUntilPopup, 'active': assistant.Active},
             'blocks': getBlocks(assistant)}
 
@@ -53,49 +98,70 @@ def getBot(assistant: Assistant) -> dict:
 
 
 def getBlocks(assistant: Assistant) -> List[dict]:
-    result: List[Block] = db.session.query(Block).filter(Block.AssistantID == assistant.ID)\
-        .order_by(Block.Order.asc()).all()
-    blocks = []
-    for block in result:
-        blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,
-                       'content': block.Content, 'storeInDB': block.StoreInDB})
-    return blocks
+    try:
+        result: List[Block] = db.session.query(Block).filter(Block.AssistantID == assistant.ID)\
+            .order_by(Block.Order.asc()).all()
+        blocks = []
+        for block in result:
+            blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,
+                           'content': block.Content, 'storeInDB': block.StoreInDB, 'labels': block.Labels, 'isSkippable': block.Skippable})
+        return blocks
+    except Exception as e:
+        print("getBlocks ERROR:", e)
+        db.session.rollback()
+    # finally:
+       # db.session.close()
 
 
 def getBlocksCountByAssistant(assistant: Assistant):
-    return db.session.query(func.count(Block.ID)).filter(Block.AssistantID == assistant.ID).scalar()
+    try:
+        return db.session.query(func.count(Block.ID)).filter(Block.AssistantID == assistant.ID).scalar()
+    except Exception as e:
+        db.session.rollback()
+    # finally:
+       # db.session.close()
 
 
 def getRemainingBlocksByAssistant(assistant: Assistant):
-    # BlocksCap - numberOfCreatedBlocks
-    return db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first()[0] - getBlocksCountByAssistant(assistant)
+    try:
+        # BlocksCap - numberOfCreatedBlocks
+        return db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first()[0] - getBlocksCountByAssistant(assistant)
+    except Exception as e:
+        db.session.rollback()
+    # finally:
+       # db.session.close()
 
 
 def addBlock(data: dict, assistant: Assistant) -> Callback:
-    # Get company MaxBlocks.
-    # Note: we will get Debug plan for now
-    if getBlocksCountByAssistant(assistant) >= db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first()[0]:
-        return Callback(False, "Blocks limit has been exceeded!")
-
-    # Set the block with max order + 1
-    maxOrder = db.session.query(func.max(Block.Order)).filter(Block.AssistantID == assistant.ID).scalar()
-    if maxOrder is None: maxOrder = 0
-
     try:
+        # Get company MaxBlocks.
+        # Note: we will get Debug plan for now
+        if getBlocksCountByAssistant(assistant) >= db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first()[0]:
+            return Callback(False, "Blocks limit has been exceeded!")
+
+        # Set the block with max order + 1
+        maxOrder = db.session.query(func.max(Block.Order)).filter(Block.AssistantID == assistant.ID).scalar()
+        if maxOrder is None: maxOrder = 0
+
         # Validate submitted block data
         json_utils.validateSchema(data, 'blocks/newBlock.json')
         block = data.get('block')
+        print(block)
         newBlock = Block(Type=BlockType(block['type']), Order=maxOrder + 1, Content=block['content'],
-                         StoreInDB=block['storeInDB'], Assistant=assistant)
+                         StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Labels=block['labels'], Assistant=assistant)
         db.session.add(newBlock)
+
+        db.session.commit()
+        return Callback(True, 'Block added successfully!', {"newBlockID": newBlock.ID,
+                                                            "remainingBlocks": getRemainingBlocksByAssistant(
+                                                                assistant)})
     except Exception as exc:
         db.session.rollback()
-        print(exc.args[0])
+        print("bot_services.addBlock ERROR: ", exc)
         return Callback(False, 'Error occurred while creating a new Block object', exc.args[0])
 
-    db.session.commit()
-    return Callback(True, 'Block added successfully!', {"newBlockID": newBlock.ID,
-                                                        "remainingBlocks": getRemainingBlocksByAssistant(assistant)})
+    # finally:
+       # db.session.close()
 
 
 def updateBot(bot, assistant: Assistant) -> Callback:
@@ -116,12 +182,20 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
     orders = []
     ids = []
     for block in blocks:
+        # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
         order = block.get('order')
         id = block.get('id')
 
-        # Make sure all submitted questions exist in the database
-        if not db.session.query(exists().where(Block.ID == id)).scalar():
-            return Callback(False, "the block of id '" + str(id) + "' doesn't exist in the database")
+        try:
+            # Make sure all submitted questions exist in the database
+            if not db.session.query(exists().where(Block.ID == id)).scalar():
+                return Callback(False, "the block of id '" + str(order) + "' doesn't exist in the database")
+        except Exception as e:
+            db.session.rollback()
+            return Callback(False, "Error while dealing with block id '" + str(order) + "'")
+        #finally:
+        #    db.session.close()
+
 
         # Make sure each question has a unique id
         if id not in ids:
@@ -147,23 +221,31 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
     if numOfBlocks != len(assistant.Blocks):
         return Callback(False, "The number of submitted blocks isn't equivalent to what stored in the database")
 
-    # ------------------------- #
-    # Validate each block's content depends on its type
-    for block in blocks:
-        callback: Callback = isValidBlock(block, str(BlockType(block.get('type')).name))
-        if not callback.Success:
-            return callback
+    try:
+        for block in blocks:
+            callback: Callback = isValidBlock(block, str(BlockType(block.get('type')).name))
+            if not callback.Success:
+                return callback
 
-        # Update the block
-        oldBlock: Block = db.session.query(Block).filter(Block.ID == block.get('id')).first()
-        oldBlock.Order = block.get('order')
-        oldBlock.Type = BlockType(block.get('type'))
-        oldBlock.Content = block.get('content')
-        oldBlock.StoreInDB = block.get('storeInDB')
+            # Update the block
+            oldBlock: Block = db.session.query(Block).filter(Block.ID == block.get('id')).first()
+            oldBlock.Type = BlockType(block.get('type'))
+            oldBlock.Content = block.get('content')
+            oldBlock.StoreInDB = block.get('storeInDB')
+            oldBlock.Skippable = block.get('isSkippable')
+            oldBlock.Order = block.get('order')
+            oldBlock.Labels = block.get('labels')
+            oldBlock.Labels = block.get('labels')
 
-    # Save
-    db.session.commit()
-    return Callback(True, "Blocks updated successfully")
+        # Save
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        return Callback(False, "Error occurred while updating blocks.")
+    # finally:
+       # db.session.close()
+    return Callback(True, "Blocks updated successfully.")
 
 
 def deleteBlockByID(id) -> Callback:
@@ -173,14 +255,19 @@ def deleteBlockByID(id) -> Callback:
             return Callback(False, "the block with id '" + str(id) + "' doesn't exist")
         assistant: Assistant = block.Assistant
         db.session.query(Block).filter(Block.ID == id).delete()
+        # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
+        blockID = block.Order
+
+        # Save
+        db.session.commit()
+        return Callback(True, 'Block with id ' + str(blockID) + " has been removed successfully.",
+                        {"remainingBlocks": getRemainingBlocksByAssistant(assistant)})
     except Exception as exc:
         print(exc)
         db.session.rollback()
-        return Callback(False, 'Block with id' + str(id) + " could not be removed.")
-    # Save
-    db.session.commit()
-    return Callback(True, 'Block with id ' + str(id) + " has been removed successfully.",
-                    {"remainingBlocks": getRemainingBlocksByAssistant(assistant)})
+        return Callback(False, 'Block with id' + str(blockID) + " could not be removed.")
+    # finally:
+       # db.session.close()
 
 
 def isValidBlock(block: dict, blockType: str):
@@ -189,8 +276,8 @@ def isValidBlock(block: dict, blockType: str):
         json_utils.validateSchema(block.get('content'), 'blocks/' + blockType + '.json')
     except Exception as exc:
         print(exc.args[0])
-        db.session.rollback()
-        blockID = block.get('id')
+        # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
+        blockID = block.get('order')
         blockType = block.get('type')
         msg = "Block data doesn't follow the correct format"
 

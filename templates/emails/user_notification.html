@@ -92,8 +92,13 @@
                                                         <tr>
                                                             <th>
                                                                 <p class="text-center">
-                                                                    <h3>Your assistant {{data['assistantName']}} has {{data['data']}} new records. To check them you can visit <a href="http://127.0.0.1:5000/admin/assistant/{{data['assistantID']}}/userinput">this link</a>.</h3>
+                                                                    {%for record in data%}
+                                                                    {%if record['data'] != 0 and record['data'] != '0'%}
+                                                                    <h3>Your assistant {{record['assistantName']}} has {{record['data']}} new records.</h3>
+                                                                    {%endif%}
+                                                                    {%endfor%}
                                                                 </p>
+                                                                <h4>To check them you can visit <a href="https://thesearchbase.com/login">this link</a>.</h4>
                                                             </th>
                                                             <th class="expander"></th>
                                                         </tr>
@@ -125,11 +130,11 @@
                                                                                     <tr>
                                                                                         <!-- Linkedin -->
                                                                                         <th class="menu-item float-center">
-                                                                                            <a href="undefined"><img src="http://thesearchbase.com/static/email_assets/images/square-linkedin-512.png" alt="" /></a>
+                                                                                            <a href="https://www.linkedin.com/company/thesearchbase/"><img src="http://thesearchbase.com/static/email_assets/images/square-linkedin-512.png" alt="" /></a>
                                                                                         </th>
                                                                                         <!-- Angel.co -->
                                                                                         <th class="menu-item float-center">
-                                                                                            <a href="undefined"><img src="http://thesearchbase.com/static/email_assets/images/peace_large.jpg" alt="" /></a>
+                                                                                            <a href="https://angel.co/thesearchbase"><img src="http://thesearchbase.com/static/email_assets/images/peace_large.jpg" alt="" /></a>
                                                                                         </th>
                                                                                     </tr>
                                                                                 </table>

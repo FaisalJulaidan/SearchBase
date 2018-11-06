@@ -8,9 +8,11 @@
       "type": "object",
       "properties":{
         "id": {"type": "integer"},
+        "labels": {"type": "string"},
         "type": {"enum": ["Question", "User Input", "File Upload", "Solutions", "End Chat"]},
         "order": {"type": "integer", "minimum": 1},
         "storeInDB": {"type": "boolean"},
+        "isSkippable": { "type": "boolean" },
         "content": {"type": "object"}
         },
       "required": ["id", "type", "order", "content"],

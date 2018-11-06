@@ -52,7 +52,11 @@ def before_request():
 
     currentURL = str(request.url_rule)
     restrictedRoutes = ['/admin', 'admin/dashboard']
-
+    try:
+        #print("TESTING: ", str(request.environ["HTTP_ORIGIN"]))
+        print("TESTING: ", str(request.user_agent))
+    except:
+        print("NO TEST")
     # If the user try to visit one of the restricted routes without logging in he will be redirected
     if any(route in currentURL for route in restrictedRoutes):
         if not session.get('Logged_in', False):

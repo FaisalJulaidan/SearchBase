@@ -4,8 +4,15 @@
 
 {% block content %}
 <style>
-    input{
-        width:300px!important;
+    #conditionsNumberInput{
+        width:32px;
+        border-style:none;
+    }
+    #conditionsNumberInput::-webkit-inner-spin-button,
+    #conditionsNumberInput::-webkit-outer-spin-button {
+
+       opacity: 1;
+
     }
 </style>
 <link rel="stylesheet" type="text/css" href="/static/css/checkbox.css">
@@ -73,6 +80,7 @@
                                             </form>
                                             <h3 id="dbDependentMessage" style="display:none;"><b>Bellow functionality requies an active database</b></h3>
                                             <div id="dbDependent">
+
                                                 <form id="solutionLinkForm" name="solutionLinkForm">
                                                     <h3>Job Links*</h3>
                                                     <p>
@@ -86,14 +94,35 @@
                                                         For example: "@jobID" : C2143. You can also take your solution ID and use Ctrl + F on this page to find the<br />
                                                         corresponding title in the Raw Data.<br />
                                                     </p>
-                                                    <input class="form-control" name="webLink" placeholder="http://mycoolwebsite.com/jobs/" {%if data.WebLink %}value="{{data.WebLink}}"{%endif%}/>
+                                                    <input style="width:300px!important;" class="form-control" name="webLink" placeholder="http://mycoolwebsite.com/jobs/" {%if data.WebLink %}value="{{data.WebLink}}"{%endif%}/>
                                                     <br />
-                                                    <input class="form-control" name="solutionsRef" placeholder="@jobID" {%if data.IDReference %}value="{{data.IDReference}}"{%endif%}/>
+                                                    <input style="width:300px!important;" class="form-control" name="solutionsRef" placeholder="@jobID" {%if data.IDReference %}value="{{data.IDReference}}"{%endif%}/>
                                                     <br />
                                                     <label class="btn btn-success" onclick="saveJobLink()">Save</label>
                                                     <p id="saveLinkMessage"></p>
                                                 </form>
+
                                                 <br />
+
+                                                <form id="requiredFiltersForm">
+                                                    <h3>Required Filters</h3>
+                                                    <p>
+                                                        You can set required keywords to be somewhere in the solution in order to show only specific records.<br />
+                                                        For example restrict it so only specific consultant or location's records are displayed to the user.<br />
+                                                    </p>
+                                                    <label><input min="0" id="conditionsNumberInput" value="0" type="number"/> Conditions must be matched:</label>
+                                                    <br />
+                                                    <div id="conditionsDiv">
+                                                        <!-- conditions come here -->
+                                                        <h4><b><i>Comming soon...</i></b></h4>
+                                                    </div>
+                                                    <br />
+                                                    <label class="btn btn-success" onclick="saveRequiredFilters()">Save</label>
+                                                    <p id="saveRequiredFiltersMessage"></p>
+                                                </form>
+
+                                                <br />
+
                                                 <div id="jobAlertsDiv">
                                                     <h3>Job Alerts</h3>
                                                     <p>
@@ -115,12 +144,13 @@
                                                     </div>
                                                     <p id="checkboxMessage"></p>
                                                 </div>
+
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <h2>Raw Data:</h2>
+                                <h2>Raw Data (Decrypted):</h2>
                                 <div class="col-md-12 col-sm-12 col-xs-12">
                                     <div class="x_panel" id="solutionsDiv" style="max-height:500px;overflow-y:auto;border-radius:5px;">
 

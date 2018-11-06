@@ -63,7 +63,7 @@
     <br>-->
 
 
-                                <h4>Would you like the chat bot to automatically open for the user?</h4>
+                                <h4>Would you like the assistant to automatically open for the user?</h4>
                                 <label class="switch">
                                     <input id="switch-autopop" name="switch-autopop" type="checkbox"
                                            onclick="switchchecked()"
@@ -77,13 +77,13 @@
                                      hidden
                                      {% endif %}>
                                     <h4>
-                                        How long should the chat bot wait before opening?
-                                        <small> *Time in Seconds</small>
+                                        How long should the assistant wait before opening?
+                                        <small> *Minimum of 1 second</small>
                                     </h4>
                                     <input name="timeto-autopop" style="width:70px"
                                            class="form-control col-md-5 col-xs-10"
                                            id="bot_time" type="number"
-                                           value="{{ autopop }}">
+                                           value="{{ autopop }}" min="0">
                                     <br>
                                     <br>
                                     <br>
@@ -102,7 +102,7 @@
                                     <div class="col-md-12">
                                         <p class="lead">
                                         <p> Deactivating and activating assistants controls how many active assistants you currently have.</p>
-                                        {%if active == "True"%}
+                                        {%if active%}
                                         <a style="background-color:grey; border-color: grey;" class="btn btn-primary btn-sm" href="/admin/assistant/active/False/{{id}}" role="button">Deactivate Assistant</a>
                                         {%else%}
                                         <a style="background-color:limegreen; border-color: limegreen;" class="btn btn-primary btn-sm" href="/admin/assistant/active/True/{{id}}" role="button">Activate Assistant</a>

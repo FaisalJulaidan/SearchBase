@@ -11,13 +11,17 @@ from flask_cors import CORS
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
 
-
 # Two functions to get assistant via id and hashids to avoid duplicate code in every route function
 def getAssistantByHashID(hashID):
     assistantID = helpers.decrypt_id(hashID)
     if len(assistantID) == 0:
         return helpers.jsonResponse(False, 404, "Assistant not found.", None)
-    return getAssistant(assistantID[0])
+
+    assistant = getAssistant(assistantID[0])
+    if not assistant.Active:
+        return helpers.jsonResponse(False, 404, "Assistant is not active.", None)
+
+    return assistant
 
 
 def getAssistant(id):

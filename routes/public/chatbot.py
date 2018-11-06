@@ -89,14 +89,12 @@ def getSolutions_forChatbot(assistantIDAsHash):
 
         # If showTop is 0 then skip below return nothing and don't even call solutions_services
         if data['showTop'] > 0:
-            getSolutionRecord_callback : Callback = solutions_services.getSolutionByAssistantID(assistant.ID)
 
             s_callback = solutions_services.getBasedOnKeywords(assistantID=assistant.ID, keywords=data['keywords'], solutionsRecord=getSolutionRecord_callback, max=data['showTop'])
             if not s_callback.Success:
                 return helpers.jsonResponse(False, 400, s_callback.Message)
 
-        return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions': s_callback.Data, "solutionsLink" : {"Success" : True,
-        "webLink" : getSolutionRecord_callback.Data.WebLink, "solutionsRef" : getSolutionRecord_callback.Data.IDReference}})
+        return helpers.jsonResponse(True, 200, "Solution list is here!", s_callback.Data)
 
 
 @chatbot_router.route("/userdownloads/<path:path>", methods=['GET'])

@@ -82,16 +82,11 @@ def getSolutions_forChatbot(assistantIDAsHash):
 
         # If showTop is 0 then skip below return nothing and don't even call solutions_services
         if data['showTop'] > 0:
-            s_callback = solutions_services.getBasedOnKeywords(assistant.ID, data['keywords'], data['showTop'])
+            getSolutionRecord_callback : Callback = solutions_services.getSolutionByAssistantID(assistant.ID)
+
+            s_callback = solutions_services.getBasedOnKeywords(assistantID=assistant.ID, keywords=data['keywords'], solutionsRecord=getSolutionRecord_callback, max=data['showTop'])
             if not s_callback.Success:
                 return helpers.jsonResponse(False, 400, s_callback.Message)
-            print("3: ", s_callback.Data)
-
-        getSolutionRecord_callback : Callback = solutions_services.getSolutionByAssistantID(assistant.ID)
-        if not getSolutionRecord_callback.Success:
-            return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions': s_callback.Data, "solutionsLink" : {"Success" : False}})
-        if not getSolutionRecord_callback.Data.WebLink or not getSolutionRecord_callback.Data.IDReference:
-            return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions': s_callback.Data, "solutionsLink" : {"Success" : False}})
 
         return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions': s_callback.Data, "solutionsLink" : {"Success" : True,
         "webLink" : getSolutionRecord_callback.Data.WebLink, "solutionsRef" : getSolutionRecord_callback.Data.IDReference}})

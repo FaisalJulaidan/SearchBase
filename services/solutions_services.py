@@ -58,7 +58,8 @@ def getBasedOnKeywords(assistantID, keywords: list, solutionsRecord, max=999999)
 def filterThroughConditions(solution, records):
     if not solution.RequiredFilters: return records
 
-    # print("INSIDE : ", records)
+    if int(solution.RequiredFilters["requiredConditionsNumber"]) == 0: return records
+
     result = []
     for record in records:
         matches = 0
@@ -74,9 +75,7 @@ def filterThroughConditions(solution, records):
         if matches >= int(solution.RequiredFilters["requiredConditionsNumber"]):
             result.append(record)
 
-    #print("AFTER : ", records)
-
-    return records
+    return result
 
 
 def filterForReturnSolutionValues(records, solutionsRecord):

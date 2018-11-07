@@ -268,7 +268,7 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
     {%for record in data.RequiredFilters["filterValues"]%}
         var appendString = "\
                 <div id='conditionInput" + conditionsNumber + "' ><input class='form-control' style='width:300px!important;display:inline-block;' type='text' name='conditionInput" + conditionsNumber + "' value='{{record|join(',')}}' /><i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteCondition(\"conditionInput" + conditionsNumber + "\")'></i>\
-                </div><br />";
+                <br /><br /></div>";
         conditionsNumber++;
         $("#conditionsDiv").append(appendString);
         updateConditionsMax();
@@ -279,7 +279,7 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
     function addCondition() {
         var appendString = "\
             <div id='conditionInput" + conditionsNumber + "' ><input class='form-control' style='width:300px!important;display:inline-block;' type='text' name='conditionInput" + conditionsNumber + "' /><i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteCondition(\"conditionInput" + conditionsNumber + "\")'></i>\
-            </div><br />";
+            <br /><br /></div>";
         conditionsNumber++;
         $("#conditionsDiv").append(appendString);
         updateConditionsMax();

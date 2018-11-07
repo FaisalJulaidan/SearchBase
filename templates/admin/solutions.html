@@ -110,14 +110,14 @@
                                                         You can set required keywords to be somewhere in the solution in order to show only specific records.<br />
                                                         For example restrict it so only specific consultant or location's records are displayed to the user.<br />
                                                     </p>
-                                                    <label><input min="0" id="conditionsNumberInput" value="0" type="number"/> Conditions must be matched:</label>
+                                                    <label><input min="0" id="conditionsNumberInput" name="conditionsNumberInput" value="0" type="number"/> Conditions must be matched:</label>
                                                     <br />
+                                                    <label style="cursor:pointer;" onclick="addCondition()">Add Condition</label>
                                                     <div id="conditionsDiv">
-                                                        <!-- conditions come here -->
-                                                        <h4><b><i>Comming soon...</i></b></h4>
+                                                        
                                                     </div>
                                                     <br />
-                                                    <label class="btn btn-success" onclick="saveRequiredFilters()">Save</label>
+                                                    <label class="btn btn-success" onclick="saveConditions()">Save</label>
                                                     <p id="saveRequiredFiltersMessage"></p>
                                                 </form>
 
@@ -262,6 +262,53 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
     $(document).off('submit', '#solutionForm');
 });
 
+    //Conditions
+    var conditionsNumber = 0 //To be changed
+
+    updateConditionsMax();
+    function addCondition() {
+        var appendString = "\
+            <div id='conditionInput" + conditionsNumber + "' ><input class='form-control' style='width:300px!important;display:inline-block;' type='text' name='conditionInput" + conditionsNumber + "' /><i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteCondition(\"conditionInput" + conditionsNumber + "\")'></i>\
+            <br /></div>";
+        conditionsNumber++;
+        $("#conditionsDiv").append(appendString);
+        updateConditionsMax();
+    }
+
+    function deleteCondition(conditionID) {
+        $("#" + conditionID).remove();
+        conditionsNumber--;
+        updateConditionsMax();
+    }
+
+    function updateConditionsMax() {
+        $("#conditionsNumberInput").attr({ "max": conditionsNumber });
+        if ($("#conditionsNumberInput").val() > conditionsNumber) {
+            $("#conditionsNumberInput").val(conditionsNumber);
+        }
+    }
+
+    function saveConditions() {
+        var form = document.forms.namedItem("requiredFiltersForm");
+        formData = new FormData(form);
+        var xhttp = new XMLHttpRequest();
+        var msg = "";
+        xhttp.open("POST", "/admin/assistant/{{ id }}/requiredfilters", true); // true is asynchronous
+        xhttp.onreadystatechange = function () {
+            if (xhttp.readyState === 4) {
+                if (xhttp.status === 200) {
+                    msg = xhttp.responseText;
+                    window.location.reload();
+                }
+                else {
+                    console.error(xhttp.statusText);
+                    msg = "Error: " + xhttp.status;
+                }
+            }
+        };
+        xhttp.send(formData);
+    }
+
     //document.getElementById('uploadButton').addEventListener('click',uploadProductFile)
     function uploadProductFile() {
         // TODO: validate the type of product before update
@@ -303,7 +350,7 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
         var form = document.forms.namedItem("solutionLinkForm");
         formData = new FormData(form);
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/admin/assistant/{{ id }}/saveSolutionWebLink", true); // true is asynchronous
+        xhttp.open("POST", "/admin/assistant/{{ id }}/savesolutionweblink", true); // true is asynchronous
         xhttp.onreadystatechange = function () {
             if (xhttp.readyState === 4) {
                 if (xhttp.status === 200) {
@@ -324,7 +371,7 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
 
     function sendSolutionAlerts() {
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/admin/assistant/{{ id }}/sendSolutionAlerts", true); // true is asynchronous
+        xhttp.open("POST", "/admin/assistant/{{ id }}/sendsolutionalerts", true); // true is asynchronous
         xhttp.onreadystatechange = function () {
             if (xhttp.readyState === 4) {
                 if (xhttp.status === 200) {
@@ -346,7 +393,7 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
     function changeAutoSolutionAlerts() {
         var state = document.getElementById("automaticSolutionAlertsCheckbox").checked;
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/admin/assistant/{{ id }}/automaticSolutionAlerts/" + state, true); // true is asynchronous
+        xhttp.open("POST", "/admin/assistant/{{ id }}/automaticsolutionalerts/" + state, true); // true is asynchronous
         xhttp.onreadystatechange = function () {
             if (xhttp.readyState === 4) {
                 if (xhttp.status === 200) {

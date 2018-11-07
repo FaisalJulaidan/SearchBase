@@ -145,7 +145,7 @@ def admin_products_file_upload(assistantID):
         else:
             return "Please insure you have selected the right File Type option"
 
-@solutions_router.route("/admin/assistant/<assistantID>/saveSolutionWebLink", methods=['POST'])
+@solutions_router.route("/admin/assistant/<assistantID>/savesolutionweblink", methods=['POST'])
 def admin_save_solution_web_link(assistantID):
 
     if request.method == "POST":
@@ -159,7 +159,14 @@ def admin_save_solution_web_link(assistantID):
 
         return updateLinkAndRef_callback.Message
 
-@solutions_router.route("/admin/assistant/<assistantID>/sendSolutionAlerts", methods=['POST'])
+@solutions_router.route("/admin/assistant/<assistantID>/requiredfilters", methods=['POST'])
+def admin_save_required_filters(assistantID):
+    
+    if request.method == "POST":
+
+
+
+@solutions_router.route("/admin/assistant/<assistantID>/sendsolutionalerts", methods=['POST'])
 def admin_send_solution_alerts(assistantID):
 
     if request.method == "POST":
@@ -168,7 +175,7 @@ def admin_send_solution_alerts(assistantID):
 
         return sendAlerts_callback.Message
 
-@solutions_router.route("/admin/assistant/<assistantID>/automaticSolutionAlerts/<setTo>", methods=['POST'])
+@solutions_router.route("/admin/assistant/<assistantID>/automaticsolutionalerts/<setTo>", methods=['POST'])
 def admin_set_automatic_solution_alert(assistantID, setTo):
 
     if request.method == "POST":

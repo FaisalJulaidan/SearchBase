@@ -29,19 +29,21 @@ def getBasedOnKeywords(assistantID, keywords: list, solutionsRecord, max=999999)
         t0 = time.time()
         solution = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
         if not solution:
-            return Callback(True, "There are no solutions associated with this assistant", None)
+            return Callback(False, "There are no solutions associated with this assistant", None)
         t2 = time.time()
         print("Time to get JSON from DB: ", t2-t0)
 
-        result = getSolutions(solution.Content, keywords)
+        result = getSolutions(solution.Content, keywords) #get solutions by keywords
         t3 = time.time()
         print("Time to get solutions from JSON: ", t3-t2)
 
-        result = sorted(result, key=getSolutionsSortKey, reverse=True)
+        result = sorted(result, key=getSolutionsSortKey, reverse=True) #sort depending on score
 
-        result = result[0:max]
+        result = filterThroughConditions(solution, result) #filter for conditions set by the client
 
-        result = filterSolutionValues(result, solutionsRecord).Data
+        result = result[0:max] #get only number of top solutions defined by the client
+
+        result = filterForReturnSolutionValues(result, solutionsRecord).Data #get only display values for chatbot and convert to chatbot to read format
 
         t5 = time.time()
 
@@ -52,7 +54,32 @@ def getBasedOnKeywords(assistantID, keywords: list, solutionsRecord, max=999999)
         print("solutions_services.getBasedOnKeywords() ERROR: ", exc)
         return Callback(False, 'Solutions could not be retrieved at this time')
 
-def filterSolutionValues(records, solutionsRecord):
+
+def filterThroughConditions(solution, records):
+    if not solution.RequiredFilters: return records
+
+    # print("INSIDE : ", records)
+    result = []
+    for record in records:
+        matches = 0
+        for conditions in solution.RequiredFilters["filterValues"]:
+            conditionsToMatch = len(conditions)
+            for condition in conditions:
+                for key,value in record["data"].items():
+                    if condition.lower() in str(value).lower():
+                        conditionsToMatch -= 1
+                        break
+            if conditionsToMatch == 0:
+                matches += 1
+        if matches >= int(solution.RequiredFilters["requiredConditionsNumber"]):
+            result.append(record)
+
+    #print("AFTER : ", records)
+
+    return records
+
+
+def filterForReturnSolutionValues(records, solutionsRecord):
     try:
         result = []
         for record in records:
@@ -83,7 +110,7 @@ def filterSolutionValues(records, solutionsRecord):
             
         return Callback(True, 'Solution values have been filtered successfully!!', result)
     except Exception as exc:
-        print("solutions_services.filterSolutionValues() ERROR: ", exc)
+        print("solutions_services.filterForReturnSolutionValues() ERROR: ", exc)
         return Callback(False, 'Solution values could not be filtered at this time')
 
 def getSolutions(content, keywords):
@@ -302,11 +329,6 @@ def deleteAllByAssistantID(assistantID):
         db.session.rollback()
         return False
 
-    # finally:
-       # db.session.close()
-
-
-
 
 def bulkAdd(objects):
     try:
@@ -338,9 +360,6 @@ def countRecordsByAssistantID(assistantID):
         db.session.rollback()
         return 0
 
-    # finally:
-       # db.session.close()
-
 
 def deleteByAssitantID(assistantID, message):
     deleteOldData : bool = deleteAllByAssistantID(assistantID)
@@ -352,6 +371,7 @@ def addOldByAssitantID(assistantID, message, currentSolutions):
     addOldSolutions_callback : Callback = bulkAdd(currentSolutions)
     if not addOldSolutions_callback.Success:
         return helpers.redirectWithMessage("admin_solutions", message)
+
 
 def convertXMLtoJSON(xmlfile):
     try:
@@ -378,6 +398,7 @@ def convertXMLtoJSON(xmlfile):
         print("solutions_services.convertXMLtoJSON ERROR: ", exc)
         return Callback(False, "An error occured while converting xml file")
 
+
 def getSolutionByAssistantID(assistantID):
     try:
         # Get result and check if None then raise exception
@@ -390,6 +411,7 @@ def getSolutionByAssistantID(assistantID):
         print("solutions_services.getSolutionByAssistantID ERROR/EMPTY: ", exc)
         db.session.rollback()
         return Callback(False, 'Could not retrieve JSON / This might be there is no data in DB')
+
 
 def createUpdateJSONByAssistantID(assistantID, content, type):
     try:
@@ -412,11 +434,15 @@ def createUpdateJSONByAssistantID(assistantID, content, type):
         db.session.rollback()
         return Callback(False, 'Could not update solutions file')
 
+
 def saveRequiredFilters(assistantID, params):
     try:
         solution_callback : Callback = getSolutionByAssistantID(assistantID)
         if not solution_callback.Success: raise Exception("Error in retrieving current settings")
 
+        solution_callback.Data.RequiredFilters = params
+        
+        db.session.commit()
 
         return Callback(True, 'Conditions have been saved')
 
@@ -424,6 +450,7 @@ def saveRequiredFilters(assistantID, params):
         print("solutions_services.saveRequiredFilters ERROR: ", exc)
         db.session.rollback()
         return Callback(False, 'Could not save conditions')
+
 
 def sendSolutionsAlerts(assistantID):
     try:
@@ -463,6 +490,7 @@ def sendSolutionsAlerts(assistantID):
         print("solutions_services.sendSolutionsAlerts ERROR: ", exc)
         return Callback(False, 'Could not send alerts at this time')
 
+
 def switchAutomaticSolutionAlerts(assistantID, setTo):
     try:
         result = getSolutionByAssistantID(assistantID)
@@ -478,6 +506,7 @@ def switchAutomaticSolutionAlerts(assistantID, setTo):
         print("solutions_services.switchAutomaticSolutionAlerts ERROR: ", exc)
         db.session.rollback()
         return Callback(False, 'Could not set automatic alerts at this time. Please insure you have a database connected or uploaded')
+
 
 def checkAutomaticSolutionAlerts(assistantID):
     try:

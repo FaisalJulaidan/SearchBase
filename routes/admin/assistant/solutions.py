@@ -164,7 +164,19 @@ def admin_save_required_filters(assistantID):
     
     if request.method == "POST":
 
+        conditionsArray = {"filterValues" : []}
 
+        try:
+            for i in range(0, 10):
+                record = request.form.get("conditionInput"+str(i), default=None).split(",")
+                record = [x.strip() for x in record if not x.strip() == ""]
+                conditionsArray["filterValues"].append(record)
+        except:
+            pass
+        conditionsArray["requiredConditionsNumber"] = request.form.get("conditionsNumberInput", default=0)
+
+        conditions_callback = solutions_services.saveRequiredFilters(assistantID, conditionsArray)
+        return conditions_callback.Message
 
 @solutions_router.route("/admin/assistant/<assistantID>/sendsolutionalerts", methods=['POST'])
 def admin_send_solution_alerts(assistantID):

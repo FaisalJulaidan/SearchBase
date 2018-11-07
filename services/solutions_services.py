@@ -389,7 +389,7 @@ def getSolutionByAssistantID(assistantID):
     except Exception as exc:
         print("solutions_services.getSolutionByAssistantID ERROR/EMPTY: ", exc)
         db.session.rollback()
-        return Callback(False, 'Could not retrieve JSON')
+        return Callback(False, 'Could not retrieve JSON / This might be there is no data in DB')
 
 def createUpdateJSONByAssistantID(assistantID, content, type):
     try:

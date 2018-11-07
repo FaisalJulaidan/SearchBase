@@ -412,6 +412,19 @@ def createUpdateJSONByAssistantID(assistantID, content, type):
         db.session.rollback()
         return Callback(False, 'Could not update solutions file')
 
+def saveRequiredFilters(assistantID, params):
+    try:
+        solution_callback : Callback = getSolutionByAssistantID(assistantID)
+        if not solution_callback.Success: raise Exception("Error in retrieving current settings")
+
+
+        return Callback(True, 'Conditions have been saved')
+
+    except Exception as exc:
+        print("solutions_services.saveRequiredFilters ERROR: ", exc)
+        db.session.rollback()
+        return Callback(False, 'Could not save conditions')
+
 def sendSolutionsAlerts(assistantID):
     try:
         userInput_callback : Callback = userInput_services.getByAssistantID(assistantID)

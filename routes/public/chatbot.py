@@ -97,8 +97,7 @@ def getSolutions_forChatbot(assistantIDAsHash):
             if not s_callback.Success:
                 return helpers.jsonResponse(False, 400, s_callback.Message)
 
-        return helpers.jsonResponse(True, 200, "Solution list is here!", {'solutions': s_callback.Data, "solutionsLink" : {"Success" : True,
-        "webLink" : getSolutionRecord_callback.Data.WebLink, "solutionsRef" : getSolutionRecord_callback.Data.IDReference}})
+        return helpers.jsonResponse(True, 200, "Solution list is here!", s_callback.Data)
 
 
 @chatbot_router.route("/userdownloads/<path:path>", methods=['GET'])

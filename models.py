@@ -294,9 +294,11 @@ class Solution(db.Model):
     if BaseConfig.USE_ENCRYPTION:
         Content = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
         RequiredFilters = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
+        DisplayTitles = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
     else:
         Content = db.Column(JsonEncodedDict, nullable=False)
         RequiredFilters = db.Column(JsonEncodedDict, nullable=True)
+        DisplayTitles = db.Column(JsonEncodedDict, nullable=True)
     Type = db.Column(db.String(64), nullable=False)
     WebLink = db.Column(db.String(128), nullable=True)
     IDReference = db.Column(db.String(64), nullable=True)

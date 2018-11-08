@@ -33,6 +33,10 @@
             <div class="row">
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_panel">
+                        <!-- <ul class="nav navbar-right panel_toolbox">
+                          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                          </li>
+                        </ul> -->
                         <div class="x_content">
                             <p class="text-muted font-13 m-b-30">
                                 This page gives you control over your solutions, where they lead and also sending users alerts for new matches.
@@ -44,13 +48,14 @@
                                     <div class="x_panel">
                                         <div class="x_title">
                                             <h2>
-                                                Upload an existing database that you have
+                                                Upload an existing database
                                                 <small>File Types: XML, JSON (coming soon)</small>
                                             </h2>
                                             <ul class="nav navbar-right panel_toolbox"></ul>
                                             <div class="clearfix"></div>
                                         </div>
                                         <div class="x_content">
+
                                             <form id="productFileForm" name="productFileForm"
                                                   enctype="multipart/form-data">
 
@@ -77,17 +82,34 @@
                                                     <br><br>
                                                     <h4 id="uploadDatabaseMessage"></h4>
                                                 </div>
+
                                             </form>
+
                                             <h3 id="dbDependentMessage" style="display:none;"><b>Bellow functionality requies an active database</b></h3>
                                             <div id="dbDependent">
 
+                                                <form id="displayTitlesForm">
+                                                    <h3>Titles to be displayed<b>*</b></h3>
+                                                    <p>
+                                                        From here you can choose which part of your information you want to be displayed.
+                                                    </p>
+                                                    <label style="cursor:pointer;" onclick="addTitle()">Add Information Line +</label>
+                                                    <div id="displayTitlesPasteDiv">
+
+                                                    </div>
+                                                    <label class="btn btn-success" onclick="saveTitles()">Save</label>
+                                                    <p id="saveDisplayTitlesMessage"></p>
+                                                </form>
+
+                                                <br />
+
                                                 <form id="solutionLinkForm" name="solutionLinkForm">
-                                                    <h3>Job Links*</h3>
+                                                    <h3>Job Links<b>*</b></h3>
                                                     <p>
                                                         In order to be able to direct users to your solutions at your home website we will need some input from you.<br />
                                                         We would need the page part that holds all the solutions and then the solution reference. For example that<br />
                                                         can be http://mycoolwebsite.com/jobs/*jobID* . To create the bridge between us we would need that information<br />
-                                                        input in the bellow boxes.
+                                                        in the bellow text inputs.
                                                         <br /><b>To do that just contact us and we will find them for you</b>.<br />
                                                         Alternatively you can try finding them on your own. To do that please provide us with the link (ex. "http://mycoolwebsite.com/jobs/")<br />
                                                         and then the reference to the jobID which you can find in your upload file(add @ in front of it) or Raw Data bellow.<br />
@@ -110,7 +132,9 @@
                                                         You can set required keywords to be somewhere in the solution in order to show only specific records.<br />
                                                         For example restrict it so only specific consultant or location's records are displayed to the user.<br />
                                                     </p>
-                                                    <label><input min="0" id="conditionsNumberInput" name="conditionsNumberInput" {%if data.RequiredFilters %}value="{{data.RequiredFilters["requiredConditionsNumber"]}}"{%else%}value="0"{%endif%} type="number"/> Conditions must be matched:</label>
+                                                    <label><input min="0" id="conditionsNumberInput" name="conditionsNumberInput" \
+                                                        {%if data.RequiredFilters %}value="{{data.RequiredFilters["requiredConditionsNumber"]}}"{%else%}value="0"{%endif%} \
+                                                        type="number"/> Conditions must be met:</label>
                                                     <br />
                                                     <label style="cursor:pointer;" onclick="addCondition()">Add Condition</label>
                                                     <div id="conditionsDiv">
@@ -246,6 +270,7 @@
         // });
         document.getElementById("dbDependentMessage").style = "display:block;"
         $("#dbDependent :input").attr("disabled", true);
+        $("#dbDependent :label").click(function(){});
     }
 
     String.prototype.replaceAll = function (search, replacement) {
@@ -253,13 +278,74 @@
         return target.split(search).join(replacement);
     };
 
-var assistantID = window.location.pathname.split('/')[3];
+    var assistantID = window.location.pathname.split('/')[3];
 
-// Once the modal is closed, unbind all onSubmit handlers from the userForm
-$(document).on('hide.bs.modal', '#solutionModal', function (e) {
-    console.log('Unbind submit event.');
-    $(document).off('submit', '#solutionForm');
-});
+    // Once the modal is closed, unbind all onSubmit handlers from the userForm
+    $(document).on('hide.bs.modal', '#solutionModal', function (e) {
+        console.log('Unbind submit event.');
+        $(document).off('submit', '#solutionForm');
+    });
+
+    var titleNumber = 0
+
+    {%if data.DisplayTitles%}
+    {%for record in data.DisplayTitles["titleValues"]%}
+        addTitle();
+        //SELECT THE VALUE
+    {%endfor%}
+    {%endif%}
+    updateTitlesNames();
+
+    function addTitle() {
+        var appendString = "\
+            <div id='titleDiv" + titleNumber + "' >\
+                <select class='form-control titleSelect' style='width:300px!important;display:inline-block;' type='text' name='titleSelect" + titleNumber + "'>\
+                    <option value=\"VAL\">VAL</option>\
+                </select>\
+                <i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteTitle(\"titleDiv" + titleNumber + "\")'></i>\
+                <br /><br />\
+            </div>";
+        titleNumber++;
+        $("#displayTitlesPasteDiv").append(appendString);
+        updateTitlesNames();
+    }
+
+    function deleteTitle(titleID) {
+        $("#" + titleID).remove();
+        titleNumber--;
+        updateTitlesNames();
+    }
+
+    function updateTitlesNames() {
+        var array = document.getElementsByClassName("titleSelect");
+        for (var i = 0; i < array.length;i++){
+            array[i].name = "titleSelect" + i;
+        }
+    }
+
+    function saveTitles() {
+        var form = document.forms.namedItem("displayTitlesForm");
+        formData = new FormData(form);
+        var xhttp = new XMLHttpRequest();
+        var msg = "";
+        xhttp.open("POST", "/admin/assistant/{{ id }}/savedisplaytitles", true); // true is asynchronous
+        xhttp.onreadystatechange = function () {
+            if (xhttp.readyState === 4) {
+                if (xhttp.status === 200) {
+                    msg = xhttp.responseText;
+                    $("#saveDisplayTitlesMessage").text(msg);
+                    setTimeout(function () { $("#saveDisplayTitlesMessage").text("") }, 2000);
+                }
+                else {
+                    console.error(xhttp.statusText);
+                    msg = "Error: " + xhttp.status;
+                    $("#saveDisplayTitlesMessage").text(msg);
+                    setTimeout(function () { $("#saveDisplayTitlesMessage").text("") }, 2000);
+                }
+            }
+        };
+        xhttp.send(formData);
+    }
 
     //Conditions
     var conditionsNumber = 0
@@ -267,7 +353,7 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
     {%if data.RequiredFilters %}
     {%for record in data.RequiredFilters["filterValues"]%}
         var appendString = "\
-                <div id='conditionInput" + conditionsNumber + "' ><input class='form-control' style='width:300px!important;display:inline-block;' type='text' name='conditionInput" + conditionsNumber + "' value='{{record|join(',')}}' /><i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteCondition(\"conditionInput" + conditionsNumber + "\")'></i>\
+                <div id='conditionInput" + conditionsNumber + "' ><input class='form-control conditionInput' style='width:300px!important;display:inline-block;' type='text' class='conditionInput' name='conditionInput" + conditionsNumber + "' value='{{record|join(',')}}' /><i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteCondition(\"conditionInput" + conditionsNumber + "\")'></i>\
                 <br /><br /></div>";
         conditionsNumber++;
         $("#conditionsDiv").append(appendString);
@@ -278,7 +364,7 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
     updateConditionsMax();
     function addCondition() {
         var appendString = "\
-            <div id='conditionInput" + conditionsNumber + "' ><input class='form-control' style='width:300px!important;display:inline-block;' type='text' name='conditionInput" + conditionsNumber + "' /><i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteCondition(\"conditionInput" + conditionsNumber + "\")'></i>\
+            <div id='conditionInput" + conditionsNumber + "' ><input class='form-control conditionInput' style='width:300px!important;display:inline-block;' type='text' name='conditionInput" + conditionsNumber + "' /><i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteCondition(\"conditionInput" + conditionsNumber + "\")'></i>\
             <br /><br /></div>";
         conditionsNumber++;
         $("#conditionsDiv").append(appendString);
@@ -295,6 +381,10 @@ $(document).on('hide.bs.modal', '#solutionModal', function (e) {
         $("#conditionsNumberInput").attr({ "max": conditionsNumber });
         if ($("#conditionsNumberInput").val() > conditionsNumber) {
             $("#conditionsNumberInput").val(conditionsNumber);
+        }
+        var array = document.getElementsByClassName("conditionInput");
+        for (var i = 0; i < array.length;i++){
+            array[i].name = "conditionInput" + i;
         }
     }
 

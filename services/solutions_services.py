@@ -106,7 +106,7 @@ def filterForReturnSolutionValues(records, solutionsRecord):
                     URL = solutionsRecord.Data.WebLink + str(record["data"][solutionsRecord.Data.IDReference])
 
             result.append({"displayData" : [title, term, location, createdOn], "buttonURL" : URL, "description" : description})
-            
+
         return Callback(True, 'Solution values have been filtered successfully!!', result)
     except Exception as exc:
         print("solutions_services.filterForReturnSolutionValues() ERROR: ", exc)
@@ -114,11 +114,11 @@ def filterForReturnSolutionValues(records, solutionsRecord):
 
 def getSolutions(content, keywords):
     try:
-        jobs = next(iter(next(iter(next(iter(content.values())).values())).values())) # GETS the first value of the dict which is the first value of a dict which is the first value of a dict
+        solutions = next(iter(next(iter(next(iter(content.values())).values())).values())) # GETS the first value of the dict which is the first value of a dict which is the first value of a dict
         result = []
         matches = ""
         originalString = dumps(content).split("SysKeys")[1]
-        for value in jobs:
+        for value in solutions:
             matches = loopThroughAllJSON(value, {"command":"get solutions", "value":keywords}, originalString, {})
             if matches:
                 result.append({"data": value, "matches": matches})
@@ -127,18 +127,33 @@ def getSolutions(content, keywords):
         print("solutions_services.getSolutions ERROR: ", exc)
         return result
 
+def getDisplayTitlesOfRecords(content):
+    try:
+        solutions = next(iter(next(iter(next(iter(content.Content.values())).values())).values())) # GETS the first value of the dict which is the first value of a dict which is the first value of a dict
+        result = []
+        for key, value in solutions[0].items():
+            result.append(key)
+        print("RESULT : ", result)
+        return Callback(True, "Display Titles have been retrieved", result)
+    except Exception as exc:
+        print("solutions_services.getDisplayTitlesOfRecords ERROR: ", exc)
+        return Callback(False, "Could not retrieve Display Titles")
+
 def loopThroughAllJSON(item, action, originalString="", result={}):
     try:
         if type(item) is dict or type(item) is MutableDict:
             for key,value in item.items():
                 result = actOnJSONItem(action, key, originalString, result)
                 loopThroughAllJSON(item[key], action, originalString, result)
+
         elif type(item) is list:
             for value in item:
                 result = actOnJSONItem(action, value, originalString, result)
                 loopThroughAllJSON(value, action, originalString, result)
+
         else:
             result = actOnJSONItem(action, item, originalString, result)
+
         return result
     except Exception as exc:
         print("solutions_services.loopThroughAllJSON ERROR: ", exc)
@@ -434,13 +449,31 @@ def createUpdateJSONByAssistantID(assistantID, content, type):
         return Callback(False, 'Could not update solutions file')
 
 
+def saveDisplayTitles(assistantID, titles):
+    try:
+        solution_callback : Callback = getSolutionByAssistantID(assistantID)
+        if not solution_callback.Success: raise Exception("Error in retrieving current settings")
+
+        solution_callback.Data.DisplayTitles = titles
+
+        db.session.commit()
+
+        return Callback(True, 'Titles have been saved')
+
+    except Exception as exc:
+        print("solutions_services.saveRequiredFilters ERROR: ", exc)
+        db.session.rollback()
+        return Callback(False, 'Could not save titles')
+
+
+
 def saveRequiredFilters(assistantID, params):
     try:
         solution_callback : Callback = getSolutionByAssistantID(assistantID)
         if not solution_callback.Success: raise Exception("Error in retrieving current settings")
 
         solution_callback.Data.RequiredFilters = params
-        
+
         db.session.commit()
 
         return Callback(True, 'Conditions have been saved')

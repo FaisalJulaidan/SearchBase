@@ -87,7 +87,7 @@ def filterForReturnSolutionValues(records, solutionsRecord, solution):
             displayArray = []
             for title in solution.DisplayTitles["titleValues"]:
                 printData = record["data"][title]
-                if printData == 0 or printData is None: printData = "-" #could be also : continue but may affect the structure of the solutions
+                if printData == 0 or printData is None: printData = "-" #could be also : continue to not print anything but may affect the structure of the solutions
                 displayArray.append(printData)
 
             description = record["data"]["$"]

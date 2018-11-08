@@ -43,7 +43,7 @@ def getBasedOnKeywords(assistantID, keywords: list, solutionsRecord, max=999999)
 
         result = result[0:max] #get only number of top solutions defined by the client
 
-        result = filterForReturnSolutionValues(result, solutionsRecord).Data #get only display values for chatbot and convert to chatbot to read format
+        result = filterForReturnSolutionValues(result, solutionsRecord, solution).Data #get only display values for chatbot and convert to chatbot to read format
 
         t5 = time.time()
 
@@ -78,24 +78,17 @@ def filterThroughConditions(solution, records):
     return result
 
 
-def filterForReturnSolutionValues(records, solutionsRecord):
+def filterForReturnSolutionValues(records, solutionsRecord, solution):
     try:
+        if not solution.DisplayTitles: raise Exception("No information to display has been selected")
+
         result = []
         for record in records:
-            title = record["data"]["@Title"]
-            if title == 0 or title is None: title = "-"
-
-
-            term = record["data"]["@Term"]
-            if term == 0 or term is None: term = "-"
-
-
-            location = record["data"]["@Loc"]
-            if location == 0 or location is None: locaton = "-"
-
-
-            createdOn = record["data"]["@CreatedOn"]
-            if createdOn == 0 or createdOn is None: createdOn = "-"
+            displayArray = []
+            for title in solution.DisplayTitles["titleValues"]:
+                printData = record["data"][title]
+                if printData == 0 or printData is None: printData = "-" #could be also : continue but may affect the structure of the solutions
+                displayArray.append(printData)
 
             description = record["data"]["$"]
             if description == 0 or description is None: description = None
@@ -105,8 +98,9 @@ def filterForReturnSolutionValues(records, solutionsRecord):
                 if solutionsRecord.Data.WebLink or solutionsRecord.Data.IDReference:
                     URL = solutionsRecord.Data.WebLink + str(record["data"][solutionsRecord.Data.IDReference])
 
-            result.append({"displayData" : [title, term, location, createdOn], "buttonURL" : URL, "description" : description})
+            result.append({"displayData" : displayArray, "buttonURL" : URL, "description" : description})
 
+        print("RESULT : ", result)
         return Callback(True, 'Solution values have been filtered successfully!!', result)
     except Exception as exc:
         print("solutions_services.filterForReturnSolutionValues() ERROR: ", exc)
@@ -133,7 +127,6 @@ def getDisplayTitlesOfRecords(content):
         result = []
         for key, value in solutions[0].items():
             result.append(key)
-        print("RESULT : ", result)
         return Callback(True, "Display Titles have been retrieved", result)
     except Exception as exc:
         print("solutions_services.getDisplayTitlesOfRecords ERROR: ", exc)

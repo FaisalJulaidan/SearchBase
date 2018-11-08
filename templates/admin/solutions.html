@@ -4,16 +4,15 @@
 
 {% block content %}
 <style>
-    #conditionsNumberInput{
-        width:32px;
-        border-style:none;
+    #conditionsNumberInput {
+        width: 32px;
+        border-style: none;
     }
-    #conditionsNumberInput::-webkit-inner-spin-button,
-    #conditionsNumberInput::-webkit-outer-spin-button {
 
-       opacity: 1;
-
-    }
+        #conditionsNumberInput::-webkit-inner-spin-button,
+        #conditionsNumberInput::-webkit-outer-spin-button {
+            opacity: 1;
+        }
 </style>
 <link rel="stylesheet" type="text/css" href="/static/css/checkbox.css">
 <div class="right_col" role="main">
@@ -116,9 +115,9 @@
                                                         For example: "@jobID" : C2143. You can also take your solution ID and use Ctrl + F on this page to find the<br />
                                                         corresponding title in the Raw Data.<br />
                                                     </p>
-                                                    <input style="width:300px!important;" class="form-control" name="webLink" placeholder="http://mycoolwebsite.com/jobs/" {%if data.WebLink %}value="{{data.WebLink}}"{%endif%}/>
+                                                    <input style="width:300px!important;" class="form-control" name="webLink" placeholder="http://mycoolwebsite.com/jobs/" {%if data.WebLink %}value="{{data.WebLink}}" {%endif%} />
                                                     <br />
-                                                    <input style="width:300px!important;" class="form-control" name="solutionsRef" placeholder="@jobID" {%if data.IDReference %}value="{{data.IDReference}}"{%endif%}/>
+                                                    <input style="width:300px!important;" class="form-control" name="solutionsRef" placeholder="@jobID" {%if data.IDReference %}value="{{data.IDReference}}" {%endif%} />
                                                     <br />
                                                     <label class="btn btn-success" onclick="saveJobLink()">Save</label>
                                                     <p id="saveLinkMessage"></p>
@@ -132,9 +131,11 @@
                                                         You can set required keywords to be somewhere in the solution in order to show only specific records.<br />
                                                         For example restrict it so only specific consultant or location's records are displayed to the user.<br />
                                                     </p>
-                                                    <label><input min="0" id="conditionsNumberInput" name="conditionsNumberInput" \
-                                                        {%if data.RequiredFilters %}value="{{data.RequiredFilters["requiredConditionsNumber"]}}"{%else%}value="0"{%endif%} \
-                                                        type="number"/> Conditions must be met:</label>
+                                                    <label>
+                                                        <input min="0" id="conditionsNumberInput" name="conditionsNumberInput" \
+                                                               {%if data.RequiredFilters %}value="{{data.RequiredFilters["requiredConditionsNumber"]}}" {%else%}value="0" {%endif%} \
+                                                               type="number" /> Conditions must be met:
+                                                    </label>
                                                     <br />
                                                     <label style="cursor:pointer;" onclick="addCondition()">Add Condition</label>
                                                     <div id="conditionsDiv">
@@ -259,15 +260,14 @@
 <!-- Solution Modal END -->
 {% endblock %}
 
+{% block naughtyScript %}
+{%endblock%}
+
 {% block customJS %}
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 <script>
     if ("{{data.Content}}" === ""){
-        console.log("TRUE")
-        // $("#dbDependent").each(function() {
-        //     $(this).attr("readonly", "true");
-        // });
         document.getElementById("dbDependentMessage").style = "display:block;"
         $("#dbDependent :input").attr("disabled", true);
         $("#dbDependent :label").click(function(){});
@@ -286,21 +286,34 @@
         $(document).off('submit', '#solutionForm');
     });
 
-    var titleNumber = 0
+    var titleNumber = 0;
+    var titles = [];
+    var titleOptionString = "";
 
-    {%if data.DisplayTitles%}
-    {%for record in data.DisplayTitles["titleValues"]%}
-        addTitle();
-        //SELECT THE VALUE
+    {%if displayTitles %}
+    {%for record in displayTitles %}
+    titles.push("{{record}}")
+    titleOptionString += "<option value='{{record}}'>{{record}}</option>"
     {%endfor%}
     {%endif%}
+
+    var selectsArrayForSelectingValue = undefined
+
+    {%if data.DisplayTitles %}
+    {%for record in data.DisplayTitles["titleValues"] %}
+    addTitle();
+    //SELECT THE VALUE
+    $(".titleSelect").last().val("{{record}}")
+    {% endfor %}
+    {% endif %}
+
     updateTitlesNames();
 
     function addTitle() {
         var appendString = "\
             <div id='titleDiv" + titleNumber + "' >\
                 <select class='form-control titleSelect' style='width:300px!important;display:inline-block;' type='text' name='titleSelect" + titleNumber + "'>\
-                    <option value=\"VAL\">VAL</option>\
+                    " + titleOptionString + " \
                 </select>\
                 <i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteTitle(\"titleDiv" + titleNumber + "\")'></i>\
                 <br /><br />\

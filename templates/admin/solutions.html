@@ -19,7 +19,7 @@
     <div class="">
         <div class="page-title">
             <div class="title_left">
-                <h3>Controlling Your Solutions</h3>
+                <h3>Controlling Your Solutions <br /><small>Note: All the data on this page has been decryped for your ease. We do not store any sensitive data without making sure it is completely secured.</small></h3>
             </div>
         </div>
         <div class="clearfix"></div>
@@ -61,7 +61,7 @@
                                                             Choose file to
                                                             upload
                                                         </label><br><br />
-                                                        <input type="file" id="productFile" name="solutionsFile" onchange="$('#fileDisplay').val($('#productFile').val())" style="display:none;" />
+                                                        <input type="file" id="productFile" name="solutionsFile" style="display:none;" />
                                                         File: <input id="fileDisplay" style="border-style:none;cursor:auto;width:95%;" readonly />
                                                         <br />
                                                         <br />
@@ -99,12 +99,13 @@
                                             <form id="displayTitlesForm">
                                                 <h3>Titles to be displayed<b>*</b></h3>
                                                 <p>
-                                                    From here you can choose which part of your information you want to be displayed.
+                                                    From here you can choose which part of your information you want to be displayed inside the solution box.<br />
+                                                    If you are unsure what data is inside those titles simply scroll down to Raw Data and have a look.
                                                 </p>
-                                                <label style="cursor:pointer;" onclick="addTitle()">Add Information Line +</label>
                                                 <div id="displayTitlesPasteDiv">
 
                                                 </div>
+                                                <label style="cursor:pointer;" onclick="addTitle()">Add Information Line +</label><br />
                                                 <label class="btn btn-success" onclick="saveTitles()">Save</label>
                                                 <p id="saveDisplayTitlesMessage"></p>
                                             </form>
@@ -146,10 +147,10 @@
                                                            type="number" /> Conditions must be met:
                                                 </label>
                                                 <br />
-                                                <label style="cursor:pointer;" onclick="addCondition()">Add Condition</label>
                                                 <div id="conditionsDiv">
 
                                                 </div>
+                                                <label style="cursor:pointer;" onclick="addCondition()">Add Condition +</label><br />
                                                 <label class="btn btn-success" onclick="saveConditions()">Save</label>
                                                 <p id="saveRequiredFiltersMessage"></p>
                                             </form>
@@ -182,7 +183,7 @@
                                     </div>
                                     <div class="x_panel" id="rawDataPanel">
                                         <div class="x_title">
-                                            <h2>Raw Data (Decrypted):</h2>
+                                            <h2>Raw Data:</h2>
                                             <ul class="nav navbar-right panel_toolbox">
                                                 <li>
                                                     <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
@@ -297,6 +298,12 @@
             collapsePanel($("#uploadDatabasePanel .collapse-link"));
         }
     });
+
+    document.getElementById('productFile').onchange = function () {
+        let filePath = $('#productFile').val().split("\\");
+        let fileName = filePath[filePath.length - 1];
+        $('#fileDisplay').val(fileName);
+    };
 
     function collapsePanel(collapser) {
         console.log(collapser)

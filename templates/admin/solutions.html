@@ -31,26 +31,23 @@
             <div class="clearfix"></div>
             <div class="row">
                 <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="x_panel">
-                        <!-- <ul class="nav navbar-right panel_toolbox">
-                          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                          </li>
-                        </ul> -->
-                        <div class="x_content">
-                            <p class="text-muted font-13 m-b-30">
-                                This page gives you control over your solutions, where they lead and also sending users alerts for new matches.
-                            </p>
+                    <div class="">
+                        <div class="">
 
                             <!-- Start of welcome message -->
                             <div class="row">
                                 <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <div class="x_panel">
+                                    <div class="x_panel" id="uploadDatabasePanel">
                                         <div class="x_title">
                                             <h2>
                                                 Upload an existing database
                                                 <small>File Types: XML, JSON (coming soon)</small>
                                             </h2>
-                                            <ul class="nav navbar-right panel_toolbox"></ul>
+                                            <ul class="nav navbar-right panel_toolbox">
+                                                <li>
+                                                    <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                </li>
+                                            </ul>
                                             <div class="clearfix"></div>
                                         </div>
                                         <div class="x_content">
@@ -84,100 +81,118 @@
 
                                             </form>
 
-                                            <h3 id="dbDependentMessage" style="display:none;"><b>Bellow functionality requies an active database</b></h3>
-                                            <div id="dbDependent">
-
-                                                <form id="displayTitlesForm">
-                                                    <h3>Titles to be displayed<b>*</b></h3>
-                                                    <p>
-                                                        From here you can choose which part of your information you want to be displayed.
-                                                    </p>
-                                                    <label style="cursor:pointer;" onclick="addTitle()">Add Information Line +</label>
-                                                    <div id="displayTitlesPasteDiv">
-
-                                                    </div>
-                                                    <label class="btn btn-success" onclick="saveTitles()">Save</label>
-                                                    <p id="saveDisplayTitlesMessage"></p>
-                                                </form>
-
-                                                <br />
-
-                                                <form id="solutionLinkForm" name="solutionLinkForm">
-                                                    <h3>Job Links<b>*</b></h3>
-                                                    <p>
-                                                        In order to be able to direct users to your solutions at your home website we will need some input from you.<br />
-                                                        We would need the page part that holds all the solutions and then the solution reference. For example that<br />
-                                                        can be http://mycoolwebsite.com/jobs/*jobID* . To create the bridge between us we would need that information<br />
-                                                        in the bellow text inputs.
-                                                        <br /><b>To do that just contact us and we will find them for you</b>.<br />
-                                                        Alternatively you can try finding them on your own. To do that please provide us with the link (ex. "http://mycoolwebsite.com/jobs/")<br />
-                                                        and then the reference to the jobID which you can find in your upload file(add @ in front of it) or Raw Data bellow.<br />
-                                                        For example: "@jobID" : C2143. You can also take your solution ID and use Ctrl + F on this page to find the<br />
-                                                        corresponding title in the Raw Data.<br />
-                                                    </p>
-                                                    <input style="width:300px!important;" class="form-control" name="webLink" placeholder="http://mycoolwebsite.com/jobs/" {%if data.WebLink %}value="{{data.WebLink}}" {%endif%} />
-                                                    <br />
-                                                    <input style="width:300px!important;" class="form-control" name="solutionsRef" placeholder="@jobID" {%if data.IDReference %}value="{{data.IDReference}}" {%endif%} />
-                                                    <br />
-                                                    <label class="btn btn-success" onclick="saveJobLink()">Save</label>
-                                                    <p id="saveLinkMessage"></p>
-                                                </form>
-
-                                                <br />
-
-                                                <form id="requiredFiltersForm">
-                                                    <h3>Required Filters</h3>
-                                                    <p>
-                                                        You can set required keywords to be somewhere in the solution in order to show only specific records.<br />
-                                                        For example restrict it so only specific consultant or location's records are displayed to the user.<br />
-                                                    </p>
-                                                    <label>
-                                                        <input min="0" id="conditionsNumberInput" style="background-color:white;" name="conditionsNumberInput" \
-                                                               {%if data.RequiredFilters %}value="{{data.RequiredFilters["requiredConditionsNumber"]}}" {%else%}value="0" {%endif%} \
-                                                               type="number" /> Conditions must be met:
-                                                    </label>
-                                                    <br />
-                                                    <label style="cursor:pointer;" onclick="addCondition()">Add Condition</label>
-                                                    <div id="conditionsDiv">
-
-                                                    </div>
-                                                    <label class="btn btn-success" onclick="saveConditions()">Save</label>
-                                                    <p id="saveRequiredFiltersMessage"></p>
-                                                </form>
-
-                                                <br />
-
-                                                <div id="jobAlertsDiv">
-                                                    <h3>Job Alerts</h3>
-                                                    <p>
-                                                        You can send emails to your clients when a new job suited for them has been added to your records.<br />
-                                                        This can be done manually by clicking the button bellow or by ticking the box which will check<br />
-                                                        and send them every time you update your data.
-                                                    </p>
-                                                    <label class="btn btn-success" onclick="sendSolutionAlerts()">Send Jobs</label>
-                                                    <p id="sendSolutionsMessage"></p>
-                                                    <h4>Send Automatically</h4>
-                                                    <div class="input-group" style="margin-bottom: 5px;">
-                                                        <label class="checkboxContainer" style="margin-bottom: 5px;">
-                                                            On data update
-
-                                                            <input id="automaticSolutionAlertsCheckbox" name="jobAlerts" value="jobAlerts" type="checkbox" {%if data.automaticSolutionAlerts%}checked{%endif%} onchange="changeAutoSolutionAlerts()" />
-
-                                                            <span class="checkmark"></span>
-                                                        </label>
-                                                    </div>
-                                                    <p id="checkboxMessage"></p>
-                                                </div>
-
-                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                    <div class="x_panel" id="dbDependentPanel">
+                                        <div class="x_title">
+                                            <h3 id="dbDependentMessage" style="display:none;width:50%;"><b>Bellow functionality requies an active database</b></h3>
+                                            <h3 id="dbDependentTitle" style="display:inline-block;width:50%;"><b>Solutions Settings and Actions</b></h3>
+                                            <ul class="nav navbar-right panel_toolbox">
+                                                <li>
+                                                    <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                </li>
+                                            </ul>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content" id="dbDependent">
 
-                                <h2>Raw Data (Decrypted):</h2>
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <div class="x_panel" id="solutionsDiv" style="max-height:500px;overflow-y:auto;border-radius:5px;">
+                                            <form id="displayTitlesForm">
+                                                <h3>Titles to be displayed<b>*</b></h3>
+                                                <p>
+                                                    From here you can choose which part of your information you want to be displayed.
+                                                </p>
+                                                <label style="cursor:pointer;" onclick="addTitle()">Add Information Line +</label>
+                                                <div id="displayTitlesPasteDiv">
 
+                                                </div>
+                                                <label class="btn btn-success" onclick="saveTitles()">Save</label>
+                                                <p id="saveDisplayTitlesMessage"></p>
+                                            </form>
+
+                                            <br />
+
+                                            <form id="solutionLinkForm" name="solutionLinkForm">
+                                                <h3>Job Links<b>*</b></h3>
+                                                <p>
+                                                    In order to be able to direct users to your solutions at your home website we will need some input from you.<br />
+                                                    We would need the page part that holds all the solutions and then the solution reference. For example that<br />
+                                                    can be http://mycoolwebsite.com/jobs/*jobID* . To create the bridge between us we would need that information<br />
+                                                    in the bellow text inputs.
+                                                    <br /><b>To do that just contact us and we will find them for you</b>.<br />
+                                                    Alternatively you can try finding them on your own. To do that please provide us with the link (ex. "http://mycoolwebsite.com/jobs/")<br />
+                                                    and then the reference to the jobID which you can find in your upload file(add @ in front of it) or Raw Data bellow.<br />
+                                                    For example: "@jobID" : C2143. You can also take your solution ID and use Ctrl + F on this page to find the<br />
+                                                    corresponding title in the Raw Data.<br />
+                                                </p>
+                                                <input style="width:300px!important;" class="form-control" name="webLink" placeholder="http://mycoolwebsite.com/jobs/" {%if data.WebLink %}value="{{data.WebLink}}" {%endif%} />
+                                                <br />
+                                                <input style="width:300px!important;" class="form-control" name="solutionsRef" placeholder="@jobID" {%if data.IDReference %}value="{{data.IDReference}}" {%endif%} />
+                                                <br />
+                                                <label class="btn btn-success" onclick="saveJobLink()">Save</label>
+                                                <p id="saveLinkMessage"></p>
+                                            </form>
+
+                                            <br />
+
+                                            <form id="requiredFiltersForm">
+                                                <h3>Returned Data Filters</h3>
+                                                <p>
+                                                    You can set required keywords to be somewhere in the solution in order to show only specific records.<br />
+                                                    For example restrict it so only specific consultant or location's records are displayed to the user.<br />
+                                                </p>
+                                                <label>
+                                                    <input min="0" id="conditionsNumberInput" style="background-color:white;" name="conditionsNumberInput" \
+                                                           {%if data.RequiredFilters %}value="{{data.RequiredFilters["requiredConditionsNumber"]}}" {%else%}value="0" {%endif%} \
+                                                           type="number" /> Conditions must be met:
+                                                </label>
+                                                <br />
+                                                <label style="cursor:pointer;" onclick="addCondition()">Add Condition</label>
+                                                <div id="conditionsDiv">
+
+                                                </div>
+                                                <label class="btn btn-success" onclick="saveConditions()">Save</label>
+                                                <p id="saveRequiredFiltersMessage"></p>
+                                            </form>
+
+                                            <br />
+
+                                            <div id="jobAlertsDiv">
+                                                <h3>Job Alerts</h3>
+                                                <p>
+                                                    You can send emails to your clients when a new job suited for them has been added to your records.<br />
+                                                    This can be done manually by clicking the button bellow or by ticking the box which will check<br />
+                                                    and send them every time you update your data.
+                                                </p>
+                                                <label class="btn btn-success" onclick="sendSolutionAlerts()">Send Jobs</label>
+                                                <p id="sendSolutionsMessage"></p>
+                                                <h4>Send Automatically</h4>
+                                                <div class="input-group" style="margin-bottom: 5px;">
+                                                    <label class="checkboxContainer" style="margin-bottom: 5px;">
+                                                        On data update
+
+                                                        <input id="automaticSolutionAlertsCheckbox" name="jobAlerts" value="jobAlerts" type="checkbox" {%if data.automaticSolutionAlerts%}checked{%endif%} onchange="changeAutoSolutionAlerts()" />
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                                <p id="checkboxMessage"></p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="x_panel" id="rawDataPanel">
+                                        <div class="x_title">
+                                            <h2>Raw Data (Decrypted):</h2>
+                                            <ul class="nav navbar-right panel_toolbox">
+                                                <li>
+                                                    <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                </li>
+                                            </ul>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content" id="solutionsDiv" style="max-height:500px;overflow-y:auto;border-radius:5px;">
+
+                                        </div>
                                     </div>
                                 </div>
 
@@ -267,10 +282,33 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 <script>
-    if ("{{data.Content}}" === ""){
-        document.getElementById("dbDependentMessage").style = "display:block;"
-        $("#dbDependent :input").attr("disabled", true);
-        $("#dbDependent :label").click(function(){});
+
+    //Colapse function from boostrap
+    $(document).ready(function () {
+        console.log(1)
+        if ("{{data.Content}}" === "") {
+            document.getElementById("dbDependentMessage").style = "display:inline-block;"
+            document.getElementById("dbDependentTitle").style = "display:none;"
+            $("#dbDependent :input").attr("disabled", true);
+            //$("#dbDependent :label").click(function () { });
+            collapsePanel($("#dbDependentPanel .collapse-link"));
+            collapsePanel($("#rawDataPanel .collapse-link"));
+        } else {
+            collapsePanel($("#uploadDatabasePanel .collapse-link"));
+        }
+    });
+
+    function collapsePanel(collapser) {
+        console.log(collapser)
+        var a = collapser.closest(".x_panel")
+            , b = collapser.find("i")
+            , c = a.find(".x_content");
+        a.attr("style") ? c.slideToggle(200, function () {
+            a.removeAttr("style")
+        }) : (c.slideToggle(200),
+            a.css("height", "auto")),
+            b.toggleClass("fa-chevron-up fa-chevron-down")
+        console.log(3)
     }
 
     String.prototype.replaceAll = function (search, replacement) {

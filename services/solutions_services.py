@@ -90,7 +90,7 @@ def filterForReturnSolutionValues(records, solutionsRecord, solution):
                 if printData == 0 or printData is None: printData = "-" #could be also : continue to not print anything but may affect the structure of the solutions
                 displayArray.append(printData)
 
-            description = record["data"]["$"]
+            description = record["data"][solution.DisplayTitles["solutionDescription"]]
             if description == 0 or description is None: description = None
 
             URL = None

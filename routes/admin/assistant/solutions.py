@@ -153,7 +153,7 @@ def admin_save_display_titles(assistantID):
 
     if request.method == "POST":
 
-        titlesArray = {"titleValues" : []}
+        titlesArray = {"titleValues" : [], "solutionDescription": ""}
 
         for i in range(0, 50):
             record = request.form.get("titleSelect"+str(i), default=None)
@@ -161,6 +161,7 @@ def admin_save_display_titles(assistantID):
             print("record: ", record)
             titlesArray["titleValues"].append(record.strip())
 
+        titlesArray["solutionDescription"] = request.form.get("description", default=None)
         conditions_callback = solutions_services.saveDisplayTitles(assistantID, titlesArray)
         return conditions_callback.Message
 

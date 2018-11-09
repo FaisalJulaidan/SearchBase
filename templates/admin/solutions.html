@@ -74,8 +74,7 @@
                                                 <div class="form-group">
                                                     <div>
                                                         <label class="btn btn-success" for="productFile">
-                                                            Choose file to
-                                                            upload
+                                                            Choose file to upload
                                                         </label><br><br />
                                                         <input type="file" id="productFile" name="solutionsFile" style="display:none;" />
                                                         File Name: <input class="form-control" id="fileDisplay" readonly />
@@ -121,6 +120,18 @@
 
                                                 </div>
                                                 <label style="cursor:pointer;" onclick="addTitle()">Add Information Line +</label><br />
+                                                <div>
+                                                    <br />
+                                                    <label>Description:</label><br />
+                                                    <select class='form-control' style='width:300px!important;display:inline-block;' id="descriptionSelect" type='text' name='description'>
+                                                        {%if displayTitles %}
+                                                        {%for record in displayTitles %}
+                                                        <option value='{{record}}'>{{record}}</option>
+                                                        {%endfor%}
+                                                        {%endif%}
+                                                    </select>
+                                                    <br /><br />
+                                                </div>
                                                 <label class="btn btn-success" onclick="saveTitles()">Save</label>
                                                 <p id="saveDisplayTitlesMessage"></p>
                                             </form>
@@ -151,7 +162,7 @@
                                             <br />
 
                                             <form id="requiredFiltersForm">
-                                                <h3>Returned Data Filters</h3>
+                                                <h3>Returned Solutions Filters</h3>
                                                 <p>
                                                     You can set required keywords to be somewhere in the solution in order to show only specific records.<br />
                                                     For example restrict it so only specific consultant or location's records are displayed to the user.<br />
@@ -301,7 +312,6 @@
 
     //Colapse function from boostrap
     $(document).ready(function () {
-        console.log(1)
         if ("{{data.Content}}" === "") {
             document.getElementById("dbDependentMessage").style = "display:inline-block;"
             document.getElementById("dbDependentTitle").style = "display:none;"
@@ -312,6 +322,10 @@
         } else {
             collapsePanel($("#uploadDatabasePanel .collapse-link"));
         }
+
+        {%if displayTitles %}
+        $("#descriptionSelect").val("{{data.DisplayTitles['solutionDescription']}}");
+        {% endif %}
     });
 
     document.getElementById('productFile').onchange = function () {
@@ -321,7 +335,6 @@
     };
 
     function collapsePanel(collapser) {
-        console.log(collapser)
         var a = collapser.closest(".x_panel")
             , b = collapser.find("i")
             , c = a.find(".x_content");
@@ -330,7 +343,6 @@
         }) : (c.slideToggle(200),
             a.css("height", "auto")),
             b.toggleClass("fa-chevron-up fa-chevron-down")
-        console.log(3)
     }
 
     String.prototype.replaceAll = function (search, replacement) {

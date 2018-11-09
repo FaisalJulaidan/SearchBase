@@ -9,10 +9,26 @@
         border-style: none;
     }
 
-        #conditionsNumberInput::-webkit-inner-spin-button,
-        #conditionsNumberInput::-webkit-outer-spin-button {
-            opacity: 1;
-        }
+    #conditionsNumberInput::-webkit-inner-spin-button,
+    #conditionsNumberInput::-webkit-outer-spin-button {
+        opacity: 1;
+    }
+    #fileDisplay {
+        cursor: auto;
+        display: inline-block;
+        width: 210px;
+        font-size: 12px;
+        height: 30px;
+        background-color: white;
+        margin-left: 3px;
+    }
+    #fileTypeSelector {
+        width: 210px;
+        font-size: 12px;
+        height: 30px;
+        display: inline-block;
+        margin-left: 9px;
+    }
 </style>
 <link rel="stylesheet" type="text/css" href="/static/css/checkbox.css">
 <div class="right_col" role="main">
@@ -62,12 +78,12 @@
                                                             upload
                                                         </label><br><br />
                                                         <input type="file" id="productFile" name="solutionsFile" style="display:none;" />
-                                                        File: <input id="fileDisplay" style="border-style:none;cursor:auto;width:95%;" readonly />
+                                                        File Name: <input class="form-control" id="fileDisplay" readonly />
                                                         <br />
                                                         <br />
                                                         File Type:
-                                                        <select name="fileType">
-                                                            <option value="RDBXML">RDB Xml File</option>
+                                                        <select class="form-control" id="fileTypeSelector" name="fileType">
+                                                            <option value="RDBXML">RDB XML File Export</option>
                                                         </select>
                                                     </div>
                                                     <br />
@@ -75,7 +91,6 @@
                                                             type="button" value="submit" onclick="uploadProductFile()">
                                                         Upload Database
                                                     </button>
-                                                    <br><br>
                                                     <h4 id="uploadDatabaseMessage"></h4>
                                                 </div>
 

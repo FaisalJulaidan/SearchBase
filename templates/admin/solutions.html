@@ -9,10 +9,11 @@
         border-style: none;
     }
 
-    #conditionsNumberInput::-webkit-inner-spin-button,
-    #conditionsNumberInput::-webkit-outer-spin-button {
-        opacity: 1;
-    }
+        #conditionsNumberInput::-webkit-inner-spin-button,
+        #conditionsNumberInput::-webkit-outer-spin-button {
+            opacity: 1;
+        }
+
     #fileDisplay {
         cursor: auto;
         display: inline-block;
@@ -22,7 +23,8 @@
         background-color: white;
         margin-left: 3px;
     }
-    #fileTypeSelector {
+
+    #fileTypeSelector, #existingFileSelector {
         width: 210px;
         font-size: 12px;
         height: 30px;
@@ -56,7 +58,7 @@
                                     <div class="x_panel" id="uploadDatabasePanel">
                                         <div class="x_title">
                                             <h2>
-                                                Upload an existing database
+                                                Upload a database / Update existing one
                                                 <small>File Types: XML, JSON (coming soon)</small>
                                             </h2>
                                             <ul class="nav navbar-right panel_toolbox">
@@ -75,9 +77,15 @@
                                                     <div>
                                                         <label class="btn btn-success" for="productFile">
                                                             Choose file to upload
-                                                        </label><br><br />
+                                                        </label>
+                                                        OR
+                                                        <select class="form-control" id="existingFileSelector" name="existingFile">
+                                                            <option value="None">Select Existing</option>
+                                                        </select>
+                                                        <br />
+                                                        <br />
                                                         <input type="file" id="productFile" name="solutionsFile" style="display:none;" />
-                                                        File Name: <input class="form-control" id="fileDisplay" readonly />
+                                                        File Name: <input class="form-control" name="fileName" id="fileDisplay" />
                                                         <br />
                                                         <br />
                                                         File Type:
@@ -98,6 +106,7 @@
                                         </div>
                                     </div>
                                     <div class="x_panel" id="dbDependentPanel">
+
                                         <div class="x_title">
                                             <h3 id="dbDependentMessage" style="display:none;width:50%;"><b>Bellow functionality requies an active database</b></h3>
                                             <h3 id="dbDependentTitle" style="display:inline-block;width:50%;"><b>Solutions Settings and Actions</b></h3>
@@ -108,103 +117,122 @@
                                             </ul>
                                             <div class="clearfix"></div>
                                         </div>
+
                                         <div class="x_content" id="dbDependent">
 
-                                            <form id="displayTitlesForm">
-                                                <h3>Titles to be displayed<b>*</b></h3>
-                                                <p>
-                                                    From here you can choose which part of your information you want to be displayed inside the solution box.<br />
-                                                    If you are unsure what data is inside those titles simply scroll down to Raw Data and have a look.
-                                                </p>
-                                                <div id="displayTitlesPasteDiv">
+                                            <div role="tabpanel">
 
+                                                <ul id="solutionsNavTab" class="nav nav-tabs bar_tabs" role="tablist">
+                                                    <li style="cursor:pointer!important;" role="presentation" class="active">
+                                                        <a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true">Hello</a>
+                                                    </li>
+                                                    <li style="cursor:pointer!important;" role="presentation" class="">
+                                                        <a href="#tab_content1" role="tab" data-toggle="tab" aria-expanded="false">Bye</a>
+                                                    </li>
+                                                </ul>
+                                                <div id="myTabContent" class="tab-content">
+                                                    <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
+
+                                                        <form id="displayTitlesForm">
+                                                            <h3>Titles to be displayed<b>*</b></h3>
+                                                            <p>
+                                                                From here you can choose which part of your information you want to be displayed inside the solution box.<br />
+                                                                If you are unsure what data is inside those titles simply scroll down to Raw Data and have a look.
+                                                            </p>
+                                                            <div id="displayTitlesPasteDiv">
+
+                                                            </div>
+                                                            <label style="cursor:pointer;" onclick="addTitle()">Add Information Line +</label><br />
+                                                            <div>
+                                                                <br />
+                                                                <label>Description:</label><br />
+                                                                <select class='form-control' style='width:300px!important;display:inline-block;' id="descriptionSelect" type='text' name='description'>
+                                                                    {%for solution in data%}
+                                                                    {%if solution["DisplayTitles"]%}
+                                                                    {%for record in solution["DisplayTitles"] %}
+                                                                    <option value='{{record}}'>{{record}}</option>
+                                                                    {%endfor%}
+                                                                    {%endif%}
+                                                                    {%endfor%}
+                                                                </select>
+                                                                <br /><br />
+                                                            </div>
+                                                            <label class="btn btn-success" onclick="saveTitles()">Save</label>
+                                                            <p id="saveDisplayTitlesMessage"></p>
+                                                        </form>
+
+                                                        <br />
+
+                                                        <form id="solutionLinkForm" name="solutionLinkForm">
+                                                            <h3>Job Links<b>*</b></h3>
+                                                            <p>
+                                                                In order to be able to direct users to your solutions at your home website we will need some input from you.<br />
+                                                                We would need the page part that holds all the solutions and then the solution reference. For example that<br />
+                                                                can be http://mycoolwebsite.com/jobs/*jobID* . To create the bridge between us we would need that information<br />
+                                                                in the bellow text inputs.
+                                                                <br /><b>To do that just contact us and we will find them for you</b>.<br />
+                                                                Alternatively you can try finding them on your own. To do that please provide us with the link (ex. "http://mycoolwebsite.com/jobs/")<br />
+                                                                and then the reference to the jobID which you can find in your upload file(add @ in front of it) or Raw Data bellow.<br />
+                                                                For example: "@jobID" : C2143. You can also take your solution ID and use Ctrl + F on this page to find the<br />
+                                                                corresponding title in the Raw Data.<br />
+                                                            </p>
+                                                            <input style="width:300px!important;" class="form-control" name="webLink" placeholder="http://mycoolwebsite.com/jobs/" {%if data.WebLink %}value="{{data.WebLink}}" {%endif%} />
+                                                            <br />
+                                                            <input style="width:300px!important;" class="form-control" name="solutionsRef" placeholder="@jobID" {%if data.IDReference %}value="{{data.IDReference}}" {%endif%} />
+                                                            <br />
+                                                            <label class="btn btn-success" onclick="saveJobLink()">Save</label>
+                                                            <p id="saveLinkMessage"></p>
+                                                        </form>
+
+                                                        <br />
+
+                                                        <form id="requiredFiltersForm">
+                                                            <h3>Returned Solutions Filters</h3>
+                                                            <p>
+                                                                You can set required keywords to be somewhere in the solution in order to show only specific records.<br />
+                                                                For example restrict it so only specific consultant or location's records are displayed to the user.<br />
+                                                            </p>
+                                                            <label>
+                                                                <input min="0" id="conditionsNumberInput" style="background-color:white;" name="conditionsNumberInput" \
+                                                                       {%if data.RequiredFilters %}value="{{data.RequiredFilters["requiredConditionsNumber"]}}" {%else%}value="0" {%endif%} \
+                                                                       type="number" /> Conditions must be met:
+                                                            </label>
+                                                            <br />
+                                                            <div id="conditionsDiv">
+
+                                                            </div>
+                                                            <label style="cursor:pointer;" onclick="addCondition()">Add Condition +</label><br />
+                                                            <label class="btn btn-success" onclick="saveConditions()">Save</label>
+                                                            <p id="saveRequiredFiltersMessage"></p>
+                                                        </form>
+
+                                                        <br />
+
+                                                        <div id="jobAlertsDiv">
+                                                            <h3>Job Alerts</h3>
+                                                            <p>
+                                                                You can send emails to your clients when a new job suited for them has been added to your records.<br />
+                                                                This can be done manually by clicking the button bellow or by ticking the box which will check<br />
+                                                                and send them every time you update your data.
+                                                            </p>
+                                                            <label class="btn btn-success" onclick="sendSolutionAlerts()">Send Jobs</label>
+                                                            <p id="sendSolutionsMessage"></p>
+                                                            <h4>Send Automatically</h4>
+                                                            <div class="input-group" style="margin-bottom: 5px;">
+                                                                <label class="checkboxContainer" style="margin-bottom: 5px;">
+                                                                    On data update
+
+                                                                    <input id="automaticSolutionAlertsCheckbox" name="jobAlerts" value="jobAlerts" type="checkbox" {%if data.automaticSolutionAlerts%}checked{%endif%} onchange="changeAutoSolutionAlerts()" />
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </div>
+                                                            <p id="checkboxMessage"></p>
+                                                        </div>
+
+                                                    </div>
                                                 </div>
-                                                <label style="cursor:pointer;" onclick="addTitle()">Add Information Line +</label><br />
-                                                <div>
-                                                    <br />
-                                                    <label>Description:</label><br />
-                                                    <select class='form-control' style='width:300px!important;display:inline-block;' id="descriptionSelect" type='text' name='description'>
-                                                        {%if displayTitles %}
-                                                        {%for record in displayTitles %}
-                                                        <option value='{{record}}'>{{record}}</option>
-                                                        {%endfor%}
-                                                        {%endif%}
-                                                    </select>
-                                                    <br /><br />
-                                                </div>
-                                                <label class="btn btn-success" onclick="saveTitles()">Save</label>
-                                                <p id="saveDisplayTitlesMessage"></p>
-                                            </form>
-
-                                            <br />
-
-                                            <form id="solutionLinkForm" name="solutionLinkForm">
-                                                <h3>Job Links<b>*</b></h3>
-                                                <p>
-                                                    In order to be able to direct users to your solutions at your home website we will need some input from you.<br />
-                                                    We would need the page part that holds all the solutions and then the solution reference. For example that<br />
-                                                    can be http://mycoolwebsite.com/jobs/*jobID* . To create the bridge between us we would need that information<br />
-                                                    in the bellow text inputs.
-                                                    <br /><b>To do that just contact us and we will find them for you</b>.<br />
-                                                    Alternatively you can try finding them on your own. To do that please provide us with the link (ex. "http://mycoolwebsite.com/jobs/")<br />
-                                                    and then the reference to the jobID which you can find in your upload file(add @ in front of it) or Raw Data bellow.<br />
-                                                    For example: "@jobID" : C2143. You can also take your solution ID and use Ctrl + F on this page to find the<br />
-                                                    corresponding title in the Raw Data.<br />
-                                                </p>
-                                                <input style="width:300px!important;" class="form-control" name="webLink" placeholder="http://mycoolwebsite.com/jobs/" {%if data.WebLink %}value="{{data.WebLink}}" {%endif%} />
-                                                <br />
-                                                <input style="width:300px!important;" class="form-control" name="solutionsRef" placeholder="@jobID" {%if data.IDReference %}value="{{data.IDReference}}" {%endif%} />
-                                                <br />
-                                                <label class="btn btn-success" onclick="saveJobLink()">Save</label>
-                                                <p id="saveLinkMessage"></p>
-                                            </form>
-
-                                            <br />
-
-                                            <form id="requiredFiltersForm">
-                                                <h3>Returned Solutions Filters</h3>
-                                                <p>
-                                                    You can set required keywords to be somewhere in the solution in order to show only specific records.<br />
-                                                    For example restrict it so only specific consultant or location's records are displayed to the user.<br />
-                                                </p>
-                                                <label>
-                                                    <input min="0" id="conditionsNumberInput" style="background-color:white;" name="conditionsNumberInput" \
-                                                           {%if data.RequiredFilters %}value="{{data.RequiredFilters["requiredConditionsNumber"]}}" {%else%}value="0" {%endif%} \
-                                                           type="number" /> Conditions must be met:
-                                                </label>
-                                                <br />
-                                                <div id="conditionsDiv">
-
-                                                </div>
-                                                <label style="cursor:pointer;" onclick="addCondition()">Add Condition +</label><br />
-                                                <label class="btn btn-success" onclick="saveConditions()">Save</label>
-                                                <p id="saveRequiredFiltersMessage"></p>
-                                            </form>
-
-                                            <br />
-
-                                            <div id="jobAlertsDiv">
-                                                <h3>Job Alerts</h3>
-                                                <p>
-                                                    You can send emails to your clients when a new job suited for them has been added to your records.<br />
-                                                    This can be done manually by clicking the button bellow or by ticking the box which will check<br />
-                                                    and send them every time you update your data.
-                                                </p>
-                                                <label class="btn btn-success" onclick="sendSolutionAlerts()">Send Jobs</label>
-                                                <p id="sendSolutionsMessage"></p>
-                                                <h4>Send Automatically</h4>
-                                                <div class="input-group" style="margin-bottom: 5px;">
-                                                    <label class="checkboxContainer" style="margin-bottom: 5px;">
-                                                        On data update
-
-                                                        <input id="automaticSolutionAlertsCheckbox" name="jobAlerts" value="jobAlerts" type="checkbox" {%if data.automaticSolutionAlerts%}checked{%endif%} onchange="changeAutoSolutionAlerts()" />
-
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                </div>
-                                                <p id="checkboxMessage"></p>
                                             </div>
-
                                         </div>
                                     </div>
                                     <div class="x_panel" id="rawDataPanel">
@@ -331,7 +359,9 @@
     document.getElementById('productFile').onchange = function () {
         let filePath = $('#productFile').val().split("\\");
         let fileName = filePath[filePath.length - 1];
+        fileName = fileName.split(".")[0];
         $('#fileDisplay').val(fileName);
+        $("#existingFileSelector").val("None");
     };
 
     function collapsePanel(collapser) {
@@ -358,6 +388,52 @@
         $(document).off('submit', '#solutionForm');
     });
 
+
+    var solutionsData = [];
+
+    $.ajax({
+        url: '/admin/assistant/' + assistantID + '/solutionsData',
+        type: "GET"
+    }).done(function (res) {
+
+        console.log("Solutions retrieved successfully!");
+        solutionsData = JSON.parse(res).data;
+
+        console.log("DATA : ", solutionsData)
+
+        if (solutionsData.length == 0) {
+            $("#dbDependent")
+        }
+
+        for (var i = 0; i < solutionsData.length; i++) {
+
+            //Set Select Database Existing values
+            var o = new Option(solutionsData[i]["Solution"]["Name"], solutionsData[i]["Solution"]["Name"]);
+            $("#existingFileSelector").append(o);
+
+            //Set Solution Navigation Titles
+            if (i == 0) {
+                $("#solutionsNavTab").append('<li style="cursor:pointer!important;" role="presentation" class="active" >\
+                    <a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true" >' + solutionsData[i]["Solution"]["Name"] + '</a >\
+                    </li > ')
+            } else {
+                $("#solutionsNavTab").append('\
+                    <li style="cursor:pointer!important;" role="presentation" class="" >\
+                    <a href="#tab_content1" role="tab" data-toggle="tab" aria-expanded="false">' + solutionsData[i]["Solution"]["Name"] + '</a>\
+                    </li >')
+            }
+
+                
+                
+        }
+
+    }).fail(function (res) {
+        console.log("Error in retrieving solutions.");
+        console.log(res);
+    });
+
+
+    //Display Titles
     var titleNumber = 0;
     var titles = [];
     var titleOptionString = "";
@@ -374,7 +450,6 @@
     {%if data.DisplayTitles %}
     {%for record in data.DisplayTitles["titleValues"] %}
     addTitle();
-    //SELECT THE VALUE
     $(".titleSelect").last().val("{{record}}")
     {% endfor %}
     {% endif %}
@@ -433,7 +508,7 @@
     }
 
     //Conditions
-    var conditionsNumber = 0
+    var conditionsNumber = 0;
 
     {%if data.RequiredFilters %}
     {%for record in data.RequiredFilters["filterValues"]%}
@@ -617,4 +692,4 @@
 
     $("#solutionsDiv").append("{{data.Content}}");
 </script>
-{% endblock %}
+{% endblock %}-->

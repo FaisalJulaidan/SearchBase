@@ -210,11 +210,11 @@ def convertionLoopRDB(item, IDsString):
         print("solutions_services.loopThroughAllJSON ERROR: ", exc)
         return item
 
-def createNew(assistantID, content, type):
+def createNew(assistantID, content, type, name):
     try:
         # Create a new user with its associated company and role
         content = replaceIDsWithDataRBD(content)
-        solution = Solution(AssistantID=assistantID, Type=type, Content=content)
+        solution = Solution(AssistantID=assistantID, Name=name, Type=type, Content=content)
         db.session.add(solution)
 
         db.session.commit()
@@ -307,9 +307,9 @@ def getAllByAssistantID(assistantID):
         if not result: raise Exception
         return Callback(True, 'Solutions have been successfully retrieved', result)
     except Exception as exc:
-        print("getAllByAssistantID Error: ", exc)
+        print("solutions_services.getAllByAssistantID Error: ", exc)
         db.session.rollback()
-        return Callback(False, 'Could not retrieve solutions for ID: ' + str(assistantID))
+        return Callback(False, 'Could not retrieve solutions')
 
     # finally:
        # db.session.close()
@@ -420,15 +420,16 @@ def getSolutionByAssistantID(assistantID):
         return Callback(False, 'Could not retrieve JSON / This might be there is no data in DB')
 
 
-def createUpdateJSONByAssistantID(assistantID, content, type):
+def createUpdateJSONByAssistantID(assistantID, content, type, name):
     try:
         # Get result and check if None then raise exception
         #db.session.query(Solution).filter(Solution.AssistantID == assistantID).delete()
         result = getSolutionByAssistantID(assistantID)
         if not result.Success:
-            createNew(assistantID, content, type)
+            createNew(assistantID, content, type, name)
             return Callback(True, 'Solutions file has been added')
 
+        result.Data.Name = name
         result.Data.Type = type
         result.Data.Content = replaceIDsWithDataRBD(content)
 

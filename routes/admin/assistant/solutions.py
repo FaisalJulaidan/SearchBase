@@ -9,14 +9,34 @@ solutions_router: Blueprint = Blueprint('Solutions_router', __name__, template_f
 @solutions_router.route("/admin/assistant/<assistantID>/solutions", methods=['GET', 'POST'])
 def admin_solutions(assistantID):
     if request.method == "GET":
-        solutions_callback: Callback = solutions_services.getFirstByAssistantID(assistantID)
+        solutions_callback: Callback = solutions_services.getAllByAssistantID(assistantID)
         if not solutions_callback.Success: return admin_services.render("admin/solutions.html", data="", id=assistantID)
 
-        displayTitles_callback : Callback = solutions_services.getDisplayTitlesOfRecords(solutions_callback.Data)
-        if not displayTitles_callback.Success: return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID)
+        returnData = []
 
-        return admin_services.render("admin/solutions.html", data=solutions_callback.Data, displayTitles=displayTitles_callback.Data, id=assistantID)
+        for solution in solutions_callback.Data:
+            displayTitles_callback : Callback = solutions_services.getDisplayTitlesOfRecords(solution)
+            if not displayTitles_callback.Success: returnData.append({"Solution" : solution, "DisplayTitles": None})
+            returnData.append({"Solution" : solution, "DisplayTitles": displayTitles_callback.Data})
 
+        return admin_services.render("admin/solutions.html", data=returnData, id=assistantID)
+
+
+@solutions_router.route("/admin/assistant/<assistantID>/solutionsData", methods=['GET'])
+def admin_solutions_data(assistantID):
+
+    if request.method == "GET":
+        solutions_callback: Callback = solutions_services.getAllByAssistantID(assistantID)
+        if not solutions_callback.Success: return helpers.jsonResponse(False, 400, "Solutions could not be retrieved")
+
+        returnData = []
+
+        for solution in solutions_callback.Data:
+            displayTitles_callback : Callback = solutions_services.getDisplayTitlesOfRecords(solution)
+            if not displayTitles_callback.Success: returnData.append({"Solution" : admin_services.convertForJinja(solution, Solution).Data[0], "DisplayTitles": None})
+            returnData.append({"Solution" : admin_services.convertForJinja(solution, Solution).Data[0], "DisplayTitles": displayTitles_callback.Data})
+
+        return helpers.jsonResponse(True, 200, "Solutions have been retrieved", returnData)
 
 @solutions_router.route("/admin/solution/<solID>", methods=['PUT', 'DELETE'])
 def update_and_delete_solution(solID):
@@ -126,23 +146,26 @@ def create_solution(assistantID):
 @solutions_router.route("/admin/assistant/<assistantID>/solutions/file", methods=['POST'])
 def admin_products_file_upload(assistantID):
     if request.method == "POST":
+        fileName = request.form.get("fileName", default=None)
         fileType = request.form.get("fileType", default=None)
+        fileExist = request.form.get("existingFile", default=None)
         file = request.files.get("solutionsFile", default=None)
 
-        if not fileType or not file:
+        if not fileExist or not fileName or not fileType or not file:
             return "File Type or Uploaded File could not be retrieved"
 
-        if fileType == "RDBXML":
-            jsonstr_callback : Callback = solutions_services.convertXMLtoJSON(file)
-            if not jsonstr_callback.Success: return jsonstr_callback.Message
+        if fileExist == "None":
+            if fileType == "RDBXML":
+                jsonstr_callback : Callback = solutions_services.convertXMLtoJSON(file)
+                if not jsonstr_callback.Success: return jsonstr_callback.Message
 
-            saveJson_callback : Callback = solutions_services.createUpdateJSONByAssistantID(assistantID, jsonstr_callback.Data, fileType)
-            if saveJson_callback.Success:
-                checkForAlerts_callback : Callback = solutions_services.checkAutomaticSolutionAlerts(assistantID)
-                if checkForAlerts_callback.Success:
-                    if checkForAlerts_callback.Data:
-                        sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(assistantID)
-                        return saveJson_callback.Message + ". " + sendAlerts_callback.Message
+                saveJson_callback : Callback = solutions_services.createUpdateJSONByAssistantID(assistantID, jsonstr_callback.Data, fileType, fileName)
+                if saveJson_callback.Success:
+                    checkForAlerts_callback : Callback = solutions_services.checkAutomaticSolutionAlerts(assistantID)
+                    if checkForAlerts_callback.Success:
+                        if checkForAlerts_callback.Data:
+                            sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(assistantID)
+                            return saveJson_callback.Message + ". " + sendAlerts_callback.Message
 
             return saveJson_callback.Message
         else:

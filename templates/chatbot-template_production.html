@@ -890,6 +890,7 @@
                 if (!validateUserInput(message, currentBlock.content.validation)) {
                     sendAssistantMessage("I am sorry but that was not in the format I think it should be...");
                     chatInputDiv.style = "display:block";
+                    $("#textMessage").focus();
                     return 0;
                 }
                 else {

@@ -100,7 +100,6 @@ def filterForReturnSolutionValues(records, solutionsRecord, solution):
 
             result.append({"displayData" : displayArray, "buttonURL" : URL, "description" : description})
 
-        print("RESULT : ", result)
         return Callback(True, 'Solution values have been filtered successfully!!', result)
     except Exception as exc:
         print("solutions_services.filterForReturnSolutionValues() ERROR: ", exc)
@@ -112,6 +111,7 @@ def getSolutions(content, keywords):
         result = []
         matches = ""
         originalString = dumps(content).split("SysKeys")[1]
+        if type(solutions) is not list: solutions = [solutions]
         for value in solutions:
             matches = loopThroughAllJSON(value, {"command":"get solutions", "value":keywords}, originalString, {})
             if matches:
@@ -125,7 +125,8 @@ def getDisplayTitlesOfRecords(content):
     try:
         solutions = next(iter(next(iter(next(iter(content.Content.values())).values())).values())) # GETS the first value of the dict which is the first value of a dict which is the first value of a dict
         result = []
-        for key, value in solutions[0].items():
+        if type(solutions) is list: solutions = solutions[0]
+        for key, value in solutions.items():
             result.append(key)
         return Callback(True, "Display Titles have been retrieved", result)
     except Exception as exc:
@@ -160,7 +161,7 @@ def actOnJSONItem(action, item, originalString, result):
             if type(item) is int:
                 try:
                     item = originalString.split('DBID": '+str(item)+', "@Desc": "')[1].split('"')[0]
-                except:
+                except Exception as e:
                     pass
             if type(item) is str:
                 item = item.lower()

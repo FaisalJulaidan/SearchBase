@@ -241,30 +241,26 @@ def getByID(id):
         db.session.rollback()
         return Callback(False, 'Could not retrieve solutions for ID: ' + str(id))
 
-    # finally:
-       # db.session.close()
 
-
-def update(solution: Solution, content):
+def updateByID(solutionID, content, type, name):
     try:
-        # Validate the keywords address using a regex. (k,k) correct (k) correct (,k) incorrect
-        # if len(keywords) > 0:
-        #     if not re.match("^([a-zA-Z]+|\\b,\\b)+$", keywords):
-        #         return Callback(False, "keyword doesn't follow the correct format ex. key1,key2...")
+        # Get result and check if None then raise exception
+        result = getByID(solutionID)
+        if not result.Success:
+            raise Exception("No record has been found")
 
-        # Update solution
-        solution.Content = replaceIDsWithDataRBD(content)
+        result.Data.Name = name
+        result.Data.Type = type
+        result.Data.Content = replaceIDsWithDataRBD(content)
 
         db.session.commit()
-        return Callback(True, 'Solution has been successfully edited.')
+
+        return Callback(True, 'Solutions file has been updated')
 
     except Exception as exc:
-        print(exc)
+        print("solutions_services.createUpdateJSONByAssistantID ERROR: ", exc)
         db.session.rollback()
-        return Callback(False, 'Sorry, Could not create the solution')
-
-    # finally:
-       # db.session.close()
+        return Callback(False, 'Could not update solutions file')
 
 
 def remove(solution: Solution) -> Callback:
@@ -311,19 +307,6 @@ def getAllByAssistantID(assistantID):
         db.session.rollback()
         return Callback(False, 'Could not retrieve solutions')
 
-    # finally:
-       # db.session.close()
-
-def getFirstByAssistantID(assistantID):
-    try:
-        # Get result and check if None then raise exception
-        result = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
-        if not result: raise Exception
-        return Callback(True, 'Solution records have been successfully retrieved', result)
-    except Exception as exc:
-        print("solutions_services.getFirstByAssistantID Error/Empty: ", exc)
-        db.session.rollback()
-        return Callback(False, 'Could not retrieve solution records')
 
 def deleteAllByAssistantID(assistantID):
 
@@ -406,41 +389,26 @@ def convertXMLtoJSON(xmlfile):
         return Callback(False, "An error occured while converting xml file")
 
 
-def getSolutionByAssistantID(assistantID):
-    try:
-        # Get result and check if None then raise exception
-        result = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
-        if not result:
-            raise Exception
-        return Callback(True, 'JSON has been successfully retrieved', result)
-
-    except Exception as exc:
-        print("solutions_services.getSolutionByAssistantID ERROR/EMPTY: ", exc)
-        db.session.rollback()
-        return Callback(False, 'Could not retrieve JSON / This might be there is no data in DB')
-
-
-def createUpdateJSONByAssistantID(assistantID, content, type, name):
-    try:
-        # Get result and check if None then raise exception
-        #db.session.query(Solution).filter(Solution.AssistantID == assistantID).delete()
-        result = getSolutionByAssistantID(assistantID)
-        if not result.Success:
-            createNew(assistantID, content, type, name)
-            return Callback(True, 'Solutions file has been added')
-
-        result.Data.Name = name
-        result.Data.Type = type
-        result.Data.Content = replaceIDsWithDataRBD(content)
-
-        db.session.commit()
-
-        return Callback(True, 'Solutions file has been updated')
-
-    except Exception as exc:
-        print("solutions_services.createUpdateJSONByAssistantID ERROR: ", exc)
-        db.session.rollback()
-        return Callback(False, 'Could not update solutions file')
+# def createUpdateJSONByAssistantID(assistantID, content, type, name):
+#     try:
+#         # Get result and check if None then raise exception
+#         result = getSolutionByAssistantID(assistantID)
+#         if not result.Success:
+#             createNew(assistantID, content, type, name)
+#             return Callback(True, 'Solutions file has been added')
+#
+#         result.Data.Name = name
+#         result.Data.Type = type
+#         result.Data.Content = replaceIDsWithDataRBD(content)
+#
+#         db.session.commit()
+#
+#         return Callback(True, 'Solutions file has been updated')
+#
+#     except Exception as exc:
+#         print("solutions_services.createUpdateJSONByAssistantID ERROR: ", exc)
+#         db.session.rollback()
+#         return Callback(False, 'Could not update solutions file')
 
 
 def saveDisplayTitles(assistantID, titles):

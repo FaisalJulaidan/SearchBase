@@ -159,11 +159,10 @@ def admin_save_solution_web_link(assistantID):
 
         return updateLinkAndRef_callback.Message
 
-@solutions_router.route("/admin/assistant/<assistantID>/requiredfilters", methods=['POST'])
-def admin_save_required_filters(assistantID):
+# @solutions_router.route("/admin/assistant/<assistantID>/requiredfilters", methods=['POST'])
+# def admin_save_required_filters(assistantID):
     
-    if request.method == "POST":
-
+    # if request.method == "POST":
 
 
 @solutions_router.route("/admin/assistant/<assistantID>/sendsolutionalerts", methods=['POST'])

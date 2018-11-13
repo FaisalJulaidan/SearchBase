@@ -584,7 +584,7 @@
                 .then((solutions) => {
                     solutions = JSON.parse(solutions);
                     console.log("1: ", solutions)
-                    displayReturnedSolutions(solutions.data.solutions)
+                    displayReturnedSolutions(solutions.data)
                 })
         }
 
@@ -676,9 +676,7 @@
                 console.log("Solutions retrieved successfully!");
                 var data = JSON.parse(res).data;
                 console.log("Data: ", data)
-                solutions = data["solutions"];
-                solutionsLinkRecord = data["solutionsLink"];
-                return solutions;
+                return data;
 
             }).fail(function (res) {
                 removeThinkingGif();
@@ -718,7 +716,7 @@
 
         function displayReturnedSolutions(solutions) {
             messageContainer = $(".messages ul");
-            console.log(solutions)
+            console.log("SOLUTIONS: ", solutions)
             // If there is no solutions in the database show this message.
             if (solutions == null) {
                 sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.");
@@ -726,29 +724,25 @@
                 sendAssistantMessage("Sorry, we couldn't find any solutions based on your input.");
 
             } else {
+                var appendString = undefined;
+                var displayData = undefined;
+                var tempData = undefined
 
                 for (var i = 0; i < solutions.length; i++) {
-                    var title = solutions[i]["data"]["@Title"];
-                    if(title === 0){ title= "-"; }
+                    appendString = "<li class=\"text-center\"> <center class='results'><div class='chatProducts'>"
 
-                    var term = solutions[i]["data"]["@Term"];
-                    if(term === 0){ term= "-"; }
+                    displayData = solutions[i]["displayData"];
 
-                    var location = solutions[i]["data"]["@Loc"];
-                    if(location === 0){ location= "-"; }
+                    for (var c = 0; c < displayData.length; c++) {
+                        tempData = displayData[c];
+                        if (tempData === 0 || tempData == null) { tempData = "-"; }
+                        appendString += "<label>" + tempData + "</label><br /><br />";
+                    }
 
-                    var createdOn = solutions[i]["data"]["@CreatedOn"];
-                    if (createdOn === 0) { createdOn = "-"; }
-
-                    var appendString = "<li class=\"text-center\"> <center class='results'><div class='chatProducts'><h5>"
-                        + title + "</h5><br><label>" + term + "</label><br><p>"
-                        + location + "</p><br><label>Created:<br>" + createdOn + "</label>"
-
-                    if (solutionsLinkRecord["Success"]){
-                        var URL = solutionsLinkRecord["webLink"] + String(solutions[i]["data"][solutionsLinkRecord["solutionsRef"]]);
-                        appendString += "<br><br><button onclick=\"openLink('" + URL +
-                         "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>Apply</span></button>"+
-                        "</div></center></li>"
+                    if (solutions[i]["buttonURL"] != null) {
+                        appendString += "<button onclick=\"openLink('" + solutions[i]["buttonURL"] +
+                            "')\" class='btn btn-primary chatProducts_button' style='vertical-align:middle'><span>Apply</span></button>" +
+                            "</div></center></li>"
                     }
 
                     messageContainer.append(appendString);
@@ -896,6 +890,7 @@
                 if (!validateUserInput(message, currentBlock.content.validation)) {
                     sendAssistantMessage("I am sorry but that was not in the format I think it should be...");
                     chatInputDiv.style = "display:block";
+                    $("#textMessage").focus();
                     return 0;
                 }
                 else {

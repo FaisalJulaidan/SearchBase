@@ -9,29 +9,27 @@ import random
 def getAnalytics(assistant, periodSpace: int, topSolustions: int):
     id = assistant.ID
     try:
-        result = {
-                  'popularSolutions': getPopularSolutions(id, topSolustions),
-                  'totalReturnedSolutions': getTotalReturnedSolutions(id),
-                  'timeSpentAvgOvertime': getTimeSpentAvgOvertime(id, periodSpace),
-                  'TotalQuestionsOverMonth':getTotalQuestionsOverMonth(id),
-                  'UsersOvertime': getUsersOvertime(id, periodSpace),
-                  'TotalSolutionsOverMonth':getTotalSolutionsOverMonth(id),
-                  'TotalUsers': getTotalUsers(id)}
         #result = {
+        #          'popularSolutions': getPopularSolutions(id, topSolustions),
+        #          'totalReturnedSolutions': getTotalReturnedSolutions(id),
+        #          'timeSpentAvgOvertime': getTimeSpentAvgOvertime(id, periodSpace),
         #          'TotalQuestionsOverMonth':getTotalQuestionsOverMonth(id),
         #          'UsersOvertime': getUsersOvertime(id, periodSpace),
         #          'TotalSolutionsOverMonth':getTotalSolutionsOverMonth(id),
         #          'TotalUsers': getTotalUsers(id)}
+        result = {
+                  'UsersOvertime': getUsersOvertime(id, periodSpace),
+                  'TotalUsers': getTotalUsers(id)}
 
 
         return Callback(True, 'Analytics processed successfully.', result)
     except Exception as e:
-        print("getPopularSolutions(id, topSolustions): ", getPopularSolutions(id, topSolustions))
-        print("getTotalReturnedSolutions(id): ", getTotalReturnedSolutions(id))
-        print("getTimeSpentAvgOvertime(id, periodSpace): ", getTimeSpentAvgOvertime(id, periodSpace))
-        print("getTotalQuestionsOverMonth(id): ", getTotalQuestionsOverMonth(id))
+        #print("getPopularSolutions(id, topSolustions): ", getPopularSolutions(id, topSolustions))
+        #print("getTotalReturnedSolutions(id): ", getTotalReturnedSolutions(id))
+        #print("getTimeSpentAvgOvertime(id, periodSpace): ", getTimeSpentAvgOvertime(id, periodSpace))
+        #print("getTotalQuestionsOverMonth(id): ", getTotalQuestionsOverMonth(id))
+        #print("getTotalSolutionsOverMonth(id): ", getTotalSolutionsOverMonth(id))
         print("getUsersOvertime(id, periodSpace): ", getUsersOvertime(id, periodSpace))
-        print("getTotalSolutionsOverMonth(id): ", getTotalSolutionsOverMonth(id))
         print("getTotalUsers(id): ", getTotalUsers(id))
         print(e)
         return Callback(False, 'Error while finding analytics')

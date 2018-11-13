@@ -12,7 +12,10 @@ def admin_solutions(assistantID):
         solutions_callback: Callback = solutions_services.getFirstByAssistantID(assistantID)
         if not solutions_callback.Success: return admin_services.render("admin/solutions.html", data="", id=assistantID)
 
-        return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID)
+        displayTitles_callback : Callback = solutions_services.getDisplayTitlesOfRecords(solutions_callback.Data)
+        if not displayTitles_callback.Success: return admin_services.render("admin/solutions.html", data=solutions_callback.Data, id=assistantID)
+
+        return admin_services.render("admin/solutions.html", data=solutions_callback.Data, displayTitles=displayTitles_callback.Data, id=assistantID)
 
 
 @solutions_router.route("/admin/solution/<solID>", methods=['PUT', 'DELETE'])
@@ -145,25 +148,59 @@ def admin_products_file_upload(assistantID):
         else:
             return "Please insure you have selected the right File Type option"
 
+@solutions_router.route("/admin/assistant/<assistantID>/savedisplaytitles", methods=['POST'])
+def admin_save_display_titles(assistantID):
+
+    if request.method == "POST":
+
+        titlesArray = {"titleValues" : [], "solutionDescription": ""}
+
+        for i in range(0, 50):
+            record = request.form.get("titleSelect"+str(i), default=None)
+            if not record: continue
+            print("record: ", record)
+            titlesArray["titleValues"].append(record.strip())
+
+        titlesArray["solutionDescription"] = request.form.get("description", default=None)
+        conditions_callback = solutions_services.saveDisplayTitles(assistantID, titlesArray)
+        return conditions_callback.Message
+
 @solutions_router.route("/admin/assistant/<assistantID>/savesolutionweblink", methods=['POST'])
 def admin_save_solution_web_link(assistantID):
 
     if request.method == "POST":
 
-        webLink = request.form.get("webLink", default=None).strip()
-        solutionsRef = request.form.get("solutionsRef", default=None).strip()
+        webLink = request.form.get("webLink", default=None)
+        solutionsRef = request.form.get("solutionsRef", default=None)
 
         if not webLink or not solutionsRef: return "Input was not retrieved correctly. Please try again"
+
+        webLink = webLink.strip()
+        solutionsRef = solutionsRef.strip()
 
         updateLinkAndRef_callback : Callback = solutions_services.updateSolutionsLinkAndRef(assistantID, webLink, solutionsRef)
 
         return updateLinkAndRef_callback.Message
 
-# @solutions_router.route("/admin/assistant/<assistantID>/requiredfilters", methods=['POST'])
-# def admin_save_required_filters(assistantID):
-    
-    # if request.method == "POST":
+@solutions_router.route("/admin/assistant/<assistantID>/requiredfilters", methods=['POST'])
+def admin_save_required_filters(assistantID):
 
+    if request.method == "POST":
+
+        conditionsArray = {"filterValues" : []}
+
+        for i in range(0, 50):
+            record = request.form.get("conditionInput"+str(i), default=None)
+            if not record: continue
+            print("record: ", record)
+            record = record.split(",")
+            record = [x.strip() for x in record if not x.strip() == ""]
+            conditionsArray["filterValues"].append(record)
+
+        conditionsArray["requiredConditionsNumber"] = request.form.get("conditionsNumberInput", default=0)
+
+        conditions_callback = solutions_services.saveRequiredFilters(assistantID, conditionsArray)
+        return conditions_callback.Message
 
 @solutions_router.route("/admin/assistant/<assistantID>/sendsolutionalerts", methods=['POST'])
 def admin_send_solution_alerts(assistantID):

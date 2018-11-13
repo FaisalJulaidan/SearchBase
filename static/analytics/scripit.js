@@ -18,12 +18,12 @@ function getAnalytics(){
 
         console.log("Analytics retrieved successfully!");
 
-        popularSolutions = res.data.popularSolutions;
-        totalReturnedSolutions = res.data.totalReturnedSolutions;
-        timeSpentAvgOvertime = res.data.timeSpentAvgOvertime;
-        totalQuestionsOverMonth = res.data.TotalQuestionsOverMonth.reverse();
-        totalSolutionsOverMonth = res.data.TotalSolutionsOverMonth.reverse();
-        console.log("res.data.usersOvertime: ", res.data.UsersOvertime);
+        //popularSolutions = res.data.popularSolutions;
+        //totalReturnedSolutions = res.data.totalReturnedSolutions;
+        //timeSpentAvgOvertime = res.data.timeSpentAvgOvertime;
+        //totalQuestionsOverMonth = res.data.TotalQuestionsOverMonth.reverse();
+        //totalSolutionsOverMonth = res.data.TotalSolutionsOverMonth.reverse();
+        //console.log("res.data.usersOvertime: ", res.data.UsersOvertime);
         usersOvertime = res.data.UsersOvertime.reverse();
         usersTotal = res.data.TotalUsers;
         //console.log(usersOvertime.reverse());

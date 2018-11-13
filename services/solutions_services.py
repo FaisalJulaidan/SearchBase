@@ -29,19 +29,21 @@ def getBasedOnKeywords(assistantID, keywords: list, solutionsRecord, max=999999)
         t0 = time.time()
         solution = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
         if not solution:
-            return Callback(True, "There are no solutions associated with this assistant", None)
+            return Callback(False, "There are no solutions associated with this assistant", None)
         t2 = time.time()
         print("Time to get JSON from DB: ", t2-t0)
 
-        result = getSolutions(solution.Content, keywords)
+        result = getSolutions(solution.Content, keywords) #get solutions by keywords
         t3 = time.time()
         print("Time to get solutions from JSON: ", t3-t2)
 
-        result = sorted(result, key=getSolutionsSortKey, reverse=True)
+        result = sorted(result, key=getSolutionsSortKey, reverse=True) #sort depending on score
 
-        result = result[0:max]
+        result = filterThroughConditions(solution, result) #filter for conditions set by the client
 
-        result = filterSolutionValues(result, solutionsRecord).Data
+        result = result[0:max] #get only number of top solutions defined by the client
+
+        result = filterForReturnSolutionValues(result, solutionsRecord, solution).Data #get only display values for chatbot and convert to chatbot to read format
 
         t5 = time.time()
 
@@ -52,26 +54,43 @@ def getBasedOnKeywords(assistantID, keywords: list, solutionsRecord, max=999999)
         print("solutions_services.getBasedOnKeywords() ERROR: ", exc)
         return Callback(False, 'Solutions could not be retrieved at this time')
 
-def filterSolutionValues(records, solutionsRecord):
+
+def filterThroughConditions(solution, records):
+    if not solution.RequiredFilters: return records
+
+    if int(solution.RequiredFilters["requiredConditionsNumber"]) == 0: return records
+
+    result = []
+    for record in records:
+        matches = 0
+        for conditions in solution.RequiredFilters["filterValues"]:
+            conditionsToMatch = len(conditions)
+            for condition in conditions:
+                for key,value in record["data"].items():
+                    if condition.lower() in str(value).lower():
+                        conditionsToMatch -= 1
+                        break
+            if conditionsToMatch == 0:
+                matches += 1
+        if matches >= int(solution.RequiredFilters["requiredConditionsNumber"]):
+            result.append(record)
+
+    return result
+
+
+def filterForReturnSolutionValues(records, solutionsRecord, solution):
     try:
+        if not solution.DisplayTitles: raise Exception("No information to display has been selected")
+
         result = []
         for record in records:
-            title = record["data"]["@Title"]
-            if title == 0 or title is None: title = "-"
+            displayArray = []
+            for title in solution.DisplayTitles["titleValues"]:
+                printData = record["data"][title]
+                if printData == 0 or printData is None: printData = "-" #could be also : continue to not print anything but may affect the structure of the solutions
+                displayArray.append(printData)
 
-
-            term = record["data"]["@Term"]
-            if term == 0 or term is None: term = "-"
-
-
-            location = record["data"]["@Loc"]
-            if location == 0 or location is None: locaton = "-"
-
-
-            createdOn = record["data"]["@CreatedOn"]
-            if createdOn == 0 or createdOn is None: createdOn = "-"
-
-            description = record["data"]["$"]
+            description = record["data"][solution.DisplayTitles["solutionDescription"]]
             if description == 0 or description is None: description = None
 
             URL = None
@@ -79,20 +98,21 @@ def filterSolutionValues(records, solutionsRecord):
                 if solutionsRecord.Data.WebLink or solutionsRecord.Data.IDReference:
                     URL = solutionsRecord.Data.WebLink + str(record["data"][solutionsRecord.Data.IDReference])
 
-            result.append({"displayData" : [title, term, location, createdOn], "buttonURL" : URL, "description" : description})
-            
+            result.append({"displayData" : displayArray, "buttonURL" : URL, "description" : description})
+
         return Callback(True, 'Solution values have been filtered successfully!!', result)
     except Exception as exc:
-        print("solutions_services.filterSolutionValues() ERROR: ", exc)
+        print("solutions_services.filterForReturnSolutionValues() ERROR: ", exc)
         return Callback(False, 'Solution values could not be filtered at this time')
 
 def getSolutions(content, keywords):
     try:
-        jobs = next(iter(next(iter(next(iter(content.values())).values())).values())) # GETS the first value of the dict which is the first value of a dict which is the first value of a dict
+        solutions = next(iter(next(iter(next(iter(content.values())).values())).values())) # GETS the first value of the dict which is the first value of a dict which is the first value of a dict
         result = []
         matches = ""
         originalString = dumps(content).split("SysKeys")[1]
-        for value in jobs:
+        if type(solutions) is not list: solutions = [solutions]
+        for value in solutions:
             matches = loopThroughAllJSON(value, {"command":"get solutions", "value":keywords}, originalString, {})
             if matches:
                 result.append({"data": value, "matches": matches})
@@ -101,18 +121,33 @@ def getSolutions(content, keywords):
         print("solutions_services.getSolutions ERROR: ", exc)
         return result
 
+def getDisplayTitlesOfRecords(content):
+    try:
+        solutions = next(iter(next(iter(next(iter(content.Content.values())).values())).values())) # GETS the first value of the dict which is the first value of a dict which is the first value of a dict
+        result = []
+        if type(solutions) is list: solutions = solutions[0]
+        for key, value in solutions.items():
+            result.append(key)
+        return Callback(True, "Display Titles have been retrieved", result)
+    except Exception as exc:
+        print("solutions_services.getDisplayTitlesOfRecords ERROR: ", exc)
+        return Callback(False, "Could not retrieve Display Titles")
+
 def loopThroughAllJSON(item, action, originalString="", result={}):
     try:
         if type(item) is dict or type(item) is MutableDict:
             for key,value in item.items():
                 result = actOnJSONItem(action, key, originalString, result)
                 loopThroughAllJSON(item[key], action, originalString, result)
+
         elif type(item) is list:
             for value in item:
                 result = actOnJSONItem(action, value, originalString, result)
                 loopThroughAllJSON(value, action, originalString, result)
+
         else:
             result = actOnJSONItem(action, item, originalString, result)
+
         return result
     except Exception as exc:
         print("solutions_services.loopThroughAllJSON ERROR: ", exc)
@@ -126,7 +161,7 @@ def actOnJSONItem(action, item, originalString, result):
             if type(item) is int:
                 try:
                     item = originalString.split('DBID": '+str(item)+', "@Desc": "')[1].split('"')[0]
-                except:
+                except Exception as e:
                     pass
             if type(item) is str:
                 item = item.lower()
@@ -302,11 +337,6 @@ def deleteAllByAssistantID(assistantID):
         db.session.rollback()
         return False
 
-    # finally:
-       # db.session.close()
-
-
-
 
 def bulkAdd(objects):
     try:
@@ -338,9 +368,6 @@ def countRecordsByAssistantID(assistantID):
         db.session.rollback()
         return 0
 
-    # finally:
-       # db.session.close()
-
 
 def deleteByAssitantID(assistantID, message):
     deleteOldData : bool = deleteAllByAssistantID(assistantID)
@@ -352,6 +379,7 @@ def addOldByAssitantID(assistantID, message, currentSolutions):
     addOldSolutions_callback : Callback = bulkAdd(currentSolutions)
     if not addOldSolutions_callback.Success:
         return helpers.redirectWithMessage("admin_solutions", message)
+
 
 def convertXMLtoJSON(xmlfile):
     try:
@@ -378,6 +406,7 @@ def convertXMLtoJSON(xmlfile):
         print("solutions_services.convertXMLtoJSON ERROR: ", exc)
         return Callback(False, "An error occured while converting xml file")
 
+
 def getSolutionByAssistantID(assistantID):
     try:
         # Get result and check if None then raise exception
@@ -390,6 +419,7 @@ def getSolutionByAssistantID(assistantID):
         print("solutions_services.getSolutionByAssistantID ERROR/EMPTY: ", exc)
         db.session.rollback()
         return Callback(False, 'Could not retrieve JSON / This might be there is no data in DB')
+
 
 def createUpdateJSONByAssistantID(assistantID, content, type):
     try:
@@ -412,11 +442,33 @@ def createUpdateJSONByAssistantID(assistantID, content, type):
         db.session.rollback()
         return Callback(False, 'Could not update solutions file')
 
+
+def saveDisplayTitles(assistantID, titles):
+    try:
+        solution_callback : Callback = getSolutionByAssistantID(assistantID)
+        if not solution_callback.Success: raise Exception("Error in retrieving current settings")
+
+        solution_callback.Data.DisplayTitles = titles
+
+        db.session.commit()
+
+        return Callback(True, 'Titles have been saved')
+
+    except Exception as exc:
+        print("solutions_services.saveRequiredFilters ERROR: ", exc)
+        db.session.rollback()
+        return Callback(False, 'Could not save titles')
+
+
+
 def saveRequiredFilters(assistantID, params):
     try:
         solution_callback : Callback = getSolutionByAssistantID(assistantID)
         if not solution_callback.Success: raise Exception("Error in retrieving current settings")
 
+        solution_callback.Data.RequiredFilters = params
+
+        db.session.commit()
 
         return Callback(True, 'Conditions have been saved')
 
@@ -424,6 +476,7 @@ def saveRequiredFilters(assistantID, params):
         print("solutions_services.saveRequiredFilters ERROR: ", exc)
         db.session.rollback()
         return Callback(False, 'Could not save conditions')
+
 
 def sendSolutionsAlerts(assistantID):
     try:
@@ -463,6 +516,7 @@ def sendSolutionsAlerts(assistantID):
         print("solutions_services.sendSolutionsAlerts ERROR: ", exc)
         return Callback(False, 'Could not send alerts at this time')
 
+
 def switchAutomaticSolutionAlerts(assistantID, setTo):
     try:
         result = getSolutionByAssistantID(assistantID)
@@ -478,6 +532,7 @@ def switchAutomaticSolutionAlerts(assistantID, setTo):
         print("solutions_services.switchAutomaticSolutionAlerts ERROR: ", exc)
         db.session.rollback()
         return Callback(False, 'Could not set automatic alerts at this time. Please insure you have a database connected or uploaded')
+
 
 def checkAutomaticSolutionAlerts(assistantID):
     try:

@@ -411,9 +411,9 @@ def convertXMLtoJSON(xmlfile):
 #         return Callback(False, 'Could not update solutions file')
 
 
-def saveDisplayTitles(assistantID, titles):
+def saveDisplayTitles(solutionID, titles):
     try:
-        solution_callback : Callback = getSolutionByAssistantID(assistantID)
+        solution_callback : Callback = getByID(solutionID)
         if not solution_callback.Success: raise Exception("Error in retrieving current settings")
 
         solution_callback.Data.DisplayTitles = titles

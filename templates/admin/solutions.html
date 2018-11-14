@@ -81,7 +81,7 @@
                                                     <div>
                                                         Action: <select class="form-control" id="existingFileSelector" name="existingFile">
                                                             <optgroup label="Connect a new Database">
-                                                                <option value="None">Upload Export File</option>
+                                                                <option value="UploadExportFile">Upload Export File</option>
                                                             </optgroup>
                                                             <optgroup id="existingFileSelectorUpdateGroup" label="Update existing one">
 
@@ -146,7 +146,7 @@
                                                             <div id="displayTitlesPasteDiv">
 
                                                             </div>
-                                                            <label style="cursor:pointer;" onclick="addTitle()">Add Information Line +</label><br />
+                                                            <label style="cursor:pointer;color:#6610f2;" onclick="addTitle()">Add Information Line +</label><br />
                                                             <div>
                                                                 <br />
                                                                 <label>Description:</label><br />
@@ -174,9 +174,9 @@
                                                                 For example: "@jobID" : C2143. You can also take your solution ID and use Ctrl + F on this page to find the<br />
                                                                 corresponding title in the Raw Data.<br />
                                                             </p>
-                                                            <input style="width:300px!important;" class="form-control" name="webLink" placeholder="http://mycoolwebsite.com/jobs/" {%if data.WebLink %}value="{{data.WebLink}}" {%endif%} />
+                                                            <input style="width:300px!important;" class="form-control" name="webLink" placeholder="http://mycoolwebsite.com/jobs/"/>
                                                             <br />
-                                                            <input style="width:300px!important;" class="form-control" name="solutionsRef" placeholder="@jobID" {%if data.IDReference %}value="{{data.IDReference}}" {%endif%} />
+                                                            <input style="width:300px!important;" class="form-control" name="solutionsRef" placeholder="@jobID"/>
                                                             <br />
                                                             <label class="btn btn-success" onclick="saveJobLink()">Save</label>
                                                             <p id="saveLinkMessage"></p>
@@ -191,15 +191,13 @@
                                                                 For example restrict it so only specific consultant or location's records are displayed to the user.<br />
                                                             </p>
                                                             <label>
-                                                                <input min="0" id="conditionsNumberInput" style="background-color:white;" name="conditionsNumberInput" \
-                                                                       {%if data.RequiredFilters %}value="{{data.RequiredFilters["requiredConditionsNumber"]}}" {%else%}value="0" {%endif%} \
-                                                                       type="number" /> Conditions must be met:
+                                                                <input min="0" id="conditionsNumberInput" style="background-color:white;" name="conditionsNumberInput" type="number" value="0" /> Conditions must be met:
                                                             </label>
                                                             <br />
                                                             <div id="conditionsDiv">
 
                                                             </div>
-                                                            <label style="cursor:pointer;" onclick="addCondition()">Add Condition +</label><br />
+                                                            <label style="cursor:pointer;color:#6610f2;" onclick="addCondition()">Add Condition +</label><br />
                                                             <label class="btn btn-success" onclick="saveConditions()">Save</label>
                                                             <p id="saveRequiredFiltersMessage"></p>
                                                         </form>
@@ -220,7 +218,7 @@
                                                                 <label class="checkboxContainer" style="margin-bottom: 5px;">
                                                                     On data update
 
-                                                                    <input id="automaticSolutionAlertsCheckbox" name="jobAlerts" value="jobAlerts" type="checkbox" {%if data.automaticSolutionAlerts%}checked{%endif%} onchange="changeAutoSolutionAlerts()" />
+                                                                    <input id="automaticSolutionAlertsCheckbox" name="jobAlerts" value="jobAlerts" type="checkbox" onchange="changeAutoSolutionAlerts()" />
 
                                                                     <span class="checkmark"></span>
                                                                 </label>
@@ -350,7 +348,7 @@
         let fileName = filePath[filePath.length - 1];
         fileName = fileName.split(".")[0];
         $('#fileDisplay').val(fileName + "_" + fullDate);
-        $("#existingFileSelector").val("None");
+        $("#existingFileSelector").val("UploadExportFile");
     };
 
     function collapsePanel(collapser) {
@@ -392,10 +390,24 @@
     }
 
     function displayCurrentSolutionTitlesForID(objectID){
+        deleteAllTitles();
         if(currentSolutionDB["DisplayTitles"].length > 0){
             for (var i = 0; i < currentSolutionDB["DisplayTitles"].length;i++){
                 $(objectID).append("<option value="+ currentSolutionDB["DisplayTitles"][i] + ">"+ currentSolutionDB["DisplayTitles"][i] + "</option>");
             }
+        }
+        var selectedTitles = currentSolutionDB["Solution"]["DisplayTitles"]["titleValues"];
+        console.log("currentSolutionDB: ", currentSolutionDB)
+        console.log("selectedTitles: ", selectedTitles)
+        if(selectedTitles.length != 0){
+            for(var i = 0; i < selectedTitles.length; i++){
+                addTitle();
+                $(".titleSelect").last().val(selectedTitles[i]);
+            }
+        }
+        console.log("solutionDescription: ", currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"])
+        if(currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"] != null){
+            $("#descriptionSelect").val(currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"]);
         }
     }
 
@@ -450,24 +462,6 @@
 
     //Display Titles
     var titleNumber = 0;
-    var titles = [];
-    var titleOptionString = "";
-
-    {%if displayTitles %}
-    {%for record in displayTitles %}
-    titles.push("{{record}}")
-    titleOptionString += "<option value='{{record}}'>{{record}}</option>"
-    {%endfor%}
-    {%endif%}
-
-    var selectsArrayForSelectingValue = undefined
-
-    {%if data.DisplayTitles %}
-    {%for record in data.DisplayTitles["titleValues"] %}
-    addTitle();
-    $(".titleSelect").last().val("{{record}}")
-    {% endfor %}
-    {% endif %}
 
     updateTitlesNames();
 
@@ -491,6 +485,12 @@
         updateTitlesNames();
     }
 
+    function deleteAllTitles(){
+        for (var i=0;i < titleNumber;i++){
+            deleteTitle("titleDiv0");
+        }
+    }
+
     function updateTitlesNames() {
         var array = document.getElementsByClassName("titleSelect");
         for (var i = 0; i < array.length;i++){
@@ -504,6 +504,7 @@
         var xhttp = new XMLHttpRequest();
         var msg = "";
         xhttp.open("POST", "/admin/assistant/{{ id }}/savedisplaytitles", true); // true is asynchronous
+        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhttp.onreadystatechange = function () {
             if (xhttp.readyState === 4) {
                 if (xhttp.status === 200) {
@@ -519,22 +520,11 @@
                 }
             }
         };
-        xhttp.send(formData);
+        xhttp.send(formData+"&solutionID="+currentSolutionDB["Solution"]["ID"]);
     }
 
     //Conditions
     var conditionsNumber = 0;
-
-    {%if data.RequiredFilters %}
-    {%for record in data.RequiredFilters["filterValues"]%}
-        var appendString = "\
-                <div id='conditionInput" + conditionsNumber + "' ><input class='form-control conditionInput' style='width:300px!important;display:inline-block;' type='text' class='conditionInput' name='conditionInput" + conditionsNumber + "' value='{{record|join(',')}}' /><i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteCondition(\"conditionInput" + conditionsNumber + "\")'></i>\
-                <br /><br /></div>";
-        conditionsNumber++;
-        $("#conditionsDiv").append(appendString);
-        updateConditionsMax();
-    {%endfor%}
-    {% endif %}
 
     updateConditionsMax();
     function addCondition() {
@@ -593,8 +583,6 @@
         // 1- if submit without adding file (done)
         // 2- submit with a wroung dataType (done)
         // 3- if there is backend response show it
-        console.log($("#existingFileSelector").val())
-        console.log($("#existingFileSelector").val() === "None")
         if ($("#productFile").val()) {
             if ($("#productFile").val().includes('json')
             ||  $("#productFile").val().includes('xml') ) {
@@ -613,6 +601,7 @@
                         else {
                             console.error(xhttp.statusText);
                             msg = "Error: " + xhttp.status;
+                            alertError(msg);
                         }
                     }
                 };
@@ -707,6 +696,6 @@
         return arrayRow;
     }
 
-    $("#solutionsDiv").append("{{data.Content}}");
+    $("#solutionsDiv").append(); //TODO
 </script>
 {% endblock %}-->

@@ -6,6 +6,7 @@ from datetime import datetime
 import enum
 import json
 from config import BaseConfig
+from flask import current_app
 
 from sqlalchemy_utils import EncryptedType, PasswordType, force_auto_coercion
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
@@ -13,11 +14,9 @@ from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
 
-
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
 # force_auto_coercion()
-
 
 
 # Activate Foreign Keys

@@ -1,5 +1,6 @@
 from models import db, Company, Assistant, Callback
-
+from utilities import helpers
+from flask import request
 
 def getByID(id) -> Callback:
     try:
@@ -11,9 +12,29 @@ def getByID(id) -> Callback:
     except Exception as exc:
         print(exc)
         db.session.rollback()
-        return Callback(False, 'Could not get the assistant by id.')
+        return Callback(False, 'Assistant not found.')
     # finally:
        # db.session.close()
+
+
+def getAssistantByHashID(hashID):
+
+    assistantID = helpers.decrypt_id(hashID)
+    # If was decrypted successfully
+    if len(assistantID) == 0:
+        return Callback(False, "Assistant not found.", None)
+
+    # Get the assistant and check if it is there
+    assistant_cb = getByID(assistantID[0])
+    if not assistant_cb.Success:
+        return assistant_cb
+
+    # check if its deactivated excluding on test page. The test page is connect.html
+    requestHeader = str(request.headers.get("Referer"))
+    if not assistant_cb.Data.Active and ("connect" not in requestHeader or "/admin/assistant/" not in requestHeader):
+        return Callback(False, "Assistant not active.", None)
+
+    return assistant_cb
 
 
 def getByName(nickname) -> Callback:

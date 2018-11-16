@@ -181,7 +181,7 @@ if os.environ['FLASK_ENV'] == 'production':
         db.create_all()
         seed()
 
-    # Run the app server
+    # Run the migration if in .env, migration = yes
     if os.environ['DB_MIGRATION'] == 'yes':
         print('Database migration mode...')
         manager.run()
@@ -195,6 +195,8 @@ elif os.environ['FLASK_ENV'] == 'development':
     # Server Setup
     print("Use Encryption:", app.config['USE_ENCRYPTION'])
     print("Secret DB Key:", app.config['SECRET_KEY_DB'])
+    config.BaseConfig.USE_ENCRYPTION = False
+
     db.init_app(app)
     mail.init_app(app)
     app.app_context().push()

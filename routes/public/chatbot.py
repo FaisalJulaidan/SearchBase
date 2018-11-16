@@ -11,28 +11,6 @@ from utilities.helpers import gzipped
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
 
-# Two functions to get assistant via id and hashids to avoid duplicate code in every route function
-def getAssistantByHashID(hashID):
-    assistantID = helpers.decrypt_id(hashID)
-    if len(assistantID) == 0:
-        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
-
-    assistant = getAssistant(assistantID[0])
-
-    #check if its deactivated excluding on test page
-    requestHeader = str(request.headers.get("Referer"))
-    if not assistant.Active and (("connect" not in requestHeader or "/admin/assistant/" not in requestHeader) and ("chatbottemplate_production" not in requestHeader)):
-        return helpers.jsonResponse(False, 404, "Assistant is not active.", None)
-
-    return assistant
-
-
-def getAssistant(id):
-    callback: Callback = assistant_services.getByID(id)
-    if not callback.Success:
-        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
-    return callback.Data
-
 
 @chatbot_router.route("/test", methods=['GET'])
 def t():
@@ -56,11 +34,14 @@ def test_chatbot_page2(assistantID):
 def chatbot(assistantIDAsHash):
 
     # Found the assistant using the hashid and not id
-    assistant: Assistant = getAssistantByHashID(assistantIDAsHash)
+    assistant_callback: Callback = assistant_services.getAssistantByHashID(assistantIDAsHash)
+    if not assistant_callback.Success:
+        return helpers.jsonResponse(False, 404, assistant_callback.Message)
 
     if request.method == "GET":
         # Get blocks for the chatbot to use
-        data: dict = bot_services.getChatbot(assistant)
+        data: dict = bot_services.getChatbot(assistant_callback.Data)
+
         return helpers.jsonResponse(True, 200, "No Message", data)
 
     # Process sent data coming from the chatbot
@@ -68,7 +49,7 @@ def chatbot(assistantIDAsHash):
 
         # Chatbot collected information
         data = request.get_json(silent=True)
-        ch_callback: Callback = chatbot_services.processData(assistant, data)
+        ch_callback: Callback = chatbot_services.processData(assistant_callback.Data, data)
 
         if not ch_callback.Success:
             return helpers.jsonResponse(False, 400, ch_callback.Message, ch_callback.Data)
@@ -80,7 +61,9 @@ def chatbot(assistantIDAsHash):
 def getSolutions_forChatbot(assistantIDAsHash):
 
     # Found the assistant using the hashid and not id
-    assistant: Assistant = getAssistantByHashID(assistantIDAsHash)
+    assistant_callback: Callback = assistant_services.getAssistantByHashID(assistantIDAsHash)
+    if not assistant_callback.Success:
+        return helpers.jsonResponse(False, 404, assistant_callback.Message)
 
     if request.method == "POST":
         # chatbot collected information
@@ -89,11 +72,12 @@ def getSolutions_forChatbot(assistantIDAsHash):
 
         # If showTop is 0 then skip below return nothing and don't even call solutions_services
         if data['showTop'] > 0:
-            getSolutionRecord_callback: Callback = solutions_services.getSolutionByAssistantID(assistant.ID)
+            getSolutionRecord_callback: Callback = solutions_services.getSolutionByAssistantID(assistant_callback.Data.ID)
             if not getSolutionRecord_callback.Success:
                 return helpers.jsonResponse(False, 200, getSolutionRecord_callback.Message)
 
-            s_callback = solutions_services.getBasedOnKeywords(assistantID=assistant.ID, keywords=data['keywords'], solutionsRecord=getSolutionRecord_callback, max=data['showTop'])
+            s_callback = solutions_services.getBasedOnKeywords(assistantID=assistant_callback.Data.ID, keywords=data['keywords'],
+                                                               solutionsRecord=getSolutionRecord_callback, max=data['showTop'])
             if not s_callback.Success:
                 return helpers.jsonResponse(False, 400, s_callback.Message)
 
@@ -111,10 +95,12 @@ def assistant_userdownloads(path):
 def get_pop_settings(assistantIDAsHash):
 
     # Found the assistant using the hashid and not id
-    assistant: Assistant = getAssistantByHashID(assistantIDAsHash)
+    assistant_callback: Callback = assistant_services.getAssistantByHashID(assistantIDAsHash)
+    if not assistant_callback.Success:
+        return helpers.jsonResponse(False, 404, assistant_callback.Message)
 
     if request.method == "GET":
-        data = {"SecondsUntilPopUp": assistant.SecondsUntilPopup, "TopBarText": assistant.TopBarText}
+        data = {"SecondsUntilPopUp": assistant_callback.Data.SecondsUntilPopup, "TopBarText": assistant_callback.Data.TopBarText}
         return helpers.jsonResponse(True, 200, "Pop up settings retrieved", data)
 
 

@@ -4,9 +4,7 @@ from utilities import json_utils, helpers
 from sqlalchemy.sql import exists, func
 from os.path import join, dirname
 import json
-from sqlalchemy.exc import IntegrityError as sqlalchemyIE
-from sqlite3 import IntegrityError as sqlite3IE
-from pymysql import IntegrityError as pymysqlIE
+
 
 
 from models import db, Callback, ValidationType, Assistant, Block, BlockType, BlockAction, Plan
@@ -83,8 +81,12 @@ def genBotViaTemplate(assistant: Assistant, tempName: str):
 
 # Get the chatbot for the public to use
 def getChatbot(assistant: Assistant) -> dict:
-    return {'assistant': {'id': helpers.encrypt_id(assistant.ID), 'name': assistant.Name, 'message': assistant.Message,
-                          'secondsUntilPopup': assistant.SecondsUntilPopup, 'active': assistant.Active},
+    return {'assistant': {'id': helpers.encrypt_id(assistant.ID),
+                          'name': assistant.Name,
+                          'message': assistant.Message,
+                          'secondsUntilPopup': assistant.SecondsUntilPopup,
+                          'topBarText': assistant.TopBarText,
+                          'active': assistant.Active},
             'blocks': getBlocks(assistant)}
 
 

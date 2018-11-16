@@ -72,10 +72,9 @@ def sendSolutionAlert(record, solutions, solutionsLink):
     try:
         targetEmail = record["email"]
         userData = record["record"]
-        solutionsRecords = solutions
 
         send_email((targetEmail), 'You have new job matches',
-               'emails/solution_alert.html', userData = userData, solutions=solutionsRecords, solutionsLink=solutionsLink)
+               'emails/solution_alert.html', userData = userData, solutions=solutions, solutionsLink=solutionsLink)
 
         return Callback(True, 'Email sent is on its way to ' + targetEmail)
 

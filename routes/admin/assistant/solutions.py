@@ -59,10 +59,10 @@ def admin_products_file_upload(assistantID):
 
                 saveJson_callback : Callback = solutions_services.updateByID(int(solutionSelect), jsonstr_callback.Data, fileType, fileName)
                 if saveJson_callback.Success:
-                    checkForAlerts_callback : Callback = solutions_services.checkAutomaticSolutionAlerts(assistantID)
+                    checkForAlerts_callback : Callback = solutions_services.checkAutomaticSolutionAlerts(int(solutionSelect))
                     if checkForAlerts_callback.Success:
                         if checkForAlerts_callback.Data:
-                            sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(assistantID)
+                            sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(int(solutionSelect))
                             return saveJson_callback.Message + ". " + sendAlerts_callback.Message
             else:
                 return "Please insure you have selected the right File Type option"
@@ -123,17 +123,17 @@ def admin_save_required_filters(assistantID, solutionID):
         conditions_callback = solutions_services.saveRequiredFilters(solutionID, conditionsArray)
         return conditions_callback.Message
 
-@solutions_router.route("/admin/assistant/<assistantID>/sendsolutionalerts", methods=['POST'])
-def admin_send_solution_alerts(assistantID):
+@solutions_router.route("/admin/assistant/<assistantID>/sendsolutionalerts/<solutionID>", methods=['POST'])
+def admin_send_solution_alerts(assistantID, solutionID):
 
     if request.method == "POST":
 
-        sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(assistantID)
+        sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(assistantID, solutionID)
 
         return sendAlerts_callback.Message
 
-@solutions_router.route("/admin/assistant/<assistantID>/automaticsolutionalerts/<setTo>", methods=['POST'])
-def admin_set_automatic_solution_alert(assistantID, setTo):
+@solutions_router.route("/admin/assistant/<assistantID>/automaticsolutionalerts/<solutionID>/<setTo>", methods=['POST'])
+def admin_set_automatic_solution_alert(assistantID, solutionID, setTo):
 
     if request.method == "POST":
 
@@ -142,6 +142,6 @@ def admin_set_automatic_solution_alert(assistantID, setTo):
         else:
             setTo = False
 
-        setAutomaticSolutionAlerts_callback : Callback = solutions_services.switchAutomaticSolutionAlerts(assistantID, setTo)
+        setAutomaticSolutionAlerts_callback : Callback = solutions_services.switchAutomaticSolutionAlerts(solutionID, setTo)
 
         return setAutomaticSolutionAlerts_callback.Message

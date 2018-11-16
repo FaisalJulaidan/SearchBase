@@ -390,28 +390,6 @@ def convertXMLtoJSON(xmlfile):
         return Callback(False, "An error occured while converting xml file")
 
 
-# def createUpdateJSONByAssistantID(assistantID, content, type, name):
-#     try:
-#         # Get result and check if None then raise exception
-#         result = getSolutionByAssistantID(assistantID)
-#         if not result.Success:
-#             createNew(assistantID, content, type, name)
-#             return Callback(True, 'Solutions file has been added')
-#
-#         result.Data.Name = name
-#         result.Data.Type = type
-#         result.Data.Content = replaceIDsWithDataRBD(content)
-#
-#         db.session.commit()
-#
-#         return Callback(True, 'Solutions file has been updated')
-#
-#     except Exception as exc:
-#         print("solutions_services.createUpdateJSONByAssistantID ERROR: ", exc)
-#         db.session.rollback()
-#         return Callback(False, 'Could not update solutions file')
-
-
 def saveDisplayTitles(solutionID, titles):
     try:
         solution_callback : Callback = getByID(solutionID)
@@ -446,7 +424,7 @@ def saveRequiredFilters(solutionID, params):
         return Callback(False, 'Could not save conditions')
 
 
-def sendSolutionsAlerts(assistantID):
+def sendSolutionsAlerts(assistantID, solutionID):
     try:
         userInput_callback : Callback = userInput_services.getByAssistantID(assistantID)
         if not userInput_callback.Success: raise Exception("Error in retrieving user input")
@@ -457,7 +435,7 @@ def sendSolutionsAlerts(assistantID):
         errorsNumber = 0
 
 
-        getSolutionRecord_callback : Callback = getSolutionByAssistantID(assistantID)
+        getSolutionRecord_callback : Callback = getByID(solutionID)
         if not getSolutionRecord_callback.Success:
             solutionsLink = {"Success" : False}
         elif not getSolutionRecord_callback.Data.WebLink or not getSolutionRecord_callback.Data.IDReference:
@@ -469,7 +447,8 @@ def sendSolutionsAlerts(assistantID):
             keywords = []
             for inputs in record["record"]:
                 keywords += inputs['keywords']
-            solutions_callback : Callback = getBasedOnKeywords(assistantID, keywords, 5)
+            solutions_callback : Callback = getBasedOnKeywords(assistantID=assistantID, keywords=keywords,
+                                                  solutionsRecord=solutions_callback, max=5)
             if not solutions_callback.Success: raise Exception("Error in getting solutions")
             if not solutions_callback.Data: continue
 
@@ -485,9 +464,9 @@ def sendSolutionsAlerts(assistantID):
         return Callback(False, 'Could not send alerts at this time')
 
 
-def switchAutomaticSolutionAlerts(assistantID, setTo):
+def switchAutomaticSolutionAlerts(solutionID, setTo):
     try:
-        result = getSolutionByAssistantID(assistantID)
+        result = getByID(solutionID)
         if not result.Success: raise Exception("Could not find alerts record")
 
         result.Data.automaticSolutionAlerts = setTo
@@ -502,9 +481,9 @@ def switchAutomaticSolutionAlerts(assistantID, setTo):
         return Callback(False, 'Could not set automatic alerts at this time. Please insure you have a database connected or uploaded')
 
 
-def checkAutomaticSolutionAlerts(assistantID):
+def checkAutomaticSolutionAlerts(solutionID):
     try:
-        result = getSolutionByAssistantID(assistantID)
+        result = getByID(solutionID)
         if not result.Success: raise Exception("Could not find alerts record")
 
         return Callback(True, 'Automatic alerts have been retrieved.', result.Data.automaticSolutionAlerts)

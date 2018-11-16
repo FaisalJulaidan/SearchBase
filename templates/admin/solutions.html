@@ -722,7 +722,7 @@
 
     function sendSolutionAlerts() {
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/admin/assistant/{{ id }}/sendsolutionalerts", true); // true is asynchronous
+        xhttp.open("POST", "/admin/assistant/{{ id }}/sendsolutionalerts/"+currentSolutionDB["Solution"]["ID"], true); // true is asynchronous
         xhttp.onreadystatechange = function () {
             if (xhttp.readyState === 4) {
                 if (xhttp.status === 200) {

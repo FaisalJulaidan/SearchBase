@@ -125,7 +125,8 @@ def getDisplayTitlesOfRecords(content):
     try:
         solutions = next(iter(next(iter(next(iter(content.Content.values())).values())).values())) # GETS the first value of the dict which is the first value of a dict which is the first value of a dict
         result = []
-        for key, value in solutions[0].items():
+        if type(solutions) is list: solutions = solutions[0]
+        for key, value in solutions.items():
             result.append(key)
         return Callback(True, "Display Titles have been retrieved", result)
     except Exception as exc:
@@ -415,7 +416,6 @@ def saveDisplayTitles(solutionID, titles):
     try:
         solution_callback : Callback = getByID(solutionID)
         if not solution_callback.Success: raise Exception("Error in retrieving current settings")
-
         solution_callback.Data.DisplayTitles = titles
 
         db.session.commit()
@@ -429,9 +429,9 @@ def saveDisplayTitles(solutionID, titles):
 
 
 
-def saveRequiredFilters(assistantID, params):
+def saveRequiredFilters(solutionID, params):
     try:
-        solution_callback : Callback = getSolutionByAssistantID(assistantID)
+        solution_callback : Callback = getByID(solutionID)
         if not solution_callback.Success: raise Exception("Error in retrieving current settings")
 
         solution_callback.Data.RequiredFilters = params
@@ -514,9 +514,9 @@ def checkAutomaticSolutionAlerts(assistantID):
         return Callback(False, 'Could not retrieve automatic alerts at this time')
 
 
-def updateSolutionsLinkAndRef(assistantID, webLink, solutionsRef):
+def updateSolutionsLinkAndRef(solutionID, webLink, solutionsRef):
     try:
-        result = getSolutionByAssistantID(assistantID)
+        result = getByID(solutionID)
         if not result.Success: raise Exception("Could not find alerts record")
 
         result.Data.WebLink = webLink

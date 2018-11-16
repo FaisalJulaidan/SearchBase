@@ -24,10 +24,11 @@ def admin_solutions_data(assistantID):
 
         for solution in solutions_callback.Data:
             displayTitles_callback : Callback = solutions_services.getDisplayTitlesOfRecords(solution)
-            if not displayTitles_callback.Success: returnData.append({"Solution" : admin_services.convertForJinja(solution, Solution).Data[0], "DisplayTitles": None})
+            if not displayTitles_callback.Success:
+                returnData.append({"Solution" : admin_services.convertForJinja(solution, Solution).Data[0], "DisplayTitles": None})
+                continue
             returnData.append({"Solution" : admin_services.convertForJinja(solution, Solution).Data[0], "DisplayTitles": displayTitles_callback.Data})
 
-        print("returnData: ", returnData)
         return helpers.jsonResponse(True, 200, "Solutions have been retrieved", returnData)
 
 
@@ -70,13 +71,12 @@ def admin_products_file_upload(assistantID):
 
         return saveJson_callback.Message
 
-@solutions_router.route("/admin/assistant/<assistantID>/savedisplaytitles", methods=['POST'])
-def admin_save_display_titles(assistantID):
+@solutions_router.route("/admin/assistant/<assistantID>/savedisplaytitles/<solutionID>", methods=['POST'])
+def admin_save_display_titles(assistantID, solutionID):
 
     if request.method == "POST":
 
         titlesArray = {"titleValues" : [], "solutionDescription": ""}
-        solutionID = request.form.get("solutionID", default=None)
         for i in range(0, 50):
             record = request.form.get("titleSelect"+str(i), default=None)
             if not record: continue
@@ -86,8 +86,8 @@ def admin_save_display_titles(assistantID):
         conditions_callback = solutions_services.saveDisplayTitles(solutionID, titlesArray)
         return conditions_callback.Message
 
-@solutions_router.route("/admin/assistant/<assistantID>/savesolutionweblink", methods=['POST'])
-def admin_save_solution_web_link(assistantID):
+@solutions_router.route("/admin/assistant/<assistantID>/savesolutionweblink/<solutionID>", methods=['POST'])
+def admin_save_solution_web_link(assistantID, solutionID):
 
     if request.method == "POST":
 
@@ -99,12 +99,12 @@ def admin_save_solution_web_link(assistantID):
         webLink = webLink.strip()
         solutionsRef = solutionsRef.strip()
 
-        updateLinkAndRef_callback : Callback = solutions_services.updateSolutionsLinkAndRef(assistantID, webLink, solutionsRef)
+        updateLinkAndRef_callback : Callback = solutions_services.updateSolutionsLinkAndRef(solutionID, webLink, solutionsRef)
 
         return updateLinkAndRef_callback.Message
 
-@solutions_router.route("/admin/assistant/<assistantID>/requiredfilters", methods=['POST'])
-def admin_save_required_filters(assistantID):
+@solutions_router.route("/admin/assistant/<assistantID>/requiredfilters/<solutionID>", methods=['POST'])
+def admin_save_required_filters(assistantID, solutionID):
 
     if request.method == "POST":
 
@@ -120,7 +120,7 @@ def admin_save_required_filters(assistantID):
 
         conditionsArray["requiredConditionsNumber"] = request.form.get("conditionsNumberInput", default=0)
 
-        conditions_callback = solutions_services.saveRequiredFilters(assistantID, conditionsArray)
+        conditions_callback = solutions_services.saveRequiredFilters(solutionID, conditionsArray)
         return conditions_callback.Message
 
 @solutions_router.route("/admin/assistant/<assistantID>/sendsolutionalerts", methods=['POST'])

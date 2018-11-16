@@ -162,23 +162,23 @@
                                                         <br />
 
                                                         <form id="solutionLinkForm" name="solutionLinkForm">
-                                                            <h3>Job Links<b>*</b></h3>
+                                                            <h3>Solution Links<b>*</b></h3>
                                                             <p>
                                                                 In order to be able to direct users to your solutions at your home website we will need some input from you.<br />
                                                                 We would need the page part that holds all the solutions and then the solution reference. For example that<br />
-                                                                can be http://mycoolwebsite.com/jobs/*jobID* . To create the bridge between us we would need that information<br />
+                                                                can be http://mycoolwebsite.com/jobs/*JobID* . To create the bridge between us we would need that information<br />
                                                                 in the bellow text inputs.
                                                                 <br /><b>To do that just contact us and we will find them for you</b>.<br />
                                                                 Alternatively you can try finding them on your own. To do that please provide us with the link (ex. "http://mycoolwebsite.com/jobs/")<br />
-                                                                and then the reference to the jobID which you can find in your upload file(add @ in front of it) or Raw Data bellow.<br />
-                                                                For example: "@jobID" : C2143. You can also take your solution ID and use Ctrl + F on this page to find the<br />
+                                                                and then the reference to the JobID which you can find in your upload file(add @ in front of it) or Raw Data bellow.<br />
+                                                                For example: "@JobDbID" : C2143. You can also take your solution ID and use Ctrl + F on this page to find the<br />
                                                                 corresponding title in the Raw Data.<br />
                                                             </p>
-                                                            <input style="width:300px!important;" class="form-control" name="webLink" placeholder="http://mycoolwebsite.com/jobs/"/>
+                                                            <input style="width:300px!important;" class="form-control" name="webLink" id="webLink" placeholder="http://mycoolwebsite.com/Solutions/"/>
                                                             <br />
-                                                            <input style="width:300px!important;" class="form-control" name="solutionsRef" placeholder="@jobID"/>
+                                                            <input style="width:300px!important;" class="form-control" name="solutionsRef" id="solutionsRef" placeholder="@SolutionID"/>
                                                             <br />
-                                                            <label class="btn btn-success" onclick="saveJobLink()">Save</label>
+                                                            <label class="btn btn-success" onclick="saveSolutionLink()">Save</label>
                                                             <p id="saveLinkMessage"></p>
                                                         </form>
 
@@ -204,21 +204,21 @@
 
                                                         <br />
 
-                                                        <div id="jobAlertsDiv">
-                                                            <h3>Job Alerts</h3>
+                                                        <div id="SolutionAlertsDiv">
+                                                            <h3>Solution Alerts</h3>
                                                             <p>
-                                                                You can send emails to your clients when a new job suited for them has been added to your records.<br />
+                                                                You can send emails to your clients when a new Solution suited for them has been added to your records.<br />
                                                                 This can be done manually by clicking the button bellow or by ticking the box which will check<br />
                                                                 and send them every time you update your data.
                                                             </p>
-                                                            <label class="btn btn-success" onclick="sendSolutionAlerts()">Send Jobs</label>
+                                                            <label class="btn btn-success" onclick="sendSolutionAlerts()">Send Solutions</label>
                                                             <p id="sendSolutionsMessage"></p>
                                                             <h4>Send Automatically</h4>
                                                             <div class="input-group" style="margin-bottom: 5px;">
                                                                 <label class="checkboxContainer" style="margin-bottom: 5px;">
                                                                     On data update
 
-                                                                    <input id="automaticSolutionAlertsCheckbox" name="jobAlerts" value="jobAlerts" type="checkbox" onchange="changeAutoSolutionAlerts()" />
+                                                                    <input id="automaticSolutionAlertsCheckbox" name="SolutionAlerts" value="SolutionAlerts" type="checkbox" onchange="changeAutoSolutionAlerts()" />
 
                                                                     <span class="checkmark"></span>
                                                                 </label>
@@ -386,26 +386,40 @@
     function changeSelectedDB(orderID){
         currentSolutionDB = solutionsData[orderID];
 
+        deleteAllTitles();
+
         displayCurrentSolutionTitlesForID("#descriptionSelect");
+
+        updatePageDisplayTitleData();
+
+        displayCurrentSolutionLink();
+
+        deleteAllConditions();
+
+        displayCurrentSolutionConditions();
     }
 
     function displayCurrentSolutionTitlesForID(objectID){
-        deleteAllTitles();
+        $(objectID).empty();
         if(currentSolutionDB["DisplayTitles"].length > 0){
             for (var i = 0; i < currentSolutionDB["DisplayTitles"].length;i++){
                 $(objectID).append("<option value="+ currentSolutionDB["DisplayTitles"][i] + ">"+ currentSolutionDB["DisplayTitles"][i] + "</option>");
             }
         }
-        var selectedTitles = currentSolutionDB["Solution"]["DisplayTitles"]["titleValues"];
-        console.log("currentSolutionDB: ", currentSolutionDB)
-        console.log("selectedTitles: ", selectedTitles)
+    }
+
+    function updatePageDisplayTitleData(){
+        var selectedTitlesTemp = currentSolutionDB["Solution"]["DisplayTitles"]
+        if(selectedTitlesTemp == null){ return 0; }
+        var selectedTitles = selectedTitlesTemp["titleValues"];
+
         if(selectedTitles.length != 0){
             for(var i = 0; i < selectedTitles.length; i++){
                 addTitle();
                 $(".titleSelect").last().val(selectedTitles[i]);
             }
         }
-        console.log("solutionDescription: ", currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"])
+
         if(currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"] != null){
             $("#descriptionSelect").val(currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"]);
         }
@@ -416,10 +430,7 @@
         type: "GET"
     }).done(function (res) {
 
-        console.log("Solutions retrieved successfully!");
         solutionsData = JSON.parse(res).data;
-
-        console.log("DATA : ", solutionsData)
 
         if (solutionsData.length == 0) {
             document.getElementById("dbDependentMessage").style = "display:inline-block;"
@@ -432,6 +443,7 @@
             //collapsePanel($("#uploadDatabasePanel .collapse-link"));
         }
 
+        console.log("DEBUG: ", solutionsData)
 
         for (var i = 0; i < solutionsData.length; i++) {
 
@@ -441,15 +453,14 @@
             //Set Solution Navigation Titles
             if (i == 0) {
                 $("#solutionsNavTab").append('<li style="cursor:pointer!important;" role="presentation" class="active" >\
-                    <a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true" >' + solutionsData[i]["Solution"]["Name"] + '</a >\
+                    <a href="#tab_content1" onclick="setTimeout(function(){changeSelectedDB('+i+');}, 130)" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true" >' + solutionsData[i]["Solution"]["Name"] + '</a >\
                     </li > ')
             } else {
                 $("#solutionsNavTab").append('\
                     <li style="cursor:pointer!important;" role="presentation" class="" >\
-                    <a href="#tab_content1" role="tab" data-toggle="tab" aria-expanded="false">' + solutionsData[i]["Solution"]["Name"] + '</a>\
+                    <a href="#tab_content1" onclick="setTimeout(function(){changeSelectedDB('+i+');}, 130)" role="tab" data-toggle="tab" aria-expanded="false">' + solutionsData[i]["Solution"]["Name"] + '</a>\
                     </li >')
             }
-
                 
         }
         changeSelectedDB(0);
@@ -487,14 +498,16 @@
 
     function deleteAllTitles(){
         for (var i=0;i < titleNumber;i++){
-            deleteTitle("titleDiv0");
+            $("#titleDiv" + i).remove();
         }
+        titleNumber = 0;
     }
 
     function updateTitlesNames() {
         var array = document.getElementsByClassName("titleSelect");
         for (var i = 0; i < array.length;i++){
             array[i].name = "titleSelect" + i;
+            array[i].id = "titleSelect" + i;
         }
     }
 
@@ -503,12 +516,12 @@
         formData = new FormData(form);
         var xhttp = new XMLHttpRequest();
         var msg = "";
-        xhttp.open("POST", "/admin/assistant/{{ id }}/savedisplaytitles", true); // true is asynchronous
-        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhttp.open("POST", "/admin/assistant/{{ id }}/savedisplaytitles/"+currentSolutionDB["Solution"]["ID"], true); // true is asynchronous
         xhttp.onreadystatechange = function () {
             if (xhttp.readyState === 4) {
                 if (xhttp.status === 200) {
                     msg = xhttp.responseText;
+                    saveTitlesToLocalSolutions();
                     $("#saveDisplayTitlesMessage").text(msg);
                     setTimeout(function () { $("#saveDisplayTitlesMessage").text("") }, 2000);
                 }
@@ -519,17 +532,44 @@
                     setTimeout(function () { $("#saveDisplayTitlesMessage").text("") }, 2000);
                 }
             }
-        };
-        xhttp.send(formData+"&solutionID="+currentSolutionDB["Solution"]["ID"]);
+        }
+        xhttp.send(formData);
+    }
+
+    function saveTitlesToLocalSolutions(){
+        var currentTitles = {"titleValues" : [], "solutionDescription": ""};
+        for (var i=1;i <= titleNumber;i++){
+            currentTitles["titleValues"].push($("#titleSelect" + (i-1)).val());
+        }
+        currentTitles["solutionDescription"] = $("#descriptionSelect").val();
+        currentSolutionDB["Solution"]["DisplayTitles"] = currentTitles;
+        for (var i = 0; i < solutionsData.length; i++) {
+            if(solutionsData[i]["Solution"]["ID"] === currentSolutionDB["Solution"]["ID"]){
+                solutionsData[i]["Solution"]["DisplayTitles"] = currentTitles;
+            }
+        }
     }
 
     //Conditions
     var conditionsNumber = 0;
 
+    function displayCurrentSolutionConditions(){
+        var requiredFilters = currentSolutionDB["Solution"]["RequiredFilters"];
+        if (requiredFilters == null){ return 0; }
+
+        console.log(requiredFilters["filterValues"])
+        for(var i = 0;i < requiredFilters["filterValues"].length;i++){
+            addCondition();
+            $(".conditionInput").last().val(requiredFilters["filterValues"][i]);
+        }
+
+        $("#conditionsNumberInput").val(requiredFilters["requiredConditionsNumber"]);
+    }
+
     updateConditionsMax();
     function addCondition() {
         var appendString = "\
-            <div id='conditionInput" + conditionsNumber + "' ><input class='form-control conditionInput' style='width:300px!important;display:inline-block;' type='text' name='conditionInput" + conditionsNumber + "' /><i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteCondition(\"conditionInput" + conditionsNumber + "\")'></i>\
+            <div id='conditionInput" + conditionsNumber + "' ><input class='form-control conditionInput' style='width:300px!important;display:inline-block;' type='text' id='conditionInputBox" + conditionsNumber + "' name='conditionInput" + conditionsNumber + "' /><i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteCondition(\"conditionInput" + conditionsNumber + "\")'></i>\
             <br /><br /></div>";
         conditionsNumber++;
         $("#conditionsDiv").append(appendString);
@@ -539,6 +579,14 @@
     function deleteCondition(conditionID) {
         $("#" + conditionID).remove();
         conditionsNumber--;
+        updateConditionsMax();
+    }
+
+    function deleteAllConditions(){
+        for (var i=0;i < conditionsNumber;i++){
+            $("#conditionInput" + i).remove();
+        }
+        conditionsNumber = 0;
         updateConditionsMax();
     }
 
@@ -558,12 +606,13 @@
         formData = new FormData(form);
         var xhttp = new XMLHttpRequest();
         var msg = "";
-        xhttp.open("POST", "/admin/assistant/{{ id }}/requiredfilters", true); // true is asynchronous
+        xhttp.open("POST", "/admin/assistant/{{ id }}/requiredfilters/"+currentSolutionDB["Solution"]["ID"], true); // true is asynchronous
         xhttp.onreadystatechange = function () {
             if (xhttp.readyState === 4) {
                 if (xhttp.status === 200) {
                     msg = xhttp.responseText;
                     $("#saveRequiredFiltersMessage").text(msg);
+                    saveConditionsToLocalSolutions();
                     setTimeout(function () { $("#saveRequiredFiltersMessage").text("") }, 2000);
                 }
                 else {
@@ -577,7 +626,22 @@
         xhttp.send(formData);
     }
 
-    //document.getElementById('uploadButton').addEventListener('click',uploadProductFile)
+    function saveConditionsToLocalSolutions(){
+        var requiredConditions = {"filterValues" : [], "requiredConditionsNumber": ""}
+
+        for (var i=0;i < conditionsNumber;i++){
+            requiredConditions["filterValues"].push($("#conditionInputBox" + i).val().replace(/ /g, " ").split(","));
+        }
+        requiredConditions["requiredConditionsNumber"] = $("#conditionsNumberInput").val();
+
+        currentSolutionDB["Solution"]["RequiredFilters"] = requiredConditions;
+        for (var i = 0; i < solutionsData.length; i++) {
+            if(solutionsData[i]["Solution"]["ID"] === currentSolutionDB["Solution"]["ID"]){
+                solutionsData[i]["Solution"]["RequiredFilters"] = requiredConditions;
+            }
+        }
+    }
+
     function uploadProductFile() {
         // TODO: validate the type of product before update
         // 1- if submit without adding file (done)
@@ -615,15 +679,21 @@
             alertError('Upload File Error','<h2>There is no file to upload</h2>')
     }
 
-    function saveJobLink(){
+    function displayCurrentSolutionLink(){
+        $("#webLink").val(currentSolutionDB["Solution"]["WebLink"]);
+        $("#solutionsRef").val(currentSolutionDB["Solution"]["IDReference"]);
+    }
+
+    function saveSolutionLink(){
         var form = document.forms.namedItem("solutionLinkForm");
         formData = new FormData(form);
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/admin/assistant/{{ id }}/savesolutionweblink", true); // true is asynchronous
+        xhttp.open("POST", "/admin/assistant/{{ id }}/savesolutionweblink/"+currentSolutionDB["Solution"]["ID"], true); // true is asynchronous
         xhttp.onreadystatechange = function () {
             if (xhttp.readyState === 4) {
                 if (xhttp.status === 200) {
                     msg = xhttp.responseText;
+                    saveSolutionLinkToLocalSolutions();
                     $("#saveLinkMessage").text(msg);
                     setTimeout(function(){$("#saveLinkMessage").text("")}, 2000);
                 }
@@ -636,6 +706,18 @@
             }
         };
         xhttp.send(formData);
+    }
+
+    function saveSolutionLinkToLocalSolutions(){
+        currentSolutionDB["Solution"]["WebLink"] = $("#webLink").val();
+        currentSolutionDB["Solution"]["IDReference"] = $("#solutionsRef").val();
+
+        for (var i = 0; i < solutionsData.length; i++) {
+            if(solutionsData[i]["Solution"]["ID"] === currentSolutionDB["Solution"]["ID"]){
+                solutionsData[i]["Solution"]["WebLink"] = $("#webLink").val();
+                solutionsData[i]["Solution"]["IDReference"] = $("#solutionsRef").val();
+            }
+        }
     }
 
     function sendSolutionAlerts() {

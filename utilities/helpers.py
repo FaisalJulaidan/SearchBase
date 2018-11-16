@@ -241,9 +241,9 @@ def isStringsLengthGreaterThanZero(*args):
 
 
 def jsonResponse(success: bool, http_code: int, msg: str, data=None):
-    print("success: ", success)
-    print("http_code: ", http_code)
-    print("msg: ", msg)
-    print("data: ", data)
+    # print("success: ", success)
+    # print("http_code: ", http_code)
+    # print("msg: ", msg)
+    # print("data: ", data)
     return json.dumps({'success': success, 'code': http_code, 'msg': msg, 'data': data}), \
         http_code, {'ContentType': 'application/json'}

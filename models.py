@@ -269,7 +269,7 @@ class Assistant(db.Model):
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
     Config = db.Column(JsonEncodedDict, nullable=True)
-    Active = db.Column(db.Boolean(), nullable=False, default=False)
+    Active = db.Column(db.Boolean(), nullable=False, default=True)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False,)

@@ -434,7 +434,6 @@ def sendSolutionsAlerts(assistantID, solutionID):
 
         errorsNumber = 0
 
-
         getSolutionRecord_callback : Callback = getByID(solutionID)
         if not getSolutionRecord_callback.Success:
             solutionsLink = {"Success" : False}

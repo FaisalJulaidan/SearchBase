@@ -1,4 +1,4 @@
-from flask import redirect, url_for, session, render_template, json
+from flask import redirect, url_for, session, render_template, json, after_this_request , request
 from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solution, ChatbotSession
 from services import assistant_services, user_services
 from datetime import datetime
@@ -7,6 +7,10 @@ from hashids import Hashids
 from config import BaseConfig
 import stripe
 import re
+from io import BytesIO
+import gzip
+import functools
+
 
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
 
@@ -241,9 +245,39 @@ def isStringsLengthGreaterThanZero(*args):
 
 
 def jsonResponse(success: bool, http_code: int, msg: str, data=None):
-    print("success: ", success)
-    print("http_code: ", http_code)
-    print("msg: ", msg)
-    print("data: ", data)
     return json.dumps({'success': success, 'code': http_code, 'msg': msg, 'data': data}), \
         http_code, {'ContentType': 'application/json'}
+
+
+def gzipped(f):
+    @functools.wraps(f)
+    def view_func(*args, **kwargs):
+        @after_this_request
+        def zipper(response):
+            accept_encoding = request.headers.get('Accept-Encoding', '')
+
+            if 'gzip' not in accept_encoding.lower():
+                return response
+
+            response.direct_passthrough = False
+
+            if (response.status_code < 200 or
+                response.status_code >= 300 or
+                'Content-Encoding' in response.headers):
+                return response
+            gzip_buffer = BytesIO()
+            gzip_file = gzip.GzipFile(mode='wb',
+                                      fileobj=gzip_buffer)
+            gzip_file.write(response.data)
+            gzip_file.close()
+
+            response.data = gzip_buffer.getvalue()
+            response.headers['Content-Encoding'] = 'gzip'
+            response.headers['Vary'] = 'Accept-Encoding'
+            response.headers['Content-Length'] = len(response.data)
+
+            return response
+
+        return f(*args, **kwargs)
+
+    return view_func

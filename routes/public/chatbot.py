@@ -7,7 +7,7 @@ from services import assistant_services, bot_services, chatbot_services, solutio
 from werkzeug.utils import secure_filename
 import uuid
 from flask_cors import CORS
-
+from utilities.helpers import gzipped
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
 
@@ -101,6 +101,7 @@ def getSolutions_forChatbot(assistantIDAsHash):
 
 
 @chatbot_router.route("/userdownloads/<path:path>", methods=['GET'])
+@gzipped
 def assistant_userdownloads(path):
     if request.method == "GET":
         return send_from_directory('static/user_downloads/', path)

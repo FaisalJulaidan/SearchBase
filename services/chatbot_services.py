@@ -9,8 +9,7 @@ def processData(assistant: Assistant, data: dict) -> Callback:
         json_utils.validateSchema(data, 'chatbot_session.json')
     except Exception as exc:
         print(exc.args)
-        return Callback(False, "The submitted chatbot data doesn't follow the correct format."
-                               " Please check /static/json_schema/chatbot_session.json", exc.args[0])
+        return Callback(False, "The submitted chatbot data doesn't follow the correct format.", exc.args[0])
     try:
 
         # collectedInformation is an array, and timeSpent is in seconds.

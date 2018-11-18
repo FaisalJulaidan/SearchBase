@@ -107,9 +107,8 @@ def filterForReturnSolutionValues(records, solutionsRecord, solution):
 
 def getSolutions(content, keywords):
     try:
-        solutions = next(iter(next(iter(next(iter(content.values())).values())).values())) # GETS the first value of the dict which is the first value of a dict which is the first value of a dict
         result = []
-        matches = ""
+        solutions = next(iter(next(iter(next(iter(content.values())).values())).values())) # GETS the first value of the dict which is the first value of a dict which is the first value of a dict
         originalString = dumps(content).split("SysKeys")[1]
         if type(solutions) is not list: solutions = [solutions]
         for value in solutions:
@@ -119,7 +118,7 @@ def getSolutions(content, keywords):
         return result
     except Exception as exc:
         print("solutions_services.getSolutions ERROR: ", exc)
-        return result
+        return []
 
 def getDisplayTitlesOfRecords(content):
     try:
@@ -161,7 +160,7 @@ def actOnJSONItem(action, item, originalString, result):
             if type(item) is int:
                 try:
                     item = originalString.split('DBID": '+str(item)+', "@Desc": "')[1].split('"')[0]
-                except Exception as e:
+                except Exception:
                     pass
             if type(item) is str:
                 item = item.lower()

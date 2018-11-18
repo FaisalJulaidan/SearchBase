@@ -1,6 +1,6 @@
 from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Enum, event, ForeignKey, types, String
+from sqlalchemy import Enum, event, ForeignKey, types, String, JSON
 from sqlalchemy.ext import mutable
 from datetime import datetime
 import enum
@@ -47,7 +47,7 @@ class JsonEncodedDict(types.TypeDecorator):
 
  # TypeEngine.with_variant says "use StringyJSON instead when
 # connecting to 'sqlite'"
-# MagicJSON = types.JSON().with_variant(JsonEncodedDict, 'sqlite')
+MagicJSON = types.JSON().with_variant(JsonEncodedDict, 'sqlite')
 mutable.MutableDict.associate_with(JsonEncodedDict)
 
 
@@ -269,7 +269,7 @@ class Assistant(db.Model):
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
     Config = db.Column(JsonEncodedDict, nullable=True)
-    Active = db.Column(db.Boolean(), nullable=False, default=False)
+    Active = db.Column(db.Boolean(), nullable=False, default=True)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False,)

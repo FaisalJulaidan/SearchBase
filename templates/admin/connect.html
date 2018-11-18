@@ -100,17 +100,17 @@
                 colon = ":";
 
             let $script = $('<script src=\"' + window.location.protocol + '//' + window.location.hostname + colon  + window.location.port +
-                '/userdownloads/integration.js\" data-name=\"tsb-widget\" data-id={{ assistantID }} data-icon="#fff" data-circle="#4B5B71" async defer>');
+                '/userdownloads/widget.js\" data-name=\"tsb-widget\" data-id={{ assistantID }} data-icon="#fff" data-circle="#4B5B71" async defer>');
 
             $('input#icon').on('change', (e) => {
                 $script.attr('data-icon', $('input#icon').val());
                 $('#URL_id').first().text($script[0].outerHTML)
-            })
+            });
 
             $('input#circle').on('change', (e) => {
                 $script.attr('data-circle', $('input#circle').val());
                 $('#URL_id').first().text($script[0].outerHTML)
-            })
+            });
 
             // paste the script tag inside textarea tag
             document.getElementById("URL_id").innerHTML = $script.prop('outerHTML');

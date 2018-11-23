@@ -11,6 +11,7 @@ from flask_migrate import Migrate, MigrateCommand, command
 from sqlalchemy_utils import create_database, database_exists
 from flask_apscheduler import APScheduler
 from utilities import helpers
+from services.jwt_auth_services import jwt
 
 
 # Import all routers to register them as blueprints
@@ -19,7 +20,7 @@ from routes.admin.routers import dashboard_router, profile_router,  admin_api, s
     changePassword_router, bot_router, adminBasic_router, \
     assistantManager_router, assistant_router
 
-from routes.public.routers import public_router, resetPassword_router, chatbot_router
+from routes.public.routers import public_router, resetPassword_router, chatbot_router, auth_router
 
 app = Flask(__name__, static_folder='static')
 db.app = app
@@ -44,6 +45,7 @@ app.register_blueprint(changePassword_router)
 app.register_blueprint(users_router)
 app.register_blueprint(bot_router)
 app.register_blueprint(chatbot_router)
+app.register_blueprint(auth_router, url_prefix='/api')
 
 
 # Code to ensure user is logged in
@@ -162,6 +164,7 @@ migrate_var = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 scheduler = APScheduler()
+jwt.init_app(app)
 
 print("Run the server...")
 if os.environ['FLASK_ENV'] == 'production':

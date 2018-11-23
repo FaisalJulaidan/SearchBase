@@ -50,6 +50,8 @@ class BaseConfig(object):
 
     SECRET_KEY = os.urandom(24)
     CSRF_SESSION_KEY = os.urandom(24)
+    JWT_SECRET_KEY = os.urandom(24)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
     SESSION_TYPE = 'filesystem'
 
     USE_ENCRYPTION = True

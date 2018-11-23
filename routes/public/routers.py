@@ -9,4 +9,5 @@ resetPassword_router: Blueprint = resetPassword_router
 from .chatbot import chatbot_router
 chatbot_router: Blueprint = chatbot_router
 
-
+from .auth import auth_router
+auth_router: Blueprint = auth_router

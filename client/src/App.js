@@ -8,7 +8,7 @@ import axios from "axios";
 class App extends Component {
     componentDidMount() {
         // Make a request for a user with a given ID
-        axios.get("http://localhost:5000/testAPI ")
+        axios.get("http://localhost:5000/api/admin/assistants ")
             .then(function (response) {
                 // handle success
                 console.log(response);

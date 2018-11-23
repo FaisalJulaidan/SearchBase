@@ -1,0 +1,15 @@
+@import "~antd/lib/style/color/colors";
+@import "~antd/lib/style/themes/default";
+@import "~antd/lib/style/mixins/index";
+
+@layout-header-background: @purple-7;
+@primary-color: @purple-9;
+@menu-dark-submenu-bg: @purple-5;
+
+@menu-prefix-cls: ~"@{ant-prefix}-menu";
+.@{menu-prefix-cls} {
+  &-submenu &-sub {
+    cursor: initial;
+    transition: all 0.6s;
+  }
+}

@@ -1,35 +1,25 @@
 import React, {Component} from 'react';
-import logo from './logo.svg';
 import './App.css';
-import Button from 'antd/lib/button';
-import axios from "axios";
+import Dashboard from "./Dashboard/Dashboard";
 
 
 class App extends Component {
-    componentDidMount() {
-        // Make a request for a user with a given ID
-        axios.get("http://localhost:5000/api/admin/assistants ")
-            .then(function (response) {
-                // handle success
-                console.log(response);
-            })
-            .catch(function (error) {
-                // handle error
-                console.log(error);
-            })
-            .then(function () {
-                // always executed
-            });
-    }
+    // componentDidMount() {
+    //     // Make a request for a user with a given ID
+    //     axios.get("http://127.0.0.1:5000/api/admin/assistant/1")
+    //         .then(function (response) {
+    //             // handle success
+    //             console.log(response);
+    //         })
+    //         .catch(function (error) {
+    //             // handle error
+    //             console.log(error);
+    //         })
+    // }
 
     render() {
         return (
-            <div className="App">
-                <header className="App-header">
-                    <img src={logo} className="App-logo" alt="logo"/>
-                    <Button type="primary">Button</Button>
-                </header>
-            </div>
+            <Dashboard/>
         );
     }
 }

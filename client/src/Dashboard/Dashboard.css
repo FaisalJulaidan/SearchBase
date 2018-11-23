@@ -2,5 +2,6 @@
 @import "~antd/lib/Icon/style/index.less";
 @import "~antd/lib/Layout/style/index.less";
 @import "~antd/lib/Menu/style/index.less";
+@import "~antd/lib/tooltip/style/index.less";
 
 @import "Dashboard.less";

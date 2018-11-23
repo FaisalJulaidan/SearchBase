@@ -28,7 +28,7 @@ db.app = app
 # Register Routes:
 app.register_blueprint(adminBasic_router)
 app.register_blueprint(assistantManager_router)
-app.register_blueprint(assistant_router)
+app.register_blueprint(assistant_router, url_prefix='/api')
 app.register_blueprint(dashboard_router)
 app.register_blueprint(public_router)
 app.register_blueprint(resetPassword_router)

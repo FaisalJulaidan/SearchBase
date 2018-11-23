@@ -1,15 +1,20 @@
-from flask import Blueprint, render_template, request, session, redirect, url_for
-from utilities import helpers
-from models import Callback
-from itsdangerous import URLSafeTimedSerializer
-from services import user_services, auth_services, mail_services
+from flask import Blueprint, render_template, request, session, redirect, url_for, jsonify
 from flask_cors import CORS
-import base64
+from itsdangerous import URLSafeTimedSerializer
+from models import Callback
+from services import user_services, auth_services, mail_services
+from utilities import helpers
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates")
 CORS(public_router)
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
+
+# Data for the user which to be displayed on every admin page
+@public_router.route("/testAPI", methods=['GET'])
+def getDoTest():
+    if request.method == "GET":
+        return jsonify({"status": "yay it's working"})
 
 @public_router.route("/", methods=['GET'])
 def indexpage():

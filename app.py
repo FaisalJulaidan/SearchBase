@@ -47,28 +47,28 @@ app.register_blueprint(chatbot_router)
 
 
 # Code to ensure user is logged in
-@app.before_request
-def before_request():
-
-    currentURL = str(request.url_rule)
-    restrictedRoutes = ['/admin', 'admin/dashboard']
-    # If the user try to visit one of the restricted routes without logging in he will be redirected
-    if any(route in currentURL for route in restrictedRoutes):
-        if not session.get('Logged_in', False):
-            return redirect('login')
-        try:
-            if request.view_args['assistantID']:
-                assistantID = int(request.view_args['assistantID'])
-                ownership_callback = assistant_services.checkOwnership(assistantID, session.get('CompanyID', None))
-                if not ownership_callback.Success:
-                    return helpers.hardRedirectWithMessage("login", ownership_callback.Message)
-                role_callback = user_services.getRolePermissions(session.get('UserID', None))
-                if not role_callback.Success:
-                    return helpers.hardRedirectWithMessage("admin/dashboard", role_callback.Message)
-                if not role_callback.Data.EditChatbots:
-                    return helpers.hardRedirectWithMessage("admin/dashboard", "Your company owner has not allowed you access to this feature.")
-        except:
-            pass
+# @app.before_request
+# def before_request():
+#
+#     currentURL = str(request.url_rule)
+#     restrictedRoutes = ['/admin', 'admin/dashboard']
+#     # If the user try to visit one of the restricted routes without logging in he will be redirected
+#     if any(route in currentURL for route in restrictedRoutes):
+#         if not session.get('Logged_in', False):
+#             return redirect('login')
+#         try:
+#             if request.view_args['assistantID']:
+#                 assistantID = int(request.view_args['assistantID'])
+#                 ownership_callback = assistant_services.checkOwnership(assistantID, session.get('CompanyID', None))
+#                 if not ownership_callback.Success:
+#                     return helpers.hardRedirectWithMessage("login", ownership_callback.Message)
+#                 role_callback = user_services.getRolePermissions(session.get('UserID', None))
+#                 if not role_callback.Success:
+#                     return helpers.hardRedirectWithMessage("admin/dashboard", role_callback.Message)
+#                 if not role_callback.Data.EditChatbots:
+#                     return helpers.hardRedirectWithMessage("admin/dashboard", "Your company owner has not allowed you access to this feature.")
+#         except:
+#             pass
 
 
 # @manager.command

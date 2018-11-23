@@ -65,7 +65,7 @@ class Dashboard extends Component {
                             <Breadcrumb.Item>Bill</Breadcrumb.Item>
                         </Breadcrumb>
                         <div style={{padding: 24, background: '#fff', minHeight: 360}}>
-                            Welcome to the search base from react :D
+                            Bill is a cat.
                         </div>
                     </Content>
                     <Footer style={{textAlign: 'center'}}>

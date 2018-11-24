@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
-import Dashboard from "./Dashboard/Dashboard";
+import Dashboard from "./containers/Dashboard/Dashboard";
 
 
 class App extends Component {

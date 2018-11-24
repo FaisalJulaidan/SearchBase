@@ -1,0 +1,40 @@
+@import "~antd/lib/style/color/colors";
+@import "~antd/lib/style/themes/default";
+
+@primary-color: @purple-5;
+
+.Logo {
+  height: 32px;
+  background: rgba(0, 0, 0, .2);
+  margin: 16px;
+}
+
+.trigger {
+  font-size: 18px;
+  line-height: 64px;
+  padding: 0 24px;
+  cursor: pointer;
+  transition: color .3s;
+}
+
+.trigger:hover {
+  color: @primary-color;
+}
+
+.Sider {
+  overflow: auto;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  border-right: 1px #ddd solid;
+}
+
+.Header {
+  background: #fff;
+  padding: 0;
+  position: fixed;
+  z-index: 1;
+  width: 100%;
+  border-bottom: 1px #ddd solid;
+
+}

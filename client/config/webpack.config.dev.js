@@ -34,9 +34,13 @@ const useTypeScript = fs.existsSync(paths.appTsConfig);
 
 // style files regexes
 const cssRegex = /\.(?:le|c)ss$/;
-const cssModuleRegex = /\.module\.css$/;
+const cssModuleRegex = /\.module\.(?:le|c)ss$/;
+
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
+
+const lessRegex = /\.less$/;
+const lessModuleRegex = /\.module\.less$/;
 
 // common function to get style loaders
 const getStyleLoaders = (cssOptions, preProcessor) => {
@@ -73,8 +77,17 @@ const getStyleLoaders = (cssOptions, preProcessor) => {
             },
         },
     ];
-    if (preProcessor) {
+    Array.prototype.insert = function (index, item) {
+        this.splice(index, 0, item);
+    };
+
+    if (typeof preProcessor === 'string') {
         loaders.push(require.resolve(preProcessor));
+    } else if (typeof preProcessor === 'object') {
+        loaders.insert(2, {
+            loader: require.resolve(preProcessor.loader),
+            options: preProcessor.options
+        });
     }
     return loaders;
 };
@@ -301,24 +314,47 @@ module.exports = {
                     // to immediately apply all styles to the DOM.
                     // By default we support SASS Modules with the
                     // extensions .module.scss or .module.sass
-                    {
-                        test: sassRegex,
-                        exclude: sassModuleRegex,
-                        use: getStyleLoaders({importLoaders: 2}, 'sass-loader'),
-                    },
+                    // {
+                    //     test: sassRegex,
+                    //     exclude: sassModuleRegex,
+                    //     use: getStyleLoaders({importLoaders: 2}, 'sass-loader'),
+                    // },
                     // Adds support for CSS Modules, but using SASS
                     // using the extension .module.scss or .module.sass
-                    {
-                        test: sassModuleRegex,
-                        use: getStyleLoaders(
-                            {
-                                importLoaders: 2,
-                                modules: true,
-                                getLocalIdent: getCSSModuleLocalIdent,
-                            },
-                            'sass-loader'
-                        ),
-                    },
+                    // {
+                    //     test: sassModuleRegex,
+                    //     use: getStyleLoaders(
+                    //         {
+                    //             importLoaders: 2,
+                    //             modules: true,
+                    //             getLocalIdent: getCSSModuleLocalIdent,
+                    //         },
+                    //         'sass-loader'
+                    //     ),
+                    // },
+                    // {
+                    //     test: lessRegex,
+                    //     exclude: lessModuleRegex,
+                    //     use: [{
+                    //         loader: 'style-loader' // creates style nodes from JS strings
+                    //     }, {
+                    //         loader: 'css-loader' // translates CSS into CommonJS
+                    //     }, {
+                    //         loader: 'less-loader' // compiles Less to CSS
+                    //     }]
+                    // },
+                    // Adds support for CSS Modules, but using SASS
+                    // using the extension .module.scss or .module.sass
+                    // {
+                    //     test: lessModuleRegex,
+                    //     use: [{
+                    //         loader: 'style-loader' // creates style nodes from JS strings
+                    //     }, {
+                    //         loader: 'css-loader' // translates CSS into CommonJS
+                    //     }, {
+                    //         loader: 'less-loader' // compiles Less to CSS
+                    //     }]
+                    // },
                     // "file" loader makes sure those assets get served by WebpackDevServer.
                     // When you `import` an asset, you get its (virtual) filename.
                     // In production, they would get copied to the `build` folder.

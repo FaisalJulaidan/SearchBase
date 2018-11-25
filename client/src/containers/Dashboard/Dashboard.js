@@ -44,7 +44,7 @@ class Dashboard extends Component {
 
                         <Menu.Item key="2">
                             <Icon type="robot"/>
-                            Assistants
+                            <span>Assistants</span>
                         </Menu.Item>
 
                         <Divider/>
@@ -62,11 +62,11 @@ class Dashboard extends Component {
 
                         <Menu.Item key="5">
                             <Icon type="dollar"/>
-                            Billing
+                            <span>Billing</span>
                         </Menu.Item>
                         <Menu.Item key="6">
                             <Icon type="question-circle"/>
-                            Support
+                            <span>Support</span>
                         </Menu.Item>
                     </Menu>
                 </Sider>

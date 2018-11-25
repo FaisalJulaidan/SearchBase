@@ -67,6 +67,12 @@ class Assistants extends Component {
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
+                    footer={[
+                        <Button key="cancle" onClick={this.handleCancel}>Cancle</Button>,
+                        <Button key="submit" type="primary" onClick={this.handleOk}>
+                            Submit
+                        </Button>,
+                    ]}
                 >
                     <NewRequest/>
                 </Modal>

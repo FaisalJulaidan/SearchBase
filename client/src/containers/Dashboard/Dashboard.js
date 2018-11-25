@@ -17,7 +17,7 @@ class Dashboard extends Component {
     toggle = () => {
         this.setState({
             collapsed: !this.state.collapsed,
-        }, () => this.setState({marginLeft: this.state.collapsed ? 80 : 200}));
+        }, () => this.setState({marginLeft: this.state.collapsed ? 81 : 200}));
     };
 
 

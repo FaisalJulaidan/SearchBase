@@ -3,8 +3,7 @@ import React, {Component} from 'react';
 import {Icon, Layout, Menu} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
-
-import Assistants from '../../components/Assistants/Assistants'
+import Flow from "../../components/Flow/Flow";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -81,8 +80,12 @@ class Dashboard extends Component {
                         />
                     </Header>
 
+                    {/*HERE GOES ALL THE ROUTES*/}
                     <Content style={{margin: 16, marginTop: 80, marginBottom: 0, height: '100%'}}>
-                        <Assistants/>
+
+                        {/*<Assistants/>*/}
+                        <Flow/>
+
                     </Content>
 
                     <Footer style={{textAlign: 'center', padding: 10}}>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';  
 import { connect } from 'react-redux';
+import { history } from '../helpers/history';
 
 export default function(ComposedComponent) {  
   class RequireAuth extends Component {

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './App.css';
 import Dashboard from "./containers/Dashboard/Dashboard";
+import LoginPage from './LoginPage/LoginPage';
 
 
 class App extends Component {
@@ -23,5 +24,6 @@ class App extends Component {
         );
     }
 }
+            
 
 export default App;

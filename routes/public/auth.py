@@ -16,10 +16,8 @@ verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y
 def authenticate():
     if request.method == "POST":
 
-        email: str = request.form.get("email", default=None)
-        password_to_check: str = request.form.get("password", default=None)
-        print(email, password_to_check)
-        callback: Callback = jwt_auth_services.authenticate(email, password_to_check)
+        data = request.get_json(silent=True)
+        callback: Callback = jwt_auth_services.authenticate(data.get('email'), data.get('password'))
 
         if callback.Success:
             return helpers.jsonResponse(True, 200, "Authorised!", callback.Data)

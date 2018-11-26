@@ -6,8 +6,8 @@ from flask_jwt_extended import JWTManager, jwt_optional, create_access_token, ge
 
 jwt = JWTManager()
 
-def signup(email, firstname, surname, password, companyName, companyPhoneNumber, websiteURL) -> Callback:
 
+def signup(email, firstname, surname, password, companyName, companyPhoneNumber, websiteURL) -> Callback:
     # Validate Email
     if not helpers.isValidEmail(email):
         return Callback(False, 'Invalid Email.')
@@ -27,11 +27,12 @@ def signup(email, firstname, surname, password, companyName, companyPhoneNumber,
     ownerRole: Callback = role_services.create('Owner', True, True, True, True, company)
     adminRole: Callback = role_services.create('Admin', True, True, True, False, company)
     userRole: Callback = role_services.create('User', True, False, False, False, company)
-    if not (ownerRole.Success or adminRole.Success or userRole.Success) :
+    if not (ownerRole.Success or adminRole.Success or userRole.Success):
         return Callback(False, 'Could not create roles for the new user.')
 
     # Create a new user with its associated company and owner role
-    user_callback = user_services.create(firstname, surname, email, password, companyPhoneNumber, company, ownerRole.Data)
+    user_callback = user_services.create(firstname, surname, email, password, companyPhoneNumber, company,
+                                         ownerRole.Data)
 
     try:
         # Create userSettings for this user
@@ -39,7 +40,7 @@ def signup(email, firstname, surname, password, companyName, companyPhoneNumber,
     except Exception as e:
         db.session.rollback()
     # finally:
-       # db.session.close()
+    # db.session.close()
 
     # Subscribe to basic plan with 14 trial days
     sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lpeLZ3EV8IfA', trialDays=14)
@@ -83,16 +84,18 @@ def authenticate(email: str, password_to_check: str) -> Callback:
             return Callback(False, "Account is not verified.")
 
         # If all the tests are valid then do login process
-        data = {"UserID": user.ID,
-                "CompanyID": user.CompanyID,
-                "UserEmail": user.Email,
-                "UserPlan": helpers.getPlanNickname(user.Company.SubID),
-                "RoleID": user.RoleID}
+        data = {'user': {"id": user.ID,
+                         "companyID": user.CompanyID,
+                         "email": user.Email,
+                         "plan": helpers.getPlanNickname(user.Company.SubID),
+                         "roleID": user.RoleID
+                         }
+                }
 
         access_token = create_access_token(identity=data)
         refresh_token = create_refresh_token(identity=data)
-        data['token'] = access_token
-        data['refresh'] = refresh_token
+        data['user']['token'] = access_token
+        data['user']['refresh'] = refresh_token
         print(data)
         # Set LastAccess
         user.LastAccess = datetime.now()
@@ -104,7 +107,7 @@ def authenticate(email: str, password_to_check: str) -> Callback:
         db.session.rollback()
         return Callback(False, "Unauthorised!", None)
     # finally:
-       # db.session.close()
+    # db.session.close()
 
 
 def refreshToken() -> Callback:

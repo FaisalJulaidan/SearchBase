@@ -103,25 +103,19 @@
                                                                             <div class="card" style="width: 18rem; border:1px solid black; border-radius: 25px;">
                                                                                 <!-- Later if we want to add an image, uncomment this -->
                                                                                 <!--<img class="card-img-top" src="..." alt="Card image cap" />-->
-                                                                                <div class="card-body">
-                                                                                    <h5 class="card-title">{{solution["data"]["@Title"]}}</h5>
-                                                                                    <p class="card-text">Job Description:</p>
-                                                                                </div>
                                                                                 <ul class="list-group list-group-flush">
                                                                                     <!-- Job Type -->
-                                                                                    <li class="list-group-item">{{solution["data"]["@Term"]}}</li>
-                                                                                    <!-- Job Location -->
-                                                                                    <li class="list-group-item">{{solution["data"]["@Loc"]}}</li>
-                                                                                    <!-- Job created on -->
-                                                                                    <li class="list-group-item">{{solution["data"]["@CreatedOn"]}}</li>
+                                                                                    {%for title in displayData%}
+                                                                                        <li class="list-group-item">{{title}}</li>
+                                                                                    {% endfor %}
                                                                                 </ul>
-                                                                                {%if solutionsLink["Success"] == True%}
+                                                                                {%if solution["buttonURL"]%}
                                                                                 <div class="card-body">
                                                                                     <!-- Links to apply -->
-                                                                                    <a href="{{solutionsLink["webLink"]}}{{solution["data"][solutionsLink["solutionsRef"]]}}" class="card-link">View</a>
+                                                                                    <a href="{{solution["buttonURL"]}}" class="card-link">View</a>
                                                                                     <!-- Link to view the job -->
                                                                                     <!-- Uncomment when we add apply feature -->
-                                                                                    <!--<a href="{{solutionsLink["webLink"]}}{{solution["data"][solutionsLink["solutionsRef"]]}}" class="card-link">Apply</a>-->
+                                                                                    <!--<a href="{{solution["buttonURL"]}}" class="card-link">Apply</a>-->
                                                                                     <br />
                                                                                     <br />
                                                                                 </div>

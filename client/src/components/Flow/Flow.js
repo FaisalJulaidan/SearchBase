@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import "./Flow.less"
 import styles from "./Flow.module.less";
 import {Avatar, Button, Card, Collapse, Drawer, Form, Icon, Input, List, Select, Tabs} from "antd";
+import {arrayMove, SortableContainer, SortableElement} from 'react-sortable-hoc';
+
 
 const Panel = Collapse.Panel;
 const TabPane = Tabs.TabPane;
@@ -20,9 +22,47 @@ function callback(key) {
     console.log(key);
 }
 
+const SortableItem = SortableElement(({value, key}) =>
+    <Collapse bordered={true}>
+        <Panel header={value} key={key}>
+            <Card title="Uesr Input" style={{width: '100%'}}>
+                {value}
+            </Card>
+        </Panel>
+    </Collapse>
+);
+
+const SortableList = SortableContainer(({items}) => {
+    return (
+        <div>
+            {items.map(
+                (value, index) => (
+                    <SortableItem key={`item-${index}`} index={index} value={value}/>
+                )
+            )}
+        </div>
+    );
+});
+
+/*
+*
+* Todo:
+*   1- split Flow into components
+*   2- design card for each tab type
+*   3- design add group modal
+*   4- make collapse list reorder-able (DONE)
+* */
+
 class Flow extends Component {
 
-    state = {visible: false};
+    state = {visible: false, items: ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'Item 6'],};
+
+    onSortEnd = ({oldIndex, newIndex}) => {
+        this.setState({
+            items: arrayMove(this.state.items, oldIndex, newIndex),
+        });
+        console.log(this.state.items)
+    };
 
 
     showDrawer = () => {
@@ -36,6 +76,7 @@ class Flow extends Component {
             visible: false,
         });
     };
+
 
     render() {
         const formItemLayout = {
@@ -322,90 +363,7 @@ class Flow extends Component {
                                 </Drawer>
 
                                 <div style={{height: "100%", width: '100%', overflowY: 'auto    '}}>
-                                    <Collapse onChange={callback}>
-                                        <Panel header="User Input" key="1">
-                                            <Card title="Uesr Input" style={{width: '100%'}}>
-                                                <Form layout='horizontal'>
-                                                    <FormItem
-                                                        label="Question"
-                                                        {...formItemLayout}>
-                                                        <Input placeholder="Ex: Where are you from?"/>
-                                                    </FormItem>
-
-                                                    <FormItem {...formItemLayout}
-                                                              label="Validation">
-
-                                                        <Select placeholder="Will validate the input">
-                                                            <Option value="recruitment">Ignore</Option>
-                                                            <Option value="Shopping">Email</Option>
-                                                            <Option value="Sales">Full Name</Option>
-                                                        </Select>
-                                                    </FormItem>
-
-                                                    <FormItem
-                                                        label="After message"
-                                                        {...formItemLayout}>
-                                                        <Input placeholder="Ex: Your input is considered"/>
-                                                    </FormItem>
-                                                </Form>
-                                            </Card>
-                                        </Panel>
-
-                                        <Panel header="File Upload" key="2">
-                                            <Card title="Uesr Input" style={{width: '100%'}}>
-                                                <Form layout='horizontal'>
-                                                    <FormItem
-                                                        label="Question"
-                                                        {...formItemLayout}>
-                                                        <Input placeholder="Ex: Where are you from?"/>
-                                                    </FormItem>
-
-                                                    <FormItem {...formItemLayout}
-                                                              label="Validation">
-
-                                                        <Select placeholder="Will validate the input">
-                                                            <Option value="recruitment">Ignore</Option>
-                                                            <Option value="Shopping">Email</Option>
-                                                            <Option value="Sales">Full Name</Option>
-                                                        </Select>
-                                                    </FormItem>
-
-                                                    <FormItem
-                                                        label="After message"
-                                                        {...formItemLayout}>
-                                                        <Input placeholder="Ex: Your input is considered"/>
-                                                    </FormItem>
-                                                </Form>
-                                            </Card>
-                                        </Panel>
-                                        <Panel header="Go to group" key="3">
-                                            <Card title="Uesr Input" style={{width: '100%'}}>
-                                                <Form layout='horizontal'>
-                                                    <FormItem
-                                                        label="Question"
-                                                        {...formItemLayout}>
-                                                        <Input placeholder="Ex: Where are you from?"/>
-                                                    </FormItem>
-
-                                                    <FormItem {...formItemLayout}
-                                                              label="Validation">
-
-                                                        <Select placeholder="Will validate the input">
-                                                            <Option value="recruitment">Ignore</Option>
-                                                            <Option value="Shopping">Email</Option>
-                                                            <Option value="Sales">Full Name</Option>
-                                                        </Select>
-                                                    </FormItem>
-
-                                                    <FormItem
-                                                        label="After message"
-                                                        {...formItemLayout}>
-                                                        <Input placeholder="Ex: Your input is considered"/>
-                                                    </FormItem>
-                                                </Form>
-                                            </Card>
-                                        </Panel>
-                                    </Collapse>
+                                    <SortableList items={this.state.items} onSortEnd={this.onSortEnd}/>
                                 </div>
 
                             </div>

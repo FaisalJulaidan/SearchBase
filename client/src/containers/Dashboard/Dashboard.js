@@ -4,6 +4,7 @@ import {Icon, Layout, Menu} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
 import Flow from "../../components/Flow/Flow";
+import Assistants from "../../components/Assistants/Assistants";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;

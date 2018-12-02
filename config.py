@@ -1,6 +1,6 @@
 import os
 from datetime import timedelta
-from urllib import request
+from urllib3 import request
 from dotenv import load_dotenv
 
 

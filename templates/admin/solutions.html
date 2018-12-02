@@ -8,12 +8,10 @@
         width: 32px;
         border-style: none;
     }
-
         #conditionsNumberInput::-webkit-inner-spin-button,
         #conditionsNumberInput::-webkit-outer-spin-button {
             opacity: 1;
         }
-
     #fileDisplay {
         cursor: auto;
         display: inline-block;
@@ -23,7 +21,6 @@
         background-color: white;
         margin-left: 3px;
     }
-
     #fileTypeSelector, #existingFileSelector {
         width: 210px;
         font-size: 12px;
@@ -333,7 +330,6 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 <script>
-
     var currentSolutionDB = undefined; //current selected solution for the page
     var solutionsData = []; //all data returned from the server for the solutions
     var assistantID = window.location.pathname.split('/')[3];
@@ -342,10 +338,6 @@
     var mm = today.getMonth()+1;
     var yyyy = today.getFullYear();
     var fullDate = dd+"-"+mm+"-"+yyyy;
-    var conditionsNumber = 0;
-    var titleNumber = 0;
-
-    //on file action select change
     document.getElementById('productFile').onchange = function () {
         let filePath = $('#productFile').val().split("\\");
         let fileName = filePath[filePath.length - 1];
@@ -353,8 +345,6 @@
         $('#fileDisplay').val(fileName + "_" + fullDate);
         $("#existingFileSelector").val("UploadExportFile");
     };
-
-    //colapse function taken and remade from template
     function collapsePanel(collapser) {
         var a = collapser.closest(".x_panel")
             , b = collapser.find("i")
@@ -365,18 +355,15 @@
             a.css("height", "auto")),
             b.toggleClass("fa-chevron-up fa-chevron-down")
     }
-
     String.prototype.replaceAll = function (search, replacement) {
         var target = this;
         return target.split(search).join(replacement);
     };
-
     // Once the modal is closed, unbind all onSubmit handlers from the userForm
     $(document).on('hide.bs.modal', '#solutionModal', function (e) {
         console.log('Unbind submit event.');
         $(document).off('submit', '#solutionForm');
     });
-
     //update selected existing solution for upload
     $("#existingFileSelector").change(function () {
         var selectedSolutionIndex = $("#existingFileSelector")[0].selectedIndex;
@@ -384,16 +371,43 @@
         $("#fileTypeSelector").val(solutionsData[selectedSolutionIndex - 1]["Solution"]["Type"].toString());
         $('#productFile').val("");
     })
-
-
-    //get current solutions
+    //update page solution information
+    function changeSelectedDB(orderID){
+        currentSolutionDB = solutionsData[orderID];
+        deleteAllTitles();
+        displayCurrentSolutionTitlesForID("#descriptionSelect");
+        updatePageDisplayTitleData();
+        displayCurrentSolutionLink();
+        deleteAllConditions();
+        displayCurrentSolutionConditions();
+    }
+    function displayCurrentSolutionTitlesForID(objectID){
+        $(objectID).empty();
+        if(currentSolutionDB["DisplayTitles"].length > 0){
+            for (var i = 0; i < currentSolutionDB["DisplayTitles"].length;i++){
+                $(objectID).append("<option value="+ currentSolutionDB["DisplayTitles"][i] + ">"+ currentSolutionDB["DisplayTitles"][i] + "</option>");
+            }
+        }
+    }
+    function updatePageDisplayTitleData(){
+        var selectedTitlesTemp = currentSolutionDB["Solution"]["DisplayTitles"]
+        if(selectedTitlesTemp == null){ return 0; }
+        var selectedTitles = selectedTitlesTemp["titleValues"];
+        if(selectedTitles.length != 0){
+            for(var i = 0; i < selectedTitles.length; i++){
+                addTitle();
+                $(".titleSelect").last().val(selectedTitles[i]);
+            }
+        }
+        if(currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"] != null){
+            $("#descriptionSelect").val(currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"]);
+        }
+    }
     $.ajax({
         url: '/admin/assistant/' + assistantID + '/solutionsData',
         type: "GET"
     }).done(function (res) {
-
         solutionsData = JSON.parse(res).data;
-
         if (solutionsData.length == 0) {
             document.getElementById("dbDependentMessage").style = "display:inline-block;"
             document.getElementById("dbDependentTitle").style = "display:none;"
@@ -404,14 +418,10 @@
         } else {
             //collapsePanel($("#uploadDatabasePanel .collapse-link"));
         }
-
         console.log("DEBUG: ", solutionsData)
-
         for (var i = 0; i < solutionsData.length; i++) {
-
             //Set Select Database Existing values
             $("#existingFileSelectorUpdateGroup").append("<option value="+ solutionsData[i]["Solution"]["ID"] + ">"+ solutionsData[i]["Solution"]["Name"] + "</option>");
-
             //Set Solution Navigation Titles
             if (i == 0) {
                 $("#solutionsNavTab").append('<li style="cursor:pointer!important;" role="presentation" class="active" >\
@@ -426,68 +436,13 @@
 
         }
         changeSelectedDB(0);
-
     }).fail(function (res) {
         console.log("Error in retrieving solutions.");
         console.log(res);
     });
-
-    //update page solution information for edditing
-
-    function changeSelectedDB(orderID){
-        currentSolutionDB = solutionsData[orderID];
-
-        deleteAllTitles();
-
-        displayCurrentSolutionTitlesForID("#descriptionSelect");
-
-        updatePageDisplayTitleData();
-
-        displayCurrentSolutionLink();
-
-        deleteAllConditions();
-
-        displayCurrentSolutionConditions();
-
-        $("#solutionsDiv").append(currentSolutionDB["Solution"]["Content"]);
-    }
-
-    function displayCurrentSolutionTitlesForID(objectID){
-        $(objectID).empty();
-        if(currentSolutionDB["DisplayTitles"].length > 0){
-            for (var i = 0; i < currentSolutionDB["DisplayTitles"].length;i++){
-                $(objectID).append("<option value="+ currentSolutionDB["DisplayTitles"][i] + ">"+ currentSolutionDB["DisplayTitles"][i] + "</option>");
-            }
-        }
-    }
-
-    function updatePageDisplayTitleData(){
-        var selectedTitlesTemp = currentSolutionDB["Solution"]["DisplayTitles"]
-        if(selectedTitlesTemp == null){ return 0; }
-        var selectedTitles = selectedTitlesTemp["titleValues"];
-
-        if(selectedTitles.length != 0){
-            for(var i = 0; i < selectedTitles.length; i++){
-                addTitle();
-                $(".titleSelect").last().val(selectedTitles[i]);
-            }
-        }
-
-        if(currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"] != null){
-            $("#descriptionSelect").val(currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"]);
-        }
-    }
-
-    function displayCurrentSolutionLink(){
-        $("#webLink").val(currentSolutionDB["Solution"]["WebLink"]);
-        $("#solutionsRef").val(currentSolutionDB["Solution"]["IDReference"]);
-    }
-
-
-    //TITLES aka DISPLAYED INFORMATION REFERENCES
-
+    //Display Titles
+    var titleNumber = 0;
     updateTitlesNames();
-
     function addTitle() {
         var appendString = "\
             <div id='titleDiv" + titleNumber + "' >\
@@ -501,20 +456,17 @@
         titleNumber++;
         updateTitlesNames();
     }
-
     function deleteTitle(titleID) {
         $("#" + titleID).remove();
         titleNumber--;
         updateTitlesNames();
     }
-
     function deleteAllTitles(){
         for (var i=0;i < titleNumber;i++){
             $("#titleDiv" + i).remove();
         }
         titleNumber = 0;
     }
-
     function updateTitlesNames() {
         var array = document.getElementsByClassName("titleSelect");
         for (var i = 0; i < array.length;i++){
@@ -522,7 +474,6 @@
             array[i].id = "titleSelect" + i;
         }
     }
-
     function saveTitles() {
         var form = document.forms.namedItem("displayTitlesForm");
         formData = new FormData(form);
@@ -547,7 +498,6 @@
         }
         xhttp.send(formData);
     }
-
     function saveTitlesToLocalSolutions(){
         var currentTitles = {"titleValues" : [], "solutionDescription": ""};
         for (var i=1;i <= titleNumber;i++){
@@ -561,23 +511,18 @@
             }
         }
     }
-
-
-    //SOLUTION CONDITIONS aka WORDS THAT NEED TO BE PRESENT IN THE RETURNED SOLUTION
-
+    //Conditions
+    var conditionsNumber = 0;
     function displayCurrentSolutionConditions(){
         var requiredFilters = currentSolutionDB["Solution"]["RequiredFilters"];
         if (requiredFilters == null){ return 0; }
-
         console.log(requiredFilters["filterValues"])
         for(var i = 0;i < requiredFilters["filterValues"].length;i++){
             addCondition();
             $(".conditionInput").last().val(requiredFilters["filterValues"][i]);
         }
-
         $("#conditionsNumberInput").val(requiredFilters["requiredConditionsNumber"]);
     }
-
     updateConditionsMax();
     function addCondition() {
         var appendString = "\
@@ -587,13 +532,11 @@
         $("#conditionsDiv").append(appendString);
         updateConditionsMax();
     }
-
     function deleteCondition(conditionID) {
         $("#" + conditionID).remove();
         conditionsNumber--;
         updateConditionsMax();
     }
-
     function deleteAllConditions(){
         for (var i=0;i < conditionsNumber;i++){
             $("#conditionInput" + i).remove();
@@ -601,7 +544,6 @@
         conditionsNumber = 0;
         updateConditionsMax();
     }
-
     function updateConditionsMax() {
         $("#conditionsNumberInput").attr({ "max": conditionsNumber });
         if ($("#conditionsNumberInput").val() > conditionsNumber) {
@@ -612,7 +554,6 @@
             array[i].name = "conditionInput" + i;
         }
     }
-
     function saveConditions() {
         var form = document.forms.namedItem("requiredFiltersForm");
         formData = new FormData(form);
@@ -637,15 +578,12 @@
         };
         xhttp.send(formData);
     }
-
     function saveConditionsToLocalSolutions(){
         var requiredConditions = {"filterValues" : [], "requiredConditionsNumber": ""}
-
         for (var i=0;i < conditionsNumber;i++){
             requiredConditions["filterValues"].push($("#conditionInputBox" + i).val().replace(/ /g, " ").split(","));
         }
         requiredConditions["requiredConditionsNumber"] = $("#conditionsNumberInput").val();
-
         currentSolutionDB["Solution"]["RequiredFilters"] = requiredConditions;
         for (var i = 0; i < solutionsData.length; i++) {
             if(solutionsData[i]["Solution"]["ID"] === currentSolutionDB["Solution"]["ID"]){
@@ -653,10 +591,6 @@
             }
         }
     }
-
-
-    //UPLOAD NEW SOLUTION DB FILE
-
     function uploadProductFile() {
         // TODO: validate the type of product before update
         // 1- if submit without adding file (done)
@@ -693,9 +627,10 @@
         else
             alertError('Upload File Error','<h2>There is no file to upload</h2>')
     }
-
-    //APPLY BUTTON LINK
-
+    function displayCurrentSolutionLink(){
+        $("#webLink").val(currentSolutionDB["Solution"]["WebLink"]);
+        $("#solutionsRef").val(currentSolutionDB["Solution"]["IDReference"]);
+    }
     function saveSolutionLink(){
         var form = document.forms.namedItem("solutionLinkForm");
         formData = new FormData(form);
@@ -719,11 +654,9 @@
         };
         xhttp.send(formData);
     }
-
     function saveSolutionLinkToLocalSolutions(){
         currentSolutionDB["Solution"]["WebLink"] = $("#webLink").val();
         currentSolutionDB["Solution"]["IDReference"] = $("#solutionsRef").val();
-
         for (var i = 0; i < solutionsData.length; i++) {
             if(solutionsData[i]["Solution"]["ID"] === currentSolutionDB["Solution"]["ID"]){
                 solutionsData[i]["Solution"]["WebLink"] = $("#webLink").val();
@@ -731,9 +664,6 @@
             }
         }
     }
-
-    //send Solution Alerts to all emails in the user input
-
     function sendSolutionAlerts() {
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", "/admin/assistant/{{ id }}/sendsolutionalerts/"+currentSolutionDB["Solution"]["ID"], true); // true is asynchronous
@@ -754,9 +684,6 @@
         };
         xhttp.send();
     }
-
-    //set should solutions be send automatically on new database update - can not be done before database is deployed
-
     function changeAutoSolutionAlerts() {
         var state = document.getElementById("automaticSolutionAlertsCheckbox").checked;
         var xhttp = new XMLHttpRequest();
@@ -766,7 +693,7 @@
                 if (xhttp.status === 200) {
                     msg = xhttp.responseText;
                     $("#checkboxMessage").text(msg);
-                    setTimeout(function(){$("#checkboxMessage").text("");}, 3000)
+                    setTimeout(removeTextboxesText, 3000)
                     if(msg == 'Could not set automatic alerts at this time. Please insure you have a database connected or uploaded'){ document.getElementById("automaticSolutionAlertsCheckbox").checked = !state;}
                 }
                 else {
@@ -774,13 +701,15 @@
                     msg = "Error: " + xhttp.status;
                     $("#checkboxMessage").text(msg);
                     document.getElementById("automaticSolutionAlertsCheckbox").checked = !state;
-                    setTimeout(function(){$("#checkboxMessage").text("");}, 3000)
+                    setTimeout(removeTextboxesText, 3000)
                 }
             }
         };
         xhttp.send();
     }
-
+    function removeTextboxesText() {
+        $("#checkboxMessage").text("");
+    }
     // helping functions
     function createArray(rows) {
         var arrayRow = [];
@@ -789,5 +718,6 @@
         }
         return arrayRow;
     }
+    $("#solutionsDiv").append(); //TODO
 </script>
 {% endblock %}-->

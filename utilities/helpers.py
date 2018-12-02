@@ -1,4 +1,4 @@
-from flask import redirect, url_for, session, render_template, json, after_this_request , request
+from flask import redirect, url_for, session, render_template, json, after_this_request, request
 from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solution, ChatbotSession
 from services import assistant_services, user_services
 from datetime import datetime
@@ -245,6 +245,10 @@ def isStringsLengthGreaterThanZero(*args):
 
 
 def jsonResponse(success: bool, http_code: int, msg: str, data=None):
+    # print("success: ", success)
+    # print("http_code: ", http_code)
+    # print("msg: ", msg)
+    # print("data: ", data)
     return json.dumps({'success': success, 'code': http_code, 'msg': msg, 'data': data}), \
         http_code, {'ContentType': 'application/json'}
 

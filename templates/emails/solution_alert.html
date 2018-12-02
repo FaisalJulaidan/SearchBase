@@ -104,9 +104,8 @@
                                                                                 <!-- Later if we want to add an image, uncomment this -->
                                                                                 <!--<img class="card-img-top" src="..." alt="Card image cap" />-->
                                                                                 <ul class="list-group list-group-flush">
-                                                                                    <!-- Job Type -->
-                                                                                    {%for title in displayData%}
-                                                                                        <li class="list-group-item">{{title}}</li>
+                                                                                    {% for display in solution["displayData"] %}
+                                                                                    <li class="list-group-item">{{display}}</li>
                                                                                     {% endfor %}
                                                                                 </ul>
                                                                                 {%if solution["buttonURL"]%}
@@ -119,7 +118,7 @@
                                                                                     <br />
                                                                                     <br />
                                                                                 </div>
-                                                                              
+
                                                                                 {%endif%}
                                                                         </div>
                                                                     </p>

@@ -434,23 +434,17 @@ def sendSolutionsAlerts(assistantID, solutionID):
         errorsNumber = 0
 
         getSolutionRecord_callback : Callback = getByID(solutionID)
-        if not getSolutionRecord_callback.Success:
-            solutionsLink = {"Success" : False}
-        elif not getSolutionRecord_callback.Data.WebLink or not getSolutionRecord_callback.Data.IDReference:
-            solutionsLink = {"Success" : False}
-        else:
-            solutionsLink = {"Success" : True, "webLink" : getSolutionRecord_callback.Data.WebLink, "solutionsRef" : getSolutionRecord_callback.Data.IDReference}
 
         for record in filterEmails_callback.Data:
             keywords = []
             for inputs in record["record"]:
                 keywords += inputs['keywords']
             solutions_callback : Callback = getBasedOnKeywords(assistantID=assistantID, keywords=keywords,
-                                                  solutionsRecord=solutions_callback, max=5)
+                                                  solutionsRecord=getSolutionRecord_callback, max=5)
             if not solutions_callback.Success: raise Exception("Error in getting solutions")
             if not solutions_callback.Data: continue
 
-            sendMail_callback : Callback = mail_services.sendSolutionAlert(record, solutions_callback.Data, solutionsLink)
+            sendMail_callback : Callback = mail_services.sendSolutionAlert(record, solutions_callback.Data)
             if not sendMail_callback.Success: errorsNumber += 1
 
         if errorsNumber > 0: return Callback(True, 'Alerts have been sent however there was an error with sending the email to ' + str(errorsNumber) + " users.")
@@ -507,3 +501,13 @@ def updateSolutionsLinkAndRef(solutionID, webLink, solutionsRef):
         print("solutions_services.updateSolutionsLinkAndRef ERROR: ", exc)
         db.session.rollback()
         return Callback(False, 'Could not update the solutions\' Link and Reference')
+
+def getFirstSolutionRecord(assistantID): #TEMP FUNCTION
+    try:
+        solution = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
+
+        return Callback(True, 'First solution has been retrieved', solution)
+    except Exception as exc:
+        print("solutions_services.getFirstSolutionRecord ERROR: ", exc)
+        return Callback(False, 'Could not retrieve solution')
+

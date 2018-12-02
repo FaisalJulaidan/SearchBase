@@ -68,13 +68,14 @@ def addedNewUserEmail(adminEmail, targetEmail, password):
         print("addedNewUserEmail() Error: ", e)
         return Callback(False, 'Could not send email to ' + targetEmail)
 
-def sendSolutionAlert(record, solutions, solutionsLink):
+def sendSolutionAlert(record, solutions):
     try:
         targetEmail = record["email"]
         userData = record["record"]
+        print("DATA: ", solutions)
 
         send_email((targetEmail), 'You have new job matches',
-               'emails/solution_alert.html', userData = userData, solutions=solutions, solutionsLink=solutionsLink)
+               'emails/solution_alert.html', userData = userData, solutions=solutions)
 
         return Callback(True, 'Email sent is on its way to ' + targetEmail)
 

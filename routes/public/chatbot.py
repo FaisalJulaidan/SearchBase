@@ -89,7 +89,7 @@ def getSolutions_forChatbot(assistantIDAsHash):
 
         # If showTop is 0 then skip below return nothing and don't even call solutions_services
         if data['showTop'] > 0:
-            getSolutionRecord_callback: Callback = solutions_services.getByID(assistant.ID)#TODO change this to solutionID
+            getSolutionRecord_callback: Callback = solutions_services.getFirstSolutionRecord(assistant.ID)#TODO change this to solutionID and func
             if not getSolutionRecord_callback.Success:
                 return helpers.jsonResponse(False, 200, getSolutionRecord_callback.Message)
 

@@ -8,10 +8,8 @@ import Header from "./Header/Header";
 /*
 *
 * Todo:
-*   1- split Flow into components (DONE)
 *   2- design card for each tab type
-*   3- design add group modal (DONE)
-*   5- Clean BlocksDrawer component (DONE)
+*   3- design add group modal
 * */
 
 class Flow extends Component {
@@ -36,7 +34,6 @@ class Flow extends Component {
                         <Blocks/>
                     </div>
                 </div>
-
             </div>
         );
     }

@@ -60,7 +60,7 @@ class Groups extends Component {
                                 <Button key="cancle" onClick={this.handleCancel}>Cancle</Button>,
                                 <Button key="submit" type="primary" onClick={this.handleOk}>
                                     Add
-                                </Button>,
+                                </Button>
                             ]}>
                             <NewGroup></NewGroup>
                         </Modal>

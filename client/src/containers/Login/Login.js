@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { authActions } from '../store/actions';
+import { authActions } from '../../store/actions/auth.action';
 
 class LoginPage extends React.Component {
 
@@ -21,9 +21,8 @@ class LoginPage extends React.Component {
         e.preventDefault();
         this.setState({ submitted: true });
         const { email, password } = this.state;
-        const { dispatch } = this.props;
         if (email && password) {
-            dispatch(authActions.login(email, password));
+            this.props.dispatch(authActions.login(email, password));
         }
     }
 

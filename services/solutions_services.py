@@ -210,11 +210,11 @@ def convertionLoopRDB(item, IDsString):
         print("solutions_services.loopThroughAllJSON ERROR: ", exc)
         return item
 
-def createNew(assistantID, content, type):
+def createNew(assistantID, content, type, name):
     try:
         # Create a new user with its associated company and role
         content = replaceIDsWithDataRBD(content)
-        solution = Solution(AssistantID=assistantID, Type=type, Content=content)
+        solution = Solution(AssistantID=assistantID, Name=name, Type=type, Content=content)
         db.session.add(solution)
 
         db.session.commit()
@@ -241,30 +241,26 @@ def getByID(id):
         db.session.rollback()
         return Callback(False, 'Could not retrieve solutions for ID: ' + str(id))
 
-    # finally:
-       # db.session.close()
 
-
-def update(solution: Solution, content):
+def updateByID(solutionID, content, type, name):
     try:
-        # Validate the keywords address using a regex. (k,k) correct (k) correct (,k) incorrect
-        # if len(keywords) > 0:
-        #     if not re.match("^([a-zA-Z]+|\\b,\\b)+$", keywords):
-        #         return Callback(False, "keyword doesn't follow the correct format ex. key1,key2...")
+        # Get result and check if None then raise exception
+        result = getByID(solutionID)
+        if not result.Success:
+            raise Exception("No record has been found")
 
-        # Update solution
-        solution.Content = replaceIDsWithDataRBD(content)
+        result.Data.Name = name
+        result.Data.Type = type
+        result.Data.Content = replaceIDsWithDataRBD(content)
 
         db.session.commit()
-        return Callback(True, 'Solution has been successfully edited.')
+
+        return Callback(True, 'Solutions file has been updated')
 
     except Exception as exc:
-        print(exc)
+        print("solutions_services.createUpdateJSONByAssistantID ERROR: ", exc)
         db.session.rollback()
-        return Callback(False, 'Sorry, Could not create the solution')
-
-    # finally:
-       # db.session.close()
+        return Callback(False, 'Could not update solutions file')
 
 
 def remove(solution: Solution) -> Callback:
@@ -307,23 +303,10 @@ def getAllByAssistantID(assistantID):
         if not result: raise Exception
         return Callback(True, 'Solutions have been successfully retrieved', result)
     except Exception as exc:
-        print("getAllByAssistantID Error: ", exc)
+        print("solutions_services.getAllByAssistantID Error: ", exc)
         db.session.rollback()
-        return Callback(False, 'Could not retrieve solutions for ID: ' + str(assistantID))
+        return Callback(False, 'Could not retrieve solutions')
 
-    # finally:
-       # db.session.close()
-
-def getFirstByAssistantID(assistantID):
-    try:
-        # Get result and check if None then raise exception
-        result = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
-        if not result: raise Exception
-        return Callback(True, 'Solution records have been successfully retrieved', result)
-    except Exception as exc:
-        print("solutions_services.getFirstByAssistantID Error/Empty: ", exc)
-        db.session.rollback()
-        return Callback(False, 'Could not retrieve solution records')
 
 def deleteAllByAssistantID(assistantID):
 
@@ -406,47 +389,10 @@ def convertXMLtoJSON(xmlfile):
         return Callback(False, "An error occured while converting xml file")
 
 
-def getSolutionByAssistantID(assistantID):
+def saveDisplayTitles(solutionID, titles):
     try:
-        # Get result and check if None then raise exception
-        result = db.session.query(Solution).filter(Solution.AssistantID == assistantID).first()
-        if not result:
-            raise Exception
-        return Callback(True, 'JSON has been successfully retrieved', result)
-
-    except Exception as exc:
-        print("solutions_services.getSolutionByAssistantID ERROR/EMPTY: ", exc)
-        db.session.rollback()
-        return Callback(False, 'Could not retrieve JSON / This might be there is no data in DB')
-
-
-def createUpdateJSONByAssistantID(assistantID, content, type):
-    try:
-        # Get result and check if None then raise exception
-        #db.session.query(Solution).filter(Solution.AssistantID == assistantID).delete()
-        result = getSolutionByAssistantID(assistantID)
-        if not result.Success:
-            createNew(assistantID, content, type)
-            return Callback(True, 'Solutions file has been added')
-
-        result.Data.Type = type
-        result.Data.Content = replaceIDsWithDataRBD(content)
-
-        db.session.commit()
-
-        return Callback(True, 'Solutions file has been updated')
-
-    except Exception as exc:
-        print("solutions_services.createUpdateJSONByAssistantID ERROR: ", exc)
-        db.session.rollback()
-        return Callback(False, 'Could not update solutions file')
-
-
-def saveDisplayTitles(assistantID, titles):
-    try:
-        solution_callback : Callback = getSolutionByAssistantID(assistantID)
+        solution_callback : Callback = getByID(solutionID)
         if not solution_callback.Success: raise Exception("Error in retrieving current settings")
-
         solution_callback.Data.DisplayTitles = titles
 
         db.session.commit()
@@ -460,9 +406,9 @@ def saveDisplayTitles(assistantID, titles):
 
 
 
-def saveRequiredFilters(assistantID, params):
+def saveRequiredFilters(solutionID, params):
     try:
-        solution_callback : Callback = getSolutionByAssistantID(assistantID)
+        solution_callback : Callback = getByID(solutionID)
         if not solution_callback.Success: raise Exception("Error in retrieving current settings")
 
         solution_callback.Data.RequiredFilters = params
@@ -477,7 +423,7 @@ def saveRequiredFilters(assistantID, params):
         return Callback(False, 'Could not save conditions')
 
 
-def sendSolutionsAlerts(assistantID):
+def sendSolutionsAlerts(assistantID, solutionID):
     try:
         userInput_callback : Callback = userInput_services.getByAssistantID(assistantID)
         if not userInput_callback.Success: raise Exception("Error in retrieving user input")
@@ -487,8 +433,7 @@ def sendSolutionsAlerts(assistantID):
 
         errorsNumber = 0
 
-
-        getSolutionRecord_callback : Callback = getSolutionByAssistantID(assistantID)
+        getSolutionRecord_callback : Callback = getByID(solutionID)
         if not getSolutionRecord_callback.Success:
             solutionsLink = {"Success" : False}
         elif not getSolutionRecord_callback.Data.WebLink or not getSolutionRecord_callback.Data.IDReference:
@@ -500,7 +445,8 @@ def sendSolutionsAlerts(assistantID):
             keywords = []
             for inputs in record["record"]:
                 keywords += inputs['keywords']
-            solutions_callback : Callback = getBasedOnKeywords(assistantID, keywords, 5)
+            solutions_callback : Callback = getBasedOnKeywords(assistantID=assistantID, keywords=keywords,
+                                                  solutionsRecord=solutions_callback, max=5)
             if not solutions_callback.Success: raise Exception("Error in getting solutions")
             if not solutions_callback.Data: continue
 
@@ -516,9 +462,9 @@ def sendSolutionsAlerts(assistantID):
         return Callback(False, 'Could not send alerts at this time')
 
 
-def switchAutomaticSolutionAlerts(assistantID, setTo):
+def switchAutomaticSolutionAlerts(solutionID, setTo):
     try:
-        result = getSolutionByAssistantID(assistantID)
+        result = getByID(solutionID)
         if not result.Success: raise Exception("Could not find alerts record")
 
         result.Data.automaticSolutionAlerts = setTo
@@ -533,9 +479,9 @@ def switchAutomaticSolutionAlerts(assistantID, setTo):
         return Callback(False, 'Could not set automatic alerts at this time. Please insure you have a database connected or uploaded')
 
 
-def checkAutomaticSolutionAlerts(assistantID):
+def checkAutomaticSolutionAlerts(solutionID):
     try:
-        result = getSolutionByAssistantID(assistantID)
+        result = getByID(solutionID)
         if not result.Success: raise Exception("Could not find alerts record")
 
         return Callback(True, 'Automatic alerts have been retrieved.', result.Data.automaticSolutionAlerts)
@@ -545,9 +491,9 @@ def checkAutomaticSolutionAlerts(assistantID):
         return Callback(False, 'Could not retrieve automatic alerts at this time')
 
 
-def updateSolutionsLinkAndRef(assistantID, webLink, solutionsRef):
+def updateSolutionsLinkAndRef(solutionID, webLink, solutionsRef):
     try:
-        result = getSolutionByAssistantID(assistantID)
+        result = getByID(solutionID)
         if not result.Success: raise Exception("Could not find alerts record")
 
         result.Data.WebLink = webLink

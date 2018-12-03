@@ -37,7 +37,12 @@ class Dashboard extends Component {
                     collapsed={this.state.collapsed}
                     className={styles.Sider}>
 
-                    <div className={styles.Logo}/>
+                    <div className={styles.Logo}>
+                        <div style={{display:'flex'}}>
+                            <Icon type="cloud" theme="twoTone" twoToneColor="#9254de" style={{fontSize: 44}}/>
+                            <div style={{lineHeight:'43px', marginLeft:25}}>TheSearchBase</div>
+                        </div>
+                    </div>
 
                     <Menu theme="light" defaultSelectedKeys={['1']} mode="inline">
                         <Menu.Item key="1">
@@ -87,7 +92,7 @@ class Dashboard extends Component {
                     {/*HERE GOES ALL THE ROUTES*/}
                     <Content style={{margin: 16, marginTop: 80, marginBottom: 0, height: '100%'}}>
 
-                        <Assistants/>
+                        {/*<Assistants/>*/}
                         {/*<Flow/>*/}
                         <Login/>
 

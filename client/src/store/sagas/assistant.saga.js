@@ -1,26 +1,29 @@
 import {delay} from 'redux-saga'
 import {put, takeEvery, all} from 'redux-saga/effects'
+import * as actionTypes from '../actions/actionTypes';
+import {assistantActions} from "../actions/assistant.action";
+import {http} from "../../helpers";
 
-const fetchAssistantsSaga = () => {
-    return 'done'
-};
+function* fetchAssistants() {
+    yield delay(1000);
+    try {
+        const res = yield http.get(`api/admin/assistants`);
+        console.log(res)
+        return yield put(assistantActions.fetchAssistantsSuccess([1, 2, 3, 4, 5, 6]));
+    } catch (e) {
+        console.log(e);
+        return yield put(assistantActions.fetchAssistantsFailure());
+    }
 
-// Our worker Saga: will perform the async increment task
-function* incrementAsync() {
-    yield delay(1000)
-    yield put({type: 'INCREMENT'})
 }
 
-// Our watcher Saga: spawn a new incrementAsync task on each INCREMENT_ASYNC
-function* watchIncrementAsync() {
-    yield takeEvery('INCREMENT_ASYNC', incrementAsync)
+function* watchfetchAssistants() {
+    yield takeEvery(actionTypes.FETCH_ASSISTANTS, fetchAssistants)
 }
 
 
-// notice how we now only export the rootSaga
-// single entry point to start all Sagas at once
 export function* assistantSaga() {
     yield all([
-        watchIncrementAsync()
+        watchfetchAssistants()
     ])
 }

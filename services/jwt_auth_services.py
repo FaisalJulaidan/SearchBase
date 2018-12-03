@@ -97,6 +97,8 @@ def authenticate(email: str, password_to_check: str) -> Callback:
         data['user']['token'] = access_token
         data['user']['refresh'] = refresh_token
         print(data)
+
+
         # Set LastAccess
         user.LastAccess = datetime.now()
         db.session.commit()

@@ -1,17 +1,22 @@
 import React, {Component} from 'react';
 import {Button, Modal} from 'antd';
-
+import {connect} from 'react-redux';
 
 import "./Assistants.less"
 import styles from "./Assistants.module.less"
 import Assistant from "../Assistant/Assistant"
 
 import NewRequest from "./NewAssistant/NewRequest"
+import {assistantActions} from "../../store/actions/assistant.action";
 
 class Assistants extends Component {
-    state = {visible: false};
+    state = {
+        visible: false,
+    };
 
-    arr = Array(15).fill(0);
+    componentDidMount() {
+        this.props.dispatch(assistantActions.fetchAssistants())
+    }
 
     showModal = () => {
         this.setState({
@@ -20,14 +25,12 @@ class Assistants extends Component {
     };
 
     handleOk = (e) => {
-        console.log(e);
         this.setState({
             visible: false,
         });
     };
 
     handleCancel = (e) => {
-        console.log(e);
         this.setState({
             visible: false,
         });
@@ -54,7 +57,7 @@ class Assistants extends Component {
 
                     <div className={styles.Body}>
                         <div className={styles.AssistantsList}>
-                            {this.arr.map((x, i) => <Assistant key={i} index={i}/>)}
+                            {this.props.assistantList.map((x, i) => <Assistant key={i} index={i}/>)}
                         </div>
                     </div>
 
@@ -80,4 +83,10 @@ class Assistants extends Component {
     }
 }
 
-export default Assistants;
+function mapStateToProps(state) {
+    return {
+        assistantList: state.assistant.assistantList
+    };
+}
+
+export default connect(mapStateToProps)(Assistants);

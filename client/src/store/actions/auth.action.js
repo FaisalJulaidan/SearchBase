@@ -28,7 +28,7 @@ const logout = () => {
     return {
         type: actionTypes.LOGOUT
     };
-}
+};
 
 export const authActions = {
     login,

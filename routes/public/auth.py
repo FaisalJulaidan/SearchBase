@@ -17,8 +17,8 @@ def authenticate():
     if request.method == "POST":
 
         data = request.get_json(silent=True)
-        callback: Callback = jwt_auth_services.authenticate(data.get('email'), data.get('password'))
 
+        callback: Callback = jwt_auth_services.authenticate(data.get('email'), data.get('password'))
         if callback.Success:
             return helpers.jsonResponse(True, 200, "Authorised!", callback.Data)
         else:

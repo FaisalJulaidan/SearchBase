@@ -1,11 +1,11 @@
 import {combineReducers} from 'redux';
 import {auth} from './auth.reducer';
-import {counter} from './counter.reducer';
+import {assistant} from "./assistant.reducer";
 
 
 const rootReducer = combineReducers({
     auth,
-    counter
+    assistant
 });
 
 export default rootReducer;

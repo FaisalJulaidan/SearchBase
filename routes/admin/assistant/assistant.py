@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, session
-from services import statistics_services, assistant_services,admin_services, user_services, bot_services
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 from models import Callback, Assistant, User
+from services import statistics_services, assistant_services, admin_services, user_services, bot_services
 from utilities import helpers
 
-assistant_router: Blueprint = Blueprint('assistant_router', __name__ , template_folder="../../templates")
-
+assistant_router: Blueprint = Blueprint('assistant_router', __name__, template_folder="../../templates")
 
 
 @assistant_router.route("/admin/assistant/create", methods=['GET'])
@@ -12,6 +13,7 @@ def create_assistant_page():
     if request.method == "GET":
         # Add the template names as they appear here!!!!!!!!
         return admin_services.render("admin/create-assistant.html", templates={'names': ["Recruitment-Basic"]})
+
 
 @assistant_router.route("/admin/assistant", methods=['POST'])
 def assistant():
@@ -34,7 +36,8 @@ def assistant():
         templateName = request.form.get("template-name", default='').strip()
         topBarText = request.form.get("top-bar-text", default='').strip()
 
-        assistant_callback: Callback = assistant_services.create(name, None, welcomeMsg, topBarText, timePopup, user.Company)
+        assistant_callback: Callback = assistant_services.create(name, None, welcomeMsg, topBarText, timePopup,
+                                                                 user.Company)
         if not assistant_callback.Success:
             return helpers.jsonResponse(False, 400, "Couldn't create the assistant", None)
 
@@ -48,9 +51,10 @@ def assistant():
         return helpers.jsonResponse(True, 200, callback.Message, {'id': assistant_callback.Data.ID})
 
 
+############# DEPREACTED #############
 # get all assistants
-@assistant_router.route("/admin/assistants", methods=['GET'])
-def admin_home():
+# @assistant_router.route("/admin/assistants", methods=['GET'])
+def admin_homeDEPREACTED():
     if request.method == "GET":
         callback: Callback = statistics_services.getTotalAll()
         if callback.Success:
@@ -59,9 +63,10 @@ def admin_home():
             assistants: Callback = assistant_services.getAll(session['CompanyID']).Data
 
             # If there are assistants then convert them to a list of dict. Otherwise return empty list[].
-            if assistants: assistants = helpers.getListFromSQLAlchemyList(assistants)
-            else: assistants = []
-
+            if assistants:
+                assistants = helpers.getListFromSQLAlchemyList(assistants)
+            else:
+                assistants = []
 
             return render_template("admin/dashboard.html",
                                    totalClicks=callback.Data.ProductsReturned,
@@ -70,6 +75,24 @@ def admin_home():
         else:
 
             return redirect('login')
+
+
+# get all assistants
+@assistant_router.route("/admin/assistants", methods=['GET'])
+@jwt_required
+def admin_home():
+    if request.method == "GET":
+        # Get all assistants
+        current_user = get_jwt_identity()
+
+        return helpers.jsonResponse(True, 200, "Assistants Returned!", 'Yay')
+
+        callback: Callback = assistant_services.getAll(session['CompanyID'])
+
+        if callback.Success:
+            return helpers.jsonResponse(True, 200, "Assistants Returned!", callback.Data)
+        else:
+            return helpers.jsonResponse(False, 401, "Cannot get Assistants!", callback.Data)
 
 
 @assistant_router.route("/admin/assistant/<int:assistantID>", methods=['DELETE'])
@@ -88,4 +111,3 @@ def assistant_delete(assistantID):
             return helpers.jsonResponse(False, 400, callback.Message, None)
 
         return helpers.jsonResponse(True, 200, callback.Message, None)
-

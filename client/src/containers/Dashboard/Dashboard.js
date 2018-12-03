@@ -6,6 +6,7 @@ import styles from "./Dashboard.module.less"
 import Assistants from "../../components/Assistants/Assistants";
 import store from '../../store/store'
 import {connect} from 'react-redux';
+import Login from "../Login";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -88,7 +89,7 @@ class Dashboard extends Component {
 
                         <Assistants/>
                         {/*<Flow/>*/}
-
+                        <Login/>
 
                     </Content>
 

@@ -13,8 +13,8 @@ function* login(action) {
         //     new Date().getTime() + response.data.expiresIn * 1000
         // );
 
-        localStorage.setItem("user", JSON.stringify(user));
-        put(authActions.loginSuccess(user));
+        yield localStorage.setItem("user", JSON.stringify(user));
+        yield put(authActions.loginSuccess(user));
         // yield put(actions.checkAuthTimeout(response.data.expiresIn));
     } catch (error) {
         yield put(authActions.loginFailure(error.response.data));

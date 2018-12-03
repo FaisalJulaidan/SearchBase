@@ -83,17 +83,15 @@ def admin_homeDEPREACTED():
 def admin_home():
     if request.method == "GET":
         # Get all assistants
-        print("hey")
-        current_user = get_jwt_identity()
-
-        return helpers.jsonResponse(True, 200, "Assistants Returned!", 'Yay')
-
-        callback: Callback = assistant_services.getAll(session['CompanyID'])
+        user = get_jwt_identity()['user']
+        callback: Callback = assistant_services.getAll(user['companyID'])
 
         if callback.Success:
-            return helpers.jsonResponse(True, 200, "Assistants Returned!", callback.Data)
+            return helpers.jsonResponse(True, 200, "Assistants Returned!",
+                                        helpers.getListFromSQLAlchemyList(callback.Data))
         else:
-            return helpers.jsonResponse(False, 401, "Cannot get Assistants!", callback.Data)
+            return helpers.jsonResponse(False, 401, "Cannot get Assistants!",
+                                        helpers.getListFromSQLAlchemyList(callback.Data))
 
 
 @assistant_router.route("/admin/assistant/<int:assistantID>", methods=['DELETE'])

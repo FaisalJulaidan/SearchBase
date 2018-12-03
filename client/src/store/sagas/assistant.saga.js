@@ -8,8 +8,7 @@ function* fetchAssistants() {
     yield delay(1000);
     try {
         const res = yield http.get(`api/admin/assistants`);
-        console.log(res)
-        return yield put(assistantActions.fetchAssistantsSuccess([1, 2, 3, 4, 5, 6]));
+        return yield put(assistantActions.fetchAssistantsSuccess(res.data.data))
     } catch (e) {
         console.log(e);
         return yield put(assistantActions.fetchAssistantsFailure());
@@ -17,13 +16,13 @@ function* fetchAssistants() {
 
 }
 
-function* watchfetchAssistants() {
+function* watchFetchAssistants() {
     yield takeEvery(actionTypes.FETCH_ASSISTANTS, fetchAssistants)
 }
 
 
 export function* assistantSaga() {
     yield all([
-        watchfetchAssistants()
+        watchFetchAssistants()
     ])
 }

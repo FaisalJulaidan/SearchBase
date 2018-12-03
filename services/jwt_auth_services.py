@@ -1,10 +1,17 @@
-from models import Callback, User, UserSettings, db
 from datetime import datetime
+
+from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, create_refresh_token
+
+from models import Callback, User, UserSettings, db
 from services import user_services, role_services, sub_services, company_services
 from utilities import helpers
-from flask_jwt_extended import JWTManager, jwt_optional, create_access_token, get_jwt_identity, create_refresh_token
 
 jwt = JWTManager()
+
+
+@jwt.invalid_token_loader
+def my_expired_token_callback(error):
+    return helpers.jsonResponse(False, 401, "Invalid Token ☹")
 
 
 def signup(email, firstname, surname, password, companyName, companyPhoneNumber, websiteURL) -> Callback:
@@ -97,7 +104,6 @@ def authenticate(email: str, password_to_check: str) -> Callback:
         data['user']['token'] = access_token
         data['user']['refresh'] = refresh_token
         print(data)
-
 
         # Set LastAccess
         user.LastAccess = datetime.now()

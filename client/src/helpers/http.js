@@ -9,7 +9,7 @@ export const http = axios.create({
 http.interceptors.request.use(
     function (config) {
         const header = authHeader();
-        if (header) config.headers.Authorization = header;
+        if (header) config.headers = header;
         return config;
     },
     function (error) {

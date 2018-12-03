@@ -83,6 +83,7 @@ def admin_homeDEPREACTED():
 def admin_home():
     if request.method == "GET":
         # Get all assistants
+        print("hey")
         current_user = get_jwt_identity()
 
         return helpers.jsonResponse(True, 200, "Assistants Returned!", 'Yay')

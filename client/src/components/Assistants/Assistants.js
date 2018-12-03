@@ -37,6 +37,7 @@ class Assistants extends Component {
     };
 
     render() {
+        console.log(this.props.assistantList)
         return (
 
             <div style={{height: '100%'}}>
@@ -57,7 +58,8 @@ class Assistants extends Component {
 
                     <div className={styles.Body}>
                         <div className={styles.AssistantsList}>
-                            {this.props.assistantList.map((x, i) => <Assistant key={i} index={i}/>)}
+                            {this.props.assistantList.map((assistant, i) => <Assistant assistant={assistant} key={i}
+                                                                                       index={i}/>)}
                         </div>
                     </div>
 

@@ -37,11 +37,13 @@ class Assistant extends Component {
     state = {};
 
     onChange(checked) {
+        // Send request to disable the assistant
         console.log(`switch to ${checked}`);
     }
 
 
     render() {
+        const {assistant} = this.props;
         return (
             <Card style={{width: 300, margin: 15, float: 'left'}}
                   cover={
@@ -51,8 +53,8 @@ class Assistant extends Component {
                            width="100%"
                            src={covers[Math.floor(Math.random() * covers.length)]}/>
                   }
-                  title={`Bot ${this.props.index + 1}`}
-                  extra={<Switch/>}
+                  title={assistant.Name}
+                  extra={<Switch defaultChecked={assistant.Active} onChange={this.onChange}/>}
                   actions={[
                       <div>
                           <Icon type="setting"/>
@@ -69,7 +71,7 @@ class Assistant extends Component {
                           </a>
                       </Dropdown>]}>
                 <Meta
-                    description={`This is bot ${this.props.index + 1}`}
+                    description={assistant.TopBarText}
                 />
             </Card>
 

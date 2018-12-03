@@ -2,67 +2,66 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import {authActions} from '../store/actions';
+import styles from '../components/Flow/Flow.module.less'
+import './Login/Login.less'
+
+import {Form, Icon, Input, Button} from 'antd';
+import {Avatar} from 'antd';
+
+
+const FormItem = Form.Item;
+
 
 class Login extends React.Component {
 
-    state = {
-        email: '',
-        password: '',
-        submitted: false,
-    };
-
-
-    handleChange = (e) => {
-        const {name, value} = e.target;
-        this.setState({[name]: value});
-    }
-
     handleSubmit = (e) => {
         e.preventDefault();
-        this.setState({submitted: true});
-        const {email, password} = this.state;
-        if (email && password) {
-            this.props.dispatch(authActions.login(email, password));
-        }
-    }
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+                console.log('Received values of form: ', values);
+                this.props.dispatch(authActions.login(values.email, values.password));
+            }
+        });
+    };
 
     handleLogout = () => {
         this.props.dispatch(authActions.logout());
-    }
+    };
 
     render() {
-        const {isLoggingIn} = this.props;
-        console.log(isLoggingIn);
-        const {email, password, submitted} = this.state;
+        const {getFieldDecorator} = this.props.form;
         return (
-            <div className="col-md-6 col-md-offset-3">
-                <div className="alert alert-info">
-                    Email: test<br/>
-                    Password: test
-                </div>
-                <h2>Login</h2>
-                <form name="form" onSubmit={this.handleSubmit}>
-                    <div>
-                        <label htmlFor="email">Email</label>
-                        <input type="text" name="email" value={email} onChange={this.handleChange}/>
-                        {submitted && !email &&
-                        <div className="help-block">Email is required</div>
-                        }
-                    </div>
-                    <div className={'form-group' + (submitted && !password ? ' has-error' : '')}>
-                        <label htmlFor="password">Password</label>
-                        <input type="password" name="password" value={password} onChange={this.handleChange}/>
-                        {submitted && !password &&
-                        <div className="help-block">Password is required</div>
-                        }
-                    </div>
-                    <div className="form-group">
-                        <button>Login</button>
-                    </div>
-                </form>
-                <button onClick={this.handleLogout}>Logout</button>
+            <div className={styles.Panel} style={{padding: 75, textAlign: 'center'}}>
+
+                <Avatar size={128} icon="user" style={{marginBottom: 50}}/>
+
+                <Form onSubmit={this.handleSubmit} className="login-form">
+                    <FormItem>
+                        {getFieldDecorator('email', {
+                            rules: [{required: true, message: 'Please input your email!'}],
+                        })(
+                            <Input prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                                   placeholder="Email"/>
+                        )}
+                    </FormItem>
+                    <FormItem>
+                        {getFieldDecorator('password', {
+                            rules: [{required: true, message: 'Please input your Password!'}],
+                        })(
+                            <Input prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>} type="password"
+                                   placeholder="Password"/>
+                        )}
+                    </FormItem>
+                    <FormItem>
+                        <Button type="primary" htmlType="submit" className="login-form-button">
+                            Log in
+                        </Button>
+                    </FormItem>
+                </Form>
             </div>
         );
+
+
     }
 }
 
@@ -72,4 +71,5 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Login);
+const loginForm = Form.create()(Login);
+export default connect(mapStateToProps)(loginForm);

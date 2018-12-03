@@ -10,12 +10,12 @@ class LoginPage extends React.Component {
         password: '',
         submitted: false
     };
-    
+
 
     handleChange = (e) => {
         const { name, value } = e.target;
         this.setState({ [name]: value });
-    }
+    };
 
     handleSubmit = (e) => {
         e.preventDefault();
@@ -24,11 +24,11 @@ class LoginPage extends React.Component {
         if (email && password) {
             this.props.dispatch(authActions.login(email, password));
         }
-    }
+    };
 
     handleLogout = () => {
         this.props.dispatch(authActions.logout());
-    }
+    };
 
     render() {
         const { isLoggingIn } = this.props;

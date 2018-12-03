@@ -16,7 +16,7 @@ class Assistants extends Component {
 
     componentDidMount() {
         this.props.dispatch(assistantActions.fetchAssistants())
-    }
+    };
 
     showModal = () => {
         this.setState({
@@ -24,20 +24,20 @@ class Assistants extends Component {
         });
     };
 
-    handleOk = (e) => {
+    handleOk = () => {
         this.setState({
             visible: false,
         });
     };
 
-    handleCancel = (e) => {
+    handleCancel = () => {
         this.setState({
             visible: false,
         });
     };
 
     render() {
-        console.log(this.props.assistantList)
+
         return (
 
             <div style={{height: '100%'}}>
@@ -72,12 +72,11 @@ class Assistants extends Component {
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                     footer={[
-                        <Button key="cancle" onClick={this.handleCancel}>Cancle</Button>,
+                        <Button key="cancel" onClick={this.handleCancel}>Cancel</Button>,
                         <Button key="submit" type="primary" onClick={this.handleOk}>
                             Submit
                         </Button>,
-                    ]}
-                >
+                    ]}>
                     <NewRequest/>
                 </Modal>
             </div>

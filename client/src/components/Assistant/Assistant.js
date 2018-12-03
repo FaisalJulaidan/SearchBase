@@ -45,9 +45,8 @@ class Assistant extends Component {
     render() {
         const {assistant} = this.props;
         return (
-            <Card style={{width: 300, margin: 15, float: 'left'}}
+            <Card style={{width: 300, margin: 15, float: 'left', height:369}}
                   cover={
-
                       <img alt="example"
                            height={200}
                            width="100%"
@@ -66,7 +65,7 @@ class Assistant extends Component {
                       </div>,
 
                       <Dropdown overlay={menu} trigger={['click']}>
-                          <a className="ant-dropdown-link" href="/">
+                          <a className="ant-dropdown-link">
                               ...
                           </a>
                       </Dropdown>]}>

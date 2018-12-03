@@ -9,10 +9,12 @@ export const http = axios.create({
 http.interceptors.request.use(
     function (config) {
         const header = authHeader();
-        if (header) config.headers = header;
+        if (!header) throw new Error('Token required!');  
+        config.headers = header;
         return config;
     },
     function (error) {
+        console.log(error)
         return Promise.reject(error);
     }
 );

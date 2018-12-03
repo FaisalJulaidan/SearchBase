@@ -1,13 +1,17 @@
-import {http} from '../../helpers';
 import * as actionTypes from '../actions/actionTypes';
 import {put, takeEvery, all} from 'redux-saga/effects'
 import {authActions} from "../actions";
+import { commaListsOr } from 'common-tags';
+import axios from 'axios';
+ 
 
 function* login(action) {
     const {email, password} = action;
 
     try {
-        const res = yield http.post(`/api/auth`, {email, password});
+        const res = yield axios.post(`/api/auth`, {email, password}, {
+            headers: {'Content-Type': 'application/json'},
+        });
         const user = res.data.data.user;
         // const expirationDate = yield new Date(
         //     new Date().getTime() + response.data.expiresIn * 1000
@@ -17,6 +21,7 @@ function* login(action) {
         yield put(authActions.loginSuccess(user));
         // yield put(actions.checkAuthTimeout(response.data.expiresIn));
     } catch (error) {
+        console.log(error)
         yield put(authActions.loginFailure(error.response.data));
     }
 }

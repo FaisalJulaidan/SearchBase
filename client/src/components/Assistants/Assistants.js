@@ -9,10 +9,9 @@ import Assistant from "../Assistant/Assistant"
 import NewRequest from "./NewAssistant/NewRequest"
 
 class Assistants extends Component {
-    state = {};
-    arr = Array(15).fill(0);
-
     state = {visible: false};
+
+    arr = Array(15).fill(0);
 
     showModal = () => {
         this.setState({

@@ -3,19 +3,22 @@ import React, {Component} from 'react';
 import {Icon, Layout, Menu} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
-import Flow from "../../components/Flow/Flow";
 import Assistants from "../../components/Assistants/Assistants";
+import store from '../../store/store'
+import {connect} from 'react-redux';
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
 
-
 const {Header, Content, Footer, Sider} = Layout;
+
+
+const action = type => store.dispatch({type});
 
 class Dashboard extends Component {
     state = {
         collapsed: false,
-        marginLeft: 200
+        marginLeft: 200,
     };
 
     toggle = () => {
@@ -23,7 +26,6 @@ class Dashboard extends Component {
             collapsed: !this.state.collapsed,
         }, () => this.setState({marginLeft: this.state.collapsed ? 81 : 200}));
     };
-
 
     render() {
         return (
@@ -84,8 +86,9 @@ class Dashboard extends Component {
                     {/*HERE GOES ALL THE ROUTES*/}
                     <Content style={{margin: 16, marginTop: 80, marginBottom: 0, height: '100%'}}>
 
-                        {/*<Assistants/>*/}
-                        <Flow/>
+                        <Assistants/>
+                        {/*<Flow/>*/}
+
 
                     </Content>
 
@@ -96,6 +99,12 @@ class Dashboard extends Component {
             </Layout>
         );
     }
+
 }
 
-export default Dashboard;
+const mapStateToProps = state => {
+    return {
+        counter: state.counter
+    }
+};
+export default connect(mapStateToProps)(Dashboard);

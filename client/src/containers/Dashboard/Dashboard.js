@@ -6,11 +6,11 @@ import styles from "./Dashboard.module.less"
 import Assistants from "../../components/Assistants/Assistants";
 import store from '../../store/store'
 import {connect} from 'react-redux';
-import Login from "../Login";
+import {history} from '../../helpers';
+import { Switch, Route } from 'react-router-dom';
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
-
 const {Header, Content, Footer, Sider} = Layout;
 
 
@@ -28,7 +28,13 @@ class Dashboard extends Component {
         }, () => this.setState({marginLeft: this.state.collapsed ? 81 : 200}));
     };
 
+    handleMenuClick = (e) => {
+        e.key === 'dashboard' ? history.push(`/dashboard`) : history.push(`/dashboard/${e.key}`)
+    }
+
     render() {
+        const {match} = this.props;
+        console.log(this.props)
         return (
             <Layout style={{height: '100%'}}>
                 <Sider
@@ -44,13 +50,13 @@ class Dashboard extends Component {
                         </div>
                     </div>
 
-                    <Menu theme="light" defaultSelectedKeys={['1']} mode="inline">
-                        <Menu.Item key="1">
+                    <Menu theme="light" defaultSelectedKeys={['1']} mode="inline" onClick={this.handleMenuClick}>
+                        <Menu.Item key="dashboard">
                             <Icon type="home"/>
                             <span>Home</span>
                         </Menu.Item>
 
-                        <Menu.Item key="2">
+                        <Menu.Item key="assistants">
                             <Icon type="robot"/>
                             <span>Assistants</span>
                         </Menu.Item>
@@ -59,20 +65,20 @@ class Dashboard extends Component {
 
                         <SubMenu key="sub2"
                                  title={<span><Icon type="user"/><span>Account Detail</span></span>}>
-                            <Menu.Item key="3">
+                            <Menu.Item key="profile">
                                 <Icon type="profile"/>
                                 Profile
                             </Menu.Item>
-                            <Menu.Item key="4" style={{fontSize: '9pt'}}>
-                                <Icon type="usergroup-add"/>Users Managment
+                            <Menu.Item key="users-management" style={{fontSize: '9pt'}}>
+                                <Icon type="usergroup-add"/>Users Management
                             </Menu.Item>
                         </SubMenu>
 
-                        <Menu.Item key="5">
+                        <Menu.Item key="billing">
                             <Icon type="dollar"/>
                             <span>Billing</span>
                         </Menu.Item>
-                        <Menu.Item key="6">
+                        <Menu.Item key="support">
                             <Icon type="question-circle"/>
                             <span>Support</span>
                         </Menu.Item>
@@ -92,9 +98,12 @@ class Dashboard extends Component {
                     {/*HERE GOES ALL THE ROUTES*/}
                     <Content style={{margin: 16, marginTop: 80, marginBottom: 0, height: '100%'}}>
 
+                        <Switch>
+                            <Route path={`${match.path}/assistants`} component={Assistants} />
+                            {/* <Route path="/dashboard" component={Dashboard} />          */}
+                        </Switch>
                         {/*<Assistants/>*/}
                         {/*<Flow/>*/}
-                        <Login/>
 
                     </Content>
 

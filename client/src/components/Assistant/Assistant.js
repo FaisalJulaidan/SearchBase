@@ -45,7 +45,7 @@ class Assistant extends Component {
     render() {
         const {assistant} = this.props;
         return (
-            <Card style={{width: 300, margin: 15, float: 'left', height:369}}
+            <Card loading={this.props.isLoading} style={{width: 300, margin: 15, float: 'left', height:369}}
                   cover={
                       <img alt="example"
                            height={200}

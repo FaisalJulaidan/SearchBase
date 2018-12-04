@@ -7,7 +7,7 @@ import styles from "./Assistants.module.less"
 import Assistant from "../Assistant/Assistant"
 
 import NewRequest from "./NewAssistant/NewRequest"
-import {assistantActions} from "../../store/actions/assistant.action";
+import {assistantActions} from "../../store/actions/assistant.actions";
 
 class Assistants extends Component {
     state = {
@@ -58,8 +58,11 @@ class Assistants extends Component {
 
                     <div className={styles.Body}>
                         <div className={styles.AssistantsList}>
-                            {this.props.assistantList.map((assistant, i) => <Assistant assistant={assistant} key={i}
-                                                                                       index={i}/>)}
+                            {this.props.assistantList.map((assistant, i) => <Assistant assistant={assistant} 
+                                                                                       key={i}
+                                                                                       index={i}
+                                                                                       isLoading={this.props.isLoading}
+                                                                                       />)}
                         </div>
                     </div>
 
@@ -86,7 +89,8 @@ class Assistants extends Component {
 
 function mapStateToProps(state) {
     return {
-        assistantList: state.assistant.assistantList
+        assistantList: state.assistant.assistantList,
+        isLoading: state.assistant.isLoading
     };
 }
 

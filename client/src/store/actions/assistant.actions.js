@@ -3,7 +3,7 @@ import * as actionTypes from './actionTypes';
 
 const fetchAssistants = () => {
     return {
-        type: actionTypes.FETCH_ASSISTANTS
+        type: actionTypes.FETCH_ASSISTANTS_REQUEST
     };
 };
 
@@ -14,9 +14,10 @@ const fetchAssistantsSuccess = (assistantList) => {
     };
 };
 
-const fetchAssistantsFailure = () => {
+const fetchAssistantsFailure = (error) => {
     return {
-        type: actionTypes.FETCH_ASSISTANTS_FAILURE
+        type: actionTypes.FETCH_ASSISTANTS_FAILURE,
+        error
     };
 };
 

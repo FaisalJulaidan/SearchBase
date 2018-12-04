@@ -1,28 +1,36 @@
 import React, {Component} from 'react';
+import { Switch, Route, withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+import {history} from './helpers';
 import './App.css';
-import Dashboard from "./containers/Dashboard/Dashboard";
 
+import {PrivateRoute} from './hoc';
+import Dashboard from "./containers/Dashboard/Dashboard";
+import Login from './containers/Login/Login'
 
 class App extends Component {
-    // componentDidMount() {
-    //     // Make a request for a user with a given ID
-    //     axios.get("http://127.0.0.1:5000/api/admin/assistant/1")
-    //         .then(function (response) {
-    //             // handle success
-    //             console.log(response);
-    //         })
-    //         .catch(function (error) {
-    //             // handle error
-    //             console.log(error);
-    //         })
-    // }
+    constructor(props) {
+        super(props);
+        history.listen((location, action) => {
+            console.log(`The current URL is ${location.pathname}${location.search}${location.hash}`)
+        });
+    }
 
     render() {
         return (
-            <Dashboard/>
+            <Switch>
+                {/* <Route exact path="/" component={Home} /> */}
+                <Route path="/login" component={Login} />
+                <PrivateRoute path="/dashboard" component={Dashboard} />         
+            </Switch>
         );
     }
 }
-            
-
-export default App;
+    
+const mapStateToProps = (state) => {
+    const { alert } = state;
+    return {
+        alert
+    };
+}
+export default withRouter(connect(mapStateToProps)(App));

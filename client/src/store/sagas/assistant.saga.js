@@ -1,7 +1,7 @@
 import {delay} from 'redux-saga'
 import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
-import {assistantActions} from "../actions";
+import {assistantActions, authActions} from "../actions";
 import {http} from "../../helpers";
 
 function* fetchAssistants() {
@@ -11,6 +11,9 @@ function* fetchAssistants() {
         return yield put(assistantActions.fetchAssistantsSuccess(res.data.data))
     } catch (error) {
         console.log(error);
+
+        yield localStorage.removeItem('user');
+        yield put(authActions.logout());
         return yield put(assistantActions.fetchAssistantsFailure(error.response.data));
     }
 

@@ -2,24 +2,33 @@ import React, {Component} from 'react';
 import "./Assistant.less"
 
 import {Card, Dropdown, Icon, Menu, Switch} from 'antd';
+import {Link} from "react-router-dom";
 
 const {Meta} = Card;
 
 
-const menu = (
+const menu = (assistant) => (
     <Menu>
         <Menu.Item key="1">
-            <Icon type="database"/> Solutions
+            <Link to={`solutions/${assistant.ID}`}>
+                <Icon type="database"/> Solutions
+            </Link>
         </Menu.Item>
         <Menu.Item key="2">
-            <Icon type="code"/>User Input
+            <Link to={`userInput/${assistant.ID}`}>
+                <Icon type="code"/>User Input
+            </Link>
         </Menu.Item>
         <Menu.Item key="3">
-            <Icon type="line-chart"/>Analytics
+            <Link to={`analytics/${assistant.ID}`}>
+                <Icon type="line-chart"/>Analytics
+            </Link>
         </Menu.Item>
         <Menu.Divider/>
         <Menu.Item key="4">
-            <Icon type="sync"/> Integration
+            <Link to={`integration/${assistant.ID}`}>
+                <Icon type="sync"/> Integration
+            </Link>
         </Menu.Item>
     </Menu>
 );
@@ -32,9 +41,11 @@ const covers = [
     'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/messages1_9ah2.svg'
 ];
 
+
 class Assistant extends Component {
 
     state = {};
+
 
     onChange(checked) {
         // Send request to disable the assistant
@@ -44,8 +55,9 @@ class Assistant extends Component {
 
     render() {
         const {assistant} = this.props;
+        const {match} = this.props;
         return (
-            <Card loading={this.props.isLoading} style={{width: 300, margin: 15, float: 'left', height:369}}
+            <Card loading={this.props.isLoading} style={{width: 300, margin: 15, float: 'left', height: 369}}
                   cover={
                       <img alt="example"
                            height={200}
@@ -56,15 +68,19 @@ class Assistant extends Component {
                   extra={<Switch defaultChecked={assistant.Active} onChange={this.onChange}/>}
                   actions={[
                       <div>
-                          <Icon type="setting"/>
-                          <span> Settings</span>
+                          <Link to={`settings/${assistant.ID}`}>
+                              <Icon type="setting"/>
+                              <span> Settings</span>
+                          </Link>
                       </div>,
                       <div>
-                          <Icon type="build"/>
-                          <span> Flow</span>
+                          <Link to={`assistants/${assistant.ID}`}>
+                              <Icon type="build"/>
+                              <span> Flow</span>
+                          </Link>
                       </div>,
 
-                      <Dropdown overlay={menu} trigger={['click']}>
+                      <Dropdown overlay={menu(assistant)} trigger={['click']}>
                           <a className="ant-dropdown-link">
                               ...
                           </a>

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import { Switch, Route, withRouter } from 'react-router-dom';
-import { connect } from 'react-redux';
+import {Switch, Route, withRouter, Redirect} from 'react-router-dom';
+import {connect} from 'react-redux';
 import {history} from './helpers';
 import './App.css';
 
@@ -20,17 +20,18 @@ class App extends Component {
         return (
             <Switch>
                 {/* <Route exact path="/" component={Home} /> */}
-                <Route path="/login" component={Login} />
-                <PrivateRoute path="/dashboard" component={Dashboard} />         
+                <Route path="/login" component={Login}/>
+                <PrivateRoute path="/dashboard" component={Dashboard}/>
+                <Redirect to={{pathname: '/dashboard'}}/>
             </Switch>
         );
     }
 }
-    
+
 const mapStateToProps = (state) => {
-    const { alert } = state;
+    const {alert} = state;
     return {
-        alert
+        alert,
     };
-}
+};
 export default withRouter(connect(mapStateToProps)(App));

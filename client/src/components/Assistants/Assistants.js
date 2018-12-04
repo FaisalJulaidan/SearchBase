@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Modal} from 'antd';
+import {Button, Modal, Skeleton} from 'antd';
 import {connect} from 'react-redux';
 
 import "./Assistants.less"
@@ -37,7 +37,6 @@ class Assistants extends Component {
     };
 
     render() {
-
         return (
 
             <div style={{height: '100%'}}>
@@ -58,11 +57,17 @@ class Assistants extends Component {
 
                     <div className={styles.Body}>
                         <div className={styles.AssistantsList}>
-                            {this.props.assistantList.map((assistant, i) => <Assistant assistant={assistant} 
-                                                                                       key={i}
-                                                                                       index={i}
-                                                                                       isLoading={this.props.isLoading}
-                                                                                       />)}
+                            {
+                                this.props.assistantList[0] ?
+                                    (
+                                        this.props.assistantList.map((assistant, i) => <Assistant assistant={assistant}
+                                                                                                  key={i}
+                                                                                                  index={i}
+                                                                                                  isLoading={this.props.isLoading}
+                                        />)
+                                    )
+                                    : <Skeleton active/>
+                            }
                         </div>
                     </div>
 

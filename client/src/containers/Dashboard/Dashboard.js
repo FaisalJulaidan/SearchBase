@@ -8,6 +8,7 @@ import store from '../../store/store'
 import {connect} from 'react-redux';
 import {history} from '../../helpers';
 import { Switch, Route } from 'react-router-dom';
+import Flow from "../../components/Flow/Flow";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -34,7 +35,6 @@ class Dashboard extends Component {
 
     render() {
         const {match} = this.props;
-        console.log(this.props)
         return (
             <Layout style={{height: '100%'}}>
                 <Sider
@@ -44,9 +44,9 @@ class Dashboard extends Component {
                     className={styles.Sider}>
 
                     <div className={styles.Logo}>
-                        <div style={{display:'flex'}}>
+                        <div style={{display: 'flex'}}>
                             <Icon type="cloud" theme="twoTone" twoToneColor="#9254de" style={{fontSize: 44}}/>
-                            <div style={{lineHeight:'43px', marginLeft:25}}>TheSearchBase</div>
+                            <div style={{lineHeight: '43px', marginLeft: 25}}>TheSearchBase</div>
                         </div>
                     </div>
 
@@ -99,8 +99,10 @@ class Dashboard extends Component {
                     <Content style={{margin: 16, marginTop: 80, marginBottom: 0, height: '100%'}}>
 
                         <Switch>
-                            <Route path={`${match.path}/assistants`} component={Assistants} />
-                            {/* <Route path="/dashboard" component={Dashboard} />          */}
+                            <Route path={`${match.path}/assistants/:id`} component={Flow}/>
+                            <Route path={`${match.path}/assistants`} component={Assistants}/>
+
+                            {/*<Route path="/dashboard" component={Dashboard}/>*/}
                         </Switch>
                         {/*<Assistants/>*/}
                         {/*<Flow/>*/}

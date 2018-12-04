@@ -4,6 +4,8 @@ import "./Flow.less"
 import Groups from "./Groups/Groups";
 import Blocks from "./Blocks/Blocks";
 import Header from "./Header/Header";
+import {flowActions} from "../../store/actions";
+import connect from "react-redux/es/connect/connect";
 
 /*
 *
@@ -14,10 +16,13 @@ import Header from "./Header/Header";
 
 class Flow extends Component {
 
+    componentDidMount() {
+        this.props.dispatch(flowActions.fetchFlowRequest())
+    }
 
     render() {
         const {assistant} = this.props.location.state;
-        console.log(assistant)
+        console.log(assistant);
 
         return (
             <div style={{height: '100%'}}>
@@ -43,5 +48,13 @@ class Flow extends Component {
 
 }
 
-export default Flow;
+
+function mapStateToProps(state) {
+    return {
+        isLoading: state.flow.isLoading
+    };
+}
+
+export default connect(mapStateToProps)(Flow);
+
 

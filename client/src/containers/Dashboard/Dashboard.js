@@ -4,18 +4,14 @@ import {Icon, Layout, Menu} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
 import Assistants from "../../components/Assistants/Assistants";
-import store from '../../store/store'
-import {connect} from 'react-redux';
 import {history} from '../../helpers';
-import { Switch, Route } from 'react-router-dom';
+import {Switch, Route} from 'react-router-dom';
 import Flow from "../../components/Flow/Flow";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
 const {Header, Content, Footer, Sider} = Layout;
 
-
-const action = type => store.dispatch({type});
 
 class Dashboard extends Component {
     state = {
@@ -31,7 +27,7 @@ class Dashboard extends Component {
 
     handleMenuClick = (e) => {
         e.key === 'dashboard' ? history.push(`/dashboard`) : history.push(`/dashboard/${e.key}`)
-    }
+    };
 
     render() {
         const {match} = this.props;
@@ -99,13 +95,11 @@ class Dashboard extends Component {
                     <Content style={{margin: 16, marginTop: 80, marginBottom: 0, height: '100%'}}>
 
                         <Switch>
-                            <Route path={`${match.path}/assistants/:id`} component={Flow}/>
+                            <Route path={`${match.path}/assistants/:id`} component={Flow} />
                             <Route path={`${match.path}/assistants`} component={Assistants}/>
 
                             {/*<Route path="/dashboard" component={Dashboard}/>*/}
                         </Switch>
-                        {/*<Assistants/>*/}
-                        {/*<Flow/>*/}
 
                     </Content>
 
@@ -119,9 +113,4 @@ class Dashboard extends Component {
 
 }
 
-const mapStateToProps = state => {
-    return {
-        counter: state.counter
-    }
-};
-export default connect(mapStateToProps)(Dashboard);
+export default Dashboard;

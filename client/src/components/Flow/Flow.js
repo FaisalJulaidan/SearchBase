@@ -16,12 +16,15 @@ class Flow extends Component {
 
 
     render() {
+        const {assistant} = this.props.location.state;
+        console.log(assistant)
+
         return (
             <div style={{height: '100%'}}>
 
                 <div style={{padding: '0 5px'}}>
                     <div style={{width: '100%', height: 56, marginBottom: 10}}>
-                        <Header/>
+                        <Header assistantName={assistant.Name}/>
                     </div>
                 </div>
 

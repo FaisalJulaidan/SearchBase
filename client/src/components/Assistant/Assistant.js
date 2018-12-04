@@ -55,7 +55,6 @@ class Assistant extends Component {
 
     render() {
         const {assistant} = this.props;
-        const {match} = this.props;
         return (
             <Card loading={this.props.isLoading} style={{width: 300, margin: 15, float: 'left', height: 369}}
                   cover={
@@ -68,13 +67,21 @@ class Assistant extends Component {
                   extra={<Switch defaultChecked={assistant.Active} onChange={this.onChange}/>}
                   actions={[
                       <div>
-                          <Link to={`settings/${assistant.ID}`}>
+
+                          <Link to={{
+                              pathname: `settings/${assistant.ID}`,
+                              state: {assistant: assistant}
+                          }}>
                               <Icon type="setting"/>
                               <span> Settings</span>
                           </Link>
                       </div>,
                       <div>
-                          <Link to={`assistants/${assistant.ID}`}>
+                          <Link
+                              to={{
+                                  pathname: `assistants/${assistant.ID}`,
+                                  state: {assistant: assistant}
+                              }}>
                               <Icon type="build"/>
                               <span> Flow</span>
                           </Link>

@@ -42,6 +42,9 @@ connection_router: Blueprint = connection_router
 from .assistant.userInput import userInput_router
 userInput_router: Blueprint = userInput_router
 
+from .assistant.flow import flow_router
+flow_router: Blueprint = flow_router
+
 from .account.users import users_router
 users_router: Blueprint = users_router
 

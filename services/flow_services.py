@@ -20,29 +20,35 @@ bot_currentVersion = "1.0.0"
 def getChatbot(assistant: Assistant) -> dict:
     return {'assistant': {'id': helpers.encrypt_id(assistant.ID), 'name': assistant.Name, 'message': assistant.Message,
                           'secondsUntilPopup': assistant.SecondsUntilPopup, 'active': assistant.Active},
-            'blocks': getBlocks(assistant)}
+            'blocks': getAllBlocks(assistant)}
 
 
 # Get the flow for the company to manage the blocks
 def getFlow(assistant: Assistant) -> Callback:
+
+    blockGroups = getBlockGroups(assistant)
+    if not blockGroups:
+        return Callback(False, 'Could not retrieve flow', None)
+
     data = {'botVersion': bot_currentVersion,
             'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
-            'blockGroups': getBlockGroups(assistant)}
+            'blockGroups':blockGroups}
     return Callback(True, 'Flow retrieved successfully', data)
 
 
 # Get the block groups each group having its list of blocks
 def getBlockGroups(assistant: Assistant) -> List[dict]:
     try:
-        result: List[BlockGroup] = db.session.query(BlockGroup).filter(Block.AssistantID == assistant.ID)
+        result: List[BlockGroup] = db.session.query(BlockGroup).filter(BlockGroup.AssistantID == assistant.ID)
         groups = []
         for group in result:
             groups.append({'id': group.ID, 'name': group.Name, 'description': group.Description,
-                           'blocks': helpers.getListFromSQLAlchemyList(group.Blocks)})
+                           'blocks': getBlocksByGroup(group)})
         return groups
     except Exception as e:
-        print("getGroups ERROR:", e)
+        print("getBlockGroups ERROR:", e)
         db.session.rollback()
+        return None
     # finally:
     # db.session.close()
 
@@ -63,16 +69,32 @@ def getGroupByID(id) -> Callback:
     # finally:
     # db.session.close()
 
-# Get all the given assistant blocks without its group. will be used for chatbot to not bother with groups
-def getBlocks(assistant: Assistant) -> List[dict]:
+
+# Get the list of blocks by group
+def getBlocksByGroup(group: BlockGroup) -> List[dict]:
     try:
-        result: List[Block] = db.session.query(Block).filter(Block.AssistantID == assistant.ID)\
-            .order_by(Block.Order.asc()).all()
         blocks = []
-        for block in result:
-            # Try to using helpers.getDictFromSQLAlchemyObj()
+        for block in group.Blocks:
             blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,
-                           'content': block.Content, 'storeInDB': block.StoreInDB, 'labels': block.Labels, 'isSkippable': block.Skippable})
+                           'content': block.Content, 'storeInDB': block.StoreInDB,
+                           'labels': block.Labels,'isSkippable': block.Skippable})
+        return blocks
+    except Exception as e:
+        print("getBlocks ERROR:", e)
+        db.session.rollback()
+    # finally:
+    # db.session.close()
+
+
+# Get all the given assistant blocks without its group. will be used for chatbot to not bother with groups
+def getAllBlocks(assistant: Assistant) -> List[dict]:
+    try:
+        groups: List[BlockGroup] = db.session.query(BlockGroup).filter(BlockGroup.AssistantID == assistant.ID)
+        blocks = []
+        for group in groups:
+            for block in group.Blocks:
+                blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,
+                               'content': block.Content, 'storeInDB': block.StoreInDB, 'labels': block.Labels, 'isSkippable': block.Skippable})
         return blocks
     except Exception as e:
         print("getBlocks ERROR:", e)
@@ -87,12 +109,12 @@ def addGroup(group: dict, assistant: Assistant) -> Callback:
         newGroup = BlockGroup(Name=group.get('name'), Description=group.get('description'), Assistant=assistant)
         db.session.add(newGroup)
         db.session.commit()
-        return Callback(True, 'Block added successfully!', {"newGroup": newGroup})
+        return Callback(True, 'Group added successfully!', {"groupID": newGroup.ID})
 
     except Exception as exc:
         db.session.rollback()
         print("flow_services.addBlock ERROR: ", exc)
-        return Callback(False, 'Error occurred while creating a new Block object', exc.args[0])
+        return Callback(False, 'Error occurred while creating a new Group', exc.args[0])
     # finally:
     # db.session.close()
 

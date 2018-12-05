@@ -1,5 +1,5 @@
 from flask import Blueprint, request, session
-from services import admin_services, assistant_services, bot_services, user_services, blockLabels_services
+from services import admin_services, assistant_services, flow_services, user_services, blockLabels_services
 from models import Callback, Assistant, User, BlockLabel
 from utilities import helpers
 
@@ -24,7 +24,7 @@ def bot_templateUpload(assistantID):
     # Upload the template
     if request.method == "POST":
         data = request.get_json(silent=True)
-        callback: Callback = bot_services.genBotViaTemplateUplaod(assistant, data)
+        callback: Callback = flow_services.genFlowViaTemplateUplaod(assistant, data)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, "Please make sure the file follow the correct format.",
                                         callback.Message)
@@ -43,7 +43,7 @@ def bot(assistantID):
     if request.method == "GET":
         assistant: Assistant = callback.Data
         # Get bot data (Blocks, Assistant...)
-        data: dict = bot_services.getBot(assistant)
+        data: dict = flow_services.getFlow(assistant)
 
         return helpers.jsonResponse(True, 200, "No Message", data)
 
@@ -51,7 +51,7 @@ def bot(assistantID):
     if request.method == "POST":
         # Get new block data from the request's body
         data = request.get_json(silent=True)
-        callback: Callback = bot_services.addBlock(data, assistant)
+        callback: Callback = flow_services.addBlock(data, assistant)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
@@ -59,7 +59,7 @@ def bot(assistantID):
     # Update the blocks
     if request.method == "PUT":
         data = request.get_json(silent=True)
-        callback: Callback = bot_services.updateBot(data, assistant)
+        callback: Callback = flow_services.updateFlow(data, assistant)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
@@ -93,7 +93,7 @@ def delete_block(blockID):
             return helpers.jsonResponse(False, 401, "Sorry, You're not authorised for deleting blocks.")
 
         # Delete the block
-        callback: Callback = bot_services.deleteBlockByID(blockID)
+        callback: Callback = flow_services.deleteBlockByID(blockID)
         if not callback.Success:
             return helpers.jsonResponse(False, 404, callback.Message, None)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
@@ -102,7 +102,7 @@ def delete_block(blockID):
 @bot_router.route("/admin/assistant/bot/options", methods=['GET'])
 def get_botFeatures():
     if request.method == "GET":
-        return helpers.jsonResponse(True, 200, "These are the options the bot provide.", bot_services.getOptions())
+        return helpers.jsonResponse(True, 200, "These are the options the bot provide.", flow_services.getOptions())
 
 
 @bot_router.route("/admin/block-labels", methods=['GET', 'POST'])

@@ -1,5 +1,5 @@
 from flask import redirect, url_for, session, render_template, json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solution, ChatbotSession
+from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solution, ChatbotSession, BlockGroup
 from services import assistant_services, user_services
 from datetime import datetime
 from sqlalchemy import inspect
@@ -36,13 +36,14 @@ def gen_dummy_data():
 
     # Create Assistatns for Aramco and Sabic companies
     reader_a = Assistant(Name="Reader", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
-    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
+    reader_a_blocksGroup = BlockGroup(Name="Group One", Description="This is Group one", Assistant=reader_a)
 
+    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
     reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
     helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
 
     ## Create Blocks
-    #db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Assistant=reader_a, Content={
+    #db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Group=reader_a_blocksGroup, Content={
     #    "answers": [
     #      {
     #        "action": "Go To Next Block",
@@ -70,7 +71,7 @@ def gen_dummy_data():
     #    ],
     #    "text": "Do you smoke?",
     #  }))
-    db.session.add(Block(Type=BlockType.UserInput, Order=1, StoreInDB=True, Assistant=reader_a, Content={
+    db.session.add(Block(Type=BlockType.UserInput, Order=1, StoreInDB=True, Group=reader_a_blocksGroup, Content={
         "action": "Go To Next Block",
         "text": "What's your email?",
         "blockToGoID": None,
@@ -78,7 +79,7 @@ def gen_dummy_data():
         "validation": "Email",
         "afterMessage": 'Your input is being processed...'
     }))
-    db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Assistant=reader_a, Content={
+    db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Group=reader_a_blocksGroup, Content={
         "action": "Go To Next Block",
         "text": "Give me some input",
         "blockToGoID": None,
@@ -87,7 +88,7 @@ def gen_dummy_data():
         "afterMessage": 'Your input is being processed...'
     }))
 
-    #db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
+    #db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Group=reader_a_blocksGroup, Content={
     #    "action": "Go To Next Block",
     #    "fileTypes": [
     #    "doc",
@@ -98,14 +99,14 @@ def gen_dummy_data():
     #    "afterMessage": 'File is being uploaded...'
     #}))
 
-    #db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Assistant=reader_a, Content={
+    #db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Group=reader_a_blocksGroup, Content={
     #    "showTop": 5,
     #    "afterMessage": 'DONE!!!!',
     #    "action": "End Chat",
     #    "blockToGoID": 0
     #}))
 
-    db.session.add(Block(Type=BlockType.Solutions, Order=3, StoreInDB=True, Assistant=reader_a, Content={
+    db.session.add(Block(Type=BlockType.Solutions, Order=3, StoreInDB=True, Group=reader_a_blocksGroup, Content={
         "showTop": 5,
         "afterMessage": 'DONE!!!!',
         "action": "End Chat",

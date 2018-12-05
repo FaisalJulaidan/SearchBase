@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, session
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback, Assistant, User
-from services import statistics_services, assistant_services, admin_services, user_services, bot_services
+from services import statistics_services, assistant_services, admin_services, user_services, flow_services
 from utilities import helpers
 
 assistant_router: Blueprint = Blueprint('assistant_router', __name__, template_folder="../../templates")
@@ -42,7 +42,7 @@ def assistant():
             return helpers.jsonResponse(False, 400, "Couldn't create the assistant", None)
 
         if 'none' not in templateName:
-            callback_bot: Callback = bot_services.genBotViaTemplate(assistant_callback.Data, templateName)
+            callback_bot: Callback = flow_services.genFlowViaTemplate(assistant_callback.Data, templateName)
             if not callback_bot.Success:
                 # if template has an error remove the created assistant
                 assistant_services.removeByID(assistant_callback.Data.ID)
@@ -78,7 +78,7 @@ def admin_homeDEPREACTED():
 
 
 # get all assistants
-@assistant_router.route("/admin/assistants", methods=['GET'])
+@assistant_router.route("/assistants", methods=['GET'])
 @jwt_required
 def admin_home():
     if request.method == "GET":
@@ -93,8 +93,8 @@ def admin_home():
             return helpers.jsonResponse(False, 401, "Cannot get Assistants!",
                                         helpers.getListFromSQLAlchemyList(callback.Data))
 
-
-@assistant_router.route("/admin/assistant/<int:assistantID>", methods=['DELETE'])
+# Delete assistant by ID
+@assistant_router.route("/assistant/<int:assistantID>", methods=['DELETE'])
 def assistant_delete(assistantID):
     if request.method == "DELETE":
         callback: Callback = assistant_services.getByID(assistantID)

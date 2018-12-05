@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "bot template schema",
+  "title": "flow template schema",
   "type": "object",
   "properties": {
     "templateName": { "type": "string" },

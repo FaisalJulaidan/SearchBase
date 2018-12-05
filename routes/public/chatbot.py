@@ -3,7 +3,7 @@ from config import BaseConfig
 from flask import Blueprint, render_template, request, send_from_directory
 from utilities import helpers
 from models import Callback, Assistant, db, ChatbotSession
-from services import assistant_services, bot_services, chatbot_services, solutions_services
+from services import assistant_services, flow_services, chatbot_services, solutions_services
 from werkzeug.utils import secure_filename
 import uuid
 from flask_cors import CORS
@@ -60,7 +60,7 @@ def chatbot(assistantIDAsHash):
 
     if request.method == "GET":
         # Get blocks for the chatbot to use
-        data: dict = bot_services.getChatbot(assistant)
+        data: dict = flow_services.getChatbot(assistant)
         return helpers.jsonResponse(True, 200, "No Message", data)
 
     # Process sent data coming from the chatbot

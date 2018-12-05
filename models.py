@@ -277,15 +277,33 @@ class Assistant(db.Model):
 
     Solutions = db.relationship('Solution', back_populates='Assistant')
     Statistics = db.relationship('Statistics', back_populates='Assistant')
-    Blocks = db.relationship('Block', back_populates='Assistant')
+    BlockGroups = db.relationship('BlockGroup', back_populates='Assistant')
     ChatbotSessions = db.relationship('ChatbotSession', back_populates='Assistant')
 
     # Constraints:
+    # Cannot have two assitants with the same name under one company
     __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
-
 
     def __repr__(self):
         return '<Assistant {}>'.format(self.Name)
+
+
+class BlockGroup(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(128), nullable=False)
+    Description = db.Column(db.String(128), nullable=False)
+
+    # Relationships:
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='BlockGroups')
+    Blocks = db.relationship('Block', back_populates='Group')
+
+    # Constraints:
+    # __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
+
+    def __repr__(self):
+        return '<BlockGroup {}>'.format(self.Name)
 
 
 class Solution(db.Model):
@@ -352,13 +370,6 @@ class BlockAction(enum.Enum):
     EndChat = 'End Chat'
 
 
-# # An association table to add a many to many relationship between Blocks & BlockLabels
-# BlocksLabels = db.Table('BlocksLabels', db.Base.metadata,
-#     db.Column('BlockID', db.Integer, ForeignKey('Block.id')),
-#     db.Column('LabelID', db.Integer, ForeignKey('BlockLabel.id'))
-# )
-
-
 class Block(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
@@ -370,8 +381,8 @@ class Block(db.Model):
     Labels = db.Column(db.String(64), nullable=False, default="")
 
     # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='Blocks')
+    GroupID = db.Column(db.Integer, db.ForeignKey('block_group.ID', ondelete='cascade'), nullable=False)
+    Group = db.relationship('BlockGroup', back_populates='Blocks')
 
     # Labels = db.relationship('BlockLabel', back_populates='Blocks', secondary=BlocksLabels)
 

@@ -7,7 +7,7 @@ import {http} from "../../helpers";
 function* fetchAssistants() {
     yield delay(1000);
     try {
-        const res = yield http.get(`admin/assistants`);
+        const res = yield http.get(`/assistants`);
         return yield put(assistantActions.fetchAssistantsSuccess(res.data.data))
     } catch (error) {
         console.log(error);

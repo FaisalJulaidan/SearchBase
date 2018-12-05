@@ -67,6 +67,10 @@ class Assistant extends Component {
         });
     };
 
+    editAssistantCallback = (editedAssistant) => {
+        console.log(editedAssistant)
+    };
+
 
     render() {
         const {assistant} = this.props;
@@ -127,13 +131,14 @@ class Assistant extends Component {
                         onOk={this.handleOk}
                         width={800}
                         onCancel={this.handleCancel}
+                        destroyOnClose={true}
                         footer={[
                             <Button key="cancel" onClick={this.handleCancel}>Cancel</Button>,
                             <Button key="submit" type="primary" onClick={this.handleOk}>
                                 Save
                             </Button>,
                         ]}>
-                        <EditAssistant assistant={assistant}/>
+                        <EditAssistant assistantCallback={this.editAssistantCallback} {...this.props} {...this.state} />
                     </Modal>
                 </div>
 

@@ -62,7 +62,7 @@ class Groups extends Component {
                                     Add
                                 </Button>
                             ]}>
-                            <NewGroup></NewGroup>
+                            <NewGroup/>
                         </Modal>
                     </div>
                 </div>

@@ -95,12 +95,11 @@ class Dashboard extends Component {
                     <Content style={{margin: 16, marginTop: 80, marginBottom: 0, height: '100%'}}>
 
                         <Switch>
-                            <Route path={`${match.path}/assistants/:id`} component={Flow} />
-                            <Route path={`${match.path}/assistants`} component={Assistants}/>
+                            <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
+                            <Route path={`${match.path}/assistants`} component={Assistants} exact/>
 
                             {/*<Route path="/dashboard" component={Dashboard}/>*/}
                         </Switch>
-
                     </Content>
 
                     <Footer style={{textAlign: 'center', padding: 10}}>

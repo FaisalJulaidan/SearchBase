@@ -297,7 +297,7 @@ class BlockGroup(db.Model):
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='BlockGroups')
-    Blocks = db.relationship('Block', back_populates='Group')
+    Blocks = db.relationship('Block', back_populates='Group', order_by='Block.Order')
 
     # Constraints:
     # __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)

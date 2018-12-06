@@ -21,7 +21,7 @@ def flow(assistantID):
 
     # Check if this user has access to this assistant
     if assistant.CompanyID != user['companyID']:
-        return helpers.jsonResponse(False, 401, "Unauthorised!", security_callback.Data)
+        return helpers.jsonResponse(False, 401, "Unauthorised!")
 
     #############
     callback: Callback = Callback(False, 'Error!', None)
@@ -41,7 +41,7 @@ def flow(assistantID):
 
 
 # Add, Update and Delete blocks group, We ask for assistant ID for security purposes
-@flow_router.route("/assistant/<int:assistantID>/group", methods=['POST', 'PUT', 'DELETE'])
+@flow_router.route("/assistant/<int:assistantID>/flow/group", methods=['POST', 'PUT', 'DELETE'])
 @jwt_required
 def group(assistantID):
 
@@ -55,15 +55,16 @@ def group(assistantID):
 
     # Check if this user has access to this assistant
     if assistant.CompanyID != user['companyID']:
-        return helpers.jsonResponse(False, 401, "Unauthorised!", secuirty_callback.Data)
+        return helpers.jsonResponse(False, 401, "Unauthorised!")
 
     #############
     callback: Callback = Callback(False, 'Error!', None)
     # Add a group
     if request.method == "POST":
         # Get the new group data from the request's body
-        group = request.get_json(silent=True)
-        callback: Callback = flow_services.addGroup(assistant, group)
+        data = request.get_json(silent=True)
+        print(data)
+        callback: Callback = flow_services.addGroup(data, assistant)
 
     # Update the blocks' group
     if request.method == "PUT":
@@ -71,7 +72,7 @@ def group(assistantID):
         data = request.get_json(silent=True)
         callback: Callback = flow_services.updateGroup(data, assistant)
 
-    # Update the blocks' group
+    # Delete the blocks' group
     if request.method == "DELETE":
         # Get new block data from the request's body
         data = request.get_json(silent=True)
@@ -83,7 +84,8 @@ def group(assistantID):
     return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
-@flow_router.route("/assistant/group/<int:groupID>/block", methods=['POST', 'DELETE'])
+# Add and Delete a single block, We ask for group ID for security purposes
+@flow_router.route("/assistant/flow/group/<int:groupID>/block", methods=['POST', 'DELETE'])
 @jwt_required
 def block(groupID):
 
@@ -98,7 +100,7 @@ def block(groupID):
 
     # Check if this user has access to this group
     if group.Assistant.CompanyID != user['companyID']:
-        return helpers.jsonResponse(False, 401, "Unauthorised!", security_callback.Data)
+        return helpers.jsonResponse(False, 401, "Unauthorised!")
 
     #############
     callback: Callback = Callback(False, 'Error!', None)
@@ -118,7 +120,6 @@ def block(groupID):
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
     return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-
 
 
 @flow_router.route("/assistant/flow/options", methods=['GET'])

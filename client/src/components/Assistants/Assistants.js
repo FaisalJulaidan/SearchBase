@@ -1,22 +1,34 @@
 import React, {Component} from 'react';
-import {Button, Modal, Skeleton} from 'antd';
+import {Button, message, Modal, Skeleton} from 'antd';
 import {connect} from 'react-redux';
 
 import "./Assistants.less"
 import styles from "./Assistants.module.less"
 import Assistant from "../Assistant/Assistant"
 
-import NewRequest from "./NewAssistant/NewRequest"
 import {assistantActions} from "../../store/actions/assistant.actions";
+import NewRequestModal from "./NewAssistantModal/NewRequestModal";
+
 
 class Assistants extends Component {
     state = {
         visible: false,
     };
 
+    componentDidUpdate(prevProps) {
+        // Show feedback for settings update
+        if (Boolean(this.props.successSettings) && Boolean(prevProps.successSettings) !== Boolean(this.props.successSettings))
+            message.success(this.props.successSettings);
+
+        if (Boolean(this.props.errorSettings) && Boolean(prevProps.errorSettings) !== Boolean(this.props.errorSettings))
+            message.error(this.props.errorSettings);
+    }
+
+
     componentDidMount() {
-        this.props.dispatch(assistantActions.fetchAssistants())
-    };
+        this.props.dispatch(assistantActions.fetchAssistants());
+    }
+
 
     showModal = () => {
         this.setState({
@@ -24,17 +36,12 @@ class Assistants extends Component {
         });
     };
 
-    handleOk = () => {
+    hideModal = () => {
         this.setState({
             visible: false,
         });
     };
 
-    handleCancel = () => {
-        this.setState({
-            visible: false,
-        });
-    };
 
     render() {
         return (
@@ -73,20 +80,10 @@ class Assistants extends Component {
 
                 </div>
 
-                <Modal
-                    width={800}
-                    title="Create New Assistant"
-                    visible={this.state.visible}
-                    onOk={this.handleOk}
-                    onCancel={this.handleCancel}
-                    footer={[
-                        <Button key="cancel" onClick={this.handleCancel}>Cancel</Button>,
-                        <Button key="submit" type="primary" onClick={this.handleOk}>
-                            Submit
-                        </Button>,
-                    ]}>
-                    <NewRequest/>
-                </Modal>
+
+                <NewRequestModal visible={this.state.visible}
+                                 hideModal={this.hideModal}/>
+
             </div>
         );
     }
@@ -95,7 +92,9 @@ class Assistants extends Component {
 function mapStateToProps(state) {
     return {
         assistantList: state.assistant.assistantList,
-        isLoading: state.assistant.isLoading
+        isLoading: state.assistant.isLoading,
+        successSettings: state.settings.successMsg,
+        errorSettings: state.settings.errorMsg,
     };
 }
 

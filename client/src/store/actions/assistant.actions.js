@@ -21,8 +21,33 @@ const fetchAssistantsFailure = (error) => {
     };
 };
 
+
+const addAssistant = (newAssistant) => {
+    return {
+        type: actionTypes.ADD_ASSISTANT_REQUEST,
+        newAssistant
+    };
+};
+
+const addAssistantSuccess = (successMsg) => {
+    return {
+        type: actionTypes.ADD_ASSISTANT_SUCCESS,
+        successMsg
+    };
+};
+
+const addAssistantFailure = (error) => {
+    return {
+        type: actionTypes.ADD_ASSISTANT_FAILURE,
+        error
+    };
+};
+
 export const assistantActions = {
     fetchAssistants,
     fetchAssistantsSuccess,
-    fetchAssistantsFailure
+    fetchAssistantsFailure,
+    addAssistant,
+    addAssistantSuccess,
+    addAssistantFailure
 };

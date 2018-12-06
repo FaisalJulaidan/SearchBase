@@ -78,7 +78,7 @@ def admin_homeDEPREACTED():
 
 
 # get all assistants
-@assistant_router.route("/assistants", methods=['GET'])
+@assistant_router.route("/assistants", methods=['GET', 'POST'])
 @jwt_required
 def admin_home():
     if request.method == "GET":
@@ -92,10 +92,29 @@ def admin_home():
         else:
             return helpers.jsonResponse(False, 401, "Cannot get Assistants!",
                                         helpers.getListFromSQLAlchemyList(callback.Data))
+    if request.method == "POST":
+        user = get_jwt_identity()['user']
+        print(request.json)
+        # TODO: Add assistant
+        return helpers.jsonResponse(True, 200, "Assistant added!")
 
-# Delete assistant by ID
-@assistant_router.route("/assistant/<int:assistantID>", methods=['DELETE'])
+
+@assistant_router.route("/assistant/<int:assistantID>", methods=['DELETE', 'PUT'])
+@jwt_required
 def assistant_delete(assistantID):
+    if request.method == "PUT":
+        updatedSettings = request.json
+        callback: Callback = assistant_services.update(assistantID,
+                                                       updatedSettings.get("Name"),
+                                                       updatedSettings.get("Message"),
+                                                       updatedSettings.get("TopBarText"),
+                                                       updatedSettings.get("SecondsUntilPopup"))
+
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+
+        return helpers.jsonResponse(True, 200, callback.Message, None)
+
     if request.method == "DELETE":
         callback: Callback = assistant_services.getByID(assistantID)
         if not callback.Success:

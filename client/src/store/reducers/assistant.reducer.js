@@ -22,6 +22,25 @@ export const assistant = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: action.error.msg
             });
+
+
+        case actionTypes.ADD_ASSISTANT_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isAdding: true
+            });
+        case actionTypes.ADD_ASSISTANT_SUCCESS:
+            return updateObject(state, {
+                successMsg: action.successMsg,
+                isAdding: false
+            });
+        case actionTypes.ADD_ASSISTANT_FAILURE:
+            return updateObject(state, {
+                isAdding: false,
+                errorMsg: action.error.msg
+            });
+
+
         default:
             return state
     }

@@ -27,7 +27,7 @@ def flow(assistantID):
     callback: Callback = Callback(False, 'Error!', None)
     # Get the assistant's flow including (groups & blocks)
     if request.method == "GET":
-        callback: Callback= flow_services.getFlow(assistant)
+        callback: Callback = flow_services.getFlow(assistant)
 
     # Update the blocks
     if request.method == "PUT":

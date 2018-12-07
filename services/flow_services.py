@@ -1,16 +1,13 @@
+import json
+from os.path import join
 from typing import List
-from config import BaseConfig
-from utilities import json_utils, helpers
+
 from sqlalchemy import and_
 from sqlalchemy.sql import exists, func
-from os.path import join, dirname
-import json
-from sqlalchemy.exc import IntegrityError as sqlalchemyIE
-from sqlite3 import IntegrityError as sqlite3IE
-from pymysql import IntegrityError as pymysqlIE
 
-
+from config import BaseConfig
 from models import db, Callback, ValidationType, Assistant, Block, BlockType, BlockAction, Plan, BlockGroup
+from utilities import json_utils, helpers
 
 bot_currentVersion = "1.0.0"
 
@@ -25,14 +22,16 @@ def getChatbot(assistant: Assistant) -> dict:
 
 # Get the flow for the company to manage the blocks
 def getFlow(assistant: Assistant) -> Callback:
-
     blockGroups = getBlockGroups(assistant)
     if not blockGroups:
-        return Callback(False, 'Could not retrieve flow', None)
+        data = {'botVersion': bot_currentVersion,
+                'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
+                'blockGroups': []}
+        return Callback(True, 'Could not retrieve flow', data)
 
     data = {'botVersion': bot_currentVersion,
             'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
-            'blockGroups':blockGroups}
+            'blockGroups': blockGroups}
     return Callback(True, 'Flow retrieved successfully', data)
 
 
@@ -77,7 +76,7 @@ def getBlocksByGroup(group: BlockGroup) -> List[dict]:
         for block in group.Blocks:
             blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,
                            'content': block.Content, 'storeInDB': block.StoreInDB,
-                           'labels': block.Labels,'isSkippable': block.Skippable})
+                           'labels': block.Labels, 'isSkippable': block.Skippable})
         return blocks
     except Exception as e:
         print("getBlocks ERROR:", e)
@@ -94,13 +93,14 @@ def getAllBlocks(assistant: Assistant) -> List[dict]:
         for group in groups:
             for block in group.Blocks:
                 blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,
-                               'content': block.Content, 'storeInDB': block.StoreInDB, 'labels': block.Labels, 'isSkippable': block.Skippable})
+                               'content': block.Content, 'storeInDB': block.StoreInDB, 'labels': block.Labels,
+                               'isSkippable': block.Skippable})
         return blocks
     except Exception as e:
         print("getBlocks ERROR:", e)
         db.session.rollback()
     # finally:
-       # db.session.close()
+    # db.session.close()
 
 
 # ----- Adders ----- #
@@ -143,7 +143,7 @@ def addBlock(data: dict, group: BlockGroup) -> Callback:
         print("flow_services.addBlock ERROR: ", exc)
         return Callback(False, 'Error occurred while creating a new Block object', exc.args[0])
     # finally:
-       # db.session.close()
+    # db.session.close()
 
 
 # ----- Updaters ----- #
@@ -160,10 +160,10 @@ def updateFlow(flow, assistant: Assistant) -> Callback:
     return Callback(True, "Bot updated successfully!")
 
 
-def updateGroup(group: dict, assistant: Assistant,) -> Callback:
+def updateGroup(group: dict, assistant: Assistant, ) -> Callback:
     try:
         # Update the group
-        group: BlockGroup = db.session.query(BlockGroup).\
+        group: BlockGroup = db.session.query(BlockGroup). \
             filter(and_(BlockGroup.ID == group.get('id'), Assistant.ID == assistant.ID)).first()
         group.Name = group.get('name')
         group.Description = group.get('description')
@@ -175,7 +175,7 @@ def updateGroup(group: dict, assistant: Assistant,) -> Callback:
         print(e)
         return Callback(False, "An error occurred while updating the group.")
     # finally:
-       # db.session.close()
+    # db.session.close()
     return Callback(True, "Group updated successfully.")
 
 
@@ -195,7 +195,7 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
         except Exception as e:
             db.session.rollback()
             return Callback(False, "Error while dealing with block id '" + str(order) + "'")
-        #finally:
+        # finally:
         #    db.session.close()
 
         # Make sure each block has a unique id
@@ -230,7 +230,7 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
                 return callback
 
             # Update the block
-            oldBlock: Block = db.session.query(Block).\
+            oldBlock: Block = db.session.query(Block). \
                 filter(and_(Block.ID == block.get('id'), Assistant.ID == assistant.ID)).first()
             oldBlock.Type = BlockType(block.get('type'))
             oldBlock.Content = block.get('content')
@@ -247,7 +247,7 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
         print(e)
         return Callback(False, "Error occurred while updating blocks.")
     # finally:
-       # db.session.close()
+    # db.session.close()
     return Callback(True, "Blocks updated successfully.")
 
 
@@ -256,7 +256,8 @@ def deleteGroupByID(id, assistant: Assistant) -> Callback:
     try:
         if not id:
             return Callback(False, "Group id is required")
-        group: BlockGroup = db.session.query(Block).filter(and_(BlockGroup.ID == id, Assistant.ID == assistant.ID)).first()
+        group: BlockGroup = db.session.query(Block).filter(
+            and_(BlockGroup.ID == id, Assistant.ID == assistant.ID)).first()
         if not group:
             return Callback(False, "Group doesn't exist")
 
@@ -270,7 +271,7 @@ def deleteGroupByID(id, assistant: Assistant) -> Callback:
         db.session.rollback()
         return Callback(False, "Group could not be removed.")
     # finally:
-       # db.session.close()
+    # db.session.close()
 
 
 def deleteBlockByID(id, assistant: Assistant) -> Callback:
@@ -291,7 +292,7 @@ def deleteBlockByID(id, assistant: Assistant) -> Callback:
         db.session.rollback()
         return Callback(False, "Block could not be removed.")
     # finally:
-       # db.session.close()
+    # db.session.close()
 
 
 def deleteAllBlock(assistant: Assistant) -> Callback:
@@ -319,41 +320,39 @@ def isValidBlock(block: dict, blockType: str):
         msg = "Block data doesn't follow the correct format"
 
         if blockType and blockID:
-            msg = "the block with id '" + str(blockID) + "' doesn't follow the correct format of "\
+            msg = "the block with id '" + str(blockID) + "' doesn't follow the correct format of " \
                   + str(BlockType(blockType).value) + " block type"
 
         return Callback(False, msg, exc.args[0])
     return Callback(True, "Valid block")
 
 
-
-
 def getOptions() -> dict:
     return {
         'botVersion': bot_currentVersion,
         'types': [a.value for a in BlockType],
-        'blockTypes': [ {
+        'blockTypes': [{
             'name': BlockType.UserInput.value,
             'validations': [uiv.value for uiv in ValidationType],
             'actions': [a.value for a in BlockAction],
             'alwaysStoreInDB': True
+        },
+            {
+                'name': BlockType.Question.value,
+                'actions': [a.value for a in BlockAction],
+                'alwaysStoreInDB': False
             },
             {
-            'name': BlockType.Question.value,
-            'actions': [a.value for a in BlockAction],
-            'alwaysStoreInDB': False
+                'name': BlockType.FileUpload.value,
+                'actions': [a.value for a in BlockAction],
+                'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
+                'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH / 1000000)) + 'MB',
+                'alwaysStoreInDB': True
             },
             {
-            'name': BlockType.FileUpload.value,
-            'actions': [a.value for a in BlockAction],
-            'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
-            'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH/1000000)) + 'MB',
-            'alwaysStoreInDB': True
-            },
-            {
-            'name': BlockType.Solutions.value,
-            'maxSolutions': 5,
-            'actions': [a.value for a in BlockAction],
+                'name': BlockType.Solutions.value,
+                'maxSolutions': 5,
+                'actions': [a.value for a in BlockAction],
             },
         ]
     }
@@ -366,21 +365,21 @@ def getBlocksCountByAssistant(assistant: Assistant):
     except Exception as e:
         db.session.rollback()
     # finally:
-       # db.session.close()
+    # db.session.close()
 
 
 def getRemainingBlocksByAssistant(assistant: Assistant):
     try:
         # BlocksCap - numberOfCreatedBlocks
-        return db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first()[0] - getBlocksCountByAssistant(assistant)
+        return db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first()[0] - getBlocksCountByAssistant(
+            assistant)
     except Exception as e:
         db.session.rollback()
     # finally:
-       # db.session.close()
+    # db.session.close()
 
 
 def genFlowViaTemplateUplaod(assistant: Assistant, data: dict):
-
     try:
         # Validate submitted block data
         json_utils.validateSchema(data, 'flowTemplate.json')
@@ -391,7 +390,7 @@ def genFlowViaTemplateUplaod(assistant: Assistant, data: dict):
         counter = 1
         for block in data.get('bot')['blocks']:
             db.session.add(Block(Type=BlockType(block['type']), Order=counter, Content=block['content'],
-                         StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Assistant=assistant))
+                                 StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Assistant=assistant))
             counter += 1
         # Save
         db.session.commit()
@@ -401,14 +400,11 @@ def genFlowViaTemplateUplaod(assistant: Assistant, data: dict):
         db.session.rollback()
         return Callback(False, 'Error while uploading a bot via a template')
     # finally:
-       # db.session.close()
-
-
+    # db.session.close()
 
 
 # Generate a bot using an already built template
 def genFlowViaTemplate(assistant: Assistant, tempName: str):
-
     try:
         # Get json template
         relative_path = join('static/bot_templates', tempName + '.json')
@@ -421,7 +417,7 @@ def genFlowViaTemplate(assistant: Assistant, tempName: str):
         counter = 1
         for block in data.get('bot')['blocks']:
             db.session.add(Block(Type=BlockType(block['type']), Order=counter, Content=block['content'],
-                         StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Assistant=assistant))
+                                 StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Assistant=assistant))
             counter += 1
         # Save
         db.session.commit()
@@ -431,4 +427,4 @@ def genFlowViaTemplate(assistant: Assistant, tempName: str):
         db.session.rollback()
         return Callback(False, 'Error while generating a bot via a template')
     # finally:
-       # db.session.close()
+    # db.session.close()

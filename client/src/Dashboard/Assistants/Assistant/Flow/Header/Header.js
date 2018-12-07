@@ -3,12 +3,13 @@ import React, {Component} from 'react';
 import "./Header.less"
 import styles from "./Header.module.less";
 import {Button} from "antd";
+import PropTypes from 'prop-types';
 
 
 class Header extends Component {
     static contextTypes = {
-        router: () => true, // replace with PropTypes.object if you use them
-    }
+        router: PropTypes.object
+    };
 
     render() {
         return (

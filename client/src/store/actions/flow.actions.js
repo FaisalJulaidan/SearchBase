@@ -1,16 +1,17 @@
 import * as actionTypes from './actionTypes';
 
 
-const fetchFlowRequest = () => {
+const fetchFlowRequest = (ID) => {
     return {
-        type: actionTypes.FETCH_FLOW_REQUEST
+        type: actionTypes.FETCH_FLOW_REQUEST,
+        ID
     };
 };
 
-const fetchFlowSuccess = (assistantList) => {
+const fetchFlowSuccess = (args) => {
     return {
         type: actionTypes.FETCH_FLOW_SUCCESS,
-        assistantList
+        ...args
     };
 };
 
@@ -20,6 +21,7 @@ const fetchFlowFailure = (error) => {
         error
     };
 };
+
 
 export const flowActions = {
     fetchFlowRequest,

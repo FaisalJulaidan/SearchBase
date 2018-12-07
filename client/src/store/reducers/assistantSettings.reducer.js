@@ -4,7 +4,6 @@ import {updateObject} from '../utility';
 const initialState = {isLoading: false, errorMsg: null};
 
 export const settings = (state = initialState, action) => {
-    console.log(action)
     switch (action.type) {
         case actionTypes.UPDATE_ASSISTANT_SETTINGS_REQUEST:
             return updateObject(state, {

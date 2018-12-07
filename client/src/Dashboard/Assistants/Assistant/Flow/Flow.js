@@ -17,16 +17,16 @@ import connect from "react-redux/es/connect/connect";
 class Flow extends Component {
 
     componentDidMount() {
-        this.props.dispatch(flowActions.fetchFlowRequest())
+        const {assistant} = this.props.location.state;
+        this.props.dispatch(flowActions.fetchFlowRequest(assistant.ID))
     }
+
 
     render() {
         const {assistant} = this.props.location.state;
-        console.log(assistant);
 
         return (
             <div style={{height: '100%'}}>
-
                 <div style={{padding: '0 5px'}}>
                     <div style={{width: '100%', height: 56, marginBottom: 10}}>
                         <Header assistantName={assistant.Name}/>
@@ -35,7 +35,7 @@ class Flow extends Component {
 
                 <div style={{height: 'calc(100% - 66px)', width: '100%', display: 'flex'}}>
                     <div style={{margin: 5, width: '30%'}}>
-                        <Groups/>
+                        <Groups isLoading={this.props.isLoading} groupsList={this.props.blockGroups}/>
                     </div>
 
                     <div style={{margin: 5, width: '70%'}}>
@@ -51,6 +51,7 @@ class Flow extends Component {
 
 function mapStateToProps(state) {
     return {
+        blockGroups: state.flow.blockGroups,
         isLoading: state.flow.isLoading
     };
 }

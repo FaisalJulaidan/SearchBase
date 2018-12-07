@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import "./Groups.less"
 import styles from "../Flow.module.less";
-import {Avatar, Button, Modal, List} from "antd";
+import {Avatar, Button, Modal, List, Spin} from "antd";
 import NewGroup from "./NewGroup/NewGroup";
 
 const data = [
@@ -67,22 +67,24 @@ class Groups extends Component {
                     </div>
                 </div>
 
-                <div className={styles.Body}>
-                    <List
-                        itemLayout="horizontal"
-                        dataSource={data}
-                        renderItem={item => (
-                            <List.Item>
-                                <List.Item.Meta
-                                    avatar={<Avatar icon="ordered-list"
-                                                    style={{backgroundColor: '#9254de'}}/>}
-                                    title={<a href="/">{item.title}</a>}
-                                    description="This groupe is to do xyz and xyz"
-                                />
-                            </List.Item>
-                        )}
-                    />
-                </div>
+                <Spin spinning={this.props.isLoading}>
+                    <div className={styles.Body}>
+                        <List
+                            itemLayout="horizontal"
+                            dataSource={this.props.groupsList}
+                            renderItem={item => (
+                                <List.Item>
+                                    <List.Item.Meta
+                                        avatar={<Avatar icon="ordered-list"
+                                                        style={{backgroundColor: '#9254de'}}/>}
+                                        title={<a href="/">{item.name}</a>}
+                                        description={item.description}
+                                    />
+                                </List.Item>
+                            )}
+                        />
+                    </div>
+                </Spin>
 
             </div>
         );

@@ -1,39 +1,44 @@
 import React, {Component} from 'react';
 import "./Groups.less"
 import styles from "../Flow.module.less";
-import {Avatar, Button, Modal, List, Spin, Skeleton} from "antd";
+import {Avatar, Button, List, Spin, Skeleton} from "antd";
 import NewGroup from "./NewGroup/NewGroup";
-
-const data = [
-    {title: 'Greetings Group'},
-    {title: 'Clients Group'},
-    {title: 'Job Finders Group'},
-    {title: 'Ending Group'}
-];
+import EditGroup from "./EditGroup/EditGroup";
 
 class Groups extends Component {
 
-    state = {visibleModal: false};
-
-    handleOk = (e) => {
-        console.log(e);
-        this.setState({
-            visibleModal: false,
-        });
-    };
-
-    handleCancel = (e) => {
-        console.log(e);
-        this.setState({
-            visibleModal: false,
-        });
+    state = {
+        newGroupModal: false,
+        editGroupModal: false,
+        selectedGroupToEdit: {}
     };
 
 
-    showModal = () => {
-        this.setState({
-            visibleModal: true,
-        });
+    ////// ADD GROUP
+    handleAddGroup = (newGroup) => {
+        this.props.addGroup(newGroup);
+        this.setState({newGroupModal: false});
+    };
+
+    handleAddGroupCancel = () => this.setState({newGroupModal: false});
+
+    showNewGroupModal = () => this.setState({newGroupModal: true});
+
+
+    ////// EDIT GROUP
+    handleEditGroup = (editedGroup) => {
+        this.props.editGroup(editedGroup);
+        this.setState({editGroupModal: false, selectedGroupToEdit: {}});
+    };
+
+    handleEditGroupCancel = () => this.setState({editGroupModal: false});
+
+    showEditGroupModal = (item) => this.setState({editGroupModal: true, selectedGroupToEdit: item});
+
+    ////// DELETE GROUP
+    handleDeleteGroup = (deletedGroup) => {
+        this.props.deleteGroup(deletedGroup);
+        this.setState({editGroupModal: false, selectedGroupToEdit: {}});
     };
 
 
@@ -46,24 +51,13 @@ class Groups extends Component {
                     </div>
                     <div>
                         <Button className={styles.PanelButton} type="primary" icon="plus"
-                                onClick={this.showModal}>
+                                onClick={this.showNewGroupModal}>
                             Add Group
                         </Button>
 
-                        <Modal
-                            width={800}
-                            title="Create New Assistant"
-                            visible={this.state.visibleModal}
-                            onOk={this.handleOk}
-                            onCancel={this.handleCancel}
-                            footer={[
-                                <Button key="cancle" onClick={this.handleCancel}>Cancle</Button>,
-                                <Button key="submit" type="primary" onClick={this.handleOk}>
-                                    Add
-                                </Button>
-                            ]}>
-                            <NewGroup/>
-                        </Modal>
+                        <NewGroup visible={this.state.newGroupModal}
+                                  handleCancel={this.handleAddGroupCancel}
+                                  handleSave={this.handleAddGroup}/>
                     </div>
                 </div>
 
@@ -77,7 +71,9 @@ class Groups extends Component {
                                 itemLayout="horizontal"
                                 dataSource={this.props.groupsList}
                                 renderItem={item => (
-                                    <List.Item>
+                                    <List.Item
+                                        actions={[<Button icon={'edit'}
+                                                          onClick={() => this.showEditGroupModal(item)}/>]}>
                                         <List.Item.Meta
                                             avatar={<Avatar icon="ordered-list"
                                                             style={{backgroundColor: '#9254de'}}/>}
@@ -90,6 +86,11 @@ class Groups extends Component {
                     }
                 </div>
 
+                <EditGroup group={this.state.selectedGroupToEdit}
+                           visible={this.state.editGroupModal}
+                           handleCancel={this.handleEditGroupCancel}
+                           handleUpdate={this.handleEditGroup}
+                           handleDelete={this.handleDeleteGroup}/>
             </div>
         );
     }

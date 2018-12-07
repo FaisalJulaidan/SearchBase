@@ -19,6 +19,56 @@ export const flow = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: action.error.msg
             });
+
+
+        case actionTypes.ADD_GROUP_REQUEST:
+            return updateObject(state, {
+                isAddingGroup: true
+            });
+        case actionTypes.ADD_GROUP_SUCCESS:
+            return updateObject(state, {
+                isAddingGroup: false,
+                successMsg: action.msg
+            });
+        case actionTypes.ADD_GROUP_FAILURE:
+            return updateObject(state, {
+                isAddingGroup: false,
+                errorMsg: action.error.msg
+            });
+
+
+        case actionTypes.EDIT_GROUP_REQUEST:
+            return updateObject(state, {
+                isEditingGroup: true
+            });
+        case actionTypes.EDIT_GROUP_SUCCESS:
+            return updateObject(state, {
+                isEditingGroup: false,
+                successMsg: action.msg
+            });
+        case actionTypes.EDIT_GROUP_FAILURE:
+            return updateObject(state, {
+                isEditingGroup: false,
+                errorMsg: action.error.msg
+            });
+
+
+        case actionTypes.DELETE_GROUP_REQUEST:
+            return updateObject(state, {
+                isDeletingGroup: true
+            });
+        case actionTypes.DELETE_GROUP_SUCCESS:
+            return updateObject(state, {
+                isDeletingGroup: false,
+                successMsg: action.msg
+            });
+        case actionTypes.DELETE_GROUP_FAILURE:
+            return updateObject(state, {
+                isDeletingGroup: false,
+                errorMsg: action.error.msg
+            });
+
+
         default:
             return state
     }

@@ -1,17 +1,20 @@
 import React, {Component} from 'react';
-import "./NewGroup.less"
 import {Button, Modal, Form, Input} from "antd";
 
 const FormItem = Form.Item;
 
-class NewGroup extends Component {
+class EditGroup extends Component {
 
     state = {};
 
-    handleSave = () => this.props.form.validateFields((err, values) => {
-        if (!err)
-            this.props.handleSave(values)
+    handleUpdate = () => this.props.form.validateFields((err, values) => {
+        if (!err) {
+            this.props.group.name = values.name;
+            this.props.group.description = values.description;
+            this.props.handleUpdate(this.props.group)
+        }
     });
+
 
     render() {
         const formItemLayout = {
@@ -22,15 +25,17 @@ class NewGroup extends Component {
         return (
             <Modal
                 width={800}
-                title="Create New Group"
-                destroyOnClose={true}
+                title="Edit Group"
                 visible={this.props.visible}
-                onOk={this.props.handleSave}
+                onOk={this.props.handleUpdate}
                 onCancel={this.props.handleCancel}
                 footer={[
+                    <Button key="delete" type="danger" onClick={() => this.props.handleDelete(this.props.group)}>
+                        Delete
+                    </Button>,
                     <Button key="Cancel" onClick={this.props.handleCancel}>Cancel</Button>,
-                    <Button key="submit" type="primary" onClick={this.handleSave}>
-                        Add
+                    <Button key="submit" type="primary" onClick={this.handleUpdate}>
+                        Update
                     </Button>
                 ]}>
                 <Form layout='horizontal'>
@@ -39,6 +44,7 @@ class NewGroup extends Component {
                         extra="Enter a name for your group to easily identify it in the group list"
                         {...formItemLayout}>
                         {getFieldDecorator('name', {
+                            initialValue: this.props.group.name,
                             rules: [{
                                 required: true,
                                 message: 'Please enter your group name',
@@ -53,6 +59,7 @@ class NewGroup extends Component {
                         extra="Just a description for you"
                         {...formItemLayout}>
                         {getFieldDecorator('description', {
+                            initialValue: this.props.group.description,
                             rules: [{
                                 required: true,
                                 message: 'Please description to your group name',
@@ -69,4 +76,4 @@ class NewGroup extends Component {
     }
 }
 
-export default Form.create()(NewGroup)
+export default Form.create()(EditGroup)

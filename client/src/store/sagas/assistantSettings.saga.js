@@ -1,4 +1,3 @@
-import {delay} from 'redux-saga'
 import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {http} from "../../helpers";

@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import "../Assistant.less"
-import SettingsModal from "./AssistantSettingsModal/SettingsModal";
 import connect from "react-redux/es/connect/connect";
 import {assistantSettingsActions} from "../../../../store/actions";
+import AssistantSettingsModal from "./AssistantSettingsModal/AssistantSettingsModal";
 
 class AssistantSettings extends Component {
 
@@ -17,8 +17,8 @@ class AssistantSettings extends Component {
 
     render() {
         return (
-            <SettingsModal assistant={this.props.assistant} visible={this.props.visible}
-                           handleSave={this.handleSave} handleCancel={this.props.hideModal}/>
+            <AssistantSettingsModal assistant={this.props.assistant} visible={this.props.visible}
+                                    handleSave={this.handleSave} handleCancel={this.props.hideModal}/>
         )
     }
 

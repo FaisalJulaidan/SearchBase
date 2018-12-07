@@ -1,11 +1,7 @@
 import React, {Component} from 'react';
 import "./Assistant.less"
-import styles from "./Assistant.modue.less"
-import {Card, Dropdown, Icon, Layout, Menu, Switch} from 'antd';
-import {Switch as DomSwitch, Link, Route} from "react-router-dom";
-import Settings from "./Settings/Settings";
-import Assistants from "../Assistants";
-import Flow from "./Flow/Flow";
+import {Card, Dropdown, Icon, Menu, Switch} from 'antd';
+import {Link} from "react-router-dom";
 import AssistantSettings from "./Settings/AssistantSettings";
 
 const {Meta} = Card;
@@ -103,8 +99,8 @@ class Assistant extends Component {
                 </Card>
 
                 <AssistantSettings assistant={assistant}
-                          hideModal={this.hideModal}
-                          visible={this.state.visible}/>
+                                   hideModal={this.hideModal}
+                                   visible={this.state.visible}/>
 
             </>
         )

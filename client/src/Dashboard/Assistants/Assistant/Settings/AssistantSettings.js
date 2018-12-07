@@ -1,15 +1,15 @@
 import React, {Component} from 'react';
 import "../Assistant.less"
-import SettingsModal from "./SettingsModal/SettingsModal";
+import SettingsModal from "./AssistantSettingsModal/SettingsModal";
 import connect from "react-redux/es/connect/connect";
-import {settingsActions} from "../../../../store/actions";
+import {assistantSettingsActions} from "../../../../store/actions";
 
-class Settings extends Component {
+class AssistantSettings extends Component {
 
     handleSave = (updatedSettings) => {
         this.props.hideModal();
         // dispatch redux action
-        this.props.dispatch(settingsActions.updateSettingsRequest({
+        this.props.dispatch(assistantSettingsActions.updateAssistantSettingsRequest({
             ID: this.props.assistant.ID,
             updatedSettings: updatedSettings
         }));
@@ -27,4 +27,4 @@ class Settings extends Component {
 const mapStateToProps = (state) => ({
     isLoading: state.settings.isLoading,
 });
-export default connect(mapStateToProps)(Settings);
+export default connect(mapStateToProps)(AssistantSettings);

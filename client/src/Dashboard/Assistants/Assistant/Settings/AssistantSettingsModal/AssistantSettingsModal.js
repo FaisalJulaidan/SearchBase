@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import "./SettingsModal.less"
+import "./AssistantSettingsModal.less"
 import {Button, Form, Input, InputNumber, Modal, Slider} from "antd";
 
 const FormItem = Form.Item;
 
 
-class SettingsModal extends Component {
+class AssistantSettingsModal extends Component {
     state = {
         inputValue: 10,
     };
@@ -130,4 +130,4 @@ class SettingsModal extends Component {
     }
 }
 
-export default Form.create()(SettingsModal)
+export default Form.create()(AssistantSettingsModal)

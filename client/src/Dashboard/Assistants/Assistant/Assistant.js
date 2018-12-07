@@ -6,6 +6,7 @@ import {Switch as DomSwitch, Link, Route} from "react-router-dom";
 import Settings from "./Settings/Settings";
 import Assistants from "../Assistants";
 import Flow from "./Flow/Flow";
+import AssistantSettings from "./Settings/AssistantSettings";
 
 const {Meta} = Card;
 
@@ -101,7 +102,7 @@ class Assistant extends Component {
                     <Meta description={assistant.TopBarText}/>
                 </Card>
 
-                <Settings assistant={assistant}
+                <AssistantSettings assistant={assistant}
                           hideModal={this.hideModal}
                           visible={this.state.visible}/>
 

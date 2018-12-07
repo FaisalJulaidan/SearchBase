@@ -2,7 +2,7 @@ import {combineReducers} from 'redux';
 import {auth} from './auth.reducer';
 import {assistant} from "./assistant.reducer";
 import {flow} from "./flow.reducer";
-import {settings} from "./settings.reducer";
+import {settings} from "./assistantSettings.reducer";
 
 
 const rootReducer = combineReducers({

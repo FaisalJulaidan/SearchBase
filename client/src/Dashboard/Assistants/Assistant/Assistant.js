@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
 import "./Assistant.less"
 import styles from "./Assistant.modue.less"
-import {Card, Dropdown, Icon, Menu, Switch} from 'antd';
-import {Link} from "react-router-dom";
+import {Card, Dropdown, Icon, Layout, Menu, Switch} from 'antd';
+import {Switch as DomSwitch, Link, Route} from "react-router-dom";
 import Settings from "./Settings/Settings";
+import Assistants from "../Assistants";
+import Flow from "./Flow/Flow";
 
 const {Meta} = Card;
 
@@ -61,6 +63,8 @@ class Assistant extends Component {
 
     render() {
         const {assistant} = this.props;
+        const {match} = this.props;
+        console.log(match)
         return (
             <>
                 <Card loading={this.props.isLoading} style={{width: 300, margin: 15, float: 'left', height: 369}}
@@ -100,6 +104,7 @@ class Assistant extends Component {
                 <Settings assistant={assistant}
                           hideModal={this.hideModal}
                           visible={this.state.visible}/>
+
             </>
         )
     }

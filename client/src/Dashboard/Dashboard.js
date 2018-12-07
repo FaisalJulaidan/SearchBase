@@ -3,10 +3,10 @@ import React, {Component} from 'react';
 import {Icon, Layout, Menu} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
-import Assistants from "../../components/Assistants/Assistants";
-import {history} from '../../helpers';
+import Assistants from './Assistants/Assistants';
+import {history} from '../helpers';
 import {Switch, Route} from 'react-router-dom';
-import Flow from "../../components/Flow/Flow";
+import Flow from "./Assistants/Assistant/Flow/Flow";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;

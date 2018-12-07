@@ -2,9 +2,7 @@ import React, {Component} from 'react';
 import "../Assistant.less"
 import SettingsModal from "./SettingsModal/SettingsModal";
 import connect from "react-redux/es/connect/connect";
-import {settingsActions} from "../../../store/actions";
-import {message} from 'antd';
-
+import {settingsActions} from "../../../../store/actions";
 
 class Settings extends Component {
 

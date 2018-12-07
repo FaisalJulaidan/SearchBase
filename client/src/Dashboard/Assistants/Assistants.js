@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import {Button, message, Modal, Skeleton} from 'antd';
+import {Button, message, Skeleton} from 'antd';
 import {connect} from 'react-redux';
 
 import "./Assistants.less"
 import styles from "./Assistants.module.less"
-import Assistant from "../Assistant/Assistant"
+import Assistant from "./Assistant/Assistant"
 
 import {assistantActions} from "../../store/actions/assistant.actions";
 import NewRequestModal from "./NewAssistantModal/NewRequestModal";

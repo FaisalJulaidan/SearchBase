@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
-import {authActions} from '../../store/actions';
+import {authActions} from '../store/actions/index';
 import styles from './Login.module.less';
 import './Login.less';
 

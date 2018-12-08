@@ -3,42 +3,48 @@ import React, {Component} from 'react';
 import "./Blocks.less"
 import styles from "../Flow.module.less";
 import {Button, Drawer, Form} from "antd";
-import {arrayMove, SortableContainer, SortableElement} from "react-sortable-hoc";
 
 import BlocksDrawer from "./BlocksDrawer/BlocksDrawer";
 import Block from "./Block/Block";
+import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
 
+// a little function to help us with reordering the result
+const reorder = (list, startIndex, endIndex) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
 
-const SortableItem = SortableElement(({value, key}) =>
-    <Block value={value} key={key}/>
-);
+    return result;
+};
 
-const SortableList = SortableContainer(({items}) => {
-    return (
-        <div>
-            {items.map(
-                (value, index) => (
-                    <SortableItem key={`item-${index}`} index={index} value={value}/>
-                )
-            )}
-        </div>
-    );
-});
-
+const getItemStyle = draggableStyle => ({margin: `0 0 8px 0`, ...draggableStyle});
 
 class Blocks extends Component {
 
+    constructor(props) {
+        super(props);
+        this.onDragEnd = this.onDragEnd.bind(this);
+    }
+
+    onDragEnd(result) {
+        // dropped outside the list
+        if (!result.destination) return;
+
+        const blocks = reorder(this.state.blocks, result.source.index, result.destination.index);
+        this.setState({blocks});
+    }
+
+
     state = {
         visible: false,
-        items: ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'Item 6'],
+        blocks: []
     };
 
-    onSortEnd = ({oldIndex, newIndex}) => {
-        this.setState({
-            items: arrayMove(this.state.items, oldIndex, newIndex),
-        });
-        console.log(this.state.items)
-    };
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.currentGroup !== this.state.currentGroup && nextProps.currentGroup.blocks)
+            this.setState({blocks: nextProps.currentGroup.blocks})
+    }
+
 
     showDrawer = () => {
         this.setState({
@@ -51,6 +57,7 @@ class Blocks extends Component {
             visible: false,
         });
     };
+
 
     render() {
         return (
@@ -68,8 +75,31 @@ class Blocks extends Component {
                 </div>
 
                 <div className={styles.Body}>
-                    <div style={{height: "100%", width: '100%', overflowY: 'auto    '}}>
-                        <SortableList items={this.state.items} onSortEnd={this.onSortEnd}/>
+                    <div style={{height: "100%", width: '100%', overflowY: 'auto'}}>
+                        {/*<SortableList blocks={this.state.blocks}*/}
+                        {/*onSortEnd={this.onSortEnd}/>*/}
+
+                        <DragDropContext onDragEnd={this.onDragEnd}>
+
+                            <Droppable droppableId="droppable">
+                                {(provided) => (
+                                    <div ref={provided.innerRef}>
+                                        {this.state.blocks.map((block, index) => (
+                                            <Draggable key={block.id} draggableId={block.order} index={index}>
+                                                {(provided) => (
+                                                    <div ref={provided.innerRef} {...provided.draggableProps}
+                                                         {...provided.dragHandleProps}
+                                                         style={getItemStyle(provided.draggableProps.style)}>
+                                                        <Block block={block}/>
+                                                    </div>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
+                        </DragDropContext>
                     </div>
                 </div>
 

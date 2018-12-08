@@ -11,7 +11,7 @@ const fetchFlowRequest = (ID) => {
 const fetchFlowSuccess = (args) => {
     return {
         type: actionTypes.FETCH_FLOW_SUCCESS,
-        ...args
+        blockGroups: args.blockGroups
     };
 };
 

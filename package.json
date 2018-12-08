@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "prop-types": "^15.6.2",
-    "redux-saga": "^0.16.2"
-  }
-}

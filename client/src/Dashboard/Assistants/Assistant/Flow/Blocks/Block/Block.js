@@ -6,11 +6,12 @@ const Panel = Collapse.Panel;
 class Block extends Component {
 
     render() {
+        const {block} = this.props;
         return (
             <Collapse bordered={true}>
-                <Panel header={this.props.value} key={this.props.key}>
-                    <Card title={this.props.value} style={{width: '100%'}}>
-                        {this.props.value}
+                <Panel header={block.content.text} key={this.props.key}>
+                    <Card title={block.content.text} style={{width: '100%'}}>
+                        <h4>{block.type}</h4>
                     </Card>
                 </Panel>
             </Collapse>

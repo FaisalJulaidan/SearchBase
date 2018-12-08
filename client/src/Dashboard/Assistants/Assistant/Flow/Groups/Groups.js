@@ -77,7 +77,7 @@ class Groups extends Component {
                                         <List.Item.Meta
                                             avatar={<Avatar icon="ordered-list"
                                                             style={{backgroundColor: '#9254de'}}/>}
-                                            title={<a href="/">{item.name}</a>}
+                                            title={<a onClick={() => this.props.selectGroup(item)}>{item.name}</a>}
                                             description={item.description}
                                         />
                                     </List.Item>

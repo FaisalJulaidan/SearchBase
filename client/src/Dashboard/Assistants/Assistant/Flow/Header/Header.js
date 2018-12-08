@@ -11,7 +11,9 @@ class Header extends Component {
         router: PropTypes.object
     };
 
+
     render() {
+
         return (
             <div className={styles.Panel}>
                 <div className={styles.Header}>
@@ -26,5 +28,9 @@ class Header extends Component {
         );
     }
 }
+
+Header.propTypes = {
+    assistantName: PropTypes.string,
+};
 
 export default Header;

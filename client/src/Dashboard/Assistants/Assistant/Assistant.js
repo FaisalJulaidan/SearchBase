@@ -60,8 +60,6 @@ class Assistant extends Component {
 
     render() {
         const {assistant} = this.props;
-        const {match} = this.props;
-        console.log(match)
         return (
             <>
                 <Card loading={this.props.isLoading} style={{width: 300, margin: 15, float: 'left', height: 369}}

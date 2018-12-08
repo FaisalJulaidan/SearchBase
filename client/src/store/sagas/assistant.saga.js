@@ -21,7 +21,8 @@ function* addAssistant(action) {
     console.log(action);
     try {
         const res = yield http.post(`/assistants`, action);
-        return yield put(assistantActions.addAssistantSuccess(res.data.msg))
+        yield put(assistantActions.addAssistantSuccess(res.data.msg));
+        return yield put(assistantActions.fetchAssistants())
     } catch (error) {
         // console.log(error);
         //

@@ -28,7 +28,7 @@ export const flow = (state = initialState, action) => {
         case actionTypes.ADD_GROUP_SUCCESS:
             return updateObject(state, {
                 isAddingGroup: false,
-                successMsg: action.msg
+                addSuccessMsg: action.msg
             });
         case actionTypes.ADD_GROUP_FAILURE:
             return updateObject(state, {
@@ -44,7 +44,7 @@ export const flow = (state = initialState, action) => {
         case actionTypes.EDIT_GROUP_SUCCESS:
             return updateObject(state, {
                 isEditingGroup: false,
-                successMsg: action.msg
+                editSuccessMsg: action.msg
             });
         case actionTypes.EDIT_GROUP_FAILURE:
             return updateObject(state, {
@@ -60,7 +60,7 @@ export const flow = (state = initialState, action) => {
         case actionTypes.DELETE_GROUP_SUCCESS:
             return updateObject(state, {
                 isDeletingGroup: false,
-                successMsg: action.msg
+                deleteSuccessMsg: action.msg
             });
         case actionTypes.DELETE_GROUP_FAILURE:
             return updateObject(state, {

@@ -16,10 +16,16 @@ import {message} from "antd";
 
 class Flow extends Component {
 
+    state = {
+        currentGroup: {blocks: []}
+    };
+
     componentDidMount() {
         const {assistant} = this.props.location.state;
         this.props.dispatch(flowActions.fetchFlowRequest(assistant.ID))
     }
+
+    selectGroup = (currentGroup) => this.setState({currentGroup});
 
     addGroup = (newGroup) => {
         const {assistant} = this.props.location.state;
@@ -41,19 +47,19 @@ class Flow extends Component {
 
     componentDidUpdate(prevProps) {
 
-        if (!this.props.isAddingGroup && prevProps.successMsg !== this.props.successMsg) {
+        if (!this.props.isAddingGroup && prevProps.addSuccessMsg !== this.props.addSuccessMsg) {
             message.destroy();
-            message.success(this.props.successMsg);
+            message.success(this.props.addSuccessMsg);
         }
 
-        if (!this.props.isEditingGroup && prevProps.successMsg !== this.props.successMsg) {
+        if (!this.props.isEditingGroup && prevProps.editSuccessMsg !== this.props.editSuccessMsg) {
             message.destroy();
-            message.success(this.props.successMsg);
+            message.success(this.props.editSuccessMsg);
         }
 
-        if (!this.props.isDeletingGroup && prevProps.successMsg !== this.props.successMsg) {
+        if (!this.props.isDeletingGroup && prevProps.deleteSuccessMsg !== this.props.deleteSuccessMsg) {
             message.destroy();
-            message.success(this.props.successMsg);
+            message.success(this.props.deleteSuccessMsg);
         }
     }
 
@@ -71,7 +77,8 @@ class Flow extends Component {
                 <div style={{height: 'calc(100% - 66px)', width: '100%', display: 'flex'}}>
                     <div style={{margin: 5, width: '30%'}}>
 
-                        <Groups isLoading={this.props.isLoading}
+                        <Groups selectGroup={this.selectGroup}
+                                isLoading={this.props.isLoading}
                                 groupsList={this.props.blockGroups}
                                 addGroup={this.addGroup}
                                 editGroup={this.editGroup}
@@ -80,7 +87,7 @@ class Flow extends Component {
                     </div>
 
                     <div style={{margin: 5, width: '70%'}}>
-                        <Blocks/>
+                        <Blocks currentGroup={this.state.currentGroup}/>
                     </div>
                 </div>
             </div>
@@ -95,13 +102,16 @@ function mapStateToProps(state) {
         blockGroups: state.flow.blockGroups,
         isLoading: state.flow.isLoading,
 
-        successMsg: state.flow.successMsg,
+        addSuccessMsg: state.flow.addSuccessMsg,
+        editSuccessMsg: state.flow.editSuccessMsg,
+        deleteSuccessMsg: state.flow.deleteSuccessMsg,
 
         isAddingGroup: state.flow.isAddingGroup,
         isEditingGroup: state.flow.isEditingGroup,
         isDeletingGroup: state.flow.isDeletingGroup
     };
 }
+
 
 export default connect(mapStateToProps)(Flow);
 

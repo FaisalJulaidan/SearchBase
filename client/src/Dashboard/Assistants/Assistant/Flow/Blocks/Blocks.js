@@ -60,15 +60,16 @@ class Blocks extends Component {
 
 
     render() {
+        console.log(this.props.currentGroup)
         return (
             <div className={styles.Panel}>
                 <div className={styles.Header}>
                     <div>
-                        <h3>Blocks</h3>
+                        <h3>{this.props.currentGroup.name} Blocks</h3>
                     </div>
                     <div>
                         <Button className={styles.PanelButton} type="primary" icon="plus"
-                                onClick={this.showDrawer}>
+                                onClick={this.showDrawer} disabled={!this.props.currentGroup.id}>
                             Add Block
                         </Button>
                     </div>

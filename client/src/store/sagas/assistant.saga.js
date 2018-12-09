@@ -17,14 +17,13 @@ function* fetchAssistants() {
 
 }
 
-function* addAssistant(action) {
-    console.log(action);
+function* addAssistant({type, newAssistant}) {
     try {
-        const res = yield http.post(`/assistants`, action);
+        const res = yield http.post(`/assistants`, newAssistant);
         yield put(assistantActions.addAssistantSuccess(res.data.msg));
         return yield put(assistantActions.fetchAssistants())
     } catch (error) {
-        // console.log(error);
+        console.log(error);
         //
         // yield localStorage.removeItem('user');
         // yield put(authActions.logout());

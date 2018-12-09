@@ -19,7 +19,6 @@ db = initialize_flask_sqlathanor(db)
 # force_auto_coercion()
 
 
-
 # Activate Foreign Keys
 @event.listens_for(Engine, "connect")
 def _set_sqlite_pragma(dbapi_connection, connection_record):
@@ -55,42 +54,13 @@ mutable.MutableDict.associate_with(JsonEncodedDict)
 
 class Company(db.Model):
 
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
-                   supports_json=True,
-                   supports_dict=True,
-                   on_serialize=None,
-                   on_deserialize=None
-                   )
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     if BaseConfig.USE_ENCRYPTION:
-        Name = db.Column(EncryptedType(db.String(80), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'),
-                         nullable=False,
-                         supports_json=True,
-                         supports_dict=True,
-                         on_serialize=None,
-                         on_deserialize=None
-                         )
-        URL = db.Column(EncryptedType(db.String(250), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'),
-                        nullable=False,
-                        supports_json=True,
-                        supports_dict=True,
-                        on_serialize=None,
-                        on_deserialize=None
-                        )
+        Name = db.Column(EncryptedType(db.String(80), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
+        URL = db.Column(EncryptedType(db.String(250), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
     else:
-        Name = db.Column(db.String(80),
-                         nullable=False,
-                         supports_json=True,
-                         supports_dict=True,
-                         on_serialize=None,
-                         on_deserialize=None
-                         )
-        URL = db.Column(db.String(250),
-                        nullable=False,
-                        supports_json=True,
-                        supports_dict=True,
-                        on_serialize=None,
-                        on_deserialize=None
-                        )
+        Name = db.Column(db.String(80), nullable=False)
+        URL = db.Column(db.String(250), nullable=False)
 
     StripeID = db.Column(db.String(68), unique=True, nullable=False,)
     SubID = db.Column(db.String(68), unique=True, default=None)
@@ -112,50 +82,14 @@ class User(db.Model):
                  )
     if BaseConfig.USE_ENCRYPTION:
         Firstname = db.Column(EncryptedType(db.String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        Surname = db.Column(EncryptedType(db.String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False,
-                            supports_json=True,
-                            supports_dict=True,
-                            on_serialize=None,
-                            on_deserialize=None
-                            )
-        Email = db.Column(EncryptedType(String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False,
-                          supports_json=True,
-                          supports_dict=True,
-                          on_serialize=None,
-                          on_deserialize=None
-                          )
-        PhoneNumber = db.Column(EncryptedType(db.String(30), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'),
-                                supports_json=True,
-                                supports_dict=True,
-                                on_serialize=None,
-                                on_deserialize=None
-                                )
+        Surname = db.Column(EncryptedType(db.String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
+        Email = db.Column(EncryptedType(String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
+        PhoneNumber = db.Column(EncryptedType(db.String(30), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'))
     else:
         Firstname = db.Column(db.String(64), nullable=False)
-        Surname = db.Column(db.String(64), nullable=False,
-                            supports_json=True,
-                            supports_dict=True,
-                            on_serialize=None,
-                            on_deserialize=None
-                            )
-        Email = db.Column(db.String(64), nullable=False, unique=True,
-                          supports_json=True,
-                          supports_dict=True,
-                          on_serialize=None,
-                          on_deserialize=None
-                          )
-        PhoneNumber = db.Column(db.String(30),
-                                supports_json=True,
-                                supports_dict=True,
-                                on_serialize=None,
-                                on_deserialize=None
-                                )
-    # Password = db.Column(db.String(255),nullable=False,
-    #                      supports_json=False,
-    #                      supports_dict=False,
-    #                      on_serialize=None,
-    #                      on_deserialize=None
-    #                      )
+        Surname = db.Column(db.String(64), nullable=False)
+        Email = db.Column(db.String(64), nullable=False)
+        PhoneNumber = db.Column(db.String(30))
     Password = db.Column(PasswordType(
         schemes=[
             'pbkdf2_sha512',
@@ -163,42 +97,17 @@ class User(db.Model):
         ],
         deprecated=['md5_crypt']
     ))
-    Verified = db.Column(db.Boolean(), nullable=False, default=False,
-                         supports_json=True,
-                         supports_dict=True,
-                         on_serialize=None,
-                         on_deserialize=None
-                         )
-    LastAccess = db.Column(db.DateTime(), nullable=True,
-                           supports_json=True,
-                           supports_dict=True,
-                           on_serialize=None,
-                           on_deserialize=None
-                           )
+    Verified = db.Column(db.Boolean(), nullable=False, default=False)
+    LastAccess = db.Column(db.DateTime(), nullable=True)
 
-    CreatedOn = db.Column(db.DateTime(), nullable=False, default=datetime.now,
-                          supports_json=True,
-                          supports_dict=True,
-                          on_serialize=None,
-                          on_deserialize=None
-                          )
+    CreatedOn = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
-    Company = db.relationship('Company', back_populates='Users',
-                              supports_json=True,
-                              supports_dict=True,
-                              on_serialize=None,
-                              on_deserialize=None
-                              )
+    Company = db.relationship('Company', back_populates='Users')
 
     RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
-    Role = db.relationship('Role', back_populates='Users',
-                           supports_json=True,
-                           supports_dict=True,
-                           on_serialize=None,
-                           on_deserialize=None
-                           )
+    Role = db.relationship('Role', back_populates='Users')
 
     Settings = db.relationship("UserSettings", uselist=False, back_populates="User")
 
@@ -210,42 +119,12 @@ class User(db.Model):
 
 class Role(db.Model):
 
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
-                   supports_json=True,
-                   supports_dict=True,
-                   on_serialize=None,
-                   on_deserialize=None
-                   )
-    Name = db.Column(db.String(64),
-                     supports_json=True,
-                     supports_dict=True,
-                     on_serialize=None,
-                     on_deserialize=None
-                     )
-    EditChatbots = db.Column(db.Boolean(), nullable=False, default=False,
-                             supports_json=True,
-                             supports_dict=True,
-                             on_serialize=None,
-                             on_deserialize=None
-                             )
-    EditUsers = db.Column(db.Boolean(), nullable=False, default=False,
-                          supports_json=True,
-                          supports_dict=True,
-                          on_serialize=None,
-                          on_deserialize=None
-                          )
-    DeleteUsers = db.Column(db.Boolean(), nullable=False, default=False,
-                            supports_json=True,
-                            supports_dict=True,
-                            on_serialize=None,
-                            on_deserialize=None
-                            )
-    AccessBilling = db.Column(db.Boolean(), nullable=False, default=False,
-                              supports_json=True,
-                              supports_dict=True,
-                              on_serialize=None,
-                              on_deserialize=None
-                              )
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(64))
+    EditChatbots = db.Column(db.Boolean(), nullable=False, default=False)
+    EditUsers = db.Column(db.Boolean(), nullable=False, default=False)
+    DeleteUsers = db.Column(db.Boolean(), nullable=False, default=False)
+    AccessBilling = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)

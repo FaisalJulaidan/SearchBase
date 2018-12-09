@@ -4,7 +4,7 @@ import "./Flow.less"
 import Groups from "./Groups/Groups";
 import Blocks from "./Blocks/Blocks";
 import Header from "./Header/Header";
-import {flowActions} from "../../../../store/actions";
+import {flowActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
 import {message} from "antd";
 

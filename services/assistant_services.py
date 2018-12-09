@@ -53,11 +53,11 @@ def getAll(companyID) -> Callback:
        # db.session.close()
 
 
-def create(nickname, route, message, topBarText, secondsUntilPopup, company: Company) -> Assistant or None:
+def create(name, message, topBarText, secondsUntilPopup, companyID) -> Assistant or None:
     try:
-        assistant = Assistant(Name=nickname, Route=route, Message=message, TopBarText=topBarText,
+        assistant = Assistant(Name=name, Route=None, Message=message, TopBarText=topBarText,
                               SecondsUntilPopup=secondsUntilPopup,
-                              Company=company)
+                              CompanyID=companyID)
         db.session.add(assistant)
         # Save
         db.session.commit()
@@ -70,20 +70,20 @@ def create(nickname, route, message, topBarText, secondsUntilPopup, company: Com
        # db.session.close()
 
 
-def update(id, nickname, message, topBarText, secondsUntilPopup)-> Callback:
+def update(id, name, message, topBarText, secondsUntilPopup)-> Callback:
     try:
-        db.session.query(Assistant).filter(Assistant.ID == id).update({'Name': nickname,
+        db.session.query(Assistant).filter(Assistant.ID == id).update({'Name': name,
                                                                        'Message': message,
                                                                        'TopBarText': topBarText,
                                                                        'SecondsUntilPopup': secondsUntilPopup})
         db.session.commit()
-        return Callback(True, nickname+' Updated Successfully')
+        return Callback(True, name+' Updated Successfully')
 
     except Exception as exc:
         print(exc)
         db.session.rollback()
         return Callback(False,
-                        "Couldn't update assistant "+nickname)
+                        "Couldn't update assistant "+name)
     # finally:
        # db.session.close()
 

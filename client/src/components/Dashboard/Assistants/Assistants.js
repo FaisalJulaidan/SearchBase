@@ -6,8 +6,8 @@ import "./Assistants.less"
 import styles from "./Assistants.module.less"
 import Assistant from "./Assistant/Assistant"
 
-import {assistantActions} from "../../store/actions/assistant.actions";
-import NewRequestModal from "./NewAssistantModal/NewRequestModal";
+import {assistantActions} from "../../../store/actions/assistant.actions";
+import NewAssistantModal from "./NewAssistantModal/NewAssistantModal";
 
 
 class Assistants extends Component {
@@ -81,7 +81,7 @@ class Assistants extends Component {
                 </div>
 
 
-                <NewRequestModal visible={this.state.visible}
+                <NewAssistantModal visible={this.state.visible}
                                  hideModal={this.hideModal}/>
 
             </div>

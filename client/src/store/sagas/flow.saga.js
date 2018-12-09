@@ -38,11 +38,12 @@ function* editGroup(action) {
     }
 }
 
-function* deleteGroup(action) {
+function* deleteGroup({type, ID, deletedGroup}) {
     try {
-        const res = yield http.delete(`/assistant/${action.ID}/flow/group`, action.deletedGroup);
+        console.log(deletedGroup)
+        const res = yield http.delete(`/assistant/${ID}/flow/group`, { data: { id: deletedGroup.id } });
         yield put(flowActions.deleteGroupSuccess(res.data.msg));
-        return yield put(flowActions.fetchFlowRequest(action.ID))
+        return yield put(flowActions.fetchFlowRequest(ID))
     } catch (error) {
         console.log(error);
         return yield put(flowActions.deleteGroupFailure(error.response.data));

@@ -1,20 +1,19 @@
 import React, {Component} from 'react';
 import "./AssistantSettingsModal.less"
-import {Button, Form, Input, InputNumber, Modal, Slider} from "antd";
+import {Button, Form, Input, InputNumber, Modal, Switch} from "antd";
 
 const FormItem = Form.Item;
 
 
 class AssistantSettingsModal extends Component {
     state = {
-        inputValue: 10,
+        isPopupDisabled: this.props.assistant.SecondsUntilPopup <= 0
     };
 
-    onChange = (value) => {
-        this.setState({
-            inputValue: value,
-        });
-    };
+    togglePopupSwitch = () => {
+        this.setState({isPopupDisabled: !this.state.isPopupDisabled})
+    }
+
 
     componentDidMount() {
         this.setState({
@@ -25,6 +24,7 @@ class AssistantSettingsModal extends Component {
     handleSave = () => {
         this.props.form.validateFields((err, values) => {
             if (!err) {
+                if(this.state.isPopupDisabled) {values.secondsUntilPopup = 0}
                 this.props.handleSave(values)
             }
         });
@@ -39,6 +39,8 @@ class AssistantSettingsModal extends Component {
         const {assistant} = this.props;
 
         const {inputValue} = this.state;
+        console.log(this.state.isPopupDisabled)
+        console.log(this.props.assistant.SecondsUntilPopup)
 
         return (
             <Modal
@@ -60,7 +62,7 @@ class AssistantSettingsModal extends Component {
                         extra="Enter a name for your assistant to easily identify it in the dashboard"
                         {...formItemLayout}>
                         {
-                            getFieldDecorator('Name', {
+                            getFieldDecorator('assistantName', {
                                 initialValue: assistant.Name,
                                 rules: [{
                                     required: true,
@@ -77,7 +79,7 @@ class AssistantSettingsModal extends Component {
                         {...formItemLayout}>
 
                         {
-                            getFieldDecorator('Message', {
+                            getFieldDecorator('welcomeMessage', {
                                 initialValue: assistant.Message,
                                 rules: [{
                                     required: true,
@@ -94,7 +96,7 @@ class AssistantSettingsModal extends Component {
                         extra="This will apear on top of your chatbot"
                         {...formItemLayout}>
                         {
-                            getFieldDecorator('TopBarText', {
+                            getFieldDecorator('topBarTitle', {
                                 initialValue: assistant.TopBarText,
                                 rules: [{
                                     required: true,
@@ -106,22 +108,16 @@ class AssistantSettingsModal extends Component {
                         }
                     </FormItem>
 
-                    <FormItem {...formItemLayout}
-                              label="Time to popup"
-                              extra="time before popup the chat bot">
-                        <Slider min={0} max={100}
-                                onChange={this.onChange}
-                                value={typeof inputValue === 'number' ? inputValue : 0}/>
-                        {
-                            getFieldDecorator('SecondsUntilPopup', {
-                                initialValue: inputValue,
-                                rules: [{
-                                    required: true,
-                                }],
-                            })(
-                                <InputNumber min={0} max={100} onChange={this.onChange}/>
-                            )
-                        }
+                    <FormItem
+                    {...formItemLayout}
+                    label="Time to Popup"
+                    extra="This will enforce the assistants' (chatbot) to popup automatically"
+                    >
+                    <Switch checked={!this.state.isPopupDisabled} onChange={this.togglePopupSwitch} style={{marginRight: '5px'}} />
+                    {getFieldDecorator('secondsUntilPopup', { initialValue: assistant.SecondsUntilPopup === 0 ? 1 : assistant.SecondsUntilPopup })(
+                        <InputNumber disabled={this.state.isPopupDisabled} min={1} />
+                    )}
+                    <span className="ant-form-text"> seconds</span>
                     </FormItem>
 
                 </Form>

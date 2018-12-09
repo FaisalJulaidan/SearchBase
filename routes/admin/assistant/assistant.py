@@ -81,22 +81,28 @@ def admin_homeDEPREACTED():
 @assistant_router.route("/assistants", methods=['GET', 'POST'])
 @jwt_required
 def admin_home():
+    # Authentication
+    user = get_jwt_identity()['user']
+
     if request.method == "GET":
         # Get all assistants
-        user = get_jwt_identity()['user']
         callback: Callback = assistant_services.getAll(user['companyID'])
 
-        if callback.Success:
-            return helpers.jsonResponse(True, 200, "Assistants Returned!",
-                                        helpers.getListFromSQLAlchemyList(callback.Data))
-        else:
-            return helpers.jsonResponse(False, 401, "Cannot get Assistants!",
+        if not callback.Success:
+            return helpers.jsonResponse(False, 404, "Cannot get Assistants!",
+                                    helpers.getListFromSQLAlchemyList(callback.Data))
+        return helpers.jsonResponse(True, 200, "Assistants Returned!",
                                         helpers.getListFromSQLAlchemyList(callback.Data))
     if request.method == "POST":
-        user = get_jwt_identity()['user']
-        print(request.json)
-        # TODO: Add assistant
-        return helpers.jsonResponse(True, 200, "Assistant added!")
+        data = request.json
+        callback: Callback = assistant_services.create(data.get('assistantName'),
+                                                       data.get('welcomeMessage'),
+                                                       data.get('topBarTitle'),
+                                                       data.get('secondsUntilPopup'),
+                                                       user['companyID'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, "Cannot add Assistant")
+        return helpers.jsonResponse(True, 200, "Assistant added successfully!", helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
 @assistant_router.route("/assistant/<int:assistantID>", methods=['DELETE', 'PUT'])
@@ -105,10 +111,10 @@ def assistant_delete(assistantID):
     if request.method == "PUT":
         updatedSettings = request.json
         callback: Callback = assistant_services.update(assistantID,
-                                                       updatedSettings.get("Name"),
-                                                       updatedSettings.get("Message"),
-                                                       updatedSettings.get("TopBarText"),
-                                                       updatedSettings.get("SecondsUntilPopup"))
+                                                       updatedSettings.get("assistantName"),
+                                                       updatedSettings.get("welcomeMessage"),
+                                                       updatedSettings.get("topBarTitle"),
+                                                       updatedSettings.get("secondsUntilPopup"))
 
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)

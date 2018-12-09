@@ -4,7 +4,7 @@ import {Icon, Layout, Menu} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
 import Assistants from './Assistants/Assistants';
-import {history} from '../helpers';
+import {history} from '../../helpers';
 import {Switch, Route} from 'react-router-dom';
 import Flow from "./Assistants/Assistant/Flow/Flow";
 

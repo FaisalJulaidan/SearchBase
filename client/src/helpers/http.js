@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {authHeader} from './authHeader';
+import {authHeader} from './auth';
 
 
 export const http = axios.create({

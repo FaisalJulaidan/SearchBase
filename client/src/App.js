@@ -5,8 +5,8 @@ import {history} from './helpers';
 import './App.css';
 
 import {PrivateRoute} from './hoc';
-import Dashboard from "./Dashboard/Dashboard";
-import Login from './Login/Login'
+import Dashboard from "./components/Dashboard/Dashboard";
+import Login from './components/Login/Login'
 
 class App extends Component {
     constructor(props) {

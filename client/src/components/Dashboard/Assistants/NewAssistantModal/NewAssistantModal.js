@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import "./NewRequestModal.less";
+import "./NewAssistantModal.less";
 
-import {Button, Form, Input, Modal, Select, message} from 'antd';
+import {Button, Form, Input, Modal, Select, InputNumber, message, Switch} from 'antd';
 import {connect} from "react-redux";
-import {assistantActions} from "../../../store/actions";
+import {assistantActions} from "../../../../store/actions";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -13,12 +13,20 @@ const loading = () => {
     message.loading('Adding assistant', 0);
 };
 
-class NewRequestModal extends Component {
+class NewAssistantModal extends Component {
 
+    state = {
+        isPopupDisabled: true
+    }
+
+    togglePopupSwitch = () => {
+        this.setState({isPopupDisabled: !this.state.isPopupDisabled})
+    }
 
     handleAdd = () => {
         this.props.form.validateFields((err, values) => {
             if (!err) {
+                if(this.state.isPopupDisabled) {values.secondsUntilPopup = 0}
                 console.log(values);
                 // send to server
                 this.props.dispatch(assistantActions.addAssistant(values));
@@ -28,7 +36,7 @@ class NewRequestModal extends Component {
     };
 
     componentDidUpdate(prevProps) {
-        if (!this.props.isAdding && this.props.isAdding != prevProps.isAdding) {
+        if (!this.props.isAdding && this.props.isAdding !== prevProps.isAdding) {
             this.props.hideModal();
             message.destroy();
             message.success(this.props.successMsg)
@@ -92,7 +100,7 @@ class NewRequestModal extends Component {
                         label="Header Title"
                         extra="This will apear on top of your chatbot"
                         {...formItemLayout}>
-                        {getFieldDecorator('headerTitle', {
+                        {getFieldDecorator('topBarTitle', {
                             rules: [{
                                 required: true,
                                 message: 'Please input your header title',
@@ -100,6 +108,18 @@ class NewRequestModal extends Component {
                         })(
                             <Input placeholder="Ex: Recruiter Bot"/>
                         )}
+                    </FormItem>
+
+                    <FormItem
+                    {...formItemLayout}
+                    label="Time to Popup"
+                    extra="This will enforce the assistants' (chatbot) to popup automatically"
+                    >
+                    <Switch defaultChecked={false} onChange={this.togglePopupSwitch} style={{marginRight: '5px'}} />
+                    {getFieldDecorator('secondsUntilPopup', { initialValue: 1 })(
+                        <InputNumber disabled={this.state.isPopupDisabled} min={1} />
+                    )}
+                    <span className="ant-form-text"> seconds</span>
                     </FormItem>
 
                     <FormItem {...formItemLayout}
@@ -129,4 +149,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(NewRequestModal))
+export default connect(mapStateToProps)(Form.create()(NewAssistantModal))

@@ -35,6 +35,7 @@ function* watchLogin() {
 function* logout() {
     // remove user from local storage to log user out
     yield localStorage.removeItem('user');
+    yield history.push('/login');
 }
 
 function* watchLogout() {

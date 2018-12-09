@@ -59,23 +59,25 @@ def group(assistantID):
 
     #############
     callback: Callback = Callback(False, 'Error!', None)
+    data = request.json
+    print(data)
+    if not data:
+        return helpers.jsonResponse(False, 400, "Data missing")
+
     # Add a group
     if request.method == "POST":
         # Get the new group data from the request's body
-        data = request.get_json(silent=True)
         print(data)
         callback: Callback = flow_services.addGroup(data, assistant)
 
     # Update the blocks' group
     if request.method == "PUT":
         # Get new block data from the request's body
-        data = request.get_json(silent=True)
         callback: Callback = flow_services.updateGroup(data, assistant)
 
     # Delete the blocks' group
     if request.method == "DELETE":
         # Get new block data from the request's body
-        data = request.get_json(silent=True)
         callback: Callback = flow_services.deleteGroupByID(data.get('id', None), assistant)
 
     # Return response

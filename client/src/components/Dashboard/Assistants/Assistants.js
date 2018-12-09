@@ -82,7 +82,7 @@ class Assistants extends Component {
 
 
                 <NewAssistantModal visible={this.state.visible}
-                                 hideModal={this.hideModal}/>
+                                   hideModal={this.hideModal}/>
 
             </div>
         );

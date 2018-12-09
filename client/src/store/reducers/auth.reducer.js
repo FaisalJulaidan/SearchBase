@@ -9,11 +9,12 @@ export const auth = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.LOGIN_REQUEST:
             return updateObject(state, {
-                errorMsg: ''
+                errorMsg: '',
+                isLoggingIn: true,
             });
         case actionTypes.LOGIN_SUCCESS:
             return updateObject(state, {
-                isLoggingIn: true,
+                isLoggingIn: false,
                 isAuthenticated: true,
                 user: action.user,
             });

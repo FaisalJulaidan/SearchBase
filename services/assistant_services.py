@@ -16,10 +16,10 @@ def getByID(id) -> Callback:
        # db.session.close()
 
 
-def getByName(nickname) -> Callback:
+def getByName(name) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(Assistant).filter(Assistant.Name == nickname).first()
+        result = db.session.query(Assistant).filter(Assistant.Name == name).first()
         if not result: raise Exception
 
         return Callback(True,

@@ -69,8 +69,8 @@ class Company(db.Model):
 
     # Relationships:
     Users = db.relationship('User', back_populates='Company', cascade="all, delete, delete-orphan")
-    Assistants = db.relationship('Assistant', back_populates='Company')
-    Roles = db.relationship('Role', back_populates='Company')
+    Assistants = db.relationship('Assistant', back_populates='Company', cascade="all, delete, delete-orphan")
+    Roles = db.relationship('Role', back_populates='Company', cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)
@@ -109,7 +109,7 @@ class User(db.Model):
     RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
     Role = db.relationship('Role', back_populates='Users')
 
-    Settings = db.relationship("UserSettings", uselist=False, back_populates="User")
+    Settings = db.relationship("UserSettings", uselist=False, back_populates="User", cascade="all, delete, delete-orphan")
 
     # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
 
@@ -176,7 +176,7 @@ class BlockGroup(db.Model):
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='BlockGroups')
-    Blocks = db.relationship('Block', back_populates='Group', order_by='Block.Order')
+    Blocks = db.relationship('Block', back_populates='Group', order_by='Block.Order', cascade="all, delete, delete-orphan")
 
     # Constraints:
     # __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)

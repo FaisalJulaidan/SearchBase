@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Card, Form, Input, Select} from "antd";
+import {Card, Form, Input, Select, Spin} from "antd";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -17,52 +17,59 @@ class Solutions extends Component {
     }
 
     render() {
+        const {blockTypes} = this.props.options;
+
+        let blockOptions = {};
+        // extract the correct blockType from blockTypes[]
+        for (const blockType of blockTypes)
+            if (blockType.name === 'Solutions')
+                blockOptions = blockType;
+
         const {getFieldDecorator} = this.props.form;
-        return (<Card title="Question"
-                      style={{width: '100%'}}>
+        return (
+            <Card title="Solutions"
+                  style={{width: '100%'}}>
 
                 <Form layout='horizontal'>
-                    <FormItem
-                        label="Assistant Name"
-                        extra="Enter a name for your assistant to easily identify it in the dashboard"
-                        {...this.props.layout}>
-                        {getFieldDecorator('assistantName2', {
+                    <FormItem label="Question"
+                              extra="The above text will be shown in a bubble inside the chat"
+                              {...this.props.options.layout}>
+                        {getFieldDecorator('text', {
                             rules: [{
                                 required: true,
-                                message: 'Please input your assistant name',
+                                message: "Please input question field",
                             }],
                         })(
-                            <Input placeholder="Ex: My first assistant, Sales Assistant"/>
+                            <Input placeholder="Ex: Where are you from?"/>
                         )}
                     </FormItem>
 
-                    <FormItem
-                        label="Question"
-                        {...this.props.layout}>
-                        <Input placeholder="Ex: Where are you from?"/>
+                    <FormItem label="Action"
+                              {...this.props.options.layout}>
+                        {
+                            blockOptions.actions ?
+                                getFieldDecorator('action')(
+                                    <Select placeholder="The next step after this block">{
+                                        blockOptions.actions.map((action, i) =>
+                                            <Option key={i} value={action}>{action}</Option>)
+                                    }</Select>
+                                )
+                                : <Spin><Select placeholder="The next step after this block"></Select></Spin>
+                        }
                     </FormItem>
 
-                    <FormItem {...this.props.layout}
-                              label="Validation">
-
-                        <Select placeholder="Will validate the input">
-                            <Option value="recruitment">Ignore</Option>
-                            <Option value="Shopping">Email</Option>
-                            <Option value="Sales">Full Name</Option>
-                        </Select>
-                    </FormItem>
-
-                    <FormItem
-                        label="After message"
-                        {...this.props.layout}>
-                        <Input placeholder="Ex: Your input is considered"/>
+                    <FormItem label="After message"
+                              extra=""
+                              {...this.props.options.layout}>
+                        {getFieldDecorator('afterMessage')(
+                            <Input placeholder="Ex: Your input is recorded"/>
+                        )}
                     </FormItem>
 
                 </Form>
             </Card>
         );
     }
-
 }
 
 export default Form.create()(Solutions);

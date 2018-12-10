@@ -52,7 +52,6 @@ class Blocks extends Component {
     handleAddBlock = (addedBlock) => {
         console.log(addedBlock);
         // pass it to Flow.js to be send to server there
-        this.closeModal()
     };
 
 

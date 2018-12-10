@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Card, Form, Input, Select} from "antd";
+import {Card, Form, Input, Select, Spin} from "antd";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -17,18 +17,27 @@ class UserInput extends Component {
     }
 
     render() {
+        const {blockTypes} = this.props.options;
+
+        let blockOptions = {};
+        // extract the correct blockType from blockTypes[]
+        for (const blockType of blockTypes)
+            if (blockType.name === 'User Input')
+                blockOptions = blockType;
+
         const {getFieldDecorator} = this.props.form;
         return (
             <Card title="User Input"
                   style={{width: '100%'}}>
+
                 <Form layout='horizontal'>
                     <FormItem label="Question"
-                              extra="Enter a name for your assistant to easily identify it in the dashboard"
-                              {...this.props.layout}>
+                              extra="The above text will be shown in a bubble inside the chat"
+                              {...this.props.options.layout}>
                         {getFieldDecorator('text', {
                             rules: [{
                                 required: true,
-                                message: "Please input your assistant name",
+                                message: "Please input question field",
                             }],
                         })(
                             <Input placeholder="Ex: Where are you from?"/>
@@ -36,22 +45,48 @@ class UserInput extends Component {
                     </FormItem>
 
                     <FormItem label="Validation"
-                              extra=""
-                              {...this.props.layout}>
-                        {getFieldDecorator('validation')(
-                            <Select placeholder="Will validate the input">
-                                <Option value="recruitment">Ignore</Option>
-                                <Option value="Shopping">Email</Option>
-                                <Option value="Sales">Full Name</Option>
-                            </Select>
-                        )}
+                              {...this.props.options.layout}>
+                        {
+                            blockOptions.validations ?
+                                getFieldDecorator('validation')(
+                                    <Select placeholder="Will validate the input">{
+                                        blockOptions.validations.map((validation, i) =>
+                                            <Option key={i} value={validation}>{validation}</Option>)
+                                    }</Select>
+                                )
+                                : <Spin><Select placeholder="Will validate the input"></Select></Spin>
+                        }
+                    </FormItem>
+
+                    <FormItem label="Action"
+                              {...this.props.options.layout}>
+                        {
+                            blockOptions.actions ?
+                                getFieldDecorator('action', {
+                                    rules: [{
+                                        required: true,
+                                        message: "Please input question field",
+                                    }],
+                                })(
+                                    <Select placeholder="The next step after this block">{
+                                        blockOptions.actions.map((action, i) =>
+                                            <Option key={i} value={action}>{action}</Option>)
+                                    }</Select>
+                                )
+                                : <Spin><Select placeholder="The next step after this block"></Select></Spin>
+                        }
                     </FormItem>
 
                     <FormItem label="After message"
                               extra=""
-                              {...this.props.layout}>
-                        {getFieldDecorator('afterMessage')(
-                            <Input placeholder="Ex: Your input is considered"/>
+                              {...this.props.options.layout}>
+                        {getFieldDecorator('afterMessage', {
+                            rules: [{
+                                required: true,
+                                message: "Please input question field",
+                            }],
+                        })(
+                            <Input placeholder="Ex: Your input is recorded"/>
                         )}
                     </FormItem>
 

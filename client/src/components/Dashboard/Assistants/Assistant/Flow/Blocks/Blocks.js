@@ -2,11 +2,11 @@ import React, {Component} from 'react';
 
 import "./Blocks.less"
 import styles from "../Flow.module.less";
-import {Button, Drawer, Form} from "antd";
+import {Button, Form} from "antd";
 
-import BlocksDrawer from "./BlocksDrawer/BlocksDrawer";
 import Block from "./Block/Block";
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
+import NewBlockModal from "./NewBlockModal/NewBlockModal";
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -21,10 +21,19 @@ const getItemStyle = draggableStyle => ({margin: `0 0 8px 0`, ...draggableStyle}
 
 class Blocks extends Component {
 
+    state = {
+        visible: false,
+        blocks: []
+    };
+
     constructor(props) {
         super(props);
         this.onDragEnd = this.onDragEnd.bind(this);
     }
+
+    showModal = () => this.setState({visible: true});
+
+    closeModal = () => this.setState({visible: false});
 
     onDragEnd(result) {
         // dropped outside the list
@@ -34,33 +43,20 @@ class Blocks extends Component {
         this.setState({blocks});
     }
 
-
-    state = {
-        visible: false,
-        blocks: []
-    };
-
     componentWillReceiveProps(nextProps) {
+        // This handles when updating the selected group to show its blocks
         if (nextProps.currentGroup !== this.state.currentGroup && nextProps.currentGroup.blocks)
             this.setState({blocks: nextProps.currentGroup.blocks})
     }
 
-
-    showDrawer = () => {
-        this.setState({
-            visible: true,
-        });
-    };
-
-    onClose = () => {
-        this.setState({
-            visible: false,
-        });
+    handleAddBlock = (addedBlock) => {
+        console.log(addedBlock);
+        // pass it to Flow.js to be send to server there
+        this.closeModal()
     };
 
 
     render() {
-        console.log(this.props.currentGroup)
         return (
             <div className={styles.Panel}>
                 <div className={styles.Header}>
@@ -69,7 +65,7 @@ class Blocks extends Component {
                     </div>
                     <div>
                         <Button className={styles.PanelButton} type="primary" icon="plus"
-                                onClick={this.showDrawer} disabled={!this.props.currentGroup.id}>
+                                onClick={this.showModal} disabled={!this.props.currentGroup.id}>
                             Add Block
                         </Button>
                     </div>
@@ -77,11 +73,8 @@ class Blocks extends Component {
 
                 <div className={styles.Body}>
                     <div style={{height: "100%", width: '100%', overflowY: 'auto'}}>
-                        {/*<SortableList blocks={this.state.blocks}*/}
-                        {/*onSortEnd={this.onSortEnd}/>*/}
 
                         <DragDropContext onDragEnd={this.onDragEnd}>
-
                             <Droppable droppableId="droppable">
                                 {(provided) => (
                                     <div ref={provided.innerRef}>
@@ -104,13 +97,9 @@ class Blocks extends Component {
                     </div>
                 </div>
 
-                <Drawer title="Configure Block"
-                        placement="right" mask={false}
-                        onClose={this.onClose}
-                        visible={this.state.visible}
-                        width={'45%'}>
-                    <BlocksDrawer onClose={this.onClose}/>
-                </Drawer>
+                <NewBlockModal visible={this.state.visible}
+                               handleAddBlock={this.handleAddBlock}
+                               closeModal={this.closeModal}/>
             </div>
         );
     }

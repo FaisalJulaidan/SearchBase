@@ -8,12 +8,6 @@ import {flowActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
 import {message} from "antd";
 
-/*
-*
-* Todo:
-*   2- design card for each tab type
-* */
-
 class Flow extends Component {
 
     state = {
@@ -27,6 +21,8 @@ class Flow extends Component {
 
     selectGroup = (currentGroup) => this.setState({currentGroup});
 
+
+    // GROUPS
     addGroup = (newGroup) => {
         const {assistant} = this.props.location.state;
         this.props.dispatch(flowActions.addGroupRequest({ID: assistant.ID, newGroup: newGroup}));
@@ -43,6 +39,26 @@ class Flow extends Component {
         const {assistant} = this.props.location.state;
         this.props.dispatch(flowActions.deleteGroupRequest({ID: assistant.ID, deletedGroup: deletedGroup}));
         message.loading(`Deleting ${deletedGroup.name} group`, 0);
+    };
+
+
+    // BLOCKS
+    addBlock = (newGroup) => {
+        const {assistant} = this.props.location.state;
+        // this.props.dispatch(flowActions.addGroupRequest({ID: assistant.ID, newGroup: newGroup}));
+        // message.loading(`Adding ${newGroup.name} group`, 0);
+    };
+
+    editBlock = (editedGroup) => {
+        const {assistant} = this.props.location.state;
+        // this.props.dispatch(flowActions.editGroupRequest({ID: assistant.ID, editedGroup: editedGroup}));
+        // message.loading(`Editing ${editedGroup.name} group`, 0);
+    };
+
+    deleteBlock = (deletedGroup) => {
+        const {assistant} = this.props.location.state;
+        // this.props.dispatch(flowActions.deleteGroupRequest({ID: assistant.ID, deletedGroup: deletedGroup}));
+        // message.loading(`Deleting ${deletedGroup.name} group`, 0);
     };
 
     componentDidUpdate(prevProps) {
@@ -87,7 +103,10 @@ class Flow extends Component {
                     </div>
 
                     <div style={{margin: 5, width: '70%'}}>
-                        <Blocks currentGroup={this.state.currentGroup}/>
+                        <Blocks addBlock={this.addBlock}
+                                editBlock={this.editBlock}
+                                deleteBlock={this.deleteBlock}
+                                currentGroup={this.state.currentGroup}/>
                     </div>
                 </div>
             </div>

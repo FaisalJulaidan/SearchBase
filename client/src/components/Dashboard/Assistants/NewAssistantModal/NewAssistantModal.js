@@ -17,11 +17,11 @@ class NewAssistantModal extends Component {
 
     state = {
         isPopupDisabled: true
-    }
+    };
 
     togglePopupSwitch = () => {
         this.setState({isPopupDisabled: !this.state.isPopupDisabled})
-    }
+    };
 
     handleAdd = () => {
         this.props.form.validateFields((err, values) => {

@@ -39,10 +39,18 @@ def data_collection():
         return render_template("collection.html")
 
 
-@public_router.route("/pricing", methods=['GET'])
-def pricing():
+@public_router.route("/CvParsing", methods=['GET'])
+def cv_parsing():
     if request.method == "GET":
-        return render_template("pricing.html")
+        return render_template("CvParsing.html")
+
+@public_router.route("/FeedbackCollector", methods=['GET'])
+def feedback_collector():
+    if request.method == "GET":
+        return render_template("Feedback.html")
+
+
+
 
 
 @public_router.route("/about", methods=['GET'])

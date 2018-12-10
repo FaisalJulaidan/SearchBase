@@ -60,14 +60,12 @@ def group(assistantID):
     #############
     callback: Callback = Callback(False, 'Error!', None)
     data = request.json
-    print(data)
     if not data:
         return helpers.jsonResponse(False, 400, "Data missing")
 
     # Add a group
     if request.method == "POST":
         # Get the new group data from the request's body
-        print(data)
         callback: Callback = flow_services.addGroup(data, assistant)
 
     # Update the blocks' group

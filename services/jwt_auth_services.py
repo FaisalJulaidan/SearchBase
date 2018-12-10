@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, create_refresh_token
 
@@ -7,11 +7,11 @@ from services import user_services, role_services, sub_services, company_service
 from utilities import helpers
 
 jwt = JWTManager()
-
+tokenExpiresIn = 15 # in minutes
 
 @jwt.invalid_token_loader
 def my_expired_token_callback(error):
-    return helpers.jsonResponse(False, 401, "Invalid Token ☹")
+    return helpers.jsonResponse(False, 401, "Token expired")
 
 
 def signup(email, firstname, surname, password, companyName, companyPhoneNumber, websiteURL) -> Callback:
@@ -101,9 +101,9 @@ def authenticate(email: str, password_to_check: str) -> Callback:
 
         access_token = create_access_token(identity=data)
         refresh_token = create_refresh_token(identity=data)
-        data['user']['token'] = access_token
-        data['user']['refresh'] = refresh_token
-        print(data)
+        data['token'] = access_token
+        data['refresh'] = refresh_token
+        data['expiresIn'] = datetime.now() + timedelta(minutes=tokenExpiresIn) # add 15 minutes from now
 
         # Set LastAccess
         user.LastAccess = datetime.now()
@@ -121,8 +121,8 @@ def authenticate(email: str, password_to_check: str) -> Callback:
 def refreshToken() -> Callback:
     try:
         current_user = get_jwt_identity()
-        print("current user: ", current_user)
-        data = {'token': create_access_token(identity=current_user)}
+        data = {'token': create_access_token(identity=current_user),
+                'expiresIn': datetime.now() + timedelta(minutes=refreshTokenExpiresIn)}
         return Callback(True, "Authorised!", data)
     except Exception as e:
         return Callback(False, "Unauthorised!", None)

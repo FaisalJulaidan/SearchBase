@@ -9,9 +9,6 @@ function* fetchAssistants() {
         return yield put(assistantActions.fetchAssistantsSuccess(res.data.data))
     } catch (error) {
         console.log(error);
-
-        yield localStorage.removeItem('user');
-        yield put(authActions.logout());
         return yield put(assistantActions.fetchAssistantsFailure(error.response.data));
     }
 

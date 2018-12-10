@@ -1,50 +1,88 @@
 import * as actionTypes from '../actions/actionTypes';
-import {put, takeEvery, all} from 'redux-saga/effects'
-import {authActions} from "../actions";
-import {history} from '../../helpers'
+import { delay } from "redux-saga";
+import { put, takeEvery, takeLatest, all } from 'redux-saga/effects'
+import { authActions } from "../actions";
+import { history, checkAuthenticity } from '../../helpers'
 import axios from 'axios';
- 
 
-function* login(action) {
-    const {email, password} = action;
 
+function* checkAuthTimeout({expirationTime, refresh}) {
+    yield delay(expirationTime * 1000);
+    yield put(authActions.refreshToken(refresh));
+}
+
+function* watchCheckAuthTimeout() {
+    yield takeEvery(actionTypes.AUTH_CHECK_TIMEOUT, checkAuthTimeout)
+}
+
+function* login({email, password}) {
     try {
         const res = yield axios.post(`/api/auth`, {email, password}, {
             headers: {'Content-Type': 'application/json'},
         });
-        const user = res.data.data.user;
-        // const expirationDate = yield new Date(
-        //     new Date().getTime() + response.data.expiresIn * 1000
-        // );
 
+        const {user, token, refresh, expiresIn} = yield res.data.data;
         yield localStorage.setItem("user", JSON.stringify(user));
+        yield localStorage.setItem("token", token);
+        yield localStorage.setItem("refresh", refresh);
+        yield localStorage.setItem("expiresIn", expiresIn);
+        // When access token expires in seconds
+        const secondsToExpire = yield (new Date(expiresIn).getTime() - new Date().getTime()) / 1000
+        // Dispatch actions
         yield put(authActions.loginSuccess(user));
-        // yield put(actions.checkAuthTimeout(response.data.expiresIn));
-
+        yield put(authActions.checkAuthTimeout(secondsToExpire, refresh)); // refresh to access token when expired
+        // Redirect to dashboard page
         yield history.push('/dashboard');
     } catch (error) {
-        console.log(error)
+        console.log(error);
         yield put(authActions.loginFailure(error.response.data));
     }
 }
 
 function* watchLogin() {
-    yield takeEvery(actionTypes.LOGIN_REQUEST, login)
+    yield takeLatest(actionTypes.LOGIN_REQUEST, login)
 }
 
 function* logout() {
-    // remove user from local storage to log user out
-    yield localStorage.removeItem('user');
+    // Clear local storage from user, token...
+    yield localStorage.clear();
     yield history.push('/login');
 }
 
 function* watchLogout() {
-    yield takeEvery(actionTypes.LOGOUT, logout)
+    yield takeLatest(actionTypes.LOGOUT, logout)
+}
+
+function* refreshToken({refresh}) {
+    try {
+        if(!checkAuthenticity()){throw new Error('Authentication Failed')}
+        const res = yield axios.post(`/api/auth/refresh`, null,{
+            headers: {'Authorization': 'Bearer ' + refresh},
+        });
+
+        const {token, expiresIn} = res.data.data;
+        yield localStorage.setItem("token", token);
+        yield localStorage.setItem("expiresIn", expiresIn);
+        const secondsToExpire = yield (new Date(expiresIn).getTime() - new Date().getTime()) / 1000;
+        yield put(authActions.checkAuthTimeout(secondsToExpire, refresh));
+
+
+    } catch (error) {
+        console.log(error);
+        // Log the user out
+        yield put(authActions.logout());
+    }
+}
+
+function* watchRefreshToken() {
+    yield takeEvery(actionTypes.REFRESH_TOKEN, refreshToken)
 }
 
 export function* authSaga() {
     yield all([
         watchLogin(),
-        watchLogout()
+        watchLogout(),
+        watchCheckAuthTimeout(),
+        watchRefreshToken()
     ])
 }

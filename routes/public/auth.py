@@ -23,7 +23,7 @@ def authenticate():
 
 
 # Refresh token endpoint
-@auth_router.route('/refresh', methods=['POST'])
+@auth_router.route('/auth/refresh', methods=['POST'])
 @jwt_refresh_token_required
 def refresh():
     callback = jwt_auth_services.refreshToken()

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {authHeader} from './auth';
-
+import store from '../store/store';
+import { authActions } from "../store/actions";
 
 export const http = axios.create({
     baseURL: '/api',
@@ -15,7 +16,17 @@ http.interceptors.request.use(
         return config;
     },
     function (error) {
-        console.log(error)
+        console.log(error);
         return Promise.reject(error);
     }
 );
+
+http.interceptors.response.use(response => {
+    return response;
+}, error => {
+    if (error.response.status === 401) {
+        console.log('Axios Unauthorised');
+        store.dispatch(authActions.logout());
+    }
+    return Promise.reject(error);
+});

@@ -160,13 +160,13 @@ def updateFlow(flow, assistant: Assistant) -> Callback:
     return Callback(True, "Bot updated successfully!")
 
 
-def updateGroup(group: dict, assistant: Assistant, ) -> Callback:
+def updateGroup(data: dict, assistant: Assistant, ) -> Callback:
     try:
         # Update the group
         group: BlockGroup = db.session.query(BlockGroup). \
-            filter(and_(BlockGroup.ID == group.get('id'), Assistant.ID == assistant.ID)).first()
-        group.Name = group.get('name')
-        group.Description = group.get('description')
+            filter(and_(BlockGroup.ID == data.get('id'), Assistant.ID == assistant.ID)).first()
+        group.Name = data.get('name')
+        group.Description = data.get('description')
 
         # Save
         db.session.commit()

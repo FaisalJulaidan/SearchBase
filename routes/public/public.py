@@ -1,11 +1,13 @@
-from flask import Blueprint, render_template, request, session, redirect, url_for, jsonify
+import os
+
+from flask import Blueprint, render_template, request, session, redirect, url_for, jsonify, send_from_directory
 from flask_cors import CORS
 from itsdangerous import URLSafeTimedSerializer
 from models import Callback
 from services import user_services, auth_services, mail_services
 from utilities import helpers
 
-public_router = Blueprint('public_router', __name__, template_folder="../templates")
+public_router = Blueprint('public_router', __name__, template_folder="../templates", static_folder='static')
 CORS(public_router)
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
@@ -16,14 +18,30 @@ def getDoTest():
     if request.method == "GET":
         return jsonify({"status": "yay it's working"})
 
-@public_router.route("/", methods=['GET'])
-def indexpage():
-    if request.method == "GET":
-        print(helpers.encrypt_id(1))
-        print(helpers.decrypt_id('YJkLo'))
-        print(helpers.encrypt_id(1) == helpers.decrypt_id('YJkLo')[0])
-        return render_template("index.html")
+# @public_router.route("/", methods=['GET'])
+# def indexpage():
+#     if request.method == "GET":
+#         print(helpers.encrypt_id(1))
+#         print(helpers.decrypt_id('YJkLo'))
+#         print(helpers.encrypt_id(1) == helpers.decrypt_id('YJkLo')[0])
+#         return render_template("index.html")
 
+# Serve React App
+@public_router.route('/', defaults={'path': ''})
+@public_router.route('/<path:path>')
+def serve(path):
+    print(os.path.exists("static/react_app/build/" + path))
+    print("HHHHHH")
+    if path != "" and os.path.exists("static/react_app/build/" + path):
+        return send_from_directory('static/react_app/build', path)
+    else:
+        return send_from_directory('static/react_app/build', 'index.html')
+
+# # Serve React App
+# @public_router.route('/')
+# def serve():
+#     print("HERE")
+#     return send_from_directory('static/react_app/build', 'index.html')
 
 @public_router.route("/features", methods=['GET'])
 def features():

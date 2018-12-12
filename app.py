@@ -1,7 +1,7 @@
 #/usr/bin/python3.5
 import os
 import config
-from flask import Flask, redirect, request, render_template, session
+from flask import Flask, redirect, request, render_template, session, send_from_directory
 from flask_api import status
 from services import assistant_services, user_services
 from models import db, Plan
@@ -47,6 +47,8 @@ app.register_blueprint(users_router)
 app.register_blueprint(bot_router)
 app.register_blueprint(chatbot_router)
 app.register_blueprint(auth_router, url_prefix='/api')
+
+
 
 
 # Code to ensure user is logged in

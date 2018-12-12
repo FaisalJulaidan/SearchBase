@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Switch, Route, withRouter, Redirect} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {history} from './helpers';
-import './App.css';
+import './App.less';
 
 import {PrivateRoute} from './hoc';
 import Dashboard from "./components/Dashboard/Dashboard";

@@ -7,6 +7,7 @@ import Assistants from './Assistants/Assistants';
 import {history} from '../../helpers';
 import {Switch, Route} from 'react-router-dom';
 import Flow from "./Assistants/Assistant/Flow/Flow";
+import Profile from "./Profile/Profile";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -97,6 +98,7 @@ class Dashboard extends Component {
                         <Switch>
                             <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+                            <Route path={`${match.path}/profile`} component={Profile} exact/>
 
                             {/*<Route path="/dashboard" component={Dashboard}/>*/}
                         </Switch>

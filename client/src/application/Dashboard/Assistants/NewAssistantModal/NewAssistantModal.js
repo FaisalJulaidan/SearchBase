@@ -135,7 +135,6 @@ class NewAssistantModal extends Component {
                             )
                         }
                     </FormItem>
-
                 </Form>
             </Modal>
         );

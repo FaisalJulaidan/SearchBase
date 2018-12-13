@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 
 import "./Profile.less"
 import styles from "./Profile.module.less"
+import {Form, Input, InputNumber, Modal, Select, Switch} from "antd";
 
 class Profile extends Component {
     state = {};
@@ -19,9 +20,10 @@ class Profile extends Component {
 
 
                     <div className={styles.Panel_Body}>
-                        {/*Here you add the components*/}
+
                         <h3>Profile component works</h3>
                         <p>You need to add components from ant-design</p>
+
                     </div>
                 </div>
             </div>

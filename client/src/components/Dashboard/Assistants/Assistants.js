@@ -48,13 +48,14 @@ class Assistants extends Component {
 
             <div style={{height: '100%'}}>
                 <div className={styles.Panel}>
-                    <div className={styles.Header}>
+                    <div className={styles.Panel_Header}>
                         <div>
                             <h3>Assistants List</h3>
                             <p>Here you can see all assistants created by you</p>
                         </div>
                         <div>
-                            <Button className={styles.AddAssistant} type="primary" icon="plus" onClick={this.showModal}>
+                            <Button className={styles.Panel_Header_Button} type="primary" icon="plus"
+                                    onClick={this.showModal}>
                                 Add Assistant
                             </Button>
                         </div>
@@ -62,7 +63,7 @@ class Assistants extends Component {
                     </div>
 
 
-                    <div className={styles.Body}>
+                    <div className={styles.Panel_Body}>
                         <div className={styles.AssistantsList}>
                             {
                                 this.props.assistantList[0] ?

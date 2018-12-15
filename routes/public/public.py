@@ -11,14 +11,36 @@ CORS(public_router)
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 
-
 @public_router.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
-        print(helpers.encrypt_id(1))
-        print(helpers.decrypt_id('YJkLo'))
-        print(helpers.encrypt_id(1) == helpers.decrypt_id('YJkLo')[0])
         return render_template("index.html")
+
+
+@public_router.route("/mail/arrange_demo", methods=['POST'])
+def register_interest():
+    if request.method == "POST":
+        email = request.form.get("user_email", default=None)
+
+        if not email:
+            return "Could not retrieve some of your inputs"
+
+        requestDemo_callback: Callback = mail_services.sendDemoRequest(email)
+        return requestDemo_callback.Message
+
+
+@public_router.route("/mail/contact_us", methods=['POST'])
+def contact_us():
+    if request.method == "POST":
+        name = request.form.get("sendingName", default=None)
+        email = request.form.get("sendingEmail", default=None)
+        message = request.form.get("sendMessage", default=None)
+
+        if not name or not email or not message:
+            return "Could not retrieve some of your inputs"
+
+        contactUs_callback: Callback = mail_services.contactUsIndex(name, email, message)
+        return contactUs_callback.Message
 
 
 @public_router.route("/features", methods=['GET'])
@@ -44,13 +66,11 @@ def cv_parsing():
     if request.method == "GET":
         return render_template("CvParsing.html")
 
+
 @public_router.route("/FeedbackCollector", methods=['GET'])
 def feedback_collector():
     if request.method == "GET":
         return render_template("Feedback.html")
-
-
-
 
 
 @public_router.route("/about", methods=['GET'])
@@ -63,7 +83,6 @@ def about():
 def contactpage():
     if request.method == "GET":
         return render_template("contact.html")
-
 
 
 # # Sitemap route
@@ -121,8 +140,8 @@ def login():
         session.permanent = True
 
         email: str = request.form.get("email", default=None)
-        password_to_check :str = request.form.get("password", default=None)
-        callback: Callback = auth_services.login(email,password_to_check)
+        password_to_check: str = request.form.get("password", default=None)
+        callback: Callback = auth_services.login(email, password_to_check)
 
         if callback.Success:
             return redirect("/admin/dashboard", code=302)
@@ -130,9 +149,8 @@ def login():
             return helpers.redirectWithMessage("login", callback.Message)
 
 
-@public_router.route('/logout',  methods=['GET'])
+@public_router.route('/logout', methods=['GET'])
 def logout():
-
     # Will clear out the session.
     session.pop('UserID', None)
     session.pop('UserEmail', None)
@@ -141,14 +159,12 @@ def logout():
     session.pop('Logged_in', False)
     session.clear()
 
-
     return redirect(url_for('public_router.login'))
 
 
 # TODO improve verification
 @public_router.route("/signup", methods=['GET', 'POST'])
 def signup():
-
     if request.method == "GET":
         msg = helpers.checkForMessage()
         return render_template("signup.html", msg=msg)
@@ -188,7 +204,9 @@ def signup():
             helpers.redirectWithMessage('signup', 'Signed up successfully but > ' + mail_callback.Message
                                         + '. Please contact TheSearchBaseStaff to activate your account.')
 
-        return helpers.redirectWithMessage("login", "We have sent you a verification email. Please use it to complete the sign up process.")
+        return helpers.redirectWithMessage("login",
+                                           "We have sent you a verification email. Please use it to complete the sign up process.")
+
 
 @public_router.route("/account/verify/<payload>", methods=['GET'])
 def verify_account(payload):
@@ -196,11 +214,13 @@ def verify_account(payload):
         try:
             data = verificationSigner.loads(payload)
             email = data.split(";")[0]
-            user_callback : Callback = user_services.verifyByEmail(email)
+            user_callback: Callback = user_services.verifyByEmail(email)
             if not user_callback.Success: raise Exception(user_callback.Message)
 
-            return helpers.redirectWithMessage("login", "Your email has been verified. You can now access your account.")
+            return helpers.redirectWithMessage("login",
+                                               "Your email has been verified. You can now access your account.")
 
         except Exception as e:
             print(e)
-            return helpers.redirectWithMessage("login", "Email verification link failed. Please contact Customer Support in order to resolve this.")
+            return helpers.redirectWithMessage("login",
+                                               "Email verification link failed. Please contact Customer Support in order to resolve this.")

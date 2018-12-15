@@ -3,247 +3,314 @@
 {% block title %}Solutions{% endblock %}
 
 {% block content %}
-<style>
-    #conditionsNumberInput {
-        width: 32px;
-        border-style: none;
-    }
+    <style>
+        #conditionsNumberInput {
+            width: 32px;
+            border-style: none;
+        }
+
         #conditionsNumberInput::-webkit-inner-spin-button,
         #conditionsNumberInput::-webkit-outer-spin-button {
             opacity: 1;
         }
-    #fileDisplay {
-        cursor: auto;
-        display: inline-block;
-        width: 210px;
-        font-size: 12px;
-        height: 30px;
-        background-color: white;
-        margin-left: 3px;
-    }
-    #fileTypeSelector, #existingFileSelector {
-        width: 210px;
-        font-size: 12px;
-        height: 30px;
-        display: inline-block;
-        margin-left: 9px;
-    }
-    ul.bar_tabs{
-        background: none!important;
-        border-bottom-width: 2px!important;
-    }
-</style>
-<link rel="stylesheet" type="text/css" href="/static/css/checkbox.css">
-<div class="right_col" role="main">
-    <div class="">
-        <div class="page-title">
-            <div class="title_left">
-                <h3>Controlling Your Solutions <br /><small>Note: All the data on this page has been decrypted for your ease. We do not store any sensitive data without making sure it is completely secured.</small></h3>
+
+        #fileDisplay {
+            cursor: auto;
+            display: inline-block;
+            width: 210px;
+            font-size: 12px;
+            height: 30px;
+            background-color: white;
+            margin-left: 3px;
+        }
+
+        #fileTypeSelector, #existingFileSelector {
+            width: 210px;
+            font-size: 12px;
+            height: 30px;
+            display: inline-block;
+            margin-left: 9px;
+        }
+
+        ul.bar_tabs {
+            background: none !important;
+            border-bottom-width: 2px !important;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="/static/css/checkbox.css">
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>Controlling Your Solutions <br/>
+                        <small>Note: All the data on this page has been decrypted for your ease. We do not store any
+                            sensitive data without making sure it is completely secured.
+                        </small>
+                    </h3>
+                </div>
             </div>
-        </div>
-        <div class="clearfix"></div>
+            <div class="clearfix"></div>
 
-        <div class="row">
-            <div class="clearfix"></div>
-        </div>
-        <div class="x_content">
-            <div class="clearfix"></div>
             <div class="row">
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="">
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="clearfix"></div>
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="">
+                            <div class="">
 
-                            <!-- Start of welcome message -->
-                            <div class="row">
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <div class="x_panel" id="uploadDatabasePanel">
-                                        <div class="x_title">
-                                            <h2>
-                                                Data Integration
-                                                <small>File Types: XML, JSON (coming soon)</small>
-                                            </h2>
-                                            <ul class="nav navbar-right panel_toolbox">
-                                                <li>
-                                                    <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                </li>
-                                            </ul>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                        <div class="x_content">
-
-                                            <form id="productFileForm" name="productFileForm"
-                                                  enctype="multipart/form-data">
-
-                                                <div class="form-group">
-                                                    <div>
-                                                        Action: <select class="form-control" id="existingFileSelector" name="existingFile">
-                                                            <optgroup label="Connect a new Database">
-                                                                <option value="UploadExportFile">Upload Export File</option>
-                                                            </optgroup>
-                                                            <optgroup id="existingFileSelectorUpdateGroup" label="Update existing one">
-
-                                                            </optgroup>
-                                                        </select>
-                                                        <br />
-                                                        <br>
-                                                        <label class="btn btn-success" for="productFile">
-                                                            Choose file to upload
-                                                        </label>
-                                                        <br />
-                                                        <br />
-                                                        <input type="file" id="productFile" name="solutionsFile" style="display:none;" />
-                                                        Database Name: <input class="form-control" name="fileName" id="fileDisplay" />
-                                                        <br />
-                                                        <br />
-                                                        Database Type:
-                                                        <select class="form-control" id="fileTypeSelector" name="fileType">
-                                                            <option value="RDBXML">RDB XML File Export</option>
-                                                        </select>
-                                                    </div>
-                                                    <br />
-                                                    <button id="uploadButton" class="btn btn-success"
-                                                            type="button" value="submit" onclick="uploadProductFile()">
-                                                        Upload Database
-                                                    </button>
-                                                    <h4 id="uploadDatabaseMessage"></h4>
-                                                </div>
-
-                                            </form>
-
-                                        </div>
-                                    </div>
-                                    <div class="x_panel" id="dbDependentPanel">
-
-                                        <div class="x_title">
-                                            <h3 id="dbDependentMessage" style="display:none;width:50%;"><b>Bellow functionality requies an active database</b></h3>
-                                            <h3 id="dbDependentTitle" style="display:inline-block;width:50%;"><b>Solutions Settings and Actions</b></h3>
-                                            <ul class="nav navbar-right panel_toolbox">
-                                                <li>
-                                                    <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                </li>
-                                            </ul>
-                                            <div class="clearfix"></div>
-                                        </div>
-
-                                        <div class="x_content" id="dbDependent">
-
-                                            <div role="tabpanel">
-
-                                                <ul id="solutionsNavTab" class="nav nav-tabs bar_tabs" role="tablist">
+                                <!-- Start of welcome message -->
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <div class="x_panel" id="uploadDatabasePanel">
+                                            <div class="x_title">
+                                                <h2>
+                                                    Data Integration
+                                                    <small>File Types: XML, JSON (coming soon)</small>
+                                                </h2>
+                                                <ul class="nav navbar-right panel_toolbox">
+                                                    <li>
+                                                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                    </li>
                                                 </ul>
-                                                <div id="myTabContent" class="tab-content">
-                                                    <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
 
-                                                        <form id="displayTitlesForm">
-                                                            <h3>Titles to be displayed<b>*</b></h3>
-                                                            <p>
-                                                                From here you can choose which part of your information you want to be displayed inside the solution box.<br />
-                                                                If you are unsure what data is inside those titles simply scroll down to Raw Data and have a look.
-                                                            </p>
-                                                            <div id="displayTitlesPasteDiv">
+                                                <form id="productFileForm" name="productFileForm"
+                                                      enctype="multipart/form-data">
 
-                                                            </div>
-                                                            <label style="cursor:pointer;color:#6610f2;" onclick="addTitle()">Add Information Line +</label><br />
-                                                            <div>
-                                                                <br />
-                                                                <label>Description:</label><br />
-                                                                <select class='form-control' style='width:300px!important;display:inline-block;' id="descriptionSelect" type='text' name='description'>
+                                                    <div class="form-group">
+                                                        <div>
+                                                            Action: <select class="form-control"
+                                                                            id="existingFileSelector"
+                                                                            name="existingFile">
+                                                            <optgroup label="Connect a new Database">
+                                                                <option value="UploadExportFile">Upload Export File
+                                                                </option>
+                                                            </optgroup>
+                                                            <optgroup id="existingFileSelectorUpdateGroup"
+                                                                      label="Update existing one">
 
-                                                                </select>
-                                                                <br /><br />
-                                                            </div>
-                                                            <label class="btn btn-success" onclick="saveTitles()">Save</label>
-                                                            <p id="saveDisplayTitlesMessage"></p>
-                                                        </form>
-
-                                                        <br />
-
-                                                        <form id="solutionLinkForm" name="solutionLinkForm">
-                                                            <h3>Solution Links<b>*</b></h3>
-                                                            <p>
-                                                                In order to be able to direct users to your solutions at your home website we will need some input from you.<br />
-                                                                We would need the page part that holds all the solutions and then the solution reference. For example that<br />
-                                                                can be http://mycoolwebsite.com/jobs/*JobID* . To create the bridge between us we would need that information<br />
-                                                                in the bellow text inputs.
-                                                                <br /><b>To do that just contact us and we will find them for you</b>.<br />
-                                                                Alternatively you can try finding them on your own. To do that please provide us with the link (ex. "http://mycoolwebsite.com/jobs/")<br />
-                                                                and then the reference to the JobID which you can find in your upload file(add @ in front of it) or Raw Data bellow.<br />
-                                                                For example: "@JobDbID" : C2143. You can also take your solution ID and use Ctrl + F on this page to find the<br />
-                                                                corresponding title in the Raw Data.<br />
-                                                            </p>
-                                                            <input style="width:300px!important;" class="form-control" name="webLink" id="webLink" placeholder="http://mycoolwebsite.com/Solutions/"/>
-                                                            <br />
-                                                            <input style="width:300px!important;" class="form-control" name="solutionsRef" id="solutionsRef" placeholder="@SolutionID"/>
-                                                            <br />
-                                                            <label class="btn btn-success" onclick="saveSolutionLink()">Save</label>
-                                                            <p id="saveLinkMessage"></p>
-                                                        </form>
-
-                                                        <br />
-
-                                                        <form id="requiredFiltersForm">
-                                                            <h3>Returned Solutions Filters</h3>
-                                                            <p>
-                                                                You can set required keywords to be somewhere in the solution in order to show only specific records.<br />
-                                                                For example restrict it so only specific consultant or location's records are displayed to the user.<br />
-                                                            </p>
-                                                            <label>
-                                                                <input min="0" id="conditionsNumberInput" style="background-color:white;" name="conditionsNumberInput" type="number" value="0" /> Conditions must be met:
+                                                            </optgroup>
+                                                        </select>
+                                                            <br/>
+                                                            <br>
+                                                            <label class="btn btn-success" for="productFile">
+                                                                Choose file to upload
                                                             </label>
-                                                            <br />
-                                                            <div id="conditionsDiv">
-
-                                                            </div>
-                                                            <label style="cursor:pointer;color:#6610f2;" onclick="addCondition()">Add Condition +</label><br />
-                                                            <label class="btn btn-success" onclick="saveConditions()">Save</label>
-                                                            <p id="saveRequiredFiltersMessage"></p>
-                                                        </form>
-
-                                                        <br />
-
-                                                        <div id="SolutionAlertsDiv">
-                                                            <h3>Solution Alerts</h3>
-                                                            <p>
-                                                                You can send emails to your clients when a new Solution suited for them has been added to your records.<br />
-                                                                This can be done manually by clicking the button bellow or by ticking the box which will check<br />
-                                                                and send them every time you update your data.
-                                                            </p>
-                                                            <label class="btn btn-success" onclick="sendSolutionAlerts()">Send Solutions</label>
-                                                            <p id="sendSolutionsMessage"></p>
-                                                            <h4>Send Automatically</h4>
-                                                            <div class="input-group" style="margin-bottom: 5px;">
-                                                                <label class="checkboxContainer" style="margin-bottom: 5px;">
-                                                                    On data update
-
-                                                                    <input id="automaticSolutionAlertsCheckbox" name="SolutionAlerts" value="SolutionAlerts" type="checkbox" onchange="changeAutoSolutionAlerts()" />
-
-                                                                    <span class="checkmark"></span>
-                                                                </label>
-                                                            </div>
-                                                            <p id="checkboxMessage"></p>
+                                                            <br/>
+                                                            <br/>
+                                                            <input type="file" id="productFile" name="solutionsFile"
+                                                                   style="display:none;"/>
+                                                            Database Name: <input class="form-control" name="fileName"
+                                                                                  id="fileDisplay"/>
+                                                            <br/>
+                                                            <br/>
+                                                            Database Type:
+                                                            <select class="form-control" id="fileTypeSelector"
+                                                                    name="fileType">
+                                                                <option value="RDBXML">RDB XML File Export</option>
+                                                            </select>
                                                         </div>
+                                                        <br/>
+                                                        <button id="uploadButton" class="btn btn-success"
+                                                                type="button" value="submit"
+                                                                onclick="uploadProductFile()">
+                                                            Upload Database
+                                                        </button>
+                                                        <h4 id="uploadDatabaseMessage"></h4>
+                                                    </div>
 
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                        <div class="x_panel" id="dbDependentPanel">
+
+                                            <div class="x_title">
+                                                <h3 id="dbDependentMessage" style="display:none;width:50%;"><b>Bellow
+                                                    functionality requies an active database</b></h3>
+                                                <h3 id="dbDependentTitle" style="display:inline-block;width:50%;"><b>Solutions
+                                                    Settings and Actions</b></h3>
+                                                <ul class="nav navbar-right panel_toolbox">
+                                                    <li>
+                                                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                    </li>
+                                                </ul>
+                                                <div class="clearfix"></div>
+                                            </div>
+
+                                            <div class="x_content" id="dbDependent">
+
+                                                <div role="tabpanel">
+
+                                                    <ul id="solutionsNavTab" class="nav nav-tabs bar_tabs"
+                                                        role="tablist">
+                                                    </ul>
+                                                    <div id="myTabContent" class="tab-content">
+                                                        <div role="tabpanel" class="tab-pane fade active in"
+                                                             id="tab_content1" aria-labelledby="home-tab">
+
+                                                            <form id="displayTitlesForm">
+                                                                <h3>Titles to be displayed<b>*</b></h3>
+                                                                <p>
+                                                                    From here you can choose which part of your
+                                                                    information you want to be displayed inside the
+                                                                    solution box.<br/>
+                                                                    If you are unsure what data is inside those titles
+                                                                    simply scroll down to Raw Data and have a look.
+                                                                </p>
+                                                                <div id="displayTitlesPasteDiv">
+
+                                                                </div>
+                                                                <label style="cursor:pointer;color:#6610f2;"
+                                                                       onclick="addTitle()">Add Information Line
+                                                                    +</label><br/>
+                                                                <div>
+                                                                    <br/>
+                                                                    <label>Description:</label><br/>
+                                                                    <select class='form-control'
+                                                                            style='width:300px!important;display:inline-block;'
+                                                                            id="descriptionSelect" type='text'
+                                                                            name='description'>
+
+                                                                    </select>
+                                                                    <br/><br/>
+                                                                </div>
+                                                                <label class="btn btn-success" onclick="saveTitles()">Save</label>
+                                                                <p id="saveDisplayTitlesMessage"></p>
+                                                            </form>
+
+                                                            <br/>
+
+                                                            <form id="solutionLinkForm" name="solutionLinkForm">
+                                                                <h3>Solution Links<b>*</b></h3>
+                                                                <p>
+                                                                    In order to be able to direct users to your
+                                                                    solutions at your home website we will need some
+                                                                    input from you.<br/>
+                                                                    We would need the page part that holds all the
+                                                                    solutions and then the solution reference. For
+                                                                    example that<br/>
+                                                                    can be http://mycoolwebsite.com/jobs/*JobID* . To
+                                                                    create the bridge between us we would need that
+                                                                    information<br/>
+                                                                    in the bellow text inputs.
+                                                                    <br/><b>To do that just contact us and we will find
+                                                                    them for you</b>.<br/>
+                                                                    Alternatively you can try finding them on your own.
+                                                                    To do that please provide us with the link (ex.
+                                                                    "http://mycoolwebsite.com/jobs/")<br/>
+                                                                    and then the reference to the JobID which you can
+                                                                    find in your upload file(add @ in front of it) or
+                                                                    Raw Data bellow.<br/>
+                                                                    For example: "@JobDbID" : C2143. You can also take
+                                                                    your solution ID and use Ctrl + F on this page to
+                                                                    find the<br/>
+                                                                    corresponding title in the Raw Data.<br/>
+                                                                </p>
+                                                                <input style="width:300px!important;"
+                                                                       class="form-control" name="webLink" id="webLink"
+                                                                       placeholder="http://mycoolwebsite.com/Solutions/"/>
+                                                                <br/>
+                                                                <input style="width:300px!important;"
+                                                                       class="form-control" name="solutionsRef"
+                                                                       id="solutionsRef" placeholder="@SolutionID"/>
+                                                                <br/>
+                                                                <label class="btn btn-success"
+                                                                       onclick="saveSolutionLink()">Save</label>
+                                                                <p id="saveLinkMessage"></p>
+                                                            </form>
+
+                                                            <br/>
+
+                                                            <form id="requiredFiltersForm">
+                                                                <h3>Returned Solutions Filters</h3>
+                                                                <p>
+                                                                    You can set required keywords to be somewhere in the
+                                                                    solution in order to show only specific
+                                                                    records.<br/>
+                                                                    For example restrict it so only specific consultant
+                                                                    or location's records are displayed to the
+                                                                    user.<br/>
+                                                                </p>
+                                                                <label>
+                                                                    <input min="0" id="conditionsNumberInput"
+                                                                           style="background-color:white;"
+                                                                           name="conditionsNumberInput" type="number"
+                                                                           value="0"/> Conditions must be met:
+                                                                </label>
+                                                                <br/>
+                                                                <div id="conditionsDiv">
+
+                                                                </div>
+                                                                <label style="cursor:pointer;color:#6610f2;"
+                                                                       onclick="addCondition()">Add Condition
+                                                                    +</label><br/>
+                                                                <label class="btn btn-success"
+                                                                       onclick="saveConditions()">Save</label>
+                                                                <p id="saveRequiredFiltersMessage"></p>
+                                                            </form>
+
+                                                            <br/>
+
+                                                            <div id="SolutionAlertsDiv">
+                                                                <h3>Solution Alerts</h3>
+                                                                <p>
+                                                                    You can send emails to your clients when a new
+                                                                    Solution suited for them has been added to your
+                                                                    records.<br/>
+                                                                    This can be done manually by clicking the button
+                                                                    bellow or by ticking the box which will check<br/>
+                                                                    and send them every time you update your data.
+                                                                </p>
+                                                                <label class="btn btn-success"
+                                                                       onclick="sendSolutionAlerts()">Send
+                                                                    Solutions</label>
+                                                                <p id="sendSolutionsMessage"></p>
+                                                                <h4>Send Automatically</h4>
+                                                                <div class="input-group" style="margin-bottom: 5px;">
+                                                                    <label class="checkboxContainer"
+                                                                           style="margin-bottom: 5px;">
+                                                                        On data update
+
+                                                                        <input id="automaticSolutionAlertsCheckbox"
+                                                                               name="SolutionAlerts"
+                                                                               value="SolutionAlerts" type="checkbox"
+                                                                               onchange="changeAutoSolutionAlerts()"/>
+
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </div>
+                                                                <p id="checkboxMessage"></p>
+                                                            </div>
+
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="x_panel" id="rawDataPanel">
-                                        <div class="x_title">
-                                            <h2>Raw Data:</h2>
-                                            <ul class="nav navbar-right panel_toolbox">
-                                                <li>
-                                                    <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                </li>
-                                            </ul>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                        <div class="x_content" id="solutionsDiv" style="max-height:500px;overflow-y:auto;border-radius:5px;">
+                                        <div class="x_panel" id="rawDataPanel">
+                                            <div class="x_title">
+                                                <h2>Raw Data:</h2>
+                                                <ul class="nav navbar-right panel_toolbox">
+                                                    <li>
+                                                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                    </li>
+                                                </ul>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content" id="solutionsDiv"
+                                                 style="max-height:500px;overflow-y:auto;border-radius:5px;">
 
+                                            </div>
                                         </div>
                                     </div>
+
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -251,473 +318,525 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- Solution Modal -->
-<div class="modal fade" id="solutionModal" tabindex="-1" role="dialog" aria-labelledby="solutionModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
+    <!-- Solution Modal -->
+    <div class="modal fade" id="solutionModal" tabindex="-1" role="dialog" aria-labelledby="solutionModalCenterTitle"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
 
-            <div class="modal-header">
-                <h3 class="modal-title" id="solutionModalLongTitle">Solution Information</h3>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <div class="modal-header">
+                    <h3 class="modal-title" id="solutionModalLongTitle">Solution Information</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form id="solutionForm">
+
+                    <div class="modal-body">
+
+                        <div class="form-group">
+                            <label for="inputID">ID</label>
+                            <input type="text" class="form-control" name="inputId" placeholder="FS5894">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputBigTitle">Major Title</label>
+                            <input type="text" class="form-control" name="inputMajorTitle" placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputSecondaryTitle">Secondary Title</label>
+                            <input type="text" class="form-control" name="inputSecondaryTitle" placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputSecondaryTitle">Short Description</label>
+                            <input type="text" class="form-control" name="inputShortDescription" placeholder="">
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="inputMoney">Money</label>
+                            <input type="text" class="form-control" name="inputMoney" value="£0" placeholder=""
+                                   onchange="validate(this)">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputKeywords">Keywords</label>
+                            <input type="text" class="form-control" name="inputKeywords" placeholder="">
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="inputURL">URL</label>
+                            <input type="url" class="form-control" name="inputURL"
+                                   placeholder="https://www.thesearchbase.com" onchange="validate(this)">
+                        </div>
+
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    </div>
+                </form>
+
             </div>
-
-            <form id="solutionForm">
-
-                <div class="modal-body">
-
-                    <div class="form-group">
-                        <label for="inputID">ID</label>
-                        <input type="text" class="form-control" name="inputId" placeholder="FS5894">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="inputBigTitle">Major Title</label>
-                        <input type="text" class="form-control" name="inputMajorTitle" placeholder="">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="inputSecondaryTitle">Secondary Title</label>
-                        <input type="text" class="form-control" name="inputSecondaryTitle" placeholder="">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="inputSecondaryTitle">Short Description</label>
-                        <input type="text" class="form-control" name="inputShortDescription" placeholder="">
-                    </div>
-
-
-                    <div class="form-group">
-                        <label for="inputMoney">Money</label>
-                        <input type="text" class="form-control" name="inputMoney" value="£0" placeholder="" onchange="validate(this)">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="inputKeywords">Keywords</label>
-                        <input type="text" class="form-control" name="inputKeywords" placeholder="">
-                    </div>
-
-
-                    <div class="form-group">
-                        <label for="inputURL">URL</label>
-                        <input type="url" class="form-control" name="inputURL" placeholder="https://www.thesearchbase.com" onchange="validate(this)">
-                    </div>
-
-
-
-
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-success">Submit</button>
-                </div>
-            </form>
-
         </div>
     </div>
-</div>
-<!-- Solution Modal END -->
+    <!-- Solution Modal END -->
 {% endblock %}
 
 {% block naughtyScript %}
-{%endblock%}
+{% endblock %}
 
 {% block customJS %}
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-<script>
-    var currentSolutionDB = undefined; //current selected solution for the page
-    var solutionsData = []; //all data returned from the server for the solutions
-    var assistantID = window.location.pathname.split('/')[3];
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1;
-    var yyyy = today.getFullYear();
-    var fullDate = dd+"-"+mm+"-"+yyyy;
-    document.getElementById('productFile').onchange = function () {
-        let filePath = $('#productFile').val().split("\\");
-        let fileName = filePath[filePath.length - 1];
-        fileName = fileName.split(".")[0];
-        $('#fileDisplay').val(fileName + "_" + fullDate);
-        $("#existingFileSelector").val("UploadExportFile");
-    };
-    function collapsePanel(collapser) {
-        var a = collapser.closest(".x_panel")
-            , b = collapser.find("i")
-            , c = a.find(".x_content");
-        a.attr("style") ? c.slideToggle(200, function () {
-            a.removeAttr("style")
-        }) : (c.slideToggle(200),
-            a.css("height", "auto")),
-            b.toggleClass("fa-chevron-up fa-chevron-down")
-    }
-    String.prototype.replaceAll = function (search, replacement) {
-        var target = this;
-        return target.split(search).join(replacement);
-    };
-    // Once the modal is closed, unbind all onSubmit handlers from the userForm
-    $(document).on('hide.bs.modal', '#solutionModal', function (e) {
-        console.log('Unbind submit event.');
-        $(document).off('submit', '#solutionForm');
-    });
-    //update selected existing solution for upload
-    $("#existingFileSelector").change(function () {
-        var selectedSolutionIndex = $("#existingFileSelector")[0].selectedIndex;
-        $("#fileDisplay").val(solutionsData[selectedSolutionIndex - 1]["Solution"]["Name"]);
-        $("#fileTypeSelector").val(solutionsData[selectedSolutionIndex - 1]["Solution"]["Type"].toString());
-        $('#productFile').val("");
-    })
-    //update page solution information
-    function changeSelectedDB(orderID){
-        currentSolutionDB = solutionsData[orderID];
-        deleteAllTitles();
-        displayCurrentSolutionTitlesForID("#descriptionSelect");
-        updatePageDisplayTitleData();
-        displayCurrentSolutionLink();
-        deleteAllConditions();
-        displayCurrentSolutionConditions();
-    }
-    function displayCurrentSolutionTitlesForID(objectID){
-        $(objectID).empty();
-        if(currentSolutionDB["DisplayTitles"].length > 0){
-            for (var i = 0; i < currentSolutionDB["DisplayTitles"].length;i++){
-                $(objectID).append("<option value="+ currentSolutionDB["DisplayTitles"][i] + ">"+ currentSolutionDB["DisplayTitles"][i] + "</option>");
+    <script>
+        var currentSolutionDB = undefined; //current selected solution for the page
+        var solutionsData = []; //all data returned from the server for the solutions
+        var assistantID = window.location.pathname.split('/')[3];
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+        var yyyy = today.getFullYear();
+        var fullDate = dd + "-" + mm + "-" + yyyy;
+        document.getElementById('productFile').onchange = function () {
+            let filePath = $('#productFile').val().split("\\");
+            let fileName = filePath[filePath.length - 1];
+            fileName = fileName.split(".")[0];
+            $('#fileDisplay').val(fileName + "_" + fullDate);
+            $("#existingFileSelector").val("UploadExportFile");
+        };
+
+        function collapsePanel(collapser) {
+            var a = collapser.closest(".x_panel")
+                , b = collapser.find("i")
+                , c = a.find(".x_content");
+            a.attr("style") ? c.slideToggle(200, function () {
+                a.removeAttr("style")
+            }) : (c.slideToggle(200),
+                a.css("height", "auto")),
+                b.toggleClass("fa-chevron-up fa-chevron-down")
+        }
+
+        String.prototype.replaceAll = function (search, replacement) {
+            var target = this;
+            return target.split(search).join(replacement);
+        };
+        // Once the modal is closed, unbind all onSubmit handlers from the userForm
+        $(document).on('hide.bs.modal', '#solutionModal', function (e) {
+            console.log('Unbind submit event.');
+            $(document).off('submit', '#solutionForm');
+        });
+        //update selected existing solution for upload
+        $("#existingFileSelector").change(function () {
+            var selectedSolutionIndex = $("#existingFileSelector")[0].selectedIndex;
+            $("#fileDisplay").val(solutionsData[selectedSolutionIndex - 1]["Solution"]["Name"]);
+            $("#fileTypeSelector").val(solutionsData[selectedSolutionIndex - 1]["Solution"]["Type"].toString());
+            $('#productFile').val("");
+        })
+
+        //update page solution information
+        function changeSelectedDB(orderID) {
+            currentSolutionDB = solutionsData[orderID];
+            deleteAllTitles();
+            displayCurrentSolutionTitlesForID("#descriptionSelect");
+            updatePageDisplayTitleData();
+            displayCurrentSolutionLink();
+            deleteAllConditions();
+            displayCurrentSolutionConditions();
+        }
+
+        function displayCurrentSolutionTitlesForID(objectID) {
+            $(objectID).empty();
+            if (currentSolutionDB["DisplayTitles"].length > 0) {
+                for (var i = 0; i < currentSolutionDB["DisplayTitles"].length; i++) {
+                    $(objectID).append("<option value=" + currentSolutionDB["DisplayTitles"][i] + ">" + currentSolutionDB["DisplayTitles"][i] + "</option>");
+                }
             }
         }
-    }
-    function updatePageDisplayTitleData(){
-        var selectedTitlesTemp = currentSolutionDB["Solution"]["DisplayTitles"]
-        if(selectedTitlesTemp == null){ return 0; }
-        var selectedTitles = selectedTitlesTemp["titleValues"];
-        if(selectedTitles.length != 0){
-            for(var i = 0; i < selectedTitles.length; i++){
-                addTitle();
-                $(".titleSelect").last().val(selectedTitles[i]);
+
+        function updatePageDisplayTitleData() {
+            var selectedTitlesTemp = currentSolutionDB["Solution"]["DisplayTitles"]
+            if (selectedTitlesTemp == null) {
+                return 0;
+            }
+            var selectedTitles = selectedTitlesTemp["titleValues"];
+            if (selectedTitles.length != 0) {
+                for (var i = 0; i < selectedTitles.length; i++) {
+                    addTitle();
+                    $(".titleSelect").last().val(selectedTitles[i]);
+                }
+            }
+            if (currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"] != null) {
+                $("#descriptionSelect").val(currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"]);
             }
         }
-        if(currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"] != null){
-            $("#descriptionSelect").val(currentSolutionDB["Solution"]["DisplayTitles"]["solutionDescription"]);
-        }
-    }
-    $.ajax({
-        url: '/admin/assistant/' + assistantID + '/solutionsData',
-        type: "GET"
-    }).done(function (res) {
-        solutionsData = JSON.parse(res).data;
-        if (solutionsData.length == 0) {
-            document.getElementById("dbDependentMessage").style = "display:inline-block;"
-            document.getElementById("dbDependentTitle").style = "display:none;"
-            $("#dbDependent :input").attr("disabled", true);
-            //$("#dbDependent :label").click(function () { });
-            collapsePanel($("#dbDependentPanel .collapse-link"));
-            collapsePanel($("#rawDataPanel .collapse-link"));
-        } else {
-            //collapsePanel($("#uploadDatabasePanel .collapse-link"));
-        }
-        console.log("DEBUG: ", solutionsData)
-        for (var i = 0; i < solutionsData.length; i++) {
-            //Set Select Database Existing values
-            $("#existingFileSelectorUpdateGroup").append("<option value="+ solutionsData[i]["Solution"]["ID"] + ">"+ solutionsData[i]["Solution"]["Name"] + "</option>");
-            //Set Solution Navigation Titles
-            if (i == 0) {
-                $("#solutionsNavTab").append('<li style="cursor:pointer!important;" role="presentation" class="active" >\
-                    <a href="#tab_content1" onclick="setTimeout(function(){changeSelectedDB('+i+');}, 130)" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true" >' + solutionsData[i]["Solution"]["Name"] + '</a >\
-                    </li > ')
+
+        $.ajax({
+            url: '/admin/assistant/' + assistantID + '/solutionsData',
+            type: "GET"
+        }).done(function (res) {
+            solutionsData = JSON.parse(res).data;
+            if (solutionsData.length == 0) {
+                document.getElementById("dbDependentMessage").style = "display:inline-block;"
+                document.getElementById("dbDependentTitle").style = "display:none;"
+                $("#dbDependent :input").attr("disabled", true);
+                //$("#dbDependent :label").click(function () { });
+                collapsePanel($("#dbDependentPanel .collapse-link"));
+                collapsePanel($("#rawDataPanel .collapse-link"));
             } else {
-                $("#solutionsNavTab").append('\
-                    <li style="cursor:pointer!important;" role="presentation" class="" >\
-                    <a href="#tab_content1" onclick="setTimeout(function(){changeSelectedDB('+i+');}, 130)" role="tab" data-toggle="tab" aria-expanded="false">' + solutionsData[i]["Solution"]["Name"] + '</a>\
-                    </li >')
+                //collapsePanel($("#uploadDatabasePanel .collapse-link"));
             }
+            console.log("DEBUG: ", solutionsData)
+            for (var i = 0; i < solutionsData.length; i++) {
+                //Set Select Database Existing values
+                $("#existingFileSelectorUpdateGroup").append("<option value=" + solutionsData[i]["Solution"]["ID"] + ">" + solutionsData[i]["Solution"]["Name"] + "</option>");
+                //Set Solution Navigation Titles
+                if (i == 0) {
+                    $("#solutionsNavTab").append('<li style="cursor:pointer!important;" role="presentation" class="active" >\
+                    <a href="#tab_content1" onclick="setTimeout(function(){changeSelectedDB(' + i + ');}, 130)" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true" >' + solutionsData[i]["Solution"]["Name"] + '</a >\
+                    </li > ')
+                } else {
+                    $("#solutionsNavTab").append('\
+                    <li style="cursor:pointer!important;" role="presentation" class="" >\
+                    <a href="#tab_content1" onclick="setTimeout(function(){changeSelectedDB(' + i + ');}, 130)" role="tab" data-toggle="tab" aria-expanded="false">' + solutionsData[i]["Solution"]["Name"] + '</a>\
+                    </li >')
+                }
 
-        }
-        changeSelectedDB(0);
-    }).fail(function (res) {
-        console.log("Error in retrieving solutions.");
-        console.log(res);
-    });
-    //Display Titles
-    var titleNumber = 0;
-    updateTitlesNames();
-    function addTitle() {
-        var appendString = "\
+            }
+            changeSelectedDB(0);
+        }).fail(function (res) {
+            console.log("Error in retrieving solutions.");
+            console.log(res);
+        });
+        //Display Titles
+        var titleNumber = 0;
+        updateTitlesNames();
+
+        function addTitle() {
+            var appendString = "\
             <div id='titleDiv" + titleNumber + "' >\
                 <select class='form-control titleSelect' style='width:300px!important;display:inline-block;' type='text' name='titleSelect" + titleNumber + "' id='titleSelect" + titleNumber + "'>\
                 </select>\
                 <i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteTitle(\"titleDiv" + titleNumber + "\")'></i>\
                 <br /><br />\
             </div>";
-        $("#displayTitlesPasteDiv").append(appendString);
-        displayCurrentSolutionTitlesForID("#titleSelect" + titleNumber);
-        titleNumber++;
-        updateTitlesNames();
-    }
-    function deleteTitle(titleID) {
-        $("#" + titleID).remove();
-        titleNumber--;
-        updateTitlesNames();
-    }
-    function deleteAllTitles(){
-        for (var i=0;i < titleNumber;i++){
-            $("#titleDiv" + i).remove();
+            $("#displayTitlesPasteDiv").append(appendString);
+            displayCurrentSolutionTitlesForID("#titleSelect" + titleNumber);
+            titleNumber++;
+            updateTitlesNames();
         }
-        titleNumber = 0;
-    }
-    function updateTitlesNames() {
-        var array = document.getElementsByClassName("titleSelect");
-        for (var i = 0; i < array.length;i++){
-            array[i].name = "titleSelect" + i;
-            array[i].id = "titleSelect" + i;
+
+        function deleteTitle(titleID) {
+            $("#" + titleID).remove();
+            titleNumber--;
+            updateTitlesNames();
         }
-    }
-    function saveTitles() {
-        var form = document.forms.namedItem("displayTitlesForm");
-        formData = new FormData(form);
-        var xhttp = new XMLHttpRequest();
-        var msg = "";
-        xhttp.open("POST", "/admin/assistant/{{ id }}/savedisplaytitles/"+currentSolutionDB["Solution"]["ID"], true); // true is asynchronous
-        xhttp.onreadystatechange = function () {
-            if (xhttp.readyState === 4) {
-                if (xhttp.status === 200) {
-                    msg = xhttp.responseText;
-                    saveTitlesToLocalSolutions();
-                    $("#saveDisplayTitlesMessage").text(msg);
-                    setTimeout(function () { $("#saveDisplayTitlesMessage").text("") }, 2000);
+
+        function deleteAllTitles() {
+            for (var i = 0; i < titleNumber; i++) {
+                $("#titleDiv" + i).remove();
+            }
+            titleNumber = 0;
+        }
+
+        function updateTitlesNames() {
+            var array = document.getElementsByClassName("titleSelect");
+            for (var i = 0; i < array.length; i++) {
+                array[i].name = "titleSelect" + i;
+                array[i].id = "titleSelect" + i;
+            }
+        }
+
+        function saveTitles() {
+            var form = document.forms.namedItem("displayTitlesForm");
+            formData = new FormData(form);
+            var xhttp = new XMLHttpRequest();
+            var msg = "";
+            xhttp.open("POST", "/admin/assistant/{{ id }}/savedisplaytitles/" + currentSolutionDB["Solution"]["ID"], true); // true is asynchronous
+            xhttp.onreadystatechange = function () {
+                if (xhttp.readyState === 4) {
+                    if (xhttp.status === 200) {
+                        msg = xhttp.responseText;
+                        saveTitlesToLocalSolutions();
+                        $("#saveDisplayTitlesMessage").text(msg);
+                        setTimeout(function () {
+                            $("#saveDisplayTitlesMessage").text("")
+                        }, 2000);
+                    }
+                    else {
+                        console.error(xhttp.statusText);
+                        msg = "Error: " + xhttp.status;
+                        $("#saveDisplayTitlesMessage").text(msg);
+                        setTimeout(function () {
+                            $("#saveDisplayTitlesMessage").text("")
+                        }, 2000);
+                    }
                 }
-                else {
-                    console.error(xhttp.statusText);
-                    msg = "Error: " + xhttp.status;
-                    $("#saveDisplayTitlesMessage").text(msg);
-                    setTimeout(function () { $("#saveDisplayTitlesMessage").text("") }, 2000);
+            }
+            xhttp.send(formData);
+        }
+
+        function saveTitlesToLocalSolutions() {
+            var currentTitles = {"titleValues": [], "solutionDescription": ""};
+            for (var i = 1; i <= titleNumber; i++) {
+                currentTitles["titleValues"].push($("#titleSelect" + (i - 1)).val());
+            }
+            currentTitles["solutionDescription"] = $("#descriptionSelect").val();
+            currentSolutionDB["Solution"]["DisplayTitles"] = currentTitles;
+            for (var i = 0; i < solutionsData.length; i++) {
+                if (solutionsData[i]["Solution"]["ID"] === currentSolutionDB["Solution"]["ID"]) {
+                    solutionsData[i]["Solution"]["DisplayTitles"] = currentTitles;
                 }
             }
         }
-        xhttp.send(formData);
-    }
-    function saveTitlesToLocalSolutions(){
-        var currentTitles = {"titleValues" : [], "solutionDescription": ""};
-        for (var i=1;i <= titleNumber;i++){
-            currentTitles["titleValues"].push($("#titleSelect" + (i-1)).val());
-        }
-        currentTitles["solutionDescription"] = $("#descriptionSelect").val();
-        currentSolutionDB["Solution"]["DisplayTitles"] = currentTitles;
-        for (var i = 0; i < solutionsData.length; i++) {
-            if(solutionsData[i]["Solution"]["ID"] === currentSolutionDB["Solution"]["ID"]){
-                solutionsData[i]["Solution"]["DisplayTitles"] = currentTitles;
+
+        //Conditions
+        var conditionsNumber = 0;
+
+        function displayCurrentSolutionConditions() {
+            var requiredFilters = currentSolutionDB["Solution"]["RequiredFilters"];
+            if (requiredFilters == null) {
+                return 0;
             }
+            console.log(requiredFilters["filterValues"])
+            for (var i = 0; i < requiredFilters["filterValues"].length; i++) {
+                addCondition();
+                $(".conditionInput").last().val(requiredFilters["filterValues"][i]);
+            }
+            $("#conditionsNumberInput").val(requiredFilters["requiredConditionsNumber"]);
         }
-    }
-    //Conditions
-    var conditionsNumber = 0;
-    function displayCurrentSolutionConditions(){
-        var requiredFilters = currentSolutionDB["Solution"]["RequiredFilters"];
-        if (requiredFilters == null){ return 0; }
-        console.log(requiredFilters["filterValues"])
-        for(var i = 0;i < requiredFilters["filterValues"].length;i++){
-            addCondition();
-            $(".conditionInput").last().val(requiredFilters["filterValues"][i]);
-        }
-        $("#conditionsNumberInput").val(requiredFilters["requiredConditionsNumber"]);
-    }
-    updateConditionsMax();
-    function addCondition() {
-        var appendString = "\
+
+        updateConditionsMax();
+
+        function addCondition() {
+            var appendString = "\
             <div id='conditionInput" + conditionsNumber + "' ><input class='form-control conditionInput' style='width:300px!important;display:inline-block;' type='text' id='conditionInputBox" + conditionsNumber + "' name='conditionInput" + conditionsNumber + "' /><i style='font-size:20px;margin-left:6px;cursor:pointer;' class=\"fa fa-times-circle\" aria-hidden=\"true\" onclick='deleteCondition(\"conditionInput" + conditionsNumber + "\")'></i>\
             <br /><br /></div>";
-        conditionsNumber++;
-        $("#conditionsDiv").append(appendString);
-        updateConditionsMax();
-    }
-    function deleteCondition(conditionID) {
-        $("#" + conditionID).remove();
-        conditionsNumber--;
-        updateConditionsMax();
-    }
-    function deleteAllConditions(){
-        for (var i=0;i < conditionsNumber;i++){
-            $("#conditionInput" + i).remove();
+            conditionsNumber++;
+            $("#conditionsDiv").append(appendString);
+            updateConditionsMax();
         }
-        conditionsNumber = 0;
-        updateConditionsMax();
-    }
-    function updateConditionsMax() {
-        $("#conditionsNumberInput").attr({ "max": conditionsNumber });
-        if ($("#conditionsNumberInput").val() > conditionsNumber) {
-            $("#conditionsNumberInput").val(conditionsNumber);
+
+        function deleteCondition(conditionID) {
+            $("#" + conditionID).remove();
+            conditionsNumber--;
+            updateConditionsMax();
         }
-        var array = document.getElementsByClassName("conditionInput");
-        for (var i = 0; i < array.length;i++){
-            array[i].name = "conditionInput" + i;
-        }
-    }
-    function saveConditions() {
-        var form = document.forms.namedItem("requiredFiltersForm");
-        formData = new FormData(form);
-        var xhttp = new XMLHttpRequest();
-        var msg = "";
-        xhttp.open("POST", "/admin/assistant/{{ id }}/requiredfilters/"+currentSolutionDB["Solution"]["ID"], true); // true is asynchronous
-        xhttp.onreadystatechange = function () {
-            if (xhttp.readyState === 4) {
-                if (xhttp.status === 200) {
-                    msg = xhttp.responseText;
-                    $("#saveRequiredFiltersMessage").text(msg);
-                    saveConditionsToLocalSolutions();
-                    setTimeout(function () { $("#saveRequiredFiltersMessage").text("") }, 2000);
-                }
-                else {
-                    console.error(xhttp.statusText);
-                    msg = "Error: " + xhttp.status;
-                    $("#saveRequiredFiltersMessage").text(msg);
-                    setTimeout(function () { $("#saveRequiredFiltersMessage").text("") }, 2000);
-                }
+
+        function deleteAllConditions() {
+            for (var i = 0; i < conditionsNumber; i++) {
+                $("#conditionInput" + i).remove();
             }
-        };
-        xhttp.send(formData);
-    }
-    function saveConditionsToLocalSolutions(){
-        var requiredConditions = {"filterValues" : [], "requiredConditionsNumber": ""}
-        for (var i=0;i < conditionsNumber;i++){
-            requiredConditions["filterValues"].push($("#conditionInputBox" + i).val().replace(/ /g, " ").split(","));
+            conditionsNumber = 0;
+            updateConditionsMax();
         }
-        requiredConditions["requiredConditionsNumber"] = $("#conditionsNumberInput").val();
-        currentSolutionDB["Solution"]["RequiredFilters"] = requiredConditions;
-        for (var i = 0; i < solutionsData.length; i++) {
-            if(solutionsData[i]["Solution"]["ID"] === currentSolutionDB["Solution"]["ID"]){
-                solutionsData[i]["Solution"]["RequiredFilters"] = requiredConditions;
+
+        function updateConditionsMax() {
+            $("#conditionsNumberInput").attr({"max": conditionsNumber});
+            if ($("#conditionsNumberInput").val() > conditionsNumber) {
+                $("#conditionsNumberInput").val(conditionsNumber);
+            }
+            var array = document.getElementsByClassName("conditionInput");
+            for (var i = 0; i < array.length; i++) {
+                array[i].name = "conditionInput" + i;
             }
         }
-    }
-    function uploadProductFile() {
-        // TODO: validate the type of product before update
-        // 1- if submit without adding file (done)
-        // 2- submit with a wroung dataType (done)
-        // 3- if there is backend response show it
-        if ($("#productFile").val()) {
-            if ($("#productFile").val().includes('json')
-            ||  $("#productFile").val().includes('xml') ) {
-                $("#uploadDatabaseMessage").text("Uploading...")
-                var form = document.forms.namedItem("productFileForm");
-                formData = new FormData(form);
-                var xhttp = new XMLHttpRequest();
-                var msg = "";
-                xhttp.open("POST", "/admin/assistant/{{ id }}/solutions/file", true); // true is asynchronous
-                xhttp.onreadystatechange = function () {
-                    if (xhttp.readyState === 4) {
-                        if (xhttp.status === 200) {
-                            msg = xhttp.responseText;
-                            window.location.reload();
-                        }
-                        else {
-                            console.error(xhttp.statusText);
-                            msg = "Error: " + xhttp.status;
-                            alertError(msg);
-                        }
+
+        function saveConditions() {
+            var form = document.forms.namedItem("requiredFiltersForm");
+            formData = new FormData(form);
+            var xhttp = new XMLHttpRequest();
+            var msg = "";
+            xhttp.open("POST", "/admin/assistant/{{ id }}/requiredfilters/" + currentSolutionDB["Solution"]["ID"], true); // true is asynchronous
+            xhttp.onreadystatechange = function () {
+                if (xhttp.readyState === 4) {
+                    if (xhttp.status === 200) {
+                        msg = xhttp.responseText;
+                        $("#saveRequiredFiltersMessage").text(msg);
+                        saveConditionsToLocalSolutions();
+                        setTimeout(function () {
+                            $("#saveRequiredFiltersMessage").text("")
+                        }, 2000);
                     }
-                };
-                xhttp.send(formData);
-                return false;
+                    else {
+                        console.error(xhttp.statusText);
+                        msg = "Error: " + xhttp.status;
+                        $("#saveRequiredFiltersMessage").text(msg);
+                        setTimeout(function () {
+                            $("#saveRequiredFiltersMessage").text("")
+                        }, 2000);
+                    }
+                }
+            };
+            xhttp.send(formData);
+        }
+
+        function saveConditionsToLocalSolutions() {
+            var requiredConditions = {"filterValues": [], "requiredConditionsNumber": ""}
+            for (var i = 0; i < conditionsNumber; i++) {
+                requiredConditions["filterValues"].push($("#conditionInputBox" + i).val().replace(/ /g, " ").split(","));
+            }
+            requiredConditions["requiredConditionsNumber"] = $("#conditionsNumberInput").val();
+            currentSolutionDB["Solution"]["RequiredFilters"] = requiredConditions;
+            for (var i = 0; i < solutionsData.length; i++) {
+                if (solutionsData[i]["Solution"]["ID"] === currentSolutionDB["Solution"]["ID"]) {
+                    solutionsData[i]["Solution"]["RequiredFilters"] = requiredConditions;
+                }
+            }
+        }
+
+        function uploadProductFile() {
+            // TODO: validate the type of product before update
+            // 1- if submit without adding file (done)
+            // 2- submit with a wroung dataType (done)
+            // 3- if there is backend response show it
+            if ($("#productFile").val()) {
+                if ($("#productFile").val().includes('json')
+                    || $("#productFile").val().includes('xml')) {
+                    $("#uploadDatabaseMessage").text("Uploading...")
+                    var form = document.forms.namedItem("productFileForm");
+                    formData = new FormData(form);
+                    var xhttp = new XMLHttpRequest();
+                    var msg = "";
+                    xhttp.open("POST", "/admin/assistant/{{ id }}/solutions/file", true); // true is asynchronous
+                    xhttp.onreadystatechange = function () {
+                        if (xhttp.readyState === 4) {
+                            if (xhttp.status === 200) {
+                                msg = xhttp.responseText;
+                                window.location.reload();
+                            }
+                            else {
+                                console.error(xhttp.statusText);
+                                msg = "Error: " + xhttp.status;
+                                alertError(msg);
+                            }
+                        }
+                    };
+                    xhttp.send(formData);
+                    return false;
+                }
+                else
+                    alertError('Upload File Error', '<h2>Data Type must be <b>json</b> or <b>xml</b></h2>')
             }
             else
-                alertError('Upload File Error','<h2>Data Type must be <b>json</b> or <b>xml</b></h2>')
+                alertError('Upload File Error', '<h2>There is no file to upload</h2>')
         }
-        else
-            alertError('Upload File Error','<h2>There is no file to upload</h2>')
-    }
-    function displayCurrentSolutionLink(){
-        $("#webLink").val(currentSolutionDB["Solution"]["WebLink"]);
-        $("#solutionsRef").val(currentSolutionDB["Solution"]["IDReference"]);
-    }
-    function saveSolutionLink(){
-        var form = document.forms.namedItem("solutionLinkForm");
-        formData = new FormData(form);
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/admin/assistant/{{ id }}/savesolutionweblink/"+currentSolutionDB["Solution"]["ID"], true); // true is asynchronous
-        xhttp.onreadystatechange = function () {
-            if (xhttp.readyState === 4) {
-                if (xhttp.status === 200) {
-                    msg = xhttp.responseText;
-                    saveSolutionLinkToLocalSolutions();
-                    $("#saveLinkMessage").text(msg);
-                    setTimeout(function(){$("#saveLinkMessage").text("")}, 2000);
+
+        function displayCurrentSolutionLink() {
+            $("#webLink").val(currentSolutionDB["Solution"]["WebLink"]);
+            $("#solutionsRef").val(currentSolutionDB["Solution"]["IDReference"]);
+        }
+
+        function saveSolutionLink() {
+            var form = document.forms.namedItem("solutionLinkForm");
+            formData = new FormData(form);
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/admin/assistant/{{ id }}/savesolutionweblink/" + currentSolutionDB["Solution"]["ID"], true); // true is asynchronous
+            xhttp.onreadystatechange = function () {
+                if (xhttp.readyState === 4) {
+                    if (xhttp.status === 200) {
+                        msg = xhttp.responseText;
+                        saveSolutionLinkToLocalSolutions();
+                        $("#saveLinkMessage").text(msg);
+                        setTimeout(function () {
+                            $("#saveLinkMessage").text("")
+                        }, 2000);
+                    }
+                    else {
+                        console.error(xhttp.statusText);
+                        msg = "Error: " + xhttp.status;
+                        $("#saveLinkMessage").text(msg);
+                        setTimeout(function () {
+                            $("#saveLinkMessage").text("")
+                        }, 2000);
+                    }
                 }
-                else {
-                    console.error(xhttp.statusText);
-                    msg = "Error: " + xhttp.status;
-                    $("#saveLinkMessage").text(msg);
-                    setTimeout(function(){$("#saveLinkMessage").text("")}, 2000);
+            };
+            xhttp.send(formData);
+        }
+
+        function saveSolutionLinkToLocalSolutions() {
+            currentSolutionDB["Solution"]["WebLink"] = $("#webLink").val();
+            currentSolutionDB["Solution"]["IDReference"] = $("#solutionsRef").val();
+            for (var i = 0; i < solutionsData.length; i++) {
+                if (solutionsData[i]["Solution"]["ID"] === currentSolutionDB["Solution"]["ID"]) {
+                    solutionsData[i]["Solution"]["WebLink"] = $("#webLink").val();
+                    solutionsData[i]["Solution"]["IDReference"] = $("#solutionsRef").val();
                 }
-            }
-        };
-        xhttp.send(formData);
-    }
-    function saveSolutionLinkToLocalSolutions(){
-        currentSolutionDB["Solution"]["WebLink"] = $("#webLink").val();
-        currentSolutionDB["Solution"]["IDReference"] = $("#solutionsRef").val();
-        for (var i = 0; i < solutionsData.length; i++) {
-            if(solutionsData[i]["Solution"]["ID"] === currentSolutionDB["Solution"]["ID"]){
-                solutionsData[i]["Solution"]["WebLink"] = $("#webLink").val();
-                solutionsData[i]["Solution"]["IDReference"] = $("#solutionsRef").val();
             }
         }
-    }
-    function sendSolutionAlerts() {
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/admin/assistant/{{ id }}/sendsolutionalerts/"+currentSolutionDB["Solution"]["ID"], true); // true is asynchronous
-        xhttp.onreadystatechange = function () {
-            if (xhttp.readyState === 4) {
-                if (xhttp.status === 200) {
-                    msg = xhttp.responseText;
-                    $("#sendSolutionsMessage").text(msg);
-                    setTimeout(function(){$("#sendSolutionsMessage").text("")}, 2000);
+
+        function sendSolutionAlerts() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/admin/assistant/{{ id }}/sendsolutionalerts/" + currentSolutionDB["Solution"]["ID"], true); // true is asynchronous
+            xhttp.onreadystatechange = function () {
+                if (xhttp.readyState === 4) {
+                    if (xhttp.status === 200) {
+                        msg = xhttp.responseText;
+                        $("#sendSolutionsMessage").text(msg);
+                        setTimeout(function () {
+                            $("#sendSolutionsMessage").text("")
+                        }, 2000);
+                    }
+                    else {
+                        console.error(xhttp.statusText);
+                        msg = "Error: " + xhttp.status;
+                        $("#sendSolutionsMessage").text(msg);
+                        setTimeout(function () {
+                            $("#sendSolutionsMessage").text("")
+                        }, 2000);
+                    }
                 }
-                else {
-                    console.error(xhttp.statusText);
-                    msg = "Error: " + xhttp.status;
-                    $("#sendSolutionsMessage").text(msg);
-                    setTimeout(function(){$("#sendSolutionsMessage").text("")}, 2000);
-                }
-            }
-        };
-        xhttp.send();
-    }
-    function changeAutoSolutionAlerts() {
-        var state = document.getElementById("automaticSolutionAlertsCheckbox").checked;
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/admin/assistant/{{ id }}/automaticsolutionalerts/" + state, true); // true is asynchronous
-        xhttp.onreadystatechange = function () {
-            if (xhttp.readyState === 4) {
-                if (xhttp.status === 200) {
-                    msg = xhttp.responseText;
-                    $("#checkboxMessage").text(msg);
-                    setTimeout(removeTextboxesText, 3000)
-                    if(msg == 'Could not set automatic alerts at this time. Please insure you have a database connected or uploaded'){ document.getElementById("automaticSolutionAlertsCheckbox").checked = !state;}
-                }
-                else {
-                    console.error(xhttp.statusText);
-                    msg = "Error: " + xhttp.status;
-                    $("#checkboxMessage").text(msg);
-                    document.getElementById("automaticSolutionAlertsCheckbox").checked = !state;
-                    setTimeout(removeTextboxesText, 3000)
-                }
-            }
-        };
-        xhttp.send();
-    }
-    function removeTextboxesText() {
-        $("#checkboxMessage").text("");
-    }
-    // helping functions
-    function createArray(rows) {
-        var arrayRow = [];
-        for (var i = 0; i < rows; i++) {
-            arrayRow[i] = [];
+            };
+            xhttp.send();
         }
-        return arrayRow;
-    }
-    $("#solutionsDiv").append(); //TODO
-</script>
+
+        function changeAutoSolutionAlerts() {
+            var state = document.getElementById("automaticSolutionAlertsCheckbox").checked;
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/admin/assistant/{{ id }}/automaticsolutionalerts/" + state, true); // true is asynchronous
+            xhttp.onreadystatechange = function () {
+                if (xhttp.readyState === 4) {
+                    if (xhttp.status === 200) {
+                        msg = xhttp.responseText;
+                        $("#checkboxMessage").text(msg);
+                        setTimeout(removeTextboxesText, 3000)
+                        if (msg == 'Could not set automatic alerts at this time. Please insure you have a database connected or uploaded') {
+                            document.getElementById("automaticSolutionAlertsCheckbox").checked = !state;
+                        }
+                    }
+                    else {
+                        console.error(xhttp.statusText);
+                        msg = "Error: " + xhttp.status;
+                        $("#checkboxMessage").text(msg);
+                        document.getElementById("automaticSolutionAlertsCheckbox").checked = !state;
+                        setTimeout(removeTextboxesText, 3000)
+                    }
+                }
+            };
+            xhttp.send();
+        }
+
+        function removeTextboxesText() {
+            $("#checkboxMessage").text("");
+        }
+
+        // helping functions
+        function createArray(rows) {
+            var arrayRow = [];
+            for (var i = 0; i < rows; i++) {
+                arrayRow[i] = [];
+            }
+            return arrayRow;
+        }
+
+        $("#solutionsDiv").append(); //TODO
+    </script>
 {% endblock %}-->

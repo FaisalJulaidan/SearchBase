@@ -12,7 +12,7 @@ class UserInput extends Component {
                 if (!err)
                     this.props.handleNewBlock(values);
                 else
-                    this.props.handleNewBlock({})
+                    this.props.handleNewBlock(false);
             });
     }
 

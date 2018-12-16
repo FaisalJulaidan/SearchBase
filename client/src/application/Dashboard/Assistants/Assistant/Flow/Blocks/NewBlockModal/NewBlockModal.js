@@ -77,14 +77,20 @@ class NewBlockModal extends Component {
     };
 
     handleNewBlock = (addedBlock) => {
-        // Reset state
-        this.setState({
-            beforeAdd: {UserInput: false, Question: false, FileUpload: false, Solutions: false},
-            currentTab: 'UserInput'
-        }, () => {
-            this.props.closeModal();
-            this.props.handleAddBlock(addedBlock)
-        });
+        if (addedBlock)
+        // Reset state & add the new block
+            this.setState({
+                beforeAdd: {UserInput: false, Question: false, FileUpload: false, Solutions: false},
+                currentTab: 'UserInput'
+            }, () => {
+                this.props.closeModal();
+                this.props.handleAddBlock(addedBlock)
+            });
+        else
+        // reset the event beforeAdd
+            this.setState({
+                beforeAdd: {UserInput: false, Question: false, FileUpload: false, Solutions: false}
+            })
     };
 
     onChangeTab = (currentTab) => this.setState({currentTab});

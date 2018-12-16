@@ -3,6 +3,7 @@ import os
 from flask import Blueprint, render_template, request, session, redirect, url_for, jsonify, send_from_directory
 from flask_cors import CORS
 from itsdangerous import URLSafeTimedSerializer
+
 from models import Callback
 from services import user_services, auth_services, mail_services
 from utilities import helpers
@@ -17,6 +18,7 @@ verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y
 def getDoTest():
     if request.method == "GET":
         return jsonify({"status": "yay it's working"})
+
 
 # @public_router.route("/", methods=['GET'])
 # def indexpage():
@@ -37,6 +39,7 @@ def serve(path):
     else:
         return send_from_directory('static/react_app/build', 'index.html')
 
+
 # # Serve React App
 # @public_router.route('/')
 # def serve():
@@ -47,6 +50,12 @@ def serve(path):
 def features():
     if request.method == "GET":
         return render_template("features.html")
+
+
+@public_router.route("/react", methods=['GET'])
+def react():
+    if request.method == "GET":
+        return render_template("react_app/index.html")
 
 
 @public_router.route("/dataRetrieval", methods=['GET'])
@@ -77,7 +86,6 @@ def about():
 def contactpage():
     if request.method == "GET":
         return render_template("contact.html")
-
 
 
 # # Sitemap route
@@ -135,8 +143,8 @@ def login():
         session.permanent = True
 
         email: str = request.form.get("email", default=None)
-        password_to_check :str = request.form.get("password", default=None)
-        callback: Callback = auth_services.login(email,password_to_check)
+        password_to_check: str = request.form.get("password", default=None)
+        callback: Callback = auth_services.login(email, password_to_check)
 
         if callback.Success:
             return redirect("/admin/dashboard", code=302)
@@ -144,9 +152,8 @@ def login():
             return helpers.redirectWithMessage("login", callback.Message)
 
 
-@public_router.route('/logout',  methods=['GET'])
+@public_router.route('/logout', methods=['GET'])
 def logout():
-
     # Will clear out the session.
     session.pop('UserID', None)
     session.pop('UserEmail', None)
@@ -155,14 +162,12 @@ def logout():
     session.pop('Logged_in', False)
     session.clear()
 
-
     return redirect(url_for('public_router.login'))
 
 
 # TODO improve verification
 @public_router.route("/signup", methods=['GET', 'POST'])
 def signup():
-
     if request.method == "GET":
         msg = helpers.checkForMessage()
         return render_template("signup.html", msg=msg)
@@ -202,7 +207,9 @@ def signup():
             helpers.redirectWithMessage('signup', 'Signed up successfully but > ' + mail_callback.Message
                                         + '. Please contact TheSearchBaseStaff to activate your account.')
 
-        return helpers.redirectWithMessage("login", "We have sent you a verification email. Please use it to complete the sign up process.")
+        return helpers.redirectWithMessage("login",
+                                           "We have sent you a verification email. Please use it to complete the sign up process.")
+
 
 @public_router.route("/account/verify/<payload>", methods=['GET'])
 def verify_account(payload):
@@ -210,11 +217,13 @@ def verify_account(payload):
         try:
             data = verificationSigner.loads(payload)
             email = data.split(";")[0]
-            user_callback : Callback = user_services.verifyByEmail(email)
+            user_callback: Callback = user_services.verifyByEmail(email)
             if not user_callback.Success: raise Exception(user_callback.Message)
 
-            return helpers.redirectWithMessage("login", "Your email has been verified. You can now access your account.")
+            return helpers.redirectWithMessage("login",
+                                               "Your email has been verified. You can now access your account.")
 
         except Exception as e:
             print(e)
-            return helpers.redirectWithMessage("login", "Email verification link failed. Please contact Customer Support in order to resolve this.")
+            return helpers.redirectWithMessage("login",
+                                               "Email verification link failed. Please contact Customer Support in order to resolve this.")

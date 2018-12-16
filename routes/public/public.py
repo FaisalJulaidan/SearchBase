@@ -34,10 +34,12 @@ def getDoTest():
 def serve(path):
     print(os.path.exists("static/react_app/build/" + path))
     print("HHHHHH")
-    if path != "" and os.path.exists("static/react_app/build/" + path):
-        return send_from_directory('static/react_app/build', path)
+    if path != "" and os.path.exists("static/react_app/" + path):
+        print("1")
+        return send_from_directory('static/react_app/', path)
     else:
-        return send_from_directory('static/react_app/build', 'index.html')
+        print("2")
+        return send_from_directory('static/react_app/', 'index.html')
 
 
 # # Serve React App

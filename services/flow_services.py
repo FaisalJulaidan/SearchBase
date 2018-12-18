@@ -135,13 +135,13 @@ def addBlock(data: dict, group: BlockGroup) -> Callback:
                          StoreInDB=block['storeInDB'], Skippable=block['isSkippable'],
                          Labels=block['labels'], Group=group)
         db.session.add(newBlock)
-
         db.session.commit()
+
         return Callback(True, 'Block added successfully!', {"newBlockID": newBlock.ID})
     except Exception as exc:
         db.session.rollback()
         print("flow_services.addBlock ERROR: ", exc)
-        return Callback(False, 'Error occurred while creating a new Block object', exc.args[0])
+        return Callback(False, 'An error occurred while creating a new Block', exc.args[0])
     # finally:
     # db.session.close()
 

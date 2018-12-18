@@ -20,7 +20,7 @@ export const flow = (state = initialState, action) => {
                 errorMsg: action.error.msg
             });
 
-
+        // Groups
         case actionTypes.ADD_GROUP_REQUEST:
             return updateObject(state, {
                 isAddingGroup: true
@@ -69,6 +69,21 @@ export const flow = (state = initialState, action) => {
             });
 
 
+        // Blocks
+        case actionTypes.ADD_BLOCK_REQUEST:
+            return updateObject(state, {
+                isAddingBlock: true
+            });
+        case actionTypes.ADD_BLOCK_SUCCESS:
+            return updateObject(state, {
+                isAddingBlock: false,
+                successMsg: action.msg
+            });
+        case actionTypes.ADD_BLOCK_FAILURE:
+            return updateObject(state, {
+                isAddingBlock: false,
+                errorMsg: action.error.msg
+            });
         default:
             return state
     }

@@ -49,11 +49,11 @@ class Blocks extends Component {
             this.setState({blocks: nextProps.currentGroup.blocks})
     }
 
-    handleAddBlock = (addedBlock) => {
-        console.log(addedBlock);
-        // pass it to Flow.js to be send to server there
+    handleAddBlock = (newBlock) => {
+        const {addBlock, currentGroup} = this.props;
+        console.log(newBlock);
+        addBlock(newBlock, currentGroup.id)
     };
-
 
     render() {
         return (
@@ -96,9 +96,11 @@ class Blocks extends Component {
                     </div>
                 </div>
 
-                <NewBlockModal visible={this.state.visible}
+                <NewBlockModal blocks={this.state.blocks}
+                               visible={this.state.visible}
                                handleAddBlock={this.handleAddBlock}
-                               closeModal={this.closeModal}/>
+                               closeModal={this.closeModal}
+                               allGroups={this.props.allGroups}/>
             </div>
         );
     }

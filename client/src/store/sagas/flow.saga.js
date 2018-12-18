@@ -4,9 +4,9 @@ import {flowActions} from "../actions/flow.actions";
 import {http} from "../../helpers";
 import {delay} from "redux-saga";
 
-function* fetchFlow(action) {
+function* fetchFlow({assistantID}) {
     try {
-        const res = yield http.get(`/assistant/${action.ID}/flow`);
+        const res = yield http.get(`/assistant/${assistantID}/flow`);
         return yield put(flowActions.fetchFlowSuccess(res.data.data))
     } catch (error) {
         console.log(error);
@@ -15,6 +15,7 @@ function* fetchFlow(action) {
 
 }
 
+// Groups
 function* addGroup(action) {
     try {
         const res = yield http.post(`/assistant/${action.ID}/flow/group`, action.newGroup);
@@ -67,12 +68,32 @@ function* watchDeleteGroup() {
     yield takeEvery(actionTypes.DELETE_GROUP_REQUEST, deleteGroup)
 }
 
+// Blocks
+function* addBlock({newBlock, groupID}) {
+    try {
+        console.log("Adding a block...");
+
+        const res = yield http.post(`/assistant/flow/group/${groupID}/block`, newBlock);
+        yield put(flowActions.addBlockSuccess(res.data.msg));
+        console.log(res);
+        // return yield put(flowActions.fetchFlowRequest(action.ID))
+    } catch (error) {
+        console.log(error);
+        return yield put(flowActions.addBlockFailure(error.response.data));
+    }
+}
+
+
+function* watchAddBlock() {
+    yield takeEvery(actionTypes.ADD_BLOCK_REQUEST, addBlock)
+}
 
 export function* flowSaga() {
     yield all([
         watchFetchFlow(),
         watchAddGroup(),
         watchEditGroup(),
-        watchDeleteGroup()
+        watchDeleteGroup(),
+        watchAddBlock()
     ])
 }

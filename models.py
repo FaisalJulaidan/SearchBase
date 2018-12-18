@@ -246,6 +246,7 @@ class BlockAction(enum.Enum):
 
     GoToNextBlock = 'Go To Next Block'
     GoToSpecificBlock = 'Go To Specific Block'
+    GoToGroup = 'Go To Group'
     EndChat = 'End Chat'
 
 

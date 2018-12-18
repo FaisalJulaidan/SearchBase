@@ -43,10 +43,12 @@ class Flow extends Component {
 
 
     // BLOCKS
-    addBlock = (newGroup) => {
+    addBlock = (newBlock, groupID) => {
         const {assistant} = this.props.location.state;
-        // this.props.dispatch(flowActions.addGroupRequest({ID: assistant.ID, newGroup: newGroup}));
-        // message.loading(`Adding ${newGroup.name} group`, 0);
+        console.log("HHHHHH");
+        console.log(newBlock, groupID);
+        this.props.dispatch(flowActions.addBlockRequest(newBlock, groupID));
+        // message.loading(`Adding new block`, 0);
     };
 
     editBlock = (editedGroup) => {
@@ -106,7 +108,9 @@ class Flow extends Component {
                         <Blocks addBlock={this.addBlock}
                                 editBlock={this.editBlock}
                                 deleteBlock={this.deleteBlock}
-                                currentGroup={this.state.currentGroup}/>
+                                currentGroup={this.state.currentGroup}
+                                allGroups={this.props.blockGroups}
+                        />
                     </div>
                 </div>
             </div>
@@ -114,7 +118,6 @@ class Flow extends Component {
     }
 
 }
-
 
 function mapStateToProps(state) {
     return {
@@ -127,7 +130,10 @@ function mapStateToProps(state) {
 
         isAddingGroup: state.flow.isAddingGroup,
         isEditingGroup: state.flow.isEditingGroup,
-        isDeletingGroup: state.flow.isDeletingGroup
+        isDeletingGroup: state.flow.isDeletingGroup,
+
+        isAddingBlock: state.flow.isAddingBlock,
+
     };
 }
 

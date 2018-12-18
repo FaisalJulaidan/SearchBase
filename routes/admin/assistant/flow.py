@@ -48,10 +48,10 @@ def group(assistantID):
     # Authenticate
     user = get_jwt_identity()['user']
     # For all type of requests methods, get the assistant
-    secuirty_callback: Callback = assistant_services.getByID(assistantID)
-    if not secuirty_callback.Success:
+    security_callback: Callback = assistant_services.getByID(assistantID)
+    if not security_callback.Success:
         return helpers.jsonResponse(False, 404, "Assistant not found.", None)
-    assistant: Assistant = secuirty_callback.Data
+    assistant: Assistant = security_callback.Data
 
     # Check if this user has access to this assistant
     if assistant.CompanyID != user['companyID']:
@@ -104,13 +104,13 @@ def block(groupID):
 
     #############
     callback: Callback = Callback(False, 'Error!', None)
-    # Add a group
+    # Add a block
     if request.method == "POST":
         # Get the new block data from the request's body
         data = request.get_json(silent=True)
         callback: Callback = flow_services.addBlock(data, group)
 
-    # Update the blocks' group
+    # Delete the block
     if request.method == "DELETE":
         # Get new block data from the request's body
         data = request.get_json(silent=True)

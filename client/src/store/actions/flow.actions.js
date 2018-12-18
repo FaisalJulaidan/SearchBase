@@ -1,10 +1,10 @@
 import * as actionTypes from './actionTypes';
 
 
-const fetchFlowRequest = (ID) => {
+const fetchFlowRequest = (assistantID) => {
     return {
         type: actionTypes.FETCH_FLOW_REQUEST,
-        ID
+        assistantID
     };
 };
 
@@ -22,8 +22,7 @@ const fetchFlowFailure = (error) => {
     };
 };
 
-//////////////////////////////////////////
-
+// Groups Actions
 const addGroupRequest = (values) => {
     return {
         type: actionTypes.ADD_GROUP_REQUEST,
@@ -94,8 +93,30 @@ const deleteGroupFailure = (error) => {
     };
 };
 
-//////////////////////////////////////////
+// Blocks Actions
+const addBlockRequest = (newBlock, groupID) => {
+    return {
+        type: actionTypes.ADD_BLOCK_REQUEST,
+        newBlock,
+        groupID
+    };
+};
 
+const addBlockSuccess = (msg) => {
+    return {
+        type: actionTypes.ADD_BLOCK_SUCCESS,
+        msg
+    };
+};
+
+const addBlockFailure = (error) => {
+    return {
+        type: actionTypes.ADD_BLOCK_FAILURE,
+        error
+    };
+};
+
+//////////////////////////////////////////
 
 export const flowActions = {
     fetchFlowRequest,
@@ -112,5 +133,9 @@ export const flowActions = {
 
     deleteGroupRequest,
     deleteGroupSuccess,
-    deleteGroupFailure
+    deleteGroupFailure,
+
+    addBlockRequest,
+    addBlockSuccess,
+    addBlockFailure
 };

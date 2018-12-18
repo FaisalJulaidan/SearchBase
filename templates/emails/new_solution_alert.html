@@ -334,6 +334,12 @@
 
 
                 <!-- Thumbnail Left, Text Right : BEGIN -->
+
+
+
+
+
+                {%for solution in solutions%}
                 <tr>
                     <!-- dir=ltr is where the magic happens. This can be changed to dir=rtl to swap the alignment on wide while maintaining stack order on narrow. -->
                     <td dir="ltr" height="100%" valign="top" width="100%" style="padding: 10px 0; background-color: #ffffff;">
@@ -358,13 +364,17 @@
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                             <tr>
                                                 <td dir="ltr" style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555; padding: 10px 10px 0; text-align: left;" class="center-on-narrow">
-                                                    <h2 style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 18px; line-height: 22px; color: #333333; font-weight: bold;">[Job Title]</h2>
+                                                    {% for display in solution["displayData"] %}
+                                                    <h2 style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 18px; line-height: 22px; color: #333333; font-weight: bold;">{{display}}</h2>
+                                                    {% endfor %}
                                                     <p style="margin: 0 0 10px 0;">[Job description]</p>
                                                     <!-- Button : BEGIN -->
                                                     <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="center-on-narrow" style="float:left;">
                                                         <tr>
 				                                            <td class="button-td button-td-primary" style="border-radius: 4px; background: #6610f2;">
-																<a class="button-a button-a-primary" href="https://google.com/" style="background: #6610f2; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 8px 15px; color: #ffffff; display: block; border-radius: 4px;">Apply</a>
+                                                                {%if solution["buttonURL"]%}
+																<a class="button-a button-a-primary" href="{{solution["buttonURL"]}}" style="background: #6610f2; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 8px 15px; color: #ffffff; display: block; border-radius: 4px;">View</a>
+                                                                {%endif%}
 															</td>
                                                         </tr>
                                                     </table>
@@ -388,6 +398,12 @@
                         <![endif]-->
                     </td>
                 </tr>
+                {%endfor%}
+
+
+
+
+
                 <!-- Thumbnail Left, Text Right : END -->
 
 

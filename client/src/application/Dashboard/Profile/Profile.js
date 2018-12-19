@@ -7,7 +7,7 @@ import ProfileInput from "./profileComponents/ProfileInput/ProfileInput";
 import CustomAnchor from "./profileComponents/CustomAnchor/CustomAnchor";
 
 const loading = () => {
-    message.loading('Updating Profile', 0);
+    message.loading('Updating...', 0);
 };
 
 const TabPane = Tabs.TabPane;
@@ -26,8 +26,14 @@ class Profile extends React.Component {
             techSupport: false,
             accountSpecialist: false
         },
+        password: {
+            old: "",
+            new: "",
+            repeat: ""
+        },
         formSubmitted: false,
-        initialRender: false
+        initialRender: false,
+        tabIndex: 1
     };
 
     handleSubmit = (e) => {
@@ -40,7 +46,6 @@ class Profile extends React.Component {
                 console.log(values);
                 // send to server
                 this.setState({formSubmitted: true});
-                const {profile, newsletters, profileSettings} = this.state;
                 //this.props.dispatch(profileActions.saveProfile(profile, newsletters, profileSettings));
                 loading();
             }
@@ -108,14 +113,18 @@ class Profile extends React.Component {
         //const profile = dispatch(profileActions.getProfile());
         if (!this.state.initialRender) {
             this.updateAllInputsFromState();
-            this.state = {initialRender: true};
+            this.setState({initialRender: true});
         }
+    }
+
+    changeTab = (key) => {
+        this.setState({tabIndex: parseInt(key)});
     }
 
     render() {
         const formItemLayout = {
             labelCol: {span: 6},
-            wrapperCol: {span: 14},
+            wrapperCol: {span: 14}
         };
 
         const {getFieldDecorator} = this.props.form;
@@ -135,17 +144,17 @@ class Profile extends React.Component {
                     </div>
 
                     <div className={styles.Panel_Body} style={{overflowY: "auto"}}>
-                        <Form onSubmit={this.handleSubmit}>
-                            <Tabs defaultActiveKey={"1"}>
-                                <TabPane tab={"Profile Details"} key={"1"}>
+                        <Tabs defaultActiveKey={"1"} onChange={this.changeTab}>
+                            <TabPane tab={"Profile Details"} key={"1"}>
 
+                                <Form onSubmit={this.handleSubmit}>
                                     <ProfileInput title={"Name"} name="profile.name"
                                                   rules={{
                                                       required: true,
                                                       message: "Please enter your first and last name here"
                                                   }}
                                                   getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}
-                                                  handleChange={this.handleChange} readOnly={false}
+                                                  handleChange={this.handleChange}
                                                   form={this.props.form}
                                                   description={"Enter your name here"}
                                     />
@@ -167,14 +176,21 @@ class Profile extends React.Component {
                                                       message: "Please enter your company name"
                                                   }}
                                                   getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}
-                                                  handleChange={this.handleChange} readOnly={false}
+                                                  handleChange={this.handleChange}
                                                   form={this.props.form}
                                                   description={"Enter your company name here"}
                                     />
 
+                                    <br/>
 
-                                </TabPane>
-                                <TabPane tab={"Data Settings"} key={"2"}>
+                                    <div style={{textAlign: "center"}}><Button htmlType={"submit"}
+                                        className={"ant-btn-primary"}>Update</Button></div>
+                                </Form>
+
+                            </TabPane>
+                            <TabPane tab={"Data Settings"} key={"2"}>
+
+                                <Form onSubmit={this.handleSubmit}>
                                     <h2>Data Sharing Settings</h2>
                                     <p>Any data that you collect, process and store on TheSearchBase platform is kept
                                         secure
@@ -247,21 +263,62 @@ class Profile extends React.Component {
                                                   "                                    most\n" +
                                                   "                                    of our software."}>
                                     </ProfileInput>
-                                </TabPane>
-                            </Tabs>
 
-                            <br/>
+                                    <br/>
 
-                            {/*submit buttons*/}
-                            <Button htmlType="button" className={"ant-btn-primary"}
-                                    onClick={this.handleSubmit}>Update</Button>
-                            <CustomAnchor route="/admin/changepassword">Change Password</CustomAnchor>
-                        </Form>
+                                    <div style={{textAlign: "center"}}><Button htmlType={"submit"}
+                                        className={"ant-btn-primary"}>Update</Button></div>
+                                </Form>
+                            </TabPane>
+                            <TabPane tab={"Change Password"} key={"3"}>
+
+                                <Form onSubmit={this.handleSubmit}>
+                                    <ProfileInput title={"Old Password"} name="password.old"
+                                                  rules={{
+                                                      required: true,
+                                                      message: "Please enter your old password"
+                                                  }}
+                                                  getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}
+                                                  handleChange={this.handleChange}
+                                                  form={this.props.form}
+                                                  description={"Enter your old password here"}
+                                    />
+
+                                    <ProfileInput title={"New Password"} name="password.new"
+                                                  rules={{
+                                                      required: true,
+                                                      message: "Please enter your new password"
+                                                  }}
+                                                  getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}
+                                                  handleChange={this.handleChange}
+                                                  form={this.props.form}
+                                                  description={"Enter your new password here"}
+                                    />
+
+                                    <ProfileInput title={"Repeat Password"} name="password.repeat"
+                                                  rules={{
+                                                      required: true,
+                                                      message: "Passwords must match"
+                                                  }}
+                                                  getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}
+                                                  handleChange={this.handleChange}
+                                                  form={this.props.form}
+                                                  description={"Enter your new password again here"}
+                                    />
+
+                                    <br/>
+
+                                    <div style={{textAlign: "center"}}><Button htmlType={"submit"}
+                                        className={"ant-btn-primary"}>Update</Button></div>
+                                </Form>
+                            </TabPane>
+                        </Tabs>
                     </div>
                 </div>
             </div>
 
-        );
+        )
+            ;
     }
 
 }

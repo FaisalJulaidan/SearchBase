@@ -26,6 +26,7 @@ class ProfileInput extends React.Component {
 ProfileInput.defaultProps = {
     type:"text",
     checked:false,
+    readOnly:false,
     rules:{required:false}
 };
 

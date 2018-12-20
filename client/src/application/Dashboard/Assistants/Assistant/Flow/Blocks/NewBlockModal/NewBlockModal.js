@@ -39,12 +39,13 @@ class NewBlockModal extends Component {
     }
 
     handleNewBlock = (newBlock) => {
-        if (newBlock) {
-            this.props.closeModal();
-            this.props.handleAddBlock(newBlock)
-        } else
-            this.props.closeModal();
+        if (newBlock)
+            this.props.handleAddBlock(newBlock);
+        this.props.closeModal();
     };
+
+
+    onChangeTab = (currentTab) => this.setState({currentTab});
 
     render() {
         return (

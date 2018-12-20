@@ -20,23 +20,56 @@ const getProfileFailure = (error) => {
     }
 };
 
-const saveProfile = (profileData) => {
+const saveProfileDetails = (profileData) => {
     return {
-        type: actionTypes.GET_PROFILE_REQUEST,
+        type: actionTypes.SAVE_PROFILE_DETAILS_REQUEST,
         profileData
     }
 };
 
-const getProfileSuccess = (profileData) => {
+const saveProfileDetailsSuccess = (successMessage) => {
     return {
-        type: actionTypes.GET_PROFILE_SUCCESS,
+        type: actionTypes.SAVE_PROFILE_DETAILS_SUCCESS,
         profileData
     }
 };
 
-const getProfileFailure = (error) => {
+const saveProfileDetailsFailure = (error) => {
     return {
-        type: actionTypes.GET_PROFILE_FAILURE,
+        type: actionTypes.SAVE_PROFILE_DETAILS_FAILURE,
         error
     }
 };
+
+const saveDataSettings = (dataSettings) => {
+    return {
+        type: actionTypes.SAVE_DATA_SETTINGS_REQUEST,
+        dataSettings
+    }
+};
+
+const saveDataSettingsSuccess = (successMessage) => {
+    return {
+        type: actionTypes.SAVE_DATA_SETTINGS_SUCCESS,
+        successMessage
+    }
+};
+
+const saveDataSettingsFailure = (error) => {
+    return {
+        type: actionTypes.SAVE_DATA_SETTINGS_FAILURE,
+        error
+    }
+};
+
+export const profileActions = {
+    getProfile,
+    getProfileSuccess,
+    getProfileFailure,
+    saveProfileDetails,
+    saveProfileDetailsSuccess,
+    saveProfileDetailsFailure,
+    saveDataSettings,
+    saveDataSettingsSuccess,
+    saveDataSettingsFailure
+}

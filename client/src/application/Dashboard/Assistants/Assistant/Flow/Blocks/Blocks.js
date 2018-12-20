@@ -100,6 +100,7 @@ class Blocks extends Component {
                                visible={this.state.visible}
                                handleAddBlock={this.handleAddBlock}
                                closeModal={this.closeModal}
+                               currentGroup={this.props.currentGroup}
                                allGroups={this.props.allGroups}/>
             </div>
         );

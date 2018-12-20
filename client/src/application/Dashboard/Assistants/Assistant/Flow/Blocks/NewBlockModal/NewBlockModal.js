@@ -20,7 +20,8 @@ class NewBlockModal extends Component {
         },
         blockTypes: [],
         blocks: [],
-        allGroups: []
+        allGroups: [],
+        currentGroup: null
     };
 
     componentDidMount() {
@@ -29,7 +30,12 @@ class NewBlockModal extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({blocks: nextProps.blocks, allGroups: nextProps.allGroups})
+        this.setState({
+            blocks: nextProps.blocks,
+            allGroups: nextProps.allGroups,
+            currentGroup: nextProps.currentGroup,
+
+        })
     }
 
     handleNewBlock = (newBlock) => {

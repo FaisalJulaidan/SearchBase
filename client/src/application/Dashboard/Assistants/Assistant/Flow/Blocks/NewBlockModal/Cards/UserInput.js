@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Card, Form, Input, Select, Spin} from "antd";
+import {Button, Card, Form, Input, Select, Spin, Checkbox} from "antd";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -11,7 +11,29 @@ class UserInput extends Component {
         showGoToGroup: false
     };
 
-    onSubmit = () => this.props.form.validateFields((err, values) => !err ? this.props.handleNewBlock(values) : '');
+    onSubmit = () => {
+        return this.props.form.validateFields((err, values) =>
+        {
+            // If from is valid crete the new block following User Input block type format
+            if(!err) {
+                const newBlock = {
+                    type: 'User Input',
+                    groupID: this.props.options.currentGroup.id,
+                    storeInDB: values.storeInDB,
+                    isSkippable: values.isSkippable,
+                    labels: '',
+                    content: {
+                        text: values.text,
+                        blockToGoID: values.blockToGoID,
+                        validation: values.validation,
+                        action: values.action,
+                        afterMessage: values.afterMessage
+                    }
+                };
+                this.props.handleNewBlock(newBlock)
+            }
+        })
+    };
 
     onCancel = () => this.props.handleNewBlock(false);
 
@@ -97,9 +119,11 @@ class UserInput extends Component {
                     {this.state.showGoToBlock ?
                         (<FormItem label="Go To Specific Block" {...this.props.options.layout}>
                             {
-                                getFieldDecorator('GoToSpecificBlock',
+                                getFieldDecorator('blockToGoID',
                                     {
-                                        rules: [{required: true, message: "Please select your next block"}]
+                                        rules: [{required: true, message: "Please select your next block"}],
+                                        initialValue: null
+
                                     }
                                 )(
                                     <Select placeholder="The next step after this block">{
@@ -116,14 +140,16 @@ class UserInput extends Component {
                     }
 
                     {this.state.showGoToGroup ?
-                        (<FormItem label="Go To Specific Group" {...this.props.options.layout}>
+                        (<FormItem label="Go To Specific Group"
+                                   extra="The selected group will start from its first block"
+                                   {...this.props.options.layout}>
                             {
-                                getFieldDecorator('GoToSpecificGroup',
+                                getFieldDecorator('blockToGoID',
                                     {
                                         rules: [{required: true, message: "Please select your next group"}]
                                     }
                                 )(
-                                    <Select placeholder="The next step after this block">{
+                                    <Select placeholder="The next block after this block">{
                                         allGroups.map((group, i) => {
                                                 if (group.blocks[0])
                                                     return <Option key={i} value={group.blocks[0].id}>
@@ -144,7 +170,7 @@ class UserInput extends Component {
 
 
                     <FormItem label="After message"
-                              extra=""
+                              extra="This message will display straight after the user's response"
                               {...this.props.options.layout}>
                         {getFieldDecorator('afterMessage', {
                             rules: [{
@@ -155,6 +181,28 @@ class UserInput extends Component {
                             <Input placeholder="Ex: Your input is recorded"/>
                         )}
                     </FormItem>
+
+                    <Form.Item
+                        label="Skippable?"
+                        {...this.props.options.layout}>
+                        {getFieldDecorator('isSkippable', {
+                            valuePropName: 'checked',
+                            initialValue: false,
+                        })(
+                            <Checkbox>Users can skip answering this question"</Checkbox>
+                        )}
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Store responses?"
+                        {...this.props.options.layout}>
+                        {getFieldDecorator('storeInDB', {
+                            valuePropName: 'checked',
+                            initialValue: true,
+                        })(
+                            <Checkbox>Users' responses should be recorded</Checkbox>
+                        )}
+                    </Form.Item>
 
                 </Form>
             </Card>

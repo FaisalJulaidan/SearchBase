@@ -5,7 +5,7 @@ import {profileActions} from "../actions";
 
 function* saveProfileDetails(action) {
     try {
-        const res = yield http.put(`assistant/${action.ID}`, action.updatedSettings);
+        const res = yield http.put(`/admin/profile/profiledetails`, action.profile);
         yield put(assistantSettingsActions.updateAssistantSettingsSuccess(res.data.msg));
         return yield put(assistantActions.fetchAssistants())
     } catch (error) {

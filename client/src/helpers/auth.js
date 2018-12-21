@@ -5,7 +5,7 @@ export const authHeader = () => {
     let refresh = localStorage.getItem('refresh');
     if (!token || !refresh) {return null}
     return {'Authorization': 'Bearer ' + token};
-}
+};
 
 
 export const getUser = () => {
@@ -13,10 +13,10 @@ export const getUser = () => {
     let user = JSON.parse(localStorage.getItem('user'));
     if(!user){return null;}
     return user;
-}
+};
 
 export const checkAuthenticity = () => {
     return !(!getUser() || !authHeader());
 
-}
+};
 

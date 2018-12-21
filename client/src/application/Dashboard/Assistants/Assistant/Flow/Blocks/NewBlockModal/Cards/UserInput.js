@@ -12,10 +12,9 @@ class UserInput extends Component {
     };
 
     onSubmit = () => {
-        return this.props.form.validateFields((err, values) =>
-        {
+        return this.props.form.validateFields((err, values) => {
             // If from is valid crete the new block following User Input block type format
-            if(!err) {
+            if (!err) {
                 const newBlock = {
                     type: 'User Input',
                     groupID: this.props.options.currentGroup.id,
@@ -24,7 +23,7 @@ class UserInput extends Component {
                     labels: '',
                     content: {
                         text: values.text,
-                        blockToGoID: values.blockToGoID,
+                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup,
                         validation: values.validation,
                         action: values.action,
                         afterMessage: values.afterMessage
@@ -121,8 +120,7 @@ class UserInput extends Component {
                             {
                                 getFieldDecorator('blockToGoID',
                                     {
-                                        rules: [{required: true, message: "Please select your next block"}],
-                                        initialValue: null
+                                        rules: [{required: true, message: "Please select your next block"}]
 
                                     }
                                 )(
@@ -144,7 +142,7 @@ class UserInput extends Component {
                                    extra="The selected group will start from its first block"
                                    {...this.props.options.layout}>
                             {
-                                getFieldDecorator('blockToGoID',
+                                getFieldDecorator('blockToGoIDGroup',
                                     {
                                         rules: [{required: true, message: "Please select your next group"}]
                                     }
@@ -153,7 +151,7 @@ class UserInput extends Component {
                                         allGroups.map((group, i) => {
                                                 if (group.blocks[0])
                                                     return <Option key={i} value={group.blocks[0].id}>
-                                                        {`${group.name}`}d
+                                                        {`${group.name}`}
                                                     </Option>;
                                                 else
                                                     return <Option disabled key={i} value={group.name}>

@@ -20,9 +20,6 @@ class Question extends Component {
     onSubmit = () => {
         return this.props.form.validateFields(['text', 'isSkippable', 'storeInDB'], (err, values) => {
 
-            // add answers from state to the object then do the schema and send to serever
-
-
             // If from is valid crete the new block following User Input block type format
             if (!err) {
                 const newBlock = {
@@ -33,10 +30,7 @@ class Question extends Component {
                     labels: '',
                     content: {
                         text: values.text,
-                        blockToGoID: values.blockToGoID,
-                        validation: values.validation,
-                        action: values.action,
-                        afterMessage: values.afterMessage
+                        answers: this.state.answers
                     }
                 };
                 this.props.handleNewBlock(newBlock)
@@ -57,11 +51,14 @@ class Question extends Component {
 
 
     addAnswer = () => {
-        this.props.form.validateFields(['answer', 'action', 'blockToGoID', 'blockToGoID', 'afterMessage'], (err, values) => {
+        this.props.form.validateFields(['answer', 'action', 'blockToGoID', 'blockToGoIDGroup', 'afterMessage'], (err, values) => {
             if (!err) {
                 const answer = {
-                    ...values,
-                    keywords: this.state.tags
+                    text: values.answer,
+                    keywords: this.state.tags,
+                    blockToGoID: values.blockToGoID || values.blockToGoIDGroup,
+                    action: values.action,
+                    afterMessage: values.afterMessage
                 };
                 this.setState({tags: []});
                 const answers = this.state.answers;
@@ -80,7 +77,7 @@ class Question extends Component {
         console.log("TODO")
     };
 
-    // Tags component's functions
+// Tags component's functions
     removeTag = (removedTag) => this.setState({tags: this.state.tags.filter(tag => tag !== removedTag)});
     showInput = () => this.setState({inputVisible: true}, () => this.input.focus());
     handleInputChange = e => this.setState({inputValue: e.target.value});
@@ -93,7 +90,7 @@ class Question extends Component {
         this.setState({tags, inputVisible: false, inputValue: '',});
     };
 
-    // END Tags component's functions
+// END Tags component's functions
 
 
     render() {
@@ -134,7 +131,7 @@ class Question extends Component {
                                 type="primary" icon="plus" shape="circle" size={"small"}></Button>
                         {
                             this.state.answers.map((answer, i) => (
-                                <Card title={answer.answer}
+                                <Card title={answer.text}
                                       key={i}
                                       extra={<Button onClick={this.removeAnswer}
                                                      type="danger" icon="delete" shape="circle"
@@ -274,7 +271,7 @@ class Question extends Component {
                                        extra="The selected group will start from its first block"
                                        {...this.props.options.layout}>
                                 {
-                                    getFieldDecorator('blockToGoID',
+                                    getFieldDecorator('blockToGoIDGroup',
                                         {
                                             rules: [{required: true, message: "Please select your next group"}]
                                         }

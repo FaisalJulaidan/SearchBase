@@ -101,8 +101,6 @@ class Profile extends React.Component {
     }
 
     componentDidMount() {
-        //this.props.dispatch(profileActions.getProfile());
-        //const profile = dispatch(profileActions.getProfile());
         this.props.dispatch(profileActions.getProfile());
         if (!this.state.initialRender) {
             this.updateAllInputsFromState();

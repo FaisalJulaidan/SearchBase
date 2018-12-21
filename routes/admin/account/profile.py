@@ -5,14 +5,14 @@ from utilities import helpers
 
 profile_router: Blueprint = Blueprint('profile_router', __name__, template_folder="../../templates")
 
+# DEPRECATED
+# @profile_router.route("/admin/profile", methods=['GET'])
+# def profilePage():
+#     if request.method == "GET":
+#         return admin_services.render("admin/profile.html")
 
-@profile_router.route("/admin/profile", methods=['GET'])
-def profilePage():
-    if request.method == "GET":
-        return admin_services.render("admin/profile.html")
 
-
-@profile_router.route("/admin/profile/data", methods=['GET'])
+@profile_router.route("/profile/data", methods=['GET'])
 def profilePageData():
     if request.method == "GET":
         email = session.get('UserEmail', None)
@@ -39,7 +39,7 @@ def profilePageData():
                                      "userSettings": userSettings_callback.Data})
 
 
-@profile_router.route("/admin/profile/profiledetails", methods=['POST'])
+@profile_router.route("/profile/profiledetails", methods=['POST'])
 def profileDetails():
     if request.method == "POST":
         names = request.form.get("names", default="Error")
@@ -67,7 +67,7 @@ def profileDetails():
         return helpers.jsonResponse(True, 200, "Records have been updated.", None)
 
 
-@profile_router.route("/admin/profile/datasettings", methods=['POST'])
+@profile_router.route("/profile/datasettings", methods=['POST'])
 def dataSettings():
     if request.method == "POST":
         userID = session.get('UserID', None)

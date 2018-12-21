@@ -1,7 +1,7 @@
 import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
-const initialState = {isLoading: false, errorMsg: null};
+const initialState = {profile: {}, isLoading: false, errorMsg: null};
 
 export const profile = (state = initialState, action) => {
     switch (action.type) {

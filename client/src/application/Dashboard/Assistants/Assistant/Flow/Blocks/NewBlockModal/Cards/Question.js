@@ -98,7 +98,7 @@ class Question extends Component {
         let blockOptions = {};
         // extract the correct blockType from blockTypes[]
         for (const blockType of blockTypes)
-            if (blockType.name === 'User Input')
+            if (blockType.name === 'Question')
                 blockOptions = blockType;
 
         const {getFieldDecorator} = this.props.form;
@@ -106,8 +106,7 @@ class Question extends Component {
         const {tags, inputVisible, inputValue} = this.state;
 
         return (
-            <Card title="Question"
-                  style={{width: '100%'}}
+            <Card style={{width: '100%'}}
                   actions={[
                       <Button key="cancel" onClick={this.onCancel}>Cancel</Button>,
                       <Button key="submit" type="primary" onClick={this.onSubmit}>Add</Button>]}>
@@ -153,7 +152,7 @@ class Question extends Component {
                             valuePropName: 'checked',
                             initialValue: false,
                         })(
-                            <Checkbox>Users can skip answering this question"</Checkbox>
+                            <Checkbox>Users can skip answering this question</Checkbox>
                         )}
                     </Form.Item>
 
@@ -162,9 +161,10 @@ class Question extends Component {
                         {...this.props.options.layout}>
                         {getFieldDecorator('storeInDB', {
                             valuePropName: 'checked',
-                            initialValue: true,
+                            initialValue: blockOptions.alwaysStoreInDB,
                         })(
-                            <Checkbox>Users' responses should be recorded</Checkbox>
+                            <Checkbox disabled={blockOptions.alwaysStoreInDB}>
+                                Users' responses should be recorded</Checkbox>
                         )}
                     </Form.Item>
 

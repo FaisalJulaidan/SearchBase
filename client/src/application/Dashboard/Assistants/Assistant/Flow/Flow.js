@@ -44,10 +44,8 @@ class Flow extends Component {
 
     // BLOCKS
     addBlock = (newBlock, groupID) => {
-        const {assistant} = this.props.location.state;
-        console.log("HHHHHH");
         console.log(newBlock, groupID);
-        this.props.dispatch(flowActions.addBlockRequest(newBlock, groupID));
+        this.props.dispatch(flowActions.addBlockRequest({block: newBlock}, groupID));
         // message.loading(`Adding new block`, 0);
     };
 

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Card, Form, Input, Select, Spin, Checkbox, Row, Col} from "antd";
+import {Button, Card, Form, Input, Select, Spin, Checkbox} from "antd";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -16,7 +16,6 @@ class FileUpload extends Component {
     onSubmit = () => {
         return this.props.form.validateFields((err, values) => {
             if (!err) {
-                console.log(values)
                 const newBlock = {
                     type: 'File Upload',
                     groupID: this.props.options.currentGroup.id,

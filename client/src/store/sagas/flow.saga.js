@@ -1,7 +1,7 @@
 import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {flowActions} from "../actions/flow.actions";
-import {http} from "../../helpers";
+import {http, alertSuccess} from "../../helpers";
 import {delay} from "redux-saga";
 
 function* fetchFlow({assistantID}) {
@@ -20,6 +20,7 @@ function* addGroup(action) {
     try {
         const res = yield http.post(`/assistant/${action.ID}/flow/group`, action.newGroup);
         yield put(flowActions.addGroupSuccess(res.data.msg));
+        yield alertSuccess('title', 'success success yaaa!');
         return yield put(flowActions.fetchFlowRequest(action.ID))
     } catch (error) {
         console.log(error);

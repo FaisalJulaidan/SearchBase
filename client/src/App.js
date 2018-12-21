@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Switch, Route, withRouter, Redirect} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {history} from './helpers';
+import {notification} from 'antd';
 import './App.less';
 
 import {PrivateRoute} from './hoc';
@@ -12,7 +13,8 @@ class App extends Component {
     constructor(props) {
         super(props);
         history.listen((location, action) => {
-            console.log(`The current URL is ${location.pathname}${location.search}${location.hash}`)
+            // Clear recent notifications boxes when route changes
+            notification.destroy();
         });
     }
 

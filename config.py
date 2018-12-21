@@ -76,7 +76,7 @@ class BaseConfig(object):
             'func': 'services.mail_services:notifyNewRecordsForLastXHours',
             'args': (12,),
             'trigger': 'interval',
-            'seconds': 15
+            'seconds': 43200
         }
     ]
 

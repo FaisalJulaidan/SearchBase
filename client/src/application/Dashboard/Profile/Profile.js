@@ -1,10 +1,12 @@
 import React from 'react';
+import {Form, Button, message, Tabs} from "antd";
+import {connect} from 'react-redux';
 
 import "./Profile.less"
 import styles from "./Profile.module.less"
-import {Form, Button, message, Tabs} from "antd";
 import ProfileInput from "./profileComponents/ProfileInput/ProfileInput";
-import CustomAnchor from "./profileComponents/CustomAnchor/CustomAnchor";
+
+import {profileActions} from "../../../store/actions/profile.actions";
 
 const loading = () => {
     message.loading('Updating...', 0);
@@ -15,9 +17,9 @@ const TabPane = Tabs.TabPane;
 class Profile extends React.Component {
     state = {
         profile: {
-            name: "Don't know how",
-            email: "to connect to",
-            companyName: "server yet."
+            name: "Test Name",
+            email: "SomeEmail@email.text",
+            companyName: "Test Company"
         },
         newsletters: false,
         profileSettings: {
@@ -84,16 +86,6 @@ class Profile extends React.Component {
         });
     };
 
-    componentDidUpdate(prevProps) {
-        if (!this.props.isAdding && this.props.isAdding !== prevProps.isAdding) {
-            this.props.hideModal();
-            message.destroy();
-            message.success(this.props.successMsg)
-
-        }
-
-    }
-
     updateAllInputsFromState() {
         const tempState = this.state;
         this.props.form.setFieldsValue({
@@ -111,6 +103,7 @@ class Profile extends React.Component {
     componentDidMount() {
         //this.props.dispatch(profileActions.getProfile());
         //const profile = dispatch(profileActions.getProfile());
+        this.props.dispatch(profileActions.getProfile());
         if (!this.state.initialRender) {
             this.updateAllInputsFromState();
             this.setState({initialRender: true});
@@ -119,14 +112,14 @@ class Profile extends React.Component {
 
     changeTab = (key) => {
         this.setState({tabIndex: parseInt(key)});
-    }
+    };
 
     render() {
         const formItemLayout = {
             labelCol: {span: 6},
             wrapperCol: {span: 14}
         };
-
+        console.log(this.props);
         const {getFieldDecorator} = this.props.form;
 
         const newsletters = this.state.newsletters;
@@ -184,7 +177,8 @@ class Profile extends React.Component {
                                     <br/>
 
                                     <div style={{textAlign: "center"}}><Button htmlType={"submit"}
-                                        className={"ant-btn-primary"}>Update</Button></div>
+                                                                               className={"ant-btn-primary"}>Update</Button>
+                                    </div>
                                 </Form>
 
                             </TabPane>
@@ -267,7 +261,8 @@ class Profile extends React.Component {
                                     <br/>
 
                                     <div style={{textAlign: "center"}}><Button htmlType={"submit"}
-                                        className={"ant-btn-primary"}>Update</Button></div>
+                                                                               className={"ant-btn-primary"}>Update</Button>
+                                    </div>
                                 </Form>
                             </TabPane>
                             <TabPane tab={"Change Password"} key={"3"}>
@@ -309,18 +304,22 @@ class Profile extends React.Component {
                                     <br/>
 
                                     <div style={{textAlign: "center"}}><Button htmlType={"submit"}
-                                        className={"ant-btn-primary"}>Update</Button></div>
+                                                                               className={"ant-btn-primary"}>Update</Button>
+                                    </div>
                                 </Form>
                             </TabPane>
                         </Tabs>
                     </div>
                 </div>
             </div>
-
-        )
-            ;
+        );
     }
-
 }
 
-export default Form.create()(Profile);
+function mapStateToProps(state) {
+    return {
+        profileData: state.profile
+    };
+}
+
+export default connect(mapStateToProps)(Form.create()(Profile));

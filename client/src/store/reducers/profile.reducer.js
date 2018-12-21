@@ -13,7 +13,7 @@ export const profile = (state = initialState, action) => {
             });
         case actionTypes.GET_PROFILE_SUCCESS:
             return updateObject(state, {
-                successMsg: action.profile,
+                profile: action.profileData,
                 isLoading: false
             });
         case actionTypes.GET_PROFILE_FAILURE:

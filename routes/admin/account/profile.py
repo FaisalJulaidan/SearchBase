@@ -9,24 +9,34 @@ profile_router: Blueprint = Blueprint('profile_router', __name__, template_folde
 @profile_router.route("/admin/profile", methods=['GET'])
 def profilePage():
     if request.method == "GET":
+        return admin_services.render("admin/profile.html")
+
+
+@profile_router.route("/admin/profile/data", methods=['GET'])
+def profilePageData():
+    if request.method == "GET":
         email = session.get('UserEmail', None)
 
         profile_callback: Callback = profile_services.getUserAndCompany(email)
-        if not profile_callback.Success: return admin_services.render("admin/profile.html", user=None, email=email,
-                                                                      company=None, newsletters=None, userSettings=None)
+        if not profile_callback.Success:
+            return helpers.jsonResponse(True, 200, "Profile has been retrieved",
+                                        {"user": None, "email": email, "company": None, "newsletters": None,
+                                         "userSettings": None})
 
         newsletter_callback: Callback = newsletter_services.checkForNewsletter(email)
         newsletters = newsletter_callback.Success
 
         userSettings_callback: Callback = user_services.getUserSettings(session.get('UserID', None))
-        if not userSettings_callback.Success: return admin_services.render("admin/profile.html",
-                                                                           user=profile_callback.Data["user"],
-                                                                           company=profile_callback.Data["company"],
-                                                                           newsletters=newsletters, userSettings=None)
+        if not userSettings_callback.Success:
+            return helpers.jsonResponse(True, 200, "Profile has been retrieved",
+                                        {"user": profile_callback.Data["user"], "email": email,
+                                         "company": profile_callback.Data["company"], "newsletters": newsletters,
+                                         "userSettings": None})
 
-        return admin_services.render("admin/profile.html", user=profile_callback.Data["user"],
-                                     company=profile_callback.Data["company"], newsletters=newsletters,
-                                     userSettings=userSettings_callback.Data)
+        return helpers.jsonResponse(True, 200, "Profile has been retrieved",
+                                    {"user": profile_callback.Data["user"], "email": email,
+                                     "company": profile_callback.Data["company"], "newsletters": newsletters,
+                                     "userSettings": userSettings_callback.Data})
 
 
 @profile_router.route("/admin/profile/profiledetails", methods=['POST'])
@@ -37,7 +47,7 @@ def profileDetails():
         companyName = request.form.get("companyName", default="Error")
 
         if names is "Error" and newEmail is "error" and companyName is "Error":
-            return helpers.redirectWithMessage("profilePage", "Could not retrieve all written information.")
+            return helpers.jsonResponse(False, 400, "Could not retrieve all written information.", None)
 
         names = names.split(" ")
         name1 = names[0]
@@ -46,15 +56,15 @@ def profileDetails():
         # update user details
         updateUser_callback: Callback = profile_services.updateUser(name1, name2, newEmail, session.get('UserID', 0))
         if not updateUser_callback.Success:
-            return helpers.redirectWithMessage("profilePage",
-                                               "Could not update User's information.")
+            return helpers.jsonResponse(False, 400, "Could not update User's information.", None)
 
         updateCompany_callback: Callback = profile_services.updateCompany(companyName, session.get('CompanyID', 0))
         if not updateCompany_callback.Success:
-            return helpers.redirectWithMessage("profilePage",
-                                               "Could not update Company's information. User information has been updated.")
+            return helpers.jsonResponse(False, 400,
+                                        "Could not update Company's information. User information has been updated.",
+                                        None)
 
-        return helpers.redirectWithMessage("profilePage", "Records have been updated.")
+        return helpers.jsonResponse(True, 200, "Records have been updated.", None)
 
 
 @profile_router.route("/admin/profile/datasettings", methods=['POST'])
@@ -77,8 +87,9 @@ def dataSettings():
         elif newsletters is "Error":
             newsletter_callback: Callback = newsletter_services.removeNewsletterPerson(email)
         if not newsletter_callback.Success:
-            return helpers.redirectWithMessage("profilePage",
-                                               newsletter_callback.Message + " Company and User information has been updated.")
+            return helpers.jsonResponse(False, 400,
+                                        newsletter_callback.Message + " Company and User information has been updated.",
+                                        None)
 
         # update user settings
         tracking = bool(tracking)
@@ -89,7 +100,8 @@ def dataSettings():
         userSettings_callback: Callback = user_services.createUpdateUserSettings(userID, tracking, techSupport,
                                                                                  accountSpecialist, notifications)
         if not userSettings_callback.Success:
-            return helpers.redirectWithMessage("profilePage",
-                                               userSettings_callback.Message + " Company, User information and newsletters has been updated.")
+            return helpers.jsonResponse(False, 400,
+                                        userSettings_callback.Message + " Company, User information and newsletters has been updated.",
+                                        None)
 
-        return
+        return helpers.jsonResponse(True, 200, "Data Settings have been updated.", None)

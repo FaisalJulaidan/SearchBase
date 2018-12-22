@@ -2,7 +2,8 @@ from flask import Blueprint, render_template, request, redirect, session
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback, Assistant, User
-from services import statistics_services, assistant_services, admin_services, user_services, flow_services
+from services import statistics_services, assistant_services, admin_services, user_services, flow_services, \
+    profile_services, newsletter_services
 from utilities import helpers
 
 assistant_router: Blueprint = Blueprint('assistant_router', __name__, template_folder="../../templates")
@@ -76,6 +77,36 @@ def admin_homeDEPREACTED():
 
             return redirect('login')
 
+# @assistant_router.route("/profile", methods=['GET'])
+# @jwt_required
+# def profilePageData():
+#     user = get_jwt_identity()['user']
+#     print("USER: ", user)
+#     if request.method == "GET":
+#         email = user.get("email", None)
+#
+#         print("EMAIL: ", email)
+#
+#         profile_callback: Callback = profile_services.getUserAndCompany(email)
+#         if not profile_callback.Success:
+#             return helpers.jsonResponse(True, 200, "Profile has been retrieved 1",
+#                                         {"user": None, "email": email, "company": None, "newsletters": None,
+#                                          "userSettings": None})
+#
+#         newsletter_callback: Callback = newsletter_services.checkForNewsletter(email)
+#         newsletters = newsletter_callback.Success
+#
+#         userSettings_callback: Callback = user_services.getUserSettings(user.get("id", None))
+#         if not userSettings_callback.Success:
+#             return helpers.jsonResponse(True, 200, "Profile has been retrieved 2",
+#                                         {"user": profile_callback.Data["user"], "email": email,
+#                                          "company": profile_callback.Data["company"], "newsletters": newsletters,
+#                                          "userSettings": None})
+#
+#         return helpers.jsonResponse(True, 200, "Profile has been retrieved 3",
+#                                     {"user": profile_callback.Data["user"], "email": email,
+#                                      "company": profile_callback.Data["company"], "newsletters": newsletters,
+#                                      "userSettings": userSettings_callback.Data})
 
 # get all assistants
 @assistant_router.route("/assistants", methods=['GET', 'POST'])

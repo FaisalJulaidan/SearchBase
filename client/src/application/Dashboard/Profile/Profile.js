@@ -17,9 +17,9 @@ const TabPane = Tabs.TabPane;
 class Profile extends React.Component {
     state = {
         profile: {
-            name: "Test Name",
-            email: "SomeEmail@email.text",
-            companyName: "Test Company"
+            name: "",
+            email: "",
+            companyName: ""
         },
         newsletters: false,
         profileSettings: {
@@ -34,7 +34,8 @@ class Profile extends React.Component {
             repeat: ""
         },
         formSubmitted: false,
-        initialRender: false,
+        dataCalled: false,
+        dataRendered: false,
         tabIndex: 1
     };
 
@@ -45,11 +46,17 @@ class Profile extends React.Component {
                 if (this.state.isPopupDisabled) {
                     values.secondsUntilPopup = 0
                 }
-                console.log(values);
                 // send to server
                 this.setState({formSubmitted: true});
-                //this.props.dispatch(profileActions.saveProfile(profile, newsletters, profileSettings));
-                loading();
+                switch (this.state.tabIndex) {
+                    case 1:
+                        this.props.dispatch(profileActions.saveProfileDetails(values));
+                        break;
+                    case 2:
+                        this.props.dispatch(profileActions.saveDataSettings(values));
+                        break;
+                }
+                //loading();
             }
         });
     };
@@ -98,14 +105,48 @@ class Profile extends React.Component {
             ["profileSettings.techSupport"]: tempState.profileSettings.techSupport,
             ["profileSettings.accountSpecialist"]: tempState.profileSettings.accountSpecialist
         });
+        this.setState({dataRendered: true});
+    }
+
+    updateStateFromProps(nextProps) {
+        const data = nextProps.profileData.profile.data;
+        if(data && !this.state.dataCalled){
+            if(data.user){
+                this.setState({
+                    profile: {
+                        name: data.user.Firstname + " " + data.user.Surname,
+                        email: data.user.Email,
+                        companyName: data.company.Name
+                    }
+                });
+            }
+
+            if(data.newsletters){
+                this.setState({
+                    newsletters: data.newsletters
+                });
+            }
+
+            if(data.userSettings){
+                this.setState({
+                    profileSettings: {
+                        statNotifications: data.userSettings.UserInputNotifications,
+                        trackData: data.userSettings.TrackingData,
+                        techSupport: data.userSettings.TechnicalSupport,
+                        accountSpecialist: data.userSettings.AccountSpecialist
+                    }
+                });
+            }
+            this.setState({dataCalled: true});
+        }
     }
 
     componentDidMount() {
         this.props.dispatch(profileActions.getProfile());
-        if (!this.state.initialRender) {
-            this.updateAllInputsFromState();
-            this.setState({initialRender: true});
-        }
+    }
+
+    componentWillReceiveProps(nextProps){
+        this.updateStateFromProps(nextProps);
     }
 
     changeTab = (key) => {
@@ -113,11 +154,13 @@ class Profile extends React.Component {
     };
 
     render() {
+        if(this.state.dataCalled && !this.state.dataRendered){
+            this.updateAllInputsFromState();
+        }
         const formItemLayout = {
             labelCol: {span: 6},
             wrapperCol: {span: 14}
         };
-        console.log(this.props);
         const {getFieldDecorator} = this.props.form;
 
         const newsletters = this.state.newsletters;

@@ -6,7 +6,8 @@ import {profileActions} from "../actions";
 
 function* getProfilePageData() {
     try {
-        const res = yield http.get(`/admin/profile/data`);
+        const res = yield http.get(`/profile`);
+        console.log("RES:", res);
         return yield put(profileActions.getProfileSuccess(res.data))
     } catch (error) {
         console.log(error);
@@ -17,7 +18,7 @@ function* getProfilePageData() {
 
 function* saveProfileDetails(action) {
     try {
-        const res = yield http.put(`/admin/profile/profiledetails`, action.profileData);
+        const res = yield http.post(`/profile/profiledetails`, action.profileData);
         yield put(profileActions.saveProfileDetailsSuccess(res.data.msg));
         return yield put(profileActions.getProfile())
     } catch (error) {
@@ -28,7 +29,7 @@ function* saveProfileDetails(action) {
 
 function* saveDataSettings(action) {
     try {
-        const res = yield http.put(`/admin/profile/datasettings`, action.dataSettings);
+        const res = yield http.post(`/profile/datasettings`, action.dataSettings);
         yield put(profileActions.saveDataSettingsSuccess(res.data.msg));
         return yield put(profileActions.getProfile())
     } catch (error) {

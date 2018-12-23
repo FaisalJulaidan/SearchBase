@@ -358,6 +358,7 @@ class Profile extends React.Component {
 }
 
 function mapStateToProps(state) {
+    console.log("MSTP: ", state);
     return {
         profileData: state.profile
     };

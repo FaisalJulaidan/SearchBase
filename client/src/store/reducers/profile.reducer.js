@@ -12,6 +12,7 @@ export const profile = (state = initialState, action) => {
                 isLoading: true
             });
         case actionTypes.GET_PROFILE_SUCCESS:
+            console.log("profileData:", action.profileData);
             return updateObject(state, {
                 profile: action.profileData,
                 isLoading: false

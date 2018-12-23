@@ -109,8 +109,8 @@ class Profile extends React.Component {
     }
 
     updateStateFromProps(nextProps) {
-        const data = nextProps.profileData.profile.data;
-        if(data && !this.state.dataCalled){
+        const data = nextProps.profileData;
+        if(!this.isEmpty(data) && !this.state.dataRendered){
             if(data.user){
                 this.setState({
                     profile: {
@@ -139,6 +139,14 @@ class Profile extends React.Component {
             }
             this.setState({dataCalled: true});
         }
+    }
+
+    isEmpty(obj) {
+        for(var key in obj) {
+            if(obj.hasOwnProperty(key))
+                return false;
+        }
+        return true;
     }
 
     componentDidMount() {
@@ -306,49 +314,49 @@ class Profile extends React.Component {
                                     </div>
                                 </Form>
                             </TabPane>
-                            <TabPane tab={"Change Password"} key={"3"}>
+                            {/*<TabPane tab={"Change Password"} key={"3"}>*/}
 
-                                <Form onSubmit={this.handleSubmit}>
-                                    <ProfileInput title={"Old Password"} name="password.old"
-                                                  rules={{
-                                                      required: true,
-                                                      message: "Please enter your old password"
-                                                  }}
-                                                  getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}
-                                                  handleChange={this.handleChange}
-                                                  form={this.props.form}
-                                                  description={"Enter your old password here"}
-                                    />
+                                {/*<Form onSubmit={this.handleSubmit}>*/}
+                                    {/*<ProfileInput title={"Old Password"} name="password.old"*/}
+                                                  {/*rules={{*/}
+                                                      {/*required: true,*/}
+                                                      {/*message: "Please enter your old password"*/}
+                                                  {/*}}*/}
+                                                  {/*getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}*/}
+                                                  {/*handleChange={this.handleChange}*/}
+                                                  {/*form={this.props.form}*/}
+                                                  {/*description={"Enter your old password here"}*/}
+                                    {/*/>*/}
 
-                                    <ProfileInput title={"New Password"} name="password.new"
-                                                  rules={{
-                                                      required: true,
-                                                      message: "Please enter your new password"
-                                                  }}
-                                                  getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}
-                                                  handleChange={this.handleChange}
-                                                  form={this.props.form}
-                                                  description={"Enter your new password here"}
-                                    />
+                                    {/*<ProfileInput title={"New Password"} name="password.new"*/}
+                                                  {/*rules={{*/}
+                                                      {/*required: true,*/}
+                                                      {/*message: "Please enter your new password"*/}
+                                                  {/*}}*/}
+                                                  {/*getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}*/}
+                                                  {/*handleChange={this.handleChange}*/}
+                                                  {/*form={this.props.form}*/}
+                                                  {/*description={"Enter your new password here"}*/}
+                                    {/*/>*/}
 
-                                    <ProfileInput title={"Repeat Password"} name="password.repeat"
-                                                  rules={{
-                                                      required: true,
-                                                      message: "Passwords must match"
-                                                  }}
-                                                  getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}
-                                                  handleChange={this.handleChange}
-                                                  form={this.props.form}
-                                                  description={"Enter your new password again here"}
-                                    />
+                                    {/*<ProfileInput title={"Repeat Password"} name="password.repeat"*/}
+                                                  {/*rules={{*/}
+                                                      {/*required: true,*/}
+                                                      {/*message: "Passwords must match"*/}
+                                                  {/*}}*/}
+                                                  {/*getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}*/}
+                                                  {/*handleChange={this.handleChange}*/}
+                                                  {/*form={this.props.form}*/}
+                                                  {/*description={"Enter your new password again here"}*/}
+                                    {/*/>*/}
 
-                                    <br/>
+                                    {/*<br/>*/}
 
-                                    <div style={{textAlign: "center"}}><Button htmlType={"submit"}
-                                                                               className={"ant-btn-primary"}>Update</Button>
-                                    </div>
-                                </Form>
-                            </TabPane>
+                                    {/*<div style={{textAlign: "center"}}><Button htmlType={"submit"}*/}
+                                                                               {/*className={"ant-btn-primary"}>Update</Button>*/}
+                                    {/*</div>*/}
+                                {/*</Form>*/}
+                            {/*</TabPane>*/}
                         </Tabs>
                     </div>
                 </div>
@@ -359,7 +367,7 @@ class Profile extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        profileData: state.profile
+        profileData: state.profile.profile
     };
 }
 

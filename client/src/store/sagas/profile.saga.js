@@ -7,7 +7,6 @@ import {profileActions} from "../actions";
 function* getProfilePageData() {
     try {
         const res = yield http.get(`/profile`);
-        console.log("RES:", res);
         return yield put(profileActions.getProfileSuccess(res.data))
     } catch (error) {
         console.log(error);

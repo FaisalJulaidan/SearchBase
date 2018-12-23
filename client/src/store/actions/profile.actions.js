@@ -6,10 +6,10 @@ const getProfile = () => {
     }
 };
 
-const getProfileSuccess = (profileData) => {
+const getProfileSuccess = (profile) => {
     return {
         type: actionTypes.GET_PROFILE_SUCCESS,
-        profileData
+        profileData: profile.data
     }
 };
 

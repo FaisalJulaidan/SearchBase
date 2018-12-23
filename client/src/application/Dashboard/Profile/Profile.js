@@ -109,8 +109,8 @@ class Profile extends React.Component {
     }
 
     updateStateFromProps(nextProps) {
-        const data = nextProps.profileData.profile.data;
-        if(data && !this.state.dataCalled){
+        const data = nextProps.profileData;
+        if(!this.isEmpty(data) && !this.state.dataRendered){
             if(data.user){
                 this.setState({
                     profile: {
@@ -139,6 +139,14 @@ class Profile extends React.Component {
             }
             this.setState({dataCalled: true});
         }
+    }
+
+    isEmpty(obj) {
+        for(var key in obj) {
+            if(obj.hasOwnProperty(key))
+                return false;
+        }
+        return true;
     }
 
     componentDidMount() {
@@ -359,7 +367,7 @@ class Profile extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        profileData: state.profile
+        profileData: state.profile.profile
     };
 }
 

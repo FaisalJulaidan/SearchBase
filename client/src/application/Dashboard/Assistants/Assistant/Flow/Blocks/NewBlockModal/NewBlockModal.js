@@ -34,7 +34,6 @@ class NewBlockModal extends Component {
             blocks: nextProps.blocks,
             allGroups: nextProps.allGroups,
             currentGroup: nextProps.currentGroup,
-
         })
     }
 

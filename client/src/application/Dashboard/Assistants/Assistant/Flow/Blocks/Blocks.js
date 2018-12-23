@@ -5,8 +5,9 @@ import styles from "../Flow.module.less";
 import {Button, Form} from "antd";
 
 import Block from "./Block/Block";
-import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
+import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
 import NewBlockModal from "./NewBlockModal/NewBlockModal";
+import EditBlockModal from "./EditBlockModal/EditBlockModal1";
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -22,18 +23,16 @@ const getItemStyle = draggableStyle => ({margin: `0 0 8px 0`, ...draggableStyle}
 class Blocks extends Component {
 
     state = {
-        visible: false,
-        blocks: []
+        addBlockVisible: false,
+        editBlockVisible: false,
+        blocks: [],
+        edittedBlock: {}
     };
 
     constructor(props) {
         super(props);
         this.onDragEnd = this.onDragEnd.bind(this);
     }
-
-    showModal = () => this.setState({visible: true});
-
-    closeModal = () => this.setState({visible: false});
 
     onDragEnd(result) {
         // dropped outside the list
@@ -49,10 +48,28 @@ class Blocks extends Component {
             this.setState({blocks: nextProps.currentGroup.blocks})
     }
 
+
+    ///////////////////////////////////////////////////
+
+    // ADD BLOCK MODAL CONFIGS
+    showAddBlockModal = () => this.setState({addBlockVisible: true});
+    closeAddBlockModal = () => this.setState({addBlockVisible: false});
+
     handleAddBlock = (newBlock) => {
         const {addBlock, currentGroup} = this.props;
         console.log(newBlock);
         addBlock(newBlock, currentGroup.id)
+    };
+
+    // EDIT BLOCK MODAL CONFIGS
+
+    // this called from block.js when you click on edit block button
+    editBlock = (edittedBlock) => this.setState({edittedBlock, editBlockVisible: true});
+    closeEditBlockModal = () => this.setState({edittedBlock: {}, editBlockVisible: false});
+
+    handleEditBlock = (edittedBlock) => {
+        const {editBlock, currentGroup} = this.props;
+        editBlock(edittedBlock, currentGroup.id)
     };
 
     render() {
@@ -64,7 +81,7 @@ class Blocks extends Component {
                     </div>
                     <div>
                         <Button className={styles.PanelButton} type="primary" icon="plus"
-                                onClick={this.showModal} disabled={!this.props.currentGroup.id}>
+                                onClick={this.showAddBlockModal} disabled={!this.props.currentGroup.id}>
                             Add Block
                         </Button>
                     </div>
@@ -83,7 +100,10 @@ class Blocks extends Component {
                                                     <div ref={provided.innerRef} {...provided.draggableProps}
                                                          {...provided.dragHandleProps}
                                                          style={getItemStyle(provided.draggableProps.style)}>
-                                                        <Block block={block}/>
+                                                        <Block block={block}
+                                                               editBlock={this.editBlock}
+                                                               deleteBlock={this.deleteBlock}
+                                                        />
                                                     </div>
                                                 )}
                                             </Draggable>
@@ -96,12 +116,22 @@ class Blocks extends Component {
                     </div>
                 </div>
 
-                <NewBlockModal blocks={this.state.blocks}
-                               visible={this.state.visible}
+                <NewBlockModal visible={this.state.addBlockVisible}
                                handleAddBlock={this.handleAddBlock}
-                               closeModal={this.closeModal}
+                               closeModal={this.closeAddBlockModal}
+
+                               blocks={this.state.blocks}
                                currentGroup={this.props.currentGroup}
                                allGroups={this.props.allGroups}/>
+
+                <EditBlockModal visible={this.state.editBlockVisible}
+                                handleEditBlock={this.handleEditBlock}
+                                closeModal={this.closeEditBlockModal}
+
+                                block={this.state.edittedBlock}
+                                blocks={this.state.blocks}
+                                currentGroup={this.props.currentGroup}
+                                allGroups={this.props.allGroups}/>
             </div>
         );
     }

@@ -7,7 +7,6 @@ const getProfile = () => {
 };
 
 const getProfileSuccess = (profile) => {
-    console.log("action profileData: ", profile);
     return {
         type: actionTypes.GET_PROFILE_SUCCESS,
         profileData: profile.data

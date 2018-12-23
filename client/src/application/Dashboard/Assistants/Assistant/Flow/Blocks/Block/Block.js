@@ -75,23 +75,34 @@ class Block extends Component {
                     }
 
                     {block.content.answers ?
-                        <>
+                        <div>
                             Answers:
                             {
                                 block.content.answers.map((answer, i) =>
-                                    <Card key={i}>
+                                    <Card key={i} style={{margin: 5, width: 300}}>
                                         <Meta
                                             title={answer.text}
                                             description={
-                                                answer.keywords.map((keyword, i) =>
-                                                    <Tag key={i}>{keyword}</Tag>)
+                                                (<>Keywords: {answer.keywords.map((keyword, i) =>
+                                                    <Tag key={i}>{keyword}</Tag>)}</>)
                                             }
                                         />
+                                        <Row>
+                                            <Divider/>
+                                            <Col span={6}>Action:</Col>
+                                            <Col span={12}>{answer.action}</Col>
+                                        </Row>
+
+                                        <Row>
+                                            <Divider/>
+                                            <Col span={6}>After Message</Col>
+                                            <Col span={12}>{answer.afterMessage}</Col>
+                                        </Row>
+
                                     </Card>
                                 )
                             }
-                            <Divider/>
-                        </>
+                        </div>
                         : null
                     }
 

@@ -8,6 +8,7 @@ import {history} from '../../helpers';
 import {Switch, Route} from 'react-router-dom';
 import Flow from "./Assistants/Assistant/Flow/Flow";
 import Profile from "./Profile/Profile";
+import Integration from "./Assistants/Assistant/Integration/Integration";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -61,7 +62,7 @@ class Dashboard extends Component {
                         <Divider/>
 
                         <SubMenu key="sub2"
-                                 title={<span><Icon type="user"/><span>Account Detail</span></span>}>
+                                 title={<span><Icon type="user"/><span>Account Details</span></span>}>
                             <Menu.Item key="profile">
                                 <Icon type="profile"/>
                                 Profile
@@ -99,6 +100,7 @@ class Dashboard extends Component {
                             <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                             <Route path={`${match.path}/profile`} component={Profile} exact/>
+                            <Route path={`${match.path}/integration/:id`} component={Integration}/>
 
                             {/*<Route path="/dashboard" component={Dashboard}/>*/}
                         </Switch>

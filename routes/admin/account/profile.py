@@ -1,6 +1,8 @@
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 from services import profile_services, admin_services, newsletter_services, user_services
 from models import Callback
-from flask import Blueprint, request, redirect, session
+from flask import Blueprint, request
 from utilities import helpers
 
 profile_router: Blueprint = Blueprint('profile_router', __name__, template_folder="../../templates")
@@ -12,39 +14,50 @@ profile_router: Blueprint = Blueprint('profile_router', __name__, template_folde
 #         return admin_services.render("admin/profile.html")
 
 
-@profile_router.route("/profile/data", methods=['GET'])
+@profile_router.route("/profile", methods=['GET'])
+@jwt_required
 def profilePageData():
     if request.method == "GET":
-        email = session.get('UserEmail', None)
+        user = get_jwt_identity()['user']
 
-        profile_callback: Callback = profile_services.getUserAndCompany(email)
-        if not profile_callback.Success:
-            return helpers.jsonResponse(True, 200, "Profile has been retrieved",
-                                        {"user": None, "email": email, "company": None, "newsletters": None,
-                                         "userSettings": None})
+        if request.method == "GET":
+            email = user.get("email", None)
 
-        newsletter_callback: Callback = newsletter_services.checkForNewsletter(email)
-        newsletters = newsletter_callback.Success
+            profile_callback: Callback = profile_services.getUserAndCompany(email)
+            if not profile_callback.Success:
+                return helpers.jsonResponse(True, 200, "Profile has been retrieved 1",
+                                            {"user": None, "email": email, "company": None, "newsletters": None,
+                                             "userSettings": None})
 
-        userSettings_callback: Callback = user_services.getUserSettings(session.get('UserID', None))
-        if not userSettings_callback.Success:
-            return helpers.jsonResponse(True, 200, "Profile has been retrieved",
+            newsletter_callback: Callback = newsletter_services.checkForNewsletter(email)
+            newsletters = newsletter_callback.Success
+
+            userSettings_callback: Callback = user_services.getUserSettings(user.get("id", 0))
+
+            if not userSettings_callback.Success or not userSettings_callback.Data:
+                return helpers.jsonResponse(True, 200, "Profile has been retrieved 2",
+                                            {"user": profile_callback.Data["user"], "email": email,
+                                             "company": profile_callback.Data["company"], "newsletters": newsletters,
+                                             "userSettings": None})
+
+            return helpers.jsonResponse(True, 200, "Profile has been retrieved 3",
                                         {"user": profile_callback.Data["user"], "email": email,
                                          "company": profile_callback.Data["company"], "newsletters": newsletters,
-                                         "userSettings": None})
-
-        return helpers.jsonResponse(True, 200, "Profile has been retrieved",
-                                    {"user": profile_callback.Data["user"], "email": email,
-                                     "company": profile_callback.Data["company"], "newsletters": newsletters,
-                                     "userSettings": userSettings_callback.Data})
+                                         "userSettings": helpers.getDictFromSQLAlchemyObj(userSettings_callback.Data)})
 
 
 @profile_router.route("/profile/profiledetails", methods=['POST'])
+@jwt_required
 def profileDetails():
+    user = get_jwt_identity()['user']
     if request.method == "POST":
-        names = request.form.get("names", default="Error")
-        newEmail = request.form.get("email", default="error").lower()
-        companyName = request.form.get("companyName", default="Error")
+        profile = request.json.get("profile", None)
+        if not profile:
+            return helpers.jsonResponse(False, 400, "Could not retrieve all written information.", None)
+
+        names = profile.get("name", "Error")
+        newEmail = profile.get("email", "error").lower()
+        companyName = profile.get("companyName", "Error")
 
         if names is "Error" and newEmail is "error" and companyName is "Error":
             return helpers.jsonResponse(False, 400, "Could not retrieve all written information.", None)
@@ -54,11 +67,11 @@ def profileDetails():
         name2 = names[1]
 
         # update user details
-        updateUser_callback: Callback = profile_services.updateUser(name1, name2, newEmail, session.get('UserID', 0))
+        updateUser_callback: Callback = profile_services.updateUser(name1, name2, newEmail, user.get("id", 0))
         if not updateUser_callback.Success:
             return helpers.jsonResponse(False, 400, "Could not update User's information.", None)
 
-        updateCompany_callback: Callback = profile_services.updateCompany(companyName, session.get('CompanyID', 0))
+        updateCompany_callback: Callback = profile_services.updateCompany(companyName, user.get("companyID", 0))
         if not updateCompany_callback.Success:
             return helpers.jsonResponse(False, 400,
                                         "Could not update Company's information. User information has been updated.",
@@ -68,23 +81,27 @@ def profileDetails():
 
 
 @profile_router.route("/profile/datasettings", methods=['POST'])
+@jwt_required
 def dataSettings():
+    user = get_jwt_identity()['user']
     if request.method == "POST":
-        userID = session.get('UserID', None)
-        email = session.get('UserEmail', None)
+        userID = user.get("id", 0)
+        email = user.get("email", None)
 
-        newsletters = request.form.get("newsletters", default="Error")
-        tracking = request.form.get("tracking", default="")
-        techSupport = request.form.get("techSupport", default="")
-        notifications = request.form.get("notifications", default="")
-        accountSpecialist = request.form.get("accountSpecialist", default="")
+        profileSettings = request.json.get("profileSettings", {})
+
+        newsletters = request.json.get("newsletters", False)
+        tracking = profileSettings.get("trackData", False)
+        techSupport = profileSettings.get("techSupport", False)
+        notifications = profileSettings.get("statNotifications", False)
+        accountSpecialist = profileSettings.get("accountSpecialist", False)
 
         # update newsletters
-        if newsletters == "newlettersON":
+        if newsletters:
             newsletter_callback: Callback = newsletter_services.checkForNewsletter(email)
             if not newsletter_callback.Success:
                 newsletter_callback: Callback = newsletter_services.addNewsletterPerson(email)
-        elif newsletters is "Error":
+        else:
             newsletter_callback: Callback = newsletter_services.removeNewsletterPerson(email)
         if not newsletter_callback.Success:
             return helpers.jsonResponse(False, 400,
@@ -92,13 +109,9 @@ def dataSettings():
                                         None)
 
         # update user settings
-        tracking = bool(tracking)
-        techSupport = bool(techSupport)
-        accountSpecialist = bool(accountSpecialist)
-        notifications = bool(notifications)
-
         userSettings_callback: Callback = user_services.createUpdateUserSettings(userID, tracking, techSupport,
                                                                                  accountSpecialist, notifications)
+
         if not userSettings_callback.Success:
             return helpers.jsonResponse(False, 400,
                                         userSettings_callback.Message + " Company, User information and newsletters has been updated.",

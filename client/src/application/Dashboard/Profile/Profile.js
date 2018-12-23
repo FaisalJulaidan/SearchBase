@@ -366,7 +366,6 @@ class Profile extends React.Component {
 }
 
 function mapStateToProps(state) {
-    console.log(state);
     return {
         profileData: state.profile.profile
     };

@@ -16,7 +16,7 @@ def create_assistant_page():
 
 
 @assistant_router.route("/admin/assistant", methods=['POST'])
-def assistant():
+def assistantttt():
     if request.method == "POST":
 
         # Get the admin user who is logged in and wants to create a new user.
@@ -77,11 +77,11 @@ def admin_homeDEPREACTED():
             return redirect('login')
 
 
-# get all assistants
+# Get all assistants & Add new assistant
 @assistant_router.route("/assistants", methods=['GET', 'POST'])
 @jwt_required
-def admin_home():
-    # Authentication
+def assistants():
+    # Authenticate
     user = get_jwt_identity()['user']
 
     if request.method == "GET":
@@ -107,7 +107,22 @@ def admin_home():
 
 @assistant_router.route("/assistant/<int:assistantID>", methods=['DELETE', 'PUT'])
 @jwt_required
-def assistant_delete(assistantID):
+def assistant(assistantID):
+    # Authenticate
+    user = get_jwt_identity()['user']
+    # For all type of requests methods, get the assistant
+    security_callback: Callback = assistant_services.getByID(assistantID)
+    if not security_callback.Success:
+        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+    assistant: Assistant = security_callback.Data
+
+    # Check if this user has access to this assistant
+    if assistant.CompanyID != user['companyID']:
+        return helpers.jsonResponse(False, 401, "Unauthorised!")
+
+    #############
+    callback: Callback = Callback(False, 'Error!', None)
+    # Update assistant
     if request.method == "PUT":
         updatedSettings = request.json
         callback: Callback = assistant_services.update(assistantID,
@@ -115,23 +130,38 @@ def assistant_delete(assistantID):
                                                        updatedSettings.get("welcomeMessage"),
                                                        updatedSettings.get("topBarTitle"),
                                                        updatedSettings.get("secondsUntilPopup"))
-
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message, None)
-
-        return helpers.jsonResponse(True, 200, callback.Message, None)
-
+    # Delete assistant
     if request.method == "DELETE":
-        callback: Callback = assistant_services.getByID(assistantID)
-        if not callback.Success:
-            return helpers.jsonResponse(False, 404, "Assistant not found.", None)
-        assistant: Assistant = callback.Data
-
-        if assistant.CompanyID != session.get('CompanyID', 0):
-            return helpers.jsonResponse(False, 401, "You'r not authorised to delete this assistant", None)
-
         callback: Callback = assistant_services.removeByID(assistantID)
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message, None)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message, None)
 
-        return helpers.jsonResponse(True, 200, callback.Message, None)
+    return helpers.jsonResponse(True, 200, callback.Message, None)
+
+
+# Activate or deactivate assistant
+@assistant_router.route("/assistant/<int:assistantID>/status/<int:statusValue>", methods=['PUT'])
+@jwt_required
+def assistant_status(assistantID, statusValue):
+
+    # Authenticate
+    user = get_jwt_identity()['user']
+    # For all type of requests methods, get the assistant
+    security_callback: Callback = assistant_services.getByID(assistantID)
+    if not security_callback.Success:
+        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+    assistant: Assistant = security_callback.Data
+
+    # Check if this user has access to this assistant
+    if assistant.CompanyID != user['companyID']:
+        return helpers.jsonResponse(False, 401, "Unauthorised!")
+
+    #############
+    callback: Callback = Callback(False, 'Error!', None)
+    # Update assistant status
+    if request.method == "PUT":
+        callback: Callback = assistant_services.changeStatus(assistant, statusValue)
+
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message, None)
+    return helpers.jsonResponse(True, 200, callback.Message, None)

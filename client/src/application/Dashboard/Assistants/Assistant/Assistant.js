@@ -58,6 +58,10 @@ class Assistant extends Component {
         });
     };
 
+    onActiveChanged = () => {
+
+    }
+
     render() {
         const {assistant} = this.props;
         return (
@@ -70,7 +74,7 @@ class Assistant extends Component {
                                src={covers[Math.floor(Math.random() * covers.length)]}/>
                       }
                       title={assistant.Name}
-                      extra={<Switch defaultChecked={assistant.Active} onChange={this.onChange}/>}
+                      extra={<Switch defaultChecked={assistant.Active} onChange={this.onActiveChanged}/>}
                       actions={[
                           <div onClick={this.showModal}>
                               <Icon type="setting"/>

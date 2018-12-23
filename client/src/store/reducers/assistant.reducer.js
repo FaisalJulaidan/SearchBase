@@ -40,6 +40,22 @@ export const assistant = (state = initialState, action) => {
                 errorMsg: action.error.msg
             });
 
+        case actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isChanging: true
+            });
+        case actionTypes.CHANGE_ASSISTANT_STATUS_SUCCESS:
+
+            return updateObject(state, {
+                successMsg: action.successMsg,
+                isChanging: false
+            });
+        case actionTypes.CHANGE_ASSISTANT_STATUS_FAILURE:
+            return updateObject(state, {
+                isChanging: false,
+                errorMsg: action.error.msg
+            });
 
         default:
             return state

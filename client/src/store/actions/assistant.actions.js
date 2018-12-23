@@ -43,11 +43,40 @@ const addAssistantFailure = (error) => {
     };
 };
 
+
+
+const changeAssistantStatus = (assistantID) => {
+    return {
+        type: actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST,
+        assistantID
+    };
+};
+
+const changeAssistantStatusSuccess = (successMsg, status, assistantID) => {
+    return {
+        type: actionTypes.CHANGE_ASSISTANT_STATUS_SUCCESS,
+        successMsg,
+        status,
+        assistantID
+    };
+};
+
+const changeAssistantStatusFailure = (error) => {
+    return {
+        type: actionTypes.CHANGE_ASSISTANT_STATUS_FAILURE,
+        error
+    };
+};
+
 export const assistantActions = {
     fetchAssistants,
     fetchAssistantsSuccess,
     fetchAssistantsFailure,
     addAssistant,
     addAssistantSuccess,
-    addAssistantFailure
+    addAssistantFailure,
+
+    changeAssistantStatus,
+    changeAssistantStatusSuccess,
+    changeAssistantStatusFailure,
 };

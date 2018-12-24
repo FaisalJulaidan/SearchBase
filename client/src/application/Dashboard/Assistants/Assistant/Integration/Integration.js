@@ -45,6 +45,14 @@ class Integration extends React.Component {
         if(oldBotScript){ oldBotScript.remove(); }
     }
 
+    copyScriptPaste = () => {
+        const pasteArea = document.getElementById("pasteArea");
+
+        pasteArea.select();
+
+        document.execCommand("copy");
+    };
+
     testIntegration = () => {
         this.removeChatbot();
         const script = document.createElement("script");
@@ -127,11 +135,13 @@ class Integration extends React.Component {
                                 source code.
                             </p>
 
-                            <textarea value={ReactDOMServer.renderToString(urlPaste)}
-                                      style={{width: "94%", height: "110px", fontWeight: "600"}}
+                            <textarea value={ReactDOMServer.renderToString(urlPaste)} id={"pasteArea"}
+                                      style={{width: "94%", height: "110px", fontWeight: "600", margin: "1.5% 0"}}
                                       readOnly/>
 
-                            <Button onClick={this.testIntegration} className={"ant-btn-primary"}>Test Bot</Button>
+                            <Button onClick={this.copyScriptPaste} className={"ant-btn-primary"}>Copy</Button>
+
+                            <Button style={{marginLeft:"5px"}} onClick={this.testIntegration} className={"ant-btn-primary"}>Test</Button>
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Card, Checkbox, Form, Input, Select, Spin, Tag, Modal, Icon, Tooltip} from "antd";
+import {Button, Card, Checkbox, Form, Icon, Input, Modal, Select, Spin, Tag, Tooltip} from "antd";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -22,18 +22,19 @@ class Question extends Component {
 
             // If from is valid crete the new block following User Input block type format
             if (!err) {
-                const newBlock = {
-                    type: 'Question',
-                    groupID: this.props.options.currentGroup.id,
-                    storeInDB: values.storeInDB,
-                    isSkippable: values.isSkippable,
-                    labels: '',
-                    content: {
-                        text: values.text,
-                        answers: this.state.answers
+                this.props.handleNewBlock({
+                    block: {
+                        type: 'Question',
+                        groupID: this.props.options.currentGroup.id,
+                        storeInDB: values.storeInDB,
+                        isSkippable: values.isSkippable,
+                        labels: '',
+                        content: {
+                            text: values.text,
+                            answers: this.state.answers
+                        }
                     }
-                };
-                this.props.handleNewBlock(newBlock)
+                })
             }
         })
     };

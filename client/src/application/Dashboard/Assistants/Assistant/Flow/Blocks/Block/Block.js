@@ -1,10 +1,20 @@
 import React, {Component} from 'react';
-import {Row, Col, Collapse, Divider, Button, Card, Tag} from "antd";
+import {Row, Col, Collapse, Divider, Button, Card, Tag, Checkbox} from "antd";
 
 const Panel = Collapse.Panel;
 const {Meta} = Card;
 
 class Block extends Component {
+
+    editBlock(block) {
+        console.log('this block needs to be edited', block)
+        this.props.editBlock(block)
+    }
+
+    deleteBlock(block) {
+        console.log('this block needs to be delete', block)
+        this.props.deleteBlock(block)
+    }
 
     render() {
         const {block} = this.props;
@@ -14,8 +24,11 @@ class Block extends Component {
                     <>
                         {block.type} <Divider type="vertical"/>
                         {block.content.text} <Divider type="vertical"/>
-                        <Button icon={'edit'} size={"small"}/> <Divider type="vertical"/>
-                        <Button icon={'delete'} size={"small"} type={"danger"}/>
+
+                        <Button icon={'edit'} size={"small"} onClick={() => this.editBlock(block)}/>
+                        <Divider type="vertical"/>
+                        <Button icon={'delete'} size={"small"} type={"danger"}
+                                onClick={() => this.deleteBlock(block)}/>
                     </>
                 )}
                        key={this.props.key}>
@@ -69,6 +82,18 @@ class Block extends Component {
                         <Row>
                             <Col span={6}>show Top</Col>
                             <Col span={12}>{block.content.showTop}</Col>
+                            <Divider/>
+                        </Row>
+                        : null
+                    }
+
+                    {block.content.storeInDB ?
+                        <Row>
+                            <Col span={6}>Stroe in DB:</Col>
+                            <Col span={6}><Checkbox checked={block.content.storeInDB}></Checkbox></Col>
+
+                            <Col span={6}>Skippable:</Col>
+                            <Col span={6}><Checkbox checked={block.content.isSkippable}></Checkbox></Col>
                             <Divider/>
                         </Row>
                         : null

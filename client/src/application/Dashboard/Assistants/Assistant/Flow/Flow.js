@@ -49,9 +49,11 @@ class Flow extends Component {
         // message.loading(`Adding new block`, 0);
     };
 
-    editBlock = (editedGroup) => {
+    editBlock = (editBlock, groupID) => {
         const {assistant} = this.props.location.state;
-        // this.props.dispatch(flowActions.editGroupRequest({ID: assistant.ID, editedGroup: editedGroup}));
+        console.log(editBlock, groupID)
+        //READY FOR SAGA
+        // this.props.dispatch(flowActions.editBlockRequest({block: newBlock}, groupID));
         // message.loading(`Editing ${editedGroup.name} group`, 0);
     };
 

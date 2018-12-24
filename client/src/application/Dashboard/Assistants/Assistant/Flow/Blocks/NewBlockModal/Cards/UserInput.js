@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Card, Form, Input, Select, Spin, Checkbox} from "antd";
+import {Button, Card, Checkbox, Form, Input, Select, Spin} from "antd";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -15,21 +15,22 @@ class UserInput extends Component {
         return this.props.form.validateFields((err, values) => {
             // If from is valid crete the new block following User Input block type format
             if (!err) {
-                const newBlock = {
-                    type: 'User Input',
-                    groupID: this.props.options.currentGroup.id,
-                    storeInDB: values.storeInDB,
-                    isSkippable: values.isSkippable,
-                    labels: '',
-                    content: {
-                        text: values.text,
-                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup,
-                        validation: values.validation,
-                        action: values.action,
-                        afterMessage: values.afterMessage
+                this.props.handleNewBlock({
+                    block: {
+                        type: 'User Input',
+                        groupID: this.props.options.currentGroup.id,
+                        storeInDB: values.storeInDB,
+                        isSkippable: values.isSkippable,
+                        labels: '',
+                        content: {
+                            text: values.text,
+                            blockToGoID: values.blockToGoID || values.blockToGoIDGroup,
+                            validation: values.validation,
+                            action: values.action,
+                            afterMessage: values.afterMessage
+                        }
                     }
-                };
-                this.props.handleNewBlock(newBlock)
+                })
             }
         })
     };

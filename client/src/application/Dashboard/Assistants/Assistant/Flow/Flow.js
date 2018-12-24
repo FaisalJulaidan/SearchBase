@@ -19,6 +19,14 @@ class Flow extends Component {
         this.props.dispatch(flowActions.fetchFlowRequest(assistant.ID))
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.blockGroups !== this.props.blockGroups)
+            nextProps.blockGroups.map((group) => {
+                if (group.id === this.state.currentGroup.id)
+                    this.setState({currentGroup: group})
+            })
+    }
+
     selectGroup = (currentGroup) => this.setState({currentGroup});
 
 
@@ -44,16 +52,18 @@ class Flow extends Component {
 
     // BLOCKS
     addBlock = (newBlock, groupID) => {
-        console.log(newBlock, groupID);
-        this.props.dispatch(flowActions.addBlockRequest({block: newBlock}, groupID));
+        const {assistant} = this.props.location.state;
+        this.props.dispatch(flowActions.addBlockRequest({
+            newBlock: newBlock,
+            groupID: groupID,
+            assistantID: assistant.ID
+        }));
         // message.loading(`Adding new block`, 0);
     };
 
-    editBlock = (editBlock, groupID) => {
+    editBlock = (edittedBlock, groupID) => {
         const {assistant} = this.props.location.state;
-        console.log(editBlock, groupID)
-        //READY FOR SAGA
-        // this.props.dispatch(flowActions.editBlockRequest({block: newBlock}, groupID));
+        this.props.dispatch(flowActions.editBlockRequest({edittedBlock, groupID, assistantID: assistant.ID}));
         // message.loading(`Editing ${editedGroup.name} group`, 0);
     };
 
@@ -109,8 +119,7 @@ class Flow extends Component {
                                 editBlock={this.editBlock}
                                 deleteBlock={this.deleteBlock}
                                 currentGroup={this.state.currentGroup}
-                                allGroups={this.props.blockGroups}
-                        />
+                                allGroups={this.props.blockGroups}/>
                     </div>
                 </div>
             </div>

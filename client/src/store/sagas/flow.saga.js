@@ -1,11 +1,11 @@
-import {put, takeEvery, all} from 'redux-saga/effects'
+import {all, put, takeEvery} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {flowActions} from "../actions/flow.actions";
-import {http, alertSuccess} from "../../helpers";
-import {delay} from "redux-saga";
+import {alertSuccess, http} from "../../helpers";
 
 function* fetchFlow({assistantID}) {
     try {
+        console.log(assistantID);
         const res = yield http.get(`/assistant/${assistantID}/flow`);
         return yield put(flowActions.fetchFlowSuccess(res.data.data))
     } catch (error) {
@@ -13,6 +13,10 @@ function* fetchFlow({assistantID}) {
         return yield put(flowActions.fetchFlowFailure(error.response.data));
     }
 
+}
+
+function* watchFetchFlow() {
+    yield takeEvery(actionTypes.FETCH_FLOW_REQUEST, fetchFlow)
 }
 
 // Groups
@@ -26,7 +30,6 @@ function* addGroup(action) {
         console.log(error);
         return yield put(flowActions.addGroupFailure(error.response.data));
     }
-
 }
 
 function* editGroup(action) {
@@ -40,21 +43,17 @@ function* editGroup(action) {
     }
 }
 
-function* deleteGroup({type, ID, deletedGroup}) {
+
+function* deleteGroup({type, assistantID, deletedGroup}) {
     try {
         console.log(deletedGroup)
-        const res = yield http.delete(`/assistant/${ID}/flow/group`, { data: { id: deletedGroup.id } });
+        const res = yield http.delete(`/assistant/${assistantID}/flow/group`, {data: {id: deletedGroup.id}});
         yield put(flowActions.deleteGroupSuccess(res.data.msg));
-        return yield put(flowActions.fetchFlowRequest(ID))
+        return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
         return yield put(flowActions.deleteGroupFailure(error.response.data));
     }
-}
-
-
-function* watchFetchFlow() {
-    yield takeEvery(actionTypes.FETCH_FLOW_REQUEST, fetchFlow)
 }
 
 function* watchAddGroup() {
@@ -70,17 +69,33 @@ function* watchDeleteGroup() {
 }
 
 // Blocks
-function* addBlock({newBlock, groupID}) {
+function* addBlock({newBlock, groupID, assistantID}) {
     try {
         console.log("Adding a block...");
 
         const res = yield http.post(`/assistant/flow/group/${groupID}/block`, newBlock);
         yield put(flowActions.addBlockSuccess(res.data.msg));
-        console.log(res);
-        // return yield put(flowActions.fetchFlowRequest(action.ID))
+        return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
         return yield put(flowActions.addBlockFailure(error.response.data));
+    }
+}
+
+function* editBlock({newBlock, groupID, assistantID}) {
+    try {
+        console.warn("Editting a block... in [Flow.saga.js] line:88");
+        console.warn(newBlock, groupID, assistantID);
+
+        // const res = yield http.post(`/assistant/flow/group/${groupID}/block`, newBlock);
+        // yield put(flowActions.addBlockSuccess(res.data.msg));
+        // console.log(res);
+        // yield put(flowActions.editBlockSuccess(res.data.msg));
+        yield put(flowActions.editBlockSuccess(''));
+        return yield put(flowActions.fetchFlowRequest(assistantID))
+    } catch (error) {
+        console.log(error);
+        return yield put(flowActions.editBlockFailure(error.response.data));
     }
 }
 
@@ -89,12 +104,17 @@ function* watchAddBlock() {
     yield takeEvery(actionTypes.ADD_BLOCK_REQUEST, addBlock)
 }
 
+function* watchEditBlock() {
+    yield takeEvery(actionTypes.EDIT_BLOCK_REQUEST, editBlock)
+}
+
 export function* flowSaga() {
     yield all([
         watchFetchFlow(),
         watchAddGroup(),
         watchEditGroup(),
         watchDeleteGroup(),
-        watchAddBlock()
+        watchAddBlock(),
+        watchEditBlock(),
     ])
 }

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Card, Form, Input, Select, Spin, Checkbox} from "antd";
+import {Button, Card, Checkbox, Form, Input, Select, Spin} from "antd";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -16,21 +16,22 @@ class FileUpload extends Component {
     onSubmit = () => {
         return this.props.form.validateFields((err, values) => {
             if (!err) {
-                const newBlock = {
-                    type: 'File Upload',
-                    groupID: this.props.options.currentGroup.id,
-                    storeInDB: values.storeInDB,
-                    isSkippable: values.isSkippable,
-                    labels: '',
-                    content: {
-                        text: values.text,
-                        action: values.action,
-                        fileTypes: this.state.fileTypes,
-                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup,
-                        afterMessage: values.afterMessage
+                this.props.handleNewBlock({
+                    block: {
+                        type: 'File Upload',
+                        groupID: this.props.options.currentGroup.id,
+                        storeInDB: values.storeInDB,
+                        isSkippable: values.isSkippable,
+                        labels: '',
+                        content: {
+                            text: values.text,
+                            action: values.action,
+                            fileTypes: this.state.fileTypes,
+                            blockToGoID: values.blockToGoID || values.blockToGoIDGroup,
+                            afterMessage: values.afterMessage
+                        }
                     }
-                };
-                this.props.handleNewBlock(newBlock)
+                })
             }
         })
     };

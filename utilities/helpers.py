@@ -34,11 +34,11 @@ def gen_dummy_data():
     aramco = Company.query.filter(Company.Name == "Aramco").first()
     sabic = Company.query.filter(Company.Name == "Sabic").first()
 
-    # Create Assistatns for Aramco and Sabic companies
+    # Create Assistants for Aramco and Sabic companies
     reader_a = Assistant(Name="Reader", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
     reader_a_blocksGroup = BlockGroup(Name="Group One", Description="This is Group one", Assistant=reader_a)
-
     helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
+
     reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
     helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
 
@@ -160,6 +160,20 @@ def gen_dummy_data():
 
     db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=30,  ActiveBotsCap=2, InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
+    # Chatbot Sessions
+    data = {
+        "collectedInformation": [
+            {
+                "blockID": 1,
+                "questionText": "What is your email?",
+                "input": "faisal@gmail.com",
+                "keywords": ['faisal', 'developer', 'email']
+            }
+        ]
+    }
+    db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now(),
+                                  TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3, Assistant=reader_a))
 
     # Save all changes
     db.session.commit()

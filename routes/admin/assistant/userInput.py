@@ -1,24 +1,50 @@
 from flask import Blueprint, render_template, request, redirect, session
-from services import  admin_services, userInput_services
-from models import Callback, ChatbotSession
-from config import BaseConfig
+from services import admin_services, userInput_services, assistant_services
+from models import Callback, ChatbotSession, Assistant
 from utilities import helpers
+from config import BaseConfig
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 userInput_router: Blueprint = Blueprint('userInput_router', __name__ , template_folder="../../templates")
 
 
-# get all assistants
-@userInput_router.route("/admin/assistant/<assistantID>/userinput", methods=["GET"])
+# Get all assistant's user inputs
+@userInput_router.route("/assistant/<int:assistantID>/userinput", methods=["GET", "DELETE"])
+@jwt_required
 def admin_user_input(assistantID):
 
+    # Authenticate
+    user = get_jwt_identity()['user']
+    # For all type of requests methods, get the assistant
+    security_callback: Callback = assistant_services.getByID(assistantID)
+    if not security_callback.Success:
+        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+    assistant: Assistant = security_callback.Data
+
+    # Check if this user has access to this assistant
+    if assistant.CompanyID != user['companyID']:
+        return helpers.jsonResponse(False, 401, "Unauthorised!")
+
+    #############
+    callback: Callback = Callback(False, 'Error!', None)
+    # Get the assistant's user inputs/chatbot sessions
     if request.method == "GET":
-        userInput_callback : Callback = userInput_services.getByAssistantID(assistantID)
-        if not userInput_callback.Success : return admin_services.render("admin/data-storage.html", data=[], route=[])
-        result = []
-        for d in userInput_callback.Data:
-            result.append({'id': d.ID, 'data': d.Data, 'filePath': d.FilePath, "dateTime": d.DateTime})
-        route = BaseConfig.USER_FILES
-        return admin_services.render("admin/data-storage.html", assistantID=assistantID, data=result, route=route)
+        callback: Callback = userInput_services.getByAssistantID(assistantID)
+        # Return response
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
+        return helpers.jsonResponse(True, 200, callback.Message, {'data': helpers.getListFromSQLAlchemyList(callback.Data),
+                                                                  'filesPath': BaseConfig.USER_FILES})
+
+
+    # Clear all user inputs/chatbot sessions
+    if request.method == "DELETE":
+        callback: Callback = userInput_services.deleteAll(assistantID)
+        # Return response
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+
 
 
 @userInput_router.route("/admin/assistant/<assistantID>/<recordID>/delete", methods=["GET"])

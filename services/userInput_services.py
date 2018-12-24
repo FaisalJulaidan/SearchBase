@@ -5,15 +5,10 @@ from utilities import helpers
 def getByAssistantID(assistantID):
     try:
         result = db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID).all()
-        print(result)
-        if not result: raise Exception
-
-        return Callback(True, "Got user input by assistant id successfully.", result)
+        return Callback(True, "User inputs retrieved successfully.", result)
 
     except Exception as exc:
-
         print("userInput_services.getByAssistantID() Error: ", exc)
-
         return Callback(False, 'Could not retrieve the data.')
 
 def filterForContainEmails(records):

@@ -7,7 +7,7 @@ import Groups from "../Flow/Groups/Groups";
 import Blocks from "../Flow/Blocks/Blocks";
 import Header from "./Header/Header"
 import connect from "react-redux/es/connect/connect";
-import hasher from "../../../../../helpers/hashids"
+import Hasher from "../../../../../helpers/hashids"
 
 class Integration extends React.Component {
 
@@ -23,7 +23,7 @@ class Integration extends React.Component {
 
     componentDidMount() {
         this.setState({
-            dataID: hasher.encode(this.props.match.params.id),
+            dataID: Hasher.encode(this.props.match.params.id),
             source: window.location.protocol + '//' + window.location.hostname + ":" + window.location.port + "/userdownloads/widget.js"
         });
     }

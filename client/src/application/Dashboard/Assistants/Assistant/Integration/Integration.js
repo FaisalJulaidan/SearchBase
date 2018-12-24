@@ -117,7 +117,7 @@ class Integration extends React.Component {
                                 <textarea value={ReactDOMServer.renderToString(urlPaste)}
                                           style={{width: "90%", height: "90px", fontWeight: "600"}}
                                           readOnly/>
-
+                                {urlPaste}
                                 <Button onClick={this.testIntegration} className={"ant-btn-primary"}>Test Bot</Button>
                             </div>
                         </div>

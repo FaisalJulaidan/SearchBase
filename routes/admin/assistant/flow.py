@@ -31,7 +31,7 @@ def flow(assistantID):
 
     # Update the blocks
     if request.method == "PUT":
-        data = request.get_json(silent=True)
+        data = request.json
         callback: Callback = flow_services.updateFlow(data, assistant)
 
 

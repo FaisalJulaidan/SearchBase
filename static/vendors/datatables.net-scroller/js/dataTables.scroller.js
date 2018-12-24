@@ -74,7 +74,7 @@ var DataTable = $.fn.dataTable;
  *     <li>Speed! The aim of Scroller for DataTables is to make rendering large data sets fast</li>
  *     <li>Full compatibility with deferred rendering in DataTables for maximum speed</li>
  *     <li>Display millions of rows</li>
- *     <li>Integration with state saving in DataTables (scrolling position is saved)</li>
+ *     <li>UserInput with state saving in DataTables (scrolling position is saved)</li>
  *     <li>Easy to use</li>
  *   </ul>
  *

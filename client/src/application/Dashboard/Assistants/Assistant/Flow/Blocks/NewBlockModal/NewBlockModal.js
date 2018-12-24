@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import {http} from "../../../../../../../helpers";
 
-import {Modal, Icon, Tabs} from 'antd';
+import {Icon, Modal, Tabs} from 'antd';
 
 import UserInput from "./Cards/UserInput";
 import Question from "./Cards/Question";

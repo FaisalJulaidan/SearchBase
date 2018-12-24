@@ -93,11 +93,13 @@ const deleteGroupFailure = (error) => {
     };
 };
 
-// Blocks Actions
-const addBlockRequest = (newBlock, groupID) => {
+//////////////////////////////////////////
+// ADD Blocks Actions
+const addBlockRequest = ({newBlock, assistantID, groupID}) => {
     return {
         type: actionTypes.ADD_BLOCK_REQUEST,
         newBlock,
+        assistantID,
         groupID
     };
 };
@@ -115,7 +117,30 @@ const addBlockFailure = (error) => {
         error
     };
 };
+//////////////////////////////////////////
+// EDIT Blocks Actions
+const editBlockRequest = ({edittedBlock, assistantID, groupID}) => {
+    return {
+        type: actionTypes.EDIT_BLOCK_REQUEST,
+        edittedBlock,
+        assistantID,
+        groupID
+    };
+};
 
+const editBlockSuccess = (msg) => {
+    return {
+        type: actionTypes.EDIT_BLOCK_SUCCESS,
+        msg
+    };
+};
+
+const editBlockFailure = (error) => {
+    return {
+        type: actionTypes.EDIT_BLOCK_FAILURE,
+        error
+    };
+};
 //////////////////////////////////////////
 
 export const flowActions = {
@@ -137,5 +162,9 @@ export const flowActions = {
 
     addBlockRequest,
     addBlockSuccess,
-    addBlockFailure
+    addBlockFailure,
+
+    editBlockRequest,
+    editBlockSuccess,
+    editBlockFailure
 };

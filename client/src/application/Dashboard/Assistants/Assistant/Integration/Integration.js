@@ -61,12 +61,12 @@ class Integration extends React.Component {
         return (
             <div style={{height: '100%'}}>
                 <div style={{padding: '0 5px'}}>
-                    <div style={{width: '100%', height: 56, marginBottom: 10}}>
+                    <div style={{height: 56, marginBottom: 10}}>
                         <Header display={"Integration"}/>
                     </div>
                 </div>
 
-                <div style={{height: 'calc(100% - 66px)', width: '100%', display: 'flex'}}>
+                <div style={{height: 'calc(100% - 66px)', display: 'flex'}}>
 
                     <div style={{margin: 5, width: '45%'}}>
 

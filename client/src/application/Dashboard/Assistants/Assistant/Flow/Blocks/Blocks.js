@@ -54,23 +54,14 @@ class Blocks extends Component {
     // ADD BLOCK MODAL CONFIGS
     showAddBlockModal = () => this.setState({addBlockVisible: true});
     closeAddBlockModal = () => this.setState({addBlockVisible: false});
+    handleAddBlock = (newBlock) => this.props.addBlock(newBlock, this.props.currentGroup.id);
 
-    handleAddBlock = (newBlock) => {
-        const {addBlock, currentGroup} = this.props;
-        console.log(newBlock);
-        addBlock(newBlock, currentGroup.id)
-    };
 
     // EDIT BLOCK MODAL CONFIGS
-
     // this called from block.js when you click on edit block button
     editBlock = (edittedBlock) => this.setState({edittedBlock, editBlockVisible: true});
     closeEditBlockModal = () => this.setState({edittedBlock: {}, editBlockVisible: false});
-
-    handleEditBlock = (edittedBlock) => {
-        const {editBlock, currentGroup} = this.props;
-        editBlock(edittedBlock, currentGroup.id)
-    };
+    handleEditBlock = (edittedBlock) => this.props.editBlock(edittedBlock, this.props.currentGroup.id);
 
     render() {
         return (

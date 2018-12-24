@@ -77,7 +77,7 @@ def update(id, name, message, topBarText, secondsUntilPopup)-> Callback:
                                                                        'TopBarText': topBarText,
                                                                        'SecondsUntilPopup': secondsUntilPopup})
         db.session.commit()
-        return Callback(True, name+' Updated Successfully')
+        return Callback(True, name + ' Updated Successfully')
 
     except Exception as exc:
         print(exc)
@@ -89,21 +89,20 @@ def update(id, name, message, topBarText, secondsUntilPopup)-> Callback:
 
 
 
-def changeStatus(id, active):
+def changeStatus(assistant: Assistant, statusValue):
     try:
-        if type(active) is str:
-            if active == "True": active = True
-            elif active == "False": active = False
-            else: raise Exception
+        isActive = False
+        if statusValue > 0:
+           isActive = True
 
-        db.session.query(Assistant).filter(Assistant.ID == id).update({'Active': active})
+        assistant.Active = isActive
         db.session.commit()
         return Callback(True, 'Assistant status has been changed.')
 
     except Exception as exc:
         print("Error in assistant_services.changeStatus(): ", exc)
         db.session.rollback()
-        return Callback(False, 'Sorry, Could not change the assistant\' status.')
+        return Callback(False, "Could not change the assistant's status.")
     # finally:
        # db.session.close()
 

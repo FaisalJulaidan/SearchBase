@@ -4,6 +4,7 @@ import {assistant} from "./assistant.reducer";
 import {flow} from "./flow.reducer";
 import {settings} from "./assistantSettings.reducer";
 import {profile} from "./profile.reducer";
+import {userInput} from "./userInput.reducer";
 
 
 const rootReducer = combineReducers({
@@ -11,7 +12,8 @@ const rootReducer = combineReducers({
     assistant,
     flow,
     settings,
-    profile
+    profile,
+    userInput
 });
 
 export default rootReducer;

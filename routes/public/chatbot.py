@@ -15,48 +15,29 @@ CORS(chatbot_router)
 def getAssistantByHashID(hashID):
     assistantID = helpers.decrypt_id(hashID)
     if len(assistantID) == 0:
-        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+        return Callback(False, "Assistant not found!", None)
 
-    assistant = getAssistant(assistantID[0])
+    callback: Callback = assistant_services.getByID(assistantID[0])
+    if not callback.Success:
+        return Callback(False, "Assistant not found!", None)
+    assistant: Assistant = callback.Data
 
-    #check if its deactivated excluding on test page
+    # Check if assistant is active excluding on test page
     requestHeader = str(request.headers.get("Referer"))
     if not assistant.Active and (("connect" not in requestHeader or "/admin/assistant/" not in requestHeader) and ("chatbottemplate_production" not in requestHeader)):
-        return helpers.jsonResponse(False, 404, "Assistant is not active.", None)
+        return Callback(False, "Assistant is not active.", None)
+    return callback
 
-    return assistant
-
-
-def getAssistant(id):
-    callback: Callback = assistant_services.getByID(id)
-    if not callback.Success:
-        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
-    return callback.Data
-
-
-@chatbot_router.route("/test", methods=['GET'])
-def t():
-    if request.method == "GET":
-        return render_template("test-chatbot.html")
-
-
-@chatbot_router.route("/chatbottemplate/<assistantID>", methods=['GET'])
-def test_chatbot_page(assistantID):
-    if request.method == "GET":
-        return render_template("chatbot-template.html")
-
-
-@chatbot_router.route("/chatbottemplate_production/<assistantID>", methods=['GET'])
-def test_chatbot_page2(assistantID):
-    if request.method == "GET":
-        return render_template("chatbot-template_production.html")
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
 def chatbot(assistantIDAsHash):
 
-    # Found the assistant using the hashid and not id
-    assistant: Assistant = getAssistantByHashID(assistantIDAsHash)
+    # Find the assistant by hashid and not id
+    callback: Callback = getAssistantByHashID(assistantIDAsHash)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 404, callback.Message, callback.Data)
+    assistant: Assistant = callback.Data
 
     if request.method == "GET":
         # Get blocks for the chatbot to use
@@ -79,19 +60,26 @@ def chatbot(assistantIDAsHash):
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot/solutions", methods=['POST'])
 def getSolutions_forChatbot(assistantIDAsHash):
 
-    # Found the assistant using the hashid and not id
-    assistant: Assistant = getAssistantByHashID(assistantIDAsHash)
+    # Since this route is broken, return empty an list of solutions to continue development
+    return helpers.jsonResponse(True, 200, "TEST TEST", [])
+    #######################################################################################
+
+    # Find the assistant by hashid and not id
+    callback: Callback = getAssistantByHashID(assistantIDAsHash)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 404, callback.Message, callback.Data)
+    assistant: Assistant = callback.Data
 
     if request.method == "POST":
         # chatbot collected information
-        data = request.get_json(silent=True)
+        data = request.json
         solutions = []
 
         # If showTop is 0 then skip below return nothing and don't even call solutions_services
         if data['showTop'] > 0:
             getSolutionRecord_callback: Callback = solutions_services.getFirstSolutionRecord(assistant.ID)#TODO change this to solutionID and func
             if not getSolutionRecord_callback.Success:
-                return helpers.jsonResponse(False, 200, getSolutionRecord_callback.Message)
+                return helpers.jsonResponse(False, 400, getSolutionRecord_callback.Message)
 
             s_callback = solutions_services.getBasedOnKeywords(assistantID=assistant.ID, keywords=data['keywords'], solutionsRecord=getSolutionRecord_callback, max=data['showTop'])
             if not s_callback.Success:
@@ -110,12 +98,16 @@ def assistant_userdownloads(path):
 @chatbot_router.route("/getpopupsettings/<string:assistantIDAsHash>", methods=['GET'])
 def get_pop_settings(assistantIDAsHash):
 
-    # Found the assistant using the hashid and not id
-    assistant: Assistant = getAssistantByHashID(assistantIDAsHash)
+    # Find the assistant by hashid and not id
+    callback: Callback = getAssistantByHashID(assistantIDAsHash)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 404, callback.Message, callback.Data)
+    assistant: Assistant = callback.Data
 
     if request.method == "GET":
-        data = {"SecondsUntilPopUp": assistant.SecondsUntilPopup, "TopBarText": assistant.TopBarText}
-        return helpers.jsonResponse(True, 200, "Pop up settings retrieved", data)
+        return helpers.jsonResponse(True, 200, "Pop up settings retrieved",
+                                    {"SecondsUntilPopUp": assistant.SecondsUntilPopup,
+                                     "TopBarText": assistant.TopBarText})
 
 
 @chatbot_router.route("/assistant/<int:sessionID>/file", methods=['POST'])
@@ -126,7 +118,7 @@ def chatbot_upload_files(sessionID):
     userInput: ChatbotSession = callback.Data
 
     if request.method == "POST":
-        data = request.get_json(silent=True)
+        data = request.json
         if request.method == 'POST':
 
             try:
@@ -135,8 +127,6 @@ def chatbot_upload_files(sessionID):
                     return helpers.jsonResponse(False, 404, "No file part")
                 file = request.files['file']
 
-                # if user does not select file, browser also
-                # submit an empty part without filename
                 if file.filename == '':
                     return helpers.jsonResponse(False, 404, "No selected file")
 
@@ -147,12 +137,5 @@ def chatbot_upload_files(sessionID):
             except Exception as exc:
                 return helpers.jsonResponse(False, 404, "Couldn't save the file")
 
-
-            # if file and allowed_file(file.filename):
-            #     filename = secure_filename(file.filename)
-            #     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            #     return redirect(url_for('uploaded_file',
-            #                             filename=filename))
-
             db.session.commit()
-            return helpers.jsonResponse(True, 200, "file uploaded successfully!!")
+            return helpers.jsonResponse(True, 200, "File uploaded successfully!!")

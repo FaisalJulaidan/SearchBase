@@ -3,7 +3,6 @@
   "title": "flow schema",
   "type": "object",
   "properties": {
-    "botVersion": {"enum": ["1.0.0"]},
     "blocks": {"type": "array", "items": {
       "type": "object",
       "properties":{

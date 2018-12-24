@@ -10,23 +10,35 @@ const {Meta} = Card;
 const menu = (assistant) => (
     <Menu>
         <Menu.Item key="1">
-            <Link to={`solutions/${assistant.ID}`}>
+            <Link to={{
+                      pathname: `assistants/${assistant.ID}/solutions`,
+                      state: {assistant: assistant}
+                  }}>
                 <Icon type="database"/> Solutions
             </Link>
         </Menu.Item>
         <Menu.Item key="2">
-            <Link to={`userInput/${assistant.ID}`}>
+            <Link to={{
+                      pathname: `assistants/${assistant.ID}/userInput`,
+                      state: {assistant: assistant}
+                  }}>
                 <Icon type="code"/> User Input
             </Link>
         </Menu.Item>
         <Menu.Item key="3">
-            <Link to={`analytics/${assistant.ID}`}>
+            <Link to={{
+                      pathname: `assistants/${assistant.ID}/analytics`,
+                      state: {assistant: assistant}
+                  }}>
                 <Icon type="line-chart"/> Analytics
             </Link>
         </Menu.Item>
         <Menu.Divider/>
         <Menu.Item key="4">
-            <Link to={`integration/${assistant.ID}`}>
+            <Link to={{
+                      pathname: `integration/${assistant.ID}`,
+                      state: {assistant: assistant}
+                  }}>
                 <Icon type="sync"/> Integration
             </Link>
         </Menu.Item>
@@ -58,6 +70,10 @@ class Assistant extends Component {
         });
     };
 
+    onActiveChanged = () => {
+
+    }
+
     render() {
         const {assistant} = this.props;
         return (
@@ -70,7 +86,7 @@ class Assistant extends Component {
                                src={covers[Math.floor(Math.random() * covers.length)]}/>
                       }
                       title={assistant.Name}
-                      extra={<Switch defaultChecked={assistant.Active} onChange={this.onChange}/>}
+                      extra={<Switch defaultChecked={assistant.Active} onChange={this.onActiveChanged}/>}
                       actions={[
                           <div onClick={this.showModal}>
                               <Icon type="setting"/>

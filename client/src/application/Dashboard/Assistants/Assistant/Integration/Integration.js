@@ -1,12 +1,9 @@
 import React from 'react';
-import {Form, Button, message, Tabs, Input} from "antd";
+import {Button, Input} from "antd";
 import "./Integration.less"
 import styles from "./Integration.module.less"
 import ReactDOMServer from 'react-dom/server'
-import Groups from "../Flow/Groups/Groups";
-import Blocks from "../Flow/Blocks/Blocks";
 import Header from "./Header/Header"
-import connect from "react-redux/es/connect/connect";
 import Hasher from "../../../../../helpers/hashids"
 
 class Integration extends React.Component {

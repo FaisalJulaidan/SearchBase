@@ -6,6 +6,8 @@ import ReactDOMServer from 'react-dom/server'
 import Groups from "../Flow/Groups/Groups";
 import Blocks from "../Flow/Blocks/Blocks";
 import Header from "./Header/Header"
+import connect from "react-redux/es/connect/connect";
+import hasher from "../../../../../helpers/hashids"
 
 class Integration extends React.Component {
 
@@ -20,9 +22,8 @@ class Integration extends React.Component {
     };
 
     componentDidMount() {
-        console.log(this.props);
         this.setState({
-            dataID: this.props.match.params.id,
+            dataID: hasher.encode(this.props.match.params.id),
             source: window.location.protocol + '//' + window.location.hostname + ":" + window.location.port + "/userdownloads/widget.js"
         });
     }
@@ -39,12 +40,10 @@ class Integration extends React.Component {
         script.src = this.state.source;
         script.async = this.state.async;
         script.defer = this.state.defer;
-        script.dataName = this.state.dataName;
-        script.dataID = this.state.dataID;
-        script.dataIcon = this.state.dataIcon;
-        script.dataCircle = this.state.dataCircle;
-
-        console.log(script);
+        // script.dataName = this.state.dataName;
+        // script.dataID = this.state.dataID;
+        // script.dataIcon = this.state.dataIcon;
+        // script.dataCircle = this.state.dataCircle;
 
         document.body.appendChild(script);
     };
@@ -54,7 +53,7 @@ class Integration extends React.Component {
         const urlPaste = (<script src={window.location.protocol + '//' +
             window.location.hostname + ":" + window.location.port + "/userdownloads/widget.js"}
                               data-name={this.state.dataName}
-                              data-id={this.props.match.params.id}
+                              data-id={this.state.dataID}
                               data-icon={this.state.dataIcon}
                               data-circle={this.state.dataCircle} async={this.state.async}
                               defer={this.state.defer}/>);
@@ -128,4 +127,4 @@ class Integration extends React.Component {
     }
 }
 
-export default Integration;
+export default (Integration);

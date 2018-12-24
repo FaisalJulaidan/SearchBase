@@ -1,5 +1,5 @@
 import React from 'react';
-import {Form, Button, message, Tabs} from "antd";
+import {Form, Button, message, Tabs, Input} from "antd";
 import "./Integration.less"
 import styles from "./Integration.module.less"
 import ReactDOMServer from 'react-dom/server'
@@ -15,7 +15,7 @@ class Integration extends React.Component {
         source: "",
         dataName: "tsb-widget",
         dataID: "assistantid",
-        dataIcon: "#ffffff",
+        // dataIcon: "#ffffff",
         dataCircle: "#01d1de",
         async: true,
         defer: true
@@ -93,20 +93,23 @@ class Integration extends React.Component {
 
                             <p> Currently you can edit the colour setting of your assistant's button.
                                 Simply pick your preferred one bellow.</p>
-                            <div style={{display: "-webkit-inline-box"}}>
 
-                                {/*<div style={{margin: "10px"}}>*/}
-                                    {/*<input type="color" name="dataIcon" value={this.state.dataIcon}*/}
+                            <table style={{margin: "5% 28%"}}>
+                                {/*<tr style={{paddingLeft: "12%"}}>*/}
+                                    {/*<td><label style={{fontSize: "16px", fontWeight: "500"}}>Icon</label></td>*/}
+                                    {/*<td style={{paddingLeft: "34%", paddingTop: "5%"}}>*/}
+                                        {/*<Input style={{padding: "3px", width: "60px"}} className={"antd-primary"} type="color" name="dataCircle" value={this.state.dataIcon}*/}
                                            {/*onChange={this.handleChange}/>*/}
-                                    {/*<label htmlFor="icon">Icon</label>*/}
-                                {/*</div>*/}
-
-                                <div style={{margin: "10px"}}>
-                                    <input type="color" name="dataCircle" value={this.state.dataCircle}
+                                    {/*</td>*/}
+                                {/*</tr>*/}
+                                <tr style={{paddingLeft: "12%"}}>
+                                    <td><label style={{fontSize: "16px", fontWeight: "500"}}>Circle</label></td>
+                                    <td style={{paddingLeft: "34%", paddingTop: "5%"}}>
+                                        <Input style={{padding: "3px", width: "60px"}} className={"antd-primary"} type="color" name="dataCircle" value={this.state.dataCircle}
                                            onChange={this.handleChange}/>
-                                    <label htmlFor="circle">Circle</label>
-                                </div>
-                            </div>
+                                    </td>
+                                </tr>
+                            </table>
 
                         </div>
                     </div>

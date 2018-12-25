@@ -15,7 +15,7 @@
         "isSkippable": { "type": "boolean" },
         "content": {"type": "object"}
       },
-      "required": ["id", "groupID", "type", "order", "content"],
+      "required": ["id", "groupID", "type", "order", "storeInDB", "isSkippable", "content"],
       "additionalProperties": false
       }
     }

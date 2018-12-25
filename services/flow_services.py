@@ -336,7 +336,7 @@ def getOptions() -> dict:
             'validations': [uiv.value for uiv in ValidationType],
             'actions': [a.value for a in BlockAction],
             'alwaysStoreInDB': True
-        },
+            },
             {
                 'name': BlockType.Question.value,
                 'actions': [a.value for a in BlockAction],
@@ -370,7 +370,7 @@ def getBlocksCountByAssistant(assistant: Assistant):
 
 def getRemainingBlocksByAssistant(assistant: Assistant):
     try:
-        # BlocksCap - numberOfCreatedBlocks
+        # BlocksCap = numberOfCreatedBlocks
         return db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first()[0] - getBlocksCountByAssistant(
             assistant)
     except Exception as e:

@@ -54,6 +54,8 @@ class Question extends Component {
                 this.props.handleEditBlock({
                     type: 'Question',
                     groupID: this.props.options.currentGroup.id,
+                    id: this.props.options.block.id,
+                    order: this.props.options.block.order,
                     storeInDB: values.storeInDB,
                     isSkippable: values.isSkippable,
                     labels: '',

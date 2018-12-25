@@ -19,6 +19,8 @@ class Solutions extends Component {
                 this.props.handleEditBlock({
                     type: 'Solutions',
                     groupID: this.props.options.currentGroup.id,
+                    id: this.props.options.block.id,
+                    order: this.props.options.block.order,
                     storeInDB: values.storeInDB,
                     isSkippable: values.isSkippable,
                     labels: '',

@@ -18,6 +18,8 @@ class UserInput extends Component {
                 this.props.handleEditBlock({
                     type: 'User Input',
                     groupID: this.props.options.currentGroup.id,
+                    id: this.props.options.block.id,
+                    order: this.props.options.block.order,
                     storeInDB: values.storeInDB,
                     isSkippable: values.isSkippable,
                     labels: '',

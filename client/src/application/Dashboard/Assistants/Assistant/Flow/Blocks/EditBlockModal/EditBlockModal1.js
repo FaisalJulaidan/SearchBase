@@ -2,13 +2,11 @@ import React, {Component} from 'react';
 
 import {http} from "../../../../../../../helpers";
 
-import {Modal, Tabs} from 'antd';
+import {Modal} from 'antd';
 import UserInput from "./Cards/UserInput";
 import Question from "./Cards/Question";
 import FileUpload from "./Cards/FileUpload";
 import Solutions from "./Cards/Solutions";
-
-const TabPane = Tabs.TabPane;
 
 class EditBlockModal extends Component {
 

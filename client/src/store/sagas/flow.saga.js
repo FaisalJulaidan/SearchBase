@@ -71,8 +71,7 @@ function* watchDeleteGroup() {
 // Blocks
 function* addBlock({newBlock, groupID, assistantID}) {
     try {
-        console.log("Adding a block...");
-
+        console.log(newBlock)
         const res = yield http.post(`/assistant/flow/group/${groupID}/block`, newBlock);
         yield put(flowActions.addBlockSuccess(res.data.msg));
         return yield put(flowActions.fetchFlowRequest(assistantID))
@@ -82,14 +81,31 @@ function* addBlock({newBlock, groupID, assistantID}) {
     }
 }
 
-function* editBlock({newBlock, groupID, assistantID}) {
+function* editBlock({edittedBlock, groupID, assistantID}) {
     try {
-        console.warn("Editting a block... in [Flow.saga.js] line:88");
-        console.warn(newBlock, groupID, assistantID);
+        // prepair flow and add the editted block to the whole flow
+        let res = yield http.get(`/assistant/${assistantID}/flow`);
+        res.data.data.blockGroups.map((group, i) => {
+            if (group.id === groupID)
+                group.blocks.map((block, j) => {
+                    if (block.id === edittedBlock.id)
+                        res.data.data.blockGroups[i].blocks[j] = edittedBlock
+                })
+        });
+        const allFlows = res.data.data.blockGroups.map((group) => group.blocks);
+        const allFlow = {
+            blocks: []
+        };
+        allFlows.map(eachFlow => eachFlow.map((block) => {
+            block.groupID = groupID;
+            allFlow.blocks.push(block)
+        }));
+        console.log(allFlow);
+        res = yield http.put(`/assistant/${assistantID}/flow`, allFlow);
 
-        // const res = yield http.post(`/assistant/flow/group/${groupID}/block`, newBlock);
+
         // yield put(flowActions.addBlockSuccess(res.data.msg));
-        // console.log(res);
+        console.log(res);
         // yield put(flowActions.editBlockSuccess(res.data.msg));
         yield put(flowActions.editBlockSuccess(''));
         return yield put(flowActions.fetchFlowRequest(assistantID))

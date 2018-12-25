@@ -20,6 +20,6 @@
       }
     }
   },
-  "required": ["botVersion", "blocks"],
+  "required": ["blocks"],
   "additionalProperties": false
 }

@@ -21,7 +21,7 @@ class Integration extends React.Component {
     componentDidMount() {
         this.setState({
             dataID: hasher.encode(this.props.match.params.id),
-            source: window.location.protocol + '//' + window.location.hostname + ":" + window.location.port + "/userdownloads/widget.js"
+            source: this.getWidgetSrc()
         });
     }
 
@@ -35,12 +35,12 @@ class Integration extends React.Component {
         });
     };
 
-    removeChatbot(){
+    removeChatbot = () => {
         let oldBot = document.getElementById("TheSearchBase_Chatbot");
         if(oldBot){ oldBot.remove(); }
         let oldBotScript = document.getElementById("oldBotScript");
         if(oldBotScript){ oldBotScript.remove(); }
-    }
+    };
 
     copyScriptPaste = () => {
         const pasteArea = document.getElementById("pasteArea");
@@ -64,17 +64,25 @@ class Integration extends React.Component {
         document.body.appendChild(script);
     };
 
+    getWidgetSrc = () => {
+        // include the colon if there is port number, which means localhost and not real server
+        let colon = "";
+        if (window.location.port !== "") {colon = ":";}
+        const {protocol, port, hostname} = window.location;
+        return protocol + '//' + hostname + colon + port + "/userdownloads/widget.js";
+    };
+
+    getChatbotScript = () => {
+        return <script src={this.getWidgetSrc()}
+                       data-name={this.state.dataName}
+                       data-id={this.state.dataID}
+                       // data-icon={this.state.dataIcon}
+                       data-circle={this.state.dataCircle}
+                       async={this.state.async}
+                       defer={this.state.defer}/>
+    };
+
     render() {
-
-        const urlPaste = (<script src={window.location.protocol + '//' +
-            window.location.hostname + ":" + window.location.port + "/userdownloads/widget.js"}
-                              data-name={this.state.dataName}
-                              data-id={this.state.dataID}
-                              // data-icon={this.state.dataIcon}
-                              data-circle={this.state.dataCircle}
-                              async={this.state.async}
-                              defer={this.state.defer}/>);
-
         return (
             <div style={{height: '100%'}}>
                 <div style={{padding: '0 5px'}}>
@@ -84,13 +92,11 @@ class Integration extends React.Component {
                 </div>
 
                 <div style={{height: 'calc(100% - 66px)', display: 'flex'}}>
-
                     <div style={{margin: 5, width: '45%'}} className={styles.Panel}>
 
                         <div className={styles.Header} style={{position: "inherit"}}>
                             <h3>Choosing your Assistant's looks</h3>
                         </div>
-
 
                         <div className={styles.Body}>
 
@@ -122,7 +128,6 @@ class Integration extends React.Component {
                             <h3>Connecting your assistant</h3>
                         </div>
 
-
                         <div className={styles.Body}>
                             <p>
                                 To integrate your assistant, you must paste the pre-made code into any part of your
@@ -130,12 +135,10 @@ class Integration extends React.Component {
                                 source code.
                             </p>
 
-                            <textarea value={ReactDOMServer.renderToString(urlPaste)} id={"pasteArea"}
+                            <textarea value={ReactDOMServer.renderToString(this.getChatbotScript())} id={"pasteArea"}
                                       style={{width: "94%", height: "110px", fontWeight: "600", margin: "1.5% 0"}}
                                       readOnly/>
-
                             <Button onClick={this.copyScriptPaste} className={"ant-btn-primary"}>Copy</Button>
-
                             <Button style={{marginLeft:"5px"}} onClick={this.testIntegration} className={"ant-btn-primary"}>Test</Button>
                         </div>
                     </div>

@@ -1,13 +1,17 @@
 import Hashids from "hashids";
 
-const hasher = new Hashids("b9iLXiAa", 5);
+const hashids = new Hashids("b9iLXiAa", 5);
 
 const encode = (param) => {
-    return hasher.encode(param);
+    return hashids.encode(param);
 };
 
 const decode = (param) => {
-    return hasher.decode(param);
+    return hashids.decode(param);
 };
 
-export default hasher;
+
+export const hasher = {
+    encode,
+    decode
+};

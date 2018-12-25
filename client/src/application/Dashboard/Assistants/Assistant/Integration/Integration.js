@@ -4,7 +4,7 @@ import "./Integration.less"
 import styles from "./Integration.module.less"
 import ReactDOMServer from 'react-dom/server'
 import Header from "./Header/Header"
-import Hasher from "../../../../../helpers/hashids"
+import { hasher } from "../../../../../helpers"
 
 class Integration extends React.Component {
 
@@ -20,7 +20,7 @@ class Integration extends React.Component {
 
     componentDidMount() {
         this.setState({
-            dataID: Hasher.encode(this.props.match.params.id),
+            dataID: hasher.encode(this.props.match.params.id),
             source: window.location.protocol + '//' + window.location.hostname + ":" + window.location.port + "/userdownloads/widget.js"
         });
     }
@@ -44,9 +44,7 @@ class Integration extends React.Component {
 
     copyScriptPaste = () => {
         const pasteArea = document.getElementById("pasteArea");
-
         pasteArea.select();
-
         document.execCommand("copy");
     };
 

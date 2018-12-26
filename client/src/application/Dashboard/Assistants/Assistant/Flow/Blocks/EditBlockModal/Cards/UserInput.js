@@ -20,15 +20,15 @@ class UserInput extends Component {
                     groupID: this.props.options.currentGroup.id,
                     id: this.props.options.block.id,
                     order: this.props.options.block.order,
-                    storeInDB: values.storeInDB,
                     isSkippable: values.isSkippable,
                     labels: '',
+                    storeInDB: values.storeInDB,
                     content: {
                         text: values.text,
                         blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                         validation: values.validation,
                         action: values.action,
-                        afterMessage: values.afterMessage
+                        afterMessage: values.afterMessage,
                     }
                 })
         })

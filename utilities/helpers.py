@@ -75,7 +75,6 @@ def gen_dummy_data():
         "action": "Go To Next Block",
         "text": "What's your email?",
         "blockToGoID": None,
-        "storeInDB": True,
         "validation": "Email",
         "afterMessage": 'Your input is being processed...'
     }))
@@ -83,7 +82,6 @@ def gen_dummy_data():
         "action": "Go To Next Block",
         "text": "Give me some input",
         "blockToGoID": None,
-        "storeInDB": True,
         "validation": "Ignore",
         "afterMessage": 'Your input is being processed...'
     }))

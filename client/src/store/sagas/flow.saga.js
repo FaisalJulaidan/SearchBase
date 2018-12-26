@@ -105,8 +105,9 @@ function* editBlock({edittedBlock, groupID, assistantID}) {
     }
 }
 
-function* deleteBlock({deletedBlock, groupID, assistantID}) {
+function* deleteBlock({deletedBlock, assistantID, groupID}) {
     try {
+        console.log(deletedBlock, assistantID, groupID);
         const res = yield http.delete(`/assistant/flow/group/${groupID}/block`, {data: {id: deletedBlock.id}});
         yield put(flowActions.deleteBlockSuccess(res.data.msg));
         return yield put(flowActions.fetchFlowRequest(assistantID))
@@ -115,7 +116,6 @@ function* deleteBlock({deletedBlock, groupID, assistantID}) {
         return yield put(flowActions.deleteBlockFailure(error.response.data));
     }
 }
-
 
 function* watchAddBlock() {
     yield takeEvery(actionTypes.ADD_BLOCK_REQUEST, addBlock)

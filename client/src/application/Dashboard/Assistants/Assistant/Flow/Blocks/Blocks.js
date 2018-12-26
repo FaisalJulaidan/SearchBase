@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import "./Blocks.less"
 import styles from "../Flow.module.less";
-import {Button, Form} from "antd";
+import {Button, Form, Modal} from "antd";
 
 import Block from "./Block/Block";
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
@@ -19,14 +19,17 @@ const reorder = (list, startIndex, endIndex) => {
 };
 
 const getItemStyle = draggableStyle => ({margin: `0 0 8px 0`, ...draggableStyle});
+const confirm = Modal.confirm;
 
 class Blocks extends Component {
 
     state = {
         addBlockVisible: false,
         editBlockVisible: false,
+        deleteBlockVisible: false,
         blocks: [],
-        edittedBlock: {}
+        edittedBlock: {},
+        deletedBlock: {content: {}}
     };
 
     constructor(props) {
@@ -62,6 +65,17 @@ class Blocks extends Component {
     editBlock = (edittedBlock) => this.setState({edittedBlock, editBlockVisible: true});
     closeEditBlockModal = () => this.setState({edittedBlock: {}, editBlockVisible: false});
     handleEditBlock = (edittedBlock) => this.props.editBlock(edittedBlock, this.props.currentGroup.id);
+
+    // DELETE BLOCK MODAL CONFIGS
+    // this called from block.js when you click on delete block button
+    deleteBlock = (deletedBlock) => confirm({
+        title: `Delete block with type: ${deletedBlock.type}`,
+        content: `You can't get back to the deleted block after click ok`,
+        onOk: () => this.handleDeleteBlock(deletedBlock)
+    });
+    handleDeleteBlock = (deletedBlock) => this.props.deleteBlock(deletedBlock, this.props.currentGroup.id);
+
+
 
     render() {
         return (

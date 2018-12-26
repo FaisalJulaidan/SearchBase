@@ -53,11 +53,7 @@ class Flow extends Component {
     // BLOCKS
     addBlock = (newBlock, groupID) => {
         const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.addBlockRequest({
-            newBlock: newBlock,
-            groupID: groupID,
-            assistantID: assistant.ID
-        }));
+        this.props.dispatch(flowActions.addBlockRequest({newBlock, groupID, assistantID: assistant.ID}));
         // message.loading(`Adding new block`, 0);
     };
 
@@ -67,9 +63,9 @@ class Flow extends Component {
         // message.loading(`Editing ${editedGroup.name} group`, 0);
     };
 
-    deleteBlock = (deletedGroup) => {
+    deleteBlock = (deletedBlock, groupID) => {
         const {assistant} = this.props.location.state;
-        // this.props.dispatch(flowActions.deleteGroupRequest({ID: assistant.ID, deletedGroup: deletedGroup}));
+        this.props.dispatch(flowActions.deleteBlockRequest({deletedBlock, groupID, assistantID: assistant.ID}));
         // message.loading(`Deleting ${deletedGroup.name} group`, 0);
     };
 

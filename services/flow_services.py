@@ -147,16 +147,14 @@ def addBlock(data: dict, group: BlockGroup) -> Callback:
 
 
 # ----- Updaters ----- #
-def updateFlow(currentUpdatedGroup, assistant: Assistant) -> Callback:
+def updateFlow(flow, assistant: Assistant) -> Callback:
     try:
-        # json_utils.validateSchema(flow, 'flow.json')
-        # we need to have better validation
-        True
+        json_utils.validateSchema(flow['blocks'], 'flow.json')
     except Exception as exc:
         print(exc.args)
         return Callback(False, "The submitted bot data does not doesn't follow the correct format")
 
-    callback: Callback = updateBlocks(currentUpdatedGroup, assistant)
+    callback: Callback = updateBlocks(flow, assistant)
     if not callback.Success:
         return Callback(False, callback.Message, callback.Data)
     return Callback(True, "Bot updated successfully!")
@@ -231,6 +229,7 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
             if not callback.Success:
                 return callback
 
+            print(block);
             # HERE THE UPDATE PROBLEM START
             # Update the block
             oldBlock: Block = db.session.query(Block). \

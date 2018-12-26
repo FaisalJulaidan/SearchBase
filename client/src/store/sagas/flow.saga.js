@@ -85,25 +85,15 @@ function* editBlock({edittedBlock, groupID, assistantID}) {
     try {
         // prepair flow and add the editted block to the whole flow
         let res = yield http.get(`/assistant/${assistantID}/flow`);
-        res.data.data.blockGroups.map((group, i) => {
+        let currentUpdatedGroup = [];
+        res.data.data.blockGroups.map((group) => {
             if (group.id === groupID)
-                group.blocks.map((block, j) => {
-                    if (block.id === edittedBlock.id)
-                        res.data.data.blockGroups[i].blocks[j] = edittedBlock
-                })
+                group.blocks.map(
+                    block => block.id === edittedBlock.id ? currentUpdatedGroup.push(edittedBlock) : currentUpdatedGroup.push(block)
+                )
         });
-        const allFlows = res.data.data.blockGroups.map((group) => group.blocks);
-        const allFlow = {
-            blocks: []
-        };
-        allFlows.map(eachFlow => eachFlow.map((block) => {
-            block.groupID = groupID;
-            allFlow.blocks.push(block)
-        }));
-        console.log(allFlow);
-        res = yield http.put(`/assistant/${assistantID}/flow`, allFlow);
 
-
+        res = yield http.put(`/assistant/${assistantID}/flow`, currentUpdatedGroup);
         // yield put(flowActions.addBlockSuccess(res.data.msg));
         console.log(res);
         // yield put(flowActions.editBlockSuccess(res.data.msg));
@@ -112,6 +102,17 @@ function* editBlock({edittedBlock, groupID, assistantID}) {
     } catch (error) {
         console.log(error);
         return yield put(flowActions.editBlockFailure(error.response.data));
+    }
+}
+
+function* deleteBlock({deletedBlock, groupID, assistantID}) {
+    try {
+        const res = yield http.delete(`/assistant/flow/group/${groupID}/block`, {data: {id: deletedBlock.id}});
+        yield put(flowActions.deleteBlockSuccess(res.data.msg));
+        return yield put(flowActions.fetchFlowRequest(assistantID))
+    } catch (error) {
+        console.log(error);
+        return yield put(flowActions.deleteBlockFailure(error.response.data));
     }
 }
 
@@ -124,13 +125,20 @@ function* watchEditBlock() {
     yield takeEvery(actionTypes.EDIT_BLOCK_REQUEST, editBlock)
 }
 
+function* watchDeleteBlock() {
+    yield takeEvery(actionTypes.DELETE_BLOCK_REQUEST, deleteBlock)
+}
+
 export function* flowSaga() {
     yield all([
         watchFetchFlow(),
+
         watchAddGroup(),
         watchEditGroup(),
         watchDeleteGroup(),
+
         watchAddBlock(),
         watchEditBlock(),
+        watchDeleteBlock()
     ])
 }

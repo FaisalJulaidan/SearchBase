@@ -1,4 +1,4 @@
-{
+ {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "User Input block schema",
   "type": "object",
@@ -7,7 +7,8 @@
     "blockToGoID": {"type": ["number", "null"]},
     "validation": {"enum": ["Email", "Telephone","Ignore", "FullName"]},
     "action": { "enum": ["Go To Next Block", "Go To Specific Block", "End Chat" ] },
-    "afterMessage": {"type": "string"}
+    "afterMessage": {"type": "string"},
+    "storeInDB": {"type": "boolean"}
   },
   "required": [
     "text",

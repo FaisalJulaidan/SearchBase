@@ -25,7 +25,7 @@ class UserInput extends Component {
                     labels: '',
                     content: {
                         text: values.text,
-                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup,
+                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                         validation: values.validation,
                         action: values.action,
                         afterMessage: values.afterMessage

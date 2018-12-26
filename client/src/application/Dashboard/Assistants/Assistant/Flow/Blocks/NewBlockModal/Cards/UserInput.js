@@ -14,6 +14,7 @@ class UserInput extends Component {
     onSubmit = () => {
         return this.props.form.validateFields((err, values) => {
             // If from is valid crete the new block following User Input block type format
+            debugger
             if (!err) {
                 this.props.handleNewBlock({
                     block: {
@@ -24,7 +25,7 @@ class UserInput extends Component {
                         labels: '',
                         content: {
                             text: values.text,
-                            blockToGoID: values.blockToGoID || values.blockToGoIDGroup,
+                            blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                             validation: values.validation,
                             action: values.action,
                             afterMessage: values.afterMessage

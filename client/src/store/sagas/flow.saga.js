@@ -1,12 +1,14 @@
 import {all, put, takeEvery} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {flowActions} from "../actions/flow.actions";
-import {alertSuccess, http} from "../../helpers";
+import {http} from "../../helpers";
+import {alertSuccess, destroyMessage, loadingMessage} from "../../helpers/alert";
 
 function* fetchFlow({assistantID}) {
     try {
-        console.log(assistantID);
+        loadingMessage('Loading Flow');
         const res = yield http.get(`/assistant/${assistantID}/flow`);
+        yield destroyMessage();
         return yield put(flowActions.fetchFlowSuccess(res.data.data))
     } catch (error) {
         console.log(error);
@@ -22,9 +24,11 @@ function* watchFetchFlow() {
 // Groups
 function* addGroup(action) {
     try {
+        loadingMessage('Adding Group');
         const res = yield http.post(`/assistant/${action.ID}/flow/group`, action.newGroup);
         yield put(flowActions.addGroupSuccess(res.data.msg));
-        yield alertSuccess('title', 'success success yaaa!');
+        yield destroyMessage();
+        yield alertSuccess('Group Added', res.data.msg);
         return yield put(flowActions.fetchFlowRequest(action.ID))
     } catch (error) {
         console.log(error);
@@ -34,8 +38,11 @@ function* addGroup(action) {
 
 function* editGroup(action) {
     try {
+        loadingMessage('Updating Group');
         const res = yield http.put(`/assistant/${action.ID}/flow/group`, action.editedGroup);
         yield put(flowActions.editGroupSuccess(res.data.msg));
+        yield destroyMessage();
+        yield alertSuccess('Group Updated', res.data.msg);
         return yield put(flowActions.fetchFlowRequest(action.ID))
     } catch (error) {
         console.log(error);
@@ -43,12 +50,13 @@ function* editGroup(action) {
     }
 }
 
-
 function* deleteGroup({type, assistantID, deletedGroup}) {
     try {
-        console.log(deletedGroup)
+        loadingMessage('Deleting Group');
         const res = yield http.delete(`/assistant/${assistantID}/flow/group`, {data: {id: deletedGroup.id}});
         yield put(flowActions.deleteGroupSuccess(res.data.msg));
+        yield destroyMessage();
+        yield alertSuccess('Group Deleted', res.data.msg);
         return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
@@ -71,9 +79,13 @@ function* watchDeleteGroup() {
 // Blocks
 function* addBlock({newBlock, groupID, assistantID}) {
     try {
-        console.log(newBlock)
+        loadingMessage('Adding Block');
         const res = yield http.post(`/assistant/flow/group/${groupID}/block`, newBlock);
+
+        yield destroyMessage();
+        yield alertSuccess('Block Added', res.data.msg);
         yield put(flowActions.addBlockSuccess(res.data.msg));
+
         return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
@@ -83,31 +95,20 @@ function* addBlock({newBlock, groupID, assistantID}) {
 
 function* editBlock({edittedBlock, groupID, assistantID}) {
     try {
-        // prepair flow and add the editted block to the whole flow
+        loadingMessage('Updating Block');
         let res = yield http.get(`/assistant/${assistantID}/flow`);
-        res.data.data.blockGroups.map((group, i) => {
+        let currentUpdatedGroup = [];
+        res.data.data.blockGroups.map((group) => {
             if (group.id === groupID)
-                group.blocks.map((block, j) => {
-                    if (block.id === edittedBlock.id)
-                        res.data.data.blockGroups[i].blocks[j] = edittedBlock
+                group.blocks.map((block) => {
+                    if (!block.groupID) block.groupID = groupID;
+                    block.id === edittedBlock.id ? currentUpdatedGroup.push(edittedBlock) : currentUpdatedGroup.push(block);
                 })
         });
-        const allFlows = res.data.data.blockGroups.map((group) => group.blocks);
-        const allFlow = {
-            blocks: []
-        };
-        allFlows.map(eachFlow => eachFlow.map((block) => {
-            block.groupID = groupID;
-            allFlow.blocks.push(block)
-        }));
-        console.log(allFlow);
-        res = yield http.put(`/assistant/${assistantID}/flow`, allFlow);
-
-
-        // yield put(flowActions.addBlockSuccess(res.data.msg));
-        console.log(res);
-        // yield put(flowActions.editBlockSuccess(res.data.msg));
-        yield put(flowActions.editBlockSuccess(''));
+        res = yield http.put(`/assistant/${assistantID}/flow`, {blocks: currentUpdatedGroup});
+        yield destroyMessage();
+        yield alertSuccess('Block Updated', res.data.msg);
+        yield put(flowActions.editBlockSuccess(res.data.msg));
         return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
@@ -115,6 +116,19 @@ function* editBlock({edittedBlock, groupID, assistantID}) {
     }
 }
 
+function* deleteBlock({deletedBlock, assistantID, groupID}) {
+    try {
+        loadingMessage('Deleting Block');
+        const res = yield http.delete(`/assistant/flow/group/${groupID}/block`, {data: {id: deletedBlock.id}});
+        yield put(flowActions.deleteBlockSuccess(res.data.msg));
+        yield destroyMessage();
+        yield alertSuccess('Block Deleted', res.data.msg);
+        return yield put(flowActions.fetchFlowRequest(assistantID))
+    } catch (error) {
+        console.log(error);
+        return yield put(flowActions.deleteBlockFailure(error.response.data));
+    }
+}
 
 function* watchAddBlock() {
     yield takeEvery(actionTypes.ADD_BLOCK_REQUEST, addBlock)
@@ -124,13 +138,20 @@ function* watchEditBlock() {
     yield takeEvery(actionTypes.EDIT_BLOCK_REQUEST, editBlock)
 }
 
+function* watchDeleteBlock() {
+    yield takeEvery(actionTypes.DELETE_BLOCK_REQUEST, deleteBlock)
+}
+
 export function* flowSaga() {
     yield all([
         watchFetchFlow(),
+
         watchAddGroup(),
         watchEditGroup(),
         watchDeleteGroup(),
+
         watchAddBlock(),
         watchEditBlock(),
+        watchDeleteBlock()
     ])
 }

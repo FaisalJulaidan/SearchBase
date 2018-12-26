@@ -143,6 +143,32 @@ const editBlockFailure = (error) => {
 };
 //////////////////////////////////////////
 
+//////////////////////////////////////////
+// DELETE Blocks Actions
+const deleteBlockRequest = ({deletedBlock, assistantID, groupID}) => {
+    return {
+        type: actionTypes.DELETE_BLOCK_REQUEST,
+        deletedBlock,
+        assistantID,
+        groupID
+    };
+};
+
+const deleteBlockSuccess = (msg) => {
+    return {
+        type: actionTypes.DELETE_BLOCK_SUCCESS,
+        msg
+    };
+};
+
+const deleteBlockFailure = (error) => {
+    return {
+        type: actionTypes.DELETE_BLOCK_FAILURE,
+        error
+    };
+};
+//////////////////////////////////////////
+
 export const flowActions = {
     fetchFlowRequest,
     fetchFlowSuccess,
@@ -166,5 +192,9 @@ export const flowActions = {
 
     editBlockRequest,
     editBlockSuccess,
-    editBlockFailure
+    editBlockFailure,
+
+    deleteBlockRequest,
+    deleteBlockSuccess,
+    deleteBlockFailure
 };

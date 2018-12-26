@@ -229,6 +229,8 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
             if not callback.Success:
                 return callback
 
+            print(block);
+            # HERE THE UPDATE PROBLEM START
             # Update the block
             oldBlock: Block = db.session.query(Block). \
                 filter(and_(Block.ID == block.get('id'), Assistant.ID == assistant.ID)).first()

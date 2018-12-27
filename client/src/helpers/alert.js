@@ -16,15 +16,16 @@ export const alertSuccess = (title, message) => {
 export const alertError = (title, message) => {
     notification.error({
         message: title,
-        description: message,
-        duration: duration,
-        placement: placement,
+        description: message
     });
 };
 
 export const loadingMessage = title => message.loading(title);
 
-export const destroyMessage = () => message.destroy();
+export const destroyMessage = () => {
+    message.destroy();
+    notification.destroy();
+};
 
 export const alertInfo = (title, message) => {
     notification.info({

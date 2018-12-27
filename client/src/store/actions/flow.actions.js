@@ -74,7 +74,7 @@ const editGroupFailure = (error) => {
 const deleteGroupRequest = (values) => {
     return {
         type: actionTypes.DELETE_GROUP_REQUEST,
-        ID: values.ID,
+        assistantID: values.assistantID,
         deletedGroup: values.deletedGroup
     };
 };
@@ -168,6 +168,30 @@ const deleteBlockFailure = (error) => {
     };
 };
 //////////////////////////////////////////
+// UPDATE Blocks' order Actions
+const updateBlocksOrderRequest = ({newBlocksOrder, assistantID, groupID}) => {
+    return {
+        type: actionTypes.UPDATE_BLOCKS_ORDER_REQUEST,
+        newBlocksOrder,
+        assistantID,
+        groupID
+    };
+};
+
+const updateBlocksOrderSuccess = (msg) => {
+    return {
+        type: actionTypes.UPDATE_BLOCKS_ORDER_SUCCESS,
+        msg
+    };
+};
+
+const updateBlocksOrderFailure = (error) => {
+    return {
+        type: actionTypes.UPDATE_BLOCKS_ORDER_FAILURE,
+        error
+    };
+};
+//////////////////////////////////////////
 
 export const flowActions = {
     fetchFlowRequest,
@@ -196,5 +220,11 @@ export const flowActions = {
 
     deleteBlockRequest,
     deleteBlockSuccess,
-    deleteBlockFailure
+    deleteBlockFailure,
+
+    updateBlocksOrderRequest,
+    updateBlocksOrderSuccess,
+    updateBlocksOrderFailure
+
+
 };

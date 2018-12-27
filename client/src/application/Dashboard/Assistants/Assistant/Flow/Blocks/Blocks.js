@@ -41,8 +41,11 @@ class Blocks extends Component {
         // dropped outside the list
         if (!result.destination) return;
 
-        const blocks = reorder(this.state.blocks, result.source.index, result.destination.index);
+        let blocks = reorder(this.state.blocks, result.source.index, result.destination.index);
+        for (const i in blocks) blocks[i].order = Number(i) + 1;
         this.setState({blocks});
+        // send a request to the server
+        this.props.reorderBlocks(blocks, this.props.currentGroup.id)
     }
 
     componentWillReceiveProps(nextProps) {

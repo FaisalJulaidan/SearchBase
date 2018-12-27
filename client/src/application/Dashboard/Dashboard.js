@@ -100,11 +100,11 @@ class Dashboard extends Component {
 
                         <Switch>
                             <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
-                            <Route path={`${match.path}/assistants`} component={Assistants} exact/>
-                            <Route path={`${match.path}/profile`} component={Profile} exact/>
+                            <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
                             <Route path={`${match.path}/assistants/:id/userInput`} component={UserInput}/>
                             <Route path={`${match.path}/assistants/:id/solutions`} component={Solutions}/>
-                            <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
+                            <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+                            <Route path={`${match.path}/profile`} component={Profile} exact/>
 
                             {/*<Route path="/dashboard" component={Dashboard}/>*/}
                         </Switch>

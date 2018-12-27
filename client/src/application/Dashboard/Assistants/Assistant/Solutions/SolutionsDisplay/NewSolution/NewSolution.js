@@ -1,17 +1,34 @@
 import React from 'react';
 import "./NewSolution.less"
-import {Button, Modal, Form, Input} from "antd";
+import {Button, Modal, Form, Input, Select, Tabs, Icon, Upload} from "antd";
 
 const FormItem = Form.Item;
+const TabPane = Tabs.TabPane;
+const OptGroup = Select.OptGroup;
+const Option = Select.Option;
 
 class NewSolution extends React.Component {
 
-    state = {};
+    state = {
+        connectionType: "none"
+    };
 
     handleSave = () => this.props.form.validateFields((err, values) => {
         if (!err)
             this.props.handleSave(values)
     });
+
+    changeTypeHandler = (e) => {
+        console.log("e: ", e);
+        if (e === "RDB XML File Export") {
+            this.setState({connectionType: "fileUpload"});
+        }
+        else if (e === "Bullhorn" || e === "RDB") {
+            this.setState({connectionType: "CRMConnection"});
+        } else {
+            this.setState({connectionType: "none"});
+        }
+    };
 
     render() {
         const formItemLayout = {
@@ -19,6 +36,7 @@ class NewSolution extends React.Component {
             wrapperCol: {span: 14},
         };
         const {getFieldDecorator} = this.props.form;
+
         return (
             <Modal
                 width={800}
@@ -36,33 +54,85 @@ class NewSolution extends React.Component {
                 <Form layout='horizontal'>
                     <FormItem
                         label="Solution Name"
-                        extra="Enter a name for your group to easily identify it in the group list"
+                        extra="Enter a name for your solution to easily identify it in the solution list"
                         {...formItemLayout}>
                         {getFieldDecorator('name', {
                             rules: [{
                                 required: true,
-                                message: 'Please enter your group name',
+                                message: 'Please enter your solution name',
                             }],
                         })(
-                            <Input placeholder="Ex: Greetings group, Sales group"/>
+                            <Input placeholder="Ex: Jobs file, Bullhorn connection"/>
                         )}
                     </FormItem>
 
                     <FormItem
-                        label="Solution Description"
-                        extra="Just a description for you"
+                        label="Solution Type"
+                        extra="The type of File or CRM you want to connect"
                         {...formItemLayout}>
-                        {getFieldDecorator('description', {
+                        {getFieldDecorator('type', {
                             rules: [{
                                 required: true,
-                                message: 'Please description to your group name',
+                                message: 'Please select what type of connection you are making',
                             }],
                         })(
-                            <Input placeholder="Ex: this is first group, this group help get info from user"/>
+                            <Select onChange={this.changeTypeHandler}>
+                                <OptGroup label={"File Upload"}>
+                                    {
+                                        this.props.databaseFileTypes.map(fileType => (
+                                                <Option key={fileType} value={fileType}>{fileType}</Option>
+                                            )
+                                        )
+                                    }
+                                </OptGroup>
+                                <OptGroup label={"CRM Connection"}>
+                                    {
+                                        this.props.databaseCRMTypes.map(CRMType => (
+                                                <Option key={CRMType} value={CRMType}>{CRMType}</Option>
+                                            )
+                                        )
+                                    }
+                                </OptGroup>
+                            </Select>
                         )}
                     </FormItem>
 
-
+                    <Tabs activeKey={this.state.connectionType} tabBarStyle={{display:"none"}}>
+                        <TabPane tab={"none"} key={"none"}>
+                            <div style={{height: "86px", width:"752px"}}/>
+                        </TabPane>
+                        <TabPane tab={"fileUpload"} key={"fileUpload"}>
+                            <Button htmlFor={"fileUpload"}><Icon type={"upload"}/>Click to Upload</Button>
+                            <FormItem
+                                label="Upload File"
+                                extra="Select the file you wish to upload"
+                                {...formItemLayout}>
+                                {getFieldDecorator('uploadFile', {
+                                    rules: [{
+                                        required: this.state.connectionType === "fileUpload",
+                                        message: 'Please select the file you wish to upload from your local machine',
+                                    }],
+                                })(
+                                    <Input type={"file"} id={"fileUpload"} hidden={false} placeholder="Ex: Jobs.xml, Client.json"/>
+                                )}
+                            </FormItem>
+                        </TabPane>
+                        <TabPane tab={"CRMConnection"} key={"CRMConnection"}>
+                            <FormItem
+                                label="CRM Connection Link"
+                                extra="Please paste your connection link"
+                                {...formItemLayout}>
+                                {getFieldDecorator('CRMLink', {
+                                    rules: [{
+                                        required: this.state.connectionType === "CRMConnection",
+                                        message: 'Please paste the connection link for your CRM provided to you by us or your CRM manager',
+                                    }],
+                                })(
+                                    <Input placeholder=""/>
+                                )}
+                            </FormItem>
+                        </TabPane>
+                    </Tabs>
                 </Form>
             </Modal>
         );

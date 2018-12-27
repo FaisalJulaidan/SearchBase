@@ -21,8 +21,33 @@ const getSolutionsFailure = (error) => {
     }
 };
 
+const addSolution = (assistantID, solution) => {
+    return {
+        type: actionTypes.ADD_SOLUTION_REQUEST,
+        assistantID,
+        solution
+    }
+};
+
+const addSolutionSuccess = (message) => {
+    return {
+        type: actionTypes.ADD_SOLUTION_SUCCESS,
+        message
+    }
+};
+
+const addSolutionFailure = (error) => {
+    return {
+        type: actionTypes.ADD_SOLUTION_FAILURE,
+        error
+    }
+};
+
 export const solutionsActions = {
     getSolutions,
     getSolutionsSuccess,
-    getSolutionsFailure
+    getSolutionsFailure,
+    addSolution,
+    addSolutionSuccess,
+    addSolutionFailure
 };

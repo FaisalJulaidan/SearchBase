@@ -11,19 +11,17 @@ import Groups from "../Flow/Groups/Groups";
 class Solutions extends React.Component{
     state = {
         currentSolution: {blocks: []},
-        databaseConnectionTypes: ["Upload Export File"],
-        databaseTypes: ["RDB XML File Export"]
+        databaseFileTypes: ["RDB XML File Export"],
+        databaseCRMTypes: ["Bullhorn", "RDB"]
     };
 
     componentDidMount() {
-        console.log("MOUNTED PROPS: ", this.props);
         const {assistant} = this.props.location.state;
         this.props.dispatch(solutionsActions.getSolutions(assistant.ID))
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.solutions !== this.props.solutions) {
-            console.log("SOLUTIONS RECEIVED");
             nextProps.solutionsData.map((solution) => {
                 if (solution.id === this.state.currentSolution.id)
                     this.setState({currentSolution: solution})
@@ -36,8 +34,9 @@ class Solutions extends React.Component{
 
     // GROUPS
     addSolution = (newSolution) => {
-        // const {assistant} = this.props.location.state;
-        // this.props.dispatch(flowActions.addSolutionRequest({ID: assistant.ID, newSolution: newSolution}));
+        const {assistant} = this.props.location.state;
+        console.log("NEW SOLUTION: ", newSolution);
+        this.props.dispatch(solutionsActions.addSolution({ID: assistant.ID, newSolution: newSolution}));
         // message.loading(`Adding ${newSolution.name} group`, 0);
     };
 
@@ -74,8 +73,6 @@ class Solutions extends React.Component{
 
 
     render(){
-        console.log("PROPS: ", this.props);
-
 
         return (
              <div style={{height: '100%'}}>
@@ -91,9 +88,12 @@ class Solutions extends React.Component{
                         <SolutionsDisplay selectSolution={this.selectSolution}
                                 isLoading={this.props.isLoading}
                                 solutionsData={this.props.solutionsData}
-                                addGroup={this.addGroup}
-                                editGroup={this.editGroup}
-                                deleteGroup={this.deleteGroup}/>
+                                addSolution={this.addSolution}
+                                editSolution={this.editSolution}
+                                deleteSolution={this.deleteSolution}
+                                databaseFileTypes={this.state.databaseFileTypes}
+                                databaseCRMTypes={this.state.databaseCRMTypes}
+                        />
 
                     </div>
 

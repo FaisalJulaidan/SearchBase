@@ -55,7 +55,7 @@ class NewGroup extends Component {
                         {getFieldDecorator('description', {
                             rules: [{
                                 required: true,
-                                message: 'Please description to your group name',
+                                message: 'Please add description to your group name',
                             }],
                         })(
                             <Input placeholder="Ex: this is first group, this group help get info from user"/>

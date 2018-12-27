@@ -7,7 +7,6 @@ export const solutions = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.GET_SOLUTIONS_REQUEST:
             return updateObject(state, {
-                solutionsData: {},
                 errorMsg: null,
                 isLoading: true
             });
@@ -18,7 +17,21 @@ export const solutions = (state = initialState, action) => {
             });
         case actionTypes.GET_SOLUTIONS_FAILURE:
             return updateObject(state, {
-                solutionsData: {},
+                isLoading: false,
+                errorMsg: action.error.msg
+            });
+        case actionTypes.ADD_SOLUTION_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isLoading: true
+            });
+        case actionTypes.ADD_SOLUTION_SUCCESS:
+            return updateObject(state, {
+                isLoading: false,
+                message: action.message
+            });
+        case actionTypes.ADD_SOLUTION_FAILURE:
+            return updateObject(state, {
                 isLoading: false,
                 errorMsg: action.error.msg
             });

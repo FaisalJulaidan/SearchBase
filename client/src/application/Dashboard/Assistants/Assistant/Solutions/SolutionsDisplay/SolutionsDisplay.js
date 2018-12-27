@@ -37,11 +37,11 @@ class SolutionsDisplay extends React.Component{
     };
 
     render (){
-        console.log("SOLUTIONS DISPLAY PROPS: ", this.props);
+        console.log("SOLUTIONS DISPLAY PROPS ON RENDER: ", this.props);
 
         return(
             <div className={styles.Panel}>
-                <div className={styles.Header}>
+                <div className={styles.Header} style={{}}>
                     <div>
                         <h3>Solutions List</h3>
                     </div>
@@ -52,8 +52,11 @@ class SolutionsDisplay extends React.Component{
                         </Button>
 
                         <NewSolution visible={this.state.newSolutionModal}
-                                  handleCancel={this.handleAddSolutionCancel}
-                                  handleSave={this.handleAddSolution}/>
+                                     handleCancel={this.handleAddSolutionCancel}
+                                     handleSave={this.handleAddSolution}
+                                     databaseFileTypes={this.props.databaseFileTypes}
+                                     databaseCRMTypes={this.props.databaseCRMTypes}
+                        />
                     </div>
                 </div>
 
@@ -65,7 +68,7 @@ class SolutionsDisplay extends React.Component{
                             :
                             <List
                                 itemLayout="horizontal"
-                                dataSource={this.props.groupsList}
+                                dataSource={this.props.solutionsData}
                                 renderItem={item => (
                                     <List.Item
                                         actions={[<Button icon={'edit'}
@@ -73,7 +76,7 @@ class SolutionsDisplay extends React.Component{
                                         <List.Item.Meta
                                             avatar={<Avatar icon="ordered-list"
                                                             style={{backgroundColor: '#9254de'}}/>}
-                                            title={<a onClick={() => this.props.selectSolution(item)}>{item.name}</a>}
+                                            title={<a onClick={() => this.props.selectSolution(item)}>{item.Solution.Name}</a>}
                                             description={item.description}
                                         />
                                     </List.Item>

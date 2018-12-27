@@ -2,18 +2,20 @@ from flask import Blueprint, request, redirect, flash, session
 from services import solutions_services, admin_services, assistant_services, sub_services, company_services
 from models import Callback, Solution, Company, Assistant
 from utilities import helpers
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 solutions_router: Blueprint = Blueprint('Solutions_router', __name__, template_folder="../../templates")
 
-@solutions_router.route("/admin/assistant/<assistantID>/solutions", methods=['GET', 'POST'])
-def admin_solutions(assistantID):
+# @solutions_router.route("/admin/assistant/<assistantID>/solutions", methods=['GET', 'POST'])
+# def admin_solutions(assistantID):
+#
+#     if request.method == "GET":
+#         return admin_services.render("admin/solutions.html", id=assistantID)
 
-    if request.method == "GET":
-        return admin_services.render("admin/solutions.html", id=assistantID)
 
-
-@solutions_router.route("/admin/assistant/<assistantID>/solutionsData", methods=['GET'])
+@solutions_router.route("/assistant/<assistantID>/solutionsData", methods=['GET', 'PUT', 'POST', 'DELETE'])
+@jwt_required
 def admin_solutions_data(assistantID):
 
     if request.method == "GET":
@@ -31,47 +33,53 @@ def admin_solutions_data(assistantID):
 
         return helpers.jsonResponse(True, 200, "Solutions have been retrieved", returnData)
 
+    if request.method == "PUT":
+        print(request.json)
+        fileName = request.json.get("name", default=None)
+        fileType = request.json.get("type", default=None)
+        print(request.json)
+        if not fileName or not fileType:
+            return helpers.jsonResponse(False, 403, "File name or type could not be retrieved")
 
-@solutions_router.route("/admin/assistant/<assistantID>/solutions/file", methods=['POST'])
-def admin_products_file_upload(assistantID):
-    if request.method == "POST":
-        fileName = request.form.get("fileName", default=None)
-        fileType = request.form.get("fileType", default=None)
-        solutionSelect = request.form.get("existingFile", default=None)
-        file = request.files.get("solutionsFile", default=None)
+        if fileType == "RDB XML File Export":
+            file = request.files.get("file", default=None)
+            print(file)
+            if not file:
+                return helpers.jsonResponse(False, 403, "File Type or Uploaded File could not be retrieved")
 
-        if not solutionSelect or not fileName or not fileType or not file:
-            return "File Type or Uploaded File could not be retrieved"
+            jsonstr_callback : Callback = solutions_services.convertXMLtoJSON(file)
+            if not jsonstr_callback.Success:
+                print(1)
+                return helpers.jsonResponse(False, 403, jsonstr_callback.Message)
 
-        if solutionSelect == "UploadExportFile":
-            if fileType == "RDBXML":
-                jsonstr_callback : Callback = solutions_services.convertXMLtoJSON(file)
-                if not jsonstr_callback.Success: return jsonstr_callback.Message
-
-                saveJson_callback : Callback = solutions_services.createNew(assistantID, jsonstr_callback.Data, fileType, fileName)
-            else:
-                return "Please insure you have selected the right File Type option"
-
-        elif solutionSelect.isdigit():
-            if fileType == "RDBXML":
-                jsonstr_callback : Callback = solutions_services.convertXMLtoJSON(file)
-                if not jsonstr_callback.Success: return jsonstr_callback.Message
-
-                saveJson_callback : Callback = solutions_services.updateByID(int(solutionSelect), jsonstr_callback.Data, fileType, fileName)
-                if saveJson_callback.Success:
-                    checkForAlerts_callback : Callback = solutions_services.checkAutomaticSolutionAlerts(int(solutionSelect))
-                    if checkForAlerts_callback.Success:
-                        if checkForAlerts_callback.Data:
-                            sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(int(solutionSelect))
-                            return saveJson_callback.Message + ". " + sendAlerts_callback.Message
-            else:
-                return "Please insure you have selected the right File Type option"
+            saveJson_callback : Callback = solutions_services.createNew(assistantID, jsonstr_callback.Data, fileType, fileName)
+            if not saveJson_callback.Success:
+                print(2)
+                return helpers.jsonResponse(False, 403, saveJson_callback.Message)
+            returnMessage = saveJson_callback.Message
         else:
-            return "Could not find the selected Action in the our system. Please try again."
+            print(3)
+            return helpers.jsonResponse(False, 403, "Please insure you have selected the right File Type option")
 
-        return saveJson_callback.Message
+        return helpers.jsonResponse(True, 200, returnMessage)
+        # UPDATE UPLOADED FILES:
+        #
+        #     jsonstr_callback : Callback = solutions_services.convertXMLtoJSON(file)
+        #     if not jsonstr_callback.Success: return jsonstr_callback.Message
+        #
+        #     saveJson_callback : Callback = solutions_services.updateByID(int(solutionSelect), jsonstr_callback.Data, fileType, fileName)
+        #     if saveJson_callback.Success:
+        #         checkForAlerts_callback : Callback = solutions_services.checkAutomaticSolutionAlerts(int(solutionSelect))
+        #         if checkForAlerts_callback.Success:
+        #             if checkForAlerts_callback.Data:
+        #                 sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(int(solutionSelect))
+        #                 return saveJson_callback.Message + ". " + sendAlerts_callback.Message
+        # else:
+        #     return "Please insure you have selected the right File Type option"
 
-@solutions_router.route("/admin/assistant/<assistantID>/savedisplaytitles/<solutionID>", methods=['POST'])
+
+@solutions_router.route("/assistant/<assistantID>/savedisplaytitles/<solutionID>", methods=['POST'])
+@jwt_required
 def admin_save_display_titles(assistantID, solutionID):
 
     if request.method == "POST":
@@ -86,7 +94,8 @@ def admin_save_display_titles(assistantID, solutionID):
         conditions_callback = solutions_services.saveDisplayTitles(solutionID, titlesArray)
         return conditions_callback.Message
 
-@solutions_router.route("/admin/assistant/<assistantID>/savesolutionweblink/<solutionID>", methods=['POST'])
+@solutions_router.route("/assistant/<assistantID>/savesolutionweblink/<solutionID>", methods=['POST'])
+@jwt_required
 def admin_save_solution_web_link(assistantID, solutionID):
 
     if request.method == "POST":
@@ -103,7 +112,8 @@ def admin_save_solution_web_link(assistantID, solutionID):
 
         return updateLinkAndRef_callback.Message
 
-@solutions_router.route("/admin/assistant/<assistantID>/requiredfilters/<solutionID>", methods=['POST'])
+@solutions_router.route("/assistant/<assistantID>/requiredfilters/<solutionID>", methods=['POST'])
+@jwt_required
 def admin_save_required_filters(assistantID, solutionID):
 
     if request.method == "POST":
@@ -123,7 +133,8 @@ def admin_save_required_filters(assistantID, solutionID):
         conditions_callback = solutions_services.saveRequiredFilters(solutionID, conditionsArray)
         return conditions_callback.Message
 
-@solutions_router.route("/admin/assistant/<assistantID>/sendsolutionalerts/<solutionID>", methods=['POST'])
+@solutions_router.route("/assistant/<assistantID>/sendsolutionalerts/<solutionID>", methods=['POST'])
+@jwt_required
 def admin_send_solution_alerts(assistantID, solutionID):
 
     if request.method == "POST":
@@ -132,7 +143,8 @@ def admin_send_solution_alerts(assistantID, solutionID):
 
         return sendAlerts_callback.Message
 
-@solutions_router.route("/admin/assistant/<assistantID>/automaticsolutionalerts/<solutionID>/<setTo>", methods=['POST'])
+@solutions_router.route("/assistant/<assistantID>/automaticsolutionalerts/<solutionID>/<setTo>", methods=['POST'])
+@jwt_required
 def admin_set_automatic_solution_alert(assistantID, solutionID, setTo):
 
     if request.method == "POST":

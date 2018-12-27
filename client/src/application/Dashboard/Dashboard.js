@@ -74,10 +74,10 @@ class Dashboard extends Component {
                             </Menu.Item>
                         </SubMenu>
 
-                        <Menu.Item key="billing">
-                            <Icon type="dollar"/>
-                            <span>Billing</span>
-                        </Menu.Item>
+                        {/*<Menu.Item key="billing">*/}
+                            {/*<Icon type="dollar"/>*/}
+                            {/*<span>Billing</span>*/}
+                        {/*</Menu.Item>*/}
                         <Menu.Item key="support">
                             <Icon type="question-circle"/>
                             <span>Support</span>

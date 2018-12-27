@@ -42,7 +42,7 @@ class Flow extends Component {
 
     deleteGroup = (deletedGroup) => {
         const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.deleteGroupRequest({ID: assistant.ID, deletedGroup: deletedGroup}));
+        this.props.dispatch(flowActions.deleteGroupRequest({assistantID: assistant.ID, deletedGroup: deletedGroup}));
     };
 
 
@@ -60,6 +60,11 @@ class Flow extends Component {
     deleteBlock = (deletedBlock, groupID) => {
         const {assistant} = this.props.location.state;
         this.props.dispatch(flowActions.deleteBlockRequest({deletedBlock, groupID, assistantID: assistant.ID}));
+    };
+
+    reorderBlocks = (newBlocksOrder, groupID) => {
+        const {assistant} = this.props.location.state;
+        this.props.dispatch(flowActions.updateBlocksOrderRequest({newBlocksOrder, groupID, assistantID: assistant.ID}));
     };
 
     render() {
@@ -89,6 +94,7 @@ class Flow extends Component {
                         <Blocks addBlock={this.addBlock}
                                 editBlock={this.editBlock}
                                 deleteBlock={this.deleteBlock}
+                                reorderBlocks={this.reorderBlocks}
                                 currentGroup={this.state.currentGroup}
                                 allGroups={this.props.blockGroups}/>
                     </div>

@@ -2,13 +2,11 @@ import {all, put, takeEvery} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {flowActions} from "../actions/flow.actions";
 import {http} from "../../helpers";
-import {alertSuccess, destroyMessage, loadingMessage} from "../../helpers/alert";
+import {alertError, alertSuccess, destroyMessage, loadingMessage} from "../../helpers/alert";
 
 function* fetchFlow({assistantID}) {
     try {
-        loadingMessage('Loading Flow');
         const res = yield http.get(`/assistant/${assistantID}/flow`);
-        yield destroyMessage();
         return yield put(flowActions.fetchFlowSuccess(res.data.data))
     } catch (error) {
         console.log(error);
@@ -50,7 +48,7 @@ function* editGroup(action) {
     }
 }
 
-function* deleteGroup({type, assistantID, deletedGroup}) {
+function* deleteGroup({assistantID, deletedGroup}) {
     try {
         loadingMessage('Deleting Group');
         const res = yield http.delete(`/assistant/${assistantID}/flow/group`, {data: {id: deletedGroup.id}});
@@ -130,6 +128,22 @@ function* deleteBlock({deletedBlock, assistantID, groupID}) {
     }
 }
 
+function* updateBlcoksOrder({newBlocksOrder, assistantID, groupID}) {
+    try {
+        loadingMessage('Updating Blocks Order');
+        const res = yield http.put(`/assistant/${assistantID}/flow`, {blocks: newBlocksOrder});
+        yield put(flowActions.updateBlocksOrderSuccess(res.data.msg));
+        yield destroyMessage();
+        yield alertSuccess('Order Updated', res.data.msg);
+        return yield put(flowActions.fetchFlowRequest(assistantID))
+    } catch (error) {
+        console.log(error);
+        yield destroyMessage();
+        yield alertError('Error in Block Delete', error.message);
+        return yield put(flowActions.updateBlocksOrderFailure(error.response.data));
+    }
+}
+
 function* watchAddBlock() {
     yield takeEvery(actionTypes.ADD_BLOCK_REQUEST, addBlock)
 }
@@ -142,6 +156,10 @@ function* watchDeleteBlock() {
     yield takeEvery(actionTypes.DELETE_BLOCK_REQUEST, deleteBlock)
 }
 
+function* watchUpdateBlcoksOrder() {
+    yield takeEvery(actionTypes.UPDATE_BLOCKS_ORDER_REQUEST, updateBlcoksOrder)
+}
+
 export function* flowSaga() {
     yield all([
         watchFetchFlow(),
@@ -152,6 +170,7 @@ export function* flowSaga() {
 
         watchAddBlock(),
         watchEditBlock(),
-        watchDeleteBlock()
+        watchDeleteBlock(),
+        watchUpdateBlcoksOrder()
     ])
 }

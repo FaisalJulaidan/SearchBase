@@ -76,7 +76,8 @@ def getBlocksByGroup(group: BlockGroup) -> List[dict]:
         for block in group.Blocks:
             blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,
                            'content': block.Content, 'storeInDB': block.StoreInDB,
-                           'labels': block.Labels, 'isSkippable': block.Skippable})
+                           'labels': block.Labels, 'isSkippable': block.Skippable,
+                           'groupID': block.GroupID})
         return blocks
     except Exception as e:
         print("getBlocks ERROR:", e)

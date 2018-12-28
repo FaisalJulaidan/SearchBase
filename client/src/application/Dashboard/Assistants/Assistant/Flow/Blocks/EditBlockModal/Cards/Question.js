@@ -77,7 +77,7 @@ class Question extends Component {
                 const answer = {
                     text: values.answer,
                     keywords: this.state.tags,
-                    blockToGoID: values.blockToGoID || values.blockToGoIDGroup,
+                    blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                     action: values.action,
                     afterMessage: values.afterMessage
                 };

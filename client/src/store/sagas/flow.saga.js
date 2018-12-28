@@ -128,14 +128,13 @@ function* deleteBlock({deletedBlock, assistantID, groupID}) {
     }
 }
 
-function* updateBlcoksOrder({newBlocksOrder, assistantID, groupID}) {
+function* updateBlcoksOrder({newBlocksOrder, assistantID}) {
     try {
         loadingMessage('Updating Blocks Order');
         const res = yield http.put(`/assistant/${assistantID}/flow`, {blocks: newBlocksOrder});
         yield put(flowActions.updateBlocksOrderSuccess(res.data.msg));
         yield destroyMessage();
-        yield alertSuccess('Order Updated', res.data.msg);
-        return yield put(flowActions.fetchFlowRequest(assistantID))
+        return yield alertSuccess('Order Updated', res.data.msg);
     } catch (error) {
         console.log(error);
         yield destroyMessage();

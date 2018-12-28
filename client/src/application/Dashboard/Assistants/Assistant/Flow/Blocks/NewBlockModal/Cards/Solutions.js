@@ -23,9 +23,9 @@ class Solutions extends Component {
                         isSkippable: values.isSkippable,
                         labels: '',
                         content: {
-                            showTop: values.showTop,
+                            showTop: Number(values.showTop),
                             action: values.action,
-                            blockToGoID: values.blockToGoID || values.blockToGoIDGroup,
+                            blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                             afterMessage: values.afterMessage,
                         }
                     }

@@ -1,4 +1,6 @@
 #!/bin/bash
+
+
 rm -rf ../static/react_app
 mkdir ../static/react_app
 find build -type f -maxdepth 1 -exec mv {} ../static/react_app \;

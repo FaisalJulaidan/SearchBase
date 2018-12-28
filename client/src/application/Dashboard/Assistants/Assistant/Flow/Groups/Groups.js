@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import "./Groups.less"
-import styles from "../Flow.module.less";
+import styles from "./Groups.module.less";
 import {Avatar, Button, List, Spin, Skeleton} from "antd";
 import NewGroup from "./NewGroup/NewGroup";
 import EditGroup from "./EditGroup/EditGroup";
@@ -45,12 +45,12 @@ class Groups extends Component {
     render() {
         return (
             <div className={styles.Panel}>
-                <div className={styles.Header}>
+                <div className={styles.Panel_Header}>
                     <div>
                         <h3>Flow Groups</h3>
                     </div>
                     <div>
-                        <Button className={styles.PanelButton} type="primary" icon="plus"
+                        <Button className={styles.Panel_Header_Button} type="primary" icon="plus"
                                 onClick={this.showNewGroupModal}>
                             Add Group
                         </Button>
@@ -62,7 +62,7 @@ class Groups extends Component {
                 </div>
 
 
-                <div className={styles.Body}>
+                <div className={styles.Panel_Body}>
                     {
                         this.props.isLoading ?
                             <Spin><Skeleton active={true}/></Spin>

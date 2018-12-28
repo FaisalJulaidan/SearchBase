@@ -3,10 +3,10 @@ import "./Flow.less"
 
 import Groups from "./Groups/Groups";
 import Blocks from "./Blocks/Blocks";
-import Header from "./Header/Header";
+import Header from "../../../../../components/Header/Header";
 import {flowActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
-
+import styles from "./Flow.module.less"
 class Flow extends Component {
 
     state = {
@@ -72,25 +72,18 @@ class Flow extends Component {
 
         return (
             <div style={{height: '100%'}}>
-                <div style={{padding: '0 5px'}}>
-                    <div style={{width: '100%', height: 56, marginBottom: 10}}>
-                        <Header assistantName={assistant.Name}/>
-                    </div>
-                </div>
+                <Header display={assistant.Name}/>
 
-                <div style={{height: 'calc(100% - 66px)', width: '100%', display: 'flex'}}>
-                    <div style={{margin: 5, width: '30%'}}>
-
+                <div className={styles.Panel_Body_Only}>
+                    <div style={{margin: '0 5px 0 0', width: '30%'}}>
                         <Groups selectGroup={this.selectGroup}
                                 isLoading={this.props.isLoading}
                                 groupsList={this.props.blockGroups}
                                 addGroup={this.addGroup}
                                 editGroup={this.editGroup}
                                 deleteGroup={this.deleteGroup}/>
-
                     </div>
-
-                    <div style={{margin: 5, width: '70%'}}>
+                    <div style={{margin: '0 0 0 5px', width: '70%'}}>
                         <Blocks addBlock={this.addBlock}
                                 editBlock={this.editBlock}
                                 deleteBlock={this.deleteBlock}
@@ -100,6 +93,7 @@ class Flow extends Component {
                     </div>
                 </div>
             </div>
+
         );
     }
 
@@ -125,5 +119,3 @@ function mapStateToProps(state) {
 
 
 export default connect(mapStateToProps)(Flow);
-
-

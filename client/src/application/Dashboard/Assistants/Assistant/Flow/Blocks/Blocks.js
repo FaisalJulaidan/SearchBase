@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import "./Blocks.less"
-import styles from "../Flow.module.less";
+import styles from "./Blocks.module.less";
 import {Button, Form, Modal} from "antd";
 
 import Block from "./Block/Block";
@@ -83,19 +83,19 @@ class Blocks extends Component {
     render() {
         return (
             <div className={styles.Panel}>
-                <div className={styles.Header}>
+                <div className={styles.Panel_Header}>
                     <div>
                         <h3>{this.props.currentGroup.name} Blocks</h3>
                     </div>
                     <div>
-                        <Button className={styles.PanelButton} type="primary" icon="plus"
+                        <Button className={styles.Panel_Header_Button} type="primary" icon="plus"
                                 onClick={this.showAddBlockModal} disabled={!this.props.currentGroup.id}>
                             Add Block
                         </Button>
                     </div>
                 </div>
 
-                <div className={styles.Body}>
+                <div className={styles.Panel_Body}>
                     <div style={{height: "100%", width: '100%', overflowY: 'auto'}}>
 
                         <DragDropContext onDragEnd={this.onDragEnd}>

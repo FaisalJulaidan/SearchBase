@@ -36,6 +36,10 @@ class Solutions extends React.Component{
     addSolution = (newSolution) => {
         const {assistant} = this.props.location.state;
         console.log("NEW SOLUTION: ", newSolution);
+        for (let pair of newSolution.entries()) {
+            console.log(pair[0]+ ', ' + pair[1]);
+            console.log(typeof pair[1])
+        }
         this.props.dispatch(solutionsActions.addSolution({ID: assistant.ID, newSolution: newSolution}));
         // message.loading(`Adding ${newSolution.name} group`, 0);
     };

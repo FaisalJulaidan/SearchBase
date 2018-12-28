@@ -15,11 +15,11 @@ function* getSolutionsData({assistantID}) {
 
 }
 
-function* addSolution({assistantID, solution}) {
+function* addSolution(action) {
     try {
-        const res = yield http.put(`/assistant/${assistantID}/solutionsData`, solution);
-        yield put(solutionsActions.addSolutionSuccess(res.message))
-        return getSolutionsData({assistantID})
+        const res = yield http.put(`/assistant/${action.params.ID}/solutionsData`, action.params.newSolution);
+        yield put(solutionsActions.addSolutionSuccess(res.message));
+        return getSolutionsData(action.assistantID)
     } catch (error) {
         console.log(error);
         return yield put(solutionsActions.addSolutionFailure(error.response.data));

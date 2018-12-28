@@ -10,16 +10,26 @@ const Option = Select.Option;
 class NewSolution extends React.Component {
 
     state = {
-        connectionType: "none"
+        connectionType: "none",
+        uploadFile: undefined
     };
 
     handleSave = () => this.props.form.validateFields((err, values) => {
-        if (!err)
-            this.props.handleSave(values)
+        if (!err && this.state.uploadFile){
+            values["uploadFile"] = this.state.uploadFile;
+            const formData = new FormData();
+            for (let key in values) {
+                // skip loop if the property is from prototype
+                if (!values.hasOwnProperty(key)) continue;
+
+                formData.append(key, values[key]);
+            }
+            this.props.handleSave(formData);
+            this.resetState();
+        }
     });
 
     changeTypeHandler = (e) => {
-        console.log("e: ", e);
         if (e === "RDB XML File Export") {
             this.setState({connectionType: "fileUpload"});
         }
@@ -30,13 +40,27 @@ class NewSolution extends React.Component {
         }
     };
 
+    onFileChange = (e) => {
+      const file = e.target.files[0];
+      this.setState({uploadFile: file})
+    };
+
+    resetState = () => {
+        this.setState({uploadFile: undefined, connectionType: "none"});
+    };
+
+    closeModal = () => {
+        this.resetState();
+        this.props.handleCancel();
+    };
+
     render() {
         const formItemLayout = {
             labelCol: {span: 6},
             wrapperCol: {span: 14},
         };
         const {getFieldDecorator} = this.props.form;
-
+        console.log(this.state);
         return (
             <Modal
                 width={800}
@@ -46,7 +70,7 @@ class NewSolution extends React.Component {
                 onOk={this.props.handleSave}
                 onCancel={this.props.handleCancel}
                 footer={[
-                    <Button key="Cancel" onClick={this.props.handleCancel}>Cancel</Button>,
+                    <Button key="Cancel" onClick={this.closeModal}>Cancel</Button>,
                     <Button key="submit" type="primary" onClick={this.handleSave}>
                         Add
                     </Button>
@@ -85,14 +109,14 @@ class NewSolution extends React.Component {
                                         )
                                     }
                                 </OptGroup>
-                                <OptGroup label={"CRM Connection"}>
-                                    {
-                                        this.props.databaseCRMTypes.map(CRMType => (
-                                                <Option key={CRMType} value={CRMType}>{CRMType}</Option>
-                                            )
-                                        )
-                                    }
-                                </OptGroup>
+                                {/*<OptGroup label={"CRM Connection"}>*/}
+                                    {/*{*/}
+                                        {/*this.props.databaseCRMTypes.map(CRMType => (*/}
+                                                {/*<Option key={CRMType} value={CRMType}>{CRMType}</Option>*/}
+                                            {/*)*/}
+                                        {/*)*/}
+                                    {/*}*/}
+                                {/*</OptGroup>*/}
                             </Select>
                         )}
                     </FormItem>
@@ -102,19 +126,17 @@ class NewSolution extends React.Component {
                             <div style={{height: "86px", width:"752px"}}/>
                         </TabPane>
                         <TabPane tab={"fileUpload"} key={"fileUpload"}>
-                            <Button htmlFor={"fileUpload"}><Icon type={"upload"}/>Click to Upload</Button>
+                            {/*<Button htmlFor={"fileUpload"}><Icon type={"upload"}/>Click to Upload</Button>*/}
                             <FormItem
                                 label="Upload File"
                                 extra="Select the file you wish to upload"
                                 {...formItemLayout}>
-                                {getFieldDecorator('uploadFile', {
-                                    rules: [{
-                                        required: this.state.connectionType === "fileUpload",
-                                        message: 'Please select the file you wish to upload from your local machine',
-                                    }],
-                                })(
-                                    <Input type={"file"} id={"fileUpload"} hidden={false} placeholder="Ex: Jobs.xml, Client.json"/>
-                                )}
+
+                                <Input type={"file"} id={"fileUpload"} hidden={true} onChange={this.onFileChange}/>
+                                <Button onClick={() => {document.getElementById("fileUpload").click()}}>
+                                    <Icon type={"upload"}/>Select File
+                                </Button> <label>{this.state.uploadFile ? this.state.uploadFile.name : "No File Chosen"}</label>
+
                             </FormItem>
                         </TabPane>
                         <TabPane tab={"CRMConnection"} key={"CRMConnection"}>

@@ -21,11 +21,11 @@ const getSolutionsFailure = (error) => {
     }
 };
 
-const addSolution = (assistantID, solution) => {
+const addSolution = (params) => {
+    console.log(params);
     return {
         type: actionTypes.ADD_SOLUTION_REQUEST,
-        assistantID,
-        solution
+        params
     }
 };
 

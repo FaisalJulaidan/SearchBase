@@ -87,7 +87,7 @@ class Integration extends React.Component {
     render() {
         return (
             <div style={{height: '100%'}}>
-                <Header display={"Integration"}/>
+                <Header display={`Integration`}/>
 
                 <div className={styles.Panel_Body_Only}>
                     <div style={{marginRight: 5, width: '45%'}} className={styles.Panel}>
@@ -101,6 +101,7 @@ class Integration extends React.Component {
                                 Simply pick your preferred one bellow.</p>
 
                             <table style={{margin: "5% 28%"}}>
+                                <tbody>
                                 <tr style={{paddingLeft: "12%"}}>
                                     <td><label style={{fontSize: "16px", fontWeight: "500"}}>Circle</label></td>
                                     <td style={{paddingLeft: "34%", paddingTop: "5%"}}>
@@ -109,6 +110,7 @@ class Integration extends React.Component {
                                                onChange={this.handleChange}/>
                                     </td>
                                 </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>

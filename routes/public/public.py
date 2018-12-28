@@ -1,10 +1,8 @@
 import os
-
-from flask import Blueprint, render_template, request, session, redirect, url_for, jsonify, send_from_directory
+from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory
 from flask_cors import CORS
 from itsdangerous import URLSafeTimedSerializer
 
-from models import Callback
 from services import user_services, auth_services, mail_services
 from utilities import helpers
 
@@ -13,51 +11,27 @@ CORS(public_router)
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 
-# Data for the user which to be displayed on every admin page
-@public_router.route("/testAPI", methods=['GET'])
-def getDoTest():
-    if request.method == "GET":
-        return jsonify({"status": "yay it's working"})
-
-
-# @public_router.route("/", methods=['GET'])
-# def indexpage():
-#     if request.method == "GET":
-#         print(helpers.encrypt_id(1))
-#         print(helpers.decrypt_id('YJkLo'))
-#         print(helpers.encrypt_id(1) == helpers.decrypt_id('YJkLo')[0])
-#         return render_template("index.html")
-
 # Serve React App
-@public_router.route('/', defaults={'path': ''})
-@public_router.route('/<path:path>')
+@public_router.route('/login', defaults={'path': ''})
+@public_router.route('/dashboard', defaults={'path': ''})
+@public_router.route('/dashboard/<path:path>')
 def serve(path):
-    print(os.path.exists("static/react_app/build/" + path))
-    print("HHHHHH")
     if path != "" and os.path.exists("static/react_app/" + path):
-        print("1")
-        return send_from_directory('static/react_app/', path)
+        return send_from_directory('static/react_app', path)
     else:
-        print("2")
-        return send_from_directory('static/react_app/', 'index.html')
+        # return redirect(url_for("public_router.serve('')"))
+        return send_from_directory('static/react_app', 'index.html')
 
 
-# # Serve React App
-# @public_router.route('/')
-# def serve():
-#     print("HERE")
-#     return send_from_directory('static/react_app/build', 'index.html')
+@public_router.route("/", methods=['GET'])
+def indexpage():
+    if request.method == "GET":
+        return render_template("index.html")
 
 @public_router.route("/features", methods=['GET'])
 def features():
     if request.method == "GET":
         return render_template("features.html")
-
-
-@public_router.route("/react", methods=['GET'])
-def react():
-    if request.method == "GET":
-        return render_template("react_app/index.html")
 
 
 @public_router.route("/dataRetrieval", methods=['GET'])
@@ -88,14 +62,6 @@ def about():
 def contactpage():
     if request.method == "GET":
         return render_template("contact.html")
-
-
-# # Sitemap route
-# @public_router.route('/robots.txt')
-# @public_router.route('/sitemap.xml')
-# def static_from_root():
-#     return send_from_directory(app.static_folder, request.path[1:])
-
 
 # Terms and conditions page route
 @public_router.route("/termsandconditions", methods=['GET'])
@@ -135,7 +101,7 @@ def sendEmail():
         return render_template("index.html")
 
 
-@public_router.route("/login", methods=['GET', 'POST'])
+@public_router.route("/login_deprecated", methods=['GET', 'POST'])
 def login():
     if request.method == "GET":
         msg = helpers.checkForMessage()

@@ -51,8 +51,8 @@ if (env.stringified['process.env'].NODE_ENV !== '"production"') {
 const useTypeScript = fs.existsSync(paths.appTsConfig);
 
 // style files regexes
-const cssRegex = /\.css$/;
-const cssModuleRegex = /\.module\.css$/;
+const cssRegex = /\.(?:le|c)ss$/;
+const cssModuleRegex = /\.module\.(?:le|c)ss$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
 
@@ -69,6 +69,12 @@ const getStyleLoaders = (cssOptions, preProcessor) => {
     {
       loader: require.resolve('css-loader'),
       options: cssOptions,
+    }, {
+          loader: require.resolve('less-loader'),
+          options: {
+              importLoaders: 1,
+              javascriptEnabled: true
+          },
     },
     {
       // Options for PostCSS as we reference these options twice
@@ -92,14 +98,18 @@ const getStyleLoaders = (cssOptions, preProcessor) => {
       },
     },
   ];
-  if (preProcessor) {
-    loaders.push({
-      loader: require.resolve(preProcessor),
-      options: {
-        sourceMap: shouldUseSourceMap,
-      },
-    });
-  }
+    Array.prototype.insert = function (index, item) {
+        this.splice(index, 0, item);
+    };
+
+    if (typeof preProcessor === 'string') {
+        loaders.push(require.resolve(preProcessor));
+    } else if (typeof preProcessor === 'object') {
+        loaders.insert(2, {
+            loader: require.resolve(preProcessor.loader),
+            options: preProcessor.options
+        });
+    }
   return loaders;
 };
 

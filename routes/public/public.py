@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory
 from flask_cors import CORS
 from itsdangerous import URLSafeTimedSerializer
-
+from models import Callback
 from services import user_services, auth_services, mail_services
 from utilities import helpers
 

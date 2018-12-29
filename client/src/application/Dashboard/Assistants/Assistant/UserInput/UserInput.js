@@ -1,7 +1,7 @@
 import React from 'react';
 import "./UserInput.less"
 import styles from "./UserInput.module.less"
-import Header from "./Header/Header"
+import Header from "../../../../../components/Header/Header";
 
 import {userInputActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
@@ -32,14 +32,16 @@ class UserInput extends React.Component {
     }, {
         title: 'Questions Answered',
         dataIndex: 'QuestionsAnswered',
+        key: 'QuestionsAnswered',
     }, {
         title: 'Solutions Returned',
         dataIndex: 'SolutionsReturned',
     }, {
         title: 'Time Spent',
         dataIndex: 'TimeSpent',
+        key: 'TimeSpent',
         render: (text, record) => (<p>{
-            moment.duration(parseInt('55'), 'seconds').asMinutes().toFixed(2) + " minute(s)"
+            moment.duration(parseInt(text), 'seconds').asMinutes().toFixed(2) + " minute(s)"
         }
         </p>),
 
@@ -49,7 +51,6 @@ class UserInput extends React.Component {
         render: (text, record, index) => (
             <span>
               <a onClick={()=> {
-                  console.log(record);
                   this.setState({viewModal: true, selectedRecord: record})
                 }
               }> View</a>
@@ -87,10 +88,13 @@ class UserInput extends React.Component {
 
     render() {
         const {assistant} = this.props.location.state;
-
+        console.log(this.props.userInputs);
         return (
 
             <div style={{height: '100%'}}>
+
+                <Header display={assistant.Name}/>
+
                 <div className={styles.Panel}>
                     <div className={styles.Panel_Header}>
                         <div>
@@ -115,13 +119,11 @@ class UserInput extends React.Component {
 
                 <ViewModal visible={this.state.viewModal}
                            closeViewModal={this.closeViewModal}
+                           filesPath={this.props.userInputs.filesPath}
                            record={this.state.selectedRecord}
+                           assistant={assistant}
                 />
             </div>
-
-
-
-
         );
     }
 }

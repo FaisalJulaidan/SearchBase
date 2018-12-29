@@ -1,11 +1,13 @@
 import React from 'react';
 
-import {Button, Input} from "antd";
+import {Button, Col, Input, Row} from "antd";
 import Header from "../../../../../components/Header/Header"
 
 import styles from "./Integration.module.less"
 import ReactDOMServer from 'react-dom/server'
 import {hasher} from "../../../../../helpers"
+import {SwatchesPicker} from 'react-color';
+
 import "./Integration.less"
 
 class Integration extends React.Component {
@@ -31,17 +33,13 @@ class Integration extends React.Component {
         this.removeChatbot();
     }
 
-    handleChange = ({target}) => {
-        this.setState({
-            [target.name]: target.value
-        });
-    };
+    handleChange = (color) => this.setState({dataCircle: color.hex || color.target.value});
 
     removeChatbot = () => {
         let oldBot = document.getElementById("TheSearchBase_Chatbot");
-        if(oldBot){ oldBot.remove(); }
+        if (oldBot) oldBot.remove();
         let oldBotScript = document.getElementById("oldBotScript");
-        if(oldBotScript){ oldBotScript.remove(); }
+        if (oldBotScript) oldBotScript.remove();
     };
 
     copyScriptPaste = () => {
@@ -97,23 +95,35 @@ class Integration extends React.Component {
                         </div>
 
                         <div className={styles.Panel_Body}>
-                            <p> Currently you can edit the colour setting of your assistant's button.
-                                Simply pick your preferred one bellow.</p>
+                            <Row type="flex" justify="center">
+                                <Col>
+                                    <p> Currently you can edit the colour setting of your assistant's button.
+                                        Simply pick your preferred one bellow.</p>
+                                </Col>
+                            </Row>
 
-                            <table style={{margin: "5% 28%"}}>
-                                <tbody>
-                                <tr style={{paddingLeft: "12%"}}>
-                                    <td><label style={{fontSize: "16px", fontWeight: "500"}}>Circle</label></td>
-                                    <td style={{paddingLeft: "34%", paddingTop: "5%"}}>
-                                        <Input style={{padding: "3px", width: "60px"}} className={"antd-primary"}
-                                               type="color" name="dataCircle" value={this.state.dataCircle}
-                                               onChange={this.handleChange}/>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                            <br/>
+
+                            <Row type="flex" justify="center" style={{marginBottom: 50}}>
+                                <Col>
+                                    <SwatchesPicker color={this.state.dataCircle} onChange={this.handleChange}/>
+                                </Col>
+                            </Row>
+
+                            <Row type="flex" justify="center">
+                                <Col>
+                                    <p style={{lineHeight: '27px', marginRight: 5}}>Selected Color:</p>
+                                </Col>
+                                <Col>
+                                    <Input style={{padding: "3px", width: "60px"}} type="color" name="dataCircle"
+                                           value={this.state.dataCircle} onChange={this.handleChange}/>
+                                </Col>
+
+                            </Row>
                         </div>
                     </div>
+
+
                     <div style={{marginLeft: 5, width: '55%'}} className={styles.Panel}>
 
                         <div className={styles.Panel_Header} style={{position: "inherit"}}>

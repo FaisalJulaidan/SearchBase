@@ -5,9 +5,11 @@ from utilities import helpers
 from models import Callback, Assistant, db, ChatbotSession
 from services import assistant_services, flow_services, chatbot_services, solutions_services
 from werkzeug.utils import secure_filename
+from sqlalchemy.sql import and_
 import uuid
+from sqlalchemy import inspect
 from flask_cors import CORS
-from utilities.helpers import gzipped
+from utilities import helpers
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
 
@@ -89,7 +91,7 @@ def getSolutions_forChatbot(assistantIDAsHash):
 
 
 @chatbot_router.route("/userdownloads/<path:path>", methods=['GET'])
-@gzipped
+@helpers.gzipped
 def assistant_userdownloads(path):
     if request.method == "GET":
         return send_from_directory('static/user_downloads/', path)
@@ -112,6 +114,8 @@ def get_pop_settings(assistantIDAsHash):
 
 @chatbot_router.route("/assistant/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(sessionID):
+
+
     callback: Callback = chatbot_services.getBySessionID(sessionID)
     if not callback.Success:
         return helpers.jsonResponse(False, 404, "Session not found.", None)
@@ -122,20 +126,32 @@ def chatbot_upload_files(sessionID):
         if request.method == 'POST':
 
             try:
-                # check if the post request has the file part
+                # Check if the post request has the file part
                 if 'file' not in request.files:
                     return helpers.jsonResponse(False, 404, "No file part")
-                file = request.files['file']
+                filenames = ''
+                for file in request.files.getlist('file'):
+                    if file.filename == '':
+                        return helpers.jsonResponse(False, 404, "No selected file")
 
-                if file.filename == '':
-                    return helpers.jsonResponse(False, 404, "No selected file")
+                    # Generate unique name: hash_sessionIDEncrypted.extension
+                    filename = str(uuid.uuid4()) + '_' + helpers.encrypt_id(sessionID) + '.' + \
+                               secure_filename(file.filename).rsplit('.', 1)[1].lower()
+                    # Save file in the server
+                    file.save(os.path.join(BaseConfig.USER_FILES, filename))
 
-                filename = str(uuid.uuid4()) + '.' + secure_filename(file.filename).rsplit('.', 1)[1].lower()
-                file.save(os.path.join(BaseConfig.USER_FILES, filename))
-                userInput.FilePath = filename
+                    # if there is multiple files, split there name by commas
+                    if filenames == '':
+                        filenames = filename
+                    else:
+                        filenames+= ',' + filename
+
+                # Store filenames in the DB
+                userInput.FilePath = filenames
 
             except Exception as exc:
+                print(exc)
                 return helpers.jsonResponse(False, 404, "Couldn't save the file")
-
+            # Save changes
             db.session.commit()
             return helpers.jsonResponse(True, 200, "File uploaded successfully!!")

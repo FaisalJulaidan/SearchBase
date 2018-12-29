@@ -128,7 +128,7 @@ function* deleteBlock({deletedBlock, assistantID, groupID}) {
     }
 }
 
-function* updateBlcoksOrder({newBlocksOrder, assistantID}) {
+function* updateBlocksOrder({newBlocksOrder, assistantID}) {
     try {
         loadingMessage('Updating Blocks Order');
         const res = yield http.put(`/assistant/${assistantID}/flow`, {blocks: newBlocksOrder});
@@ -156,7 +156,7 @@ function* watchDeleteBlock() {
 }
 
 function* watchUpdateBlcoksOrder() {
-    yield takeEvery(actionTypes.UPDATE_BLOCKS_ORDER_REQUEST, updateBlcoksOrder)
+    yield takeEvery(actionTypes.UPDATE_BLOCKS_ORDER_REQUEST, updateBlocksOrder)
 }
 
 export function* flowSaga() {

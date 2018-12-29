@@ -1045,7 +1045,7 @@
 
             class BlockTypeUserInput {
                 constructor(text, action, validation, blockToGoID, storeInDB, isSkippable, type, order, id, labels, afterMessage = "") {
-                    this.UserInput = {
+                    this.Home = {
                         content: {
                             action: action ? action : 'Go To Next Block',
                             text: text,
@@ -1178,7 +1178,7 @@
                     let labels = blockLabelsArrayToSendString(getLabelsFromBlockLabels(id));
                     let isSkippable = document.getElementById('skippable' + id).checked;
 
-                    botData.blocks.push(new BlockTypeUserInput(text, action, validation, blockToGoID, storeInDB, isSkippable, type, order, id, labels, afterMessage).UserInput);
+                    botData.blocks.push(new BlockTypeUserInput(text, action, validation, blockToGoID, storeInDB, isSkippable, type, order, id, labels, afterMessage).Home);
                 }
 
                 if (type == 'File Upload') {

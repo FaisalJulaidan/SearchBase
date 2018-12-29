@@ -11,6 +11,8 @@ import Profile from "./Profile/Profile";
 import Integration from "./Assistants/Assistant/Integration/Integration";
 import UserInput from "./Assistants/Assistant/UserInput/UserInput";
 import Solutions from "./Assistants/Assistant/Solutions/Solutions";
+import Home from "./Home/Home";
+
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -97,7 +99,6 @@ class Dashboard extends Component {
 
                     {/*HERE GOES ALL THE ROUTES*/}
                     <Content style={{margin: 16, marginTop: 80, marginBottom: 0, height: '100%'}}>
-
                         <Switch>
                             <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
                             <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
@@ -105,13 +106,15 @@ class Dashboard extends Component {
                             <Route path={`${match.path}/assistants/:id/solutions`} component={Solutions}/>
                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                             <Route path={`${match.path}/profile`} component={Profile} exact/>
-
-                            {/*<Route path="/dashboard" component={Dashboard}/>*/}
+                            <Route path="/dashboard" component={Home}/>
                         </Switch>
                     </Content>
 
+
+
+
                     <Footer style={{textAlign: 'center', padding: 10}}>
-                        The Search Base ©2018
+                        Copyright TheSearchBase Limited 2019. All rights reserved.
                     </Footer>
                 </Layout>
             </Layout>

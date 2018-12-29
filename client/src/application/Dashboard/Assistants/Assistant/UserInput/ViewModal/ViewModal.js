@@ -1,10 +1,8 @@
 import React, {Component} from 'react';
 import "./ViewModal.less"
 import {Button, Modal, Table} from "antd";
-import axios from 'axios';
 import {http, alertError} from '../../../../../../helpers';
 import saveAs from 'file-saver';
-import moment from "moment";
 
 
 class ViewModal extends Component {
@@ -45,13 +43,15 @@ class ViewModal extends Component {
     }
 
     downloadFile = (e) => {
+        // Get file name by index. indexes stored in each button corresponds to filenames stored in the state
         const fileName = this.state.fileNames[e.target.getAttribute('data-index')];
         if (!fileName){
             alertError("File Error", "Sorry, but file doesn't exist!");
             return;
         }
+
         http({
-            url: `/assistant/1/userinput/${fileName}`,
+            url: `/assistant/${this.props.assistant.ID}/userinput/${fileName}`,
             method: 'GET',
             responseType: 'blob', // important
         }).then((response) => {
@@ -63,7 +63,7 @@ class ViewModal extends Component {
 
     render() {
         const {record} = this.props;
-        console.log(this.props);
+        console.log(this.state);
         return (
             <Modal
                 width={800}

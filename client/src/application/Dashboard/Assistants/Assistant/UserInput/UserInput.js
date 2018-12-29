@@ -118,6 +118,7 @@ class UserInput extends React.Component {
                            closeViewModal={this.closeViewModal}
                            filesPath={this.props.userInputs.filesPath}
                            record={this.state.selectedRecord}
+                           assistant={this.props.location.state.assistant}
                 />
             </div>
 

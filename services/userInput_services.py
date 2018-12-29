@@ -3,7 +3,6 @@ from utilities import helpers
 from sqlalchemy.sql import and_
 
 
-
 def getByAssistantID(assistantID):
     try:
         result = db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID).all()

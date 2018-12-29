@@ -108,10 +108,17 @@ class Dashboard extends Component {
 
                             {/*<Route path="/dashboard" component={Dashboard}/>*/}
                         </Switch>
+
+                        <h1>Welcome to the Dashboard.</h1>
+                        <h3>Use your side navigation to navigate the application.</h3>
+
                     </Content>
 
+
+
+
                     <Footer style={{textAlign: 'center', padding: 10}}>
-                        The Search Base ©2018
+                        Copyright TheSearchBase Limited 2019. All rights reserved.
                     </Footer>
                 </Layout>
             </Layout>

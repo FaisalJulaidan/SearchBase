@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import "./Groups.less"
 import styles from "./Groups.module.less";
-import {Avatar, Button, List, Spin, Skeleton} from "antd";
+import {Avatar, Button, List, Skeleton, Spin} from "antd";
 import NewGroup from "./NewGroup/NewGroup";
 import EditGroup from "./EditGroup/EditGroup";
 
@@ -71,13 +71,13 @@ class Groups extends Component {
                                 itemLayout="horizontal"
                                 dataSource={this.props.groupsList}
                                 renderItem={item => (
-                                    <List.Item
-                                        actions={[<Button icon={'edit'}
-                                                          onClick={() => this.showEditGroupModal(item)}/>]}>
+                                    <List.Item actions={[<Button icon={'edit'}
+                                                                 onClick={() => this.showEditGroupModal(item)}/>]}>
                                         <List.Item.Meta
-                                            avatar={<Avatar icon="ordered-list"
-                                                            style={{backgroundColor: '#9254de'}}/>}
-                                            title={<a onClick={() => this.props.selectGroup(item)}>{item.name}</a>}
+                                            onClick={() => this.props.selectGroup(item)}
+                                            className={styles.groupsList}
+                                            avatar={<Avatar icon="ordered-list" style={{backgroundColor: '#9254de'}}/>}
+                                            title={item.name}
                                             description={item.description}
                                         />
                                     </List.Item>

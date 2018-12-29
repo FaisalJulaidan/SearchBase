@@ -36,7 +36,7 @@ const menu = (assistant) => (
         <Menu.Divider/>
         <Menu.Item key="4">
             <Link to={{
-                      pathname: `integration/${assistant.ID}`,
+                      pathname: `assistants/${assistant.ID}/integration`,
                       state: {assistant: assistant}
                   }}>
                 <Icon type="sync"/> Integration

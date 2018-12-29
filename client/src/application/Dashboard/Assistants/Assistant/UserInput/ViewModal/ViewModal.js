@@ -1,13 +1,18 @@
 import React, {Component} from 'react';
 import "./ViewModal.less"
 import {Button, Modal, Table} from "antd";
+import axios from 'axios';
+import {http, alertError} from '../../../../../../helpers';
+import saveAs from 'file-saver';
 import moment from "moment";
 
 
 class ViewModal extends Component {
 
-    state = {};
-
+    state = {
+        fileNames: []
+    };
+    counter = -1;
     columns = [{
         title: 'Question',
         key: 'questionText',
@@ -15,14 +20,50 @@ class ViewModal extends Component {
     }, {
         title: 'Input',
         key: 'input',
-        render: (text, record, index) => (
-            <p>
-                {record.input}
-            </p>
-        ),
+        render: (text, record, index) => {
+
+            if (record.input === '&FILE_UPLOAD&') {
+                this.counter+=1;
+                return (<Button hreftype="primary" data-index={this.counter} icon="download" size="small"
+                                onClick={(e) => {this.downloadFile(e)}}>
+                    Download File
+                </Button>);
+            }
+
+            else {
+               return (<p>
+                   {record.input}
+               </p>);
+            }
+        },
     }];
 
+    componentWillReceiveProps(nextProps, nextContext) {
+        if(nextProps.record && nextProps.record.FilePath){
+            this.setState({fileNames: nextProps.record.FilePath.split(',')})
+        }
+    }
+
+    downloadFile = (e) => {
+        const fileName = this.state.fileNames[e.target.getAttribute('data-index')];
+        if (!fileName){
+            alertError("File Error", "Sorry, but file doesn't exist!");
+            return;
+        }
+        http({
+            url: `/assistant/1/userinput/${fileName}`,
+            method: 'GET',
+            responseType: 'blob', // important
+        }).then((response) => {
+            saveAs(new Blob([response.data]), fileName);
+        }).catch(error => {
+            alertError("File Error", "Sorry, cannot download this file!")
+        });
+    };
+
     render() {
+        const {record} = this.props;
+        console.log(this.props);
         return (
             <Modal
                 width={800}
@@ -36,7 +77,7 @@ class ViewModal extends Component {
                 ]}>
                 {this.props.record ? (
                     <Table columns={this.columns}
-                           dataSource={this.props.record.Data.collectedInformation}
+                           dataSource={record.Data.collectedInformation}
                            size='middle'
                            pagination={false}
                     />

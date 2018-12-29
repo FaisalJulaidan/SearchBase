@@ -3,11 +3,10 @@ import "./Flow.less"
 
 import Groups from "./Groups/Groups";
 import Blocks from "./Blocks/Blocks";
-import Header from "./Header/Header";
+import Header from "../../../../../components/Header/Header";
 import {flowActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
-import {message} from "antd";
-
+import styles from "./Flow.module.less"
 class Flow extends Component {
 
     state = {
@@ -34,19 +33,16 @@ class Flow extends Component {
     addGroup = (newGroup) => {
         const {assistant} = this.props.location.state;
         this.props.dispatch(flowActions.addGroupRequest({ID: assistant.ID, newGroup: newGroup}));
-        message.loading(`Adding ${newGroup.name} group`, 0);
     };
 
     editGroup = (editedGroup) => {
         const {assistant} = this.props.location.state;
         this.props.dispatch(flowActions.editGroupRequest({ID: assistant.ID, editedGroup: editedGroup}));
-        message.loading(`Editing ${editedGroup.name} group`, 0);
     };
 
     deleteGroup = (deletedGroup) => {
         const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.deleteGroupRequest({ID: assistant.ID, deletedGroup: deletedGroup}));
-        message.loading(`Deleting ${deletedGroup.name} group`, 0);
+        this.props.dispatch(flowActions.deleteGroupRequest({assistantID: assistant.ID, deletedGroup: deletedGroup}));
     };
 
 
@@ -54,71 +50,50 @@ class Flow extends Component {
     addBlock = (newBlock, groupID) => {
         const {assistant} = this.props.location.state;
         this.props.dispatch(flowActions.addBlockRequest({newBlock, groupID, assistantID: assistant.ID}));
-        // message.loading(`Adding new block`, 0);
     };
 
     editBlock = (edittedBlock, groupID) => {
         const {assistant} = this.props.location.state;
         this.props.dispatch(flowActions.editBlockRequest({edittedBlock, groupID, assistantID: assistant.ID}));
-        // message.loading(`Editing ${editedGroup.name} group`, 0);
     };
 
     deleteBlock = (deletedBlock, groupID) => {
         const {assistant} = this.props.location.state;
         this.props.dispatch(flowActions.deleteBlockRequest({deletedBlock, groupID, assistantID: assistant.ID}));
-        // message.loading(`Deleting ${deletedGroup.name} group`, 0);
     };
 
-    componentDidUpdate(prevProps) {
-
-        if (!this.props.isAddingGroup && prevProps.addSuccessMsg !== this.props.addSuccessMsg) {
-            message.destroy();
-            message.success(this.props.addSuccessMsg);
-        }
-
-        if (!this.props.isEditingGroup && prevProps.editSuccessMsg !== this.props.editSuccessMsg) {
-            message.destroy();
-            message.success(this.props.editSuccessMsg);
-        }
-
-        if (!this.props.isDeletingGroup && prevProps.deleteSuccessMsg !== this.props.deleteSuccessMsg) {
-            message.destroy();
-            message.success(this.props.deleteSuccessMsg);
-        }
-    }
+    reorderBlocks = (newBlocksOrder, groupID) => {
+        const {assistant} = this.props.location.state;
+        this.props.dispatch(flowActions.updateBlocksOrderRequest({newBlocksOrder, groupID, assistantID: assistant.ID}));
+    };
 
     render() {
         const {assistant} = this.props.location.state;
 
         return (
             <div style={{height: '100%'}}>
-                <div style={{padding: '0 5px'}}>
-                    <div style={{width: '100%', height: 56, marginBottom: 10}}>
-                        <Header assistantName={assistant.Name}/>
-                    </div>
-                </div>
+                <Header display={assistant.Name}/>
 
-                <div style={{height: 'calc(100% - 66px)', width: '100%', display: 'flex'}}>
-                    <div style={{margin: 5, width: '30%'}}>
-
+                <div className={styles.Panel_Body_Only}>
+                    <div style={{margin: '0 5px 0 0', width: '30%'}}>
                         <Groups selectGroup={this.selectGroup}
                                 isLoading={this.props.isLoading}
                                 groupsList={this.props.blockGroups}
                                 addGroup={this.addGroup}
                                 editGroup={this.editGroup}
                                 deleteGroup={this.deleteGroup}/>
-
                     </div>
-
-                    <div style={{margin: 5, width: '70%'}}>
+                    <div style={{margin: '0 0 0 5px', width: '70%'}}>
                         <Blocks addBlock={this.addBlock}
                                 editBlock={this.editBlock}
                                 deleteBlock={this.deleteBlock}
+                                reorderBlocks={this.reorderBlocks}
                                 currentGroup={this.state.currentGroup}
                                 allGroups={this.props.blockGroups}/>
                     </div>
                 </div>
             </div>
+
         );
     }
 
@@ -144,5 +119,3 @@ function mapStateToProps(state) {
 
 
 export default connect(mapStateToProps)(Flow);
-
-

@@ -10,6 +10,7 @@ import Flow from "./Assistants/Assistant/Flow/Flow";
 import Profile from "./Profile/Profile";
 import Integration from "./Assistants/Assistant/Integration/Integration";
 import UserInput from "./Assistants/Assistant/UserInput/UserInput";
+import Solutions from "./Assistants/Assistant/Solutions/Solutions";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -73,10 +74,10 @@ class Dashboard extends Component {
                             </Menu.Item>
                         </SubMenu>
 
-                        <Menu.Item key="billing">
-                            <Icon type="dollar"/>
-                            <span>Billing</span>
-                        </Menu.Item>
+                        {/*<Menu.Item key="billing">*/}
+                            {/*<Icon type="dollar"/>*/}
+                            {/*<span>Billing</span>*/}
+                        {/*</Menu.Item>*/}
                         <Menu.Item key="support">
                             <Icon type="question-circle"/>
                             <span>Support</span>
@@ -99,10 +100,11 @@ class Dashboard extends Component {
 
                         <Switch>
                             <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
+                            <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
+                            <Route path={`${match.path}/assistants/:id/userInput`} component={UserInput}/>
+                            <Route path={`${match.path}/assistants/:id/solutions`} component={Solutions}/>
                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                             <Route path={`${match.path}/profile`} component={Profile} exact/>
-                            <Route path={`${match.path}/integration/:id`} component={Integration}/>
-                            <Route path={`${match.path}/assistants/:id/userInput`} component={UserInput}/>
 
                             {/*<Route path="/dashboard" component={Dashboard}/>*/}
                         </Switch>

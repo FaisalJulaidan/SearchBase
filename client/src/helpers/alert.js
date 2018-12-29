@@ -1,4 +1,4 @@
-import {notification} from 'antd';
+import {message, notification} from 'antd';
 
 const duration = 2.5;
 const placement = "topRight";
@@ -16,10 +16,15 @@ export const alertSuccess = (title, message) => {
 export const alertError = (title, message) => {
     notification.error({
         message: title,
-        description: message,
-        duration: duration,
-        placement: placement,
+        description: message
     });
+};
+
+export const loadingMessage = title => message.loading(title);
+
+export const destroyMessage = () => {
+    message.destroy();
+    notification.destroy();
 };
 
 export const alertInfo = (title, message) => {

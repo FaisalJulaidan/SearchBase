@@ -45,7 +45,6 @@ class Assistants extends Component {
 
     render() {
         return (
-
             <div style={{height: '100%'}}>
                 <div className={styles.Panel}>
                     <div className={styles.Panel_Header}>

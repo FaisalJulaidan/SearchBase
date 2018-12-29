@@ -1,5 +1,7 @@
 from models import db, Callback, ChatbotSession
 from utilities import helpers
+from sqlalchemy.sql import and_
+
 
 
 def getByAssistantID(assistantID):
@@ -9,6 +11,17 @@ def getByAssistantID(assistantID):
 
     except Exception as exc:
         print("userInput_services.getByAssistantID() Error: ", exc)
+        return Callback(False, 'Could not retrieve the data.')
+
+def getByID(id, assistant):
+    try:
+        result = db.session.query(ChatbotSession)\
+            .filter(and_(ChatbotSession.AssistantID == assistant.ID, ChatbotSession.ID == id))\
+            .first()
+        return Callback(True, "User input retrieved successfully.", result)
+
+    except Exception as exc:
+        print("userInput_services.getByID() Error: ", exc)
         return Callback(False, 'Could not retrieve the data.')
 
 def filterForContainEmails(records):

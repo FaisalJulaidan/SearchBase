@@ -7,7 +7,7 @@ from services import assistant_services, flow_services, chatbot_services, soluti
 from werkzeug.utils import secure_filename
 import uuid
 from flask_cors import CORS
-from utilities.helpers import gzipped
+from utilities import helpers
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
 
@@ -89,7 +89,7 @@ def getSolutions_forChatbot(assistantIDAsHash):
 
 
 @chatbot_router.route("/userdownloads/<path:path>", methods=['GET'])
-@gzipped
+@helpers.gzipped
 def assistant_userdownloads(path):
     if request.method == "GET":
         return send_from_directory('static/user_downloads/', path)
@@ -112,10 +112,22 @@ def get_pop_settings(assistantIDAsHash):
 
 @chatbot_router.route("/assistant/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(sessionID):
-    callback: Callback = chatbot_services.getBySessionID(sessionID)
-    if not callback.Success:
+
+    try:
+        result = db.session.query(ChatbotSession).with_lockmode('update').filter(ChatbotSession.ID == sessionID).first()
+        print(result)
+        if not result: raise Exception
+
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
         return helpers.jsonResponse(False, 404, "Session not found.", None)
-    userInput: ChatbotSession = callback.Data
+
+    # callback: Callback = chatbot_services.getBySessionID(sessionID)
+    # if not callback.Success:
+    #     return helpers.jsonResponse(False, 404, "Session not found.", None)
+    # userInput: ChatbotSession = callback.Data
+    userInput: ChatbotSession = result
 
     if request.method == "POST":
         data = request.json
@@ -130,9 +142,20 @@ def chatbot_upload_files(sessionID):
                 if file.filename == '':
                     return helpers.jsonResponse(False, 404, "No selected file")
 
-                filename = str(uuid.uuid4()) + '.' + secure_filename(file.filename).rsplit('.', 1)[1].lower()
+                filename = str(uuid.uuid4()) + '_' + helpers.encrypt_id(sessionID) + '.' + secure_filename(file.filename).rsplit('.', 1)[1].lower()
                 file.save(os.path.join(BaseConfig.USER_FILES, filename))
-                userInput.FilePath = filename
+
+
+
+                print("==========")
+                print(userInput.FilePath)
+                print(file.filename)
+                if(userInput.FilePath):
+                    print(1)
+                    userInput.FilePath = userInput.FilePath + ',' +filename
+                else:
+                    print(2)
+                    userInput.FilePath = filename
 
             except Exception as exc:
                 return helpers.jsonResponse(False, 404, "Couldn't save the file")

@@ -28,6 +28,7 @@
     "eslint-plugin-jsx-a11y": "6.1.2",
     "eslint-plugin-react": "7.11.1",
     "file-loader": "2.0.0",
+    "file-saver": "^2.0.0",
     "fork-ts-checker-webpack-plugin-alt": "0.4.14",
     "fs-extra": "7.0.0",
     "hashids": "^1.2.2",
@@ -60,6 +61,7 @@
     "redux-logger": "^3.0.6",
     "redux-saga": "^0.16.2",
     "redux-thunk": "^2.3.0",
+    "reqwest": "^2.0.5",
     "resolve": "1.8.1",
     "sass-loader": "7.1.0",
     "style-loader": "0.23.0",
@@ -72,9 +74,10 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
-    "build": "node scripts/build.js && mv build ../static/react_app",
+    "build": "node scripts/build.js && bash scripts/after_build",
     "test": "node scripts/test.js"
   },
+  "homepage": "/",
   "eslintConfig": {
     "extends": "react-app"
   },

@@ -27,7 +27,7 @@ class FileUpload extends Component {
                             text: values.text,
                             action: values.action,
                             fileTypes: this.state.fileTypes,
-                            blockToGoID: values.blockToGoID || values.blockToGoIDGroup,
+                            blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                             afterMessage: values.afterMessage
                         }
                     }

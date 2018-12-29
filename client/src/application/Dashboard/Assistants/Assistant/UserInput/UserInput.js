@@ -1,7 +1,7 @@
 import React from 'react';
 import "./UserInput.less"
 import styles from "./UserInput.module.less"
-import Header from "./Header/Header"
+import Header from "../../../../../components/Header/Header";
 
 import {userInputActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
@@ -92,6 +92,9 @@ class UserInput extends React.Component {
         return (
 
             <div style={{height: '100%'}}>
+
+                <Header display={assistant.Name}/>
+
                 <div className={styles.Panel}>
                     <div className={styles.Panel_Header}>
                         <div>
@@ -118,13 +121,9 @@ class UserInput extends React.Component {
                            closeViewModal={this.closeViewModal}
                            filesPath={this.props.userInputs.filesPath}
                            record={this.state.selectedRecord}
-                           assistant={this.props.location.state.assistant}
+                           assistant={assistant}
                 />
             </div>
-
-
-
-
         );
     }
 }

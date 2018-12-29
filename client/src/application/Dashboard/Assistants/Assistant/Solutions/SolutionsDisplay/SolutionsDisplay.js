@@ -1,40 +1,49 @@
 import React from 'react';
 import styles from "../Solutions.module.less";
 import {Avatar, Button, List, Skeleton, Spin} from "antd";
-import NewSolution from "./NewSolution/NewSolution";
+import SolutionModal from "./SolutionModal/SolutionModal";
 
 class SolutionsDisplay extends React.Component{
     state = {
-        newSolutionModal: false,
-        editSolutionModal: false,
+        SolutionModal: false,
+        editMode: false,
         selectedSolutionToEdit: {}
     };
 
-    handleAddSolution = (newSolution) => {
-        this.props.addSolution(newSolution);
-        this.setState({newSolutionModal: false});
+    handleSolution = (Solution, edit) => {
+        if(!edit){
+            this.props.addSolution(Solution);
+            this.setState({SolutionModal: false, editMode:false});
+        } else {
+            this.props.editSolution(Solution);
+            this.setState({SolutionModal: false, editMode:false});
+        }
     };
 
-    handleAddSolutionCancel = () => this.setState({newSolutionModal: false});
+    handleSolutionCancel = () => this.setState({SolutionModal: false, editMode:false});
 
-    showNewSolutionModal = () => this.setState({newSolutionModal: true});
+    showSolutionModal = () => this.setState({SolutionModal: true});
 
-
-    ////// EDIT GROUP
-    handleEditSolution = (editedSolution) => {
-        this.props.editSolution(editedSolution);
-        this.setState({editSolutionModal: false, selectedSolutionToEdit: {}});
+    selectSolution = (item) => {
+        this.setState({selectedSolutionToEdit: item, editMode:true, SolutionModal:true});
     };
 
-    handleEditSolutionCancel = () => this.setState({editSolutionModal: false});
 
-    showEditSolutionModal = (item) => this.setState({editSolutionModal: true, selectedSolutionToEdit: item});
-
-    ////// DELETE GROUP
-    handleDeleteSolution = (deletedSolution) => {
-        this.props.deleteSolution(deletedSolution);
-        this.setState({editSolutionModal: false, selectedSolutionToEdit: {}});
-    };
+    // ////// EDIT GROUP
+    // handleEditSolution = (editedSolution) => {
+    //     this.props.editSolution(editedSolution);
+    //     this.setState({editSolutionModal: false, selectedSolutionToEdit: {}});
+    // };
+    //
+    // handleEditSolutionCancel = () => this.setState({editSolutionModal: false});
+    //
+    // showEditSolutionModal = (item) => this.setState({editSolutionModal: true, selectedSolutionToEdit: item});
+    //
+    // ////// DELETE GROUP
+    // handleDeleteSolution = (deletedSolution) => {
+    //     this.props.deleteSolution(deletedSolution);
+    //     this.setState({editSolutionModal: false, selectedSolutionToEdit: {}});
+    // };
 
     render (){
         return(
@@ -45,16 +54,9 @@ class SolutionsDisplay extends React.Component{
                     </div>
                     <div>
                         <Button className={styles.Panel_Header_Button} type="primary" icon="plus"
-                                onClick={this.showNewSolutionModal}>
+                                onClick={this.showSolutionModal}>
                             Add Solution
                         </Button>
-
-                        <NewSolution visible={this.state.newSolutionModal}
-                                     handleCancel={this.handleAddSolutionCancel}
-                                     handleSave={this.handleAddSolution}
-                                     databaseFileTypes={this.props.databaseFileTypes}
-                                     databaseCRMTypes={this.props.databaseCRMTypes}
-                        />
                     </div>
                 </div>
 
@@ -70,7 +72,7 @@ class SolutionsDisplay extends React.Component{
                                 renderItem={item => (
                                     <List.Item
                                         actions={[<Button icon={'edit'}
-                                                          onClick={() => this.showEditSolutionModal(item)}/>]}>
+                                                          onClick={() => this.selectSolution(item)}/>]}>
                                         <List.Item.Meta
                                             avatar={<Avatar icon="ordered-list"
                                                             style={{backgroundColor: '#9254de'}}/>}
@@ -83,11 +85,14 @@ class SolutionsDisplay extends React.Component{
                     }
                 </div>
 
-                {/*<EditSolution group={this.state.selectedSolutionToEdit}*/}
-                           {/*visible={this.state.editSolutionModal}*/}
-                           {/*handleCancel={this.handleEditSolutionCancel}*/}
-                           {/*handleUpdate={this.handleEditSolution}*/}
-                           {/*handleDelete={this.handleDeleteSolution}/>*/}
+                <SolutionModal visible={this.state.SolutionModal}
+                                     handleCancel={this.handleSolutionCancel}
+                                     handleSave={this.handleSolution}
+                                     databaseFileTypes={this.props.databaseFileTypes}
+                                     databaseCRMTypes={this.props.databaseCRMTypes}
+                                     edit={this.state.editMode}
+                                     solutionToEdit={this.state.editMode ? this.state.selectedSolutionToEdit : {}}
+                        />
             </div>
         )
     }

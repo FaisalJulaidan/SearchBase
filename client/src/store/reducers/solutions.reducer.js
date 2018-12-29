@@ -35,6 +35,21 @@ export const solutions = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: action.error.msg
             });
+        case actionTypes.EDIT_SOLUTION_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isLoading: true
+            });
+        case actionTypes.EDIT_SOLUTION_SUCCESS:
+            return updateObject(state, {
+                isLoading: false,
+                message: action.message
+            });
+        case actionTypes.EDIT_SOLUTION_FAILURE:
+            return updateObject(state, {
+                isLoading: false,
+                errorMsg: action.error.msg
+            });
         default:
             return state
     }

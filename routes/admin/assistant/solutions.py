@@ -56,6 +56,38 @@ def admin_solutions_data(assistantID):
             return helpers.jsonResponse(False, 403, "Please insure you have selected the right File Type option")
 
         return helpers.jsonResponse(True, 200, returnMessage)
+
+    if request.method == "POST":
+        fileName = request.form.get("name", None)
+        fileType = request.form.get("type", None)
+        if not fileName or not fileType:
+            return helpers.jsonResponse(False, 403, "File name or type could not be retrieved")
+
+        if fileType == "RDB XML File Export":
+            file = request.files.get("uploadFile", None)
+
+            if file:
+                jsonstr_callback: Callback = solutions_services.convertXMLtoJSON(file)
+                if not jsonstr_callback.Success:
+                    return helpers.jsonResponse(False, 403, jsonstr_callback.Message)
+                file = jsonstr_callback.Data
+
+            updateJson_callback: Callback = solutions_services.updateByID(assistantID, file, fileType,
+                                                                       fileName)
+            if not updateJson_callback.Success:
+                return helpers.jsonResponse(False, 403, updateJson_callback.Message)
+
+            checkForAlerts_callback: Callback = solutions_services.checkAutomaticSolutionAlerts(assistantID)
+            if checkForAlerts_callback.Success:
+                if checkForAlerts_callback.Data:
+                    sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(assistantID)
+                    return updateJson_callback.Message + ". " + sendAlerts_callback.Message
+
+            returnMessage = updateJson_callback.Message
+        else:
+            return helpers.jsonResponse(False, 403, "Please insure you have selected the right File Type option")
+
+        return helpers.jsonResponse(True, 200, returnMessage)
         # UPDATE UPLOADED FILES:
         #
         #     jsonstr_callback : Callback = solutions_services.convertXMLtoJSON(file)

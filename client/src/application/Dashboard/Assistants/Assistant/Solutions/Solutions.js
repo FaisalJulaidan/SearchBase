@@ -31,25 +31,17 @@ class Solutions extends React.Component{
 
     addSolution = (newSolution) => {
         const {assistant} = this.props.location.state;
-        console.log("NEW SOLUTION: ", newSolution);
-        for (let pair of newSolution.entries()) {
-            console.log(pair[0]+ ', ' + pair[1]);
-            console.log(typeof pair[1])
-        }
         this.props.dispatch(solutionsActions.addSolution({ID: assistant.ID, newSolution: newSolution}));
-        // message.loading(`Adding ${newSolution.name} group`, 0);
     };
 
     editSolution = (editedSolution) => {
-        // const {assistant} = this.props.location.state;
-        // this.props.dispatch(flowActions.editSolutionRequest({ID: assistant.ID, editedSolution: editedSolution}));
-        // message.loading(`Editing ${editedSolution.name} group`, 0);
+        const {assistant} = this.props.location.state;
+        this.props.dispatch(solutionsActions.editSolution({ID: assistant.ID, editedSolution: editedSolution}));
     };
 
     deleteSolution = (deletedSolution) => {
         // const {assistant} = this.props.location.state;
         // this.props.dispatch(flowActions.deleteSolutionRequest({ID: assistant.ID, deletedSolution: deletedSolution}));
-        // message.loading(`Deleting ${deletedSolution.name} group`, 0);
     };
 
     componentDidUpdate(prevProps) {

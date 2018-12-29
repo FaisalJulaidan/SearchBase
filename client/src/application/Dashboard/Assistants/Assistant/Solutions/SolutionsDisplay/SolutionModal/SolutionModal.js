@@ -1,13 +1,14 @@
 import React from 'react';
-import "./NewSolution.less"
+import "./SolutionModal.less"
 import {Button, Modal, Form, Input, Select, Tabs, Icon, Upload} from "antd";
+import {isEmpty} from "lodash";
 
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
 const OptGroup = Select.OptGroup;
 const Option = Select.Option;
 
-class NewSolution extends React.Component {
+class SolutionModal extends React.Component {
 
     state = {
         connectionType: "none",
@@ -15,18 +16,18 @@ class NewSolution extends React.Component {
     };
 
     handleSave = () => this.props.form.validateFields((err, values) => {
-        if (!err && this.state.uploadFile){
-            values["uploadFile"] = this.state.uploadFile;
-            const formData = new FormData();
-            for (let key in values) {
-                // skip loop if the property is from prototype
-                if (!values.hasOwnProperty(key)) continue;
-
-                formData.append(key, values[key]);
-            }
-            this.props.handleSave(formData);
-            this.resetState();
+        if (err || (this.state.uploadFile === undefined && !this.props.edit)){
+            return false;
         }
+        values["uploadFile"] = this.state.uploadFile;
+        const formData = new FormData();
+        for (let key in values) {
+            // skip loop if the property is from prototype
+            if (!values.hasOwnProperty(key)) continue;
+
+            formData.append(key, values[key]);
+        }
+        this.props.handleSave(formData, this.props.edit);
     });
 
     changeTypeHandler = (e) => {
@@ -45,12 +46,14 @@ class NewSolution extends React.Component {
       this.setState({uploadFile: file})
     };
 
-    resetState = () => {
-        this.setState({uploadFile: undefined, connectionType: "none"});
-    };
+    componentWillReceiveProps(){
+        if(!this.props.visible){
+            this.setState({uploadFile: undefined, connectionType: "none"});
+            this.changeTypeHandler("none");
+        }
+    }
 
     closeModal = () => {
-        this.resetState();
         this.props.handleCancel();
     };
 
@@ -60,7 +63,11 @@ class NewSolution extends React.Component {
             wrapperCol: {span: 14},
         };
         const {getFieldDecorator} = this.props.form;
-        console.log(this.state);
+
+        const solutionExists = this.props.edit;
+        if(solutionExists && this.state.connectionType === "none"){
+            this.changeTypeHandler(this.props.solutionToEdit.Solution.Type);
+        }
         return (
             <Modal
                 width={800}
@@ -72,7 +79,7 @@ class NewSolution extends React.Component {
                 footer={[
                     <Button key="Cancel" onClick={this.closeModal}>Cancel</Button>,
                     <Button key="submit" type="primary" onClick={this.handleSave}>
-                        Add
+                        {solutionExists ? "Update" : "Add"}
                     </Button>
                 ]}>
                 <Form layout='horizontal'>
@@ -81,6 +88,7 @@ class NewSolution extends React.Component {
                         extra="Enter a name for your solution to easily identify it in the solution list"
                         {...formItemLayout}>
                         {getFieldDecorator('name', {
+                            initialValue: solutionExists ? this.props.solutionToEdit.Solution.Name : "",
                             rules: [{
                                 required: true,
                                 message: 'Please enter your solution name',
@@ -95,6 +103,7 @@ class NewSolution extends React.Component {
                         extra="The type of File or CRM you want to connect"
                         {...formItemLayout}>
                         {getFieldDecorator('type', {
+                            initialValue: solutionExists ? this.props.solutionToEdit.Solution.Type : "",
                             rules: [{
                                 required: true,
                                 message: 'Please select what type of connection you are making',
@@ -128,7 +137,7 @@ class NewSolution extends React.Component {
                         <TabPane tab={"fileUpload"} key={"fileUpload"}>
                             {/*<Button htmlFor={"fileUpload"}><Icon type={"upload"}/>Click to Upload</Button>*/}
                             <FormItem
-                                label="Upload File"
+                                label= {solutionExists ? "Upload New File" : "Upload File"}
                                 extra="Select the file you wish to upload"
                                 {...formItemLayout}>
 
@@ -161,4 +170,4 @@ class NewSolution extends React.Component {
     }
 }
 
-export default Form.create()(NewSolution)
+export default Form.create()(SolutionModal)

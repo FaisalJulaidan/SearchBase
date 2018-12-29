@@ -43,11 +43,36 @@ const addSolutionFailure = (error) => {
     }
 };
 
+const editSolution = (params) => {
+    console.log(params);
+    return {
+        type: actionTypes.EDIT_SOLUTION_REQUEST,
+        params
+    }
+};
+
+const editSolutionSuccess = (message) => {
+    return {
+        type: actionTypes.EDIT_SOLUTION_SUCCESS,
+        message
+    }
+};
+
+const editSolutionFailure = (error) => {
+    return {
+        type: actionTypes.EDIT_SOLUTION_FAILURE,
+        error
+    }
+};
+
 export const solutionsActions = {
     getSolutions,
     getSolutionsSuccess,
     getSolutionsFailure,
     addSolution,
     addSolutionSuccess,
-    addSolutionFailure
+    addSolutionFailure,
+    editSolution,
+    editSolutionSuccess,
+    editSolutionFailure
 };

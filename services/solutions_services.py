@@ -251,7 +251,8 @@ def updateByID(solutionID, content, type, name):
 
         result.Data.Name = name
         result.Data.Type = type
-        result.Data.Content = replaceIDsWithDataRBD(content)
+        if content:
+            result.Data.Content = replaceIDsWithDataRBD(content)
 
         db.session.commit()
 

@@ -76,7 +76,17 @@ class Blocks extends Component {
         content: `You can't get back to the deleted block after click ok`,
         onOk: () => this.handleDeleteBlock(deletedBlock)
     });
-    handleDeleteBlock = (deletedBlock) => this.props.deleteBlock(deletedBlock, this.props.currentGroup.id);
+    handleDeleteBlock = (deletedBlock) => {
+        this.props.deleteBlock(deletedBlock, this.props.currentGroup.id);
+
+        // Remove the deletedBlock
+        let blocks = this.state.blocks.filter((block) => block.id !== deletedBlock.id);
+        // Update order
+        for (const i in blocks) blocks[i].order = Number(i) + 1;
+        this.setState({blocks});
+        // send a request to the server
+        this.props.reorderBlocks(blocks, this.props.currentGroup.id)
+    };
 
 
 

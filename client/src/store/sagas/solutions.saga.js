@@ -25,7 +25,8 @@ function* addSolution(action) {
         yield alertSuccess('Solution Added', res.data.msg);
         return yield http.get(solutionsActions.getSolutions(action.assistantID))
     } catch (error) {
-        console.log(error);
+        console.log(error.response);
+        yield alertError('Error in adding Solution', error.response.data.msg);
         return yield put(solutionsActions.addSolutionFailure(error.response.data));
     }
 

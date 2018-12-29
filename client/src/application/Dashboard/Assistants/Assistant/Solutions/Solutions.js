@@ -45,7 +45,6 @@ class Solutions extends React.Component{
     };
 
     componentDidUpdate(prevProps) {
-
         // if (!this.props.isAddingSolution && prevProps.addSuccessMsg !== this.props.addSuccessMsg) {
         //     message.destroy();
         //     message.success(this.props.addSuccessMsg);

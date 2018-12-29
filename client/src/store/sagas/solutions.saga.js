@@ -2,6 +2,7 @@ import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {http} from "../../helpers";
 import {solutionsActions} from "../actions";
+import {alertError, alertSuccess, destroyMessage, loadingMessage} from "../../helpers/alert";
 
 
 function* getSolutionsData({assistantID}) {
@@ -15,11 +16,14 @@ function* getSolutionsData({assistantID}) {
 
 }
 
-function* addSolution({assistantID, solution}) {
+function* addSolution(action) {
     try {
-        const res = yield http.put(`/assistant/${assistantID}/solutionsData`, solution);
-        yield put(solutionsActions.addSolutionSuccess(res.message))
-        return getSolutionsData({assistantID})
+        loadingMessage('Adding Solution');
+        const res = yield http.put(`/assistant/${action.params.ID}/solutionsData`, action.params.newSolution);
+        yield put(solutionsActions.addSolutionSuccess(res.message));
+        yield destroyMessage();
+        yield alertSuccess('Solution Added', res.data.msg);
+        return yield http.get(solutionsActions.getSolutions(action.assistantID))
     } catch (error) {
         console.log(error);
         return yield put(solutionsActions.addSolutionFailure(error.response.data));

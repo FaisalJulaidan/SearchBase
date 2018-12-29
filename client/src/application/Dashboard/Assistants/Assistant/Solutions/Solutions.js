@@ -1,12 +1,10 @@
 import React from 'react'
 import connect from "react-redux/es/connect/connect";
 import styles from "../../Assistants.module.less";
-import {Button, message} from "antd";
-import Header from "./Header/Header";
+import Header from "../../../../../components/Header/Header"
 import SolutionsDisplay from "./SolutionsDisplay/SolutionsDisplay";
 import SolutionsSettings from "./SolutionsSettings/SolutionsSettings";
 import {solutionsActions} from "../../../../../store/actions";
-import Groups from "../Flow/Groups/Groups";
 
 class Solutions extends React.Component{
     state = {
@@ -31,11 +29,13 @@ class Solutions extends React.Component{
 
     selectSolution = (currentSolution) => this.setState({currentSolution});
 
-
-    // GROUPS
     addSolution = (newSolution) => {
         const {assistant} = this.props.location.state;
         console.log("NEW SOLUTION: ", newSolution);
+        for (let pair of newSolution.entries()) {
+            console.log(pair[0]+ ', ' + pair[1]);
+            console.log(typeof pair[1])
+        }
         this.props.dispatch(solutionsActions.addSolution({ID: assistant.ID, newSolution: newSolution}));
         // message.loading(`Adding ${newSolution.name} group`, 0);
     };

@@ -34,31 +34,25 @@ def admin_solutions_data(assistantID):
         return helpers.jsonResponse(True, 200, "Solutions have been retrieved", returnData)
 
     if request.method == "PUT":
-        print(request.json)
-        fileName = request.json.get("name", default=None)
-        fileType = request.json.get("type", default=None)
-        print(request.json)
+        fileName = request.form.get("name", None)
+        fileType = request.form.get("type", None)
         if not fileName or not fileType:
             return helpers.jsonResponse(False, 403, "File name or type could not be retrieved")
 
         if fileType == "RDB XML File Export":
-            file = request.files.get("file", default=None)
-            print(file)
+            file = request.files.get("uploadFile", None)
             if not file:
-                return helpers.jsonResponse(False, 403, "File Type or Uploaded File could not be retrieved")
+                return helpers.jsonResponse(False, 403, "Uploaded File could not be retrieved")
 
             jsonstr_callback : Callback = solutions_services.convertXMLtoJSON(file)
             if not jsonstr_callback.Success:
-                print(1)
                 return helpers.jsonResponse(False, 403, jsonstr_callback.Message)
 
             saveJson_callback : Callback = solutions_services.createNew(assistantID, jsonstr_callback.Data, fileType, fileName)
             if not saveJson_callback.Success:
-                print(2)
                 return helpers.jsonResponse(False, 403, saveJson_callback.Message)
             returnMessage = saveJson_callback.Message
         else:
-            print(3)
             return helpers.jsonResponse(False, 403, "Please insure you have selected the right File Type option")
 
         return helpers.jsonResponse(True, 200, returnMessage)

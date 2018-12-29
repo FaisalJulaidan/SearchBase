@@ -37,16 +37,14 @@ class SolutionsDisplay extends React.Component{
     };
 
     render (){
-        console.log("SOLUTIONS DISPLAY PROPS ON RENDER: ", this.props);
-
         return(
             <div className={styles.Panel}>
-                <div className={styles.Header} style={{}}>
+                <div className={styles.Panel_Header}>
                     <div>
                         <h3>Solutions List</h3>
                     </div>
                     <div>
-                        <Button className={styles.PanelButton} type="primary" icon="plus"
+                        <Button className={styles.Panel_Header_Button} type="primary" icon="plus"
                                 onClick={this.showNewSolutionModal}>
                             Add Solution
                         </Button>
@@ -61,7 +59,7 @@ class SolutionsDisplay extends React.Component{
                 </div>
 
 
-                <div className={styles.Body}>
+                <div className={styles.Panel_Body}>
                     {
                         this.props.isLoading ?
                             <Spin><Skeleton active={true}/></Spin>

@@ -1,7 +1,10 @@
 import os
+
 from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory
 from flask_cors import CORS
+from flask_jwt_extended import jwt_required
 from itsdangerous import URLSafeTimedSerializer
+
 from models import Callback
 from services import user_services, auth_services, mail_services
 from utilities import helpers
@@ -13,13 +16,20 @@ verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y
 
 # Serve React App
 @public_router.route('/login', defaults={'path': ''})
-@public_router.route('/dashboard', defaults={'path': ''})
-@public_router.route('/dashboard/<path:path>')
 def serve(path):
     if path != "" and os.path.exists("static/react_app/" + path):
         return send_from_directory('static/react_app', path)
     else:
-        # return redirect(url_for("public_router.serve('')"))
+        return send_from_directory('static/react_app', 'index.html')
+
+
+@public_router.route('/dashboard', defaults={'path': ''})
+@public_router.route('/dashboard/<path:path>')
+@jwt_required
+def serveDashboard(path):
+    if path != "" and os.path.exists("static/react_app/" + path):
+        return send_from_directory('static/react_app', path)
+    else:
         return send_from_directory('static/react_app', 'index.html')
 
 

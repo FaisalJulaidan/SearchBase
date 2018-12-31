@@ -38,7 +38,7 @@ class SolutionsSettings extends React.Component{
                                 <p>From here you can choose which part of your information you want to be displayed inside the solution box.
                                     If you are unsure what data is inside those titles simply have a look at the Raw Data section.</p>
                                 <Button className={styles.Button} type="primary" onClick={this.addNewDisplaySelect}>Add More Information</Button>
-                                <QueueAnim component={"div"} type={['right', 'left']} leaveReverse>
+                                <QueueAnim>
                                 {
                                     this.state.chosenDisplays.map((record, index) => {
                                         return (

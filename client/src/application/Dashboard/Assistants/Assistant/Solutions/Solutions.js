@@ -54,6 +54,10 @@ class Solutions extends React.Component{
             ));
     };
 
+    updateButtonLink = (information) => {
+
+    };
+
     render(){
         return (
              <div style={{height: '100%'}}>
@@ -84,6 +88,7 @@ class Solutions extends React.Component{
                         <SolutionsSettings
                             currentSolution={this.state.currentSolution}
                             updateInformationToDisplay={this.updateInformationToDisplay}
+                            updateButtonLink={this.updateButtonLink}
                         />
 
                     </div>

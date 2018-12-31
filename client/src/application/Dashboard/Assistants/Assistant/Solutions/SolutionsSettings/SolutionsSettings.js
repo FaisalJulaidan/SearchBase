@@ -27,6 +27,9 @@ class SolutionsSettings extends React.Component{
                     case 1:
                         this.props.updateInformationToDisplay(values);
                         break;
+                    case 2:
+                        this.props.updateButtonLink(values);
+                        break;
                 }
             }
         });
@@ -53,17 +56,8 @@ class SolutionsSettings extends React.Component{
     componentWillReceiveProps(newProps){
         if(!isEmpty(this.props.currentSolution)){
             if(this.props.currentSolution.Solution.ID === newProps.currentSolution.Solution.ID){ return null; }
-            this.resetState();
         }
         this.renderInformationToDisplay(newProps);
-    }
-
-    resetState() {
-        this.setState({
-            chosenDisplays: [],
-            formSubmitted: false,
-            tabIndex: 1
-        });
     }
 
     render (){
@@ -100,13 +94,13 @@ class SolutionsSettings extends React.Component{
                                                             message: 'Please select a header',
                                                         }],
                                                     })(
-                                                            <Select className={styles.Select}>
-                                                                {
-                                                                    this.props.currentSolution.DisplayTitles.map((record, index) => {
-                                                                        return <Option key={index} value={record}>{record}</Option>
-                                                                    })
-                                                                }
-                                                            </Select>
+                                                        <Select className={styles.Select}>
+                                                            {
+                                                                this.props.currentSolution.DisplayTitles.map((record, index) => {
+                                                                    return <Option key={index} value={record}>{record}</Option>
+                                                                })
+                                                            }
+                                                        </Select>
                                                     )}
                                                 </FormItem>
                                             )
@@ -128,6 +122,37 @@ class SolutionsSettings extends React.Component{
                                         and then the reference to the JobID which you can find in your upload file(add @ in front of it) or Raw Data bellow.<br />
                                         For example: \"@JobDbID\" : C2143. <br />You can also take your solution ID and use Ctrl + F on this page to find the
                                         corresponding title in the Raw Data.</p>
+
+                                    <FormItem style={{margin: "15px 0 5px 0"}}>
+                                        {getFieldDecorator("webLink", {
+                                            //initialValue: record,
+                                            rules: [{
+                                                required: true,
+                                                message: 'Please paste the link without the solution ID here',
+                                            }],
+                                        })(
+                                            <Input className={styles.Input} placeholder={"https://jobwebsite.com/jobs/"}/>
+                                        )}
+                                    </FormItem>
+
+                                    <FormItem style={{marginBottom: "5px"}}>
+                                        {getFieldDecorator("idHeader", {
+                                            //initialValue: record,
+                                            rules: [{
+                                                required: true,
+                                                message: 'Please select the header that holds the job ID',
+                                            }],
+                                        })(
+                                            <Select className={styles.Select}>
+                                                {
+                                                    this.props.currentSolution.DisplayTitles.map((record, index) => {
+                                                        return <Option key={index} value={record}>{record}</Option>
+                                                    })
+                                                }
+                                            </Select>
+                                        )}
+                                    </FormItem>
+                                    <Button htmlType={"submit"} className={"ant-btn-primary"} style={{marginTop:"10px"}}>Update</Button>
                                 </Form>
                             </TabPane>
 

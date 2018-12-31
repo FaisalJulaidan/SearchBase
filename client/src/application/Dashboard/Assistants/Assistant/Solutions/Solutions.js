@@ -8,7 +8,7 @@ import {solutionsActions} from "../../../../../store/actions";
 
 class Solutions extends React.Component{
     state = {
-        currentSolution: {blocks: []},
+        currentSolution: {},
         databaseFileTypes: ["RDB XML File Export"],
         databaseCRMTypes: ["Bullhorn", "RDB"]
     };
@@ -44,25 +44,6 @@ class Solutions extends React.Component{
         // this.props.dispatch(flowActions.deleteSolutionRequest({ID: assistant.ID, deletedSolution: deletedSolution}));
     };
 
-    componentDidUpdate(prevProps) {
-        // if (!this.props.isAddingSolution && prevProps.addSuccessMsg !== this.props.addSuccessMsg) {
-        //     message.destroy();
-        //     message.success(this.props.addSuccessMsg);
-        // }
-        //
-        // if (!this.props.isEditingSolution && prevProps.editSuccessMsg !== this.props.editSuccessMsg) {
-        //     message.destroy();
-        //     message.success(this.props.editSuccessMsg);
-        // }
-        //
-        // if (!this.props.isDeletingSolution && prevProps.deleteSuccessMsg !== this.props.deleteSuccessMsg) {
-        //     message.destroy();
-        //     message.success(this.props.deleteSuccessMsg);
-        // }
-    }
-
-
-
     render(){
 
         return (
@@ -76,21 +57,24 @@ class Solutions extends React.Component{
                 <div style={{height: 'calc(100% - 66px)', width: '100%', display: 'flex'}}>
                     <div style={{margin: 5, width: '30%'}}>
 
-                        <SolutionsDisplay selectSolution={this.selectSolution}
-                                isLoading={this.props.isLoading}
-                                solutionsData={this.props.solutionsData}
-                                addSolution={this.addSolution}
-                                editSolution={this.editSolution}
-                                deleteSolution={this.deleteSolution}
-                                databaseFileTypes={this.state.databaseFileTypes}
-                                databaseCRMTypes={this.state.databaseCRMTypes}
+                        <SolutionsDisplay
+                            selectSolution={this.selectSolution}
+                            isLoading={this.props.isLoading}
+                            solutionsData={this.props.solutionsData}
+                            addSolution={this.addSolution}
+                            editSolution={this.editSolution}
+                            deleteSolution={this.deleteSolution}
+                            databaseFileTypes={this.state.databaseFileTypes}
+                            databaseCRMTypes={this.state.databaseCRMTypes}
                         />
 
                     </div>
 
                     <div style={{margin: 5, width: '70%'}}>
 
-                        {/*<SolutionsSettings />*/}
+                        <SolutionsSettings
+                            currentSolution={this.state.currentSolution}
+                        />
 
                     </div>
                 </div>
@@ -100,7 +84,6 @@ class Solutions extends React.Component{
 }
 
 function mapStateToProps(state) {
-    console.log("PROPS STATE: ", state);
     return {
         solutionsData: state.solutions.solutionsData,
         isLoading: state.solutions.isLoading,

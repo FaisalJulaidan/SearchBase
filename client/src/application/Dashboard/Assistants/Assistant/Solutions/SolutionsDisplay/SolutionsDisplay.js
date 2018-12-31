@@ -28,17 +28,6 @@ class SolutionsDisplay extends React.Component{
         this.setState({selectedSolutionToEdit: item, editMode:true, SolutionModal:true});
     };
 
-
-    // ////// EDIT GROUP
-    // handleEditSolution = (editedSolution) => {
-    //     this.props.editSolution(editedSolution);
-    //     this.setState({editSolutionModal: false, selectedSolutionToEdit: {}});
-    // };
-    //
-    // handleEditSolutionCancel = () => this.setState({editSolutionModal: false});
-    //
-    // showEditSolutionModal = (item) => this.setState({editSolutionModal: true, selectedSolutionToEdit: item});
-    //
     // ////// DELETE GROUP
     // handleDeleteSolution = (deletedSolution) => {
     //     this.props.deleteSolution(deletedSolution);
@@ -74,7 +63,7 @@ class SolutionsDisplay extends React.Component{
                                         actions={[<Button icon={'edit'}
                                                           onClick={() => this.selectSolution(item)}/>]}>
                                         <List.Item.Meta
-                                            avatar={<Avatar icon="ordered-list"
+                                            avatar={<Avatar icon="database"
                                                             style={{backgroundColor: '#9254de'}}/>}
                                             title={<a onClick={() => this.props.selectSolution(item)}>{item.Solution.Name}</a>}
                                             description={item.description}

@@ -65,6 +65,30 @@ const editSolutionFailure = (error) => {
     }
 };
 
+const updateSolutionInformationToDisplay = (params) => {
+    console.log(params);
+    return {
+        type: actionTypes.UPDATE_SOLUTION_INFORMATION_TO_DISPLAY_REQUEST,
+        params
+    }
+};
+
+const updateSolutionInformationToDisplaySuccess = (params) => {
+    console.log(params);
+    return {
+        type: actionTypes.UPDATE_SOLUTION_INFORMATION_TO_DISPLAY_SUCCESS,
+        params
+    }
+};
+
+const updateSolutionInformationToDisplayFailure = (params) => {
+    console.log(params);
+    return {
+        type: actionTypes.UPDATE_SOLUTION_INFORMATION_TO_DISPLAY_FAILURE,
+        params
+    }
+};
+
 export const solutionsActions = {
     getSolutions,
     getSolutionsSuccess,
@@ -74,5 +98,8 @@ export const solutionsActions = {
     addSolutionFailure,
     editSolution,
     editSolutionSuccess,
-    editSolutionFailure
+    editSolutionFailure,
+    updateSolutionInformationToDisplay,
+    updateSolutionInformationToDisplaySuccess,
+    updateSolutionInformationToDisplayFailure
 };

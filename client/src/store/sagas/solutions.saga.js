@@ -20,9 +20,9 @@ function* addSolution(action) {
     try {
         loadingMessage('Adding Solution');
         const res = yield http.put(`/assistant/${action.params.ID}/solutionsData`, action.params.newSolution);
-        yield put(solutionsActions.addSolutionSuccess(res.message));
         yield destroyMessage();
         yield alertSuccess('Solution Added', res.data.msg);
+        yield put(solutionsActions.addSolutionSuccess(res.message));
         return yield http.get(solutionsActions.getSolutions(action.assistantID))
     } catch (error) {
         console.log(error.response);
@@ -35,14 +35,28 @@ function* editSolution(action) {
     try {
         loadingMessage('Editing Solution');
         const res = yield http.post(`/assistant/${action.params.ID}/solutionsData`, action.params.editedSolution);
-        yield put(solutionsActions.editSolutionSuccess(res.message));
         yield destroyMessage();
         yield alertSuccess('Solution Edited', res.data.msg);
+        yield put(solutionsActions.editSolutionSuccess(res.message));
         return yield http.get(solutionsActions.getSolutions(action.assistantID))
     } catch (error) {
         console.log(error.response);
         yield alertError('Error in editing Solution', error.response.data.msg);
         return yield put(solutionsActions.editSolutionFailure(error.response.data));
+    }
+}
+
+function* updateSolutionInformationToDisplay(action) {
+    try {
+        loadingMessage('Editing Solution Settings');
+        const res = yield http.post(`/assistant/savedisplaytitles/${action.params.solutionID}`, action.params.information);
+        yield destroyMessage();
+        yield alertSuccess('Solution Settings Edited', res.data.msg);
+        return yield put(solutionsActions.updateSolutionInformationToDisplaySuccess(res.message));
+    } catch (error) {
+        console.log(error.response);
+        yield alertError('Error in editing Solution Settings', error.response.data.msg);
+        return yield put(solutionsActions.updateSolutionInformationToDisplayFailure(error.response.data));
     }
 }
 
@@ -58,10 +72,15 @@ function* watchEditSolutionRequests(){
     yield takeEvery(actionTypes.EDIT_SOLUTION_REQUEST, editSolution)
 }
 
+function* watchUpdateSolutionInformationToDisplayRequests(){
+    yield takeEvery(actionTypes.UPDATE_SOLUTION_INFORMATION_TO_DISPLAY_REQUEST, updateSolutionInformationToDisplay)
+}
+
 export function* solutionsSaga() {
     yield all([
         watchSolutionsRequests(),
         watchAddSolutionRequests(),
-        watchEditSolutionRequests()
+        watchEditSolutionRequests(),
+        watchUpdateSolutionInformationToDisplayRequests()
     ])
 }

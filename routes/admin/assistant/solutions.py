@@ -88,35 +88,20 @@ def admin_solutions_data(assistantID):
             return helpers.jsonResponse(False, 403, "Please insure you have selected the right File Type option")
 
         return helpers.jsonResponse(True, 200, returnMessage)
-        # UPDATE UPLOADED FILES:
-        #
-        #     jsonstr_callback : Callback = solutions_services.convertXMLtoJSON(file)
-        #     if not jsonstr_callback.Success: return jsonstr_callback.Message
-        #
-        #     saveJson_callback : Callback = solutions_services.updateByID(int(solutionSelect), jsonstr_callback.Data, fileType, fileName)
-        #     if saveJson_callback.Success:
-        #         checkForAlerts_callback : Callback = solutions_services.checkAutomaticSolutionAlerts(int(solutionSelect))
-        #         if checkForAlerts_callback.Success:
-        #             if checkForAlerts_callback.Data:
-        #                 sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(int(solutionSelect))
-        #                 return saveJson_callback.Message + ". " + sendAlerts_callback.Message
-        # else:
-        #     return "Please insure you have selected the right File Type option"
 
 
-@solutions_router.route("/assistant/<assistantID>/savedisplaytitles/<solutionID>", methods=['POST'])
+@solutions_router.route("/assistant/savedisplaytitles/<solutionID>", methods=['POST'])
 @jwt_required
-def admin_save_display_titles(assistantID, solutionID):
-
+def admin_save_display_titles(solutionID):
     if request.method == "POST":
 
         titlesArray = {"titleValues" : [], "solutionDescription": ""}
         for i in range(0, 50):
-            record = request.form.get("titleSelect"+str(i), default=None)
+            record = request.json.get("displaySelect"+str(i), None)
             if not record: continue
             titlesArray["titleValues"].append(record.strip())
 
-        titlesArray["solutionDescription"] = request.form.get("description", default=None)
+        titlesArray["solutionDescription"] = request.json.get("description", None)
         conditions_callback = solutions_services.saveDisplayTitles(solutionID, titlesArray)
         return conditions_callback.Message
 

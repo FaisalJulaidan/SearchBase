@@ -5,6 +5,7 @@ import Header from "../../../../../components/Header/Header"
 import SolutionsDisplay from "./SolutionsDisplay/SolutionsDisplay";
 import SolutionsSettings from "./SolutionsSettings/SolutionsSettings";
 import {solutionsActions} from "../../../../../store/actions";
+import {isEmpty} from "lodash";
 
 class Solutions extends React.Component{
     state = {
@@ -44,8 +45,16 @@ class Solutions extends React.Component{
         // this.props.dispatch(flowActions.deleteSolutionRequest({ID: assistant.ID, deletedSolution: deletedSolution}));
     };
 
-    render(){
+    updateInformationToDisplay = (information) => {
+        this.props.dispatch(solutionsActions.updateSolutionInformationToDisplay(
+            {
+                solutionID: this.state.currentSolution.Solution.ID,
+                information: information
+            }
+            ));
+    };
 
+    render(){
         return (
              <div style={{height: '100%'}}>
                 <div style={{padding: '0 5px'}}>
@@ -74,6 +83,7 @@ class Solutions extends React.Component{
 
                         <SolutionsSettings
                             currentSolution={this.state.currentSolution}
+                            updateInformationToDisplay={this.updateInformationToDisplay}
                         />
 
                     </div>

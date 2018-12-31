@@ -56,6 +56,12 @@ class SolutionsSettings extends React.Component{
                             </Form>
                         </TabPane>
 
+                        <TabPane tab={"Button Link"} key={"2"}/>
+
+                        <TabPane tab={"Results' Filters"} key={"3"}/>
+
+                        <TabPane tab={"Email Auto-match"} key={"4"}/>
+
                     </Tabs>
                 </div>
             </div>

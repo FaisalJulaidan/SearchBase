@@ -44,7 +44,6 @@ const addSolutionFailure = (error) => {
 };
 
 const editSolution = (params) => {
-    console.log(params);
     return {
         type: actionTypes.EDIT_SOLUTION_REQUEST,
         params
@@ -65,6 +64,90 @@ const editSolutionFailure = (error) => {
     }
 };
 
+const updateSolutionInformationToDisplay = (params) => {
+    return {
+        type: actionTypes.UPDATE_SOLUTION_INFORMATION_TO_DISPLAY_REQUEST,
+        params
+    }
+};
+
+const updateSolutionInformationToDisplaySuccess = (params) => {
+    return {
+        type: actionTypes.UPDATE_SOLUTION_INFORMATION_TO_DISPLAY_SUCCESS,
+        params
+    }
+};
+
+const updateSolutionInformationToDisplayFailure = (params) => {
+    return {
+        type: actionTypes.UPDATE_SOLUTION_INFORMATION_TO_DISPLAY_FAILURE,
+        params
+    }
+};
+
+const updateButtonLink = (params) => {
+    return {
+        type: actionTypes.UPDATE_BUTTON_LINK_REQUEST,
+        params
+    }
+};
+
+const updateButtonLinkSuccess = (params) => {
+    return {
+        type: actionTypes.UPDATE_BUTTON_LINK_SUCCESS,
+        params
+    }
+};
+
+const updateButtonLinkFailure = (params) => {
+    return {
+        type: actionTypes.UPDATE_BUTTON_LINK_FAILURE,
+        params
+    }
+};
+
+const sendSolutionAlert = (params) => {
+    return {
+        type: actionTypes.SEND_SOLUTION_ALERT_REQUEST,
+        params
+    }
+};
+
+const sendSolutionAlertSuccess = (params) => {
+    return {
+        type: actionTypes.SEND_SOLUTION_ALERT_SUCCESS,
+        params
+    }
+};
+
+const sendSolutionAlertFailure = (params) => {
+    return {
+        type: actionTypes.SEND_SOLUTION_ALERT_FAILURE,
+        params
+    }
+};
+
+const updateAutomaticSolutions = (params) => {
+    return {
+        type: actionTypes.UPDATE_AUTOMATIC_SOLUTION_ALERTS_REQUEST,
+        params
+    }
+};
+
+const updateAutomaticSolutionsSuccess = (params) => {
+    return {
+        type: actionTypes.UPDATE_AUTOMATIC_SOLUTION_ALERTS_SUCCESS,
+        params
+    }
+};
+
+const updateAutomaticSolutionsFailure = (params) => {
+    return {
+        type: actionTypes.UPDATE_AUTOMATIC_SOLUTION_ALERTS_FAILURE,
+        params
+    }
+};
+
 export const solutionsActions = {
     getSolutions,
     getSolutionsSuccess,
@@ -74,5 +157,17 @@ export const solutionsActions = {
     addSolutionFailure,
     editSolution,
     editSolutionSuccess,
-    editSolutionFailure
+    editSolutionFailure,
+    updateSolutionInformationToDisplay,
+    updateSolutionInformationToDisplaySuccess,
+    updateSolutionInformationToDisplayFailure,
+    updateButtonLink,
+    updateButtonLinkSuccess,
+    updateButtonLinkFailure,
+    sendSolutionAlert,
+    sendSolutionAlertSuccess,
+    sendSolutionAlertFailure,
+    updateAutomaticSolutions,
+    updateAutomaticSolutionsSuccess,
+    updateAutomaticSolutionsFailure
 };

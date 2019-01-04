@@ -137,7 +137,7 @@ class SolutionModal extends React.Component {
                         <TabPane tab={"fileUpload"} key={"fileUpload"}>
                             {/*<Button htmlFor={"fileUpload"}><Icon type={"upload"}/>Click to Upload</Button>*/}
                             <FormItem
-                                label= {solutionExists ? "Upload New File" : "Upload File"}
+                                label= {solutionExists ? "Upload File" : "Upload File"}
                                 extra="Select the file you wish to upload"
                                 {...formItemLayout}>
 

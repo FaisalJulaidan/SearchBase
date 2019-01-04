@@ -120,8 +120,10 @@ def gen_dummy_data():
     db.session.add(Role(Name="Admin", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
     db.session.add(Role(Name="User", Company= sabic, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
 
-    db.session.add(Solution(Name="TestSolution", Content="", RequiredFilters=None, DisplayTitles=None,
-                            Type="RDB XML File Export", WebLink=None, IDReference=None, automaticSolutionAlerts=False, AssistantID=1))
+    # does not work currently
+    # db.session.add(Solution(Name="TestSolution", Content="",
+    #                         RequiredFilters=None, DisplayTitles=None,
+    #                         Type="RDB XML File Export", WebLink=None, IDReference=None, automaticSolutionAlerts=False, AssistantID=1))
 
     # Get Roles
     owner_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "Owner").first()

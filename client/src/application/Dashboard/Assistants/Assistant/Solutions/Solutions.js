@@ -46,16 +46,32 @@ class Solutions extends React.Component{
     };
 
     updateInformationToDisplay = (information) => {
-        this.props.dispatch(solutionsActions.updateSolutionInformationToDisplay(
-            {
-                solutionID: this.state.currentSolution.Solution.ID,
-                information: information
-            }
-            ));
+        this.props.dispatch(solutionsActions.updateSolutionInformationToDisplay({
+            solutionID: this.state.currentSolution.Solution.ID,
+            information: information
+        }));
     };
 
     updateButtonLink = (information) => {
+        this.props.dispatch(solutionsActions.updateButtonLink({
+            solutionID: this.state.currentSolution.Solution.ID,
+            information: information
+        }));
+    };
 
+    sendSolutionAlerts = () => {
+        const {assistant} = this.props.location.state;
+        this.props.dispatch(solutionsActions.sendSolutionAlert({
+            assistantID: assistant,
+            solutionID: this.state.currentSolution.Solution.ID
+        }));
+    };
+
+    updateAutomaticAlerts = (switchState) => {
+        this.props.dispatch(solutionsActions.updateAutomaticSolutions({
+                solutionID: this.state.currentSolution.Solution.ID,
+                information: {"setTo": switchState}
+            }));
     };
 
     render(){
@@ -89,6 +105,8 @@ class Solutions extends React.Component{
                             currentSolution={this.state.currentSolution}
                             updateInformationToDisplay={this.updateInformationToDisplay}
                             updateButtonLink={this.updateButtonLink}
+                            updateAutomaticAlerts={this.updateAutomaticAlerts}
+                            sendSolutionAlerts={this.sendSolutionAlerts}
                         />
 
                     </div>

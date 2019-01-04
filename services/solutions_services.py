@@ -122,7 +122,6 @@ def getSolutions(content, keywords):
 
 def getDisplayTitlesOfRecords(content):
     try:
-        print(content.Content)
         solutions = next(iter(next(iter(next(iter(content.Content.values())).values())).values())) # GETS the first value of the dict which is the first value of a dict which is the first value of a dict
         result = []
         if type(solutions) is list: solutions = solutions[0]

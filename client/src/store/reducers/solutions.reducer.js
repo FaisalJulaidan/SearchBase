@@ -50,6 +50,51 @@ export const solutions = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: action.error.msg
             });
+        case actionTypes.UPDATE_BUTTON_LINK_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isLoading: true
+            });
+        case actionTypes.UPDATE_BUTTON_LINK_SUCCESS:
+            return updateObject(state, {
+                isLoading: false,
+                message: action.message
+            });
+        case actionTypes.UPDATE_BUTTON_LINK_FAILURE:
+            return updateObject(state, {
+                isLoading: false,
+                errorMsg: action.error.msg
+            });
+        case actionTypes.SEND_SOLUTION_ALERT_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isLoading: true
+            });
+        case actionTypes.SEND_SOLUTION_ALERT_SUCCESS:
+            return updateObject(state, {
+                isLoading: false,
+                message: action.message
+            });
+        case actionTypes.SEND_SOLUTION_ALERT_FAILURE:
+            return updateObject(state, {
+                isLoading: false,
+                errorMsg: action.error.msg
+            });
+        case actionTypes.UPDATE_AUTOMATIC_SOLUTION_ALERTS_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isLoading: true
+            });
+        case actionTypes.UPDATE_AUTOMATIC_SOLUTION_ALERTS_SUCCESS:
+            return updateObject(state, {
+                isLoading: false,
+                message: action.message
+            });
+        case actionTypes.UPDATE_AUTOMATIC_SOLUTION_ALERTS_FAILURE:
+            return updateObject(state, {
+                isLoading: false,
+                errorMsg: action.error.msg
+            });
         default:
             return state
     }

@@ -98,34 +98,40 @@ def admin_save_display_titles(solutionID):
         titlesArray = {"titleValues" : [], "solutionDescription": ""}
         for i in range(0, 50):
             record = request.json.get("displaySelect"+str(i), None)
-            if not record: continue
+            if not record:
+                continue
             titlesArray["titleValues"].append(record.strip())
 
         titlesArray["solutionDescription"] = request.json.get("description", None)
         conditions_callback = solutions_services.saveDisplayTitles(solutionID, titlesArray)
-        return conditions_callback.Message
+        if not conditions_callback.Success:
+            return helpers.jsonResponse(False, 403, conditions_callback.Message)
 
-@solutions_router.route("/assistant/<assistantID>/savesolutionweblink/<solutionID>", methods=['POST'])
+        return helpers.jsonResponse(True, 200, conditions_callback.Message)
+
+@solutions_router.route("/assistant/savesolutionweblink/<solutionID>", methods=['POST'])
 @jwt_required
-def admin_save_solution_web_link(assistantID, solutionID):
+def admin_save_solution_web_link(solutionID):
 
     if request.method == "POST":
+        webLink = request.json.get("webLink", None)
+        solutionsRef = request.json.get("IDHeader", None)
 
-        webLink = request.form.get("webLink", default=None)
-        solutionsRef = request.form.get("solutionsRef", default=None)
-
-        if not webLink or not solutionsRef: return "Input was not retrieved correctly. Please try again"
+        if not webLink or not solutionsRef:
+            return helpers.jsonResponse(False, 403, "Input was not retrieved correctly. Please try again")
 
         webLink = webLink.strip()
         solutionsRef = solutionsRef.strip()
 
         updateLinkAndRef_callback : Callback = solutions_services.updateSolutionsLinkAndRef(solutionID, webLink, solutionsRef)
+        if not updateLinkAndRef_callback.Success:
+            return helpers.jsonResponse(False, 403, updateLinkAndRef_callback.Message)
 
-        return updateLinkAndRef_callback.Message
+        return helpers.jsonResponse(True, 200, updateLinkAndRef_callback.Message)
 
-@solutions_router.route("/assistant/<assistantID>/requiredfilters/<solutionID>", methods=['POST'])
+@solutions_router.route("/assistant/requiredfilters/<solutionID>", methods=['POST'])
 @jwt_required
-def admin_save_required_filters(assistantID, solutionID):
+def admin_save_required_filters(solutionID):
 
     if request.method == "POST":
 
@@ -134,7 +140,6 @@ def admin_save_required_filters(assistantID, solutionID):
         for i in range(0, 50):
             record = request.form.get("conditionInput"+str(i), default=None)
             if not record: continue
-            print("record: ", record)
             record = record.split(",")
             record = [x.strip() for x in record if not x.strip() == ""]
             conditionsArray["filterValues"].append(record)
@@ -151,20 +156,21 @@ def admin_send_solution_alerts(assistantID, solutionID):
     if request.method == "POST":
 
         sendAlerts_callback : Callback = solutions_services.sendSolutionsAlerts(assistantID, solutionID)
+        if not sendAlerts_callback.Success:
+            return helpers.jsonResponse(False, 403, sendAlerts_callback.Message)
 
-        return sendAlerts_callback.Message
+        return helpers.jsonResponse(True, 200, sendAlerts_callback.Message)
 
-@solutions_router.route("/assistant/<assistantID>/automaticsolutionalerts/<solutionID>/<setTo>", methods=['POST'])
+@solutions_router.route("/assistant/automaticsolutionalerts/<solutionID>", methods=['POST'])
 @jwt_required
-def admin_set_automatic_solution_alert(assistantID, solutionID, setTo):
+def admin_set_automatic_solution_alert(solutionID):
 
     if request.method == "POST":
 
-        if setTo == "true":
-            setTo = True
-        else:
-            setTo = False
+        setTo = request.json.get("setTo", None)
 
         setAutomaticSolutionAlerts_callback : Callback = solutions_services.switchAutomaticSolutionAlerts(solutionID, setTo)
+        if not setAutomaticSolutionAlerts_callback.Success:
+            return helpers.jsonResponse(False, 403, setAutomaticSolutionAlerts_callback.Message)
 
-        return setAutomaticSolutionAlerts_callback.Message
+        return helpers.jsonResponse(True, 200, setAutomaticSolutionAlerts_callback.Message)

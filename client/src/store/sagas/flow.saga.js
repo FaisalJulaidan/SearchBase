@@ -30,6 +30,7 @@ function* addGroup(action) {
         return yield put(flowActions.fetchFlowRequest(action.ID))
     } catch (error) {
         console.log(error);
+        yield destroyMessage();
         return yield put(flowActions.addGroupFailure(error.response.data));
     }
 }
@@ -44,6 +45,7 @@ function* editGroup(action) {
         return yield put(flowActions.fetchFlowRequest(action.ID))
     } catch (error) {
         console.log(error);
+        yield destroyMessage();
         return yield put(flowActions.editGroupFailure(error.response.data));
     }
 }
@@ -58,6 +60,7 @@ function* deleteGroup({assistantID, deletedGroup}) {
         return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
+        yield destroyMessage();
         return yield put(flowActions.deleteGroupFailure(error.response.data));
     }
 }

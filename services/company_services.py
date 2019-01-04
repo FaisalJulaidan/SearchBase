@@ -36,8 +36,6 @@ def getAll() -> list:
     # finally:
        # db.session.close()
 
-
-
 def create(name, url, ownerEmail) -> Company or None:
 
     try:
@@ -62,8 +60,6 @@ def create(name, url, ownerEmail) -> Company or None:
     # finally:
        # db.session.close()
     # Save
-
-
 
 def removeByName(name) -> bool:
 
@@ -107,7 +103,6 @@ def getByCompanyID(id) -> Callback:
     # finally:
        # db.session.close()
 
-
 def getByStripeID(id) -> Callback:
     try:
         # Get result and check if None then raise exception
@@ -122,3 +117,19 @@ def getByStripeID(id) -> Callback:
         return Callback(False, 'Could not get the assistant by nickname.')
     # finally:
        # db.session.close()
+
+def updateCompany(companyName, companyID):
+    try:
+        callback: Callback = getByCompanyID(companyID)
+        if not callback.Success: return Callback(False, "Could not find company")
+        callback.Data.Name = companyName
+        db.session.commit()
+
+        return Callback(True, "Company has been updated")
+    except Exception as exc:
+        print("profile_services.updateCompany() ERROR: ", exc)
+        db.session.rollback()
+        return Callback(False, "Company cold not be updated")
+
+    # finally:
+    # db.session.close()

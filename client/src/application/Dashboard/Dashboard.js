@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 
-import {Icon, Layout, Menu} from 'antd';
+import {Icon, Layout, Menu, Dropdown, Avatar, Button} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
 import Assistants from './Assistants/Assistants';
-import {history} from '../../helpers';
+import {history, getUser} from '../../helpers';
 import {Switch, Route} from 'react-router-dom';
 import Flow from "./Assistants/Assistant/Flow/Flow";
 import Profile from "./Profile/Profile";
@@ -12,6 +12,9 @@ import Integration from "./Assistants/Assistant/Integration/Integration";
 import UserInput from "./Assistants/Assistant/UserInput/UserInput";
 import Solutions from "./Assistants/Assistant/Solutions/Solutions";
 import Home from "./Home/Home";
+import {authActions} from "../../store/actions";
+import store from '../../store/store';
+import {connect} from 'react-redux';
 
 
 const {SubMenu} = Menu;
@@ -32,11 +35,63 @@ class Dashboard extends Component {
     };
 
     handleMenuClick = (e) => {
+        if (e.key === 'logout'){this.logout()}
         e.key === 'dashboard' ? history.push(`/dashboard`) : history.push(`/dashboard/${e.key}`)
     };
 
+    logout = () => {
+        store.dispatch(authActions.logout());
+    };
+
+    getInitials = (username) => {
+        const initials = username.match(/\b\w/g) || [];
+        return ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
+    };
+
     render() {
+
         const {match} = this.props;
+        const user = getUser();
+        let userInfo = null;
+
+        // User Information at the top
+        if (!user) {
+            this.logout();
+        } else {
+
+            let avatar = (
+                <Avatar size="large" style={{ backgroundColor: '#9254de', verticalAlign: 'middle' }}>
+                    {this.getInitials(user.username)}
+                </Avatar>
+            );
+            let userInfoMenu = (
+                <Menu onClick={this.handleMenuClick}>
+                    <Menu.Item key="profile">
+                        <div style={{display:'flex', marginTop:'10px'}}>
+                            {avatar}
+                            <div style={{marginLeft:'10px'}}>
+                                <h3>{user.username}</h3>
+                                <p>{user.email}</p>
+                            </div>
+                        </div>
+                    </Menu.Item>
+                    <Menu.Divider />
+                    <Menu.Item key="logout" >
+                        <Icon type="logout"/>
+                        <span>Logout</span>
+                    </Menu.Item>
+                </Menu>
+            );
+
+            userInfo = (
+                <Dropdown overlay={userInfoMenu} overlayStyle={{width:'255px'}}>
+                    {avatar}
+                </Dropdown>
+            );
+        }
+        // End of User Information
+
+
         return (
             <Layout style={{height: '100%'}}>
                 <Sider
@@ -52,7 +107,7 @@ class Dashboard extends Component {
                         </div>
                     </div>
 
-                    <Menu theme="light" defaultSelectedKeys={['1']} mode="inline" onClick={this.handleMenuClick}>
+                    <Menu theme="light" defaultSelectedKeys={['dashboard']} mode="inline" onClick={this.handleMenuClick}>
                         <Menu.Item key="dashboard">
                             <Icon type="home"/>
                             <span>Home</span>
@@ -91,14 +146,17 @@ class Dashboard extends Component {
 
                     <Header className={styles.Header}>
                         <Icon
-                            className={styles.trigger}
+                            className={styles.Trigger}
                             type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
                             onClick={this.toggle}
                         />
+                        <div className={styles.UserInfo}>
+                            {userInfo}
+                        </div>
                     </Header>
 
                     {/*HERE GOES ALL THE ROUTES*/}
-                    <Content style={{margin: 16, marginTop: 80, marginBottom: 0, height: '100%'}}>
+                    <Content style={{margin: 16, marginTop: 10, marginBottom: 0, height: '100%'}}>
                         <Switch>
                             <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
                             <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
@@ -110,9 +168,6 @@ class Dashboard extends Component {
                         </Switch>
                     </Content>
 
-
-
-
                     <Footer style={{textAlign: 'center', padding: 10}}>
                         Copyright TheSearchBase Limited 2019. All rights reserved.
                     </Footer>
@@ -120,7 +175,12 @@ class Dashboard extends Component {
             </Layout>
         );
     }
-
 }
 
-export default Dashboard;
+function mapStateToProps(state) {
+    return {
+        profile: state.profile.profile
+    };
+}
+
+export default connect(mapStateToProps)(Dashboard);

@@ -61,7 +61,7 @@ class Dashboard extends Component {
 
             let avatar = (
                 <Avatar size="large" style={{ backgroundColor: '#9254de', verticalAlign: 'middle' }}>
-                    {this.getInitials(user.username)}
+                    {/*{this.getInitials(user.username)}*/}
                 </Avatar>
             );
             let userInfoMenu = (

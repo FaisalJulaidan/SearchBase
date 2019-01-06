@@ -10,7 +10,8 @@ const Option = Select.Option;
 class ITDForm extends React.Component {
 
     state = {
-        chosenDisplays: [],
+        solutionID: undefined,
+        chosenDisplays: []
     };
 
     addNewDisplaySelect = () => {
@@ -19,12 +20,13 @@ class ITDForm extends React.Component {
         this.setState({chosenDisplays: chosenDisplays});
     };
 
-    static getDerivedStateFromProps(newProps){
-        if(newProps.currentSolution.Solution === undefined){ return ({chosenDisplays: []}); }
-        if(newProps.currentSolution.Solution.DisplayTitles === null){ return ({chosenDisplays: []}); }
+    static getDerivedStateFromProps(newProps, prevState){
+        if(newProps.currentSolution.Solution.ID === prevState.solutionID){ return null; }
+        if(newProps.currentSolution.Solution === undefined){ return null; }
+        if(newProps.currentSolution.Solution.DisplayTitles === null){ return null; }
 
         const chosenDisplays = [...newProps.currentSolution.Solution.DisplayTitles.titleValues];
-        return ({chosenDisplays: chosenDisplays});
+        return ({chosenDisplays: chosenDisplays, solutionID: newProps.currentSolution.Solution.ID});
     }
 
     handleSubmit = (e) => {

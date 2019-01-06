@@ -52,13 +52,9 @@ def profile():
 
     # Update profile details
     if request.method == "POST":
-        profile = request.json.get("profile", None)
-        if not profile:
-            return helpers.jsonResponse(False, 400, "Could not retrieve all written information.", None)
-
-        names = profile.get("name", None)
-        newEmail = profile.get("email", None)
-        companyName = profile.get("companyName", None)
+        names = request.json.get("name", None)
+        newEmail = request.json.get("email", None)
+        companyName = request.json.get("companyName", None)
 
         if not(names or newEmail or companyName):
             return helpers.jsonResponse(False, 400, "Data missing..", None)
@@ -77,8 +73,6 @@ def profile():
             return helpers.jsonResponse(False, 400,"Could not update Company's information.", None)
 
         return helpers.jsonResponse(True, 200, "Profile has been updated.", None)
-
-
 
 
 @profile_router.route("/profile/settings", methods=['POST'])

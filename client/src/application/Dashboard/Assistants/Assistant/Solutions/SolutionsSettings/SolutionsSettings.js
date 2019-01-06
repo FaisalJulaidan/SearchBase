@@ -30,11 +30,21 @@ class SolutionsSettings extends React.Component{
                         <Tabs defaultActiveKey={"1"}>
 
                             <TabPane tab={"Information to Display"} key={"1"}>
-                                <ITDForm currentSolution={this.props.currentSolution} updateInformationToDisplay={this.props.updateInformationToDisplay}/>
+
+                                <ITDForm
+                                    currentSolution={this.props.currentSolution}
+                                    updateInformationToDisplay={this.props.updateInformationToDisplay}
+                                />
+
                             </TabPane>
 
                             <TabPane tab={"Button Link"} key={"2"}>
-                                <BTForm currentSolution={this.props.currentSolution} updateButtonLink={this.props.updateButtonLink}/>
+
+                                <BTForm
+                                    currentSolution={this.props.currentSolution}
+                                    updateButtonLink={this.props.updateButtonLink}
+                                />
+
                             </TabPane>
 
                             {/*<TabPane tab={"Results' Filters"} key={"3"}>*/}
@@ -42,7 +52,13 @@ class SolutionsSettings extends React.Component{
                             {/*</TabPane>*/}
 
                             <TabPane tab={"Email Auto-match"} key={"4"}>
-                                <EAmForm sendSolutionAlerts={this.props.sendSolutionAlerts} submitAutomaticAlerts={(e) => {this.props.updateAutomaticAlerts(e)}}/>
+
+                                <EAmForm
+                                    currentSolution={this.props.currentSolution}
+                                    sendSolutionAlerts={this.props.sendSolutionAlerts}
+                                    submitAutomaticAlerts={(e) => {this.props.updateAutomaticAlerts(e)}}
+                                />
+
                             </TabPane>
 
                         </Tabs>

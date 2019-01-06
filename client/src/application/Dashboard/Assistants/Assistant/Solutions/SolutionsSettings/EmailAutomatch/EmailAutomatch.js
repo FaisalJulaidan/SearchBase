@@ -6,7 +6,6 @@ class EmailAutomatch extends React.Component {
 
 
     render() {
-
         return (
             <div style={{textAlign:"center"}}>
 
@@ -17,7 +16,8 @@ class EmailAutomatch extends React.Component {
                 <Button onClick={this.props.sendSolutionAlerts} className={styles.Button} type={"primary"}>Send Matches</Button><br />
 
                 <label>Automatic Matching on Record Update:</label><br />
-                <Switch loading={false} checkedChildren={"On"} unCheckedChildren={"Off"} defaultChecked={false} onChange={this.props.submitAutomaticAlerts}/>
+                <Switch loading={false} checkedChildren={"On"} unCheckedChildren={"Off"}
+                        defaultChecked={this.props.currentSolution.Solution.automaticSolutionAlerts} onChange={this.props.submitAutomaticAlerts}/>
 
 
             </div>

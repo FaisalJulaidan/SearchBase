@@ -1,7 +1,7 @@
 import * as actionTypes from '../actions/actionTypes';
 import { delay } from "redux-saga";
 import { put, takeEvery, takeLatest, all } from 'redux-saga/effects'
-import { authActions } from "../actions";
+import {authActions, profileActions} from "../actions";
 import { history, checkAuthenticity } from '../../helpers'
 import {alertError, alertSuccess, destroyMessage, loadingMessage} from "../../helpers/alert";
 import axios from 'axios';
@@ -22,7 +22,7 @@ function* login({email, password}) {
         const res = yield axios.post(`/api/auth`, {email, password}, {
             headers: {'Content-Type': 'application/json'},
         });
-        console.log("RES:", res);
+
         const {user, token, refresh, expiresIn} = yield res.data.data;
         yield localStorage.setItem("user", JSON.stringify(user));
         yield localStorage.setItem("token", token);
@@ -32,6 +32,7 @@ function* login({email, password}) {
         const secondsToExpire = yield (new Date(expiresIn).getTime() - new Date().getTime()) / 1000;
         // Dispatch actions
         yield destroyMessage();
+        yield put(profileActions.getProfile());
         yield put(authActions.loginSuccess(user));
         yield put(authActions.checkAuthTimeout(secondsToExpire, refresh)); // refresh to access token when expired
         // Redirect to dashboard page
@@ -60,7 +61,7 @@ function* watchLogout() {
 
 function* refreshToken({refresh}) {
     try {
-        if(!checkAuthenticity()){throw new Error('Authentication Failed')}
+        if(!checkAuthenticity()){throw new Error('Authentication Failed!')}
         const res = yield axios.post(`/api/auth/refresh`, null,{
             headers: {'Authorization': 'Bearer ' + refresh},
         });

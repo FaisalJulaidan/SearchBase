@@ -1,5 +1,17 @@
 from models import db, Company, Assistant, Callback
 
+def authorised_getByID(assistantID, companyID) -> Callback:
+    security_callback: Callback = getByID(assistantID)
+    if not security_callback.Success:
+        return Callback(False, "Assistant not found.", 404)
+    assistant: Assistant = security_callback.Data
+
+    # Check if this user has access to this assistant
+    if assistant.CompanyID != companyID:
+        return Callback(False, "Unauthorised!", 401)
+
+    return Callback(True, "Assistant retrieved successfully.", assistant)
+
 
 def getByID(id) -> Callback:
     try:

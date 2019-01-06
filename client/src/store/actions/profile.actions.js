@@ -9,7 +9,7 @@ const getProfile = () => {
 const getProfileSuccess = (profile) => {
     return {
         type: actionTypes.GET_PROFILE_SUCCESS,
-        profileData: profile.data
+        profileData: profile
     }
 };
 

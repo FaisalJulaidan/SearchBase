@@ -94,6 +94,9 @@ def authenticate(email: str, password_to_check: str) -> Callback:
         data = {'user': {"id": user.ID,
                          "companyID": user.CompanyID,
                          "email": user.Email,
+                         "username": user.Firstname + ' ' + user.Surname,
+                         "lastAccess": user.LastAccess,
+                         "phoneNumber": user.PhoneNumber,
                          "plan": helpers.getPlanNickname(user.Company.SubID),
                          "roleID": user.RoleID
                          }

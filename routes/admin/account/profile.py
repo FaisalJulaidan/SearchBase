@@ -1,7 +1,7 @@
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from services import profile_services, admin_services, newsletter_services, user_services
-from models import Callback
+from services import newsletter_services, user_services, company_services
+from models import Callback, User
 from flask import Blueprint, request
 from utilities import helpers
 
@@ -14,71 +14,76 @@ profile_router: Blueprint = Blueprint('profile_router', __name__, template_folde
 #         return admin_services.render("admin/profile.html")
 
 
-@profile_router.route("/profile", methods=['GET'])
+@profile_router.route("/profile", methods=['GET', 'POST'])
 @jwt_required
-def profilePageData():
-    if request.method == "GET":
-        user = get_jwt_identity()['user']
+def profile():
 
-        if request.method == "GET":
-            email = user.get("email", None)
-
-            profile_callback: Callback = profile_services.getUserAndCompany(email)
-            if not profile_callback.Success:
-                return helpers.jsonResponse(True, 200, "Profile has been retrieved 1",
-                                            {"user": None, "email": email, "company": None, "newsletters": None,
-                                             "userSettings": None})
-
-            newsletter_callback: Callback = newsletter_services.checkForNewsletter(email)
-            newsletters = newsletter_callback.Success
-
-            userSettings_callback: Callback = user_services.getUserSettings(user.get("id", 0))
-
-            if not userSettings_callback.Success or not userSettings_callback.Data:
-                return helpers.jsonResponse(True, 200, "Profile has been retrieved 2",
-                                            {"user": profile_callback.Data["user"], "email": email,
-                                             "company": profile_callback.Data["company"], "newsletters": newsletters,
-                                             "userSettings": None})
-
-            return helpers.jsonResponse(True, 200, "Profile has been retrieved 3",
-                                        {"user": profile_callback.Data["user"], "email": email,
-                                         "company": profile_callback.Data["company"], "newsletters": newsletters,
-                                         "userSettings": helpers.getDictFromSQLAlchemyObj(userSettings_callback.Data)})
-
-
-@profile_router.route("/profile/profiledetails", methods=['POST'])
-@jwt_required
-def profileDetails():
+    # Authenticate
     user = get_jwt_identity()['user']
-    if request.method == "POST":
-        names = request.json.get("name", "Error")
-        newEmail = request.json.get("email", "error").lower()
-        companyName = request.json.get("companyName", "Error")
 
-        if names is "Error" and newEmail is "error" and companyName is "Error":
+    # Get profile details
+    if request.method == "GET":
+        email = user.get("email", None)
+
+        # Get user record
+        user_callback: Callback = user_services.getByEmail(email)
+        if not user_callback.Success:
+            return helpers.jsonResponse(True, 200, "Profile has been retrieved 1",
+                                        {"user": None, "email": email, "company": None, "newsletters": None,
+                                         "userSettings": None})
+        user : User = user_callback.Data
+
+        # Check newsletter
+        newsletter_callback: Callback = newsletter_services.checkForNewsletter(email)
+        newsletters = newsletter_callback.Success
+
+        # Get user's settings
+        userSettings_callback: Callback = user_services.getUserSettings(user.ID)
+        if not userSettings_callback.Success or not userSettings_callback.Data:
+            return helpers.jsonResponse(True, 200, "Profile has been retrieved 2",
+                                        {"user": helpers.getDictFromSQLAlchemyObj(user), "email": email,
+                                         "company": helpers.getDictFromSQLAlchemyObj(user.Company), "newsletters": newsletters,
+                                         "userSettings": None})
+
+        return helpers.jsonResponse(True, 200, "Profile has been retrieved 3",
+                                    {"user": helpers.getDictFromSQLAlchemyObj(user), "email": email,
+                                     "company": helpers.getDictFromSQLAlchemyObj(user.Company), "newsletters": newsletters,
+                                     "userSettings": helpers.getDictFromSQLAlchemyObj(userSettings_callback.Data)})
+
+    # Update profile details
+    if request.method == "POST":
+        profile = request.json.get("profile", None)
+        if not profile:
             return helpers.jsonResponse(False, 400, "Could not retrieve all written information.", None)
 
+        names = profile.get("name", None)
+        newEmail = profile.get("email", None)
+        companyName = profile.get("companyName", None)
+
+        if not(names or newEmail or companyName):
+            return helpers.jsonResponse(False, 400, "Data missing..", None)
+
         names = names.split(" ")
-        name1 = names[0]
-        name2 = names[1]
+        firstname = names[0]
+        surname = names[1]
 
         # update user details
-        updateUser_callback: Callback = profile_services.updateUser(name1, name2, newEmail, user.get("id", 0))
-        if not updateUser_callback.Success:
+        callback: Callback = user_services.updateUser(firstname, surname, newEmail.lower(), user.get("id", 0))
+        if not callback.Success:
             return helpers.jsonResponse(False, 400, "Could not update User's information.", None)
 
-        updateCompany_callback: Callback = profile_services.updateCompany(companyName, user.get("companyID", 0))
-        if not updateCompany_callback.Success:
-            return helpers.jsonResponse(False, 400,
-                                        "Could not update Company's information. User information has been updated.",
-                                        None)
+        callback: Callback = company_services.updateCompany(companyName, user.get("companyID", 0))
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400,"Could not update Company's information.", None)
 
-        return helpers.jsonResponse(True, 200, "Records have been updated.", None)
+        return helpers.jsonResponse(True, 200, "Profile has been updated.", None)
 
 
-@profile_router.route("/profile/datasettings", methods=['POST'])
+
+
+@profile_router.route("/profile/settings", methods=['POST'])
 @jwt_required
-def dataSettings():
+def profile_settings():
     user = get_jwt_identity()['user']
     if request.method == "POST":
         userID = user.get("id", 0)
@@ -106,8 +111,8 @@ def dataSettings():
                                         None)
 
         # update user settings
-        userSettings_callback: Callback = user_services.createUpdateUserSettings(userID, tracking, techSupport,
-                                                                                 accountSpecialist, notifications)
+        userSettings_callback: Callback = user_services.updateUserSettings(userID, tracking, techSupport,
+                                                                           accountSpecialist, notifications)
 
         if not userSettings_callback.Success:
             return helpers.jsonResponse(False, 400,

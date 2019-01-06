@@ -8,16 +8,31 @@
   margin: 16px;
 }
 
-.trigger {
+.Trigger {
   font-size: 18px;
   line-height: 64px;
-  padding: 0 24px;
   cursor: pointer;
   transition: color .3s;
 }
 
-.trigger:hover {
+.Trigger:hover {
   color: @primary-color;
+}
+
+.Header {
+  display: flex;
+  justify-content: space-between;
+  background: #fff;
+  padding: 0 25px;
+  width: 100%;
+  border-bottom: 1px #ddd solid;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+.UserInfo {
+
 }
 
 .Sider {
@@ -31,17 +46,6 @@
   -webkit-box-sizing: border-box;
 }
 
-.Header {
-  background: #fff;
-  padding: 0;
-  position: fixed;
-  z-index: 1;
-  width: 100%;
-  border-bottom: 1px #ddd solid;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-}
 
 .Panel {
   height: 100%;

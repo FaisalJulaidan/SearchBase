@@ -11,17 +11,13 @@ flow_router: Blueprint = Blueprint('flow_router', __name__, template_folder="../
 @flow_router.route("/assistant/<int:assistantID>/flow", methods=['GET', 'PUT'])
 @jwt_required
 def flow(assistantID):
-    # Auth
-    user = get_jwt_identity()['user']
-    # For all type of requests methods, get the assistant
-    security_callback: Callback = assistant_services.getByID(assistantID)
-    if not security_callback.Success:
-        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
-    assistant: Assistant = security_callback.Data
 
-    # Check if this user has access to this assistant
-    if assistant.CompanyID != user['companyID']:
-        return helpers.jsonResponse(False, 401, "Unauthorised!")
+    # Authenticate
+    user = get_jwt_identity()['user']
+    security_callback: Callback = assistant_services.authorised_getByID(assistantID, user['companyID'])
+    if not security_callback.Success:
+        return helpers.jsonResponse(False, security_callback.Data, security_callback.Message, None)
+    assistant: Assistant = security_callback.Data
 
     #############
     callback: Callback = Callback(False, 'Error!', None)

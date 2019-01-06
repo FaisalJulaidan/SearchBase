@@ -19,7 +19,7 @@ def authenticate():
         if callback.Success:
             return helpers.jsonResponse(True, 200, "Authorised!", callback.Data)
         else:
-            return helpers.jsonResponse(False, 401, "Unauthorised!", callback.Data)
+            return helpers.jsonResponse(False, 401, "Incorrect log in details!", callback.Data)
 
 
 # Refresh token endpoint

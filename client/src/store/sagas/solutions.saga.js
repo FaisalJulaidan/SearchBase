@@ -23,11 +23,12 @@ function* addSolution(action) {
         yield destroyMessage();
         yield alertSuccess('Solution Added', res.data.msg);
         yield put(solutionsActions.addSolutionSuccess(res.message));
-        return yield http.get(solutionsActions.getSolutions(action.assistantID))
+        yield put(solutionsActions.getSolutions(action.params.ID));
     } catch (error) {
         console.log(error.response);
+        yield destroyMessage();
         yield alertError('Error in adding Solution', error.response.data.msg);
-        return yield put(solutionsActions.addSolutionFailure(error.response.data));
+        yield put(solutionsActions.addSolutionFailure(error.response.data));
     }
 }
 
@@ -38,11 +39,12 @@ function* editSolution(action) {
         yield destroyMessage();
         yield alertSuccess('Solution Edited', res.data.msg);
         yield put(solutionsActions.editSolutionSuccess(res.message));
-        return yield http.get(solutionsActions.getSolutions(action.assistantID))
+        yield put(solutionsActions.getSolutions(action.params.ID))
     } catch (error) {
         console.log(error.response);
+        yield destroyMessage();
         yield alertError('Error in editing Solution', error.response.data.msg);
-        return yield put(solutionsActions.editSolutionFailure(error.response.data));
+        yield put(solutionsActions.editSolutionFailure(error.response.data));
     }
 }
 
@@ -52,11 +54,11 @@ function* updateSolutionInformationToDisplay(action) {
         const res = yield http.post(`/assistant/savedisplaytitles/${action.params.solutionID}`, action.params.information);
         yield destroyMessage();
         yield alertSuccess('Display Settings have been edited', res.data.msg);
-        return yield put(solutionsActions.updateSolutionInformationToDisplaySuccess(res.message));
+        yield put(solutionsActions.updateSolutionInformationToDisplaySuccess(res.message));
     } catch (error) {
         console.log(error.response);
         yield alertError('Error in editing Display Settings', error.response.data.msg);
-        return yield put(solutionsActions.updateSolutionInformationToDisplayFailure(error.response.data));
+        yield put(solutionsActions.updateSolutionInformationToDisplayFailure(error.response.data));
     }
 }
 
@@ -66,11 +68,11 @@ function* updateButtonLink(action) {
         const res = yield http.post(`/assistant/savesolutionweblink/${action.params.solutionID}`, action.params.information);
         yield destroyMessage();
         yield alertSuccess('Button Link has been updated', res.data.msg);
-        return yield put(solutionsActions.updateButtonLinkSuccess(res.message));
+        yield put(solutionsActions.updateButtonLinkSuccess(res.message));
     } catch (error) {
         console.log(error.response);
         yield alertError('Error in updating Button Link', error.response.data.msg);
-        return yield put(solutionsActions.updateButtonLinkFailure(error.response.data));
+        yield put(solutionsActions.updateButtonLinkFailure(error.response.data));
     }
 }
 
@@ -80,11 +82,11 @@ function* sendSolutionAlerts(action) {
         const res = yield http.post(`/assistant/${action.params.assistantID}/sendsolutionalerts/${action.params.solutionID}`);
         yield destroyMessage();
         yield alertSuccess('Solution Alerts have been sent', res.data.msg);
-        return yield put(solutionsActions.sendSolutionAlertSuccess(res.message));
+        yield put(solutionsActions.sendSolutionAlertSuccess(res.message));
     } catch (error) {
         console.log(error.response);
         yield alertError('Error in sending Solution Alerts', error.response.data.msg);
-        return yield put(solutionsActions.sendSolutionAlertFailure(error.response.data));
+        yield put(solutionsActions.sendSolutionAlertFailure(error.response.data));
     }
 }
 
@@ -94,11 +96,11 @@ function* updateAutomaticSolutionsAlerts(action) {
         const res = yield http.post(`/assistant/automaticsolutionalerts/${action.params.solutionID}`, action.params.information);
         yield destroyMessage();
         yield alertSuccess('Automatic Solution Alerts have been updated', res.data.msg);
-        return yield put(solutionsActions.updateAutomaticSolutionsSuccess(res.message));
+        yield put(solutionsActions.updateAutomaticSolutionsSuccess(res.message));
     } catch (error) {
         console.log(error.response);
         yield alertError('Error in updating Automatic Solution Alerts', error.response.data.msg);
-        return yield put(solutionsActions.updateAutomaticSolutionsFailure(error.response.data));
+        yield put(solutionsActions.updateAutomaticSolutionsFailure(error.response.data));
     }
 }
 

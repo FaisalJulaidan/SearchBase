@@ -51,13 +51,9 @@ def profilePageData():
 def profileDetails():
     user = get_jwt_identity()['user']
     if request.method == "POST":
-        profile = request.json.get("profile", None)
-        if not profile:
-            return helpers.jsonResponse(False, 400, "Could not retrieve all written information.", None)
-
-        names = profile.get("name", "Error")
-        newEmail = profile.get("email", "error").lower()
-        companyName = profile.get("companyName", "Error")
+        names = request.json.get("name", "Error")
+        newEmail = request.json.get("email", "error").lower()
+        companyName = request.json.get("companyName", "Error")
 
         if names is "Error" and newEmail is "error" and companyName is "Error":
             return helpers.jsonResponse(False, 400, "Could not retrieve all written information.", None)
@@ -88,13 +84,14 @@ def dataSettings():
         userID = user.get("id", 0)
         email = user.get("email", None)
 
-        profileSettings = request.json.get("profileSettings", {})
+        newsletters = request.json.get("newsletters", "Error")
+        tracking = request.json.get("trackData", "Error")
+        techSupport = request.json.get("techSupport", "Error")
+        notifications = request.json.get("statNotifications", "Error")
+        accountSpecialist = request.json.get("accountSpecialist", "Error")
 
-        newsletters = request.json.get("newsletters", False)
-        tracking = profileSettings.get("trackData", False)
-        techSupport = profileSettings.get("techSupport", False)
-        notifications = profileSettings.get("statNotifications", False)
-        accountSpecialist = profileSettings.get("accountSpecialist", False)
+        if newsletters == "Error" or tracking == "Error" or techSupport == "Error" or notifications == "Error" or accountSpecialist == "Error":
+            return helpers.jsonResponse(False, 400, "Input could not be received", None)
 
         # update newsletters
         if newsletters:

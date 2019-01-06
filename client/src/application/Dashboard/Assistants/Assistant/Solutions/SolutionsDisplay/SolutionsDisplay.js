@@ -63,9 +63,11 @@ class SolutionsDisplay extends React.Component{
                                         actions={[<Button icon={'edit'}
                                                           onClick={() => this.selectSolution(item)}/>]}>
                                         <List.Item.Meta
+                                            onClick={() => this.props.selectSolution(item)}
+                                            className={styles.groupsList}
                                             avatar={<Avatar icon="database"
                                                             style={{backgroundColor: '#9254de'}}/>}
-                                            title={<a onClick={() => this.props.selectSolution(item)}>{item.Solution.Name}</a>}
+                                            title={item.Solution.Name}
                                             description={item.description}
                                         />
                                     </List.Item>

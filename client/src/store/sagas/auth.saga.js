@@ -3,6 +3,7 @@ import { delay } from "redux-saga";
 import { put, takeEvery, takeLatest, all } from 'redux-saga/effects'
 import { authActions } from "../actions";
 import { history, checkAuthenticity } from '../../helpers'
+import {alertError, alertSuccess, destroyMessage, loadingMessage} from "../../helpers/alert";
 import axios from 'axios';
 
 
@@ -17,24 +18,28 @@ function* watchCheckAuthTimeout() {
 
 function* login({email, password}) {
     try {
+        loadingMessage('Logging you in...');
         const res = yield axios.post(`/api/auth`, {email, password}, {
             headers: {'Content-Type': 'application/json'},
         });
-
+        console.log("RES:", res);
         const {user, token, refresh, expiresIn} = yield res.data.data;
         yield localStorage.setItem("user", JSON.stringify(user));
         yield localStorage.setItem("token", token);
         yield localStorage.setItem("refresh", refresh);
         yield localStorage.setItem("expiresIn", expiresIn);
         // When access token expires in seconds
-        const secondsToExpire = yield (new Date(expiresIn).getTime() - new Date().getTime()) / 1000
+        const secondsToExpire = yield (new Date(expiresIn).getTime() - new Date().getTime()) / 1000;
         // Dispatch actions
+        yield destroyMessage();
         yield put(authActions.loginSuccess(user));
         yield put(authActions.checkAuthTimeout(secondsToExpire, refresh)); // refresh to access token when expired
         // Redirect to dashboard page
         yield history.push('/dashboard');
     } catch (error) {
         console.log(error);
+        yield destroyMessage();
+        yield alertError('Log in Unsuccessful', error.response.data.msg);
         yield put(authActions.loginFailure(error.response.data));
     }
 }

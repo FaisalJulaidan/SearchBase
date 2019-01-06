@@ -52,16 +52,16 @@ def profile():
 
     # Update profile details
     if request.method == "POST":
-        names = request.json.get("name", None)
+        name = request.json.get("name", None)
         newEmail = request.json.get("email", None)
         companyName = request.json.get("companyName", None)
 
-        if not(names or newEmail or companyName):
+        if not(name or newEmail or companyName):
             return helpers.jsonResponse(False, 400, "Data missing..", None)
 
-        names = names.split(" ")
-        firstname = names[0]
-        surname = names[1]
+        firstname = name.strip().split(' ')[0]
+        surname = ' '.join((name + ' ').split(' ')[1:]).strip()
+
 
         # update user details
         callback: Callback = user_services.updateUser(firstname, surname, newEmail.lower(), user.get("id", 0))

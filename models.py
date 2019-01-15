@@ -189,13 +189,13 @@ class Solution(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(64), nullable=False)
     if BaseConfig.USE_ENCRYPTION:
-        Content = db.Column(EncryptedType(MagicJSON, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        RequiredFilters = db.Column(EncryptedType(MagicJSON, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
-        DisplayTitles = db.Column(EncryptedType(MagicJSON, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
+        Content = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
+        RequiredFilters = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
+        DisplayTitles = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
     else:
-        Content = db.Column(MagicJSON, nullable=False)
-        RequiredFilters = db.Column(MagicJSON, nullable=True)
-        DisplayTitles = db.Column(MagicJSON, nullable=True)
+        Content = db.Column(JsonEncodedDict, nullable=False)
+        RequiredFilters = db.Column(JsonEncodedDict, nullable=True)
+        DisplayTitles = db.Column(JsonEncodedDict, nullable=True)
     Type = db.Column(db.String(64), nullable=False)
     WebLink = db.Column(db.String(128), nullable=True)
     IDReference = db.Column(db.String(64), nullable=True)
@@ -254,7 +254,7 @@ class Block(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Type = db.Column(Enum(BlockType), nullable=False)
     Order = db.Column(db.Integer, nullable=False)
-    Content = db.Column(MagicJSON, nullable=False)
+    Content = db.Column(JsonEncodedDict, nullable=False)
     StoreInDB = db.Column(db.Boolean(), nullable=False, default=True)
     Skippable = db.Column(db.Boolean(), nullable=False, default=False)
     Labels = db.Column(db.String(64), nullable=False, default="")
@@ -287,9 +287,9 @@ class ChatbotSession(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     if BaseConfig.USE_ENCRYPTION:
-        Data = db.Column(EncryptedType(MagicJSON, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
+        Data = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
     else:
-        Data = db.Column(MagicJSON, nullable=False)
+        Data = db.Column(JsonEncodedDict, nullable=False)
     FilePath = db.Column(db.String(250), nullable=True, default=None)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     TimeSpent = db.Column(db.Integer, nullable=False, default=0)

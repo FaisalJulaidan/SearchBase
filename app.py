@@ -197,7 +197,7 @@ if os.environ['FLASK_ENV'] == 'production':
 
 elif os.environ['FLASK_ENV'] == 'development':
     app.config.from_object('config.DevelopmentConfig')
-
+    config.BaseConfig.USE_ENCRYPTION = False
     # Server Setup
     print("Use Encryption:", app.config['USE_ENCRYPTION'])
     print("Secret DB Key:", app.config['SECRET_KEY_DB'])

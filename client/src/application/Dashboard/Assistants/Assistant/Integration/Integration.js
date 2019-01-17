@@ -10,6 +10,9 @@ import {SwatchesPicker} from 'react-color';
 
 import "./Integration.less"
 
+const {TextArea} = Input;
+
+
 class Integration extends React.Component {
 
     state = {
@@ -64,12 +67,24 @@ class Integration extends React.Component {
         document.body.appendChild(script);
     };
 
+
     getWidgetSrc = () => {
         // include the colon if there is port number, which means localhost and not real server
         let colon = "";
         if (window.location.port !== "") {colon = ":";}
         const {protocol, port, hostname} = window.location;
         return protocol + '//' + hostname + colon + port + "/userdownloads/widget.js";
+    };
+
+    generateDirectLink = () => {
+        const {protocol, port, hostname} = window.location;
+        let colon = "";
+        if (window.location.port !== "") colon = ":";
+        if (port === "3000")
+            window.open(`${protocol}//${hostname}${colon}5000/assistant/YJkLo/chatbot_direct_link`);
+        else
+            window.open(`${protocol}//${hostname}${colon}${port}/assistant/YJkLo/chatbot_direct_link`);
+
     };
 
     getChatbotScript = () => {
@@ -130,19 +145,22 @@ class Integration extends React.Component {
                             <h3>Connecting your assistant</h3>
                         </div>
 
-                        <div className={styles.Panel_Body}>
-                            <p>
+                        <div className={styles.Panel_Body} style={{textAlign: 'center'}}>
+                            <p style={{textAlign: 'left'}}>
                                 To integrate your assistant, you must paste the pre-made code into any part of your
                                 HTML
                                 source code.
                             </p>
 
-                            <textarea value={ReactDOMServer.renderToString(this.getChatbotScript())} id={"pasteArea"}
-                                      style={{width: "94%", height: "110px", fontWeight: "600", margin: "1.5% 0"}}
+                            <TextArea value={ReactDOMServer.renderToString(this.getChatbotScript())}
+                                      id={"pasteArea"}
+                                      style={{width: "100%", height: "110px", fontWeight: "600", margin: "1.5% 0"}}
                                       readOnly/>
                             <Button onClick={this.copyScriptPaste} className={"ant-btn-primary"}>Copy</Button>
                             <Button style={{marginLeft: "5px"}} onClick={this.testIntegration}
                                     className={"ant-btn-primary"}>Test</Button>
+                            <Button style={{marginLeft: "5px"}} onClick={this.generateDirectLink}
+                                    className={"ant-btn-primary"}>Generate Direct Link</Button>
                         </div>
                     </div>
                 </div>

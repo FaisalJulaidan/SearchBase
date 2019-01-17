@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 
-import {Icon, Layout, Menu, Dropdown, Avatar, Button} from 'antd';
+import {Avatar, Dropdown, Icon, Layout, Menu} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
 import Assistants from './Assistants/Assistants';
-import {history, getUser} from '../../helpers';
-import {Switch, Route} from 'react-router-dom';
+import {getUser, history} from '../../helpers';
+import {Route, Switch} from 'react-router-dom';
 import Flow from "./Assistants/Assistant/Flow/Flow";
 import Profile from "./Profile/Profile";
 import Integration from "./Assistants/Assistant/Integration/Integration";
@@ -61,7 +61,7 @@ class Dashboard extends Component {
 
             let avatar = (
                 <Avatar size="large" style={{ backgroundColor: '#9254de', verticalAlign: 'middle' }}>
-                    {this.getInitials(user.username)}
+                    {this.getInitials(user.username || '')}
                 </Avatar>
             );
             let userInfoMenu = (

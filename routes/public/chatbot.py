@@ -1,15 +1,16 @@
 import os
+import uuid
+
+from flask import Blueprint, request, send_from_directory
+from flask import render_template
+from flask_cors import CORS
+from werkzeug.utils import secure_filename
+
 from config import BaseConfig
-from flask import Blueprint, render_template, request, send_from_directory
-from utilities import helpers
 from models import Callback, Assistant, db, ChatbotSession
 from services import assistant_services, flow_services, chatbot_services, solutions_services
-from werkzeug.utils import secure_filename
-from sqlalchemy.sql import and_
-import uuid
-from sqlalchemy import inspect
-from flask_cors import CORS
 from utilities import helpers
+
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
 
@@ -31,6 +32,10 @@ def getAssistantByHashID(hashID):
     return callback
 
 
+@chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot_direct_link", methods=['GET'])
+def chatbot_direct_link(assistantIDAsHash):
+    if request.method == "GET":
+        return render_template("chatbot_direct_link.html", assistantID=assistantIDAsHash)
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
 def chatbot(assistantIDAsHash):

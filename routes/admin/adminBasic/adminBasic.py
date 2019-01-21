@@ -16,7 +16,7 @@ def admin_assistant_tools():
 
 
 #Support pages
-@adminBasic_router.route("/admin/support/general", methods=['GET'])
+@adminBasic_router.route("/admin/support", methods=['GET'])
 def admin_general_support():
     if request.method == "GET":
         return admin_services.render("admin/support/general.html")

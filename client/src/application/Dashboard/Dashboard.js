@@ -7,7 +7,7 @@ import Assistants from './Assistants/Assistants';
 import {getUser, history} from '../../helpers';
 import {Route, Switch} from 'react-router-dom';
 import Flow from "./Assistants/Assistant/Flow/Flow";
-import Profile from "./Profile/Profile";
+import Profile from "./AccountDetails/Profile/Profile";
 import Documentation from "./Documentation/Documentation";
 import Integration from "./Assistants/Assistant/Integration/Integration";
 import UserInput from "./Assistants/Assistant/UserInput/UserInput";

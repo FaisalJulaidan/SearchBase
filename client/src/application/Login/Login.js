@@ -42,13 +42,13 @@ class Login extends React.Component {
                             </Col>
                         </Row>
 
-                        <Row type="flex" justify="center">
-                            <Col>
-                                <img width={100}
-                                     src="https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/login_jdch.svg"
-                                     alt=""/>
-                            </Col>
-                        </Row>
+                        {/*<Row type="flex" justify="center">*/}
+                            {/*<Col>*/}
+                                {/*<img width={200}*/}
+                                     {/*src="https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/authentication_fsn5.svg"*/}
+                                     {/*alt=""/>*/}
+                            {/*</Col>*/}
+                        {/*</Row>*/}
 
                         <br/>
 
@@ -76,7 +76,7 @@ class Login extends React.Component {
                             </Col>
                         </Row>
 
-                        <Row type="flex" justify="center">
+                        <Row type="flex" justify="center" className={styles.LoginButton}>
                             <Col span={12}>
                                 <Button type="primary" htmlType="submit"
                                         style={{width: '100%'}}

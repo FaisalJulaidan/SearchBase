@@ -58,9 +58,14 @@ export const flow = (state = initialState, action) => {
                 isDeletingGroup: true
             });
         case actionTypes.DELETE_GROUP_SUCCESS:
+            let blockGroups = [...state.blockGroups];
+            const groupToDeleteIndex =  blockGroups.findIndex(group => group.id === action.groupID);
+            blockGroups.splice(groupToDeleteIndex, 1);
+
             return updateObject(state, {
                 isDeletingGroup: false,
-                deleteSuccessMsg: action.msg
+                deleteSuccessMsg: action.msg,
+                blockGroups
             });
         case actionTypes.DELETE_GROUP_FAILURE:
             return updateObject(state, {
@@ -84,6 +89,24 @@ export const flow = (state = initialState, action) => {
                 isAddingBlock: false,
                 errorMsg: action.error.msg
             });
+
+
+        case actionTypes.DELETE_BLOCK_REQUEST:
+            return updateObject(state, {
+                isDeletingBlock: true
+            });
+        case actionTypes.DELETE_BLOCK_SUCCESS:
+            return updateObject(state, {
+                isDeletingBlock: false,
+                deleteSuccessMsg: action.msg,
+            });
+        case actionTypes.DELETE_BLOCK_FAILURE:
+            return updateObject(state, {
+                isDeletingBlock: false,
+                errorMsg: action.error.msg
+            });
+
+
         default:
             return state
     }

@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
 import "./Groups.less"
 import styles from "./Groups.module.less";
-import {Avatar, Button, List, Skeleton, Spin} from "antd";
+import {Avatar, Button, List, Skeleton, Spin, Modal} from "antd";
 import NewGroup from "./NewGroup/NewGroup";
 import EditGroup from "./EditGroup/EditGroup";
+
+const confirm = Modal.confirm;
 
 class Groups extends Component {
 
@@ -37,8 +39,15 @@ class Groups extends Component {
 
     ////// DELETE GROUP
     handleDeleteGroup = (deletedGroup) => {
-        this.props.deleteGroup(deletedGroup);
-        this.setState({editGroupModal: false, selectedGroupToEdit: {}});
+        console.log(deletedGroup);
+        confirm({
+            title: `Delete group confirmation`,
+            content: `If you click OK, this group will be deleted with its associated blocks forever`,
+            onOk: () => {
+                this.props.deleteGroup(deletedGroup);
+                this.setState({editGroupModal: false, selectedGroupToEdit: {}});
+            }
+        });
     };
 
 

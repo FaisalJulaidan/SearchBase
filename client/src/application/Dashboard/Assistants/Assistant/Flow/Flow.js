@@ -32,17 +32,18 @@ class Flow extends Component {
     // GROUPS
     addGroup = (newGroup) => {
         const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.addGroupRequest({ID: assistant.ID, newGroup: newGroup}));
+        this.props.dispatch(flowActions.addGroupRequest({assistantID: assistant.ID, newGroup: newGroup}));
     };
 
     editGroup = (editedGroup) => {
         const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.editGroupRequest({ID: assistant.ID, editedGroup: editedGroup}));
+        this.props.dispatch(flowActions.editGroupRequest({assistantID: assistant.ID, editedGroup: editedGroup}));
     };
 
     deleteGroup = (deletedGroup) => {
         const {assistant} = this.props.location.state;
         this.props.dispatch(flowActions.deleteGroupRequest({assistantID: assistant.ID, deletedGroup: deletedGroup}));
+        this.setState({currentGroup: {blocks: []}});
     };
 
 

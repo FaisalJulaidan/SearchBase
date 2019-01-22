@@ -20,14 +20,14 @@ function* watchFetchFlow() {
 }
 
 // Groups
-function* addGroup(action) {
+function* addGroup({assistantID, newGroup}) {
     try {
         loadingMessage('Adding Group');
-        const res = yield http.post(`/assistant/${action.ID}/flow/group`, action.newGroup);
+        const res = yield http.post(`/assistant/${assistantID}/flow/group`, newGroup);
         yield put(flowActions.addGroupSuccess(res.data.msg));
         yield destroyMessage();
         yield alertSuccess('Group Added', res.data.msg);
-        return yield put(flowActions.fetchFlowRequest(action.ID))
+        return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
         yield destroyMessage();
@@ -35,14 +35,14 @@ function* addGroup(action) {
     }
 }
 
-function* editGroup(action) {
+function* editGroup({assistantID, editedGroup}) {
     try {
         loadingMessage('Updating Group');
-        const res = yield http.put(`/assistant/${action.ID}/flow/group`, action.editedGroup);
+        const res = yield http.put(`/assistant/${assistantID}/flow/group`, editedGroup);
         yield put(flowActions.editGroupSuccess(res.data.msg));
         yield destroyMessage();
         yield alertSuccess('Group Updated', res.data.msg);
-        return yield put(flowActions.fetchFlowRequest(action.ID))
+        return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
         yield destroyMessage();
@@ -54,10 +54,9 @@ function* deleteGroup({assistantID, deletedGroup}) {
     try {
         loadingMessage('Deleting Group');
         const res = yield http.delete(`/assistant/${assistantID}/flow/group`, {data: {id: deletedGroup.id}});
-        yield put(flowActions.deleteGroupSuccess(res.data.msg));
+        yield put(flowActions.deleteGroupSuccess(res.data.msg, deletedGroup.id));
         yield destroyMessage();
-        yield alertSuccess('Group Deleted', res.data.msg);
-        return yield put(flowActions.fetchFlowRequest(assistantID))
+        return yield alertSuccess('Group Deleted', res.data.msg);
     } catch (error) {
         console.log(error);
         yield destroyMessage();

@@ -277,11 +277,11 @@ def deleteGroupByID(id, assistant: Assistant) -> Callback:
     # db.session.close()
 
 
-def deleteBlockByID(id, assistant: Assistant) -> Callback:
+def deleteBlockByID(id, group: BlockGroup) -> Callback:
     try:
         if not id:
             return Callback(False, "Group id is required.")
-        block: Block = db.session.query(Block).filter(and_(Block.ID == id, Assistant.ID == assistant.ID)).first()
+        block: Block = db.session.query(Block).filter(and_(Block.ID == id, group.ID == group.ID)).first()
         if not block:
             return Callback(False, "Block doesn't exist.")
 

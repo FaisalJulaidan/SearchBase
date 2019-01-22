@@ -50,8 +50,9 @@ class Blocks extends Component {
 
     componentWillReceiveProps(nextProps) {
         // This handles when updating the selected group to show its blocks
-        if (nextProps.currentGroup !== this.state.currentGroup && nextProps.currentGroup.blocks)
+        if (nextProps.currentGroup !== this.state.currentGroup && nextProps.currentGroup.blocks){
             this.setState({blocks: nextProps.currentGroup.blocks})
+        }
     }
 
 
@@ -73,7 +74,7 @@ class Blocks extends Component {
     // this called from block.js when you click on delete block button
     deleteBlock = (deletedBlock) => confirm({
         title: `Delete block with type: ${deletedBlock.type}`,
-        content: `You can't get back to the deleted block after click ok`,
+        content: `If you click OK, this block will be deleted forever`,
         onOk: () => this.handleDeleteBlock(deletedBlock)
     });
     handleDeleteBlock = (deletedBlock) => {

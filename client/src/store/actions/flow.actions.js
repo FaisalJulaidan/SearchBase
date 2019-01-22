@@ -23,11 +23,11 @@ const fetchFlowFailure = (error) => {
 };
 
 // Groups Actions
-const addGroupRequest = (values) => {
+const addGroupRequest = ({assistantID, newGroup}) => {
     return {
         type: actionTypes.ADD_GROUP_REQUEST,
-        ID: values.ID,
-        newGroup: values.newGroup
+        assistantID: assistantID,
+        newGroup: newGroup
     };
 };
 
@@ -47,11 +47,11 @@ const addGroupFailure = (error) => {
 
 //////////////////////////////////////////
 
-const editGroupRequest = (values) => {
+const editGroupRequest = ({assistantID, editedGroup}) => {
     return {
         type: actionTypes.EDIT_GROUP_REQUEST,
-        ID: values.ID,
-        editedGroup: values.editedGroup
+        assistantID: assistantID,
+        editedGroup: editedGroup
     };
 };
 
@@ -71,18 +71,19 @@ const editGroupFailure = (error) => {
 
 //////////////////////////////////////////
 
-const deleteGroupRequest = (values) => {
+const deleteGroupRequest = ({assistantID, deletedGroup}) => {
     return {
         type: actionTypes.DELETE_GROUP_REQUEST,
-        assistantID: values.assistantID,
-        deletedGroup: values.deletedGroup
+        assistantID: assistantID,
+        deletedGroup: deletedGroup
     };
 };
 
-const deleteGroupSuccess = (msg) => {
+const deleteGroupSuccess = (msg, groupID) => {
     return {
         type: actionTypes.DELETE_GROUP_SUCCESS,
-        msg
+        msg,
+        groupID
     };
 };
 

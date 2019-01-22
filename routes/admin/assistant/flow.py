@@ -103,13 +103,13 @@ def block(groupID):
     # Add a block
     if request.method == "POST":
         # Get the new block data from the request's body
-        data = request.get_json(silent=True)
+        data = request.json
         callback: Callback = flow_services.addBlock(data, group)
 
     # Delete the block
     if request.method == "DELETE":
         # Get new block data from the request's body
-        data = request.get_json(silent=True)
+        data = request.json
         callback: Callback = flow_services.deleteBlockByID(data.get('id', None), group)
 
     # Return response

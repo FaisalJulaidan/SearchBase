@@ -6,13 +6,8 @@ from utilities import helpers
 analytics_router: Blueprint = Blueprint('analytics_router', __name__, template_folder="../../templates")
 
 
-@analytics_router.route("/admin/assistant/<assistantID>/analytics", methods=['GET'])
-def admin_analytics_page(assistantID):
-    if request.method == "GET":
-        return admin_services.render("admin/analytics.html")
 
-
-@analytics_router.route("/admin/assistant/<assistantID>/analytics/data", methods=['GET'])
+@analytics_router.route("/assistant/<assistantID>/analytics", methods=['GET'])
 def admin_analytics_data(assistantID):
     if request.method == "GET":
         callback: Callback = assistant_services.getByID(assistantID)

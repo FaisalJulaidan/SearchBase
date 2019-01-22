@@ -1,11 +1,5 @@
 from flask import Blueprint
 
-from .adminBasic.adminBasic import adminBasic_router
-adminBasic_router: Blueprint = adminBasic_router
-
-from .dashboard.dashboard import dashboard_router
-dashboard_router: Blueprint = dashboard_router
-
 from .account.profile import profile_router
 profile_router: Blueprint = profile_router
 
@@ -15,9 +9,6 @@ users_router: Blueprint = users_router
 from .account.changePassword import changePassword_router
 changePassword_router: Blueprint = changePassword_router
 
-from .admin_api import admin_api
-admin_api: Blueprint = admin_api
-
 from .assistant.settings import settings_router
 settings_router: Blueprint = settings_router
 
@@ -26,9 +17,6 @@ solutions_router: Blueprint = solutions_router
 
 from .subscription.sub import sub_router
 sub_router: Blueprint = sub_router
-
-from .assistant.assistantManager import assistantManager_router
-assistantManager_router: Blueprint = assistantManager_router
 
 from .assistant.assistant import assistant_router
 assistant_router: Blueprint = assistant_router
@@ -51,9 +39,5 @@ users_router: Blueprint = users_router
 from .account.profile import profile_router
 profile_router: Blueprint = profile_router
 
-
 from .assistant.bot import bot_router
 bot_router: Blueprint = bot_router
-
-from .tools.emojiConverter import emoji_router
-emoji_router: Blueprint = emoji_router

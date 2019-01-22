@@ -13,10 +13,9 @@ from services.jwt_auth_services import jwt
 from utilities import helpers
 
 # Import all routers to register them as blueprints
-from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
+from routes.admin.routers import profile_router, settings_router,\
     solutions_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
-    changePassword_router, bot_router, adminBasic_router, flow_router, \
-    assistantManager_router, assistant_router
+    changePassword_router, bot_router, flow_router, assistant_router
 
 from routes.public.routers import public_router, resetPassword_router, chatbot_router, auth_router
 
@@ -25,15 +24,11 @@ db.app = app
 
 
 # Register Routes:
-app.register_blueprint(adminBasic_router)
-app.register_blueprint(assistantManager_router)
 app.register_blueprint(assistant_router, url_prefix='/api')
 app.register_blueprint(flow_router, url_prefix='/api')
-app.register_blueprint(dashboard_router)
 app.register_blueprint(public_router)
 app.register_blueprint(resetPassword_router)
 app.register_blueprint(profile_router, url_prefix='/api')
-app.register_blueprint(admin_api)
 app.register_blueprint(sub_router)
 app.register_blueprint(settings_router)
 app.register_blueprint(solutions_router, url_prefix='/api')

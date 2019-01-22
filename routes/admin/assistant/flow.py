@@ -64,9 +64,9 @@ def group(assistantID):
         # Get the new group data from the request's body
         callback: Callback = flow_services.addGroup(data, assistant)
 
-    # Update the blocks' group
+    # Update the group
     if request.method == "PUT":
-        # Get new block data from the request's body
+        # Get new blocks data from the request's body
         callback: Callback = flow_services.updateGroup(data, assistant)
 
     # Delete the blocks' group

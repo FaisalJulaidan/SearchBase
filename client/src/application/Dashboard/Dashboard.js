@@ -13,6 +13,7 @@ import Integration from "./Assistants/Assistant/Integration/Integration";
 import UserInput from "./Assistants/Assistant/UserInput/UserInput";
 import Solutions from "./Assistants/Assistant/Solutions/Solutions";
 import Home from "./Home/Home";
+import Analytics from "./Assistants/Assistant/Analytics/Analytics";
 import {authActions} from "../../store/actions";
 import store from '../../store/store';
 import {connect} from 'react-redux';
@@ -163,6 +164,7 @@ class Dashboard extends Component {
                             <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
                             <Route path={`${match.path}/assistants/:id/userInput`} component={UserInput}/>
                             <Route path={`${match.path}/assistants/:id/solutions`} component={Solutions}/>
+                            <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                             <Route path={`${match.path}/profile`} component={Profile} exact/>
                             <Route path={`${match.path}/documentation`} component={Documentation} exact/>

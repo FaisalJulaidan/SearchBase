@@ -6,6 +6,7 @@
   "dependencies": {
     "@babel/core": "7.1.0",
     "@svgr/webpack": "2.4.1",
+    "ant-design-pro": "^2.2.1",
     "antd": "^3.10.8",
     "axios": "^0.18.0",
     "babel-core": "7.0.0-bridge.0",
@@ -40,14 +41,16 @@
     "jest-resolve": "23.6.0",
     "less": "^3.8.1",
     "less-loader": "^4.1.0",
+    "lodash": "latest",
     "mini-css-extract-plugin": "0.4.3",
-    "moment": "^2.23.0",
+    "moment": "^2.24.0",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.1.0",
     "postcss-flexbugs-fixes": "4.1.0",
     "postcss-loader": "3.0.0",
     "postcss-preset-env": "6.0.6",
     "postcss-safe-parser": "4.0.1",
+    "rc-animate": "latest",
     "rc-queue-anim": "^1.6.10",
     "rc-tween-one": "^2.2.20",
     "react": "^16.6.3",
@@ -73,9 +76,7 @@
     "webpack": "4.19.1",
     "webpack-dev-server": "3.1.9",
     "webpack-manifest-plugin": "2.0.4",
-    "workbox-webpack-plugin": "3.6.3",
-    "rc-animate": "latest",
-    "lodash": "latest"
+    "workbox-webpack-plugin": "3.6.3"
   },
   "scripts": {
     "start": "node scripts/start.js",

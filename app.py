@@ -1,18 +1,16 @@
 #/usr/bin/python3.5
 import os
 import config
-from flask import Flask, redirect, request, render_template, session, send_from_directory
+from flask import Flask, render_template
 from flask_api import status
-from services import assistant_services, user_services
 from models import db, Plan
 from services.mail_services import mail
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand, command
 from sqlalchemy_utils import create_database, database_exists
 from flask_apscheduler import APScheduler
-from utilities import helpers
 from services.jwt_auth_services import jwt
-
+from utilities import helpers
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import dashboard_router, profile_router,  admin_api, settings_router,\
@@ -48,32 +46,6 @@ app.register_blueprint(bot_router)
 app.register_blueprint(chatbot_router)
 app.register_blueprint(auth_router, url_prefix='/api')
 
-
-
-
-# Code to ensure user is logged in
-# @app.before_request
-# def before_request():
-#
-#     currentURL = str(request.url_rule)
-#     restrictedRoutes = ['/admin', 'admin/dashboard']
-#     # If the user try to visit one of the restricted routes without logging in he will be redirected
-#     if any(route in currentURL for route in restrictedRoutes):
-#         if not session.get('Logged_in', False):
-#             return redirect('login')
-#         try:
-#             if request.view_args['assistantID']:
-#                 assistantID = int(request.view_args['assistantID'])
-#                 ownership_callback = assistant_services.checkOwnership(assistantID, session.get('CompanyID', None))
-#                 if not ownership_callback.Success:
-#                     return helpers.hardRedirectWithMessage("login", ownership_callback.Message)
-#                 role_callback = user_services.getRolePermissions(session.get('UserID', None))
-#                 if not role_callback.Success:
-#                     return helpers.hardRedirectWithMessage("admin/dashboard", role_callback.Message)
-#                 if not role_callback.Data.EditChatbots:
-#                     return helpers.hardRedirectWithMessage("admin/dashboard", "Your company owner has not allowed you access to this feature.")
-#         except:
-#             pass
 
 
 # @manager.command
@@ -193,7 +165,6 @@ if os.environ['FLASK_ENV'] == 'production':
         manager.run()
     else:
         print('Production mode running...')
-        # app.run()
 
 elif os.environ['FLASK_ENV'] == 'development':
     app.config.from_object('config.DevelopmentConfig')
@@ -215,6 +186,6 @@ elif os.environ['FLASK_ENV'] == 'development':
 
     # Run the app server
     print('Development mode running...')
-    #app.run(threaded = True)
+
 else:
     print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")

@@ -13,7 +13,6 @@ from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
 
-
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
 # force_auto_coercion()
@@ -31,7 +30,7 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
 class JsonEncodedDict(types.TypeDecorator):
     """Stores and retrieves JSON as TEXT."""
 
-    impl = types.Text
+    impl = types.TEXT
 
     def process_bind_param(self, value, dialect):
         if value is not None:
@@ -54,17 +53,10 @@ mutable.MutableDict.associate_with(JsonEncodedDict)
 class Company(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    if BaseConfig.USE_ENCRYPTION:
-        Name = db.Column(EncryptedType(db.String(80), 'FakeKey'), nullable=False)
-        URL = db.Column(EncryptedType(db.String(250), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-    else:
-        Name = db.Column(db.String(80), nullable=False)
-        URL = db.Column(db.String(250), nullable=False)
-
+    Name = db.Column(db.String(80), nullable=False)
+    URL = db.Column(db.String(250), nullable=False)
     StripeID = db.Column(db.String(68), unique=True, nullable=False,)
     SubID = db.Column(db.String(68), unique=True, default=None)
-
-    # Size = db.Column(db.String(60))
 
     # Relationships:
     Users = db.relationship('User', back_populates='Company', cascade="all, delete, delete-orphan")
@@ -77,18 +69,11 @@ class Company(db.Model):
 
 class User(db.Model):
 
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
-                 )
-    if BaseConfig.USE_ENCRYPTION:
-        Firstname = db.Column(EncryptedType(db.String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        Surname = db.Column(EncryptedType(db.String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        Email = db.Column(EncryptedType(String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        PhoneNumber = db.Column(EncryptedType(db.String(30), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'))
-    else:
-        Firstname = db.Column(db.String(64), nullable=False)
-        Surname = db.Column(db.String(64), nullable=False)
-        Email = db.Column(db.String(64), nullable=False)
-        PhoneNumber = db.Column(db.String(30))
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Firstname = db.Column(db.String(64), nullable=False)
+    Surname = db.Column(db.String(64), nullable=False)
+    Email = db.Column(db.String(64), nullable=False)
+    PhoneNumber = db.Column(db.String(30))
     Password = db.Column(PasswordType(
         schemes=[
             'pbkdf2_sha512',
@@ -98,7 +83,6 @@ class User(db.Model):
     ))
     Verified = db.Column(db.Boolean(), nullable=False, default=False)
     LastAccess = db.Column(db.DateTime(), nullable=True)
-
     CreatedOn = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
     # Relationships:
@@ -188,14 +172,11 @@ class Solution(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(64), nullable=False)
-    if BaseConfig.USE_ENCRYPTION:
-        Content = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        RequiredFilters = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
-        DisplayTitles = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
-    else:
-        Content = db.Column(JsonEncodedDict, nullable=False)
-        RequiredFilters = db.Column(JsonEncodedDict, nullable=True)
-        DisplayTitles = db.Column(JsonEncodedDict, nullable=True)
+
+    Content = db.Column(MagicJSON, nullable=False)
+    RequiredFilters = db.Column(MagicJSON, nullable=True)
+    DisplayTitles = db.Column(MagicJSON, nullable=True)
+
     Type = db.Column(db.String(64), nullable=False)
     WebLink = db.Column(db.String(128), nullable=True)
     IDReference = db.Column(db.String(64), nullable=True)
@@ -254,7 +235,7 @@ class Block(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Type = db.Column(Enum(BlockType), nullable=False)
     Order = db.Column(db.Integer, nullable=False)
-    Content = db.Column(JsonEncodedDict, nullable=False)
+    Content = db.Column(MagicJSON, nullable=False)
     StoreInDB = db.Column(db.Boolean(), nullable=False, default=True)
     Skippable = db.Column(db.Boolean(), nullable=False, default=False)
     Labels = db.Column(db.String(64), nullable=False, default="")
@@ -286,16 +267,12 @@ class BlockLabel(db.Model):
 class ChatbotSession(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    if BaseConfig.USE_ENCRYPTION:
-        Data = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-    else:
-        Data = db.Column(JsonEncodedDict, nullable=False)
+    Data = db.Column(MagicJSON, nullable=False)
     FilePath = db.Column(db.String(250), nullable=True, default=None)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     TimeSpent = db.Column(db.Integer, nullable=False, default=0)
     SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
     QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
-
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)

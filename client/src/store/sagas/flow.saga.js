@@ -101,6 +101,7 @@ function* editBlock({edittedBlock, groupID, assistantID}) {
         loadingMessage('Updating Block');
         let res = yield http.get(`/assistant/${assistantID}/flow`);
         let currentUpdatedGroup = [];
+        edittedBlock = edittedBlock.block;
         res.data.data.blockGroups.map((group) => {
             if (group.id === groupID)
                 group.blocks.map((block) => {

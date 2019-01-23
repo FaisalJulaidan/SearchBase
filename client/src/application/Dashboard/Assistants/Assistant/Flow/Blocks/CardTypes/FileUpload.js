@@ -14,17 +14,15 @@ class FileUpload extends Component {
         groupName: ''
     };
 
-    onSubmit = () => {
-        return this.props.form.validateFields((err, values) => {
-            if (!err) {
-                this.props.handleEditBlock({
+    onSubmit = () => this.props.form.validateFields((err, values) => {
+        if (!err) {
+            let options = {
+                block: {
                     type: 'File Upload',
                     groupID: this.props.options.currentGroup.id,
-                    id: this.props.options.block.id,
-                    order: this.props.options.block.order,
-                    storeInDB: values.storeInDB,
+                    storeInDB: true,
                     isSkippable: values.isSkippable,
-                    labels: '',
+                    dataCategoryID: values.dataCategoryID,
                     content: {
                         text: values.text,
                         action: values.action,
@@ -32,12 +30,46 @@ class FileUpload extends Component {
                         blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                         afterMessage: values.afterMessage
                     }
-                })
-            }
-        })
-    };
+                }
+            };
 
-    onCancel = () => this.props.handleEditBlock(false);
+            if (this.handleNewBlock)
+                this.handleNewBlock(options);
+            else {
+                // Edit Block
+                options.block.id = this.props.options.block.id;
+                options.block.order = this.props.options.block.order;
+                this.handleEditBlock(options);
+            }
+        }
+    });
+
+    componentWillMount() {
+        this.handleNewBlock = this.props.handleNewBlock;
+        this.handleEditBlock = this.props.handleEditBlock
+    }
+
+    onDelete = () => this.props.handleDeleteBlock({
+        id: this.props.options.block.id,
+        type: 'File Upload',
+    });
+
+    onCancel = () => this.handleNewBlock ? this.handleNewBlock(false) : this.handleEditBlock(false);
+
+    componentDidMount() {
+        const {allGroups} = this.props.options;
+        let block = this.props.options.block ? this.props.options.block : {content: {}};
+        if (block.content.action === "Go To Specific Block")
+            this.setState({showGoToBlock: true, showGoToGroup: false});
+        else if (block.content.action === "Go To Group") {
+            // because here we dont' have column in each block contains all the group
+            // this is a workaround to have the group name from the block id
+            this.setState({showGoToBlock: false, showGoToGroup: true});
+            const {blockToGoID} = block.content;
+            allGroups.map((group) => group.blocks[0].id === blockToGoID ? this.setState({groupName: group.name}) : null)
+        } else
+            this.setState({showGoToBlock: false, showGoToGroup: false});
+    }
 
     onSelectAction = (action) => {
         if (action === "Go To Specific Block")
@@ -48,46 +80,34 @@ class FileUpload extends Component {
             this.setState({showGoToBlock: false, showGoToGroup: false});
     };
 
-    componentDidMount() {
-        const {block, allGroups} = this.props.options;
-
-        if (block.content.action === "Go To Specific Block")
-            this.setState({showGoToBlock: true, showGoToGroup: false});
-        else if (block.content.action === "Go To Group") {
-            // because here we dont' have column in each block contains all the group
-            // this is a workaround to have the group name from the block id
-            this.setState({showGoToBlock: false, showGoToGroup: true});
-            const {blockToGoID} = block.content;
-            allGroups.map((group) => group.blocks[0].id === blockToGoID ? this.setState({groupName: group.name}) : null)
-        }
-        else
-            this.setState({showGoToBlock: false, showGoToGroup: false});
-    }
-
     onChange = (checkedValues) => this.setState({fileTypes: checkedValues});
 
     render() {
-        const {block, flowOptions, allBlocks, allGroups} = this.props.options;
+        const {flowOptions, allGroups, allBlocks} = this.props.options;
         let blockOptions = {};
-        // extract the correct blockType from blockTypes[]
+        let block = this.props.options.block ? this.props.options.block : {content: {}};
 
+        // extract the correct blockType from blockTypes[]
         for (const blockType of flowOptions.blockTypes)
-            if (blockType.name === "File Upload")
+            if (blockType.name === 'File Upload')
                 blockOptions = blockType;
+
         const {getFieldDecorator} = this.props.form;
+
+        const buttons = this.handleNewBlock ? [
+            <Button key="cancel" onClick={this.onCancel}>Cancel</Button>,
+            <Button key="submit" type="primary" onClick={this.onSubmit}>Add</Button>
+        ] : [
+            <Button key="delete" type="danger" onClick={this.onDelete}>
+                Delete
+            </Button>,
+            <Button key="cancel" onClick={this.onCancel}>Cancel</Button>,
+            <Button key="submit" type="primary" onClick={this.onSubmit}>Update</Button>
+        ];
 
         const typesAllowed = blockOptions.typesAllowed;
         return (
-            <Card style={{width: '100%'}}
-                  actions={[
-                      <Button key="delete" type="danger" onClick={() => console.log('needs to be implement')}>
-                          Delete
-                      </Button>,
-                      <Button key="cancel" onClick={() => this.props.handleEditBlock(false)}>Cancel</Button>,
-                      <Button key="submit" type="primary" onClick={this.onSubmit}>
-                          Update
-                      </Button>]}
-            >
+            <Card style={{width: '100%'}} actions={buttons}>
                 <Form layout='horizontal'>
                     <FormItem label="Question"
                               extra="The above text will be shown in a bubble inside the chat"
@@ -101,6 +121,27 @@ class FileUpload extends Component {
                         })(
                             <Input placeholder="Ex: Please upload you cv"/>
                         )}
+                    </FormItem>
+
+                    <FormItem label="Data Category"
+                              extra="Categorising users' responses will result in  more efficient AI processing"
+                              {...this.props.options.layout}>
+                        {
+                            getFieldDecorator('dataCategoryID', {
+                                initialValue: null || block.dataCategoryID,
+                                rules: [{
+                                    required: true,
+                                    message: "Please specify the data category",
+                                }]
+                            })(
+                                <Select placeholder="Will validate the input">
+                                    {
+                                        flowOptions.dataCategories.map((category, i) =>
+                                            <Option key={i} value={category.ID}>{category.Name}</Option>)
+                                    }
+                                </Select>
+                            )
+                        }
                     </FormItem>
 
                     <FormItem label="File Types"
@@ -148,7 +189,6 @@ class FileUpload extends Component {
                                     {
                                         initialValue: block.content.blockToGoID,
                                         rules: [{required: true, message: "Please select your next block"}]
-
                                     }
                                 )(
                                     <Select placeholder="The next step after this block">{
@@ -194,6 +234,7 @@ class FileUpload extends Component {
                         : null
                     }
 
+
                     <FormItem label="After message"
                               extra="This message will display straight after the user's response"
                               {...this.props.options.layout}>
@@ -201,7 +242,7 @@ class FileUpload extends Component {
                             initialValue: block.content.afterMessage,
                             rules: [{
                                 required: true,
-                                message: "Please input after message field",
+                                message: "Please input question field",
                             }],
                         })(
                             <Input placeholder="Ex: Your input is recorded"/>
@@ -218,19 +259,6 @@ class FileUpload extends Component {
                             <Checkbox>Users can skip answering this question</Checkbox>
                         )}
                     </Form.Item>
-
-                    <Form.Item
-                        label="Store responses?"
-                        {...this.props.options.layout}>
-                        {getFieldDecorator('storeInDB', {
-                            valuePropName: 'checked',
-                            initialValue: blockOptions.alwaysStoreInDB,
-                        })(
-                            <Checkbox disabled={blockOptions.alwaysStoreInDB}>
-                                Users' responses should be recorded</Checkbox>
-                        )}
-                    </Form.Item>
-
                 </Form>
             </Card>
         );

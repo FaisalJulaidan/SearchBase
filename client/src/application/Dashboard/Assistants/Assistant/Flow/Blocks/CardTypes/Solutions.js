@@ -8,34 +8,50 @@ class Solutions extends Component {
 
     state = {
         showGoToBlock: false,
-        showGoToGroup: false
+        showGoToGroup: false,
+        groupName: ''
     };
 
-    onSubmit = () => {
-        return this.props.form.validateFields((err, values) => {
-            // If from is valid crete the new block following User Input block type format
-            if (!err) {
-                const newBlock = {
-                    block: {
-                        type: 'Solutions',
-                        groupID: this.props.options.currentGroup.id,
-                        storeInDB: false,
-                        isSkippable: false,
-                        dataCategoryID: null,
-                        content: {
-                            showTop: Number(values.showTop),
-                            action: values.action,
-                            blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
-                            afterMessage: values.afterMessage,
-                        }
+    componentWillMount() {
+        this.handleNewBlock = this.props.handleNewBlock;
+        this.handleEditBlock = this.props.handleEditBlock
+    }
+
+    onSubmit = () => this.props.form.validateFields((err, values) => {
+        if (!err) {
+            let options = {
+                block: {
+                    type: 'Solutions',
+                    groupID: this.props.options.currentGroup.id,
+                    storeInDB: false,
+                    isSkippable: false,
+                    dataCategoryID: null,
+                    content: {
+                        showTop: Number(values.showTop),
+                        action: values.action,
+                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
+                        afterMessage: values.afterMessage,
                     }
-                };
-                this.props.handleNewBlock(newBlock)
-            }
-        })
-    };
+                }
+            };
 
-    onCancel = () => this.props.handleNewBlock(false);
+            if (this.handleNewBlock)
+                this.handleNewBlock(options);
+            else {
+                // Edit Block
+                options.block.id = this.props.options.block.id;
+                options.block.order = this.props.options.block.order;
+                this.handleEditBlock(options);
+            }
+        }
+    });
+
+    onDelete = () => this.props.handleDeleteBlock({
+        id: this.props.options.block.id,
+        type: 'Solutions',
+    });
+
+    onCancel = () => this.handleNewBlock ? this.handleNewBlock(false) : this.handleEditBlock(false);
 
     onSelectAction = (action) => {
         if (action === "Go To Specific Block")
@@ -46,26 +62,53 @@ class Solutions extends Component {
             this.setState({showGoToBlock: false, showGoToGroup: false});
     };
 
+    componentDidMount() {
+        const {allGroups} = this.props.options;
+        let block = this.props.options.block ? this.props.options.block : {content: {}};
+        if (block.content.action === "Go To Specific Block")
+            this.setState({showGoToBlock: true, showGoToGroup: false});
+        else if (block.content.action === "Go To Group") {
+            // because here we dont' have column in each block contains all the group
+            // this is a workaround to have the group name from the block id
+            this.setState({showGoToBlock: false, showGoToGroup: true});
+            const {blockToGoID} = block.content;
+            allGroups.map((group) => group.blocks[0].id === blockToGoID ? this.setState({groupName: group.name}) : null)
+        } else
+            this.setState({showGoToBlock: false, showGoToGroup: false});
+    }
+
+
     render() {
-        const {flowOptions, blocks, allGroups} = this.props.options;
+        const {flowOptions, allGroups, allBlocks} = this.props.options;
         let blockOptions = {};
+        let block = this.props.options.block ? this.props.options.block : {content: {}};
+
         // extract the correct blockType from blockTypes[]
         for (const blockType of flowOptions.blockTypes)
-            if (blockType.name === 'User Input')
+            if (blockType.name === 'Solutions')
                 blockOptions = blockType;
 
         const {getFieldDecorator} = this.props.form;
+
+        const buttons = this.handleNewBlock ? [
+            <Button key="cancel" onClick={this.onCancel}>Cancel</Button>,
+            <Button key="submit" type="primary" onClick={this.onSubmit}>Add</Button>
+        ] : [
+            <Button key="delete" type="danger" onClick={this.onDelete}>
+                Delete
+            </Button>,
+            <Button key="cancel" onClick={this.onCancel}>Cancel</Button>,
+            <Button key="submit" type="primary" onClick={this.onSubmit}>Update</Button>
+        ];
+
         return (
-            <Card style={{width: '100%'}}
-                  actions={[
-                      <Button key="cancel" onClick={this.onCancel}>Cancel</Button>,
-                      <Button key="submit" type="primary" onClick={this.onSubmit}>Add</Button>]}
-            >
+            <Card style={{width: '100%'}} actions={buttons}>
                 <Form layout='horizontal'>
                     <FormItem label="Show Top Results"
                               extra="Number of results you want to return (Best matches)"
                               {...this.props.options.layout}>
                         {getFieldDecorator('showTop', {
+                            initialValue: block.content.showTop,
                             rules: [{
                                 required: true,
                                 message: "Please set how many solutions to return",
@@ -81,6 +124,7 @@ class Solutions extends Component {
                         {
                             blockOptions.actions ?
                                 getFieldDecorator('action', {
+                                    initialValue: block.content.action,
                                     rules: [{
                                         required: true,
                                         message: "Please input question field",
@@ -102,12 +146,12 @@ class Solutions extends Component {
                             {
                                 getFieldDecorator('blockToGoID',
                                     {
+                                        initialValue: block.content.blockToGoID,
                                         rules: [{required: true, message: "Please select your next block"}]
-
                                     }
                                 )(
                                     <Select placeholder="The next step after this block">{
-                                        blocks.map((block, i) =>
+                                        allBlocks.map((block, i) =>
                                             <Option key={i} value={block.id}>
                                                 {`${block.id}- (${block.type}) ${block.content.text ? block.content.text : ''}`}
                                             </Option>
@@ -126,6 +170,7 @@ class Solutions extends Component {
                             {
                                 getFieldDecorator('blockToGoIDGroup',
                                     {
+                                        initialValue: this.state.groupName,
                                         rules: [{required: true, message: "Please select your next group"}]
                                     }
                                 )(
@@ -152,6 +197,7 @@ class Solutions extends Component {
                               extra="This message will display straight after the user's response"
                               {...this.props.options.layout}>
                         {getFieldDecorator('afterMessage', {
+                            initialValue: block.content.afterMessage,
                             rules: [{
                                 required: true,
                                 message: "Please input after message field",
@@ -160,6 +206,29 @@ class Solutions extends Component {
                             <Input placeholder="Ex: There you go :)"/>
                         )}
                     </FormItem>
+
+                    <Form.Item
+                        label="Skippable?"
+                        {...this.props.options.layout}>
+                        {getFieldDecorator('isSkippable', {
+                            valuePropName: 'checked',
+                            initialValue: block.isSkippable,
+                        })(
+                            <Checkbox>Users can skip answering this question</Checkbox>
+                        )}
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Store responses?"
+                        {...this.props.options.layout}>
+                        {getFieldDecorator('storeInDB', {
+                            valuePropName: 'checked',
+                            initialValue: blockOptions.alwaysStoreInDB,
+                        })(
+                            <Checkbox disabled={blockOptions.alwaysStoreInDB}>
+                                Users' responses should be recorded</Checkbox>
+                        )}
+                    </Form.Item>
                 </Form>
             </Card>
         );

@@ -1,20 +1,13 @@
 import React, {Component} from 'react';
-import {Row, Col, Collapse, Divider, Button, Card, Tag, Checkbox} from "antd";
+import {Button, Card, Checkbox, Col, Collapse, Divider, Row, Tag} from "antd";
 
 const Panel = Collapse.Panel;
 const {Meta} = Card;
 
 class Block extends Component {
 
-    editBlock(block) {
-        console.log('this block needs to be edited', block)
-        this.props.editBlock(block)
-    }
-
-    deleteBlock(block) {
-        console.log('this block needs to be delete', block)
-        this.props.deleteBlock(block)
-    }
+    editBlock = (block) => this.props.editBlock(block);
+    deleteBlock = (block) => this.props.deleteBlock(block);
 
     render() {
         const {block} = this.props;

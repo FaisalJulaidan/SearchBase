@@ -14,32 +14,32 @@ class Question extends Component {
         tags: [],
         inputVisible: false,
         inputValue: '',
-        answers: []
+        answers: [],
+
+        groupName: ''
     };
 
-    onSubmit = () => {
-        return this.props.form.validateFields(['text', 'isSkippable', 'storeInDB'], (err, values) => {
+    componentDidMount() {
+        const {allGroups} = this.props.options;
+        let block = this.props.options.block ? this.props.options.block : {content: {}};
+        if (block.content.action === "Go To Specific Block")
+            this.setState({showGoToBlock: true, showGoToGroup: false});
+        else if (block.content.action === "Go To Group") {
+            // because here we dont' have column in each block contains all the group
+            // this is a workaround to have the group name from the block id
+            this.setState({showGoToBlock: false, showGoToGroup: true});
+            const {blockToGoID} = block.content;
+            allGroups.map((group) => group.blocks[0].id === blockToGoID ? this.setState({groupName: group.name}) : null)
+        } else
+            this.setState({showGoToBlock: false, showGoToGroup: false});
 
-            // If from is valid crete the new block following User Input block type format
-            if (!err) {
-                this.props.handleNewBlock({
-                    block: {
-                        type: 'Question',
-                        groupID: this.props.options.currentGroup.id,
-                        storeInDB: values.storeInDB,
-                        isSkippable: values.isSkippable,
-                        dataCategoryID: values.dataCategoryID,
-                        content: {
-                            text: values.text,
-                            answers: this.state.answers
-                        }
-                    }
-                })
-            }
-        })
-    };
+        this.setState({answers: block.content.answers || []})
+    }
 
-    onCancel = () => this.props.handleNewBlock(false);
+    componentWillMount() {
+        this.handleNewBlock = this.props.handleNewBlock;
+        this.handleEditBlock = this.props.handleEditBlock
+    }
 
     onSelectAction = (action) => {
         if (action === "Go To Specific Block")
@@ -50,6 +50,48 @@ class Question extends Component {
             this.setState({showGoToBlock: false, showGoToGroup: false});
     };
 
+    onSubmit = () => this.props.form.validateFields(['text', 'isSkippable', 'storeInDB', 'dataCategoryID'], (err, values) => {
+        if (!err) {
+            let options = {
+                block: {
+                    type: 'Question',
+                    groupID: this.props.options.currentGroup.id,
+                    storeInDB: values.storeInDB,
+                    isSkippable: values.isSkippable || false,
+                    dataCategoryID: values.dataCategoryID,
+                    content: {
+                        text: values.text,
+                        answers: this.state.answers
+                    }
+                }
+            };
+
+            if (this.handleNewBlock)
+                this.handleNewBlock(options);
+            else {
+                // Edit Block
+                options.block.id = this.props.options.block.id;
+                options.block.order = this.props.options.block.order;
+                this.handleEditBlock(options);
+            }
+        }
+    });
+
+    onDeleteBlock = () => this.props.handleDeleteBlock({
+        id: this.props.options.block.id,
+        type: 'Question',
+    });
+
+    onCancel = () => this.handleNewBlock ? this.handleNewBlock(false) : this.handleEditBlock(false);
+
+    onSelectAction = (action) => {
+        if (action === "Go To Specific Block")
+            this.setState({showGoToBlock: true, showGoToGroup: false});
+        else if (action === "Go To Group")
+            this.setState({showGoToBlock: false, showGoToGroup: true});
+        else
+            this.setState({showGoToBlock: false, showGoToGroup: false});
+    };
 
     addAnswer = () => {
         this.props.form.validateFields(['answer', 'action', 'blockToGoID', 'blockToGoIDGroup', 'afterMessage'], (err, values) => {
@@ -95,8 +137,10 @@ class Question extends Component {
 
 
     render() {
-        const {flowOptions, blocks, allGroups} = this.props.options;
+        const {flowOptions, allGroups, allBlocks} = this.props.options;
         let blockOptions = {};
+        let block = this.props.options.block ? this.props.options.block : {content: {}};
+
         // extract the correct blockType from blockTypes[]
         for (const blockType of flowOptions.blockTypes)
             if (blockType.name === 'Question')
@@ -106,16 +150,23 @@ class Question extends Component {
 
         const {tags, inputVisible, inputValue} = this.state;
 
+        const buttons = this.handleNewBlock ? [
+            <Button key="cancel" onClick={this.onCancel}>Cancel</Button>,
+            <Button key="submit" type="primary" onClick={this.onSubmit}>Add</Button>
+        ] : [
+            <Button key="delete" type="danger" onClick={this.onDeleteBlock}>Delete</Button>,
+            <Button key="cancel" onClick={this.onCancel}>Cancel</Button>,
+            <Button key="submit" type="primary" onClick={this.onSubmit}>Update</Button>
+        ];
+
         return (
-            <Card style={{width: '100%'}}
-                  actions={[
-                      <Button key="cancel" onClick={this.onCancel}>Cancel</Button>,
-                      <Button key="submit" type="primary" onClick={this.onSubmit}>Add</Button>]}>
+            <Card style={{width: '100%'}} actions={buttons}>
                 <Form layout='horizontal'>
                     <FormItem label="Question"
                               extra="The above text will be shown in a bubble inside the chat"
                               {...this.props.options.layout}>
                         {getFieldDecorator('text', {
+                            initialValue: block.content.text,
                             rules: [{
                                 required: true,
                                 message: "Please input question field",
@@ -130,13 +181,13 @@ class Question extends Component {
                               {...this.props.options.layout}>
                         {
                             getFieldDecorator('dataCategoryID', {
+                                initialValue: null,
                                 rules: [{
                                     required: true,
                                     message: "Please specify the data category",
                                 }]
                             })(
-                                <Select placeholder="Will validate the input"
-                                        defaultValue='None'>
+                                <Select placeholder="Will validate the input">
                                     {
                                         flowOptions.dataCategories.map((category, i) =>
                                             <Option key={i} value={category.ID}>{category.Name}</Option>)
@@ -172,7 +223,7 @@ class Question extends Component {
                         {...this.props.options.layout}>
                         {getFieldDecorator('isSkippable', {
                             valuePropName: 'checked',
-                            initialValue: false,
+                            initialValue: block.isSkippable,
                         })(
                             <Checkbox>Users can skip answering this question</Checkbox>
                         )}
@@ -276,7 +327,7 @@ class Question extends Component {
                                         }
                                     )(
                                         <Select placeholder="The next step after this block">{
-                                            blocks.map((block, i) =>
+                                            allBlocks.map((block, i) =>
                                                 <Option key={i} value={block.id}>
                                                     {`${block.id}- (${block.type}) ${block.content.text ? block.content.text : ''}`}
                                                 </Option>

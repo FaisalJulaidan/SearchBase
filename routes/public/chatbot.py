@@ -48,20 +48,22 @@ def chatbot(assistantIDAsHash):
 
     if request.method == "GET":
         # Get blocks for the chatbot to use
-        data: dict = flow_services.getChatbot(assistant)
-        return helpers.jsonResponse(True, 200, "No Message", data)
+        callback: Callback = flow_services.getChatbot(assistant)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
+        return helpers.jsonResponse(True, 200, "No Message", callback.Data)
 
     # Process sent data coming from the chatbot
     if request.method == "POST":
 
         # Chatbot collected information
-        data = request.get_json(silent=True)
-        ch_callback: Callback = chatbot_services.processData(assistant, data)
+        data = request.json
+        callback: Callback = chatbot_services.processData(assistant, data)
 
-        if not ch_callback.Success:
-            return helpers.jsonResponse(False, 400, ch_callback.Message, ch_callback.Data)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
 
-        return helpers.jsonResponse(True, 200, "Collected data is successfully processed", {'sessionID': ch_callback.Data.ID})
+        return helpers.jsonResponse(True, 200, "Collected data is successfully processed", {'sessionID': callback.Data.ID})
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot/solutions", methods=['POST'])

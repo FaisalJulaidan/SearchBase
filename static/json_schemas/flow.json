@@ -8,7 +8,7 @@
       "properties":{
         "id": {"type": "integer"},
         "groupID": {"type": "integer"},
-        "dataCategoryID": {"type": "integer"},
+        "dataCategoryID": {"type": ["integer", "null"]},
         "type": {"enum": ["Question", "User Input", "File Upload", "Solutions", "End Chat"]},
         "order": {"type": "integer", "minimum": 1},
         "storeInDB": {"type": "boolean"},

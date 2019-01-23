@@ -15,10 +15,17 @@ bot_currentVersion = "1.0.0"
 
 # ----- Getters ----- #
 # Get the chatbot for the public to use
-def getChatbot(assistant: Assistant) -> dict:
-    return {'assistant': {'id': helpers.encrypt_id(assistant.ID), 'name': assistant.Name, 'message': assistant.Message,
-                          'secondsUntilPopup': assistant.SecondsUntilPopup, 'active': assistant.Active},
-            'blocks': getAllBlocks(assistant)}
+def getChatbot(assistant: Assistant) -> Callback:
+    try:
+        data = {'assistant': {'id': helpers.encrypt_id(assistant.ID), 'name': assistant.Name, 'message': assistant.Message,
+                              'secondsUntilPopup': assistant.SecondsUntilPopup, 'active': assistant.Active},
+                'blocks': getAllBlocks(assistant)}
+        return Callback(True, '', data)
+    except Exception as e:
+        print("ERROR: getChatbot()", e)
+        db.session.rollback()
+        return Callback(False, 'Could not retrieve chatbot')
+
 
 
 # Get the flow for the company to manage the blocks
@@ -39,7 +46,6 @@ def getBlockGroups(assistant: Assistant) -> List[dict]:
         result: List[BlockGroup] = db.session.query(BlockGroup).filter(BlockGroup.AssistantID == assistant.ID)
         groups = []
         for group in result:
-            block = getBlocksFromGroup(group)
             groups.append({'id': group.ID, 'name': group.Name, 'description': group.Description,
                            'blocks': getBlocksFromGroup(group)})
         return groups
@@ -98,13 +104,13 @@ def getAllBlocks(assistant: Assistant) -> List[dict]:
                 blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,
                                'content': block.Content, 'storeInDB': block.StoreInDB,
                                'groupID': block.GroupID, 'isSkippable': block.Skippable,
-                               'dataCategoryID': block.DataCategoryID, 'dataCategoryName': block.DataCategory.Name,
+                               'dataCategoryID': block.DataCategoryID
                                })
         return blocks
     except Exception as e:
         print("getBlocks ERROR:", e)
         db.session.rollback()
-        return None
+        raise Exception('Error: getAllBlocks()')
     # finally:
     # db.session.close()
 

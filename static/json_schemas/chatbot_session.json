@@ -8,6 +8,7 @@
       "properties":{
         "blockID": {"type": "integer"},
         "questionText": {"type": "string"},
+        "dataCategoryID": {"type": ["integer", "null"]},
         "input": {"type": "string"},
         "keywords": {"type": ["array","string"], "items": {"type": ["string"]}}
         },

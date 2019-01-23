@@ -67,11 +67,11 @@ class FileUpload extends Component {
     onChange = (checkedValues) => this.setState({fileTypes: checkedValues});
 
     render() {
-        const {block, blockTypes, allBlocks, allGroups} = this.props.options;
+        const {block, flowOptions, allBlocks, allGroups} = this.props.options;
         let blockOptions = {};
         // extract the correct blockType from blockTypes[]
 
-        for (const blockType of blockTypes)
+        for (const blockType of flowOptions.blockTypes)
             if (blockType.name === "File Upload")
                 blockOptions = blockType;
         const {getFieldDecorator} = this.props.form;

@@ -121,5 +121,10 @@ def block(groupID):
 @flow_router.route("/assistant/flow/options", methods=['GET'])
 @jwt_required
 def get_flowOptions():
+
     if request.method == "GET":
-        return helpers.jsonResponse(True, 200, "These are the options the flow provides.", flow_services.getOptions())
+        callback: Callback = flow_services.getOptions()
+        # Return response
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
+        return helpers.jsonResponse(True, 200, "These are the options the flow provides.", callback.Data)

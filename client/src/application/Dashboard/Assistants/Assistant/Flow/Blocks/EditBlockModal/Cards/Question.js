@@ -116,10 +116,10 @@ class Question extends Component {
 
 
     render() {
-        const {block, blockTypes, allBlocks, allGroups} = this.props.options;
+        const {block, flowOptions, allBlocks, allGroups} = this.props.options;
         let blockOptions = {};
         // extract the correct blockType from blockTypes[]
-        for (const blockType of blockTypes)
+        for (const blockType of flowOptions.blockTypes)
             if (blockType.name === 'Question')
                 blockOptions = blockType;
 

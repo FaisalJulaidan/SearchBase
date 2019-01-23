@@ -7,7 +7,7 @@ import {Button, Form, Modal} from "antd";
 import Block from "./Block/Block";
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
 import NewBlockModal from "./NewBlockModal/NewBlockModal";
-import EditBlockModal from "./EditBlockModal/EditBlockModal1";
+import EditBlockModal from "./EditBlockModal/EditBlockModal";
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -77,6 +77,7 @@ class Blocks extends Component {
         content: `If you click OK, this block will be deleted forever`,
         onOk: () => this.handleDeleteBlock(deletedBlock)
     });
+
     handleDeleteBlock = (deletedBlock) => {
         this.props.deleteBlock(deletedBlock, this.props.currentGroup.id);
 
@@ -92,6 +93,7 @@ class Blocks extends Component {
 
 
     render() {
+        console.log(this.state.blocks);
         return (
             <div className={styles.Panel}>
                 <div className={styles.Panel_Header}>

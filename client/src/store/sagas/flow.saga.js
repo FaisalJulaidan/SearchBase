@@ -10,7 +10,9 @@ function* fetchFlow({assistantID}) {
         return yield put(flowActions.fetchFlowSuccess(res.data.data))
     } catch (error) {
         console.log(error);
-        return yield put(flowActions.fetchFlowFailure(error.response.data));
+        yield put(flowActions.fetchFlowFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not retrieve the flow");
+
     }
 
 }
@@ -89,7 +91,8 @@ function* addBlock({newBlock, groupID, assistantID}) {
         return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
-        return yield put(flowActions.addBlockFailure(error.response.data));
+        yield put(flowActions.addBlockFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not create the block");
     }
 }
 
@@ -112,7 +115,8 @@ function* editBlock({edittedBlock, groupID, assistantID}) {
         return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
-        return yield put(flowActions.editBlockFailure(error.response.data));
+        yield put(flowActions.editBlockFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not update the block");
     }
 }
 
@@ -126,7 +130,8 @@ function* deleteBlock({deletedBlock, assistantID, groupID}) {
         return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
-        return yield put(flowActions.deleteBlockFailure(error.response.data));
+        yield put(flowActions.deleteBlockFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not delete the block");
     }
 }
 
@@ -141,7 +146,8 @@ function* updateBlocksOrder({newBlocksOrder, assistantID}) {
         console.log(error);
         yield destroyMessage();
         yield alertError('Error in Block Delete', error.message);
-        return yield put(flowActions.updateBlocksOrderFailure(error.response.data));
+        yield put(flowActions.updateBlocksOrderFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not update the blocks order");
     }
 }
 
@@ -157,8 +163,21 @@ function* watchDeleteBlock() {
     yield takeEvery(actionTypes.DELETE_BLOCK_REQUEST, deleteBlock)
 }
 
-function* watchUpdateBlcoksOrder() {
+function* watchUpdateBlocksOrder() {
     yield takeEvery(actionTypes.UPDATE_BLOCKS_ORDER_REQUEST, updateBlocksOrder)
+}
+
+// Data Category (For Future)
+function* addDataCategory({name}) {
+    try {
+
+    } catch (error) {
+
+    }
+}
+
+function* watchAddDataCategory() {
+    yield takeEvery(actionTypes.ADD_DATA_CATEGORY_REQUEST, addDataCategory)
 }
 
 export function* flowSaga() {
@@ -172,6 +191,6 @@ export function* flowSaga() {
         watchAddBlock(),
         watchEditBlock(),
         watchDeleteBlock(),
-        watchUpdateBlcoksOrder()
+        watchUpdateBlocksOrder()
     ])
 }

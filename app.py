@@ -3,7 +3,7 @@ import os
 import config
 from flask import Flask, render_template
 from flask_api import status
-from models import db, Plan
+from models import db, Plan, DataCategory
 from services.mail_services import mail
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand, command
@@ -40,32 +40,6 @@ app.register_blueprint(users_router)
 app.register_blueprint(bot_router)
 app.register_blueprint(chatbot_router)
 app.register_blueprint(auth_router, url_prefix='/api')
-
-
-
-# @manager.command
-def seed():
-
-    # Plans
-    db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic', MaxSolutions=600, MaxBlocks=100, ActiveBotsCap=2,
-                        InactiveBotsCap=3,
-                        AdditionalUsersCap=5, ExtendedLogic=False, ImportDatabase=False, CompanyNameOnChatbot=False))
-
-    db.session.add(
-        Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate', MaxSolutions=5000, MaxBlocks=100, ActiveBotsCap=4,
-             InactiveBotsCap=8,
-             AdditionalUsersCap=10, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
-
-    db.session.add(
-        Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=100, ActiveBotsCap=10,
-             InactiveBotsCap=30,
-             AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
-
-    db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=100, ActiveBotsCap=2,
-                        InactiveBotsCap=2,
-                        AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
-    db.session.commit()
-
 
 
 ## Error Handlers ##
@@ -152,7 +126,7 @@ if os.environ['FLASK_ENV'] == 'production':
         print('Create db tables')
         create_database(url)
         db.create_all()
-        seed()
+        helpers.seed()
 
     # Run the app server
     if os.environ['DB_MIGRATION'] == 'yes':

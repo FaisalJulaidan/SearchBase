@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import {Avatar, Dropdown, Icon, Layout, Menu} from 'antd';
+import {Avatar, Dropdown, Icon, Layout, Menu, notification} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
 import Assistants from './Assistants/Assistants';
@@ -29,6 +29,7 @@ class Dashboard extends Component {
         collapsed: false,
         marginLeft: 200,
     };
+
 
     toggle = () => {
         this.setState({
@@ -109,7 +110,7 @@ class Dashboard extends Component {
                         </div>
                     </div>
 
-                    <Menu theme="light" defaultSelectedKeys={['dashboard']} mode="inline" onClick={this.handleMenuClick}>
+                    <Menu theme="light" defaultSelectedKeys={this.state.selectedMenuKey} mode="inline" onClick={this.handleMenuClick}>
                         <Menu.Item key="dashboard">
                             <Icon type="home"/>
                             <span>Home</span>

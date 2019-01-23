@@ -150,24 +150,6 @@ class Assistant(db.Model):
         return '<Assistant {}>'.format(self.Name)
 
 
-class BlockGroup(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Name = db.Column(db.String(128), nullable=False)
-    Description = db.Column(db.String(128), nullable=False)
-
-    # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='BlockGroups')
-    Blocks = db.relationship('Block', back_populates='Group', order_by='Block.Order', cascade="all, delete, delete-orphan")
-
-    # Constraints:
-    # __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
-
-    def __repr__(self):
-        return '<BlockGroup {}>'.format(self.Name)
-
-
 class Solution(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
@@ -206,63 +188,6 @@ class Statistics(db.Model):
     def __repr__(self):
         return '<Statistics {}>'.format(self.Name)
 
-
-class ValidationType(enum.Enum):
-
-    Ignore = 'Ignore'
-    Email = 'Email'
-    Telephone = 'Telephone'
-    FullName = 'FullName'
-
-
-class BlockType(enum.Enum):
-    UserInput = 'User Input'
-    Question = 'Question'
-    FileUpload = 'File Upload'
-    Solutions = 'Solutions'
-
-
-class BlockAction(enum.Enum):
-
-    GoToNextBlock = 'Go To Next Block'
-    GoToSpecificBlock = 'Go To Specific Block'
-    GoToGroup = 'Go To Group'
-    EndChat = 'End Chat'
-
-
-class Block(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Type = db.Column(Enum(BlockType), nullable=False)
-    Order = db.Column(db.Integer, nullable=False)
-    Content = db.Column(MagicJSON, nullable=False)
-    StoreInDB = db.Column(db.Boolean(), nullable=False, default=True)
-    Skippable = db.Column(db.Boolean(), nullable=False, default=False)
-    Labels = db.Column(db.String(64), nullable=False, default="")
-
-    # Relationships:
-    GroupID = db.Column(db.Integer, db.ForeignKey('block_group.ID', ondelete='cascade'), nullable=False)
-    Group = db.relationship('BlockGroup', back_populates='Blocks')
-
-    # Labels = db.relationship('BlockLabel', back_populates='Blocks', secondary=BlocksLabels)
-
-    # Constraints:
-    # __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)
-
-    def __repr__(self):
-        return '<Block {}>'.format(self.Type)
-
-class BlockLabel(db.Model):
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Text = db.Column(db.String(128), nullable=False)
-    Colour = db.Column(db.String(128), nullable=False)
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False,)
-
-    # Relationships:
-    # Blocks = db.relationship('Block', back_populates='Labels', secondary=BlocksLabels)
-
-    def __repr__(self):
-        return '<BlockLabel {}>'.format(self.Text)
 
 class ChatbotSession(db.Model):
 
@@ -327,6 +252,99 @@ class UserSettings(db.Model):
 
     def __repr__(self):
         return '<UserSettings {}>'.format(self.ID)
+
+
+# ============= Block Stuff ===================
+
+class ValidationType(enum.Enum):
+
+    Ignore = 'Ignore'
+    Email = 'Email'
+    Telephone = 'Telephone'
+    FullName = 'Full Name'
+
+
+class BlockType(enum.Enum):
+    UserInput = 'User Input'
+    Question = 'Question'
+    FileUpload = 'File Upload'
+    Solutions = 'Solutions'
+
+
+class BlockAction(enum.Enum):
+
+    GoToNextBlock = 'Go To Next Block'
+    GoToSpecificBlock = 'Go To Specific Block'
+    GoToGroup = 'Go To Group'
+    EndChat = 'End Chat'
+
+
+class BlockGroup(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(128), nullable=False)
+    Description = db.Column(db.String(128), nullable=False)
+
+    # Relationships:
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='BlockGroups')
+    Blocks = db.relationship('Block', back_populates='Group', order_by='Block.Order', cascade="all, delete, delete-orphan")
+
+    # Constraints:
+    # __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
+
+    def __repr__(self):
+        return '<BlockGroup {}>'.format(self.Name)
+
+class DataCategory(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(64),nullable=False)
+    Industry = db.Column(db.String(64),nullable=False)
+
+    # Relationships:
+    Blocks = db.relationship('Block', back_populates='DataCategory', order_by='Block.Order', cascade="all, delete, delete-orphan")
+
+    def __repr__(self):
+        return '<DataCategory {}>'.format(self.Name)
+
+class Block(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Type = db.Column(Enum(BlockType), nullable=False)
+    Order = db.Column(db.Integer, nullable=False)
+    Content = db.Column(MagicJSON, nullable=False)
+    StoreInDB = db.Column(db.Boolean(), nullable=False, default=True)
+    Skippable = db.Column(db.Boolean(), nullable=False, default=False)
+
+    # Relationships:
+    GroupID = db.Column(db.Integer, db.ForeignKey('block_group.ID', ondelete='cascade'), nullable=False)
+    Group = db.relationship('BlockGroup', back_populates='Blocks')
+
+    DataCategoryID = db.Column(db.Integer, db.ForeignKey('data_category.ID', ondelete='SET NULL'))
+    DataCategory = db.relationship('DataCategory', back_populates='Blocks')
+
+
+# Labels = db.relationship('BlockLabel', back_populates='Blocks', secondary=BlocksLabels)
+
+    # Constraints:
+    # __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)
+
+    def __repr__(self):
+        return '<Block {}>'.format(self.Type)
+
+class BlockLabel(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Text = db.Column(db.String(128), nullable=False)
+    Colour = db.Column(db.String(128), nullable=False)
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False,)
+
+    # Relationships:
+    # Blocks = db.relationship('Block', back_populates='Labels', secondary=BlocksLabels)
+
+    def __repr__(self):
+        return '<BlockLabel {}>'.format(self.Text)
+
 
 
 class Callback():

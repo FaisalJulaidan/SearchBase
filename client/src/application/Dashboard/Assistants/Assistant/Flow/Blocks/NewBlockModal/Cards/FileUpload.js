@@ -20,9 +20,9 @@ class FileUpload extends Component {
                     block: {
                         type: 'File Upload',
                         groupID: this.props.options.currentGroup.id,
-                        storeInDB: values.storeInDB,
+                        storeInDB: true,
                         isSkippable: values.isSkippable,
-                        labels: '',
+                        dataCategoryID: values.dataCategoryID,
                         content: {
                             text: values.text,
                             action: values.action,
@@ -50,11 +50,11 @@ class FileUpload extends Component {
     onChange = (checkedValues) => this.setState({fileTypes: checkedValues});
 
     render() {
-        const {blockTypes, blocks, allGroups} = this.props.options;
+        const {flowOptions, blocks, allGroups} = this.props.options;
         let blockOptions = {};
         // extract the correct blockType from blockTypes[]
 
-        for (const blockType of blockTypes)
+        for (const blockType of flowOptions.blockTypes)
             if (blockType.name === "File Upload")
                 blockOptions = blockType;
         const {getFieldDecorator} = this.props.form;
@@ -77,6 +77,27 @@ class FileUpload extends Component {
                         })(
                             <Input placeholder="Ex: Please upload you cv"/>
                         )}
+                    </FormItem>
+
+                    <FormItem label="Data Category"
+                              extra="Categorising users' responses will result in  more efficient AI processing"
+                              {...this.props.options.layout}>
+                        {
+                            getFieldDecorator('dataCategoryID', {
+                                rules: [{
+                                    required: true,
+                                    message: "Please specify the data category",
+                                }]
+                            })(
+                                <Select placeholder="Will validate the input"
+                                        defaultValue='None'>
+                                    {
+                                        flowOptions.dataCategories.map((category, i) =>
+                                            <Option key={i} value={category.ID}>{category.Name}</Option>)
+                                    }
+                                </Select>
+                            )
+                        }
                     </FormItem>
 
                     <FormItem label="File Types"
@@ -190,19 +211,6 @@ class FileUpload extends Component {
                             <Checkbox>Users can skip answering this question</Checkbox>
                         )}
                     </Form.Item>
-
-                    <Form.Item
-                        label="Store responses?"
-                        {...this.props.options.layout}>
-                        {getFieldDecorator('storeInDB', {
-                            valuePropName: 'checked',
-                            initialValue: blockOptions.alwaysStoreInDB,
-                        })(
-                            <Checkbox disabled={blockOptions.alwaysStoreInDB}>
-                                Users' responses should be recorded</Checkbox>
-                        )}
-                    </Form.Item>
-
                 </Form>
             </Card>
         );

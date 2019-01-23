@@ -8,12 +8,12 @@
       "properties": {
         "type": { "enum": [ "Question", "User Input", "File Upload", "Solutions"] },
         "groupID": {"type": "integer"},
+        "dataCategoryID": {"type": ["integer", "null"]},
         "storeInDB": { "type": "boolean" },
         "isSkippable": { "type": "boolean" },
-        "labels": {"type": "string"},
         "content": { "type": "object" }
       },
-      "required": ["type","groupID", "storeInDB", "content"],
+      "required": ["type","groupID", "dataCategoryID", "storeInDB", "content"],
       "additionalProperties": false
     }
   },

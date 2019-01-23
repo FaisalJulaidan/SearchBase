@@ -4,7 +4,7 @@ from models import db,Callback,Solution, Assistant
 from sqlalchemy import func, exists
 from utilities import helpers
 from sqlalchemy.ext.mutable import MutableDict
-from services import userInput_services, mail_services
+from services import chatbotSession_services, mail_services
 
 import xml.etree.ElementTree as ET
 from json import dumps
@@ -426,10 +426,10 @@ def saveRequiredFilters(solutionID, params):
 
 def sendSolutionsAlerts(assistantID, solutionID):
     try:
-        userInput_callback : Callback = userInput_services.getByAssistantID(assistantID)
+        userInput_callback : Callback = chatbotSession_services.getByAssistantID(assistantID)
         if not userInput_callback.Success: raise Exception("Error in retrieving user input")
 
-        filterEmails_callback : Callback = userInput_services.filterForContainEmails(userInput_callback.Data)
+        filterEmails_callback : Callback = chatbotSession_services.filterForContainEmails(userInput_callback.Data)
         if not filterEmails_callback.Success: raise Exception("Error in filtering for emails")
 
         errorsNumber = 0

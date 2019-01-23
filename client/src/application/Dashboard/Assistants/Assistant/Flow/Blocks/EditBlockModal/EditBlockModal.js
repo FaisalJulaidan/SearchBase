@@ -15,7 +15,7 @@ class EditBlockModal extends Component {
             labelCol: {span: 6},
             wrapperCol: {span: 14}
         },
-        blockTypes: [],
+        flowOptions: [],
         allBlocks: [],
         allGroups: [],
         currentGroup: null
@@ -23,7 +23,7 @@ class EditBlockModal extends Component {
 
     componentDidMount() {
         http.get(`/assistant/flow/options`)
-            .then(res => this.setState({blockTypes: res.data.data.blockTypes}))
+            .then(res => this.setState({flowOptions: res.data.data}))
     }
 
     componentWillReceiveProps(nextProps) {

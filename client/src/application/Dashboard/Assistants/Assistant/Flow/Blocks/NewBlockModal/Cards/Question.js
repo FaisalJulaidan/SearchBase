@@ -28,7 +28,7 @@ class Question extends Component {
                         groupID: this.props.options.currentGroup.id,
                         storeInDB: values.storeInDB,
                         isSkippable: values.isSkippable,
-                        labels: '',
+                        dataCategoryID: values.dataCategoryID,
                         content: {
                             text: values.text,
                             answers: this.state.answers
@@ -95,10 +95,10 @@ class Question extends Component {
 
 
     render() {
-        const {blockTypes, blocks, allGroups} = this.props.options;
+        const {flowOptions, blocks, allGroups} = this.props.options;
         let blockOptions = {};
         // extract the correct blockType from blockTypes[]
-        for (const blockType of blockTypes)
+        for (const blockType of flowOptions.blockTypes)
             if (blockType.name === 'Question')
                 blockOptions = blockType;
 
@@ -123,6 +123,27 @@ class Question extends Component {
                         })(
                             <Input placeholder="Ex: Where are you from?"/>
                         )}
+                    </FormItem>
+
+                    <FormItem label="Data Category"
+                              extra="Categorising users' responses will result in  more efficient AI processing"
+                              {...this.props.options.layout}>
+                        {
+                            getFieldDecorator('dataCategoryID', {
+                                rules: [{
+                                    required: true,
+                                    message: "Please specify the data category",
+                                }]
+                            })(
+                                <Select placeholder="Will validate the input"
+                                        defaultValue='None'>
+                                    {
+                                        flowOptions.dataCategories.map((category, i) =>
+                                            <Option key={i} value={category.ID}>{category.Name}</Option>)
+                                    }
+                                </Select>
+                            )
+                        }
                     </FormItem>
 
                     <FormItem label="Answers"

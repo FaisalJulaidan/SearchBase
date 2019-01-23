@@ -1,8 +1,5 @@
-import sqlalchemy.exc
-
-from flask import session
 from models import db, Company, Statistics, Callback
-from services import user_services, db_services
+from services import user_services
 
 def getByAssistantID(id) -> Statistics:
     try:

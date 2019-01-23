@@ -19,9 +19,9 @@ class Solutions extends Component {
                     block: {
                         type: 'Solutions',
                         groupID: this.props.options.currentGroup.id,
-                        storeInDB: values.storeInDB,
-                        isSkippable: values.isSkippable,
-                        labels: '',
+                        storeInDB: false,
+                        isSkippable: false,
+                        dataCategoryID: null,
                         content: {
                             showTop: Number(values.showTop),
                             action: values.action,
@@ -47,10 +47,10 @@ class Solutions extends Component {
     };
 
     render() {
-        const {blockTypes, blocks, allGroups} = this.props.options;
+        const {flowOptions, blocks, allGroups} = this.props.options;
         let blockOptions = {};
         // extract the correct blockType from blockTypes[]
-        for (const blockType of blockTypes)
+        for (const blockType of flowOptions.blockTypes)
             if (blockType.name === 'User Input')
                 blockOptions = blockType;
 
@@ -63,15 +63,15 @@ class Solutions extends Component {
             >
                 <Form layout='horizontal'>
                     <FormItem label="Show Top Results"
-                              extra="Number of results you want to return"
+                              extra="Number of results you want to return (Best matches)"
                               {...this.props.options.layout}>
                         {getFieldDecorator('showTop', {
                             rules: [{
                                 required: true,
-                                message: "Please show top field",
+                                message: "Please set how many solutions to return",
                             }],
                         })(
-                            <Input min="1" type="number" placeholder="Ex: Where are you from?"/>
+                            <Input min="1" type="number" placeholder="Ex: 5"/>
                         )}
                     </FormItem>
 
@@ -160,31 +160,6 @@ class Solutions extends Component {
                             <Input placeholder="Ex: There you go :)"/>
                         )}
                     </FormItem>
-
-
-                    <Form.Item
-                        label="Skippable?"
-                        {...this.props.options.layout}>
-                        {getFieldDecorator('isSkippable', {
-                            valuePropName: 'checked',
-                            initialValue: false,
-                        })(
-                            <Checkbox>Users can skip answering this question</Checkbox>
-                        )}
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Store responses?"
-                        {...this.props.options.layout}>
-                        {getFieldDecorator('storeInDB', {
-                            valuePropName: 'checked',
-                            initialValue: blockOptions.alwaysStoreInDB,
-                        })(
-                            <Checkbox disabled={blockOptions.alwaysStoreInDB}>
-                                Users' responses should be recorded</Checkbox>
-                        )}
-                    </Form.Item>
-
                 </Form>
             </Card>
         );

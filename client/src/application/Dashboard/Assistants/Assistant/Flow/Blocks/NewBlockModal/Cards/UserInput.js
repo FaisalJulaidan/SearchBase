@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Card, Checkbox, Form, Input, Select, Spin} from "antd";
+import {Button, Card, Checkbox, Form, Input, Select, Spin, Divider, Icon} from "antd";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -21,7 +21,7 @@ class UserInput extends Component {
                         groupID: this.props.options.currentGroup.id,
                         storeInDB: values.storeInDB,
                         isSkippable: values.isSkippable,
-                        labels: '',
+                        dataCategoryID: values.dataCategoryID,
                         content: {
                             text: values.text,
                             blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
@@ -46,11 +46,12 @@ class UserInput extends Component {
             this.setState({showGoToBlock: false, showGoToGroup: false});
     };
 
+
     render() {
-        const {blockTypes, blocks, allGroups} = this.props.options;
+        const {flowOptions, blocks, allGroups} = this.props.options;
         let blockOptions = {};
         // extract the correct blockType from blockTypes[]
-        for (const blockType of blockTypes)
+        for (const blockType of flowOptions.blockTypes)
             if (blockType.name === 'User Input')
                 blockOptions = blockType;
 
@@ -75,6 +76,27 @@ class UserInput extends Component {
                         )}
                     </FormItem>
 
+                    <FormItem label="Data Category"
+                              extra="Categorising users' responses will result in  more efficient AI processing"
+                              {...this.props.options.layout}>
+                        {
+                                getFieldDecorator('dataCategoryID', {
+                                    rules: [{
+                                        required: true,
+                                        message: "Please specify the data category",
+                                    }]
+                                })(
+                                    <Select placeholder="Will validate the input"
+                                            defaultValue='None'>
+                                        {
+                                            flowOptions.dataCategories.map((category, i) =>
+                                                <Option key={i} value={category.ID}>{category.Name}</Option>)
+                                        }
+                                    </Select>
+                                )
+                        }
+                    </FormItem>
+
                     <FormItem label="Validation"
                               {...this.props.options.layout}>
                         {
@@ -82,13 +104,15 @@ class UserInput extends Component {
                                 getFieldDecorator('validation', {
                                     rules: [{
                                         required: true,
-                                        message: "Please field validation",
+                                        message: "Please select a validation type",
                                     }]
                                 })(
-                                    <Select placeholder="Will validate the input">{
+                                    <Select placeholder="Will validate the input">
+                                    {
                                         blockOptions.validations.map((validation, i) =>
                                             <Option key={i} value={validation}>{validation}</Option>)
-                                    }</Select>
+                                    }
+                                    </Select>
                                 )
                                 : <Spin><Select placeholder="Will validate the input"></Select></Spin>
                         }

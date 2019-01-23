@@ -1,5 +1,5 @@
 from flask import Blueprint, request, send_from_directory
-from services import userInput_services, assistant_services
+from services import chatbotSession_services, assistant_services
 from models import Callback, ChatbotSession, Assistant
 from utilities import helpers
 from config import BaseConfig
@@ -29,7 +29,7 @@ def user_input(assistantID):
     callback: Callback = Callback(False, 'Error!', None)
     # Get the assistant's user inputs/chatbot sessions
     if request.method == "GET":
-        callback: Callback = userInput_services.getByAssistantID(assistantID)
+        callback: Callback = chatbotSession_services.getByAssistantID(assistantID)
         # Return response
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
@@ -39,7 +39,7 @@ def user_input(assistantID):
 
     # Clear all user inputs/chatbot sessions
     if request.method == "DELETE":
-        callback: Callback = userInput_services.deleteAll(assistantID)
+        callback: Callback = chatbotSession_services.deleteAll(assistantID)
         # Return response
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
@@ -69,7 +69,7 @@ def user_input_file_uploads(assistantID, path):
         return helpers.jsonResponse(False, 404, "File not found.", None)
 
 
-    ui_callback: Callback = userInput_services.getByID(id, assistant)
+    ui_callback: Callback = chatbotSession_services.getByID(id, assistant)
     if not ui_callback.Success:
         return helpers.jsonResponse(False, 404, "File not found.", None)
     user_input: ChatbotSession = ui_callback.Data
@@ -86,7 +86,7 @@ def user_input_file_uploads(assistantID, path):
 def admin_record_delete(assistantID, recordID):
 
     if request.method == "GET":
-        deleteRecord_callback : Callback = userInput_services.deleteByID(recordID)
+        deleteRecord_callback : Callback = chatbotSession_services.deleteByID(recordID)
 
         return str(deleteRecord_callback.Success)
 
@@ -94,6 +94,6 @@ def admin_record_delete(assistantID, recordID):
 def admin_record_delete_all(assistantID):
 
     if request.method == "GET":
-        deleteRecords_callback : Callback = userInput_services.deleteAll(assistantID)
+        deleteRecords_callback : Callback = chatbotSession_services.deleteAll(assistantID)
 
         return helpers.redirectWithMessageAndAssistantID("admin_user_input", assistantID, deleteRecords_callback.Message)

@@ -8,6 +8,7 @@ from sqlalchemy.sql import exists, func
 from config import BaseConfig
 from models import db, Callback, ValidationType, Assistant, Block, BlockType, BlockAction, Plan, BlockGroup
 from utilities import json_utils, helpers
+from services import dataCategories_services
 
 bot_currentVersion = "1.0.0"
 
@@ -24,10 +25,7 @@ def getChatbot(assistant: Assistant) -> dict:
 def getFlow(assistant: Assistant) -> Callback:
     blockGroups = getBlockGroups(assistant)
     if not blockGroups:
-        data = {'botVersion': bot_currentVersion,
-                'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
-                'blockGroups': []}
-        return Callback(True, 'Could not retrieve flow', data)
+        return Callback(False, 'Could not retrieve flow')
 
     data = {'botVersion': bot_currentVersion,
             'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
@@ -41,13 +39,14 @@ def getBlockGroups(assistant: Assistant) -> List[dict]:
         result: List[BlockGroup] = db.session.query(BlockGroup).filter(BlockGroup.AssistantID == assistant.ID)
         groups = []
         for group in result:
+            block = getBlocksFromGroup(group)
             groups.append({'id': group.ID, 'name': group.Name, 'description': group.Description,
-                           'blocks': getBlocksByGroup(group)})
+                           'blocks': getBlocksFromGroup(group)})
         return groups
     except Exception as e:
         print("getBlockGroups ERROR:", e)
         db.session.rollback()
-        return None
+        return []
     # finally:
     # db.session.close()
 
@@ -70,18 +69,20 @@ def getGroupByID(id) -> Callback:
 
 
 # Get the list of blocks by group
-def getBlocksByGroup(group: BlockGroup) -> List[dict]:
+def getBlocksFromGroup(group: BlockGroup) -> List[dict]:
     try:
         blocks = []
         for block in group.Blocks:
             blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,
                            'content': block.Content, 'storeInDB': block.StoreInDB,
-                           'labels': block.Labels, 'isSkippable': block.Skippable,
-                           'groupID': block.GroupID})
+                           'groupID': block.GroupID, 'isSkippable': block.Skippable,
+                           'dataCategoryID': block.DataCategoryID
+                           })
         return blocks
     except Exception as e:
         print("getBlocks ERROR:", e)
         db.session.rollback()
+        raise Exception('Error: getBlocksFromGroup()')
     # finally:
     # db.session.close()
 
@@ -90,16 +91,20 @@ def getBlocksByGroup(group: BlockGroup) -> List[dict]:
 def getAllBlocks(assistant: Assistant) -> List[dict]:
     try:
         groups: List[BlockGroup] = db.session.query(BlockGroup).filter(BlockGroup.AssistantID == assistant.ID)
+        if not groups: raise Exception
         blocks = []
         for group in groups:
             for block in group.Blocks:
                 blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,
-                               'content': block.Content, 'storeInDB': block.StoreInDB, 'labels': block.Labels,
-                               'isSkippable': block.Skippable})
+                               'content': block.Content, 'storeInDB': block.StoreInDB,
+                               'groupID': block.GroupID, 'isSkippable': block.Skippable,
+                               'dataCategoryID': block.DataCategoryID, 'dataCategoryName': block.DataCategory.Name,
+                               })
         return blocks
     except Exception as e:
         print("getBlocks ERROR:", e)
         db.session.rollback()
+        return None
     # finally:
     # db.session.close()
 
@@ -134,7 +139,7 @@ def addBlock(data: dict, group: BlockGroup) -> Callback:
 
         newBlock = Block(Type=BlockType(block['type']), Order=maxOrder + 1, Content=block['content'],
                          StoreInDB=block['storeInDB'], Skippable=block['isSkippable'],
-                         Labels=block['labels'], Group=group)
+                         Group=group, DataCategoryID=block['dataCategoryID'])
         db.session.add(newBlock)
         db.session.commit()
 
@@ -230,8 +235,6 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
             if not callback.Success:
                 return callback
 
-            print(block);
-            # HERE THE UPDATE PROBLEM START
             # Update the block
             oldBlock: Block = db.session.query(Block). \
                 filter(and_(Block.ID == block.get('id'), Assistant.ID == assistant.ID)).first()
@@ -330,16 +333,22 @@ def isValidBlock(block: dict, blockType: str):
     return Callback(True, "Valid block")
 
 
-def getOptions() -> dict:
-    return {
+def getOptions(industry=None) -> Callback:
+
+    callback: Callback = dataCategories_services.getAll()
+    if not callback.Success:
+        return Callback(False, 'Error in getting data categories')
+
+    options =  {
         'botVersion': bot_currentVersion,
         'types': [a.value for a in BlockType],
+        'dataCategories': helpers.getListFromSQLAlchemyList(callback.Data),
         'blockTypes': [{
             'name': BlockType.UserInput.value,
             'validations': [uiv.value for uiv in ValidationType],
             'actions': [a.value for a in BlockAction],
             'alwaysStoreInDB': True
-            },
+        },
             {
                 'name': BlockType.Question.value,
                 'actions': [a.value for a in BlockAction],
@@ -359,6 +368,9 @@ def getOptions() -> dict:
             },
         ]
     }
+    return Callback(True, '', options)
+
+
 
 
 # ----- Extras ----- #

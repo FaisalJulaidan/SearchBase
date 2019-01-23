@@ -1,42 +1,41 @@
 import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
-const initialState = {userInputs: [], isLoading: false, errorMsg: null};
+const initialState = {chatbotSessions: [], isLoading: false, errorMsg: null};
 
-export const userInput = (state = initialState, action) => {
+export const chatbotSessions = (state = initialState, action) => {
     switch (action.type) {
-        // Fetching user inputs
-        case actionTypes.FETCH_USERINPUT_REQUEST:
+        // Fetching chatbot sessions
+        case actionTypes.FETCH_CHATBOT_SESSIONS_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
                 isLoading: true
             });
-        case actionTypes.FETCH_USERINPUT_SUCCESS:
-            console.log(action.userInputs);
+        case actionTypes.FETCH_CHATBOT_SESSIONS_SUCCESS:
             return updateObject(state, {
-                userInputs: action.userInputs,
+                chatbotSessions: action.chatbotSessions,
                 isLoading: false
             });
-        case actionTypes.FETCH_USERINPUT_FAILURE:
+        case actionTypes.FETCH_CHATBOT_SESSIONS_FAILURE:
             return updateObject(state, {
-                userInputs: [],
+                chatbotSessions: [],
                 isLoading: false,
                 errorMsg: action.error.msg
             });
 
-        //Clearing all user inputs
-        case actionTypes.CLEAR_ALL_USERINPUT_REQUEST:
+        //Clearing all chatbot sessions
+        case actionTypes.CLEAR_ALL_CHATBOT_SESSIONS_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
                 isClearingAll: true
             });
-        case actionTypes.CLEAR_ALL_USERINPUT_SUCCESS:
+        case actionTypes.CLEAR_ALL_CHATBOT_SESSIONS_SUCCESS:
             return updateObject(state, {
                 isClearingAll: false,
-                userInputs: [],
+                chatbotSessions: [],
                 errorMsg: null,
             });
-        case actionTypes.CLEAR_ALL_USERINPUT_FAILURE:
+        case actionTypes.CLEAR_ALL_CHATBOT_SESSIONS_FAILURE:
             return updateObject(state, {
                 isClearingAll: false,
                 errorMsg: action.error.msg

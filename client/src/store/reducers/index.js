@@ -4,7 +4,7 @@ import {assistant} from "./assistant.reducer";
 import {flow} from "./flow.reducer";
 import {settings} from "./assistantSettings.reducer";
 import {profile} from "./profile.reducer";
-import {userInput} from "./userInput.reducer";
+import {chatbotSessions} from "./chatbotSessions.reducer";
 import {solutions} from "./solutions.reducer";
 
 
@@ -14,7 +14,7 @@ const rootReducer = combineReducers({
     flow,
     settings,
     profile,
-    userInput,
+    chatbotSessions,
     solutions
 });
 

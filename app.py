@@ -14,7 +14,7 @@ from utilities import helpers
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, settings_router,\
-    solutions_router, analytics_router, sub_router, connection_router, userInput_router, users_router,\
+    solutions_router, analytics_router, sub_router, connection_router, chatbotSession_router, users_router,\
     changePassword_router, bot_router, flow_router, assistant_router
 
 from routes.public.routers import public_router, resetPassword_router, chatbot_router, auth_router
@@ -34,7 +34,7 @@ app.register_blueprint(settings_router)
 app.register_blueprint(solutions_router, url_prefix='/api')
 app.register_blueprint(analytics_router, url_prefix='/api')
 app.register_blueprint(connection_router, url_prefix='/api')
-app.register_blueprint(userInput_router, url_prefix='/api')
+app.register_blueprint(chatbotSession_router, url_prefix='/api')
 app.register_blueprint(changePassword_router)
 app.register_blueprint(users_router)
 app.register_blueprint(bot_router)

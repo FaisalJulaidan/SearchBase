@@ -1,16 +1,17 @@
 import React, {Component} from 'react';
-import "./ViewModal.less"
+import "./ViewsSessionModal.less"
 import {Button, Modal, Table} from "antd";
-import {http, alertError} from '../../../../../../helpers';
+import {http, alertError} from '../../../../../../../helpers';
 import saveAs from 'file-saver';
 
 
-class ViewModal extends Component {
+class ViewsSessionModal extends Component {
 
+    counter = -1;
     state = {
         fileNames: []
     };
-    counter = -1;
+
     columns = [{
         title: 'Question',
         key: 'questionText',
@@ -88,4 +89,4 @@ class ViewModal extends Component {
     }
 }
 
-export default ViewModal;
+export default ViewsSessionModal;

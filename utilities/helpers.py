@@ -1,5 +1,6 @@
 from flask import redirect, url_for, session, render_template, json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solution, ChatbotSession, BlockGroup, DataCategory
+from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solution, ChatbotSession,\
+    BlockGroup, DataCategory
 from services import assistant_services, user_services
 from datetime import datetime
 from sqlalchemy import inspect
@@ -156,6 +157,7 @@ def gen_dummy_data():
             {
                 "blockID": 1,
                 "questionText": "What is your email?",
+                "dataCategoryID": None,
                 "input": "faisal@gmail.com",
                 "keywords": ['faisal', 'developer', 'email']
             }

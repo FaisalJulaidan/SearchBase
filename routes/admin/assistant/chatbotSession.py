@@ -5,13 +5,13 @@ from utilities import helpers
 from config import BaseConfig
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-userInput_router: Blueprint = Blueprint('userInput_router', __name__ , template_folder="../../templates")
+chatbotSession_router: Blueprint = Blueprint('userInput_router', __name__ , template_folder="../../templates")
 
 
 # Get all assistant's user inputs
-@userInput_router.route("/assistant/<int:assistantID>/userinput", methods=["GET", "DELETE"])
+@chatbotSession_router.route("/assistant/<int:assistantID>/chatbotSessions", methods=["GET", "DELETE"])
 @jwt_required
-def user_input(assistantID):
+def chatbotSession(assistantID):
 
     # Authenticate
     user = get_jwt_identity()['user']
@@ -45,10 +45,10 @@ def user_input(assistantID):
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
-@userInput_router.route("/assistant/<int:assistantID>/userinput/<path:path>", methods=['GET'])
+@chatbotSession_router.route("/assistant/<int:assistantID>/chatbotSessions/<path:path>", methods=['GET'])
 @jwt_required
 @helpers.gzipped
-def user_input_file_uploads(assistantID, path):
+def chatbotSession_file_uploads(assistantID, path):
     # Authenticate
     user = get_jwt_identity()['user']
     # For all type of requests methods, get the assistant
@@ -61,7 +61,8 @@ def user_input_file_uploads(assistantID, path):
     if assistant.CompanyID != user['companyID']:
         return helpers.jsonResponse(False, 401, "Unauthorised!")
 
-    # the id of the user input session is included in the name of the file after "_" character, but encrypted
+    # Security procedure ->
+    # the id of the user input session is included in the name of the file after "_" symbol, but encrypted
     try:
         id = helpers.decrypt_id(path[path.index('_')+1:path.index('.')])[0]
         if not id: raise Exception
@@ -82,18 +83,25 @@ def user_input_file_uploads(assistantID, path):
         return send_from_directory('static/file_uploads/user_files', path)
 
 
-@userInput_router.route("/admin/assistant/<assistantID>/<recordID>/delete", methods=["GET"])
-def admin_record_delete(assistantID, recordID):
+@chatbotSession_router.route("/assistant/<assistantID>/chatbotSessions/<sessionID>", methods=["DELETE"])
+def chatbotSession_delete_record(assistantID, sessionID):
 
-    if request.method == "GET":
-        deleteRecord_callback : Callback = chatbotSession_services.deleteByID(recordID)
+    # Authenticate
+    user = get_jwt_identity()['user']
+    # For all type of requests methods, get the assistant
+    security_callback: Callback = assistant_services.getByID(assistantID)
+    if not security_callback.Success:
+        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+    assistant: Assistant = security_callback.Data
 
-        return str(deleteRecord_callback.Success)
+    # Check if this user has access to this assistant
+    if assistant.CompanyID != user['companyID']:
+        return helpers.jsonResponse(False, 401, "Unauthorised!")
 
-@userInput_router.route("/admin/assistant/<assistantID>/deleteAll", methods=["GET"])
-def admin_record_delete_all(assistantID):
+    if request.method == "DELETE":
 
-    if request.method == "GET":
-        deleteRecords_callback : Callback = chatbotSession_services.deleteAll(assistantID)
+        callback : Callback = chatbotSession_services.deleteByID(sessionID)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
-        return helpers.redirectWithMessageAndAssistantID("admin_user_input", assistantID, deleteRecords_callback.Message)

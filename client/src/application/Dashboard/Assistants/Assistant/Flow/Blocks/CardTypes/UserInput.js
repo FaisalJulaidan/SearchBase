@@ -127,7 +127,7 @@ class UserInput extends Component {
                               {...this.props.options.layout}>
                         {
                             getFieldDecorator('dataCategoryID', {
-                                initialValue: null,
+                                initialValue: null || block.dataCategoryID,
                                 rules: [{
                                     required: true,
                                     message: "Please specify the data category",

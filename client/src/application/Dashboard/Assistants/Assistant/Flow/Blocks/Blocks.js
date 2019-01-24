@@ -5,8 +5,8 @@ import {Button, Form, Modal} from "antd";
 
 import Block from "./Block/Block";
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
-import NewBlockModal from "./NewBlockModal/NewBlockModal";
-import EditBlockModal from "./EditBlockModal/EditBlockModal1";
+import NewBlockModal from "./Modals/NewBlockModal";
+import EditBlockModal from "./Modals/EditBlockModal1";
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {

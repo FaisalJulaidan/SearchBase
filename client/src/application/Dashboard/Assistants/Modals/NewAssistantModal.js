@@ -39,9 +39,7 @@ class NewAssistantModal extends Component {
             this.props.hideModal();
             message.destroy();
             message.success(this.props.successMsg)
-
         }
-
     }
 
 

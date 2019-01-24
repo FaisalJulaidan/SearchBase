@@ -100,7 +100,7 @@ class Question extends Component {
                     text: values.answer,
                     keywords: this.state.tags,
                     blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
-                    action: values.action,
+                    action: values.action === "Go To Group" ? "Go To Specific Block" : values.action,
                     afterMessage: values.afterMessage
                 };
                 this.setState({tags: []});
@@ -116,9 +116,12 @@ class Question extends Component {
 
     showAddAnswer = () => this.setState({modalVisible: true});
     hideAddAnswer = () => this.setState({modalVisible: false});
-    removeAnswer = () => {
-        console.log("TODO")
-    };
+
+    removeAnswer = deletedAnswer => this.setState({
+        answers: [...this.state.answers].filter(answer =>
+            (answer.afterMessage !== deletedAnswer.afterMessage) &&
+            (answer.text !== deletedAnswer.text))
+    });
 
 // Tags component's functions
     removeTag = (removedTag) => this.setState({tags: this.state.tags.filter(tag => tag !== removedTag)});
@@ -205,14 +208,13 @@ class Question extends Component {
                             this.state.answers.map((answer, i) => (
                                 <Card title={answer.text}
                                       key={i}
-                                      extra={<Button onClick={this.removeAnswer}
+                                      extra={<Button onClick={() => this.removeAnswer(answer)}
                                                      type="danger" icon="delete" shape="circle"
                                                      size={"small"}></Button>}
                                       style={{width: 200, margin: 10}}>
                                     <p>Action: {answer.action}</p>
                                     Tags: <br/>
                                     {answer.keywords.map((keyword, i) => <Tag key={i}>{keyword}</Tag>)}
-
                                 </Card>
                             ))
                         }

@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 
-import "./Blocks.less"
 import styles from "./Blocks.module.less";
 import {Button, Form, Modal} from "antd";
 

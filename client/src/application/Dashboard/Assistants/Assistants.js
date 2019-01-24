@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {Button, message, Skeleton} from 'antd';
 import {connect} from 'react-redux';
 
-import "./Assistants.less"
 import styles from "./Assistants.module.less"
 import Assistant from "./Assistant/Assistant"
 

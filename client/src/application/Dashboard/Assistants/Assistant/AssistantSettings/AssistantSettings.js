@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "../Assistant.less"
 import connect from "react-redux/es/connect/connect";
 import {assistantSettingsActions} from "../../../../../store/actions";
 import AssistantSettingsModal from "./AssistantSettingsModal/AssistantSettingsModal";

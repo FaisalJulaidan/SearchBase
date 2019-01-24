@@ -1,6 +1,5 @@
 import React from 'react';
 import styles from "./Analytics.module.less";
-import "./Analytics.less"
 
 import Header from "../../../../../components/Header/Header";
 import {Bar} from "ant-design-pro/lib/Charts";

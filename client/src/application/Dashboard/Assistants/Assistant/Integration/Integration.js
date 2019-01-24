@@ -8,7 +8,6 @@ import ReactDOMServer from 'react-dom/server'
 import {hasher} from "../../../../../helpers"
 import {SwatchesPicker} from 'react-color';
 
-import "./Integration.less"
 
 const {TextArea} = Input;
 

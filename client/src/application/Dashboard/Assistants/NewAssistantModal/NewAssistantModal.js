@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "./NewAssistantModal.less";
 
 import {Button, Form, Input, Modal, Select, InputNumber, message, Switch} from 'antd';
 import {connect} from "react-redux";

@@ -140,7 +140,7 @@ export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allB
     );
 };
 
-export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, allBlocks, showGoToGroup}) => {
+export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, allGroups, showGoToGroup}) => {
     return (
         showGoToGroup ?
             (

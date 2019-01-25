@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {Button, Card, Checkbox, Form, Icon, Input, Modal, Select, Tag, Tooltip} from "antd";
+import {Button, Card, Form, Icon, Input, Modal, Popconfirm, Tag, Tooltip} from "antd";
+
 import {getInitialVariables, initActionType} from './CardTypesHelpers'
 import {
     ActionFormItem,
@@ -9,11 +10,11 @@ import {
     QuestionFormItem,
     ShowGoToBlockFormItem,
     ShowGoToGroupFormItem,
-    SkippableFormItem
+    SkippableFormItem,
+    StoreInDBFormItem
 } from './CardTypesFormItems'
 
 const FormItem = Form.Item;
-const Option = Select.Option;
 
 class Question extends Component {
 
@@ -30,35 +31,38 @@ class Question extends Component {
         groupName: ''
     };
 
-    onSubmit = () => this.props.form.validateFields(['text', 'isSkippable', 'storeInDB', 'dataCategoryID'], (err, values) => {
-        if (!err) {
-            let options = {
-                block: {
-                    type: 'Question',
-                    groupID: this.props.options.currentGroup.id,
-                    storeInDB: values.storeInDB,
-                    isSkippable: values.isSkippable || false,
-                    dataCategoryID: values.dataCategoryID,
-                    content: {
-                        text: values.text,
-                        answers: this.state.answers
+    //Submit whole block
+    onSubmit = () => this.props.form.validateFields(['text', 'isSkippable', 'storeInDB', 'dataCategoryID'],
+        (err, values) => {
+            if (!err) {
+                let options = {
+                    block: {
+                        type: 'Question',
+                        groupID: this.props.options.currentGroup.id,
+                        storeInDB: values.storeInDB,
+                        isSkippable: values.isSkippable || false,
+                        dataCategoryID: values.dataCategoryID,
+                        content: {
+                            text: values.text,
+                            answers: this.state.answers
+                        }
                     }
-                }
-            };
+                };
 
-            if (this.handleNewBlock)
-                this.handleNewBlock(options);
-            else {
-                // Edit Block
-                options.block.id = this.props.options.block.id;
-                options.block.order = this.props.options.block.order;
-                this.handleEditBlock(options);
+                if (this.handleNewBlock)
+                    this.handleNewBlock(options);
+                else {
+                    // Edit Block
+                    options.block.id = this.props.options.block.id;
+                    options.block.order = this.props.options.block.order;
+                    this.handleEditBlock(options);
+                }
             }
-        }
     });
 
-    addAnswer = () => {
-        this.props.form.validateFields(['answer', 'action', 'blockToGoID', 'blockToGoIDGroup', 'afterMessage'], (err, values) => {
+    //Add single answer
+    addAnswer = () => this.props.form.validateFields(['answer', 'action', 'blockToGoID', 'blockToGoIDGroup', 'afterMessage'],
+        (err, values) => {
             if (!err) {
                 const answer = {
                     text: values.answer,
@@ -67,27 +71,18 @@ class Question extends Component {
                     action: values.action === "Go To Group" ? "Go To Specific Block" : values.action,
                     afterMessage: values.afterMessage
                 };
-                this.setState({tags: []});
-                const answers = this.state.answers;
-                answers.push(answer);
-                this.setState({answers});
+                let answers = [answer].concat(this.state.answers);
+                this.setState({answers, tags: []});
                 this.hideAddAnswer();
-                console.log(this.state.answers)
             }
-        })
-
-    };
-
+        });
     showAddAnswer = () => this.setState({modalVisible: true});
     hideAddAnswer = () => this.setState({modalVisible: false});
-
     removeAnswer = deletedAnswer => this.setState({
-        answers: [...this.state.answers].filter(answer =>
-            (answer.afterMessage !== deletedAnswer.afterMessage) &&
-            (answer.text !== deletedAnswer.text))
+        answers: [...this.state.answers].filter(answer => (answer.afterMessage !== deletedAnswer.afterMessage) && (answer.text !== deletedAnswer.text))
     });
 
-// Tags component's functions
+    //Tags component's functions
     removeTag = (removedTag) => this.setState({tags: this.state.tags.filter(tag => tag !== removedTag)});
     showInput = () => this.setState({inputVisible: true}, () => this.input.focus());
     handleInputChange = e => this.setState({inputValue: e.target.value});
@@ -100,7 +95,6 @@ class Question extends Component {
         this.setState({tags, inputVisible: false, inputValue: '',});
     };
 
-// END Tags component's functions
 
     componentWillMount() {
         this.handleNewBlock = this.props.handleNewBlock;
@@ -109,6 +103,7 @@ class Question extends Component {
 
         const {allGroups, block} = getInitialVariables(this.props.options);
         this.setState(initActionType(block, allGroups));
+        this.setState({answers: block.content.answers || []})
     }
 
 
@@ -137,11 +132,16 @@ class Question extends Component {
                                 type="primary" icon="plus" shape="circle" size={"small"}></Button>
                         {
                             this.state.answers.map((answer, i) => (
-                                <Card title={answer.text}
-                                      key={i}
-                                      extra={<Button onClick={() => this.removeAnswer(answer)}
-                                                     type="danger" icon="delete" shape="circle"
-                                                     size={"small"}></Button>}
+
+                                <Card title={answer.text} key={i}
+                                      extra={
+                                          <Popconfirm placement="topRight" title="Are you sure delete this answer?"
+                                                      onConfirm={() => this.removeAnswer(answer)}
+                                                      okText="Yes" cancelText="No">
+                                              <Button type="danger" icon="delete" shape="circle"
+                                                      size={"small"}></Button>
+                                          </Popconfirm>
+                                      }
                                       style={{width: 200, margin: 10}}>
                                     <p>Action: {answer.action}</p>
                                     Tags: <br/>
@@ -152,19 +152,11 @@ class Question extends Component {
                     </FormItem>
 
 
-                    <Form.Item
-                        label="Store responses?"
-                        {...this.props.options.layout}>
-                        {getFieldDecorator('storeInDB', {
-                            valuePropName: 'checked',
-                            initialValue: blockOptions.alwaysStoreInDB,
-                        })(
-                            <Checkbox disabled={blockOptions.alwaysStoreInDB}>
-                                Users' responses should be recorded</Checkbox>
-                        )}
-                    </Form.Item>
-
                     <SkippableFormItem FormItem={FormItem} block={block}
+                                       getFieldDecorator={getFieldDecorator}
+                                       layout={this.props.options.layout}/>
+
+                    <StoreInDBFormItem FormItem={FormItem} block={block} blockOptions={blockOptions}
                                        getFieldDecorator={getFieldDecorator}
                                        layout={this.props.options.layout}/>
 
@@ -172,14 +164,8 @@ class Question extends Component {
 
 
                 {/*ADDING ANSWER*/}
-                <Modal
-                    title="Add Answer"
-                    width={700}
-                    destroyOnClose={true}
-                    visible={this.state.modalVisible}
-                    onOk={this.addAnswer}
-                    onCancel={this.hideAddAnswer}>
-
+                <Modal title="Add Answer" width={700} destroyOnClose={true} visible={this.state.modalVisible}
+                       onOk={this.addAnswer} onCancel={this.hideAddAnswer}>
                     <Form>
                         <FormItem label="Answer"
                                   extra="This will be shown as answer in chatbot"

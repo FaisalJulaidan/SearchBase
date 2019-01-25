@@ -5,7 +5,6 @@ import {chatbotSessionsActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
 import {Tabs} from 'antd';
 import Sessions from "./Sessions/Sessions";
-import Categorised from "./Categorised/Categorised";
 
 const TabPane = Tabs.TabPane;
 

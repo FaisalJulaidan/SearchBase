@@ -13,8 +13,8 @@
             "name": {"enum": ["No Type", "Email", "Telephone", "Contact Time", "Desired Salary", "Availability", "Desired Position", "Desired Position Years Exp", "Top Skill", "Top Skill Years Exp", "Resume", "Linkdin URL", "Desired Location", "Employment Type", "Desired Hourly Rate"]},
             "validation": {"enum": ["Ignore", "Email", "Telephone", "Name", "Number", "URL"]}
           },
-          "required": ["name","validation"],
-          "additionalProperties": false
+          "required": ["name", "validation"],
+          "additionalProperties": true
         },
         "type": {"enum": ["Question", "User Input", "File Upload", "Solutions", "End Chat"]},
         "order": {"type": "integer", "minimum": 1},

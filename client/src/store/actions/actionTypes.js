@@ -59,7 +59,7 @@ export const FETCH_FLOW_FAILURE = 'FETCH_FLOW_FAILURE';
 
 
 
-// Profile
+// Conversation
 export const GET_PROFILE_REQUEST = 'GET_PROFILE_REQUEST';
 export const GET_PROFILE_SUCCESS = 'GET_PROFILE_SUCCESS';
 export const GET_PROFILE_FAILURE = 'GET_PROFILE_FAILURE';

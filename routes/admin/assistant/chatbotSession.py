@@ -3,7 +3,7 @@ from services import chatbotSession_services, assistant_services, dataCategories
 from models import Callback, ChatbotSession, Assistant
 from utilities import helpers
 from config import BaseConfig
-from enums import UserType
+from enums import UserType, DataType
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 chatbotSession_router: Blueprint = Blueprint('userInput_router', __name__ , template_folder="../../templates")
@@ -36,7 +36,8 @@ def chatbotSession(assistantID):
             return helpers.jsonResponse(False, 400, "Error in retrieving sessions.")
         return helpers.jsonResponse(True, 200, s_callback.Message,
                                     {'sessionsList': s_callback.Data,
-                                     'userTypes': [uiv.value for uiv in UserType],
+                                     'userTypes': [ut.value for ut in UserType],
+                                     'dataTypes': [dt.value for dt in DataType],
                                      'filesPath': BaseConfig.USER_FILES
                                      })
 

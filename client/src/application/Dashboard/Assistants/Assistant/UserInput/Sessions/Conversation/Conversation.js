@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import {Button, Modal, Table} from "antd";
+import {Button, Table, Tag} from "antd";
 import {http, alertError} from '../../../../../../../helpers';
 import saveAs from 'file-saver';
 
 
-class ViewsSessionModal extends Component {
+class Conversation extends Component {
 
     counter = -1;
     state = {
@@ -34,6 +34,10 @@ class ViewsSessionModal extends Component {
                </p>);
             }
         },
+    },{
+        title: 'Data Type',
+        key: 'DataType',
+        render: (text, record, index) => (<Tag key={record.UserType}>{record.dataType}</Tag>),
     }];
 
     componentWillReceiveProps(nextProps, nextContext) {
@@ -62,30 +66,15 @@ class ViewsSessionModal extends Component {
     };
 
     render() {
-        const {record} = this.props;
-        console.log(this.state);
+        const {session} = this.props;
         return (
-            <Modal
-                width={800}
-                title="User Inputs"
-                destroyOnClose={true}
-                visible={this.props.visible}
-                onCancel={this.props.closeViewModal}
-                onOk={this.props.closeViewModal}
-                footer={[
-                    <Button key="Cancel" onClick={this.props.closeViewModal}>OK</Button>
-                ]}>
-                {this.props.record ? (
-                    <Table columns={this.columns}
-                           dataSource={record.Data.collectedData}
-                           size='middle'
-                           pagination={false}
-                    />
-                ) : (<p>No Data</p>)}
-
-            </Modal>
+            <Table columns={this.columns}
+                   dataSource={session.Data.collectedData}
+                   size='middle'
+                   pagination={false}
+            />
         );
     }
 }
 
-export default ViewsSessionModal;
+export default Conversation;

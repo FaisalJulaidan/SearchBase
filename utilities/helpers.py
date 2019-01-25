@@ -164,9 +164,31 @@ def gen_dummy_data():
                 "dataType": 'Email',
                 "input": "faisal@gmail.com",
                 "keywords": ['faisal', 'developer', 'email']
+            },
+            {
+                "blockID": 2,
+                "questionText": "How are you doing?",
+                "dataType": 'No Type',
+                "input": "I am fine thank you",
+                "keywords": []
+            },
+            {
+                "blockID": 3,
+                "questionText": "When are you available",
+                "dataType": 'Availability',
+                "input": "Only weekend days",
+                "keywords": []
+            },
+            {
+                "blockID": 4,
+                "questionText": "What is your friend's email?",
+                "dataType": "Email",
+                "input": "friend@hotmail.com",
+                "keywords": []
             }
         ]
     }
+
     db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now(),
                                   TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
                                   UserType=enums.UserType.Candidate, Assistant=reader_a))

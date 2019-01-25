@@ -1,5 +1,6 @@
 from models import db, Callback, ChatbotSession
 from utilities import helpers
+from typing import List
 from sqlalchemy.sql import and_
 
 
@@ -9,7 +10,7 @@ def getByAssistantID(assistantID):
         sessions= db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID).all()
         if not sessions: raise Exception
 
-        data = __chatbotSessionJsonList(sessions) # will convert to json and solve Enums issue
+        data = chatbotSessionDictList(sessions) # will convert to json and solve Enums issue
         return Callback(True, "User inputs retrieved successfully.", data)
 
     except Exception as exc:
@@ -23,7 +24,7 @@ def getByID(id, assistant):
             .filter(and_(ChatbotSession.AssistantID == assistant.ID, ChatbotSession.ID == id))\
             .first()
         if not session: raise Exception
-        return Callback(True, "User input retrieved successfully.", __chatbotSessionJson(session))
+        return Callback(True, "User input retrieved successfully.", chatbotSessionDict(session))
 
     except Exception as exc:
         print("userInput_services.getByID() Error: ", exc)
@@ -78,32 +79,39 @@ def deleteAll(assistantID):
 
 
 # ----- Extras ----- #
-def __chatbotSessionJson(session):
+
+
+def chatbotSessionDict(session: ChatbotSession):
     try:
-        data = {'ID': session.ID, 'Data': session.Data, 'FilePath': session.FilePath,
-                     'DateTime': session.DateTime, 'TimeSpent': session.TimeSpent,
-                     'SolutionsReturned': session.SolutionsReturned,
-                     'QuestionsAnswered': session.QuestionsAnswered,
-                     'AssistantID': session.AssistantID}
-        return data
+        return createDictFromSession(session)
     except Exception as e:
         print(" __chatbotSessionJson ERROR:", e)
         db.session.rollback()
         raise Exception('Error: __chatbotSessionJson')
 
 
-def __chatbotSessionJsonList(sessions):
+def chatbotSessionDictList(sessions: List[ChatbotSession]):
     try:
         data= []
         for session in sessions:
-            data.append({'ID': session.ID, 'Data': session.Data, 'FilePath': session.FilePath,
-                         'DateTime': session.DateTime, 'TimeSpent': session.TimeSpent,
-                         'SolutionsReturned': session.SolutionsReturned,
-                         'QuestionsAnswered': session.QuestionsAnswered,
-                         'AssistantID': session.AssistantID})
+            data.append(createDictFromSession(session))
         return data
     except Exception as e:
         print(" __chatbotSessionJsonList ERROR:", e)
         db.session.rollback()
         raise Exception('Error: __chatbotSessionJsonList')
 
+
+def createDictFromSession(session: ChatbotSession):
+    try:
+        session = {'ID': session.ID, 'Data': session.Data, 'FilePath': session.FilePath,
+                   'DateTime': session.DateTime, 'TimeSpent': session.TimeSpent,
+                   'SolutionsReturned': session.SolutionsReturned,
+                   'QuestionsAnswered': session.QuestionsAnswered,
+                   'UserType': session.UserType.value,
+                   'AssistantID': session.AssistantID
+                   }
+        return session
+    except Exception as e:
+        print("createBlockFromDict ERROR:", e)
+        raise Exception('Error: createBlockFromDict()')

@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from "./Sessions.module.less"
 import {chatbotSessionsActions} from "../../../../../../store/actions";
-import ViewsSessionModal from "./ViewSessionModal/ViewsSessionModal";
+import ViewsModal from "./ViewModal/ViewsModal";
 import { Table, Button, Modal, Tag } from 'antd';
 import moment from 'moment';
 import {alertError, http} from "../../../../../../helpers";
@@ -31,7 +31,7 @@ class Sessions extends React.Component {
 
 
     closeViewModal = () => {
-        this.setState({viewModal: false, selectedRecord: null})
+        this.setState({viewModal: false, selectedSession: null})
     };
 
 
@@ -135,8 +135,8 @@ class Sessions extends React.Component {
             ],
             onFilter: (value, record) => {
                 console.log(value);
-                record.UserType.name.includes(value)},
-            render: (text, record) => (<Tag key={record.UserType.name}>{record.UserType.name}</Tag>),
+                record.UserType.includes(value)},
+            render: (text, record) => (<Tag key={record.UserType}>{record.UserType}</Tag>),
 
         },{
             title: 'Questions Answered',
@@ -176,7 +176,7 @@ class Sessions extends React.Component {
             render: (text, record, index) => (
                 <span>
               <a onClick={()=> {
-                  this.setState({viewModal: true, selectedRecord: record})
+                  this.setState({viewModal: true, selectedSession: record})
               }
               }> View</a>
                     {/*<Divider type="vertical" />*/}
@@ -201,16 +201,17 @@ class Sessions extends React.Component {
                        dataSource={sessions.sessionsList ? sessions.sessionsList : null}
                        onChange={this.handleFilter}
                        loading={this.props.isLoading}
-                       expandedRowRender={this.expandedRowRender}
+                       // expandedRowRender={this.expandedRowRender}
                        size='middle'
                 />
 
 
-                <ViewsSessionModal visible={this.state.viewModal}
-                                   closeViewModal={this.closeViewModal}
-                                   filesPath={this.props.sessions.filesPath}
-                                   record={this.state.selectedRecord}
-                                   assistant={this.props.assistant}
+                <ViewsModal visible={this.state.viewModal}
+                            closeViewModal={this.closeViewModal}
+                            filesPath={this.props.sessions.filesPath}
+                            dataTypes={this.props.sessions.dataTypes}
+                            session={this.state.selectedSession}
+                            assistant={this.props.assistant}
                 />
             </div>
         );

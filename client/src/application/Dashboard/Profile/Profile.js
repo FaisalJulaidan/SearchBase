@@ -45,7 +45,7 @@ class Profile extends React.Component {
 
                     <div className={styles.Panel_Body} style={{overflowY: "auto"}}>
                         <Tabs defaultActiveKey={"1"}>
-                            <TabPane tab={"Profile Details"} key={"1"}>
+                            <TabPane tab={"Conversation Details"} key={"1"}>
                                 <ProfileDetails profileData={this.props.profileData} saveProfileDetails={this.saveProfileDetails}/>
                             </TabPane>
 

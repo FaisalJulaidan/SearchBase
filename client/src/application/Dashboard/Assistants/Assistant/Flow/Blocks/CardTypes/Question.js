@@ -32,7 +32,7 @@ class Question extends Component {
     };
 
     //Submit whole block
-    onSubmit = () => this.props.form.validateFields(['text', 'isSkippable', 'storeInDB', 'dataCategoryID'],
+    onSubmit = () => this.props.form.validateFields(['text', 'isSkippable', 'storeInDB', 'dataType'],
         (err, values) => {
             if (!err) {
                 let options = {
@@ -41,7 +41,7 @@ class Question extends Component {
                         groupID: this.props.options.currentGroup.id,
                         storeInDB: values.storeInDB,
                         isSkippable: values.isSkippable || false,
-                        dataCategoryID: values.dataCategoryID,
+                        dataType: values.dataType,
                         content: {
                             text: values.text,
                             answers: this.state.answers
@@ -180,7 +180,7 @@ class Question extends Component {
                             )}
                         </FormItem>
 
-                        <FormItem label="Tags" {...this.props.options.layout}>
+                        <FormItem label="Keywords" {...this.props.options.layout}>
                             <div>
                                 {tags.map((tag) => {
                                     const isLongTag = tag.length > 20;

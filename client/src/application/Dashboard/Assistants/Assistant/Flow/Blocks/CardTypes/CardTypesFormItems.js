@@ -24,12 +24,11 @@ export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block}) =
 );
 
 export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, flowOptions, block}) => (
-    <FormItem label="Data Category"
-              extra="Categorising users' responses will result in  more efficient AI processing"
-              {...layout}>
+    <FormItem label="Data Type" {...layout}
+              extra="Selecting a Data Type will result a smarter AI processing">
         {
             getFieldDecorator('dataType', {
-                initialValue: block.dataType ? block.dataType : undefined,
+                initialValue: block.dataType ? block.dataType.name : undefined,
                 rules: [{
                     required: true,
                     message: "Please specify the data category",

@@ -451,7 +451,7 @@ def createBlockFromDict(block: dict, order, group: BlockGroup):
     try:
         block = Block(Type=enums.BlockType(block.get('type')), Order=order, Content=block.get('content'),
                      StoreInDB=block.get('storeInDB'), Skippable=block.get('isSkippable'),
-                     Group=group, DataType=enums.DataType(block.get('dataType').replace(" ", "")))
+                     Group=group, DataType=enums.DataType[block.get('dataType').replace(" ", "")])
         return block
     except Exception as e:
         print("createBlockFromDict ERROR:", e)

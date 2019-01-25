@@ -33,7 +33,7 @@ class FileUpload extends Component {
                     groupID: this.props.options.currentGroup.id,
                     storeInDB: true,
                     isSkippable: values.isSkippable,
-                    dataCategoryID: values.dataCategoryID,
+                    dataType: "No Type",
                     content: {
                         text: values.text,
                         action: values.action,

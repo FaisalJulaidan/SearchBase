@@ -1,18 +1,20 @@
 import React, {Component} from 'react';
-import {Card, Checkbox, Form, Select, Spin} from "antd";
+import {Card, Form} from "antd";
 
-import {getInitialVariables, initActionType, onChange} from './CardTypesHelpers'
+import {getInitialVariables, initActionType} from './CardTypesHelpers'
 import {
     ActionFormItem,
     AfterMessageFormItem,
     ButtonsForm,
+    DataCategoryFormItem,
+    FileTypesFormItem,
     QuestionFormItem,
+    ShowGoToBlockFormItem,
+    ShowGoToGroupFormItem,
     SkippableFormItem
 } from './CardTypesFormItems'
 
 const FormItem = Form.Item;
-const Option = Select.Option;
-const CheckboxGroup = Checkbox.Group;
 
 class FileUpload extends Component {
 
@@ -22,8 +24,6 @@ class FileUpload extends Component {
         fileTypes: [],
         groupName: ''
     };
-
-    setStateHandler = (state) => this.setState(state);
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
         if (!err) {
@@ -75,115 +75,41 @@ class FileUpload extends Component {
         return (
             <Card style={{width: '100%'}} actions={buttons}>
                 <Form layout='horizontal'>
-                    <QuestionFormItem block={block} FormItem={FormItem}
+                    <QuestionFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
-                                      layout={{...this.props.options.layout}}/>
+                                      layout={this.props.options.layout}/>
 
-                    <FormItem label="Data Category"
-                              extra="Categorising users' responses will result in  more efficient AI processing"
-                              {...this.props.options.layout}>
-                        {
-                            getFieldDecorator('dataCategoryID', {
-                                initialValue: null || block.dataCategoryID,
-                                rules: [{
-                                    required: true,
-                                    message: "Please specify the data category",
-                                }]
-                            })(
-                                <Select placeholder="Will validate the input">
-                                    {
-                                        flowOptions.dataCategories.map((category, i) =>
-                                            <Option key={i} value={category.ID}>{category.Name}</Option>)
-                                    }
-                                </Select>
-                            )
-                        }
-                    </FormItem>
+                    <DataCategoryFormItem FormItem={FormItem} block={block}
+                                          getFieldDecorator={getFieldDecorator} flowOptions={flowOptions}
+                                          layout={this.props.options.layout}/>
 
-                    <FormItem label="File Types"
-                              {...this.props.options.layout}>
-                        {
-                            blockOptions.typesAllowed ?
-                                getFieldDecorator('fileTypes', {
-                                    initialValue: block.content.fileTypes,
-                                    rules: [{
-                                        required: true,
-                                        message: "Please select the accepted file type",
-                                    }]
-                                })(
-                                    <CheckboxGroup options={typesAllowed}
-                                                   onChange={(checkedValues) => this.setState(onChange(checkedValues))}/>
-                                )
-                                : <Spin/>
-                        }
-                    </FormItem>
-
-                    <ActionFormItem block={block} FormItem={FormItem} onSubmit={this.onSubmit}
-                                    blockOptions={blockOptions}
-                                    setStateHandler={(state) => this.setStateHandler(state)}
-                                    getFieldDecorator={getFieldDecorator}
-                                    layout={{...this.props.options.layout}}/>
-
-                    {this.state.showGoToBlock ?
-                        (<FormItem label="Go To Specific Block" {...this.props.options.layout}>
-                            {
-                                getFieldDecorator('blockToGoID',
-                                    {
-                                        initialValue: block.content.blockToGoID,
-                                        rules: [{required: true, message: "Please select your next block"}]
-                                    }
-                                )(
-                                    <Select placeholder="The next step after this block">{
-                                        allBlocks.map((block, i) =>
-                                            <Option key={i} value={block.id}>
-                                                {`${block.id}- (${block.type}) ${block.content.text ? block.content.text : ''}`}
-                                            </Option>
-                                        )
-                                    }</Select>
-                                )
-                            }
-                        </FormItem>)
-                        : null
-                    }
-
-                    {this.state.showGoToGroup ?
-                        (<FormItem label="Go To Specific Group"
-                                   extra="The selected group will start from its first block"
-                                   {...this.props.options.layout}>
-                            {
-                                getFieldDecorator('blockToGoIDGroup',
-                                    {
-                                        initialValue: this.state.groupName,
-                                        rules: [{required: true, message: "Please select your next group"}]
-                                    }
-                                )(
-                                    <Select placeholder="The next block after this block">{
-                                        allGroups.map((group, i) => {
-                                                if (group.blocks[0])
-                                                    return <Option key={i} value={group.blocks[0].id}>
-                                                        {`${group.name}`}
-                                                    </Option>;
-                                                else
-                                                    return <Option disabled key={i} value={group.name}>
-                                                        {`${group.name}`}
-                                                    </Option>
-                                            }
-                                        )
-                                    }</Select>
-                                )
-                            }
-                        </FormItem>)
-                        : null
-                    }
-
-                    <AfterMessageFormItem block={block} FormItem={FormItem}
-                                          getFieldDecorator={getFieldDecorator}
-                                          layout={{...this.props.options.layout}}/>
-
-
-                    <SkippableFormItem block={block} FormItem={FormItem}
+                    <FileTypesFormItem FormItem={FormItem} typesAllowed={typesAllowed} block={block}
+                                       setStateHandler={(state) => this.setState(state)}
                                        getFieldDecorator={getFieldDecorator}
-                                       layout={{...this.props.options.layout}}/>
+                                       layout={this.props.options.layout}/>
+
+                    <ActionFormItem FormItem={FormItem} blockOptions={blockOptions} block={block}
+                                    setStateHandler={(state) => this.setState(state)}
+                                    getFieldDecorator={getFieldDecorator}
+                                    layout={this.props.options.layout}/>
+
+                    <ShowGoToBlockFormItem FormItem={FormItem} allBlocks={allBlocks} block={block}
+                                           showGoToBlock={this.state.showGoToBlock}
+                                           getFieldDecorator={getFieldDecorator}
+                                           layout={this.props.options.layout}/>
+
+                    <ShowGoToGroupFormItem FormItem={FormItem} allGroups={allGroups}
+                                           showGoToGroup={this.state.showGoToGroup}
+                                           getFieldDecorator={getFieldDecorator}
+                                           layout={this.props.options.layout}/>
+
+                    <AfterMessageFormItem FormItem={FormItem} block={block}
+                                          getFieldDecorator={getFieldDecorator}
+                                          layout={this.props.options.layout}/>
+
+                    <SkippableFormItem FormItem={FormItem} block={block}
+                                       getFieldDecorator={getFieldDecorator}
+                                       layout={this.props.options.layout}/>
                 </Form>
             </Card>
         );

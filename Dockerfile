@@ -1,0 +1,10 @@
+FROM mysql
+
+# ROOT PASSWORD
+ENV MYSQL_ROOT_PASSWORD=root
+
+RUN usr/bin/mysql start
+RUN mysql -u root -p$MYSQL_ROOT_PASSWORD  -e "CREATE DATABASE TheSearchBase"
+
+#PORT
+EXPOSE 3306

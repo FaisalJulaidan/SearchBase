@@ -33,7 +33,7 @@ class DataType(Enum):
     # IMPORTANT: make sure when you edit or add new DataType to change the JSON schemas accordingly.
     # You know just ask Faisal Julaidan before making any changes.
     # ===============================================================================================
-    NoType = {'name': 'None', 'validation': ValidationType.Ignore.value}
+    NoType = {'name': 'No Type', 'validation': ValidationType.Ignore.value}
     Email = {'name': 'Email', 'validation': ValidationType.Email.value}
     Telephone = {'name': 'Telephone', 'validation': ValidationType.Telephone.value}
     ContactTime = {'name': 'Contact Time', 'validation': ValidationType.Email.value}

@@ -244,7 +244,7 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
             oldBlock.Order = block.get('order')
             oldBlock.Labels = block.get('labels')
             oldBlock.GroupID = block.get('groupID')
-            oldBlock.DataType = enums.DataType(block.get('dataType').replace(" ", ""))
+            oldBlock.DataType = enums.DataType[block.get('dataType')['name'].replace(" ", "")]
 
         # Save
         db.session.commit()
@@ -451,7 +451,7 @@ def createBlockFromDict(block: dict, order, group: BlockGroup):
     try:
         block = Block(Type=enums.BlockType(block.get('type')), Order=order, Content=block.get('content'),
                      StoreInDB=block.get('storeInDB'), Skippable=block.get('isSkippable'),
-                     Group=group, DataType=enums.DataType[block.get('dataType').replace(" ", "")])
+                     Group=group, DataType=enums.DataType[block.get('dataType')['name'].replace(" ", "")])
         return block
     except Exception as e:
         print("createBlockFromDict ERROR:", e)

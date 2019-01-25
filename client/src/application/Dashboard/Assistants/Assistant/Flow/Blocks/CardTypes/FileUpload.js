@@ -1,5 +1,14 @@
 import React, {Component} from 'react';
-import {Button, Card, Checkbox, Form, Input, Select, Spin} from "antd";
+import {Card, Checkbox, Form, Select, Spin} from "antd";
+
+import {getInitialVariables, initActionType, onChange} from './CardTypesHelpers'
+import {
+    ActionFormItem,
+    AfterMessageFormItem,
+    ButtonsForm,
+    QuestionFormItem,
+    SkippableFormItem
+} from './CardTypesFormItems'
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -13,6 +22,8 @@ class FileUpload extends Component {
         fileTypes: [],
         groupName: ''
     };
+
+    setStateHandler = (state) => this.setState(state);
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
         if (!err) {
@@ -46,82 +57,27 @@ class FileUpload extends Component {
 
     componentWillMount() {
         this.handleNewBlock = this.props.handleNewBlock;
-        this.handleEditBlock = this.props.handleEditBlock
+        this.handleEditBlock = this.props.handleEditBlock;
+        this.handleDeleteBlock = this.props.handleDeleteBlock;
+
+        const {allGroups, block} = getInitialVariables(this.props.options);
+        this.setState(initActionType(block, allGroups));
     }
 
-    onDelete = () => this.props.handleDeleteBlock({
-        id: this.props.options.block.id,
-        type: 'File Upload',
-    });
-
-    onCancel = () => this.handleNewBlock ? this.handleNewBlock(false) : this.handleEditBlock(false);
-
-    componentDidMount() {
-        const {allGroups} = this.props.options;
-        let block = this.props.options.block ? this.props.options.block : {content: {}};
-        if (block.content.action === "Go To Specific Block")
-            this.setState({showGoToBlock: true, showGoToGroup: false});
-        else if (block.content.action === "Go To Group") {
-            // because here we dont' have column in each block contains all the group
-            // this is a workaround to have the group name from the block id
-            this.setState({showGoToBlock: false, showGoToGroup: true});
-            const {blockToGoID} = block.content;
-            allGroups.map((group) => group.blocks[0].id === blockToGoID ? this.setState({groupName: group.name}) : null)
-        } else
-            this.setState({showGoToBlock: false, showGoToGroup: false});
-    }
-
-    onSelectAction = (action) => {
-        if (action === "Go To Specific Block")
-            this.setState({showGoToBlock: true, showGoToGroup: false});
-        else if (action === "Go To Group")
-            this.setState({showGoToBlock: false, showGoToGroup: true});
-        else
-            this.setState({showGoToBlock: false, showGoToGroup: false});
-    };
-
-    onChange = (checkedValues) => this.setState({fileTypes: checkedValues});
 
     render() {
-        const {flowOptions, allGroups, allBlocks} = this.props.options;
-        let blockOptions = {};
-        let block = this.props.options.block ? this.props.options.block : {content: {}};
-
-        // extract the correct blockType from blockTypes[]
-        for (const blockType of flowOptions.blockTypes)
-            if (blockType.name === 'File Upload')
-                blockOptions = blockType;
-
+        const {flowOptions, allGroups, allBlocks, blockOptions, block} = getInitialVariables(this.props.options, 'File Upload');
         const {getFieldDecorator} = this.props.form;
+        const {typesAllowed} = blockOptions;
 
-        const buttons = this.handleNewBlock ? [
-            <Button key="cancel" onClick={this.onCancel}>Cancel</Button>,
-            <Button key="submit" type="primary" onClick={this.onSubmit}>Add</Button>
-        ] : [
-            <Button key="delete" type="danger" onClick={this.onDelete}>
-                Delete
-            </Button>,
-            <Button key="cancel" onClick={this.onCancel}>Cancel</Button>,
-            <Button key="submit" type="primary" onClick={this.onSubmit}>Update</Button>
-        ];
+        const buttons = ButtonsForm(this.handleNewBlock, this.handleEditBlock, this.handleDeleteBlock, this.onSubmit, block);
 
-        const typesAllowed = blockOptions.typesAllowed;
         return (
             <Card style={{width: '100%'}} actions={buttons}>
                 <Form layout='horizontal'>
-                    <FormItem label="Question"
-                              extra="The above text will be shown in a bubble inside the chat"
-                              {...this.props.options.layout}>
-                        {getFieldDecorator('text', {
-                            initialValue: block.content.text,
-                            rules: [{
-                                required: true,
-                                message: "Please input question field",
-                            }],
-                        })(
-                            <Input placeholder="Ex: Please upload you cv"/>
-                        )}
-                    </FormItem>
+                    <QuestionFormItem block={block} FormItem={FormItem}
+                                      getFieldDecorator={getFieldDecorator}
+                                      layout={{...this.props.options.layout}}/>
 
                     <FormItem label="Data Category"
                               extra="Categorising users' responses will result in  more efficient AI processing"
@@ -155,32 +111,18 @@ class FileUpload extends Component {
                                         message: "Please select the accepted file type",
                                     }]
                                 })(
-                                    <CheckboxGroup options={typesAllowed} onChange={this.onChange}/>
+                                    <CheckboxGroup options={typesAllowed}
+                                                   onChange={(checkedValues) => this.setState(onChange(checkedValues))}/>
                                 )
                                 : <Spin/>
                         }
                     </FormItem>
 
-                    <FormItem label="Action"{...this.props.options.layout}>
-                        {
-                            blockOptions.actions ?
-                                getFieldDecorator('action', {
-                                    initialValue: block.content.action,
-                                    rules: [{
-                                        required: true,
-                                        message: "Please input question field",
-                                    }],
-                                })(
-                                    <Select onSelect={this.onSelectAction}
-                                            placeholder="The next step after this block">{
-                                        blockOptions.actions.map((action, i) =>
-                                            <Option key={i}
-                                                    value={action}>{action}</Option>)
-                                    }</Select>
-                                )
-                                : <Spin><Select placeholder="The next step after this block"></Select></Spin>
-                        }
-                    </FormItem>
+                    <ActionFormItem block={block} FormItem={FormItem} onSubmit={this.onSubmit}
+                                    blockOptions={blockOptions}
+                                    setStateHandler={(state) => this.setStateHandler(state)}
+                                    getFieldDecorator={getFieldDecorator}
+                                    layout={{...this.props.options.layout}}/>
 
                     {this.state.showGoToBlock ?
                         (<FormItem label="Go To Specific Block" {...this.props.options.layout}>
@@ -234,31 +176,14 @@ class FileUpload extends Component {
                         : null
                     }
 
+                    <AfterMessageFormItem block={block} FormItem={FormItem}
+                                          getFieldDecorator={getFieldDecorator}
+                                          layout={{...this.props.options.layout}}/>
 
-                    <FormItem label="After message"
-                              extra="This message will display straight after the user's response"
-                              {...this.props.options.layout}>
-                        {getFieldDecorator('afterMessage', {
-                            initialValue: block.content.afterMessage,
-                            rules: [{
-                                required: true,
-                                message: "Please input question field",
-                            }],
-                        })(
-                            <Input placeholder="Ex: Your input is recorded"/>
-                        )}
-                    </FormItem>
 
-                    <Form.Item
-                        label="Skippable?"
-                        {...this.props.options.layout}>
-                        {getFieldDecorator('isSkippable', {
-                            valuePropName: 'checked',
-                            initialValue: block.isSkippable,
-                        })(
-                            <Checkbox>Users can skip answering this question</Checkbox>
-                        )}
-                    </Form.Item>
+                    <SkippableFormItem block={block} FormItem={FormItem}
+                                       getFieldDecorator={getFieldDecorator}
+                                       layout={{...this.props.options.layout}}/>
                 </Form>
             </Card>
         );

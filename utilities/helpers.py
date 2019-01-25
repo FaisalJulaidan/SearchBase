@@ -174,7 +174,7 @@ def gen_dummy_data():
             },
             {
                 "blockID": 3,
-                "questionText": "When are you available",
+                "questionText": "When are you available?",
                 "dataType": 'Availability',
                 "input": "Only weekend days",
                 "keywords": []

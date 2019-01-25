@@ -1,5 +1,4 @@
 import React from 'react';
-import "./UserInput.less"
 import styles from "./UserInput.module.less"
 import Header from "../../../../../components/Header/Header";
 import {chatbotSessionsActions} from "../../../../../store/actions";

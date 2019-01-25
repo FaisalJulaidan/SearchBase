@@ -4,10 +4,10 @@ import {http} from "../../../../../../../helpers";
 
 import {Icon, Modal, Tabs} from 'antd';
 
-import UserInput from "./Cards/UserInput";
-import Question from "./Cards/Question";
-import FileUpload from "./Cards/FileUpload";
-import Solutions from "./Cards/Solutions";
+import UserInput from "../CardTypes/UserInput";
+import Question from "../CardTypes/Question";
+import FileUpload from "../CardTypes/FileUpload";
+import Solutions from "../CardTypes/Solutions";
 import NewDataCategoryModal from "../../../../../../../components/Modals/NewDataCategoryModal/NewDataCategoryModal";
 
 const TabPane = Tabs.TabPane;
@@ -20,7 +20,7 @@ class NewBlockModal extends Component {
             wrapperCol: {span: 14}
         },
         flowOptions: {},
-        blocks: [],
+        allBlocks: [],
         allGroups: [],
         currentGroup: null,
     };
@@ -32,7 +32,7 @@ class NewBlockModal extends Component {
 
     componentWillReceiveProps(nextProps) {
         this.setState({
-            blocks: nextProps.blocks,
+            allBlocks: nextProps.allBlocks,
             allGroups: nextProps.allGroups,
             currentGroup: nextProps.currentGroup,
         })
@@ -47,7 +47,6 @@ class NewBlockModal extends Component {
     onChangeTab = (currentTab) => this.setState({currentTab});
 
     render() {
-        console.log(this.state.flowOptions);
         return (
             <div>
                 <Modal width={800}

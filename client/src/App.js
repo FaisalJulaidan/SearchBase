@@ -1,9 +1,8 @@
 import React, {Component} from 'react';
-import {Switch, Route, withRouter, Redirect} from 'react-router-dom';
+import {Redirect, Route, Switch, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {history} from './helpers';
 import {notification} from 'antd';
-import './App.less';
 
 import {PrivateRoute} from './hoc';
 import Dashboard from "./application/Dashboard/Dashboard";

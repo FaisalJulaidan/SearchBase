@@ -3,10 +3,10 @@ import React, {Component} from 'react';
 import {http} from "../../../../../../../helpers";
 
 import {Modal} from 'antd';
-import UserInput from "./Cards/UserInput";
-import Question from "./Cards/Question";
-import FileUpload from "./Cards/FileUpload";
-import Solutions from "./Cards/Solutions";
+import UserInput from "../CardTypes/UserInput";
+import Question from "../CardTypes/Question";
+import FileUpload from "../CardTypes/FileUpload";
+import Solutions from "../CardTypes/Solutions";
 
 class EditBlockModal extends Component {
 
@@ -30,7 +30,7 @@ class EditBlockModal extends Component {
         this.setState({
             block: nextProps.block,
 
-            allBlocks: nextProps.blocks,
+            allBlocks: nextProps.allBlocks,
             allGroups: nextProps.allGroups,
             currentGroup: nextProps.currentGroup
         })
@@ -52,13 +52,17 @@ class EditBlockModal extends Component {
                    footer={null}>
 
                 {this.props.block.type === "User Input" ?
-                    <UserInput options={this.state} handleEditBlock={this.handleEditBlock}/> : null}
+                    <UserInput options={this.state} handleEditBlock={this.handleEditBlock}
+                               handleDeleteBlock={this.props.handleDeleteBlock}/> : null}
                 {this.props.block.type === "Question" ?
-                    <Question options={this.state} handleEditBlock={this.handleEditBlock}/> : null}
+                    <Question options={this.state} handleEditBlock={this.handleEditBlock}
+                              handleDeleteBlock={this.props.handleDeleteBlock}/> : null}
                 {this.props.block.type === "File Upload" ?
-                    <FileUpload options={this.state} handleEditBlock={this.handleEditBlock}/> : null}
+                    <FileUpload options={this.state} handleEditBlock={this.handleEditBlock}
+                                handleDeleteBlock={this.props.handleDeleteBlock}/> : null}
                 {this.props.block.type === "Solutions" ?
-                    <Solutions options={this.state} handleEditBlock={this.handleEditBlock}/> : null}
+                    <Solutions options={this.state} handleEditBlock={this.handleEditBlock}
+                               handleDeleteBlock={this.props.handleDeleteBlock}/> : null}
             </Modal>
         );
     }

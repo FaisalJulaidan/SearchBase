@@ -3,7 +3,6 @@ import {Form, Button, message, Tabs} from "antd";
 import {connect} from 'react-redux';
 import {isEmpty} from "lodash";
 
-import "./Profile.less"
 import styles from "./Profile.module.less"
 import ProfileDetails from "./profileComponents/ProfileDetails/ProfileDetails";
 import DataSettings from "./profileComponents/DataSettings/DataSettings";

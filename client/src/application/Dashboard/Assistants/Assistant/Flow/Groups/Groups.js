@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "./Groups.less"
 import styles from "./Groups.module.less";
 import {Avatar, Button, List, Skeleton, Spin, Modal} from "antd";
 import NewGroup from "./NewGroup/NewGroup";

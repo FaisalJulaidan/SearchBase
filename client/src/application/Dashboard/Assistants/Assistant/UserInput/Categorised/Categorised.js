@@ -1,5 +1,4 @@
 import React from 'react';
-import "./Categorised.less"
 import styles from "./Categorised.module.less"
 import { Table, Button, Modal } from 'antd';
 import moment from 'moment';

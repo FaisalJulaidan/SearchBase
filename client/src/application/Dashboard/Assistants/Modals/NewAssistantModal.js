@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "./NewAssistantModal.less";
 
 import {Button, Form, Input, Modal, Select, InputNumber, message, Switch} from 'antd';
 import {connect} from "react-redux";
@@ -40,9 +39,7 @@ class NewAssistantModal extends Component {
             this.props.hideModal();
             message.destroy();
             message.success(this.props.successMsg)
-
         }
-
     }
 
 

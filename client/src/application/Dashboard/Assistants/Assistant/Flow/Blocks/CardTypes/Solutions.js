@@ -3,41 +3,55 @@ import {Button, Card, Checkbox, Form, Input, Select, Spin} from "antd";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
-const CheckboxGroup = Checkbox.Group;
 
-class FileUpload extends Component {
+class Solutions extends Component {
 
     state = {
         showGoToBlock: false,
         showGoToGroup: false,
-        fileTypes: [],
         groupName: ''
     };
 
-    onSubmit = () => {
-        return this.props.form.validateFields((err, values) => {
-            if (!err) {
-                this.props.handleEditBlock({
-                    type: 'File Upload',
-                    groupID: this.props.options.currentGroup.id,
-                    id: this.props.options.block.id,
-                    order: this.props.options.block.order,
-                    storeInDB: values.storeInDB,
-                    isSkippable: values.isSkippable,
-                    labels: '',
-                    content: {
-                        text: values.text,
-                        action: values.action,
-                        fileTypes: this.state.fileTypes,
-                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
-                        afterMessage: values.afterMessage
-                    }
-                })
-            }
-        })
-    };
+    componentWillMount() {
+        this.handleNewBlock = this.props.handleNewBlock;
+        this.handleEditBlock = this.props.handleEditBlock
+    }
 
-    onCancel = () => this.props.handleEditBlock(false);
+    onSubmit = () => this.props.form.validateFields((err, values) => {
+        if (!err) {
+            let options = {
+                block: {
+                    type: 'Solutions',
+                    groupID: this.props.options.currentGroup.id,
+                    storeInDB: false,
+                    isSkippable: false,
+                    dataCategoryID: null,
+                    content: {
+                        showTop: Number(values.showTop),
+                        action: values.action,
+                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
+                        afterMessage: values.afterMessage,
+                    }
+                }
+            };
+
+            if (this.handleNewBlock)
+                this.handleNewBlock(options);
+            else {
+                // Edit Block
+                options.block.id = this.props.options.block.id;
+                options.block.order = this.props.options.block.order;
+                this.handleEditBlock(options);
+            }
+        }
+    });
+
+    onDelete = () => this.props.handleDeleteBlock({
+        id: this.props.options.block.id,
+        type: 'Solutions',
+    });
+
+    onCancel = () => this.handleNewBlock ? this.handleNewBlock(false) : this.handleEditBlock(false);
 
     onSelectAction = (action) => {
         if (action === "Go To Specific Block")
@@ -49,8 +63,8 @@ class FileUpload extends Component {
     };
 
     componentDidMount() {
-        const {block, allGroups} = this.props.options;
-
+        const {allGroups} = this.props.options;
+        let block = this.props.options.block ? this.props.options.block : {content: {}};
         if (block.content.action === "Go To Specific Block")
             this.setState({showGoToBlock: true, showGoToGroup: false});
         else if (block.content.action === "Go To Group") {
@@ -59,68 +73,54 @@ class FileUpload extends Component {
             this.setState({showGoToBlock: false, showGoToGroup: true});
             const {blockToGoID} = block.content;
             allGroups.map((group) => group.blocks[0].id === blockToGoID ? this.setState({groupName: group.name}) : null)
-        }
-        else
+        } else
             this.setState({showGoToBlock: false, showGoToGroup: false});
     }
 
-    onChange = (checkedValues) => this.setState({fileTypes: checkedValues});
 
     render() {
-        const {block, flowOptions, allBlocks, allGroups} = this.props.options;
+        const {flowOptions, allGroups, allBlocks} = this.props.options;
         let blockOptions = {};
-        // extract the correct blockType from blockTypes[]
+        let block = this.props.options.block ? this.props.options.block : {content: {}};
 
+        // extract the correct blockType from blockTypes[]
         for (const blockType of flowOptions.blockTypes)
-            if (blockType.name === "File Upload")
+            if (blockType.name === 'Solutions')
                 blockOptions = blockType;
+
         const {getFieldDecorator} = this.props.form;
 
-        const typesAllowed = blockOptions.typesAllowed;
+        const buttons = this.handleNewBlock ? [
+            <Button key="cancel" onClick={this.onCancel}>Cancel</Button>,
+            <Button key="submit" type="primary" onClick={this.onSubmit}>Add</Button>
+        ] : [
+            <Button key="delete" type="danger" onClick={this.onDelete}>
+                Delete
+            </Button>,
+            <Button key="cancel" onClick={this.onCancel}>Cancel</Button>,
+            <Button key="submit" type="primary" onClick={this.onSubmit}>Update</Button>
+        ];
+
         return (
-            <Card style={{width: '100%'}}
-                  actions={[
-                      <Button key="delete" type="danger" onClick={() => console.log('needs to be implement')}>
-                          Delete
-                      </Button>,
-                      <Button key="cancel" onClick={() => this.props.handleEditBlock(false)}>Cancel</Button>,
-                      <Button key="submit" type="primary" onClick={this.onSubmit}>
-                          Update
-                      </Button>]}
-            >
+            <Card style={{width: '100%'}} actions={buttons}>
                 <Form layout='horizontal'>
-                    <FormItem label="Question"
-                              extra="The above text will be shown in a bubble inside the chat"
+                    <FormItem label="Show Top Results"
+                              extra="Number of results you want to return (Best matches)"
                               {...this.props.options.layout}>
-                        {getFieldDecorator('text', {
-                            initialValue: block.content.text,
+                        {getFieldDecorator('showTop', {
+                            initialValue: block.content.showTop,
                             rules: [{
                                 required: true,
-                                message: "Please input question field",
+                                message: "Please set how many solutions to return",
                             }],
                         })(
-                            <Input placeholder="Ex: Please upload you cv"/>
+                            <Input min="1" type="number" placeholder="Ex: 5"/>
                         )}
                     </FormItem>
 
-                    <FormItem label="File Types"
-                              {...this.props.options.layout}>
-                        {
-                            blockOptions.typesAllowed ?
-                                getFieldDecorator('fileTypes', {
-                                    initialValue: block.content.fileTypes,
-                                    rules: [{
-                                        required: true,
-                                        message: "Please select the accepted file type",
-                                    }]
-                                })(
-                                    <CheckboxGroup options={typesAllowed} onChange={this.onChange}/>
-                                )
-                                : <Spin/>
-                        }
-                    </FormItem>
 
-                    <FormItem label="Action"{...this.props.options.layout}>
+                    <FormItem label="Action"
+                              {...this.props.options.layout}>
                         {
                             blockOptions.actions ?
                                 getFieldDecorator('action', {
@@ -148,7 +148,6 @@ class FileUpload extends Component {
                                     {
                                         initialValue: block.content.blockToGoID,
                                         rules: [{required: true, message: "Please select your next block"}]
-
                                     }
                                 )(
                                     <Select placeholder="The next step after this block">{
@@ -204,7 +203,7 @@ class FileUpload extends Component {
                                 message: "Please input after message field",
                             }],
                         })(
-                            <Input placeholder="Ex: Your input is recorded"/>
+                            <Input placeholder="Ex: There you go :)"/>
                         )}
                     </FormItem>
 
@@ -230,12 +229,11 @@ class FileUpload extends Component {
                                 Users' responses should be recorded</Checkbox>
                         )}
                     </Form.Item>
-
                 </Form>
             </Card>
         );
     }
 }
 
-export default Form.create()(FileUpload);
+export default Form.create()(Solutions);
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import "./Home.less"
 import styles from "./Home.module.less"
 
 class Home extends React.Component {

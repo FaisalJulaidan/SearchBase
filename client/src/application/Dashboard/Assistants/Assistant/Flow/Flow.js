@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "./Flow.less"
 
 import Groups from "./Groups/Groups";
 import Blocks from "./Blocks/Blocks";

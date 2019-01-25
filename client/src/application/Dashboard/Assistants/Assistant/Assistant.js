@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "./Assistant.less"
 import {Card, Dropdown, Icon, Menu, Switch} from 'antd';
 import {Link} from "react-router-dom";
 import AssistantSettings from "./AssistantSettings/AssistantSettings";

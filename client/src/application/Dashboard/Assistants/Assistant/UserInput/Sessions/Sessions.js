@@ -1,5 +1,4 @@
 import React from 'react';
-import "./Sessions.less"
 import styles from "./Sessions.module.less"
 import {chatbotSessionsActions} from "../../../../../../store/actions";
 import ViewsSessionModal from "./ViewSessionModal/ViewsSessionModal";

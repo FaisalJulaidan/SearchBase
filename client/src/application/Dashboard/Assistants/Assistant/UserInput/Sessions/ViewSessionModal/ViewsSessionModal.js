@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "./ViewsSessionModal.less"
 import {Button, Modal, Table} from "antd";
 import {http, alertError} from '../../../../../../../helpers';
 import saveAs from 'file-saver';

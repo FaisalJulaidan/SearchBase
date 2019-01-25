@@ -1,13 +1,12 @@
 import React, {Component} from 'react';
 
-import "./Blocks.less"
 import styles from "./Blocks.module.less";
 import {Button, Form, Modal} from "antd";
 
 import Block from "./Block/Block";
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
-import NewBlockModal from "./NewBlockModal/NewBlockModal";
-import EditBlockModal from "./EditBlockModal/EditBlockModal";
+import NewBlockModal from "./Modals/NewBlockModal";
+import EditBlockModal from "./Modals/EditBlockModal1";
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -87,13 +86,13 @@ class Blocks extends Component {
         for (const i in blocks) blocks[i].order = Number(i) + 1;
         this.setState({blocks});
         // send a request to the server
-        this.props.reorderBlocks(blocks, this.props.currentGroup.id)
+        this.props.reorderBlocks(blocks, this.props.currentGroup.id);
+        this.closeEditBlockModal()
     };
 
 
 
     render() {
-        console.log(this.state.blocks);
         return (
             <div className={styles.Panel}>
                 <div className={styles.Panel_Header}>
@@ -141,17 +140,18 @@ class Blocks extends Component {
                                handleAddBlock={this.handleAddBlock}
                                closeModal={this.closeAddBlockModal}
 
-                               blocks={this.state.blocks}
                                currentGroup={this.props.currentGroup}
+                               allBlocks={this.state.blocks}
                                allGroups={this.props.allGroups}/>
 
                 <EditBlockModal visible={this.state.editBlockVisible}
                                 handleEditBlock={this.handleEditBlock}
+                                handleDeleteBlock={this.deleteBlock}
                                 closeModal={this.closeEditBlockModal}
 
                                 block={this.state.edittedBlock}
-                                blocks={this.state.blocks}
                                 currentGroup={this.props.currentGroup}
+                                allBlocks={this.state.blocks}
                                 allGroups={this.props.allGroups}/>
             </div>
         );

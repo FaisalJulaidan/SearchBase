@@ -4,11 +4,10 @@ from typing import List
 
 from sqlalchemy import and_
 from sqlalchemy.sql import exists, func
-from enums import *
+import enums
 from config import BaseConfig
 from models import db, Callback, Assistant, Block, Plan, BlockGroup
 from utilities import json_utils, helpers
-from services import dataCategories_services
 
 bot_currentVersion = "1.0.0"
 
@@ -231,21 +230,21 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
     # After full validation of blocks' data integrity, we will update the blocks one by one.
     try:
         for block in blocks:
-            callback: Callback = isValidBlock(block, str(BlockType(block.get('type')).name))
+            callback: Callback = isValidBlock(block, str(enums.BlockType(block.get('type')).name))
             if not callback.Success:
                 return callback
 
             # Update the block
             oldBlock: Block = db.session.query(Block). \
                 filter(and_(Block.ID == block.get('id'), Assistant.ID == assistant.ID)).first()
-            oldBlock.Type = BlockType(block.get('type'))
+            oldBlock.Type = enums.BlockType(block.get('type'))
             oldBlock.Content = block.get('content')
             oldBlock.StoreInDB = block.get('storeInDB')
             oldBlock.Skippable = block.get('isSkippable')
             oldBlock.Order = block.get('order')
             oldBlock.Labels = block.get('labels')
             oldBlock.GroupID = block.get('groupID')
-            oldBlock.DataType = DataType(block.get('dataType').replace(" ", ""))
+            oldBlock.DataType = enums.DataType(block.get('dataType').replace(" ", ""))
 
         # Save
         db.session.commit()
@@ -388,7 +387,7 @@ def isValidBlock(block: dict, blockType: str):
 
         if blockType and blockID:
             msg = "the block with id '" + str(blockID) + "' doesn't follow the correct format of " \
-                  + str(BlockType(blockType).value) + " block type"
+                  + str(enums.BlockType(blockType).value) + " block type"
 
         return Callback(False, msg, exc.args[0])
     return Callback(True, "Valid block")
@@ -396,37 +395,32 @@ def isValidBlock(block: dict, blockType: str):
 
 def getOptions(industry=None) -> Callback:
 
-    callback: Callback = dataCategories_services.getAll()
-    if not callback.Success:
-        return Callback(False, 'Error in getting data categories')
-
     options =  {
         'botVersion': bot_currentVersion,
-        'types': [a.value for a in BlockType],
-        'dataCategories': helpers.getListFromSQLAlchemyList(callback.Data),
-        'userTypes': [uiv.value for uiv in UserType],
+        'types': [a.value for a in enums.BlockType],
+        'userTypes': [uiv.value for uiv in enums.UserType],
+        'dataTypes': [uiv.value for uiv in enums.DataType],
         'blockTypes': [{
-            'name': BlockType.UserInput.value,
-            'validations': [uiv.value for uiv in ValidationType],
-            'actions': [a.value for a in BlockAction],
+            'name': enums.BlockType.UserInput.value,
+            'actions': [a.value for a in enums.BlockAction],
             'alwaysStoreInDB': True
         },
             {
-                'name': BlockType.Question.value,
-                'actions': [a.value for a in BlockAction],
+                'name': enums.BlockType.Question.value,
+                'actions': [a.value for a in enums.BlockAction],
                 'alwaysStoreInDB': False
             },
             {
-                'name': BlockType.FileUpload.value,
-                'actions': [a.value for a in BlockAction],
+                'name': enums.BlockType.FileUpload.value,
+                'actions': [a.value for a in enums.BlockAction],
                 'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
                 'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH / 1000000)) + 'MB',
                 'alwaysStoreInDB': True
             },
             {
-                'name': BlockType.Solutions.value,
+                'name': enums.BlockType.Solutions.value,
                 'maxSolutions': 5,
-                'actions': [a.value for a in BlockAction],
+                'actions': [a.value for a in enums.BlockAction],
             },
         ]
     }
@@ -455,9 +449,9 @@ def getRemainingBlocksByAssistant(assistant: Assistant):
 
 def createBlockFromDict(block: dict, order, group: BlockGroup):
     try:
-        block = Block(Type=BlockType(block.get('type')), Order=order, Content=block.get('content'),
+        block = Block(Type=enums.BlockType(block.get('type')), Order=order, Content=block.get('content'),
                      StoreInDB=block.get('storeInDB'), Skippable=block.get('isSkippable'),
-                     Group=group, DataType=DataType(block.get('dataType').replace(" ", "")))
+                     Group=group, DataType=enums.DataType(block.get('dataType').replace(" ", "")))
         return block
     except Exception as e:
         print("createBlockFromDict ERROR:", e)

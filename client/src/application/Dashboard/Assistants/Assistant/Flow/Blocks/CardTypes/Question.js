@@ -35,13 +35,14 @@ class Question extends Component {
     onSubmit = () => this.props.form.validateFields(['text', 'isSkippable', 'storeInDB', 'dataType'],
         (err, values) => {
             if (!err) {
+                const {flowOptions} = getInitialVariables(this.props.options);
                 let options = {
                     block: {
                         type: 'Question',
                         groupID: this.props.options.currentGroup.id,
                         storeInDB: values.storeInDB,
                         isSkippable: values.isSkippable || false,
-                        dataType: values.dataType,
+                        dataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
                         content: {
                             text: values.text,
                             answers: this.state.answers

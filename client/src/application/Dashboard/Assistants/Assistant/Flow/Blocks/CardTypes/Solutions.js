@@ -32,13 +32,14 @@ class Solutions extends Component {
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
         if (!err) {
+            const {flowOptions} = getInitialVariables(this.props.options);
             let options = {
                 block: {
                     type: 'Solutions',
                     groupID: this.props.options.currentGroup.id,
                     storeInDB: false,
                     isSkippable: false,
-                    dataType: "No Type",
+                    dataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
                     content: {
                         showTop: Number(values.showTop),
                         action: values.action,

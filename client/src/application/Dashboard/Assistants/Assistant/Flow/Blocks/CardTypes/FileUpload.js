@@ -27,13 +27,14 @@ class FileUpload extends Component {
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
         if (!err) {
+            const {flowOptions} = getInitialVariables(this.props.options);
             let options = {
                 block: {
                     type: 'File Upload',
                     groupID: this.props.options.currentGroup.id,
                     storeInDB: true,
                     isSkippable: values.isSkippable,
-                    dataType: "No Type",
+                    dataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
                     content: {
                         text: values.text,
                         action: values.action,

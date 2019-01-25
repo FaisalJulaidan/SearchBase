@@ -6,7 +6,7 @@ import {
     ActionFormItem,
     AfterMessageFormItem,
     ButtonsForm,
-    DataCategoryFormItem,
+    DataTypeFormItem,
     FileTypesFormItem,
     QuestionFormItem,
     ShowGoToBlockFormItem,
@@ -79,9 +79,9 @@ class FileUpload extends Component {
                                       getFieldDecorator={getFieldDecorator}
                                       layout={this.props.options.layout}/>
 
-                    <DataCategoryFormItem FormItem={FormItem} block={block}
-                                          getFieldDecorator={getFieldDecorator} flowOptions={flowOptions}
-                                          layout={this.props.options.layout}/>
+                    <DataTypeFormItem FormItem={FormItem} block={block}
+                                      getFieldDecorator={getFieldDecorator} flowOptions={flowOptions}
+                                      layout={this.props.options.layout}/>
 
                     <FileTypesFormItem FormItem={FormItem} typesAllowed={typesAllowed} block={block}
                                        setStateHandler={(state) => this.setState(state)}

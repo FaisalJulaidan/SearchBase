@@ -6,7 +6,7 @@ import {
     ActionFormItem,
     AfterMessageFormItem,
     ButtonsForm,
-    DataCategoryFormItem,
+    DataTypeFormItem,
     QuestionFormItem,
     ShowGoToBlockFormItem,
     ShowGoToGroupFormItem,
@@ -122,9 +122,9 @@ class Question extends Component {
                                       getFieldDecorator={getFieldDecorator}
                                       layout={this.props.options.layout}/>
 
-                    <DataCategoryFormItem FormItem={FormItem} block={block}
-                                          getFieldDecorator={getFieldDecorator} flowOptions={flowOptions}
-                                          layout={this.props.options.layout}/>
+                    <DataTypeFormItem FormItem={FormItem} block={block}
+                                      getFieldDecorator={getFieldDecorator} flowOptions={flowOptions}
+                                      layout={this.props.options.layout}/>
 
                     <FormItem label="Answers"
                               {...this.props.options.layout}>

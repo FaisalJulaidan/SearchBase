@@ -23,13 +23,13 @@ export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block}) =
     </FormItem>
 );
 
-export const DataCategoryFormItem = ({FormItem, layout, getFieldDecorator, flowOptions, block}) => (
+export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, flowOptions, block}) => (
     <FormItem label="Data Category"
               extra="Categorising users' responses will result in  more efficient AI processing"
               {...layout}>
         {
-            getFieldDecorator('dataCategoryID', {
-                initialValue: block.dataCategoryID ? block.dataCategoryID : undefined,
+            getFieldDecorator('dataType', {
+                initialValue: block.dataType ? block.dataType : undefined,
                 rules: [{
                     required: true,
                     message: "Please specify the data category",
@@ -37,8 +37,8 @@ export const DataCategoryFormItem = ({FormItem, layout, getFieldDecorator, flowO
             })(
                 <Select placeholder="Will validate the input">
                     {
-                        flowOptions.dataCategories.map((category, i) =>
-                            <Option key={i} value={category.ID}>{category.Name}</Option>)
+                        flowOptions.dataTypes.map((type, i) =>
+                            <Option key={i} value={type.name}>{type.name}</Option>)
                     }
                 </Select>
             )

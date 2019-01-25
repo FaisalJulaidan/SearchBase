@@ -35,18 +35,18 @@ class DataType(Enum):
     # ===============================================================================================
     NoType = {'name': 'None', 'validation': None}
     Email = {'name': 'Email', 'validation': ValidationType.Email.value}
-    Telephone = {'name': 'Telephone', 'validation': ValidationType.Telephone.value},
+    Telephone = {'name': 'Telephone', 'validation': ValidationType.Telephone.value}
     ContactTime = {'name': 'Contact Time', 'validation': ValidationType.Email.value}
-    DesiredSalary = {'name': 'Desired Salary', 'validation': ValidationType.Number.value},
-    Availability = {'name': 'Availability', 'validation': None},
-    DesiredPosition = {'name': 'Desired Position', 'validation': None},
-    DesiredPositionYearsExp = {'name': 'Desired Position Years Exp', 'validation': None},
-    TopSkill = {'name': 'Top Skill', 'validation': None},
-    TopSkillYearsExp = {'name': 'Top Skill Years Exp', 'validation': None},
-    Resume = {'name': 'Resume', 'validation': None},
-    LinkdinURL = {'name': 'Linkdin URL', 'validation': ValidationType.URL.value},
-    DesiredLocation = {'name': 'Desired Location', 'validation': None},
-    EmploymentType = {'name': 'Employment Type', 'validation': None},
+    DesiredSalary = {'name': 'Desired Salary', 'validation': ValidationType.Number.value}
+    Availability = {'name': 'Availability', 'validation': None}
+    DesiredPosition = {'name': 'Desired Position', 'validation': None}
+    DesiredPositionYearsExp = {'name': 'Desired Position Years Exp', 'validation': None}
+    TopSkill = {'name': 'Top Skill', 'validation': None}
+    TopSkillYearsExp = {'name': 'Top Skill Years Exp', 'validation': None}
+    Resume = {'name': 'Resume', 'validation': None}
+    LinkdinURL = {'name': 'Linkdin URL', 'validation': ValidationType.URL.value}
+    DesiredLocation = {'name': 'Desired Location', 'validation': None}
+    EmploymentType = {'name': 'Employment Type', 'validation': None}
     DesiredHourlyRate = {'name': 'Desired Hourly Rate', 'validation': None}
 
 

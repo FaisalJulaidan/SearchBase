@@ -3,17 +3,10 @@ import styles from "./UserInput.module.less"
 import Header from "../../../../../components/Header/Header";
 import {chatbotSessionsActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
-import {Tabs} from 'antd';
 import Sessions from "./Sessions/Sessions";
-
-const TabPane = Tabs.TabPane;
 
 
 class UserInput extends React.Component {
-
-    state = {
-    };
-
 
     componentDidMount() {
         const {assistant} = this.props.location.state;
@@ -31,7 +24,6 @@ class UserInput extends React.Component {
         return (
 
             <div style={{height: '100%'}}>
-
                 <Header display={assistant.Name}/>
 
                 <div className={styles.Panel}>
@@ -42,23 +34,12 @@ class UserInput extends React.Component {
                         </div>
                     </div>
 
-                    <div className={styles.Panel_Body} style={{overflowY: "auto"}}>
-                        <Tabs defaultActiveKey={"1"}>
-                            <TabPane tab={"All Sessions"} key={"1"}>
-                                <Sessions sessions={this.props.chatbotSessions}
-                                          isLoading={this.props.isLoading}
-                                          isClearingAll={this.props.isClearingAll}
-                                          clearAllChatbotSessions={this.clearAllChatbotSessions}
-                                          assistant/>
-                            </TabPane>
-
-                            {/*<TabPane tab={"Categorised"} key={"2"}>*/}
-                                {/*<Categorised sessions={this.props.chatbotSessions}*/}
-                                             {/*isLoading={this.props.isLoading}*/}
-                                             {/*clearAllChatbotSessions={this.clearAllChatbotSessions}*/}
-                                             {/*assistant/>*/}
-                            {/*</TabPane>*/}
-                        </Tabs>
+                    <div className={styles.Panel_Body}>
+                        <Sessions sessions={this.props.chatbotSessions}
+                                  isLoading={this.props.isLoading}
+                                  isClearingAll={this.props.isClearingAll}
+                                  clearAllChatbotSessions={this.clearAllChatbotSessions}
+                                  assistant/>
                     </div>
                 </div>
             </div>

@@ -1,10 +1,12 @@
 import {Button, Checkbox, Input, Select, Spin} from "antd";
 import React from 'react';
-import {onCancel, onChange, onDelete, onSelectAction} from "./CardTypesHelpers";
+import {onCancel, onDelete, onFileTypeChange, onSelectAction} from "./CardTypesHelpers";
 
 const Option = Select.Option;
 const CheckboxGroup = Checkbox.Group;
 
+// Common Components
+////////////////////////////////////////////
 export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block}) => (
     <FormItem label="Question"
               extra="The above text will be shown in a bubble inside the chat"
@@ -44,25 +46,6 @@ export const DataCategoryFormItem = ({FormItem, layout, getFieldDecorator, flowO
     </FormItem>
 );
 
-export const FileTypesFormItem = ({FormItem, layout, getFieldDecorator, typesAllowed, block}) => (
-    <FormItem label="File Types" {...layout}>
-        {
-            typesAllowed ?
-                getFieldDecorator('fileTypes', {
-                    initialValue: block.content.fileTypes,
-                    rules: [{
-                        required: true,
-                        message: "Please select the accepted file type",
-                    }]
-                })(
-                    <CheckboxGroup options={typesAllowed}
-                                   onChange={(checkedValues) => this.setState(onChange(checkedValues))}/>
-                )
-                : <Spin/>
-        }
-    </FormItem>
-);
-
 export const SkippableFormItem = ({FormItem, layout, getFieldDecorator, block}) => (
     <FormItem label="Skippable?" {...layout}>
         {getFieldDecorator('isSkippable', {
@@ -70,6 +53,18 @@ export const SkippableFormItem = ({FormItem, layout, getFieldDecorator, block}) 
             initialValue: block.isSkippable ? block.isSkippable : undefined,
         })(
             <Checkbox>Users can skip answering this question</Checkbox>
+        )}
+    </FormItem>
+);
+
+export const StoreInDBFormItem = ({FormItem, layout, getFieldDecorator, block, blockOptions}) => (
+    <FormItem label="Store responses?" {...layout}>
+        {getFieldDecorator('storeInDB', {
+            valuePropName: 'checked',
+            initialValue: block.alwaysStoreInDB ? block.alwaysStoreInDB : blockOptions.alwaysStoreInDB,
+        })(
+            <Checkbox disabled={blockOptions.alwaysStoreInDB}>
+                Users' responses should be recorded</Checkbox>
         )}
     </FormItem>
 );
@@ -140,7 +135,7 @@ export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allB
     );
 };
 
-export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, allGroups, showGoToGroup}) => {
+export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, allGroups, showGoToGroup, groupName}) => {
     return (
         showGoToGroup ?
             (
@@ -150,7 +145,7 @@ export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, allG
                     {
                         getFieldDecorator('blockToGoIDGroup',
                             {
-                                initialValue: this.state.groupName ? this.state.groupName : undefined,
+                                initialValue: groupName ? groupName : undefined,
                                 rules: [{required: true, message: "Please select your next group"}]
                             }
                         )(
@@ -174,6 +169,8 @@ export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, allG
     );
 };
 
+// Others
+//////////////////////////////////////////////////
 export const ButtonsForm = (handleNewBlock, handleEditBlock, handleDeleteBlock, onSubmit, block) => (
     handleNewBlock ? [
         <Button key="cancel" onClick={() => onCancel(handleNewBlock, handleEditBlock)}>Cancel</Button>,
@@ -186,4 +183,23 @@ export const ButtonsForm = (handleNewBlock, handleEditBlock, handleDeleteBlock, 
         <Button key="cancel" onClick={() => onCancel(handleNewBlock, handleEditBlock)}>Cancel</Button>,
         <Button key="submit" type="primary" onClick={onSubmit}>Update</Button>
     ]
+);
+
+export const FileTypesFormItem = ({FormItem, layout, getFieldDecorator, typesAllowed, block}) => (
+    <FormItem label="File Types" {...layout}>
+        {
+            typesAllowed ?
+                getFieldDecorator('fileTypes', {
+                    initialValue: block.content.fileTypes,
+                    rules: [{
+                        required: true,
+                        message: "Please select the accepted file type",
+                    }]
+                })(
+                    <CheckboxGroup options={typesAllowed}
+                                   onChange={(checkedValues) => this.setState(onFileTypeChange(checkedValues))}/>
+                )
+                : <Spin/>
+        }
+    </FormItem>
 );

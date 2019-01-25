@@ -30,7 +30,7 @@ export const onSelectAction = (action) => {
         return {showGoToBlock: false, showGoToGroup: false};
 };
 
-export const onChange = (checkedValues) => {
+export const onFileTypeChange = (checkedValues) => {
     return {fileTypes: checkedValues}
 };
 

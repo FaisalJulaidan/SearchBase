@@ -98,7 +98,7 @@ class FileUpload extends Component {
                                            getFieldDecorator={getFieldDecorator}
                                            layout={this.props.options.layout}/>
 
-                    <ShowGoToGroupFormItem FormItem={FormItem} allGroups={allGroups}
+                    <ShowGoToGroupFormItem FormItem={FormItem} allGroups={allGroups} groupName={this.state.groupName}
                                            showGoToGroup={this.state.showGoToGroup}
                                            getFieldDecorator={getFieldDecorator}
                                            layout={this.props.options.layout}/>

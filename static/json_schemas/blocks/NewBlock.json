@@ -8,12 +8,12 @@
       "properties": {
         "type": { "enum": [ "Question", "User Input", "File Upload", "Solutions"] },
         "groupID": {"type": "integer"},
-        "dataCategoryID": {"type": ["integer", "null"]},
+        "dataType": {"enum": ["None", "Email", "Telephone", "Contact Time", "Desired Salary", "Availability", "Desired Position", "Desired Position Years Exp", "Top Skill", "Top Skill Years Exp", "Resume", "Linkdin URL", "Desired Location", "Employment Type", "Desired Hourly Rate"]},
         "storeInDB": { "type": "boolean" },
         "isSkippable": { "type": "boolean" },
         "content": { "type": "object" }
       },
-      "required": ["type","groupID", "dataCategoryID", "storeInDB", "content"],
+      "required": ["type","groupID", "dataType", "storeInDB", "content"],
       "additionalProperties": false
     }
   },

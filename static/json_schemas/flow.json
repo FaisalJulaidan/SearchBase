@@ -8,14 +8,14 @@
       "properties":{
         "id": {"type": "integer"},
         "groupID": {"type": "integer"},
-        "dataCategoryID": {"type": ["integer", "null"]},
+        "dataType": {"enum": ["None", "Email", "Telephone", "Contact Time", "Desired Salary", "Availability", "Desired Position", "Desired Position Years Exp", "Top Skill", "Top Skill Years Exp", "Resume", "Linkdin URL", "Desired Location", "Employment Type", "Desired Hourly Rate"]},
         "type": {"enum": ["Question", "User Input", "File Upload", "Solutions", "End Chat"]},
         "order": {"type": "integer", "minimum": 1},
         "storeInDB": {"type": "boolean"},
         "isSkippable": { "type": "boolean" },
         "content": {"type": "object"}
       },
-      "required": ["id", "groupID", "dataCategoryID", "type", "order", "storeInDB", "isSkippable", "content"],
+      "required": ["id", "groupID", "dataType", "type", "order", "storeInDB", "isSkippable", "content"],
       "additionalProperties": false
       }
     }

@@ -1,14 +1,11 @@
 from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Enum, event, types, String
+from sqlalchemy import Enum, event, types
 from sqlalchemy.ext import mutable
 from datetime import datetime
-import enum
 import json
-from config import BaseConfig
-
-from sqlalchemy_utils import EncryptedType, PasswordType, force_auto_coercion
-from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
+import enums
+from sqlalchemy_utils import PasswordType
 
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
@@ -189,24 +186,6 @@ class Statistics(db.Model):
         return '<Statistics {}>'.format(self.Name)
 
 
-class ChatbotSession(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Data = db.Column(MagicJSON, nullable=False)
-    FilePath = db.Column(db.String(250), nullable=True, default=None)
-    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
-    TimeSpent = db.Column(db.Integer, nullable=False, default=0)
-    SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
-    QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
-
-    # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')
-
-    def __repr__(self):
-        return '<ChatbotSession {}>'.format(self.Data)
-
-
 class Plan(db.Model):
 
     ID = db.Column(db.String(25), primary_key=True, unique=True)
@@ -254,29 +233,24 @@ class UserSettings(db.Model):
         return '<UserSettings {}>'.format(self.ID)
 
 
-# ============= Block Stuff ===================
+class ChatbotSession(db.Model):
 
-class ValidationType(enum.Enum):
-
-    Ignore = 'Ignore'
-    Email = 'Email'
-    Telephone = 'Telephone'
-    FullName = 'Full Name'
-
-
-class BlockType(enum.Enum):
-    UserInput = 'User Input'
-    Question = 'Question'
-    FileUpload = 'File Upload'
-    Solutions = 'Solutions'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Data = db.Column(MagicJSON, nullable=False)
+    FilePath = db.Column(db.String(250), nullable=True, default=None)
+    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+    TimeSpent = db.Column(db.Integer, nullable=False, default=0)
+    SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
+    QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
+    UserType = db.Column(Enum(enums.UserType), nullable=False)
 
 
-class BlockAction(enum.Enum):
+# Relationships:
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')
 
-    GoToNextBlock = 'Go To Next Block'
-    GoToSpecificBlock = 'Go To Specific Block'
-    GoToGroup = 'Go To Group'
-    EndChat = 'End Chat'
+    def __repr__(self):
+        return '<ChatbotSession {}>'.format(self.Data)
 
 
 class BlockGroup(db.Model):
@@ -296,22 +270,23 @@ class BlockGroup(db.Model):
     def __repr__(self):
         return '<BlockGroup {}>'.format(self.Name)
 
-class DataCategory(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Name = db.Column(db.String(64),nullable=False)
-    Industry = db.Column(db.String(64),nullable=False)
-
-    # Relationships:
-    Blocks = db.relationship('Block', back_populates='DataCategory', order_by='Block.Order', cascade="all, delete, delete-orphan")
-
-    def __repr__(self):
-        return '<DataCategory {}>'.format(self.Name)
+# class DataCategory(db.Model):
+#
+#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+#     Name = db.Column(db.String(64),nullable=False)
+#     Industry = db.Column(db.String(64),nullable=False)
+#
+#     # Relationships:
+#     Blocks = db.relationship('Block', back_populates='DataCategory', order_by='Block.Order', cascade="all, delete, delete-orphan")
+#
+#     def __repr__(self):
+#         return '<DataCategory {}>'.format(self.Name)
 
 class Block(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Type = db.Column(Enum(BlockType), nullable=False)
+    Type = db.Column(Enum(enums.BlockType), nullable=False)
+    DataType = db.Column(Enum(enums.DataType), nullable=False)
     Order = db.Column(db.Integer, nullable=False)
     Content = db.Column(MagicJSON, nullable=False)
     StoreInDB = db.Column(db.Boolean(), nullable=False, default=True)
@@ -320,12 +295,11 @@ class Block(db.Model):
     # Relationships:
     GroupID = db.Column(db.Integer, db.ForeignKey('block_group.ID', ondelete='cascade'), nullable=False)
     Group = db.relationship('BlockGroup', back_populates='Blocks')
+    #
+    # DataCategoryID = db.Column(db.Integer, db.ForeignKey('data_category.ID', ondelete='SET NULL'))
+    # DataCategory = db.relationship('DataCategory', back_populates='Blocks')
 
-    DataCategoryID = db.Column(db.Integer, db.ForeignKey('data_category.ID', ondelete='SET NULL'))
-    DataCategory = db.relationship('DataCategory', back_populates='Blocks')
-
-
-# Labels = db.relationship('BlockLabel', back_populates='Blocks', secondary=BlocksLabels)
+    # Labels = db.relationship('BlockLabel', back_populates='Blocks', secondary=BlocksLabels)
 
     # Constraints:
     # __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)

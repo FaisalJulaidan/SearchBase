@@ -78,7 +78,7 @@ class ViewsSessionModal extends Component {
                 ]}>
                 {this.props.record ? (
                     <Table columns={this.columns}
-                           dataSource={record.Data.collectedInformation}
+                           dataSource={record.Data.collectedData}
                            size='middle'
                            pagination={false}
                     />

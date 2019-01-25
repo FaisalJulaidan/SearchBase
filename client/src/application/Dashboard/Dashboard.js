@@ -173,9 +173,9 @@ class Dashboard extends Component {
                         </Switch>
                     </Content>
 
-                    <Footer style={{textAlign: 'center', padding: 10}}>
-                        Copyright TheSearchBase Limited 2019. All rights reserved.
-                    </Footer>
+                    {/*<Footer style={{textAlign: 'center', padding: 10}}>*/}
+                        {/*Copyright TheSearchBase Limited 2019. All rights reserved.*/}
+                    {/*</Footer>*/}
                 </Layout>
             </Layout>
         );

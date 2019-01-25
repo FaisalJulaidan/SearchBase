@@ -1,8 +1,9 @@
 from flask import Blueprint, request, send_from_directory
-from services import chatbotSession_services, assistant_services
+from services import chatbotSession_services, assistant_services, dataCategories_services
 from models import Callback, ChatbotSession, Assistant
 from utilities import helpers
 from config import BaseConfig
+from enums import UserType
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 chatbotSession_router: Blueprint = Blueprint('userInput_router', __name__ , template_folder="../../templates")
@@ -26,15 +27,18 @@ def chatbotSession(assistantID):
         return helpers.jsonResponse(False, 401, "Unauthorised!")
 
     #############
-    callback: Callback = Callback(False, 'Error!', None)
     # Get the assistant's user inputs/chatbot sessions
     if request.method == "GET":
-        callback: Callback = chatbotSession_services.getByAssistantID(assistantID)
+        s_callback: Callback = chatbotSession_services.getByAssistantID(assistantID)
+
         # Return response
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
-        return helpers.jsonResponse(True, 200, callback.Message, {'data': helpers.getListFromSQLAlchemyList(callback.Data),
-                                                                  'filesPath': BaseConfig.USER_FILES})
+        if not s_callback.Success:
+            return helpers.jsonResponse(False, 400, "Error in retrieving sessions.")
+        return helpers.jsonResponse(True, 200, s_callback.Message,
+                                    {'sessionsList': s_callback.Data,
+                                     'userTypes': [uiv.value for uiv in UserType],
+                                     'filesPath': BaseConfig.USER_FILES
+                                     })
 
 
     # Clear all user inputs/chatbot sessions

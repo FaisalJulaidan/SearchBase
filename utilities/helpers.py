@@ -1,8 +1,7 @@
-from flask import redirect, url_for, session, render_template, json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solution, ChatbotSession,\
-    BlockGroup, DataCategory
-from services import assistant_services, user_services
-from datetime import datetime
+from flask import json, after_this_request, request
+from models import db, Role, Company, Assistant, Plan, Block, ChatbotSession, BlockGroup
+from services import user_services
+from datetime import datetime, timedelta
 from sqlalchemy import inspect
 from hashids import Hashids
 from config import BaseConfig
@@ -11,17 +10,19 @@ import re
 from io import BytesIO
 import gzip
 import functools
+import enums
 
 
+# ID Hasher
+# IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
-
-
 def encrypt_id(id):
     return hashids.encrypt(id)
 
 
 def decrypt_id(id):
     return hashids.decrypt(id)
+
 
 
 # Generates dummy data for testing
@@ -72,18 +73,20 @@ def gen_dummy_data():
     #    ],
     #    "text": "Do you smoke?",
     #  }))
-    db.session.add(Block(Type=BlockType.UserInput, Order=1, StoreInDB=True, Group=reader_a_blocksGroup, Content={
+
+    db.session.add(Block(Type=enums.BlockType.UserInput, Order=1, StoreInDB=True,
+                         DataType=enums.DataType.Availability, Group=reader_a_blocksGroup, Content={
         "action": "Go To Next Block",
         "text": "What's your email?",
         "blockToGoID": None,
-        "validation": "Email",
         "afterMessage": 'Your input is being processed...'
     }))
-    db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Group=reader_a_blocksGroup, Content={
+
+    db.session.add(Block(Type=enums.BlockType.UserInput, Order=2, StoreInDB=True,
+                         Group=reader_a_blocksGroup, DataType=enums.DataType.Availability, Content={
         "action": "Go To Next Block",
         "text": "Give me some input",
         "blockToGoID": None,
-        "validation": "Ignore",
         "afterMessage": 'Your input is being processed...'
     }))
 
@@ -105,7 +108,8 @@ def gen_dummy_data():
     #    "blockToGoID": 0
     #}))
 
-    db.session.add(Block(Type=BlockType.Solutions, Order=3, StoreInDB=True, Group=reader_a_blocksGroup, Content={
+    db.session.add(Block(Type=enums.BlockType.Solutions, Order=3, StoreInDB=True, DataType=enums.DataType.NoType,
+                         Group=reader_a_blocksGroup, Content={
         "showTop": 5,
         "afterMessage": 'DONE!!!!',
         "action": "End Chat",
@@ -153,18 +157,30 @@ def gen_dummy_data():
 
     # Chatbot Sessions
     data = {
-        "collectedInformation": [
+        "collectedData": [
             {
                 "blockID": 1,
                 "questionText": "What is your email?",
-                "dataCategoryID": None,
+                "dataType": 'Email',
                 "input": "faisal@gmail.com",
                 "keywords": ['faisal', 'developer', 'email']
             }
         ]
     }
     db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now(),
-                                  TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3, Assistant=reader_a))
+                                  TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
+                                  UserType=enums.UserType.Candidate, Assistant=reader_a))
+
+    db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now() - timedelta(days=10),
+                                  TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
+                                  UserType=enums.UserType.Client,Assistant=reader_a))
+
+    # add chatbot session in bulk
+    for i in range(50):
+        db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now() - timedelta(days=i),
+                                      TimeSpent=i+40, SolutionsReturned=i+3, QuestionsAnswered=i+4,
+                                      UserType=enums.UserType.Candidate, Assistant=reader_a))
+
 
     # will save changes as well
     seed()
@@ -190,10 +206,6 @@ def seed():
                         InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
-    # Data Categories
-    db.session.add(DataCategory(Name='General', Industry='All'))
-    db.session.add(DataCategory(Name='Job Titles', Industry='Recruitment'))
-    db.session.add(DataCategory(Name='CVs', Industry='Recruitment'))
 
     db.session.commit()
 

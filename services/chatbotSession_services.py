@@ -3,26 +3,35 @@ from utilities import helpers
 from sqlalchemy.sql import and_
 
 
+# ----- Getters ----- #
 def getByAssistantID(assistantID):
     try:
-        result = db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID).all()
-        return Callback(True, "User inputs retrieved successfully.", result)
+        sessions= db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID).all()
+        if not sessions: raise Exception
+
+        data = __chatbotSessionJsonList(sessions) # will convert to json and solve Enums issue
+        return Callback(True, "User inputs retrieved successfully.", data)
 
     except Exception as exc:
-        print("userInput_services.getByAssistantID() Error: ", exc)
+        print("chatbotSession_services.getByAssistantID() Error: ", exc)
         return Callback(False, 'Could not retrieve the data.')
+
 
 def getByID(id, assistant):
     try:
-        result = db.session.query(ChatbotSession)\
+        session = db.session.query(ChatbotSession)\
             .filter(and_(ChatbotSession.AssistantID == assistant.ID, ChatbotSession.ID == id))\
             .first()
-        return Callback(True, "User input retrieved successfully.", result)
+        if not session: raise Exception
+        return Callback(True, "User input retrieved successfully.", __chatbotSessionJson(session))
 
     except Exception as exc:
         print("userInput_services.getByID() Error: ", exc)
         return Callback(False, 'Could not retrieve the data.')
 
+
+
+# ----- Filters ----- #
 def filterForContainEmails(records):
     try:
         result = []
@@ -41,6 +50,8 @@ def filterForContainEmails(records):
 
         return Callback(False, 'Could not filter the data.')
 
+
+# ----- Deletions ----- #
 def deleteByID(id):
     try:
         db.session.query(ChatbotSession).filter(ChatbotSession.ID == id).delete()
@@ -64,3 +75,35 @@ def deleteAll(assistantID):
         return Callback(False, 'Records could not be removed.')
     # finally:
        # db.session.close()
+
+
+# ----- Extras ----- #
+def __chatbotSessionJson(session):
+    try:
+        data = {'ID': session.ID, 'Data': session.Data, 'FilePath': session.FilePath,
+                     'DateTime': session.DateTime, 'TimeSpent': session.TimeSpent,
+                     'SolutionsReturned': session.SolutionsReturned,
+                     'QuestionsAnswered': session.QuestionsAnswered,
+                     'AssistantID': session.AssistantID}
+        return data
+    except Exception as e:
+        print(" __chatbotSessionJson ERROR:", e)
+        db.session.rollback()
+        raise Exception('Error: __chatbotSessionJson')
+
+
+def __chatbotSessionJsonList(sessions):
+    try:
+        data= []
+        for session in sessions:
+            data.append({'ID': session.ID, 'Data': session.Data, 'FilePath': session.FilePath,
+                         'DateTime': session.DateTime, 'TimeSpent': session.TimeSpent,
+                         'SolutionsReturned': session.SolutionsReturned,
+                         'QuestionsAnswered': session.QuestionsAnswered,
+                         'AssistantID': session.AssistantID})
+        return data
+    except Exception as e:
+        print(" __chatbotSessionJsonList ERROR:", e)
+        db.session.rollback()
+        raise Exception('Error: __chatbotSessionJsonList')
+

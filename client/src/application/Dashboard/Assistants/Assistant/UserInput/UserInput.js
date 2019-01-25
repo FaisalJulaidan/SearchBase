@@ -48,15 +48,18 @@ class UserInput extends React.Component {
                         <Tabs defaultActiveKey={"1"}>
                             <TabPane tab={"All Sessions"} key={"1"}>
                                 <Sessions sessions={this.props.chatbotSessions}
+                                          isLoading={this.props.isLoading}
+                                          isClearingAll={this.props.isClearingAll}
                                           clearAllChatbotSessions={this.clearAllChatbotSessions}
                                           assistant/>
                             </TabPane>
 
-                            <TabPane tab={"Categorised"} key={"2"}>
-                                <Categorised sessions={this.props.chatbotSessions}
-                                          clearAllChatbotSessions={this.clearAllChatbotSessions}
-                                          assistant/>
-                            </TabPane>
+                            {/*<TabPane tab={"Categorised"} key={"2"}>*/}
+                                {/*<Categorised sessions={this.props.chatbotSessions}*/}
+                                             {/*isLoading={this.props.isLoading}*/}
+                                             {/*clearAllChatbotSessions={this.clearAllChatbotSessions}*/}
+                                             {/*assistant/>*/}
+                            {/*</TabPane>*/}
                         </Tabs>
                     </div>
                 </div>

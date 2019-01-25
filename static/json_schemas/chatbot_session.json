@@ -3,16 +3,16 @@
   "title": "chatbot session schema",
   "type": "object",
   "properties": {
-    "collectedInformation": {"type": "array", "items": {
+    "collectedData": {"type": "array", "items": {
       "type": "object",
       "properties":{
         "blockID": {"type": "integer"},
         "questionText": {"type": "string"},
-        "dataCategoryID": {"type": ["integer", "null"]},
+        "dataType": {"enum": ["None", "Email", "Telephone", "Contact Time", "Desired Salary", "Availability", "Desired Position", "Desired Position Years Exp", "Top Skill", "Top Skill Years Exp", "Resume", "Linkdin URL", "Desired Location", "Employment Type", "Desired Hourly Rate"]},
         "input": {"type": "string"},
         "keywords": {"type": ["array","string"], "items": {"type": ["string"]}}
         },
-      "required": ["blockID", "questionText", "input", "keywords"],
+      "required": ["blockID", "questionText", "dataType", "input", "keywords"],
       "additionalProperties": false
       }
     },
@@ -20,6 +20,6 @@
     "showTop": {"type": "integer"},
     "solutionsReturned": {"type": "integer"}
   },
-  "required": ["collectedInformation", "keywords", "showTop", "solutionsReturned"],
+  "required": ["collectedData", "keywords", "showTop", "solutionsReturned"],
   "additionalProperties": false
 }

@@ -15,10 +15,16 @@ class Categorised extends React.Component {
     };
 
     columns = [{
-        // title: '#',
-        // dataIndex: '#',
-        // key: '#',
-        // render: (text, record, index) => (<p>{index+1}</p>),
+        title: '#',
+        dataIndex: '#',
+        key: '#',
+        render: (text, record, index) => (<p>{index+1}</p>),
+    },{
+        title: ' Session ID',
+        dataIndex: 'ID',
+        key: 'ID',
+        sorter: (a, b) => a.ID - b.ID,
+        render: (text, record) => (<p>{record.ID}</p>),
     }];
 
 
@@ -28,16 +34,15 @@ class Categorised extends React.Component {
 
 
     render() {
-        console.log(this.props.sessions);
+        const {sessions} = this.props;
         return (
 
             <div style={{height: '100%'}}>
-                Table
-                {/*<Table columns={this.columns}*/}
-                       {/*dataSource={this.props.sessions.data}*/}
-                       {/*loading={this.props.isLoading}*/}
-                       {/*size='middle'*/}
-                {/*/>*/}
+                <Table columns={this.columns}
+                       dataSource={sessions.sessionsList ? sessions.sessionsList : null}
+                       loading={this.props.isLoading}
+                       size='middle'
+                />
 
 
             </div>

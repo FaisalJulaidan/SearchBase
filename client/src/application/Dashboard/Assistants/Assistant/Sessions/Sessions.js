@@ -1,11 +1,11 @@
 import React from 'react';
 import styles from "./Sessions.module.less"
-import {chatbotSessionsActions} from "../../../../../../store/actions";
 import ViewsModal from "./ViewModal/ViewsModal";
 import { Table, Button, Modal, Tag } from 'antd';
 import moment from 'moment';
-import {alertError, http} from "../../../../../../helpers";
-import saveAs from "file-saver";
+import {chatbotSessionsActions} from "../../../../../store/actions";
+import connect from "react-redux/es/connect/connect";
+import Header from "../../../../../components/Header/Header";
 
 const confirm = Modal.confirm;
 
@@ -16,7 +16,21 @@ class Sessions extends React.Component {
     state = {
         filteredInfo: null,
         sortedInfo: null,
+        selectedSession: null,
+        viewModal: false
     };
+
+
+    componentDidMount() {
+        const {assistant} = this.props.location.state;
+        this.props.dispatch(chatbotSessionsActions.fetchChatbotSessions(assistant.ID))
+    }
+
+    clearAllChatbotSessions = () => {
+        const {assistant} = this.props.location.state;
+        this.props.dispatch(chatbotSessionsActions.clearAllChatbotSessions(assistant.ID))
+    };
+
 
     handleFilter = (pagination, filters, sorter) => {
         console.log('Various parameters', pagination, filters, sorter);
@@ -25,9 +39,6 @@ class Sessions extends React.Component {
             sortedInfo: sorter,
         });
     };
-
-
-
 
 
     closeViewModal = () => {
@@ -46,24 +57,7 @@ class Sessions extends React.Component {
         });
     };
 
-    downloadFile = (e) => {
-        // Get file name by index. indexes stored in each button corresponds to filenames stored in the state
-        const fileName = this.state.fileNames[e.target.getAttribute('data-index')];
-        if (!fileName){
-            alertError("File Error", "Sorry, but file doesn't exist!");
-            return;
-        }
 
-        http({
-            url: `/assistant/${this.props.assistant.ID}/userinput/${fileName}`,
-            method: 'GET',
-            responseType: 'blob', // important
-        }).then((response) => {
-            saveAs(new Blob([response.data]), fileName);
-        }).catch(error => {
-            alertError("File Error", "Sorry, cannot download this file!")
-        });
-    };
 
     // Nested table that has all the answered questions per session
     expandedRowRender = (record, index, indent, expanded) => {
@@ -108,10 +102,12 @@ class Sessions extends React.Component {
 
 
     render() {
+        const {assistant} = this.props.location.state;
         const {sessions} = this.props;
         let { sortedInfo, filteredInfo } = this.state;
         sortedInfo = sortedInfo || {};
         filteredInfo = filteredInfo || {};
+
         const columns = [{
             title: '#',
             dataIndex: '#',
@@ -188,34 +184,52 @@ class Sessions extends React.Component {
 
 
         return (
-
             <div style={{height: '100%'}}>
+                <Header display={assistant.Name}/>
+                <div className={styles.Panel}>
+                    <div className={styles.Panel_Header}>
+                        <div>
+                            <h3>{assistant.Name}: User Inputs</h3>
+                            <p>Here you can find all the responses to your chatbot</p>
+                        </div>
+                    </div>
 
+                    <div className={styles.Panel_Body}>
+                        <Button className={styles.ClearAllBtn} type="primary" icon="delete"
+                                onClick={this.showConfirmForClearing} loading={this.props.isClearingAll}>
+                            Clear All
+                        </Button>
 
-                <Button className={styles.ClearAllBtn} type="primary" icon="delete"
-                        onClick={this.showConfirmForClearing} loading={this.props.isClearingAll}>
-                    Clear All
-                </Button>
+                        <Table columns={columns}
+                               dataSource={sessions.sessionsList ? sessions.sessionsList : null}
+                               onChange={this.handleFilter}
+                               loading={this.props.isLoading}
+                            // expandedRowRender={this.expandedRowRender}
+                               size='middle'
+                        />
 
-                <Table columns={columns}
-                       dataSource={sessions.sessionsList ? sessions.sessionsList : null}
-                       onChange={this.handleFilter}
-                       loading={this.props.isLoading}
-                       // expandedRowRender={this.expandedRowRender}
-                       size='middle'
-                />
-
-
-                <ViewsModal visible={this.state.viewModal}
-                            closeViewModal={this.closeViewModal}
-                            filesPath={this.props.sessions.filesPath}
-                            dataTypes={this.props.sessions.dataTypes}
-                            session={this.state.selectedSession}
-                            assistant={this.props.assistant}
-                />
+                        <ViewsModal visible={this.state.viewModal}
+                                    closeViewModal={this.closeViewModal}
+                                    filesPath={sessions.filesPath}
+                                    dataTypes={sessions.dataTypes}
+                                    session={this.state.selectedSession}
+                                    assistant={assistant}
+                        />
+                    </div>
+                </div>
             </div>
         );
     }
 }
 
-export default Sessions;
+const mapStateToProps = state =>  {
+    const {chatbotSessions} = state;
+    return {
+        sessions: chatbotSessions.chatbotSessions,
+        isLoading: chatbotSessions.isLoading,
+        errorMsg: chatbotSessions.errorMsg,
+
+        isClearingAll: chatbotSessions.isClearingAll
+    };
+};
+export default connect(mapStateToProps)(Sessions);

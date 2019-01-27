@@ -10,7 +10,7 @@ import Flow from "./Assistants/Assistant/Flow/Flow";
 import Profile from "./Profile/Profile";
 import Documentation from "./Documentation/Documentation";
 import Integration from "./Assistants/Assistant/Integration/Integration";
-import UserInput from "./Assistants/Assistant/UserInput/UserInput";
+import Sessions from "./Assistants/Assistant/Sessions/Sessions";
 import Solutions from "./Assistants/Assistant/Solutions/Solutions";
 import Home from "./Home/Home";
 import Analytics from "./Assistants/Assistant/Analytics/Analytics";
@@ -163,7 +163,7 @@ class Dashboard extends Component {
                         <Switch>
                             <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
                             <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
-                            <Route path={`${match.path}/assistants/:id/userInput`} component={UserInput}/>
+                            <Route path={`${match.path}/assistants/:id/sessions`} component={Sessions}/>
                             <Route path={`${match.path}/assistants/:id/solutions`} component={Solutions}/>
                             <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>

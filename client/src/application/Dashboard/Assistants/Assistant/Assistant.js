@@ -18,7 +18,7 @@ const menu = (assistant) => (
         </Menu.Item>
         <Menu.Item key="2">
             <Link to={{
-                      pathname: `assistants/${assistant.ID}/userInput`,
+                      pathname: `assistants/${assistant.ID}/sessions`,
                       state: {assistant: assistant}
                   }}>
                 <Icon type="code"/> User Input

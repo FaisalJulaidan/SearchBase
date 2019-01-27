@@ -1,13 +1,16 @@
 from models import db, Callback, ChatbotSession
 from utilities import helpers
 from typing import List
+from sqlalchemy.sql import desc
+
 from sqlalchemy.sql import and_
 
 
 # ----- Getters ----- #
-def getByAssistantID(assistantID):
+def getAllByAssistantID(assistantID):
     try:
-        sessions= db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID).all()
+        sessions= db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID) \
+            .order_by(desc(ChatbotSession.DateTime)).all()
         if not sessions: raise Exception
 
         data = chatbotSessionDictList(sessions) # will convert to json and solve Enums issue
@@ -24,7 +27,7 @@ def getByID(id, assistant):
             .filter(and_(ChatbotSession.AssistantID == assistant.ID, ChatbotSession.ID == id))\
             .first()
         if not session: raise Exception
-        return Callback(True, "User input retrieved successfully.", chatbotSessionDict(session))
+        return Callback(True, "User input retrieved successfully.", session)
 
     except Exception as exc:
         print("userInput_services.getByID() Error: ", exc)
@@ -79,15 +82,6 @@ def deleteAll(assistantID):
 
 
 # ----- Extras ----- #
-
-
-def chatbotSessionDict(session: ChatbotSession):
-    try:
-        return createDictFromSession(session)
-    except Exception as e:
-        print(" __chatbotSessionJson ERROR:", e)
-        db.session.rollback()
-        raise Exception('Error: __chatbotSessionJson')
 
 
 def chatbotSessionDictList(sessions: List[ChatbotSession]):

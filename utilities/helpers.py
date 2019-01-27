@@ -45,7 +45,8 @@ def gen_dummy_data():
     helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
 
     ## Create Blocks
-    #db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Group=reader_a_blocksGroup, Content={
+    #db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Skippable=False,
+    # Group=reader_a_blocksGroup, Content={
     #    "answers": [
     #      {
     #        "action": "Go To Next Block",
@@ -74,47 +75,56 @@ def gen_dummy_data():
     #    "text": "Do you smoke?",
     #  }))
 
-    db.session.add(Block(Type=enums.BlockType.UserInput, Order=1, StoreInDB=True,
-                         DataType=enums.DataType.Availability, Group=reader_a_blocksGroup, Content={
-        "action": "Go To Next Block",
-        "text": "What's your email?",
-        "blockToGoID": None,
-        "afterMessage": 'Your input is being processed...'
+    # db.session.add(Block(Type=enums.BlockType.UserInput, Order=1, StoreInDB=True,
+    #                      DataType=enums.DataType.Email, Group=reader_a_blocksGroup, Content={
+    #     "action": "Go To Next Block",
+    #     "text": "What's your email?",
+    #     "blockToGoID": None,
+    #     "afterMessage": 'Your input is being processed...'
+    # }))
+    #
+    # db.session.add(Block(Type=enums.BlockType.UserInput, Order=1, StoreInDB=True,
+    #                      Group=reader_a_blocksGroup, DataType=enums.DataType.Resume, Content={
+    #     "action": "Go To Next Block",
+    #     "text": "Give me some input",
+    #     "blockToGoID": None,
+    #     "afterMessage": 'Your input is being processed...'
+    # }))
+
+    db.session.add(Block(Type=enums.BlockType.FileUpload, Order=2, StoreInDB=True, Skippable=True,
+                         DataType=enums.DataType.Resume, Group=reader_a_blocksGroup, Content={
+       "action": "Go To Next Block",
+       "fileTypes": [
+       "doc",
+       "pdf",
+       "docx",
+       ],
+       "text": "Upload your CV",
+       "blockToGoID": None,
+       "afterMessage": 'File is being uploaded...'
     }))
 
-    db.session.add(Block(Type=enums.BlockType.UserInput, Order=2, StoreInDB=True,
-                         Group=reader_a_blocksGroup, DataType=enums.DataType.Availability, Content={
-        "action": "Go To Next Block",
-        "text": "Give me some input",
-        "blockToGoID": None,
-        "afterMessage": 'Your input is being processed...'
-    }))
+    # db.session.add(Block(Type=enums.BlockType.FileUpload, Order=2, StoreInDB=True,
+    #                      DataType=enums.DataType.Resume, Group=reader_a_blocksGroup, Content={
+    #         "action": "Go To Next Block",
+    #         "fileTypes": [
+    #             "doc",
+    #             "pdf",
+    #             "docx",
+    #         ],
+    #         "text": "Upload your CV 2",
+    #         "blockToGoID": None,
+    #         "afterMessage": 'File is being uploaded...'
+    #     }))
 
-    #db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Group=reader_a_blocksGroup, Content={
-    #    "action": "Go To Next Block",
-    #    "fileTypes": [
-    #    "doc",
-    #    "pdf"
-    #    ],
-    #    "text": "Upload your CV",
-    #    "blockToGoID": None,
-    #    "afterMessage": 'File is being uploaded...'
-    #}))
 
-    #db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Group=reader_a_blocksGroup, Content={
-    #    "showTop": 5,
-    #    "afterMessage": 'DONE!!!!',
-    #    "action": "End Chat",
-    #    "blockToGoID": 0
-    #}))
-
-    db.session.add(Block(Type=enums.BlockType.Solutions, Order=3, StoreInDB=True, DataType=enums.DataType.NoType,
-                         Group=reader_a_blocksGroup, Content={
-        "showTop": 5,
-        "afterMessage": 'DONE!!!!',
-        "action": "End Chat",
-        "blockToGoID": 0
-    }))
+    # db.session.add(Block(Type=enums.BlockType.Solutions, Order=4, StoreInDB=True, DataType=enums.DataType.NoType,
+    #                      Group=reader_a_blocksGroup, Content={
+    #     "showTop": 5,
+    #     "afterMessage": 'DONE!!!!',
+    #     "action": "End Chat",
+    #     "blockToGoID": 0
+    # }))
 
     # Create Roles
     db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))

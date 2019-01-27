@@ -426,7 +426,7 @@ def saveRequiredFilters(solutionID, params):
 
 def sendSolutionsAlerts(assistantID, solutionID):
     try:
-        userInput_callback : Callback = chatbotSession_services.getByAssistantID(assistantID)
+        userInput_callback : Callback = chatbotSession_services.getAllByAssistantID(assistantID)
         if not userInput_callback.Success: raise Exception("Error in retrieving user input")
 
         filterEmails_callback : Callback = chatbotSession_services.filterForContainEmails(userInput_callback.Data)

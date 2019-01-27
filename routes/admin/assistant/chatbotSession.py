@@ -29,7 +29,7 @@ def chatbotSession(assistantID):
     #############
     # Get the assistant's user inputs/chatbot sessions
     if request.method == "GET":
-        s_callback: Callback = chatbotSession_services.getByAssistantID(assistantID)
+        s_callback: Callback = chatbotSession_services.getAllByAssistantID(assistantID)
 
         # Return response
         if not s_callback.Success:
@@ -75,13 +75,13 @@ def chatbotSession_file_uploads(assistantID, path):
         return helpers.jsonResponse(False, 404, "File not found.", None)
 
 
-    ui_callback: Callback = chatbotSession_services.getByID(id, assistant)
-    if not ui_callback.Success:
+    cs_callback: Callback = chatbotSession_services.getByID(id, assistant)
+    if not cs_callback.Success:
         return helpers.jsonResponse(False, 404, "File not found.", None)
-    user_input: ChatbotSession = ui_callback.Data
+    session: ChatbotSession = cs_callback.Data
 
     # Check if this user has access to user input session
-    if assistant != user_input.Assistant:
+    if assistant != session.Assistant:
         return helpers.jsonResponse(False, 401, "File access is unauthorised!")
 
     if request.method == "GET":

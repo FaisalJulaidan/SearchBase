@@ -4,6 +4,7 @@ from typing import List
 
 from sqlalchemy import and_
 from sqlalchemy.sql import exists, func
+
 import enums
 from config import BaseConfig
 from models import db, Callback, Assistant, Block, Plan, BlockGroup
@@ -20,7 +21,9 @@ def getChatbot(assistant: Assistant) -> Callback:
                               'message': assistant.Message,
                               'secondsUntilPopup': assistant.SecondsUntilPopup,
                               'active': assistant.Active},
-                'blocks': getAllBlocks(assistant)}
+                'blocks': getAllBlocks(assistant),
+                'dataTypes': getOptions().Data['dataTypes']
+                }
         return Callback(True, '', data)
     except Exception as e:
         print("ERROR: getChatbot()", e)
@@ -400,11 +403,12 @@ def getOptions(industry=None) -> Callback:
         'types': [a.value for a in enums.BlockType],
         'userTypes': [uiv.value for uiv in enums.UserType],
         'dataTypes': [uiv.value for uiv in enums.DataType],
-        'blockTypes': [{
-            'name': enums.BlockType.UserInput.value,
-            'actions': [a.value for a in enums.BlockAction],
-            'alwaysStoreInDB': True
-        },
+        'blockTypes': [
+            {
+                'name': enums.BlockType.UserInput.value,
+                'actions': [a.value for a in enums.BlockAction],
+                'alwaysStoreInDB': True
+            },
             {
                 'name': enums.BlockType.Question.value,
                 'actions': [a.value for a in enums.BlockAction],

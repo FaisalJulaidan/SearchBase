@@ -75,34 +75,34 @@ def gen_dummy_data():
     #    "text": "Do you smoke?",
     #  }))
 
-    # db.session.add(Block(Type=enums.BlockType.UserInput, Order=1, StoreInDB=True,
-    #                      DataType=enums.DataType.Email, Group=reader_a_blocksGroup, Content={
-    #     "action": "Go To Next Block",
-    #     "text": "What's your email?",
-    #     "blockToGoID": None,
-    #     "afterMessage": 'Your input is being processed...'
-    # }))
-    #
-    # db.session.add(Block(Type=enums.BlockType.UserInput, Order=1, StoreInDB=True,
-    #                      Group=reader_a_blocksGroup, DataType=enums.DataType.Resume, Content={
-    #     "action": "Go To Next Block",
-    #     "text": "Give me some input",
-    #     "blockToGoID": None,
-    #     "afterMessage": 'Your input is being processed...'
-    # }))
-
-    db.session.add(Block(Type=enums.BlockType.FileUpload, Order=2, StoreInDB=True, Skippable=True,
-                         DataType=enums.DataType.Resume, Group=reader_a_blocksGroup, Content={
-       "action": "Go To Next Block",
-       "fileTypes": [
-       "doc",
-       "pdf",
-       "docx",
-       ],
-       "text": "Upload your CV",
-       "blockToGoID": None,
-       "afterMessage": 'File is being uploaded...'
+    db.session.add(Block(Type=enums.BlockType.UserInput, Order=1, StoreInDB=True,
+                         DataType=enums.DataType.Email, Group=reader_a_blocksGroup, Content={
+        "action": "Go To Next Block",
+        "text": "What's your email?",
+        "blockToGoID": None,
+        "afterMessage": 'Your input is being processed...'
     }))
+
+    db.session.add(Block(Type=enums.BlockType.UserInput, Order=2, StoreInDB=True,
+                         Group=reader_a_blocksGroup, DataType=enums.DataType.TopSkill, Content={
+        "action": "Go To Next Block",
+        "text": "Give me some input",
+        "blockToGoID": None,
+        "afterMessage": 'Your input is being processed...'
+    }))
+
+    # db.session.add(Block(Type=enums.BlockType.FileUpload, Order=2, StoreInDB=True, Skippable=True,
+    #                      DataType=enums.DataType.Resume, Group=reader_a_blocksGroup, Content={
+    #    "action": "Go To Next Block",
+    #    "fileTypes": [
+    #    "doc",
+    #    "pdf",
+    #    "docx",
+    #    ],
+    #    "text": "Upload your CV",
+    #    "blockToGoID": None,
+    #    "afterMessage": 'File is being uploaded...'
+    # }))
 
     # db.session.add(Block(Type=enums.BlockType.FileUpload, Order=2, StoreInDB=True,
     #                      DataType=enums.DataType.Resume, Group=reader_a_blocksGroup, Content={

@@ -53,6 +53,9 @@ class DataType(Enum):
     Telephone = {'name': 'Telephone', 'validation': ValidationType.Telephone.value,
                  'userTypes': [UserType.Candidate.value, UserType.Client.value]}
 
+    Resume = {'name': 'Resume', 'validation': ValidationType.Ignore.value,
+              'userTypes': [UserType.Candidate.value]}
+
     ContactTime = {'name': 'Contact Time', 'validation': ValidationType.Email.value,
                    'userTypes': [UserType.Candidate.value, UserType.Client.value]}
 
@@ -73,9 +76,6 @@ class DataType(Enum):
 
     TopSkillYearsExp = {'name': 'Top Skill Years Exp', 'validation': ValidationType.Ignore.value,
                         'userTypes': [UserType.Candidate.value]}
-
-    Resume = {'name': 'Resume', 'validation': ValidationType.Ignore.value,
-              'userTypes': [UserType.Candidate.value]}
 
     LinkdinURL = {'name': 'Linkdin URL', 'validation': ValidationType.URL.value,
                   'userTypes': [UserType.Candidate.value, UserType.Client.value]}

@@ -18,8 +18,9 @@
     },
     "keywords": {"type": ["array","string"], "items": {"type": ["string"]}},
     "showTop": {"type": "integer"},
-    "solutionsReturned": {"type": "integer"}
+    "solutionsReturned": {"type": "integer"},
+    "userType": {"enum": ["Unknown", "Candidate", "Client"]}
   },
-  "required": ["collectedData", "keywords", "showTop", "solutionsReturned"],
+  "required": ["collectedData", "keywords", "showTop", "solutionsReturned", "userType"],
   "additionalProperties": false
 }

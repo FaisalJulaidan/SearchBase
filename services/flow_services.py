@@ -22,7 +22,6 @@ def getChatbot(assistant: Assistant) -> Callback:
                               'secondsUntilPopup': assistant.SecondsUntilPopup,
                               'active': assistant.Active},
                 'blocks': getAllBlocks(assistant),
-                'dataTypes': getOptions().Data['dataTypes']
                 }
         return Callback(True, '', data)
     except Exception as e:

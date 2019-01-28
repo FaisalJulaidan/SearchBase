@@ -76,7 +76,7 @@ def gen_dummy_data():
     #  }))
 
     db.session.add(Block(Type=enums.BlockType.UserInput, Order=1, StoreInDB=True, Skippable=True,
-                         DataType=enums.DataType.Email, Group=reader_a_blocksGroup, Content={
+                         Group=reader_a_blocksGroup, DataType=enums.DataType.Email, Content={
         "action": "Go To Next Block",
         "text": "What's your email?",
         "blockToGoID": None,

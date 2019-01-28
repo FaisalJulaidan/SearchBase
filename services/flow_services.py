@@ -246,7 +246,7 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
             oldBlock.Order = block.get('order')
             oldBlock.Labels = block.get('labels')
             oldBlock.GroupID = block.get('groupID')
-            oldBlock.DataType = enums.DataType[block.get('dataType')['name'].replace(" ", "")]
+            oldBlock.DataType = block.get('dataType')['name'].replace(" ", "")
 
         # Save
         db.session.commit()

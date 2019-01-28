@@ -26,6 +26,11 @@ class Sessions extends React.Component {
         this.props.dispatch(chatbotSessionsActions.fetchChatbotSessions(assistant.ID))
     }
 
+    refreshSessions = () => {
+        const {assistant} = this.props.location.state;
+        this.props.dispatch(chatbotSessionsActions.fetchChatbotSessions(assistant.ID))
+    };
+
     clearAllChatbotSessions = () => {
         const {assistant} = this.props.location.state;
         this.props.dispatch(chatbotSessionsActions.clearAllChatbotSessions(assistant.ID))
@@ -195,7 +200,14 @@ class Sessions extends React.Component {
                     </div>
 
                     <div className={styles.Panel_Body}>
-                        <Button className={styles.ClearAllBtn} type="primary" icon="delete"
+
+                        <Button className={styles.MainBtn} type="primary" icon="sync"
+                                onClick={this.refreshSessions} loading={this.props.isLoading}>
+                            Refresh
+                        </Button>
+
+
+                        <Button className={styles.MainBtn} type="primary" icon="delete"
                                 onClick={this.showConfirmForClearing} loading={this.props.isClearingAll}>
                             Clear All
                         </Button>

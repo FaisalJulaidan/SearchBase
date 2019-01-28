@@ -19,8 +19,9 @@ def processData(assistant: Assistant, data: dict) -> Callback:
                                    TimeSpent=44,
                                    SolutionsReturned=data['solutionsReturned'],
                                    QuestionsAnswered=len(collectedData),
-                                   UserType= enums.UserType.Candidate,
+                                   UserType= data['userType'],
                                    Assistant=assistant)
+
 
         db.session.add(chatbotSession)
         db.session.commit()

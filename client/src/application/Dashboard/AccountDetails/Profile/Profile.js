@@ -7,7 +7,7 @@ import styles from "./Profile.module.less"
 import ProfileDetails from "./profileComponents/ProfileDetails/ProfileDetails";
 import DataSettings from "./profileComponents/DataSettings/DataSettings";
 
-import {profileActions} from "../../../store/actions/profile.actions";
+import {profileActions} from "../../../../store/actions/profile.actions";
 const TabPane = Tabs.TabPane;
 
 class Profile extends React.Component {

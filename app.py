@@ -128,6 +128,9 @@ if os.environ['FLASK_ENV'] == 'production':
         db.create_all()
         helpers.seed()
 
+    scheduler.init_app(app)
+    scheduler.start()
+
     # Run the app server
     if os.environ['DB_MIGRATION'] == 'yes':
         print('Database migration mode...')
@@ -151,7 +154,7 @@ elif os.environ['FLASK_ENV'] == 'development':
     helpers.gen_dummy_data()
 
     scheduler.init_app(app)
-    # scheduler.start()
+    scheduler.start()
 
     # Run the app server
     print('Development mode running...')

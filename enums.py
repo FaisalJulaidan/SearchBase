@@ -57,10 +57,14 @@ class DataType(Enum):
     Telephone = {'name': 'Telephone', 'validation': ValidationType.Telephone.value,
                  'userTypes': [UserType.Candidate.value, UserType.Client.value]}
 
-    LinkdinURL = {'name': 'Linkdin URL', 'validation': ValidationType.URL.value,
+    LinkedInURL = {'name': 'Linkdin URL', 'validation': ValidationType.URL.value,
               'userTypes': [UserType.Candidate.value, UserType.Client.value]}
 
     # Candidate
+
+    PreferredLocation = {'name': 'Preferred Location', 'validation': ValidationType.Ignore.value,
+                       'userTypes': [UserType.Candidate.value]}
+
     Gender = {'name': 'Gender', 'validation': ValidationType.Ignore.value,
               'userTypes': [UserType.Candidate.value]}
 
@@ -76,45 +80,33 @@ class DataType(Enum):
     Availability = {'name': 'Availability', 'validation': ValidationType.Ignore.value,
                     'userTypes': [UserType.Candidate.value]}
 
+    CurrentRole = {'name': 'Current Role', 'validation': ValidationType.Number.value,
+                     'userTypes': [UserType.Candidate.value]}
+
+    DesiredPosition = {'name': 'Desired Position', 'validation': ValidationType.Ignore.value,
+                       'userTypes': [UserType.Candidate.value]}
+
     CurrentSalary = {'name': 'Current Salary', 'validation': ValidationType.Number.value,
                      'userTypes': [UserType.Candidate.value]}
 
     DesiredSalary = {'name': 'Desired Salary', 'validation': ValidationType.Number.value,
                      'userTypes': [UserType.Candidate.value]}
 
-    DesiredPosition = {'name': 'Desired Position', 'validation': ValidationType.Ignore.value,
-                       'userTypes': [UserType.Candidate.value]}
+    PreferredEmploymentType = {'name': 'Desired Employment Type', 'validation': ValidationType.Ignore.value,
+                      'userTypes': [UserType.Candidate.value]}
 
-    # DesiredPositionYearsExp = {'name': 'Desired Position Years Exp', 'validation': ValidationType.Ignore.value,
-    #                            'userTypes': [UserType.Candidate.value]}
+    DesiredHourlyRate = {'name': 'Desired Hourly Rate', 'validation': ValidationType.Number.value,
+                         'userTypes': [UserType.Candidate.value]}
 
-    TopSkills = {'name': 'Top Skills', 'validation': ValidationType.Ignore.value,
+    CandidateSkills = {'name': 'Candidate Skills', 'validation': ValidationType.Ignore.value,
                 'userTypes': [UserType.Candidate.value]}
 
     YearsExp = {'name': 'Years Exp', 'validation': ValidationType.Ignore.value,
                         'userTypes': [UserType.Candidate.value]}
 
 
-    DesiredLocation = {'name': 'Desired Location', 'validation': ValidationType.Ignore.value,
-                       'userTypes': [UserType.Candidate.value]}
-
-    DesiredEmploymentType = {'name': 'Desired Employment Type', 'validation': ValidationType.Ignore.value,
-                      'userTypes': [UserType.Candidate.value]}
-
-    DesiredHourlyRate = {'name': 'Desired Hourly Rate', 'validation': ValidationType.Number.value,
-                         'userTypes': [UserType.Candidate.value]}
-
 
     # Client
-
-    ClientName = {'name': 'Name of the Client\'s company', 'validation': ValidationType.Name.value,
-            'userTypes': [UserType.Client.value]}
-
-    ClientEmail = {'name': 'Email', 'validation': ValidationType.Email.value,
-             'userTypes': [UserType.Client.value]}
-
-    ClientTelephone = {'name': 'Telephone', 'validation': ValidationType.Telephone.value,
-                 'userTypes': [UserType.Client.value]}
 
     Location = {'name': 'Location', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}
@@ -125,8 +117,11 @@ class DataType(Enum):
     OfferingSalary = {'name': 'Offering Salary', 'validation': ValidationType.Number.value,
                      'userTypes': [UserType.Client.value]}
 
-    OfferingEmploymentType = {'name': 'Offering Employment Type', 'validation': ValidationType.Ignore.value,
-                      'userTypes': [UserType.Client.value]}
+    JobDescription = {'name': 'Description of the Job', 'validation': ValidationType.Ignore.value,
+                     'userTypes': [UserType.Client.value]}
+
+    JobCandidatesNeeded = {'name': 'Candidates looking to recruit', 'validation': ValidationType.Ignore.value,
+                     'userTypes': [UserType.Client.value]}
 
     EssentialSkills = {'name': 'Essential Skills', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}
@@ -134,19 +129,17 @@ class DataType(Enum):
     EssentialYearsExperience = {'name': 'Essential years of experience', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}
 
-    JobType = {'name': 'Type of Job (Perm/Contract)', 'validation': ValidationType.Ignore.value,
-                     'userTypes': [UserType.Client.value]}
+    OfferingEmploymentType = {'name': 'Type of Job (Perm/Contract)', 'validation': ValidationType.Ignore.value,
+                      'userTypes': [UserType.Client.value]}
 
-    JobSalary = {'name': 'Salary being offered', 'validation': ValidationType.Ignore.value,
+    JobSalaryOffered = {'name': 'Salary being offered', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}
 
     JobRate = {'name': 'Contract Rate', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}
 
-
     JobAvailability = {'name': 'Availability Of the Job', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}
-
 
     DesiredSkills = {'name': 'Desired Skills', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}

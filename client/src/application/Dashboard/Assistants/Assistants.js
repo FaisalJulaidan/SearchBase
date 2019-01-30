@@ -2,13 +2,11 @@ import React, {Component} from 'react';
 import {Button, message, Skeleton} from 'antd';
 import {connect} from 'react-redux';
 
-import "./Assistants.less"
 import styles from "./Assistants.module.less"
 import Assistant from "./Assistant/Assistant"
 
 import {assistantActions} from "../../../store/actions/assistant.actions";
-import NewAssistantModal from "./NewAssistantModal/NewAssistantModal";
-
+import NewAssistantModal from "./Modals/NewAssistantModal";
 
 class Assistants extends Component {
     state = {
@@ -30,17 +28,8 @@ class Assistants extends Component {
     }
 
 
-    showModal = () => {
-        this.setState({
-            visible: true,
-        });
-    };
-
-    hideModal = () => {
-        this.setState({
-            visible: false,
-        });
-    };
+    showModal = () => this.setState({visible: true});
+    hideModal = () => this.setState({visible: false});
 
 
     render() {
@@ -58,7 +47,6 @@ class Assistants extends Component {
                                 Add Assistant
                             </Button>
                         </div>
-
                     </div>
 
 
@@ -79,7 +67,6 @@ class Assistants extends Component {
                     </div>
 
                 </div>
-
 
                 <NewAssistantModal visible={this.state.visible}
                                    hideModal={this.hideModal}/>

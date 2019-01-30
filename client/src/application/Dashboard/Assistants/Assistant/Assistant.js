@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "./Assistant.less"
 import {Card, Dropdown, Icon, Menu, Switch} from 'antd';
 import {Link} from "react-router-dom";
 import AssistantSettings from "./AssistantSettings/AssistantSettings";
@@ -19,7 +18,7 @@ const menu = (assistant) => (
         </Menu.Item>
         <Menu.Item key="2">
             <Link to={{
-                      pathname: `assistants/${assistant.ID}/userInput`,
+                      pathname: `assistants/${assistant.ID}/sessions`,
                       state: {assistant: assistant}
                   }}>
                 <Icon type="code"/> User Input

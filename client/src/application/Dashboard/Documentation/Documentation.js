@@ -23,12 +23,6 @@ class Documentation extends React.Component{
 
         return (
             <div style={{height: '100%'}}>
-                <div style={{padding: '0 5px'}}>
-                    <div style={{width: '100%', height: 56, marginBottom: 10}}>
-                        <Header display={"Solutions"}/>
-                    </div>
-                </div>
-
                 <div style={{height: 'calc(100% - 66px)', width: '100%', display: 'flex'}}>
                     <div style={{margin: 5, width: '27%'}}>
                         <div className={styles.Panel}>
@@ -40,7 +34,7 @@ class Documentation extends React.Component{
                             <div className={styles.Panel_Body}>
                                 <Menu
                                     mode="inline"
-                                    style={{ width: 256 }}
+                                    style={{ width: '100%' }}
                                     onClick={this.handleMenuChange}
                                     defaultSelectedKeys={['1']}
                                     defaultOpenKeys={['sub1']}

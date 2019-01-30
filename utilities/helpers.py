@@ -1,7 +1,7 @@
-from flask import redirect, url_for, session, render_template, json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solution, ChatbotSession, BlockGroup
-from services import assistant_services, user_services
-from datetime import datetime
+from flask import json, after_this_request, request
+from models import db, Role, Company, Assistant, Plan, Block, ChatbotSession, BlockGroup
+from services import user_services
+from datetime import datetime, timedelta
 from sqlalchemy import inspect
 from hashids import Hashids
 from config import BaseConfig
@@ -10,17 +10,19 @@ import re
 from io import BytesIO
 import gzip
 import functools
+import enums
 
 
+# ID Hasher
+# IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
-
-
 def encrypt_id(id):
     return hashids.encrypt(id)
 
 
 def decrypt_id(id):
     return hashids.decrypt(id)
+
 
 
 # Generates dummy data for testing
@@ -43,7 +45,8 @@ def gen_dummy_data():
     helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
 
     ## Create Blocks
-    #db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Group=reader_a_blocksGroup, Content={
+    #db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Skippable=False,
+    # Group=reader_a_blocksGroup, Content={
     #    "answers": [
     #      {
     #        "action": "Go To Next Block",
@@ -71,45 +74,57 @@ def gen_dummy_data():
     #    ],
     #    "text": "Do you smoke?",
     #  }))
-    db.session.add(Block(Type=BlockType.UserInput, Order=1, StoreInDB=True, Group=reader_a_blocksGroup, Content={
+
+    db.session.add(Block(Type=enums.BlockType.UserInput, Order=1, StoreInDB=True, Skippable=True,
+                         Group=reader_a_blocksGroup, DataType=enums.DataType.Email, Content={
         "action": "Go To Next Block",
         "text": "What's your email?",
         "blockToGoID": None,
-        "validation": "Email",
-        "afterMessage": 'Your input is being processed...'
-    }))
-    db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Group=reader_a_blocksGroup, Content={
-        "action": "Go To Next Block",
-        "text": "Give me some input",
-        "blockToGoID": None,
-        "validation": "Ignore",
         "afterMessage": 'Your input is being processed...'
     }))
 
-    #db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Group=reader_a_blocksGroup, Content={
+    db.session.add(Block(Type=enums.BlockType.UserInput, Order=2, StoreInDB=True, Skippable=False,
+                         Group=reader_a_blocksGroup, DataType=enums.DataType.FullName, Content={
+        "action": "Go To Next Block",
+        "text": "Give me some input",
+        "blockToGoID": None,
+        "afterMessage": 'Your input is being processed...'
+    }))
+
+    # db.session.add(Block(Type=enums.BlockType.FileUpload, Order=2, StoreInDB=True, Skippable=True,
+    #                      DataType=enums.DataType.Resume, Group=reader_a_blocksGroup, Content={
     #    "action": "Go To Next Block",
     #    "fileTypes": [
     #    "doc",
-    #    "pdf"
+    #    "pdf",
+    #    "docx",
     #    ],
     #    "text": "Upload your CV",
     #    "blockToGoID": None,
     #    "afterMessage": 'File is being uploaded...'
-    #}))
+    # }))
 
-    #db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Group=reader_a_blocksGroup, Content={
-    #    "showTop": 5,
-    #    "afterMessage": 'DONE!!!!',
-    #    "action": "End Chat",
-    #    "blockToGoID": 0
-    #}))
+    # db.session.add(Block(Type=enums.BlockType.FileUpload, Order=2, StoreInDB=True,
+    #                      DataType=enums.DataType.Resume, Group=reader_a_blocksGroup, Content={
+    #         "action": "Go To Next Block",
+    #         "fileTypes": [
+    #             "doc",
+    #             "pdf",
+    #             "docx",
+    #         ],
+    #         "text": "Upload your CV 2",
+    #         "blockToGoID": None,
+    #         "afterMessage": 'File is being uploaded...'
+    #     }))
 
-    db.session.add(Block(Type=BlockType.Solutions, Order=3, StoreInDB=True, Group=reader_a_blocksGroup, Content={
-        "showTop": 5,
-        "afterMessage": 'DONE!!!!',
-        "action": "End Chat",
-        "blockToGoID": 0
-    }))
+
+    # db.session.add(Block(Type=enums.BlockType.Solutions, Order=4, StoreInDB=True, DataType=enums.DataType.NoType,
+    #                      Group=reader_a_blocksGroup, Content={
+    #     "showTop": 5,
+    #     "afterMessage": 'DONE!!!!',
+    #     "action": "End Chat",
+    #     "blockToGoID": 0
+    # }))
 
     # Create Roles
     db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
@@ -149,65 +164,82 @@ def gen_dummy_data():
     user_services.create(firstname='firstname', surname='lastname', email='e6@e.com', password='123', phone='4344423', company=sabic,
                          role=user_sabic, verified=True)
 
-    # Plans
-    db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic', MaxSolutions=600, MaxBlocks=20, ActiveBotsCap=2, InactiveBotsCap=3,
-                        AdditionalUsersCap=5, ExtendedLogic=False, ImportDatabase=False, CompanyNameOnChatbot=False))
-
-    db.session.add(
-        Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate', MaxSolutions=5000, MaxBlocks=20, ActiveBotsCap=4, InactiveBotsCap=8,
-             AdditionalUsersCap=10, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
-
-    db.session.add(
-        Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=20, ActiveBotsCap=10, InactiveBotsCap=30,
-             AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
-
-    db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=30,  ActiveBotsCap=2, InactiveBotsCap=2,
-                        AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
     # Chatbot Sessions
     data = {
-        "collectedInformation": [
+        "collectedData": [
             {
                 "blockID": 1,
                 "questionText": "What is your email?",
+                "dataType": 'Email',
                 "input": "faisal@gmail.com",
                 "keywords": ['faisal', 'developer', 'email']
+            },
+            {
+                "blockID": 2,
+                "questionText": "How are you doing?",
+                "dataType": 'No Type',
+                "input": "I am fine thank you",
+                "keywords": []
+            },
+            {
+                "blockID": 3,
+                "questionText": "When are you available?",
+                "dataType": 'Availability',
+                "input": "Only weekend days",
+                "keywords": []
+            },
+            {
+                "blockID": 4,
+                "questionText": "What is your friend's email?",
+                "dataType": "Email",
+                "input": "friend@hotmail.com",
+                "keywords": []
             }
         ]
     }
+
     db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now(),
-                                  TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3, Assistant=reader_a))
+                                  TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
+                                  UserType=enums.UserType.Candidate, Assistant=reader_a))
 
-    # Save all changes
+    db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now() - timedelta(days=10),
+                                  TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
+                                  UserType=enums.UserType.Client,Assistant=reader_a))
+
+    # add chatbot session in bulk
+    for i in range(50):
+        db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now() - timedelta(days=i),
+                                      TimeSpent=i+40, SolutionsReturned=i+3, QuestionsAnswered=i+4,
+                                      UserType=enums.UserType.Candidate, Assistant=reader_a))
+
+
+    # will save changes as well
+    seed()
+
+def seed():
+
+    # Plans
+    db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic', MaxSolutions=600, MaxBlocks=100, ActiveBotsCap=2,
+                        InactiveBotsCap=3,
+                        AdditionalUsersCap=5, ExtendedLogic=False, ImportDatabase=False, CompanyNameOnChatbot=False))
+
+    db.session.add(
+        Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate', MaxSolutions=5000, MaxBlocks=100, ActiveBotsCap=4,
+             InactiveBotsCap=8,
+             AdditionalUsersCap=10, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
+    db.session.add(
+        Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=100, ActiveBotsCap=10,
+             InactiveBotsCap=30,
+             AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
+    db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=100, ActiveBotsCap=2,
+                        InactiveBotsCap=2,
+                        AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
+
+
     db.session.commit()
-
-
-def hardRedirectWithMessage(route, message):
-    session["returnMessage"] = message
-    return redirect(route)
-
-
-def redirectWithMessage(route, message):
-    session["returnMessage"] = message
-    if "/" in route:
-        return redirect(route)
-    else:
-        return redirect(url_for("." + route))
-
-
-def redirectWithMessageAndAssistantID(route, assistantID, message):
-    session["returnMessage"] = message
-    return redirect(url_for("." + route, assistantID=assistantID))
-    if "/" in route:
-        return redirect(route)
-    else:
-        return redirect(url_for("." + route, assistantID=assistantID))
-
-def checkForMessage():
-    message = session.get('returnMessage', "")
-    if message:
-        session["returnMessage"] = ""
-    return message
 
 
 def getPlanNickname(SubID=None):

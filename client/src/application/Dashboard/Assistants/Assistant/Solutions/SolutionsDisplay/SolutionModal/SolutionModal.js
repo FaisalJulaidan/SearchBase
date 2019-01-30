@@ -1,5 +1,4 @@
 import React from 'react';
-import "./SolutionModal.less"
 import {Button, Modal, Form, Input, Select, Tabs, Icon, Upload} from "antd";
 import {isEmpty} from "lodash";
 

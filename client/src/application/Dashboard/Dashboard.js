@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import {Avatar, Dropdown, Icon, Layout, Menu} from 'antd';
+import {Avatar, Dropdown, Icon, Layout, Menu, notification} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
 import Assistants from './Assistants/Assistants';
@@ -11,9 +11,10 @@ import Profile from "./AccountDetails/Profile/Profile";
 import UsersManagement from "./AccountDetails/UsersManagement/UsersManagement";
 import Documentation from "./Documentation/Documentation";
 import Integration from "./Assistants/Assistant/Integration/Integration";
-import UserInput from "./Assistants/Assistant/UserInput/UserInput";
+import Sessions from "./Assistants/Assistant/Sessions/Sessions";
 import Solutions from "./Assistants/Assistant/Solutions/Solutions";
 import Home from "./Home/Home";
+import Analytics from "./Assistants/Assistant/Analytics/Analytics";
 import {authActions} from "../../store/actions";
 import store from '../../store/store';
 import {connect} from 'react-redux';
@@ -29,6 +30,7 @@ class Dashboard extends Component {
         collapsed: false,
         marginLeft: 200,
     };
+
 
     toggle = () => {
         this.setState({
@@ -109,7 +111,7 @@ class Dashboard extends Component {
                         </div>
                     </div>
 
-                    <Menu theme="light" defaultSelectedKeys={['dashboard']} mode="inline" onClick={this.handleMenuClick}>
+                    <Menu theme="light" defaultSelectedKeys={this.state.selectedMenuKey} mode="inline" onClick={this.handleMenuClick}>
                         <Menu.Item key="dashboard">
                             <Icon type="home"/>
                             <span>Home</span>
@@ -162,8 +164,9 @@ class Dashboard extends Component {
                         <Switch>
                             <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
                             <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
-                            <Route path={`${match.path}/assistants/:id/userInput`} component={UserInput}/>
+                            <Route path={`${match.path}/assistants/:id/sessions`} component={Sessions}/>
                             <Route path={`${match.path}/assistants/:id/solutions`} component={Solutions}/>
+                            <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                             <Route path={`${match.path}/profile`} component={Profile} exact/>
                             <Route path={`${match.path}/users-management`} component={UsersManagement} exact/>

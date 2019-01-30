@@ -1,5 +1,6 @@
 from models import db, Callback, ChatbotSession, Assistant
 from utilities import json_utils
+import enums
 
 
 
@@ -13,12 +14,14 @@ def processData(assistant: Assistant, data: dict) -> Callback:
     try:
 
         # collectedInformation is an array, and timeSpent is in seconds.
-        collectedInformation = data['collectedInformation']
-        chatbotSession = ChatbotSession(Data={'collectedInformation': collectedInformation},
+        collectedData = data['collectedData']
+        chatbotSession = ChatbotSession(Data={'collectedData': collectedData},
                                    TimeSpent=44,
                                    SolutionsReturned=data['solutionsReturned'],
-                                   QuestionsAnswered=len(collectedInformation),
+                                   QuestionsAnswered=len(collectedData),
+                                   UserType= data['userType'],
                                    Assistant=assistant)
+
 
         db.session.add(chatbotSession)
         db.session.commit()

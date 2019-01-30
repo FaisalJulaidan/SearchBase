@@ -10,8 +10,10 @@
     "afterMessage": {"type": "string"}
     },
   "required": [
+    "text",
     "action",
-    "fileTypes"
+    "blockToGoID",
+    "afterMessage"
   ],
   "additionalProperties": false
 }

@@ -10,7 +10,9 @@ function* fetchFlow({assistantID}) {
         return yield put(flowActions.fetchFlowSuccess(res.data.data))
     } catch (error) {
         console.log(error);
-        return yield put(flowActions.fetchFlowFailure(error.response.data));
+        yield put(flowActions.fetchFlowFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not retrieve the flow");
+
     }
 
 }
@@ -20,14 +22,14 @@ function* watchFetchFlow() {
 }
 
 // Groups
-function* addGroup(action) {
+function* addGroup({assistantID, newGroup}) {
     try {
         loadingMessage('Adding Group');
-        const res = yield http.post(`/assistant/${action.ID}/flow/group`, action.newGroup);
+        const res = yield http.post(`/assistant/${assistantID}/flow/group`, newGroup);
         yield put(flowActions.addGroupSuccess(res.data.msg));
         yield destroyMessage();
         yield alertSuccess('Group Added', res.data.msg);
-        return yield put(flowActions.fetchFlowRequest(action.ID))
+        return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
         yield destroyMessage();
@@ -35,14 +37,14 @@ function* addGroup(action) {
     }
 }
 
-function* editGroup(action) {
+function* editGroup({assistantID, editedGroup}) {
     try {
         loadingMessage('Updating Group');
-        const res = yield http.put(`/assistant/${action.ID}/flow/group`, action.editedGroup);
+        const res = yield http.put(`/assistant/${assistantID}/flow/group`, editedGroup);
         yield put(flowActions.editGroupSuccess(res.data.msg));
         yield destroyMessage();
         yield alertSuccess('Group Updated', res.data.msg);
-        return yield put(flowActions.fetchFlowRequest(action.ID))
+        return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
         yield destroyMessage();
@@ -54,10 +56,9 @@ function* deleteGroup({assistantID, deletedGroup}) {
     try {
         loadingMessage('Deleting Group');
         const res = yield http.delete(`/assistant/${assistantID}/flow/group`, {data: {id: deletedGroup.id}});
-        yield put(flowActions.deleteGroupSuccess(res.data.msg));
+        yield put(flowActions.deleteGroupSuccess(res.data.msg, deletedGroup.id));
         yield destroyMessage();
-        yield alertSuccess('Group Deleted', res.data.msg);
-        return yield put(flowActions.fetchFlowRequest(assistantID))
+        return yield alertSuccess('Group Deleted', res.data.msg);
     } catch (error) {
         console.log(error);
         yield destroyMessage();
@@ -90,7 +91,8 @@ function* addBlock({newBlock, groupID, assistantID}) {
         return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
-        return yield put(flowActions.addBlockFailure(error.response.data));
+        yield put(flowActions.addBlockFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not create the block");
     }
 }
 
@@ -99,6 +101,7 @@ function* editBlock({edittedBlock, groupID, assistantID}) {
         loadingMessage('Updating Block');
         let res = yield http.get(`/assistant/${assistantID}/flow`);
         let currentUpdatedGroup = [];
+        edittedBlock = edittedBlock.block;
         res.data.data.blockGroups.map((group) => {
             if (group.id === groupID)
                 group.blocks.map((block) => {
@@ -113,7 +116,8 @@ function* editBlock({edittedBlock, groupID, assistantID}) {
         return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
-        return yield put(flowActions.editBlockFailure(error.response.data));
+        yield put(flowActions.editBlockFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not update the block");
     }
 }
 
@@ -127,7 +131,8 @@ function* deleteBlock({deletedBlock, assistantID, groupID}) {
         return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
-        return yield put(flowActions.deleteBlockFailure(error.response.data));
+        yield put(flowActions.deleteBlockFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not delete the block");
     }
 }
 
@@ -142,7 +147,8 @@ function* updateBlocksOrder({newBlocksOrder, assistantID}) {
         console.log(error);
         yield destroyMessage();
         yield alertError('Error in Block Delete', error.message);
-        return yield put(flowActions.updateBlocksOrderFailure(error.response.data));
+        yield put(flowActions.updateBlocksOrderFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not update the blocks order");
     }
 }
 
@@ -158,8 +164,21 @@ function* watchDeleteBlock() {
     yield takeEvery(actionTypes.DELETE_BLOCK_REQUEST, deleteBlock)
 }
 
-function* watchUpdateBlcoksOrder() {
+function* watchUpdateBlocksOrder() {
     yield takeEvery(actionTypes.UPDATE_BLOCKS_ORDER_REQUEST, updateBlocksOrder)
+}
+
+// Data Category (For Future)
+function* addDataCategory({name}) {
+    try {
+
+    } catch (error) {
+
+    }
+}
+
+function* watchAddDataCategory() {
+    yield takeEvery(actionTypes.ADD_DATA_CATEGORY_REQUEST, addDataCategory)
 }
 
 export function* flowSaga() {
@@ -173,6 +192,6 @@ export function* flowSaga() {
         watchAddBlock(),
         watchEditBlock(),
         watchDeleteBlock(),
-        watchUpdateBlcoksOrder()
+        watchUpdateBlocksOrder()
     ])
 }

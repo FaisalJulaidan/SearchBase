@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "./NewGroup.less"
 import {Button, Modal, Form, Input} from "antd";
 
 const FormItem = Form.Item;

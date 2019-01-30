@@ -64,9 +64,9 @@ def group(assistantID):
         # Get the new group data from the request's body
         callback: Callback = flow_services.addGroup(data, assistant)
 
-    # Update the blocks' group
+    # Update the group
     if request.method == "PUT":
-        # Get new block data from the request's body
+        # Get new blocks data from the request's body
         callback: Callback = flow_services.updateGroup(data, assistant)
 
     # Delete the blocks' group
@@ -103,13 +103,13 @@ def block(groupID):
     # Add a block
     if request.method == "POST":
         # Get the new block data from the request's body
-        data = request.get_json(silent=True)
+        data = request.json
         callback: Callback = flow_services.addBlock(data, group)
 
     # Delete the block
     if request.method == "DELETE":
         # Get new block data from the request's body
-        data = request.get_json(silent=True)
+        data = request.json
         callback: Callback = flow_services.deleteBlockByID(data.get('id', None), group)
 
     # Return response
@@ -121,5 +121,10 @@ def block(groupID):
 @flow_router.route("/assistant/flow/options", methods=['GET'])
 @jwt_required
 def get_flowOptions():
+
     if request.method == "GET":
-        return helpers.jsonResponse(True, 200, "These are the options the flow provides.", flow_services.getOptions())
+        callback: Callback = flow_services.getOptions()
+        # Return response
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
+        return helpers.jsonResponse(True, 200, "These are the options the flow provides.", callback.Data)

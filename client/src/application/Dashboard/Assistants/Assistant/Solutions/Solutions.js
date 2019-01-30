@@ -1,6 +1,5 @@
 import React from 'react'
 import connect from "react-redux/es/connect/connect";
-import styles from "../../Assistants.module.less";
 import Header from "../../../../../components/Header/Header"
 import SolutionsDisplay from "./SolutionsDisplay/SolutionsDisplay";
 import SolutionsSettings from "./SolutionsSettings/SolutionsSettings";

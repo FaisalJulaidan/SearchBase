@@ -1,13 +1,12 @@
 import React, {Component} from 'react';
 
-import "./Blocks.less"
 import styles from "./Blocks.module.less";
 import {Button, Form, Modal} from "antd";
 
 import Block from "./Block/Block";
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
-import NewBlockModal from "./NewBlockModal/NewBlockModal";
-import EditBlockModal from "./EditBlockModal/EditBlockModal1";
+import NewBlockModal from "./Modals/NewBlockModal";
+import EditBlockModal from "./Modals/EditBlockModal1";
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -50,8 +49,9 @@ class Blocks extends Component {
 
     componentWillReceiveProps(nextProps) {
         // This handles when updating the selected group to show its blocks
-        if (nextProps.currentGroup !== this.state.currentGroup && nextProps.currentGroup.blocks)
+        if (nextProps.currentGroup !== this.state.currentGroup && nextProps.currentGroup.blocks){
             this.setState({blocks: nextProps.currentGroup.blocks})
+        }
     }
 
 
@@ -73,9 +73,10 @@ class Blocks extends Component {
     // this called from block.js when you click on delete block button
     deleteBlock = (deletedBlock) => confirm({
         title: `Delete block with type: ${deletedBlock.type}`,
-        content: `You can't get back to the deleted block after click ok`,
+        content: `If you click OK, this block will be deleted forever`,
         onOk: () => this.handleDeleteBlock(deletedBlock)
     });
+
     handleDeleteBlock = (deletedBlock) => {
         this.props.deleteBlock(deletedBlock, this.props.currentGroup.id);
 
@@ -85,7 +86,8 @@ class Blocks extends Component {
         for (const i in blocks) blocks[i].order = Number(i) + 1;
         this.setState({blocks});
         // send a request to the server
-        this.props.reorderBlocks(blocks, this.props.currentGroup.id)
+        this.props.reorderBlocks(blocks, this.props.currentGroup.id);
+        this.closeEditBlockModal()
     };
 
 
@@ -138,17 +140,18 @@ class Blocks extends Component {
                                handleAddBlock={this.handleAddBlock}
                                closeModal={this.closeAddBlockModal}
 
-                               blocks={this.state.blocks}
                                currentGroup={this.props.currentGroup}
+                               allBlocks={this.state.blocks}
                                allGroups={this.props.allGroups}/>
 
                 <EditBlockModal visible={this.state.editBlockVisible}
                                 handleEditBlock={this.handleEditBlock}
+                                handleDeleteBlock={this.deleteBlock}
                                 closeModal={this.closeEditBlockModal}
 
                                 block={this.state.edittedBlock}
-                                blocks={this.state.blocks}
                                 currentGroup={this.props.currentGroup}
+                                allBlocks={this.state.blocks}
                                 allGroups={this.props.allGroups}/>
             </div>
         );

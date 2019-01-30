@@ -3,7 +3,6 @@ import {Form, Button, message, Tabs} from "antd";
 import {connect} from 'react-redux';
 import {isEmpty} from "lodash";
 
-import "./Profile.less"
 import styles from "./Profile.module.less"
 import ProfileDetails from "./profileComponents/ProfileDetails/ProfileDetails";
 import DataSettings from "./profileComponents/DataSettings/DataSettings";
@@ -46,7 +45,7 @@ class Profile extends React.Component {
 
                     <div className={styles.Panel_Body} style={{overflowY: "auto"}}>
                         <Tabs defaultActiveKey={"1"}>
-                            <TabPane tab={"Profile Details"} key={"1"}>
+                            <TabPane tab={"Conversation Details"} key={"1"}>
                                 <ProfileDetails profileData={this.props.profileData} saveProfileDetails={this.saveProfileDetails}/>
                             </TabPane>
 

@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 
 import {authActions} from '../../store/actions/index';
 import styles from './Login.module.less';
-import './Login.less';
 
 import {Button, Col, Form, Icon, Input, Row, Spin} from 'antd';
 
@@ -55,7 +54,7 @@ class Login extends React.Component {
                         <Row type="flex" justify="center">
                             <Col>
                                 <Form onSubmit={this.handleSubmit} layout={'horizontal'}>
-                                    <FormItem>
+                                    <FormItem className={styles.LoginFormItem}>
                                         {getFieldDecorator('email', {
                                             rules: [{required: true, message: 'Please input your email!'}],
                                         })(
@@ -63,7 +62,7 @@ class Login extends React.Component {
                                                    placeholder="Email"/>
                                         )}
                                     </FormItem>
-                                    <FormItem>
+                                    <FormItem className={styles.LoginFormItem}>
                                         {getFieldDecorator('password', {
                                             rules: [{required: true, message: 'Please input your Password!'}],
                                         })(

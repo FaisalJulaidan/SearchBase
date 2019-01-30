@@ -28,7 +28,7 @@ def profile():
         # Get user record
         user_callback: Callback = user_services.getByEmail(email)
         if not user_callback.Success:
-            return helpers.jsonResponse(True, 200, "Profile has been retrieved 1",
+            return helpers.jsonResponse(True, 200, "Conversation has been retrieved 1",
                                         {"user": None, "email": email, "company": None, "newsletters": None,
                                          "userSettings": None})
         user : User = user_callback.Data
@@ -40,12 +40,12 @@ def profile():
         # Get user's settings
         userSettings_callback: Callback = user_services.getUserSettings(user.ID)
         if not userSettings_callback.Success or not userSettings_callback.Data:
-            return helpers.jsonResponse(True, 200, "Profile has been retrieved 2",
+            return helpers.jsonResponse(True, 200, "Conversation has been retrieved 2",
                                         {"user": helpers.getDictFromSQLAlchemyObj(user), "email": email,
                                          "company": helpers.getDictFromSQLAlchemyObj(user.Company), "newsletters": newsletters,
                                          "userSettings": None})
 
-        return helpers.jsonResponse(True, 200, "Profile has been retrieved 3",
+        return helpers.jsonResponse(True, 200, "Conversation has been retrieved 3",
                                     {"user": helpers.getDictFromSQLAlchemyObj(user), "email": email,
                                      "company": helpers.getDictFromSQLAlchemyObj(user.Company), "newsletters": newsletters,
                                      "userSettings": helpers.getDictFromSQLAlchemyObj(userSettings_callback.Data)})
@@ -72,7 +72,7 @@ def profile():
         if not callback.Success:
             return helpers.jsonResponse(False, 400,"Could not update Company's information.", None)
 
-        return helpers.jsonResponse(True, 200, "Profile has been updated.", None)
+        return helpers.jsonResponse(True, 200, "Conversation has been updated.", None)
 
 
 @profile_router.route("/profile/settings", methods=['POST'])

@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "./AssistantSettingsModal.less"
 import {Button, Form, Input, InputNumber, Modal, Switch} from "antd";
 
 const FormItem = Form.Item;

@@ -5,8 +5,9 @@ from typing import List
 from sqlalchemy import and_
 from sqlalchemy.sql import exists, func
 
+import enums
 from config import BaseConfig
-from models import db, Callback, ValidationType, Assistant, Block, BlockType, BlockAction, Plan, BlockGroup
+from models import db, Callback, Assistant, Block, Plan, BlockGroup
 from utilities import json_utils, helpers
 
 bot_currentVersion = "1.0.0"
@@ -14,20 +15,27 @@ bot_currentVersion = "1.0.0"
 
 # ----- Getters ----- #
 # Get the chatbot for the public to use
-def getChatbot(assistant: Assistant) -> dict:
-    return {'assistant': {'id': helpers.encrypt_id(assistant.ID), 'name': assistant.Name, 'message': assistant.Message,
-                          'secondsUntilPopup': assistant.SecondsUntilPopup, 'active': assistant.Active},
-            'blocks': getAllBlocks(assistant)}
+def getChatbot(assistant: Assistant) -> Callback:
+    try:
+        data = {'assistant': {'id': helpers.encrypt_id(assistant.ID), 'name': assistant.Name,
+                              'message': assistant.Message,
+                              'secondsUntilPopup': assistant.SecondsUntilPopup,
+                              'active': assistant.Active},
+                'blocks': getAllBlocks(assistant),
+                }
+        return Callback(True, '', data)
+    except Exception as e:
+        print("ERROR: getChatbot()", e)
+        db.session.rollback()
+        return Callback(False, 'Could not retrieve chatbot flow')
+
 
 
 # Get the flow for the company to manage the blocks
 def getFlow(assistant: Assistant) -> Callback:
     blockGroups = getBlockGroups(assistant)
     if not blockGroups:
-        data = {'botVersion': bot_currentVersion,
-                'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
-                'blockGroups': []}
-        return Callback(True, 'Could not retrieve flow', data)
+        return Callback(False, 'Could not retrieve flow')
 
     data = {'botVersion': bot_currentVersion,
             'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
@@ -42,12 +50,12 @@ def getBlockGroups(assistant: Assistant) -> List[dict]:
         groups = []
         for group in result:
             groups.append({'id': group.ID, 'name': group.Name, 'description': group.Description,
-                           'blocks': getBlocksByGroup(group)})
+                           'blocks': getBlocksFromGroup(group)})
         return groups
     except Exception as e:
         print("getBlockGroups ERROR:", e)
         db.session.rollback()
-        return None
+        raise Exception('Error: getBlockGroups()')
     # finally:
     # db.session.close()
 
@@ -70,18 +78,19 @@ def getGroupByID(id) -> Callback:
 
 
 # Get the list of blocks by group
-def getBlocksByGroup(group: BlockGroup) -> List[dict]:
+def getBlocksFromGroup(group: BlockGroup) -> List[dict]:
     try:
+
         blocks = []
         for block in group.Blocks:
-            blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,
-                           'content': block.Content, 'storeInDB': block.StoreInDB,
-                           'labels': block.Labels, 'isSkippable': block.Skippable,
-                           'groupID': block.GroupID})
+            blocks.append(createDictFromBlock(block))
+
         return blocks
+
     except Exception as e:
         print("getBlocks ERROR:", e)
         db.session.rollback()
+        raise Exception('Error: getBlocksFromGroup()')
     # finally:
     # db.session.close()
 
@@ -90,16 +99,18 @@ def getBlocksByGroup(group: BlockGroup) -> List[dict]:
 def getAllBlocks(assistant: Assistant) -> List[dict]:
     try:
         groups: List[BlockGroup] = db.session.query(BlockGroup).filter(BlockGroup.AssistantID == assistant.ID)
+        if not groups: raise Exception
+
         blocks = []
         for group in groups:
             for block in group.Blocks:
-                blocks.append({'id': block.ID, 'type': block.Type.value, 'order': block.Order,
-                               'content': block.Content, 'storeInDB': block.StoreInDB, 'labels': block.Labels,
-                               'isSkippable': block.Skippable})
+                blocks.append(createDictFromBlock(block))
+
         return blocks
     except Exception as e:
         print("getBlocks ERROR:", e)
         db.session.rollback()
+        raise Exception('Error: getAllBlocks()')
     # finally:
     # db.session.close()
 
@@ -124,7 +135,7 @@ def addBlock(data: dict, group: BlockGroup) -> Callback:
     try:
 
         # Validate submitted block content using json schema
-        json_utils.validateSchema(data, 'blocks/newBlock.json')
+        json_utils.validateSchema(data, 'blocks/NewBlock.json')
         block = data.get('block')
 
         # Set the block with max order + 1
@@ -132,9 +143,7 @@ def addBlock(data: dict, group: BlockGroup) -> Callback:
         if maxOrder is None:
             maxOrder = 0
 
-        newBlock = Block(Type=BlockType(block['type']), Order=maxOrder + 1, Content=block['content'],
-                         StoreInDB=block['storeInDB'], Skippable=block['isSkippable'],
-                         Labels=block['labels'], Group=group)
+        newBlock = createBlockFromDict(block, maxOrder + 1, group)
         db.session.add(newBlock)
         db.session.commit()
 
@@ -219,29 +228,25 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
         return Callback(False, "blocks' order values should be consecutive"
                                " e.g. [1,2,3] or [1,3,2] (correct), [1,2,4] (incorrect)")
 
-    # Make sure the number of submitted questions is equivalent to what stored in the database
-    # if numOfBlocks != len(group.Blocks):
-    #     return Callback(False, "The number of submitted blocks isn't equivalent to what stored in the database")
 
     # After full validation of blocks' data integrity, we will update the blocks one by one.
     try:
         for block in blocks:
-            callback: Callback = isValidBlock(block, str(BlockType(block.get('type')).name))
+            callback: Callback = isValidBlock(block, str(enums.BlockType(block.get('type')).name))
             if not callback.Success:
                 return callback
 
-            print(block);
-            # HERE THE UPDATE PROBLEM START
             # Update the block
             oldBlock: Block = db.session.query(Block). \
                 filter(and_(Block.ID == block.get('id'), Assistant.ID == assistant.ID)).first()
-            oldBlock.Type = BlockType(block.get('type'))
+            oldBlock.Type = enums.BlockType(block.get('type'))
             oldBlock.Content = block.get('content')
             oldBlock.StoreInDB = block.get('storeInDB')
             oldBlock.Skippable = block.get('isSkippable')
             oldBlock.Order = block.get('order')
             oldBlock.Labels = block.get('labels')
             oldBlock.GroupID = block.get('groupID')
+            oldBlock.DataType = block.get('dataType')['name'].replace(" ", "")
 
         # Save
         db.session.commit()
@@ -277,11 +282,11 @@ def deleteGroupByID(id, assistant: Assistant) -> Callback:
     # db.session.close()
 
 
-def deleteBlockByID(id, assistant: Assistant) -> Callback:
+def deleteBlockByID(id, group: BlockGroup) -> Callback:
     try:
         if not id:
             return Callback(False, "Group id is required.")
-        block: Block = db.session.query(Block).filter(and_(Block.ID == id, Assistant.ID == assistant.ID)).first()
+        block: Block = db.session.query(Block).filter(and_(Block.ID == id, group.ID == group.ID)).first()
         if not block:
             return Callback(False, "Block doesn't exist.")
 
@@ -312,6 +317,66 @@ def deleteAllBlock(assistant: Assistant) -> Callback:
     # db.session.close()
 
 
+
+
+# ----- Template Generators ----- #
+
+# OLD CODE: This has to add group functionality
+def genFlowViaTemplateUplaod(group: BlockGroup, data: dict):
+    try:
+        # Validate submitted block data
+        json_utils.validateSchema(data, 'flowTemplate.json')
+        print(data.get('bot')['blocks'][0])
+        if not deleteAllBlock(group.Assistant).Success:
+            return Callback(False, 'Error in deleting blocks')
+
+        counter = 1
+        for block in data.get('bot')['blocks']:
+            db.session.add(createBlockFromDict(block, counter, group))
+            counter += 1
+        # Save
+        db.session.commit()
+        return Callback(True, 'Template was successfully uploaded')
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Error while uploading a bot via a template')
+    # finally:
+    # db.session.close()
+
+
+# OLD CODE: This has to add group functionality
+# Generate a bot using an already built template
+def genFlowViaTemplate(group: BlockGroup, tempName: str):
+    try:
+        # Get json template
+        relative_path = join('static/bot_templates', tempName + '.json')
+        absolute_path = join(BaseConfig.APP_ROOT, relative_path)
+        data = json.load(open(absolute_path))
+
+        # Validate submitted block data
+
+        json_utils.validateSchema(data, 'flowTemplate.json')
+        counter = 1
+        for block in data.get('bot')['blocks']:
+            db.session.add(createBlockFromDict(block, counter, group))
+            counter += 1
+        # Save
+        db.session.commit()
+        return Callback(True, 'Bot was successfully generated via a template')
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Error while generating a bot via a template')
+    # finally:
+    # db.session.close()
+
+
+
+
+
+# ----- Extras ----- #
+
 def isValidBlock(block: dict, blockType: str):
     try:
         json_utils.validateSchema(block.get('content'), 'blocks/' + blockType + '.json')
@@ -324,44 +389,47 @@ def isValidBlock(block: dict, blockType: str):
 
         if blockType and blockID:
             msg = "the block with id '" + str(blockID) + "' doesn't follow the correct format of " \
-                  + str(BlockType(blockType).value) + " block type"
+                  + str(enums.BlockType(blockType).value) + " block type"
 
         return Callback(False, msg, exc.args[0])
     return Callback(True, "Valid block")
 
 
-def getOptions() -> dict:
-    return {
+def getOptions(industry=None) -> Callback:
+
+    options =  {
         'botVersion': bot_currentVersion,
-        'types': [a.value for a in BlockType],
-        'blockTypes': [{
-            'name': BlockType.UserInput.value,
-            'validations': [uiv.value for uiv in ValidationType],
-            'actions': [a.value for a in BlockAction],
-            'alwaysStoreInDB': True
+        'types': [a.value for a in enums.BlockType],
+        'userTypes': [uiv.value for uiv in enums.UserType],
+        'dataTypes': [uiv.value for uiv in enums.DataType],
+        'blockTypes': [
+            {
+                'name': enums.BlockType.UserInput.value,
+                'actions': [a.value for a in enums.BlockAction],
+                'alwaysStoreInDB': True
             },
             {
-                'name': BlockType.Question.value,
-                'actions': [a.value for a in BlockAction],
+                'name': enums.BlockType.Question.value,
+                'actions': [a.value for a in enums.BlockAction],
                 'alwaysStoreInDB': False
             },
             {
-                'name': BlockType.FileUpload.value,
-                'actions': [a.value for a in BlockAction],
+                'name': enums.BlockType.FileUpload.value,
+                'actions': [a.value for a in enums.BlockAction],
                 'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
                 'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH / 1000000)) + 'MB',
                 'alwaysStoreInDB': True
             },
             {
-                'name': BlockType.Solutions.value,
+                'name': enums.BlockType.Solutions.value,
                 'maxSolutions': 5,
-                'actions': [a.value for a in BlockAction],
+                'actions': [a.value for a in enums.BlockAction],
             },
         ]
     }
+    return Callback(True, '', options)
 
 
-# ----- Extras ----- #
 def getBlocksCountByAssistant(assistant: Assistant):
     try:
         return db.session.query(func.count(Block.ID)).filter(Block.AssistantID == assistant.ID).scalar()
@@ -382,52 +450,25 @@ def getRemainingBlocksByAssistant(assistant: Assistant):
     # db.session.close()
 
 
-def genFlowViaTemplateUplaod(assistant: Assistant, data: dict):
+def createBlockFromDict(block: dict, order, group: BlockGroup):
     try:
-        # Validate submitted block data
-        json_utils.validateSchema(data, 'flowTemplate.json')
-        print(data.get('bot')['blocks'][0])
-        if not deleteAllBlock(assistant).Success:
-            return Callback(False, 'Error in deleting blocks')
-
-        counter = 1
-        for block in data.get('bot')['blocks']:
-            db.session.add(Block(Type=BlockType(block['type']), Order=counter, Content=block['content'],
-                                 StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Assistant=assistant))
-            counter += 1
-        # Save
-        db.session.commit()
-        return Callback(True, 'Template was successfully uploaded')
-    except Exception as exc:
-        print(exc)
-        db.session.rollback()
-        return Callback(False, 'Error while uploading a bot via a template')
-    # finally:
-    # db.session.close()
+        block = Block(Type=enums.BlockType(block.get('type')), Order=order, Content=block.get('content'),
+                     StoreInDB=block.get('storeInDB'), Skippable=block.get('isSkippable'),
+                     Group=group, DataType=enums.DataType[block.get('dataType')['name'].replace(" ", "")])
+        return block
+    except Exception as e:
+        print("createBlockFromDict ERROR:", e)
+        raise Exception('Error: createBlockFromDict()')
 
 
-# Generate a bot using an already built template
-def genFlowViaTemplate(assistant: Assistant, tempName: str):
+def createDictFromBlock(block: Block):
     try:
-        # Get json template
-        relative_path = join('static/bot_templates', tempName + '.json')
-        absolute_path = join(BaseConfig.APP_ROOT, relative_path)
-        data = json.load(open(absolute_path))
-
-        # Validate submitted block data
-
-        json_utils.validateSchema(data, 'flowTemplate.json')
-        counter = 1
-        for block in data.get('bot')['blocks']:
-            db.session.add(Block(Type=BlockType(block['type']), Order=counter, Content=block['content'],
-                                 StoreInDB=block['storeInDB'], Skippable=block['isSkippable'], Assistant=assistant))
-            counter += 1
-        # Save
-        db.session.commit()
-        return Callback(True, 'Bot was successfully generated via a template')
-    except Exception as exc:
-        print(exc)
-        db.session.rollback()
-        return Callback(False, 'Error while generating a bot via a template')
-    # finally:
-    # db.session.close()
+        block = {'id': block.ID, 'type': block.Type.value, 'order': block.Order,
+                'content': block.Content, 'storeInDB': block.StoreInDB,
+                'groupID': block.GroupID, 'isSkippable': block.Skippable,
+                'dataType': block.DataType.value
+                }
+        return block
+    except Exception as e:
+        print("createBlockFromDict ERROR:", e)
+        raise Exception('Error: createBlockFromDict()')

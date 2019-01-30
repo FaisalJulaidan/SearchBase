@@ -27,7 +27,7 @@ function* saveProfileData(action) {
         const res = yield http.post(`/profile`, action.profileData);
         yield put(profileActions.saveProfileDetailsSuccess(res.data.msg));
         yield destroyMessage();
-        yield alertSuccess('Profile Saved', "Profile details have been updated");
+        yield alertSuccess('Conversation Saved', "Conversation details have been updated");
         return yield put(profileActions.getProfile())
     } catch (error) {
         console.log(error);

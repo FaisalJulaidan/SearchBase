@@ -8,6 +8,7 @@ import {getUser, history} from '../../helpers';
 import {Route, Switch} from 'react-router-dom';
 import Flow from "./Assistants/Assistant/Flow/Flow";
 import Profile from "./AccountDetails/Profile/Profile";
+import UsersManagement from "./AccountDetails/UsersManagement/UsersManagement";
 import Documentation from "./Documentation/Documentation";
 import Integration from "./Assistants/Assistant/Integration/Integration";
 import UserInput from "./Assistants/Assistant/UserInput/UserInput";
@@ -165,6 +166,7 @@ class Dashboard extends Component {
                             <Route path={`${match.path}/assistants/:id/solutions`} component={Solutions}/>
                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                             <Route path={`${match.path}/profile`} component={Profile} exact/>
+                            <Route path={`${match.path}/users-management`} component={UsersManagement} exact/>
                             <Route path={`${match.path}/documentation`} component={Documentation} exact/>
                             <Route path="/dashboard" component={Home}/>
                         </Switch>

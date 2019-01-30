@@ -1,8 +1,15 @@
 from enum import Enum, unique
 
 # ===============================================================================================
-# IMPORTANT: before making any changes to this file please ask Faisal Julaidan.
+# IMPORTANT: make sure when you edit or add new Enums to change the JSON schemas accordingly.
+# also don't forget to  migrate database tables where necessary e.g. ChatbotSession, Block
+# You know just ask Faisal Julaidan before making any changes.
+# STEP TO FOLLOW
+# 1. Change the Enum
+# 2. Make the change accordingly to the JSON Schema
+# 3. Migrate the Database accordingly
 # ===============================================================================================
+
 
 class ValidationType(Enum):
     Ignore = 'Ignore'
@@ -36,15 +43,12 @@ class UserType(Enum):
 
 @unique
 class DataType(Enum):
-    # ===============================================================================================
-    # IMPORTANT: make sure when you edit or add new DataType to change the JSON schemas accordingly.
-    # also don't forget to  migrate ChatbotSession table's records
-    # You know just ask Faisal Julaidan before making any changes.
-    # ===============================================================================================
+
+    # Common
     NoType = {'name': 'No Type', 'validation': ValidationType.Ignore.value,
               'userTypes': []}
 
-    FullName = {'name': 'Full Name', 'validation': ValidationType.Name.value,
+    Name = {'name': 'Name', 'validation': ValidationType.Name.value,
              'userTypes': [UserType.Candidate.value, UserType.Client.value]}
 
     Email = {'name': 'Email', 'validation': ValidationType.Email.value,
@@ -53,40 +57,68 @@ class DataType(Enum):
     Telephone = {'name': 'Telephone', 'validation': ValidationType.Telephone.value,
                  'userTypes': [UserType.Candidate.value, UserType.Client.value]}
 
+    LinkdinURL = {'name': 'Linkdin URL', 'validation': ValidationType.URL.value,
+              'userTypes': [UserType.Candidate.value, UserType.Client.value]}
+
+    # Candidate
+    Gender = {'name': 'Gender', 'validation': ValidationType.Ignore.value,
+              'userTypes': [UserType.Candidate.value]}
+
+    Degree = {'name': 'Degree', 'validation': ValidationType.Ignore.value,
+              'userTypes': [UserType.Candidate.value]}
+
     Resume = {'name': 'Resume', 'validation': ValidationType.Ignore.value,
               'userTypes': [UserType.Candidate.value]}
 
     ContactTime = {'name': 'Contact Time', 'validation': ValidationType.Email.value,
                    'userTypes': [UserType.Candidate.value, UserType.Client.value]}
 
+    Availability = {'name': 'Availability', 'validation': ValidationType.Ignore.value,
+                    'userTypes': [UserType.Candidate.value]}
+
+    CurrentSalary = {'name': 'Current Salary', 'validation': ValidationType.Number.value,
+                     'userTypes': [UserType.Candidate.value]}
+
     DesiredSalary = {'name': 'Desired Salary', 'validation': ValidationType.Number.value,
                      'userTypes': [UserType.Candidate.value]}
 
-    Availability = {'name': 'Availability', 'validation': ValidationType.Ignore.value,
-                    'userTypes': [UserType.Candidate.value, UserType.Client.value]}
-
     DesiredPosition = {'name': 'Desired Position', 'validation': ValidationType.Ignore.value,
-                       'userTypes': [UserType.Candidate.value, UserType.Client.value]}
+                       'userTypes': [UserType.Candidate.value]}
 
     DesiredPositionYearsExp = {'name': 'Desired Position Years Exp', 'validation': ValidationType.Ignore.value,
-                               'userTypes': [UserType.Candidate.value, UserType.Client.value]}
+                               'userTypes': [UserType.Candidate.value]}
 
-    TopSkill = {'name': 'Top Skill', 'validation': ValidationType.Ignore.value,
+    TopSkills = {'name': 'Top Skills', 'validation': ValidationType.Ignore.value,
                 'userTypes': [UserType.Candidate.value]}
 
-    TopSkillYearsExp = {'name': 'Top Skill Years Exp', 'validation': ValidationType.Ignore.value,
+    TopSkillsYearsExp = {'name': 'Top Skills Years Exp', 'validation': ValidationType.Ignore.value,
                         'userTypes': [UserType.Candidate.value]}
 
-    LinkdinURL = {'name': 'Linkdin URL', 'validation': ValidationType.URL.value,
-                  'userTypes': [UserType.Candidate.value, UserType.Client.value]}
 
     DesiredLocation = {'name': 'Desired Location', 'validation': ValidationType.Ignore.value,
                        'userTypes': [UserType.Candidate.value]}
 
-    EmploymentType = {'name': 'Employment Type', 'validation': ValidationType.Ignore.value,
+    DesiredEmploymentType = {'name': 'Desired Employment Type', 'validation': ValidationType.Ignore.value,
                       'userTypes': [UserType.Candidate.value]}
 
-    DesiredHourlyRate = {'name': 'Desired Hourly Rate', 'validation': ValidationType.Ignore.value,
+    DesiredHourlyRate = {'name': 'Desired Hourly Rate', 'validation': ValidationType.Number.value,
                          'userTypes': [UserType.Candidate.value]}
 
+
+    # Client
+
+    Location = {'name': 'Location', 'validation': ValidationType.Ignore.value,
+                     'userTypes': [UserType.Client.value]}
+
+    NearbyStation = {'name': 'Nearby Station', 'validation': ValidationType.Ignore.value,
+                'userTypes': [UserType.Client.value]}
+
+    OfferingSalary = {'name': 'Offering Salary', 'validation': ValidationType.Number.value,
+                     'userTypes': [UserType.Client.value]}
+
+    OfferingEmploymentType = {'name': 'Offering Employment Type', 'validation': ValidationType.Ignore.value,
+                      'userTypes': [UserType.Client.value]}
+
+    DesiredSkills = {'name': 'Desired Skills', 'validation': ValidationType.Ignore.value,
+                     'userTypes': [UserType.Client.value]}
 

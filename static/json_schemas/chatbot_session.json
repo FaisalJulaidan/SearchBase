@@ -8,7 +8,9 @@
       "properties":{
         "blockID": {"type": "integer"},
         "questionText": {"type": "string"},
-        "dataType": {"enum": ["No Type", "Email", "Full Name", "Telephone", "Contact Time", "Desired Salary", "Availability", "Desired Position", "Desired Position Years Exp", "Top Skill", "Top Skill Years Exp", "Resume", "Linkdin URL", "Desired Location", "Employment Type", "Desired Hourly Rate"]},
+        "dataType": {"enum": ["No Type", "Email", "Name", "Telephone", "Linkdin URL",
+          "Degree", "Gender", "Resume", "Contact Time", "Availability", "Current Salary", "Desired Salary", "Desired Position", "Desired Position Years Exp", "Top Skills", "Top Skills Years Exp", "Desired Location", "Desired Employment Type", "Desired Hourly Rate"
+        , "Location", "NearbyStation", "Offering Salary", "Offering Employment Type", "Desired Skills"]},
         "input": {"type": "string"},
         "keywords": {"type": ["array","string"], "items": {"type": ["string"]}}
         },

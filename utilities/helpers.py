@@ -84,7 +84,7 @@ def gen_dummy_data():
     }))
 
     db.session.add(Block(Type=enums.BlockType.UserInput, Order=2, StoreInDB=True, Skippable=False,
-                         Group=reader_a_blocksGroup, DataType=enums.DataType.FullName, Content={
+                         Group=reader_a_blocksGroup, DataType=enums.DataType.Name, Content={
         "action": "Go To Next Block",
         "text": "Give me some input",
         "blockToGoID": None,

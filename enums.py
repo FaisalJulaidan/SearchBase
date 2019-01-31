@@ -120,7 +120,7 @@ class DataType(Enum):
     JobDescription = {'name': 'Description of the Job', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}
 
-    JobCandidatesNeeded = {'name': 'Candidates looking to recruit', 'validation': ValidationType.Ignore.value,
+    CandidatesNeeded = {'name': 'Candidates looking to recruit', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}
 
     EssentialSkills = {'name': 'Essential Skills', 'validation': ValidationType.Ignore.value,
@@ -135,7 +135,7 @@ class DataType(Enum):
     JobSalaryOffered = {'name': 'Salary being offered', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}
 
-    JobRate = {'name': 'Contract Rate', 'validation': ValidationType.Ignore.value,
+    ContractRate = {'name': 'Contract Rate', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}
 
     JobAvailability = {'name': 'Availability Of the Job', 'validation': ValidationType.Ignore.value,

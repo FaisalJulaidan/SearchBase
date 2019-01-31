@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS Companies;
 DROP TABLE IF EXISTS Users;
-DROP TABLE IF EXISTS Assistants;
+DROP TABLE IF EXISTS Databases;
 DROP TABLE IF EXISTS Products;
 DROP TABLE IF EXISTS Statistics;
 DROP TABLE IF EXISTS Questions;
@@ -42,7 +42,7 @@ CREATE TABLE 'UserSettings' (
 	FOREIGN KEY('CompanyID') REFERENCES 'Companies'('ID')
 );
 
-CREATE TABLE 'Assistants' (
+CREATE TABLE 'Databases' (
 	'ID'	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	'CompanyID'	INTEGER NOT NULL,
 	'Route'	TEXT UNIQUE,
@@ -63,7 +63,7 @@ CREATE TABLE 'Products' (
 	'Keywords'	TEXT NOT NULL,
 	'Discount'	TEXT NOT NULL,
 	'URL'	TEXT NOT NULL,
-	FOREIGN KEY('AssistantID') REFERENCES 'Assistants'('ID')
+	FOREIGN KEY('AssistantID') REFERENCES 'Databases'('ID')
 );
 
 CREATE TABLE 'Statistics' (
@@ -80,7 +80,7 @@ CREATE TABLE 'Questions' (
 	'AssistantID'	INTEGER NOT NULL,
 	'Question'	TEXT NOT NULL,
 	'Type'	TEXT NOT NULL,
-	FOREIGN KEY('AssistantID') REFERENCES 'Assistants'('ID')
+	FOREIGN KEY('AssistantID') REFERENCES 'Databases'('ID')
 );
 
 CREATE TABLE 'Answers' (

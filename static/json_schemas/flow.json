@@ -12,14 +12,14 @@
         "dataType": {"type": "object",
           "properties": {
             "name": {"enum": ["No Type", "Email", "Name", "Telephone", "Linkdin URL",
-              "Degree", "Gender", "Resume", "Contact Time", "Availability", "Current Salary", "Desired Salary", "Desired Position", "Desired Position Years Exp", "Top Skills", "Top Skills Years Exp", "Desired Location", "Desired Employment Type", "Desired Hourly Rate"
-            , "Location", "NearbyStation", "Offering Salary", "Offering Employment Type", "Desired Skills"]},
+              "Degree", "Gender", "Resume", "Contact Time", "Availability", "Current Salary", "Desired Salary", "Desired Position", "Candidate Skills", "Years Exp", "Preferred Location", "Preferred Employment Type", "Desired Hourly Rate"
+            , "Location", "NearbyStation", "Job Salary Offered", "Employment Type Offered", "Essential Skills", "Essential Years Exp",  "Job Description", "Job Availability"]},
             "validation": {"enum": ["Ignore", "Email", "Telephone", "Name", "Number", "URL"]}
           },
-
           "required": ["name", "validation"],
           "additionalProperties": true
         },
+
         "type": {"enum": ["Question", "User Input", "File Upload", "Solutions", "End Chat"]},
         "order": {"type": "integer", "minimum": 1},
         "storeInDB": {"type": "boolean"},

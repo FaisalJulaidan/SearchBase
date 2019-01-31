@@ -9,8 +9,8 @@
         "blockID": {"type": "integer"},
         "questionText": {"type": "string"},
         "dataType": {"enum": ["No Type", "Email", "Name", "Telephone", "Linkdin URL",
-          "Degree", "Gender", "Resume", "Contact Time", "Availability", "Current Salary", "Desired Salary", "Desired Position", "Desired Position Years Exp", "Top Skills", "Top Skills Years Exp", "Desired Location", "Desired Employment Type", "Desired Hourly Rate"
-        , "Location", "NearbyStation", "Offering Salary", "Offering Employment Type", "Desired Skills"]},
+          "Degree", "Gender", "Resume", "Contact Time", "Availability", "Current Salary", "Desired Salary", "Desired Position", "Candidate Skills", "Years Exp", "Preferred Location", "Preferred Employment Type", "Desired Hourly Rate"
+        , "Location", "NearbyStation", "Job Salary Offered", "Employment Type Offered", "Essential Skills", "Essential Years Exp",  "Job Description", "Job Availability"]},
         "input": {"type": "string"},
         "keywords": {"type": ["array","string"], "items": {"type": ["string"]}}
         },

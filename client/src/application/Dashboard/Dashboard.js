@@ -4,6 +4,7 @@ import {Avatar, Dropdown, Icon, Layout, Menu, notification} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
 import Assistants from './Assistants/Assistants';
+import Databases from './Databases/Databases';
 import {getUser, history} from '../../helpers';
 import {Route, Switch} from 'react-router-dom';
 import Flow from "./Assistants/Assistant/Flow/Flow";
@@ -122,6 +123,11 @@ class Dashboard extends Component {
                             <span>Assistants</span>
                         </Menu.Item>
 
+                        <Menu.Item key="databases">
+                            <Icon type="database"/>
+                            <span>Databases</span>
+                        </Menu.Item>
+
                         <Divider/>
 
                         <SubMenu key="sub2"
@@ -168,6 +174,7 @@ class Dashboard extends Component {
                             <Route path={`${match.path}/assistants/:id/solutions`} component={Solutions}/>
                             <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+                            <Route path={`${match.path}/databases`} component={Databases} exact/>
                             <Route path={`${match.path}/profile`} component={Profile} exact/>
                             <Route path={`${match.path}/users-management`} component={UsersManagement} exact/>
                             <Route path={`${match.path}/documentation`} component={Documentation} exact/>

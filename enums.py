@@ -83,13 +83,13 @@ class DataType(Enum):
     CurrentRole = {'name': 'Current Role', 'validation': ValidationType.Number.value,
                      'userTypes': [UserType.Candidate.value]}
 
-    DesiredSalary = {'name': 'Desired Salary', 'validation': ValidationType.Number.value,
-                     'userTypes': [UserType.Candidate.value]}
-
     DesiredPosition = {'name': 'Desired Position', 'validation': ValidationType.Ignore.value,
                        'userTypes': [UserType.Candidate.value]}
 
-    Skills = {'name': 'Skills', 'validation': ValidationType.Ignore.value,
+    DesiredSalary = {'name': 'Desired Salary', 'validation': ValidationType.Number.value,
+                     'userTypes': [UserType.Candidate.value]}
+
+    CandidateSkills = {'name': 'Candidate Skills', 'validation': ValidationType.Ignore.value,
                 'userTypes': [UserType.Candidate.value]}
 
     YearsExp = {'name': 'Years Exp', 'validation': ValidationType.Ignore.value,
@@ -98,14 +98,15 @@ class DataType(Enum):
     PreferredLocation = {'name': 'Preferred Location', 'validation': ValidationType.Ignore.value,
                          'userTypes': [UserType.Candidate.value]}
 
-    PreferredEmploymentType = {'name': 'Preferred Employment Type', 'validation': ValidationType.Ignore.value,
+    PreferredEmploymentType = {'name': 'Desired Employment Type', 'validation': ValidationType.Ignore.value,
                                'userTypes': [UserType.Candidate.value]}
 
     DesiredHourlyRate = {'name': 'Desired Hourly Rate', 'validation': ValidationType.Number.value,
                      'userTypes': [UserType.Candidate.value]}
 
 
-    # Client
+
+# Client
 
     Location = {'name': 'Location', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}
@@ -119,22 +120,25 @@ class DataType(Enum):
     EmploymentTypeOffered = {'name': 'Employment Type Offered', 'validation': ValidationType.Ignore.value,
                               'userTypes': [UserType.Client.value]}
 
+    CandidatesNeeded = {'name': 'Candidates looking to recruit', 'validation': ValidationType.Ignore.value,
+                     'userTypes': [UserType.Client.value]}
+
     EssentialSkills = {'name': 'Essential Skills', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}
 
-    EssentialYearsExperience = {'name': 'Essential years of experience', 'validation': ValidationType.Ignore.value,
+    EssentialYearsExp = {'name': 'Essential Years Exp', 'validation': ValidationType.Ignore.value,
+                     'userTypes': [UserType.Client.value]}
+
+    ContractRate = {'name': 'Contract Rate', 'validation': ValidationType.Ignore.value,
                      'userTypes': [UserType.Client.value]}
 
     JobDescription = {'name': 'Job Description', 'validation': ValidationType.Ignore.value,
                       'userTypes': [UserType.Client.value]}
 
     JobAvailability = {'name': 'Job Availability', 'validation': ValidationType.Ignore.value,
-                       'userTypes': [UserType.Client.value]}
+                     'userTypes': [UserType.Client.value]}
 
-    JobRate = {'name': 'Contract Rate', 'validation': ValidationType.Ignore.value,
-               'userTypes': [UserType.Client.value]}
-
-    JobCandidatesNeeded = {'name': 'Candidates looking to recruit', 'validation': ValidationType.Ignore.value,
+    JobCandidatesNeeded = {'name': 'Job Candidates Needed', 'validation': ValidationType.Ignore.value,
                            'userTypes': [UserType.Client.value]}
 
 

@@ -441,6 +441,7 @@ def getBlocksCountByAssistant(assistant: Assistant):
 
 def getRemainingBlocksByAssistant(assistant: Assistant):
     try:
+
         # BlocksCap = numberOfCreatedBlocks
         return db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first()[0] - getBlocksCountByAssistant(
             assistant)

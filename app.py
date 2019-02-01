@@ -3,7 +3,7 @@ import os
 import config
 from flask import Flask, render_template
 from flask_api import status
-from models import db
+from models import db, User
 from services.mail_services import mail
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand, command
@@ -11,7 +11,8 @@ from sqlalchemy_utils import create_database, database_exists
 from flask_apscheduler import APScheduler
 from services.jwt_auth_services import jwt
 from utilities import helpers
-from enums import DataType
+import pandas
+import re
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, settings_router,\
     solutions_router, analytics_router, sub_router, connection_router, chatbotSession_router, users_router,\
@@ -156,8 +157,18 @@ elif os.environ['FLASK_ENV'] == 'development':
     scheduler.init_app(app)
     scheduler.start()
 
-    # Run the app server
-    print('Development mode running...')
+    # # Test with data analysis using Pandas library
+    # df = pandas.read_sql_query("SELECT * FROM User", db.get_engine(app))
+    # keywords = ['Hadi', 'name', 'Ali', 4]
+    # df['result'] = df['Firstname'] + " " + df['Surname'] + " " + df['Email'] + " " + df['PhoneNumber']
+    # df['count'] = df.result.str.count('h', flags=re.IGNORECASE)
+    # df.loc[df.RoleID >=3, ['count']] += 5
+    #
+    # print(df)
+    # print(df.nlargest(2, 'count').to_json(orient='records'))
+    #
+    # # Run the app server
+    # print('Development mode running...')
 
 else:
     print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")

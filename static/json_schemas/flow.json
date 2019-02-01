@@ -13,7 +13,7 @@
           "properties": {
             "name": {"enum": ["No Type", "Name", "Email", "Telephone", "Linkdin URL",
               "Gender", "Degree", "Resume", "Contact Time", "Availability", "Current Salary", "Current Role", "Desired Salary", "Desired Position", "Candidate Skills", "Years Exp", "Preferred Location", "Preferred Employment Type", "Desired Hourly Rate"
-            , "Location", "NearbyStation", "Job Salary Offered", "Employment Type Offered", "Essential Skills", "Essential Years Exp", "Contract Rate",  "Job Description", "Job Availability", "Job Candidates Needed"]},
+            , "Location", "NearbyStation", "Job Salary Offered", "Employment Type Offered", "Essential Skills", "Essential Years Exp", "Contract Rate",  "Job Description", "Job Availability", "Candidates Needed"]},
             "validation": {"enum": ["Ignore", "Email", "Telephone", "Name", "Number", "URL"]}
           },
           "required": ["name", "validation"],

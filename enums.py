@@ -137,7 +137,7 @@ class DataType(Enum):
     JobDescription = {'name': 'Job Description', 'validation': ValidationType.Ignore.value,
                       'userTypes': [UserType.Client.value]}
 
-    JobCandidatesNeeded = {'name': 'Candidates needed for the job', 'validation': ValidationType.Ignore.value,
+    JobCandidatesNeeded = {'name': 'Job Candidates Needed', 'validation': ValidationType.Ignore.value,
                            'userTypes': [UserType.Client.value]}
 
 

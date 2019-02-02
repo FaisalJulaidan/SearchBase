@@ -62,9 +62,6 @@ class DataType(Enum):
 
     # Candidate
 
-    PreferredLocation = {'name': 'Preferred Location', 'validation': ValidationType.Ignore.value,
-                       'userTypes': [UserType.Candidate.value]}
-
     Gender = {'name': 'Gender', 'validation': ValidationType.Ignore.value,
               'userTypes': [UserType.Candidate.value]}
 
@@ -91,9 +88,6 @@ class DataType(Enum):
 
     DesiredSalary = {'name': 'Desired Salary', 'validation': ValidationType.Number.value,
                      'userTypes': [UserType.Candidate.value]}
-
-    PreferredEmploymentType = {'name': 'Desired Employment Type', 'validation': ValidationType.Ignore.value,
-                      'userTypes': [UserType.Candidate.value]}
 
     DesiredHourlyRate = {'name': 'Desired Hourly Rate', 'validation': ValidationType.Number.value,
                          'userTypes': [UserType.Candidate.value]}
@@ -143,7 +137,7 @@ class DataType(Enum):
     JobDescription = {'name': 'Job Description', 'validation': ValidationType.Ignore.value,
                       'userTypes': [UserType.Client.value]}
 
-    JobCandidatesNeeded = {'name': 'Candidates looking to recruit', 'validation': ValidationType.Ignore.value,
+    JobCandidatesNeeded = {'name': 'Candidates needed for the job', 'validation': ValidationType.Ignore.value,
                            'userTypes': [UserType.Client.value]}
 
 

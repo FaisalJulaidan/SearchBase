@@ -1,21 +1,35 @@
-import {Button, Modal, Steps} from 'antd';
+import {Button, Divider, Modal, Steps} from 'antd';
 
 import React, {Component} from 'react';
 import UploadDatabaseStep from './NewDatabaseSteps/UploadDatabaseStep'
 import styles from "./NewDatabaseModal.module.less"
+import ConfigureDatabaseStep from "./NewDatabaseSteps/UploadDatabaseStep/ConfigureDatabaseStep";
 
 const Step = Steps.Step;
 
-
 class NewDatabaseModal extends Component {
+
+    constructor(props) {
+        super(props);
+        this.configureDatabaseStep = React.createRef();
+    }
 
     state = {
         current: 0,
         fileList: [],
         uploading: false,
+        databaseConfiguration: {
+            databaseName: undefined,
+            databaseType: undefined
+        }
     };
 
     steps = [
+        {
+            title: 'Configre Database',
+            content: () => <ConfigureDatabaseStep ref={this.configureDatabaseStep}
+                                                  databaseConfiguration={this.state.databaseConfiguration}/>
+        },
         {
             title: 'Upload Data',
             content: () => <UploadDatabaseStep uploading={this.state.uploading}
@@ -33,7 +47,21 @@ class NewDatabaseModal extends Component {
         }];
 
 
-    next = () => this.setState({current: this.state.current + 1});
+    next = () => {
+        if (this.state.current + 1 === 1)
+            this.configureDatabaseStep.current.validateFields(
+                (err, values) => err ? null : this.setState({
+                    databaseConfiguration: {
+                        databaseName: values.databaseName,
+                        databaseType: values.databaseType
+                    },
+                    current: this.state.current + 1
+                })
+            );
+        else
+            this.setState({current: this.state.current + 1})
+    };
+
     prev = () => this.setState({current: this.state.current - 1});
 
     render() {
@@ -53,6 +81,8 @@ class NewDatabaseModal extends Component {
                 </Steps>
 
                 <div className={styles.steps_content}>{this.steps[current].content()}</div>
+
+                <Divider/>
 
                 <div className={styles.steps_action}>
                     {

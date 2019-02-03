@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from "./Sessions.module.less"
 import ViewsModal from "./ViewModal/ViewsModal";
-import { Table, Button, Modal, Tag } from 'antd';
+import {Button, Modal, Table, Tag} from 'antd';
 import moment from 'moment';
 import {chatbotSessionsActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
@@ -197,20 +197,22 @@ class Sessions extends React.Component {
                             <h3>{assistant.Name}: User Inputs</h3>
                             <p>Here you can find all the responses to your chatbot</p>
                         </div>
+
+                        <div>
+                            <Button className={styles.Panel_Header_Button} type="primary" icon="sync"
+                                    onClick={this.refreshSessions} loading={this.props.isLoading}>
+                                Refresh
+                            </Button>
+
+
+                            <Button className={styles.Panel_Header_Button} type="primary" icon="delete"
+                                    onClick={this.showConfirmForClearing} loading={this.props.isClearingAll}>
+                                Clear All
+                            </Button>
+                        </div>
                     </div>
 
                     <div className={styles.Panel_Body}>
-
-                        <Button className={styles.MainBtn} type="primary" icon="sync"
-                                onClick={this.refreshSessions} loading={this.props.isLoading}>
-                            Refresh
-                        </Button>
-
-
-                        <Button className={styles.MainBtn} type="primary" icon="delete"
-                                onClick={this.showConfirmForClearing} loading={this.props.isClearingAll}>
-                            Clear All
-                        </Button>
 
                         <Table columns={columns}
                                dataSource={sessions.sessionsList ? sessions.sessionsList : null}

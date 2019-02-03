@@ -8,7 +8,7 @@ import Header from "../../../components/Header/Header";
 
 class Databases extends Component {
     state = {
-        visible: false,
+        visible: true,
     };
 
     componentDidUpdate(prevProps) {

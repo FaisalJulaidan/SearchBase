@@ -1,9 +1,9 @@
 import {Button, Divider, Modal, Steps} from 'antd';
 
 import React, {Component} from 'react';
-import UploadDatabaseStep from './NewDatabaseSteps/UploadDatabaseStep'
+import UploadDatabaseStep from './NewDatabaseSteps/UploadDatabaseStep/UploadDatabaseStep'
 import styles from "./NewDatabaseModal.module.less"
-import ConfigureDatabaseStep from "./NewDatabaseSteps/UploadDatabaseStep/ConfigureDatabaseStep";
+import ConfigureDatabaseStep from "./NewDatabaseSteps/ConfigureDatabaseStep";
 
 const Step = Steps.Step;
 

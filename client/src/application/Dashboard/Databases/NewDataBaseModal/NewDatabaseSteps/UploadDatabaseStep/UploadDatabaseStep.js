@@ -1,20 +1,31 @@
 import {Button, Icon, Upload} from "antd";
-import React, {Component} from 'react'
-
+import React, {Component} from 'react';
 
 class UploadDatabaseStep extends Component {
+    tabJSON(csv) {
+        let lines = eval('`' + csv + '`').split("\n");
+        let result = [];
+        let headers = lines[0].split("\t");
+        for (let i = 1; i < lines.length; i++) {
+            let obj = {};
+            let currentline = lines[i].split("\t");
+            for (let j = 0; j < headers.length; j++)
+                obj[headers[j].trim()] = currentline[j].replace(/"/g, "");
+            result.push(obj);
+        }
+        //return result; //JavaScript object
+        return eval(JSON.stringify(result)); //JSON
+    }
+
     render() {
-        const {uploading, fileList, setStateHandler} = this.props;
+        const {fileList, setStateHandler} = this.props;
 
         const handleUpload = () => {
-            const formData = new FormData();
-            fileList.forEach((file) => {
-                formData.append('files[]', file);
-            });
-
-            setStateHandler({
-                uploading: true,
-            });
+            let reader = new FileReader();
+            reader.readAsText(this.props.fileList[0]);
+            reader.onload = () => {
+                console.log(this.tabJSON(reader.result));
+            }
         };
 
         const props = {
@@ -53,6 +64,9 @@ class UploadDatabaseStep extends Component {
                             <Icon type="upload"/> Upload
                         </Button>
                     </Upload>
+                    <Button onClick={handleUpload}>
+                        Test
+                    </Button>
                 </div>
             </div>
         )

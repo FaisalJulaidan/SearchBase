@@ -8,10 +8,12 @@ from sqlalchemy.sql import exists, func
 import enums
 from config import BaseConfig
 from models import db, Callback, Assistant, Block, Plan, BlockGroup
-from utilities import json_utils, helpers
+from utilities import helpers
 
 bot_currentVersion = "1.0.0"
 
+from jsonschema import validate
+from utilities import json_schemas
 
 # ----- Getters ----- #
 # Get the chatbot for the public to use
@@ -135,7 +137,7 @@ def addBlock(data: dict, group: BlockGroup) -> Callback:
     try:
 
         # Validate submitted block content using json schema
-        json_utils.validateSchema(data, 'blocks/NewBlock.json')
+        validate(data, json_schemas.new_block)
         block = data.get('block')
 
         # Set the block with max order + 1
@@ -159,7 +161,7 @@ def addBlock(data: dict, group: BlockGroup) -> Callback:
 # ----- Updaters ----- #
 def updateFlow(flow, assistant: Assistant) -> Callback:
     try:
-        json_utils.validateSchema(flow, 'flow.json')
+        validate(flow, json_schemas.flow)
     except Exception as exc:
         print(exc.args)
         return Callback(False, "The submitted bot data does not doesn't follow the correct format")
@@ -325,7 +327,7 @@ def deleteAllBlock(assistant: Assistant) -> Callback:
 def genFlowViaTemplateUplaod(group: BlockGroup, data: dict):
     try:
         # Validate submitted block data
-        json_utils.validateSchema(data, 'flowTemplate.json')
+        # json_utils.validateSchema(data, 'flowTemplate.json')
         print(data.get('bot')['blocks'][0])
         if not deleteAllBlock(group.Assistant).Success:
             return Callback(False, 'Error in deleting blocks')
@@ -356,7 +358,7 @@ def genFlowViaTemplate(group: BlockGroup, tempName: str):
 
         # Validate submitted block data
 
-        json_utils.validateSchema(data, 'flowTemplate.json')
+        # json_utils.validateSchema(data, 'flowTemplate.json')
         counter = 1
         for block in data.get('bot')['blocks']:
             db.session.add(createBlockFromDict(block, counter, group))
@@ -379,7 +381,7 @@ def genFlowViaTemplate(group: BlockGroup, tempName: str):
 
 def isValidBlock(block: dict, blockType: str):
     try:
-        json_utils.validateSchema(block.get('content'), 'blocks/' + blockType + '.json')
+        validate(block.get('content'), getattr(json_schemas, blockType))
     except Exception as exc:
         print(exc.args[0])
         # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
@@ -441,6 +443,7 @@ def getBlocksCountByAssistant(assistant: Assistant):
 
 def getRemainingBlocksByAssistant(assistant: Assistant):
     try:
+
         # BlocksCap = numberOfCreatedBlocks
         return db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first()[0] - getBlocksCountByAssistant(
             assistant)

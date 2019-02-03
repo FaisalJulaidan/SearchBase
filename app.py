@@ -3,7 +3,7 @@ import os
 import config
 from flask import Flask, render_template
 from flask_api import status
-from models import db
+from models import db, Company
 from services.mail_services import mail
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand, command
@@ -11,7 +11,9 @@ from sqlalchemy_utils import create_database, database_exists
 from flask_apscheduler import APScheduler
 from services.jwt_auth_services import jwt
 from utilities import helpers
-from enums import DataType
+
+from services import databases_services
+
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, settings_router,\
     solutions_router, analytics_router, sub_router, connection_router, chatbotSession_router, users_router,\
@@ -155,6 +157,14 @@ elif os.environ['FLASK_ENV'] == 'development':
 
     scheduler.init_app(app)
     scheduler.start()
+
+    # aramco = Company.query.filter(Company.Name == "Aramco").first()
+    #
+    # databases_services.scanCandidates(aramco, 'db1',
+    #                                   {'Job Salary Offered': [1550],
+    #                                    'Job Description': ['working', 'as', 'software', 'engineer', 'to', 'build', 'software'],
+    #                                    'Essential Skills': ['python', 'mysql', 'css', 'html']
+    #                                    })
 
     # Run the app server
     print('Development mode running...')

@@ -1,13 +1,13 @@
 from models import db, Callback, ChatbotSession, Assistant
-from utilities import json_utils
-import enums
+from jsonschema import validate
+from utilities import json_schemas
 
 
 
 # Process chatbot data
 def processData(assistant: Assistant, data: dict) -> Callback:
     try:
-        json_utils.validateSchema(data, 'chatbot_session.json')
+        validate(data, json_schemas.chatbot_session)
     except Exception as exc:
         print(exc.args)
         return Callback(False, "The submitted chatbot data doesn't follow the correct format.", exc.args[0])

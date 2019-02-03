@@ -11,10 +11,10 @@
 
         "dataType": {"type": "object",
           "properties": {
-            "name": {"enum": ["No Type", "Email", "Name", "Telephone", "Linkdin URL",
-              "Degree", "Gender", "Resume", "Contact Time", "Availability", "Current Salary", "Desired Salary", "Desired Position", "Candidate Skills", "Years Exp", "Preferred Location", "Preferred Employment Type", "Desired Hourly Rate"
-            , "Location", "NearbyStation", "Job Salary Offered", "Employment Type Offered", "Essential Skills", "Essential Years Exp",  "Job Description", "Job Availability"]},
-            "validation": {"enum": ["Ignore", "Email", "Telephone", "Name", "Number", "URL"]}
+            "name": {"enum": ["No Type", "Name", "Email", "Telephone", "Linkdin URL", "Post Code",
+              "Gender", "Degree", "Resume", "Contact Time", "Availability", "Current Salary", "Current Role", "Job Title", "Current Employer", "Current Employment Type", "Desired Salary", "Desired Position", "Candidate Skills", "Years Exp", "Preferred Location", "Preferred Employment Type", "Desired Hourly Rate",
+              "Location", "NearbyStation", "Job Salary Offered", "Employment Type Offered", "Essential Skills", "Essential Years Exp", "Contract Rate",  "Job Description", "Job Availability", "Candidates Needed"]},
+            "validation": {"enum": ["Ignore", "Email", "Telephone", "Name", "Number", "URL", "Post Code"]}
           },
 
           "required": ["name", "validation"],

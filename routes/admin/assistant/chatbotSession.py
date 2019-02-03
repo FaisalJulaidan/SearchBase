@@ -1,5 +1,5 @@
 from flask import Blueprint, request, send_from_directory
-from services import chatbotSession_services, assistant_services, dataCategories_services
+from services import chatbotSession_services, assistant_services
 from models import Callback, ChatbotSession, Assistant
 from utilities import helpers
 from config import BaseConfig

@@ -35,14 +35,17 @@ def getChatbot(assistant: Assistant) -> Callback:
 
 # Get the flow for the company to manage the blocks
 def getFlow(assistant: Assistant) -> Callback:
-    blockGroups = getBlockGroups(assistant)
-    if not blockGroups:
-        return Callback(False, 'Could not retrieve flow')
+    try:
 
-    data = {'botVersion': bot_currentVersion,
-            'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
-            'blockGroups': blockGroups}
-    return Callback(True, 'Flow retrieved successfully', data)
+        blockGroups = getBlockGroups(assistant)
+        data = {'botVersion': bot_currentVersion,
+                'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
+                'blockGroups': blockGroups}
+        return Callback(True, 'Flow retrieved successfully', data)
+
+    except Exception as e:
+        print("getFlow ERROR:", e)
+        return Callback(False, 'Could not retrieve flow')
 
 
 # Get the block groups each group having its list of blocks

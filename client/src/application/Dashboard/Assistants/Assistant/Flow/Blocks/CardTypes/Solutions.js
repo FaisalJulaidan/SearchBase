@@ -72,7 +72,7 @@ class Solutions extends Component {
                 <Form layout='horizontal'>
 
                     <FormItem label="Show Top Results"
-                              extra="Number of results you want to return (Best matches)"
+                              extra="Number of results you want to return (Best matches e.g. Clients, Candidates, etc.)"
                               {...this.props.options.layout}>
                         {getFieldDecorator('showTop', {
                             initialValue: block.content.showTop,
@@ -105,13 +105,6 @@ class Solutions extends Component {
                                           getFieldDecorator={getFieldDecorator}
                                           layout={this.props.options.layout}/>
 
-                    <SkippableFormItem FormItem={FormItem} block={block}
-                                       getFieldDecorator={getFieldDecorator}
-                                       layout={this.props.options.layout}/>
-
-                    <StoreInDBFormItem FormItem={FormItem} block={block} blockOptions={blockOptions}
-                                       getFieldDecorator={getFieldDecorator}
-                                       layout={this.props.options.layout}/>
                 </Form>
             </Card>
         );

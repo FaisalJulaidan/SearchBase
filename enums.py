@@ -62,9 +62,7 @@ class DataType(Enum):
 
     # Candidate
 
-    Gender = {'name': 'Gender', 'validation': ValidationType.Ignore.value,
-              'userTypes': [UserType.Candidate.value]}
-
+    # User can upload
     Degree = {'name': 'Degree', 'validation': ValidationType.Ignore.value,
               'userTypes': [UserType.Candidate.value]}
 
@@ -74,15 +72,19 @@ class DataType(Enum):
     ContactTime = {'name': 'Contact Time', 'validation': ValidationType.Email.value,
                    'userTypes': [UserType.Candidate.value, UserType.Client.value]}
 
+    # User can upload
     Availability = {'name': 'Availability', 'validation': ValidationType.Ignore.value,
                     'userTypes': [UserType.Candidate.value]}
 
+    # User can upload
     CurrentRole = {'name': 'Current Role', 'validation': ValidationType.Number.value,
                      'userTypes': [UserType.Candidate.value]}
 
+    # User can upload
     DesiredPosition = {'name': 'Desired Position', 'validation': ValidationType.Ignore.value,
                        'userTypes': [UserType.Candidate.value]}
 
+    # User can upload
     CurrentSalary = {'name': 'Current Salary', 'validation': ValidationType.Number.value,
                      'userTypes': [UserType.Candidate.value]}
 
@@ -92,15 +94,19 @@ class DataType(Enum):
     DesiredHourlyRate = {'name': 'Desired Hourly Rate', 'validation': ValidationType.Number.value,
                          'userTypes': [UserType.Candidate.value]}
 
+    # User can upload
     CandidateSkills = {'name': 'Candidate Skills', 'validation': ValidationType.Ignore.value,
                 'userTypes': [UserType.Candidate.value]}
 
+    # User can upload
     YearsExp = {'name': 'Years Exp', 'validation': ValidationType.Ignore.value,
                         'userTypes': [UserType.Candidate.value]}
 
+    # User can upload
     PreferredEmploymentType = {'name': 'Preferred Employment Type', 'validation': ValidationType.Ignore.value,
                                'userTypes': [UserType.Candidate.value]}
 
+    # User can upload
     PreferredLocation = {'name': 'Preferred Location', 'validation': ValidationType.Ignore.value,
                          'userTypes': [UserType.Candidate.value]}
 

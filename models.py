@@ -336,7 +336,8 @@ class Candidate(db.Model):
     Name = db.Column(db.String(64), nullable=True)
     Email = db.Column(db.String(64), nullable=True)
     Telephone = db.Column(db.String(64), nullable=True)
-    LinkdinURL = db.Column(db.String(128), nullable=True)
+    LinkdinURL = db.Column(db.String(512), nullable=True)
+    PostCode = db.Column(db.String(64), nullable=True)
 
     Gender = db.Column(db.String(24), nullable=True)
     Degree = db.Column(db.String(64), nullable=True)
@@ -345,8 +346,12 @@ class Candidate(db.Model):
     Availability = db.Column(db.String(64), nullable=True)
     CurrentSalary = db.Column(db.Float(), nullable=True)
     CurrentRole = db.Column(db.String(64), nullable=True)
-    DesiredPosition = db.Column(db.String(64), nullable=True)
+    JobTitle = db.Column(db.String(64), nullable=True)
+    CurrentEmployer = db.Column(db.String(64), nullable=True)
+    CurrentEmploymentType = db.Column(db.String(64), nullable=True)
+
     DesiredSalary = db.Column(db.Float(), nullable=True)
+    DesiredPosition = db.Column(db.String(64), nullable=True)
     CandidateSkills = db.Column(db.String(64), nullable=True)
     YearsExp = db.Column(db.Float(), nullable=True)
     PreferredLocation = db.Column(db.String(64), nullable=True)
@@ -369,6 +374,7 @@ class Client(db.Model):
     Email = db.Column(db.String(64), nullable=True)
     Telephone = db.Column(db.String(64), nullable=True)
     LinkdinURL = db.Column(db.String(128), nullable=True)
+    PostCode = db.Column(db.String(64), nullable=True)
 
     Location = db.Column(db.String(64), nullable=True)
     NearbyStation = db.Column(db.String(64), nullable=True)
@@ -376,7 +382,7 @@ class Client(db.Model):
     EmploymentTypeOffered = db.Column(db.String(64), nullable=True)
     CandidatesNeeded = db.Column(db.Integer(), nullable=True)
     EssentialSkills = db.Column(db.String(512), nullable=True)
-    EssentialYearsExp = db.Column(db.String(64), nullable=True)
+    EssentialYearsExp = db.Column(db.Float(), nullable=True)
     ContractRate = db.Column(db.Float(), nullable=True)
     JobDescription = db.Column(db.String(512), nullable=True)
     JobAvailability = db.Column(db.String(64), nullable=True)
@@ -398,5 +404,3 @@ class Callback():
         self.Success: bool = success
         self.Message: str = message
         self.Data: str or dict or bool = data
-    pass
-    # if success else 'Error: ' + message

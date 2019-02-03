@@ -1,20 +1,26 @@
 import {Button, Icon, Upload} from "antd";
-import React, {Component} from 'react'
-
+import React, {Component} from 'react';
+import XLSX from 'xlsx';
 
 class UploadDatabaseStep extends Component {
     render() {
-        const {uploading, fileList, setStateHandler} = this.props;
+        const {fileList, setStateHandler} = this.props;
 
         const handleUpload = () => {
-            const formData = new FormData();
-            fileList.forEach((file) => {
-                formData.append('files[]', file);
-            });
+            // This reads the file from the upload component
+            // the file when upoloaded as blob is considerd as binary
+            const reader = new FileReader();
+            reader.readAsBinaryString(fileList[0]);
+            reader.onload = () => {
+                const workbook = XLSX.read(reader.result, {type: 'binary'});
+                const first_worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
-            setStateHandler({
-                uploading: true,
-            });
+                const data = XLSX.utils.sheet_to_json(first_worksheet);
+                const headers = XLSX.utils.sheet_to_json(first_worksheet, {header: 1})[0];
+                /* DO SOMETHING WITH workbook HERE */
+                console.log(headers);
+                console.log(data);
+            };
         };
 
         const props = {
@@ -53,6 +59,9 @@ class UploadDatabaseStep extends Component {
                             <Icon type="upload"/> Upload
                         </Button>
                     </Upload>
+                    <Button onClick={handleUpload}>
+                        Test
+                    </Button>
                 </div>
             </div>
         )

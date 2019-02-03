@@ -1,6 +1,6 @@
 import {Form, Input, Select} from "antd";
 import React, {Component} from 'react'
-import "./UploadDatabaseStep.less"
+import "./UploadDatabaseStep/UploadDatabaseStep.less"
 
 const FormItem = Form.Item;
 const Option = Select.Option;

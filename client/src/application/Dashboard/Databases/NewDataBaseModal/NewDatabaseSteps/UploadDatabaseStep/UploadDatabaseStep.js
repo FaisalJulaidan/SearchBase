@@ -1,31 +1,26 @@
 import {Button, Icon, Upload} from "antd";
 import React, {Component} from 'react';
+import XLSX from 'xlsx';
 
 class UploadDatabaseStep extends Component {
-    tabJSON(csv) {
-        let lines = eval('`' + csv + '`').split("\n");
-        let result = [];
-        let headers = lines[0].split("\t");
-        for (let i = 1; i < lines.length; i++) {
-            let obj = {};
-            let currentline = lines[i].split("\t");
-            for (let j = 0; j < headers.length; j++)
-                obj[headers[j].trim()] = currentline[j].replace(/"/g, "");
-            result.push(obj);
-        }
-        //return result; //JavaScript object
-        return eval(JSON.stringify(result)); //JSON
-    }
-
     render() {
         const {fileList, setStateHandler} = this.props;
 
         const handleUpload = () => {
-            let reader = new FileReader();
-            reader.readAsText(this.props.fileList[0]);
+            // This reads the file from the upload component
+            // the file when upoloaded as blob is considerd as binary
+            const reader = new FileReader();
+            reader.readAsBinaryString(fileList[0]);
             reader.onload = () => {
-                console.log(this.tabJSON(reader.result));
-            }
+                const workbook = XLSX.read(reader.result, {type: 'binary'});
+                const first_worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+                const data = XLSX.utils.sheet_to_json(first_worksheet);
+                const headers = XLSX.utils.sheet_to_json(first_worksheet, {header: 1})[0];
+                /* DO SOMETHING WITH workbook HERE */
+                console.log(headers);
+                console.log(data);
+            };
         };
 
         const props = {

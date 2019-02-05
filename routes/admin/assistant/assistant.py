@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, session
+from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from models import Callback, Assistant, User
-from services import statistics_services, assistant_services, admin_services, user_services, flow_services
+from models import Callback, Assistant
+from services import assistant_services
 from utilities import helpers
 
 assistant_router: Blueprint = Blueprint('assistant_router', __name__, template_folder="../../templates")
@@ -42,7 +42,7 @@ def assistant(assistantID):
 
     # Authenticate
     user = get_jwt_identity()['user']
-    security_callback: Callback = assistant_services.authorised_getByID(assistantID, user['companyID'])
+    security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
     if not security_callback.Success:
         return helpers.jsonResponse(False, security_callback.Data, security_callback.Message, None)
     assistant: Assistant = security_callback.Data
@@ -73,7 +73,7 @@ def assistant_status(assistantID, statusValue):
 
     # Authenticate
     user = get_jwt_identity()['user']
-    security_callback: Callback = assistant_services.authorised_getByID(assistantID, user['companyID'])
+    security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
     if not security_callback.Success:
         return helpers.jsonResponse(False, security_callback.Data, security_callback.Message, None)
     assistant: Assistant = security_callback.Data

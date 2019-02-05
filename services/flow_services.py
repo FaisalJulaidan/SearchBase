@@ -1,6 +1,7 @@
 import json
 from os.path import join
 from typing import List
+from flask import request
 
 from sqlalchemy import and_
 from sqlalchemy.sql import exists, func
@@ -9,6 +10,7 @@ import enums
 from config import BaseConfig
 from models import db, Callback, Assistant, Block, Plan, BlockGroup
 from utilities import helpers
+from services import assistant_services
 
 bot_currentVersion = "1.0.0"
 
@@ -17,15 +19,28 @@ from utilities import json_schemas
 
 # ----- Getters ----- #
 # Get the chatbot for the public to use
-def getChatbot(assistant: Assistant) -> Callback:
+def getChatbot(assistantHashID) -> Callback:
     try:
-        data = {'assistant': {'id': helpers.encrypt_id(assistant.ID), 'name': assistant.Name,
+
+        callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
+        if not callback.Success:
+            return Callback(False, "Assistant not found!")
+        assistant: Assistant = callback.Data
+
+        # Check if assistant is active excluding on test page
+        requestHeader = str(request.headers.get("Referer"))
+        if not assistant.Active and (("connect" not in requestHeader or "/admin/assistant/" not in requestHeader) and ("chatbottemplate_production" not in requestHeader)):
+            return Callback(False, "Assistant is not active.", None)
+
+
+        data = {'assistant': {'id': assistantHashID, 'name': assistant.Name,
                               'message': assistant.Message,
                               'secondsUntilPopup': assistant.SecondsUntilPopup,
                               'active': assistant.Active},
                 'blocks': getAllBlocks(assistant),
                 }
         return Callback(True, '', data)
+
     except Exception as e:
         print("ERROR: getChatbot()", e)
         db.session.rollback()

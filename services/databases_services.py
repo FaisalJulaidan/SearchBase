@@ -7,12 +7,11 @@ import enums
 from sqlalchemy import and_
 from enums import  DatabaseType, DataType as DT
 
-
-def fetchDatabase(id, company: Company) -> Callback:
+def fetchDatabase(id, companyID: int) -> Callback:
     try:
         # Get result and check if None then raise exception
         database: Database = db.session.query(Database)\
-            .filter(and_(Database.CompanyID == company.ID, Database.ID == id)).first()
+            .filter(and_(Database.CompanyID == companyID, Database.ID == id)).first()
         if not database: raise Exception
 
         if database.Type == DatabaseType.Clients:
@@ -23,7 +22,8 @@ def fetchDatabase(id, company: Company) -> Callback:
             print('fetch from candidate table')
             return getAllCandidates(database.ID)
 
-        return Callback(False, "Can not fetch databases.")
+        # Reaching to this point means the type of the db is not supported
+        return Callback(False, "No database found!")
 
     except Exception as exc:
         print(exc)
@@ -34,6 +34,20 @@ def fetchDatabase(id, company: Company) -> Callback:
 
 
 # ----- Getters ----- #
+def getDatabasesList(companyID: int) -> Callback:
+    try:
+        databases: List[Database] = db.session.query(Database) \
+            .filter(and_(Database.CompanyID == companyID))
+        return Callback(True, "Databases list is here", databases)
+
+    except Exception as exc:
+        print(exc)
+        return Callback(False, 'Could not fetch the databases list.')
+    # finally:
+    # db.session.close()
+
+
+
 def getAllCandidates(dbID) -> Callback:
     try:
         candidates: List[Candidate] = db.session.query(Candidate).filter(Database.ID == dbID).all()
@@ -122,10 +136,9 @@ def scanCandidates(company: Company, databaseName, keywords: dict):
 def getOptions() -> Callback:
     options =  {
         'types': [a.value for a in enums.DatabaseType ],
-        enums.DatabaseType.Candidates.name: [{'column':c.key, 'type':c.type, 'nullable': c.nullable}
+        enums.DatabaseType.Candidates.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
                                              for c in Candidate.__table__.columns],
-        enums.DatabaseType.Jobs.name: [{'column':c.key, 'type':c.type, 'nullable': c.nullable}
+        enums.DatabaseType.Jobs.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
                                        for c in Job.__table__.columns],
     }
-    print(options)
     return Callback(True, '', options)

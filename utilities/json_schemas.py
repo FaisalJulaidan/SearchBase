@@ -80,7 +80,7 @@ new_block = {
                              },
                 "storeInDB": { "type": "boolean" },
                 "isSkippable": { "type": "boolean" },
-                "content": { "type": "object" }
+                "content": { "type": "object" } # Depends on BlockType, see below schemas for content
             },
             "required": ["type","groupID", "dataType", "storeInDB", "content"],
             "additionalProperties": False

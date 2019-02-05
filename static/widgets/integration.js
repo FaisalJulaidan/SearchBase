@@ -108,7 +108,7 @@ window.onload = (function (global) {
     iFrameDiv.style.opacity = '0';
 
     iFrameDiv.innerHTML = '<div class="TSB-contact-profile">\n' +
-        '        <img src=\"'+host+'/static/user_downloads/favicon-96x96.png\" alt=""/>\n' +
+        '        <img src='+host+'\"/static/widgets/favicon-96x96.png\" alt=""/>\n' +
         '        <p id="tsb-bot-header" class="TSB-bot-title">Bot</p>\n' +
         '\n' +
         '        <div class="TSB-social-media" id=\'TSB-closeIframe\'>\n' +

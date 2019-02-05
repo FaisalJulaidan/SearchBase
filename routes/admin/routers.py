@@ -9,9 +9,6 @@ users_router: Blueprint = users_router
 from .account.changePassword import changePassword_router
 changePassword_router: Blueprint = changePassword_router
 
-from .assistant.settings import settings_router
-settings_router: Blueprint = settings_router
-
 from .assistant.solutions import solutions_router
 solutions_router: Blueprint = solutions_router
 
@@ -38,9 +35,6 @@ users_router: Blueprint = users_router
 
 from .account.profile import profile_router
 profile_router: Blueprint = profile_router
-
-from .assistant.bot import bot_router
-bot_router: Blueprint = bot_router
 
 from .database.database import database_router
 database_router: Blueprint = database_router

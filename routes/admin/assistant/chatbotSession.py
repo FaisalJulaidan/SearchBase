@@ -17,14 +17,10 @@ def chatbotSession(assistantID):
     # Authenticate
     user = get_jwt_identity()['user']
     # For all type of requests methods, get the assistant
-    security_callback: Callback = assistant_services.getByID(assistantID)
+    security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
     if not security_callback.Success:
         return helpers.jsonResponse(False, 404, "Assistant not found.", None)
     assistant: Assistant = security_callback.Data
-
-    # Check if this user has access to this assistant
-    if assistant.CompanyID != user['companyID']:
-        return helpers.jsonResponse(False, 401, "Unauthorised!")
 
     #############
     # Get the assistant's user inputs/chatbot sessions
@@ -57,14 +53,10 @@ def chatbotSession_file_uploads(assistantID, path):
     # Authenticate
     user = get_jwt_identity()['user']
     # For all type of requests methods, get the assistant
-    security_callback: Callback = assistant_services.getByID(assistantID)
+    security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
     if not security_callback.Success:
         return helpers.jsonResponse(False, 404, "Assistant not found.", None)
     assistant: Assistant = security_callback.Data
-
-    # Check if this user has access to this assistant
-    if assistant.CompanyID != user['companyID']:
-        return helpers.jsonResponse(False, 401, "Unauthorised!")
 
     # Security procedure ->
     # the id of the user input session is included in the name of the file after "_" symbol, but encrypted
@@ -94,14 +86,11 @@ def chatbotSession_delete_record(assistantID, sessionID):
     # Authenticate
     user = get_jwt_identity()['user']
     # For all type of requests methods, get the assistant
-    security_callback: Callback = assistant_services.getByID(assistantID)
+    security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
     if not security_callback.Success:
         return helpers.jsonResponse(False, 404, "Assistant not found.", None)
     assistant: Assistant = security_callback.Data
 
-    # Check if this user has access to this assistant
-    if assistant.CompanyID != user['companyID']:
-        return helpers.jsonResponse(False, 401, "Unauthorised!")
 
     if request.method == "DELETE":
 

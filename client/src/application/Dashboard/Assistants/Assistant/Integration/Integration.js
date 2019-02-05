@@ -17,7 +17,7 @@ class Integration extends React.Component {
     state = {
         source: "",
         dataName: "tsb-widget",
-        dataID: "assistantid",
+        assistantID: "assistantid",
         // dataIcon: "#ffffff",
         dataCircle: "#9254de",
         async: true,
@@ -26,7 +26,7 @@ class Integration extends React.Component {
 
     componentDidMount() {
         this.setState({
-            dataID: hasher.encode(this.props.match.params.id),
+            assistantID: hasher.encode(this.props.match.params.id),
             source: this.getWidgetSrc()
         });
     }
@@ -58,7 +58,7 @@ class Integration extends React.Component {
         script.async = this.state.async;
         script.defer = this.state.defer;
         script.setAttribute("data-name", this.state.dataName);
-        script.setAttribute("data-id", this.state.dataID);
+        script.setAttribute("data-id", this.state.assistantID);
         // script.setAttribute("data-icon", this.state.dataIcon);
         script.setAttribute("data-circle", this.state.dataCircle);
         script.setAttribute("id", "oldBotScript");
@@ -72,7 +72,7 @@ class Integration extends React.Component {
         let colon = "";
         if (window.location.port !== "") {colon = ":";}
         const {protocol, port, hostname} = window.location;
-        return protocol + '//' + hostname + colon + port + "/userdownloads/widget.js";
+        return protocol + '//' + hostname + colon + port + "/api/widgets/chatbotOLD.js";
     };
 
     generateDirectLink = () => {
@@ -80,16 +80,16 @@ class Integration extends React.Component {
         let colon = "";
         if (window.location.port !== "") colon = ":";
         if (port === "3000")
-            window.open(`${protocol}//${hostname}${colon}5000/assistant/YJkLo/chatbot_direct_link`);
+            window.open(`${protocol}//${hostname}${colon}5000/api/assistant/${this.state.assistantID}/chatbot_direct_link`);
         else
-            window.open(`${protocol}//${hostname}${colon}${port}/assistant/YJkLo/chatbot_direct_link`);
+            window.open(`${protocol}//${hostname}${colon}${port}/api/assistant/${this.state.assistantID}/chatbot_direct_link`);
 
     };
 
     getChatbotScript = () => {
         return <script src={this.getWidgetSrc()}
                        data-name={this.state.dataName}
-                       data-id={this.state.dataID}
+                       data-id={this.state.assistantID}
                        // data-icon={this.state.dataIcon}
                        data-circle={this.state.dataCircle}
                        async={this.state.async}

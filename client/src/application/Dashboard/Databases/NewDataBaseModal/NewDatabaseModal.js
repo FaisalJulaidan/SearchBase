@@ -4,6 +4,7 @@ import React, {Component} from 'react';
 import UploadDatabaseStep from './NewDatabaseSteps/UploadDatabaseStep/UploadDatabaseStep'
 import styles from "./NewDatabaseModal.module.less"
 import ConfigureDatabaseStep from "./NewDatabaseSteps/ConfigureDatabaseStep";
+import ColumnSelectionStep from "./NewDatabaseSteps/ColumnSelectionStep";
 
 const Step = Steps.Step;
 
@@ -33,6 +34,7 @@ class NewDatabaseModal extends Component {
         {
             title: 'Configre Database',
             content: () => <ConfigureDatabaseStep ref={this.configureDatabaseStep}
+                                                  databaseOptions={this.props.databaseOptions}
                                                   databaseConfiguration={this.state.databaseConfiguration}/>
         },
         {
@@ -44,8 +46,10 @@ class NewDatabaseModal extends Component {
                                                fileList={this.state.fileList}/>
         },
         {
-            title: 'Second',
-            content: () => 'Second-content',
+            title: 'Column Selection',
+            content: () => <ColumnSelectionStep databaseOptions={this.props.databaseOptions}
+                                                databaseType={this.state.databaseConfiguration.databaseType}
+                                                excelFile={this.state.excelFile}/>,
         },
         {
             title: 'Last',

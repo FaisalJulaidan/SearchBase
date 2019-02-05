@@ -43,89 +43,188 @@ class UserType(Enum):
 
 
 class DatabaseType(Enum):
-    Client = 'Client'
-    Candidate = 'Candidate'
-    Job = 'Job'
+    Candidates = 'Candidates'
+    Jobs = 'Jobs'
+    Clients = 'Clients' # Not supported yet
+
 
 
 
 # === Data Types Stuff === #
-def dataTypeCreator(name: str, validation: ValidationType, userTypes: List[UserType]):
+def dataTypeCreator(name: str, validation: ValidationType, userTypes: List[UserType], databaseTypes: List[DatabaseType]):
     return {'name': name,
             'validation': validation.value,
-            'userTypes': [ut.value for ut in userTypes]}
+            'userTypes': [ut.value for ut in userTypes],
+            'databaseTypes': [dt.value for dt in databaseTypes]
+            }
 
 @unique
 class DataType(Enum):
 
     # Common
-    NoType = dataTypeCreator('No Type', ValidationType.Ignore, [])
+    NoType = dataTypeCreator('No Type', ValidationType.Ignore, [], [])
 
-    Name = dataTypeCreator('Name', ValidationType.Name, [UserType.Candidate, UserType.Client])
+    Name = dataTypeCreator('Name',
+                           ValidationType.Name,
+                           [UserType.Candidate, UserType.Client],
+                           [DatabaseType.Candidates, DatabaseType.Clients])
 
-    Email = dataTypeCreator('Email', ValidationType.Email, [UserType.Candidate, UserType.Client])
+    Email = dataTypeCreator('Email',
+                            ValidationType.Email,
+                            [UserType.Candidate,
+                             UserType.Client],
+                            [DatabaseType.Candidates, DatabaseType.Clients])
 
-    Telephone = dataTypeCreator('Telephone', ValidationType.Telephone, [UserType.Candidate, UserType.Client])
+    Telephone = dataTypeCreator('Telephone',
+                                ValidationType.Telephone,
+                                [UserType.Candidate, UserType.Client],
+                                [DatabaseType.Candidates, DatabaseType.Clients])
 
-    LinkdinURL = dataTypeCreator('Linkdin URL', ValidationType.URL, [UserType.Candidate, UserType.Client])
+    LinkdinURL = dataTypeCreator('Linkdin URL',
+                                 ValidationType.URL,
+                                 [UserType.Candidate, UserType.Client],
+                                 [DatabaseType.Candidates, DatabaseType.Clients])
 
-    PostCode = dataTypeCreator('Post Code', ValidationType.PostCode, [UserType.Candidate, UserType.Client])
+    PostCode = dataTypeCreator('Post Code',
+                               ValidationType.PostCode,
+                               [UserType.Candidate, UserType.Client],
+                               [DatabaseType.Candidates, DatabaseType.Clients])
 
     # Candidate
-    Gender = dataTypeCreator('Gender', ValidationType.Ignore, [UserType.Candidate])
+    Gender = dataTypeCreator('Gender',
+                             ValidationType.Ignore,
+                             [UserType.Candidate],
+                             [DatabaseType.Candidates])
 
-    Degree = dataTypeCreator('Degree', ValidationType.Ignore, [UserType.Candidate])
+    Degree = dataTypeCreator('Degree',
+                             ValidationType.Ignore,
+                             [UserType.Candidate],
+                             [DatabaseType.Candidates])
 
-    Resume = dataTypeCreator('Resume', ValidationType.Ignore, [UserType.Candidate])
+    Resume = dataTypeCreator('Resume',
+                             ValidationType.Ignore,
+                             [UserType.Candidate],
+                             [DatabaseType.Candidates])
 
-    ContactTime = dataTypeCreator('Contact Time', ValidationType.Ignore, [UserType.Candidate])
+    ContactTime = dataTypeCreator('Contact Time',
+                                  ValidationType.Ignore,
+                                  [UserType.Candidate],
+                                  [DatabaseType.Candidates])
 
-    Availability = dataTypeCreator('Availability', ValidationType.Ignore, [UserType.Candidate])
+    Availability = dataTypeCreator('Availability',
+                                   ValidationType.Ignore,
+                                   [UserType.Candidate],
+                                   [DatabaseType.Candidates])
 
-    CurrentSalary = dataTypeCreator('Current Salary', ValidationType.Number, [UserType.Candidate])
+    CurrentSalary = dataTypeCreator('Current Salary',
+                                    ValidationType.Number,
+                                    [UserType.Candidate],
+                                    [DatabaseType.Candidates])
 
-    CurrentRole = dataTypeCreator('Current Role', ValidationType.Ignore, [UserType.Candidate])
+    CurrentRole = dataTypeCreator('Current Role',
+                                  ValidationType.Ignore,
+                                  [UserType.Candidate],
+                                  [DatabaseType.Candidates])
 
-    JobTitle = dataTypeCreator('Job Title', ValidationType.Ignore, [UserType.Candidate])
+    JobTitle = dataTypeCreator('Job Title',
+                               ValidationType.Ignore,
+                               [UserType.Candidate],
+                               [DatabaseType.Candidates])
 
-    CurrentEmployer = dataTypeCreator('Current Employer', ValidationType.Ignore, [UserType.Candidate])
+    CurrentEmployer = dataTypeCreator('Current Employer',
+                                      ValidationType.Ignore,
+                                      [UserType.Candidate],
+                                      [DatabaseType.Candidates])
 
-    CurrentEmploymentType = dataTypeCreator('Current Employment Type', ValidationType.Ignore, [UserType.Candidate])
+    CurrentEmploymentType = dataTypeCreator('Current Employment Type',
+                                            ValidationType.Ignore,
+                                            [UserType.Candidate],
+                                            [DatabaseType.Candidates])
 
-    DesiredSalary = dataTypeCreator('Desired Salary', ValidationType.Number, [UserType.Candidate])
+    DesiredSalary = dataTypeCreator('Desired Salary',
+                                    ValidationType.Number,
+                                    [UserType.Candidate],
+                                    [DatabaseType.Candidates])
 
-    DesiredPosition = dataTypeCreator('Desired Position', ValidationType.Ignore, [UserType.Candidate])
+    DesiredPosition = dataTypeCreator('Desired Position',
+                                      ValidationType.Ignore,
+                                      [UserType.Candidate],
+                                      [DatabaseType.Candidates])
 
-    CandidateSkills = dataTypeCreator('Candidate Skills', ValidationType.Ignore, [UserType.Candidate])
+    CandidateSkills = dataTypeCreator('Candidate Skills',
+                                      ValidationType.Ignore,
+                                      [UserType.Candidate],
+                                      [DatabaseType.Candidates])
 
-    YearsExp = dataTypeCreator('Years Exp', ValidationType.Number, [UserType.Candidate])
+    YearsExp = dataTypeCreator('Years Exp',
+                               ValidationType.Number,
+                               [UserType.Candidate],
+                               [DatabaseType.Candidates])
 
-    PreferredLocation = dataTypeCreator('Preferred Location', ValidationType.Ignore, [UserType.Candidate])
+    PreferredLocation = dataTypeCreator('Preferred Location',
+                                        ValidationType.Ignore,
+                                        [UserType.Candidate],
+                                        [DatabaseType.Candidates])
 
-    PreferredEmploymentType = dataTypeCreator('Desired Employment Type', ValidationType.Ignore, [UserType.Candidate])
+    PreferredEmploymentType = dataTypeCreator('Desired Employment Type',
+                                              ValidationType.Ignore,
+                                              [UserType.Candidate],
+                                              [DatabaseType.Candidates])
 
-    DesiredHourlyRate = dataTypeCreator('Desired Hourly Rate', ValidationType.Number, [UserType.Candidate])
+    DesiredHourlyRate = dataTypeCreator('Desired Hourly Rate',
+                                        ValidationType.Number,
+                                        [UserType.Candidate],
+                                        [DatabaseType.Candidates])
 
 # Client
-    Location = dataTypeCreator('Location', ValidationType.Ignore, [UserType.Client])
+    Location = dataTypeCreator('Location',
+                               ValidationType.Ignore,
+                               [UserType.Client],
+                               [DatabaseType.Clients])
 
-    NearbyStation = dataTypeCreator('Nearby Station', ValidationType.Ignore, [UserType.Client])
+    NearbyStation = dataTypeCreator('Nearby Station',
+                                    ValidationType.Ignore,
+                                    [UserType.Client],
+                                    [DatabaseType.Clients])
 
-    JobSalaryOffered = dataTypeCreator('Job Salary Offered', ValidationType.Number, [UserType.Client])
+    JobSalaryOffered = dataTypeCreator('Job Salary Offered',
+                                       ValidationType.Number,
+                                       [UserType.Client],
+                                       [DatabaseType.Clients])
 
-    EmploymentTypeOffered = dataTypeCreator('Employment Type Offered', ValidationType.Ignore, [UserType.Client])
+    EmploymentTypeOffered = dataTypeCreator('Employment Type Offered',
+                                            ValidationType.Ignore,
+                                            [UserType.Client],
+                                            [DatabaseType.Clients])
 
-    CandidatesNeeded = dataTypeCreator('Candidates Needed', ValidationType.Number, [UserType.Client])
+    CandidatesNeeded = dataTypeCreator('Candidates Needed',
+                                       ValidationType.Number,
+                                       [UserType.Client],
+                                       [DatabaseType.Clients])
 
-    EssentialSkills = dataTypeCreator('Essential Skills', ValidationType.Ignore, [UserType.Client])
+    EssentialSkills = dataTypeCreator('Essential Skills',
+                                      ValidationType.Ignore,
+                                      [UserType.Client],
+                                      [DatabaseType.Clients])
 
-    EssentialYearsExp = dataTypeCreator('Essential Years Exp', ValidationType.Number, [UserType.Client])
+    EssentialYearsExp = dataTypeCreator('Essential Years Exp',
+                                        ValidationType.Number,
+                                        [UserType.Client],
+                                        [DatabaseType.Clients])
 
-    ContractRate = dataTypeCreator('Contract Rate', ValidationType.Number,[UserType.Client])
+    ContractRate = dataTypeCreator('Contract Rate',
+                                   ValidationType.Number,
+                                   [UserType.Client],
+                                   [DatabaseType.Clients])
 
-    JobDescription = dataTypeCreator('Job Description', ValidationType.Ignore, [UserType.Client])
+    JobDescription = dataTypeCreator('Job Description',
+                                     ValidationType.Ignore,
+                                     [UserType.Client],
+                                     [DatabaseType.Clients])
 
-    JobAvailability = dataTypeCreator('Job Availability', ValidationType.Ignore, [UserType.Client])
-
+    JobAvailability = dataTypeCreator('Job Availability',
+                                      ValidationType.Ignore,
+                                      [UserType.Client],
+                                      [DatabaseType.Clients])
 
 

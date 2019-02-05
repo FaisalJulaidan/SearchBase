@@ -1,12 +1,10 @@
-from models import db, Callback, Database, Candidate, Client, Company, Assistant
+from models import db, Callback, Database, Candidate, Client, Company, Assistant, Job
 from typing import List
 import pandas
 import re
+import enums
 
-from sqlalchemy import func, exists
 from sqlalchemy import and_
-
-from utilities import helpers
 from enums import  DatabaseType, DataType as DT
 
 
@@ -17,11 +15,11 @@ def fetchDatabase(id, company: Company) -> Callback:
             .filter(and_(Database.CompanyID == company.ID, Database.ID == id)).first()
         if not database: raise Exception
 
-        if database.Type == DatabaseType.Client:
+        if database.Type == DatabaseType.Clients:
             print('fetch from client table')
             return getAllClients(database.ID)
 
-        elif database.Type == DatabaseType.Candidate:
+        elif database.Type == DatabaseType.Candidates:
             print('fetch from candidate table')
             return getAllCandidates(database.ID)
 
@@ -82,7 +80,7 @@ def scanCandidates(company: Company, databaseName, keywords: dict):
         if keywords.get(DT.JobSalaryOffered.value['name']):
             df.loc[df[DT.DesiredSalary.name] >= keywords[DT.JobSalaryOffered.value['name']][-1], 'count'] += 3
 
-        # Years Exp <> Essential Years Exp | points=3
+        # Desired Hourly Rate <> Contract Rate | points=3
         if keywords.get(DT.ContractRate.value['name']):
             df.loc[df[DT.DesiredHourlyRate.name] >= keywords[DT.ContractRate.value['name']][-1], 'count'] += 3
 
@@ -119,3 +117,15 @@ def scanCandidates(company: Company, databaseName, keywords: dict):
         print("scanCandidates() ERROR: ", exc)
         return Callback(False, 'Error while search the database for matches!')
 
+
+
+def getOptions() -> Callback:
+    options =  {
+        'types': [a.value for a in enums.DatabaseType ],
+        enums.DatabaseType.Candidates.name: [{'column':c.key, 'type':c.type, 'nullable': c.nullable}
+                                             for c in Candidate.__table__.columns],
+        enums.DatabaseType.Jobs.name: [{'column':c.key, 'type':c.type, 'nullable': c.nullable}
+                                       for c in Job.__table__.columns],
+    }
+    print(options)
+    return Callback(True, '', options)

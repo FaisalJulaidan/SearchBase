@@ -15,7 +15,7 @@ class NewDatabaseModal extends Component {
     }
 
     state = {
-        current: 0,
+        current: 1,
         fileList: [],
         uploading: false,
         databaseConfiguration: {

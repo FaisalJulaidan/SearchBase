@@ -17,7 +17,7 @@ from services import databases_services
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, settings_router,\
     solutions_router, analytics_router, sub_router, connection_router, chatbotSession_router, users_router,\
-    changePassword_router, bot_router, flow_router, assistant_router
+    changePassword_router, bot_router, flow_router, assistant_router, database_router
 
 from routes.public.routers import public_router, resetPassword_router, chatbot_router, auth_router
 
@@ -39,9 +39,9 @@ app.register_blueprint(connection_router, url_prefix='/api')
 app.register_blueprint(chatbotSession_router, url_prefix='/api')
 app.register_blueprint(changePassword_router)
 app.register_blueprint(users_router)
-app.register_blueprint(bot_router)
 app.register_blueprint(chatbot_router)
 app.register_blueprint(auth_router, url_prefix='/api')
+app.register_blueprint(database_router, url_prefix='/api')
 
 
 ## Error Handlers ##
@@ -158,13 +158,7 @@ elif os.environ['FLASK_ENV'] == 'development':
     scheduler.init_app(app)
     scheduler.start()
 
-    # aramco = Company.query.filter(Company.Name == "Aramco").first()
-    #
-    # databases_services.scanCandidates(aramco, 'db1',
-    #                                   {'Job Salary Offered': [1550],
-    #                                    'Job Description': ['working', 'as', 'software', 'engineer', 'to', 'build', 'software'],
-    #                                    'Essential Skills': ['python', 'mysql', 'css', 'html']
-    #                                    })
+    databases_services.getOptions()
 
     # Run the app server
     print('Development mode running...')

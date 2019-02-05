@@ -214,7 +214,7 @@ def gen_dummy_data():
                                       UserType=enums.UserType.Candidate, Assistant=reader_a))
 
 
-    db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidate, Company=aramco)
+    db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidates, Company=aramco)
     db.session.add(db1)
 
     db.session.add(addCandidate(db1, 'Faisal', 2000, "Software Engineer", "python, java, javascript, SQL",

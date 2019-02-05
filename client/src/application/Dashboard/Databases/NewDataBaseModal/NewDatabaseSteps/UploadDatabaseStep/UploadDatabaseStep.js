@@ -8,7 +8,7 @@ class UploadDatabaseStep extends Component {
 
         const handleUpload = () => {
             // This reads the file from the upload component
-            // the file when upoloaded as blob is considerd as binary
+            // the file when uploaded as blob is considered as binary
             const reader = new FileReader();
             reader.readAsBinaryString(fileList[0]);
             reader.onload = () => {
@@ -27,6 +27,7 @@ class UploadDatabaseStep extends Component {
             listType: 'picture',
             multiple: false,
             defaultFileList: [...fileList],
+            accept:".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
             onRemove: (file) => {
                 setStateHandler((state) => {
                     const index = state.fileList.indexOf(file);
@@ -54,11 +55,18 @@ class UploadDatabaseStep extends Component {
                     <p>Upload your Database to be used in the chat interaction</p>
                 </div>
                 <div style={{textAlign: 'center'}}>
-                    <Upload {...props}>
-                        <Button>
-                            <Icon type="upload"/> Upload
-                        </Button>
-                    </Upload>
+                    <Upload.Dragger {...props}>
+                        {/*<Button>*/}
+                            {/*<Icon type="upload"/> Upload*/}
+                        {/*</Button>*/}
+
+                        <p className="ant-upload-drag-icon">
+                            <Icon type="inbox" />
+                        </p>
+                        <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                        <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
+
+                    </Upload.Dragger>
                     <Button onClick={handleUpload}>
                         Test
                     </Button>

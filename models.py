@@ -366,6 +366,23 @@ class Candidate(db.Model):
     def __repr__(self):
         return '<Candidate {}>'.format(self.Name)
 
+class Job(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    JobTitle = db.Column(db.String(64), nullable=True)
+    Location = db.Column(db.String(64), nullable=True)
+    PositionType = db.Column(db.String(64), nullable=True)
+    EmploymentType = db.Column(db.String(64), nullable=True)
+    Salary = db.Column(db.Float(), nullable=True)
+    StartDate = db.Column(db.DateTime(), nullable=True)
+
+    # Relationships:
+
+    DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
+    Database = db.relationship('Database')
+
+    def __repr__(self):
+        return '<Client {}>'.format(self.Name)
 
 class Client(db.Model):
 

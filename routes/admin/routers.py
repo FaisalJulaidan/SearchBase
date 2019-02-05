@@ -41,3 +41,6 @@ profile_router: Blueprint = profile_router
 
 from .assistant.bot import bot_router
 bot_router: Blueprint = bot_router
+
+from .database.database import database_router
+database_router: Blueprint = database_router

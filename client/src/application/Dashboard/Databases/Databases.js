@@ -17,7 +17,7 @@ class Databases extends Component {
     }
 
     componentWillMount() {
-        http.get(`/database/options`)
+        http.get(`/databases/options`)
             .then(res => this.setState({databaseOptions: res.data.data}))
     }
 

@@ -12,15 +12,20 @@ class NewDatabaseModal extends Component {
     constructor(props) {
         super(props);
         this.configureDatabaseStep = React.createRef();
+        this.uploadDatabaseStep = React.createRef();
     }
 
     state = {
-        current: 1,
+        current: 0,
         fileList: [],
-        uploading: false,
         databaseConfiguration: {
             databaseName: undefined,
             databaseType: undefined
+        },
+
+        excelFile: {
+            headers: undefined,
+            data: undefined
         }
     };
 
@@ -32,9 +37,10 @@ class NewDatabaseModal extends Component {
         },
         {
             title: 'Upload Data',
-            content: () => <UploadDatabaseStep uploading={this.state.uploading}
+            content: () => <UploadDatabaseStep ref={this.uploadDatabaseStep}
+                                               uploading={this.state.uploading}
                                                handleUpload={this.handleUpload}
-                                               setStateHandler={(state) => this.setState(state)}
+                                               setStateHandler={state => this.setState(state)}
                                                fileList={this.state.fileList}/>
         },
         {
@@ -48,18 +54,28 @@ class NewDatabaseModal extends Component {
 
 
     next = () => {
-        if (this.state.current + 1 === 1)
-            this.configureDatabaseStep.current.validateFields(
-                (err, values) => err ? null : this.setState({
-                    databaseConfiguration: {
-                        databaseName: values.databaseName,
-                        databaseType: values.databaseType
-                    },
-                    current: this.state.current + 1
-                })
-            );
-        else
-            this.setState({current: this.state.current + 1})
+        switch (this.state.current + 1) {
+            case 1:
+                this.configureDatabaseStep.current.validateFields(
+                    (err, values) => err ? null : this.setState({
+                        databaseConfiguration: {
+                            databaseName: values.databaseName,
+                            databaseType: values.databaseType
+                        },
+                        current: this.state.current + 1
+                    })
+                );
+                break;
+            case 2:
+                this.uploadDatabaseStep.current.readExcel().then(
+                    excelFile => this.setState({excelFile, current: this.state.current + 1}),
+                    rejectedExcelFile => this.setState({excelFile: rejectedExcelFile})
+                );
+                break;
+            default:
+                this.setState({current: this.state.current + 1});
+                break;
+        }
     };
 
     prev = () => this.setState({current: this.state.current - 1});

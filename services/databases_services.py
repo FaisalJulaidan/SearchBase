@@ -137,9 +137,12 @@ def getOptions() -> Callback:
     options =  {
         'types': [a.value for a in enums.DatabaseType ],
         enums.DatabaseType.Candidates.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
-                                             for c in Candidate.__table__.columns if c.key != 'ID'],
+                                             for c in Candidate.__table__.columns
+                                             if (c.key != 'ID' or c.key == 'DatabaseID')],
         enums.DatabaseType.Jobs.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
-                                       for c in Job.__table__.columns if c.key != 'ID'],
+                                       for c in Job.__table__.columns
+                                       if (c.key != 'ID' or c.key == 'DatabaseID')],
+
     }
     print(options)
     return Callback(True, '', options)

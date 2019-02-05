@@ -12,6 +12,7 @@ class ConfigureDatabaseStep extends Component {
             wrapperCol: {span: 14},
         };
         const {getFieldDecorator} = this.props.form;
+        const {databaseOptions} = this.props;
 
         return (
             <div>
@@ -46,9 +47,13 @@ class ConfigureDatabaseStep extends Component {
                                 message: 'Please input your assistant name',
                             }],
                         })(
-                            <Select placeholder="Please select type">
-                                <Option value="candidate">Candidate</Option>
-                                <Option value="client">Client</Option>
+                            <Select placeholder="Please select type" loading={!(!!databaseOptions)}>
+                                {
+                                    databaseOptions ?
+                                        databaseOptions.types.map((type, key) =>
+                                            <Option key={key} value={type}>{type}</Option>)
+                                        : null
+                                }
                             </Select>
                         )}
                     </FormItem>

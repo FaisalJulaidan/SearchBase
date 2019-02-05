@@ -5,6 +5,7 @@ import {Menu} from 'antd';
 import styles from "./Databases.module.less"
 import NewDatabaseModal from "./NewDataBaseModal/NewDatabaseModal";
 import Header from "../../../components/Header/Header";
+import {http} from "../../../helpers";
 
 class Databases extends Component {
     state = {
@@ -15,9 +16,9 @@ class Databases extends Component {
 
     }
 
-
-    componentDidMount() {
-
+    componentWillMount() {
+        http.get(`/database/options`)
+            .then(res => this.setState({databaseOptions: res.data.data}))
     }
 
 
@@ -64,6 +65,7 @@ class Databases extends Component {
                 </div>
 
                 <NewDatabaseModal visible={this.state.visible}
+                                  databaseOptions={this.state.databaseOptions}
                                   hideModal={this.hideModal}/>
 
             </div>

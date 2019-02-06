@@ -1,4 +1,4 @@
-import {Button, Divider, Modal, Steps} from 'antd';
+import {Button, Divider, Modal, Steps, Spin} from 'antd';
 
 import React, {Component} from 'react';
 import UploadDatabaseStep from './NewDatabaseSteps/UploadDatabaseStep/UploadDatabaseStep'
@@ -23,6 +23,8 @@ class NewDatabaseModal extends Component {
             databaseName: undefined,
             databaseType: undefined
         },
+
+        isFileUploading: false,
 
         excelFile: {
             headers: undefined,
@@ -72,7 +74,10 @@ class NewDatabaseModal extends Component {
                 break;
             case 2:
                 this.uploadDatabaseStep.current.readExcel().then(
-                    excelFile => this.setState({excelFile, current: this.state.current + 1}),
+                    excelFile => {
+                        console.log(excelFile);
+                        this.setState({excelFile, current: this.state.current + 1})
+                    },
                     rejectedExcelFile => this.setState({excelFile: rejectedExcelFile})
                 );
                 break;
@@ -88,6 +93,7 @@ class NewDatabaseModal extends Component {
         const {current} = this.state;
 
         return (
+
             <Modal
                 width={800}
                 title="Upload New Database"
@@ -95,34 +101,37 @@ class NewDatabaseModal extends Component {
                 onCancel={this.props.hideModal}
                 destroyOnClose={true}
                 footer={null}>
+                <Spin spinning={this.state.isFileUploading}>
 
-                <Steps current={current}>
-                    {this.steps.map(item => <Step key={item.title} title={item.title}/>)}
-                </Steps>
+                    <Steps current={current}>
+                        {this.steps.map(item => <Step key={item.title} title={item.title}/>)}
+                    </Steps>
 
-                <div className={styles.steps_content}>{this.steps[current].content()}</div>
+                    <div className={styles.steps_content}>{this.steps[current].content()}</div>
 
-                <Divider/>
+                    <Divider/>
 
-                <div className={styles.steps_action}>
-                    {
-                        current > 0
-                        && (
-                            <Button style={{marginLeft: 8}} onClick={() => this.prev()}>
-                                Previous
-                            </Button>
-                        )
-                    }
-                    {
-                        current < this.steps.length - 1
-                        && <Button type="primary" onClick={() => this.next()}>Next</Button>
-                    }
-                    {
-                        current === this.steps.length - 1
-                        && <Button type="primary" onClick={this.props.hideModal}>Done</Button>
-                    }
-                </div>
+                    <div className={styles.steps_action}>
+                        {
+                            current > 0
+                            && (
+                                <Button style={{marginLeft: 8}} onClick={() => this.prev()}>
+                                    Previous
+                                </Button>
+                            )
+                        }
+                        {
+                            current < this.steps.length - 1
+                            && <Button type="primary" onClick={() => this.next()}>Next</Button>
+                        }
+                        {
+                            current === this.steps.length - 1
+                            && <Button type="primary" onClick={this.props.hideModal}>Done</Button>
+                        }
+                    </div>
+                </Spin>
             </Modal>
+
         );
     }
 }

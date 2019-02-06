@@ -14,9 +14,10 @@ class ColumnSelectionStep extends Component {
     handleChange = selectedColumns => this.setState({selectedColumns: [...this.state.selectedColumns].concat(selectedColumns).unique()})
 
 
-    handleRemove = removedColumn => setTimeout(() => this.setState({selectedColumns: this.state.selectedColumns.filter(selectedColumn => selectedColumn !== removedColumn)}
-        , 100)
-    );
+    handleRemove = removedColumn => setTimeout(() =>
+        this.setState({selectedColumns: this.state.selectedColumns.filter(selectedColumn => selectedColumn !== removedColumn)}
+        ), 100);
+
 
 
     render() {

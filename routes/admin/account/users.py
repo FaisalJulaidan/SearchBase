@@ -1,16 +1,20 @@
-from flask import jsonify, json
-from services import user_services, admin_services, role_services, company_services, mail_services
-from models import Callback, db, User, Company
-from flask import Blueprint, request, redirect, session
-from utilities import helpers, json_utils
-import string
 import random
+import string
+
+from flask import Blueprint, request, redirect, session
+from flask import json
+
+from models import Callback, db, User
+from services import user_services, admin_services, role_services, mail_services
+from utilities import helpers
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 users_router: Blueprint = Blueprint('users_router', __name__, template_folder="../../templates")
 
 
 # Update roles
-@users_router.route("/admin/roles", methods=['PUT'])
+@users_router.route("/roles", methods=['PUT'])
+@jwt_required
 def update_roles():
     if request.method == "PUT":
 
@@ -22,7 +26,8 @@ def update_roles():
 
         # Check if the admin user is authorised for such an operation.
         if not adminUser.Role.Name == 'Owner':
-            return helpers.jsonResponse(False, 401, "Sorry, You're not authorised. Only owners are allowed to edit user's permissions.")
+            return helpers.jsonResponse(False, 401,
+                                        "Sorry, You're not authorised. Only owners are allowed to edit user's permissions.")
 
         # New roles values
         values = request.form.get("data", default=None)
@@ -51,11 +56,12 @@ def update_roles():
 
 
 # Get all users for logged in company
-@users_router.route("/admin/users", methods=['GET'])
-def admin_users():
+@users_router.route("/users", methods=['GET'])
+@jwt_required
+def users():
     if request.method == "GET":
         users_callback: Callback = user_services.getAllByCompanyID(session.get('CompanyID', 0))
-        role_callback: Callback =  role_services.getAllByCompanyID(session.get('CompanyID', 0))
+        role_callback: Callback = role_services.getAllByCompanyID(session.get('CompanyID', 0))
 
         roles = []
         userWithRoles = []
@@ -68,8 +74,9 @@ def admin_users():
 
 
 # Create a new user under the logged in user's company
-@users_router.route("/admin/user", methods=['POST'])
-def admin_users_add():
+@users_router.route("/user", methods=['POST'])
+@jwt_required
+def users_add():
     if request.method == "POST":
 
         # Get the admin user who is logged in and wants to create a new user.
@@ -115,17 +122,19 @@ def admin_users_add():
         if not callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry couldn't create the user. Try again!")
 
-        email_callback : Callback = mail_services.addedNewUserEmail(session.get('UserEmail', "Error"), email, password)
+        email_callback: Callback = mail_services.addedNewUserEmail(session.get('UserEmail', "Error"), email, password)
         if not email_callback.Success:
-            return json.dumps({'success': False, 'msg': " New user was created but could not send email with login information. Please delete and readd the user."}), \
+            return json.dumps({'success': False,
+                               'msg': " New user was created but could not send email with login information. Please delete and readd the user."}), \
                    400, {'ContentType': 'application/json'}
 
         return json.dumps({'success': True, 'msg': " User has been created successfully!"}), \
-                   200, {'ContentType': 'application/json'}
+               200, {'ContentType': 'application/json'}
 
 
 # Update user with id <userID>
-@users_router.route("/admin/user/<userID>", methods=['PUT'])
+@users_router.route("/user/<userID>", methods=['PUT'])
+@jwt_required
 def update_user(userID):
     if request.method == "PUT":
 
@@ -174,8 +183,8 @@ def update_user(userID):
         return helpers.jsonResponse(True, 200, "User updated successfully!")
 
 
-
-@users_router.route("/admin/user/<userID>", methods=['DELETE'])
+@users_router.route("/user/<userID>", methods=['DELETE'])
+@jwt_required
 def delete_user(userID):
     if request.method == "DELETE":
 

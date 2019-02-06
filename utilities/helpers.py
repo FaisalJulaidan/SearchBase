@@ -150,7 +150,7 @@ def gen_dummy_data():
     user_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "User").first()
 
     # Create Users
-    user_services.create(firstname='Ahmad', surname='Hadi', email='aa@aa.com', password='123', phone='4344423',
+    user_services.create(firstname='Sylvester', surname='Stallone', email='aa@aa.com', password='123', phone='4344423',
                          company=aramco, role=owner_aramco, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='4344423', company=aramco,
                          role=admin_aramco, verified=True)

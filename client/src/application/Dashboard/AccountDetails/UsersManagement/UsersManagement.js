@@ -1,14 +1,19 @@
 import React from "react";
 import styles from "./UsersManagement.module.less";
 import {Tabs} from "antd";
+import connect from "react-redux/es/connect/connect";
+import {usersManagementActions} from "../../../../store/actions";
 
 const TabPane = Tabs.TabPane;
 
 class UsersManagement extends React.Component {
 
+    componentDidMount() {
+        this.props.dispatch(usersManagementActions.getUsers())
+    }
 
     render () {
-
+        console.log(this.state)
         return (
             <div style={{height: '100%'}}>
                 <div className={styles.Panel}>
@@ -36,4 +41,10 @@ class UsersManagement extends React.Component {
     }
 }
 
-export default UsersManagement
+function mapStateToProps(state) {
+    return {
+        usersData: state.usersList
+    };
+}
+
+export default connect(mapStateToProps)(UsersManagement)

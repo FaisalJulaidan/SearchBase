@@ -26,13 +26,11 @@ function* addGroup({assistantID, newGroup}) {
     try {
         loadingMessage('Adding Group');
         const res = yield http.post(`/assistant/${assistantID}/flow/group`, newGroup);
-        yield put(flowActions.addGroupSuccess(res.data.msg));
-        yield destroyMessage();
-        yield alertSuccess('Group Added', res.data.msg);
-        return yield put(flowActions.fetchFlowRequest(assistantID))
+        yield put(flowActions.fetchFlowRequest(assistantID))
+        return yield alertSuccess('Group Added', res.data.msg);
+
     } catch (error) {
         console.log(error);
-        yield destroyMessage();
         return yield put(flowActions.addGroupFailure(error.response.data));
     }
 }
@@ -48,7 +46,9 @@ function* editGroup({assistantID, editedGroup}) {
     } catch (error) {
         console.log(error);
         yield destroyMessage();
-        return yield put(flowActions.editGroupFailure(error.response.data));
+        yield put(flowActions.editGroupFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not update the group.");
+
     }
 }
 
@@ -62,7 +62,9 @@ function* deleteGroup({assistantID, deletedGroup}) {
     } catch (error) {
         console.log(error);
         yield destroyMessage();
-        return yield put(flowActions.deleteGroupFailure(error.response.data));
+        yield put(flowActions.deleteGroupFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not remove the group.");
+
     }
 }
 

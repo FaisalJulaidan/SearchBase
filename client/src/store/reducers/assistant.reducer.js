@@ -23,7 +23,7 @@ export const assistant = (state = initialState, action) => {
                 errorMsg: action.error.msg
             });
 
-
+        // Add
         case actionTypes.ADD_ASSISTANT_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
@@ -39,6 +39,49 @@ export const assistant = (state = initialState, action) => {
                 isAdding: false,
                 errorMsg: action.error.msg
             });
+
+        // Update
+        case actionTypes.UPDATE_ASSISTANT_REQUEST:
+            return updateObject(state, {
+                successMsg: null,
+                errorMsg: null,
+                isLoading: true
+            });
+        case actionTypes.UPDATE_ASSISTANT_SUCCESS:
+            return updateObject(state, {
+                successMsg: action.successMsg,
+                isLoading: false
+            });
+        case actionTypes.UPDATE_ASSISTANT_FAILURE:
+            return updateObject(state, {
+                isLoading: false,
+                errorMsg: action.error.msg
+            });
+
+        // Delete
+        case actionTypes.DELETE_ASSISTANT_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isDeleting: true
+            });
+        case actionTypes.DELETE_ASSISTANT_SUCCESS:
+
+            let assistantList = [...state.assistantList];
+            const assistantToDeleteIndex =  assistantList
+                .findIndex(assistant => assistant.id === action.assistantID);
+            assistantList.splice(assistantToDeleteIndex, 1);
+
+            return updateObject(state, {
+                successMsg: action.successMsg,
+                isDeleting: false,
+                assistantList
+            });
+        case actionTypes.DELETE_ASSISTANT_FAILURE:
+            return updateObject(state, {
+                isDeleting: false,
+                errorMsg: action.error.msg
+            });
+
 
         case actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST:
             return updateObject(state, {

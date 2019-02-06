@@ -67,7 +67,7 @@ def chatbotSession_file_uploads(assistantID, path):
         return helpers.jsonResponse(False, 404, "File not found.", None)
 
 
-    cs_callback: Callback = chatbotSession_services.getByID(id, assistant)
+    cs_callback: Callback = chatbotSession_services.getByID(id, assistantID)
     if not cs_callback.Success:
         return helpers.jsonResponse(False, 404, "File not found.", None)
     session: ChatbotSession = cs_callback.Data

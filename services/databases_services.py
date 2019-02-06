@@ -1,4 +1,5 @@
 from models import db, Callback, Database, Candidate, Client, Company, Assistant, Job
+from services import assistant_services
 from typing import List
 import pandas
 import re
@@ -78,10 +79,16 @@ def getAllClients(dbID) -> Callback:
     # db.session.close()
 
 # ----- Scanners (Pandas) ----- #
-def scanCandidates(company: Company, databaseName, keywords: dict):
+def scanCandidates(dbID, assistantHashID, keywords: dict):
     try:
+
+        callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
+        if not callback.Success:
+            return Callback(False, "Assistant not found!")
+        assistant: Assistant = callback.Data
+
         database: Database = db.session.query(Database) \
-            .filter(and_(Database.CompanyID == company.ID, Database.Name == databaseName)).first()
+            .filter(and_(Database.CompanyID == assistant.CompanyID, Database.ID == dbID)).first()
         if not database: raise Exception
 
 
@@ -120,9 +127,6 @@ def scanCandidates(company: Company, databaseName, keywords: dict):
         if keywords.get(DT.EmploymentTypeOffered.value['name']):
             df['count'] += 2 * df[DT.PreferredEmploymentType.name].str.count('|'.join(keywords[DT.EmploymentTypeOffered.value['name']]),
                                                                      flags=re.IGNORECASE)
-
-
-
 
         print(df.nlargest(2, 'count'))
         print(df.nlargest(2, 'count').to_json(orient='records'))

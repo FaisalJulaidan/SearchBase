@@ -157,8 +157,6 @@ elif os.environ['FLASK_ENV'] == 'development':
     scheduler.init_app(app)
     scheduler.start()
 
-    databases_services.getOptions()
-
     # Run the app server
     print('Development mode running...')
 

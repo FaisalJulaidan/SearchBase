@@ -1,25 +1,26 @@
 import {Button, Icon, Upload, message} from "antd";
 import React, {Component} from 'react';
-import XLSX from 'xlsx';
+
+import MyWorker from "./excel_worker";
 
 class UploadDatabaseStep extends Component {
 
     readExcel = () => { // returns a promise because reader is asynchronous function
-        const {fileList} = this.props;
+        const {fileList, setStateHandler} = this.props;
         // This reads the file from the upload component
         // the file when uploaded as blob is considered as binary
         return new Promise((resolve, reject) => {
             if (fileList[0]) {
+                setStateHandler({isFileUploading: true});
                 const reader = new FileReader();
                 reader.readAsBinaryString(fileList[0]);
                 reader.onload = () => {
-                    const workbook = XLSX.read(reader.result, {type: 'binary'});
-                    const first_worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    /* DO SOMETHING WITH workbook HERE */
-                    return resolve({
-                        headers: XLSX.utils.sheet_to_json(first_worksheet, {header: 1})[0],
-                        data: XLSX.utils.sheet_to_json(first_worksheet)
-                    });
+                    const myWorker = new Worker(MyWorker);
+                    myWorker.postMessage(reader.result);
+                    myWorker.onmessage = (m) => {
+                        setStateHandler({isFileUploading: false});
+                        return resolve(m.data)
+                    };
                 }
             } else {
                 message.error('Please upload Excel file or CSV file');

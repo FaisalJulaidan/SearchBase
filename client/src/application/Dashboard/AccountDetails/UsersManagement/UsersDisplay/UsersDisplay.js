@@ -126,13 +126,17 @@ class UsersDisplay extends React.Component {
         let data = nextProps.users;
         if(!isEmpty(data)){
             if(data !== this.state.data){
+                //add records needed by the columns
+                // needs key
                 data = data.map((record, index) => {data[index]["key"] = data[index]["ID"]; return record});
 
+                // cant put 2 in 1
                 data = data.map((record, index) => {
                     data[index]["Fullname"] = data[index]["Firstname"] + " " + data[index]["Surname"];
                     return record
                 });
 
+                // cant go down a . when editing
                 data = data.map((record, index) => {data[index]["RoleName"] = data[index]["Role"]["Name"]; return record});
 
                 this.setState({
@@ -157,10 +161,11 @@ class UsersDisplay extends React.Component {
             const index = newData.findIndex(item => key === item.key);
             if (index > -1) {
                 const item = newData[index];
-                newData.splice(index, 1, {
-                    ...item,
-                    ...row,
-                });
+                const newRecord = {...item, ...row};
+                console.log("newRecord", newRecord);
+                this.props.editUser(newRecord);
+
+                newData.splice(index, 1, newRecord);
                 this.setState({ data: newData, editingKey: '' });
             } else {
                 newData.push(row);
@@ -180,7 +185,7 @@ class UsersDisplay extends React.Component {
                 cell: EditableCell,
             },
         };
-        console.log("STATE", this.state)
+
         const columns = this.columns.map((col) => {
             if (!col.editable) {
                 return col;

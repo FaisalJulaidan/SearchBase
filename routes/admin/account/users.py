@@ -32,7 +32,7 @@ def update_roles():
                                         "Sorry, You're not authorised. Only owners are allowed to edit user's permissions.")
 
         # New roles values
-        values = request.form.get("data", default=None)
+        values = request.form.get("data", None)
         if not values:
             return helpers.jsonResponse(False, 400, "Please provide all required info for the roles.")
         values = json.loads(values)
@@ -80,12 +80,12 @@ def users():
 
 
 # Create a new user under the logged in user's company
-@users_router.route("/user", methods=['POST'])
+@users_router.route("/user", methods=['PUT', 'POST', 'DELETE'])
 @jwt_required
-def users_add():
+def user():
     user = get_jwt_identity()['user']
 
-    if request.method == "POST":
+    if request.method == "PUT":
 
         # Get the admin user who is logged in and wants to create a new user.
         callback: Callback = user_services.getByID(user.get('id', 0))
@@ -99,10 +99,10 @@ def users_add():
 
         # If authorised then complete the process
         # Get submitted user info
-        firstname = request.form.get("firstname", default='').strip()
-        surname = request.form.get("surname", default='').strip()
-        email = request.form.get("email", default='').strip()
-        role = request.form.get("role", default='').strip()
+        firstname = request.json.get("Firstname", '').strip()
+        surname = request.json.get("Surname", '').strip()
+        email = request.json.get("Email", '').strip()
+        role = request.json.get("Role", {}).get("Name", None)
         password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
 
         # Check if info valid
@@ -139,21 +139,21 @@ def users_add():
         return json.dumps({'success': True, 'msg': " User has been created successfully!"}), \
                200, {'ContentType': 'application/json'}
 
+    if request.method == "POST":
 
-# Update user with id <userID>
-@users_router.route("/user/<userID>", methods=['PUT'])
-@jwt_required
-def update_user(userID):
-    user = get_jwt_identity()['user']
-
-    if request.method == "PUT":
+        print("request.json", request.json)
 
         # User info
-        firstname = request.form.get("firstname", default='').strip()
-        surname = request.form.get("surname", default='').strip()
-        email = request.form.get("email", default='').strip()
-        role = request.form.get("role", default='').strip()
-
+        userID = user.get("id", 0)
+        firstname = request.json.get("Firstname", '').strip()
+        surname = request.json.get("Surname", '').strip()
+        email = request.json.get("Email", '').strip()
+        role = request.json.get("Role", {}).get("Name", None)
+        print("userID", userID)
+        print("firstname", firstname)
+        print("surname", surname)
+        print("email", email)
+        print("role", role)
         if not helpers.isStringsLengthGreaterThanZero(firstname, surname, email, role):
             return helpers.jsonResponse(False, 400, "Please provide all required info for the new user.")
 
@@ -191,12 +191,6 @@ def update_user(userID):
 
         print("Success >> user updated")
         return helpers.jsonResponse(True, 200, "User updated successfully!")
-
-
-@users_router.route("/user/<userID>", methods=['DELETE'])
-@jwt_required
-def delete_user(userID):
-    user = get_jwt_identity()['user']
 
     if request.method == "DELETE":
 

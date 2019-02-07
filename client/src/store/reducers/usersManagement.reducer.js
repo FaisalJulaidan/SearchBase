@@ -22,6 +22,48 @@ export const usersManagement = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: action.error.msg
             });
+        case actionTypes.ADD_USER_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isLoading: true
+            });
+        case actionTypes.ADD_USER_SUCCESS:
+            return updateObject(state, {
+                isLoading: false
+            });
+        case actionTypes.ADD_USER_FAILURE:
+            return updateObject(state, {
+                isLoading: false,
+                errorMsg: action.error.msg
+            });
+        case actionTypes.EDIT_USER_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isLoading: true
+            });
+        case actionTypes.EDIT_USER_SUCCESS:
+            return updateObject(state, {
+                isLoading: false
+            });
+        case actionTypes.EDIT_USER_FAILURE:
+            return updateObject(state, {
+                isLoading: false,
+                errorMsg: action.error.msg
+            });
+        case actionTypes.DELETE_USER_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isLoading: true
+            });
+        case actionTypes.DELETE_USER_SUCCESS:
+            return updateObject(state, {
+                isLoading: false
+            });
+        case actionTypes.DELETE_USER_FAILURE:
+            return updateObject(state, {
+                isLoading: false,
+                errorMsg: action.error.msg
+            });
 
         default:
             return state

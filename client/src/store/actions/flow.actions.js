@@ -142,7 +142,6 @@ const editBlockFailure = (error) => {
         error
     };
 };
-//////////////////////////////////////////
 
 //////////////////////////////////////////
 // DELETE Blocks Actions
@@ -194,28 +193,6 @@ const updateBlocksOrderFailure = (error) => {
 };
 //////////////////////////////////////////
 
-//////////////////////////////////////////
-// ADD Data Category (For Future)
-const addDataCategoryRequest = ({name}) => {
-    return {
-        type: actionTypes.ADD_DATA_CATEGORY_REQUEST,
-        name
-    };
-};
-
-const addDataCategorySuccess = (msg) => {
-    return {
-        type: actionTypes.ADD_DATA_CATEGORY_SUCCESS,
-        msg
-    };
-};
-
-const addDataCategoryFailure = (error) => {
-    return {
-        type: actionTypes.ADD_DATA_CATEGORY_FAILURE,
-        error
-    };
-};
 
 export const flowActions = {
 
@@ -250,9 +227,5 @@ export const flowActions = {
     updateBlocksOrderRequest,
     updateBlocksOrderSuccess,
     updateBlocksOrderFailure,
-
-    addDataCategoryRequest,
-    addDataCategorySuccess,
-    addDataCategoryFailure,
 
 };

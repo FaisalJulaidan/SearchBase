@@ -1,7 +1,6 @@
 import React from "react";
 import {Popconfirm} from "antd";
-
-const EditableContext = React.createContext();
+import {EditableContext} from "../UsersDisplay";
 
 const Columns = (isEditing, save, cancel, edit) => (
     [
@@ -27,7 +26,7 @@ const Columns = (isEditing, save, cancel, edit) => (
             title: 'operation',
             dataIndex: 'operation',
             render: (text, record) => {
-                console.log(text, record)
+                console.log("text, record", text, record)
                 const editable = isEditing(record);
                 return (
                     <div>

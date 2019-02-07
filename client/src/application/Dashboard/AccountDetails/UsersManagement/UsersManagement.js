@@ -14,7 +14,6 @@ class UsersManagement extends React.Component {
     }
 
     render () {
-        console.log(this.props)
         return (
             <div style={{height: '100%'}}>
                 <div className={styles.Panel}>
@@ -28,7 +27,7 @@ class UsersManagement extends React.Component {
                     <div className={styles.Panel_Body} style={{overflowY: "auto"}}>
                         <Tabs defaultActiveKey={"1"}>
                             <TabPane tab={"Users"} key={"1"}>
-                                <UsersDisplay/>
+                                <UsersDisplay users={this.props.usersData.users}/>
                             </TabPane>
 
                             <TabPane tab={"Roles' Permissions"} key={"2"}>

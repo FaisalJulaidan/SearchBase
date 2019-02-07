@@ -1,8 +1,8 @@
 import React from "react";
 import {Form, Input, InputNumber} from "antd";
+import {EditableContext} from "../UsersDisplay";
 
 const FormItem = Form.Item;
-const EditableContext = React.createContext();
 
 class EditableCell extends React.Component {
     getInput = () => {
@@ -47,4 +47,4 @@ class EditableCell extends React.Component {
     }
 }
 
-export default Form.create()(EditableCell);
+export default EditableCell;

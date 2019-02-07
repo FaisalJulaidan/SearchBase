@@ -1,8 +1,6 @@
 import React from "react";
 import {Form} from "antd";
-
-
-const EditableContext = React.createContext();
+import {EditableContext} from "../UsersDisplay";
 
 const EditableRow = ({ form, index, ...props }) => (
   <EditableContext.Provider value={form}>

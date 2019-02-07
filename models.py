@@ -58,6 +58,7 @@ class Company(db.Model):
     # Relationships:
     Users = db.relationship('User', back_populates='Company', cascade="all, delete, delete-orphan")
     Assistants = db.relationship('Assistant', back_populates='Company', cascade="all, delete, delete-orphan")
+    Databases = db.relationship('Database', back_populates='Company', cascade="all, delete, delete-orphan")
     Roles = db.relationship('Role', back_populates='Company', cascade="all, delete, delete-orphan")
 
     def __repr__(self):
@@ -140,7 +141,7 @@ class Assistant(db.Model):
     ChatbotSessions = db.relationship('ChatbotSession', back_populates='Assistant')
 
     # Constraints:
-    # Cannot have two assitants with the same name under one company
+    # Cannot have two assistants with the same name under one company
     __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
 
     def __repr__(self):
@@ -270,17 +271,6 @@ class BlockGroup(db.Model):
     def __repr__(self):
         return '<BlockGroup {}>'.format(self.Name)
 
-# class DataCategory(db.Model):
-#
-#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-#     Name = db.Column(db.String(64),nullable=False)
-#     Industry = db.Column(db.String(64),nullable=False)
-#
-#     # Relationships:
-#     Blocks = db.relationship('Block', back_populates='DataCategory', order_by='Block.Order', cascade="all, delete, delete-orphan")
-#
-#     def __repr__(self):
-#         return '<DataCategory {}>'.format(self.Name)
 
 class Block(db.Model):
 
@@ -307,6 +297,7 @@ class Block(db.Model):
     def __repr__(self):
         return '<Block {}>'.format(self.Type)
 
+
 class BlockLabel(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Text = db.Column(db.String(128), nullable=False)
@@ -320,11 +311,113 @@ class BlockLabel(db.Model):
         return '<BlockLabel {}>'.format(self.Text)
 
 
+class Database(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(64),nullable=False)
+    Type = db.Column(Enum(enums.DatabaseType), nullable=False)
+
+    # Relationships:
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
+    Company = db.relationship('Company', back_populates='Databases')
+
+
+    # Constraints:
+    # Cannot have two databases with the same name under one company
+    __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_database'),)
+
+    def __repr__(self):
+        return '<Database {}>'.format(self.Name)
+
+
+class Candidate(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(64), nullable=True)
+    Email = db.Column(db.String(64), nullable=True)
+    Telephone = db.Column(db.String(64), nullable=True)
+    LinkdinURL = db.Column(db.String(512), nullable=True)
+    PostCode = db.Column(db.String(64), nullable=True)
+
+    Gender = db.Column(db.String(24), nullable=True)
+    Degree = db.Column(db.String(64), nullable=True)
+    # Resume = db.Column(db.String(64), nullable=True) # this will be a file
+    ContactTime = db.Column(db.String(64), nullable=True)
+    Availability = db.Column(db.String(64), nullable=True)
+    CurrentSalary = db.Column(db.Float(), nullable=True)
+    CurrentRole = db.Column(db.String(64), nullable=True)
+    JobTitle = db.Column(db.String(64), nullable=True)
+    CurrentEmployer = db.Column(db.String(64), nullable=True)
+    CurrentEmploymentType = db.Column(db.String(64), nullable=True)
+
+    DesiredSalary = db.Column(db.Float(), nullable=True)
+    DesiredPosition = db.Column(db.String(64), nullable=True)
+    CandidateSkills = db.Column(db.String(64), nullable=True)
+    YearsExp = db.Column(db.Float(), nullable=True)
+    PreferredLocation = db.Column(db.String(64), nullable=True)
+    PreferredEmploymentType = db.Column(db.String(64), nullable=True)
+    DesiredHourlyRate = db.Column(db.Float(), nullable=True)
+
+
+    # Relationships:
+    DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
+    Database = db.relationship('Database')
+
+    def __repr__(self):
+        return '<Candidate {}>'.format(self.Name)
+
+class Job(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    JobTitle = db.Column(db.String(64), nullable=True)
+    Location = db.Column(db.String(64), nullable=True)
+    PositionType = db.Column(db.String(64), nullable=True)
+    EmploymentType = db.Column(db.String(64), nullable=True)
+    Salary = db.Column(db.Float(), nullable=True)
+    StartDate = db.Column(db.DateTime(), nullable=True)
+
+    # Relationships:
+
+    DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
+    Database = db.relationship('Database')
+
+    def __repr__(self):
+        return '<Client {}>'.format(self.Name)
+
+class Client(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(64), nullable=True)
+    Email = db.Column(db.String(64), nullable=True)
+    Telephone = db.Column(db.String(64), nullable=True)
+    LinkdinURL = db.Column(db.String(128), nullable=True)
+    PostCode = db.Column(db.String(64), nullable=True)
+
+    Location = db.Column(db.String(64), nullable=True)
+    NearbyStation = db.Column(db.String(64), nullable=True)
+    JobSalaryOffered = db.Column(db.Float(), nullable=True)
+    EmploymentTypeOffered = db.Column(db.String(64), nullable=True)
+    CandidatesNeeded = db.Column(db.Integer(), nullable=True)
+    EssentialSkills = db.Column(db.String(512), nullable=True)
+    EssentialYearsExp = db.Column(db.Float(), nullable=True)
+    ContractRate = db.Column(db.Float(), nullable=True)
+    JobDescription = db.Column(db.String(512), nullable=True)
+    JobAvailability = db.Column(db.String(64), nullable=True)
+
+    # Relationships:
+
+    DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
+    Database = db.relationship('Database')
+
+    def __repr__(self):
+        return '<Client {}>'.format(self.Name)
+
+
+
+
 
 class Callback():
     def __init__(self, success: bool, message: str, data: str or dict or bool = None):
         self.Success: bool = success
         self.Message: str = message
         self.Data: str or dict or bool = data
-    pass
-    # if success else 'Error: ' + message

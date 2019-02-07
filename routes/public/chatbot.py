@@ -14,22 +14,6 @@ from utilities import helpers
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
 
-# Two functions to get assistant via id and hashids to avoid duplicate code in every route function
-def getAssistantByHashID(hashID):
-    assistantID = helpers.decrypt_id(hashID)
-    if len(assistantID) == 0:
-        return Callback(False, "Assistant not found!", None)
-
-    callback: Callback = assistant_services.getByID(assistantID[0])
-    if not callback.Success:
-        return Callback(False, "Assistant not found!", None)
-    assistant: Assistant = callback.Data
-
-    # Check if assistant is active excluding on test page
-    requestHeader = str(request.headers.get("Referer"))
-    if not assistant.Active and (("connect" not in requestHeader or "/admin/assistant/" not in requestHeader) and ("chatbottemplate_production" not in requestHeader)):
-        return Callback(False, "Assistant is not active.", None)
-    return callback
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot_direct_link", methods=['GET'])
@@ -40,15 +24,9 @@ def chatbot_direct_link(assistantIDAsHash):
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
 def chatbot(assistantIDAsHash):
 
-    # Find the assistant by hashid and not id
-    callback: Callback = getAssistantByHashID(assistantIDAsHash)
-    if not callback.Success:
-        return helpers.jsonResponse(False, 404, callback.Message, callback.Data)
-    assistant: Assistant = callback.Data
-
     if request.method == "GET":
         # Get blocks for the chatbot to use
-        callback: Callback = flow_services.getChatbot(assistant)
+        callback: Callback = flow_services.getChatbot(assistantIDAsHash)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
         return helpers.jsonResponse(True, 200, "No Message", callback.Data)
@@ -58,7 +36,7 @@ def chatbot(assistantIDAsHash):
 
         # Chatbot collected information
         data = request.json
-        callback: Callback = chatbot_services.processData(assistant, data)
+        callback: Callback = chatbot_services.processData(assistantIDAsHash, data)
 
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
@@ -97,26 +75,12 @@ def getSolutions_forChatbot(assistantIDAsHash):
         return helpers.jsonResponse(True, 200, "Solution list is here!", s_callback.Data)
 
 
-@chatbot_router.route("/userdownloads/<path:path>", methods=['GET'])
+@chatbot_router.route("/widgets/<path:path>", methods=['GET'])
 @helpers.gzipped
 def assistant_userdownloads(path):
     if request.method == "GET":
-        return send_from_directory('static/user_downloads/', path)
+        return send_from_directory('static/widgets/', path)
 
-
-@chatbot_router.route("/getpopupsettings/<string:assistantIDAsHash>", methods=['GET'])
-def get_pop_settings(assistantIDAsHash):
-
-    # Find the assistant by hashid and not id
-    callback: Callback = getAssistantByHashID(assistantIDAsHash)
-    if not callback.Success:
-        return helpers.jsonResponse(False, 404, callback.Message, callback.Data)
-    assistant: Assistant = callback.Data
-
-    if request.method == "GET":
-        return helpers.jsonResponse(True, 200, "Pop up settings retrieved",
-                                    {"SecondsUntilPopUp": assistant.SecondsUntilPopup,
-                                     "TopBarText": assistant.TopBarText})
 
 
 @chatbot_router.route("/assistant/<int:sessionID>/file", methods=['POST'])

@@ -121,7 +121,8 @@ class Question extends Component {
                 <Form layout='horizontal'>
                     <QuestionFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
-                                      layout={this.props.options.layout}/>
+                                      layout={this.props.options.layout}
+                                      placeholder="Ex: What best describes you?"/>
 
                     <DataTypeFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator} flowOptions={flowOptions}

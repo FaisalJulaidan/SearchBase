@@ -100,7 +100,7 @@
                 colon = ":";
 
             let $script = $('<script src=\"' + window.location.protocol + '//' + window.location.hostname + colon  + window.location.port +
-                '/userdownloads/widget.js\" data-name=\"tsb-widget\" data-id={{ assistantID }} data-icon="#fff" data-circle="#4B5B71" async defer>');
+                '/api/widgets/chatbot.js\" data-name=\"tsb-widget\" data-id={{ assistantID }} data-icon="#fff" data-circle="#4B5B71" async defer>');
 
             $('input#icon').on('change', (e) => {
                 $script.attr('data-icon', $('input#icon').val());

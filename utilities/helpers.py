@@ -1,5 +1,5 @@
 from flask import json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, Block, ChatbotSession, BlockGroup
+from models import db, Role, Company, Assistant, Plan, Block, ChatbotSession, BlockGroup, Database, Candidate
 from services import user_services
 from datetime import datetime, timedelta
 from sqlalchemy import inspect
@@ -214,8 +214,33 @@ def gen_dummy_data():
                                       UserType=enums.UserType.Candidate, Assistant=reader_a))
 
 
-    # will save changes as well
-    seed()
+    db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidates, Company=aramco)
+    db.session.add(db1)
+
+    db.session.add(addCandidate(db1, 'Faisal', 2000, "Software Engineer", "python, java, javascript, SQL",
+                                5, "London","contract", 30))
+
+    db.session.add(addCandidate(db1, 'Mohammed', 4000, "Software Engineer", "python, SQL",
+                                10, "Cardiff","Contract", 50))
+
+    db.session.add(addCandidate(db1, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
+                                2, "Cardiff","Contract", 20))
+
+    seed() # will save changes as well
+
+
+def addCandidate(db, name, ds, dp, cs, ye, pl, pe, ehr):
+    return Candidate(Database=db, Name=name,
+                     DesiredSalary=ds,
+                     DesiredPosition=dp,
+                     CandidateSkills =cs,
+                     YearsExp = ye,
+                     PreferredLocation = pl,
+                     PreferredEmploymentType = pe,
+                     DesiredHourlyRate = ehr)
+
+
+
 
 def seed():
 
@@ -295,10 +320,6 @@ def isStringsLengthGreaterThanZero(*args):
 
 
 def jsonResponse(success: bool, http_code: int, msg: str, data=None):
-    # print("success: ", success)
-    # print("http_code: ", http_code)
-    # print("msg: ", msg)
-    # print("data: ", data)
     return json.dumps({'success': success, 'code': http_code, 'msg': msg, 'data': data}), \
         http_code, {'ContentType': 'application/json'}
 

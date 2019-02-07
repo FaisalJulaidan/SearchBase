@@ -1,6 +1,7 @@
 import json
 from os.path import join
 from typing import List
+from flask import request
 
 from sqlalchemy import and_
 from sqlalchemy.sql import exists, func
@@ -8,22 +9,38 @@ from sqlalchemy.sql import exists, func
 import enums
 from config import BaseConfig
 from models import db, Callback, Assistant, Block, Plan, BlockGroup
-from utilities import json_utils, helpers
+from utilities import helpers
+from services import assistant_services
 
 bot_currentVersion = "1.0.0"
 
+from jsonschema import validate
+from utilities import json_schemas
 
 # ----- Getters ----- #
 # Get the chatbot for the public to use
-def getChatbot(assistant: Assistant) -> Callback:
+def getChatbot(assistantHashID) -> Callback:
     try:
-        data = {'assistant': {'id': helpers.encrypt_id(assistant.ID), 'name': assistant.Name,
+
+        callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
+        if not callback.Success:
+            return Callback(False, "Assistant not found!")
+        assistant: Assistant = callback.Data
+
+        # Check if assistant is active excluding on test page
+        requestHeader = str(request.headers.get("Referer"))
+        if not assistant.Active and (("connect" not in requestHeader or "/admin/assistant/" not in requestHeader) and ("chatbottemplate_production" not in requestHeader)):
+            return Callback(False, "Assistant is not active.", None)
+
+
+        data = {'assistant': {'id': assistantHashID, 'name': assistant.Name,
                               'message': assistant.Message,
                               'secondsUntilPopup': assistant.SecondsUntilPopup,
                               'active': assistant.Active},
                 'blocks': getAllBlocks(assistant),
                 }
         return Callback(True, '', data)
+
     except Exception as e:
         print("ERROR: getChatbot()", e)
         db.session.rollback()
@@ -33,14 +50,17 @@ def getChatbot(assistant: Assistant) -> Callback:
 
 # Get the flow for the company to manage the blocks
 def getFlow(assistant: Assistant) -> Callback:
-    blockGroups = getBlockGroups(assistant)
-    if not blockGroups:
-        return Callback(False, 'Could not retrieve flow')
+    try:
 
-    data = {'botVersion': bot_currentVersion,
-            'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
-            'blockGroups': blockGroups}
-    return Callback(True, 'Flow retrieved successfully', data)
+        blockGroups = getBlockGroups(assistant)
+        data = {'botVersion': bot_currentVersion,
+                'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
+                'blockGroups': blockGroups}
+        return Callback(True, 'Flow retrieved successfully', data)
+
+    except Exception as e:
+        print("getFlow ERROR:", e)
+        return Callback(False, 'Could not retrieve flow')
 
 
 # Get the block groups each group having its list of blocks
@@ -135,7 +155,7 @@ def addBlock(data: dict, group: BlockGroup) -> Callback:
     try:
 
         # Validate submitted block content using json schema
-        json_utils.validateSchema(data, 'blocks/NewBlock.json')
+        validate(data, json_schemas.new_block)
         block = data.get('block')
 
         # Set the block with max order + 1
@@ -159,7 +179,7 @@ def addBlock(data: dict, group: BlockGroup) -> Callback:
 # ----- Updaters ----- #
 def updateFlow(flow, assistant: Assistant) -> Callback:
     try:
-        json_utils.validateSchema(flow, 'flow.json')
+        validate(flow, json_schemas.flow)
     except Exception as exc:
         print(exc.args)
         return Callback(False, "The submitted bot data does not doesn't follow the correct format")
@@ -325,7 +345,7 @@ def deleteAllBlock(assistant: Assistant) -> Callback:
 def genFlowViaTemplateUplaod(group: BlockGroup, data: dict):
     try:
         # Validate submitted block data
-        json_utils.validateSchema(data, 'flowTemplate.json')
+        # json_utils.validateSchema(data, 'flowTemplate.json')
         print(data.get('bot')['blocks'][0])
         if not deleteAllBlock(group.Assistant).Success:
             return Callback(False, 'Error in deleting blocks')
@@ -356,7 +376,7 @@ def genFlowViaTemplate(group: BlockGroup, tempName: str):
 
         # Validate submitted block data
 
-        json_utils.validateSchema(data, 'flowTemplate.json')
+        # json_utils.validateSchema(data, 'flowTemplate.json')
         counter = 1
         for block in data.get('bot')['blocks']:
             db.session.add(createBlockFromDict(block, counter, group))
@@ -379,7 +399,7 @@ def genFlowViaTemplate(group: BlockGroup, tempName: str):
 
 def isValidBlock(block: dict, blockType: str):
     try:
-        json_utils.validateSchema(block.get('content'), 'blocks/' + blockType + '.json')
+        validate(block.get('content'), getattr(json_schemas, blockType))
     except Exception as exc:
         print(exc.args[0])
         # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
@@ -441,6 +461,7 @@ def getBlocksCountByAssistant(assistant: Assistant):
 
 def getRemainingBlocksByAssistant(assistant: Assistant):
     try:
+
         # BlocksCap = numberOfCreatedBlocks
         return db.session.query(Plan.MaxBlocks).filter(Plan.Nickname == 'debug').first()[0] - getBlocksCountByAssistant(
             assistant)

@@ -1,4 +1,6 @@
 from models import db, Company, Assistant, Callback
+from sqlalchemy import and_
+from utilities import helpers
 
 def authorised_getByID(assistantID, companyID) -> Callback:
     security_callback: Callback = getByID(assistantID)
@@ -13,17 +15,36 @@ def authorised_getByID(assistantID, companyID) -> Callback:
     return Callback(True, "Assistant retrieved successfully.", assistant)
 
 
-def getByID(id) -> Callback:
+def getAssistantByHashID(hashID):
+    try:
+        assistantID = helpers.decrypt_id(hashID)
+        if len(assistantID) == 0:
+            return Callback(False, "Assistant not found!", None)
+
+        # Get result and check if None then raise exception
+        assistant: Assistant = db.session.query(Assistant).get(assistantID)
+        if not assistant: raise Exception
+        return Callback(True, "", assistant)
+
+
+    except Exception as exc:
+        print("getAssistantByHashID() ERROR:" + str(exc))
+        return Callback(False, "Assistant not found!")
+
+    # finally:
+            # db.session.close()
+
+def getByID(id, companyID) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(Assistant).get(id)
+        result = db.session.query(Assistant)\
+            .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).first()
         if not result: raise Exception
-        return Callback(True, "Got assistant by id successfully.", result)
+        return Callback(True, "Got assistant successfully.", result)
 
     except Exception as exc:
         print(exc)
-        db.session.rollback()
-        return Callback(False, 'Could not get the assistant by id.')
+        return Callback(False, 'Could not get the assistant.')
     # finally:
        # db.session.close()
 
@@ -40,8 +61,7 @@ def getByName(name) -> Callback:
     except Exception as exc:
         print(exc)
         db.session.rollback()
-        return Callback(False,
-                        'Could not get the assistant by nickname.')
+        return Callback(False, 'Could not get the assistant by nickname.')
     # finally:
        # db.session.close()
 
@@ -134,7 +154,7 @@ def removeByID(id) -> Callback:
 
 def checkOwnership(assistantID, companyID):
     try:
-        assistant_callback : Callback = getByID(assistantID)
+        assistant_callback : Callback = getByID(assistantID, companyID)
         if not assistant_callback.Success: 
             return Callback(False, "Error in retrieving necessary information.")
 

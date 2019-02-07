@@ -7,7 +7,7 @@ const CheckboxGroup = Checkbox.Group;
 
 // Common Components
 ////////////////////////////////////////////
-export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block}) => (
+export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block, placeholder}) => (
     <FormItem label="Question"
               extra="The above text will be shown in a bubble inside the chat"
               {...layout}>
@@ -18,23 +18,23 @@ export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block}) =
                 message: "Please input question field",
             }],
         })(
-            <Input placeholder="Ex: Please upload you cv"/>
+            <Input placeholder={placeholder}/>
         )}
     </FormItem>
 );
 
 export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, flowOptions, block}) => (
     <FormItem label="Data Type" {...layout}
-              extra="Selecting a Data Type will result a smarter AI processing">
+              extra="Selecting a Data Type will result in a smarter AI processing and accurate data collection">
         {
             getFieldDecorator('dataType', {
                 initialValue: block.dataType ? block.dataType.name : undefined,
                 rules: [{
                     required: true,
-                    message: "Please specify the data category",
+                    message: "Please specify the data type",
                 }]
             })(
-                <Select placeholder="Will validate the input">
+                <Select placeholder="Will validate the input and categorise user inputs">
                     {
                         flowOptions.dataTypes.map((type, i) =>
                             <Option key={i} value={type.name}>{type.name}</Option>)
@@ -75,7 +75,7 @@ export const AfterMessageFormItem = ({FormItem, layout, getFieldDecorator, block
         {getFieldDecorator('afterMessage', {
             initialValue: block.content.afterMessage ? block.content.afterMessage : undefined,
             rules: [{
-                required: true,
+                required: false,
                 message: "Please input question field",
             }],
         })(
@@ -92,7 +92,7 @@ export const ActionFormItem = ({FormItem, layout, getFieldDecorator, setStateHan
                     initialValue: block.content.action ? block.content.action : undefined,
                     rules: [{
                         required: true,
-                        message: "Please input question field",
+                        message: "Please select an action",
                     }],
                 })(
                     <Select onSelect={(action) => setStateHandler(onSelectAction(action))}
@@ -120,7 +120,7 @@ export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allB
                                 rules: [{required: true, message: "Please select your next block"}]
                             }
                         )(
-                            <Select placeholder="The next step after this block">{
+                            <Select placeholder="The next block to go to">{
                                 allBlocks.map((block, i) =>
                                     <Option key={i} value={block.id}>
                                         {`${block.id}- (${block.type}) ${block.content.text ? block.content.text : ''}`}
@@ -148,7 +148,7 @@ export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, allG
                                 rules: [{required: true, message: "Please select your next group"}]
                             }
                         )(
-                            <Select placeholder="The next block after this block">{
+                            <Select placeholder="The first next block of a group">{
                                 allGroups.map((group, i) => {
                                         if (group.blocks[0])
                                             return <Option key={i} value={group.blocks[0].id}>

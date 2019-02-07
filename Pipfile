@@ -67,6 +67,7 @@ Werkzeug = "==0.14.1"
 Flask-JWT-Extended = "==3.13.1"
 MarkupSafe = "==1.1.0"
 PyJWT = "==1.6.4"
+pandas = "*"
 
 [requires]
 python_version = "2.7"

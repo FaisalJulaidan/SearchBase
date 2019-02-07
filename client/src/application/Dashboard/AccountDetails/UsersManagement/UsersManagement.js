@@ -1,14 +1,19 @@
 import React from "react";
 import styles from "./UsersManagement.module.less";
 import {Tabs} from "antd";
+import connect from "react-redux/es/connect/connect";
+import {usersManagementActions} from "../../../../store/actions";
+import UsersDisplay from "./UsersDisplay/UsersDisplay";
 
 const TabPane = Tabs.TabPane;
 
 class UsersManagement extends React.Component {
 
+    componentDidMount() {
+        this.props.dispatch(usersManagementActions.getUsers());
+    }
 
     render () {
-
         return (
             <div style={{height: '100%'}}>
                 <div className={styles.Panel}>
@@ -22,11 +27,11 @@ class UsersManagement extends React.Component {
                     <div className={styles.Panel_Body} style={{overflowY: "auto"}}>
                         <Tabs defaultActiveKey={"1"}>
                             <TabPane tab={"Users"} key={"1"}>
-
+                                <UsersDisplay users={this.props.usersData.users}/>
                             </TabPane>
 
                             <TabPane tab={"Roles' Permissions"} key={"2"}>
-
+                                2
                             </TabPane>
                         </Tabs>
                     </div>
@@ -36,4 +41,10 @@ class UsersManagement extends React.Component {
     }
 }
 
-export default UsersManagement
+function mapStateToProps(state) {
+    return {
+        usersData: state.usersManagement.usersList
+    };
+}
+
+export default connect(mapStateToProps)(UsersManagement)

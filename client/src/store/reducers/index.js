@@ -5,6 +5,7 @@ import {flow} from "./flow.reducer";
 import {profile} from "./profile.reducer";
 import {chatbotSessions} from "./chatbotSessions.reducer";
 import {solutions} from "./solutions.reducer";
+import {usersManagement} from "./usersManagement.reducer";
 
 
 const rootReducer = combineReducers({
@@ -13,7 +14,8 @@ const rootReducer = combineReducers({
     flow,
     profile,
     chatbotSessions,
-    solutions
+    solutions,
+    usersManagement
 });
 
 export default rootReducer;

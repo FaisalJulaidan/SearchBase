@@ -5,7 +5,7 @@ from sqlalchemy.ext import mutable
 from datetime import datetime
 import json
 import enums
-from sqlalchemy_utils import PasswordType
+from sqlalchemy_utils import PasswordType, CurrencyType, Currency
 
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
@@ -43,7 +43,6 @@ class JsonEncodedDict(types.TypeDecorator):
  # TypeEngine.with_variant says "use StringyJSON instead when connecting to 'sqlite'"
 MagicJSON = types.JSON().with_variant(JsonEncodedDict, 'sqlite')
 mutable.MutableDict.associate_with(JsonEncodedDict)
-
 
 # ============= Models ===================
 
@@ -345,6 +344,7 @@ class Candidate(db.Model):
     ContactTime = db.Column(db.String(64), nullable=True)
     Availability = db.Column(db.String(64), nullable=True)
     CurrentSalary = db.Column(db.Float(), nullable=True)
+    Currency = db.Column(CurrencyType)
     CurrentRole = db.Column(db.String(64), nullable=True)
     JobTitle = db.Column(db.String(64), nullable=True)
     CurrentEmployer = db.Column(db.String(64), nullable=True)
@@ -374,6 +374,7 @@ class Job(db.Model):
     PositionType = db.Column(db.String(64), nullable=True)
     EmploymentType = db.Column(db.String(64), nullable=True)
     Salary = db.Column(db.Float(), nullable=True)
+    Currency = db.Column(CurrencyType)
     StartDate = db.Column(db.DateTime(), nullable=True)
 
     # Relationships:
@@ -396,6 +397,7 @@ class Client(db.Model):
     Location = db.Column(db.String(64), nullable=True)
     NearbyStation = db.Column(db.String(64), nullable=True)
     JobSalaryOffered = db.Column(db.Float(), nullable=True)
+    Currency = db.Column(CurrencyType)
     EmploymentTypeOffered = db.Column(db.String(64), nullable=True)
     CandidatesNeeded = db.Column(db.Integer(), nullable=True)
     EssentialSkills = db.Column(db.String(512), nullable=True)

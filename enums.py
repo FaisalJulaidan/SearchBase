@@ -16,9 +16,8 @@ class ValidationType(Enum):
     Email = 'Email'
     Telephone = 'Telephone'
     Number = 'Number'
-    Name = 'Name'
+    String = 'String'
     URL = 'URL'
-    PostCode = 'Post Code'
 
 
 class BlockType(Enum):
@@ -65,7 +64,7 @@ class DataType(Enum):
     NoType = dataTypeCreator('No Type', ValidationType.Ignore, [], [])
 
     Name = dataTypeCreator('Name',
-                           ValidationType.Name,
+                           ValidationType.String,
                            [UserType.Candidate, UserType.Client],
                            [DatabaseType.Candidates, DatabaseType.Clients])
 
@@ -86,7 +85,7 @@ class DataType(Enum):
                                  [DatabaseType.Candidates, DatabaseType.Clients])
 
     PostCode = dataTypeCreator('Post Code',
-                               ValidationType.PostCode,
+                               ValidationType.Ignore,
                                [UserType.Candidate, UserType.Client],
                                [DatabaseType.Candidates, DatabaseType.Clients])
 

@@ -4,6 +4,7 @@ from typing import List
 import pandas
 import re
 import enums
+from sqlalchemy_utils import Currency
 
 from sqlalchemy import and_
 from enums import  DatabaseType, DataType as DT
@@ -146,6 +147,8 @@ def getOptions() -> Callback:
         enums.DatabaseType.Jobs.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
                                        for c in Job.__table__.columns
                                        if (c.key != 'ID' and c.key != 'DatabaseID')],
+        'currencyCodes': ['GBP', 'USD', 'EUR', 'AED', 'CAD']
+
 
     }
     print(options)

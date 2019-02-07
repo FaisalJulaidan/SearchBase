@@ -41,8 +41,8 @@ function* saveDataSettings(action) {
         loadingMessage('Saving Data Settings');
         const res = yield http.post(`/profile/settings`, action.dataSettings);
         yield destroyMessage();
-        yield alertSuccess('Data Settings saved', res.data.msg);
         yield put(profileActions.saveDataSettingsSuccess(res.data.msg));
+        yield alertSuccess('Data Settings saved', res.data.msg);
         return yield put(profileActions.getProfile())
     } catch (error) {
         console.log(error);

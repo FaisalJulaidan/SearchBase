@@ -90,7 +90,7 @@ const DeleteDatabaseFailure = (error) => {
     }
 };
 
-export const profileActions = {
+export const databaseActions = {
     getDatabasesList,
     getDatabasesListSuccess,
     getDatabasesListFailure,

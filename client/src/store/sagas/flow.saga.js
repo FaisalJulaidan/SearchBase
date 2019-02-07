@@ -179,9 +179,6 @@ function* addDataCategory({name}) {
     }
 }
 
-function* watchAddDataCategory() {
-    yield takeEvery(actionTypes.ADD_DATA_CATEGORY_REQUEST, addDataCategory)
-}
 
 export function* flowSaga() {
     yield all([

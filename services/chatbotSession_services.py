@@ -1,10 +1,47 @@
-from models import db, Callback, ChatbotSession
-from utilities import helpers
+from models import db, Callback, ChatbotSession, Assistant
+from utilities import helpers, json_schemas
+from jsonschema import validate
 from typing import List
 from sqlalchemy.sql import desc
-
+from services import assistant_services
 from sqlalchemy.sql import and_
 
+
+# Process chatbot session data
+def processSession(assistantHashID, data: dict) -> Callback:
+
+    callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
+    if not callback.Success:
+        return Callback(False, "Assistant not found!")
+    assistant: Assistant = callback.Data
+
+    # Validate submitted session
+    try:
+        validate(data, json_schemas.chatbot_session)
+    except Exception as exc:
+        print(exc.args)
+        return Callback(False, "The submitted chatbot data doesn't follow the correct format.", exc.args[0])
+
+    try:
+
+        # collectedData is an array, and timeSpent is in seconds.
+        collectedData = data['collectedData']
+        chatbotSession = ChatbotSession(Data={'collectedData': collectedData},
+                                        TimeSpent=44,
+                                        SolutionsReturned=data['solutionsReturned'],
+                                        QuestionsAnswered=len(collectedData),
+                                        UserType= data['userType'],
+                                        Assistant=assistant)
+        db.session.add(chatbotSession)
+        db.session.commit()
+        return Callback(True, 'Chatbot data has been processed successfully!', chatbotSession)
+
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, "An error occurred while processing chatbot data.")
+    # finally:
+    # db.session.close()
 
 # ----- Getters ----- #
 def getAllByAssistantID(assistantID):
@@ -21,17 +58,16 @@ def getAllByAssistantID(assistantID):
         return Callback(False, 'Could not retrieve the data.')
 
 
-def getByID(id, assistant):
+def getByID(sessionID, assistantID):
     try:
         session = db.session.query(ChatbotSession)\
-            .filter(and_(ChatbotSession.AssistantID == assistant.ID, ChatbotSession.ID == id))\
-            .first()
+            .filter(and_(ChatbotSession.AssistantID == assistantID, ChatbotSession.ID == sessionID)).first()
         if not session: raise Exception
-        return Callback(True, "User input retrieved successfully.", session)
+        return Callback(True, "ChatbotSession retrieved successfully.", session)
 
     except Exception as exc:
         print("userInput_services.getByID() Error: ", exc)
-        return Callback(False, 'Could not retrieve the data.')
+        return Callback(False, 'Could not retrieve the session.')
 
 
 

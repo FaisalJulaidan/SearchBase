@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 
 from config import BaseConfig
 from models import Callback, Assistant, db, ChatbotSession
-from services import assistant_services, flow_services, chatbot_services, solutions_services
+from services import chatbotSession_services, flow_services, solutions_services
 from utilities import helpers
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
@@ -20,6 +20,7 @@ CORS(chatbot_router)
 def chatbot_direct_link(assistantIDAsHash):
     if request.method == "GET":
         return render_template("chatbot_direct_link.html", assistantID=assistantIDAsHash)
+
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
 def chatbot(assistantIDAsHash):
@@ -36,7 +37,7 @@ def chatbot(assistantIDAsHash):
 
         # Chatbot collected information
         data = request.json
-        callback: Callback = chatbot_services.processData(assistantIDAsHash, data)
+        callback: Callback = chatbotSession_services.processSession(assistantIDAsHash, data)
 
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
@@ -77,23 +78,23 @@ def getSolutions_forChatbot(assistantIDAsHash):
 
 @chatbot_router.route("/widgets/<path:path>", methods=['GET'])
 @helpers.gzipped
-def assistant_userdownloads(path):
+def get_widget(path):
     if request.method == "GET":
         return send_from_directory('static/widgets/', path)
 
 
 
-@chatbot_router.route("/assistant/<int:sessionID>/file", methods=['POST'])
-def chatbot_upload_files(sessionID):
+@chatbot_router.route("/assistant/<string:assistantIDAsHash>/session/<int:sessionID>/file", methods=['POST'])
+def chatbot_upload_files(assistantIDAsHash, sessionID):
 
 
-    callback: Callback = chatbot_services.getBySessionID(sessionID)
+    callback: Callback = chatbotSession_services.getByID(sessionID, helpers.decrypt_id(assistantIDAsHash))
     if not callback.Success:
         return helpers.jsonResponse(False, 404, "Session not found.", None)
-    userInput: ChatbotSession = callback.Data
+    session: ChatbotSession = callback.Data
+
 
     if request.method == "POST":
-        data = request.json
         if request.method == 'POST':
 
             try:
@@ -118,7 +119,7 @@ def chatbot_upload_files(sessionID):
                         filenames+= ',' + filename
 
                 # Store filenames in the DB
-                userInput.FilePath = filenames
+                session.FilePath = filenames
 
             except Exception as exc:
                 print(exc)

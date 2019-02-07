@@ -13,15 +13,6 @@ class Assistants extends Component {
         visible: false,
     };
 
-    componentDidUpdate(prevProps) {
-        // Show feedback for settings update
-        if (Boolean(this.props.successSettings) && Boolean(prevProps.successSettings) !== Boolean(this.props.successSettings))
-            message.success(this.props.successSettings);
-
-        if (Boolean(this.props.errorSettings) && Boolean(prevProps.errorSettings) !== Boolean(this.props.errorSettings))
-            message.error(this.props.errorSettings);
-    }
-
 
     componentDidMount() {
         this.props.dispatch(assistantActions.fetchAssistants());
@@ -80,8 +71,6 @@ function mapStateToProps(state) {
     return {
         assistantList: state.assistant.assistantList,
         isLoading: state.assistant.isLoading,
-        successSettings: state.settings.successMsg,
-        errorSettings: state.settings.errorMsg,
     };
 }
 

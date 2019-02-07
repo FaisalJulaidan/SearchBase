@@ -49,6 +49,9 @@ class AssistantSettingsModal extends Component {
                 destroyOnClose={true}
                 onCancel={this.props.handleCancel}
                 footer={[
+                    <Button key="delete" type="danger" onClick={this.props.handleDelete}>
+                        Delete
+                    </Button>,
                     <Button key="cancel" onClick={this.props.handleCancel}>Cancel</Button>,
                     <Button key="submit" type="primary" onClick={this.handleSave}>
                         Save

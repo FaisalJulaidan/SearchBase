@@ -7,10 +7,10 @@ const getUsers = () => {
     };
 };
 
-const getUsersSuccess = (assistantList) => {
+const getUsersSuccess = (usersData) => {
     return {
         type: actionTypes.GET_USERS_SUCCESS,
-        assistantList
+        usersData
     };
 };
 

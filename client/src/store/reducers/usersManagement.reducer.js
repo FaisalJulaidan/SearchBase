@@ -5,7 +5,7 @@ const initialState = {usersList: [], isLoading: false, errorMsg: null};
 
 export const usersManagement = (state = initialState, action) => {
     switch (action.type) {
-        case actionTypes.GET_SOLUTIONS_REQUEST:
+        case actionTypes.GET_USERS_REQUEST:
             return updateObject(state, {
                 usersList: [],
                 errorMsg: null,
@@ -13,7 +13,7 @@ export const usersManagement = (state = initialState, action) => {
             });
         case actionTypes.GET_USERS_SUCCESS:
             return updateObject(state, {
-                usersList: action.usersList,
+                usersList: action.usersData,
                 isLoading: false
             });
         case actionTypes.GET_USERS_FAILURE:

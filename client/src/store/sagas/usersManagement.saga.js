@@ -17,7 +17,7 @@ function* getUsers() {
 
 
 function* watchGetUsers() {
-    yield takeEvery(actionTypes.GET_USERS_REQUEST, getUsers())
+    yield takeEvery(actionTypes.GET_USERS_REQUEST, getUsers)
 }
 
 

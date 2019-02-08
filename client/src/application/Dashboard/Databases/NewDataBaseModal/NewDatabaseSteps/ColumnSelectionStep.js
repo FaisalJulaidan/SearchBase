@@ -1,11 +1,44 @@
 import {Form, Input, Select, Checkbox, Button, Divider, Icon} from "antd";
-import NoticeIcon from 'ant-design-pro/lib/NoticeIcon';
 
 import React, {Component} from 'react'
 import "./UploadDatabaseStep/UploadDatabaseStep.less"
 
 const FormItem = Form.Item;
 const Option = Select.Option;
+
+
+/**
+ * Columns which have mapped with excelColumn
+ @typedef SelectedColumn
+ @type {object}
+ @property {string} ourColumn - TSB colums naming.
+ @property {string[]} excelColumn - Users' colums naming.
+ */
+
+/**
+ * Columns which have mapped with excelColumn
+ @typedef TSBcolumnOption
+ @type {object}
+ @property {string} column - the name of the column.
+ @property {boolean} nullable - is nullable?.
+ @property {string} type - type of column (VARCHAR(any) | FLOAT | DATETIME).
+ */
+
+/**
+ * The returned object from validate_and_construct function
+ @typedef ColumnValidator
+ @type {object}
+ @property {(string|number|null)} data - the record's data.
+ @property {(string|null)} message - if not valid here will be a message.
+ @property {boolean} isValid - to check if valid or not.
+ */
+
+/**
+ * The constructed record before check if valid or not
+ @typedef NewRecord
+ @type {Object.<string, ColumnValidator>}
+ */
+
 
 class ColumnSelectionStep extends Component {
     state = {
@@ -15,134 +48,109 @@ class ColumnSelectionStep extends Component {
     handleChange = selectedColumns => this.setState({selectedColumns: [...this.state.selectedColumns].concat(selectedColumns).unique()});
     handleRemove = removedColumn => setTimeout(() => this.setState({selectedColumns: this.state.selectedColumns.filter(selectedColumn => selectedColumn !== removedColumn)}), 100);
 
+    /**
+     * Returns the ColumnValidator of the passed userRecord
+     * @param {TSBcolumnOption} TSBcolumnOption - The options needs to be met inorder to be sent to TSB db
+     * @param {String[]} userColumns
+     * @param {Object} userRecord
+     * @returns {ColumnValidator}
+     */
+    validate_and_construct = (TSBcolumnOption, userColumns, userRecord) => {
+        // find and merge userColumns data in userRecord
+        // 1- Merge userColumns data in userRecord as validatedData
+        // 2- validate that validatedData is meeting the TSBcolumnOption
+        // 3- return ColumnValidator Object with its attributes
+
+        /** @type {boolean} */
+        let isValid = true;
+
+        /** @type {(string|null)} */
+        let message = null;
+
+        /** @type {(string|number|null)} */
+        let validatedData;
+
+
+        if (TSBcolumnOption.column === "Currency")
+            validatedData = userColumns.join('');
+        else
+            validatedData = userColumns.map(userColumn => userRecord[userColumn]).filter(item => item).join(' ').trim();
+
+
+        if (TSBcolumnOption.type.includes("VARCHAR")) {
+            // get number from varchar then validate string length
+            const string_length = /\(([^)]+)\)/.exec(TSBcolumnOption.type)[1];
+
+            if (validatedData) {
+                if (validatedData.length > string_length) {
+                    isValid = false;
+                    message = `${validatedData} is exceeding the string length ${string_length}`
+                }
+            } else if (!validatedData && !TSBcolumnOption.nullable) {
+                isValid = false;
+                message = `${userColumns} can't be null in ${JSON.stringify(userRecord)}`
+            }
+        }
+
+        if (TSBcolumnOption.type === "FLOAT") {
+            if (validatedData) {
+                validatedData = Number(validatedData);
+                if (isNaN(validatedData)) {
+                    isValid = false;
+                    message = `${validatedData} Should be Numbers only`
+                } else if (!validatedData && !TSBcolumnOption.nullable) {
+                    isValid = false;
+                    message = `${userColumns} can't be null in ${JSON.stringify(userRecord)}`
+                }
+            }
+        }
+
+        return {
+            data: validatedData,
+            message: message,
+            isValid: isValid
+        }
+    };
+
     validate = () => {
-        const {form: {validateFields}, excelFile} = this.props;
+        const {form: {validateFields}, excelFile, databaseOptions, databaseType} = this.props;
+
         validateFields((errors, columns) => {
             // convert object to array of {ourColumn, excelColumn} pairs
-            const me = this.props;
             columns = Object.keys(columns).map(key => {
                 return {ourColumn: key, excelColumn: columns[key]};
             });
-            // get columns which have mapped column with excelColumn
-            const selectedColumns = columns.filter(column => !!column.excelColumn);
 
+            /** @type {SelectedColumn[]} */
+            const selectedColumns = columns.filter(column => !!column.excelColumn).filter(column => !!column.excelColumn[0]);
+
+            /** @type {NewRecord[]} */
             let validRecords = [];
+
+            /** @type {NewRecord[]} */
             let invalidRecords = [];
 
-            // Definition
-            // selectedColumns[]: {
-            //     ourColumn: String,
-            //     excelColumn: String[]
-            // }
+            for (const user_record of excelFile.data) {
+                /** @type {NewRecord} */
+                let record = {};
 
-            // excel.data
-            /*
-            - - - - - - -
-            -
-            -
+                for (const selectedColumn of selectedColumns) {
+                    const {ourColumn, excelColumn} = selectedColumn;
 
-            | | | | => selcted columns
-            --------
-            | => validator
-            I need to check all excel records for this specifc column
-            & when i'm done push it the valid recrod
+                    /** @type {TSBcolumnOption} */
+                    const TSBcolumnOption = databaseOptions[databaseType].find(databaseOptions => databaseOptions.column === ourColumn);
 
-            N
-            | | | |
-            - - - -
-            - * - -
-            - - - -
-
-            valid_records = []
-            invalid_records = []
-
-            loop => excel.data as user_record
-                for (const selectedColum of selectedColumns){
-                    const {ourColumn,excelColumn} = selectedColum;
-
-                    type = databaseOptions[databaseType].find(type => type.column === ourColumn);
-                    record[ourColumn] = validate_and_construct(type,[...excelColumn])
+                    /** @type {ColumnValidator} */
+                    record[ourColumn] = this.validate_and_construct(TSBcolumnOption, [...excelColumn], user_record)
                 }
 
-                name = {
-                    data:'hey',
-                    messeage:null,
-                    isValid:true
-                }
-                record['x'] = validate(type,[user_record.['m'],user_record.['n']])
-                record['y'] = validate(user_record.['y'])
-                record['z'] = validate(user_record.['z'])
-                record['k'] = validate(user_record.['k'])
-
-                loop in the record keys and check if record doens't have any invalid colum
-
-                loop => record.keys as key
-                    if(!recod[key].isValid)
-                        return invalid_records.push(record)
-
-                records.push(record)
-
-             records: record[]
-             record: {string: validate}[]
-             validate: (string , string[])=> {
-                data: string || number,
-                message: string,
-                isValid: boolean
-             }
-
-
-             */
-            for (const selectedColumn of selectedColumns) {
-                // find the validator from databaseOptions
-                const columnValidator = me.databaseOptions[me.databaseType].find(type => type.column === selectedColumn.ourColumn);
-
-                if (columnValidator.type.includes("VARCHAR")) {
-                    // get number from varchar then validate string length
-                    const string_length = /\(([^)]+)\)/.exec(columnValidator.type)[1];
-                    for (const record of excelFile.data) {
-                        let isValidRecord = false;
-                        for (const excelColumn of selectedColumn.excelColumn) {
-                            // because XLSX doesn't return the empty columns
-                            if (record[excelColumn])
-                                isValidRecord = record[excelColumn].length <= string_length;
-                            else if (columnValidator.nullable)
-                                isValidRecord = true;
-                        }
-
-                        if (isValidRecord) validRecords.push(record);
-                        else invalidRecords.push({
-                            record,
-                            justification: `${selectedColumn.excelColumn} doesn't meet the validation of VARCHAR(${string_length})`
-                        });
-                    }
-                }
-
-                if (columnValidator.type === "FLOAT") {
-                    for (const record of excelFile.data) {
-                        let isValidRecord = false;
-
-                        for (const excelColumn of selectedColumn.excelColumn) {
-                            // because XLSX doesn't return the empty cells
-                            if (record[excelColumn])
-                                isValidRecord = isNaN(record[excelColumn]);
-                            else
-                                isValidRecord = false
-                        }
-
-                        if (isValidRecord) validRecords.push(record);
-                        else invalidRecords.push({
-                            record,
-                            justification: `${selectedColumn.excelColumn} doesn't meet the validation of FLOAT`
-                        });
-                    }
-                }
-
-                if (columnValidator.type === "DATETIME") {
-                    // Ask Faisal
-                }
+                if (Object.values(record).flatMap(value => value.isValid).indexOf(false) > -1)
+                    invalidRecords.push(record);
+                else
+                    validRecords.push(record);
             }
 
-            debugger
+            console.log(validRecords, invalidRecords);
 
         });
     };

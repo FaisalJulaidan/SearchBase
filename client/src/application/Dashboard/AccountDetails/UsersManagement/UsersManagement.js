@@ -13,6 +13,18 @@ class UsersManagement extends React.Component {
         this.props.dispatch(usersManagementActions.getUsers());
     }
 
+    addUser = (user) => {
+        this.props.dispatch(usersManagementActions.addUser({user:user}));
+    };
+
+    editUser = (user) => {
+        this.props.dispatch(usersManagementActions.editUser({user:user}));
+    };
+
+    deleteUser = (user) => {
+        this.props.dispatch(usersManagementActions.deleteUser({user:user}));
+    };
+
     render () {
         return (
             <div style={{height: '100%'}}>
@@ -27,10 +39,15 @@ class UsersManagement extends React.Component {
                     <div className={styles.Panel_Body} style={{overflowY: "auto"}}>
                         <Tabs defaultActiveKey={"1"}>
                             <TabPane tab={"Users"} key={"1"}>
-                                <UsersDisplay users={this.props.usersData.users}/>
+                                <UsersDisplay
+                                    users={this.props.usersData.users}
+                                    addUser={this.addUser}
+                                    editUser={this.editUser}
+                                    deleteUser={this.deleteUser}
+                                />
                             </TabPane>
 
-                            <TabPane tab={"Roles' Permissions"} key={"2"}>
+                            <TabPane tab={"Permissions"} key={"2"}>
                                 2
                             </TabPane>
                         </Tabs>

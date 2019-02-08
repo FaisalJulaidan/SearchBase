@@ -22,7 +22,6 @@ const getSolutionsFailure = (error) => {
 };
 
 const addSolution = (params) => {
-    console.log(params);
     return {
         type: actionTypes.ADD_SOLUTION_REQUEST,
         params

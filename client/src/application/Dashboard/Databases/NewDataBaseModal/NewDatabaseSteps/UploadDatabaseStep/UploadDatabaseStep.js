@@ -39,7 +39,7 @@ class UploadDatabaseStep extends Component {
             multiple: false,
             defaultFileList: [...fileList],
             accept:".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
-            onRemove: (file) => {
+            onRemove: file => {
                 setStateHandler((state) => {
                     const index = state.fileList.indexOf(file);
                     const newFileList = state.fileList.slice();
@@ -49,7 +49,7 @@ class UploadDatabaseStep extends Component {
                     };
                 });
             },
-            beforeUpload: (file) => {
+            beforeUpload: file => {
                 file.thumbUrl = 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/files1_9ool.svg';
                 setStateHandler(() => ({fileList: [file]}));
                 return false;
@@ -71,19 +71,6 @@ class UploadDatabaseStep extends Component {
                             <Icon type="upload"/> Upload
                         </Button>
                     </Upload>
-                    {/*<Upload.Dragger {...props}>*/}
-                    {/*<p className="ant-upload-drag-icon">*/}
-                    {/*<Icon type="inbox"/>*/}
-                    {/*</p>*/}
-                    {/*<p className="ant-upload-text">Click or drag file to this area to upload</p>*/}
-                    {/*<p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from*/}
-                    {/*uploading company data or other band files</p>*/}
-
-                    {/*</Upload.Dragger>*/}
-
-                    {/*<Button onClick={handleUpload}>*/}
-                    {/*Test*/}
-                    {/*</Button>*/}
                 </div>
             </div>
         )

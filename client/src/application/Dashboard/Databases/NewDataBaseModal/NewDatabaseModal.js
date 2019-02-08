@@ -14,14 +14,15 @@ class NewDatabaseModal extends Component {
         super(props);
         this.configureDatabaseStep = React.createRef();
         this.uploadDatabaseStep = React.createRef();
+        this.columnSelectionStep = React.createRef();
     }
 
     state = {
-        current: 0,
+        current: 1,
         fileList: [],
         databaseConfiguration: {
-            databaseName: undefined,
-            databaseType: undefined
+            databaseName: 'abc',
+            databaseType: 'Candidates'
         },
 
         isFileUploading: false,
@@ -49,7 +50,8 @@ class NewDatabaseModal extends Component {
         },
         {
             title: 'Column Selection',
-            content: () => <ColumnSelectionStep databaseOptions={this.props.databaseOptions}
+            content: () => <ColumnSelectionStep wrappedComponentRef={form => this.columnSelectionStep = form}
+                                                databaseOptions={this.props.databaseOptions}
                                                 databaseType={this.state.databaseConfiguration.databaseType}
                                                 excelFile={this.state.excelFile}/>,
         },
@@ -72,6 +74,7 @@ class NewDatabaseModal extends Component {
                     })
                 );
                 break;
+
             case 2:
                 this.uploadDatabaseStep.current.readExcel().then(
                     excelFile => {
@@ -81,6 +84,11 @@ class NewDatabaseModal extends Component {
                     rejectedExcelFile => this.setState({excelFile: rejectedExcelFile})
                 );
                 break;
+
+            case 3:
+                this.columnSelectionStep.validate();
+                break;
+
             default:
                 this.setState({current: this.state.current + 1});
                 break;
@@ -101,7 +109,7 @@ class NewDatabaseModal extends Component {
                 onCancel={this.props.hideModal}
                 destroyOnClose={true}
                 footer={null}>
-                <Spin spinning={this.state.isFileUploading}>
+                <Spin spinning={this.state.isFileUploading} tip="Reading Excel File">
 
                     <Steps current={current}>
                         {this.steps.map(item => <Step key={item.title} title={item.title}/>)}

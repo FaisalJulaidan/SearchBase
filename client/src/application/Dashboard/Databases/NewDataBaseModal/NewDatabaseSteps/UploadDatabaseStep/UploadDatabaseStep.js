@@ -1,7 +1,7 @@
 import {Button, Icon, Upload, message} from "antd";
 import React, {Component} from 'react';
 
-import MyWorker from "./excel_worker";
+import Worker from "./excel.worker";
 
 class UploadDatabaseStep extends Component {
 
@@ -15,11 +15,19 @@ class UploadDatabaseStep extends Component {
                 const reader = new FileReader();
                 reader.readAsBinaryString(fileList[0]);
                 reader.onload = () => {
-                    const myWorker = new Worker(MyWorker);
-                    myWorker.postMessage(reader.result);
-                    myWorker.onmessage = (m) => {
+                    const worker = new Worker();
+                    worker.postMessage(reader.result);
+                    worker.onmessage = (event) => {
                         setStateHandler({isFileUploading: false});
-                        return resolve(m.data)
+                        if (event.data.headers)
+                            return resolve(event.data);
+                        else {
+                            message.error('The uploaded size is too big');
+                            return reject({
+                                headers: undefined,
+                                data: undefined
+                            });
+                        }
                     };
                 }
             } else {

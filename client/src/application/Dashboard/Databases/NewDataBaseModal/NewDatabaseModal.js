@@ -5,7 +5,7 @@ import UploadDatabaseStep from './NewDatabaseSteps/UploadDatabaseStep/UploadData
 import styles from "./NewDatabaseModal.module.less"
 import ConfigureDatabaseStep from "./NewDatabaseSteps/ConfigureDatabaseStep";
 import ColumnSelectionStep from "./NewDatabaseSteps/ColumnSelectionStep";
-
+import {dummyExcelData} from './testdata'
 const Step = Steps.Step;
 
 class NewDatabaseModal extends Component {
@@ -18,18 +18,20 @@ class NewDatabaseModal extends Component {
     }
 
     state = {
-        current: 1,
+        current: 2,
         fileList: [],
         databaseConfiguration: {
             databaseName: 'abc',
-            databaseType: 'Candidates'
+            databaseType: 'Jobs'
         },
 
         isFileUploading: false,
 
         excelFile: {
-            headers: undefined,
-            data: undefined
+            headers: dummyExcelData.headers,
+            // headers: undefined,
+            // data: undefined
+            data: dummyExcelData.data
         }
     };
 
@@ -78,7 +80,7 @@ class NewDatabaseModal extends Component {
             case 2:
                 this.uploadDatabaseStep.current.readExcel().then(
                     excelFile => {
-                        console.log(excelFile);
+                        console.log(JSON.stringify(excelFile));
                         this.setState({excelFile, current: this.state.current + 1})
                     },
                     rejectedExcelFile => this.setState({excelFile: rejectedExcelFile})
@@ -86,7 +88,7 @@ class NewDatabaseModal extends Component {
                 break;
 
             case 3:
-                this.columnSelectionStep.validate();
+                this.columnSelectionStep.parseForm();
                 break;
 
             default:

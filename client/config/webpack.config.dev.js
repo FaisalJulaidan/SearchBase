@@ -121,6 +121,8 @@ module.exports = {
         // changing JS code would still trigger a refresh.
     ],
     output: {
+        path: path.join(__dirname, 'dist'),
+        globalObject: 'this',
         // Add /* filename */ comments to generated require()s in the output.
         pathinfo: true,
         // This does not produce a real file. It's just the virtual path that is
@@ -192,6 +194,10 @@ module.exports = {
     module: {
         strictExportPresence: true,
         rules: [
+            {
+                test: /\.worker\.js$/,
+                use: {loader: 'worker-loader'}
+            },
             // Disable require.ensure as it's not a standard language feature.
             {parser: {requireEnsure: false}},
 

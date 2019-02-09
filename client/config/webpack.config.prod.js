@@ -126,6 +126,7 @@ module.exports = {
   // In production, we only want to load the app code.
   entry: [paths.appIndexJs],
   output: {
+    globalObject: 'this',
     // The build folder.
     path: paths.appBuild,
     // Generated JS file names (with nested folders).
@@ -257,6 +258,10 @@ module.exports = {
   module: {
     strictExportPresence: true,
     rules: [
+      {
+        test: /\.worker\.js$/,
+        use: {loader: 'worker-loader'}
+      },
       // Disable require.ensure as it's not a standard language feature.
       { parser: { requireEnsure: false } },
 

@@ -1,4 +1,4 @@
-import {Form, Input, Select, Checkbox, Button, Divider, Icon} from "antd";
+import {Form, Input, Select, Checkbox, Button, Divider, Icon, Spin} from "antd";
 
 import React, {Component} from 'react'
 import "./UploadDatabaseStep/UploadDatabaseStep.less"
@@ -31,6 +31,7 @@ const Option = Select.Option;
  @property {(string|number|null)} data - the record's data.
  @property {(string|null)} message - if not valid here will be a message.
  @property {boolean} isValid - to check if valid or not.
+ @property {string[]} originalColumns - the columns in the uploaded file.
  */
 
 /**
@@ -105,21 +106,42 @@ class ColumnSelectionStep extends Component {
             }
         }
 
+        if (TSBcolumnOption.type === "DATETIME") {
+            const date = new Date(validatedData);
+            validatedData = {
+                year: date.getUTCFullYear(),
+                month: date.getUTCMonth() + 1,
+                day: date.getUTCDate()
+            };
+
+            if (!validatedData.year || !validatedData.month || !validatedData.day) {
+                isValid = false;
+                message = `${JSON.stringify(validatedData)} You should pass dates only`
+            }
+        }
+
         return {
             data: validatedData,
             message: message,
-            isValid: isValid
+            isValid: isValid,
+            originalColumns: userColumns
         }
     };
 
-    validate = () => {
+    parseForm = () => {
         const {form: {validateFields}, excelFile, databaseOptions, databaseType} = this.props;
-
         validateFields((errors, columns) => {
             // convert object to array of {ourColumn, excelColumn} pairs
             columns = Object.keys(columns).map(key => {
                 return {ourColumn: key, excelColumn: columns[key]};
             });
+
+
+            // const relatedColumn = columns.find(column => column.ourColumn.includes("DateFormat")).ourColumn.split('_')[0];
+            // const DateFormat = columns.find((column) => column.ourColumn.includes("DateFormat")).excelColumn;
+            // columns.find(column => column.ourColumn === relatedColumn).dateFormat = DateFormat;
+            // Remove the DateFormat column
+            // columns = columns.filter(column => !column.ourColumn.includes("DateFormat"));
 
             /** @type {SelectedColumn[]} */
             const selectedColumns = columns.filter(column => !!column.excelColumn).filter(column => !!column.excelColumn[0]);
@@ -168,38 +190,80 @@ class ColumnSelectionStep extends Component {
 
         return (
             <div>
-                <Form layout='horizontal'>
-                    {
-                        databaseOptions[databaseType].map((type, index) =>
-                            <FormItem label={type.column} {...formItemLayout} key={index}>
-                                {getFieldDecorator(type.column, {
-                                    defaultValue: selectedColumns,
-                                    rules: [{
-                                        required: !type.nullable,
-                                        message: 'This is required field',
-                                    }],
-                                })(
-                                    type.column === "Currency" ?
+                {!!databaseOptions ?
+                    <Form layout='horizontal'>
+                        {databaseOptions[databaseType].map((type, index) => {
+                            if (type.column === "Currency") return (
+                                <FormItem label={type.column} {...formItemLayout} key={index}>
+                                    {getFieldDecorator(type.column, {
+                                        defaultValue: selectedColumns,
+                                        rules: [{required: !type.nullable, message: 'This is required field',}]
+                                    })
+                                    (
                                         <Select key={index} placeholder="Please select currency">
                                             {databaseOptions.currencyCodes.map(
                                                 (currencyCode, index) =>
                                                     <Option key={index} value={currencyCode}>{currencyCode}</Option>
                                             )}
-                                        </Select> :
+                                        </Select>
+                                    )}
+                                </FormItem>
+                            );
 
-                                        <Select mode="multiple"
-                                                placeholder="Select Column or Columns"
+                            // else if (type.type === "DATETIME") return (
+                            //     <div key={index}>
+                            //         <FormItem label={type.column} {...formItemLayout} >
+                            //             <div>
+                            //                 {getFieldDecorator(type.column, {
+                            //                     defaultValue: selectedColumns,
+                            //                     rules: [{required: !type.nullable, message: 'This is required field',}]
+                            //                 })
+                            //                 (
+                            //                     <Select mode="multiple"
+                            //                             placeholder="Select Column or Columns"
+                            //                             onDeselect={this.handleRemove}
+                            //                             onChange={this.handleChange}
+                            //                             style={{width: "60%", marginRight: 5}}>
+                            //                         {filteredOptions.map(item => (
+                            //                             <Select.Option key={item} value={item}>{item}</Select.Option>
+                            //                         ))}
+                            //                     </Select>
+                            //                 )}
+                            //                 {getFieldDecorator(`${type.column}_DateFormat`)
+                            //                 (
+                            //                     <Select placeholder="Select date format"
+                            //                             style={{width: "calc(40% - 5px)"}}>
+                            //                         <Option value={"MM/DD/YY"}>{"MM/DD/YY"}</Option>
+                            //                         <Option value={"DD/MM/YY"}>{"DD/MM/YY"}</Option>
+                            //                         <Option value={"YY/MM/DD"}>{"YY/MM/DD"}</Option>
+                            //                     </Select>
+                            //                 )}
+                            //             </div>
+                            //         </FormItem>
+                            //     </div>
+                            // );
+
+                            else return (
+                                <FormItem label={type.column} {...formItemLayout} key={index}>
+                                    {getFieldDecorator(type.column, {
+                                        defaultValue: selectedColumns,
+                                        rules: [{required: !type.nullable, message: 'This is required field',}]
+                                    })
+                                    (
+                                        <Select mode="multiple" placeholder="Select Column or Columns"
                                                 onDeselect={this.handleRemove}
                                                 onChange={this.handleChange}>
                                             {filteredOptions.map(item => (
                                                 <Select.Option key={item} value={item}>{item}</Select.Option>
                                             ))}
                                         </Select>
-                                )}
-                            </FormItem>
-                        )
-                    }
-                </Form>
+                                    )}
+                                </FormItem>
+                            );
+                        })}
+                    </Form>
+                    : <Spin/>}
+
             </div>
         )
     }

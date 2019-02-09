@@ -28,7 +28,7 @@ const Option = Select.Option;
  * The returned object from validate_and_construct function
  @typedef ColumnValidator
  @type {object}
- @property {(string|number|null)} data - the record's data.
+ @property {(string|number|null|Date)} data - the record's data.
  @property {(string|null)} message - if not valid here will be a message.
  @property {boolean} isValid - to check if valid or not.
  @property {string[]} originalColumns - the columns in the uploaded file.
@@ -38,6 +38,15 @@ const Option = Select.Option;
  * The constructed record before check if valid or not
  @typedef NewRecord
  @type {Object.<string, ColumnValidator>}
+ */
+
+/**
+ * Date type
+ @typedef Date
+ @type {Object}
+ @property {string} year
+ @property {string} month
+ @property {string} day
  */
 
 
@@ -68,7 +77,7 @@ class ColumnSelectionStep extends Component {
         /** @type {(string|null)} */
         let message = null;
 
-        /** @type {(string|number|null)} */
+        /** @type {(string|number|null|Date)} */
         let validatedData;
 
 
@@ -111,7 +120,7 @@ class ColumnSelectionStep extends Component {
             validatedData = {
                 year: date.getUTCFullYear(),
                 month: date.getUTCMonth() + 1,
-                day: date.getUTCDate()
+                day: date.getUTCDate() + 1
             };
 
             if (!validatedData.year || !validatedData.month || !validatedData.day) {
@@ -128,52 +137,52 @@ class ColumnSelectionStep extends Component {
         }
     };
 
+    /**
+     * @returns {Promise} Promise object represents the valid and invalid data
+     */
     parseForm = () => {
         const {form: {validateFields}, excelFile, databaseOptions, databaseType} = this.props;
-        validateFields((errors, columns) => {
-            // convert object to array of {ourColumn, excelColumn} pairs
-            columns = Object.keys(columns).map(key => {
-                return {ourColumn: key, excelColumn: columns[key]};
-            });
+        return new Promise((resolve) => {
+            validateFields((errors, columns) => {
+                // convert object to array of {ourColumn, excelColumn} pairs
+                columns = Object.keys(columns).map(key => {
+                    return {ourColumn: key, excelColumn: columns[key]};
+                });
 
+                /** @type {SelectedColumn[]} */
+                const selectedColumns = columns.filter(column => !!column.excelColumn).filter(column => !!column.excelColumn[0]);
 
-            // const relatedColumn = columns.find(column => column.ourColumn.includes("DateFormat")).ourColumn.split('_')[0];
-            // const DateFormat = columns.find((column) => column.ourColumn.includes("DateFormat")).excelColumn;
-            // columns.find(column => column.ourColumn === relatedColumn).dateFormat = DateFormat;
-            // Remove the DateFormat column
-            // columns = columns.filter(column => !column.ourColumn.includes("DateFormat"));
+                /** @type {NewRecord[]} */
+                let validRecords = [];
 
-            /** @type {SelectedColumn[]} */
-            const selectedColumns = columns.filter(column => !!column.excelColumn).filter(column => !!column.excelColumn[0]);
+                /** @type {NewRecord[]} */
+                let invalidRecords = [];
 
-            /** @type {NewRecord[]} */
-            let validRecords = [];
+                for (const user_record of excelFile.data) {
+                    /** @type {NewRecord} */
+                    let record = {};
 
-            /** @type {NewRecord[]} */
-            let invalidRecords = [];
+                    for (const selectedColumn of selectedColumns) {
+                        const {ourColumn, excelColumn} = selectedColumn;
 
-            for (const user_record of excelFile.data) {
-                /** @type {NewRecord} */
-                let record = {};
+                        /** @type {TSBcolumnOption} */
+                        const TSBcolumnOption = databaseOptions[databaseType].find(databaseOptions => databaseOptions.column === ourColumn);
 
-                for (const selectedColumn of selectedColumns) {
-                    const {ourColumn, excelColumn} = selectedColumn;
+                        /** @type {ColumnValidator} */
+                        record[ourColumn] = this.validate_and_construct(TSBcolumnOption, [...excelColumn], user_record)
+                    }
 
-                    /** @type {TSBcolumnOption} */
-                    const TSBcolumnOption = databaseOptions[databaseType].find(databaseOptions => databaseOptions.column === ourColumn);
-
-                    /** @type {ColumnValidator} */
-                    record[ourColumn] = this.validate_and_construct(TSBcolumnOption, [...excelColumn], user_record)
+                    if (Object.values(record).flatMap(value => value.isValid).indexOf(false) > -1)
+                        invalidRecords.push(record);
+                    else
+                        validRecords.push(record);
                 }
 
-                if (Object.values(record).flatMap(value => value.isValid).indexOf(false) > -1)
-                    invalidRecords.push(record);
-                else
-                    validRecords.push(record);
-            }
-
-            console.log(validRecords, invalidRecords);
-
+                return resolve({
+                    validRecords: validRecords,
+                    invalidRecords: invalidRecords
+                });
+            });
         });
     };
 

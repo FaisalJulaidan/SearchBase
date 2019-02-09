@@ -20,6 +20,7 @@ class NewDatabaseModal extends Component {
     state = {
         current: 2,
         fileList: [],
+
         databaseConfiguration: {
             databaseName: 'abc',
             databaseType: 'Jobs'
@@ -32,7 +33,10 @@ class NewDatabaseModal extends Component {
             // headers: undefined,
             // data: undefined
             data: dummyExcelData.data
-        }
+        },
+
+        validRecords: [],
+        invalidRecords: []
     };
 
     steps = [
@@ -88,7 +92,12 @@ class NewDatabaseModal extends Component {
                 break;
 
             case 3:
-                this.columnSelectionStep.parseForm();
+                this.columnSelectionStep.parseForm().then(
+                    records => this.setState({
+                        validRecords: records.validRecords,
+                        invalidRecords: records.invalidRecords
+                    })
+                );
                 break;
 
             default:

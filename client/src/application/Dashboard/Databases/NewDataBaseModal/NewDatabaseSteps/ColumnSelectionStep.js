@@ -1,4 +1,4 @@
-import {Form, Input, Select, Checkbox, Button, Divider, Icon, Spin} from "antd";
+import {Form, message, Select, Spin} from "antd";
 
 import React, {Component} from 'react'
 import "./UploadDatabaseStep/UploadDatabaseStep.less"
@@ -142,7 +142,7 @@ class ColumnSelectionStep extends Component {
      */
     parseForm = () => {
         const {form: {validateFields}, excelFile, databaseOptions, databaseType} = this.props;
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             validateFields((errors, columns) => {
                 // convert object to array of {ourColumn, excelColumn} pairs
                 columns = Object.keys(columns).map(key => {
@@ -178,10 +178,16 @@ class ColumnSelectionStep extends Component {
                         validRecords.push(record);
                 }
 
-                return resolve({
-                    validRecords: validRecords,
-                    invalidRecords: invalidRecords
-                });
+
+                if (selectedColumns[0])
+                    return resolve({
+                        validRecords: validRecords,
+                        invalidRecords: invalidRecords
+                    });
+                else {
+                    message.error('Select at least one column');
+                    return reject('Rejected');
+                }
             });
         });
     };

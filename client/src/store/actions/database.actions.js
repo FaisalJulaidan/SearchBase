@@ -1,8 +1,8 @@
 import * as actionTypes from './actionTypes';
 
-const getDatabasesList = () => {
+const getDatabasesList = (companyID) => {
     return {
-        type: actionTypes.GET_DATABASES_LIST_REQUEST
+        type: actionTypes.GET_DATABASES_LIST_REQUEST,
     }
 };
 
@@ -22,10 +22,10 @@ const getDatabasesListFailure = (error) => {
 
 
 // Upload
-const uploadDatabase = (database) => {
+const uploadDatabase = (newDatabase) => {
     return {
         type: actionTypes.UPLOAD_DATABASE_REQUEST,
-        database
+        newDatabase
     }
 };
 

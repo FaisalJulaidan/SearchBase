@@ -6,6 +6,7 @@ import {profile} from "./profile.reducer";
 import {chatbotSessions} from "./chatbotSessions.reducer";
 import {solutions} from "./solutions.reducer";
 import {usersManagement} from "./usersManagement.reducer";
+import {database} from "./database.reducer";
 
 
 const rootReducer = combineReducers({
@@ -15,7 +16,8 @@ const rootReducer = combineReducers({
     profile,
     chatbotSessions,
     solutions,
-    usersManagement
+    usersManagement,
+    database
 });
 
 export default rootReducer;

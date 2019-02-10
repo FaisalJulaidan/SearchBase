@@ -6,6 +6,8 @@ import styles from "./Databases.module.less"
 import NewDatabaseModal from "./NewDataBaseModal/NewDatabaseModal";
 import Header from "../../../components/Header/Header";
 import {http} from "../../../helpers";
+import {databaseActions} from "../../../store/actions";
+
 
 class Databases extends Component {
     state = {
@@ -18,13 +20,30 @@ class Databases extends Component {
 
     componentWillMount() {
         http.get(`/databases/options`)
-            .then(res => this.setState({databaseOptions: res.data.data}))
+            .then(res => this.setState({databaseOptions: res.data.data}));
+
+        this.props.dispatch(databaseActions.getDatabasesList());
+
     }
 
 
     showModal = () => this.setState({visible: true});
     hideModal = () => this.setState({visible: false});
 
+
+    uploadDatabase = newDatabase => this.props.dispatch(databaseActions.uploadDatabase({newDatabase: newDatabase}));
+
+    //
+    // editGroup = (editedGroup) => {
+    //     const {assistant} = this.props.location.state;
+    //     this.props.dispatch(flowActions.editGroupRequest({assistantID: assistant.ID, editedGroup: editedGroup}));
+    // };
+    //
+    // deleteGroup = (deletedGroup) => {
+    //     const {assistant} = this.props.location.state;
+    //     this.props.dispatch(flowActions.deleteGroupRequest({assistantID: assistant.ID, deletedGroup: deletedGroup}));
+    //     this.setState({currentGroup: {blocks: []}});
+    // };
 
     render() {
         return (
@@ -41,10 +60,10 @@ class Databases extends Component {
                             </div>
                             <div className={styles.Panel_Body}>
                                 <Menu mode="inline">
-                                    <Menu.Item key="9">Database 1</Menu.Item>
-                                    <Menu.Item key="10">Database 2</Menu.Item>
-                                    <Menu.Item key="11">Database 3</Menu.Item>
-                                    <Menu.Item key="12">Database 4</Menu.Item>
+                                    {
+                                        this.props.databasesList.map((database, index) =>
+                                            <Menu.Item key={index}>{database}</Menu.Item>)
+                                    }
                                 </Menu>
                             </div>
                         </div>
@@ -66,6 +85,7 @@ class Databases extends Component {
 
                 <NewDatabaseModal visible={this.state.visible}
                                   databaseOptions={this.state.databaseOptions}
+                                  uploadDatabase={this.uploadDatabase}
                                   hideModal={this.hideModal}/>
 
             </div>
@@ -75,7 +95,7 @@ class Databases extends Component {
 
 function mapStateToProps(state) {
     return {
-
+        databasesList: state.database.databasesList
     };
 }
 

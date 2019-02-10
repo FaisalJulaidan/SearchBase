@@ -1,4 +1,4 @@
-import {Button, Divider, Modal, Steps, Spin} from 'antd';
+import {Button, Divider, Modal, Steps, Spin, message} from 'antd';
 
 import React, {Component} from 'react';
 import styles from "./NewDatabaseModal.module.less"
@@ -9,8 +9,8 @@ import ColumnSelectionStep from "./NewDatabaseSteps/ColumnSelectionStep";
 import ConfirmStep from "./NewDatabaseSteps/ConfirmStep";
 
 import {dummyExcelData, validData, invalidData} from './testdata'
-
 const Step = Steps.Step;
+
 class NewDatabaseModal extends Component {
 
     constructor(props) {
@@ -26,7 +26,9 @@ class NewDatabaseModal extends Component {
 
         databaseConfiguration: {
             databaseName: 'abc',
+            // databaseName: undefined,
             databaseType: 'Candidates'
+            // databaseType: undefined
         },
 
         isFileUploading: false,
@@ -47,9 +49,11 @@ class NewDatabaseModal extends Component {
     steps = [
         {
             title: 'Configre Database',
-            content: () => <ConfigureDatabaseStep ref={this.configureDatabaseStep}
-                                                  databaseOptions={this.props.databaseOptions}
-                                                  databaseConfiguration={this.state.databaseConfiguration}/>
+            content: () => this.props.databaseOptions ?
+                <ConfigureDatabaseStep ref={this.configureDatabaseStep}
+                                       databaseOptions={this.props.databaseOptions}
+                                       databaseConfiguration={this.state.databaseConfiguration}/>
+                : <Spin/>
         },
         {
             title: 'Upload Data',
@@ -61,19 +65,21 @@ class NewDatabaseModal extends Component {
         },
         {
             title: 'Column Selection',
-            content: () => <ColumnSelectionStep wrappedComponentRef={form => this.columnSelectionStep = form}
-                                                databaseOptions={this.props.databaseOptions}
-                                                databaseType={this.state.databaseConfiguration.databaseType}
-                                                excelFile={this.state.excelFile}/>,
+            content: () => this.props.databaseOptions ?
+                <ColumnSelectionStep wrappedComponentRef={form => this.columnSelectionStep = form}
+                                     databaseOptions={this.props.databaseOptions}
+                                     databaseType={this.state.databaseConfiguration.databaseType}
+                                     excelFile={this.state.excelFile}/>
+                : <Spin/>
         },
         {
-            title: 'Last',
-            content: () => this.props.databaseOptions ? <ConfirmStep validRecords={this.state.validRecords}
-                                                                     columns={this.props.databaseOptions[this.state.databaseConfiguration.databaseType]}
-                                                                     invalidRecords={this.state.invalidRecords}/> :
-                <Spin/>,
+            title: 'Confirm ',
+            content: () => this.props.databaseOptions ?
+                <ConfirmStep validRecords={this.state.validRecords}
+                             columns={this.props.databaseOptions[this.state.databaseConfiguration.databaseType]}
+                             invalidRecords={this.state.invalidRecords}/>
+                : <Spin/>
         }];
-
 
     next = () => {
         switch (this.state.current + 1) {
@@ -105,7 +111,9 @@ class NewDatabaseModal extends Component {
                         validRecords: records.validRecords,
                         invalidRecords: records.invalidRecords,
                         current: this.state.current + 1
-                    })
+                    }),
+                    () => {
+                    }
                 );
                 break;
 
@@ -119,21 +127,23 @@ class NewDatabaseModal extends Component {
 
     submitDatabase = () => {
         this.props.hideModal();
-        console.log('valid data ready to be submitted to the server')
+        if (this.state.validRecords)
+            this.props.uploadDatabase(this.state.validRecords);
+        else
+            message.error('No valid records to be sent');
     };
+
     render() {
         const {current} = this.state;
 
         return (
-            <Modal
-                width={800}
-                title="Upload New Database"
-                visible={this.props.visible}
-                onCancel={this.props.hideModal}
-                destroyOnClose={true}
-                footer={null}>
+            <Modal width={"80%"}
+                   title="Upload New Database"
+                   visible={this.props.visible}
+                   onCancel={this.props.hideModal}
+                   destroyOnClose={true}
+                   footer={null}>
                 <Spin spinning={this.state.isFileUploading} tip="Reading Excel File">
-
                     <Steps current={current}>
                         {this.steps.map(item => <Step key={item.title} title={item.title}/>)}
                     </Steps>

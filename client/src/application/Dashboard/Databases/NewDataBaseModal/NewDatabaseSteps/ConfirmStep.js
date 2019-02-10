@@ -1,4 +1,4 @@
-import {Form, Table, Tag, Divider} from "antd";
+import {Table, Divider} from "antd";
 import React, {Component} from 'react'
 import {ColumnsOptions} from '../ColumnsOptions'
 
@@ -6,8 +6,10 @@ class ConfirmStep extends Component {
 
     getValidRecordsData = (records) => {
         let x = [];
+        let counter = 0;
         for (const record of records) {
             let renderedRecord = {};
+            renderedRecord.key = counter++;
 
             for (const key of Object.keys(record))
                 renderedRecord[key] = record[key].data;
@@ -28,7 +30,6 @@ class ConfirmStep extends Component {
                 <Table columns={columnsOptions}
                        dataSource={this.getValidRecordsData(validRecords)}
                        size="small"
-                       rowKey={'string'}
                        scroll={{x: 1100}}
                        pagination={{pageSize: 5}}/>
                 <Divider/>
@@ -37,7 +38,6 @@ class ConfirmStep extends Component {
                 <Table columns={columnsOptions}
                        dataSource={this.getValidRecordsData(invalidRecords)}
                        size="small"
-                       rowKey={'string'}
                        scroll={{x: 1100}}
                        pagination={{pageSize: 5}}/>
             </div>

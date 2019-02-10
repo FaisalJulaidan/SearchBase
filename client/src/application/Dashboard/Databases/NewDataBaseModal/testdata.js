@@ -146,3 +146,86 @@ export const dummyExcelData = {
         "Zip code": "S5 6ND"
     }]
 };
+
+export const validData = [{
+    "Name": {
+        "data": "Alexa Amazon",
+        "message": null,
+        "isValid": true,
+        "originalColumns": ["First Name", "Last Name"]
+    },
+    "Email": {"data": "amazon@amazon.co.uk", "message": null, "isValid": true, "originalColumns": [" Email"]},
+    "Telephone": {"data": "34583945", "message": null, "isValid": true, "originalColumns": ["Mobile"]},
+    "LinkdinURL": {"data": "", "message": null, "isValid": true, "originalColumns": ["linkedln"]},
+    "PostCode": {"data": "W4 6YT", "message": null, "isValid": true, "originalColumns": ["Zip code"]},
+    "Gender": {"data": "FEMALE", "message": null, "isValid": true, "originalColumns": ["Gender"]},
+    "Degree": {"data": "University", "message": null, "isValid": true, "originalColumns": ["Degree"]}
+}, {
+    "Name": {
+        "data": "Evgeniy Tonchev",
+        "message": null,
+        "isValid": true,
+        "originalColumns": ["First Name", "Last Name"]
+    },
+    "Email": {"data": "tonchev@thesearchbase.com", "message": null, "isValid": true, "originalColumns": [" Email"]},
+    "Telephone": {"data": "456000", "message": null, "isValid": true, "originalColumns": ["Mobile"]},
+    "LinkdinURL": {
+        "data": "https://www.linkedin.com/in/mehdi-este-142460107/",
+        "message": null,
+        "isValid": true,
+        "originalColumns": ["linkedln"]
+    },
+    "PostCode": {"data": "S5 6ND", "message": null, "isValid": true, "originalColumns": ["Zip code"]},
+    "Gender": {"data": "MALE", "message": null, "isValid": true, "originalColumns": ["Gender"]},
+    "Degree": {"data": "GCSE", "message": null, "isValid": true, "originalColumns": ["Degree"]}
+}, {
+    "Name": {"data": "Mehdi Este", "message": null, "isValid": true, "originalColumns": ["First Name", "Last Name"]},
+    "Email": {"data": "m.este@thesearchbase.com", "message": null, "isValid": true, "originalColumns": [" Email"]},
+    "Telephone": {"data": "6546456456", "message": null, "isValid": true, "originalColumns": ["Mobile"]},
+    "LinkdinURL": {"data": "", "message": null, "isValid": true, "originalColumns": ["linkedln"]},
+    "PostCode": {"data": "W1 3AE", "message": null, "isValid": true, "originalColumns": ["Zip code"]},
+    "Gender": {"data": "MALE", "message": null, "isValid": true, "originalColumns": ["Gender"]},
+    "Degree": {"data": "A-Levels", "message": null, "isValid": true, "originalColumns": ["Degree"]}
+}, {
+    "Name": {"data": "Alexa Amazon", "message": null, "isValid": true, "originalColumns": ["First Name", "Last Name"]},
+    "Email": {"data": "amazon@amazon.co.uk", "message": null, "isValid": true, "originalColumns": [" Email"]},
+    "Telephone": {"data": "456456456", "message": null, "isValid": true, "originalColumns": ["Mobile"]},
+    "LinkdinURL": {"data": "", "message": null, "isValid": true, "originalColumns": ["linkedln"]},
+    "PostCode": {"data": "W4 6YT", "message": null, "isValid": true, "originalColumns": ["Zip code"]},
+    "Gender": {"data": "FEMALE", "message": null, "isValid": true, "originalColumns": ["Gender"]},
+    "Degree": {"data": "University", "message": null, "isValid": true, "originalColumns": ["Degree"]}
+}, {
+    "Name": {
+        "data": "Evgeniy Tonchev",
+        "message": null,
+        "isValid": true,
+        "originalColumns": ["First Name", "Last Name"]
+    },
+    "Email": {"data": "tonchev@thesearchbase.com", "message": null, "isValid": true, "originalColumns": [" Email"]},
+    "Telephone": {"data": "45645645645", "message": null, "isValid": true, "originalColumns": ["Mobile"]},
+    "LinkdinURL": {"data": "", "message": null, "isValid": true, "originalColumns": ["linkedln"]},
+    "PostCode": {"data": "S5 6ND", "message": null, "isValid": true, "originalColumns": ["Zip code"]},
+    "Gender": {"data": "MALE", "message": null, "isValid": true, "originalColumns": ["Gender"]},
+    "Degree": {"data": "University", "message": null, "isValid": true, "originalColumns": ["Degree"]}
+}];
+
+export const invalidData = [{
+    "Name": {
+        "data": "MehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdi Este",
+        "message": "MehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdiMehdi Este is exceeding the string length 64",
+        "isValid": false,
+        "originalColumns": ["First Name", "Last Name"]
+    },
+    "Email": {"data": "m.este@thesearchbase.com", "message": null, "isValid": true, "originalColumns": [" Email"]},
+    "Telephone": {"data": "7777777777", "message": null, "isValid": true, "originalColumns": ["Mobile"]},
+    "LinkdinURL": {
+        "data": "https://www.linkedin.com/in/mehdi-este-142460107/",
+        "message": null,
+        "isValid": true,
+        "originalColumns": ["linkedln"]
+    },
+    "PostCode": {"data": "W1 3AE", "message": null, "isValid": true, "originalColumns": ["Zip code"]},
+    "Gender": {"data": "MALE", "message": null, "isValid": true, "originalColumns": ["Gender"]},
+    "Degree": {"data": "University", "message": null, "isValid": true, "originalColumns": ["Degree"]}
+}];
+

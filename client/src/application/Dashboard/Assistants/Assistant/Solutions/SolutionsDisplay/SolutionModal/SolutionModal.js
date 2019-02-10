@@ -111,10 +111,11 @@ class SolutionModal extends React.Component {
                             <Select onChange={this.changeTypeHandler}>
                                 <OptGroup label={"File Upload"}>
                                     {
+                                        this.props.databaseFileTypes ?
                                         this.props.databaseFileTypes.map(fileType => (
                                                 <Option key={fileType} value={fileType}>{fileType}</Option>
                                             )
-                                        )
+                                        ) : null
                                     }
                                 </OptGroup>
                                 {/*<OptGroup label={"CRM Connection"}>*/}

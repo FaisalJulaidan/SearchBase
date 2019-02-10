@@ -80,7 +80,7 @@ def users():
 
 
 # Create a new user under the logged in user's company
-@users_router.route("/user", methods=['PUT', 'POST', 'DELETE'])
+@users_router.route("/user", methods=['PUT', 'POST'])
 @jwt_required
 def user():
     user = get_jwt_identity()['user']
@@ -99,11 +99,15 @@ def user():
 
         # If authorised then complete the process
         # Get submitted user info
-        firstname = request.json.get("Firstname", '').strip()
-        surname = request.json.get("Surname", '').strip()
-        email = request.json.get("Email", '').strip()
-        role = request.json.get("Role", {}).get("Name", None)
+        name = request.form.get("name", '').strip()
+        firstname = name.split(" ")[0]
+        surname = name.split(" ")[len(name.split(" ")) - 1]
+        email = request.form.get("email", '').strip()
+        role = request.form.get("type", "")
         password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
+
+        if role != "Admin" and role != "User":
+            return helpers.jsonResponse(False, 400, "Role must be Admin or User")
 
         # Check if info valid
         if not helpers.isStringsLengthGreaterThanZero(firstname, surname, email, role):
@@ -114,8 +118,8 @@ def user():
             return helpers.jsonResponse(False, 400, "Please provide a valid email.")
 
         # Check if email is already used
-        user: User = user_services.getByEmail(email).Data
-        if user:
+        userTest: User = user_services.getByEmail(email).Data
+        if userTest:
             return helpers.jsonResponse(False, 400, "Email is already on use.")
 
         # Get the role to be assigned for the user
@@ -141,19 +145,13 @@ def user():
 
     if request.method == "POST":
 
-        print("request.json", request.json)
-
         # User info
-        userID = user.get("id", 0)
+        userID = request.json.get("ID", 0)
         firstname = request.json.get("Firstname", '').strip()
         surname = request.json.get("Surname", '').strip()
         email = request.json.get("Email", '').strip()
         role = request.json.get("Role", {}).get("Name", None)
-        print("userID", userID)
-        print("firstname", firstname)
-        print("surname", surname)
-        print("email", email)
-        print("role", role)
+
         if not helpers.isStringsLengthGreaterThanZero(firstname, surname, email, role):
             return helpers.jsonResponse(False, 400, "Please provide all required info for the new user.")
 
@@ -192,9 +190,16 @@ def user():
         print("Success >> user updated")
         return helpers.jsonResponse(True, 200, "User updated successfully!")
 
-    if request.method == "DELETE":
+
+@users_router.route("/user_delete", methods=['POST'])
+@jwt_required
+def user_delete():
+    user = get_jwt_identity()['user']
+
+    if request.method == "POST":
 
         # Get the user to be deleted.
+        userID = request.json.get("ID", 0)
         if not userID: userID = 0
         callback: Callback = user_services.getByID(userID)
         if not callback.Success:
@@ -216,5 +221,4 @@ def user():
         if not callback.Success:
             return helpers.jsonResponse(False, 500, "Sorry, error occurred. Try again please!")
 
-        print("Success.  " + userID)
         return helpers.jsonResponse(True, 200, "User deleted successfully!")

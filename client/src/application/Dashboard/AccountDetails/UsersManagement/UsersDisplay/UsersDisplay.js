@@ -1,17 +1,16 @@
 import React from "react";
-import styles from "./UsersDisplay.less";
 
-import {
-    Table, Input, InputNumber, Popconfirm, Form,
-} from 'antd';
+import {Button, Form, Input, InputNumber, Popconfirm, Table,} from 'antd';
 import {isEmpty} from "lodash";
+import UserModal from "./UserModal/UserModal";
+import styles from "./UsersDisplay.less"
 
 
 const data = [];
 const FormItem = Form.Item;
 const EditableContext = React.createContext();
 
-const EditableRow = ({ form, index, ...props }) => (
+const EditableRow = ({form, index, ...props}) => (
     <EditableContext.Provider value={form}>
         <tr {...props} />
     </EditableContext.Provider>
@@ -22,9 +21,9 @@ const EditableFormRow = Form.create()(EditableRow);
 class EditableCell extends React.Component {
     getInput = () => {
         if (this.props.inputType === 'number') {
-            return <InputNumber />;
+            return <InputNumber/>;
         }
-        return <Input />;
+        return <Input/>;
     };
 
     render() {
@@ -40,11 +39,11 @@ class EditableCell extends React.Component {
         return (
             <EditableContext.Consumer>
                 {(form) => {
-                    const { getFieldDecorator } = form;
+                    const {getFieldDecorator} = form;
                     return (
                         <td {...restProps}>
                             {editing ? (
-                                <FormItem style={{ margin: 0 }}>
+                                <FormItem style={{margin: 0}}>
                                     {getFieldDecorator(dataIndex, {
                                         rules: [{
                                             required: true,
@@ -65,7 +64,7 @@ class EditableCell extends React.Component {
 class UsersDisplay extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { data, editingKey: '' };
+        this.state = {data, editingKey: '', UserModal: false};
         this.columns = [
             {
                 title: 'Name',
@@ -98,8 +97,8 @@ class UsersDisplay extends React.Component {
                     {form => (
                         <a
                             href="javascript:;"
-                            onClick={() => this.save(form, record.key)}
-                            style={{ marginRight: 8 }}
+                            onClick={() => this.handleEdit(form, record.key)}
+                            style={{marginRight: 8}}
                         >
                             Save
                         </a>
@@ -113,7 +112,10 @@ class UsersDisplay extends React.Component {
                   </Popconfirm>
                 </span>
                             ) : (
-                                <a onClick={() => this.edit(record.key)}>Edit</a>
+                                <>
+                                    <a style={{marginRight:"7px"}} onClick={() => this.edit(record.key)}>Edit</a>
+                                    <a onClick={() => this.delete(record.key)}>Delete</a>
+                                </>
                             )}
                         </div>
                     );
@@ -122,13 +124,16 @@ class UsersDisplay extends React.Component {
         ];
     }
 
-    componentWillReceiveProps(nextProps){
+    componentWillReceiveProps(nextProps) {
         let data = nextProps.users;
-        if(!isEmpty(data)){
-            if(data !== this.state.data){
+        if (!isEmpty(data)) {
+            if (data !== this.state.data) {
                 //add records needed by the columns
                 // needs key
-                data = data.map((record, index) => {data[index]["key"] = data[index]["ID"]; return record});
+                data = data.map((record, index) => {
+                    data[index]["key"] = data[index]["ID"];
+                    return record
+                });
 
                 // cant put 2 in 1
                 data = data.map((record, index) => {
@@ -137,7 +142,10 @@ class UsersDisplay extends React.Component {
                 });
 
                 // cant go down a . when editing
-                data = data.map((record, index) => {data[index]["RoleName"] = data[index]["Role"]["Name"]; return record});
+                data = data.map((record, index) => {
+                    data[index]["RoleName"] = data[index]["Role"]["Name"];
+                    return record
+                });
 
                 this.setState({
                     data: data
@@ -149,34 +157,50 @@ class UsersDisplay extends React.Component {
     isEditing = record => record.key === this.state.editingKey;
 
     cancel = () => {
-        this.setState({ editingKey: '' });
+        this.setState({editingKey: ''});
     };
 
-    save(form, key) {
+    handleAdd = (form) => {
+        this.props.addUser(form);
+        this.setState({UserModal: false})
+    };
+
+    handleEdit(form, key) {
         form.validateFields((error, row) => {
             if (error) {
                 return;
             }
+            console.log("row", row);
             const newData = [...this.state.data];
             const index = newData.findIndex(item => key === item.key);
             if (index > -1) {
                 const item = newData[index];
                 const newRecord = {...item, ...row};
-                console.log("newRecord", newRecord);
+
+                console.log("item", item)
+                console.log("newRecord", newRecord)
                 this.props.editUser(newRecord);
 
                 newData.splice(index, 1, newRecord);
-                this.setState({ data: newData, editingKey: '' });
+                this.setState({data: newData, editingKey: ''});
             } else {
                 newData.push(row);
-                this.setState({ data: newData, editingKey: '' });
+                this.setState({data: newData, editingKey: ''});
             }
         });
     }
 
     edit(key) {
-        this.setState({ editingKey: key });
+        this.setState({editingKey: key});
     }
+
+    delete = (key) => {
+        this.props.deleteUser(this.state.data.filter(record => record["key"] === key)[0]);
+    };
+
+    showUserModal = () => this.setState({UserModal: true});
+
+    handleUserCancel = () => this.setState({UserModal: false});
 
     render() {
         const components = {
@@ -203,13 +227,27 @@ class UsersDisplay extends React.Component {
         });
 
         return (
-            <Table
-                components={components}
-                bordered
-                dataSource={this.state.data}
-                columns={columns}
-                rowClassName="editable-row"
-            />
+            <>
+                <UserModal
+                    visible={this.state.UserModal}
+                    handleCancel={this.handleUserCancel}
+                    handleSave={this.handleAdd}
+                />
+                <div style={{textAlign: "right"}}>
+                    <Button className={styles.Panel_Header_Button} style={{marginBottom: "10px"}} type="primary"
+                            icon="plus"
+                            onClick={this.showUserModal}>
+                        Add User
+                    </Button>
+                </div>
+                <Table
+                    components={components}
+                    bordered
+                    dataSource={this.state.data}
+                    columns={columns}
+                    rowClassName="editable-row"
+                />
+            </>
         );
     }
 }

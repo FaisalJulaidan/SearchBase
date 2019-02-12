@@ -33,12 +33,11 @@ def getChatbot(assistantHashID) -> Callback:
             return Callback(False, "Assistant is not active.", None)
 
 
-        data = {'assistant': {'id': assistantHashID, 'name': assistant.Name,
-                              'message': assistant.Message,
-                              'secondsUntilPopup': assistant.SecondsUntilPopup,
-                              'active': assistant.Active},
-                'blocks': getAllBlocks(assistant),
-                }
+        data = {'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
+                'blocks': helpers.getListFromSQLAlchemyList(getAllBlocks(assistant))}
+        data['assistant']['ID'] = assistantHashID
+
+
         return Callback(True, '', data)
 
     except Exception as e:
@@ -73,12 +72,7 @@ def getFlow(assistant: Assistant) -> Callback:
 # Get the block groups each group having its list of blocks
 def getBlockGroups(assistant: Assistant) -> List[dict]:
     try:
-
         result: List[BlockGroup] = db.session.query(BlockGroup).filter(BlockGroup.AssistantID == assistant.ID).all()
-        # groups = []
-        # for group in result:
-        #     groups.append({'id': group.ID, 'name': group.Name, 'description': group.Description,
-        #                    'blocks': getBlocksFromGroup(group)})
         return result
     except Exception as e:
         print("getBlockGroups ERROR:", e)
@@ -101,24 +95,6 @@ def getGroupByID(id) -> Callback:
         print("getGroups ERROR:", e)
         db.session.rollback()
         return Callback(False, 'Could not retrieve group.')
-    # finally:
-    # db.session.close()
-
-
-# Get the list of blocks by group
-def getBlocksFromGroup(group: BlockGroup) -> List[dict]:
-    try:
-
-        blocks = []
-        for block in group.Blocks:
-            blocks.append(createDictFromBlock(block))
-
-        return blocks
-
-    except Exception as e:
-        print("getBlocks ERROR:", e)
-        db.session.rollback()
-        raise Exception('Error: getBlocksFromGroup()')
     # finally:
     # db.session.close()
 
@@ -484,19 +460,6 @@ def createBlockFromDict(block: dict, order, group: BlockGroup):
         block = Block(Type=enums.BlockType(block.get('type')), Order=order, Content=block.get('content'),
                      StoreInDB=block.get('storeInDB'), Skippable=block.get('isSkippable'),
                      Group=group, DataType=enums.DataType[block.get('dataType')['name'].replace(" ", "")])
-        return block
-    except Exception as e:
-        print("createBlockFromDict ERROR:", e)
-        raise Exception('Error: createBlockFromDict()')
-
-
-def createDictFromBlock(block: Block):
-    try:
-        block = {'id': block.ID, 'type': block.Type.value, 'order': block.Order,
-                'content': block.Content, 'storeInDB': block.StoreInDB,
-                'groupID': block.GroupID, 'isSkippable': block.Skippable,
-                'dataType': block.DataType.value
-                }
         return block
     except Exception as e:
         print("createBlockFromDict ERROR:", e)

@@ -12,7 +12,7 @@ export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block, pl
               extra="The above text will be shown in a bubble inside the chat"
               {...layout}>
         {getFieldDecorator('text', {
-            initialValue: block.content.text,
+            initialValue: block.Content.text,
             rules: [{
                 required: true,
                 message: "Please input question field",
@@ -28,7 +28,7 @@ export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, flowOptio
               extra="Selecting a Data Type will result in a smarter AI processing and accurate data collection">
         {
             getFieldDecorator('dataType', {
-                initialValue: block.dataType ? block.dataType.name : undefined,
+                initialValue: block.DataType ? block.DataType.name : undefined,
                 rules: [{
                     required: true,
                     message: "Please specify the data type",
@@ -49,13 +49,14 @@ export const SkippableFormItem = ({FormItem, layout, getFieldDecorator, block}) 
     <FormItem label="Skippable?" {...layout}>
         {getFieldDecorator('isSkippable', {
             valuePropName: 'checked',
-            initialValue: block.isSkippable ? block.isSkippable : undefined,
+            initialValue: block.IsSkippable ? block.IsSkippable : undefined,
         })(
             <Checkbox>Users can skip answering this question</Checkbox>
         )}
     </FormItem>
 );
 
+//TODO: Needs to be checked
 export const StoreInDBFormItem = ({FormItem, layout, getFieldDecorator, block, blockOptions}) => (
     <FormItem label="Store responses?" {...layout}>
         {getFieldDecorator('storeInDB', {
@@ -73,7 +74,7 @@ export const AfterMessageFormItem = ({FormItem, layout, getFieldDecorator, block
               extra="This message will display straight after the user's response"
               {...layout}>
         {getFieldDecorator('afterMessage', {
-            initialValue: block.content.afterMessage ? block.content.afterMessage : undefined,
+            initialValue: block.Content.afterMessage ? block.Content.afterMessage : undefined,
             rules: [{
                 required: false,
                 message: "Please input question field",
@@ -89,7 +90,7 @@ export const ActionFormItem = ({FormItem, layout, getFieldDecorator, setStateHan
         {
             blockOptions.actions ?
                 getFieldDecorator('action', {
-                    initialValue: block.content.action ? block.content.action : undefined,
+                    initialValue: block.Content.action ? block.Content.action : undefined,
                     rules: [{
                         required: true,
                         message: "Please select an action",
@@ -112,18 +113,18 @@ export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allB
         showGoToBlock ?
             (
                 <FormItem label="Go To Specific Block" {...layout}>
-                    {console.log(block.content.blockToGoID)}
+                    {console.log(block.Content.blockToGoID)}
                     {
                         getFieldDecorator('blockToGoID',
                             {
-                                initialValue: block.content.blockToGoID ? block.content.blockToGoID : undefined,
+                                initialValue: block.Content.blockToGoID ? block.Content.blockToGoID : undefined,
                                 rules: [{required: true, message: "Please select your next block"}]
                             }
                         )(
                             <Select placeholder="The next block to go to">{
                                 allBlocks.map((block, i) =>
-                                    <Option key={i} value={block.id}>
-                                        {`${block.id}- (${block.type}) ${block.content.text ? block.content.text : ''}`}
+                                    <Option key={i} value={block.ID}>
+                                        {`${block.ID}- (${block.Type}) ${block.Content.text ? block.Content.text : ''}`}
                                     </Option>
                                 )
                             }</Select>
@@ -176,7 +177,7 @@ export const ButtonsForm = (handleNewBlock, handleEditBlock, handleDeleteBlock, 
         <Button key="submit" type="primary" onClick={onSubmit}>Add</Button>
     ] : [
         <Button key="delete" type="danger"
-                onClick={() => onDelete(block.id, block.type, handleDeleteBlock)}>
+                onClick={() => onDelete(block.ID, block.Type, handleDeleteBlock)}>
             Delete
         </Button>,
         <Button key="cancel" onClick={() => onCancel(handleNewBlock, handleEditBlock)}>Cancel</Button>,
@@ -189,7 +190,7 @@ export const FileTypesFormItem = ({FormItem, layout, getFieldDecorator, typesAll
         {
             typesAllowed ?
                 getFieldDecorator('fileTypes', {
-                    initialValue: block.content.fileTypes,
+                    initialValue: block.Content.fileTypes,
                     rules: [{
                         required: true,
                         message: "Please select the accepted file type",

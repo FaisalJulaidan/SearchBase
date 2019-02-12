@@ -16,7 +16,7 @@ class Block extends Component {
                 <Panel header={(
                     <>
                         {block.type} <Divider type="vertical"/>
-                        {block.content.text} <Divider type="vertical"/>
+                        {block.Content.text} <Divider type="vertical"/>
 
                         <Button icon={'edit'} size={"small"} onClick={() => this.editBlock(block)}/>
                         <Divider type="vertical"/>
@@ -26,64 +26,64 @@ class Block extends Component {
                 )}
                        key={this.props.key}>
 
-                    {block.content.text ?
+                    {block.Content.text ?
                         <Row>
                             <Col span={6}>Question:</Col>
-                            <Col span={12}>{block.content.text}</Col>
+                            <Col span={12}>{block.Content.text}</Col>
                             <Divider/>
                         </Row>
                         : null
                     }
 
-                    {block.content.blockToGoID ?
+                    {block.Content.blockToGoID ?
                         <Row>
                             <Col span={6}>block To Go ID:</Col>
-                            <Col span={12}>{block.content.blockToGoID}</Col>
+                            <Col span={12}>{block.Content.blockToGoID}</Col>
                             <Divider/>
                         </Row>
                         : null
                     }
 
-                    {block.content.validation ?
+                    {block.Content.validation ?
                         <Row>
                             <Col span={6}>validation</Col>
-                            <Col span={12}>{block.content.validation}</Col>
+                            <Col span={12}>{block.Content.validation}</Col>
                             <Divider/>
                         </Row>
                         : null
                     }
 
-                    {block.content.action ?
+                    {block.Content.action ?
                         <Row>
                             <Col span={6}>action</Col>
-                            <Col span={12}>{block.content.action}</Col>
+                            <Col span={12}>{block.Content.action}</Col>
                             <Divider/>
                         </Row>
                         : null
                     }
 
-                    {block.content.afterMessage ?
+                    {block.Content.afterMessage ?
                         <Row>
                             <Col span={6}>after Message</Col>
-                            <Col span={12}>{block.content.afterMessage}</Col>
+                            <Col span={12}>{block.Content.afterMessage}</Col>
                             <Divider/>
                         </Row>
                         : null
                     }
 
-                    {block.content.showTop ?
+                    {block.Content.showTop ?
                         <Row>
                             <Col span={6}>show Top</Col>
-                            <Col span={12}>{block.content.showTop}</Col>
+                            <Col span={12}>{block.Content.showTop}</Col>
                             <Divider/>
                         </Row>
                         : null
                     }
 
-                    {block.content.storeInDB ?
+                    {block.Content.storeInDB ?
                         <Row>
                             <Col span={6}>Stroe in DB:</Col>
-                            <Col span={6}><Checkbox checked={block.content.storeInDB}></Checkbox></Col>
+                            <Col span={6}><Checkbox checked={block.Content.storeInDB}></Checkbox></Col>
 
                             <Col span={6}>Skippable:</Col>
                             <Col span={6}><Checkbox checked={block.content.isSkippable}></Checkbox></Col>
@@ -92,11 +92,11 @@ class Block extends Component {
                         : null
                     }
 
-                    {block.content.answers ?
+                    {block.Content.answers ?
                         <div>
                             Answers:
                             {
-                                block.content.answers.map((answer, i) =>
+                                block.Content.answers.map((answer, i) =>
                                     <Card key={i} style={{margin: 5, width: 300}}>
                                         <Meta
                                             title={answer.text}

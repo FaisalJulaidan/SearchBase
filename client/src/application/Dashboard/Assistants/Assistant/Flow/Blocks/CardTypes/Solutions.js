@@ -53,8 +53,8 @@ class Solutions extends Component {
                 this.handleNewBlock(options);
             else {
                 // Edit Block
-                options.block.id = this.props.options.block.id;
-                options.block.order = this.props.options.block.order;
+                options.block.id = this.props.options.block.ID;
+                options.block.order = this.props.options.block.Order;
                 this.handleEditBlock(options);
             }
         }
@@ -75,7 +75,7 @@ class Solutions extends Component {
                               extra="Number of results you want to return (Best matches e.g. Clients, Candidates, etc.)"
                               {...this.props.options.layout}>
                         {getFieldDecorator('showTop', {
-                            initialValue: block.content.showTop,
+                            initialValue: block.Content.showTop,
                             rules: [{
                                 required: true,
                                 message: "Please set how many solutions to return",

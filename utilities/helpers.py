@@ -2,6 +2,7 @@ from flask import json, after_this_request, request
 from models import db, Role, Company, Assistant, Plan, Block, ChatbotSession, BlockGroup, Database, Candidate
 from services import user_services
 from datetime import datetime, timedelta
+from enum import Enum
 from sqlalchemy import inspect
 from hashids import Hashids
 from config import BaseConfig
@@ -291,8 +292,16 @@ def isValidEmail(email: str) -> bool:
 
 # Convert a SQLAlchemy object to a single dict
 def getDictFromSQLAlchemyObj(obj):
-    return {c.key: getattr(obj, c.key)
-            for c in inspect(obj).mapper.column_attrs if c.key not in ("Password")}
+    d = {}
+    for attr in obj.__table__.columns:
+        key = attr.name
+        if not key == 'Password':
+            d[key] = getattr(obj, key)
+            if isinstance(d[attr.name], Enum):
+                d[key] = d[key].value
+    return d
+    # return {c.key: getattr(obj, c.key)
+    #         for c in inspect(obj).mapper.column_attrs if c.key not in ("Password")}
 
 
 # Convert a SQLAlchemy list of objects to a list of dicts

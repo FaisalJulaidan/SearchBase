@@ -72,7 +72,7 @@ class Blocks extends Component {
     // DELETE BLOCK MODAL CONFIGS
     // this called from block.js when you click on delete block button
     deleteBlock = (deletedBlock) => confirm({
-        title: `Delete block with type: ${deletedBlock.type}`,
+        title: `Delete block with type: ${deletedBlock.Type}`,
         content: `If you click OK, this block will be deleted forever`,
         onOk: () => this.handleDeleteBlock(deletedBlock)
     });
@@ -81,7 +81,7 @@ class Blocks extends Component {
         this.props.deleteBlock(deletedBlock, this.props.currentGroup.id);
 
         // Remove the deletedBlock
-        let blocks = this.state.blocks.filter((block) => block.id !== deletedBlock.id);
+        let blocks = this.state.blocks.filter((block) => block.ID !== deletedBlock.ID);
         // Update order
         for (const i in blocks) blocks[i].order = Number(i) + 1;
         this.setState({blocks});
@@ -115,7 +115,7 @@ class Blocks extends Component {
                                 {(provided) => (
                                     <div ref={provided.innerRef}>
                                         {this.state.blocks.map((block, index) => (
-                                            <Draggable key={block.id} draggableId={block.order} index={index}>
+                                            <Draggable key={block.ID} draggableId={block.Order} index={index}>
                                                 {(provided) => (
                                                     <div ref={provided.innerRef} {...provided.draggableProps}
                                                          {...provided.dragHandleProps}

@@ -51,16 +51,16 @@ class EditBlockModal extends Component {
                    destroyOnClose={true}
                    footer={null}>
 
-                {this.props.block.type === "User Input" ?
+                {this.props.block.Type === "User Input" ?
                     <UserInput options={this.state} handleEditBlock={this.handleEditBlock}
                                handleDeleteBlock={this.props.handleDeleteBlock}/> : null}
-                {this.props.block.type === "Question" ?
+                {this.props.block.Type === "Question" ?
                     <Question options={this.state} handleEditBlock={this.handleEditBlock}
                               handleDeleteBlock={this.props.handleDeleteBlock}/> : null}
-                {this.props.block.type === "File Upload" ?
+                {this.props.block.Type === "File Upload" ?
                     <FileUpload options={this.state} handleEditBlock={this.handleEditBlock}
                                 handleDeleteBlock={this.props.handleDeleteBlock}/> : null}
-                {this.props.block.type === "Solutions" ?
+                {this.props.block.Type === "Solutions" ?
                     <Solutions options={this.state} handleEditBlock={this.handleEditBlock}
                                handleDeleteBlock={this.props.handleDeleteBlock}/> : null}
             </Modal>

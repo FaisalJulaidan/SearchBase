@@ -8,7 +8,6 @@ import {alertError, destroyMessage, loadingMessage} from "../../helpers/alert";
 function* getDatabaseList() {
     try {
         loadingMessage('Loading databases list');
-        debugger
 
         const res = yield http.get(`/databases`);
 

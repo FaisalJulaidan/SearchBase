@@ -7,14 +7,14 @@ export const onCancel = (handleNewBlock, handleEditBlock) => handleNewBlock ? ha
 
 
 export const initActionType = (block, allGroups) => {
-    if (block.content.action === "Go To Specific Block")
+    if (block.Content.action === "Go To Specific Block")
         return {showGoToBlock: true, showGoToGroup: false};
-    else if (block.content.action === "Go To Group") {
+    else if (block.Content.action === "Go To Group") {
         // because here we dont' have column in each block contains all the group
         // this is a workaround to have the group name from the block id
-        const {blockToGoID} = block.content;
+        const {blockToGoID} = block.Content;
         allGroups.map((group) => {
-            if (group.blocks[0].id === blockToGoID)
+            if (group.blocks[0].ID === blockToGoID)
                 return {showGoToBlock: false, showGoToGroup: true, groupName: group.name}
         })
     } else
@@ -40,7 +40,7 @@ export const getInitialVariables = (options, type) => {
     let blockOptions = {};
     // extract the correct blockType from blockTypes[]
     for (const blockType of flowOptions.blockTypes)
-        if (blockType.name === (block.type || type)) {
+        if (blockType.name === (block.Type || type)) {
             blockOptions = blockType;
             break;
         }

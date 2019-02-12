@@ -52,10 +52,17 @@ def getChatbot(assistantHashID) -> Callback:
 def getFlow(assistant: Assistant) -> Callback:
     try:
 
-        blockGroups = getBlockGroups(assistant)
+        blockGroups = []
+        for group in assistant.BlockGroups:
+            blockGroups.append({
+                'id': group.ID,
+                'name': group.Name,
+                'description': group.Description,
+                'blocks': helpers.getListFromSQLAlchemyList(group.Blocks)
+            })
         data = {'botVersion': bot_currentVersion,
                 'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
-                'blockGroups': blockGroups}
+                'blockGroups':  blockGroups}
         return Callback(True, 'Flow retrieved successfully', data)
 
     except Exception as e:
@@ -66,12 +73,13 @@ def getFlow(assistant: Assistant) -> Callback:
 # Get the block groups each group having its list of blocks
 def getBlockGroups(assistant: Assistant) -> List[dict]:
     try:
-        result: List[BlockGroup] = db.session.query(BlockGroup).filter(BlockGroup.AssistantID == assistant.ID)
-        groups = []
-        for group in result:
-            groups.append({'id': group.ID, 'name': group.Name, 'description': group.Description,
-                           'blocks': getBlocksFromGroup(group)})
-        return groups
+
+        result: List[BlockGroup] = db.session.query(BlockGroup).filter(BlockGroup.AssistantID == assistant.ID).all()
+        # groups = []
+        # for group in result:
+        #     groups.append({'id': group.ID, 'name': group.Name, 'description': group.Description,
+        #                    'blocks': getBlocksFromGroup(group)})
+        return result
     except Exception as e:
         print("getBlockGroups ERROR:", e)
         db.session.rollback()
@@ -118,13 +126,13 @@ def getBlocksFromGroup(group: BlockGroup) -> List[dict]:
 # Get all the given assistant blocks without its group. will be used for chatbot to not bother with groups
 def getAllBlocks(assistant: Assistant) -> List[dict]:
     try:
-        groups: List[BlockGroup] = db.session.query(BlockGroup).filter(BlockGroup.AssistantID == assistant.ID)
+        groups: List[BlockGroup] = db.session.query(BlockGroup).filter(BlockGroup.AssistantID == assistant.ID).all()
         if not groups: raise Exception
 
         blocks = []
         for group in groups:
             for block in group.Blocks:
-                blocks.append(createDictFromBlock(block))
+                blocks.append(block)
 
         return blocks
     except Exception as e:

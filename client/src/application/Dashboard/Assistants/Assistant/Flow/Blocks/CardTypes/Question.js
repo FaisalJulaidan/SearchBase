@@ -54,8 +54,8 @@ class Question extends Component {
                     this.handleNewBlock(options);
                 else {
                     // Edit Block
-                    options.block.id = this.props.options.block.id;
-                    options.block.order = this.props.options.block.order;
+                    options.block.id = this.props.options.block.ID;
+                    options.block.order = this.props.options.block.Order;
                     this.handleEditBlock(options);
                 }
             }
@@ -104,7 +104,7 @@ class Question extends Component {
 
         const {allGroups, block} = getInitialVariables(this.props.options);
         this.setState(initActionType(block, allGroups));
-        this.setState({answers: block.content.answers || []})
+        this.setState({answers: block.Content.answers || []})
     }
 
 

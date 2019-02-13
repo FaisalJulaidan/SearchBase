@@ -8,7 +8,7 @@ import ConfigureDatabaseStep from "./NewDatabaseSteps/ConfigureDatabaseStep";
 import ColumnSelectionStep from "./NewDatabaseSteps/ColumnSelectionStep";
 import ConfirmStep from "./NewDatabaseSteps/ConfirmStep";
 
-import {dummyExcelData, validData, invalidData} from './testdata'
+import {dummyExcelData, jobsExcelSheet, validData, invalidData} from './testdata'
 const Step = Steps.Step;
 
 class NewDatabaseModal extends Component {
@@ -27,17 +27,18 @@ class NewDatabaseModal extends Component {
         databaseConfiguration: {
             databaseName: 'abc',
             // databaseName: undefined,
-            databaseType: 'Candidates'
+            databaseType: 'Jobs'
             // databaseType: undefined
         },
 
         isFileUploading: false,
 
         excelFile: {
-            headers: dummyExcelData.headers,
+            // headers: dummyExcelData.headers,
+            headers: jobsExcelSheet.headers,
             // headers: undefined,
             // data: undefined
-            data: dummyExcelData.data
+            data: jobsExcelSheet.data
         },
 
         // validRecords: [],

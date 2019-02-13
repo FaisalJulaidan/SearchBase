@@ -1,18 +1,25 @@
 import React from 'react'
 
-export const ColumnsOptions = (columns) => Object.keys(columns).map((c, index) => {
-    if (c === "Name" || c === "Email")
+export const ColumnsOptions = (columnHeader) =>
+    Object.keys(columnHeader).map((c, index) => {
         return {
             title: c,
             dataIndex: c,
             key: index,
-            fixed: 'left',
-            width: 150,
-        };
-    else
-        return {
-            title: c,
-            dataIndex: c,
-            key: index,
+            width: 100,
+            render: item => <span>{
+                item.isValid ?
+                    (
+                        item.data.day ?
+                            [item.data.year, item.data.month, item.data.day].join('/')
+                            :
+                            item.data
+                    )
+                    :
+                    (
+                        <p style={{backgroundColor: '#ff7875'}}> {item.message}</p>
+                    )
+            }</span>
+
         }
 });

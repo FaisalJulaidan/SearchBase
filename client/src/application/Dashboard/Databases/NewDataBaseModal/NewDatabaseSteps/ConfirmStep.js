@@ -4,33 +4,14 @@ import {ColumnsOptions} from '../ColumnsOptions'
 
 class ConfirmStep extends Component {
 
-    getValidRecordsData = records => {
+    getRecordsData = records => {
         let x = [];
         let counter = 0;
         for (const record of records) {
             let renderedRecord = {};
             renderedRecord.key = counter++;
-
             for (const key of Object.keys(record))
-                renderedRecord[key] = record[key].data;
-
-            x.push(renderedRecord);
-        }
-        return x;
-    };
-
-    getInvalidRecordsData = records => {
-        let x = [];
-        let counter = 0;
-        for (const record of records) {
-            let renderedRecord = {};
-            renderedRecord.key = counter++;
-
-            for (const key of Object.keys(record))
-                if (!record[key].isValid)
-                    renderedRecord[key] = record[key].message;
-                else
-                    renderedRecord[key] = record[key].data;
+                renderedRecord[key] = record[key];
             x.push(renderedRecord);
         }
         return x;
@@ -44,17 +25,16 @@ class ConfirmStep extends Component {
             <div>
                 <h4>View over the valid data </h4>
                 <Table columns={columnsOptions}
-                       dataSource={this.getValidRecordsData(validRecords)}
+                       dataSource={this.getRecordsData(validRecords)}
                        size="small"
-                       scroll={{x: 1100}}
                        pagination={{pageSize: 5}}/>
+
                 <Divider/>
 
                 <h4>View over the invalid data </h4>
                 <Table columns={columnsOptions}
-                       dataSource={this.getInvalidRecordsData(invalidRecords)}
+                       dataSource={this.getRecordsData(invalidRecords)}
                        size="small"
-                       scroll={{x: 1100}}
                        pagination={{pageSize: 5}}/>
             </div>
         )

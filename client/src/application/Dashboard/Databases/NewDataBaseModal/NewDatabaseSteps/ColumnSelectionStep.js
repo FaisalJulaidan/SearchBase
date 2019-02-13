@@ -140,57 +140,56 @@ class ColumnSelectionStep extends Component {
     /**
      * @returns {Promise} Promise object represents the valid and invalid data
      */
-    parseForm = () => {
+    parseForm = () => new Promise((resolve, reject) => {
         const {form: {validateFields}, excelFile, databaseOptions, databaseType} = this.props;
-        return new Promise((resolve, reject) => {
-            validateFields((errors, columns) => {
-                // convert object to array of {ourColumn, excelColumn} pairs
-                columns = Object.keys(columns).map(key => {
-                    return {ourColumn: key, excelColumn: columns[key]};
-                });
-
-                /** @type {SelectedColumn[]} */
-                const selectedColumns = columns.filter(column => !!column.excelColumn).filter(column => !!column.excelColumn[0]);
-
-                /** @type {NewRecord[]} */
-                let validRecords = [];
-
-                /** @type {NewRecord[]} */
-                let invalidRecords = [];
-
-                for (const user_record of excelFile.data) {
-                    /** @type {NewRecord} */
-                    let record = {};
-
-                    for (const selectedColumn of selectedColumns) {
-                        const {ourColumn, excelColumn} = selectedColumn;
-
-                        /** @type {TSBcolumnOption} */
-                        const TSBcolumnOption = databaseOptions[databaseType].find(databaseOptions => databaseOptions.column === ourColumn);
-
-                        /** @type {ColumnValidator} */
-                        record[ourColumn] = this.validate_and_construct(TSBcolumnOption, [...excelColumn], user_record)
-                    }
-
-                    if (Object.values(record).flatMap(value => value.isValid).indexOf(false) > -1)
-                        invalidRecords.push(record);
-                    else
-                        validRecords.push(record);
-                }
-
-
-                if (selectedColumns[0])
-                    return resolve({
-                        validRecords: validRecords,
-                        invalidRecords: invalidRecords
-                    });
-                else {
-                    message.error('Select at least one column');
-                    return reject('Rejected');
-                }
+        validateFields((errors, columns) => {
+            // convert object to array of {ourColumn, excelColumn} pairs
+            columns = Object.keys(columns).map(key => {
+                return {ourColumn: key, excelColumn: columns[key]};
             });
+
+            /** @type {SelectedColumn[]} */
+            const selectedColumns = columns.filter(column => !!column.excelColumn).filter(column => !!column.excelColumn[0]);
+
+            /** @type {NewRecord[]} */
+            let validRecords = [];
+
+            /** @type {NewRecord[]} */
+            let invalidRecords = [];
+
+            for (const user_record of excelFile.data) {
+                /** @type {NewRecord} */
+                let record = {};
+
+                for (const selectedColumn of selectedColumns) {
+                    const {ourColumn, excelColumn} = selectedColumn;
+
+                    /** @type {TSBcolumnOption} */
+                    const TSBcolumnOption = databaseOptions[databaseType].find(databaseOptions => databaseOptions.column === ourColumn);
+
+                    /** @type {ColumnValidator} */
+                    record[ourColumn] = this.validate_and_construct(TSBcolumnOption, [...excelColumn], user_record)
+                }
+
+                if (Object.values(record).flatMap(value => value.isValid).indexOf(false) > -1)
+                    invalidRecords.push(record);
+                else
+                    validRecords.push(record);
+            }
+
+
+            if (selectedColumns[0])
+                return resolve({
+                    validRecords: validRecords,
+                    invalidRecords: invalidRecords
+                });
+            else {
+                message.error('Select at least one column');
+                return reject('Rejected');
+            }
         });
-    };
+    });
+
 
     render() {
         const formItemLayout = {

@@ -11,7 +11,7 @@ import {databaseActions} from "../../../store/actions";
 
 class Databases extends Component {
     state = {
-        visible: false,
+        visible: true,
     };
 
     componentWillMount() {

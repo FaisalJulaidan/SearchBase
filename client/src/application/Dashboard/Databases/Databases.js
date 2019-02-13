@@ -11,19 +11,14 @@ import {databaseActions} from "../../../store/actions";
 
 class Databases extends Component {
     state = {
-        visible: true,
+        visible: false,
     };
-
-    componentDidUpdate(prevProps) {
-
-    }
 
     componentWillMount() {
         http.get(`/databases/options`)
             .then(res => this.setState({databaseOptions: res.data.data}));
 
         this.props.dispatch(databaseActions.getDatabasesList());
-
     }
 
 
@@ -62,7 +57,7 @@ class Databases extends Component {
                                 <Menu mode="inline">
                                     {
                                         this.props.databasesList.map((database, index) =>
-                                            <Menu.Item key={index}>{database}</Menu.Item>)
+                                            <Menu.Item key={index}>{database.Name}</Menu.Item>)
                                     }
                                 </Menu>
                             </div>

@@ -7,6 +7,7 @@ export const ColumnsOptions = (columns) => Object.keys(columns).map((c, index) =
             dataIndex: c,
             key: index,
             fixed: 'left',
+            width: 150,
         };
     else
         return {

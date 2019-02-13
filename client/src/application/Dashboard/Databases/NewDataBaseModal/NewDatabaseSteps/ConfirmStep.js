@@ -4,7 +4,7 @@ import {ColumnsOptions} from '../ColumnsOptions'
 
 class ConfirmStep extends Component {
 
-    getValidRecordsData = (records) => {
+    getValidRecordsData = records => {
         let x = [];
         let counter = 0;
         for (const record of records) {
@@ -19,6 +19,22 @@ class ConfirmStep extends Component {
         return x;
     };
 
+    getInvalidRecordsData = records => {
+        let x = [];
+        let counter = 0;
+        for (const record of records) {
+            let renderedRecord = {};
+            renderedRecord.key = counter++;
+
+            for (const key of Object.keys(record))
+                if (!record[key].isValid)
+                    renderedRecord[key] = record[key].message;
+                else
+                    renderedRecord[key] = record[key].data;
+            x.push(renderedRecord);
+        }
+        return x;
+    };
 
     render() {
 
@@ -36,7 +52,7 @@ class ConfirmStep extends Component {
 
                 <h4>View over the invalid data </h4>
                 <Table columns={columnsOptions}
-                       dataSource={this.getValidRecordsData(invalidRecords)}
+                       dataSource={this.getInvalidRecordsData(invalidRecords)}
                        size="small"
                        scroll={{x: 1100}}
                        pagination={{pageSize: 5}}/>

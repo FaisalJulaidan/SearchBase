@@ -1,6 +1,6 @@
 import * as actionTypes from './actionTypes';
 
-const getDatabasesList = (companyID) => {
+const getDatabasesList = () => {
     return {
         type: actionTypes.GET_DATABASES_LIST_REQUEST,
     }
@@ -9,7 +9,7 @@ const getDatabasesList = (companyID) => {
 const getDatabasesListSuccess = (databasesList) => {
     return {
         type: actionTypes.GET_DATABASES_LIST_SUCCESS,
-        databasesList
+        databasesList: databasesList
     }
 };
 

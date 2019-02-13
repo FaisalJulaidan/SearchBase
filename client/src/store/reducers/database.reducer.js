@@ -13,7 +13,7 @@ export const database = (state = initialState, action) => {
         case actionTypes.GET_DATABASES_LIST_SUCCESS:
             return updateObject(state, {
                 isLoading: false,
-                blockGroups: action.blockGroups
+                databasesList: action.databasesList
             });
         case actionTypes.GET_DATABASES_LIST_FAILURE:
             return updateObject(state, {

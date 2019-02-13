@@ -19,7 +19,7 @@ def get_databaseOptions():
         return helpers.jsonResponse(True, 200, "These are the options the database provides.", callback.Data)
 
 
-@database_router.route("/databases", methods=['GET'])
+@database_router.route("/databases", methods=['GET', 'POST'])
 @jwt_required
 def get_databasesList():
 

@@ -46,12 +46,10 @@ def processSession(assistantHashID, data: dict) -> Callback:
 # ----- Getters ----- #
 def getAllByAssistantID(assistantID):
     try:
-        sessions= db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID) \
+        sessions: List[ChatbotSession]= db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID) \
             .order_by(desc(ChatbotSession.DateTime)).all()
-        if not sessions: raise Exception
 
-        data = chatbotSessionDictList(sessions) # will convert to json and solve Enums issue
-        return Callback(True, "User inputs retrieved successfully.", data)
+        return Callback(True, "User inputs retrieved successfully.", sessions)
 
     except Exception as exc:
         print("chatbotSession_services.getByAssistantID() Error: ", exc)
@@ -115,33 +113,3 @@ def deleteAll(assistantID):
         return Callback(False, 'Records could not be removed.')
     # finally:
        # db.session.close()
-
-
-# ----- Extras ----- #
-
-
-def chatbotSessionDictList(sessions: List[ChatbotSession]):
-    try:
-        data= []
-        for session in sessions:
-            data.append(createDictFromSession(session))
-        return data
-    except Exception as e:
-        print(" __chatbotSessionJsonList ERROR:", e)
-        db.session.rollback()
-        raise Exception('Error: __chatbotSessionJsonList')
-
-
-def createDictFromSession(session: ChatbotSession):
-    try:
-        session = {'ID': session.ID, 'Data': session.Data, 'FilePath': session.FilePath,
-                   'DateTime': session.DateTime, 'TimeSpent': session.TimeSpent,
-                   'SolutionsReturned': session.SolutionsReturned,
-                   'QuestionsAnswered': session.QuestionsAnswered,
-                   'UserType': session.UserType.value,
-                   'AssistantID': session.AssistantID
-                   }
-        return session
-    except Exception as e:
-        print("createBlockFromDict ERROR:", e)
-        raise Exception('Error: createBlockFromDict()')

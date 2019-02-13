@@ -40,10 +40,6 @@ def getDatabasesList(companyID: int) -> Callback:
     try:
         databases: List[Database] = db.session.query(Database) \
             .filter(and_(Database.CompanyID == companyID)).all()
-        dbList = []
-        for database in databases:
-            dbList.append(creteDatabaseDict(database))
-
         return Callback(True, "Databases list is here", databases)
 
     except Exception as exc:
@@ -51,19 +47,6 @@ def getDatabasesList(companyID: int) -> Callback:
         return Callback(False, 'Could not fetch the databases list.')
     # finally:
     # db.session.close()
-
-
-def creteDatabaseDict(database: Database):
-    try:
-        database = {'id': database.ID,
-                    'name': database.Name,
-                    'type': database.Type.value,
-                    }
-        return database
-    except Exception as e:
-        print("creteDatabaseDict ERROR:", e)
-        raise Exception('Error: creteDatabaseDict()')
-
 
 
 def getAllCandidates(dbID) -> Callback:
@@ -164,8 +147,5 @@ def getOptions() -> Callback:
                                        for c in Job.__table__.columns
                                        if (c.key != 'ID' and c.key != 'DatabaseID')],
         'currencyCodes': ['GBP', 'USD', 'EUR', 'AED', 'CAD']
-
-
     }
-    print(options)
     return Callback(True, '', options)

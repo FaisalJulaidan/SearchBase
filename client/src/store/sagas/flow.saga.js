@@ -26,7 +26,8 @@ function* addGroup({assistantID, newGroup}) {
     try {
         loadingMessage('Adding Group');
         const res = yield http.post(`/assistant/${assistantID}/flow/group`, newGroup);
-        yield put(flowActions.fetchFlowRequest(assistantID))
+        yield put(flowActions.fetchFlowRequest(assistantID));
+        yield destroyMessage();
         return yield alertSuccess('Group Added', res.data.msg);
 
     } catch (error) {

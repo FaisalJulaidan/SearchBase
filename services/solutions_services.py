@@ -429,7 +429,8 @@ def sendSolutionsAlerts(assistantID, solutionID):
         userInput_callback : Callback = chatbotSession_services.getAllByAssistantID(assistantID)
         if not userInput_callback.Success: raise Exception("Error in retrieving user input")
 
-        filterEmails_callback : Callback = chatbotSession_services.filterForContainEmails(userInput_callback.Data)
+        filterEmails_callback : Callback = chatbotSession_services\
+            .filterForContainEmails(helpers.getListFromSQLAlchemyList(userInput_callback.Data))
         if not filterEmails_callback.Success: raise Exception("Error in filtering for emails")
 
         errorsNumber = 0

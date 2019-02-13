@@ -7,10 +7,10 @@ flow = {
         "blocks": {"type": "array", "items": {
             "type": "object",
             "properties":{
-                "id": {"type": "integer"},
-                "groupID": {"type": "integer"},
+                "ID": {"type": "integer"},
+                "GroupID": {"type": "integer"},
 
-                "dataType": {"type": "object",
+                "DataType": {"type": "object",
                              "properties": {
                                  "name": {"enum": [e.value['name'] for e in enums.DataType]},
                                  "validation": {"enum": [e.value for e in enums.ValidationType]}
@@ -19,13 +19,13 @@ flow = {
                              "additionalProperties": True
                              },
 
-                "type": {"enum": [e.value for e in enums.BlockType]},
-                "order": {"type": "integer", "minimum": 1},
-                "storeInDB": {"type": "boolean"},
-                "isSkippable": { "type": "boolean" },
-                "content": {"type": "object"}
+                "Type": {"enum": [e.value for e in enums.BlockType]},
+                "Order": {"type": "integer", "minimum": 1},
+                "StoreInDB": {"type": "boolean"},
+                "IsSkippable": { "type": "boolean" },
+                "Content": {"type": "object"}
             },
-            "required": ["id", "groupID", "dataType", "type", "order", "storeInDB", "isSkippable", "content"],
+            "required": ["ID", "GroupID", "DataType", "Type", "Order", "StoreInDB", "IsSkippable", "Content"],
             "additionalProperties": False
         }
                    }
@@ -68,9 +68,9 @@ new_block = {
         "block": {
             "type": "object",
             "properties": {
-                "type": { "enum": [e.value for e in enums.BlockType]},
-                "groupID": {"type": "integer"},
-                "dataType": {"type": "object",
+                "Type": { "enum": [e.value for e in enums.BlockType]},
+                "GroupID": {"type": "integer"},
+                "DataType": {"type": "object",
                                  "properties": {
                                      "name": {"enum": [e.value['name'] for e in enums.DataType]},
                                      "validation": {"enum": [e.value for e in enums.ValidationType]}
@@ -78,11 +78,11 @@ new_block = {
                                  "required": ["name", "validation"],
                                  "additionalProperties": True
                              },
-                "storeInDB": { "type": "boolean" },
-                "isSkippable": { "type": "boolean" },
-                "content": { "type": "object" } # Depends on BlockType, see below schemas for content
+                "StoreInDB": { "type": "boolean" },
+                "IsSkippable": { "type": "boolean" },
+                "Content": { "type": "object" } # Depends on BlockType, see below schemas for content
             },
-            "required": ["type","groupID", "dataType", "storeInDB", "content"],
+            "required": ["Type","GroupID", "DataType", "StoreInDB", "Content"],
             "additionalProperties": False
         }
     },

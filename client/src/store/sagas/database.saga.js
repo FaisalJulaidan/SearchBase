@@ -5,13 +5,12 @@ import {http} from "../../helpers";
 import {alertError, destroyMessage, loadingMessage} from "../../helpers/alert";
 
 
-function* getDatabaseList() {
+function* getDatabasesList() {
     try {
         loadingMessage('Loading databases list');
-
         const res = yield http.get(`/databases`);
-
-        yield put(databaseActions.getDatabasesListSuccess(res.response.data));
+        yield put(databaseActions.getDatabasesListSuccess(res.data.data));
+        yield destroyMessage();
 
     } catch (error) {
         console.log(error);
@@ -22,7 +21,7 @@ function* getDatabaseList() {
 }
 
 function* watchGetDatabaseList() {
-    yield takeLatest(actionTypes.GET_DATABASES_LIST_REQUEST, getDatabaseList)
+    yield takeLatest(actionTypes.GET_DATABASES_LIST_REQUEST, getDatabasesList)
 }
 
 function* addDatabase({newDatabase}) {

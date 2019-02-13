@@ -52,7 +52,7 @@ class Sessions extends React.Component {
 
 
     showConfirmForClearing = () => {
-        const clear = this.props.clearAllChatbotSessions;
+        const clear = this.clearAllChatbotSessions;
         confirm({
             title: 'Do you want to delete all records?',
             content: 'By clicking OK, there will be no way to get these records back!',

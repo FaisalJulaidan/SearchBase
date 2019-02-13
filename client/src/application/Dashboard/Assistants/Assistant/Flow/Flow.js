@@ -54,7 +54,12 @@ class Flow extends Component {
 
     editBlock = (edittedBlock, groupID) => {
         const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.editBlockRequest({edittedBlock, groupID, assistantID: assistant.ID}));
+        this.props.dispatch(flowActions.editBlockRequest({
+            edittedBlock,
+            groupID,
+            assistantID: assistant.ID,
+            currentBlocks: [...this.state.currentGroup.blocks]
+        }));
     };
 
     deleteBlock = (deletedBlock, groupID) => {

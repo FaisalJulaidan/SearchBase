@@ -35,12 +35,12 @@ class Solutions extends Component {
             const {flowOptions} = getInitialVariables(this.props.options);
             let options = {
                 block: {
-                    type: 'Solutions',
-                    groupID: this.props.options.currentGroup.id,
-                    storeInDB: false,
-                    isSkippable: false,
-                    dataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
-                    content: {
+                    Type: 'Solutions',
+                    GroupID: this.props.options.currentGroup.id,
+                    StoreInDB: false,
+                    Skippable: false,
+                    DataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
+                    Content: {
                         showTop: Number(values.showTop),
                         action: values.action,
                         blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
@@ -53,8 +53,8 @@ class Solutions extends Component {
                 this.handleNewBlock(options);
             else {
                 // Edit Block
-                options.block.id = this.props.options.block.ID;
-                options.block.order = this.props.options.block.Order;
+                options.block.ID = this.props.options.block.ID;
+                options.block.Order = this.props.options.block.Order;
                 this.handleEditBlock(options);
             }
         }

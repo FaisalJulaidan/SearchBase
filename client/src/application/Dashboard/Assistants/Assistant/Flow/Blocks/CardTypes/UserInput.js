@@ -28,7 +28,7 @@ class UserInput extends Component {
         this.handleEditBlock = this.props.handleEditBlock;
         this.handleDeleteBlock = this.props.handleDeleteBlock;
 
-        const {allGroups, block} = getInitialVariables(this.props.options);
+        const {allGroups, block} = getInitialVariables(this.props.options, "User Input");
         this.setState(initActionType(block, allGroups));
     }
 
@@ -37,12 +37,12 @@ class UserInput extends Component {
             const {flowOptions} = getInitialVariables(this.props.options);
             let options = {
                 block: {
-                    type: 'User Input',
-                    groupID: this.props.options.currentGroup.id,
-                    storeInDB: values.storeInDB,
-                    isSkippable: values.isSkippable || false,
-                    dataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
-                    content: {
+                    Type: 'User Input',
+                    GroupID: this.props.options.currentGroup.id,
+                    StoreInDB: values.storeInDB,
+                    Skippable: values.isSkippable || false,
+                    DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
+                    Content: {
                         text: values.text,
                         blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                         action: values.action,
@@ -55,8 +55,8 @@ class UserInput extends Component {
                 this.handleNewBlock(options);
             else {
                 // Edit Block
-                options.block.id = this.props.options.block.ID;
-                options.block.order = this.props.options.block.Order;
+                options.block.ID = this.props.options.block.ID;
+                options.block.Order = this.props.options.block.Order;
                 this.handleEditBlock(options);
             }
 

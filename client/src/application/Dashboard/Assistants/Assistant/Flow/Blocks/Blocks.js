@@ -83,7 +83,7 @@ class Blocks extends Component {
         // Remove the deletedBlock
         let blocks = this.state.blocks.filter((block) => block.ID !== deletedBlock.ID);
         // Update order
-        for (const i in blocks) blocks[i].order = Number(i) + 1;
+        for (const i in blocks) blocks[i].Order = Number(i) + 1;
         this.setState({blocks});
         // send a request to the server
         this.props.reorderBlocks(blocks, this.props.currentGroup.id);

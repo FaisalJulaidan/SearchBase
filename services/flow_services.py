@@ -236,7 +236,7 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
     # After full validation of blocks' data integrity, we will update the blocks one by one.
     try:
         for block in blocks:
-            callback: Callback = isValidBlock(block, str(enums.BlockType(block.get('type')).name))
+            callback: Callback = isValidBlock(block, str(enums.BlockType(block.get('Type')).name))
             if not callback.Success:
                 return callback
 

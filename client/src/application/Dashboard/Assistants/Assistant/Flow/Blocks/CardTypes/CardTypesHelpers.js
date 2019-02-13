@@ -36,7 +36,7 @@ export const onFileTypeChange = (checkedValues) => {
 
 export const getInitialVariables = (options, type) => {
     const {flowOptions, allGroups, allBlocks} = options;
-    let block = options.block ? options.block : {content: {}};
+    let block = options.block ? options.block : {Content: {}};
     let blockOptions = {};
     // extract the correct blockType from blockTypes[]
     for (const blockType of flowOptions.blockTypes)

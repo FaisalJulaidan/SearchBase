@@ -120,12 +120,13 @@ const addBlockFailure = (error) => {
 };
 //////////////////////////////////////////
 // EDIT Blocks Actions
-const editBlockRequest = ({edittedBlock, assistantID, groupID}) => {
+const editBlockRequest = ({edittedBlock, assistantID, groupID, currentBlocks}) => {
     return {
         type: actionTypes.EDIT_BLOCK_REQUEST,
         edittedBlock,
         assistantID,
-        groupID
+        groupID,
+        currentBlocks
     };
 };
 

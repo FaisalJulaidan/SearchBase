@@ -30,12 +30,12 @@ class FileUpload extends Component {
             const {flowOptions} = getInitialVariables(this.props.options);
             let options = {
                 block: {
-                    type: 'File Upload',
-                    groupID: this.props.options.currentGroup.id,
-                    storeInDB: true,
-                    isSkippable: values.isSkippable,
-                    dataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
-                    content: {
+                    Type: 'File Upload',
+                    GroupID: this.props.options.currentGroup.id,
+                    StoreInDB: true,
+                    Skippable: values.isSkippable || false,
+                    DataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
+                    Content: {
                         text: values.text,
                         action: values.action,
                         fileTypes: this.state.fileTypes,
@@ -49,8 +49,8 @@ class FileUpload extends Component {
                 this.handleNewBlock(options);
             else {
                 // Edit Block
-                options.block.id = this.props.options.block.ID;
-                options.block.order = this.props.options.block.Order;
+                options.block.ID = this.props.options.block.ID;
+                options.block.Order = this.props.options.block.Order;
                 this.handleEditBlock(options);
             }
         }

@@ -7,7 +7,8 @@ const CheckboxGroup = Checkbox.Group;
 
 // Common Components
 ////////////////////////////////////////////
-export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block, placeholder}) => (
+export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block, placeholder}) => {
+    return (
     <FormItem label="Question"
               extra="The above text will be shown in a bubble inside the chat"
               {...layout}>
@@ -21,7 +22,8 @@ export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block, pl
             <Input placeholder={placeholder}/>
         )}
     </FormItem>
-);
+    )
+};
 
 export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, flowOptions, block}) => (
     <FormItem label="Data Type" {...layout}
@@ -49,6 +51,7 @@ export const SkippableFormItem = ({FormItem, layout, getFieldDecorator, block}) 
     <FormItem label="Skippable?" {...layout}>
         {getFieldDecorator('isSkippable', {
             valuePropName: 'checked',
+            defaultValue: false,
             initialValue: block.IsSkippable ? block.IsSkippable : undefined,
         })(
             <Checkbox>Users can skip answering this question</Checkbox>

@@ -27,7 +27,7 @@ function* watchGetDatabaseList() {
 function* addDatabase({newDatabase}) {
     try {
         loadingMessage('Loading databases list');
-        // const res = yield http.get(`/databases/${companyID}`);
+        const res = yield http.post(`/databases`, newDatabase);
 
         // debugger;
 

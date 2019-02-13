@@ -1,17 +1,18 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Menu} from 'antd';
+import {Menu, Table, Spin} from 'antd';
 
 import styles from "./Databases.module.less"
 import NewDatabaseModal from "./NewDatabaseModal/NewDatabaseModal";
 import Header from "../../../components/Header/Header";
 import {http} from "../../../helpers";
 import {databaseActions} from "../../../store/actions";
+import {ColumnsOptions} from "./NewDatabaseModal/ColumnsOptions";
 
 
 class Databases extends Component {
     state = {
-        visible: true,
+        visible: false,
     };
 
     componentWillMount() {
@@ -27,18 +28,25 @@ class Databases extends Component {
 
 
     uploadDatabase = newDatabase => this.props.dispatch(databaseActions.uploadDatabase({newDatabase: newDatabase}));
+    showDatabaseInfo = (databaseID) => this.props.dispatch(databaseActions.fetchDatabase(databaseID));
 
-    //
-    // editGroup = (editedGroup) => {
-    //     const {assistant} = this.props.location.state;
-    //     this.props.dispatch(flowActions.editGroupRequest({assistantID: assistant.ID, editedGroup: editedGroup}));
-    // };
-    //
-    // deleteGroup = (deletedGroup) => {
-    //     const {assistant} = this.props.location.state;
-    //     this.props.dispatch(flowActions.deleteGroupRequest({assistantID: assistant.ID, deletedGroup: deletedGroup}));
-    //     this.setState({currentGroup: {blocks: []}});
-    // };
+
+    componentWillUnmount() {
+        this.props.dispatch(databaseActions.resetFetchedDtabase())
+    }
+
+    getRecordsData = records => {
+        let x = [];
+        for (const record of records) {
+            let renderedRecord = {};
+            for (const key of Object.keys(record))
+                if (key !== 'DatabaseID')
+                    renderedRecord[key] = record[key];
+
+            x.push(renderedRecord);
+        }
+        return x;
+    };
 
     render() {
         return (
@@ -47,7 +55,7 @@ class Databases extends Component {
                         button={{icon: "plus", onClick: this.showModal, text: 'Add Database'}}/>
 
                 <div className={styles.Panel_Body_Only}>
-                    <div style={{margin: '0 5px 0 0', width: '30%'}}>
+                    <div style={{margin: '0 5px 0 0', width: '20%'}}>
                         <div className={styles.Panel}>
 
                             <div className={styles.Panel_Header} style={{position: "inherit"}}>
@@ -57,7 +65,8 @@ class Databases extends Component {
                                 <Menu mode="inline">
                                     {
                                         this.props.databasesList.map((database, index) =>
-                                            <Menu.Item key={index}>{database.Name}</Menu.Item>)
+                                            <Menu.Item key={index}
+                                                       onClick={() => this.showDatabaseInfo(database.ID)}>{database.Name}</Menu.Item>)
                                     }
                                 </Menu>
                             </div>
@@ -65,14 +74,32 @@ class Databases extends Component {
 
                     </div>
 
-                    <div style={{margin: '0 0 0 5px', width: '70%'}}>
+                    <div style={{margin: '0 0 0 5px', width: '80%'}}>
                         <div className={styles.Panel}>
                             <div className={styles.Panel_Header} style={{position: "inherit"}}>
                                 <h3>Databases Information</h3>
                             </div>
 
                             <div className={styles.Panel_Body}>
-                                hello world
+
+                                {
+                                    !!this.props.fetchedDatabase.databaseContent?.length ?
+                                        <Table
+                                            style={{height: '100%', width: 'auto'}}
+                                            size={'small'}
+                                            bordered
+                                            columns={ColumnsOptions(this.props.fetchedDatabase.databaseContent[0], 'db')}
+                                            dataSource={this.getRecordsData(this.props.fetchedDatabase.databaseContent)}
+                                            rowKey={'ID'}
+                                            pagination={{pageSize: 11}} scroll={{x: 3200}}/>
+                                        :
+                                        <Spin/>
+                                }
+
+
+                                {/*<pre>{*/}
+                                {/*JSON.stringify(this.props.fetchedDatabase, null, 2)*/}
+                                {/*}</pre>*/}
                             </div>
                         </div>
                     </div>
@@ -90,7 +117,8 @@ class Databases extends Component {
 
 function mapStateToProps(state) {
     return {
-        databasesList: state.database.databasesList
+        databasesList: state.database.databasesList,
+        fetchedDatabase: state.database.fetchedDatabase
     };
 }
 

@@ -117,10 +117,11 @@ class ColumnSelectionStep extends Component {
 
         if (TSBcolumnOption.type === "DATETIME") {
             const date = new Date(validatedData);
+
             validatedData = {
                 year: date.getUTCFullYear(),
-                month: date.getUTCMonth() + 1,
-                day: date.getUTCDate() + 1
+                month: date.getMonth() + 1,
+                day: date.getDate()
             };
 
             if (!validatedData.year || !validatedData.month || !validatedData.day) {

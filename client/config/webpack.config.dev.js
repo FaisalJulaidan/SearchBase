@@ -246,6 +246,7 @@ module.exports = {
                             ),
 
                             plugins: [
+                                "@babel/plugin-proposal-optional-chaining",
                                 [
                                     require.resolve('babel-plugin-named-asset-import'),
                                     {

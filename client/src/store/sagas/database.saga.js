@@ -25,9 +25,9 @@ function* watchGetDatabaseList() {
 
 function* fetchDatabases({databaseID}) {
     try {
-        loadingMessage('Loading databases');
+        loadingMessage('Loading database');
         const res = yield http.get(`/databases/${databaseID}`);
-        yield put(databaseActions.fetchDatabaseSuccess(res.data.data));
+        yield put(databaseActions.fetchDatabaseSuccess(res.data.msg, res.data.data));
         yield destroyMessage();
     } catch (error) {
         console.log(error);
@@ -41,7 +41,7 @@ function* watchFetchDatabases() {
     yield takeLatest(actionTypes.FETCH_DATABASE_REQUEST, fetchDatabases)
 }
 
-function* addDatabase({newDatabase}) {
+function* uploadDatabase({newDatabase}) {
     try {
         loadingMessage('Adding database');
         const res = yield http.post(`/databases`, newDatabase);
@@ -53,12 +53,12 @@ function* addDatabase({newDatabase}) {
         console.log(error);
         yield destroyMessage();
         yield alertError('Adding database faild', error.response.data.msg);
-        yield put(databaseActions.getDatabasesListFailure(error.response.data));
+        yield put(databaseActions.uploadDatabaseFailure(error.response.data));
     }
 }
 
 function* watchAddDatabase() {
-    yield takeLatest(actionTypes.UPLOAD_DATABASE_REQUEST, addDatabase)
+    yield takeLatest(actionTypes.UPLOAD_DATABASE_REQUEST, uploadDatabase)
 }
 
 export function* databaseSaga() {

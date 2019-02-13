@@ -36,6 +36,8 @@ export const database = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: action.error.msg
             });
+        case actionTypes.RESET_DATABASE:
+            return updateObject(state, {fetchedDatabase: {}});
 
 
         case actionTypes.DELETE_DATABASE_REQUEST:

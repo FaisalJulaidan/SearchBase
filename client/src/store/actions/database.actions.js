@@ -47,9 +47,10 @@ const uploadDatabaseFailure = (error) => {
 
 
 // Fetch
-const fetchDatabase = () => {
+const fetchDatabase = (databaseID) => {
     return {
         type: actionTypes.FETCH_DATABASE_REQUEST,
+        databaseID
     }
 };
 
@@ -67,7 +68,11 @@ const fetchDatabaseFailure = (error) => {
         error
     }
 };
-
+const resetFetchedDtabase = () => {
+    return {
+        type: actionTypes.RESET_DATABASE
+    }
+};
 
 // Delete
 const DeleteDatabase = () => {
@@ -103,6 +108,7 @@ export const databaseActions = {
     fetchDatabase,
     fetchDatabaseSuccess,
     fetchDatabaseFailure,
+    resetFetchedDtabase,
 
     DeleteDatabase,
     DeleteDatabaseSuccess,

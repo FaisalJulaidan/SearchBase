@@ -7,8 +7,8 @@ import UploadDatabaseStep from './NewDatabaseSteps/UploadDatabaseStep/UploadData
 import ConfigureDatabaseStep from "./NewDatabaseSteps/ConfigureDatabaseStep";
 import ColumnSelectionStep from "./NewDatabaseSteps/ColumnSelectionStep";
 import ConfirmStep from "./NewDatabaseSteps/ConfirmStep";
+// import {dummyExcelData, jobsExcelSheet, validData, invalidData} from './testdata'
 
-import {dummyExcelData, jobsExcelSheet, validData, invalidData} from './testdata'
 const Step = Steps.Step;
 
 class NewDatabaseModal extends Component {
@@ -21,30 +21,23 @@ class NewDatabaseModal extends Component {
     }
 
     state = {
-        current: 3,
+        current: 0,
         fileList: [],
 
         databaseConfiguration: {
-            databaseName: 'aax',
-            // databaseName: undefined,
-            databaseType: 'Jobs'
-            // databaseType: undefined
+            databaseName: undefined,
+            databaseType: undefined
         },
 
         isFileUploading: false,
 
         excelFile: {
-            // headers: dummyExcelData.headers,
-            headers: jobsExcelSheet.headers,
-            // headers: undefined,
-            // data: undefined
-            data: jobsExcelSheet.data
+            headers: undefined,
+            data: undefined
         },
 
-        // validRecords: [],
-        validRecords: validData,
-        // invalidRecords: []
-        invalidRecords: invalidData
+        validRecords: [],
+        invalidRecords: []
     };
 
     steps = [

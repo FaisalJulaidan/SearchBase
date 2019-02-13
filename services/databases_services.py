@@ -173,7 +173,7 @@ def getDatabasesList(companyID: int) -> Callback:
 
 def getAllCandidates(dbID) -> Callback:
     try:
-        return db.session.query(Candidate).filter(Database.ID == dbID).all()
+        return db.session.query(Candidate).filter(Candidate.DatabaseID == dbID).all()
 
     except Exception as exc:
         db.session.rollback()
@@ -183,7 +183,7 @@ def getAllCandidates(dbID) -> Callback:
 
 def getAllClients(dbID) -> Callback:
     try:
-        return db.session.query(Client).filter(Database.ID == dbID).all()
+        return db.session.query(Client).filter(Client.DatabaseID == dbID).all()
     except Exception as exc:
         print("fetchCandidates() ERROR: ", exc)
         raise Exception('Error: fetchCandidates()')
@@ -192,7 +192,7 @@ def getAllClients(dbID) -> Callback:
 
 def getAllJobs(dbID) -> Callback:
     try:
-        return db.session.query(Job).filter(Database.ID == dbID).all()
+        return db.session.query(Job).filter(Job.DatabaseID == dbID).all()
     except Exception as exc:
         print("fetchCandidates() ERROR: ", exc)
         raise Exception('Error: getAllJobs()')
@@ -282,6 +282,9 @@ def getOptions() -> Callback:
         enums.DatabaseType.Jobs.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
                                        for c in Job.__table__.columns
                                        if (c.key != 'ID' and c.key != 'DatabaseID')],
+        enums.DatabaseType.Clients.name: [{'column': c.key, 'type': str(c.type), 'nullable': c.nullable}
+                                          for c in Client.__table__.columns
+                                          if (c.key != 'ID' and c.key != 'DatabaseID')],
         'currencyCodes': ['GBP', 'USD', 'EUR', 'AED', 'CAD']
     }
     return Callback(True, '', options)

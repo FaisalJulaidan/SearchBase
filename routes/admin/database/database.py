@@ -40,7 +40,7 @@ def get_databasesList():
         # Return response
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
-        return helpers.jsonResponse(True, 200, callback.Message)
+        return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
 @database_router.route("/databases/<int:databaseID>", methods=['GET', 'DELETE'])

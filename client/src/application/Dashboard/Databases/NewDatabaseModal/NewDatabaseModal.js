@@ -25,7 +25,7 @@ class NewDatabaseModal extends Component {
         fileList: [],
 
         databaseConfiguration: {
-            databaseName: 'abc',
+            databaseName: 'aax',
             // databaseName: undefined,
             databaseType: 'Jobs'
             // databaseType: undefined

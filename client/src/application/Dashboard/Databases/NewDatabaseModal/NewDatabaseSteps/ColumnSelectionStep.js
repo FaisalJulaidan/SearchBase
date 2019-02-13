@@ -143,6 +143,11 @@ class ColumnSelectionStep extends Component {
     parseForm = () => new Promise((resolve, reject) => {
         const {form: {validateFields}, excelFile, databaseOptions, databaseType} = this.props;
         validateFields((errors, columns) => {
+            if (errors) {
+                message.error('Select a value for the required fields');
+                return reject('Rejected');
+            }
+
             // convert object to array of {ourColumn, excelColumn} pairs
             columns = Object.keys(columns).map(key => {
                 return {ourColumn: key, excelColumn: columns[key]};

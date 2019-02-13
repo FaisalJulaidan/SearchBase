@@ -21,6 +21,7 @@ export const database = (state = initialState, action) => {
                 errorMsg: action.error.msg
             });
 
+
         case actionTypes.DELETE_DATABASE_REQUEST:
             return updateObject(state, {
                 isDeletingGroup: true
@@ -29,7 +30,6 @@ export const database = (state = initialState, action) => {
             let databasesList = [...state.databasesList];
             const databaseToDeleteIndex =  databasesList.findIndex(db => db.ID === action.databaseID);
             databasesList.splice(databaseToDeleteIndex, 1);
-
             return updateObject(state, {
                 isDeletingGroup: false,
                 databasesList: action.databasesList
@@ -40,6 +40,23 @@ export const database = (state = initialState, action) => {
                 errorMsg: action.error.msg
             });
 
+
+        case actionTypes.UPLOAD_DATABASE_REQUEST:
+            return updateObject(state, {
+                isLoading: true
+            });
+        case actionTypes.UPLOAD_DATABASE_SUCCESS:
+            let updatedDatabaseList = [...state.databasesList];
+            updatedDatabaseList.push(action.newDatabase);
+            return updateObject(state, {
+                isLoading: false,
+                databasesList: updatedDatabaseList
+            });
+        case actionTypes.UPLOAD_DATABASE_FAILURE:
+            return updateObject(state, {
+                isLoading: false,
+                errorMsg: action.error.msg
+            });
 
         default:
             return state

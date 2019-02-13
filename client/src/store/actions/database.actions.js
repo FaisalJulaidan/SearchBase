@@ -30,10 +30,11 @@ const uploadDatabase = (newDatabase) => {
 };
 
 
-const uploadDatabaseSuccess = (successMessage) => {
+const uploadDatabaseSuccess = (successMessage, newDatabase) => {
     return {
         type: actionTypes.UPLOAD_DATABASE_SUCCESS,
-        successMessage
+        successMessage,
+        newDatabase
     }
 };
 

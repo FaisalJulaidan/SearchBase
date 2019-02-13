@@ -99,24 +99,19 @@ function* addBlock({newBlock, groupID, assistantID}) {
     }
 }
 
-function* editBlock({edittedBlock, groupID, assistantID}) {
+function* editBlock({edittedBlock, assistantID, currentBlocks}) {
     try {
         loadingMessage('Updating Block');
-        let res = yield http.get(`/assistant/${assistantID}/flow`);
         let currentUpdatedGroup = [];
         edittedBlock = edittedBlock.block;
-        res.data.data.blockGroups.map((group) => {
-            if (group.id === groupID)
-                group.blocks.map((block) => {
-                    if (!block.groupID) block.groupID = groupID;
-                    block.id === edittedBlock.id ? currentUpdatedGroup.push(edittedBlock) : currentUpdatedGroup.push(block);
-                })
-        });
-        res = yield http.put(`/assistant/${assistantID}/flow`, {blocks: currentUpdatedGroup});
+        currentBlocks.map(block =>
+            block.ID === edittedBlock.ID ? currentUpdatedGroup.push(edittedBlock) : currentUpdatedGroup.push(block)
+        );
+        const res = yield http.put(`/assistant/${assistantID}/flow`, {blocks: currentUpdatedGroup});
         yield destroyMessage();
         yield alertSuccess('Block Updated', res.data.msg);
-        yield put(flowActions.editBlockSuccess(res.data.msg));
-        return yield put(flowActions.fetchFlowRequest(assistantID))
+        yield put(flowActions.editBlockSuccess('done'));
+        return yield put(flowActions.fetchFlowRequest(assistantID));
     } catch (error) {
         console.log(error);
         yield put(flowActions.editBlockFailure(error.response.data));
@@ -127,7 +122,7 @@ function* editBlock({edittedBlock, groupID, assistantID}) {
 function* deleteBlock({deletedBlock, assistantID, groupID}) {
     try {
         loadingMessage('Deleting Block');
-        const res = yield http.delete(`/assistant/flow/group/${groupID}/block`, {data: {id: deletedBlock.id}});
+        const res = yield http.delete(`/assistant/flow/group/${groupID}/block`, {data: {id: deletedBlock.ID}});
         yield put(flowActions.deleteBlockSuccess(res.data.msg));
         yield destroyMessage();
         yield alertSuccess('Block Deleted', res.data.msg);

@@ -127,8 +127,9 @@ class NewDatabaseModal extends Component {
 
     submitDatabase = () => {
         this.props.hideModal();
-        if (this.state.validRecords)
-            this.props.uploadDatabase(this.state.validRecords);
+        const {validRecords, databaseConfiguration} = this.state;
+        if (validRecords)
+            this.props.uploadDatabase({...databaseConfiguration, data: validRecords});
         else
             message.error('No valid records to be sent');
     };

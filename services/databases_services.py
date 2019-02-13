@@ -4,6 +4,7 @@ from typing import List
 import pandas
 import re
 import enums
+from datetime import datetime
 from sqlalchemy_utils import Currency
 
 from sqlalchemy import and_
@@ -16,13 +17,17 @@ def fetchDatabase(id, companyID: int) -> Callback:
             .filter(and_(Database.CompanyID == companyID, Database.ID == id)).first()
         if not database: raise Exception
 
-        if database.Type == DatabaseType.Clients:
-            print('fetch from client table')
-            return getAllClients(database.ID)
-
-        elif database.Type == DatabaseType.Candidates:
+        if database.Type == DatabaseType.Candidates:
             print('fetch from candidate table')
-            return getAllCandidates(database.ID)
+            return getAllCandidates(id)
+
+        elif database.Type == DatabaseType.Clients:
+            print('fetch from client table')
+            return getAllClients(id)
+
+        elif database.Type == DatabaseType.Jobs:
+            print('fetch from candidate table')
+            return getAllJobs(id)
 
         # Reaching to this point means the type of the db is not supported
         return Callback(False, "No database found!")
@@ -33,6 +38,121 @@ def fetchDatabase(id, companyID: int) -> Callback:
         return Callback(False, 'Could not fetch the database.')
     # finally:
         # db.session.close()
+
+
+# ----- Uploader ----- #
+def uploadDatabase(data: dict, companyID: int) -> Callback:
+
+    try:
+        # Inner/nested functions
+        def createDatabase(name, type: DatabaseType):
+            return Database(Name=name, Type=type, CompanyID=companyID)
+
+        # Create currency for Currency column
+        def createCurrency(currency):
+            currency = currency.get('data', None)
+            if currency:
+                return Currency(currency)
+            return None
+
+        def uploadCandidates(databaseData):
+            newDatabase: Database = createDatabase(databaseData["databaseName"], DatabaseType.Candidates)
+            candidates = []
+            for record in databaseData["records"]:
+                new_record = Candidate(
+                                       Database=newDatabase,
+                                       Name=record.get('Name',{}).get('data'),
+                                       Email=record.get('Email',{}).get('data'),
+                                       Telephone=record.get('Telephone',{}).get('data'),
+                                       LinkdinURL=record.get('LinkdinURL',{}).get('data'),
+                                       PostCode=record.get('PostCode',{}).get('data'),
+                                       Gender=record.get('Gender',{}).get('data'),
+                                       Degree=record.get('Degree',{}).get('data'),
+                                       ContactTime=record.get('ContactTime',{}).get('data'),
+                                       Availability=record.get('Availability',{}).get('data'),
+                                       CurrentSalary=record.get('CurrentSalary',{}).get('data', None),
+                                       Currency=createCurrency(record.get('Currency', {})),
+                                       CurrentRole=record.get('CurrentRole',{}).get('data'),
+                                       JobTitle=record.get('JobTitle',{}).get('data'),
+                                       CurrentEmployer=record.get('CurrentEmployer',{}).get('data'),
+                                       CurrentEmploymentType=record.get('CurrentEmploymentType',{}).get('data'),
+                                       DesiredSalary=record.get('DesiredSalary',{}).get('data', None),
+                                       DesiredPosition=record.get('DesiredPosition',{}).get('data'),
+                                       CandidateSkills=record.get('CandidateSkills',{}).get('data'),
+                                       YearsExp=record.get('YearsExp',{}).get('data', None),
+                                       PreferredLocation=record.get('PreferredLocation',{}).get('data'),
+                                       PreferredEmploymentType=record.get('PreferredEmploymentType',{}).get('data'),
+                                       DesiredHourlyRate=record.get('DesiredHourlyRate',{}).get('data', None)
+                )
+                candidates.append(new_record)
+            db.session.add_all(candidates)
+
+        def uploadClients(databaseData):
+            newDatabase: Database = createDatabase(databaseData["databaseName"], DatabaseType.Clients)
+            clients = []
+            for record in databaseData["records"]:
+                new_record = Client(
+                    Database=newDatabase,
+                    Name=record.get('Name',{}).get('data'),
+                    Email=record.get('Email',{}).get('data'),
+                    Telephone=record.get('Telephone',{}).get('data'),
+                    LinkdinURL=record.get('LinkdinURL',{}).get('data'),
+                    PostCode=record.get('PostCode',{}).get('data'),
+                    Location=record.get('Location',{}).get('data'),
+                    NearbyStation=record.get('NearbyStation',{}).get('data'),
+                    JobSalaryOffered=record.get('JobSalaryOffered',{}).get('data', None),
+                    Currency=createCurrency(record.get('Currency', {})),
+                    EmploymentTypeOffered=record.get('EmploymentTypeOffered',{}).get('data'),
+                    CandidatesNeeded=record.get('CandidatesNeeded',{}).get('data', None),
+                    EssentialSkills=record.get('EssentialSkills',{}).get('data'),
+                    EssentialYearsExp=record.get('EssentialYearsExp',{}).get('data', None),
+                    ContractRate=record.get('ContractRate',{}).get('data', None),
+                    JobDescription=record.get('JobDescription',{}).get('data'),
+                    JobAvailability=record.get('JobAvailability',{}).get('data')
+                )
+                clients.append(new_record)
+            db.session.add_all(clients)
+
+        def uploadJobs(databaseData):
+            newDatabase: Database = createDatabase(databaseData["databaseName"], DatabaseType.Clients)
+            jobs = []
+            for record in databaseData["records"]:
+                # create datetime for StartDate
+                startDate = record.get('StartDate',{}).get('data', None)
+                if startDate:
+                    startDate = datetime(year=startDate['year'],
+                                         month=startDate['month'],
+                                         day=startDate['day'])
+
+                new_record = Job(
+                    Database=newDatabase,
+                    JobTitle=record.get('JobTitle',{}).get('data'),
+                    Location=record.get('Location',{}).get('data'),
+                    PositionType=record.get('PositionType',{}).get('data'),
+                    EmploymentType=record.get('EmploymentType',{}).get('data'),
+                    Salary=record.get('Salary',{}).get('data', None),
+                    Currency=createCurrency(record.get('Currency', {})),
+                    StartDate=startDate,
+                )
+                jobs.append(new_record)
+            db.session.add_all(jobs)
+        # ===========================
+
+        database = data.get('newDatabase')
+        if database['databaseType'] == enums.DatabaseType.Candidates.value:
+            uploadCandidates(database)
+        elif database == enums.DatabaseType.Clients.value:
+            uploadClients(database)
+        elif database == enums.DatabaseType.Jobs.value:
+            uploadJobs(database)
+        else:
+            return Callback(False, "Database type is not recognised")
+        # After finishing from uploading database without errors, save changes
+        db.session.commit()
+        return Callback(True, "Databases was successfully uploaded!")
+    except Exception as exc:
+        print(exc)
+        return Callback(False, 'Could not upload the databases.')
 
 
 # ----- Getters ----- #
@@ -52,7 +172,6 @@ def getDatabasesList(companyID: int) -> Callback:
 def getAllCandidates(dbID) -> Callback:
     try:
         candidates: List[Candidate] = db.session.query(Candidate).filter(Database.ID == dbID).all()
-        if not candidates: raise Exception
         return Callback(True, 'Candidates was successfully retrieved.', candidates)
 
     except Exception as exc:
@@ -60,23 +179,44 @@ def getAllCandidates(dbID) -> Callback:
         print("fetchCandidates() ERROR: ", exc)
         return Callback(False, 'Candidates could not be retrieved.')
 
-    # finally:
-    # db.session.close()
-
 
 def getAllClients(dbID) -> Callback:
     try:
         clients: List[Client] = db.session.query(Client).filter(Database.ID == dbID).all()
-        if not clients: raise Exception
-        return Callback(True, 'Candidates was successfully retrieved.', clients)
+        return Callback(True, 'Clients was successfully retrieved.', clients)
 
     except Exception as exc:
         db.session.rollback()
         print("fetchCandidates() ERROR: ", exc)
         return Callback(False, 'Clients could not be retrieved.')
 
+
+
+def getAllJobs(dbID) -> Callback:
+    try:
+        jobs: List[Job] = db.session.query(Job).filter(Database.ID == dbID).all()
+        return Callback(True, 'Jobs was successfully retrieved.', jobs)
+
+    except Exception as exc:
+        db.session.rollback()
+        print("fetchCandidates() ERROR: ", exc)
+        return Callback(False, 'Jobs could not be retrieved.')
+
+# ----- Deletion ----- #
+def deleteDatabase(databaseID, companyID) -> Callback:
+    try:
+        db.session.query(Database).filter(and_(Database.CompanyID == companyID, Database.ID == databaseID)) \
+            .delete()
+        db.session.commit()
+        return Callback(True, 'Database has been deleted.')
+
+    except Exception as exc:
+        print("Error in deleteDatabase(): ", exc)
+        db.session.rollback()
+        return Callback(False, 'Could not remove the database.')
     # finally:
     # db.session.close()
+
 
 # ----- Scanners (Pandas) ----- #
 def scanCandidates(dbID, assistantHashID, keywords: dict):

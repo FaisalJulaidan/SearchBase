@@ -320,7 +320,6 @@ class Database(db.Model):
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='Databases')
 
-
     # Constraints:
     # Cannot have two databases with the same name under one company
     __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_database'),)

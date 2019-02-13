@@ -48,7 +48,7 @@ class NewDatabaseModal extends Component {
 
     steps = [
         {
-            title: 'Configre Database',
+            title: 'Configure Database',
             content: () => this.props.databaseOptions ?
                 <ConfigureDatabaseStep ref={this.configureDatabaseStep}
                                        databaseOptions={this.props.databaseOptions}
@@ -129,7 +129,7 @@ class NewDatabaseModal extends Component {
         this.props.hideModal();
         const {validRecords, databaseConfiguration} = this.state;
         if (validRecords) {
-            this.props.uploadDatabase({...databaseConfiguration, data: validRecords});
+            this.props.uploadDatabase({...databaseConfiguration, records: validRecords});
             // Reset state
             this.setState({
                 current: 0,

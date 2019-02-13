@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {Menu} from 'antd';
 
 import styles from "./Databases.module.less"
-import NewDatabaseModal from "./NewDataBaseModal/NewDatabaseModal";
+import NewDatabaseModal from "./NewDatabaseModal/NewDatabaseModal";
 import Header from "../../../components/Header/Header";
 import {http} from "../../../helpers";
 import {databaseActions} from "../../../store/actions";

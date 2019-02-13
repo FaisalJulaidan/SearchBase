@@ -59,6 +59,7 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
             newDatabase: Database = createDatabase(databaseData["databaseName"], DatabaseType.Candidates)
             candidates = []
             for record in databaseData["records"]:
+                print(record)
                 new_record = Candidate(
                                        Database=newDatabase,
                                        Name=record.get('Name',{}).get('data'),
@@ -70,19 +71,19 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
                                        Degree=record.get('Degree',{}).get('data'),
                                        ContactTime=record.get('ContactTime',{}).get('data'),
                                        Availability=record.get('Availability',{}).get('data'),
-                                       CurrentSalary=record.get('CurrentSalary',{}).get('data', None),
+                                       CurrentSalary=record.get('CurrentSalary',{}).get('data') or None,
                                        Currency=createCurrency(record.get('Currency', {})),
                                        CurrentRole=record.get('CurrentRole',{}).get('data'),
                                        JobTitle=record.get('JobTitle',{}).get('data'),
                                        CurrentEmployer=record.get('CurrentEmployer',{}).get('data'),
                                        CurrentEmploymentType=record.get('CurrentEmploymentType',{}).get('data'),
-                                       DesiredSalary=record.get('DesiredSalary',{}).get('data', None),
+                                       DesiredSalary=record.get('DesiredSalary',{}).get('data') or None,
                                        DesiredPosition=record.get('DesiredPosition',{}).get('data'),
                                        CandidateSkills=record.get('CandidateSkills',{}).get('data'),
-                                       YearsExp=record.get('YearsExp',{}).get('data', None),
+                                       YearsExp=record.get('YearsExp',{}).get('data') or None,
                                        PreferredLocation=record.get('PreferredLocation',{}).get('data'),
                                        PreferredEmploymentType=record.get('PreferredEmploymentType',{}).get('data'),
-                                       DesiredHourlyRate=record.get('DesiredHourlyRate',{}).get('data', None)
+                                       DesiredHourlyRate=record.get('DesiredHourlyRate',{}).get('data') or None
                 )
                 candidates.append(new_record)
             db.session.add_all(candidates)
@@ -100,13 +101,13 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
                     PostCode=record.get('PostCode',{}).get('data'),
                     Location=record.get('Location',{}).get('data'),
                     NearbyStation=record.get('NearbyStation',{}).get('data'),
-                    JobSalaryOffered=record.get('JobSalaryOffered',{}).get('data', None),
+                    JobSalaryOffered=record.get('JobSalaryOffered',{}).get('data') or None,
                     Currency=createCurrency(record.get('Currency', {})),
-                    EmploymentTypeOffered=record.get('EmploymentTypeOffered',{}).get('data'),
-                    CandidatesNeeded=record.get('CandidatesNeeded',{}).get('data', None),
+                    EmploymentTypeOffered=record.get('EmploymentTypeOffered',{}).get('data') or None,
+                    CandidatesNeeded=record.get('CandidatesNeeded',{}).get('data') or None,
                     EssentialSkills=record.get('EssentialSkills',{}).get('data'),
-                    EssentialYearsExp=record.get('EssentialYearsExp',{}).get('data', None),
-                    ContractRate=record.get('ContractRate',{}).get('data', None),
+                    EssentialYearsExp=record.get('EssentialYearsExp',{}).get('data') or None,
+                    ContractRate=record.get('ContractRate',{}).get('data') or None,
                     JobDescription=record.get('JobDescription',{}).get('data'),
                     JobAvailability=record.get('JobAvailability',{}).get('data')
                 )
@@ -130,7 +131,7 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
                     Location=record.get('Location',{}).get('data'),
                     PositionType=record.get('PositionType',{}).get('data'),
                     EmploymentType=record.get('EmploymentType',{}).get('data'),
-                    Salary=record.get('Salary',{}).get('data', None),
+                    Salary=record.get('Salary',{}).get('data') or None,
                     Currency=createCurrency(record.get('Currency', {})),
                     StartDate=startDate,
                 )
@@ -141,9 +142,9 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
         database = data.get('newDatabase')
         if database['databaseType'] == enums.DatabaseType.Candidates.value:
             uploadCandidates(database)
-        elif database == enums.DatabaseType.Clients.value:
+        elif database['databaseType'] == enums.DatabaseType.Clients.value:
             uploadClients(database)
-        elif database == enums.DatabaseType.Jobs.value:
+        elif database['databaseType'] == enums.DatabaseType.Jobs.value:
             uploadJobs(database)
         else:
             return Callback(False, "Database type is not recognised")

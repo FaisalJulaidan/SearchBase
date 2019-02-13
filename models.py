@@ -331,7 +331,7 @@ class Database(db.Model):
 class Candidate(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Name = db.Column(db.String(64), nullable=True)
+    Name = db.Column(db.String(64), nullable=False)
     Email = db.Column(db.String(64), nullable=True)
     Telephone = db.Column(db.String(64), nullable=True)
     LinkdinURL = db.Column(db.String(512), nullable=True)
@@ -368,7 +368,7 @@ class Candidate(db.Model):
 class Job(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    JobTitle = db.Column(db.String(64), nullable=True)
+    JobTitle = db.Column(db.String(64), nullable=False)
     Location = db.Column(db.String(64), nullable=True)
     PositionType = db.Column(db.String(64), nullable=True)
     EmploymentType = db.Column(db.String(64), nullable=True)
@@ -387,7 +387,7 @@ class Job(db.Model):
 class Client(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Name = db.Column(db.String(64), nullable=True)
+    Name = db.Column(db.String(64), nullable=False)
     Email = db.Column(db.String(64), nullable=True)
     Telephone = db.Column(db.String(64), nullable=True)
     LinkdinURL = db.Column(db.String(128), nullable=True)

@@ -387,8 +387,8 @@ def isValidBlock(block: dict, blockType: str):
     except Exception as exc:
         print(exc.args[0])
         # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
-        blockID = block.get('order')
-        blockType = block.get('type')
+        blockID = block.get('Order')
+        blockType = block.get('Type')
         msg = "Block data doesn't follow the correct format"
 
         if blockType and blockID:

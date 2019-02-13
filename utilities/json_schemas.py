@@ -1,6 +1,34 @@
 import enums
 from config import BaseConfig
 
+
+chatbot_session = {
+    "type": "object",
+    "properties": {
+        "collectedData": {"type": "array", "items": {
+            "type": "object",
+            "properties":{
+                "blockID": {"type": "integer"},
+                "questionText": {"type": "string"},
+                "dataType": {"enum": [e.value['name'] for e in enums.DataType]},
+                "input": {"type": "string"},
+                "keywords": {"type": "array", "items": {"type": "string"}}
+            },
+            "required": ["blockID", "questionText", "dataType", "input", "keywords"],
+            "additionalProperties": False
+        }
+                          },
+        "keywords": {"type": "array", "items": {"type": "string"}},
+        "keywordsByDataType": {"type": "object", "items": {"type": "object"}},
+        "showTop": {"type": "integer"},
+        "solutionsReturned": {"type": "integer"},
+        "userType": {"enum": [e.value for e in enums.UserType]}
+    },
+    "required": ["collectedData", "keywords", "keywordsByDataType", "showTop", "solutionsReturned", "userType"],
+    "additionalProperties": False
+}
+
+
 flow = {
     "type": "object",
     "properties": {
@@ -22,42 +50,15 @@ flow = {
                 "Type": {"enum": [e.value for e in enums.BlockType]},
                 "Order": {"type": "integer", "minimum": 1},
                 "StoreInDB": {"type": "boolean"},
-                "IsSkippable": { "type": "boolean" },
+                "Skippable": { "type": "boolean" },
                 "Content": {"type": "object"}
             },
-            "required": ["ID", "GroupID", "DataType", "Type", "Order", "StoreInDB", "IsSkippable", "Content"],
+            "required": ["ID", "GroupID", "DataType", "Type", "Order", "StoreInDB", "Skippable", "Content"],
             "additionalProperties": False
         }
                    }
     },
     "required": ["blocks"],
-    "additionalProperties": False
-}
-
-
-chatbot_session = {
-    "type": "object",
-    "properties": {
-        "collectedData": {"type": "array", "items": {
-            "type": "object",
-            "properties":{
-                "blockID": {"type": "integer"},
-                "questionText": {"type": "string"},
-                "dataType": {"enum": [e.value['name'] for e in enums.DataType]},
-                "input": {"type": "string"},
-                "keywords": {"type": "array", "items": {"type": "string"}}
-            },
-            "required": ["blockID", "questionText", "dataType", "input", "keywords"],
-            "additionalProperties": False
-            }
-        },
-        "keywords": {"type": "array", "items": {"type": "string"}},
-        "keywordsByDataType": {"type": "object", "items": {"type": "object"}},
-        "showTop": {"type": "integer"},
-        "solutionsReturned": {"type": "integer"},
-        "userType": {"enum": [e.value for e in enums.UserType]}
-    },
-    "required": ["collectedData", "keywords", "keywordsByDataType", "showTop", "solutionsReturned", "userType"],
     "additionalProperties": False
 }
 
@@ -79,10 +80,10 @@ new_block = {
                                  "additionalProperties": True
                              },
                 "StoreInDB": { "type": "boolean" },
-                "IsSkippable": { "type": "boolean" },
+                "Skippable": { "type": "boolean" },
                 "Content": { "type": "object" } # Depends on BlockType, see below schemas for content
             },
-            "required": ["Type","GroupID", "DataType", "StoreInDB", "Content"],
+            "required": ["Type","GroupID", "DataType", "StoreInDB", "Skippable", "Content"],
             "additionalProperties": False
         }
     },

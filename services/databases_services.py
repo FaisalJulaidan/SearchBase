@@ -55,8 +55,7 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
                 return Currency(currency)
             return None
 
-        def uploadCandidates(databaseData):
-            newDatabase: Database = createDatabase(databaseData["databaseName"], DatabaseType.Candidates)
+        def uploadCandidates(databaseData, newDatabase):
             candidates = []
             for record in databaseData["records"]:
                 print(record)
@@ -88,8 +87,7 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
                 candidates.append(new_record)
             db.session.add_all(candidates)
 
-        def uploadClients(databaseData):
-            newDatabase: Database = createDatabase(databaseData["databaseName"], DatabaseType.Clients)
+        def uploadClients(databaseData, newDatabase):
             clients = []
             for record in databaseData["records"]:
                 new_record = Client(
@@ -114,8 +112,7 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
                 clients.append(new_record)
             db.session.add_all(clients)
 
-        def uploadJobs(databaseData):
-            newDatabase: Database = createDatabase(databaseData["databaseName"], DatabaseType.Clients)
+        def uploadJobs(databaseData, newDatabase):
             jobs = []
             for record in databaseData["records"]:
                 # create datetime for StartDate
@@ -139,18 +136,22 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
             db.session.add_all(jobs)
         # ===========================
 
-        database = data.get('newDatabase')
-        if database['databaseType'] == enums.DatabaseType.Candidates.value:
-            uploadCandidates(database)
-        elif database['databaseType'] == enums.DatabaseType.Clients.value:
-            uploadClients(database)
-        elif database['databaseType'] == enums.DatabaseType.Jobs.value:
-            uploadJobs(database)
+        databaseData = data.get('newDatabase')
+        databaseName = databaseData["databaseName"]
+        if databaseData['databaseType'] == enums.DatabaseType.Candidates.value:
+            newDatabase = createDatabase(databaseName, DatabaseType.Candidates)
+            uploadCandidates(databaseData, newDatabase)
+        elif databaseData['databaseType'] == enums.DatabaseType.Clients.value:
+            newDatabase = createDatabase(databaseName, DatabaseType.Clients)
+            uploadClients(databaseData, newDatabase)
+        elif databaseData['databaseType'] == enums.DatabaseType.Jobs.value:
+            newDatabase = createDatabase(databaseName, DatabaseType.Jobs)
+            uploadJobs(databaseData, newDatabase)
         else:
             return Callback(False, "Database type is not recognised")
         # After finishing from uploading database without errors, save changes
         db.session.commit()
-        return Callback(True, "Databases was successfully uploaded!")
+        return Callback(True, "Databases was successfully uploaded!", newDatabase)
     except Exception as exc:
         print(exc)
         return Callback(False, 'Could not upload the databases.')

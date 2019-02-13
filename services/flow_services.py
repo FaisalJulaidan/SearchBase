@@ -199,8 +199,8 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
     ids = []
     for block in blocks:
         # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
-        order = block.get('order')
-        id = block.get('id')
+        order = block.get('Order')
+        id = block.get('ID')
 
         try:
             # Make sure all submitted blocks exist in the database
@@ -242,15 +242,15 @@ def updateBlocks(blocks, assistant: Assistant) -> Callback:
 
             # Update the block
             oldBlock: Block = db.session.query(Block). \
-                filter(and_(Block.ID == block.get('id'), Assistant.ID == assistant.ID)).first()
-            oldBlock.Type = enums.BlockType(block.get('type'))
-            oldBlock.Content = block.get('content')
-            oldBlock.StoreInDB = block.get('storeInDB')
-            oldBlock.Skippable = block.get('isSkippable')
-            oldBlock.Order = block.get('order')
-            oldBlock.Labels = block.get('labels')
-            oldBlock.GroupID = block.get('groupID')
-            oldBlock.DataType = block.get('dataType')['name'].replace(" ", "")
+                filter(and_(Block.ID == block.get('ID'), Assistant.ID == assistant.ID)).first()
+            oldBlock.Type = enums.BlockType(block.get('Type'))
+            oldBlock.Content = block.get('Content')
+            oldBlock.StoreInDB = block.get('StoreInDB')
+            oldBlock.Skippable = block.get('Skippable')
+            oldBlock.Order = block.get('Order')
+            # oldBlock.Labels = block.get('labels')
+            oldBlock.GroupID = block.get('GroupID')
+            oldBlock.DataType = block.get('DataType')['name'].replace(" ", "")
 
         # Save
         db.session.commit()
@@ -383,7 +383,7 @@ def genFlowViaTemplate(group: BlockGroup, tempName: str):
 
 def isValidBlock(block: dict, blockType: str):
     try:
-        validate(block.get('content'), getattr(json_schemas, blockType))
+        validate(block.get('Content'), getattr(json_schemas, blockType))
     except Exception as exc:
         print(exc.args[0])
         # order is the visual id to be displayed to the user, while id is is the real id of the block in the DB.
@@ -457,9 +457,9 @@ def getRemainingBlocksByAssistant(assistant: Assistant):
 
 def createBlockFromDict(block: dict, order, group: BlockGroup):
     try:
-        block = Block(Type=enums.BlockType(block.get('type')), Order=order, Content=block.get('content'),
-                     StoreInDB=block.get('storeInDB'), Skippable=block.get('isSkippable'),
-                     Group=group, DataType=enums.DataType[block.get('dataType')['name'].replace(" ", "")])
+        block = Block(Type=enums.BlockType(block.get('Type')), Order=order, Content=block.get('Content'),
+                     StoreInDB=block.get('StoreInDB'), Skippable=block.get('Skippable'),
+                     Group=group, DataType=enums.DataType[block.get('DataType')['name'].replace(" ", "")])
         return block
     except Exception as e:
         print("createBlockFromDict ERROR:", e)

@@ -1,4 +1,4 @@
-from models import db, Callback, Database, Candidate, Client, Company, Assistant, Job
+from models import db, Callback, Database, Candidate, Client, Assistant, Job
 from services import assistant_services
 from typing import List
 import pandas
@@ -6,7 +6,7 @@ import re
 import enums
 from datetime import datetime
 from sqlalchemy_utils import Currency
-
+from utilities import helpers
 from sqlalchemy import and_
 from enums import  DatabaseType, DataType as DT
 
@@ -17,23 +17,26 @@ def fetchDatabase(id, companyID: int) -> Callback:
             .filter(and_(Database.CompanyID == companyID, Database.ID == id)).first()
         if not database: raise Exception
 
+        databaseContent = None
         if database.Type == DatabaseType.Candidates:
             print('fetch from candidate table')
-            return getAllCandidates(id)
+            databaseContent = getAllCandidates(id)
 
         elif database.Type == DatabaseType.Clients:
             print('fetch from client table')
-            return getAllClients(id)
+            databaseContent = getAllClients(id)
 
         elif database.Type == DatabaseType.Jobs:
             print('fetch from candidate table')
-            return getAllJobs(id)
+            databaseContent = getAllJobs(id)
 
-        # Reaching to this point means the type of the db is not supported
-        return Callback(False, "No database found!")
+        if not databaseContent: raise Exception()
+        return Callback(True, "", {'databaseInfo': helpers.getDictFromSQLAlchemyObj(database),
+                                   'databaseContent': helpers.getListFromSQLAlchemyList(databaseContent)})
 
     except Exception as exc:
         print(exc)
+        print('srjglkjsdlkgjewr')
         db.session.rollback()
         return Callback(False, 'Could not fetch the database.')
     # finally:
@@ -167,14 +170,10 @@ def getDatabasesList(companyID: int) -> Callback:
     except Exception as exc:
         print(exc)
         return Callback(False, 'Could not fetch the databases list.')
-    # finally:
-    # db.session.close()
-
 
 def getAllCandidates(dbID) -> Callback:
     try:
-        candidates: List[Candidate] = db.session.query(Candidate).filter(Database.ID == dbID).all()
-        return Callback(True, 'Candidates was successfully retrieved.', candidates)
+        return db.session.query(Candidate).filter(Database.ID == dbID).all()
 
     except Exception as exc:
         db.session.rollback()
@@ -184,25 +183,20 @@ def getAllCandidates(dbID) -> Callback:
 
 def getAllClients(dbID) -> Callback:
     try:
-        clients: List[Client] = db.session.query(Client).filter(Database.ID == dbID).all()
-        return Callback(True, 'Clients was successfully retrieved.', clients)
-
+        return db.session.query(Client).filter(Database.ID == dbID).all()
     except Exception as exc:
-        db.session.rollback()
         print("fetchCandidates() ERROR: ", exc)
-        return Callback(False, 'Clients could not be retrieved.')
+        raise Exception('Error: fetchCandidates()')
 
 
 
 def getAllJobs(dbID) -> Callback:
     try:
-        jobs: List[Job] = db.session.query(Job).filter(Database.ID == dbID).all()
-        return Callback(True, 'Jobs was successfully retrieved.', jobs)
-
+        return db.session.query(Job).filter(Database.ID == dbID).all()
     except Exception as exc:
-        db.session.rollback()
         print("fetchCandidates() ERROR: ", exc)
-        return Callback(False, 'Jobs could not be retrieved.')
+        raise Exception('Error: getAllJobs()')
+
 
 # ----- Deletion ----- #
 def deleteDatabase(databaseID, companyID) -> Callback:

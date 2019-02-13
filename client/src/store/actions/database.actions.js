@@ -53,11 +53,11 @@ const fetchDatabase = () => {
     }
 };
 
-const fetchDatabaseSuccess = (successMessage, database) => {
+const fetchDatabaseSuccess = (successMessage, fetchedDatabase) => {
     return {
         type: actionTypes.FETCH_DATABASE_SUCCESS,
         successMessage,
-        database
+        fetchedDatabase
     }
 };
 

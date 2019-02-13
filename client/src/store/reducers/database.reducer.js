@@ -1,7 +1,7 @@
 import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
-const initialState = {isLoading: false, errorMsg: null, databasesList: []};
+const initialState = {isLoading: false, errorMsg: null, databasesList: [], fetchedDatabase:{}};
 
 
 export const database = (state = initialState, action) => {
@@ -16,6 +16,22 @@ export const database = (state = initialState, action) => {
                 databasesList: action.databasesList
             });
         case actionTypes.GET_DATABASES_LIST_FAILURE:
+            return updateObject(state, {
+                isLoading: false,
+                errorMsg: action.error.msg
+            });
+
+
+        case actionTypes.FETCH_DATABASE_REQUEST:
+            return updateObject(state, {
+                isLoading: true
+            });
+        case actionTypes.FETCH_DATABASE_SUCCESS:
+            return updateObject(state, {
+                isLoading: false,
+                fetchedDatabase: action.fetchedDatabase
+            });
+        case actionTypes.FETCH_DATABASE_FAILURE:
             return updateObject(state, {
                 isLoading: false,
                 errorMsg: action.error.msg

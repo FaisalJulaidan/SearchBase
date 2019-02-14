@@ -116,26 +116,28 @@ class Databases extends Component {
 
                                 {/*}*/}
 
+
                                 {
                                     !!this.props.fetchedDatabase.databaseContent?.length ?
                                         <DatabseInfo
                                             data={this.getRecordsData(this.props.fetchedDatabase.databaseContent)}/>
                                         :
-                                        <div>
-                                            <img
-                                                src="https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/following_q0cr.svg"
-                                                width={"50%"}
-                                                style={{
-                                                    display: "block",
-                                                    marginLeft: "auto",
-                                                    marginRight: "auto",
-                                                }}
-                                            />
-                                            <p style={{textAlign: 'center', marginTop: 5}}>
-                                                Select a database to show its data
-                                            </p>
-                                        </div>
-
+                                        <Spin spinning={this.props.isLoadingDatabase}>
+                                            <div>
+                                                <img
+                                                    src="https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/following_q0cr.svg"
+                                                    width={"50%"}
+                                                    style={{
+                                                        display: "block",
+                                                        marginLeft: "auto",
+                                                        marginRight: "auto",
+                                                    }}
+                                                />
+                                                <p style={{textAlign: 'center', marginTop: 5}}>
+                                                    Select a database to show its data
+                                                </p>
+                                            </div>
+                                        </Spin>
                                 }
 
 

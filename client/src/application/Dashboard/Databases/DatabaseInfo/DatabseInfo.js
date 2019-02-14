@@ -17,7 +17,6 @@ class DatabseInfo extends Component {
         console.log(handsontableData);
         return (
             <div style={{height: '100%'}}>
-
                 <HotTable id="hot"
                           data={handsontableData1}
                           colHeaders={Object.keys(handsontableData[0])}

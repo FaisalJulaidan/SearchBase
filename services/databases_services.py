@@ -20,19 +20,32 @@ def fetchDatabase(id, companyID: int) -> Callback:
         databaseContent = None
         if database.Type == DatabaseType.Candidates:
             print('fetch from candidate table')
-            databaseContent = getAllCandidates(id)
+            databaseContent = helpers.getListFromSQLAlchemyList(getAllCandidates(id))
+
 
         elif database.Type == DatabaseType.Clients:
             print('fetch from client table')
-            databaseContent = getAllClients(id)
+            databaseContent = helpers.getListFromSQLAlchemyList(getAllClients(id))
+
 
         elif database.Type == DatabaseType.Jobs:
             print('fetch from candidate table')
-            databaseContent = getAllJobs(id)
+            databaseContent = helpers.getListFromSQLAlchemyList(getAllJobs(id))
+            for i, _ in enumerate(databaseContent):
+                temp = databaseContent[i]['Currency'].code
+                del databaseContent[i]['Currency']
+                databaseContent[i]['Currency'] = temp
+
+                day = databaseContent[i]['StartDate'].day
+                month = databaseContent[i]['StartDate'].month
+                year = databaseContent[i]['StartDate'].year
+                del databaseContent[i]['StartDate']
+                databaseContent[i]['StartDate'] = '/'.join(map(str, [year, month, day]))
+
 
         if not databaseContent: raise Exception()
         return Callback(True, "", {'databaseInfo': helpers.getDictFromSQLAlchemyObj(database),
-                                   'databaseContent': helpers.getListFromSQLAlchemyList(databaseContent)})
+                                   'databaseContent': databaseContent})
 
     except Exception as exc:
         print(exc)

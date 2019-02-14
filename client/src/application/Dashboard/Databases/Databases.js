@@ -9,7 +9,7 @@ import {http} from "../../../helpers";
 import {databaseActions} from "../../../store/actions";
 import {ColumnsOptions} from "./NewDatabaseModal/ColumnsOptions";
 
-import DatabseInfo from "./DatabaseInfo/DatabseInfo"
+import DatabaseInfo from "./DatabaseInfo/DatabaseInfo"
 
 class Databases extends Component {
 
@@ -119,7 +119,7 @@ class Databases extends Component {
 
                                 {
                                     !!this.props.fetchedDatabase.databaseContent?.length ?
-                                        <DatabseInfo
+                                        <DatabaseInfo
                                             data={this.getRecordsData(this.props.fetchedDatabase.databaseContent)}/>
                                         :
                                         <Spin spinning={this.props.isLoadingDatabase}>

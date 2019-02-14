@@ -188,7 +188,7 @@ export const ButtonsForm = (handleNewBlock, handleEditBlock, handleDeleteBlock, 
     ]
 );
 
-export const FileTypesFormItem = ({FormItem, layout, getFieldDecorator, typesAllowed, block, setStateHandler}) => (
+export const FileTypesFormItem = ({FormItem, block, layout, getFieldDecorator, typesAllowed, setStateHandler}) => (
     <FormItem label="File Types" {...layout}>
         {
             typesAllowed ?
@@ -203,6 +203,31 @@ export const FileTypesFormItem = ({FormItem, layout, getFieldDecorator, typesAll
                                    onChange={(checkedValues) => setStateHandler(onFileTypeChange(checkedValues))}/>
                 )
                 : <Spin/>
+        }
+    </FormItem>
+);
+
+export const ScannedDatabaseFormItem = ({FormItem, block, getFieldDecorator, layout, databasesList}) => (
+    <FormItem label="Database" {...layout}
+              extra="The database to be scanned for solutions (Jobs, Candidate...)">
+        {
+                getFieldDecorator('databaseID', {
+                    initialValue: block.Content.databaseID ?
+                        databasesList.find(database => database.ID === block.Content.databaseID).Name
+                        : undefined,
+                    rules: [{
+                        required: true,
+                        message: "Please select a database. " +
+                            "If you don't have one please go to Database section form the left menu and upload one, " +
+                            "otherwise you won't be able to creat a Solution block and search for solutions in the chatbot",
+                    }],
+                })(
+                    <Select placeholder="EX: Jobs database">{
+                        databasesList.map((database, i) =>
+                            <Option key={i}
+                                    value={database.ID}>{database.Name}</Option>)
+                    }</Select>
+                )
         }
     </FormItem>
 );

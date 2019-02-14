@@ -10,12 +10,13 @@ class Block extends Component {
     deleteBlock = (block) => this.props.deleteBlock(block);
 
     render() {
-        const {block} = this.props;
+        const {block, databasesList} = this.props;
+
         return (
             <Collapse bordered={true}>
                 <Panel header={(
                     <>
-                        {block.type} <Divider type="vertical"/>
+                        {block.Type} <Divider type="vertical"/>
                         {block.Content.text} <Divider type="vertical"/>
 
                         <Button icon={'edit'} size={"small"} onClick={() => this.editBlock(block)}/>
@@ -75,6 +76,15 @@ class Block extends Component {
                         <Row>
                             <Col span={6}>show Top</Col>
                             <Col span={12}>{block.Content.showTop}</Col>
+                            <Divider/>
+                        </Row>
+                        : null
+                    }
+
+                    {block.Content.databaseID ?
+                        <Row>
+                            <Col span={6}>Database</Col>
+                            <Col span={12}>{databasesList?.find(database => database.ID === block.Content.databaseID).Name}</Col>
                             <Divider/>
                         </Row>
                         : null

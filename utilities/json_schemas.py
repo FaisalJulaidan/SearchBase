@@ -154,9 +154,9 @@ Solutions = {
         "showTop": {"type": "integer", "minimum": 1},
         "action": { "enum": [e.value for e in enums.BlockAction]},
         "blockToGoID": { "type": [ "number",  "null" ] },
-        "afterMessage": {"type": "string"}
-
+        "afterMessage": {"type": "string"},
+        "databaseID": { "type":"number" },
     },
-    "required": ["showTop", "action", "afterMessage", "blockToGoID"],
+    "required": ["showTop", "action", "afterMessage", "blockToGoID", "databaseID"],
     "additionalProperties": False
 }

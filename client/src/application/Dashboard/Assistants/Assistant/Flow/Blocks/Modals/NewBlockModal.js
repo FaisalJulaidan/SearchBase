@@ -79,7 +79,8 @@ class NewBlockModal extends Component {
                         <TabPane tab={<span><Icon type="tag"/>Solutions</span>}
                                  key="Solutions">
                             <Solutions options={this.state}
-                                       handleNewBlock={this.handleNewBlock}/>
+                                       handleNewBlock={this.handleNewBlock}
+                                       databasesList={this.props.databasesList}/>
                         </TabPane>
 
                     </Tabs>

@@ -7,8 +7,7 @@ import {
     ButtonsForm,
     ShowGoToBlockFormItem,
     ShowGoToGroupFormItem,
-    SkippableFormItem,
-    StoreInDBFormItem
+    ScannedDatabaseFormItem
 } from './CardTypesFormItems'
 
 const FormItem = Form.Item;
@@ -45,6 +44,7 @@ class Solutions extends Component {
                         action: values.action,
                         blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                         afterMessage: values.afterMessage,
+                        databaseID: values.databaseID,
                     }
                 }
             };
@@ -85,6 +85,10 @@ class Solutions extends Component {
                         )}
                     </FormItem>
 
+                    <ScannedDatabaseFormItem FormItem={FormItem} block={block}
+                                          getFieldDecorator={getFieldDecorator}
+                                          layout={this.props.options.layout}
+                                          databasesList={this.props.databasesList}/>
 
                     <ActionFormItem FormItem={FormItem} blockOptions={blockOptions} block={block}
                                     setStateHandler={(state) => this.setState(state)}

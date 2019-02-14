@@ -4,7 +4,7 @@ import {HotTable} from "@handsontable/react";
 import './DatabaseInfo.less'
 import {ColumnsOptions} from "../NewDatabaseModal/ColumnsOptions";
 
-class DatabseInfo extends Component {
+class DatabaseInfo extends Component {
 
 
     // handsontableData = Handsontable.helper.createSpreadsheetData(6, 10);
@@ -28,4 +28,4 @@ class DatabseInfo extends Component {
 }
 
 
-export default DatabseInfo;
+export default DatabaseInfo;

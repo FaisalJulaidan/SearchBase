@@ -88,38 +88,12 @@ class Databases extends Component {
 
                             <div className={styles.Panel_Body} style={{padding: 0}}>
 
-                                {/*{*/}
-                                {/*!!this.props.fetchedDatabase.databaseContent?.length ?*/}
-                                {/*<Table*/}
-                                {/*style={{height: '100%', width: 'auto'}}*/}
-                                {/*// size={'small'}*/}
-                                {/*// bordered*/}
-                                {/*columns={ColumnsOptions(this.props.fetchedDatabase.databaseContent[0], 'db')}*/}
-                                {/*dataSource={this.getRecordsData(this.props.fetchedDatabase.databaseContent)}*/}
-                                {/*rowKey={'ID'}*/}
-                                {/*pagination={{pageSize: 11}} scroll={{x: 3200}}/>*/}
-                                {/*:*/}
-                                {/*<div>*/}
-                                {/*<img*/}
-                                {/*src="https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/following_q0cr.svg"*/}
-                                {/*width={"50%"}*/}
-                                {/*style={{*/}
-                                {/*display: "block",*/}
-                                {/*marginLeft: "auto",*/}
-                                {/*marginRight: "auto",*/}
-                                {/*}}*/}
-                                {/*/>*/}
-                                {/*<p style={{textAlign: 'center', marginTop: 5}}>*/}
-                                {/*Select a database to show its data*/}
-                                {/*</p>*/}
-                                {/*</div>*/}
-
-                                {/*}*/}
-
 
                                 {
                                     !!this.props.fetchedDatabase.databaseContent?.length ?
                                         <DatabaseInfo
+                                            databaseOption={this.state.databaseOptions}
+                                            databaseInfo={this.props.fetchedDatabase.databaseInfo}
                                             data={this.getRecordsData(this.props.fetchedDatabase.databaseContent)}/>
                                         :
                                         <Spin spinning={this.props.isLoadingDatabase}>

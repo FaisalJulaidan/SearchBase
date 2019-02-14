@@ -6,22 +6,19 @@ import {ColumnsOptions} from "../NewDatabaseModal/ColumnsOptions";
 
 class DatabseInfo extends Component {
 
-
-    // handsontableData = Handsontable.helper.createSpreadsheetData(6, 10);
-
-
     render() {
-        let handsontableData = this.props.data;
-        let handsontableData1 = handsontableData.map(record => Object.values(record));
-        // const handsontableColmns = this.props.data ? ColumnsOptions(handsontableData[0], 'handsontable') : [];
-        console.log(handsontableData);
+
+        let data = this.props.data;
+        const columns = this.props.databaseOption[this.props.databaseInfo.Type].map(x => x.column);
+        const colHeaders = this.props.databaseOption[this.props.databaseInfo.Type].map(x => x.column).map(x => {
+            return {
+                data: x,
+                editor: false
+            }
+        });
         return (
             <div style={{height: '100%'}}>
-                <HotTable id="hot"
-                          data={handsontableData1}
-                          colHeaders={Object.keys(handsontableData[0])}
-                          rowHeaders={true}/>
-
+                <HotTable id="hot" data={data} colHeaders={columns} columns={colHeaders} rowHeaders={true}/>
             </div>
         );
     }

@@ -86,8 +86,8 @@ class Databases extends Component {
                                     !!this.props.fetchedDatabase.databaseContent?.length ?
                                         <Table
                                             style={{height: '100%', width: 'auto'}}
-                                            size={'small'}
-                                            bordered
+                                            // size={'small'}
+                                            // bordered
                                             columns={ColumnsOptions(this.props.fetchedDatabase.databaseContent[0], 'db')}
                                             dataSource={this.getRecordsData(this.props.fetchedDatabase.databaseContent)}
                                             rowKey={'ID'}

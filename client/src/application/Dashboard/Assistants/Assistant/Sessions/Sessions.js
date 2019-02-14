@@ -64,7 +64,7 @@ class Sessions extends React.Component {
 
 
 
-    // Nested table that has all the answered questions per session
+    // Nested table that has all the answered questions per session (Not being used)
     expandedRowRender = (record, index, indent, expanded) => {
         const columns = [
             {

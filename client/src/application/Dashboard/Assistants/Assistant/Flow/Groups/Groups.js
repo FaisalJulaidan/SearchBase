@@ -38,7 +38,6 @@ class Groups extends Component {
 
     ////// DELETE GROUP
     handleDeleteGroup = (deletedGroup) => {
-        console.log(deletedGroup);
         confirm({
             title: `Delete group confirmation`,
             content: `If you click OK, this group will be deleted with its associated blocks forever`,

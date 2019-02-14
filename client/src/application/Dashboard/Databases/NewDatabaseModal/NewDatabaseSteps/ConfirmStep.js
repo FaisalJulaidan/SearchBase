@@ -23,7 +23,7 @@ class ConfirmStep extends Component {
         const columnsOptions = ColumnsOptions(validRecords[0] || invalidRecords[0]);
         return (
             <div>
-                <h4>View over the valid data </h4>
+                <h4>Valid data </h4>
                 <Table columns={columnsOptions}
                        dataSource={this.getRecordsData(validRecords)}
                        size="small"
@@ -31,7 +31,7 @@ class ConfirmStep extends Component {
 
                 <Divider/>
 
-                <h4>View over the invalid data </h4>
+                <h4>Invalid data (wither fix them or upload without them) </h4>
                 <Table columns={columnsOptions}
                        dataSource={this.getRecordsData(invalidRecords)}
                        size="small"

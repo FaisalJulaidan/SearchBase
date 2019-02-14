@@ -1,11 +1,13 @@
 import React from "react";
 import styles from "./UsersManagement.module.less";
-import {Tabs} from "antd";
+import {Tabs, Modal} from "antd";
 import connect from "react-redux/es/connect/connect";
 import {usersManagementActions} from "../../../../store/actions";
 import UsersDisplay from "./UsersDisplay/UsersDisplay";
 
 const TabPane = Tabs.TabPane;
+const confirm = Modal.confirm;
+
 
 class UsersManagement extends React.Component {
 
@@ -22,7 +24,13 @@ class UsersManagement extends React.Component {
     };
 
     deleteUser = (user) => {
-        this.props.dispatch(usersManagementActions.deleteUser({user:user}));
+        confirm({
+            title: `Delete user confirmation`,
+            content: `If you click OK, this user will be deleted and its associated details forever`,
+            onOk: () => {
+                this.props.dispatch(usersManagementActions.deleteUser({user:user}));
+            }
+        });
     };
 
     render () {

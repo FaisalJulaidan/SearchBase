@@ -36,7 +36,6 @@ def fetchDatabase(id, companyID: int) -> Callback:
 
     except Exception as exc:
         print(exc)
-        print('srjglkjsdlkgjewr')
         db.session.rollback()
         return Callback(False, 'Could not fetch the database.')
     # finally:

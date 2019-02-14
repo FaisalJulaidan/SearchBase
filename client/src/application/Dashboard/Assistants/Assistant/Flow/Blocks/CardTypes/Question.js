@@ -182,7 +182,9 @@ class Question extends Component {
                             )}
                         </FormItem>
 
-                        <FormItem label="Keywords" {...this.props.options.layout}>
+                        <FormItem label="Keywords" {...this.props.options.layout}
+                                  extra="Adding related keywords to the answer is necessary
+                                  for retrieving accurate solutions to the user">
                             <div>
                                 {tags.map((tag) => {
                                     const isLongTag = tag.length > 20;
@@ -209,7 +211,7 @@ class Question extends Component {
                                     <Tag
                                         onClick={this.showInput}
                                         style={{background: '#fff', borderStyle: 'dashed'}}>
-                                        <Icon type="plus"/> New Tag
+                                        <Icon type="plus"/> New Keyword
                                     </Tag>
                                 )}
                             </div>

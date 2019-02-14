@@ -5,6 +5,7 @@
   "proxy": "http://localhost:5000",
   "dependencies": {
     "@babel/core": "7.1.0",
+    "@handsontable/react": "^2.1.0",
     "@svgr/webpack": "2.4.1",
     "ant-design-pro": "^2.2.1",
     "antd": "^3.10.8",
@@ -32,6 +33,7 @@
     "file-saver": "^2.0.0",
     "fork-ts-checker-webpack-plugin-alt": "0.4.14",
     "fs-extra": "7.0.0",
+    "handsontable": "^6.2.2",
     "hashids": "^1.2.2",
     "history": "^4.7.2",
     "html-webpack-plugin": "4.0.0-alpha.2",

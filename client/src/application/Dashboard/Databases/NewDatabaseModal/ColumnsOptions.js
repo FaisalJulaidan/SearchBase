@@ -18,7 +18,9 @@ export const ColumnsOptions = (columnHeader, type) => {
                     key: index,
                     width: 150
                 };
-        } else
+        } else if (type === "handsontable")
+            return c;
+        else
             return {
                 title: c,
                 dataIndex: c,

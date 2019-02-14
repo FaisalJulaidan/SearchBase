@@ -43,7 +43,7 @@ class Solutions extends Component {
                         showTop: Number(values.showTop),
                         action: values.action,
                         blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
-                        afterMessage: values.afterMessage,
+                        afterMessage: values.afterMessage || "" ,
                         databaseID: values.databaseID,
                     }
                 }

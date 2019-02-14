@@ -70,7 +70,7 @@ class Question extends Component {
                     keywords: this.state.tags,
                     blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                     action: values.action === "Go To Group" ? "Go To Specific Block" : values.action,
-                    afterMessage: values.afterMessage
+                    afterMessage: values.afterMessage || ""
                 };
                 let answers = [answer].concat(this.state.answers);
                 this.setState({answers, tags: []});

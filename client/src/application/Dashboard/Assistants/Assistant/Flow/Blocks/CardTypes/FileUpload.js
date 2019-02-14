@@ -40,7 +40,7 @@ class FileUpload extends Component {
                         action: values.action,
                         fileTypes: this.state.fileTypes,
                         blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
-                        afterMessage: values.afterMessage
+                        afterMessage: values.afterMessage || ""
                     }
                 }
             };

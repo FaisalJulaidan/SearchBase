@@ -46,7 +46,7 @@ class UserInput extends Component {
                         text: values.text,
                         blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                         action: values.action,
-                        afterMessage: values.afterMessage
+                        afterMessage: values.afterMessage || ""
                     }
                 }
             };

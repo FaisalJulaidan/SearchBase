@@ -16,7 +16,7 @@ export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block, pl
             initialValue: block.Content.text,
             rules: [{
                 required: true,
-                message: "Please input question field",
+                message: "Please input a question",
             }],
         })(
             <Input placeholder={placeholder}/>

@@ -135,12 +135,18 @@ def addGroup(group: dict, assistant: Assistant) -> Callback:
     # db.session.close()
 
 
-def addBlock(data: dict, group: BlockGroup) -> Callback:
+def addBlock(block: dict, group: BlockGroup) -> Callback:
     try:
 
-        # Validate submitted block content using json schema
-        validate(data, json_schemas.new_block)
-        block = data.get('block')
+        # Validate submitted block using json schema
+        validate(block, json_schemas.new_block)
+        block = block.get('block')
+
+        # Go deeper and validate the block's content based on its type using json schema
+        callback: Callback = isValidBlock(block, str(enums.BlockType(block.get('Type')).name))
+        if not callback.Success:
+            return callback
+
 
         # Set the block with max order + 1
         maxOrder = db.session.query(func.max(Block.Order)).filter(Block.GroupID == group.ID).scalar()

@@ -20,11 +20,10 @@ chatbot_session = {
                           },
         "keywords": {"type": "array", "items": {"type": "string"}},
         "keywordsByDataType": {"type": "object", "items": {"type": "object"}},
-        "showTop": {"type": "integer"},
         "solutionsReturned": {"type": "integer"},
         "userType": {"enum": [e.value for e in enums.UserType]}
     },
-    "required": ["collectedData", "keywords", "keywordsByDataType", "showTop", "solutionsReturned", "userType"],
+    "required": ["collectedData", "keywords", "keywordsByDataType", "solutionsReturned", "userType"],
     "additionalProperties": False
 }
 

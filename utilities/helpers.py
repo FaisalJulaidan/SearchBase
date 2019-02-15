@@ -85,7 +85,7 @@ def gen_dummy_data():
     }))
 
     db.session.add(Block(Type=enums.BlockType.UserInput, Order=2, StoreInDB=True, Skippable=False,
-                         Group=reader_a_blocksGroup, DataType=enums.DataType.Name, Content={
+                         Group=reader_a_blocksGroup, DataType=enums.DataType.EssentialSkills, Content={
         "action": "Go To Next Block",
         "text": "Give me some input",
         "blockToGoID": None,
@@ -119,13 +119,14 @@ def gen_dummy_data():
     #     }))
 
 
-    # db.session.add(Block(Type=enums.BlockType.Solutions, Order=4, StoreInDB=True, DataType=enums.DataType.NoType,
-    #                      Group=reader_a_blocksGroup, Content={
-    #     "showTop": 5,
-    #     "afterMessage": 'DONE!!!!',
-    #     "action": "End Chat",
-    #     "blockToGoID": 0
-    # }))
+    db.session.add(Block(Type=enums.BlockType.Solutions, Order=3, StoreInDB=True, DataType=enums.DataType.NoType,
+                         Group=reader_a_blocksGroup, Content={
+        "showTop": 5,
+        "afterMessage": 'here is what we found!',
+        "action": "End Chat",
+        "blockToGoID": 0,
+        "databaseID": 1
+    }))
 
     # Create Roles
     db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
@@ -136,10 +137,6 @@ def gen_dummy_data():
     db.session.add(Role(Name="Admin", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
     db.session.add(Role(Name="User", Company= sabic, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
 
-    # does not work currently
-    # db.session.add(Solution(Name="TestSolution", Content="",
-    #                         RequiredFilters=None, DisplayTitles=None,
-    #                         Type="RDB XML File Export", WebLink=None, IDReference=None, automaticSolutionAlerts=False, AssistantID=1))
 
     # Get Roles
     owner_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "Owner").first()

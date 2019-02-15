@@ -9,6 +9,7 @@ from sqlalchemy_utils import Currency
 from utilities import helpers
 from sqlalchemy import and_
 from enums import  DatabaseType, DataType as DT
+import json
 
 def fetchDatabase(id, companyID: int) -> Callback:
     try:
@@ -227,7 +228,8 @@ def deleteDatabase(databaseID, companyID) -> Callback:
 
 
 # ----- Scanners (Pandas) ----- #
-def scanCandidates(dbID, assistantHashID, keywords: dict):
+
+def scan(session, assistantHashID):
     try:
 
         callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
@@ -236,15 +238,40 @@ def scanCandidates(dbID, assistantHashID, keywords: dict):
         assistant: Assistant = callback.Data
 
         database: Database = db.session.query(Database) \
-            .filter(and_(Database.CompanyID == assistant.CompanyID, Database.ID == dbID)).first()
+            .filter(and_(Database.CompanyID == assistant.CompanyID, Database.ID == session['databaseID'])).first()
         if not database: raise Exception
 
+        # Scan database for solutions based on database type
+        result = None
+        if database.Type == enums.DatabaseType.Candidates:
+            return scanCandidates(session)
+        elif database.Type == enums.DatabaseType.Clients:
+            pass
+        elif database.Type == enums.DatabaseType.Jobs:
+            pass
+        else:
+            return Callback(False, "Database type is not recognised")
 
-        # Data analysis using Pandas library
+        return Callback(False, "", result)
 
-        df = pandas.read_sql("SELECT * FROM Candidate WHERE DatabaseID=1", con=db.session.bind)
 
-        df['count'] = 0
+    except Exception as exc:
+        print("scan() ERROR: ", exc)
+        return Callback(False, 'Error while scanning the database')
+
+
+# Data analysis using Pandas library
+def scanCandidates(session):
+    try:
+        dbID = int(session['databaseID']) # prevent sql injection
+        df = pandas.read_sql("SELECT * FROM Candidate WHERE DatabaseID=" + str(dbID),
+                             con=db.session.bind)
+
+        keywords = session['keywordsByDataType']
+        df['count'] = 0 # add column for tracking score
+        # Delete sensitive columns e.g. candidate name
+        df.drop(['ID', DT.Name.name, DT.Email.name, DT.Telephone.name], axis=1, inplace=True)
+
         # Desired Salary <> Job Salary Offered | points=3
         if keywords.get(DT.JobSalaryOffered.value['name']):
             df.loc[df[DT.DesiredSalary.name] >= keywords[DT.JobSalaryOffered.value['name']][-1], 'count'] += 3
@@ -276,8 +303,10 @@ def scanCandidates(dbID, assistantHashID, keywords: dict):
             df['count'] += 2 * df[DT.PreferredEmploymentType.name].str.count('|'.join(keywords[DT.EmploymentTypeOffered.value['name']]),
                                                                      flags=re.IGNORECASE)
 
-        print(df.nlargest(2, 'count'))
-        print(df.nlargest(2, 'count').to_json(orient='records'))
+
+
+        return Callback(True, '', json.loads(df[df['count']>0].nlargest(session.get('showTop', 0), 'count')
+                                          .to_json(orient='records')))
 
     except Exception as exc:
         print("scanCandidates() ERROR: ", exc)

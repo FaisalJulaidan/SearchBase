@@ -97,7 +97,7 @@ class Blocks extends Component {
     render() {
         return (
             <div className={styles.Panel}>
-                <div className={styles.Panel_Header}>
+                <div className={styles.Panel_Header_With_Button}>
                     <div>
                         <h3>{this.props.currentGroup.name} Blocks</h3>
                     </div>

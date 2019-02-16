@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Menu, Table, Spin} from 'antd';
+import {Menu, Table, Spin, Button} from 'antd';
 
 import styles from "./Databases.module.less"
 import NewDatabaseModal from "./NewDatabaseModal/NewDatabaseModal";
@@ -82,13 +82,27 @@ class Databases extends Component {
 
                     <div style={{margin: '0 0 0 5px', width: '80%'}}>
                         <div className={styles.Panel}>
-                            <div className={styles.Panel_Header} style={{position: "inherit"}}>
-                                <h3>Databases Information</h3>
+                            <div className={styles.Panel_Header_With_Button}>
+                                <div>
+                                    <h3>Databases Information</h3>
+                                </div>
+                                <div>
+                                    <Button className={styles.Panel_Header_Button}
+                                            disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}
+                                            type="primary" icon="info"
+                                            onClick={this.showDBInfo}>
+                                        Info
+                                    </Button>
+                                    <Button className={styles.Panel_Header_Button} type="danger" icon="delete"
+                                            disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}
+                                            onClick={this.deleteDB}>
+                                        Delete Database
+                                    </Button>
+                                </div>
                             </div>
 
+
                             <div className={styles.Panel_Body} style={{padding: 0}}>
-
-
                                 {
                                     !!this.props.fetchedDatabase.databaseContent?.length ?
                                         <DatabaseInfo
@@ -114,11 +128,6 @@ class Databases extends Component {
                                             </div>
                                         </Spin>
                                 }
-
-
-                                {/*<pre>{*/}
-                                {/*JSON.stringify(this.props.fetchedDatabase, null, 2)*/}
-                                {/*}</pre>*/}
                             </div>
                         </div>
                     </div>

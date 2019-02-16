@@ -25,7 +25,6 @@ def serve(path):
 
 @public_router.route('/dashboard', defaults={'path': ''})
 @public_router.route('/dashboard/<path:path>')
-@jwt_required
 def serveDashboard(path):
     if path != "" and os.path.exists("static/react_app/" + path):
         return send_from_directory('static/react_app', path)

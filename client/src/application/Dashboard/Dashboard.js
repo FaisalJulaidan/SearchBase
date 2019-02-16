@@ -20,6 +20,7 @@ import {authActions} from "../../store/actions";
 import store from '../../store/store';
 import {connect} from 'react-redux';
 
+import {TransitionGroup, CSSTransition} from "react-transition-group";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -170,19 +171,26 @@ class Dashboard extends Component {
 
                     {/*HERE GOES ALL THE ROUTES*/}
                     <Content style={{margin: 16, marginTop: 10, marginBottom: 0, height: '100%'}}>
-                        <Switch>
-                            <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
-                            <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
-                            <Route path={`${match.path}/assistants/:id/sessions`} component={Sessions}/>
-                            <Route path={`${match.path}/assistants/:id/solutions`} component={Solutions}/>
-                            <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
-                            <Route path={`${match.path}/assistants`} component={Assistants} exact/>
-                            <Route path={`${match.path}/databases`} component={Databases} exact/>
-                            <Route path={`${match.path}/profile`} component={Profile} exact/>
-                            <Route path={`${match.path}/users-management`} component={UsersManagement} exact/>
-                            <Route path={`${match.path}/documentation`} component={Documentation} exact/>
-                            <Route path="/dashboard" component={Home}/>
-                        </Switch>
+                        <Route render={() =>
+                            <TransitionGroup style={{height: '100%'}}>
+                                <CSSTransition key={location.key} classNames="fade" timeout={550}>
+                                    <Switch location={location} style={{height: '100%'}}>
+                                        <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
+                                        <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
+                                        <Route path={`${match.path}/assistants/:id/sessions`} component={Sessions}/>
+                                        <Route path={`${match.path}/assistants/:id/solutions`} component={Solutions}/>
+                                        <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
+                                        <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+                                        <Route path={`${match.path}/databases`} component={Databases} exact/>
+                                        <Route path={`${match.path}/profile`} component={Profile} exact/>
+                                        <Route path={`${match.path}/users-management`} component={UsersManagement} exact/>
+                                        <Route path={`${match.path}/documentation`} component={Documentation} exact/>
+                                        <Route path="/dashboard" component={Home}/>
+                                    </Switch>
+                                </CSSTransition>
+                            </TransitionGroup>
+                        }/>
+
                     </Content>
 
                     <Footer style={{textAlign: 'center', padding: 10}}>

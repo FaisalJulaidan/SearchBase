@@ -6,7 +6,7 @@ import styles from "./Dashboard.module.less"
 import Assistants from './Assistants/Assistants';
 import Databases from './Databases/Databases';
 import {getUser, history} from '../../helpers';
-import {Route, Switch} from 'react-router-dom';
+import {Route, Switch, withRouter} from 'react-router-dom';
 import Flow from "./Assistants/Assistant/Flow/Flow";
 import Profile from "./AccountDetails/Profile/Profile";
 import UsersManagement from "./AccountDetails/UsersManagement/UsersManagement";
@@ -55,9 +55,10 @@ class Dashboard extends Component {
 
     render() {
 
-        const {match} = this.props;
+        const {match, location} = this.props;
         const user = getUser();
         let userInfo = null;
+        console.log(location)
 
         // User Information at the top
         if (!user) {
@@ -112,7 +113,9 @@ class Dashboard extends Component {
                         </div>
                     </div>
 
-                    <Menu theme="light" defaultSelectedKeys={this.state.selectedMenuKey} mode="inline" onClick={this.handleMenuClick}>
+                    <Menu theme="light" defaultSelectedKeys={this.state.selectedMenuKey}
+                          selectedKeys={location.pathname.split('/')[2] ? [location.pathname.split('/')[2]] : [location.pathname.split('/')[1]]}
+                          mode="inline" onClick={this.handleMenuClick}>
                         <Menu.Item key="dashboard">
                             <Icon type="home"/>
                             <span>Home</span>
@@ -197,4 +200,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Dashboard);
+export default withRouter(connect(mapStateToProps)(Dashboard));

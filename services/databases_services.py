@@ -33,15 +33,17 @@ def fetchDatabase(id, companyID: int) -> Callback:
             print('fetch from candidate table')
             databaseContent = helpers.getListFromSQLAlchemyList(getAllJobs(id))
             for i, _ in enumerate(databaseContent):
-                temp = databaseContent[i]['Currency'].code
-                del databaseContent[i]['Currency']
-                databaseContent[i]['Currency'] = temp
+                if databaseContent[i]['Currency']:
+                    temp = databaseContent[i]['Currency'].code
+                    del databaseContent[i]['Currency']
+                    databaseContent[i]['Currency'] = temp
 
-                day = databaseContent[i]['StartDate'].day
-                month = databaseContent[i]['StartDate'].month
-                year = databaseContent[i]['StartDate'].year
-                del databaseContent[i]['StartDate']
-                databaseContent[i]['StartDate'] = '/'.join(map(str, [year, month, day]))
+                if databaseContent[i]['StartDate']:
+                    day = databaseContent[i]['StartDate'].day
+                    month = databaseContent[i]['StartDate'].month
+                    year = databaseContent[i]['StartDate'].year
+                    del databaseContent[i]['StartDate']
+                    databaseContent[i]['StartDate'] = '/'.join(map(str, [year, month, day]))
 
 
         if not databaseContent: raise Exception()

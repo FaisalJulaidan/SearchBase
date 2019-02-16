@@ -121,7 +121,6 @@ module.exports = {
         // changing JS code would still trigger a refresh.
     ],
     output: {
-        path: path.join(__dirname, 'dist'),
         globalObject: 'this',
         // Add /* filename */ comments to generated require()s in the output.
         pathinfo: true,

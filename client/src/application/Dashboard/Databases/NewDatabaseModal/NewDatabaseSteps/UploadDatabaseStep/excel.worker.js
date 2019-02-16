@@ -5,6 +5,7 @@ if ('function' === typeof importScripts) {
     importScripts('http://localhost:5000/static/xlsx/xlsx.js');
 }
 
+//eslint-disable-next-line
 self.addEventListener('message', (e) => {
     // MY CODE ***************************************************************
     const workbook = XLSX.read(e.data, {type: 'binary', cellDates: true});

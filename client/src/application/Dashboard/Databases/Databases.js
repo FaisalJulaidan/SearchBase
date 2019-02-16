@@ -103,6 +103,7 @@ class Databases extends Component {
                                                     width={"50%"}
                                                     style={{
                                                         display: "block",
+                                                        marginTop:20,
                                                         marginLeft: "auto",
                                                         marginRight: "auto",
                                                     }}

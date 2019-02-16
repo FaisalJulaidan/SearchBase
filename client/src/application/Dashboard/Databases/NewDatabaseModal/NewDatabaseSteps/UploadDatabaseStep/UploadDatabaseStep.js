@@ -69,8 +69,11 @@ class UploadDatabaseStep extends Component {
         return (
             <div>
                 <div style={{textAlign: 'center'}}>
-                    <img src="http://localhost:5000/static/images/upload_data.svg" alt="Upload Data Iamge"
-                         style={{width: 300}}/>
+                    <img
+
+                        src={`${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/static/images/upload_data.svg`}
+                        alt="Upload Data Iamge"
+                        style={{width: 300}}/>
                     <p>Upload your Database to be used in the chat interaction</p>
                 </div>
                 <div style={{textAlign: 'center'}}>

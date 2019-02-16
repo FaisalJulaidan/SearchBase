@@ -57,7 +57,7 @@ def getSolutions_forChatbot(assistantHashID):
             callback: Callback = databases_services.scan(data, assistantHashID)
             if not callback.Success:
                 return helpers.jsonResponse(False, 400, callback.Message)
-            return helpers.jsonResponse(True, 200, "Solution list is here!", callback.Data)
+            return helpers.jsonResponse(True, 200, "Solutions list is here!", callback.Data)
         return helpers.jsonResponse(True, 200, "show top is 0", [])
 
 

@@ -413,6 +413,7 @@ def getOptions(industry=None) -> Callback:
         'types': [a.value for a in enums.BlockType],
         'userTypes': [uiv.value for uiv in enums.UserType],
         'dataTypes': [uiv.value for uiv in enums.DataType],
+        'databaseTypes': [dbt.name for dbt in enums.DatabaseType],
         'blockTypes': [
             {
                 'name': enums.BlockType.UserInput.value,

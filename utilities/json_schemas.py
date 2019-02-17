@@ -154,7 +154,7 @@ Solutions = {
         "action": { "enum": [e.value for e in enums.BlockAction]},
         "blockToGoID": { "type": [ "number",  "null" ] },
         "afterMessage": {"type": "string"},
-        "databaseType": { "enum": [e.name for e in enums.BlockAction]},
+        "databaseType": { "enum": [dbt.name for dbt in enums.DatabaseType]},
     },
     "required": ["showTop", "action", "afterMessage", "blockToGoID", "databaseID"],
     "additionalProperties": False

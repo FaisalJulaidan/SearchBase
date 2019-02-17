@@ -96,7 +96,8 @@ class Flow extends Component {
                                 reorderBlocks={this.reorderBlocks}
                                 currentGroup={this.state.currentGroup}
                                 allGroups={this.props.blockGroups}
-                                databasesList={this.props.databasesList}/>
+                                databasesList={this.props.databasesList}
+                                options={this.props.options}/>
                     </div>
                 </div>
             </div>
@@ -122,6 +123,7 @@ function mapStateToProps(state) {
         isAddingBlock: state.flow.isAddingBlock,
 
         databasesList: state.database.databasesList,
+        options: state.options.options,
 
     };
 }

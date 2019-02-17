@@ -15,16 +15,16 @@ class EditBlockModal extends Component {
             labelCol: {span: 6},
             wrapperCol: {span: 14}
         },
-        flowOptions: [],
+        flowOptions: this.props.options.flow,
         allBlocks: [],
         allGroups: [],
         currentGroup: null
     };
 
-    componentDidMount() {
-        http.get(`/assistant/flow/options`)
-            .then(res => this.setState({flowOptions: res.data.data}))
-    }
+    // componentDidMount() {
+    //     http.get(`/assistant/flow/options`)
+    //         .then(res => this.setState({flowOptions: res.data.data}))
+    // }
 
     componentWillReceiveProps(nextProps) {
         this.setState({

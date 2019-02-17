@@ -6,3 +6,4 @@ export * from './chatbotSessions';
 export * from './solutions.saga';
 export * from './usersManagement.saga';
 export * from './database.saga';
+export * from './options.saga';

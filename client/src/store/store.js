@@ -9,7 +9,8 @@ import {
     chatbotSessions,
     solutionsSaga,
     usersManagementSaga,
-    databaseSaga
+    databaseSaga,
+    optionsSaga
 } from './sagas'
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -28,6 +29,7 @@ sagaMiddleware.run(chatbotSessions);
 sagaMiddleware.run(solutionsSaga);
 sagaMiddleware.run(usersManagementSaga);
 sagaMiddleware.run(databaseSaga);
+sagaMiddleware.run(optionsSaga);
 
 
 export default store;

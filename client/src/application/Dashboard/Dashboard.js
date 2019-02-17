@@ -16,7 +16,7 @@ import Sessions from "./Assistants/Assistant/Sessions/Sessions";
 import Solutions from "./Assistants/Assistant/Solutions/Solutions";
 import Home from "./Home/Home";
 import Analytics from "./Assistants/Assistant/Analytics/Analytics";
-import {authActions} from "../../store/actions";
+import {authActions, optionsActions} from "../../store/actions";
 import store from '../../store/store';
 import {connect} from 'react-redux';
 
@@ -32,6 +32,10 @@ class Dashboard extends Component {
         collapsed: false,
         marginLeft: 200,
     };
+
+    componentWillMount() {
+        this.props.dispatch(optionsActions.getOptions())
+    }
 
 
     toggle = () => {

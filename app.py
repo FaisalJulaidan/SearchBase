@@ -12,12 +12,11 @@ from flask_apscheduler import APScheduler
 from services.jwt_auth_services import jwt
 from utilities import helpers
 from flask_babel import Babel
-from services import databases_services
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, solutions_router, analytics_router, sub_router,\
     connection_router, chatbotSession_router, users_router, changePassword_router, flow_router, assistant_router,\
-    database_router
+    database_router, options_router
 
 from routes.public.routers import public_router, resetPassword_router, chatbot_router, auth_router
 
@@ -41,6 +40,7 @@ app.register_blueprint(users_router, url_prefix='/api')
 app.register_blueprint(chatbot_router, url_prefix='/api')
 app.register_blueprint(auth_router, url_prefix='/api')
 app.register_blueprint(database_router, url_prefix='/api')
+app.register_blueprint(options_router, url_prefix='/api')
 
 
 ## Error Handlers ##

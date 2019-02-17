@@ -51,7 +51,8 @@ class EditBlockModal extends Component {
                    footer={null}>
 
                 {this.props.block.Type === "User Input" ?
-                    <UserInput modalState={this.state} handleEditBlock={this.handleEditBlock}
+                    <UserInput modalState={this.state}
+                               handleEditBlock={this.handleEditBlock}
                                handleDeleteBlock={this.props.handleDeleteBlock}
                                options={this.props.options}/> : null}
                 {this.props.block.Type === "Question" ?

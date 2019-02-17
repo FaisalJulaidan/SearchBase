@@ -22,20 +22,31 @@ class UserInput extends Component {
         showGoToGroup: false,
     };
 
-    componentWillMount() {
-        this.handleNewBlock = this.props.handleNewBlock;
-        this.handleEditBlock = this.props.handleEditBlock;
-        this.handleDeleteBlock = this.props.handleDeleteBlock;
-
+    componentDidMount() {
         const {modalState, options} = this.props;
         const {block} = getInitialVariables(options.flow, modalState);
         this.setState(initActionType(block, this.props.modalState.allGroups));
     }
 
-    onSubmit = () => this.props.form.validateFields((err, values) => {
+    onSubmit = (formBlock) => this.props.form.validateFields((err, values) => {
         if (!err) {
             const flowOptions = this.props.options.flow;
-            console.log(this.props.options);
+
+            const getBlockId = () => {
+                if (values.blockToGoID)
+                    return values.blockToGoID;
+                else if (values.blockToGoIDGroup)
+                    return values.blockToGoIDGroup;
+                else
+                // find my id and my next block id then return it
+                // else retrun null
+                    for (const [index, block] of Object.entries(this.props.modalState.currentGroup.blocks))
+                        if (formBlock.ID === block.ID)
+                            if (this.props.modalState.currentGroup.blocks[Number(index) + 1].ID)
+                                return this.props.modalState.currentGroup.blocks[Number(index) + 1].ID;
+                            else
+                                return null
+            };
             let options = {
                 block: {
                     Type: 'User Input',
@@ -45,20 +56,20 @@ class UserInput extends Component {
                     DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
                     Content: {
                         text: values.text,
-                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
+                        blockToGoID: getBlockId(values.blockToGoID, values.blockToGoIDGroup),
                         action: values.action,
                         afterMessage: values.afterMessage || ""
                     }
                 }
             };
 
-            if (this.handleNewBlock)
-                this.handleNewBlock(options);
+            if (this.props.handleNewBlock)
+                this.props.handleNewBlock(options);
             else {
                 // Edit Block
                 options.block.ID = this.props.modalState.block.ID;
                 options.block.Order = this.props.modalState.block.Order;
-                this.handleEditBlock(options);
+                this.props.handleEditBlock(options);
             }
 
         }
@@ -66,12 +77,13 @@ class UserInput extends Component {
 
 
     render() {
-        const {modalState, options, form} = this.props;
+        const {modalState, options, form, handleNewBlock, handleEditBlock, handleDeleteBlock} = this.props;
         const {blockOptions, block} = getInitialVariables(options.flow ,modalState, 'User Input');
         const {allGroups, allBlocks, currentGroup, layout} = modalState;
         const {getFieldDecorator} = form;
 
-        const buttons = ButtonsForm(this.handleNewBlock, this.handleEditBlock, this.handleDeleteBlock, this.onSubmit, block);
+
+        const buttons = ButtonsForm(handleNewBlock, handleEditBlock, handleDeleteBlock, this.onSubmit, block);
 
         return (
             <Card style={{width: '100%'}} actions={buttons}>
@@ -97,7 +109,7 @@ class UserInput extends Component {
                                            layout={layout}/>
 
                     <ShowGoToGroupFormItem FormItem={FormItem}
-                                           block={block}
+                                           currentBlock={block}
                                            allGroups={allGroups}
                                            currentGroup={currentGroup}
                                            showGoToGroup={this.state.showGoToGroup}

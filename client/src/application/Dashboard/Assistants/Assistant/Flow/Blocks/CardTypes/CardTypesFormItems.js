@@ -102,8 +102,7 @@ export const ActionFormItem = ({FormItem, layout, getFieldDecorator, setStateHan
                     <Select onSelect={(action) => setStateHandler(onSelectAction(action))}
                             placeholder="The next step after this block">{
                         blockOptions.actions.map((action, i) =>
-                            <Option key={i}
-                                    value={action}>{action}</Option>)
+                            <Option key={i} value={action}>{action}</Option>)
                     }</Select>
                 )
                 : <Spin><Select placeholder="The next step after this block"></Select></Spin>
@@ -116,7 +115,6 @@ export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allB
         showGoToBlock ?
             (
                 <FormItem label="Go To Specific Block" {...layout}>
-                    {console.log(block.Content.blockToGoID)}
                     {
                         getFieldDecorator('blockToGoID',
                             {
@@ -142,28 +140,29 @@ export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, curr
 
     allGroups = allGroups.filter(group => group.id !== currentGroup.id);
     const selectedGroup = allGroups.find(group => !!group.blocks.find(block => block.id === currentBlock?.Content?.goToBlockID));
+
     return (
         showGoToGroup ?
             (
                 <FormItem label="Go To Specific Group"
                           extra="The selected group will start from its first block"
                           {...layout}>
-                    {console.log(selectedGroup)}
                     {
                         getFieldDecorator('blockToGoIDGroup',
                             {
-                                initialValue: selectedGroup ? selectedGroup.name : undefined,
+                                initialValue: currentBlock && selectedGroup ? selectedGroup.blocks[0].ID : undefined,
                                 rules: [{required: true, message: "Please select your next group"}]
                             }
                         )(
                             <Select placeholder="The first next block of a group">{
                                 allGroups.map((group, i) => {
-                                        if (group.blocks[0])
-                                            return <Option key={i} value={group.blocks[0].id}>
+                                    console.log(group.blocks[0].ID, 'from loop')
+                                    if (group.blocks[0]) {
+                                        return <Option key={i} value={group.blocks[0].ID}>
                                                 {`${group.name}`}
                                             </Option>;
-                                        else
-                                            return <Option disabled key={i} value={group.name}>
+                                    } else
+                                        return <Option disabled key={i} value={group.name}>
                                                 {`${group.name}`}
                                             </Option>
                                     }
@@ -178,8 +177,8 @@ export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, curr
 
 // Others
 //////////////////////////////////////////////////
-export const ButtonsForm = (handleNewBlock, handleEditBlock, handleDeleteBlock, onSubmit, block) => (
-    handleNewBlock ? [
+export const ButtonsForm = (handleNewBlock, handleEditBlock, handleDeleteBlock, onSubmit, block) => {
+    return handleNewBlock ? [
         <Button key="cancel" onClick={() => onCancel(handleNewBlock, handleEditBlock)}>Cancel</Button>,
         <Button key="submit" type="primary" onClick={onSubmit}>Add</Button>
     ] : [
@@ -188,9 +187,10 @@ export const ButtonsForm = (handleNewBlock, handleEditBlock, handleDeleteBlock, 
             Delete
         </Button>,
         <Button key="cancel" onClick={() => onCancel(handleNewBlock, handleEditBlock)}>Cancel</Button>,
-        <Button key="submit" type="primary" onClick={onSubmit}>Update</Button>
+        <Button key="submit" type="primary" onClick={() => onSubmit(block)}>Update</Button>
     ]
-);
+}
+
 
 export const FileTypesFormItem = ({FormItem, block, layout, getFieldDecorator, typesAllowed, setStateHandler}) => (
     <FormItem label="File Types" {...layout}>

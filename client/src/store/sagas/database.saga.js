@@ -25,7 +25,7 @@ function* watchGetDatabaseList() {
 
 function* fetchDatabases({databaseID}) {
     try {
-        loadingMessage('Loading database');
+        loadingMessage('Loading database', 0);
         const res = yield http.get(`/databases/${databaseID}`);
         yield put(databaseActions.fetchDatabaseSuccess(res.data.msg, res.data.data));
         yield destroyMessage();
@@ -43,7 +43,7 @@ function* watchFetchDatabases() {
 
 function* uploadDatabase({newDatabase}) {
     try {
-        loadingMessage('Adding database');
+        loadingMessage('Adding database', 0);
         const res = yield http.post(`/databases`, newDatabase);
         yield destroyMessage();
         yield alertSuccess('Database added', res.data.msg);

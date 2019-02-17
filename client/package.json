@@ -64,6 +64,7 @@
     "react-redux": "^5.1.1",
     "react-router-dom": "^4.3.1",
     "react-sortable-hoc": "^0.8.4",
+    "react-transition-group": "^2.5.3",
     "react-trello": "^2.0.5",
     "redux": "^4.0.1",
     "redux-logger": "^3.0.6",

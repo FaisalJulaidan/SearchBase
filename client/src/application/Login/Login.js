@@ -6,13 +6,8 @@ import styles from './Login.module.less';
 
 import {Button, Col, Form, Icon, Input, Row, Spin} from 'antd';
 
-
 const FormItem = Form.Item;
 class Login extends React.Component {
-
-    state = {
-        isLoggin: false
-    };
 
     handleSubmit = (e) => {
         e.preventDefault();
@@ -34,20 +29,12 @@ class Login extends React.Component {
         return (
             <div className={styles.LoginBackground}>
                 <div className={[styles.LoginPanel, styles.fadeIn].join(' ')}>
-                    <Spin spinning={this.state.isLoggin}>
+                    <Spin spinning={this.props.isLoggingIn}>
                         <Row type="flex" justify="center">
                             <Col>
                                 <h1>Login Page</h1>
                             </Col>
                         </Row>
-
-                        {/*<Row type="flex" justify="center">*/}
-                            {/*<Col>*/}
-                                {/*<img width={200}*/}
-                                     {/*src="https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/authentication_fsn5.svg"*/}
-                                     {/*alt=""/>*/}
-                            {/*</Col>*/}
-                        {/*</Row>*/}
 
                         <br/>
 

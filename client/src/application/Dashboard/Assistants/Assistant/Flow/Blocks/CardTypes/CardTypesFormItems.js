@@ -51,8 +51,7 @@ export const SkippableFormItem = ({FormItem, layout, getFieldDecorator, block}) 
     <FormItem label="Skippable?" {...layout}>
         {getFieldDecorator('isSkippable', {
             valuePropName: 'checked',
-            defaultValue: false,
-            initialValue: block.IsSkippable ? block.IsSkippable : undefined,
+            initialValue: block.Skippable ? block.Skippable : false,
         })(
             <Checkbox>Users can skip answering this question</Checkbox>
         )}

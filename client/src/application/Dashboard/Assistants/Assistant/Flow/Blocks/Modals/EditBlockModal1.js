@@ -63,7 +63,7 @@ class EditBlockModal extends Component {
                 {this.props.block.Type === "Solutions" ?
                     <Solutions options={this.state} handleEditBlock={this.handleEditBlock}
                                handleDeleteBlock={this.props.handleDeleteBlock}
-                               databasesList={this.props.databasesList}/> : null}
+                               databaseOptions={this.props.databaseOptions}/> : null}
 
             </Modal>
         );

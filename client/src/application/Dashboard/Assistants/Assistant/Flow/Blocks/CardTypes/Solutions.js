@@ -88,7 +88,7 @@ class Solutions extends Component {
                     <ScannedDatabaseFormItem FormItem={FormItem} block={block}
                                           getFieldDecorator={getFieldDecorator}
                                           layout={this.props.options.layout}
-                                          databasesList={this.props.databasesList}/>
+                                          databaseOptions={this.props.databaseOptions}/>
 
                     <ActionFormItem FormItem={FormItem} blockOptions={blockOptions} block={block}
                                     setStateHandler={(state) => this.setState(state)}

@@ -207,25 +207,23 @@ export const FileTypesFormItem = ({FormItem, block, layout, getFieldDecorator, t
     </FormItem>
 );
 
-export const ScannedDatabaseFormItem = ({FormItem, block, getFieldDecorator, layout, databasesList}) => (
+export const ScannedDatabaseFormItem = ({FormItem, block, getFieldDecorator, layout, databaseOptions}) => (
     <FormItem label="Database" {...layout}
               extra="The database to be scanned for solutions (Jobs, Candidate...)">
         {
-                getFieldDecorator('databaseID', {
-                    initialValue: block.Content.databaseID ?
-                        databasesList.find(database => database.ID === block.Content.databaseID).Name
-                        : undefined,
+            getFieldDecorator('databaseType', {
+                initialValue: block.Content.databaseType ?
+                    databaseOptions.types.find(type => type === block.Content.databaseType)
+                    : undefined,
                     rules: [{
                         required: true,
-                        message: "Please select a database. " +
+                        message: "Please select a database type " +
                             "If you don't have one please go to Database section form the left menu and upload one, " +
                             "otherwise you won't be able to creat a Solution block and search for solutions in the chatbot",
                     }],
                 })(
-                    <Select placeholder="EX: Jobs database">{
-                        databasesList.map((database, i) =>
-                            <Option key={i}
-                                    value={database.ID}>{database.Name}</Option>)
+                <Select placeholder="EX: Jobs database">{databaseOptions.types.map((type, i) =>
+                    <Option key={i} value={type}>{type}</Option>)
                     }</Select>
                 )
         }

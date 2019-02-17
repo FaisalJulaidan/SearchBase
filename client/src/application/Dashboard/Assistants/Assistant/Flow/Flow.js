@@ -3,9 +3,10 @@ import React, {Component} from 'react';
 import Groups from "./Groups/Groups";
 import Blocks from "./Blocks/Blocks";
 import Header from "../../../../../components/Header/Header";
-import {flowActions, databaseActions} from "../../../../../store/actions";
+import {flowActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
 import styles from "./Flow.module.less"
+import {http} from "../../../../../helpers";
 class Flow extends Component {
 
     state = {
@@ -15,7 +16,8 @@ class Flow extends Component {
     componentDidMount() {
         const {assistant} = this.props.location.state;
         this.props.dispatch(flowActions.fetchFlowRequest(assistant.ID));
-        this.props.dispatch(databaseActions.getDatabasesList())
+        http.get(`/databases/options`)
+            .then(res => this.setState({databaseOptions: res.data.data}));
     }
 
     componentWillReceiveProps(nextProps) {
@@ -96,7 +98,7 @@ class Flow extends Component {
                                 reorderBlocks={this.reorderBlocks}
                                 currentGroup={this.state.currentGroup}
                                 allGroups={this.props.blockGroups}
-                                databasesList={this.props.databasesList}/>
+                                databaseOptions={this.state.databaseOptions}/>
                     </div>
                 </div>
             </div>
@@ -120,9 +122,6 @@ function mapStateToProps(state) {
         isDeletingGroup: state.flow.isDeletingGroup,
 
         isAddingBlock: state.flow.isAddingBlock,
-
-        databasesList: state.database.databasesList,
-
     };
 }
 

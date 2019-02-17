@@ -80,7 +80,7 @@ class NewBlockModal extends Component {
                                  key="Solutions">
                             <Solutions options={this.state}
                                        handleNewBlock={this.handleNewBlock}
-                                       databasesList={this.props.databasesList}/>
+                                       databaseOptions={this.props.databaseOptions}/>
                         </TabPane>
 
                     </Tabs>

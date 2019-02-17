@@ -7,7 +7,6 @@ import NewDatabaseModal from "./NewDatabaseModal/NewDatabaseModal";
 import Header from "../../../components/Header/Header";
 import {http} from "../../../helpers";
 import {databaseActions} from "../../../store/actions";
-import {ColumnsOptions} from "./NewDatabaseModal/ColumnsOptions";
 
 import DatabaseInfo from "./DatabaseInfo/DatabaseInfo"
 

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Card, Form} from "antd";
-import {getInitialVariables, initActionType} from './CardTypesHelpers'
+import {getInitialVariables, initActionType, getBlockId} from './CardTypesHelpers'
 import {
     ActionFormItem,
     AfterMessageFormItem,
@@ -32,21 +32,7 @@ class UserInput extends Component {
         if (!err) {
             const flowOptions = this.props.options.flow;
 
-            const getBlockId = () => {
-                if (values.blockToGoID)
-                    return values.blockToGoID;
-                else if (values.blockToGoIDGroup)
-                    return values.blockToGoIDGroup;
-                else
-                // find my id and my next block id then return it
-                // else retrun null
-                    for (const [index, block] of Object.entries(this.props.modalState.currentGroup.blocks))
-                        if (formBlock.ID === block.ID)
-                            if (this.props.modalState.currentGroup.blocks[Number(index) + 1].ID)
-                                return this.props.modalState.currentGroup.blocks[Number(index) + 1].ID;
-                            else
-                                return null
-            };
+
             let options = {
                 block: {
                     Type: 'User Input',
@@ -56,7 +42,7 @@ class UserInput extends Component {
                     DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
                     Content: {
                         text: values.text,
-                        blockToGoID: getBlockId(values.blockToGoID, values.blockToGoIDGroup),
+                        blockToGoID: getBlockId(values.blockToGoID, values.blockToGoIDGroup, this.props.modalState.currentGroup.blocks, formBlock),
                         action: values.action,
                         afterMessage: values.afterMessage || ""
                     }

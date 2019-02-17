@@ -33,6 +33,22 @@ export const onFileTypeChange = (checkedValues) => {
     return {fileTypes: checkedValues}
 };
 
+export const getBlockId = (blockToGoID, blockToGoIDGroup, blocks, formBlock) => {
+    if (blockToGoID)
+        return blockToGoID;
+    else if (blockToGoIDGroup)
+        return blockToGoIDGroup;
+    else
+    // find my id and my next block id then return it
+    // else retrun null
+        for (const [index, block] of Object.entries(blocks))
+            if (formBlock.ID === block.ID)
+                if (blocks[Number(index) + 1].ID)
+                    return blocks[Number(index) + 1].ID;
+                else
+                    return null
+};
+
 export const getInitialVariables = (flowOptions, modalState, type) => {
     let block = modalState.block ? modalState.block : {Content: {}};
     let blockOptions = {};

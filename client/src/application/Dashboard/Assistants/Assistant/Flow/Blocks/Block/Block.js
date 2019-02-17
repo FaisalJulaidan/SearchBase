@@ -10,7 +10,8 @@ class Block extends Component {
     deleteBlock = (block) => this.props.deleteBlock(block);
 
     render() {
-        const {block, databasesList} = this.props;
+        const {block, options} = this.props;
+        const {databases} = options;
 
         return (
             <Collapse bordered={true}>
@@ -84,7 +85,9 @@ class Block extends Component {
                     {block.Content.databaseID ?
                         <Row>
                             <Col span={6}>Database</Col>
-                            <Col span={12}>{databasesList?.find(database => database.ID === block.Content.databaseID).Name}</Col>
+                            <Col
+                                span={12}>{databases.databaseTypes?databases.databaseTypes
+                                .find(databaseType => databaseType === block.Content.databaseType):null}</Col>
                             <Divider/>
                         </Row>
                         : null

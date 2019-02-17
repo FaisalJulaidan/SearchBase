@@ -125,7 +125,7 @@ class Blocks extends Component {
                                                         <Block block={block}
                                                                editBlock={this.editBlock}
                                                                deleteBlock={this.deleteBlock}
-                                                               databasesList={this.props.databasesList}
+                                                               options={this.props.options}
                                                         />
                                                     </div>
                                                 )}
@@ -146,7 +146,6 @@ class Blocks extends Component {
                                currentGroup={this.props.currentGroup}
                                allBlocks={this.state.blocks}
                                allGroups={this.props.allGroups}
-                               databasesList={this.props.databasesList}
                                options={this.props.options}/>
 
                 <EditBlockModal visible={this.state.editBlockVisible}
@@ -158,9 +157,7 @@ class Blocks extends Component {
                                 currentGroup={this.props.currentGroup}
                                 allBlocks={this.state.blocks}
                                 allGroups={this.props.allGroups}
-                                databasesList={this.props.databasesList}
-                                options={this.props.options}
-                />
+                                options={this.props.options}/>
             </div>
         );
     }

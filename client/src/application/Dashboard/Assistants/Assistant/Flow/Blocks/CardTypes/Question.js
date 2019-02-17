@@ -35,7 +35,7 @@ class Question extends Component {
     onSubmit = () => this.props.form.validateFields(['text', 'isSkippable', 'storeInDB', 'dataType'],
         (err, values) => {
             if (!err) {
-                const {flowOptions} = getInitialVariables(this.props.options);
+                const {flowOptions} = this.props.options.flow;
                 let options = {
                     block: {
                         Type: 'Question',
@@ -54,8 +54,8 @@ class Question extends Component {
                     this.handleNewBlock(options);
                 else {
                     // Edit Block
-                    options.block.ID = this.props.options.block.ID;
-                    options.block.Order = this.props.options.block.Order;
+                    options.block.ID = this.props.modalState.block.ID;
+                    options.block.Order = this.props.modalState.block.Order;
                     this.handleEditBlock(options);
                 }
             }
@@ -102,15 +102,18 @@ class Question extends Component {
         this.handleEditBlock = this.props.handleEditBlock;
         this.handleDeleteBlock = this.props.handleDeleteBlock;
 
-        const {allGroups, block} = getInitialVariables(this.props.options);
-        this.setState(initActionType(block, allGroups));
+        const {modalState, options} = this.props;
+        const {block} = getInitialVariables(options.flow, modalState);
+        this.setState(initActionType(block, this.props.modalState.allGroups));
         this.setState({answers: block.Content.answers || []})
     }
 
 
     render() {
-        const {flowOptions, allGroups, allBlocks, blockOptions, block} = getInitialVariables(this.props.options, 'Question');
-        const {getFieldDecorator} = this.props.form;
+        const {modalState, options, form} = this.props;
+        const {blockOptions, block} = getInitialVariables(options.flow ,modalState, 'Question');
+        const {allGroups, allBlocks, currentGroup, layout} = modalState;
+        const {getFieldDecorator} = form;
 
         const {tags, inputVisible, inputValue} = this.state;
 
@@ -121,15 +124,16 @@ class Question extends Component {
                 <Form layout='horizontal'>
                     <QuestionFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
-                                      layout={this.props.options.layout}
+                                      layout={layout}
                                       placeholder="Ex: What best describes you?"/>
 
                     <DataTypeFormItem FormItem={FormItem} block={block}
-                                      getFieldDecorator={getFieldDecorator} flowOptions={flowOptions}
-                                      layout={this.props.options.layout}/>
+                                      getFieldDecorator={getFieldDecorator}
+                                      options={this.props.options}
+                                      layout={layout}/>
 
                     <FormItem label="Answers"
-                              {...this.props.options.layout}>
+                              {...layout}>
                         <Button onClick={this.showAddAnswer}
                                 type="primary" icon="plus" shape="circle" size={"small"}></Button>
                         {
@@ -156,11 +160,11 @@ class Question extends Component {
 
                     <SkippableFormItem FormItem={FormItem} block={block}
                                        getFieldDecorator={getFieldDecorator}
-                                       layout={this.props.options.layout}/>
+                                       layout={layout}/>
 
                     <StoreInDBFormItem FormItem={FormItem} block={block} blockOptions={blockOptions}
                                        getFieldDecorator={getFieldDecorator}
-                                       layout={this.props.options.layout}/>
+                                       layout={layout}/>
 
                 </Form>
 
@@ -171,7 +175,7 @@ class Question extends Component {
                     <Form>
                         <FormItem label="Answer"
                                   extra="This will be shown as answer in chatbot"
-                                  {...this.props.options.layout}>
+                                  {...layout}>
                             {getFieldDecorator('answer', {
                                 rules: [{
                                     required: true,
@@ -182,7 +186,7 @@ class Question extends Component {
                             )}
                         </FormItem>
 
-                        <FormItem label="Keywords" {...this.props.options.layout}
+                        <FormItem label="Keywords" {...layout}
                                   extra="Adding related keywords to the answer is necessary
                                   for retrieving accurate solutions to the user">
                             <div>
@@ -217,24 +221,30 @@ class Question extends Component {
                             </div>
                         </FormItem>
 
-                        <ActionFormItem FormItem={FormItem} blockOptions={blockOptions} block={block}
+                        <ActionFormItem FormItem={FormItem} blockOptions={blockOptions}
+                                        block={block}
                                         setStateHandler={(state) => this.setState(state)}
                                         getFieldDecorator={getFieldDecorator}
-                                        layout={this.props.options.layout}/>
+                                        layout={layout}/>
 
-                        <ShowGoToBlockFormItem FormItem={FormItem} allBlocks={allBlocks} block={block}
+                        <ShowGoToBlockFormItem FormItem={FormItem}
+                                               block={block}
+                                               allBlocks={allBlocks}
                                                showGoToBlock={this.state.showGoToBlock}
                                                getFieldDecorator={getFieldDecorator}
-                                               layout={this.props.options.layout}/>
+                                               layout={layout}/>
 
-                        <ShowGoToGroupFormItem FormItem={FormItem} allGroups={allGroups}
+                        <ShowGoToGroupFormItem FormItem={FormItem}
+                                               block={block}
+                                               allGroups={allGroups}
+                                               currentGroup={currentGroup}
                                                showGoToGroup={this.state.showGoToGroup}
                                                getFieldDecorator={getFieldDecorator}
-                                               layout={this.props.options.layout}/>
+                                               layout={layout}/>
 
                         <AfterMessageFormItem FormItem={FormItem} block={block}
                                               getFieldDecorator={getFieldDecorator}
-                                              layout={this.props.options.layout}/>
+                                              layout={layout}/>
                     </Form>
 
                 </Modal>

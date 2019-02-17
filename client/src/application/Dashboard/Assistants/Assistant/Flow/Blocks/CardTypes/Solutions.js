@@ -17,7 +17,6 @@ class Solutions extends Component {
     state = {
         showGoToBlock: false,
         showGoToGroup: false,
-        groupName: ''
     };
 
     componentWillMount() {
@@ -25,13 +24,14 @@ class Solutions extends Component {
         this.handleEditBlock = this.props.handleEditBlock;
         this.handleDeleteBlock = this.props.handleDeleteBlock;
 
-        const {allGroups, block} = getInitialVariables(this.props.options);
-        this.setState(initActionType(block, allGroups));
+        const {modalState, options} = this.props;
+        const {block} = getInitialVariables(options.flow, modalState);
+        this.setState(initActionType(block, this.props.modalState.allGroups));
     }
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
         if (!err) {
-            const {flowOptions} = getInitialVariables(this.props.options);
+            const {flowOptions} = this.props.options.flow;
             let options = {
                 block: {
                     Type: 'Solutions',
@@ -53,8 +53,8 @@ class Solutions extends Component {
                 this.handleNewBlock(options);
             else {
                 // Edit Block
-                options.block.ID = this.props.options.block.ID;
-                options.block.Order = this.props.options.block.Order;
+                options.block.ID = this.props.modalState.block.ID;
+                options.block.Order = this.props.modalState.block.Order;
                 this.handleEditBlock(options);
             }
         }
@@ -62,8 +62,10 @@ class Solutions extends Component {
 
 
     render() {
-        const {flowOptions, allGroups, allBlocks, blockOptions, block} = getInitialVariables(this.props.options, 'Solutions');
-        const {getFieldDecorator} = this.props.form;
+        const {modalState, options, form} = this.props;
+        const {blockOptions, block} = getInitialVariables(options.flow ,modalState, 'Solutions');
+        const {allGroups, allBlocks, currentGroup, layout} = modalState;
+        const {getFieldDecorator} = form;
 
         const buttons = ButtonsForm(this.handleNewBlock, this.handleEditBlock, this.handleDeleteBlock, this.onSubmit, block);
 
@@ -73,7 +75,7 @@ class Solutions extends Component {
 
                     <FormItem label="Show Top Results"
                               extra="Number of results you want to return (Best matches e.g. Clients, Candidates, etc.)"
-                              {...this.props.options.layout}>
+                              {...layout}>
                         {getFieldDecorator('showTop', {
                             initialValue: block.Content.showTop,
                             rules: [{
@@ -87,27 +89,30 @@ class Solutions extends Component {
 
                     <ScannedDatabaseFormItem FormItem={FormItem} block={block}
                                           getFieldDecorator={getFieldDecorator}
-                                          layout={this.props.options.layout}
-                                          databasesList={this.props.databasesList}/>
+                                             layout={layout}
+                                          options={this.props.options}/>
 
                     <ActionFormItem FormItem={FormItem} blockOptions={blockOptions} block={block}
                                     setStateHandler={(state) => this.setState(state)}
                                     getFieldDecorator={getFieldDecorator}
-                                    layout={this.props.options.layout}/>
+                                    layout={layout}/>
 
                     <ShowGoToBlockFormItem FormItem={FormItem} allBlocks={allBlocks} block={block}
                                            showGoToBlock={this.state.showGoToBlock}
                                            getFieldDecorator={getFieldDecorator}
-                                           layout={this.props.options.layout}/>
+                                           layout={layout}/>
 
-                    <ShowGoToGroupFormItem FormItem={FormItem} allGroups={allGroups} groupName={this.state.groupName}
+                    <ShowGoToGroupFormItem FormItem={FormItem}
+                                           block={block}
+                                           allGroups={allGroups}
+                                           currentGroup={currentGroup}
                                            showGoToGroup={this.state.showGoToGroup}
                                            getFieldDecorator={getFieldDecorator}
-                                           layout={this.props.options.layout}/>
+                                           layout={layout}/>
 
                     <AfterMessageFormItem FormItem={FormItem} block={block}
                                           getFieldDecorator={getFieldDecorator}
-                                          layout={this.props.options.layout}/>
+                                          layout={layout}/>
 
                 </Form>
             </Card>

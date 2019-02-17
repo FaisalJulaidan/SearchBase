@@ -19,10 +19,10 @@ class NewBlockModal extends Component {
             labelCol: {span: 6},
             wrapperCol: {span: 14}
         },
-        flowOptions: this.props.options.flow,
         allBlocks: [],
         allGroups: [],
         currentGroup: null,
+        block: null
     };
 
     // componentDidMount() {
@@ -59,28 +59,31 @@ class NewBlockModal extends Component {
                     <Tabs type="card" onChange={this.onChangeTab}>
                         <TabPane tab={<span><Icon type="form"/>User Input</span>}
                                  key="UserInput">
-                            <UserInput options={this.state}
+                            <UserInput modalState={this.state}
                                        addNewDataCategory={this.showNewDataCategoryModal}
-                                       handleNewBlock={this.handleNewBlock}/>
+                                       handleNewBlock={this.handleNewBlock}
+                                       options={this.props.options}/>
                         </TabPane>
 
                         <TabPane tab={<span><Icon type="question-circle"/>Question</span>}
                                  key="Question">
-                            <Question options={this.state}
-                                      handleNewBlock={this.handleNewBlock}/>
+                            <Question modalState={this.state}
+                                      handleNewBlock={this.handleNewBlock}
+                                      options={this.props.options}/>
                         </TabPane>
 
                         <TabPane tab={<span><Icon type="file-add"/>File Upload</span>}
                                  key="FileUpload">
-                            <FileUpload options={this.state}
-                                        handleNewBlock={this.handleNewBlock}/>
+                            <FileUpload modalState={this.state}
+                                        handleNewBlock={this.handleNewBlock}
+                                        options={this.props.options}/>
                         </TabPane>
 
                         <TabPane tab={<span><Icon type="tag"/>Solutions</span>}
                                  key="Solutions">
-                            <Solutions options={this.state}
+                            <Solutions modalState={this.state}
                                        handleNewBlock={this.handleNewBlock}
-                                       databasesList={this.props.databasesList}/>
+                                       options={this.props.options}/>
                         </TabPane>
 
                     </Tabs>

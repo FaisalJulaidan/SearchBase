@@ -15,10 +15,10 @@ class EditBlockModal extends Component {
             labelCol: {span: 6},
             wrapperCol: {span: 14}
         },
-        flowOptions: this.props.options.flow,
         allBlocks: [],
         allGroups: [],
-        currentGroup: null
+        currentGroup: null,
+        block: null
     };
 
     // componentDidMount() {
@@ -29,10 +29,9 @@ class EditBlockModal extends Component {
     componentWillReceiveProps(nextProps) {
         this.setState({
             block: nextProps.block,
-
             allBlocks: nextProps.allBlocks,
             allGroups: nextProps.allGroups,
-            currentGroup: nextProps.currentGroup
+            currentGroup: nextProps.currentGroup,
         })
     }
 
@@ -52,18 +51,21 @@ class EditBlockModal extends Component {
                    footer={null}>
 
                 {this.props.block.Type === "User Input" ?
-                    <UserInput options={this.state} handleEditBlock={this.handleEditBlock}
-                               handleDeleteBlock={this.props.handleDeleteBlock}/> : null}
-                {this.props.block.Type === "Question" ?
-                    <Question options={this.state} handleEditBlock={this.handleEditBlock}
-                              handleDeleteBlock={this.props.handleDeleteBlock}/> : null}
-                {this.props.block.Type === "File Upload" ?
-                    <FileUpload options={this.state} handleEditBlock={this.handleEditBlock}
-                                handleDeleteBlock={this.props.handleDeleteBlock}/> : null}
-                {this.props.block.Type === "Solutions" ?
-                    <Solutions options={this.state} handleEditBlock={this.handleEditBlock}
+                    <UserInput modalState={this.state} handleEditBlock={this.handleEditBlock}
                                handleDeleteBlock={this.props.handleDeleteBlock}
-                               databasesList={this.props.databasesList}/> : null}
+                               options={this.props.options}/> : null}
+                {this.props.block.Type === "Question" ?
+                    <Question modalState={this.state} handleEditBlock={this.handleEditBlock}
+                              handleDeleteBlock={this.props.handleDeleteBlock}
+                              options={this.props.options}/> : null}
+                {this.props.block.Type === "File Upload" ?
+                    <FileUpload modalState={this.state} handleEditBlock={this.handleEditBlock}
+                                handleDeleteBlock={this.props.handleDeleteBlock}
+                                options={this.props.options}/> : null}
+                {this.props.block.Type === "Solutions" ?
+                    <Solutions modalState={this.state} handleEditBlock={this.handleEditBlock}
+                               handleDeleteBlock={this.props.handleDeleteBlock}
+                               options={this.props.options}/> : null}
 
             </Modal>
         );

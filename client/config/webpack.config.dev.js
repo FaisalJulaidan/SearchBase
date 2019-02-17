@@ -53,7 +53,11 @@ const getStyleLoaders = (cssOptions, preProcessor) => {
             loader: require.resolve('less-loader'),
             options: {
                 importLoaders: 1,
-                javascriptEnabled: true
+                javascriptEnabled: true,
+                modifyVars: {
+                    'primary-color': '#9254de',
+                    'link-color': '#9254de',
+                }
             },
         },
         {

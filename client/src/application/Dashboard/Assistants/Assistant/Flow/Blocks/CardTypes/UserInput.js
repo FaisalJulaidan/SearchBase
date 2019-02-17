@@ -20,7 +20,6 @@ class UserInput extends Component {
     state = {
         showGoToBlock: false,
         showGoToGroup: false,
-        groupName: ''
     };
 
     componentWillMount() {
@@ -28,17 +27,19 @@ class UserInput extends Component {
         this.handleEditBlock = this.props.handleEditBlock;
         this.handleDeleteBlock = this.props.handleDeleteBlock;
 
-        const {allGroups, block} = getInitialVariables(this.props.options, "User Input");
-        this.setState(initActionType(block, allGroups));
+        const {modalState, options} = this.props;
+        const {block} = getInitialVariables(options.flow, modalState);
+        this.setState(initActionType(block, this.props.modalState.allGroups));
     }
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
         if (!err) {
-            const {flowOptions} = getInitialVariables(this.props.options);
+            const flowOptions = this.props.options.flow;
+            console.log(this.props.options);
             let options = {
                 block: {
                     Type: 'User Input',
-                    GroupID: this.props.options.currentGroup.id,
+                    GroupID: this.props.modalState.currentGroup.id,
                     StoreInDB: values.storeInDB,
                     Skippable: values.isSkippable || false,
                     DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
@@ -55,8 +56,8 @@ class UserInput extends Component {
                 this.handleNewBlock(options);
             else {
                 // Edit Block
-                options.block.ID = this.props.options.block.ID;
-                options.block.Order = this.props.options.block.Order;
+                options.block.ID = this.props.modalState.block.ID;
+                options.block.Order = this.props.modalState.block.Order;
                 this.handleEditBlock(options);
             }
 
@@ -65,8 +66,10 @@ class UserInput extends Component {
 
 
     render() {
-        const {flowOptions, allGroups, allBlocks, blockOptions, block} = getInitialVariables(this.props.options, 'User Input');
-        const {getFieldDecorator} = this.props.form;
+        const {modalState, options, form} = this.props;
+        const {blockOptions, block} = getInitialVariables(options.flow ,modalState, 'User Input');
+        const {allGroups, allBlocks, currentGroup, layout} = modalState;
+        const {getFieldDecorator} = form;
 
         const buttons = ButtonsForm(this.handleNewBlock, this.handleEditBlock, this.handleDeleteBlock, this.onSubmit, block);
 
@@ -75,39 +78,43 @@ class UserInput extends Component {
                 <Form layout='horizontal'>
                     <QuestionFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
-                                      layout={this.props.options.layout}
+                                      layout={layout}
                                       placeholder="Ex: What is your email?"/>
 
                     <DataTypeFormItem FormItem={FormItem} block={block}
-                                      getFieldDecorator={getFieldDecorator} flowOptions={flowOptions}
-                                      layout={this.props.options.layout}/>
+                                      getFieldDecorator={getFieldDecorator}
+                                      options={this.props.options}
+                                      layout={layout}/>
 
                     <ActionFormItem FormItem={FormItem} blockOptions={blockOptions} block={block}
                                     setStateHandler={(state) => this.setState(state)}
                                     getFieldDecorator={getFieldDecorator}
-                                    layout={this.props.options.layout}/>
+                                    layout={layout}/>
 
                     <ShowGoToBlockFormItem FormItem={FormItem} allBlocks={allBlocks} block={block}
                                            showGoToBlock={this.state.showGoToBlock}
                                            getFieldDecorator={getFieldDecorator}
-                                           layout={this.props.options.layout}/>
+                                           layout={layout}/>
 
-                    <ShowGoToGroupFormItem FormItem={FormItem} allGroups={allGroups} groupName={this.state.groupName}
+                    <ShowGoToGroupFormItem FormItem={FormItem}
+                                           block={block}
+                                           allGroups={allGroups}
+                                           currentGroup={currentGroup}
                                            showGoToGroup={this.state.showGoToGroup}
                                            getFieldDecorator={getFieldDecorator}
-                                           layout={this.props.options.layout}/>
+                                           layout={layout}/>
 
                     <AfterMessageFormItem FormItem={FormItem} block={block}
                                           getFieldDecorator={getFieldDecorator}
-                                          layout={this.props.options.layout}/>
+                                          layout={layout}/>
 
                     <SkippableFormItem FormItem={FormItem} block={block}
                                        getFieldDecorator={getFieldDecorator}
-                                       layout={this.props.options.layout}/>
+                                       layout={layout}/>
 
                     <StoreInDBFormItem FormItem={FormItem} block={block} blockOptions={blockOptions}
                                        getFieldDecorator={getFieldDecorator}
-                                       layout={this.props.options.layout}/>
+                                       layout={layout}/>
 
                 </Form>
             </Card>

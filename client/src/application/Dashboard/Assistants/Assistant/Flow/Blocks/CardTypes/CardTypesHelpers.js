@@ -34,9 +34,8 @@ export const onFileTypeChange = (checkedValues) => {
     return {fileTypes: checkedValues}
 };
 
-export const getInitialVariables = (options, type) => {
-    const {flowOptions, allGroups, allBlocks} = options;
-    let block = options.block ? options.block : {Content: {}};
+export const getInitialVariables = (flowOptions, modalState, type) => {
+    let block = modalState.block ? modalState.block : {Content: {}};
     let blockOptions = {};
     // extract the correct blockType from blockTypes[]
     for (const blockType of flowOptions.blockTypes)
@@ -44,5 +43,5 @@ export const getInitialVariables = (options, type) => {
             blockOptions = blockType;
             break;
         }
-    return {flowOptions, allGroups, allBlocks, blockOptions, block}
+    return {blockOptions, block}
 };

@@ -42,8 +42,8 @@ class UserType(Enum):
 
 
 class DatabaseType(Enum):
-    Candidates = {'name': 'Candidates', 'userType': UserType.CandidateSeeker }
-    Jobs = {'name': 'Jobs', 'userType': UserType.JobSeeker }
+    Candidates = {'name': 'Candidates', 'userType': UserType.CandidateSeeker.name}
+    Jobs = {'name': 'Jobs', 'userType': UserType.JobSeeker.name}
 
 
 # === Data Types Stuff === #

@@ -9,23 +9,23 @@ const CheckboxGroup = Checkbox.Group;
 ////////////////////////////////////////////
 export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block, placeholder}) => {
     return (
-    <FormItem label="Question"
-              extra="The above text will be shown in a bubble inside the chat"
-              {...layout}>
-        {getFieldDecorator('text', {
-            initialValue: block.Content.text,
-            rules: [{
-                required: true,
-                message: "Please input a question",
-            }],
-        })(
-            <Input placeholder={placeholder}/>
-        )}
-    </FormItem>
+        <FormItem label="Question"
+                  extra="The above text will be shown in a bubble inside the chat"
+                  {...layout}>
+            {getFieldDecorator('text', {
+                initialValue: block.Content.text,
+                rules: [{
+                    required: true,
+                    message: "Please input a question",
+                }],
+            })(
+                <Input placeholder={placeholder}/>
+            )}
+        </FormItem>
     )
 };
 
-export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, flowOptions, block}) => (
+export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, options, block}) => (
     <FormItem label="Data Type" {...layout}
               extra="Selecting a Data Type will result in a smarter AI processing and accurate data collection">
         {
@@ -38,7 +38,7 @@ export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, flowOptio
             })(
                 <Select placeholder="Will validate the input and categorise user inputs">
                     {
-                        flowOptions.dataTypes.map((type, i) =>
+                        options.flow.dataTypes.map((type, i) =>
                             <Option key={i} value={type.name}>{type.name}</Option>)
                     }
                 </Select>
@@ -138,17 +138,21 @@ export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allB
     );
 };
 
-export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, allGroups, showGoToGroup, groupName}) => {
+export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, currentBlock, currentGroup, allGroups, showGoToGroup}) => {
+
+    allGroups = allGroups.filter(group => group.id !== currentGroup.id);
+    const selectedGroup = allGroups.find(group => !!group.blocks.find(block => block.id === currentBlock?.Content?.goToBlockID));
     return (
         showGoToGroup ?
             (
                 <FormItem label="Go To Specific Group"
                           extra="The selected group will start from its first block"
                           {...layout}>
+                    {console.log(selectedGroup)}
                     {
                         getFieldDecorator('blockToGoIDGroup',
                             {
-                                initialValue: groupName ? groupName : undefined,
+                                initialValue: selectedGroup ? selectedGroup.name : undefined,
                                 rules: [{required: true, message: "Please select your next group"}]
                             }
                         )(
@@ -207,27 +211,25 @@ export const FileTypesFormItem = ({FormItem, block, layout, getFieldDecorator, t
     </FormItem>
 );
 
-export const ScannedDatabaseFormItem = ({FormItem, block, getFieldDecorator, layout, databasesList}) => (
+export const ScannedDatabaseFormItem = ({FormItem, block, getFieldDecorator, layout, options}) => (
     <FormItem label="Database" {...layout}
               extra="The database to be scanned for solutions (Jobs, Candidate...)">
         {
-                getFieldDecorator('databaseID', {
-                    initialValue: block.Content.databaseID ?
-                        databasesList.find(database => database.ID === block.Content.databaseID).Name
-                        : undefined,
-                    rules: [{
-                        required: true,
-                        message: "Please select a database. " +
-                            "If you don't have one please go to Database section form the left menu and upload one, " +
-                            "otherwise you won't be able to creat a Solution block and search for solutions in the chatbot",
-                    }],
-                })(
-                    <Select placeholder="EX: Jobs database">{
-                        databasesList.map((database, i) =>
-                            <Option key={i}
-                                    value={database.ID}>{database.Name}</Option>)
-                    }</Select>
-                )
+            getFieldDecorator('databaseType', {
+                initialValue: block.Content.databaseType ?
+                    options.databases.types.find(type => type === block.Content.databaseType)
+                    : undefined,
+                rules: [{
+                    required: true,
+                    message: "Please select a database type " +
+                        "If you don't have one please go to Database section form the left menu and upload one, " +
+                        "otherwise you won't be able to creat a Solution block and search for solutions in the chatbot",
+                }],
+            })(
+                <Select placeholder="EX: Jobs database">{options.databases.types.map((type, i) =>
+                    <Option key={i} value={type}>{type}</Option>)
+                }</Select>
+            )
         }
     </FormItem>
 );

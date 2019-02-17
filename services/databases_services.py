@@ -1,4 +1,4 @@
-from models import db, Callback, Database, Candidate, Client, Assistant, Job
+from models import db, Callback, Database, Candidate, Assistant, Job
 from services import assistant_services
 from typing import List
 import pandas
@@ -23,12 +23,6 @@ def fetchDatabase(id, companyID: int) -> Callback:
             print('fetch from candidate table')
             databaseContent = helpers.getListFromSQLAlchemyList(getAllCandidates(id))
 
-
-        elif database.Type == DatabaseType.Clients:
-            print('fetch from client table')
-            databaseContent = helpers.getListFromSQLAlchemyList(getAllClients(id))
-
-
         elif database.Type == DatabaseType.Jobs:
             print('fetch from candidate table')
             databaseContent = helpers.getListFromSQLAlchemyList(getAllJobs(id))
@@ -44,7 +38,6 @@ def fetchDatabase(id, companyID: int) -> Callback:
                     year = databaseContent[i]['StartDate'].year
                     del databaseContent[i]['StartDate']
                     databaseContent[i]['StartDate'] = '/'.join(map(str, [year, month, day]))
-
 
         if not databaseContent: raise Exception()
         return Callback(True, "", {'databaseInfo': helpers.getDictFromSQLAlchemyObj(database),
@@ -105,31 +98,6 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
                 candidates.append(new_record)
             db.session.add_all(candidates)
 
-        def uploadClients(databaseData, newDatabase):
-            clients = []
-            for record in databaseData["records"]:
-                new_record = Client(
-                    Database=newDatabase,
-                    Name=record.get('Name',{}).get('data'),
-                    Email=record.get('Email',{}).get('data'),
-                    Telephone=record.get('Telephone',{}).get('data'),
-                    LinkdinURL=record.get('LinkdinURL',{}).get('data'),
-                    PostCode=record.get('PostCode',{}).get('data'),
-                    Location=record.get('Location',{}).get('data'),
-                    NearbyStation=record.get('NearbyStation',{}).get('data'),
-                    JobSalaryOffered=record.get('JobSalaryOffered',{}).get('data') or None,
-                    Currency=createCurrency(record.get('Currency', {})),
-                    EmploymentTypeOffered=record.get('EmploymentTypeOffered',{}).get('data') or None,
-                    CandidatesNeeded=record.get('CandidatesNeeded',{}).get('data') or None,
-                    EssentialSkills=record.get('EssentialSkills',{}).get('data'),
-                    EssentialYearsExp=record.get('EssentialYearsExp',{}).get('data') or None,
-                    ContractRate=record.get('ContractRate',{}).get('data') or None,
-                    JobDescription=record.get('JobDescription',{}).get('data'),
-                    JobAvailability=record.get('JobAvailability',{}).get('data')
-                )
-                clients.append(new_record)
-            db.session.add_all(clients)
-
         def uploadJobs(databaseData, newDatabase):
             jobs = []
             for record in databaseData["records"]:
@@ -156,13 +124,10 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
 
         databaseData = data.get('newDatabase')
         databaseName = databaseData["databaseName"]
-        if databaseData['databaseType'] == enums.DatabaseType.Candidates.value:
+        if databaseData['databaseType'] == enums.DatabaseType.Candidates.name:
             newDatabase = createDatabase(databaseName, DatabaseType.Candidates)
             uploadCandidates(databaseData, newDatabase)
-        elif databaseData['databaseType'] == enums.DatabaseType.Clients.value:
-            newDatabase = createDatabase(databaseName, DatabaseType.Clients)
-            uploadClients(databaseData, newDatabase)
-        elif databaseData['databaseType'] == enums.DatabaseType.Jobs.value:
+        elif databaseData['databaseType'] == enums.DatabaseType.Jobs.name:
             newDatabase = createDatabase(databaseName, DatabaseType.Jobs)
             uploadJobs(databaseData, newDatabase)
         else:
@@ -196,15 +161,6 @@ def getAllCandidates(dbID) -> Callback:
         return Callback(False, 'Candidates could not be retrieved.')
 
 
-def getAllClients(dbID) -> Callback:
-    try:
-        return db.session.query(Client).filter(Client.DatabaseID == dbID).all()
-    except Exception as exc:
-        print("fetchCandidates() ERROR: ", exc)
-        raise Exception('Error: fetchCandidates()')
-
-
-
 def getAllJobs(dbID) -> Callback:
     try:
         return db.session.query(Job).filter(Job.DatabaseID == dbID).all()
@@ -230,7 +186,6 @@ def deleteDatabase(databaseID, companyID) -> Callback:
 
 
 # ----- Scanners (Pandas) ----- #
-
 def scan(session, assistantHashID):
     try:
 
@@ -247,8 +202,6 @@ def scan(session, assistantHashID):
         result = None
         if database.Type == enums.DatabaseType.Candidates:
             return scanCandidates(session)
-        elif database.Type == enums.DatabaseType.Clients:
-            pass
         elif database.Type == enums.DatabaseType.Jobs:
             pass
         else:
@@ -318,16 +271,13 @@ def scanCandidates(session):
 
 def getOptions() -> Callback:
     options =  {
-        'types': [a.value for a in enums.DatabaseType ],
+        'types': [dt.name for dt in enums.DatabaseType ],
         enums.DatabaseType.Candidates.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
                                              for c in Candidate.__table__.columns
                                              if (c.key != 'ID' and c.key != 'DatabaseID')],
         enums.DatabaseType.Jobs.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
                                        for c in Job.__table__.columns
                                        if (c.key != 'ID' and c.key != 'DatabaseID')],
-        enums.DatabaseType.Clients.name: [{'column': c.key, 'type': str(c.type), 'nullable': c.nullable}
-                                          for c in Client.__table__.columns
-                                          if (c.key != 'ID' and c.key != 'DatabaseID')],
         'currencyCodes': ['GBP', 'USD', 'EUR', 'AED', 'CAD']
     }
     return Callback(True, '', options)

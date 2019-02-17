@@ -60,6 +60,7 @@ def getFlow(assistant: Assistant) -> Callback:
                 'blocks': helpers.getListFromSQLAlchemyList(group.Blocks)
             })
         data = {'botVersion': bot_currentVersion,
+                'userTypes': [ut.name for ut in enums.UserType],
                 'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
                 'blockGroups':  blockGroups}
         return Callback(True, 'Flow retrieved successfully', data)

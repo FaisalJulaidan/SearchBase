@@ -156,6 +156,6 @@ Solutions = {
         "afterMessage": {"type": "string"},
         "databaseType": { "enum": [dbt.name for dbt in enums.DatabaseType]},
     },
-    "required": ["showTop", "action", "afterMessage", "blockToGoID", "databaseID"],
+    "required": ["showTop", "action", "afterMessage", "blockToGoID", "databaseType"],
     "additionalProperties": False
 }

@@ -406,42 +406,6 @@ def isValidBlock(block: dict, blockType: str):
     return Callback(True, "Valid block")
 
 
-def getOptions(industry=None) -> Callback:
-
-    options =  {
-        'botVersion': bot_currentVersion,
-        'types': [a.value for a in enums.BlockType],
-        'userTypes': [uiv.value for uiv in enums.UserType],
-        'dataTypes': [uiv.value for uiv in enums.DataType],
-        'databaseTypes': [dbt.name for dbt in enums.DatabaseType],
-        'blockTypes': [
-            {
-                'name': enums.BlockType.UserInput.value,
-                'actions': [a.value for a in enums.BlockAction],
-                'alwaysStoreInDB': True
-            },
-            {
-                'name': enums.BlockType.Question.value,
-                'actions': [a.value for a in enums.BlockAction],
-                'alwaysStoreInDB': False
-            },
-            {
-                'name': enums.BlockType.FileUpload.value,
-                'actions': [a.value for a in enums.BlockAction],
-                'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
-                'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH / 1000000)) + 'MB',
-                'alwaysStoreInDB': True
-            },
-            {
-                'name': enums.BlockType.Solutions.value,
-                'maxSolutions': 5,
-                'actions': [a.value for a in enums.BlockAction],
-            },
-        ]
-    }
-    return Callback(True, '', options)
-
-
 def getBlocksCountByAssistant(assistant: Assistant):
     try:
         return db.session.query(func.count(Block.ID)).filter(Block.AssistantID == assistant.ID).scalar()

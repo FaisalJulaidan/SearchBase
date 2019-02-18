@@ -32,14 +32,14 @@ class Question extends Component {
     };
 
     //Submit whole block
-    onSubmit = () => this.props.form.validateFields(['text', 'isSkippable', 'storeInDB', 'dataType'],
+    onSubmit = (formBlock) => this.props.form.validateFields(['text', 'isSkippable', 'storeInDB', 'dataType'],
         (err, values) => {
             if (!err) {
-                const {flowOptions} = this.props.options.flow;
+                const flowOptions = this.props.options.flow;
                 let options = {
                     block: {
                         Type: 'Question',
-                        GroupID: this.props.options.currentGroup.id,
+                        GroupID: this.props.modalState.currentGroup.id,
                         StoreInDB: values.storeInDB,
                         Skippable: values.isSkippable || false,
                         DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
@@ -50,13 +50,13 @@ class Question extends Component {
                     }
                 };
 
-                if (this.handleNewBlock)
-                    this.handleNewBlock(options);
+                if (this.props.handleNewBlock)
+                    this.props.handleNewBlock(options);
                 else {
                     // Edit Block
                     options.block.ID = this.props.modalState.block.ID;
                     options.block.Order = this.props.modalState.block.Order;
-                    this.handleEditBlock(options);
+                    this.props.handleEditBlock(options);
                 }
             }
     });
@@ -98,10 +98,6 @@ class Question extends Component {
 
 
     componentWillMount() {
-        this.handleNewBlock = this.props.handleNewBlock;
-        this.handleEditBlock = this.props.handleEditBlock;
-        this.handleDeleteBlock = this.props.handleDeleteBlock;
-
         const {modalState, options} = this.props;
         const {block} = getInitialVariables(options.flow, modalState);
         this.setState(initActionType(block, this.props.modalState.allGroups));
@@ -110,14 +106,14 @@ class Question extends Component {
 
 
     render() {
-        const {modalState, options, form} = this.props;
+        const {modalState, options, form, handleNewBlock, handleEditBlock, handleDeleteBlock} = this.props;
         const {blockOptions, block} = getInitialVariables(options.flow ,modalState, 'Question');
         const {allGroups, allBlocks, currentGroup, layout} = modalState;
         const {getFieldDecorator} = form;
 
         const {tags, inputVisible, inputValue} = this.state;
 
-        const buttons = ButtonsForm(this.handleNewBlock, this.handleEditBlock, this.handleDeleteBlock, this.onSubmit, block);
+        const buttons = ButtonsForm(handleNewBlock, handleEditBlock, handleDeleteBlock, this.onSubmit, block);
 
         return (
             <Card style={{width: '100%'}} actions={buttons}>

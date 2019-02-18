@@ -16,8 +16,6 @@ class Flow extends Component {
     componentDidMount() {
         const {assistant} = this.props.location.state;
         this.props.dispatch(flowActions.fetchFlowRequest(assistant.ID));
-        http.get(`/databases/options`)
-            .then(res => this.setState({databaseOptions: res.data.data}));
     }
 
     componentWillReceiveProps(nextProps) {

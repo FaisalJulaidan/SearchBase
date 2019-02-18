@@ -210,7 +210,7 @@ export const FileTypesFormItem = ({FormItem, block, layout, getFieldDecorator, t
     </FormItem>
 );
 
-export const ScannedDatabaseFormItem = ({FormItem, block, getFieldDecorator, layout, options}) => (
+export const DatabaseTypeFormItem = ({FormItem, block, getFieldDecorator, layout, options}) => (
     <FormItem label="Database" {...layout}
               extra="The database to be scanned for solutions (Jobs, Candidate...)">
         {

@@ -8,7 +8,6 @@ import UserInput from "../CardTypes/UserInput";
 import Question from "../CardTypes/Question";
 import FileUpload from "../CardTypes/FileUpload";
 import Solutions from "../CardTypes/Solutions";
-import NewDataCategoryModal from "../../../../../../../components/Modals/NewDataCategoryModal/NewDataCategoryModal";
 
 const TabPane = Tabs.TabPane;
 

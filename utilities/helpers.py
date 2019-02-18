@@ -125,7 +125,7 @@ def gen_dummy_data():
         "afterMessage": 'here is what we found!',
         "action": "End Chat",
         "blockToGoID": 0,
-        "databaseID": 1
+        "databaseType": enums.DatabaseType.Candidates.name
     }))
 
     # Create Roles

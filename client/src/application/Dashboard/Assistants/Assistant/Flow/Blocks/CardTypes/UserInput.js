@@ -31,8 +31,6 @@ class UserInput extends Component {
     onSubmit = (formBlock) => this.props.form.validateFields((err, values) => {
         if (!err) {
             const flowOptions = this.props.options.flow;
-
-
             let options = {
                 block: {
                     Type: 'User Input',

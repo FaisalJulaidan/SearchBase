@@ -38,6 +38,8 @@ export const getBlockId = (blockToGoID, blockToGoIDGroup, blocks, formBlock) => 
         return blockToGoID;
     else if (blockToGoIDGroup)
         return blockToGoIDGroup;
+    else if (formBlock === "NewBlock")
+        return null
     else
     // find my id and my next block id then return it
     // else retrun null

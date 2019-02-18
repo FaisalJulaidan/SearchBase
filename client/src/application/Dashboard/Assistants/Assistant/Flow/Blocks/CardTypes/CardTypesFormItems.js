@@ -179,7 +179,7 @@ export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, curr
 export const ButtonsForm = (handleNewBlock, handleEditBlock, handleDeleteBlock, onSubmit, block) => {
     return handleNewBlock ? [
         <Button key="cancel" onClick={() => onCancel(handleNewBlock, handleEditBlock)}>Cancel</Button>,
-        <Button key="submit" type="primary" onClick={onSubmit}>Add</Button>
+        <Button key="submit" type="primary" onClick={() => onSubmit('NewBlock')}>Add</Button>
     ] : [
         <Button key="delete" type="danger"
                 onClick={() => onDelete(block.ID, block.Type, handleDeleteBlock)}>

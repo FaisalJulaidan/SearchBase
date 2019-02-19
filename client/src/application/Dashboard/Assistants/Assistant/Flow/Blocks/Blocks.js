@@ -41,7 +41,9 @@ class Blocks extends Component {
         if (!result.destination) return;
 
         let blocks = reorder(this.state.blocks, result.source.index, result.destination.index);
-        for (const i in blocks) blocks[i].order = Number(i) + 1;
+        for (const i in blocks) {
+            blocks[i].Order = Number(i) + 1;
+        }
         this.setState({blocks});
         // send a request to the server
         this.props.reorderBlocks(blocks, this.props.currentGroup.id)
@@ -95,7 +97,7 @@ class Blocks extends Component {
     render() {
         return (
             <div className={styles.Panel}>
-                <div className={styles.Panel_Header}>
+                <div className={styles.Panel_Header_With_Button}>
                     <div>
                         <h3>{this.props.currentGroup.name} Blocks</h3>
                     </div>
@@ -123,6 +125,7 @@ class Blocks extends Component {
                                                         <Block block={block}
                                                                editBlock={this.editBlock}
                                                                deleteBlock={this.deleteBlock}
+                                                               options={this.props.options}
                                                         />
                                                     </div>
                                                 )}
@@ -142,7 +145,8 @@ class Blocks extends Component {
 
                                currentGroup={this.props.currentGroup}
                                allBlocks={this.state.blocks}
-                               allGroups={this.props.allGroups}/>
+                               allGroups={this.props.allGroups}
+                               options={this.props.options}/>
 
                 <EditBlockModal visible={this.state.editBlockVisible}
                                 handleEditBlock={this.handleEditBlock}
@@ -152,7 +156,8 @@ class Blocks extends Component {
                                 block={this.state.edittedBlock}
                                 currentGroup={this.props.currentGroup}
                                 allBlocks={this.state.blocks}
-                                allGroups={this.props.allGroups}/>
+                                allGroups={this.props.allGroups}
+                                options={this.props.options}/>
             </div>
         );
     }

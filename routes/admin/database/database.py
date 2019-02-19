@@ -40,7 +40,7 @@ def get_databasesList():
         # Return response
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
-        return helpers.jsonResponse(True, 200, callback.Message)
+        return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
 @database_router.route("/databases/<int:databaseID>", methods=['GET', 'DELETE'])
@@ -55,11 +55,12 @@ def get_database(databaseID):
         # Return response
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
+        print(callback.Data)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
     if request.method == "DELETE":
         callback: Callback = databases_services.deleteDatabase(databaseID, user['companyID'])
         # Return response
         if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
-        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+            return helpers.jsonResponse(False, 400, callback.Message)
+        return helpers.jsonResponse(True, 200, callback.Message)

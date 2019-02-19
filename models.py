@@ -331,7 +331,7 @@ class Database(db.Model):
 class Candidate(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Name = db.Column(db.String(64), nullable=True)
+    Name = db.Column(db.String(64), nullable=False)
     Email = db.Column(db.String(64), nullable=True)
     Telephone = db.Column(db.String(64), nullable=True)
     LinkdinURL = db.Column(db.String(512), nullable=True)
@@ -341,7 +341,6 @@ class Candidate(db.Model):
     Degree = db.Column(db.String(64), nullable=True)
     # Resume = db.Column(db.String(64), nullable=True) # this will be a file
     ContactTime = db.Column(db.String(64), nullable=True)
-    Availability = db.Column(db.String(64), nullable=True)
     CurrentSalary = db.Column(db.Float(), nullable=True)
     Currency = db.Column(CurrencyType)
     CurrentRole = db.Column(db.String(64), nullable=True)
@@ -355,7 +354,7 @@ class Candidate(db.Model):
     YearsExp = db.Column(db.Float(), nullable=True)
     PreferredLocation = db.Column(db.String(64), nullable=True)
     PreferredEmploymentType = db.Column(db.String(64), nullable=True)
-    DesiredHourlyRate = db.Column(db.Float(), nullable=True)
+    DesiredPayRate = db.Column(db.Float(), nullable=True)
 
 
     # Relationships:
@@ -368,11 +367,15 @@ class Candidate(db.Model):
 class Job(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    JobTitle = db.Column(db.String(64), nullable=True)
+    Title = db.Column(db.String(64), nullable=False)
+    Description = db.Column(db.String(64), nullable=False)
+    Availability = db.Column(db.String(64), nullable=True)
     Location = db.Column(db.String(64), nullable=True)
     PositionType = db.Column(db.String(64), nullable=True)
     EmploymentType = db.Column(db.String(64), nullable=True)
+    EssentialSkills = db.Column(db.String(512), nullable=True)
     Salary = db.Column(db.Float(), nullable=True)
+    PayRate = db.Column(db.Float(), nullable=True)
     Currency = db.Column(CurrencyType)
     StartDate = db.Column(db.DateTime(), nullable=True)
 
@@ -382,36 +385,36 @@ class Job(db.Model):
     Database = db.relationship('Database')
 
     def __repr__(self):
-        return '<Client {}>'.format(self.Name)
+        return '<Job {}>'.format(self.JobTitle)
 
-class Client(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Name = db.Column(db.String(64), nullable=True)
-    Email = db.Column(db.String(64), nullable=True)
-    Telephone = db.Column(db.String(64), nullable=True)
-    LinkdinURL = db.Column(db.String(128), nullable=True)
-    PostCode = db.Column(db.String(64), nullable=True)
-
-    Location = db.Column(db.String(64), nullable=True)
-    NearbyStation = db.Column(db.String(64), nullable=True)
-    JobSalaryOffered = db.Column(db.Float(), nullable=True)
-    Currency = db.Column(CurrencyType)
-    EmploymentTypeOffered = db.Column(db.String(64), nullable=True)
-    CandidatesNeeded = db.Column(db.Integer(), nullable=True)
-    EssentialSkills = db.Column(db.String(512), nullable=True)
-    EssentialYearsExp = db.Column(db.Float(), nullable=True)
-    ContractRate = db.Column(db.Float(), nullable=True)
-    JobDescription = db.Column(db.String(512), nullable=True)
-    JobAvailability = db.Column(db.String(64), nullable=True)
-
-    # Relationships:
-
-    DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
-    Database = db.relationship('Database')
-
-    def __repr__(self):
-        return '<Client {}>'.format(self.Name)
+# class Client(db.Model):
+#
+#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+#     Name = db.Column(db.String(64), nullable=False)
+#     Email = db.Column(db.String(64), nullable=True)
+#     Telephone = db.Column(db.String(64), nullable=True)
+#     LinkdinURL = db.Column(db.String(128), nullable=True)
+#     PostCode = db.Column(db.String(64), nullable=True)
+#
+#     Location = db.Column(db.String(64), nullable=True)
+#     NearbyStation = db.Column(db.String(64), nullable=True)
+#     JobSalaryOffered = db.Column(db.Float(), nullable=True)
+#     Currency = db.Column(CurrencyType)
+#     EmploymentTypeOffered = db.Column(db.String(64), nullable=True)
+#     CandidatesNeeded = db.Column(db.Integer(), nullable=True)
+#     EssentialSkills = db.Column(db.String(512), nullable=True)
+#     EssentialYearsExp = db.Column(db.Float(), nullable=True)
+#     ContractRate = db.Column(db.Float(), nullable=True)
+#     JobDescription = db.Column(db.String(512), nullable=True)
+#     JobAvailability = db.Column(db.String(64), nullable=True)
+#
+#     # Relationships:
+#
+#     DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
+#     Database = db.relationship('Database')
+#
+#     def __repr__(self):
+#         return '<Client {}>'.format(self.Name)
 
 
 

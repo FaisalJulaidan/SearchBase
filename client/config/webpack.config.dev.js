@@ -53,7 +53,11 @@ const getStyleLoaders = (cssOptions, preProcessor) => {
             loader: require.resolve('less-loader'),
             options: {
                 importLoaders: 1,
-                javascriptEnabled: true
+                javascriptEnabled: true,
+                modifyVars: {
+                    'primary-color': '#9254de',
+                    'link-color': '#9254de',
+                }
             },
         },
         {
@@ -121,7 +125,6 @@ module.exports = {
         // changing JS code would still trigger a refresh.
     ],
     output: {
-        path: path.join(__dirname, 'dist'),
         globalObject: 'this',
         // Add /* filename */ comments to generated require()s in the output.
         pathinfo: true,
@@ -246,6 +249,7 @@ module.exports = {
                             ),
 
                             plugins: [
+                                "@babel/plugin-proposal-optional-chaining",
                                 [
                                     require.resolve('babel-plugin-named-asset-import'),
                                     {

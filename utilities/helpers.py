@@ -85,7 +85,7 @@ def gen_dummy_data():
     }))
 
     db.session.add(Block(Type=enums.BlockType.UserInput, Order=2, StoreInDB=True, Skippable=False,
-                         Group=reader_a_blocksGroup, DataType=enums.DataType.Name, Content={
+                         Group=reader_a_blocksGroup, DataType=enums.DataType.CandidateSkills, Content={
         "action": "Go To Next Block",
         "text": "Give me some input",
         "blockToGoID": None,
@@ -119,13 +119,14 @@ def gen_dummy_data():
     #     }))
 
 
-    # db.session.add(Block(Type=enums.BlockType.Solutions, Order=4, StoreInDB=True, DataType=enums.DataType.NoType,
-    #                      Group=reader_a_blocksGroup, Content={
-    #     "showTop": 5,
-    #     "afterMessage": 'DONE!!!!',
-    #     "action": "End Chat",
-    #     "blockToGoID": 0
-    # }))
+    db.session.add(Block(Type=enums.BlockType.Solutions, Order=3, StoreInDB=True, DataType=enums.DataType.NoType,
+                         Group=reader_a_blocksGroup, Content={
+        "showTop": 5,
+        "afterMessage": 'here is what we found!',
+        "action": "End Chat",
+        "blockToGoID": 0,
+        "databaseType": enums.DatabaseType.Candidates.name
+    }))
 
     # Create Roles
     db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
@@ -136,10 +137,6 @@ def gen_dummy_data():
     db.session.add(Role(Name="Admin", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
     db.session.add(Role(Name="User", Company= sabic, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
 
-    # does not work currently
-    # db.session.add(Solution(Name="TestSolution", Content="",
-    #                         RequiredFilters=None, DisplayTitles=None,
-    #                         Type="RDB XML File Export", WebLink=None, IDReference=None, automaticSolutionAlerts=False, AssistantID=1))
 
     # Get Roles
     owner_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "Owner").first()
@@ -202,17 +199,17 @@ def gen_dummy_data():
 
     db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now(),
                                   TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
-                                  UserType=enums.UserType.Candidate, Assistant=reader_a))
+                                  UserType=enums.UserType.JobSeeker, Assistant=reader_a))
 
     db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now() - timedelta(days=10),
                                   TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
-                                  UserType=enums.UserType.Client,Assistant=reader_a))
+                                  UserType=enums.UserType.CandidateSeeker, Assistant=reader_a))
 
     # add chatbot session in bulk
     for i in range(50):
         db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now() - timedelta(days=i),
                                       TimeSpent=i+40, SolutionsReturned=i+3, QuestionsAnswered=i+4,
-                                      UserType=enums.UserType.Candidate, Assistant=reader_a))
+                                      UserType=enums.UserType.JobSeeker, Assistant=reader_a))
 
 
     db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidates, Company=aramco)
@@ -238,7 +235,7 @@ def addCandidate(db, name, ds, dp, cs, ye, pl, pe, ehr):
                      YearsExp = ye,
                      PreferredLocation = pl,
                      PreferredEmploymentType = pe,
-                     DesiredHourlyRate = ehr)
+                     DesiredPayRate = ehr)
 
 
 

@@ -1,8 +1,12 @@
-import {all, put, takeEvery} from 'redux-saga/effects'
+import {all, put, takeEvery, select} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {flowActions} from "../actions/flow.actions";
 import {http} from "../../helpers";
+import {checkBlockTogGoID} from "../../application/Dashboard/Assistants/Assistant/Flow/Blocks/CardTypes/CardTypesHelpers"
 import {alertError, alertSuccess, destroyMessage, loadingMessage} from "../../helpers/alert";
+
+
+export const getBlockGroups = (state) => state.flow.blockGroups;
 
 function* fetchFlow({assistantID}) {
     try {
@@ -91,6 +95,14 @@ function* addBlock({newBlock, groupID, assistantID}) {
         yield alertSuccess('Block Added', res.data.msg);
         yield put(flowActions.addBlockSuccess(res.data.msg));
 
+        ////////////////////////////
+        // NOT SURE ABOUT IT
+        // let blockGroups = yield select(getBlockGroups); // <-- get the state of block groups form reducer
+        // const currentUpdatedGroup = checkBlockTogGoID(null, blockGroups, groupID);
+        // debugger
+        // yield http.put(`/assistant/${assistantID}/flow`, {blocks: currentUpdatedGroup});
+        ////////////////////////////
+
         return yield put(flowActions.fetchFlowRequest(assistantID))
     } catch (error) {
         console.log(error);
@@ -102,11 +114,18 @@ function* addBlock({newBlock, groupID, assistantID}) {
 function* editBlock({edittedBlock, assistantID, currentBlocks}) {
     try {
         loadingMessage('Updating Block');
+
+        ////////////////////////////
         let currentUpdatedGroup = [];
         edittedBlock = edittedBlock.block;
         currentBlocks.map(block =>
             block.ID === edittedBlock.ID ? currentUpdatedGroup.push(edittedBlock) : currentUpdatedGroup.push(block)
         );
+
+        let blockGroups = yield select(getBlockGroups); // <-- get the state of block groups form reducer
+        currentUpdatedGroup = checkBlockTogGoID(currentUpdatedGroup, blockGroups);
+        ////////////////////////////
+
         const res = yield http.put(`/assistant/${assistantID}/flow`, {blocks: currentUpdatedGroup});
         yield destroyMessage();
         yield alertSuccess('Block Updated', res.data.msg);

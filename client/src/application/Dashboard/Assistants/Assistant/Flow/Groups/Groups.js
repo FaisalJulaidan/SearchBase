@@ -38,7 +38,6 @@ class Groups extends Component {
 
     ////// DELETE GROUP
     handleDeleteGroup = (deletedGroup) => {
-        console.log(deletedGroup);
         confirm({
             title: `Delete group confirmation`,
             content: `If you click OK, this group will be deleted with its associated blocks forever`,
@@ -53,7 +52,7 @@ class Groups extends Component {
     render() {
         return (
             <div className={styles.Panel}>
-                <div className={styles.Panel_Header}>
+                <div className={styles.Panel_Header_With_Button}>
                     <div>
                         <h3>Flow Groups</h3>
                     </div>

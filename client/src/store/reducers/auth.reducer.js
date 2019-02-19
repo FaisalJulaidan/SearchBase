@@ -2,7 +2,7 @@ import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
 let user = JSON.parse(localStorage.getItem('user'));
-const initialState = user ? {isAuthenticated: true, user} : {isAuthenticated: false, user: null};
+const initialState = user ? {isAuthenticated: true, user} : {isAuthenticated: false, user: null, isLoggingIn: false};
 
 export const auth = (state = initialState, action) => {
     switch (action.type) {

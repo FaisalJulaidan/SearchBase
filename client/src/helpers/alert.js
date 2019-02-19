@@ -20,7 +20,7 @@ export const alertError = (title, message) => {
     });
 };
 
-export const loadingMessage = title => message.loading(title);
+export const loadingMessage = (title, time = 1.5) => message.loading(title, time);
 
 export const destroyMessage = () => {
     message.destroy();

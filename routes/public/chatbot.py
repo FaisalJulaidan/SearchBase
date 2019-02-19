@@ -7,8 +7,8 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
 from config import BaseConfig
-from models import Callback, Assistant, db, ChatbotSession
-from services import chatbotSession_services, flow_services, solutions_services
+from models import Callback, db, ChatbotSession
+from services import chatbotSession_services, flow_services, databases_services
 from utilities import helpers
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
@@ -45,35 +45,20 @@ def chatbot(assistantIDAsHash):
         return helpers.jsonResponse(True, 200, "Collected data is successfully processed", {'sessionID': callback.Data.ID})
 
 
-@chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot/solutions", methods=['POST'])
-def getSolutions_forChatbot(assistantIDAsHash):
-
-    # Since this route is broken, return empty an list of solutions to continue development
-    return helpers.jsonResponse(True, 200, "TEST TEST", [])
-    #######################################################################################
-
-    # Find the assistant by hashid and not id
-    callback: Callback = getAssistantByHashID(assistantIDAsHash)
-    if not callback.Success:
-        return helpers.jsonResponse(False, 404, callback.Message, callback.Data)
-    assistant: Assistant = callback.Data
+@chatbot_router.route("/assistant/<string:assistantHashID>/chatbot/solutions", methods=['POST'])
+def getSolutions_forChatbot(assistantHashID):
 
     if request.method == "POST":
         # chatbot collected information
         data = request.json
-        solutions = []
 
         # If showTop is 0 then skip below return nothing and don't even call solutions_services
         if data['showTop'] > 0:
-            getSolutionRecord_callback: Callback = solutions_services.getFirstSolutionRecord(assistant.ID)#TODO change this to solutionID and func
-            if not getSolutionRecord_callback.Success:
-                return helpers.jsonResponse(False, 400, getSolutionRecord_callback.Message)
-
-            s_callback = solutions_services.getBasedOnKeywords(assistantID=assistant.ID, keywords=data['keywords'], solutionsRecord=getSolutionRecord_callback, max=data['showTop'])
-            if not s_callback.Success:
-                return helpers.jsonResponse(False, 400, s_callback.Message)
-
-        return helpers.jsonResponse(True, 200, "Solution list is here!", s_callback.Data)
+            callback: Callback = databases_services.scan(data, assistantHashID)
+            if not callback.Success:
+                return helpers.jsonResponse(False, 400, callback.Message)
+            return helpers.jsonResponse(True, 200, "Solutions list is here!", callback.Data)
+        return helpers.jsonResponse(True, 200, "show top is 0", [])
 
 
 @chatbot_router.route("/widgets/<path:path>", methods=['GET'])

@@ -1,23 +1,24 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Menu} from 'antd';
+import {Menu, Table, Spin, Button} from 'antd';
 
 import styles from "./Databases.module.less"
-import NewDatabaseModal from "./NewDataBaseModal/NewDatabaseModal";
+import NewDatabaseModal from "./NewDatabaseModal/NewDatabaseModal";
 import Header from "../../../components/Header/Header";
 import {http} from "../../../helpers";
 import {databaseActions} from "../../../store/actions";
 
+import DatabaseInfo from "./DatabaseInfo/DatabaseInfo"
 
 class Databases extends Component {
+
     state = {
-        visible: true,
+        visible: false,
     };
 
     componentWillMount() {
         http.get(`/databases/options`)
             .then(res => this.setState({databaseOptions: res.data.data}));
-
         this.props.dispatch(databaseActions.getDatabasesList());
     }
 
@@ -27,18 +28,30 @@ class Databases extends Component {
 
 
     uploadDatabase = newDatabase => this.props.dispatch(databaseActions.uploadDatabase({newDatabase: newDatabase}));
+    showDatabaseInfo = (databaseID) => this.props.dispatch(databaseActions.fetchDatabase(databaseID));
 
-    //
-    // editGroup = (editedGroup) => {
-    //     const {assistant} = this.props.location.state;
-    //     this.props.dispatch(flowActions.editGroupRequest({assistantID: assistant.ID, editedGroup: editedGroup}));
-    // };
-    //
-    // deleteGroup = (deletedGroup) => {
-    //     const {assistant} = this.props.location.state;
-    //     this.props.dispatch(flowActions.deleteGroupRequest({assistantID: assistant.ID, deletedGroup: deletedGroup}));
-    //     this.setState({currentGroup: {blocks: []}});
-    // };
+
+    componentWillUnmount() {
+        this.props.dispatch(databaseActions.resetFetchedDtabase())
+    }
+
+    getRecordsData = records => {
+        let x = [];
+
+        if (records) {
+            for (const record of records) {
+                let renderedRecord = {};
+                for (const key of Object.keys(record))
+                    if (key !== 'DatabaseID')
+                        renderedRecord[key] = record[key];
+
+                x.push(renderedRecord);
+            }
+        }
+        return x;
+    };
+
+
 
     render() {
         return (
@@ -47,7 +60,7 @@ class Databases extends Component {
                         button={{icon: "plus", onClick: this.showModal, text: 'Add Database'}}/>
 
                 <div className={styles.Panel_Body_Only}>
-                    <div style={{margin: '0 5px 0 0', width: '30%'}}>
+                    <div style={{margin: '0 5px 0 0', width: '20%'}}>
                         <div className={styles.Panel}>
 
                             <div className={styles.Panel_Header} style={{position: "inherit"}}>
@@ -57,7 +70,8 @@ class Databases extends Component {
                                 <Menu mode="inline">
                                     {
                                         this.props.databasesList.map((database, index) =>
-                                            <Menu.Item key={index}>{database.Name}</Menu.Item>)
+                                            <Menu.Item key={index}
+                                                       onClick={() => this.showDatabaseInfo(database.ID)}>{database.Name}</Menu.Item>)
                                     }
                                 </Menu>
                             </div>
@@ -65,14 +79,54 @@ class Databases extends Component {
 
                     </div>
 
-                    <div style={{margin: '0 0 0 5px', width: '70%'}}>
+                    <div style={{margin: '0 0 0 5px', width: '80%'}}>
                         <div className={styles.Panel}>
-                            <div className={styles.Panel_Header} style={{position: "inherit"}}>
-                                <h3>Databases Information</h3>
+                            <div className={styles.Panel_Header_With_Button}>
+                                <div>
+                                    <h3>Databases Information</h3>
+                                </div>
+                                <div>
+                                    <Button className={styles.Panel_Header_Button}
+                                            disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}
+                                            type="primary" icon="info"
+                                            onClick={this.showDBInfo}>
+                                        Info
+                                    </Button>
+                                    <Button className={styles.Panel_Header_Button} type="danger" icon="delete"
+                                            disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}
+                                            onClick={this.deleteDB}>
+                                        Delete Database
+                                    </Button>
+                                </div>
                             </div>
 
-                            <div className={styles.Panel_Body}>
-                                hello world
+
+                            <div className={styles.Panel_Body} style={{padding: 0}}>
+                                {
+                                    !!this.props.fetchedDatabase.databaseContent?.length ?
+                                        <DatabaseInfo
+                                            databaseOption={this.state.databaseOptions}
+                                            databaseInfo={this.props.fetchedDatabase.databaseInfo}
+                                            data={this.getRecordsData(this.props.fetchedDatabase.databaseContent)}/>
+                                        :
+                                        <Spin spinning={this.props.isLoadingDatabase}>
+                                            <div>
+                                                <img
+                                                    src="https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/following_q0cr.svg"
+                                                    width={"50%"}
+                                                    style={{
+                                                        display: "block",
+                                                        marginTop:20,
+                                                        marginLeft: "auto",
+                                                        marginRight: "auto",
+                                                    }}
+                                                />
+                                                <p style={{textAlign: 'center', marginTop: 5}}>
+                                                    Select a database to show its data
+                                                </p>
+                                            </div>
+                                        </Spin>
+                                }
                             </div>
                         </div>
                     </div>
@@ -90,7 +144,9 @@ class Databases extends Component {
 
 function mapStateToProps(state) {
     return {
-        databasesList: state.database.databasesList
+        databasesList: state.database.databasesList,
+        fetchedDatabase: state.database.fetchedDatabase,
+        isLoadingDatabase: state.database.isLoading
     };
 }
 

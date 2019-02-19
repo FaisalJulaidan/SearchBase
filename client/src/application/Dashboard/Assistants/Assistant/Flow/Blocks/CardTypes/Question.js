@@ -32,14 +32,14 @@ class Question extends Component {
     };
 
     //Submit whole block
-    onSubmit = () => this.props.form.validateFields(['text', 'isSkippable', 'storeInDB', 'dataType'],
+    onSubmit = (formBlock) => this.props.form.validateFields(['text', 'isSkippable', 'storeInDB', 'dataType'],
         (err, values) => {
             if (!err) {
-                const {flowOptions} = getInitialVariables(this.props.options);
+                const flowOptions = this.props.options.flow;
                 let options = {
                     block: {
                         Type: 'Question',
-                        GroupID: this.props.options.currentGroup.id,
+                        GroupID: this.props.modalState.currentGroup.id,
                         StoreInDB: values.storeInDB,
                         Skippable: values.isSkippable || false,
                         DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
@@ -50,13 +50,13 @@ class Question extends Component {
                     }
                 };
 
-                if (this.handleNewBlock)
-                    this.handleNewBlock(options);
+                if (this.props.handleNewBlock)
+                    this.props.handleNewBlock(options);
                 else {
                     // Edit Block
-                    options.block.ID = this.props.options.block.ID;
-                    options.block.Order = this.props.options.block.Order;
-                    this.handleEditBlock(options);
+                    options.block.ID = this.props.modalState.block.ID;
+                    options.block.Order = this.props.modalState.block.Order;
+                    this.props.handleEditBlock(options);
                 }
             }
     });
@@ -70,7 +70,7 @@ class Question extends Component {
                     keywords: this.state.tags,
                     blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                     action: values.action === "Go To Group" ? "Go To Specific Block" : values.action,
-                    afterMessage: values.afterMessage
+                    afterMessage: values.afterMessage || ""
                 };
                 let answers = [answer].concat(this.state.answers);
                 this.setState({answers, tags: []});
@@ -98,38 +98,38 @@ class Question extends Component {
 
 
     componentWillMount() {
-        this.handleNewBlock = this.props.handleNewBlock;
-        this.handleEditBlock = this.props.handleEditBlock;
-        this.handleDeleteBlock = this.props.handleDeleteBlock;
-
-        const {allGroups, block} = getInitialVariables(this.props.options);
-        this.setState(initActionType(block, allGroups));
+        const {modalState, options} = this.props;
+        const {block} = getInitialVariables(options.flow, modalState);
+        this.setState(initActionType(block, this.props.modalState.allGroups));
         this.setState({answers: block.Content.answers || []})
     }
 
 
     render() {
-        const {flowOptions, allGroups, allBlocks, blockOptions, block} = getInitialVariables(this.props.options, 'Question');
-        const {getFieldDecorator} = this.props.form;
+        const {modalState, options, form, handleNewBlock, handleEditBlock, handleDeleteBlock} = this.props;
+        const {blockOptions, block} = getInitialVariables(options.flow ,modalState, 'Question');
+        const {allGroups, allBlocks, currentGroup, layout} = modalState;
+        const {getFieldDecorator} = form;
 
         const {tags, inputVisible, inputValue} = this.state;
 
-        const buttons = ButtonsForm(this.handleNewBlock, this.handleEditBlock, this.handleDeleteBlock, this.onSubmit, block);
+        const buttons = ButtonsForm(handleNewBlock, handleEditBlock, handleDeleteBlock, this.onSubmit, block);
 
         return (
             <Card style={{width: '100%'}} actions={buttons}>
                 <Form layout='horizontal'>
                     <QuestionFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
-                                      layout={this.props.options.layout}
+                                      layout={layout}
                                       placeholder="Ex: What best describes you?"/>
 
                     <DataTypeFormItem FormItem={FormItem} block={block}
-                                      getFieldDecorator={getFieldDecorator} flowOptions={flowOptions}
-                                      layout={this.props.options.layout}/>
+                                      getFieldDecorator={getFieldDecorator}
+                                      options={this.props.options}
+                                      layout={layout}/>
 
                     <FormItem label="Answers"
-                              {...this.props.options.layout}>
+                              {...layout}>
                         <Button onClick={this.showAddAnswer}
                                 type="primary" icon="plus" shape="circle" size={"small"}></Button>
                         {
@@ -156,11 +156,11 @@ class Question extends Component {
 
                     <SkippableFormItem FormItem={FormItem} block={block}
                                        getFieldDecorator={getFieldDecorator}
-                                       layout={this.props.options.layout}/>
+                                       layout={layout}/>
 
                     <StoreInDBFormItem FormItem={FormItem} block={block} blockOptions={blockOptions}
                                        getFieldDecorator={getFieldDecorator}
-                                       layout={this.props.options.layout}/>
+                                       layout={layout}/>
 
                 </Form>
 
@@ -171,7 +171,7 @@ class Question extends Component {
                     <Form>
                         <FormItem label="Answer"
                                   extra="This will be shown as answer in chatbot"
-                                  {...this.props.options.layout}>
+                                  {...layout}>
                             {getFieldDecorator('answer', {
                                 rules: [{
                                     required: true,
@@ -182,7 +182,9 @@ class Question extends Component {
                             )}
                         </FormItem>
 
-                        <FormItem label="Keywords" {...this.props.options.layout}>
+                        <FormItem label="Keywords" {...layout}
+                                  extra="Adding related keywords to the answer is necessary
+                                  for retrieving accurate solutions to the user">
                             <div>
                                 {tags.map((tag) => {
                                     const isLongTag = tag.length > 20;
@@ -209,30 +211,36 @@ class Question extends Component {
                                     <Tag
                                         onClick={this.showInput}
                                         style={{background: '#fff', borderStyle: 'dashed'}}>
-                                        <Icon type="plus"/> New Tag
+                                        <Icon type="plus"/> New Keyword
                                     </Tag>
                                 )}
                             </div>
                         </FormItem>
 
-                        <ActionFormItem FormItem={FormItem} blockOptions={blockOptions} block={block}
+                        <ActionFormItem FormItem={FormItem} blockOptions={blockOptions}
+                                        block={block}
                                         setStateHandler={(state) => this.setState(state)}
                                         getFieldDecorator={getFieldDecorator}
-                                        layout={this.props.options.layout}/>
+                                        layout={layout}/>
 
-                        <ShowGoToBlockFormItem FormItem={FormItem} allBlocks={allBlocks} block={block}
+                        <ShowGoToBlockFormItem FormItem={FormItem}
+                                               block={block}
+                                               allBlocks={allBlocks}
                                                showGoToBlock={this.state.showGoToBlock}
                                                getFieldDecorator={getFieldDecorator}
-                                               layout={this.props.options.layout}/>
+                                               layout={layout}/>
 
-                        <ShowGoToGroupFormItem FormItem={FormItem} allGroups={allGroups}
+                        <ShowGoToGroupFormItem FormItem={FormItem}
+                                               block={block}
+                                               allGroups={allGroups}
+                                               currentGroup={currentGroup}
                                                showGoToGroup={this.state.showGoToGroup}
                                                getFieldDecorator={getFieldDecorator}
-                                               layout={this.props.options.layout}/>
+                                               layout={layout}/>
 
                         <AfterMessageFormItem FormItem={FormItem} block={block}
                                               getFieldDecorator={getFieldDecorator}
-                                              layout={this.props.options.layout}/>
+                                              layout={layout}/>
                     </Form>
 
                 </Modal>

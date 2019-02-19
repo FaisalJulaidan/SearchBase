@@ -6,7 +6,7 @@ import styles from "./Dashboard.module.less"
 import Assistants from './Assistants/Assistants';
 import Databases from './Databases/Databases';
 import {getUser, history} from '../../helpers';
-import {Route, Switch} from 'react-router-dom';
+import {Route, Switch, withRouter} from 'react-router-dom';
 import Flow from "./Assistants/Assistant/Flow/Flow";
 import Profile from "./AccountDetails/Profile/Profile";
 import Billing from "./AccountDetails/Billing/Billing";
@@ -17,10 +17,11 @@ import Sessions from "./Assistants/Assistant/Sessions/Sessions";
 import Solutions from "./Assistants/Assistant/Solutions/Solutions";
 import Home from "./Home/Home";
 import Analytics from "./Assistants/Assistant/Analytics/Analytics";
-import {authActions} from "../../store/actions";
+import {authActions, optionsActions} from "../../store/actions";
 import store from '../../store/store';
 import {connect} from 'react-redux';
 
+import {TransitionGroup, CSSTransition} from "react-transition-group";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -32,6 +33,10 @@ class Dashboard extends Component {
         collapsed: false,
         marginLeft: 200,
     };
+
+    componentWillMount() {
+        this.props.dispatch(optionsActions.getOptions())
+    }
 
 
     toggle = () => {
@@ -56,9 +61,10 @@ class Dashboard extends Component {
 
     render() {
 
-        const {match} = this.props;
+        const {match, location} = this.props;
         const user = getUser();
         let userInfo = null;
+        console.log(location)
 
         // User Information at the top
         if (!user) {
@@ -113,7 +119,9 @@ class Dashboard extends Component {
                         </div>
                     </div>
 
-                    <Menu theme="light" defaultSelectedKeys={this.state.selectedMenuKey} mode="inline" onClick={this.handleMenuClick}>
+                    <Menu theme="light" defaultSelectedKeys={this.state.selectedMenuKey}
+                          selectedKeys={location.pathname.split('/')[2] ? [location.pathname.split('/')[2]] : [location.pathname.split('/')[1]]}
+                          mode="inline" onClick={this.handleMenuClick}>
                         <Menu.Item key="dashboard">
                             <Icon type="home"/>
                             <span>Home</span>
@@ -168,20 +176,27 @@ class Dashboard extends Component {
 
                     {/*HERE GOES ALL THE ROUTES*/}
                     <Content style={{margin: 16, marginTop: 10, marginBottom: 0, height: '100%'}}>
-                        <Switch>
-                            <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
-                            <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
-                            <Route path={`${match.path}/assistants/:id/sessions`} component={Sessions}/>
-                            <Route path={`${match.path}/assistants/:id/solutions`} component={Solutions}/>
-                            <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
-                            <Route path={`${match.path}/assistants`} component={Assistants} exact/>
-                            <Route path={`${match.path}/databases`} component={Databases} exact/>
-                            <Route path={`${match.path}/profile`} component={Profile} exact/>
-                            <Route path={`${match.path}/billing`} component={Billing} exact/>
-                            <Route path={`${match.path}/users-management`} component={UsersManagement} exact/>
-                            <Route path={`${match.path}/documentation`} component={Documentation} exact/>
-                            <Route path="/dashboard" component={Home}/>
-                        </Switch>
+                        <Route render={() =>
+                            <TransitionGroup style={{height: '100%'}}>
+                                <CSSTransition key={location.key} classNames="fade" timeout={550}>
+                                    <Switch location={location} style={{height: '100%'}}>
+                                        <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
+                                        <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
+                                        <Route path={`${match.path}/assistants/:id/sessions`} component={Sessions}/>
+                                        <Route path={`${match.path}/assistants/:id/solutions`} component={Solutions}/>
+                                        <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
+                                        <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+                                        <Route path={`${match.path}/databases`} component={Databases} exact/>
+                                        <Route path={`${match.path}/profile`} component={Profile} exact/>
+                                        <Route path={`${match.path}/billing`} component={Billing} exact/>
+                                        <Route path={`${match.path}/users-management`} component={UsersManagement} exact/>
+                                        <Route path={`${match.path}/documentation`} component={Documentation} exact/>
+                                        <Route path="/dashboard" component={Home}/>
+                                    </Switch>
+                                </CSSTransition>
+                            </TransitionGroup>
+                        }/>
+
                     </Content>
 
                     <Footer style={{textAlign: 'center', padding: 10}}>
@@ -199,4 +214,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Dashboard);
+export default withRouter(connect(mapStateToProps)(Dashboard));

@@ -7,6 +7,7 @@ import {chatbotSessions} from "./chatbotSessions.reducer";
 import {solutions} from "./solutions.reducer";
 import {usersManagement} from "./usersManagement.reducer";
 import {database} from "./database.reducer";
+import {options} from "./options.reducer";
 
 
 const rootReducer = combineReducers({
@@ -17,7 +18,8 @@ const rootReducer = combineReducers({
     chatbotSessions,
     solutions,
     usersManagement,
-    database
+    database,
+    options,
 });
 
 export default rootReducer;

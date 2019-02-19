@@ -6,6 +6,7 @@ import Header from "../../../../../components/Header/Header";
 import {flowActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
 import styles from "./Flow.module.less"
+import {http} from "../../../../../helpers";
 class Flow extends Component {
 
     state = {
@@ -14,7 +15,7 @@ class Flow extends Component {
 
     componentDidMount() {
         const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.fetchFlowRequest(assistant.ID))
+        this.props.dispatch(flowActions.fetchFlowRequest(assistant.ID));
     }
 
     componentWillReceiveProps(nextProps) {
@@ -94,7 +95,8 @@ class Flow extends Component {
                                 deleteBlock={this.deleteBlock}
                                 reorderBlocks={this.reorderBlocks}
                                 currentGroup={this.state.currentGroup}
-                                allGroups={this.props.blockGroups}/>
+                                allGroups={this.props.blockGroups}
+                                options={this.props.options}/>
                     </div>
                 </div>
             </div>
@@ -106,6 +108,7 @@ class Flow extends Component {
 
 function mapStateToProps(state) {
     return {
+        options: state.options.options,
         blockGroups: state.flow.blockGroups,
         isLoading: state.flow.isLoading,
 
@@ -118,7 +121,6 @@ function mapStateToProps(state) {
         isDeletingGroup: state.flow.isDeletingGroup,
 
         isAddingBlock: state.flow.isAddingBlock,
-
     };
 }
 

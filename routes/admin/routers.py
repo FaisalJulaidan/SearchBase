@@ -38,3 +38,6 @@ profile_router: Blueprint = profile_router
 
 from .database.database import database_router
 database_router: Blueprint = database_router
+
+from .account.options import options_router
+options_router: Blueprint = options_router

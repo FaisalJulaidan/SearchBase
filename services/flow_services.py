@@ -60,6 +60,7 @@ def getFlow(assistant: Assistant) -> Callback:
                 'blocks': helpers.getListFromSQLAlchemyList(group.Blocks)
             })
         data = {'botVersion': bot_currentVersion,
+                'userTypes': [ut.name for ut in enums.UserType],
                 'assistant': helpers.getDictFromSQLAlchemyObj(assistant),
                 'blockGroups':  blockGroups}
         return Callback(True, 'Flow retrieved successfully', data)
@@ -135,12 +136,18 @@ def addGroup(group: dict, assistant: Assistant) -> Callback:
     # db.session.close()
 
 
-def addBlock(data: dict, group: BlockGroup) -> Callback:
+def addBlock(block: dict, group: BlockGroup) -> Callback:
     try:
 
-        # Validate submitted block content using json schema
-        validate(data, json_schemas.new_block)
-        block = data.get('block')
+        # Validate submitted block using json schema
+        validate(block, json_schemas.new_block)
+        block = block.get('block')
+
+        # Go deeper and validate the block's content based on its type using json schema
+        callback: Callback = isValidBlock(block, str(enums.BlockType(block.get('Type')).name))
+        if not callback.Success:
+            return callback
+
 
         # Set the block with max order + 1
         maxOrder = db.session.query(func.max(Block.Order)).filter(Block.GroupID == group.ID).scalar()
@@ -397,41 +404,6 @@ def isValidBlock(block: dict, blockType: str):
 
         return Callback(False, msg, exc.args[0])
     return Callback(True, "Valid block")
-
-
-def getOptions(industry=None) -> Callback:
-
-    options =  {
-        'botVersion': bot_currentVersion,
-        'types': [a.value for a in enums.BlockType],
-        'userTypes': [uiv.value for uiv in enums.UserType],
-        'dataTypes': [uiv.value for uiv in enums.DataType],
-        'blockTypes': [
-            {
-                'name': enums.BlockType.UserInput.value,
-                'actions': [a.value for a in enums.BlockAction],
-                'alwaysStoreInDB': True
-            },
-            {
-                'name': enums.BlockType.Question.value,
-                'actions': [a.value for a in enums.BlockAction],
-                'alwaysStoreInDB': False
-            },
-            {
-                'name': enums.BlockType.FileUpload.value,
-                'actions': [a.value for a in enums.BlockAction],
-                'typesAllowed': [t for t in BaseConfig.ALLOWED_EXTENSIONS],
-                'fileMaxSize': str(int(BaseConfig.MAX_CONTENT_LENGTH / 1000000)) + 'MB',
-                'alwaysStoreInDB': True
-            },
-            {
-                'name': enums.BlockType.Solutions.value,
-                'maxSolutions': 5,
-                'actions': [a.value for a in enums.BlockAction],
-            },
-        ]
-    }
-    return Callback(True, '', options)
 
 
 def getBlocksCountByAssistant(assistant: Assistant):

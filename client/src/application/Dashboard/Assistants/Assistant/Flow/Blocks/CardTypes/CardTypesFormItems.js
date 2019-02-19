@@ -9,23 +9,23 @@ const CheckboxGroup = Checkbox.Group;
 ////////////////////////////////////////////
 export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block, placeholder}) => {
     return (
-    <FormItem label="Question"
-              extra="The above text will be shown in a bubble inside the chat"
-              {...layout}>
-        {getFieldDecorator('text', {
-            initialValue: block.Content.text,
-            rules: [{
-                required: true,
-                message: "Please input question field",
-            }],
-        })(
-            <Input placeholder={placeholder}/>
-        )}
-    </FormItem>
+        <FormItem label="Question"
+                  extra="The above text will be shown in a bubble inside the chat"
+                  {...layout}>
+            {getFieldDecorator('text', {
+                initialValue: block.Content.text,
+                rules: [{
+                    required: true,
+                    message: "Please input a question",
+                }],
+            })(
+                <Input placeholder={placeholder}/>
+            )}
+        </FormItem>
     )
 };
 
-export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, flowOptions, block}) => (
+export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, options, block}) => (
     <FormItem label="Data Type" {...layout}
               extra="Selecting a Data Type will result in a smarter AI processing and accurate data collection">
         {
@@ -38,7 +38,7 @@ export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, flowOptio
             })(
                 <Select placeholder="Will validate the input and categorise user inputs">
                     {
-                        flowOptions.dataTypes.map((type, i) =>
+                        options.flow.dataTypes.map((type, i) =>
                             <Option key={i} value={type.name}>{type.name}</Option>)
                     }
                 </Select>
@@ -51,8 +51,7 @@ export const SkippableFormItem = ({FormItem, layout, getFieldDecorator, block}) 
     <FormItem label="Skippable?" {...layout}>
         {getFieldDecorator('isSkippable', {
             valuePropName: 'checked',
-            defaultValue: false,
-            initialValue: block.IsSkippable ? block.IsSkippable : undefined,
+            initialValue: block.Skippable ? block.Skippable : false,
         })(
             <Checkbox>Users can skip answering this question</Checkbox>
         )}
@@ -102,8 +101,7 @@ export const ActionFormItem = ({FormItem, layout, getFieldDecorator, setStateHan
                     <Select onSelect={(action) => setStateHandler(onSelectAction(action))}
                             placeholder="The next step after this block">{
                         blockOptions.actions.map((action, i) =>
-                            <Option key={i}
-                                    value={action}>{action}</Option>)
+                            <Option key={i} value={action}>{action}</Option>)
                     }</Select>
                 )
                 : <Spin><Select placeholder="The next step after this block"></Select></Spin>
@@ -116,7 +114,6 @@ export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allB
         showGoToBlock ?
             (
                 <FormItem label="Go To Specific Block" {...layout}>
-                    {console.log(block.Content.blockToGoID)}
                     {
                         getFieldDecorator('blockToGoID',
                             {
@@ -138,7 +135,11 @@ export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allB
     );
 };
 
-export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, allGroups, showGoToGroup, groupName}) => {
+export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, currentBlock, currentGroup, allGroups, showGoToGroup}) => {
+
+    allGroups = allGroups.filter(group => group.id !== currentGroup.id);
+    const selectedGroup = allGroups.find(group => !!group.blocks.find(block => block.id === currentBlock?.Content?.goToBlockID));
+
     return (
         showGoToGroup ?
             (
@@ -148,18 +149,19 @@ export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, allG
                     {
                         getFieldDecorator('blockToGoIDGroup',
                             {
-                                initialValue: groupName ? groupName : undefined,
+                                initialValue: currentBlock && selectedGroup ? selectedGroup.blocks[0].ID : undefined,
                                 rules: [{required: true, message: "Please select your next group"}]
                             }
                         )(
                             <Select placeholder="The first next block of a group">{
                                 allGroups.map((group, i) => {
-                                        if (group.blocks[0])
-                                            return <Option key={i} value={group.blocks[0].id}>
+                                    console.log(group.blocks[0].ID, 'from loop')
+                                    if (group.blocks[0]) {
+                                        return <Option key={i} value={group.blocks[0].ID}>
                                                 {`${group.name}`}
                                             </Option>;
-                                        else
-                                            return <Option disabled key={i} value={group.name}>
+                                    } else
+                                        return <Option disabled key={i} value={group.name}>
                                                 {`${group.name}`}
                                             </Option>
                                     }
@@ -174,21 +176,22 @@ export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, allG
 
 // Others
 //////////////////////////////////////////////////
-export const ButtonsForm = (handleNewBlock, handleEditBlock, handleDeleteBlock, onSubmit, block) => (
-    handleNewBlock ? [
+export const ButtonsForm = (handleNewBlock, handleEditBlock, handleDeleteBlock, onSubmit, block) => {
+    return handleNewBlock ? [
         <Button key="cancel" onClick={() => onCancel(handleNewBlock, handleEditBlock)}>Cancel</Button>,
-        <Button key="submit" type="primary" onClick={onSubmit}>Add</Button>
+        <Button key="submit" type="primary" onClick={() => onSubmit('NewBlock')}>Add</Button>
     ] : [
         <Button key="delete" type="danger"
                 onClick={() => onDelete(block.ID, block.Type, handleDeleteBlock)}>
             Delete
         </Button>,
         <Button key="cancel" onClick={() => onCancel(handleNewBlock, handleEditBlock)}>Cancel</Button>,
-        <Button key="submit" type="primary" onClick={onSubmit}>Update</Button>
+        <Button key="submit" type="primary" onClick={() => onSubmit(block)}>Update</Button>
     ]
-);
+}
 
-export const FileTypesFormItem = ({FormItem, layout, getFieldDecorator, typesAllowed, block, setStateHandler}) => (
+
+export const FileTypesFormItem = ({FormItem, block, layout, getFieldDecorator, typesAllowed, setStateHandler}) => (
     <FormItem label="File Types" {...layout}>
         {
             typesAllowed ?
@@ -203,6 +206,29 @@ export const FileTypesFormItem = ({FormItem, layout, getFieldDecorator, typesAll
                                    onChange={(checkedValues) => setStateHandler(onFileTypeChange(checkedValues))}/>
                 )
                 : <Spin/>
+        }
+    </FormItem>
+);
+
+export const DatabaseTypeFormItem = ({FormItem, block, getFieldDecorator, layout, options}) => (
+    <FormItem label="Database" {...layout}
+              extra="The database to be scanned for solutions (Jobs, Candidate...)">
+        {
+            getFieldDecorator('databaseType', {
+                initialValue: block.Content.databaseType ?
+                    options.databases.types.find(type => type === block.Content.databaseType)
+                    : undefined,
+                rules: [{
+                    required: true,
+                    message: "Please select a database type " +
+                        "If you don't have one please go to Database section form the left menu and upload one, " +
+                        "otherwise you won't be able to creat a Solution block and search for solutions in the chatbot",
+                }],
+            })(
+                <Select placeholder="EX: Jobs database">{options.databases.types.map((type, i) =>
+                    <Option key={i} value={type}>{type}</Option>)
+                }</Select>
+            )
         }
     </FormItem>
 );

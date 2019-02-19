@@ -27,7 +27,7 @@ class Profile extends Component {
             if (sessions.length < 1) return null;
 
             // If there are more than one inputs of the same dataType then concat them
-            let input = null;
+            let input = "";
             let downloadFilesBtns = [];
             let isFiles = false;
 

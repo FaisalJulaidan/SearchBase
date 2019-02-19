@@ -30,10 +30,11 @@ const uploadDatabase = (newDatabase) => {
 };
 
 
-const uploadDatabaseSuccess = (successMessage) => {
+const uploadDatabaseSuccess = (successMessage, newDatabase) => {
     return {
         type: actionTypes.UPLOAD_DATABASE_SUCCESS,
-        successMessage
+        successMessage,
+        newDatabase
     }
 };
 
@@ -46,17 +47,18 @@ const uploadDatabaseFailure = (error) => {
 
 
 // Fetch
-const fetchDatabase = () => {
+const fetchDatabase = (databaseID) => {
     return {
         type: actionTypes.FETCH_DATABASE_REQUEST,
+        databaseID
     }
 };
 
-const fetchDatabaseSuccess = (successMessage, database) => {
+const fetchDatabaseSuccess = (successMessage, fetchedDatabase) => {
     return {
         type: actionTypes.FETCH_DATABASE_SUCCESS,
         successMessage,
-        database
+        fetchedDatabase
     }
 };
 
@@ -66,7 +68,11 @@ const fetchDatabaseFailure = (error) => {
         error
     }
 };
-
+const resetFetchedDtabase = () => {
+    return {
+        type: actionTypes.RESET_DATABASE
+    }
+};
 
 // Delete
 const DeleteDatabase = () => {
@@ -102,6 +108,7 @@ export const databaseActions = {
     fetchDatabase,
     fetchDatabaseSuccess,
     fetchDatabaseFailure,
+    resetFetchedDtabase,
 
     DeleteDatabase,
     DeleteDatabaseSuccess,

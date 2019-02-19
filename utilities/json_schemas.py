@@ -20,11 +20,10 @@ chatbot_session = {
                           },
         "keywords": {"type": "array", "items": {"type": "string"}},
         "keywordsByDataType": {"type": "object", "items": {"type": "object"}},
-        "showTop": {"type": "integer"},
         "solutionsReturned": {"type": "integer"},
         "userType": {"enum": [e.value for e in enums.UserType]}
     },
-    "required": ["collectedData", "keywords", "keywordsByDataType", "showTop", "solutionsReturned", "userType"],
+    "required": ["collectedData", "keywords", "keywordsByDataType", "solutionsReturned", "userType"],
     "additionalProperties": False
 }
 
@@ -154,9 +153,9 @@ Solutions = {
         "showTop": {"type": "integer", "minimum": 1},
         "action": { "enum": [e.value for e in enums.BlockAction]},
         "blockToGoID": { "type": [ "number",  "null" ] },
-        "afterMessage": {"type": "string"}
-
+        "afterMessage": {"type": "string"},
+        "databaseType": { "enum": [dbt.name for dbt in enums.DatabaseType]},
     },
-    "required": ["showTop", "action", "afterMessage", "blockToGoID"],
+    "required": ["showTop", "action", "afterMessage", "blockToGoID", "databaseType"],
     "additionalProperties": False
 }

@@ -9,6 +9,7 @@ import {getUser, history} from '../../helpers';
 import {Route, Switch, withRouter} from 'react-router-dom';
 import Flow from "./Assistants/Assistant/Flow/Flow";
 import Profile from "./AccountDetails/Profile/Profile";
+import Billing from "./AccountDetails/Billing/Billing";
 import UsersManagement from "./AccountDetails/UsersManagement/UsersManagement";
 import Documentation from "./Documentation/Documentation";
 import Integration from "./Assistants/Assistant/Integration/Integration";
@@ -138,21 +139,21 @@ class Dashboard extends Component {
 
                         <Divider/>
 
-                        <SubMenu key="sub2"
-                                 title={<span><Icon type="user"/><span>Account Details</span></span>}>
+                        <SubMenu key="sub2" title={<span><Icon type="user"/><span>Account Details</span></span>}>
                             <Menu.Item key="profile">
                                 <Icon type="profile"/>
                                 Profile
                             </Menu.Item>
+                            <Menu.Item key="billing">
+                                <Icon type="pound"/>
+                                Billing
+                            </Menu.Item>
                             <Menu.Item key="users-management" style={{fontSize: '9pt'}}>
-                                <Icon type="usergroup-add"/>Users Management
+                                <Icon type="usergroup-add"/>
+                                Users Management
                             </Menu.Item>
                         </SubMenu>
 
-                        {/*<Menu.Item key="billing">*/}
-                            {/*<Icon type="dollar"/>*/}
-                            {/*<span>Billing</span>*/}
-                        {/*</Menu.Item>*/}
                         <Menu.Item key="documentation">
                             <Icon type="question-circle"/>
                             <span>Documentation</span>
@@ -187,6 +188,7 @@ class Dashboard extends Component {
                                         <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                                         <Route path={`${match.path}/databases`} component={Databases} exact/>
                                         <Route path={`${match.path}/profile`} component={Profile} exact/>
+                                        <Route path={`${match.path}/billing`} component={Billing} exact/>
                                         <Route path={`${match.path}/users-management`} component={UsersManagement} exact/>
                                         <Route path={`${match.path}/documentation`} component={Documentation} exact/>
                                         <Route path="/dashboard" component={Home}/>

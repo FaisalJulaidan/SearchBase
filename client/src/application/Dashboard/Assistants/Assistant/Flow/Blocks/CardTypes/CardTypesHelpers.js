@@ -55,9 +55,9 @@ export const getBlockId = (blockToGoID, blockToGoIDGroup, blocks, formBlock) => 
 export const checkBlockTogGoID = (blocks, blockGroups, groupID) => {
     // if there is a passed blocks
     //   - if Content.action === "Go To Next Block" update it from here to the next block ID (DONE)
-    //   - Check the current block if its ID is valid or not
+    //   - Check the current block if its blockToGoID is valid or not
     //     - how to check if it is valid or not?
-    //       by find this ID in all blocks in the assistant level
+    //       by finding this ID in all blocks in the assistant level
     //       if not return it as null
     //       - in the case of deleting a block and there are blocks assigned to to it
     // if there is no passed blocks

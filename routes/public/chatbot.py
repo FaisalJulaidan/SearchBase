@@ -79,36 +79,35 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
     session: ChatbotSession = callback.Data
 
 
-    if request.method == "POST":
-        if request.method == 'POST':
+    if request.method == 'POST':
 
-            try:
-                # Check if the post request has the file part
-                if 'file' not in request.files:
-                    return helpers.jsonResponse(False, 404, "No file part")
-                filenames = ''
-                for file in request.files.getlist('file'):
-                    if file.filename == '':
-                        return helpers.jsonResponse(False, 404, "No selected file")
+        try:
+            # Check if the post request has the file part
+            if 'file' not in request.files:
+                return helpers.jsonResponse(False, 404, "No file part")
+            filenames = ''
+            for file in request.files.getlist('file'):
+                if file.filename == '':
+                    return helpers.jsonResponse(False, 404, "No selected file")
 
-                    # Generate unique name: hash_sessionIDEncrypted.extension
-                    filename = str(uuid.uuid4()) + '_' + helpers.encrypt_id(sessionID) + '.' + \
-                               secure_filename(file.filename).rsplit('.', 1)[1].lower()
-                    # Save file in the server
-                    file.save(os.path.join(BaseConfig.USER_FILES, filename))
+                # Generate unique name: hash_sessionIDEncrypted.extension
+                filename = str(uuid.uuid4()) + '_' + helpers.encrypt_id(sessionID) + '.' + \
+                           secure_filename(file.filename).rsplit('.', 1)[1].lower()
+                # Save file in the server
+                file.save(os.path.join(BaseConfig.USER_FILES, filename))
 
-                    # if there is multiple files, split there name by commas
-                    if filenames == '':
-                        filenames = filename
-                    else:
-                        filenames+= ',' + filename
+                # if there is multiple files, split there name by commas
+                if filenames == '':
+                    filenames = filename
+                else:
+                    filenames+= ',' + filename
 
-                # Store filenames in the DB
-                session.FilePath = filenames
+            # Store filenames in the DB
+            session.FilePath = filenames
 
-            except Exception as exc:
-                print(exc)
-                return helpers.jsonResponse(False, 404, "Couldn't save the file")
-            # Save changes
-            db.session.commit()
-            return helpers.jsonResponse(True, 200, "File uploaded successfully!!")
+        except Exception as exc:
+            print(exc)
+            return helpers.jsonResponse(False, 404, "Couldn't save the file")
+        # Save changes
+        db.session.commit()
+        return helpers.jsonResponse(True, 200, "File uploaded successfully!!")

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Handsontable from 'handsontable';
 import {HotTable} from "@handsontable/react";
 import './DatabaseInfo.less'
-import {ColumnsOptions} from "../NewDatabaseModal/ColumnsOptions";
+// import {ColumnsOptions} from "../NewDataBaseModal/ColumnsOptions";
 
 class DatabaseInfo extends Component {
 

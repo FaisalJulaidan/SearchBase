@@ -62,7 +62,7 @@ class Billing extends React.Component {
                                                             <span className="sign">£</span>
                                                             <span className="currency">14</span>
                                                             <span className="cent">.99</span>
-                                                            <span className="month">/MON</span>
+                                                            <span className="month">/Monthly</span>
                                                         </span>
                                                     </div>
                                                     {/*//PRICE END*/}
@@ -74,10 +74,10 @@ class Billing extends React.Component {
                                                 <div className="generic_feature_list">
                                                     <ul>
                                                         <li><span>2GB</span> Bandwidth</li>
-                                                        <li><span>150GB</span> Storage</li>
-                                                        <li><span>12</span> Accounts</li>
+                                                        <li><span>CV</span> Storage</li>
+                                                        <li><span>∞</span> Unlimited Usage</li>
                                                         <li><span>7</span> Host Domain</li>
-                                                        <li><span>24/7</span> Support</li>
+                                                        <li><span>7 Day</span> Support</li>
                                                     </ul>
                                                 </div>
                                                 {/*//FEATURE LIST END*/}
@@ -116,10 +116,10 @@ class Billing extends React.Component {
                                                     {/*PRICE START*/}
                                                     <div className="generic_price_tag clearfix">	
                                                         <span className="price">
-                                                            <span className="sign">$</span>
-                                                            <span className="currency">299</span>
+                                                            <span className="sign">£</span>
+                                                            <span className="currency">129</span>
                                                             <span className="cent">.99</span>
-                                                            <span className="month">/MON</span>
+                                                            <span className="month">/Annually</span>
                                                         </span>
                                                     </div>
                                                     {/*//PRICE END*/}

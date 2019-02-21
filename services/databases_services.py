@@ -102,7 +102,7 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
             jobs = []
             for record in databaseData["records"]:
                 # create datetime for StartDate
-                startDate = record.get('StartDate',{}).get('data', None)
+                startDate = record.get('StartDate', {}).get('data', None)
                 if startDate:
                     startDate = datetime(year=startDate['year'],
                                          month=startDate['month'],
@@ -110,11 +110,12 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
 
                 new_record = Job(
                     Database=newDatabase,
-                    JobTitle=record.get('JobTitle',{}).get('data'),
-                    Location=record.get('Location',{}).get('data'),
-                    PositionType=record.get('PositionType',{}).get('data'),
-                    EmploymentType=record.get('EmploymentType',{}).get('data'),
-                    Salary=record.get('Salary',{}).get('data') or None,
+                    Title=record.get('Title', {}).get('data'),
+                    Description=record.get('Description', {}).get('data'),
+                    Location=record.get('Location', {}).get('data'),
+                    PositionType=record.get('PositionType', {}).get('data'),
+                    EmploymentType=record.get('EmploymentType', {}).get('data'),
+                    Salary=record.get('Salary', {}).get('data') or None,
                     Currency=createCurrency(record.get('Currency', {})),
                     StartDate=startDate,
                 )

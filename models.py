@@ -366,7 +366,7 @@ class Candidate(db.Model):
 class Job(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Title = db.Column(db.String(64), nullable=False)
-    Description = db.Column(db.String(64), nullable=False)
+    Description = db.Column(db.String(5000), nullable=False)
     Availability = db.Column(db.String(64), nullable=True)
     Location = db.Column(db.String(64), nullable=True)
     PositionType = db.Column(db.String(64), nullable=True)

@@ -149,6 +149,11 @@ class ColumnSelectionStep extends Component {
                 return reject('Rejected');
             }
 
+            if (!excelFile.data) {
+                message.error('Please check your CSV file try to add more than one single record');
+                return reject('Rejected');
+            }
+
             // convert object to array of {ourColumn, excelColumn} pairs
             columns = Object.keys(columns).map(key => {
                 return {ourColumn: key, excelColumn: columns[key]};
@@ -182,7 +187,6 @@ class ColumnSelectionStep extends Component {
                 else
                     validRecords.push(record);
             }
-
 
             if (selectedColumns[0])
                 return resolve({

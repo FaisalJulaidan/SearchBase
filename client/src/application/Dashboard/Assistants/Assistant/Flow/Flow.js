@@ -6,7 +6,6 @@ import Header from "../../../../../components/Header/Header";
 import {flowActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
 import styles from "./Flow.module.less"
-import {http} from "../../../../../helpers";
 class Flow extends Component {
 
     state = {

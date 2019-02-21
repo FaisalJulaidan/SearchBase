@@ -1,16 +1,15 @@
 import React, {Component} from 'react';
-import Handsontable from 'handsontable';
 import {HotTable} from "@handsontable/react";
 import './DatabaseInfo.less'
-// import {ColumnsOptions} from "../NewDataBaseModal/ColumnsOptions";
 
 class DatabaseInfo extends Component {
 
     render() {
 
         let data = this.props.data;
-        const columns = this.props.databaseOption[this.props.databaseInfo.Type].map(x => x.column);
-        const colHeaders = this.props.databaseOption[this.props.databaseInfo.Type].map(x => x.column).map(x => {
+
+        const columns = this.props.databaseOptions[this.props.databaseInfo.Type.name].map(x => x.column);
+        const colHeaders = this.props.databaseOptions[this.props.databaseInfo.Type.name].map(x => x.column).map(x => {
             return {
                 data: x,
                 editor: false

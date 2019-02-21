@@ -106,7 +106,7 @@ class NewDatabaseModal extends Component {
                         invalidRecords: records.invalidRecords,
                         current: this.state.current + 1
                     }),
-                    (error) => console.error(error)
+                    error => console.error(error)
                 );
                 break;
 

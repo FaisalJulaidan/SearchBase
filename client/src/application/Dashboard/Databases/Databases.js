@@ -17,8 +17,6 @@ class Databases extends Component {
     };
 
     componentWillMount() {
-        http.get(`/databases/options`)
-            .then(res => this.setState({databaseOptions: res.data.data}));
         this.props.dispatch(databaseActions.getDatabasesList());
     }
 
@@ -103,11 +101,14 @@ class Databases extends Component {
 
                             <div className={styles.Panel_Body} style={{padding: 0}}>
                                 {
-                                    !!this.props.fetchedDatabase.databaseContent?.length ?
-                                        <DatabaseInfo
-                                            databaseOption={this.state.databaseOptions}
-                                            databaseInfo={this.props.fetchedDatabase.databaseInfo}
-                                            data={this.getRecordsData(this.props.fetchedDatabase.databaseContent)}/>
+                                    (
+                                        (!!this.props.fetchedDatabase.databaseContent?.length)
+                                        &&
+                                        (!!this.props.options.databases)
+                                    ) ?
+                                        <DatabaseInfo databaseOptions={this.props.options.databases}
+                                                      databaseInfo={this.props.fetchedDatabase.databaseInfo}
+                                                      data={this.getRecordsData(this.props.fetchedDatabase.databaseContent)}/>
                                         :
                                         <Spin spinning={this.props.isLoadingDatabase}>
                                             <div>
@@ -133,7 +134,7 @@ class Databases extends Component {
                 </div>
 
                 <NewDatabaseModal visible={this.state.visible}
-                                  databaseOptions={this.state.databaseOptions}
+                                  databaseOptions={this.props.options?.databases}
                                   uploadDatabase={this.uploadDatabase}
                                   hideModal={this.hideModal}/>
 
@@ -146,7 +147,9 @@ function mapStateToProps(state) {
     return {
         databasesList: state.database.databasesList,
         fetchedDatabase: state.database.fetchedDatabase,
-        isLoadingDatabase: state.database.isLoading
+        isLoadingDatabase: state.database.isLoading,
+
+        options: state.options.options,
     };
 }
 

@@ -6,23 +6,22 @@ import Header from "../../../../../components/Header/Header";
 import {flowActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
 import styles from "./Flow.module.less"
+import {Spin} from "antd";
+import shortid from 'shortid';
 class Flow extends Component {
 
     state = {
-        currentGroup: {blocks: []}
+        currentGroup: {blocks: []},
+        assistant: {}
     };
 
-    componentDidMount() {
-        const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.fetchFlowRequest(assistant.ID));
-    }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.blockGroups !== this.props.blockGroups)
-            nextProps.blockGroups.map((group) => {
-                if (group.id === this.state.currentGroup.id)
-                    this.setState({currentGroup: group})
-            })
+    componentDidMount() {
+        this.setState({
+                assistant: this.props.location.state.assistant
+            },
+            () => console.log(this.state.assistant)
+        )
     }
 
     selectGroup = (currentGroup) => this.setState({currentGroup});
@@ -47,9 +46,27 @@ class Flow extends Component {
 
 
     // BLOCKS
-    addBlock = (newBlock, groupID) => {
-        const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.addBlockRequest({newBlock, groupID, assistantID: assistant.ID}));
+    addBlock = (newBlock) => {
+        const {assistant, currentGroup} = this.state;
+        let updatedAssistant = {...assistant};
+        let updatedGroup = updatedAssistant.Flow.groups[updatedAssistant.Flow.groups.findIndex(group => group.ID === currentGroup.ID)];
+
+        const ID = shortid.generate();
+        newBlock.ID = ID;
+
+        if (updatedGroup.blocks.length > 0) {
+            const lastBlock = updatedGroup.blocks[updatedGroup.blocks.length - 1];
+            if (lastBlock.Content.action === "Go To Next Block")
+                lastBlock.Content.blockToGoID = ID;
+        }
+
+        updatedGroup.blocks.push(newBlock);
+
+        console.log(updatedAssistant, updatedGroup);
+        this.setState({
+            assistant: updatedAssistant,
+            currentGroup: updatedGroup
+        })
     };
 
     editBlock = (edittedBlock, groupID) => {
@@ -73,32 +90,40 @@ class Flow extends Component {
     };
 
     render() {
-        const {assistant} = this.props.location.state;
-
+        const {assistant} = this.state;
+        const {Flow} = assistant;
         return (
-            <div style={{height: '100%'}}>
-                <Header display={assistant.Name}/>
+            <Spin spinning={!(!!Flow)} style={{height: '100%'}}>
 
-                <div className={styles.Panel_Body_Only}>
-                    <div style={{margin: '0 5px 0 0', width: '30%'}}>
-                        <Groups selectGroup={this.selectGroup}
-                                isLoading={this.props.isLoading}
-                                groupsList={this.props.blockGroups}
-                                addGroup={this.addGroup}
-                                editGroup={this.editGroup}
-                                deleteGroup={this.deleteGroup}/>
-                    </div>
-                    <div style={{margin: '0 0 0 5px', width: '70%'}}>
-                        <Blocks addBlock={this.addBlock}
-                                editBlock={this.editBlock}
-                                deleteBlock={this.deleteBlock}
-                                reorderBlocks={this.reorderBlocks}
-                                currentGroup={this.state.currentGroup}
-                                allGroups={this.props.blockGroups}
-                                options={this.props.options}/>
+                <div style={{height: '100%'}}>
+                    <Header display={assistant.Name}/>
+                    <div className={styles.Panel_Body_Only}>
+                        <div style={{margin: '0 5px 0 0', width: '30%'}}>
+                            {
+                                Flow && <Groups selectGroup={this.selectGroup}
+                                                isLoading={this.props.isLoading}
+                                                groupsList={Flow.groups}
+                                                addGroup={this.addGroup}
+                                                editGroup={this.editGroup}
+                                                deleteGroup={this.deleteGroup}/>
+                            }
+                        </div>
+
+                        <div style={{margin: '0 0 0 5px', width: '70%'}}>
+                            {
+                                Flow && <Blocks addBlock={this.addBlock}
+                                                editBlock={this.editBlock}
+                                                deleteBlock={this.deleteBlock}
+                                                reorderBlocks={this.reorderBlocks}
+                                                currentGroup={this.state.currentGroup}
+                                                allGroups={Flow.groups}
+                                                options={this.props.options}/>
+                            }
+                        </div>
+
                     </div>
                 </div>
-            </div>
+            </Spin>
 
         );
     }
@@ -108,8 +133,8 @@ class Flow extends Component {
 function mapStateToProps(state) {
     return {
         options: state.options.options,
-        blockGroups: state.flow.blockGroups,
-        isLoading: state.flow.isLoading,
+        // blockGroups: state.flow.blockGroups,
+        // isLoading: state.flow.isLoading,
 
         addSuccessMsg: state.flow.addSuccessMsg,
         editSuccessMsg: state.flow.editSuccessMsg,
@@ -120,6 +145,7 @@ function mapStateToProps(state) {
         isDeletingGroup: state.flow.isDeletingGroup,
 
         isAddingBlock: state.flow.isAddingBlock,
+
     };
 }
 

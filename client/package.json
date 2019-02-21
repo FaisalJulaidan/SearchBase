@@ -73,6 +73,7 @@
     "reqwest": "^2.0.5",
     "resolve": "1.8.1",
     "sass-loader": "7.1.0",
+    "shortid": "^2.2.14",
     "style-loader": "0.23.0",
     "terser-webpack-plugin": "1.1.0",
     "url-loader": "1.1.1",

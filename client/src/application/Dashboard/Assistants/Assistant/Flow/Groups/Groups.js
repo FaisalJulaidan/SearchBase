@@ -1,10 +1,17 @@
 import React, {Component} from 'react';
 import styles from "./Groups.module.less";
-import {Avatar, Button, List, Skeleton, Spin, Modal} from "antd";
+import {Button, List, Skeleton, Spin, Modal, Menu} from "antd";
 import NewGroup from "./NewGroup/NewGroup";
 import EditGroup from "./EditGroup/EditGroup";
 
 const confirm = Modal.confirm;
+
+const content = (
+    <div>
+        <p>Content</p>
+        <p>Content</p>
+    </div>
+);
 
 class Groups extends Component {
 
@@ -13,7 +20,6 @@ class Groups extends Component {
         editGroupModal: false,
         selectedGroupToEdit: {}
     };
-
 
     ////// ADD GROUP
     handleAddGroup = (newGroup) => {
@@ -70,27 +76,18 @@ class Groups extends Component {
 
 
                 <div className={styles.Panel_Body}>
-                    {
-                        this.props.isLoading ?
-                            <Spin><Skeleton active={true}/></Spin>
-                            :
-                            <List
-                                itemLayout="horizontal"
-                                dataSource={this.props.groupsList}
-                                renderItem={item => (
-                                    <List.Item actions={[<Button icon={'edit'}
-                                                                 onClick={() => this.showEditGroupModal(item)}/>]}>
-                                        <List.Item.Meta
-                                            onClick={() => this.props.selectGroup(item)}
-                                            className={styles.groupsList}
-                                            avatar={<Avatar icon="ordered-list" style={{backgroundColor: '#9254de'}}/>}
-                                            title={item.name}
-                                            description={item.description}
-                                        />
-                                    </List.Item>
-                                )}
-                            />
-                    }
+
+
+                    <Menu mode="inline">
+                        {
+                            this.props.groupsList.map((group, index) =>
+                                <Menu.Item onClick={() => this.props.selectGroup(group)} key={index}>
+                                    {group.name}
+                                </Menu.Item>
+                            )
+                        }
+                    </Menu>
+
                 </div>
 
                 <EditGroup group={this.state.selectedGroupToEdit}

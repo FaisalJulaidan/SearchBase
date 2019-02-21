@@ -32,18 +32,15 @@ class UserInput extends Component {
         if (!err) {
             const flowOptions = this.props.options.flow;
             let options = {
-                block: {
-                    Type: 'User Input',
-                    GroupID: this.props.modalState.currentGroup.id,
-                    StoreInDB: values.storeInDB,
-                    Skippable: values.isSkippable || false,
-                    DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
-                    Content: {
-                        text: values.text,
-                        blockToGoID: getBlockId(values.blockToGoID, values.blockToGoIDGroup, this.props.modalState.currentGroup.blocks, formBlock),
-                        action: values.action,
-                        afterMessage: values.afterMessage || ""
-                    }
+                Type: 'User Input',
+                StoreInDB: values.storeInDB,
+                Skippable: values.isSkippable || false,
+                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
+                Content: {
+                    text: values.text,
+                    blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
+                    action: values.action,
+                    afterMessage: values.afterMessage || ""
                 }
             };
 

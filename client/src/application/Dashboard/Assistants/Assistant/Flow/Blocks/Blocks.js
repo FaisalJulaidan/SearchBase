@@ -50,6 +50,7 @@ class Blocks extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        debugger
         // This handles when updating the selected group to show its blocks
         if (nextProps.currentGroup !== this.state.currentGroup && nextProps.currentGroup.blocks){
             this.setState({blocks: nextProps.currentGroup.blocks})
@@ -111,31 +112,38 @@ class Blocks extends Component {
 
                 <div className={styles.Panel_Body}>
                     <div style={{height: "100%", width: '100%', overflowY: 'auto'}}>
+                        {/*<DragDropContext onDragEnd={this.onDragEnd}>*/}
+                        {/*<Droppable droppableId="droppable">*/}
+                        {/*{(provided) => (*/}
+                        {/*<div ref={provided.innerRef}>*/}
+                        {/*{this.state.blocks.map((block, index) => (*/}
+                        {/*<Draggable key={block.ID} draggableId={block.Order} index={index}>*/}
+                        {/*{(provided) => (*/}
+                        {/*<div ref={provided.innerRef} {...provided.draggableProps}*/}
+                        {/*{...provided.dragHandleProps}*/}
+                        {/*style={getItemStyle(provided.draggableProps.style)}>*/}
+                        {/*<Block block={block}*/}
+                        {/*editBlock={this.editBlock}*/}
+                        {/*deleteBlock={this.deleteBlock}*/}
+                        {/*options={this.props.options}*/}
+                        {/*/>*/}
+                        {/*</div>*/}
+                        {/*)}*/}
+                        {/*</Draggable>*/}
+                        {/*))}*/}
+                        {/*{provided.placeholder}*/}
+                        {/*</div>*/}
+                        {/*)}*/}
+                        {/*</Droppable>*/}
+                        {/*</DragDropContext>*/}
 
-                        <DragDropContext onDragEnd={this.onDragEnd}>
-                            <Droppable droppableId="droppable">
-                                {(provided) => (
-                                    <div ref={provided.innerRef}>
-                                        {this.state.blocks.map((block, index) => (
-                                            <Draggable key={block.ID} draggableId={block.Order} index={index}>
-                                                {(provided) => (
-                                                    <div ref={provided.innerRef} {...provided.draggableProps}
-                                                         {...provided.dragHandleProps}
-                                                         style={getItemStyle(provided.draggableProps.style)}>
-                                                        <Block block={block}
-                                                               editBlock={this.editBlock}
-                                                               deleteBlock={this.deleteBlock}
-                                                               options={this.props.options}
-                                                        />
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </DragDropContext>
+                        {this.state.blocks.map((block, index) =>
+                            <Block block={block}
+                                   key={index}
+                                   editBlock={this.editBlock}
+                                   deleteBlock={this.deleteBlock}
+                                   options={this.props.options}/>
+                        )}
                     </div>
                 </div>
 

@@ -90,6 +90,8 @@ class User(db.Model):
     RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
     Role = db.relationship('Role', back_populates='Users')
 
+    NotificationsRegister = db.relationship('NotificationsRegister', back_populates='User')
+
     Settings = db.relationship("UserSettings", uselist=False, back_populates="User",
                                cascade="all, delete, delete-orphan")
 
@@ -120,10 +122,14 @@ class Role(db.Model):
         return '<Role {}>'.format(self.Name)
 
 
-notifications_association_table = db.Table("notifications_association", db.Model.metadata,
-                                           db.Column("assistant_id", db.Integer, db.ForeignKey("assistant.ID")),
-                                           db.Column("user_id", db.Integer, db.ForeignKey("user.ID"))
-                                           )
+class NotificationsRegister(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    AssistantID = db.Column(db.Integer, db.ForeignKey("assistant.ID", ondelete='cascade'), nullable=False)
+    UserID = db.Column(db.Integer, db.ForeignKey("user.ID", ondelete='cascade'), nullable=False)
+
+    # Relationships:
+    Assistant = db.relationship('Assistant', back_populates='NotificationsRegister')
+    User = db.relationship('User', back_populates='NotificationsRegister')
 
 
 class Assistant(db.Model):
@@ -134,14 +140,14 @@ class Assistant(db.Model):
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
     Config = db.Column(MagicJSON, nullable=True)
+    MailPeriod = db.Column(db.Integer, default=None)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
 
     # Relationships:
-    notifyUsers = db.relationship("User", secondary=notifications_association_table)
-
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )
     Company = db.relationship('Company', back_populates='Assistants')
 
+    NotificationsRegister = db.relationship('NotificationsRegister', back_populates='Assistant')
     Solutions = db.relationship('Solution', back_populates='Assistant')
     Statistics = db.relationship('Statistics', back_populates='Assistant')
     BlockGroups = db.relationship('BlockGroup', back_populates='Assistant')

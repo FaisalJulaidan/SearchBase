@@ -11,7 +11,7 @@ class AssistantSettingsModal extends Component {
 
     togglePopupSwitch = () => {
         this.setState({isPopupDisabled: !this.state.isPopupDisabled})
-    }
+    };
 
 
     componentDidMount() {
@@ -123,7 +123,23 @@ class AssistantSettingsModal extends Component {
                         <span className="ant-form-text"> seconds</span>
                     </FormItem>
 
-                </Form>
+                    /*<FormItem
+                        {...formItemLayout}
+                        label="New Record Alert"
+                        extra="Turning this on will make the assistant alert you when it has been used"
+                    >
+                        <Switch checked={!this.state.isPopupDisabled} onChange={this.togglePopupSwitch}
+                                style={{marginRight: '5px'}}/>
+                        {getFieldDecorator('recordAlertSwitch',
+                            {
+                                initialValue: assistant.SecondsUntilPopup === 0 ? 1 : assistant.SecondsUntilPopup
+                            })(
+                            <InputNumber disabled={this.state.isPopupDisabled} min={1}/>
+                        )}
+                        <span className="ant-form-text"> seconds</span>
+                    </FormItem>*/
+
+                 </Form>
             </Modal>
         );
     }

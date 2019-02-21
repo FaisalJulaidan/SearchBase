@@ -24,6 +24,7 @@ class Assistants extends Component {
 
 
     render() {
+        console.log(this.props)
         return (
             <div style={{height: '100%'}}>
                 <div className={styles.Panel}>

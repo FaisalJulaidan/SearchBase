@@ -18,12 +18,20 @@ def assistants():
     if request.method == "GET":
         # Get all assistants
         callback: Callback = assistant_services.getAll(user['companyID'])
-
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "Cannot get Assistants!",
                                     helpers.getListFromSQLAlchemyList(callback.Data))
-        return helpers.jsonResponse(True, 200, "Assistants Returned!",
-                                        helpers.getListFromSQLAlchemyList(callback.Data))
+
+        notifications_callback: Callback = assistant_services.getAllNotificationsRegisters()
+        if notifications_callback.Success:
+            registers = helpers.getListFromSQLAlchemyList(notifications_callback.Data)
+        else:
+            registers = {}
+
+        return helpers.jsonResponse(True, 200, "Assistants Returned!", {
+                                                        "assistants": helpers.getListFromSQLAlchemyList(callback.Data),
+                                                        "registers": registers
+                                                    })
     if request.method == "POST":
         data = request.json
         callback: Callback = assistant_services.create(data.get('assistantName'),

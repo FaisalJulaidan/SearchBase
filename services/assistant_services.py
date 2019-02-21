@@ -1,4 +1,4 @@
-from models import db, Company, Assistant, Callback
+from models import db, Company, Assistant, Callback, NotificationsRegister
 from sqlalchemy import and_
 from utilities import helpers
 
@@ -155,5 +155,33 @@ def checkOwnership(assistantID, companyID):
         print("Error in assistant_services.checkOwnership(): ", exc)
         db.session.rollback()
         return Callback(False, 'Error in verifying ownership over assistant.')
-    # finally:
-       # db.session.close()
+
+
+def getNotificationsRegisterByID(id):
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(Assistant).filter(NotificationsRegister.AssistantID == id).all()
+        if not result: raise Exception
+
+        return Callback(True,
+                        "Got NotificationsRegister by assistant ID successfully.",
+                        result)
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Could not get the NotificationsRegister by assistant ID.')
+
+
+def getAllNotificationsRegisters():
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(Assistant).all()
+        if not result: raise Exception
+
+        return Callback(True,
+                        "Got NotificationsRegisters successfully.",
+                        result)
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Could not get the NotificationsRegisters.')

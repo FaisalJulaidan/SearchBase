@@ -28,36 +28,47 @@ chatbot_session = {
 }
 
 
+
 flow = {
     "type": "object",
     "properties": {
-        "blocks": {"type": "array", "items": {
+        "groups": {"type": "array", "items": {
             "type": "object",
             "properties":{
-                "ID": {"type": "integer"},
-                "GroupID": {"type": "integer"},
+                "name": {"type": "string"},
+                "description": {"type": "string"},
+                "blocks": {"type": "array", "items": {
+                    "type": "object",
+                    "properties":{
+                        "ID": {"type": "integer"},
+                        "GroupID": {"type": "integer"},
 
-                "DataType": {"type": "object",
-                             "properties": {
-                                 "name": {"enum": [e.value['name'] for e in enums.DataType]},
-                                 "validation": {"enum": [e.value for e in enums.ValidationType]}
-                             },
-                             "required": ["name", "validation"],
-                             "additionalProperties": True
-                             },
+                        "DataType": {"type": "object",
+                                     "properties": {
+                                         "name": {"enum": [e.value['name'] for e in enums.DataType]},
+                                         "validation": {"enum": [e.value for e in enums.ValidationType]}
+                                     },
+                                     "required": ["name", "validation"],
+                                     "additionalProperties": True
+                                     },
 
-                "Type": {"enum": [e.value for e in enums.BlockType]},
-                "Order": {"type": "integer", "minimum": 1},
-                "StoreInDB": {"type": "boolean"},
-                "Skippable": { "type": "boolean" },
-                "Content": {"type": "object"}
+                        "Type": {"enum": [e.value for e in enums.BlockType]},
+                        "StoreInDB": {"type": "boolean"},
+                        "Skippable": { "type": "boolean" },
+                        "Content": {"type": "object"}
+                    },
+                    "required": ["ID", "GroupID", "DataType", "Type", "Order", "StoreInDB", "Skippable", "Content"],
+                    "additionalProperties": False
+                    }
+                }
             },
-            "required": ["ID", "GroupID", "DataType", "Type", "Order", "StoreInDB", "Skippable", "Content"],
+            "required": ["name", "blocks"],
             "additionalProperties": False
-        }
-                   }
+            }
+        },
+
     },
-    "required": ["blocks"],
+    "required": ["groups"],
     "additionalProperties": False
 }
 

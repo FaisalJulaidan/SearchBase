@@ -129,6 +129,7 @@ notifications_association_table = db.Table("notifications_association", db.Model
 class Assistant(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
+    Flow = db.Column(MagicJSON, nullable=True)
     Route = db.Column(db.String(64), unique=True)
     Message = db.Column(db.String(500), nullable=False)
     TopBarText = db.Column(db.String(64), nullable=False)

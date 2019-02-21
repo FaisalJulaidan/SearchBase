@@ -38,7 +38,40 @@ def gen_dummy_data():
     sabic = Company.query.filter(Company.Name == "Sabic").first()
 
     # Create Assistants for Aramco and Sabic companies
-    reader_a = Assistant(Name="Reader", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
+    reader_a = Assistant(Name="Reader", Message="Hey there",
+                         TopBarText="Aramco Bot", SecondsUntilPopup=1,
+                         Active=True, Company=aramco,
+                         Flow= {
+                             "groups": [
+                                 {
+                                     "id": "tisd83f4",
+                                     "name": "group 1",
+                                     "description": "The best group",
+                                     "blocks": [
+                                         {
+                                             "ID": "834hf",
+                                             "DataType": {
+                                                 "name": "Email",
+                                                 "validation": "Email"
+                                             },
+                                             "Type": "User Input",
+                                             "StoreInDB": True,
+                                             "Skippable": False,
+                                             "Content": {
+                                                 "action": "Go To Next Block",
+                                                 "text": "What's your email?",
+                                                 "blockToGoID": None,
+                                                 "afterMessage": "Your input is being processed..."
+                                             }
+                                         }
+                                     ]
+                                 }
+                             ]
+                         })
+
+
+
+
     reader_a_blocksGroup = BlockGroup(Name="Group One", Description="This is Group one", Assistant=reader_a)
     helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
 

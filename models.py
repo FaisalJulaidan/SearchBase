@@ -12,6 +12,8 @@ from sqlite3 import Connection as SQLite3Connection
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
+
+
 # force_auto_coercion()
 
 
@@ -40,18 +42,18 @@ class JsonEncodedDict(types.TypeDecorator):
         return value
 
 
- # TypeEngine.with_variant says "use StringyJSON instead when connecting to 'sqlite'"
+# TypeEngine.with_variant says "use StringyJSON instead when connecting to 'sqlite'"
 MagicJSON = types.JSON().with_variant(JsonEncodedDict, 'sqlite')
 mutable.MutableDict.associate_with(JsonEncodedDict)
+
 
 # ============= Models ===================
 
 class Company(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(80), nullable=False)
     URL = db.Column(db.String(250), nullable=False)
-    StripeID = db.Column(db.String(68), unique=True, nullable=False,)
+    StripeID = db.Column(db.String(68), unique=True, nullable=False, )
     SubID = db.Column(db.String(68), unique=True, default=None)
 
     # Relationships:
@@ -65,7 +67,6 @@ class Company(db.Model):
 
 
 class User(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Firstname = db.Column(db.String(64), nullable=False)
     Surname = db.Column(db.String(64), nullable=False)
@@ -89,7 +90,8 @@ class User(db.Model):
     RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
     Role = db.relationship('Role', back_populates='Users')
 
-    Settings = db.relationship("UserSettings", uselist=False, back_populates="User", cascade="all, delete, delete-orphan")
+    Settings = db.relationship("UserSettings", uselist=False, back_populates="User",
+                               cascade="all, delete, delete-orphan")
 
     # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
 
@@ -98,7 +100,6 @@ class User(db.Model):
 
 
 class Role(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(64))
     EditChatbots = db.Column(db.Boolean(), nullable=False, default=False)
@@ -119,10 +120,15 @@ class Role(db.Model):
         return '<Role {}>'.format(self.Name)
 
 
-class Assistant(db.Model):
+notifications_association_table = db.Table("notifications_association", db.Model.metadata,
+                                           db.Column("assistant_id", db.Integer, db.ForeignKey("assistant.ID")),
+                                           db.Column("user_id", db.Integer, db.ForeignKey("user.ID"))
+                                           )
 
+
+class Assistant(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Name = db.Column(db.String(128),nullable=False)
+    Name = db.Column(db.String(128), nullable=False)
     Route = db.Column(db.String(64), unique=True)
     Message = db.Column(db.String(500), nullable=False)
     TopBarText = db.Column(db.String(64), nullable=False)
@@ -131,7 +137,9 @@ class Assistant(db.Model):
     Active = db.Column(db.Boolean(), nullable=False, default=True)
 
     # Relationships:
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False,)
+    notifyUsers = db.relationship("User", secondary=notifications_association_table)
+
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )
     Company = db.relationship('Company', back_populates='Assistants')
 
     Solutions = db.relationship('Solution', back_populates='Assistant')
@@ -148,7 +156,6 @@ class Assistant(db.Model):
 
 
 class Solution(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(64), nullable=False)
 
@@ -170,7 +177,6 @@ class Solution(db.Model):
 
 
 class Statistics(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
@@ -187,7 +193,6 @@ class Statistics(db.Model):
 
 
 class Plan(db.Model):
-
     ID = db.Column(db.String(25), primary_key=True, unique=True)
     Nickname = db.Column(db.String(40), nullable=False, unique=True)
     MaxSolutions = db.Column(db.Integer, nullable=False, default=0)
@@ -207,7 +212,6 @@ class Plan(db.Model):
 
 
 class Newsletter(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Email = db.Column(db.String(64), nullable=False, unique=True)
 
@@ -219,7 +223,6 @@ class Newsletter(db.Model):
 
 
 class UserSettings(db.Model):
-
     ID = db.Column(db.Integer, db.ForeignKey("user.ID", ondelete='cascade'), primary_key=True, unique=True)
     TrackingData = db.Column(db.Boolean, nullable=False, default=False)
     TechnicalSupport = db.Column(db.Boolean, nullable=False, default=False)
@@ -234,7 +237,6 @@ class UserSettings(db.Model):
 
 
 class ChatbotSession(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Data = db.Column(MagicJSON, nullable=False)
     FilePath = db.Column(db.String(250), nullable=True, default=None)
@@ -244,8 +246,7 @@ class ChatbotSession(db.Model):
     QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
     UserType = db.Column(Enum(enums.UserType), nullable=False)
 
-
-# Relationships:
+    # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')
 
@@ -254,7 +255,6 @@ class ChatbotSession(db.Model):
 
 
 class BlockGroup(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     Description = db.Column(db.String(128), nullable=False)
@@ -262,7 +262,8 @@ class BlockGroup(db.Model):
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='BlockGroups')
-    Blocks = db.relationship('Block', back_populates='Group', order_by='Block.Order', cascade="all, delete, delete-orphan")
+    Blocks = db.relationship('Block', back_populates='Group', order_by='Block.Order',
+                             cascade="all, delete, delete-orphan")
 
     # Constraints:
     # __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
@@ -272,7 +273,6 @@ class BlockGroup(db.Model):
 
 
 class Block(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Type = db.Column(Enum(enums.BlockType), nullable=False)
     DataType = db.Column(Enum(enums.DataType), nullable=False)
@@ -284,6 +284,7 @@ class Block(db.Model):
     # Relationships:
     GroupID = db.Column(db.Integer, db.ForeignKey('block_group.ID', ondelete='cascade'), nullable=False)
     Group = db.relationship('BlockGroup', back_populates='Blocks')
+
     #
     # DataCategoryID = db.Column(db.Integer, db.ForeignKey('data_category.ID', ondelete='SET NULL'))
     # DataCategory = db.relationship('DataCategory', back_populates='Blocks')
@@ -301,7 +302,7 @@ class BlockLabel(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Text = db.Column(db.String(128), nullable=False)
     Colour = db.Column(db.String(128), nullable=False)
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False,)
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )
 
     # Relationships:
     # Blocks = db.relationship('Block', back_populates='Labels', secondary=BlocksLabels)
@@ -311,9 +312,8 @@ class BlockLabel(db.Model):
 
 
 class Database(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Name = db.Column(db.String(64),nullable=False)
+    Name = db.Column(db.String(64), nullable=False)
     Type = db.Column(Enum(enums.DatabaseType), nullable=False)
 
     # Relationships:
@@ -329,7 +329,6 @@ class Database(db.Model):
 
 
 class Candidate(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(64), nullable=False)
     Email = db.Column(db.String(64), nullable=True)
@@ -356,7 +355,6 @@ class Candidate(db.Model):
     PreferredEmploymentType = db.Column(db.String(64), nullable=True)
     DesiredPayRate = db.Column(db.Float(), nullable=True)
 
-
     # Relationships:
     DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
     Database = db.relationship('Database')
@@ -364,8 +362,8 @@ class Candidate(db.Model):
     def __repr__(self):
         return '<Candidate {}>'.format(self.Name)
 
-class Job(db.Model):
 
+class Job(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Title = db.Column(db.String(64), nullable=False)
     Description = db.Column(db.String(64), nullable=False)
@@ -386,6 +384,7 @@ class Job(db.Model):
 
     def __repr__(self):
         return '<Job {}>'.format(self.JobTitle)
+
 
 # class Client(db.Model):
 #
@@ -415,9 +414,6 @@ class Job(db.Model):
 #
 #     def __repr__(self):
 #         return '<Client {}>'.format(self.Name)
-
-
-
 
 
 class Callback():

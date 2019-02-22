@@ -40,20 +40,30 @@ class Flow extends Component {
     // GROUPS
     addGroup = newGroup => {
         const {updatedAssistant} = this.getUpdatableState();
+
         updatedAssistant.Flow.groups.push({
             id: shortid.generate(),
             name: newGroup.name,
             description: newGroup.description,
             blocks: []
         });
-        this.setState({assistant: updatedAssistant, isSaved: false})
+
+        this.setState({
+            assistant: updatedAssistant,
+            isSaved: false
+        })
     };
 
     editGroup = editedGroup => {
         const {updatedAssistant, updatedGroup} = this.getUpdatableState();
+
         updatedGroup.name = editedGroup.name;
         updatedGroup.description = editedGroup.description;
-        this.setState({assistant: updatedAssistant, isSaved: false});
+
+        this.setState({
+            assistant: updatedAssistant,
+            isSaved: false
+        })
     };
 
     deleteGroup = deletedGroup => {
@@ -90,8 +100,23 @@ class Flow extends Component {
         })
     };
 
-    editBlock = (edittedBlock, groupID) => {
+    editBlock = (edittedBlock) => {
+        const {updatedAssistant, updatedGroup} = this.getUpdatableState();
+        const nextBlock = updatedGroup.blocks[updatedGroup.blocks.findIndex(b => b.ID === edittedBlock.ID) + 1];
 
+        if (edittedBlock.Content.action === "Go To Next Block")
+            if (nextBlock?.ID)
+                edittedBlock.Content.blockToGoID = nextBlock.ID;
+            else
+                edittedBlock.Content.blockToGoID = null;
+
+        updatedGroup.blocks[updatedGroup.blocks.findIndex(b => b.ID === edittedBlock.ID)] = edittedBlock;
+
+        this.setState({
+            assistant: updatedAssistant,
+            currentGroup: updatedGroup,
+            isSaved: false
+        })
     };
 
     deleteBlock = (deletedBlock) => {
@@ -112,13 +137,34 @@ class Flow extends Component {
             content: <p>If you click OK, this block will be deleted forever and will affect <b>{counter}</b> blocks</p>,
             onOk: () => {
                 updatedGroup.blocks = updatedGroup.blocks.filter((block) => block.ID !== deletedBlock.ID);
-                this.setState({assistant: updatedAssistant, currentGroup: updatedGroup, isSaved: false})
+
+                this.setState({
+                    assistant: updatedAssistant,
+                    currentGroup: updatedGroup,
+                    isSaved: false
+                })
             }
         });
     };
 
-    reorderBlocks = (newBlocksOrder, groupID) => {
+    reorderBlocks = (newBlocksOrder) => {
+        const {updatedAssistant, updatedGroup} = this.getUpdatableState();
+        newBlocksOrder.map((block, index, array) => {
+            if (block.Content.action === "Go To Next Block")
+                if (array[index + 1]?.ID)
+                    block.Content.blockToGoID = array[index + 1].ID;
+                else
+                    block.Content.blockToGoID = null;
+            return block
+        });
 
+        updatedGroup.blocks = newBlocksOrder;
+
+        this.setState({
+            assistant: updatedAssistant,
+            currentGroup: updatedGroup,
+            isSaved: false
+        })
     };
 
     saveFlow = () => {

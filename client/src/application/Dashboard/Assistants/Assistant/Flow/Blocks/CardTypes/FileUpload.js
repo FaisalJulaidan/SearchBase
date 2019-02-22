@@ -46,8 +46,7 @@ class FileUpload extends Component {
                 this.props.handleNewBlock(options);
             else {
                 // Edit Block
-                options.block.ID = this.props.modalState.block.ID;
-                options.block.Order = this.props.modalState.block.Order;
+                options.ID = this.props.modalState.block.ID;
                 this.props.handleEditBlock(options);
             }
         }

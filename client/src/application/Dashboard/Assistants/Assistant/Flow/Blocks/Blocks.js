@@ -72,26 +72,8 @@ class Blocks extends Component {
     handleEditBlock = (edittedBlock) => this.props.editBlock(edittedBlock, this.props.currentGroup.id);
 
     // DELETE BLOCK MODAL CONFIGS
-    // this called from block.js when you click on delete block button
-    deleteBlock = (deletedBlock) => confirm({
-        title: `Delete block with type: ${deletedBlock.Type}`,
-        content: `If you click OK, this block will be deleted forever`,
-        onOk: () => this.handleDeleteBlock(deletedBlock)
-    });
-
-    handleDeleteBlock = (deletedBlock) => {
-        this.props.deleteBlock(deletedBlock, this.props.currentGroup.id);
-
-        // Remove the deletedBlock
-        let blocks = this.state.blocks.filter((block) => block.ID !== deletedBlock.ID);
-        // Update order
-        for (const i in blocks) blocks[i].Order = Number(i) + 1;
-        this.setState({blocks});
-        // send a request to the server
-        this.props.reorderBlocks(blocks, this.props.currentGroup.id);
-        this.closeEditBlockModal()
-    };
-
+    // this called from block.js & editBlockModal when you click on delete block button
+    handleDeleteBlock = deletedBlock => this.props.deleteBlock(deletedBlock);
 
 
     render() {
@@ -140,7 +122,7 @@ class Blocks extends Component {
                             <Block block={block}
                                    key={index}
                                    editBlock={this.editBlock}
-                                   deleteBlock={this.deleteBlock}
+                                   deleteBlock={this.handleDeleteBlock}
                                    options={this.props.options}/>
                         )}
                     </div>
@@ -157,7 +139,7 @@ class Blocks extends Component {
 
                 <EditBlockModal visible={this.state.editBlockVisible}
                                 handleEditBlock={this.handleEditBlock}
-                                handleDeleteBlock={this.deleteBlock}
+                                handleDeleteBlock={this.handleDeleteBlock}
                                 closeModal={this.closeEditBlockModal}
 
                                 block={this.state.edittedBlock}

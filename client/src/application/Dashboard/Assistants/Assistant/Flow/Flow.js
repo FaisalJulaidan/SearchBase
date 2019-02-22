@@ -6,21 +6,23 @@ import Header from "../../../../../components/Header/Header";
 import {flowActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
 import styles from "./Flow.module.less"
-import {Spin} from "antd";
+import {Modal, Spin} from "antd";
 import shortid from 'shortid';
+
+const confirm = Modal.confirm;
 
 class Flow extends Component {
 
     state = {
         currentGroup: {blocks: []},
-        assistant: {}
+        assistant: {},
+        isSaved: true
     };
 
     getUpdateableState = () => {
         const {assistant, currentGroup} = this.state;
         let updatedAssistant = JSON.parse(JSON.stringify(assistant));
-        let updatedGroup = updatedAssistant.Flow.groups[updatedAssistant.Flow.groups.findIndex(group => group.ID === currentGroup.ID)];
-
+        let updatedGroup = updatedAssistant.Flow.groups[updatedAssistant.Flow.groups.findIndex(group => group.id === currentGroup.id)];
         return {updatedAssistant, updatedGroup}
     };
 
@@ -44,14 +46,14 @@ class Flow extends Component {
             description: newGroup.description,
             blocks: []
         });
-        this.setState({assistant: updatedAssistant})
+        this.setState({assistant: updatedAssistant, isSaved: false})
     };
 
     editGroup = editedGroup => {
         const {updatedAssistant, updatedGroup} = this.getUpdateableState();
         updatedGroup.name = editedGroup.name;
         updatedGroup.description = editedGroup.description;
-        this.setState({assistant: updatedAssistant});
+        this.setState({assistant: updatedAssistant, isSaved: false});
     };
 
     deleteGroup = deletedGroup => {
@@ -59,8 +61,10 @@ class Flow extends Component {
         updatedAssistant.Flow.groups = updatedAssistant.Flow.groups.filter(group => group.id !== deletedGroup.id);
         this.setState({
             assistant: updatedAssistant,
-            currentGroup: {blocks: []}
+            currentGroup: {blocks: []},
+            isSaved: false
         });
+        // Todo: run the blocksRelation checker function
     };
 
 
@@ -81,7 +85,8 @@ class Flow extends Component {
 
         this.setState({
             assistant: updatedAssistant,
-            currentGroup: updatedGroup
+            currentGroup: updatedGroup,
+            isSaved: false
         })
     };
 
@@ -95,9 +100,27 @@ class Flow extends Component {
         }));
     };
 
-    deleteBlock = (deletedBlock, groupID) => {
-        const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.deleteBlockRequest({deletedBlock, groupID, assistantID: assistant.ID}));
+    deleteBlock = (deletedBlock) => {
+        const {updatedAssistant, updatedGroup} = this.getUpdateableState();
+        let counter = 0;
+        updatedAssistant.Flow.groups.forEach((group) => {
+            group.blocks.map((block) => {
+                if (block.Content.blockToGoID === deletedBlock.ID) {
+                    block.Content.blockToGoID = null;
+                    counter++;
+                }
+                return block;
+            })
+        });
+
+        confirm({
+            title: `Delete block with type: ${deletedBlock.Type}`,
+            content: <p>If you click OK, this block will be deleted forever and will affect <b>{counter}</b> blocks</p>,
+            onOk: () => {
+                updatedGroup.blocks = updatedGroup.blocks.filter((block) => block.ID !== deletedBlock.ID);
+                this.setState({assistant: updatedAssistant, currentGroup: updatedGroup, isSaved: false})
+            }
+        });
     };
 
     reorderBlocks = (newBlocksOrder, groupID) => {
@@ -118,7 +141,12 @@ class Flow extends Component {
 
                 <div style={{height: '100%'}}>
                     <Header display={assistant.Name}
-                            button={{icon: "save", onClick: this.submitFlow, text: 'Save Flow', disabled: false}}/>
+                            button={{
+                                icon: "save",
+                                onClick: this.submitFlow,
+                                text: 'Save Flow',
+                                disabled: this.state.isSaved
+                            }}/>
 
                     <div className={styles.Panel_Body_Only}>
                         <div style={{margin: '0 5px 0 0', width: '27%'}}>

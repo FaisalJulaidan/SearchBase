@@ -27,24 +27,13 @@ class Flow extends Component {
     };
 
     componentDidMount() {
-        // this.setState({
-        //         assistant: this.props.location.state.assistant
-        //     },
-        //     () => console.log(this.state.assistant)
-        // )
+        this.setState({
+                assistant: this.props.location.state.assistant
+            },
+            () => console.log(this.state.assistant)
+        )
     }
 
-    componentWillReceiveProps(nextProps, nextContext) {
-        const {assistantList, match} = nextProps;
-        console.log(nextProps);
-        console.log("==============");
-        if(assistantList[0]){
-            const newAssistant = assistantList.find(assistant => {
-                return assistant.ID === +match.params.id});
-            this.setState({assistant: newAssistant,
-                currentGroup: newAssistant.Flow.groups.find(group => group.id === this.state.currentGroup.id)})
-        }
-    }
 
     selectGroup = currentGroup => this.setState({currentGroup});
 
@@ -134,8 +123,12 @@ class Flow extends Component {
     };
 
     saveFlow = () => {
+        // if i got the assistans.js then i click on flow
         this.props.dispatch(assistantActions.updateFlow(this.state.assistant));
-        console.log(this.props.successMsg);
+        // this when i refresh the page beacause the props.llcati.stat kj fasdis sdfsdf stuck and need to
+        // be clicked again from the alst page
+        this.props.location.state.assistant = this.state.assistant;
+
         if (this.props.successMsg)
             this.setState({isSaved: true});
     };
@@ -193,7 +186,6 @@ class Flow extends Component {
 function mapStateToProps(state) {
     return {
         options: state.options.options,
-        assistantList: state.assistant.assistantList,
         successMsg: state.assistant.updateFlowSuccessMsg,
     };
 }

@@ -79,6 +79,7 @@ new_block = {
         "block": {
             "type": "object",
             "properties": {
+                "ID": {"type": "string"},
                 "Type": { "enum": [e.value for e in enums.BlockType]},
                 "GroupID": {"type": "integer"},
                 "DataType": {"type": "object",

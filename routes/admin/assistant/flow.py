@@ -19,21 +19,13 @@ def flow(assistantID):
         return helpers.jsonResponse(False, security_callback.Data, security_callback.Message, None)
     assistant: Assistant = security_callback.Data
 
-    #############
-    callback: Callback = Callback(False, 'Error!', None)
-    # Get the assistant's flow including (groups & blocks)
-    if request.method == "GET":
-        callback: Callback = flow_services.getFlow(assistant)
-
     # Update the blocks
     if request.method == "PUT":
         data = request.json
         callback: Callback = flow_services.updateFlow(data, assistant)
-
-
-    if not callback.Success:
-        return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
-    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
 # Add, Update and Delete blocks group, We ask for assistant ID for security purposes

@@ -121,10 +121,11 @@ const updateFlow = (assistant) => {
     };
 };
 
-const updateFlowSuccess = (assistant) => {
+const updateFlowSuccess = (assistant, msg) => {
     return {
         type: actionTypes.UPDATE_FLOW_SUCCESS,
-        assistant
+        assistant,
+        msg
     };
 };
 

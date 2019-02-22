@@ -19,6 +19,12 @@ class Flow extends Component {
         isSaved: true
     };
 
+    componentWillReceiveProps(nextProps, nextContext) {
+        console.log(this.props, nextProps);
+        if (nextProps.successMsg)
+            this.setState({isSaved: true}, () => console.log(nextProps.successMsg));
+    }
+
     getUpdatableState = () => {
         const {assistant, currentGroup} = this.state;
         let updatedAssistant = JSON.parse(JSON.stringify(assistant));
@@ -173,9 +179,6 @@ class Flow extends Component {
         // this when i refresh the page beacause the props.llcati.stat kj fasdis sdfsdf stuck and need to
         // be clicked again from the alst page
         this.props.location.state.assistant = this.state.assistant;
-
-        if (this.props.successMsg)
-            this.setState({isSaved: true});
     };
 
     render() {

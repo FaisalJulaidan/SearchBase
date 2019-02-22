@@ -2,7 +2,7 @@ import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {assistantActions, authActions, flowActions} from "../actions";
 import {http} from "../../helpers";
-import {alertError, alertSuccess, destroyMessage, loadingMessage} from "../../helpers/alert";
+import {alertError, alertSuccess, destroyMessage, loadingMessage, sucessMessage} from "../../helpers/alert";
 
 
 function* fetchAssistants() {
@@ -61,11 +61,13 @@ function* deleteAssistant({assistantID}) {
 
 function* updateFlow({assistant}) {
     try {
-        loadingMessage('Updating Block');
+        loadingMessage('Updating Flow', 0);
+
         const res = yield http.put(`/assistant/${assistant.ID}/flow`, {flow: assistant.Flow});
         yield destroyMessage();
-        yield alertSuccess('Flow Updated', res.data.msg);
-        yield put(assistantActions.updateFlowSuccess(assistant));
+
+        yield sucessMessage('Flow Updated');
+        yield put(assistantActions.updateFlowSuccess(assistant, res.data.msg));
     } catch (error) {
         console.log(error);
         yield put(assistantActions.updateFlowFailure(error.response.data));

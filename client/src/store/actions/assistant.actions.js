@@ -113,6 +113,28 @@ const changeAssistantStatusFailure = (error) => {
     };
 };
 
+
+const updateFlow = (assistant) => {
+    return {
+        type: actionTypes.UPDATE_FLOW_REQUEST,
+        assistant
+    };
+};
+
+const updateFlowSuccess = (assistant) => {
+    return {
+        type: actionTypes.UPDATE_FLOW_SUCCESS,
+        assistant
+    };
+};
+
+const updateFlowFailure = (error) => {
+    return {
+        type: actionTypes.UPDATE_FLOW_FAILURE,
+        error
+    };
+};
+
 export const assistantActions = {
     fetchAssistants,
     fetchAssistantsSuccess,
@@ -133,4 +155,8 @@ export const assistantActions = {
     changeAssistantStatus,
     changeAssistantStatusSuccess,
     changeAssistantStatusFailure,
+
+    updateFlow,
+    updateFlowSuccess,
+    updateFlowFailure
 };

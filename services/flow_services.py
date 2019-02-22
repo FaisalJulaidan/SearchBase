@@ -56,7 +56,7 @@ def updateFlow(flow, assistant: Assistant) -> Callback:
         groupIDs = []
         for group in flow['groups']:
             # Make sure each Group has a unique id
-            if id not in groupIDs:
+            if group['id'] not in groupIDs:
                 groupIDs.append(id)
             else:
                 return Callback(False, "two groups shouldn't have the same id."
@@ -65,7 +65,7 @@ def updateFlow(flow, assistant: Assistant) -> Callback:
             # Ensure each Block has a unique id
             blockIDs = []
             for block in group['blocks']:
-                if id not in blockIDs:
+                if block['ID'] not in blockIDs:
                     blockIDs.append(id)
                 else:
                     return Callback(False, "two blocks shouldn't have the same id."
@@ -78,11 +78,13 @@ def updateFlow(flow, assistant: Assistant) -> Callback:
                     return callback
 
         # Update flow and save
+        print(flow)
         assistant.Flow = flow
         db.session.commit()
         return Callback(True, "Flow updated successfully!")
 
     except Exception as exc:
+        print("EROROROROROROROR")
         print(exc.args)
         return Callback(False, "The submitted Flow doesn't follow the correct format")
 
@@ -95,7 +97,6 @@ def isValidBlock(block: dict, blockType: str):
         print(exc.args[0])
         blockType = block.get('Type')
         msg = "Block data doesn't follow the correct format"
-
         if blockType:
             msg = "the Block with id '" + block.get('ID') + "' doesn't follow the correct format of " \
                   + str(enums.BlockType(blockType).value) + " block type"

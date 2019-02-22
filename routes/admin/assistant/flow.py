@@ -8,7 +8,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 flow_router: Blueprint = Blueprint('flow_router', __name__, template_folder="../../templates")
 
 
-@flow_router.route("/assistant/<int:assistantID>/flow", methods=['GET', 'PUT'])
+@flow_router.route("/assistant/<int:assistantID>/flow", methods=['PUT'])
 @jwt_required
 def flow(assistantID):
 
@@ -22,7 +22,7 @@ def flow(assistantID):
     # Update the blocks
     if request.method == "PUT":
         data = request.json
-        callback: Callback = flow_services.updateFlow(data, assistant)
+        callback: Callback = flow_services.updateFlow(data.get('flow'), assistant)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)

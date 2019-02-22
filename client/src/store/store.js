@@ -4,7 +4,6 @@ import rootReducer from './reducers';
 import {
     assistantSaga,
     authSaga,
-    flowSaga,
     profileSaga,
     chatbotSessions,
     solutionsSaga,
@@ -21,7 +20,6 @@ const store = createStore(
     composeEnhancers(applyMiddleware(sagaMiddleware))
 );
 
-sagaMiddleware.run(flowSaga);
 sagaMiddleware.run(assistantSaga);
 sagaMiddleware.run(authSaga);
 sagaMiddleware.run(profileSaga);

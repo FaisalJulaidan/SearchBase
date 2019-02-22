@@ -100,6 +100,29 @@ export const assistant = (state = initialState, action) => {
                 errorMsg: action.error.msg
             });
 
+        case actionTypes.UPDATE_FLOW_REQUEST:
+            return updateObject(state, {
+                isUpdatingFlow: true,
+                updateFlowSuccessMsg: null,
+                updateFlowErrorMsg: null,
+            });
+        case actionTypes.UPDATE_FLOW_SUCCESS:
+
+            assistantList = [...state.assistantList];
+            let assistantToUpdate =  assistantList.findIndex(assistant => assistant.id === action.assistant.id);
+            assistantToUpdate = action.assistant;
+
+            return updateObject(state, {
+                isUpdatingFlow: false,
+                updateFlowSuccessMsg: action.msg,
+                assistantList: assistantList
+            });
+        case actionTypes.UPDATE_FLOW_FAILURE:
+            return updateObject(state, {
+                isUpdatingFlow: false,
+                updateFlowErrorMsg: action.error.msg
+            });
+
         default:
             return state
     }

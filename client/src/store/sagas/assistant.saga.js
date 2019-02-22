@@ -59,6 +59,25 @@ function* deleteAssistant({assistantID}) {
 }
 
 
+function* updateFlow({assistant}) {
+    try {
+        loadingMessage('Updating Block');
+        const res = yield http.put(`/assistant/${assistant.ID}/flow`, {flow: assistant.Flow});
+        yield destroyMessage();
+        yield alertSuccess('Flow Updated', res.data.msg);
+        yield put(assistantActions.updateFlowSuccess(assistant));
+    } catch (error) {
+        console.log(error);
+        yield put(assistantActions.updateFlowFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not update the flow");
+    }
+}
+
+
+function* watchUpdateFlow() {
+    yield takeEvery(actionTypes.UPDATE_FLOW_REQUEST, updateFlow)
+}
+
 function* watchFetchAssistants() {
     yield takeEvery(actionTypes.FETCH_ASSISTANTS_REQUEST, fetchAssistants)
 }
@@ -82,6 +101,7 @@ export function* assistantSaga() {
         watchAddAssistant(),
         watchUpdateAssistant(),
         watchDeleteAssistant(),
+        watchUpdateFlow(),
 
     ])
 }

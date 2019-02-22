@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import Groups from "./Groups/Groups";
 import Blocks from "./Blocks/Blocks";
 import Header from "../../../../../components/Header/Header";
-import {flowActions} from "../../../../../store/actions";
+import {assistantActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
 import styles from "./Flow.module.less"
 import {Modal, Spin} from "antd";
@@ -19,7 +19,7 @@ class Flow extends Component {
         isSaved: true
     };
 
-    getUpdateableState = () => {
+    getUpdatableState = () => {
         const {assistant, currentGroup} = this.state;
         let updatedAssistant = JSON.parse(JSON.stringify(assistant));
         let updatedGroup = updatedAssistant.Flow.groups[updatedAssistant.Flow.groups.findIndex(group => group.id === currentGroup.id)];
@@ -27,11 +27,23 @@ class Flow extends Component {
     };
 
     componentDidMount() {
-        this.setState({
-                assistant: this.props.location.state.assistant
-            },
-            () => console.log(this.state.assistant)
-        )
+        // this.setState({
+        //         assistant: this.props.location.state.assistant
+        //     },
+        //     () => console.log(this.state.assistant)
+        // )
+    }
+
+    componentWillReceiveProps(nextProps, nextContext) {
+        const {assistantList, match} = nextProps;
+        console.log(nextProps);
+        console.log("==============");
+        if(assistantList[0]){
+            const newAssistant = assistantList.find(assistant => {
+                return assistant.ID === +match.params.id});
+            this.setState({assistant: newAssistant,
+                currentGroup: newAssistant.Flow.groups.find(group => group.id === this.state.currentGroup.id)})
+        }
     }
 
     selectGroup = currentGroup => this.setState({currentGroup});
@@ -39,7 +51,7 @@ class Flow extends Component {
 
     // GROUPS
     addGroup = newGroup => {
-        const {updatedAssistant} = this.getUpdateableState();
+        const {updatedAssistant} = this.getUpdatableState();
         updatedAssistant.Flow.groups.push({
             id: shortid.generate(),
             name: newGroup.name,
@@ -50,14 +62,14 @@ class Flow extends Component {
     };
 
     editGroup = editedGroup => {
-        const {updatedAssistant, updatedGroup} = this.getUpdateableState();
+        const {updatedAssistant, updatedGroup} = this.getUpdatableState();
         updatedGroup.name = editedGroup.name;
         updatedGroup.description = editedGroup.description;
         this.setState({assistant: updatedAssistant, isSaved: false});
     };
 
     deleteGroup = deletedGroup => {
-        const {updatedAssistant} = this.getUpdateableState();
+        const {updatedAssistant} = this.getUpdatableState();
         updatedAssistant.Flow.groups = updatedAssistant.Flow.groups.filter(group => group.id !== deletedGroup.id);
         this.setState({
             assistant: updatedAssistant,
@@ -70,7 +82,7 @@ class Flow extends Component {
 
     // BLOCKS
     addBlock = (newBlock) => {
-        const {updatedAssistant, updatedGroup} = this.getUpdateableState();
+        const {updatedAssistant, updatedGroup} = this.getUpdatableState();
 
         const ID = shortid.generate();
         newBlock.ID = ID;
@@ -91,17 +103,11 @@ class Flow extends Component {
     };
 
     editBlock = (edittedBlock, groupID) => {
-        const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.editBlockRequest({
-            edittedBlock,
-            groupID,
-            assistantID: assistant.ID,
-            currentBlocks: [...this.state.currentGroup.blocks]
-        }));
+
     };
 
     deleteBlock = (deletedBlock) => {
-        const {updatedAssistant, updatedGroup} = this.getUpdateableState();
+        const {updatedAssistant, updatedGroup} = this.getUpdatableState();
         let counter = 0;
         updatedAssistant.Flow.groups.forEach((group) => {
             group.blocks.map((block) => {
@@ -124,12 +130,14 @@ class Flow extends Component {
     };
 
     reorderBlocks = (newBlocksOrder, groupID) => {
-        const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.updateBlocksOrderRequest({newBlocksOrder, groupID, assistantID: assistant.ID}));
+
     };
 
-    submitFlow = () => {
-        console.log('ready to send the updated assistant')
+    saveFlow = () => {
+        this.props.dispatch(assistantActions.updateFlow(this.state.assistant));
+        console.log(this.props.successMsg);
+        if (this.props.successMsg)
+            this.setState({isSaved: true});
     };
 
     render() {
@@ -143,7 +151,7 @@ class Flow extends Component {
                     <Header display={assistant.Name}
                             button={{
                                 icon: "save",
-                                onClick: this.submitFlow,
+                                onClick: this.saveFlow,
                                 text: 'Save Flow',
                                 disabled: this.state.isSaved
                             }}/>
@@ -185,19 +193,8 @@ class Flow extends Component {
 function mapStateToProps(state) {
     return {
         options: state.options.options,
-        // blockGroups: state.flow.blockGroups,
-        // isLoading: state.flow.isLoading,
-
-        addSuccessMsg: state.flow.addSuccessMsg,
-        editSuccessMsg: state.flow.editSuccessMsg,
-        deleteSuccessMsg: state.flow.deleteSuccessMsg,
-
-        isAddingGroup: state.flow.isAddingGroup,
-        isEditingGroup: state.flow.isEditingGroup,
-        isDeletingGroup: state.flow.isDeletingGroup,
-
-        isAddingBlock: state.flow.isAddingBlock,
-
+        assistantList: state.assistant.assistantList,
+        successMsg: state.assistant.updateFlowSuccessMsg,
     };
 }
 

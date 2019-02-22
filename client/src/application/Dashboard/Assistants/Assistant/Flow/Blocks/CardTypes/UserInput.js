@@ -28,7 +28,7 @@ class UserInput extends Component {
         this.setState(initActionType(block, this.props.modalState.allGroups));
     }
 
-    onSubmit = (formBlock) => this.props.form.validateFields((err, values) => {
+    onSubmit = () => this.props.form.validateFields((err, values) => {
         if (!err) {
             const flowOptions = this.props.options.flow;
             let options = {

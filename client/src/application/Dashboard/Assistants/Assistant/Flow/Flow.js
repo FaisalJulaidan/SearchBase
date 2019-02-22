@@ -32,7 +32,7 @@ class Flow extends Component {
         )
     }
 
-    selectGroup = (currentGroup) => this.setState({currentGroup});
+    selectGroup = currentGroup => this.setState({currentGroup});
 
 
     // GROUPS
@@ -105,17 +105,23 @@ class Flow extends Component {
         this.props.dispatch(flowActions.updateBlocksOrderRequest({newBlocksOrder, groupID, assistantID: assistant.ID}));
     };
 
+    submitFlow = () => {
+        console.log('ready to send the updated assistant')
+    };
+
     render() {
         const {assistant} = this.state;
         const {Flow} = assistant;
-        console.log(Flow);
+
         return (
             <Spin spinning={!(!!Flow)} style={{height: '100%'}}>
 
                 <div style={{height: '100%'}}>
-                    <Header display={assistant.Name}/>
+                    <Header display={assistant.Name}
+                            button={{icon: "save", onClick: this.submitFlow, text: 'Save Flow', disabled: false}}/>
+
                     <div className={styles.Panel_Body_Only}>
-                        <div style={{margin: '0 5px 0 0', width: '20%'}}>
+                        <div style={{margin: '0 5px 0 0', width: '27%'}}>
                             {
                                 Flow && <Groups selectGroup={this.selectGroup}
                                                 isLoading={this.props.isLoading}
@@ -127,7 +133,7 @@ class Flow extends Component {
                             }
                         </div>
 
-                        <div style={{margin: '0 0 0 5px', width: '80%'}}>
+                        <div style={{margin: '0 0 0 5px', width: '73%'}}>
                             {
                                 Flow && <Blocks addBlock={this.addBlock}
                                                 editBlock={this.editBlock}

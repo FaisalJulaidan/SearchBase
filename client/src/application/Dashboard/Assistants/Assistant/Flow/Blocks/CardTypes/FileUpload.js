@@ -28,19 +28,17 @@ class FileUpload extends Component {
         if (!err) {
             const flowOptions = this.props.options.flow;
             let options = {
-                block: {
-                    Type: 'File Upload',
-                    GroupID: this.props.modalState.currentGroup.id,
-                    StoreInDB: true,
-                    Skippable: values.isSkippable || false,
-                    DataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
-                    Content: {
-                        text: values.text,
-                        action: values.action,
-                        fileTypes: this.state.fileTypes,
-                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
-                        afterMessage: values.afterMessage || ""
-                    }
+                Type: 'File Upload',
+                GroupID: this.props.modalState.currentGroup.id,
+                StoreInDB: true,
+                Skippable: values.isSkippable || false,
+                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
+                Content: {
+                    text: values.text,
+                    action: values.action,
+                    fileTypes: this.state.fileTypes,
+                    blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
+                    afterMessage: values.afterMessage || ""
                 }
             };
 

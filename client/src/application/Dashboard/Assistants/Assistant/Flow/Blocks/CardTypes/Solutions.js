@@ -29,7 +29,6 @@ class Solutions extends Component {
         if (!err) {
             const flowOptions = this.props.options.flow;
             let options = {
-                block: {
                     Type: 'Solutions',
                     GroupID: this.props.modalState.currentGroup.id,
                     StoreInDB: false,
@@ -38,11 +37,10 @@ class Solutions extends Component {
                     Content: {
                         showTop: Number(values.showTop),
                         action: values.action,
-                        blockToGoID: getBlockId(values.blockToGoID, values.blockToGoIDGroup, this.props.modalState.currentGroup.blocks, formBlock),
+                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                         afterMessage: values.afterMessage || "" ,
                         databaseType: values.databaseType,
                     }
-                }
             };
 
             if (this.props.handleNewBlock)

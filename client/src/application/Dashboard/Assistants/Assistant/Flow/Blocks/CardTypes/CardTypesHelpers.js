@@ -84,7 +84,6 @@ export const checkBlockTogGoID = (blocks, blockGroups, groupID) => {
         return blocks
     } else {
         // I want this to update everything in flow
-        debugger
         blockGroups.map(group => {
             group.blocks.map(fromState_block => {
                 // check each block.Content.blockToGoID if valid or not

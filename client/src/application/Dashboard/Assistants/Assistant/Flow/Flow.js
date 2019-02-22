@@ -8,6 +8,7 @@ import connect from "react-redux/es/connect/connect";
 import styles from "./Flow.module.less"
 import {Spin} from "antd";
 import shortid from 'shortid';
+
 class Flow extends Component {
 
     state = {
@@ -15,6 +16,13 @@ class Flow extends Component {
         assistant: {}
     };
 
+    getUpdateableState = () => {
+        const {assistant, currentGroup} = this.state;
+        let updatedAssistant = JSON.parse(JSON.stringify(assistant));
+        let updatedGroup = updatedAssistant.Flow.groups[updatedAssistant.Flow.groups.findIndex(group => group.ID === currentGroup.ID)];
+
+        return {updatedAssistant, updatedGroup}
+    };
 
     componentDidMount() {
         this.setState({
@@ -24,32 +32,41 @@ class Flow extends Component {
         )
     }
 
-    selectGroup = (currentGroup) => this.setState({currentGroup});
+    selectGroup = currentGroup => this.setState({currentGroup});
 
 
     // GROUPS
-    addGroup = (newGroup) => {
-        const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.addGroupRequest({assistantID: assistant.ID, newGroup: newGroup}));
+    addGroup = newGroup => {
+        const {updatedAssistant} = this.getUpdateableState();
+        updatedAssistant.Flow.groups.push({
+            id: shortid.generate(),
+            name: newGroup.name,
+            description: newGroup.description,
+            blocks: []
+        });
+        this.setState({assistant: updatedAssistant})
     };
 
-    editGroup = (editedGroup) => {
-        const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.editGroupRequest({assistantID: assistant.ID, editedGroup: editedGroup}));
+    editGroup = editedGroup => {
+        const {updatedAssistant, updatedGroup} = this.getUpdateableState();
+        updatedGroup.name = editedGroup.name;
+        updatedGroup.description = editedGroup.description;
+        this.setState({assistant: updatedAssistant});
     };
 
-    deleteGroup = (deletedGroup) => {
-        const {assistant} = this.props.location.state;
-        this.props.dispatch(flowActions.deleteGroupRequest({assistantID: assistant.ID, deletedGroup: deletedGroup}));
-        this.setState({currentGroup: {blocks: []}});
+    deleteGroup = deletedGroup => {
+        const {updatedAssistant} = this.getUpdateableState();
+        updatedAssistant.Flow.groups = updatedAssistant.Flow.groups.filter(group => group.id !== deletedGroup.id);
+        this.setState({
+            assistant: updatedAssistant,
+            currentGroup: {blocks: []}
+        });
     };
 
 
     // BLOCKS
     addBlock = (newBlock) => {
-        const {assistant, currentGroup} = this.state;
-        let updatedAssistant = {...assistant};
-        let updatedGroup = updatedAssistant.Flow.groups[updatedAssistant.Flow.groups.findIndex(group => group.ID === currentGroup.ID)];
+        const {updatedAssistant, updatedGroup} = this.getUpdateableState();
 
         const ID = shortid.generate();
         newBlock.ID = ID;
@@ -62,7 +79,6 @@ class Flow extends Component {
 
         updatedGroup.blocks.push(newBlock);
 
-        console.log(updatedAssistant, updatedGroup);
         this.setState({
             assistant: updatedAssistant,
             currentGroup: updatedGroup
@@ -89,27 +105,35 @@ class Flow extends Component {
         this.props.dispatch(flowActions.updateBlocksOrderRequest({newBlocksOrder, groupID, assistantID: assistant.ID}));
     };
 
+    submitFlow = () => {
+        console.log('ready to send the updated assistant')
+    };
+
     render() {
         const {assistant} = this.state;
         const {Flow} = assistant;
+
         return (
             <Spin spinning={!(!!Flow)} style={{height: '100%'}}>
 
                 <div style={{height: '100%'}}>
-                    <Header display={assistant.Name}/>
+                    <Header display={assistant.Name}
+                            button={{icon: "save", onClick: this.submitFlow, text: 'Save Flow', disabled: false}}/>
+
                     <div className={styles.Panel_Body_Only}>
-                        <div style={{margin: '0 5px 0 0', width: '30%'}}>
+                        <div style={{margin: '0 5px 0 0', width: '27%'}}>
                             {
                                 Flow && <Groups selectGroup={this.selectGroup}
                                                 isLoading={this.props.isLoading}
                                                 groupsList={Flow.groups}
+                                                currentGroup={this.state.currentGroup}
                                                 addGroup={this.addGroup}
                                                 editGroup={this.editGroup}
                                                 deleteGroup={this.deleteGroup}/>
                             }
                         </div>
 
-                        <div style={{margin: '0 0 0 5px', width: '70%'}}>
+                        <div style={{margin: '0 0 0 5px', width: '73%'}}>
                             {
                                 Flow && <Blocks addBlock={this.addBlock}
                                                 editBlock={this.editBlock}

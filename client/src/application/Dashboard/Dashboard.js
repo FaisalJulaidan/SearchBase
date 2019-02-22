@@ -64,8 +64,6 @@ class Dashboard extends Component {
         const {match, location} = this.props;
         const user = getUser();
         let userInfo = null;
-        console.log(location)
-
         // User Information at the top
         if (!user) {
             this.logout();

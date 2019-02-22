@@ -50,7 +50,6 @@ class Blocks extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        debugger
         // This handles when updating the selected group to show its blocks
         if (nextProps.currentGroup !== this.state.currentGroup && nextProps.currentGroup.blocks){
             this.setState({blocks: nextProps.currentGroup.blocks})

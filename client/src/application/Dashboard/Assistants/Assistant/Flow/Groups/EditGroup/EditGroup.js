@@ -8,11 +8,8 @@ class EditGroup extends Component {
     state = {};
 
     handleUpdate = () => this.props.form.validateFields((err, values) => {
-        if (!err) {
-            this.props.group.name = values.name;
-            this.props.group.description = values.description;
-            this.props.handleUpdate(this.props.group)
-        }
+        if (!err)
+            this.props.handleUpdate(values)
     });
 
 

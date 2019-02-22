@@ -27,9 +27,8 @@ class Flow extends Component {
     };
 
     componentDidMount() {
-        this.setState({
-                assistant: this.props.location.state.assistant
-            },
+        const {assistantList, match} = this.props;
+        this.setState({assistant: assistantList.find(assistant => assistant.ID === +match.params.id)},
             () => console.log(this.state.assistant)
         )
     }
@@ -186,6 +185,7 @@ class Flow extends Component {
 function mapStateToProps(state) {
     return {
         options: state.options.options,
+        assistantList: state.assistant.assistantList,
         successMsg: state.assistant.updateFlowSuccessMsg,
     };
 }

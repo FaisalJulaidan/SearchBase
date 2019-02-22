@@ -18,7 +18,7 @@ import Solutions from "./Assistants/Assistant/Solutions/Solutions";
 import Home from "./Home/Home";
 import Analytics from "./Assistants/Assistant/Analytics/Analytics";
 import {authActions, optionsActions} from "../../store/actions";
-import store from '../../store/store';
+import { store, persistor} from '../../store/store'
 import {connect} from 'react-redux';
 
 import {TransitionGroup, CSSTransition} from "react-transition-group";

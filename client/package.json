@@ -68,6 +68,7 @@
     "react-trello": "^2.0.5",
     "redux": "^4.0.1",
     "redux-logger": "^3.0.6",
+    "redux-persist": "^5.10.0",
     "redux-saga": "^0.16.2",
     "redux-thunk": "^2.3.0",
     "reqwest": "^2.0.5",

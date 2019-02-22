@@ -108,14 +108,14 @@ export const assistant = (state = initialState, action) => {
             });
         case actionTypes.UPDATE_FLOW_SUCCESS:
 
-            assistantList = [...state.assistantList];
-            let assistantToUpdate =  assistantList.findIndex(assistant => assistant.id === action.assistant.id);
-            assistantToUpdate = action.assistant;
+            let newAssistantList = JSON.parse(JSON.stringify(state.assistantList));
+            newAssistantList =  newAssistantList.filter(assistant => assistant.id !== action.assistant.id);
+            newAssistantList.push(action.assistant);
 
             return updateObject(state, {
                 isUpdatingFlow: false,
                 updateFlowSuccessMsg: action.msg,
-                assistantList: assistantList
+                assistantList: newAssistantList
             });
         case actionTypes.UPDATE_FLOW_FAILURE:
             return updateObject(state, {

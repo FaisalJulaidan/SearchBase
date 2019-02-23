@@ -29,7 +29,6 @@ class FileUpload extends Component {
             const flowOptions = this.props.options.flow;
             let options = {
                 Type: 'File Upload',
-                GroupID: this.props.modalState.currentGroup.id,
                 StoreInDB: true,
                 Skippable: values.isSkippable || false,
                 DataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),

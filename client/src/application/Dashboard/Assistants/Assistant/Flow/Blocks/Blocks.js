@@ -102,7 +102,6 @@ class Blocks extends Component {
                                                              {...provided.dragHandleProps}
                                                              style={getItemStyle(provided.draggableProps.style)}>
                                                             <Block block={block}
-                                                                   key={index}
                                                                    editBlock={this.editBlock}
                                                                    deleteBlock={this.handleDeleteBlock}
                                                                    options={this.props.options}/>

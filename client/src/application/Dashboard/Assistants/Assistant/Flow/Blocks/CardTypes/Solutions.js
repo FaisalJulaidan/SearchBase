@@ -30,7 +30,6 @@ class Solutions extends Component {
             const flowOptions = this.props.options.flow;
             let options = {
                     Type: 'Solutions',
-                    GroupID: this.props.modalState.currentGroup.id,
                     StoreInDB: false,
                     Skippable: false,
                     DataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),

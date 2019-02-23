@@ -38,7 +38,6 @@ class Question extends Component {
                 const flowOptions = this.props.options.flow;
                 let options = {
                     Type: 'Question',
-                    GroupID: this.props.modalState.currentGroup.id,
                     StoreInDB: values.storeInDB,
                     Skippable: values.isSkippable || false,
                     DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),

@@ -22,22 +22,24 @@ def assistants():
             return helpers.jsonResponse(False, 404, "Cannot get Assistants!",
                                     helpers.getListFromSQLAlchemyList(callback.Data))
 
-        notifications_callback: Callback = assistant_services.getAllNotificationsRegisters()
-        if notifications_callback.Success:
-            registers = helpers.getListFromSQLAlchemyList(notifications_callback.Data)
-        else:
-            registers = {}
+        # notifications_callback: Callback = assistant_services.getAllNotificationsRegisters()
+        # if notifications_callback.Success:
+        #     registers = helpers.getListFromSQLAlchemyList(notifications_callback.Data)
+        # else:
+        #     registers = {}
 
         return helpers.jsonResponse(True, 200, "Assistants Returned!", {
-                                                        "assistants": helpers.getListFromSQLAlchemyList(callback.Data),
-                                                        "registers": registers
+                                                        "assistants": helpers.getListFromSQLAlchemyList(callback.Data)
                                                     })
     if request.method == "POST":
         data = request.json
+        print(data)
         callback: Callback = assistant_services.create(data.get('assistantName'),
                                                        data.get('welcomeMessage'),
                                                        data.get('topBarTitle'),
                                                        data.get('secondsUntilPopup'),
+                                                       data.get('alertsEnabled'),
+                                                       data.get('alertEvery'),
                                                        user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, "Cannot add Assistant")
@@ -64,7 +66,9 @@ def assistant(assistantID):
                                                        updatedSettings.get("assistantName", "None"),
                                                        updatedSettings.get("welcomeMessage", "None"),
                                                        updatedSettings.get("topBarTitle", "None"),
-                                                       updatedSettings.get("secondsUntilPopup", "None"))
+                                                       updatedSettings.get("secondsUntilPopup", "None"),
+                                                       updatedSettings.get("alertsEnabled", False),
+                                                       updatedSettings.get("alertEvery", 24))
     # Delete assistant
     if request.method == "DELETE":
         callback: Callback = assistant_services.removeByID(assistantID)

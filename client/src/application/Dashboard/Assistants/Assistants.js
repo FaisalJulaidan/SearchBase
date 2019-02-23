@@ -24,7 +24,6 @@ class Assistants extends Component {
 
 
     render() {
-        console.log(this.props)
         return (
             <div style={{height: '100%'}}>
                 <div className={styles.Panel}>
@@ -71,6 +70,7 @@ class Assistants extends Component {
 function mapStateToProps(state) {
     return {
         assistantList: state.assistant.assistantList,
+        registerList: state.assistant.registerList,
         isLoading: state.assistant.isLoading,
     };
 }

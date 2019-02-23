@@ -1,4 +1,4 @@
-from models import db, Company, Assistant, Callback, NotificationsRegister
+from models import db, Company, Assistant, Callback
 from sqlalchemy import and_
 from utilities import helpers
 
@@ -73,10 +73,10 @@ def getAll(companyID) -> Callback:
        # db.session.close()
 
 
-def create(name, message, topBarText, secondsUntilPopup, companyID) -> Assistant or None:
+def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, companyID) -> Assistant or None:
     try:
         assistant = Assistant(Name=name, Route=None, Message=message, TopBarText=topBarText,
-                              SecondsUntilPopup=secondsUntilPopup,
+                              SecondsUntilPopup=secondsUntilPopup, MailEnabled=mailEnabled, MailPeriod=mailPeriod,
                               CompanyID=companyID)
         db.session.add(assistant)
         # Save
@@ -90,12 +90,14 @@ def create(name, message, topBarText, secondsUntilPopup, companyID) -> Assistant
        # db.session.close()
 
 
-def update(id, name, message, topBarText, secondsUntilPopup)-> Callback:
+def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod)-> Callback:
     try:
         db.session.query(Assistant).filter(Assistant.ID == id).update({'Name': name,
                                                                        'Message': message,
                                                                        'TopBarText': topBarText,
-                                                                       'SecondsUntilPopup': secondsUntilPopup})
+                                                                       'SecondsUntilPopup': secondsUntilPopup,
+                                                                       "MailEnabled": mailEnabled,
+                                                                       "MailPeriod": mailPeriod})
         db.session.commit()
         return Callback(True, name + ' Updated Successfully')
 
@@ -157,31 +159,31 @@ def checkOwnership(assistantID, companyID):
         return Callback(False, 'Error in verifying ownership over assistant.')
 
 
-def getNotificationsRegisterByID(id):
-    try:
-        # Get result and check if None then raise exception
-        result = db.session.query(Assistant).filter(NotificationsRegister.AssistantID == id).all()
-        if not result: raise Exception
-
-        return Callback(True,
-                        "Got NotificationsRegister by assistant ID successfully.",
-                        result)
-    except Exception as exc:
-        print(exc)
-        db.session.rollback()
-        return Callback(False, 'Could not get the NotificationsRegister by assistant ID.')
-
-
-def getAllNotificationsRegisters():
-    try:
-        # Get result and check if None then raise exception
-        result = db.session.query(Assistant).all()
-        if not result: raise Exception
-
-        return Callback(True,
-                        "Got NotificationsRegisters successfully.",
-                        result)
-    except Exception as exc:
-        print(exc)
-        db.session.rollback()
-        return Callback(False, 'Could not get the NotificationsRegisters.')
+# def getNotificationsRegisterByID(id):
+#     try:
+#         # Get result and check if None then raise exception
+#         result = db.session.query(NotificationsRegister).filter(NotificationsRegister.AssistantID == id).all()
+#         if not result: raise Exception
+#
+#         return Callback(True,
+#                         "Got NotificationsRegister by assistant ID successfully.",
+#                         result)
+#     except Exception as exc:
+#         print(exc)
+#         db.session.rollback()
+#         return Callback(False, 'Could not get the NotificationsRegister by assistant ID.')
+#
+#
+# def getAllNotificationsRegisters():
+#     try:
+#         # Get result and check if None then raise exception
+#         result = db.session.query(NotificationsRegister).all()
+#         if not result: raise Exception
+#
+#         return Callback(True,
+#                         "Got NotificationsRegisters successfully.",
+#                         result)
+#     except Exception as exc:
+#         print(exc)
+#         db.session.rollback()
+#         return Callback(False, 'Could not get the NotificationsRegisters.')

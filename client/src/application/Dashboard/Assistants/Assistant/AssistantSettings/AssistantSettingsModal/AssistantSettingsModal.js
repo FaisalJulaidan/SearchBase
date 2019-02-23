@@ -1,16 +1,22 @@
 import React, {Component} from 'react';
-import {Button, Form, Input, InputNumber, Modal, Switch} from "antd";
+import {Button, Form, Input, InputNumber, Modal, Slider, Switch} from "antd";
 
 const FormItem = Form.Item;
 
 
 class AssistantSettingsModal extends Component {
     state = {
-        isPopupDisabled: this.props.assistant.SecondsUntilPopup <= 0
+        isPopupDisabled: this.props.assistant.SecondsUntilPopup <= 0,
+        isAlertsEnabled: this.props.assistant.MailEnabled,
+        alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
     };
 
     togglePopupSwitch = () => {
         this.setState({isPopupDisabled: !this.state.isPopupDisabled})
+    };
+
+    toggleAlertsSwitch = () => {
+        this.setState({isAlertsEnabled: !this.state.isAlertsEnabled})
     };
 
 
@@ -26,6 +32,8 @@ class AssistantSettingsModal extends Component {
                 if (this.state.isPopupDisabled) {
                     values.secondsUntilPopup = 0
                 }
+                values["alertsEnabled"] = this.state.isAlertsEnabled;
+
                 this.props.handleSave(values)
             }
         });
@@ -36,6 +44,10 @@ class AssistantSettingsModal extends Component {
             labelCol: {span: 6},
             wrapperCol: {span: 14},
         };
+
+        const alertsKeys = Object.keys(this.state.alertOptions);
+        const maxAlertsLength = parseInt(alertsKeys[alertsKeys.length - 1]);
+
         const {getFieldDecorator} = this.props.form;
         const {assistant} = this.props;
 
@@ -123,21 +135,29 @@ class AssistantSettingsModal extends Component {
                         <span className="ant-form-text"> seconds</span>
                     </FormItem>
 
-                    /*<FormItem
+                    <FormItem
                         {...formItemLayout}
                         label="New Record Alert"
                         extra="Turning this on will make the assistant alert you when it has been used"
                     >
-                        <Switch checked={!this.state.isPopupDisabled} onChange={this.togglePopupSwitch}
+                        <Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}
                                 style={{marginRight: '5px'}}/>
-                        {getFieldDecorator('recordAlertSwitch',
-                            {
-                                initialValue: assistant.SecondsUntilPopup === 0 ? 1 : assistant.SecondsUntilPopup
-                            })(
-                            <InputNumber disabled={this.state.isPopupDisabled} min={1}/>
+                    </FormItem>
+
+                    <FormItem
+                        {...formItemLayout}
+                        label="Alerts Every:"
+                        extra="Select in what period of time the bot to check for new records and alert you. Note: 'Immediately' could spam your email if your assistant is used a lot"
+                    >
+                        {getFieldDecorator('alertEvery', {
+                            initialValue: this.props.assistant.MailPeriod
+                        })(
+                            <Slider
+                                max={maxAlertsLength}
+                                disabled={!this.state.isAlertsEnabled}
+                                marks={this.state.alertOptions} step={null}/>
                         )}
-                        <span className="ant-form-text"> seconds</span>
-                    </FormItem>*/
+                    </FormItem>
 
                  </Form>
             </Modal>

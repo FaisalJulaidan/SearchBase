@@ -91,7 +91,7 @@ class ProfileDetails extends React.Component {
 
                 <br/>
 
-                <div style={{textAlign: "center"}}><Button htmlType={"submit"}
+                <div style={{textAlign: "center", marginBottom: "25px"}}><Button htmlType={"submit"}
                                                            className={"ant-btn-primary"}>Update</Button>
                 </div>
             </Form>

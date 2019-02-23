@@ -199,7 +199,7 @@ class Dashboard extends Component {
 
                     </Content>
 
-                    <Footer style={{textAlign: 'center', padding: 10}}>
+                    <Footer style={{textAlign: 'center', padding: 10, zIndex:1}}>
                         Copyright TheSearchBase Limited 2019. All rights reserved.
                     </Footer>
                 </Layout>

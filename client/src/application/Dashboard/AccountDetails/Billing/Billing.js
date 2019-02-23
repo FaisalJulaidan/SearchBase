@@ -73,10 +73,11 @@ class Billing extends React.Component {
                                                 {/*FEATURE LIST START*/}
                                                 <div className="generic_feature_list">
                                                     <ul>
-                                                        <li><span>2GB</span> Bandwidth</li>
+                                                        {/*<li><span>∞</span> Unlimited Usage</li>*/}
+                                                        <li><span>∞</span> Conversations</li>
                                                         <li><span>CV</span> Storage</li>
-                                                        <li><span>∞</span> Unlimited Usage</li>
-                                                        <li><span>7</span> Host Domain</li>
+                                                        <li><span>CRM</span> Integration</li>
+                                                        <li><span>Custom</span> Chatbots</li>
                                                         <li><span>7 Day</span> Support</li>
                                                     </ul>
                                                 </div>
@@ -130,11 +131,12 @@ class Billing extends React.Component {
                                                 {/*FEATURE LIST START*/}
                                                 <div className="generic_feature_list">
                                                     <ul>
-                                                        <li><span>2GB</span> Bandwidth</li>
-                                                        <li><span>150GB</span> Storage</li>
-                                                        <li><span>12</span> Accounts</li>
-                                                        <li><span>7</span> Host Domain</li>
-                                                        <li><span>24/7</span> Support</li>
+                                                        <li><span>∞</span> Unlimited Usage</li>
+                                                        <li><span>∞</span> Conversations</li>
+                                                        <li><span>CV</span> Storage</li>
+                                                        <li><span>CRM</span> Integration</li>
+                                                        <li><span>Custom</span> Chatbots</li>
+                                                        <li><span>7 Day</span> Support</li>
                                                     </ul>
                                                 </div>
                                                 {/*//FEATURE LIST END*/}
@@ -142,6 +144,66 @@ class Billing extends React.Component {
                                                 {/*BUTTON START*/}
                                                 <div className="generic_price_btn clearfix">
                                                     <a className="" href="">Sign up</a>
+                                                </div>
+                                                {/*//BUTTON END*/}
+
+                                            </div>
+                                            {/*//PRICE CONTENT END*/}
+
+                                        </div>
+
+                                        <div className="col-md-4 priceBlockStyle">
+
+                                            {/*PRICE CONTENT START*/}
+                                            <div className="generic_content clearfix">
+
+                                                {/*HEAD PRICE DETAIL START*/}
+                                                <div className="generic_head_price clearfix">
+
+                                                    {/*HEAD CONTENT START*/}
+                                                    <div className="generic_head_content clearfix">
+
+                                                        {/*HEAD START*/}
+                                                        <div className="head_bg"></div>
+                                                        <div className="head">
+                                                            <span>Enterprise</span>
+                                                        </div>
+                                                        {/*//HEAD END*/}
+
+                                                    </div>
+                                                    {/*//HEAD CONTENT END*/}
+
+                                                    {/*PRICE START*/}
+                                                    <div className="generic_price_tag clearfix">
+                                                        <span className="price">
+                                                            <span className="sign"></span>
+                                                            <span className="currency"></span>
+                                                            <span className="cent">Contact Sales Team</span>
+                                                            <span className="month"></span>
+                                                        </span>
+                                                    </div>
+                                                    {/*//PRICE END*/}
+
+                                                </div>
+                                                {/*//HEAD PRICE DETAIL END*/}
+
+                                                {/*FEATURE LIST START*/}
+                                                <div className="generic_feature_list">
+                                                    <ul>
+                                                        <li><span>Access</span> to Personal Assistant</li>
+                                                        <li><span>∞</span> Unlimited Usage</li>
+                                                        <li><span>∞</span> Conversations</li>
+                                                        <li><span>CV</span> Storage</li>
+                                                        <li><span>CRM</span> Integration</li>
+                                                        <li><span>Custom</span> Chatbots</li>
+                                                        <li><span>7 Day</span> Support</li>
+                                                    </ul>
+                                                </div>
+                                                {/*//FEATURE LIST END*/}
+
+                                                {/*BUTTON START*/}
+                                                <div className="generic_price_btn clearfix">
+                                                    <a className="" href="mailto:info@thesearchbase.com?subject=Enterprise Package&body=Hi, I'm interested in the Enterprise Package.">Contact Sales</a>
                                                 </div>
                                                 {/*//BUTTON END*/}
 

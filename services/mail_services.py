@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import sqlalchemy.exc
 
 from flask import Flask, render_template, current_app
@@ -12,6 +14,32 @@ from services import user_services, assistant_services, analytics_services, news
 
 verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 mail = Mail()
+
+
+def timer_tick():
+    now = datetime.now()
+
+    session1 = [now.replace(hour=0, minute=0, second=0, microsecond=0), now.replace(hour=3, minute=59, second=59, microsecond=999999)]
+    session2 = [now.replace(hour=4, minute=0, second=0, microsecond=0), now.replace(hour=7, minute=59, second=59, microsecond=999999)]
+    session3 = [now.replace(hour=8, minute=0, second=0, microsecond=0), now.replace(hour=11, minute=59, second=59, microsecond=999999)]
+    session4 = [now.replace(hour=12, minute=0, second=0, microsecond=0), now.replace(hour=15, minute=59, second=59, microsecond=999999)]
+    session5 = [now.replace(hour=16, minute=0, second=0, microsecond=0), now.replace(hour=19, minute=59, second=59, microsecond=999999)]
+    session6 = [now.replace(hour=20, minute=0, second=0, microsecond=0), now.replace(hour=23, minute=59, second=59, microsecond=999999)]
+    sessions = [session1, session2, session3, session4, session5, session6]
+
+    sub4 = {"interval": 4, "sessions": [session1, session2, session3, session4, session5, session6]}
+    sub8 = {"interval": 8, "sessions": [session1, session3, session5]}
+    sub12 = {"interval": 12, "sessions": [session2, session5]}
+    sub24 = {"interval": 24, "sessions": [session3]}
+    subs = [sub4, sub8, sub12, sub24]
+
+    for session in sessions:
+        if session[0] < now < session[1]:
+            print(session[0], " > ", now, " > ", session[1])
+            for sub in subs:
+                if session in sub["sessions"]:
+                    notifyNewRecordsForLastXHours(sub["interval"])
+
 
 def sendVerificationEmail(email, companyName) -> Callback:
     try:
@@ -90,7 +118,9 @@ def notifyNewRecordsForLastXHours(hours):
         if not userSettings_callback.Success: raise Exception("userSettings_callback: ", userSettings_callback.Message)
 
         for record in userSettings_callback.Data:
-            if not record.UserInputNotifications: continue
+            if not record.UserInputNotifications:
+                continue
+
             user_callback : Callback = user_services.getByID(record.ID)
             if not user_callback.Success: raise Exception("user_callback: ", user_callback.Message)
 
@@ -100,14 +130,22 @@ def notifyNewRecordsForLastXHours(hours):
             information = []
 
             for assistant in assistants_callback.Data:
-                records_callback : Callback = analytics_services.getAllRecordsByAssistantIDInTheLast(hours, assistant.ID)
-                if not records_callback.Success: raise Exception("records_callback: ", records_callback.Message)
+                if not assistant.MailEnabled or not hours == assistant.MailPeriod:
+                    continue
 
-                if not records_callback.Data: continue
+                records_callback: Callback = analytics_services.getAllRecordsByAssistantIDInTheLast(hours, assistant.ID)
+                if not records_callback.Success:
+                    raise Exception("records_callback: ", records_callback.Message)
+
+                if not records_callback.Data:
+                    continue
 
                 information.append({"assistantName": assistant.Name, "data": records_callback.Data, "assistantID": assistant.ID})
 
-            sendRecords_callback : Callback = sendNewRecordsNotification(record.Email, information)
+            if not information:
+                continue
+
+            sendRecords_callback : Callback = sendNewRecordsNotification(user_callback.Data.Email, information)
             if not sendRecords_callback.Success: raise Exception("sendRecords_callback: ", sendRecords_callback.Message)
 
     except Exception as e:

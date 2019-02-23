@@ -72,10 +72,10 @@ class BaseConfig(object):
     JOBS = [
         {
             'id': 'notify',
-            'func': 'services.mail_services:notifyNewRecordsForLastXHours',
-            'args': (12,),
+            'func': 'services.mail_services:timer_tick',
+            'args': (),
             'trigger': 'interval',
-            'seconds': 43200
+            'seconds': 14400
         }
     ]
 

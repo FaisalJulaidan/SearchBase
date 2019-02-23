@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import styles from "./Groups.module.less";
-import {Button, List, Skeleton, Spin, Modal, Menu} from "antd";
+import {Button, List, Skeleton, Spin, Modal, Menu, Empty} from "antd";
 import NewGroup from "./NewGroup/NewGroup";
 import EditGroup from "./EditGroup/EditGroup";
 
@@ -63,6 +63,7 @@ class Groups extends Component {
 
 
     render() {
+        const {groupsList} = this.props;
         return (
             <div className={styles.Panel}>
                 <div className={styles.Panel_Header_With_Button}>
@@ -99,11 +100,12 @@ class Groups extends Component {
 
                     <Menu mode="inline">
                         {
+                            groupsList ?
                             this.props.groupsList.map((group, index) =>
                                 <Menu.Item onClick={() => this.props.selectGroup(group)} key={index}>
                                     {group.name}
                                 </Menu.Item>
-                            )
+                            ) : null
                         }
                     </Menu>
 

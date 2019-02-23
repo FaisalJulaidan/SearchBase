@@ -16,12 +16,11 @@ class Flow extends Component {
 
     state = {
         currentGroup: {blocks: []},
-        assistant: {},
+        assistant: {Flow: {groups:[]}},
         isSaved: true
     };
 
     componentWillReceiveProps(nextProps, nextContext) {
-        console.log(this.props, nextProps);
         if (nextProps.successMsg)
             this.setState({isSaved: true});
     }
@@ -45,7 +44,7 @@ class Flow extends Component {
     getUpdatableState = () => {
         const {assistant, currentGroup} = this.state;
         let updatedAssistant = JSON.parse(JSON.stringify(assistant));
-        let updatedGroup = updatedAssistant.Flow.groups[updatedAssistant.Flow.groups.findIndex(group => group.id === currentGroup.id)];
+        let updatedGroup = updatedAssistant.Flow?.groups[updatedAssistant.Flow.groups.findIndex(group => group.id === currentGroup.id)];
         return {updatedAssistant, updatedGroup}
     };
 
@@ -55,7 +54,8 @@ class Flow extends Component {
     // GROUPS
     addGroup = newGroup => {
         const {updatedAssistant} = this.getUpdatableState();
-
+        if(!updatedAssistant.Flow)
+            updatedAssistant.Flow = {groups: []};
         updatedAssistant.Flow.groups.push({
             id: shortid.generate(),
             name: newGroup.name,
@@ -194,9 +194,9 @@ class Flow extends Component {
     render() {
         const {assistant} = this.state;
         const {Flow} = assistant;
-
+        console.log(Flow);
         return (
-            <Spin spinning={!(!!Flow)} style={{height: '100%'}}>
+            <Spin spinning={!(!!assistant)} style={{height: '100%'}}>
 
                 <div style={{height: '100%'}}>
                     <Header display={assistant.Name}
@@ -211,9 +211,9 @@ class Flow extends Component {
                     <div className={styles.Panel_Body_Only}>
                         <div style={{margin: '0 5px 0 0', width: '27%'}}>
                             {
-                                Flow && <Groups selectGroup={this.selectGroup}
+                                assistant && <Groups selectGroup={this.selectGroup}
                                                 isLoading={this.props.isLoading}
-                                                groupsList={Flow.groups}
+                                                groupsList={Flow?.groups}
                                                 currentGroup={this.state.currentGroup}
                                                 addGroup={this.addGroup}
                                                 editGroup={this.editGroup}
@@ -223,12 +223,12 @@ class Flow extends Component {
 
                         <div style={{margin: '0 0 0 5px', width: '73%'}}>
                             {
-                                Flow && <Blocks addBlock={this.addBlock}
+                                assistant && <Blocks addBlock={this.addBlock}
                                                 editBlock={this.editBlock}
                                                 deleteBlock={this.deleteBlock}
                                                 reorderBlocks={this.reorderBlocks}
                                                 currentGroup={this.state.currentGroup}
-                                                allGroups={Flow.groups}
+                                                allGroups={Flow?.groups}
                                                 options={this.props.options}/>
                             }
                         </div>

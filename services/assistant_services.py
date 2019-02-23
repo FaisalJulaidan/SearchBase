@@ -109,10 +109,10 @@ def update(id, name, message, topBarText, secondsUntilPopup)-> Callback:
 
 
 
-def changeStatus(assistant: Assistant, statusValue):
+def changeStatus(assistant: Assistant, status):
     try:
         isActive = False
-        if statusValue > 0:
+        if status:
            isActive = True
 
         assistant.Active = isActive

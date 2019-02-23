@@ -90,10 +90,11 @@ const deleteAssistantFailure = (error) => {
 };
 
 
-const changeAssistantStatus = (assistantID) => {
+const changeAssistantStatus = (assistantID, status) => {
     return {
         type: actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST,
-        assistantID
+        assistantID,
+        status
     };
 };
 

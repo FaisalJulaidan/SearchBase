@@ -30,25 +30,17 @@ class Block extends Component {
 
                     {block.Content.text ?
                         <Row>
-                            <Col span={6}>Question:</Col>
+                            <Col span={6}><b>Question::</b></Col>
                             <Col span={12}>{block.Content.text}</Col>
                             <Divider/>
                         </Row>
                         : null
                     }
 
-                    {block.Content.blockToGoID ?
-                        <Row>
-                            <Col span={6}>block To Go ID:</Col>
-                            <Col span={12}>{block.Content.blockToGoID}</Col>
-                            <Divider/>
-                        </Row>
-                        : null
-                    }
 
                     {block.Content.validation ?
                         <Row>
-                            <Col span={6}>validation</Col>
+                            <Col span={6}><b>Validation:</b></Col>
                             <Col span={12}>{block.Content.validation}</Col>
                             <Divider/>
                         </Row>
@@ -57,7 +49,7 @@ class Block extends Component {
 
                     {block.Content.action ?
                         <Row>
-                            <Col span={6}>action</Col>
+                            <Col span={6}><b>Action:</b></Col>
                             <Col span={12}>{block.Content.action}</Col>
                             <Divider/>
                         </Row>
@@ -66,7 +58,7 @@ class Block extends Component {
 
                     {block.Content.afterMessage ?
                         <Row>
-                            <Col span={6}>after Message</Col>
+                            <Col span={6}><b>After Message:</b></Col>
                             <Col span={12}>{block.Content.afterMessage}</Col>
                             <Divider/>
                         </Row>
@@ -75,7 +67,7 @@ class Block extends Component {
 
                     {block.Content.showTop ?
                         <Row>
-                            <Col span={6}>show Top</Col>
+                            <Col span={6}><b>Show Top:</b></Col>
                             <Col span={12}>{block.Content.showTop}</Col>
                             <Divider/>
                         </Row>
@@ -84,7 +76,7 @@ class Block extends Component {
 
                     {block.Content.databaseID ?
                         <Row>
-                            <Col span={6}>Database</Col>
+                            <Col span={6}><b>Database:</b></Col>
                             <Col
                                 span={12}>{databases.databaseTypes?databases.databaseTypes
                                 .find(databaseType => databaseType === block.Content.databaseType):null}</Col>
@@ -95,10 +87,10 @@ class Block extends Component {
 
                     {block.Content.storeInDB ?
                         <Row>
-                            <Col span={6}>Stroe in DB:</Col>
+                            <Col span={6}><b>Store in DB:</b></Col>
                             <Col span={6}><Checkbox checked={block.Content.storeInDB}></Checkbox></Col>
 
-                            <Col span={6}>Skippable:</Col>
+                            <Col span={6}><b>Skippable:</b></Col>
                             <Col span={6}><Checkbox checked={block.content.isSkippable}></Checkbox></Col>
                             <Divider/>
                         </Row>
@@ -107,7 +99,7 @@ class Block extends Component {
 
                     {block.Content.answers ?
                         <div>
-                            Answers:
+                            <b>Answers:</b>
                             {
                                 block.Content.answers.map((answer, i) =>
                                     <Card key={i} style={{margin: 5, width: 300}}>
@@ -136,6 +128,12 @@ class Block extends Component {
                         </div>
                         : null
                     }
+
+                    <Row>
+                        <Col span={6}><b>Block To Go ID:</b></Col>
+                        <Col span={12}>{block.Content.blockToGoID || `None`}</Col>
+                        <Divider/>
+                    </Row>
 
                 </Panel>
             </Collapse>

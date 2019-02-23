@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, message, Skeleton} from 'antd';
+import {Button, Skeleton, Modal} from 'antd';
 import {connect} from 'react-redux';
 
 import styles from "./Assistants.module.less"
@@ -7,6 +7,7 @@ import Assistant from "./Assistant/Assistant"
 
 import {assistantActions} from "../../../store/actions/assistant.actions";
 import NewAssistantModal from "./Modals/NewAssistantModal";
+const confirm = Modal.confirm;
 
 class Assistants extends Component {
     state = {
@@ -21,7 +22,19 @@ class Assistants extends Component {
 
     showModal = () => this.setState({visible: true});
     hideModal = () => this.setState({visible: false});
-
+    activeHandler = (checked, assistantID) => {
+        if(!checked){
+            confirm({
+                title: `Deactivate assistant`,
+                content: <p>Are you sure you want to deactivate this assistant</p>,
+                onOk: () => {
+                    this.props.dispatch(assistantActions.changeAssistantStatus(assistantID, checked))
+                }
+            });
+            return;
+        }
+        this.props.dispatch(assistantActions.changeAssistantStatus(assistantID, checked))
+    };
 
     render() {
         return (
@@ -49,6 +62,8 @@ class Assistants extends Component {
                                         this.props.assistantList.map((assistant, i) => <Assistant assistant={assistant}
                                                                                                   key={i}
                                                                                                   index={i}
+                                                                                                  isStatusChanging={this.props.isStatusChanging}
+                                                                                                  activeHandler={this.activeHandler}
                                                                                                   isLoading={this.props.isLoading}
                                         />)
                                     )
@@ -71,6 +86,7 @@ function mapStateToProps(state) {
     return {
         assistantList: state.assistant.assistantList,
         isLoading: state.assistant.isLoading,
+        isStatusChanging: state.assistant.isStatusChanging,
     };
 }
 

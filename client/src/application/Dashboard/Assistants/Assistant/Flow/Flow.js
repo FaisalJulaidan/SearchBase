@@ -8,6 +8,7 @@ import connect from "react-redux/es/connect/connect";
 import styles from "./Flow.module.less"
 import {Modal, Spin} from "antd";
 import shortid from 'shortid';
+import { Prompt } from "react-router-dom";
 
 const confirm = Modal.confirm;
 
@@ -22,15 +23,17 @@ class Flow extends Component {
     componentWillReceiveProps(nextProps, nextContext) {
         console.log(this.props, nextProps);
         if (nextProps.successMsg)
-            this.setState({isSaved: true}, () => console.log(nextProps.successMsg));
+            this.setState({isSaved: true});
     }
 
-    getUpdatableState = () => {
-        const {assistant, currentGroup} = this.state;
-        let updatedAssistant = JSON.parse(JSON.stringify(assistant));
-        let updatedGroup = updatedAssistant.Flow.groups[updatedAssistant.Flow.groups.findIndex(group => group.id === currentGroup.id)];
-        return {updatedAssistant, updatedGroup}
+    componentDidUpdate = () => {
+        if (!this.state.isSaved) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     };
+
 
     componentDidMount() {
         const {assistantList, match} = this.props;
@@ -39,6 +42,12 @@ class Flow extends Component {
         )
     }
 
+    getUpdatableState = () => {
+        const {assistant, currentGroup} = this.state;
+        let updatedAssistant = JSON.parse(JSON.stringify(assistant));
+        let updatedGroup = updatedAssistant.Flow.groups[updatedAssistant.Flow.groups.findIndex(group => group.id === currentGroup.id)];
+        return {updatedAssistant, updatedGroup}
+    };
 
     selectGroup = currentGroup => this.setState({currentGroup});
 
@@ -65,6 +74,7 @@ class Flow extends Component {
 
         updatedGroup.name = editedGroup.name;
         updatedGroup.description = editedGroup.description;
+        this.selectGroup(updatedGroup);
 
         this.setState({
             assistant: updatedAssistant,
@@ -194,7 +204,8 @@ class Flow extends Component {
                                 icon: "save",
                                 onClick: this.saveFlow,
                                 text: 'Save Flow',
-                                disabled: this.state.isSaved
+                                disabled: this.state.isSaved,
+                                loading: this.props.isUpdatingFlow
                             }}/>
 
                     <div className={styles.Panel_Body_Only}>
@@ -224,6 +235,15 @@ class Flow extends Component {
 
                     </div>
                 </div>
+
+                <Prompt
+                    when={!this.state.isSaved}
+                    message={location =>
+                        `Your flow is not saved are you sure you want leave without saving it?`
+                    }
+                />
+
+
             </Spin>
 
         );
@@ -236,6 +256,7 @@ function mapStateToProps(state) {
         options: state.options.options,
         assistantList: state.assistant.assistantList,
         successMsg: state.assistant.updateFlowSuccessMsg,
+        isUpdatingFlow: state.assistant.isUpdatingFlow,
     };
 }
 

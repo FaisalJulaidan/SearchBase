@@ -1,4 +1,4 @@
-import {put, takeEvery, all} from 'redux-saga/effects'
+import {put, takeEvery,takeLatest, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {assistantActions, authActions, flowActions} from "../actions";
 import {http} from "../../helpers";
@@ -75,9 +75,28 @@ function* updateFlow({assistant}) {
     }
 }
 
+function* updateStatus({status, assistantID}) {
+    try {
+        loadingMessage('Updating Status', 0);
+        const res = yield http.put(`/assistant/${assistantID}/status`, {status});
+        yield destroyMessage();
+        yield sucessMessage('Status Updated');
+        yield put(assistantActions.changeAssistantStatusSuccess('Status updated successfully',
+                                                                            status, assistantID));
+    } catch (error) {
+        console.log(error);
+        yield put(assistantActions.changeAssistantStatusFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not update the assistant status");
+    }
+}
+
+
+function* watchUpdateStatus() {
+    yield takeLatest(actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST, updateStatus)
+}
 
 function* watchUpdateFlow() {
-    yield takeEvery(actionTypes.UPDATE_FLOW_REQUEST, updateFlow)
+    yield takeLatest(actionTypes.UPDATE_FLOW_REQUEST, updateFlow)
 }
 
 function* watchFetchAssistants() {
@@ -104,6 +123,7 @@ export function* assistantSaga() {
         watchUpdateAssistant(),
         watchDeleteAssistant(),
         watchUpdateFlow(),
+        watchUpdateStatus(),
 
     ])
 }

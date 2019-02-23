@@ -86,17 +86,23 @@ export const assistant = (state = initialState, action) => {
         case actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
-                isChanging: true
+                isStatusChanging: true
             });
         case actionTypes.CHANGE_ASSISTANT_STATUS_SUCCESS:
+            let newAssistantStatus = [...state.assistantList].map(assistant => {
+                if(assistant.ID === action.assistantID)
+                    assistant.Active = action.status;
+                return assistant
+            });
 
             return updateObject(state, {
                 successMsg: action.successMsg,
-                isChanging: false
+                isStatusChanging: false,
+                assistantList: newAssistantStatus
             });
         case actionTypes.CHANGE_ASSISTANT_STATUS_FAILURE:
             return updateObject(state, {
-                isChanging: false,
+                isStatusChanging: false,
                 errorMsg: action.error.msg
             });
 

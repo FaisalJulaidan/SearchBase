@@ -67,9 +67,9 @@ def assistant(assistantID):
 
 
 # Activate or deactivate assistant
-@assistant_router.route("/assistant/<int:assistantID>/status/<int:statusValue>", methods=['PUT'])
+@assistant_router.route("/assistant/<int:assistantID>/status", methods=['PUT'])
 @jwt_required
-def assistant_status(assistantID, statusValue):
+def assistant_status(assistantID):
 
     # Authenticate
     user = get_jwt_identity()['user']
@@ -82,7 +82,8 @@ def assistant_status(assistantID, statusValue):
     callback: Callback = Callback(False, 'Error!', None)
     # Update assistant status
     if request.method == "PUT":
-        callback: Callback = assistant_services.changeStatus(assistant, statusValue)
+        data = request.json
+        callback: Callback = assistant_services.changeStatus(assistant, data.get('status'))
 
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)

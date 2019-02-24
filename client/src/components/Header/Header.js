@@ -38,6 +38,8 @@ class Header extends Component {
                                     <Button className={styles.Panel_Header_Button}
                                             type="primary"
                                             icon={this.props.button.icon}
+                                            disabled={this.props.button.disabled}
+                                            loading={this.props.button.loading}
                                             onClick={this.props.button.onClick}>
                                         {this.props.button.text}
                                     </Button>

@@ -90,10 +90,11 @@ const deleteAssistantFailure = (error) => {
 };
 
 
-const changeAssistantStatus = (assistantID) => {
+const changeAssistantStatus = (assistantID, status) => {
     return {
         type: actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST,
-        assistantID
+        assistantID,
+        status
     };
 };
 
@@ -109,6 +110,29 @@ const changeAssistantStatusSuccess = (successMsg, status, assistantID) => {
 const changeAssistantStatusFailure = (error) => {
     return {
         type: actionTypes.CHANGE_ASSISTANT_STATUS_FAILURE,
+        error
+    };
+};
+
+
+const updateFlow = (assistant) => {
+    return {
+        type: actionTypes.UPDATE_FLOW_REQUEST,
+        assistant
+    };
+};
+
+const updateFlowSuccess = (assistant, msg) => {
+    return {
+        type: actionTypes.UPDATE_FLOW_SUCCESS,
+        assistant,
+        msg
+    };
+};
+
+const updateFlowFailure = (error) => {
+    return {
+        type: actionTypes.UPDATE_FLOW_FAILURE,
         error
     };
 };
@@ -133,4 +157,8 @@ export const assistantActions = {
     changeAssistantStatus,
     changeAssistantStatusSuccess,
     changeAssistantStatusFailure,
+
+    updateFlow,
+    updateFlowSuccess,
+    updateFlowFailure
 };

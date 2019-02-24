@@ -41,12 +41,9 @@ class Blocks extends Component {
         if (!result.destination) return;
 
         let blocks = reorder(this.state.blocks, result.source.index, result.destination.index);
-        for (const i in blocks) {
-            blocks[i].Order = Number(i) + 1;
-        }
         this.setState({blocks});
-        // send a request to the server
-        this.props.reorderBlocks(blocks, this.props.currentGroup.id)
+        // send a request to the flow for logic
+        this.props.reorderBlocks(blocks)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -69,29 +66,11 @@ class Blocks extends Component {
     // this called from block.js when you click on edit block button
     editBlock = (edittedBlock) => this.setState({edittedBlock, editBlockVisible: true});
     closeEditBlockModal = () => this.setState({edittedBlock: {}, editBlockVisible: false});
-    handleEditBlock = (edittedBlock) => this.props.editBlock(edittedBlock, this.props.currentGroup.id);
+    handleEditBlock = (edittedBlock) => this.props.editBlock(edittedBlock);
 
     // DELETE BLOCK MODAL CONFIGS
-    // this called from block.js when you click on delete block button
-    deleteBlock = (deletedBlock) => confirm({
-        title: `Delete block with type: ${deletedBlock.Type}`,
-        content: `If you click OK, this block will be deleted forever`,
-        onOk: () => this.handleDeleteBlock(deletedBlock)
-    });
-
-    handleDeleteBlock = (deletedBlock) => {
-        this.props.deleteBlock(deletedBlock, this.props.currentGroup.id);
-
-        // Remove the deletedBlock
-        let blocks = this.state.blocks.filter((block) => block.ID !== deletedBlock.ID);
-        // Update order
-        for (const i in blocks) blocks[i].Order = Number(i) + 1;
-        this.setState({blocks});
-        // send a request to the server
-        this.props.reorderBlocks(blocks, this.props.currentGroup.id);
-        this.closeEditBlockModal()
-    };
-
+    // this called from block.js & editBlockModal when you click on delete block button
+    handleDeleteBlock = deletedBlock => this.props.deleteBlock(deletedBlock);
 
 
     render() {
@@ -111,26 +90,26 @@ class Blocks extends Component {
 
                 <div className={styles.Panel_Body}>
                     <div style={{height: "100%", width: '100%', overflowY: 'auto'}}>
-
                         <DragDropContext onDragEnd={this.onDragEnd}>
                             <Droppable droppableId="droppable">
                                 {(provided) => (
                                     <div ref={provided.innerRef}>
-                                        {this.state.blocks.map((block, index) => (
-                                            <Draggable key={block.ID} draggableId={block.Order} index={index}>
-                                                {(provided) => (
-                                                    <div ref={provided.innerRef} {...provided.draggableProps}
-                                                         {...provided.dragHandleProps}
-                                                         style={getItemStyle(provided.draggableProps.style)}>
-                                                        <Block block={block}
-                                                               editBlock={this.editBlock}
-                                                               deleteBlock={this.deleteBlock}
-                                                               options={this.props.options}
-                                                        />
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
+                                        {
+                                            this.state.blocks.map((block, index) =>
+                                                <Draggable key={block.ID} draggableId={block.ID} index={index}>
+                                                    {(provided) => (
+                                                        <div ref={provided.innerRef} {...provided.draggableProps}
+                                                             {...provided.dragHandleProps}
+                                                             style={getItemStyle(provided.draggableProps.style)}>
+                                                            <Block block={block}
+                                                                   editBlock={this.editBlock}
+                                                                   deleteBlock={this.handleDeleteBlock}
+                                                                   options={this.props.options}/>
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            )
+                                        }
                                         {provided.placeholder}
                                     </div>
                                 )}
@@ -150,7 +129,7 @@ class Blocks extends Component {
 
                 <EditBlockModal visible={this.state.editBlockVisible}
                                 handleEditBlock={this.handleEditBlock}
-                                handleDeleteBlock={this.deleteBlock}
+                                handleDeleteBlock={this.handleDeleteBlock}
                                 closeModal={this.closeEditBlockModal}
 
                                 block={this.state.edittedBlock}

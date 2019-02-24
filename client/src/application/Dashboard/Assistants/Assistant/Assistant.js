@@ -2,9 +2,9 @@ import React, {Component} from 'react';
 import {Card, Dropdown, Icon, Menu, Switch} from 'antd';
 import {Link} from "react-router-dom";
 import AssistantSettings from "./AssistantSettings/AssistantSettings";
+import {assistantActions} from "../../../../store/actions/assistant.actions";
 
 const {Meta} = Card;
-
 
 const menu = (assistant) => (
     <Menu>
@@ -45,9 +45,9 @@ const menu = (assistant) => (
 );
 
 const covers = [
-    'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/voice_control_ofo1.svg',
-    'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/group_chat_v059.svg',
-    'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/status_update_jjgk.svg',
+    // 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/voice_control_ofo1.svg',
+    // 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/group_chat_v059.svg',
+    // 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/status_update_jjgk.svg',
     'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/messages1_9ah2.svg'
 ];
 
@@ -68,8 +68,10 @@ class Assistant extends Component {
         });
     };
 
+    onActiveChanged = (checked) => this.props.activeHandler(checked, this.props.assistant.ID);
+
     render() {
-        const {assistant} = this.props;
+        const {assistant, isStatusChanging} = this.props;
         return (
             <>
                 <Card loading={this.props.isLoading} style={{width: 300, margin: 15, float: 'left', height: 369}}
@@ -80,7 +82,7 @@ class Assistant extends Component {
                                src={covers[Math.floor(Math.random() * covers.length)]}/>
                       }
                       title={assistant.Name}
-                      extra={<Switch defaultChecked={assistant.Active} onChange={this.onActiveChanged}/>}
+                      extra={<Switch loading={isStatusChanging} checked={assistant.Active} onChange={this.onActiveChanged}/>}
                       actions={[
                           <div onClick={this.showModal}>
                               <Icon type="setting"/>
@@ -88,8 +90,7 @@ class Assistant extends Component {
                           </div>,
 
                           <div>
-                              <Link
-                                  to={{
+                              <Link to={{
                                       pathname: `assistants/${assistant.ID}/flow`,
                                       state: {assistant: assistant}
                                   }}>

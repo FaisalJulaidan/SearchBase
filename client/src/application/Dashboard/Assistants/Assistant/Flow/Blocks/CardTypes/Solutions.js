@@ -29,28 +29,24 @@ class Solutions extends Component {
         if (!err) {
             const flowOptions = this.props.options.flow;
             let options = {
-                block: {
                     Type: 'Solutions',
-                    GroupID: this.props.modalState.currentGroup.id,
                     StoreInDB: false,
                     Skippable: false,
                     DataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
                     Content: {
                         showTop: Number(values.showTop),
                         action: values.action,
-                        blockToGoID: getBlockId(values.blockToGoID, values.blockToGoIDGroup, this.props.modalState.currentGroup.blocks, formBlock),
+                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                         afterMessage: values.afterMessage || "" ,
                         databaseType: values.databaseType,
                     }
-                }
             };
 
             if (this.props.handleNewBlock)
                 this.props.handleNewBlock(options);
             else {
                 // Edit Block
-                options.block.ID = this.props.modalState.block.ID;
-                options.block.Order = this.props.modalState.block.Order;
+                options.ID = this.props.modalState.block.ID;
                 this.props.handleEditBlock(options);
             }
         }

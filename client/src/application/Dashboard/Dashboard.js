@@ -18,7 +18,7 @@ import Solutions from "./Assistants/Assistant/Solutions/Solutions";
 import Home from "./Home/Home";
 import Analytics from "./Assistants/Assistant/Analytics/Analytics";
 import {authActions, optionsActions} from "../../store/actions";
-import store from '../../store/store';
+import { store, persistor} from '../../store/store'
 import {connect} from 'react-redux';
 
 import {TransitionGroup, CSSTransition} from "react-transition-group";
@@ -64,8 +64,6 @@ class Dashboard extends Component {
         const {match, location} = this.props;
         const user = getUser();
         let userInfo = null;
-        console.log(location)
-
         // User Information at the top
         if (!user) {
             this.logout();

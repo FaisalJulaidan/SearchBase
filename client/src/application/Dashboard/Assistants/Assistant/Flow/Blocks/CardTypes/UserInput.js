@@ -28,22 +28,19 @@ class UserInput extends Component {
         this.setState(initActionType(block, this.props.modalState.allGroups));
     }
 
-    onSubmit = (formBlock) => this.props.form.validateFields((err, values) => {
+    onSubmit = () => this.props.form.validateFields((err, values) => {
         if (!err) {
             const flowOptions = this.props.options.flow;
             let options = {
-                block: {
-                    Type: 'User Input',
-                    GroupID: this.props.modalState.currentGroup.id,
-                    StoreInDB: values.storeInDB,
-                    Skippable: values.isSkippable || false,
-                    DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
-                    Content: {
-                        text: values.text,
-                        blockToGoID: getBlockId(values.blockToGoID, values.blockToGoIDGroup, this.props.modalState.currentGroup.blocks, formBlock),
-                        action: values.action,
-                        afterMessage: values.afterMessage || ""
-                    }
+                Type: 'User Input',
+                StoreInDB: values.storeInDB,
+                Skippable: values.isSkippable || false,
+                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
+                Content: {
+                    text: values.text,
+                    blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
+                    action: values.action,
+                    afterMessage: values.afterMessage || ""
                 }
             };
 
@@ -51,8 +48,7 @@ class UserInput extends Component {
                 this.props.handleNewBlock(options);
             else {
                 // Edit Block
-                options.block.ID = this.props.modalState.block.ID;
-                options.block.Order = this.props.modalState.block.Order;
+                options.ID = this.props.modalState.block.ID;
                 this.props.handleEditBlock(options);
             }
 

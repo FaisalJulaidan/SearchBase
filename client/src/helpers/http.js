@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {authHeader} from './auth';
-import store from '../store/store';
+import { store, persistor} from '../store/store'
 import { authActions } from "../store/actions";
 
 export const http = axios.create({

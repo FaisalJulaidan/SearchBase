@@ -1,8 +1,8 @@
-import {put, takeEvery, all} from 'redux-saga/effects'
+import {put, takeEvery,takeLatest, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {assistantActions, authActions, flowActions} from "../actions";
 import {http} from "../../helpers";
-import {alertError, alertSuccess, destroyMessage, loadingMessage} from "../../helpers/alert";
+import {alertError, alertSuccess, destroyMessage, loadingMessage, sucessMessage} from "../../helpers/alert";
 
 
 function* fetchAssistants() {
@@ -59,6 +59,46 @@ function* deleteAssistant({assistantID}) {
 }
 
 
+function* updateFlow({assistant}) {
+    try {
+        loadingMessage('Updating Flow', 0);
+
+        const res = yield http.put(`/assistant/${assistant.ID}/flow`, {flow: assistant.Flow});
+        yield destroyMessage();
+
+        yield sucessMessage('Flow Updated');
+        yield put(assistantActions.updateFlowSuccess(assistant, res.data.msg));
+    } catch (error) {
+        console.log(error);
+        yield put(assistantActions.updateFlowFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not update the flow");
+    }
+}
+
+function* updateStatus({status, assistantID}) {
+    try {
+        loadingMessage('Updating Status', 0);
+        const res = yield http.put(`/assistant/${assistantID}/status`, {status});
+        yield destroyMessage();
+        yield sucessMessage('Status Updated');
+        yield put(assistantActions.changeAssistantStatusSuccess('Status updated successfully',
+                                                                            status, assistantID));
+    } catch (error) {
+        console.log(error);
+        yield put(assistantActions.changeAssistantStatusFailure(error.response.data));
+        return yield alertError('Error', "Sorry, we could not update the assistant status");
+    }
+}
+
+
+function* watchUpdateStatus() {
+    yield takeLatest(actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST, updateStatus)
+}
+
+function* watchUpdateFlow() {
+    yield takeLatest(actionTypes.UPDATE_FLOW_REQUEST, updateFlow)
+}
+
 function* watchFetchAssistants() {
     yield takeEvery(actionTypes.FETCH_ASSISTANTS_REQUEST, fetchAssistants)
 }
@@ -82,6 +122,8 @@ export function* assistantSaga() {
         watchAddAssistant(),
         watchUpdateAssistant(),
         watchDeleteAssistant(),
+        watchUpdateFlow(),
+        watchUpdateStatus(),
 
     ])
 }

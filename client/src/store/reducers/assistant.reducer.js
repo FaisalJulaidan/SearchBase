@@ -66,11 +66,8 @@ export const assistant = (state = initialState, action) => {
             });
         case actionTypes.DELETE_ASSISTANT_SUCCESS:
 
-            let assistantList = [...state.assistantList];
-            const assistantToDeleteIndex =  assistantList
-                .findIndex(assistant => assistant.id === action.assistantID);
-            assistantList.splice(assistantToDeleteIndex, 1);
-
+            let assistantList = [...state.assistantList].filter(assistant => assistant.ID !== action.assistantID);
+            console.log(assistantList);
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isDeleting: false,
@@ -86,18 +83,47 @@ export const assistant = (state = initialState, action) => {
         case actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
-                isChanging: true
+                isStatusChanging: true
             });
         case actionTypes.CHANGE_ASSISTANT_STATUS_SUCCESS:
+            let newAssistantStatus = [...state.assistantList].map(assistant => {
+                if(assistant.ID === action.assistantID)
+                    assistant.Active = action.status;
+                return assistant
+            });
 
             return updateObject(state, {
                 successMsg: action.successMsg,
-                isChanging: false
+                isStatusChanging: false,
+                assistantList: newAssistantStatus
             });
         case actionTypes.CHANGE_ASSISTANT_STATUS_FAILURE:
             return updateObject(state, {
-                isChanging: false,
+                isStatusChanging: false,
                 errorMsg: action.error.msg
+            });
+
+        case actionTypes.UPDATE_FLOW_REQUEST:
+            return updateObject(state, {
+                isUpdatingFlow: true,
+                updateFlowSuccessMsg: null,
+                updateFlowErrorMsg: null,
+            });
+        case actionTypes.UPDATE_FLOW_SUCCESS:
+
+            let newAssistantList = JSON.parse(JSON.stringify(state.assistantList));
+            newAssistantList =  newAssistantList.filter(assistant => assistant.id !== action.assistant.id);
+            newAssistantList.push(action.assistant);
+
+            return updateObject(state, {
+                isUpdatingFlow: false,
+                updateFlowSuccessMsg: action.msg,
+                assistantList: newAssistantList
+            });
+        case actionTypes.UPDATE_FLOW_FAILURE:
+            return updateObject(state, {
+                isUpdatingFlow: false,
+                updateFlowErrorMsg: action.error.msg
             });
 
         default:

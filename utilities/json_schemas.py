@@ -28,68 +28,47 @@ chatbot_session = {
 }
 
 
+
 flow = {
     "type": "object",
     "properties": {
-        "blocks": {"type": "array", "items": {
+        "groups": {"type": "array", "items": {
             "type": "object",
             "properties":{
-                "ID": {"type": "integer"},
-                "GroupID": {"type": "integer"},
+                "id": {"type": "string"},
+                "name": {"type": "string"},
+                "description": {"type": "string"},
+                "blocks": {"type": "array", "items": {
+                    "type": "object",
+                    "properties":{
+                        "ID": {"type": "string"},
+                        "DataType": {"type": "object",
+                                     "properties": {
+                                         "name": {"enum": [e.value['name'] for e in enums.DataType]},
+                                         "validation": {"enum": [e.value for e in enums.ValidationType]}
+                                     },
+                                     "required": ["name", "validation"],
+                                     "additionalProperties": True
+                                     },
 
-                "DataType": {"type": "object",
-                             "properties": {
-                                 "name": {"enum": [e.value['name'] for e in enums.DataType]},
-                                 "validation": {"enum": [e.value for e in enums.ValidationType]}
-                             },
-                             "required": ["name", "validation"],
-                             "additionalProperties": True
-                             },
-
-                "Type": {"enum": [e.value for e in enums.BlockType]},
-                "Order": {"type": "integer", "minimum": 1},
-                "StoreInDB": {"type": "boolean"},
-                "Skippable": { "type": "boolean" },
-                "Content": {"type": "object"}
+                        "Type": {"enum": [e.value for e in enums.BlockType]},
+                        "StoreInDB": {"type": "boolean"},
+                        "Skippable": { "type": "boolean" },
+                        "Content": {"type": "object"}
+                    },
+                    "required": ["ID", "DataType", "Type", "StoreInDB", "Skippable", "Content"],
+                    "additionalProperties": False
+                    }
+                }
             },
-            "required": ["ID", "GroupID", "DataType", "Type", "Order", "StoreInDB", "Skippable", "Content"],
+            "required": ["id", "name", "description", "blocks"],
             "additionalProperties": False
-        }
-                   }
+            }
+        },
     },
-    "required": ["blocks"],
+    "required": ["groups"],
     "additionalProperties": False
 }
-
-
-new_block = {
-    "type": "object",
-    "properties": {
-        "block": {
-            "type": "object",
-            "properties": {
-                "Type": { "enum": [e.value for e in enums.BlockType]},
-                "GroupID": {"type": "integer"},
-                "DataType": {"type": "object",
-                                 "properties": {
-                                     "name": {"enum": [e.value['name'] for e in enums.DataType]},
-                                     "validation": {"enum": [e.value for e in enums.ValidationType]}
-                                 },
-                                 "required": ["name", "validation"],
-                                 "additionalProperties": True
-                             },
-                "StoreInDB": { "type": "boolean" },
-                "Skippable": { "type": "boolean" },
-                "Content": { "type": "object" } # Depends on BlockType, see below schemas for content
-            },
-            "required": ["Type","GroupID", "DataType", "StoreInDB", "Skippable", "Content"],
-            "additionalProperties": False
-        }
-    },
-    "required": ["block"],
-    "additionalProperties": False
-}
-
 
 # ==== Block Types Schemas ====
 # Note: the variables names start with capital letters intentionally
@@ -104,7 +83,7 @@ Question = {
                 "properties": {
                     "text": { "type": "string" },
                     "keywords": { "type": "array", "items": { "type": "string" } },
-                    "blockToGoID": { "type": [ "number",  "null" ] },
+                    "blockToGoID": { "type": [ "string",  "null" ] },
                     "action": { "enum": [e.value for e in enums.BlockAction]},
                     "afterMessage": { "type": "string"}
                 },
@@ -122,7 +101,7 @@ UserInput = {
     "type": "object",
     "properties": {
         "text": {"type": "string"},
-        "blockToGoID": {"type": ["integer", "null"]},
+        "blockToGoID": {"type": ["string", "null"]},
         "action": { "enum": [e.value for e in enums.BlockAction]},
         "afterMessage": {"type": "string"}
     },
@@ -138,7 +117,7 @@ FileUpload = {
         "text": {"type": "string"},
         "action": {"enum": [e.value for e in enums.BlockAction]},
         "fileTypes": {"type": "array", "items": {"type": "string", "enum": [t for t in BaseConfig.ALLOWED_EXTENSIONS]}},
-        "blockToGoID": { "type": [ "integer", "null" ] },
+        "blockToGoID": { "type": [ "string", "null" ] },
         "afterMessage": {"type": "string"}
     },
     "required": ["text", "action", "blockToGoID", "afterMessage"
@@ -152,7 +131,7 @@ Solutions = {
     "properties": {
         "showTop": {"type": "integer", "minimum": 1},
         "action": { "enum": [e.value for e in enums.BlockAction]},
-        "blockToGoID": { "type": [ "number",  "null" ] },
+        "blockToGoID": { "type": [ "string",  "null" ] },
         "afterMessage": {"type": "string"},
         "databaseType": { "enum": [dbt.name for dbt in enums.DatabaseType]},
     },

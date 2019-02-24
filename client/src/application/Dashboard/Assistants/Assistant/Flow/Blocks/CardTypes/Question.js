@@ -37,16 +37,13 @@ class Question extends Component {
             if (!err) {
                 const flowOptions = this.props.options.flow;
                 let options = {
-                    block: {
-                        Type: 'Question',
-                        GroupID: this.props.modalState.currentGroup.id,
-                        StoreInDB: values.storeInDB,
-                        Skippable: values.isSkippable || false,
-                        DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
-                        Content: {
-                            text: values.text,
-                            answers: this.state.answers
-                        }
+                    Type: 'Question',
+                    StoreInDB: values.storeInDB,
+                    Skippable: values.isSkippable || false,
+                    DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
+                    Content: {
+                        text: values.text,
+                        answers: this.state.answers
                     }
                 };
 
@@ -54,8 +51,7 @@ class Question extends Component {
                     this.props.handleNewBlock(options);
                 else {
                     // Edit Block
-                    options.block.ID = this.props.modalState.block.ID;
-                    options.block.Order = this.props.modalState.block.Order;
+                    options.ID = this.props.modalState.block.ID;
                     this.props.handleEditBlock(options);
                 }
             }

@@ -6,14 +6,19 @@ import * as serviceWorker from './serviceWorker';
 import { Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import {history} from './helpers'
-import store from './store/store'
+// import store from './store/store'
+// import persistor from './store/store'
+import { store, persistor} from './store/store'
+import { PersistGate } from 'redux-persist/integration/react'
 
 
 const app = (
     <Provider store={store}>
-        <Router history={history} >
-            <App />
-        </Router>
+        <PersistGate loading={null} persistor={persistor}>
+            <Router history={history} >
+                <App />
+            </Router>
+        </PersistGate>
     </Provider>
 );
 

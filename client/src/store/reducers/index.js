@@ -1,19 +1,21 @@
 import {combineReducers} from 'redux';
 import {auth} from './auth.reducer';
 import {assistant} from "./assistant.reducer";
-import {flow} from "./flow.reducer";
 import {profile} from "./profile.reducer";
 import {chatbotSessions} from "./chatbotSessions.reducer";
 import {solutions} from "./solutions.reducer";
 import {usersManagement} from "./usersManagement.reducer";
 import {database} from "./database.reducer";
 import {options} from "./options.reducer";
+import * as actionTypes from '../actions/actionTypes';
+import storage from 'redux-persist/lib/storage'
 
 
-const rootReducer = combineReducers({
+
+
+const appReducer = combineReducers({
     auth,
     assistant,
-    flow,
     profile,
     chatbotSessions,
     solutions,
@@ -21,5 +23,15 @@ const rootReducer = combineReducers({
     database,
     options,
 });
+
+const rootReducer = (state, action) => {
+    if (action.type === actionTypes.LOGOUT) {
+        Object.keys(state).forEach(key => {
+            storage.removeItem(`persist:${key}`);
+        });
+        state = undefined
+    }
+    return appReducer(state, action)
+};
 
 export default rootReducer;

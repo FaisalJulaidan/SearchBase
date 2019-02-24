@@ -155,7 +155,6 @@ export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, curr
                         )(
                             <Select placeholder="The first next block of a group">{
                                 allGroups.map((group, i) => {
-                                    console.log(group.blocks[0].ID, 'from loop')
                                     if (group.blocks[0]) {
                                         return <Option key={i} value={group.blocks[0].ID}>
                                                 {`${group.name}`}
@@ -188,7 +187,7 @@ export const ButtonsForm = (handleNewBlock, handleEditBlock, handleDeleteBlock, 
         <Button key="cancel" onClick={() => onCancel(handleNewBlock, handleEditBlock)}>Cancel</Button>,
         <Button key="submit" type="primary" onClick={() => onSubmit(block)}>Update</Button>
     ]
-}
+};
 
 
 export const FileTypesFormItem = ({FormItem, block, layout, getFieldDecorator, typesAllowed, setStateHandler}) => (

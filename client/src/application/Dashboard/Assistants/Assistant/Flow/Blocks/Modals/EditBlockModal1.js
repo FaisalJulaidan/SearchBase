@@ -1,7 +1,4 @@
 import React, {Component} from 'react';
-
-import {http} from "../../../../../../../helpers";
-
 import {Modal} from 'antd';
 import UserInput from "../CardTypes/UserInput";
 import Question from "../CardTypes/Question";

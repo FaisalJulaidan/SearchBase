@@ -107,7 +107,7 @@ class Billing extends React.Component {
                                                         {/*HEAD START*/}
                                                         <div className="head_bg"></div>
                                                         <div className="head">
-                                                            <span>Unlimited</span>
+                                                            <span>Professional</span>
                                                         </div>
                                                         {/*//HEAD END*/}
 

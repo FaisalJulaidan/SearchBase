@@ -14,7 +14,7 @@ const confirm = Modal.confirm;
 
 class Flow extends Component {
 
-    savedClicked = false;
+    savedClicked = false; // Important for solving the saving flow bug
 
     state = {
         currentGroup: {blocks: []},
@@ -23,13 +23,11 @@ class Flow extends Component {
     };
 
     componentWillReceiveProps(nextProps, nextContext) {
-        console.log(nextProps === this.props);
-        if (nextProps.successMsg)
-            console.log(nextContext);
+        if (nextProps.successMsg && this.savedClicked){
+            this.savedClicked = false;
             this.setState({isSaved: true});
+        }
     }
-
-    compo
 
     componentDidUpdate = () => {
         if (!this.state.isSaved) {
@@ -192,6 +190,7 @@ class Flow extends Component {
     };
 
     saveFlow = () => {
+        this.savedClicked = true;
         this.props.dispatch(assistantActions.updateFlow(this.state.assistant));
         this.props.location.state.assistant = this.state.assistant;
     };

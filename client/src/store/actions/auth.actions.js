@@ -23,6 +23,26 @@ function loginFailure (error) {
     };
 }
 
+function signup (signupDetails) {
+    return {
+        type: actionTypes.SIGNUP_REQUEST,
+        signupDetails
+    };
+}
+
+function signupSuccess () {
+    return {
+        type: actionTypes.SIGNUP_SUCCESS,
+    };
+}
+
+function signupFailure (error) {
+    return {
+        type: actionTypes.SIGNUP_FAILURE,
+        error
+    };
+}
+
 
 const logout = () => {
     return {
@@ -48,6 +68,11 @@ export const authActions = {
     login,
     loginSuccess,
     loginFailure,
+
+    signup,
+    signupSuccess,
+    signupFailure,
+
     logout,
     refreshToken,
     checkAuthTimeout

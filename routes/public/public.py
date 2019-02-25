@@ -32,6 +32,14 @@ def serveDashboard(path):
         return send_from_directory('static/react_app', 'index.html')
 
 
+@public_router.route("/signup", methods=['GET'])
+def signup():
+
+    if request.method == "GET":
+        # msg = helpers.checkForMessage()
+        return render_template("signup.html")
+
+
 @public_router.route("/", methods=['GET'])
 def indexpage():
     if request.method == "GET":
@@ -108,84 +116,6 @@ def sendEmail():
         msg.body = mailFirstname + " said: " + mailUserMessage + " their email is: " + mailUserEmail
         mail.send(msg)
         return render_template("index.html")
-
-
-@public_router.route("/login_deprecated", methods=['GET', 'POST'])
-def login():
-    if request.method == "GET":
-        msg = helpers.checkForMessage()
-        return render_template("login.html", msg=msg)
-
-    elif request.method == "POST":
-        session.permanent = True
-
-        email: str = request.form.get("email", default=None)
-        password_to_check: str = request.form.get("password", default=None)
-        callback: Callback = auth_services.login(email, password_to_check)
-
-        if callback.Success:
-            return redirect("/admin/dashboard", code=302)
-        else:
-            return helpers.redirectWithMessage("login", callback.Message)
-
-
-@public_router.route('/logout', methods=['GET'])
-def logout():
-    # Will clear out the session.
-    session.pop('UserID', None)
-    session.pop('UserEmail', None)
-    session.pop('UserPlan', None)
-    session.pop('CompanyID', None)
-    session.pop('Logged_in', False)
-    session.clear()
-
-    return redirect(url_for('public_router.login'))
-
-
-# TODO improve verification
-@public_router.route("/signup", methods=['GET', 'POST'])
-def signup():
-    if request.method == "GET":
-        msg = helpers.checkForMessage()
-        return render_template("signup.html", msg=msg)
-
-    elif request.method == "POST":
-
-        # User info
-        email = request.form.get("email", default=None)
-        fullname = request.form.get("fullname", default=None)
-        password = request.form.get("password", default=None)
-
-        # Company info
-        name = request.form.get("companyName", default=None)
-        # size = request.form.get("companySize", default=None)
-        url = request.form.get("websiteURL", default=None)
-        phone = request.form.get("phoneNumber", default=None)
-
-        if not (fullname and email and password
-                and name and url):
-            return helpers.redirectWithMessage("signup", "Error in getting all input information.")
-
-        # Split fullname
-        firstname = fullname.strip().split(" ")[0]
-        surname = fullname.strip().split(" ")[1]
-
-        # Signup new user
-        signup_callback: Callback = auth_services.signup(email.lower(), firstname, surname, password, name, phone, url)
-        if not signup_callback.Success:
-            print(signup_callback.Message)
-            return helpers.redirectWithMessage("signup", signup_callback.Message)
-
-        # Send verification email
-        mail_callback: Callback = mail_services.sendVerificationEmail(email, name)
-
-        # If error while sending verification email
-        if not mail_callback.Success:
-            helpers.redirectWithMessage('signup', 'Signed up successfully but > ' + mail_callback.Message
-                                        + '. Please contact TheSearchBaseStaff to activate your account.')
-
-        return helpers.redirectWithMessage("login",
-                                           "We have sent you a verification email. Please use it to complete the sign up process.")
 
 
 @public_router.route("/account/verify/<payload>", methods=['GET'])

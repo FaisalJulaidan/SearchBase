@@ -7,6 +7,7 @@ import {notification} from 'antd';
 import {PrivateRoute} from './hoc';
 import Dashboard from "./application/Dashboard/Dashboard";
 import Login from './application/Login/Login'
+import Signup from './application/Signup/Signup'
 
 class App extends Component {
     constructor(props) {
@@ -22,6 +23,7 @@ class App extends Component {
             <Switch>
                 {/* <Route exact path="/" component={Home} /> */}
                 <Route path="/login" component={Login}/>
+                <Route path="/signup" component={Signup}/>
                 <PrivateRoute path="/dashboard" component={Dashboard}/>
                 <Redirect to={{pathname: '/dashboard'}}/>
             </Switch>

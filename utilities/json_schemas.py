@@ -8,7 +8,7 @@ chatbot_session = {
         "collectedData": {"type": "array", "items": {
             "type": "object",
             "properties":{
-                "blockID": {"type": "integer"},
+                "blockID": {"type": "string"},
                 "questionText": {"type": "string"},
                 "dataType": {"enum": [e.value['name'] for e in enums.DataType]},
                 "input": {"type": "string"},

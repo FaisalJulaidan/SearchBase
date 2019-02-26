@@ -10,12 +10,12 @@ def change_password():
         return admin_services.render("/accounts/changepassword.html")
     else:
 
-        currentPassword = request.form.get("currentPassword", default="Error")
-        newPassword = request.form.get("newPassword", default="Error")
+        currentPassword = request.form.get("currentPassword", default="")
+        newPassword = request.form.get("newPassword", default="")
         
-        if currentPassword is "Error" or newPassword is "Error":
+        if not currentPassword or not newPassword:
             return helpers.redirectWithMessage("change_password", "Could not retrieve all written information.")
-        
+
         changePassword_callback : Callback = user_services.changePasswordByID(session.get('UserID', None), newPassword, currentPassword)
 
         return helpers.redirectWithMessage("change_password", changePassword_callback.Message)

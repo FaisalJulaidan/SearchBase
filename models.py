@@ -262,6 +262,28 @@ class ChatbotSession(db.Model):
         return '<ChatbotSession {}>'.format(self.Data)
 
 
+# @db.validates("ChatbotSession")
+# def testing():
+#     print("SOOOOO")
+#     return True
+
+
+# def testing():
+#     print("HIIIIIIII")
+#     return True
+#
+#
+# trigger = db.DDL(
+#     ""
+# )
+#
+# db.event.listen(
+#     ChatbotSession,
+#     'before_delete',
+#     trigger.execute_if(testing)
+# )
+
+
 class BlockGroup(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)

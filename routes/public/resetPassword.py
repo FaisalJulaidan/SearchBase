@@ -13,7 +13,7 @@ def reset_password():
         msg = helpers.checkForMessage()
         return render_template("accounts/resetpassword.html", msg=msg)
     else:
-         email = request.form.get("email", default="Error")
+         email = request.form.get("email", default="").lower()
 
          company_callback : Callback = company_services.getByEmail(email)
          if not company_callback.Success: return helpers.redirectWithMessage("reset_password", "User with that email does not exist.")
@@ -27,7 +27,7 @@ def reset_password_verify(payload):
     if request.method == "GET":
         try:
             data = verificationSigner.loads(payload)
-            email = data.split(";")[0]
+            email = data.split(";")[0].lower()
             companyID = int(data.split(";")[1])
 
             company_callback : Callback = company_services.getByEmail(email)
@@ -40,7 +40,7 @@ def reset_password_verify(payload):
         return render_template("accounts/set_resetpassword.html", email=email, payload=payload)
 
     if request.method == "POST":
-        email = request.form.get("email", default="Error")
+        email = request.form.get("email", default="Error").lower()
         password = request.form.get("password", default="Error")
 
         changePassword_callback : Callback = user_services.changePasswordByEmail(email, password)

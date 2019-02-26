@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, session, redirect, url_for
+from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory
 from itsdangerous import URLSafeTimedSerializer
 from models import Callback
 from services import user_services, auth_services, mail_services, jwt_auth_services
@@ -49,11 +49,11 @@ def verify_account(payload):
         try:
             data = verificationSigner.loads(payload)
             email = data.split(";")[0]
-            user_callback : Callback = user_services.verifyByEmail(email)
+            user_callback: Callback = user_services.verifyByEmail(email)
             if not user_callback.Success: raise Exception(user_callback.Message)
 
-            return helpers.redirectWithMessage("login", "Your email has been verified. You can now access your account.")
+            return send_from_directory('static/react_app', 'index.html')
 
         except Exception as e:
             print(e)
-            return helpers.redirectWithMessage("login", "Email verification link failed. Please contact Customer Support in order to resolve this.")
+            return send_from_directory('static/react_app', 'index.html')

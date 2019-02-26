@@ -21,7 +21,13 @@ def fetchDatabase(id, companyID: int) -> Callback:
         databaseContent = None
         if database.Type == DatabaseType.Candidates:
             print('fetch from candidate table')
+            # TODO Ensure it works
             databaseContent = helpers.getListFromSQLAlchemyList(getAllCandidates(id))
+            for i, _ in enumerate(databaseContent):
+                if databaseContent[i]['Currency']:
+                    temp = databaseContent[i]['Currency'].code
+                    del databaseContent[i]['Currency']
+                    databaseContent[i]['Currency'] = temp
 
         elif database.Type == DatabaseType.Jobs:
             print('fetch from candidate table')
@@ -224,6 +230,7 @@ def scanCandidates(session):
                              con=db.session.bind)
 
         keywords = session['keywordsByDataType']
+
         df['count'] = 0 # add column for tracking score
         # Delete sensitive columns e.g. candidate name
         df.drop(['ID', DT.Name.name, DT.Email.name, DT.Telephone.name], axis=1, inplace=True)

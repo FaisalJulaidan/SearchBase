@@ -66,7 +66,7 @@ function* signup({signupDetails}) {
         yield destroyMessage();
         yield sucessMessage('Account created');
         yield put(authActions.signupSuccess());
-        // yield history.push('/login');
+        yield history.push('/login');
 
     } catch (error) {
         console.log(error);

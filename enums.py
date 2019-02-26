@@ -151,3 +151,7 @@ class DataType(Enum):
                                    ValidationType.Ignore,
                                    [UserType.CandidateSeeker])
 
+    JobDescription = dataTypeCreator('Job Description',
+                                      ValidationType.Ignore,
+                                      [UserType.CandidateSeeker])
+

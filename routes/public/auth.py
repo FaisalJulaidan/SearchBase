@@ -52,8 +52,8 @@ def verify_account(payload):
             user_callback: Callback = user_services.verifyByEmail(email)
             if not user_callback.Success: raise Exception(user_callback.Message)
 
-            return send_from_directory('static/react_app', 'index.html')
+            return redirect("/login")
 
         except Exception as e:
             print(e)
-            return send_from_directory('static/react_app', 'index.html')
+            return redirect("/login")

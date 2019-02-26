@@ -254,20 +254,34 @@ class ChatbotSession(db.Model):
     QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
     UserType = db.Column(Enum(enums.UserType), nullable=False)
 
-    @db.validates("FilePath")
-    def file_change(self, key, value):
-        print("something happened")
-        print(self)
-        print(key)
-        print(value)
-        return value
-
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')
 
     def __repr__(self):
         return '<ChatbotSession {}>'.format(self.Data)
+
+
+# @db.validates("ChatbotSession")
+# def testing():
+#     print("SOOOOO")
+#     return True
+
+
+# def testing():
+#     print("HIIIIIIII")
+#     return True
+#
+#
+# trigger = db.DDL(
+#     ""
+# )
+#
+# db.event.listen(
+#     ChatbotSession,
+#     'before_delete',
+#     trigger.execute_if(testing)
+# )
 
 
 class BlockGroup(db.Model):

@@ -201,20 +201,23 @@ def scan(session, assistantHashID):
             return Callback(False, "Assistant not found!")
         assistant: Assistant = callback.Data
 
-        database: Database = db.session.query(Database) \
-            .filter(and_(Database.CompanyID == assistant.CompanyID, Database.ID == session['databaseID'])).first()
-        if not database: raise Exception
+        databaseType: DatabaseType = DatabaseType[session['databaseType'].replace(" ", "")]
+        databases: List[Database] = db.session.query(Database.ID) \
+            .filter(and_(Database.CompanyID == assistant.CompanyID,
+                         Database.Type == databaseType)).all()
+
+
+        # if len(databases) == 0 : raise Exception
+        print([d[0] for d in databases])
 
         # Scan database for solutions based on database type
-        result = None
-        if database.Type == enums.DatabaseType.Candidates:
-            return scanCandidates(session)
-        elif database.Type == enums.DatabaseType.Jobs:
-            pass
+        if databaseType == enums.DatabaseType.Candidates:
+            return scanCandidates(session, [d[0] for d in databases])
+        elif databaseType == enums.DatabaseType.Jobs:
+            return scanJobs(session, [d[0] for d in databases])
         else:
-            return Callback(False, "Database type is not recognised")
+            return Callback(False, "Database type is not recognised", None)
 
-        return Callback(False, "", result)
 
 
     except Exception as exc:
@@ -223,59 +226,175 @@ def scan(session, assistantHashID):
 
 
 # Data analysis using Pandas library
-def scanCandidates(session):
+def scanCandidates(session, dbIDs):
     try:
-        dbID = int(session['databaseID']) # prevent sql injection
-        df = pandas.read_sql("SELECT * FROM Candidate WHERE DatabaseID=" + str(dbID),
+
+        df = pandas.read_sql(db.session.query(Candidate).filter(Candidate.DatabaseID.in_(dbIDs)).statement,
                              con=db.session.bind)
 
-        keywords = session['keywordsByDataType']
 
+        keywords = session['keywordsByDataType']
         df['count'] = 0 # add column for tracking score
         # Delete sensitive columns e.g. candidate name
-        df.drop(['ID', DT.Name.name, DT.Email.name, DT.Telephone.name], axis=1, inplace=True)
+        # df.drop(['ID', 'Name', 'Email', 'Telephone'], axis=1, inplace=True) # No need
 
-        # Desired Salary <> Job Salary Offered | points=3
-        if keywords.get(DT.JobSalaryOffered.value['name']):
-            df.loc[df[DT.DesiredSalary.name] >= keywords[DT.JobSalaryOffered.value['name']][-1], 'count'] += 3
-
-        # Desired Hourly Rate <> Contract Rate | points=3
-        if keywords.get(DT.ContractRate.value['name']):
-            df.loc[df[DT.DesiredHourlyRate.name] >= keywords[DT.ContractRate.value['name']][-1], 'count'] += 3
-
-        # Years Exp <> Essential Years Exp | points=3
-        if keywords.get(DT.EssentialYearsExp.value['name']):
-            df.loc[df[DT.YearsExp.name] >= keywords[DT.EssentialYearsExp.value['name']][-1], 'count'] += 6
+        # Numbers
+        # Received DataType: DesiredSalary <> Column: DesiredSalary | points=3
+        if keywords.get(DT.DesiredSalary.value['name']):
+            df.loc[df[Candidate.DesiredSalary.name] >= keywords[DT.DesiredSalary.value['name']][-1], 'count'] += 3
 
 
+        # Received DataType: YearsExp <> Column: YearsExp | points=5
+        if keywords.get(DT.YearsExp.value['name']):
+            df.loc[df[Candidate.YearsExp.name] <= keywords[DT.YearsExp.value['name']][-1], 'count'] += 5
 
-        # Desired Position <> Job Description | points= 1
+
+        # Received DataType: YearsExp <> Column: YearsExp | points=5
+        if keywords.get(DT.DesiredPayRate.value['name']):
+            df.loc[df[Candidate.DesiredPayRate.name] <= keywords[DT.DesiredPayRate.value['name']][-1], 'count'] += 3
+
+        #  =======================================
+
+
+        # Received DataType: DesiredPosition <> Column: DesiredPosition | points= 1
+        if keywords.get(DT.DesiredPosition.value['name']):
+            df['count'] += df[Candidate.DesiredPosition.name].str.count('|'.join(keywords[DT.DesiredPosition.value['name']]),
+                                                                 flags=re.IGNORECASE)
+
+
+        # Received DataType: CandidateSkills <> Column: CandidateSkills | points= 1
+        if keywords.get(DT.CandidateSkills.value['name']):
+            df['count'] += df[Candidate.CandidateSkills.name].str.count('|'.join(keywords[DT.CandidateSkills.value['name']]),
+                                                                 flags=re.IGNORECASE)
+
+
+        # Received DataType: PreferredLocation <> Column: PreferredLocation | points= 1
+        if keywords.get(DT.PreferredLocation.value['name']):
+            df['count'] += df[Candidate.PreferredLocation.name].str.count('|'.join(keywords[DT.PreferredLocation.value['name']]),
+                                                                        flags=re.IGNORECASE)
+
+
+        # Received DataType: PreferredEmploymentType <> Column: PreferredEmploymentType | points= 1
+        if keywords.get(DT.PreferredEmploymentType.value['name']):
+            df['count'] += df[Candidate.PreferredEmploymentType.name].str.count('|'.join(keywords[DT.PreferredEmploymentType.value['name']]),
+                                                                                flags=re.IGNORECASE)
+
+
+        # Received DataType: OfferedJobTitle <> Column: DesiredPosition | points= 1
+        if keywords.get(DT.OfferedJobTitle.value['name']):
+            df['count'] += df[Candidate.DesiredPosition.name].str.count('|'.join(keywords[DT.OfferedJobTitle.value['name']]),
+                                                                                flags=re.IGNORECASE)
+
+
+        # Received DataType: JobDescription <> Column: DesiredPosition | points= 1
         if keywords.get(DT.JobDescription.value['name']):
-            print('|'.join(keywords[DT.JobDescription.value['name']]))
-            df['count'] += df[DT.DesiredPosition.name].str.count('|'.join(keywords[DT.JobDescription.value['name']]),
-                                                                 flags=re.IGNORECASE)
-
-        # Candidate Skills <> Essential Skills | points=3 per skill
-        if keywords.get(DT.EssentialSkills.value['name']):
-            df['count'] += 3 * df[DT.CandidateSkills.name].str.count('|'.join(keywords[DT.EssentialSkills.value['name']]),
-                                                                 flags=re.IGNORECASE)
+            df['count'] += df[Candidate.DesiredPosition.name].str.count('|'.join(keywords[DT.JobDescription.value['name']]),
+                                                                        flags=re.IGNORECASE)
 
 
-        # Preferred Employment Type <> Employment Type Offered | points=2
-        if keywords.get(DT.EmploymentTypeOffered.value['name']):
-            df['count'] += 2 * df[DT.PreferredEmploymentType.name].str.count('|'.join(keywords[DT.EmploymentTypeOffered.value['name']]),
-                                                                     flags=re.IGNORECASE)
-
-
-
-        return Callback(True, '', json.loads(df[df['count']>0].nlargest(session.get('showTop', 0), 'count')
-                                          .to_json(orient='records')))
+        topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 2), 'count')
+                                .to_json(orient='records'))
+        data = []
+        for tr in topResults:
+            data = {
+                "title": tr[Candidate.DesiredPosition.name],
+                "description": tr[Candidate.CandidateSkills.name],
+                "tail": "Salary: " + str(tr[Candidate.DesiredSalary.name])
+            }
+        print(data)
+        return Callback(True, '', data)
 
     except Exception as exc:
         print("scanCandidates() ERROR: ", exc)
         return Callback(False, 'Error while search the database for matches!')
 
 
+
+def scanJobs(session, dbIDs):
+    try:
+
+        df = pandas.read_sql(db.session.query(Job).filter(Job.DatabaseID.in_(dbIDs)).statement,
+                             con=db.session.bind)
+
+
+        keywords = session['keywordsByDataType']
+        df['count'] = 0 # add column for tracking score
+        # Delete sensitive columns e.g. candidate name
+        df.drop(['ID'], axis=1, inplace=True)
+
+        # Numbers
+        # Received DataType: DesiredSalary <> Column: DesiredSalary | points=3
+        if keywords.get(DT.DesiredSalary.value['name']):
+            df.loc[df[Job.Salary.name] >= keywords[DT.DesiredSalary.value['name']][-1], 'count'] += 3
+
+
+        # Received DataType: DesiredPayRate <> Column: PayRate | points=3
+        if keywords.get(DT.DesiredPayRate.value['name']):
+            df.loc[df[Job.PayRate.name] <= keywords[DT.DesiredPayRate.value['name']][-1], 'count'] += 3
+
+        #  =======================================
+
+        # Received DataType: DesiredPosition <> Column: DesiredPosition | points= 1
+        if keywords.get(DT.DesiredPosition.value['name']):
+            df['count'] += df[Job.Description.name].str.count('|'.join(keywords[DT.DesiredPosition.value['name']]),
+                                                                        flags=re.IGNORECASE)
+
+
+        # Received DataType: CandidateSkills <> Column: EssentialSkills | points= 1
+        if keywords.get(DT.CandidateSkills.value['name']):
+            df['count'] += df[Job.EssentialSkills.name].str.count('|'.join(keywords[DT.CandidateSkills.value['name']]),
+                                                                        flags=re.IGNORECASE)
+
+        # Received DataType: CandidateSkills <> Column: Description | points= 1
+        if keywords.get(DT.CandidateSkills.value['name']):
+            df['count'] += df[Job.Description.name].str.count('|'.join(keywords[DT.CandidateSkills.value['name']]),
+                                                                  flags=re.IGNORECASE)
+
+
+        # Received DataType: PreferredLocation <> Column: Location | points= 1
+        if keywords.get(DT.PreferredLocation.value['name']):
+            df['count'] += df[Job.Location.name].str.count('|'.join(keywords[DT.PreferredLocation.value['name']]),
+                                                                          flags=re.IGNORECASE)
+
+
+        # Received DataType: PreferredEmploymentType <> Column: EmploymentType | points= 1
+        if keywords.get(DT.PreferredEmploymentType.value['name']):
+            df['count'] += df[Job.EmploymentType.name].str.count('|'.join(keywords[DT.PreferredEmploymentType.value['name']]),
+                                                                                flags=re.IGNORECASE)
+
+
+        # Received DataType: OfferedJobTitle <> Column: Title | points= 1
+        if keywords.get(DT.OfferedJobTitle.value['name']):
+            df['count'] += df[Job.Title.name].str.count('|'.join(keywords[DT.OfferedJobTitle.value['name']]),
+                                                                        flags=re.IGNORECASE)
+
+        # Received DataType: OfferedJobTitle <> Column: Description | points= 1
+        if keywords.get(DT.OfferedJobTitle.value['name']):
+            df['count'] += df[Job.Description.name].str.count('|'.join(keywords[DT.OfferedJobTitle.value['name']]),
+                                                              flags=re.IGNORECASE)
+
+
+        # Received DataType: JobDescription <> Column: Description | points= 1
+        if keywords.get(DT.JobDescription.value['name']):
+            df['count'] += df[Job.Description.name].str.count('|'.join(keywords[DT.JobDescription.value['name']]),
+                                                                        flags=re.IGNORECASE)
+
+
+        topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 2), 'count')
+                                .to_json(orient='records'))
+        data = []
+        for tr in topResults:
+            data = {
+                "title": tr[Job.Title.name],
+                "description": tr[Job.Description.name],
+                "tail": "Salary: " + str(tr[Job.Salary.name])
+            }
+        print(data)
+        return Callback(True, '', data)
+
+    except Exception as exc:
+        print("scanJobs() ERROR: ", exc)
+        return Callback(False, 'Error while search the database for matches!')
 
 def getOptions() -> Callback:
     options =  {

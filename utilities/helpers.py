@@ -248,7 +248,10 @@ def gen_dummy_data():
 
 
     db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidates, Company=aramco)
+    db2: Database = Database(Name='db2', Type=enums.DatabaseType.Candidates, Company=aramco)
+
     db.session.add(db1)
+    db.session.add(db2)
 
     db.session.add(addCandidate(db1, 'Faisal', 2000, "Software Engineer", "python, java, javascript, SQL",
                                 5, "London","contract", 30))
@@ -256,7 +259,7 @@ def gen_dummy_data():
     db.session.add(addCandidate(db1, 'Mohammed', 4000, "Software Engineer", "python, SQL",
                                 10, "Cardiff","Contract", 50))
 
-    db.session.add(addCandidate(db1, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
+    db.session.add(addCandidate(db2, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
                                 2, "Cardiff","Contract", 20))
 
     seed() # will save changes as well

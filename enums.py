@@ -82,11 +82,11 @@ class DataType(Enum):
     # Candidate
     Gender = dataTypeCreator('Gender',
                              ValidationType.Ignore,
-                             [UserType.JobSeeker])
+                             [UserType.CandidateSeeker, UserType.JobSeeker])
 
     Degree = dataTypeCreator('Degree',
                              ValidationType.Ignore,
-                             [UserType.JobSeeker])
+                             [UserType.CandidateSeeker, UserType.JobSeeker])
 
     Resume = dataTypeCreator('Resume',
                              ValidationType.Ignore,
@@ -94,7 +94,7 @@ class DataType(Enum):
 
     ContactTime = dataTypeCreator('Contact Time',
                                   ValidationType.Ignore,
-                                  [UserType.JobSeeker])
+                                  [UserType.CandidateSeeker, UserType.JobSeeker])
 
     CurrentSalary = dataTypeCreator('Current Salary',
                                     ValidationType.Number,
@@ -115,31 +115,31 @@ class DataType(Enum):
 
     DesiredSalary = dataTypeCreator('Desired Salary',
                                     ValidationType.Number,
-                                    [UserType.JobSeeker])
+                                    [UserType.CandidateSeeker, UserType.JobSeeker])
 
     DesiredPosition = dataTypeCreator('Desired Position',
                                       ValidationType.Ignore,
-                                      [UserType.JobSeeker])
+                                      [UserType.CandidateSeeker, UserType.JobSeeker])
 
     CandidateSkills = dataTypeCreator('Candidate Skills',
                                       ValidationType.Ignore,
-                                      [UserType.JobSeeker])
+                                      [UserType.CandidateSeeker, UserType.JobSeeker])
 
     YearsExp = dataTypeCreator('Years Exp',
                                ValidationType.Number,
-                               [UserType.JobSeeker])
+                               [UserType.CandidateSeeker, UserType.JobSeeker])
 
     PreferredLocation = dataTypeCreator('Preferred Location',
                                         ValidationType.Ignore,
-                                        [UserType.JobSeeker])
+                                        [UserType.CandidateSeeker, UserType.JobSeeker])
 
     PreferredEmploymentType = dataTypeCreator('Desired Employment Type',
                                               ValidationType.Ignore,
-                                              [UserType.JobSeeker])
+                                              [UserType.CandidateSeeker, UserType.JobSeeker])
 
     DesiredPayRate = dataTypeCreator('Desired Pay Rate',
                                      ValidationType.Number,
-                                     [UserType.JobSeeker])
+                                     [UserType.CandidateSeeker, UserType.JobSeeker])
 
 # Job
 

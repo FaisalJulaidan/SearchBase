@@ -85,7 +85,7 @@ class Billing extends React.Component {
 
                                                 {/*BUTTON START*/}
                                                 <div className="generic_price_btn clearfix">
-                                                    <a className="" href="">Sign up</a>
+                                                    <a className="" href="mailto:info@thesearchbase.com?subject=Standard Package&body=Hi, I'm interested in the Standard Package.">Sign up</a>
                                                 </div>
                                                 {/*//BUTTON END*/}
 
@@ -107,7 +107,7 @@ class Billing extends React.Component {
                                                         {/*HEAD START*/}
                                                         <div className="head_bg"></div>
                                                         <div className="head">
-                                                            <span>Unlimited</span>
+                                                            <span>Professional</span>
                                                         </div>
                                                         {/*//HEAD END*/}
 
@@ -143,7 +143,7 @@ class Billing extends React.Component {
 
                                                 {/*BUTTON START*/}
                                                 <div className="generic_price_btn clearfix">
-                                                    <a className="" href="">Sign up</a>
+                                                    <a className="" href="mailto:info@thesearchbase.com?subject=Professional Package&body=Hi, I'm interested in the Professional Package.">Sign up</a>
                                                 </div>
                                                 {/*//BUTTON END*/}
 

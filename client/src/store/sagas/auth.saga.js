@@ -1,9 +1,9 @@
 import * as actionTypes from '../actions/actionTypes';
 import { delay } from "redux-saga";
 import { put, takeEvery, takeLatest, all } from 'redux-saga/effects'
-import {authActions, profileActions} from "../actions";
-import { history, checkAuthenticity } from '../../helpers'
-import {alertError, alertSuccess, destroyMessage, loadingMessage} from "../../helpers/alert";
+import {assistantActions, authActions, profileActions} from "../actions";
+import {history, checkAuthenticity, http, sucessMessage} from '../../helpers'
+import {alertError, alertSuccess, destroyMessage, loadingMessage, errorMessage} from "../../helpers/alert";
 import axios from 'axios';
 
 
@@ -16,6 +16,8 @@ function* watchCheckAuthTimeout() {
     yield takeEvery(actionTypes.AUTH_CHECK_TIMEOUT, checkAuthTimeout)
 }
 
+
+// Login
 function* login({email, password}) {
     try {
         loadingMessage('Logging you in...');
@@ -37,6 +39,7 @@ function* login({email, password}) {
         yield put(authActions.checkAuthTimeout(secondsToExpire, refresh)); // refresh to access token when expired
         // Redirect to dashboard page
         yield history.push('/dashboard');
+
     } catch (error) {
         console.log(error);
         yield destroyMessage();
@@ -49,6 +52,36 @@ function* watchLogin() {
     yield takeLatest(actionTypes.LOGIN_REQUEST, login)
 }
 
+// Signup
+function* signup({signupDetails}) {
+
+    try {
+        loadingMessage('Creating your account', 0);
+
+        const res = yield axios.post(`/api/signup`, {...signupDetails}, {
+            headers: {'Content-Type': 'application/json'},
+        });
+        console.log(res);
+
+        yield destroyMessage();
+        yield sucessMessage('Account created');
+        yield put(authActions.signupSuccess());
+        // yield history.push('/login');
+
+    } catch (error) {
+        console.log(error);
+        yield destroyMessage();
+        yield put(authActions.signupFailure(error.response.data));
+        return yield errorMessage(error.response.data.msg, 0);
+    }
+}
+
+function* watchSignup() {
+    yield takeLatest(actionTypes.SIGNUP_REQUEST, signup)
+}
+
+
+// Logout
 function* logout() {
     // Clear local storage from user, token...
     yield localStorage.clear();
@@ -58,6 +91,7 @@ function* logout() {
 function* watchLogout() {
     yield takeLatest(actionTypes.LOGOUT, logout)
 }
+
 
 function* refreshToken({refresh}) {
     try {
@@ -87,6 +121,7 @@ function* watchRefreshToken() {
 export function* authSaga() {
     yield all([
         watchLogin(),
+        watchSignup(),
         watchLogout(),
         watchCheckAuthTimeout(),
         watchRefreshToken()

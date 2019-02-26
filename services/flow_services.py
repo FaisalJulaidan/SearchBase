@@ -21,22 +21,24 @@ def getChatbot(assistantHashID) -> Callback:
         assistant: Assistant = callback.Data
 
         # Get the assistant without the flow
-        data = {'assistant':
-            {
-                'ID': assistant.Name,
-                'Message': assistant.Message,
-                'TopBarText': assistant.TopBarText,
-                'SecondsUntilPopup': assistant.SecondsUntilPopup,
-                'Active': assistant.Active,
-            }
+        data = {
+            'assistant':
+                {
+                    'ID': assistant.Name,
+                    'Message': assistant.Message,
+                    'TopBarText': assistant.TopBarText,
+                    'SecondsUntilPopup': assistant.SecondsUntilPopup,
+                    'Active': assistant.Active
+                },
         }
         # Use the assistant hashID instead of the integer one
         data['assistant']['ID'] = assistantHashID
 
         # Add the flow to data object as blocks without groups
         blocks = []
-        for group in assistant.Flow.get('groups'):
-            blocks += group.blocks
+        if assistant.Flow:
+            for group in assistant.Flow.get('groups'):
+                blocks += group['blocks']
         data['blocks'] = blocks
 
         return Callback(True, '', data)

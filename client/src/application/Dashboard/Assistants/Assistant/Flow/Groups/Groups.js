@@ -72,7 +72,7 @@ class Groups extends Component {
                     </div>
                     <div>
                         <Button className={styles.Panel_Header_Button}
-                                type="dashed"
+                                type="default"
                                 size={"small"}
                                 icon="plus"
                                 onClick={this.showNewGroupModal}>

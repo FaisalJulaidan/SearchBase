@@ -5,6 +5,7 @@ import {authActions} from '../../store/actions/index';
 import styles from './Login.module.less';
 
 import {Button, Col, Form, Icon, Input, Row, Spin} from 'antd';
+import {Link} from "react-router-dom";
 
 const FormItem = Form.Item;
 class Login extends React.Component {
@@ -75,11 +76,15 @@ class Login extends React.Component {
 
                         <Row type="flex" justify="center">
                             <Col>
-                                <a className="login-form-forgot" href="account/resetpassword">Forgot password?</a>
+                                <a href="account/resetpassword">Forgot password?</a>
                             </Col>
                         </Row>
 
-
+                        <Row type="flex" justify="center">
+                            <Col>
+                                <Link to="/signup">Don't have an account?</Link>
+                            </Col>
+                        </Row>
                         <br/>
                     </Spin>
                 </div>

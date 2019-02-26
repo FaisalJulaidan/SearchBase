@@ -2,7 +2,6 @@ import {message, notification} from 'antd';
 
 const duration = 2.5;
 const placement = "topRight";
-
 export const alertSuccess = (title, message) => {
     notification.success({
         message: title,
@@ -22,6 +21,7 @@ export const alertError = (title, message) => {
 
 export const loadingMessage = (title, time = 1.5) => message.loading(title, time);
 export const sucessMessage = (title, time = 1.5) => message.success(title, time);
+export const errorMessage = (title, time = 1.5) => message.error(title, time);
 
 export const destroyMessage = () => {
     message.destroy();

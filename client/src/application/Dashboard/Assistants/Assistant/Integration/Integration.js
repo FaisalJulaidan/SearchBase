@@ -72,7 +72,7 @@ class Integration extends React.Component {
         let colon = "";
         if (window.location.port !== "") {colon = ":";}
         const {protocol, port, hostname} = window.location;
-        return protocol + '//' + hostname + colon + port + "/api/widgets/chatbotOLD.js";
+        return protocol + '//' + hostname + colon + port + "/api/widgets/chatbot.js";
     };
 
     generateDirectLink = () => {

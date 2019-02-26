@@ -14,6 +14,8 @@ const confirm = Modal.confirm;
 
 class Flow extends Component {
 
+    savedClicked = false; // Important for solving the saving flow bug
+
     state = {
         currentGroup: {blocks: []},
         assistant: {Flow: {groups:[]}},
@@ -21,12 +23,15 @@ class Flow extends Component {
     };
 
     componentWillReceiveProps(nextProps, nextContext) {
-        if (nextProps.successMsg)
+        if (nextProps.successMsg && this.savedClicked){
+            this.savedClicked = false;
             this.setState({isSaved: true});
+        }
     }
 
     componentDidUpdate = () => {
         if (!this.state.isSaved) {
+            console.log('reload?');
             window.onbeforeunload = () => true
         } else {
             window.onbeforeunload = undefined
@@ -35,6 +40,7 @@ class Flow extends Component {
 
 
     componentDidMount() {
+        console.log('componentDidMount');
         const {assistantList, match} = this.props;
         this.setState({assistant: assistantList.find(assistant => assistant.ID === +match.params.id)},
             () => console.log(this.state.assistant)
@@ -184,17 +190,15 @@ class Flow extends Component {
     };
 
     saveFlow = () => {
-        // if i got the assistans.js then i click on flow
+        this.savedClicked = true;
         this.props.dispatch(assistantActions.updateFlow(this.state.assistant));
-        // this when i refresh the page beacause the props.llcati.stat kj fasdis sdfsdf stuck and need to
-        // be clicked again from the alst page
         this.props.location.state.assistant = this.state.assistant;
     };
 
     render() {
         const {assistant} = this.state;
         const {Flow} = assistant;
-        console.log(Flow);
+
         return (
             <Spin spinning={!(!!assistant)} style={{height: '100%'}}>
 

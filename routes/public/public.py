@@ -1,8 +1,7 @@
 import os
 
-from flask import Blueprint, render_template, request, session, redirect, url_for, send_from_directory
+from flask import Blueprint, render_template, request, send_from_directory
 from flask_cors import CORS
-from flask_jwt_extended import jwt_required
 from itsdangerous import URLSafeTimedSerializer
 
 from models import Callback

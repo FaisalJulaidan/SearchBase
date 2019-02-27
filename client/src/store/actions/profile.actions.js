@@ -27,10 +27,10 @@ const saveProfileDetails = (profileData) => {
     }
 };
 
-const saveProfileDetailsSuccess = (successMessage) => {
+const saveProfileDetailsSuccess = (successMsg) => {
     return {
         type: actionTypes.SAVE_PROFILE_DETAILS_SUCCESS,
-        successMessage
+        successMsg
     }
 };
 
@@ -48,16 +48,39 @@ const saveDataSettings = (dataSettings) => {
     }
 };
 
-const saveDataSettingsSuccess = (successMessage) => {
+const saveDataSettingsSuccess = (successMsg) => {
     return {
         type: actionTypes.SAVE_DATA_SETTINGS_SUCCESS,
-        successMessage
+        successMsg
     }
 };
 
 const saveDataSettingsFailure = (error) => {
     return {
         type: actionTypes.SAVE_DATA_SETTINGS_FAILURE,
+        error
+    }
+};
+
+
+const changePassword = (oldPassword, newPassword) => {
+    return {
+        type: actionTypes.CHANGE_PASS_REQUEST,
+        oldPassword,
+        newPassword
+    }
+};
+
+const changePasswordSuccess = (successMsg) => {
+    return {
+        type: actionTypes.CHANGE_PASS_SUCCESS,
+        successMsg
+    }
+};
+
+const changePasswordFailure = (error) => {
+    return {
+        type: actionTypes.CHANGE_PASS_FAILURE,
         error
     }
 };
@@ -71,5 +94,9 @@ export const profileActions = {
     saveProfileDetailsFailure,
     saveDataSettings,
     saveDataSettingsSuccess,
-    saveDataSettingsFailure
+    saveDataSettingsFailure,
+
+    changePassword,
+    changePasswordSuccess,
+    changePasswordFailure,
 };

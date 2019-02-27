@@ -70,7 +70,7 @@ class ProfileDetails extends React.Component {
                             message: "Please enter a valid email"
                         }],
                     })(
-                        <Input readOnly={true}/>
+                        <Input disabled={true} readOnly={true}/>
                     )}
                 </FormItem>
 

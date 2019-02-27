@@ -22,6 +22,8 @@ export const profile = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: action.error.msg
             });
+
+
         case actionTypes.SAVE_PROFILE_DETAILS_REQUEST:
             return updateObject(state, {
                 successMsg: null,
@@ -38,6 +40,8 @@ export const profile = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: action.error.msg
             });
+
+
         case actionTypes.SAVE_DATA_SETTINGS_REQUEST:
             return updateObject(state, {
                 successMsg: null,

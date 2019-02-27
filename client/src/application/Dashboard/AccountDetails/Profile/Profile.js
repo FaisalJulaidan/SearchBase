@@ -1,23 +1,16 @@
 import React from 'react';
-import {Form, Button, message, Tabs} from "antd";
+import {Tabs} from "antd";
 import {connect} from 'react-redux';
-import {isEmpty} from "lodash";
 
 import styles from "./Profile.module.less"
 import ProfileDetails from "./profileComponents/ProfileDetails/ProfileDetails";
 import DataSettings from "./profileComponents/DataSettings/DataSettings";
+import ChangePassword from "./profileComponents/ChangePassword/ChangePassword";
 
 import {profileActions} from "../../../../store/actions/profile.actions";
 const TabPane = Tabs.TabPane;
 
 class Profile extends React.Component {
-    // state = {
-    //     password: {
-    //         old: "",
-    //         new: "",
-    //         repeat: ""
-    //     }
-    // };
 
     saveProfileDetails = (values) => {
         this.props.dispatch(profileActions.saveProfileDetails(values));
@@ -26,6 +19,11 @@ class Profile extends React.Component {
     saveDataSettings = (values) => {
         this.props.dispatch(profileActions.saveDataSettings(values));
     };
+
+    savePassword = (values) => {
+        this.props.dispatch(profileActions.changePassword(values.oldPassword, values.newPassword));
+    };
+
 
     componentDidMount() {
         this.props.dispatch(profileActions.getProfile());
@@ -53,49 +51,9 @@ class Profile extends React.Component {
                                 <DataSettings profileData={this.props.profileData} saveDataSettings={this.saveDataSettings}/>
                             </TabPane>
 
-                            {/*<TabPane tab={"Change Password"} key={"3"}>*/}
-
-                                {/*<Form onSubmit={this.handleSubmit}>*/}
-                                    {/*<ProfileInput title={"Old Password"} name="password.old"*/}
-                                                  {/*rules={{*/}
-                                                      {/*required: true,*/}
-                                                      {/*message: "Please enter your old password"*/}
-                                                  {/*}}*/}
-                                                  {/*getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}*/}
-                                                  {/*handleChange={this.handleChange}*/}
-                                                  {/*form={this.props.form}*/}
-                                                  {/*description={"Enter your old password here"}*/}
-                                    {/*/>*/}
-
-                                    {/*<ProfileInput title={"New Password"} name="password.new"*/}
-                                                  {/*rules={{*/}
-                                                      {/*required: true,*/}
-                                                      {/*message: "Please enter your new password"*/}
-                                                  {/*}}*/}
-                                                  {/*getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}*/}
-                                                  {/*handleChange={this.handleChange}*/}
-                                                  {/*form={this.props.form}*/}
-                                                  {/*description={"Enter your new password here"}*/}
-                                    {/*/>*/}
-
-                                    {/*<ProfileInput title={"Repeat Password"} name="password.repeat"*/}
-                                                  {/*rules={{*/}
-                                                      {/*required: true,*/}
-                                                      {/*message: "Passwords must match"*/}
-                                                  {/*}}*/}
-                                                  {/*getFieldDecorator={getFieldDecorator} formItemLayout={formItemLayout}*/}
-                                                  {/*handleChange={this.handleChange}*/}
-                                                  {/*form={this.props.form}*/}
-                                                  {/*description={"Enter your new password again here"}*/}
-                                    {/*/>*/}
-
-                                    {/*<br/>*/}
-
-                                    {/*<div style={{textAlign: "center"}}><Button htmlType={"submit"}*/}
-                                                                               {/*className={"ant-btn-primary"}>Update</Button>*/}
-                                    {/*</div>*/}
-                                {/*</Form>*/}
-                            {/*</TabPane>*/}
+                            <TabPane tab={"Change Password"} key={"3"}>
+                                <ChangePassword savePassword={this.savePassword}/>
+                            </TabPane>
                         </Tabs>
                     </div>
                 </div>
@@ -110,4 +68,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(Profile));
+export default connect(mapStateToProps)(Profile);

@@ -21,7 +21,7 @@ export const updateUsername = (firstname, surname) => {
     let user = JSON.parse(localStorage.getItem('user'));
     if(!user){return null;}
     // update username and reset localStorage
-    user.username = firstname + ' ' + surname
+    user.username = firstname + ' ' + surname;
     localStorage.setItem("user", JSON.stringify(user));
 };
 

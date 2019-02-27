@@ -22,7 +22,6 @@ class Signup extends React.Component {
 
     state = {
         confirmDirty: false,
-        autoCompleteResult: [],
     };
 
     handleSubmit = (e) => {
@@ -43,7 +42,7 @@ class Signup extends React.Component {
     compareToFirstPassword = (rule, value, callback) => {
         const form = this.props.form;
         if (value && value !== form.getFieldValue('password')) {
-            callback('Two passwords that you enter is inconsistent!');
+            callback('The two passwords that you entered are inconsistent!');
         } else {
             callback();
         }
@@ -151,7 +150,8 @@ class Signup extends React.Component {
                                         {getFieldDecorator('password', {
                                             rules: [
                                                 {required: true, message: 'Please input your Password!'},
-                                                {validator: this.validateToNextPassword}
+                                                {validator: this.validateToNextPassword},
+                                                {pattern: /^.{6,}$/, message: 'Minimum is 6 characters'}
                                             ],
                                         })(
                                             <Input prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}

@@ -7,12 +7,6 @@ from utilities import helpers
 
 profile_router: Blueprint = Blueprint('profile_router', __name__, template_folder="../../templates")
 
-# DEPRECATED
-# @profile_router.route("/admin/profile", methods=['GET'])
-# def profilePage():
-#     if request.method == "GET":
-#         return admin_services.render("admin/profile.html")
-
 
 @profile_router.route("/profile", methods=['GET', 'POST'])
 @jwt_required
@@ -23,32 +17,13 @@ def profile():
 
     # Get profile details
     if request.method == "GET":
-        email = user.get("email", None)
 
-        # Get user record
-        user_callback: Callback = user_services.getByEmail(email)
+        # Get user profile
+        user_callback: Callback = user_services.getProfile(user.get('id', 0))
         if not user_callback.Success:
-            return helpers.jsonResponse(True, 200, "Conversation has been retrieved 1",
-                                        {"user": None, "email": email, "company": None, "newsletters": None,
-                                         "userSettings": None})
-        user : User = user_callback.Data
+            return helpers.jsonResponse(False, 400, " Could not retrieve profile", user_callback.Data)
+        return helpers.jsonResponse(True, 200, "Profile retrieved successfully", user_callback.Data)
 
-        # Check newsletter
-        newsletter_callback: Callback = newsletter_services.checkForNewsletter(email)
-        newsletters = newsletter_callback.Success
-
-        # Get user's settings
-        userSettings_callback: Callback = user_services.getUserSettings(user.ID)
-        if not userSettings_callback.Success or not userSettings_callback.Data:
-            return helpers.jsonResponse(True, 200, "Conversation has been retrieved 2",
-                                        {"user": helpers.getDictFromSQLAlchemyObj(user), "email": email,
-                                         "company": helpers.getDictFromSQLAlchemyObj(user.Company), "newsletters": newsletters,
-                                         "userSettings": None})
-
-        return helpers.jsonResponse(True, 200, "Conversation has been retrieved 3",
-                                    {"user": helpers.getDictFromSQLAlchemyObj(user), "email": email,
-                                     "company": helpers.getDictFromSQLAlchemyObj(user.Company), "newsletters": newsletters,
-                                     "userSettings": helpers.getDictFromSQLAlchemyObj(userSettings_callback.Data)})
 
     # Update profile details
     if request.method == "POST":
@@ -114,3 +89,20 @@ def profile_settings():
                                         None)
 
         return helpers.jsonResponse(True, 200, "Data Settings have been updated.", None)
+
+
+@profile_router.route("/profile/password", methods=['POST'])
+@jwt_required
+def change_password():
+
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    # Get profile details
+    if request.method == "POST":
+        data = request.json
+        # Get user profile
+        callback: Callback = user_services.changePasswordByID(user.get('id', 0), data['newPassword'], data['oldPassword'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
+        return helpers.jsonResponse(True, 200, "Password updated successfully", callback.Data)

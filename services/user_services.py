@@ -1,6 +1,6 @@
 import sqlalchemy.exc
 
-from services import mail_services, company_services, role_services
+from services import mail_services, company_services, role_services, newsletter_services
 from models import db, Callback, User, Company, Role, UserSettings
 from utilities import helpers
 from sqlalchemy.sql import exists, func
@@ -86,27 +86,23 @@ def getAllByCompanyID(companyID) -> Callback:
     # finally:
        # db.session.close()
 
-def getAllByCompanyID_safe(companyID) -> Callback:
+def getProfile (userID):
     try:
-        # Get result and check if None then raise exception
-        result = db.session.query(User.ID,
-                                  User.Firstname,
-                                  User.Surname,
-                                  User.Email,
-                                  User.LastAccess)\
-            .filter(User.CompanyID == companyID).all()
+        result: UserSettings = db.session.query(UserSettings).filter(UserSettings.ID == userID).first()
         if not result: raise Exception
 
-        return Callback(True,
-                        'Users with company ID ' + str(companyID) + ' were successfully retrieved.',
-                        result)
-    except Exception as exc:
-        db.session.rollback()
-        return Callback(False,
-                        'Users with company ID ' + str(companyID) + ' could not be retrieved.')
+        profile = {
+            'user': helpers.getDictFromSQLAlchemyObj(result.User),
+            'company': helpers.getDictFromSQLAlchemyObj(result.User.Company),
+            'userSettings': helpers.getDictFromSQLAlchemyObj(result),
+            'newsletters': newsletter_services.checkForNewsletter(result.User.Email).Success
+        }
 
-    # finally:
-       # db.session.close()
+        return Callback(True, 'User settings were successfully retrieved.', profile)
+    except Exception as exc:
+        print("user_services.getProfile() ERROR: ", exc)
+        return Callback(False, 'User settings for this user does not exist.')
+
 
 def getAllUserSettings():
     try:
@@ -126,7 +122,7 @@ def getAllUserSettings():
 def getUserSettings(userID):
     try:
         result = db.session.query(UserSettings).filter(UserSettings.ID == userID).first()
-
+        if not result: raise Exception
         return Callback(True,
                         'User settings were successfully retrieved.',
                         result)
@@ -139,22 +135,7 @@ def getUserSettings(userID):
     # finally:
     # db.session.close()
 
-def getRolePermissions(userID):
-    try:
-        user_callback : Callback = getByID(userID)
-        if not user_callback.Success: raise Exception("User not found")
 
-        role_callback : Callback = role_services.getByID(user_callback.Data.RoleID)
-        if not user_callback.Success: raise Exception("Role not found")
-
-        return Callback(True, 'User Permissions have been retrieved', role_callback.Data)
-    except Exception as exc:
-        print("user_services.getRolePermissions() ERROR: ", exc)
-        db.session.rollback()
-        return Callback(False, 'Coult not retrieve user\'s permissions.')
-
-    # finally:
-    # db.session.close()
 
 
 # ----- Updaters ----- #
@@ -261,28 +242,24 @@ def updateUser(firstname, surname, newEmail, userID):
     # finally:
     # db.session.close()
 
-def changePasswordByID(userID, newPassword, currentPassword=None):
+def changePasswordByID(userID, newPassword, oldPassword=None):
     try:
         user_callback : Callback = getByID(userID)
         if not user_callback.Success:
             return Callback(False, "Could not find user's records")
 
-        if currentPassword is not None:
-            if not currentPassword == user_callback.Data.Password:
-                return Callback(False, "Incorrect Password.")
+        if oldPassword is not None:
+            if not oldPassword == user_callback.Data.Password:
+                return Callback(False, "old Password is incorrect")
 
         user_callback.Data.Password = newPassword
         db.session.commit()
-
         return Callback(True, "Password has been changed.")
 
     except Exception as exc:
         print("user_services.changePasswordByID() ERROR: ", exc)
         db.session.rollback()
         return Callback(False, "Error in updating password")
-
-    # finally:
-       # db.session.close()
 
 def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
     try:

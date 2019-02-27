@@ -1,7 +1,6 @@
 import React from 'react';
-import {Form, Button, message, Tabs} from "antd";
+import {Tabs} from "antd";
 import {connect} from 'react-redux';
-import {isEmpty} from "lodash";
 
 import styles from "./Profile.module.less"
 import ProfileDetails from "./profileComponents/ProfileDetails/ProfileDetails";
@@ -12,13 +11,6 @@ import {profileActions} from "../../../../store/actions/profile.actions";
 const TabPane = Tabs.TabPane;
 
 class Profile extends React.Component {
-    // state = {
-    //     password: {
-    //         old: "",
-    //         new: "",
-    //         repeat: ""
-    //     }
-    // };
 
     saveProfileDetails = (values) => {
         this.props.dispatch(profileActions.saveProfileDetails(values));
@@ -31,7 +23,6 @@ class Profile extends React.Component {
     savePassword = (values) => {
         this.props.dispatch(profileActions.changePassword(values.oldPassword, values.newPassword));
     };
-
 
 
     componentDidMount() {
@@ -77,4 +68,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(Profile));
+export default connect(mapStateToProps)(Profile);

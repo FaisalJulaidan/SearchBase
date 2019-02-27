@@ -9,6 +9,7 @@ import styles from "./Flow.module.less"
 import {Modal, Spin} from "antd";
 import shortid from 'shortid';
 import { Prompt } from "react-router-dom";
+import {destroyMessage, sucessMessage} from "../../../../../helpers";
 
 const confirm = Modal.confirm;
 
@@ -73,6 +74,8 @@ class Flow extends Component {
             assistant: updatedAssistant,
             isSaved: false
         })
+        destroyMessage();
+        sucessMessage('Group added!');
     };
 
     editGroup = editedGroup => {
@@ -85,7 +88,9 @@ class Flow extends Component {
         this.setState({
             assistant: updatedAssistant,
             isSaved: false
-        })
+        });
+        destroyMessage();
+        sucessMessage('Group updated!');
     };
 
     deleteGroup = deletedGroup => {
@@ -96,6 +101,8 @@ class Flow extends Component {
             currentGroup: {blocks: []},
             isSaved: false
         });
+        destroyMessage();
+        sucessMessage('Group deleted!');
         // Todo: run the blocksRelation checker function
     };
 
@@ -120,6 +127,8 @@ class Flow extends Component {
             currentGroup: updatedGroup,
             isSaved: false
         })
+        destroyMessage();
+        sucessMessage('Block added!');
     };
 
     editBlock = (edittedBlock) => {
@@ -139,6 +148,8 @@ class Flow extends Component {
             currentGroup: updatedGroup,
             isSaved: false
         })
+        destroyMessage();
+        sucessMessage('Block updated!');
     };
 
     deleteBlock = (deletedBlock) => {
@@ -164,7 +175,9 @@ class Flow extends Component {
                     assistant: updatedAssistant,
                     currentGroup: updatedGroup,
                     isSaved: false
-                })
+                });
+                destroyMessage();
+                sucessMessage('Block deleted!');
             }
         });
     };

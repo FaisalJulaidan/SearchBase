@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, create_refresh_token
 
 from models import Callback, User, UserSettings, db
-from services import user_services, role_services, sub_services, company_services
+from services import user_services, role_services, sub_services, company_services, mail_services
 from utilities import helpers
 
 jwt = JWTManager()
@@ -58,8 +58,10 @@ def signup(details) -> Callback:
     # Subscribe to basic plan with 14 trial days
     sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lpeLZ3EV8IfA', trialDays=14)
 
+    sendVerEmail_callback: Callback = mail_services.sendVerificationEmail(details["email"], details["companyName"])
+
     # If subscription failed, remove the new created company and user
-    if not sub_callback.Success:
+    if not sub_callback.Success or not sendVerEmail_callback.Success:
         # Removing the company will cascade and remove the new created user and roles as well.
         print('remove company')
         company_services.removeByName(details['companyName'])

@@ -81,6 +81,34 @@ function* watchSignup() {
 }
 
 
+// Reset Password
+function* resetPassword({data}) {
+    try {
+        loadingMessage('Sending reset password email...', 0);
+        console.log(data)
+        const res = yield axios.post(`/api/reset_password`, {...data}, {
+            headers: {'Content-Type': 'application/json'},
+        });
+        console.log(res);
+
+        yield destroyMessage();
+        yield sucessMessage('Email to reset your password has been sent');
+        yield put(authActions.signupSuccess());
+        yield history.push('/login');
+
+    } catch (error) {
+        console.log(error);
+        yield destroyMessage();
+        yield alertError('Could not send reset password email', error.response.data.msg);
+        yield put(authActions.resetPasswordFailure(error.response.data));
+    }
+}
+
+function* watchResetPassword() {
+    yield takeLatest(actionTypes.RESET_PASSWORD_REQUEST, resetPassword)
+}
+
+
 // Logout
 function* logout() {
     // Clear local storage from user, token...
@@ -122,6 +150,7 @@ export function* authSaga() {
     yield all([
         watchLogin(),
         watchSignup(),
+        watchResetPassword(),
         watchLogout(),
         watchCheckAuthTimeout(),
         watchRefreshToken()

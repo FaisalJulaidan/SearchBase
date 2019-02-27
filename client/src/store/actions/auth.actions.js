@@ -44,6 +44,27 @@ function signupFailure (error) {
 }
 
 
+function resetPassword (data) {
+    return {
+        type: actionTypes.RESET_PASSWORD_REQUEST,
+        data
+    };
+}
+
+function resetPasswordSuccess () {
+    return {
+        type: actionTypes.RESET_PASSWORD_SUCCESS,
+    };
+}
+
+function resetPasswordFailure (error) {
+    return {
+        type: actionTypes.RESET_PASSWORD_FAILURE,
+        error
+    };
+}
+
+
 const logout = () => {
     return {
         type: actionTypes.LOGOUT
@@ -72,6 +93,10 @@ export const authActions = {
     signup,
     signupSuccess,
     signupFailure,
+
+    resetPassword,
+    resetPasswordSuccess,
+    resetPasswordFailure,
 
     logout,
     refreshToken,

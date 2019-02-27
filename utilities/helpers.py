@@ -183,8 +183,8 @@ def gen_dummy_data():
     # Create Users
     user_services.create(firstname='Sylvester', surname='Stallone', email='aa@aa.com', password='123', phone='4344423',
                          company=aramco, role=owner_aramco, verified=True)
-    # user_services.create(firstname='Evg', surname='Test', email='evgeniy67@abv.bg', password='123', phone='4344423',
-    #                      company=aramco, role=admin_aramco, verified=True)
+    user_services.create(firstname='Evg', surname='Test', email='evgeniy67@abv.bg', password='123', phone='4344423',
+                         company=aramco, role=admin_aramco, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='4344423', company=aramco,
                          role=admin_aramco, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', phone='4344423', company=aramco,

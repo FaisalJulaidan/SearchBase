@@ -42,6 +42,18 @@ export const auth = (state = initialState, action) => {
                 errorMsg: action.error.msg
             });
 
+
+        case actionTypes.RESET_PASSWORD_REQUEST:
+            return updateObject(state, {
+            });
+        case actionTypes.RESET_PASSWORD_SUCCESS:
+            return updateObject(state, {
+            });
+        case actionTypes.RESET_PASSWORD_FAILURE:
+            return updateObject(state, {
+                errorMsg: action.error.msg
+            });
+
         case actionTypes.LOGOUT:
             return updateObject(state, {
                 isLoggingIn: false,

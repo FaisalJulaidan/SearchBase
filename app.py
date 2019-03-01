@@ -29,7 +29,7 @@ db.app = app
 app.register_blueprint(assistant_router, url_prefix='/api')
 app.register_blueprint(flow_router, url_prefix='/api')
 app.register_blueprint(public_router)
-app.register_blueprint(resetPassword_router)
+app.register_blueprint(resetPassword_router, url_prefix='/api')
 app.register_blueprint(profile_router, url_prefix='/api')
 app.register_blueprint(sub_router)
 app.register_blueprint(solutions_router, url_prefix='/api')

@@ -81,6 +81,57 @@ function* watchSignup() {
 }
 
 
+// Reset Password
+function* resetPassword({data}) {
+    try {
+        loadingMessage('Sending reset password email...', 0);
+
+        yield axios.post(`/api/reset_password`, {...data}, {
+            headers: {'Content-Type': 'application/json'},
+        });
+
+        yield destroyMessage();
+        yield sucessMessage('Email to reset your password has been sent');
+        yield put(authActions.resetPasswordSuccess());
+
+    } catch (error) {
+        console.log(error);
+        yield destroyMessage();
+        yield alertError('Could not send reset password email', error.response.data.msg);
+        yield put(authActions.resetPasswordFailure(error.response.data));
+    }
+}
+
+function* watchResetPassword() {
+    yield takeLatest(actionTypes.RESET_PASSWORD_REQUEST, resetPassword)
+}
+
+function* newResetPassword({data}) {
+    try {
+        loadingMessage('Saving new password...', 0);
+
+        yield axios.post(`/api/reset_password/`+data["payload"], {...data}, {
+            headers: {'Content-Type': 'application/json'},
+        });
+
+        yield destroyMessage();
+        yield sucessMessage('The password for your account has been updated');
+        yield put(authActions.newResetPasswordSuccess());
+        yield history.push('/login');
+
+    } catch (error) {
+        console.log(error);
+        yield destroyMessage();
+        yield alertError('Could not update account password', error.response.data.msg);
+        yield put(authActions.newResetPasswordFailure(error.response.data));
+    }
+}
+
+function* watchNewResetPassword() {
+    yield takeLatest(actionTypes.NEW_RESET_PASSWORD_REQUEST, newResetPassword)
+}
+
+
 // Logout
 function* logout() {
     // Clear local storage from user, token...
@@ -122,8 +173,10 @@ export function* authSaga() {
     yield all([
         watchLogin(),
         watchSignup(),
+        watchResetPassword(),
         watchLogout(),
         watchCheckAuthTimeout(),
-        watchRefreshToken()
+        watchRefreshToken(),
+        watchNewResetPassword()
     ])
 }

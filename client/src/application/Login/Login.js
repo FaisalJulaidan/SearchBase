@@ -33,7 +33,7 @@ class Login extends React.Component {
                     <Spin spinning={this.props.isLoggingIn}>
                         <Row type="flex" justify="center">
                             <Col>
-                                <h1>Login Page</h1>
+                                <h1>Login</h1>
                             </Col>
                         </Row>
 
@@ -76,7 +76,7 @@ class Login extends React.Component {
 
                         <Row type="flex" justify="center">
                             <Col>
-                                <a href="account/resetpassword">Forgot password?</a>
+                                <a href="/reset_password">Forgot password?</a>
                             </Col>
                         </Row>
 

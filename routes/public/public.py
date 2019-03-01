@@ -1,6 +1,6 @@
 import os
 
-from flask import Blueprint, render_template, request, send_from_directory
+from flask import Blueprint, render_template, request, send_from_directory, redirect
 from flask_cors import CORS
 from itsdangerous import URLSafeTimedSerializer
 
@@ -126,10 +126,8 @@ def verify_account(payload):
             user_callback: Callback = user_services.verifyByEmail(email)
             if not user_callback.Success: raise Exception(user_callback.Message)
 
-            return helpers.redirectWithMessage("login",
-                                               "Your email has been verified. You can now access your account.")
+            return redirect("/login")
 
         except Exception as e:
             print(e)
-            return helpers.redirectWithMessage("login",
-                                               "Email verification link failed. Please contact Customer Support in order to resolve this.")
+            return redirect("/login")

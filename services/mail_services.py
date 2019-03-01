@@ -76,7 +76,7 @@ def sendPasswordResetEmail(email, companyID):
     try:
 
         payload = email + ";" + str(companyID)
-        link = "https://www.thesearchbase.com/account/resetpassword/" + verificationSigner.dumps(payload)
+        link = "https://www.thesearchbase.com/reset_password/" + verificationSigner.dumps(payload)
 
         send_email((email), 'Password reset',
                    '/emails/reset_password.html', link=link)

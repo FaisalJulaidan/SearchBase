@@ -9,6 +9,7 @@ import Dashboard from "./application/Dashboard/Dashboard";
 import Login from './application/Login/Login'
 import Signup from './application/Signup/Signup'
 import ResetPassword from './application/ResetPassword/ResetPassword'
+import NewResetPassword from './application/ResetPassword/NewResetPassword/NewResetPassword'
 
 class App extends Component {
     constructor(props) {
@@ -25,7 +26,8 @@ class App extends Component {
                 {/* <Route exact path="/" component={Home} /> */}
                 <Route path="/login" component={Login}/>
                 <Route path="/signup" component={Signup}/>
-                <Route path="/reset_password" component={ResetPassword}/>
+                <Route path="/reset_password" component={ResetPassword} exact/>
+                <Route path="/reset_password/" component={NewResetPassword}/>
                 <PrivateRoute path="/dashboard" component={Dashboard}/>
                 <Redirect to={{pathname: '/dashboard'}}/>
             </Switch>

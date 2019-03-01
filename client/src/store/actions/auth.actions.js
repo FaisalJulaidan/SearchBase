@@ -65,6 +65,27 @@ function resetPasswordFailure (error) {
 }
 
 
+function newResetPassword (data) {
+    return {
+        type: actionTypes.NEW_RESET_PASSWORD_REQUEST,
+        data
+    };
+}
+
+function newResetPasswordSuccess () {
+    return {
+        type: actionTypes.NEW_RESET_PASSWORD_SUCCESS,
+    };
+}
+
+function newResetPasswordFailure (error) {
+    return {
+        type: actionTypes.NEW_RESET_PASSWORD_FAILURE,
+        error
+    };
+}
+
+
 const logout = () => {
     return {
         type: actionTypes.LOGOUT
@@ -97,6 +118,10 @@ export const authActions = {
     resetPassword,
     resetPasswordSuccess,
     resetPasswordFailure,
+
+    newResetPassword,
+    newResetPasswordSuccess,
+    newResetPasswordFailure,
 
     logout,
     refreshToken,

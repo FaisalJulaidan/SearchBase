@@ -28,11 +28,8 @@ def reset_password():
         return helpers.jsonResponse(True, 200, mail_callback.Message)
 
 
-@resetPassword_router.route("/reset_password/<payload>", methods=['GET', 'PUT', 'POST'])
+@resetPassword_router.route("/reset_password/<payload>", methods=['PUT', 'POST'])
 def reset_password_verify(payload):
-    if request.method == "GET":
-        return send_from_directory('static/react_app', 'index.html')
-
     if request.method == "PUT":
         try:
             data = verificationSigner.loads(payload)
@@ -51,11 +48,15 @@ def reset_password_verify(payload):
         return redirect("/login")
 
     if request.method == "POST":
-        email = request.form.get("email", "Error").lower()
-        password = request.form.get("password", "Error")
+        data = verificationSigner.loads(payload)
+        email = data.split(";")[0].lower()
+        password = request.json.get("password", "").lower()
+
+        if not password:
+            return helpers.jsonResponse(False, 400, "Server did not manage to receive your new password")
 
         changePassword_callback: Callback = user_services.changePasswordByEmail(email, password)
         if not changePassword_callback.Success:
-            return redirect("/login")
+            return helpers.jsonResponse(False, 400, changePassword_callback.Message)
 
-        return redirect("/login")
+        return helpers.jsonResponse(True, 200, changePassword_callback.Message)

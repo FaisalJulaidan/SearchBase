@@ -85,16 +85,14 @@ function* watchSignup() {
 function* resetPassword({data}) {
     try {
         loadingMessage('Sending reset password email...', 0);
-        console.log(data)
-        const res = yield axios.post(`/api/reset_password`, {...data}, {
+
+        yield axios.post(`/api/reset_password`, {...data}, {
             headers: {'Content-Type': 'application/json'},
         });
-        console.log(res);
 
         yield destroyMessage();
         yield sucessMessage('Email to reset your password has been sent');
-        yield put(authActions.signupSuccess());
-        yield history.push('/login');
+        yield put(authActions.resetPasswordSuccess());
 
     } catch (error) {
         console.log(error);
@@ -106,6 +104,31 @@ function* resetPassword({data}) {
 
 function* watchResetPassword() {
     yield takeLatest(actionTypes.RESET_PASSWORD_REQUEST, resetPassword)
+}
+
+function* newResetPassword({data}) {
+    try {
+        loadingMessage('Saving new password...', 0);
+
+        yield axios.post(`/api/reset_password/`+data["payload"], {...data}, {
+            headers: {'Content-Type': 'application/json'},
+        });
+
+        yield destroyMessage();
+        yield sucessMessage('The password for your account has been updated');
+        yield put(authActions.newResetPasswordSuccess());
+        yield history.push('/login');
+
+    } catch (error) {
+        console.log(error);
+        yield destroyMessage();
+        yield alertError('Could not update account password', error.response.data.msg);
+        yield put(authActions.newResetPasswordFailure(error.response.data));
+    }
+}
+
+function* watchNewResetPassword() {
+    yield takeLatest(actionTypes.NEW_RESET_PASSWORD_REQUEST, newResetPassword)
 }
 
 
@@ -153,6 +176,7 @@ export function* authSaga() {
         watchResetPassword(),
         watchLogout(),
         watchCheckAuthTimeout(),
-        watchRefreshToken()
+        watchRefreshToken(),
+        watchNewResetPassword()
     ])
 }

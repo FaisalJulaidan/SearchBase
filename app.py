@@ -163,6 +163,8 @@ elif os.environ['FLASK_ENV'] == 'development':
     #                          'keywordsByDataType': {'Desired Salary': [1500]} },
     #                         "YJkLo")
 
+    # print(databases_services.getAllCandidates(1))
+
     # Run the app server
     print('Development mode running...')
 

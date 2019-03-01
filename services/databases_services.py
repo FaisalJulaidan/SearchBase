@@ -19,9 +19,11 @@ def fetchDatabase(id, companyID: int) -> Callback:
         if not database: raise Exception
 
         databaseContent = None
+        # TODO Ensure it works
         if database.Type == DatabaseType.Candidates:
             print('fetch from candidate table')
-            # TODO Ensure it works
+            # result = helpers.getListFromSQLAlchemyList(getAllCandidates(id))
+            # databaseContent = result['records']
             databaseContent = helpers.getListFromSQLAlchemyList(getAllCandidates(id))
             for i, _ in enumerate(databaseContent):
                 if databaseContent[i]['Currency']:
@@ -158,15 +160,22 @@ def getDatabasesList(companyID: int) -> Callback:
         print(exc)
         return Callback(False, 'Could not fetch the databases list.')
 
-def getAllCandidates(dbID) -> Callback:
+def getAllCandidates(dbID) -> dict:
     try:
         return db.session.query(Candidate).filter(Candidate.DatabaseID == dbID).all()
+        result = db.session.query(Candidate).filter(Candidate.DatabaseID == dbID).paginate(1, 1, False)
+        # data = {
+        #     'records': result.items,
+        #     'hasNext': result.has_next,
+        #     'hasPrev': result.has_prev,
+        #     'nextNum': result.next_num,
+        #     'prevNum': result.prev_num,
+        # }
+        # return data
 
     except Exception as exc:
-        db.session.rollback()
         print("fetchCandidates() ERROR: ", exc)
-        return Callback(False, 'Candidates could not be retrieved.')
-
+        raise Exception
 
 def getAllJobs(dbID) -> Callback:
     try:

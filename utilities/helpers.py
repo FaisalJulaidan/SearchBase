@@ -145,17 +145,17 @@ def gen_dummy_data():
         ]
     }
 
-    db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now(),
+    db.session.add(ChatbotSession(Data=data, DateTime=datetime.now(),
                                   TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
                                   UserType=enums.UserType.JobSeeker, Assistant=reader_a))
 
-    db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now() - timedelta(days=10),
+    db.session.add(ChatbotSession(Data=data, DateTime=datetime.now() - timedelta(days=10),
                                   TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
                                   UserType=enums.UserType.CandidateSeeker, Assistant=reader_a))
 
     # add chatbot session in bulk
     for i in range(50):
-        db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now() - timedelta(days=i),
+        db.session.add(ChatbotSession(Data=data, DateTime=datetime.now() - timedelta(days=i),
                                       TimeSpent=i+40, SolutionsReturned=i+3, QuestionsAnswered=i+4,
                                       UserType=enums.UserType.JobSeeker, Assistant=reader_a))
 

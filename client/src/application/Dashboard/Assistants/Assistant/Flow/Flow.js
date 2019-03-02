@@ -9,7 +9,7 @@ import styles from "./Flow.module.less"
 import {Modal, Spin} from "antd";
 import shortid from 'shortid';
 import { Prompt } from "react-router-dom";
-import {destroyMessage, sucessMessage} from "../../../../../helpers";
+import {destroyMessage, successMessage} from "../../../../../helpers";
 
 const confirm = Modal.confirm;
 
@@ -75,7 +75,7 @@ class Flow extends Component {
             isSaved: false
         })
         destroyMessage();
-        sucessMessage('Group added!');
+        successMessage('Group added!');
     };
 
     editGroup = editedGroup => {
@@ -90,7 +90,7 @@ class Flow extends Component {
             isSaved: false
         });
         destroyMessage();
-        sucessMessage('Group updated!');
+        successMessage('Group updated!');
     };
 
     deleteGroup = deletedGroup => {
@@ -102,7 +102,7 @@ class Flow extends Component {
             isSaved: false
         });
         destroyMessage();
-        sucessMessage('Group deleted!');
+        successMessage('Group deleted!');
         // Todo: run the blocksRelation checker function
     };
 
@@ -128,7 +128,7 @@ class Flow extends Component {
             isSaved: false
         })
         destroyMessage();
-        sucessMessage('Block added!');
+        successMessage('Block added!');
     };
 
     editBlock = (edittedBlock) => {
@@ -149,7 +149,7 @@ class Flow extends Component {
             isSaved: false
         })
         destroyMessage();
-        sucessMessage('Block updated!');
+        successMessage('Block updated!');
     };
 
     deleteBlock = (deletedBlock) => {
@@ -177,7 +177,7 @@ class Flow extends Component {
                     isSaved: false
                 });
                 destroyMessage();
-                sucessMessage('Block deleted!');
+                successMessage('Block deleted!');
             }
         });
     };

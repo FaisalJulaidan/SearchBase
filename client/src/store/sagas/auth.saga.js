@@ -1,9 +1,9 @@
 import * as actionTypes from '../actions/actionTypes';
 import { delay } from "redux-saga";
 import { put, takeEvery, takeLatest, all } from 'redux-saga/effects'
-import {assistantActions, authActions, profileActions} from "../actions";
-import {history, checkAuthenticity, http, sucessMessage} from '../../helpers'
-import {alertError, alertSuccess, destroyMessage, loadingMessage, errorMessage} from "../../helpers/alert";
+import {authActions, profileActions} from "../actions";
+import {history, checkAuthenticity, http, successMessage} from '../../helpers'
+import {destroyMessage, loadingMessage, errorMessage, warningMessage} from "../../helpers/alert";
 import axios from 'axios';
 
 
@@ -43,7 +43,7 @@ function* login({email, password}) {
     } catch (error) {
         console.log(error);
         yield destroyMessage();
-        yield alertError('Log in Unsuccessful', error.response.data.msg);
+        yield errorMessage(error.response.data.msg, 0);
         yield put(authActions.loginFailure(error.response.data));
     }
 }
@@ -57,20 +57,18 @@ function* signup({signupDetails}) {
 
     try {
         loadingMessage('Creating your account', 0);
-
         const res = yield axios.post(`/api/signup`, {...signupDetails}, {
             headers: {'Content-Type': 'application/json'},
         });
         console.log(res);
-
-        yield destroyMessage();
-        yield sucessMessage('Account created');
+        yield successMessage('Account created');
         yield put(authActions.signupSuccess());
+
         yield history.push('/login');
+        yield warningMessage('Please verify your account', 0);
 
     } catch (error) {
         console.log(error);
-        yield destroyMessage();
         yield put(authActions.signupFailure(error.response.data));
         return yield errorMessage(error.response.data.msg, 0);
     }
@@ -85,19 +83,15 @@ function* watchSignup() {
 function* resetPassword({data}) {
     try {
         loadingMessage('Sending reset password email...', 0);
-
         yield axios.post(`/api/reset_password`, {...data}, {
             headers: {'Content-Type': 'application/json'},
         });
-
-        yield destroyMessage();
-        yield sucessMessage('Email to reset your password has been sent');
+        yield successMessage('Email to reset your password has been sent');
         yield put(authActions.resetPasswordSuccess());
 
     } catch (error) {
         console.log(error);
-        yield destroyMessage();
-        yield alertError('Could not send reset password email', error.response.data.msg);
+        yield errorMessage('Could not send reset password email', 0);
         yield put(authActions.resetPasswordFailure(error.response.data));
     }
 }
@@ -109,20 +103,17 @@ function* watchResetPassword() {
 function* newResetPassword({data}) {
     try {
         loadingMessage('Saving new password...', 0);
-
         yield axios.post(`/api/reset_password/`+data["payload"], {...data}, {
             headers: {'Content-Type': 'application/json'},
         });
-
-        yield destroyMessage();
-        yield sucessMessage('The password for your account has been updated');
+        yield successMessage('The password for your account has been updated');
         yield put(authActions.newResetPasswordSuccess());
         yield history.push('/login');
+        yield successMessage('Login using your new password');
 
     } catch (error) {
         console.log(error);
-        yield destroyMessage();
-        yield alertError('Could not update account password', error.response.data.msg);
+        yield errorMessage('Could not update account password', 0);
         yield put(authActions.newResetPasswordFailure(error.response.data));
     }
 }
@@ -137,6 +128,8 @@ function* logout() {
     // Clear local storage from user, token...
     yield localStorage.clear();
     yield history.push('/login');
+    yield successMessage('You have been logged out');
+
 }
 
 function* watchLogout() {

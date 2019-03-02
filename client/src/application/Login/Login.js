@@ -76,7 +76,7 @@ class Login extends React.Component {
 
                         <Row type="flex" justify="center">
                             <Col>
-                                <a href="/reset_password">Forgot password?</a>
+                                <Link to="/forget_password">Forgot password?</Link>
                             </Col>
                         </Row>
 

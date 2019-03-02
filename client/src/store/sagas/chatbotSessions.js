@@ -1,7 +1,7 @@
 import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {chatbotSessionsActions} from "../actions";
-import {http, alertSuccess, alertError} from "../../helpers";
+import {http, destroyMessage, successMessage, errorMessage, loadingMessage} from "../../helpers";
 
 function* fetchChatbotSessions({assistantID}) {
     try {
@@ -19,14 +19,14 @@ function* watchFetchChatbotSessions() {
 
 function* clearAllChatbotSessions({assistantID}) {
     try {
+        loadingMessage('Removing all sessions...', 0);
         const res = yield http.delete(`/assistant/${assistantID}/chatbotSessions`);
         yield put(chatbotSessionsActions.clearAllChatbotSessionsSuccess());
-        return yield alertSuccess('Cleared Successfully', res.data.msg)
+        yield successMessage('All sessions cleared');
     } catch (error) {
         console.log(error);
         yield put(chatbotSessionsActions.clearAllChatbotSessionsFailure(error));
-        return yield alertError('Error', "Sorry, we could'nt clear all the records!");
-
+        yield errorMessage(error.response.data.msg);
     }
 }
 

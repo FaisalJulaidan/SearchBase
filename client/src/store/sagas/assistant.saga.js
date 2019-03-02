@@ -1,8 +1,7 @@
 import {put, takeEvery,takeLatest, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
-import {assistantActions, authActions, flowActions} from "../actions";
-import {errorMessage, http} from "../../helpers";
-import {alertError, alertSuccess, destroyMessage, loadingMessage, sucessMessage} from "../../helpers/alert";
+import {assistantActions, flowActions} from "../actions";
+import {http, destroyMessage, loadingMessage, successMessage, errorMessage} from "../../helpers";
 
 
 function* fetchAssistants() {
@@ -11,7 +10,6 @@ function* fetchAssistants() {
         yield put(assistantActions.fetchAssistantsSuccess(res.data.data));
     } catch (error) {
         console.log(error);
-        yield destroyMessage();
         yield errorMessage(error.response.data.msg);
         yield put(assistantActions.fetchAssistantsFailure(error.response.data));
     }
@@ -20,15 +18,14 @@ function* fetchAssistants() {
 
 function* addAssistant({type, newAssistant}) {
     try {
+        loadingMessage('Removing all sessions...', 0);
         const res = yield http.post(`/assistants`, newAssistant);
         yield put(assistantActions.addAssistantSuccess(res.data.msg));
         yield put(assistantActions.fetchAssistants());
-        yield destroyMessage();
-        yield sucessMessage('Assistant added!');
+        yield successMessage('Assistant added!');
 
     } catch (error) {
         console.log(error);
-        yield destroyMessage();
         yield errorMessage(error.response.data.msg);
         yield put(assistantActions.addAssistantFailure(error.response.data));
     }
@@ -39,11 +36,9 @@ function* updateAssistant({assistantID, updatedSettings}) {
         const res = yield http.put(`assistant/${assistantID}`, updatedSettings);
         yield put(assistantActions.updateAssistantSuccess(res.data.msg));
         yield put(assistantActions.fetchAssistants());
-        yield destroyMessage();
-        yield sucessMessage('Assistant updated!');
+        yield successMessage('Assistant updated!');
     } catch (error) {
         console.log(error);
-        yield destroyMessage();
         yield errorMessage(error.response.data.msg);
         yield put(assistantActions.updateAssistantFailure(error.response.data));
 
@@ -56,11 +51,9 @@ function* deleteAssistant({assistantID}) {
         loadingMessage('Removing assistant...', 0);
         const res = yield http.delete(`/assistant/${assistantID}`);
         yield put(assistantActions.deleteAssistantSuccess(assistantID, res.data.msg));
-        yield destroyMessage();
-        yield sucessMessage('Assistant deleted');
+        yield successMessage('Assistant deleted');
     } catch (error) {
         console.log(error);
-        yield destroyMessage();
         yield errorMessage(error.response.data.msg);
         yield put(assistantActions.deleteAssistantFailure(error.response.data));
     }
@@ -72,12 +65,10 @@ function* updateFlow({assistant}) {
         loadingMessage('Updating Flow', 0);
 
         const res = yield http.put(`/assistant/${assistant.ID}/flow`, {flow: assistant.Flow});
-        yield destroyMessage();
-        yield sucessMessage('Flow Updated');
+        yield successMessage('Flow Updated');
         yield put(assistantActions.updateFlowSuccess(assistant, res.data.msg));
     } catch (error) {
         console.log(error);
-        yield destroyMessage();
         yield errorMessage(error.response.data.msg);
         yield put(assistantActions.updateFlowFailure(error.response.data));
     }
@@ -88,7 +79,7 @@ function* updateStatus({status, assistantID}) {
         loadingMessage('Updating Status', 0);
         const res = yield http.put(`/assistant/${assistantID}/status`, {status});
         yield destroyMessage();
-        yield sucessMessage('Status Updated');
+        yield successMessage('Status Updated');
         yield put(assistantActions.changeAssistantStatusSuccess('Status updated successfully',
                                                                             status, assistantID));
     } catch (error) {

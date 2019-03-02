@@ -2,13 +2,14 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import {authActions} from '../../store/actions/index';
-import styles from './ResetPassword.module.less';
+import styles from './ForgetPassword.module.less';
 
 import {Button, Col, Form, Icon, Input, Row} from 'antd';
+import {Link} from "react-router-dom";
 
 const FormItem = Form.Item;
 
-class ResetPassword extends React.Component {
+class ForgetPassword extends React.Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
@@ -61,7 +62,7 @@ class ResetPassword extends React.Component {
 
                     <Row type="flex" justify="center">
                         <Col>
-                            <a href="/login">Back to login?</a>
+                            <Link to="/login">Back to login?</Link>
                         </Col>
                     </Row>
 
@@ -78,4 +79,4 @@ function mapStateToProps(state) {
     return {};
 }
 
-export default connect(mapStateToProps)(Form.create()(ResetPassword));
+export default connect(mapStateToProps)(Form.create()(ForgetPassword));

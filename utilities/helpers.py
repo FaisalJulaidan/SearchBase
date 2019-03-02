@@ -68,98 +68,11 @@ def gen_dummy_data():
                                  }
                              ]
                          })
-
-
-
-
-    reader_a_blocksGroup = BlockGroup(Name="Group One", Description="This is Group one", Assistant=reader_a)
     helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
 
     reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
     helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
 
-    ## Create Blocks
-    #db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Skippable=False,
-    # Group=reader_a_blocksGroup, Content={
-    #    "answers": [
-    #      {
-    #        "action": "Go To Next Block",
-    #        "text": "Yes",
-    #        "timesClicked": 0,
-    #        "keywords": [
-    #          "smoker",
-    #          "sad"
-    #        ],
-    #        "blockToGoId": 0,
-    #        "afterMessage": 'Yesss!!'
-    #      },
-    #      {
-    #        "action": "Go To Next Block",
-    #        "text": "No",
-    #        "timesClicked": 0,
-    #        "keywords": [
-    #          "smoker",
-    #          "sad"
-    #        ],
-    #        "blockToGoId": 1,
-    #        "afterMessage": 'NOOOO!!'
-
-    #      }
-    #    ],
-    #    "text": "Do you smoke?",
-    #  }))
-
-    db.session.add(Block(Type=enums.BlockType.UserInput, Order=1, StoreInDB=True, Skippable=True,
-                         Group=reader_a_blocksGroup, DataType=enums.DataType.Email, Content={
-        "action": "Go To Next Block",
-        "text": "What's your email?",
-        "blockToGoID": None,
-        "afterMessage": 'Your input is being processed...'
-    }))
-
-    db.session.add(Block(Type=enums.BlockType.UserInput, Order=2, StoreInDB=True, Skippable=False,
-                         Group=reader_a_blocksGroup, DataType=enums.DataType.CandidateSkills, Content={
-        "action": "Go To Next Block",
-        "text": "Give me some input",
-        "blockToGoID": None,
-        "afterMessage": 'Your input is being processed...'
-    }))
-
-    # db.session.add(Block(Type=enums.BlockType.FileUpload, Order=2, StoreInDB=True, Skippable=True,
-    #                      DataType=enums.DataType.Resume, Group=reader_a_blocksGroup, Content={
-    #    "action": "Go To Next Block",
-    #    "fileTypes": [
-    #    "doc",
-    #    "pdf",
-    #    "docx",
-    #    ],
-    #    "text": "Upload your CV",
-    #    "blockToGoID": None,
-    #    "afterMessage": 'File is being uploaded...'
-    # }))
-
-    # db.session.add(Block(Type=enums.BlockType.FileUpload, Order=2, StoreInDB=True,
-    #                      DataType=enums.DataType.Resume, Group=reader_a_blocksGroup, Content={
-    #         "action": "Go To Next Block",
-    #         "fileTypes": [
-    #             "doc",
-    #             "pdf",
-    #             "docx",
-    #         ],
-    #         "text": "Upload your CV 2",
-    #         "blockToGoID": None,
-    #         "afterMessage": 'File is being uploaded...'
-    #     }))
-
-
-    db.session.add(Block(Type=enums.BlockType.Solutions, Order=3, StoreInDB=True, DataType=enums.DataType.NoType,
-                         Group=reader_a_blocksGroup, Content={
-        "showTop": 5,
-        "afterMessage": 'here is what we found!',
-        "action": "End Chat",
-        "blockToGoID": 0,
-        "databaseType": enums.DatabaseType.Candidates.name
-    }))
 
     # Create Roles
     db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
@@ -194,8 +107,8 @@ def gen_dummy_data():
                          role=owner_sabic, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='4344423', company=sabic,
                          role=admin_sabic, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e6@e.com', password='123', phone='4344423', company=sabic,
-                         role=user_sabic, verified=True)
+    user_services.create(firstname='Faisal', surname='Julaidan', email='julaidan.faisal@gmail.com', password='123', phone='4344423', company=sabic,
+                         role=user_sabic, verified=False)
 
 
     # Chatbot Sessions

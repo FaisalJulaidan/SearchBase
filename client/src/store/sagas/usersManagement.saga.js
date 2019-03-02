@@ -1,8 +1,7 @@
 import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {solutionsActions, usersManagementActions} from "../actions";
-import {http} from "../../helpers";
-import {alertError, alertSuccess, destroyMessage, loadingMessage} from "../../helpers/alert";
+import {http, alertError, alertSuccess, destroyMessage, loadingMessage, successMessage, errorMessage} from "../../helpers";
 
 function* getUsers() {
     try {
@@ -16,49 +15,45 @@ function* getUsers() {
 
 function* addUser(action) {
     try {
-        loadingMessage('Adding User');
+        loadingMessage('Adding new user...');
         const res = yield http.put(`/user`, action.params.user);
-        yield destroyMessage();
-        yield alertSuccess('User Added', res.data.msg);
+
+        yield successMessage('User Added');
         yield put(usersManagementActions.addUserSuccess(res.message));
         yield put(usersManagementActions.getUsers());
     } catch (error) {
         console.log(error.response);
-        yield destroyMessage();
-        yield alertError('Error in adding User', error.response.data.msg);
+        yield errorMessage('Error in adding User');
         yield put(usersManagementActions.addUserFailure(error.response.data));
     }
 }
 
 function* editUser(action) {
     try {
-        loadingMessage('Editing User');
-        console.log("action.params", action.params)
+        loadingMessage('Editing user...');
         const res = yield http.post(`/user`, action.params.user);
-        yield destroyMessage();
-        yield alertSuccess('User Edited', res.data.msg);
+
+        yield successMessage('User edited');
         yield put(usersManagementActions.editUserSuccess(res.message));
         yield put(usersManagementActions.getUsers())
     } catch (error) {
         console.log(error.response);
-        yield destroyMessage();
-        yield alertError('Error in editing User', error.response.data.msg);
+        yield errorMessage('Error in editing user');
         yield put(usersManagementActions.editUserFailure(error.response.data));
     }
 }
 
 function* deleteUser(action) {
     try {
-        loadingMessage('Deleting User');
+        loadingMessage('Deleting user...');
         const res = yield http.post(`/user_delete`, action.params.user);
-        yield destroyMessage();
-        yield alertSuccess('User Deleted', res.data.msg);
+
+        yield successMessage('User deleted');
         yield put(usersManagementActions.deleteUserSuccess(res.message));
         yield put(usersManagementActions.getUsers())
     } catch (error) {
         console.log(error.response);
-        yield destroyMessage();
-        yield alertError('Error in deleting User', error.response.data.msg);
+        yield errorMessage('Error in deleting User');
         yield put(usersManagementActions.deleteUserFailure(error.response.data));
     }
 }

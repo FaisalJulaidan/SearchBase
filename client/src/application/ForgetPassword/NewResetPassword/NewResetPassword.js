@@ -5,6 +5,7 @@ import {authActions} from '../../../store/actions/index';
 import styles from './NewResetPassword.module.less';
 
 import {Button, Col, Form, Icon, Input, Row} from 'antd';
+import {Link} from "react-router-dom";
 
 const FormItem = Form.Item;
 
@@ -78,7 +79,7 @@ class NewNewResetPassword extends React.Component {
 
                     <Row type="flex" justify="center">
                         <Col>
-                            <a href="/login">Back to login?</a>
+                            <Link to="/login">Back to login?</Link>
                         </Col>
                     </Row>
 

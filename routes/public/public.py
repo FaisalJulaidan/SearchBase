@@ -5,8 +5,7 @@ from flask_cors import CORS
 from itsdangerous import URLSafeTimedSerializer
 
 from models import Callback
-from services import user_services, auth_services, mail_services
-from utilities import helpers
+from services import user_services
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates", static_folder='static')
 CORS(public_router)
@@ -14,7 +13,9 @@ verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y
 
 
 # Serve React App
-@public_router.route('/login', defaults={'path': ''})
+@public_router.route('/login')
+@public_router.route('/signup')
+@public_router.route('/forget_password')
 def serve(path):
     if path != "" and os.path.exists("static/react_app/" + path):
         return send_from_directory('static/react_app', path)
@@ -30,13 +31,6 @@ def serveDashboard(path):
     else:
         return send_from_directory('static/react_app', 'index.html')
 
-
-@public_router.route("/signup", methods=['GET'])
-def signup():
-
-    if request.method == "GET":
-        # msg = helpers.checkForMessage()
-        return render_template("signup.html")
 
 
 @public_router.route("/", methods=['GET'])
@@ -122,6 +116,7 @@ def verify_account(payload):
     if request.method == "GET":
         try:
             data = verificationSigner.loads(payload)
+            print(data)
             email = data.split(";")[0]
             user_callback: Callback = user_services.verifyByEmail(email)
             if not user_callback.Success: raise Exception(user_callback.Message)

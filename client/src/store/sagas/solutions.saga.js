@@ -2,7 +2,7 @@ import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {http} from "../../helpers";
 import {solutionsActions} from "../actions";
-import {alertError, alertSuccess, destroyMessage, loadingMessage} from "../../helpers/alert";
+import {alertError, alertSuccess, destroyMessage, loadingMessage, successMessage, errorMessage} from "../../helpers/alert";
 
 
 function* getSolutionsData({assistantID}) {
@@ -18,23 +18,23 @@ function* getSolutionsData({assistantID}) {
 
 function* addSolution(action) {
     try {
-        loadingMessage('Adding Solution');
+        loadingMessage('Adding Solution...');
         const res = yield http.put(`/assistant/${action.params.ID}/solutionsData`, action.params.newSolution);
-        yield destroyMessage();
-        yield alertSuccess('Solution Added', res.data.msg);
+
+        yield successMessage('Solution Added');
         yield put(solutionsActions.addSolutionSuccess(res.message));
         yield put(solutionsActions.getSolutions(action.params.ID));
     } catch (error) {
         console.log(error.response);
         yield destroyMessage();
-        yield alertError('Error in adding Solution', error.response.data.msg);
+        yield errorMessage('Error in adding Solution');
         yield put(solutionsActions.addSolutionFailure(error.response.data));
     }
 }
 
 function* editSolution(action) {
     try {
-        loadingMessage('Editing Solution');
+        loadingMessage('Editing Solution...');
         const res = yield http.post(`/assistant/${action.params.ID}/solutionsData`, action.params.editedSolution);
         yield destroyMessage();
         yield alertSuccess('Solution Edited', res.data.msg);

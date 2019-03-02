@@ -250,17 +250,17 @@ def scanCandidates(session, dbIDs):
         # Numbers
         # Received DataType: DesiredSalary <> Column: DesiredSalary | points=3
         if keywords.get(DT.DesiredSalary.value['name']):
-            df.loc[df[Candidate.DesiredSalary.name] >= keywords[DT.DesiredSalary.value['name']][-1], 'count'] += 3
+            df.loc[df[Candidate.DesiredSalary.name] <= float(keywords[DT.DesiredSalary.value['name']][-1]), 'count'] += 3
 
 
         # Received DataType: YearsExp <> Column: YearsExp | points=5
         if keywords.get(DT.YearsExp.value['name']):
-            df.loc[df[Candidate.YearsExp.name] <= keywords[DT.YearsExp.value['name']][-1], 'count'] += 5
+            df.loc[df[Candidate.YearsExp.name] >= float(keywords[DT.YearsExp.value['name']][-1]), 'count'] += 5
 
 
         # Received DataType: YearsExp <> Column: YearsExp | points=5
         if keywords.get(DT.DesiredPayRate.value['name']):
-            df.loc[df[Candidate.DesiredPayRate.name] <= keywords[DT.DesiredPayRate.value['name']][-1], 'count'] += 3
+            df.loc[df[Candidate.DesiredPayRate.name] <= float(keywords[DT.DesiredPayRate.value['name']][-1]), 'count'] += 3
 
         #  =======================================
 
@@ -300,16 +300,17 @@ def scanCandidates(session, dbIDs):
             df['count'] += df[Candidate.DesiredPosition.name].str.count('|'.join(keywords[DT.JobDescription.value['name']]),
                                                                         flags=re.IGNORECASE)
 
+        print(df)
 
         topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 2), 'count')
                                 .to_json(orient='records'))
         data = []
         for tr in topResults:
-            data = {
+            data.append({
                 "title": tr[Candidate.DesiredPosition.name],
                 "description": tr[Candidate.CandidateSkills.name],
                 "tail": "Salary: " + str(tr[Candidate.DesiredSalary.name])
-            }
+            })
         print(data)
         return Callback(True, '', data)
 
@@ -334,12 +335,12 @@ def scanJobs(session, dbIDs):
         # Numbers
         # Received DataType: DesiredSalary <> Column: DesiredSalary | points=3
         if keywords.get(DT.DesiredSalary.value['name']):
-            df.loc[df[Job.Salary.name] >= keywords[DT.DesiredSalary.value['name']][-1], 'count'] += 3
+            df.loc[df[Job.Salary.name] >= float(keywords[DT.DesiredSalary.value['name']][-1]), 'count'] += 3
 
 
         # Received DataType: DesiredPayRate <> Column: PayRate | points=3
         if keywords.get(DT.DesiredPayRate.value['name']):
-            df.loc[df[Job.PayRate.name] <= keywords[DT.DesiredPayRate.value['name']][-1], 'count'] += 3
+            df.loc[df[Job.PayRate.name] >= float(keywords[DT.DesiredPayRate.value['name']][-1]), 'count'] += 3
 
         #  =======================================
 
@@ -388,16 +389,15 @@ def scanJobs(session, dbIDs):
             df['count'] += df[Job.Description.name].str.count('|'.join(keywords[DT.JobDescription.value['name']]),
                                                                         flags=re.IGNORECASE)
 
-
-        topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 2), 'count')
+        topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 0), 'count')
                                 .to_json(orient='records'))
         data = []
         for tr in topResults:
-            data = {
+            data.append({
                 "title": tr[Job.Title.name],
                 "description": tr[Job.Description.name],
                 "tail": "Salary: " + str(tr[Job.Salary.name])
-            }
+            })
         print(data)
         return Callback(True, '', data)
 

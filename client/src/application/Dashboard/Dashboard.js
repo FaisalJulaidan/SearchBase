@@ -17,10 +17,13 @@ import Sessions from "./Assistants/Assistant/Sessions/Sessions";
 import Home from "./Home/Home";
 import Analytics from "./Assistants/Assistant/Analytics/Analytics";
 import {authActions, optionsActions} from "../../store/actions";
-import { store, persistor} from '../../store/store'
+import {store} from '../../store/store'
 import {connect} from 'react-redux';
 
 import {TransitionGroup, CSSTransition} from "react-transition-group";
+
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faCloud} from '@fortawesome/free-solid-svg-icons'
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -110,10 +113,19 @@ class Dashboard extends Component {
                     className={styles.Sider}>
 
                     <div className={styles.Logo}>
-                        <div style={{display: 'flex'}}>
-                            <Icon type="cloud" theme="twoTone" twoToneColor="#9254de" style={{fontSize: 44}}/>
-                            <div style={{lineHeight: '43px', marginLeft: 25}}>TheSearchBase</div>
-                        </div>
+                        {
+                            this.state.collapsed ?
+                                <div style={{display: 'flex'}}>
+                                    <FontAwesomeIcon size="2x" icon={faCloud}
+                                                     style={{color: '#673AB7', marginLeft: 7}}/>
+                                </div>
+                                :
+                                <div style={{display: 'flex'}}>
+                                    <FontAwesomeIcon size="2x" icon={faCloud} style={{color: '#673AB7'}}/>
+                                    <div style={{lineHeight: '32px', marginLeft: 18}}>TheSearchBase</div>
+                                </div>
+                        }
+
                     </div>
 
                     <Menu theme="light" defaultSelectedKeys={this.state.selectedMenuKey}

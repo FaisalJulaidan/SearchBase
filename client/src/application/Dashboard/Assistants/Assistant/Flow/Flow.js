@@ -126,7 +126,7 @@ class Flow extends Component {
             assistant: updatedAssistant,
             currentGroup: updatedGroup,
             isSaved: false
-        })
+        });
         destroyMessage();
         successMessage('Block added!');
     };
@@ -147,7 +147,7 @@ class Flow extends Component {
             assistant: updatedAssistant,
             currentGroup: updatedGroup,
             isSaved: false
-        })
+        });
         destroyMessage();
         successMessage('Block updated!');
     };
@@ -185,11 +185,23 @@ class Flow extends Component {
     reorderBlocks = (newBlocksOrder) => {
         const {updatedAssistant, updatedGroup} = this.getUpdatableState();
         newBlocksOrder.map((block, index, array) => {
-            if (block.Content.action === "Go To Next Block")
-                if (array[index + 1]?.ID)
-                    block.Content.blockToGoID = array[index + 1].ID;
-                else
-                    block.Content.blockToGoID = null;
+            if (block.Type === "Question") {
+                block.Content.answers.map((answer) => {
+                    if (answer.action === "Go To Next Block")
+                        if (array[index + 1]?.ID)
+                            answer.blockToGoID = array[index + 1].ID;
+                        else
+                            answer.blockToGoID = null;
+                    return answer
+                })
+            } else {
+                if (block.Content.action === "Go To Next Block")
+                    if (array[index + 1]?.ID)
+                        block.Content.blockToGoID = array[index + 1].ID;
+                    else
+                        block.Content.blockToGoID = null;
+            }
+
             return block
         });
 

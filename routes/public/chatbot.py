@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 
 from config import BaseConfig
 from models import Callback, db, ChatbotSession
-from services import chatbotSession_services, flow_services, databases_services
+from services import chatbotSession_services, flow_services, databases_services, stored_file_services
 from utilities import helpers
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
@@ -68,16 +68,14 @@ def get_widget(path):
         return send_from_directory('static/widgets/', path)
 
 
-
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/session/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(assistantIDAsHash, sessionID):
 
-
-    callback: Callback = chatbotSession_services.getByID(sessionID, helpers.decrypt_id(assistantIDAsHash))
+    callback: Callback = chatbotSession_services.getByID(sessionID, helpers.decrypt_id(assistantIDAsHash)[0])
     if not callback.Success:
         return helpers.jsonResponse(False, 404, "Session not found.", None)
     session: ChatbotSession = callback.Data
-
+    print(2)
 
     if request.method == 'POST':
 
@@ -102,8 +100,12 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                 else:
                     filenames+= ',' + filename
 
-            # Store filenames in the DB
-            session.FilePath = filenames
+            print(1)
+            # Store filepaths in the DB
+            saveFile_callback: Callback = stored_file_services.create(filenames, session)
+            if not saveFile_callback.Success:
+                raise Exception(saveFile_callback.Message)
+            print(2)
 
         except Exception as exc:
             print(exc)

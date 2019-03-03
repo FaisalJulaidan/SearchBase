@@ -3,7 +3,7 @@ from utilities import helpers, json_schemas
 from jsonschema import validate
 from typing import List
 from sqlalchemy.sql import desc
-from services import assistant_services
+from services import assistant_services, stored_file_services
 from sqlalchemy.sql import and_
 
 
@@ -49,10 +49,16 @@ def getAllByAssistantID(assistantID):
         sessions: List[ChatbotSession]= db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID) \
             .order_by(desc(ChatbotSession.DateTime)).all()
 
+        for session in sessions:
+            storedFile_callback: Callback = stored_file_services.getBySession(session)
+            if storedFile_callback.Success:
+                session.FilePath = storedFile_callback.Data.FilePath
+
         return Callback(True, "User inputs retrieved successfully.", sessions)
 
     except Exception as exc:
         print("chatbotSession_services.getByAssistantID() Error: ", exc)
+        db.session.rollback()
         return Callback(False, 'Could not retrieve the data.')
 
 
@@ -60,11 +66,18 @@ def getByID(sessionID, assistantID):
     try:
         session = db.session.query(ChatbotSession)\
             .filter(and_(ChatbotSession.AssistantID == assistantID, ChatbotSession.ID == sessionID)).first()
-        if not session: raise Exception
+        if not session:
+            raise Exception
+
+        storedFile_callback: Callback = stored_file_services.getBySession(session)
+        if storedFile_callback.Success:
+            session.FilePath = storedFile_callback.Data.FilePath
+
         return Callback(True, "ChatbotSession retrieved successfully.", session)
 
     except Exception as exc:
-        print("userInput_services.getByID() Error: ", exc)
+        print("chatbotSession_services.getByID() Error: ", exc)
+        db.session.rollback()
         return Callback(False, 'Could not retrieve the session.')
 
 
@@ -85,7 +98,7 @@ def filterForContainEmails(records):
     except Exception as exc:
 
         print("userInput_services.filterForContainEmails ERROR: ", exc)
-
+        db.session.rollback()
         return Callback(False, 'Could not filter the data.')
 
 

@@ -1,9 +1,7 @@
 import React from "react";
 import Header from "../../../components/Header/Header";
-import SolutionsDisplay from "../Assistants/Assistant/Solutions/SolutionsDisplay/SolutionsDisplay";
-import SolutionsSettings from "../Assistants/Assistant/Solutions/SolutionsSettings/SolutionsSettings";
 import {Menu, Icon, Tabs, Button} from 'antd';
-import styles from "../Assistants/Assistant/Solutions/Solutions.module.less";
+import styles from "./Documentation.module.less";
 
 const SubMenu = Menu.SubMenu;
 const TabPane = Tabs.TabPane;

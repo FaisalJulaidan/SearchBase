@@ -194,7 +194,7 @@ class Sessions extends React.Component {
                 <div className={styles.Panel}>
                     <div className={styles.Panel_Header}>
                         <div>
-                            <h3>{assistant.Name}: User Inputs</h3>
+                            <h3>{assistant.Name}: conversations</h3>
                             <p>Here you can find all the responses to your chatbot</p>
                         </div>
 

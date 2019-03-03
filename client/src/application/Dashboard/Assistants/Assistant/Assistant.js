@@ -10,21 +10,13 @@ const menu = (assistant) => (
     <Menu>
         <Menu.Item key="1">
             <Link to={{
-                      pathname: `assistants/${assistant.ID}/solutions`,
-                      state: {assistant: assistant}
-                  }}>
-                <Icon type="database"/> Solutions
-            </Link>
-        </Menu.Item>
-        <Menu.Item key="2">
-            <Link to={{
                       pathname: `assistants/${assistant.ID}/sessions`,
                       state: {assistant: assistant}
                   }}>
-                <Icon type="code"/> User Input
+                <Icon type="code"/> Conversations
             </Link>
         </Menu.Item>
-        <Menu.Item key="3">
+        <Menu.Item key="2">
             <Link to={{
                       pathname: `assistants/${assistant.ID}/analytics`,
                       state: {assistant: assistant}
@@ -33,7 +25,7 @@ const menu = (assistant) => (
             </Link>
         </Menu.Item>
         <Menu.Divider/>
-        <Menu.Item key="4">
+        <Menu.Item key="3">
             <Link to={{
                       pathname: `assistants/${assistant.ID}/integration`,
                       state: {assistant: assistant}

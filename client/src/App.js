@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {Redirect, Route, Switch, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {history} from './helpers';
-import {notification} from 'antd';
 
 import {PrivateRoute} from './hoc';
 import Dashboard from "./application/Dashboard/Dashboard";
@@ -10,13 +9,14 @@ import Login from './application/Login/Login'
 import Signup from './application/Signup/Signup'
 import ForgetPassword from './application/ForgetPassword/ForgetPassword'
 import NewResetPassword from './application/ForgetPassword/NewResetPassword/NewResetPassword'
+import {destroyMessage} from './helpers/alert';
 
 class App extends Component {
     constructor(props) {
         super(props);
         history.listen((location, action) => {
             // Clear recent notifications boxes when route changes
-            notification.destroy();
+            destroyMessage();
         });
     }
 

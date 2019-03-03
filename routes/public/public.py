@@ -6,35 +6,48 @@ from itsdangerous import URLSafeTimedSerializer
 
 from models import Callback
 from services import user_services
+from utilities import helpers
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates", static_folder='static')
 CORS(public_router)
-verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
+
+
+# ======== Server React =========== #
+def serve(path=''):
+    if path != "" and os.path.exists("static/react_app/" + path):
+        return send_from_directory('static/react_app', path)
+    else:
+        return send_from_directory('static/react_app', 'index.html')
 
 # Serve React App
 @public_router.route('/login')
-@public_router.route('/signup')
-@public_router.route('/forget_password')
-def serve(path):
-    if path != "" and os.path.exists("static/react_app/" + path):
-        return send_from_directory('static/react_app', path)
-    else:
-        return send_from_directory('static/react_app', 'index.html')
+def login():
+   return serve()
 
+@public_router.route('/signup')
+def signup():
+    return serve()
+
+@public_router.route('/forget_password')
+def forget_password():
+    return serve()
+
+@public_router.route('/reset_password/<payload>')
+def reset_password(payload):
+    return serve()
 
 @public_router.route('/dashboard', defaults={'path': ''})
 @public_router.route('/dashboard/<path:path>')
-def serveDashboard(path):
-    if path != "" and os.path.exists("static/react_app/" + path):
-        return send_from_directory('static/react_app', path)
-    else:
-        return send_from_directory('static/react_app', 'index.html')
+def dashboard(path):
+    return serve(path)
+
+# ============================================
 
 
 
 @public_router.route("/", methods=['GET'])
-def indexpage():
+def index_page():
     if request.method == "GET":
         return render_template("index.html")
 
@@ -115,8 +128,7 @@ def sendEmail():
 def verify_account(payload):
     if request.method == "GET":
         try:
-            data = verificationSigner.loads(payload)
-            print(data)
+            data = helpers.verificationSigner.loads(payload, salt='email-confirm-key')
             email = data.split(";")[0]
             user_callback: Callback = user_services.verifyByEmail(email)
             if not user_callback.Success: raise Exception(user_callback.Message)

@@ -62,7 +62,7 @@ class ForgetPassword extends React.Component {
 
                     <Row type="flex" justify="center">
                         <Col>
-                            <Link to="/login">Back to login?</Link>
+                            <Link style={{color: "#9254de"}} to="/login">Back to login?</Link>
                         </Col>
                     </Row>
 

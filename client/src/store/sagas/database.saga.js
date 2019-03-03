@@ -12,8 +12,9 @@ function* getDatabasesList() {
         successMessage('Databases loaded')
     } catch (error) {
         console.log(error);
-        yield errorMessage(error.response.data.msg);
         yield put(databaseActions.getDatabasesListFailure(error.response.data));
+        yield errorMessage("Couldn't load databases list");
+
     }
 }
 
@@ -29,7 +30,7 @@ function* fetchDatabase({databaseID}) {
         yield successMessage('Database loaded');
     } catch (error) {
         console.log(error);
-        yield errorMessage("Error in loading database");
+        yield errorMessage("Couldn't load database");
         yield put(databaseActions.fetchDatabaseFailure(error.response.data));
     }
 }
@@ -48,8 +49,8 @@ function* uploadDatabase({newDatabase}) {
 
     } catch (error) {
         console.log(error);
-        yield errorMessage("Error in uploading database");
         yield put(databaseActions.uploadDatabaseFailure(error.response.data));
+        yield errorMessage("Couldn't upload database");
     }
 }
 

@@ -31,8 +31,8 @@ function* saveProfileData(action) {
         return yield put(profileActions.getProfile())
     } catch (error) {
         console.log(error);
+        yield put(profileActions.saveProfileDetailsFailure(error.response.data));
         yield errorMessage("Couldn't save your profile");
-        return yield put(profileActions.saveProfileDetailsFailure(error.response.data));
     }
 }
 
@@ -45,8 +45,8 @@ function* saveDataSettings(action) {
         return yield put(profileActions.getProfile())
     } catch (error) {
         console.log(error);
-        yield errorMessage(error.response.data.msg);
-        return yield put(profileActions.saveDataSettingsFailure(error.response.data));
+        yield put(profileActions.saveDataSettingsFailure(error.response.data));
+        yield errorMessage("Couldn't your settings");
     }
 }
 
@@ -59,8 +59,8 @@ function* changePassword({newPassword, oldPassword}) {
 
     } catch (error) {
         console.log(error);
+        yield put(profileActions.changePasswordFailure(error.response.data));
         yield errorMessage(error.response.data.msg);
-        return yield put(profileActions.changePasswordFailure(error.response.data));
     }
 }
 

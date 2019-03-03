@@ -3,22 +3,26 @@
   "title": "chatbot session schema",
   "type": "object",
   "properties": {
-    "collectedInformation": {"type": "array", "items": {
+    "collectedData": {"type": "array", "items": {
       "type": "object",
       "properties":{
         "blockID": {"type": "integer"},
         "questionText": {"type": "string"},
+        "dataType": {"enum": ["No Type", "Name", "Email", "Telephone", "Linkdin URL",
+          "Gender", "Degree", "Resume", "Contact Time", "Availability", "Current Salary", "Current Role", "Desired Salary", "Desired Position", "Candidate Skills", "Years Exp", "Preferred Location", "Preferred Employment Type", "Desired Hourly Rate",
+          "Location", "NearbyStation", "Job Salary Offered", "Employment Type Offered", "Essential Skills", "Essential Years Exp", "Contract Rate",  "Job Description", "Job Availability", "Candidates Needed"]},
         "input": {"type": "string"},
         "keywords": {"type": ["array","string"], "items": {"type": ["string"]}}
         },
-      "required": ["blockID", "questionText", "input", "keywords"],
+      "required": ["blockID", "questionText", "dataType", "input", "keywords"],
       "additionalProperties": false
       }
     },
     "keywords": {"type": ["array","string"], "items": {"type": ["string"]}},
     "showTop": {"type": "integer"},
-    "solutionsReturned": {"type": "integer"}
+    "solutionsReturned": {"type": "integer"},
+    "userType": {"enum": ["Unknown", "Candidate", "Client"]}
   },
-  "required": ["collectedInformation", "keywords", "showTop", "solutionsReturned"],
+  "required": ["collectedData", "keywords", "showTop", "solutionsReturned", "userType"],
   "additionalProperties": false
 }

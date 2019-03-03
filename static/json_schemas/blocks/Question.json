@@ -10,7 +10,6 @@
         "type": "object",
         "properties": {
           "text": { "type": "string" },
-          "timesClicked": { "type": "integer", "minimum": 0 },
           "keywords": { "type": "array", "items": { "type": "string" } },
           "blockToGoID": { "type": [ "number",  "null" ] },
           "action": { "enum": ["Go To Next Block", "Go To Specific Block", "End Chat" ] },

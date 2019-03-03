@@ -26,7 +26,6 @@ def checkForNewsletter(email):
         return Callback(True, email + ' is registered for newsletters')
     except Exception as e:
         db.session.rollback()
-        print("newsletter_services.checkForNewsletter() ERROR: ", e)
         return Callback(False, email + ' is not registered for newsletters')
 
     # finally:

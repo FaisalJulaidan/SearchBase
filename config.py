@@ -44,12 +44,13 @@ class BaseConfig(object):
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-    PRODUCT_FILES = os.path.join(APP_ROOT, 'static/file_uploads/product_files')
     USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
 
     SECRET_KEY = os.urandom(24)
     CSRF_SESSION_KEY = os.urandom(24)
+    JWT_SECRET_KEY = os.urandom(24)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
     SESSION_TYPE = 'filesystem'
 
     USE_ENCRYPTION = True
@@ -58,7 +59,7 @@ class BaseConfig(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Hashids Salt
-    HASH_IDS_SALT = 'b9iLXiAa'
+    HASH_IDS_SALT = 'b9iLXiAa' # Never change it
 
     # Mail Config
     MAIL_SERVER = 'smtp.gmail.com'
@@ -71,10 +72,10 @@ class BaseConfig(object):
     JOBS = [
         {
             'id': 'notify',
-            'func': 'services.mail_services:notifyNewRecordsForLastXHours',
-            'args': (12,),
+            'func': 'services.mail_services:timer_tick',
+            'args': (),
             'trigger': 'interval',
-            'seconds': 43200
+            'seconds': 14400
         }
     ]
 

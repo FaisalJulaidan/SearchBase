@@ -1,21 +1,19 @@
 from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Enum, event, ForeignKey, types, String, JSON
+from sqlalchemy import Enum, event, types
 from sqlalchemy.ext import mutable
 from datetime import datetime
-import enum
 import json
-from config import BaseConfig
-from flask import current_app
-
-from sqlalchemy_utils import EncryptedType, PasswordType, force_auto_coercion
-from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
+import enums
+from sqlalchemy_utils import PasswordType, CurrencyType, Currency
 
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
+
+
 # force_auto_coercion()
 
 
@@ -31,7 +29,7 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
 class JsonEncodedDict(types.TypeDecorator):
     """Stores and retrieves JSON as TEXT."""
 
-    impl = types.Text
+    impl = types.TEXT
 
     def process_bind_param(self, value, dialect):
         if value is not None:
@@ -44,8 +42,7 @@ class JsonEncodedDict(types.TypeDecorator):
         return value
 
 
- # TypeEngine.with_variant says "use StringyJSON instead when
-# connecting to 'sqlite'"
+# TypeEngine.with_variant says "use StringyJSON instead when connecting to 'sqlite'"
 MagicJSON = types.JSON().with_variant(JsonEncodedDict, 'sqlite')
 mutable.MutableDict.associate_with(JsonEncodedDict)
 
@@ -53,108 +50,28 @@ mutable.MutableDict.associate_with(JsonEncodedDict)
 # ============= Models ===================
 
 class Company(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
-                   supports_json=True,
-                   supports_dict=True,
-                   on_serialize=None,
-                   on_deserialize=None
-                   )
-    if BaseConfig.USE_ENCRYPTION:
-        Name = db.Column(EncryptedType(db.String(80), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'),
-                         nullable=False,
-                         supports_json=True,
-                         supports_dict=True,
-                         on_serialize=None,
-                         on_deserialize=None
-                         )
-        URL = db.Column(EncryptedType(db.String(250), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'),
-                        nullable=False,
-                        supports_json=True,
-                        supports_dict=True,
-                        on_serialize=None,
-                        on_deserialize=None
-                        )
-    else:
-        Name = db.Column(db.String(80),
-                         nullable=False,
-                         supports_json=True,
-                         supports_dict=True,
-                         on_serialize=None,
-                         on_deserialize=None
-                         )
-        URL = db.Column(db.String(250),
-                        nullable=False,
-                        supports_json=True,
-                        supports_dict=True,
-                        on_serialize=None,
-                        on_deserialize=None
-                        )
-
-    StripeID = db.Column(db.String(68), unique=True, nullable=False,)
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(80), nullable=False)
+    URL = db.Column(db.String(250), nullable=False)
+    StripeID = db.Column(db.String(68), unique=True, nullable=False, )
     SubID = db.Column(db.String(68), unique=True, default=None)
-
-    # Size = db.Column(db.String(60))
 
     # Relationships:
     Users = db.relationship('User', back_populates='Company', cascade="all, delete, delete-orphan")
-    Assistants = db.relationship('Assistant', back_populates='Company')
-    Roles = db.relationship('Role', back_populates='Company')
+    Assistants = db.relationship('Assistant', back_populates='Company', cascade="all, delete, delete-orphan")
+    Databases = db.relationship('Database', back_populates='Company', cascade="all, delete, delete-orphan")
+    Roles = db.relationship('Role', back_populates='Company', cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)
 
 
 class User(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
-                 )
-    if BaseConfig.USE_ENCRYPTION:
-        Firstname = db.Column(EncryptedType(db.String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        Surname = db.Column(EncryptedType(db.String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False,
-                            supports_json=True,
-                            supports_dict=True,
-                            on_serialize=None,
-                            on_deserialize=None
-                            )
-        Email = db.Column(EncryptedType(String(64), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False,
-                          supports_json=True,
-                          supports_dict=True,
-                          on_serialize=None,
-                          on_deserialize=None
-                          )
-        PhoneNumber = db.Column(EncryptedType(db.String(30), BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'),
-                                supports_json=True,
-                                supports_dict=True,
-                                on_serialize=None,
-                                on_deserialize=None
-                                )
-    else:
-        Firstname = db.Column(db.String(64), nullable=False)
-        Surname = db.Column(db.String(64), nullable=False,
-                            supports_json=True,
-                            supports_dict=True,
-                            on_serialize=None,
-                            on_deserialize=None
-                            )
-        Email = db.Column(db.String(64), nullable=False, unique=True,
-                          supports_json=True,
-                          supports_dict=True,
-                          on_serialize=None,
-                          on_deserialize=None
-                          )
-        PhoneNumber = db.Column(db.String(30),
-                                supports_json=True,
-                                supports_dict=True,
-                                on_serialize=None,
-                                on_deserialize=None
-                                )
-    # Password = db.Column(db.String(255),nullable=False,
-    #                      supports_json=False,
-    #                      supports_dict=False,
-    #                      on_serialize=None,
-    #                      on_deserialize=None
-    #                      )
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Firstname = db.Column(db.String(64), nullable=False)
+    Surname = db.Column(db.String(64), nullable=False)
+    Email = db.Column(db.String(64), nullable=False)
+    PhoneNumber = db.Column(db.String(30))
     Password = db.Column(PasswordType(
         schemes=[
             'pbkdf2_sha512',
@@ -162,44 +79,21 @@ class User(db.Model):
         ],
         deprecated=['md5_crypt']
     ))
-    Verified = db.Column(db.Boolean(), nullable=False, default=False,
-                         supports_json=True,
-                         supports_dict=True,
-                         on_serialize=None,
-                         on_deserialize=None
-                         )
-    LastAccess = db.Column(db.DateTime(), nullable=True,
-                           supports_json=True,
-                           supports_dict=True,
-                           on_serialize=None,
-                           on_deserialize=None
-                           )
-
-    CreatedOn = db.Column(db.DateTime(), nullable=False, default=datetime.now,
-                          supports_json=True,
-                          supports_dict=True,
-                          on_serialize=None,
-                          on_deserialize=None
-                          )
+    Verified = db.Column(db.Boolean(), nullable=False, default=False)
+    LastAccess = db.Column(db.DateTime(), nullable=True)
+    CreatedOn = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
-    Company = db.relationship('Company', back_populates='Users',
-                              supports_json=True,
-                              supports_dict=True,
-                              on_serialize=None,
-                              on_deserialize=None
-                              )
+    Company = db.relationship('Company', back_populates='Users')
 
     RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
-    Role = db.relationship('Role', back_populates='Users',
-                           supports_json=True,
-                           supports_dict=True,
-                           on_serialize=None,
-                           on_deserialize=None
-                           )
+    Role = db.relationship('Role', back_populates='Users')
 
-    Settings = db.relationship("UserSettings", uselist=False, back_populates="User")
+    # NotificationsRegister = db.relationship('NotificationsRegister', back_populates='User')
+
+    Settings = db.relationship("UserSettings", uselist=False, back_populates="User",
+                               cascade="all, delete, delete-orphan")
 
     # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
 
@@ -208,43 +102,12 @@ class User(db.Model):
 
 
 class Role(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True,
-                   supports_json=True,
-                   supports_dict=True,
-                   on_serialize=None,
-                   on_deserialize=None
-                   )
-    Name = db.Column(db.String(64),
-                     supports_json=True,
-                     supports_dict=True,
-                     on_serialize=None,
-                     on_deserialize=None
-                     )
-    EditChatbots = db.Column(db.Boolean(), nullable=False, default=False,
-                             supports_json=True,
-                             supports_dict=True,
-                             on_serialize=None,
-                             on_deserialize=None
-                             )
-    EditUsers = db.Column(db.Boolean(), nullable=False, default=False,
-                          supports_json=True,
-                          supports_dict=True,
-                          on_serialize=None,
-                          on_deserialize=None
-                          )
-    DeleteUsers = db.Column(db.Boolean(), nullable=False, default=False,
-                            supports_json=True,
-                            supports_dict=True,
-                            on_serialize=None,
-                            on_deserialize=None
-                            )
-    AccessBilling = db.Column(db.Boolean(), nullable=False, default=False,
-                              supports_json=True,
-                              supports_dict=True,
-                              on_serialize=None,
-                              on_deserialize=None
-                              )
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(64))
+    EditChatbots = db.Column(db.Boolean(), nullable=False, default=False)
+    EditUsers = db.Column(db.Boolean(), nullable=False, default=False)
+    DeleteUsers = db.Column(db.Boolean(), nullable=False, default=False)
+    AccessBilling = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
@@ -259,61 +122,46 @@ class Role(db.Model):
         return '<Role {}>'.format(self.Name)
 
 
-class Assistant(db.Model):
+# class NotificationsRegister(db.Model):
+#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+#     AssistantID = db.Column(db.Integer, db.ForeignKey("assistant.ID", ondelete='cascade'), nullable=False)
+#     UserID = db.Column(db.Integer, db.ForeignKey("user.ID", ondelete='cascade'), nullable=False)
+#
+#     # Relationships:
+#     Assistant = db.relationship('Assistant', back_populates='NotificationsRegister')
+#     User = db.relationship('User', back_populates='NotificationsRegister')
 
+
+class Assistant(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Name = db.Column(db.String(128),nullable=False)
+    Name = db.Column(db.String(128), nullable=False)
+    Flow = db.Column(MagicJSON, nullable=True)
     Route = db.Column(db.String(64), unique=True)
     Message = db.Column(db.String(500), nullable=False)
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
-    Config = db.Column(JsonEncodedDict, nullable=True)
+    Config = db.Column(MagicJSON, nullable=True)
+    MailEnabled = db.Column(db.Boolean, nullable=False, default=False)
+    MailPeriod = db.Column(db.Integer, nullable=False, default=12)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
 
     # Relationships:
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False,)
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )
     Company = db.relationship('Company', back_populates='Assistants')
 
-    Solutions = db.relationship('Solution', back_populates='Assistant')
+    # NotificationsRegister = db.relationship('NotificationsRegister', back_populates='Assistant')
     Statistics = db.relationship('Statistics', back_populates='Assistant')
-    Blocks = db.relationship('Block', back_populates='Assistant')
     ChatbotSessions = db.relationship('ChatbotSession', back_populates='Assistant')
 
     # Constraints:
+    # Cannot have two assistants with the same name under one company
     __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
-
 
     def __repr__(self):
         return '<Assistant {}>'.format(self.Name)
 
 
-class Solution(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Name = db.Column(db.String(64), nullable=False)
-    if BaseConfig.USE_ENCRYPTION:
-        Content = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-        RequiredFilters = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
-        DisplayTitles = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=True)
-    else:
-        Content = db.Column(JsonEncodedDict, nullable=False)
-        RequiredFilters = db.Column(JsonEncodedDict, nullable=True)
-        DisplayTitles = db.Column(JsonEncodedDict, nullable=True)
-    Type = db.Column(db.String(64), nullable=False)
-    WebLink = db.Column(db.String(128), nullable=True)
-    IDReference = db.Column(db.String(64), nullable=True)
-    automaticSolutionAlerts = db.Column(db.Boolean(), nullable=False, default=False)
-
-    # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='Solutions')
-
-    def __repr__(self):
-        return '<Solution {}>'.format(self.ID)
-
-
 class Statistics(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
@@ -329,93 +177,7 @@ class Statistics(db.Model):
         return '<Statistics {}>'.format(self.Name)
 
 
-class ValidationType(enum.Enum):
-
-    Ignore = 'Ignore'
-    Email = 'Email'
-    Telephone = 'Telephone'
-    FullName = 'FullName'
-
-
-class BlockType(enum.Enum):
-    UserInput = 'User Input'
-    Question = 'Question'
-    FileUpload = 'File Upload'
-    Solutions = 'Solutions'
-
-
-class BlockAction(enum.Enum):
-
-    GoToNextBlock = 'Go To Next Block'
-    GoToSpecificBlock = 'Go To Specific Block'
-    EndChat = 'End Chat'
-
-
-# # An association table to add a many to many relationship between Blocks & BlockLabels
-# BlocksLabels = db.Table('BlocksLabels', db.Base.metadata,
-#     db.Column('BlockID', db.Integer, ForeignKey('Block.id')),
-#     db.Column('LabelID', db.Integer, ForeignKey('BlockLabel.id'))
-# )
-
-
-class Block(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Type = db.Column(Enum(BlockType), nullable=False)
-    Order = db.Column(db.Integer, nullable=False)
-    Content = db.Column(JsonEncodedDict, nullable=False)
-    StoreInDB = db.Column(db.Boolean(), nullable=False, default=True)
-    Skippable = db.Column(db.Boolean(), nullable=False, default=False)
-    Labels = db.Column(db.String(64), nullable=False, default="")
-
-    # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='Blocks')
-
-    # Labels = db.relationship('BlockLabel', back_populates='Blocks', secondary=BlocksLabels)
-
-    # Constraints:
-    # __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)
-
-    def __repr__(self):
-        return '<Block {}>'.format(self.Type)
-
-class BlockLabel(db.Model):
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Text = db.Column(db.String(128), nullable=False)
-    Colour = db.Column(db.String(128), nullable=False)
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False,)
-
-    # Relationships:
-    # Blocks = db.relationship('Block', back_populates='Labels', secondary=BlocksLabels)
-
-    def __repr__(self):
-        return '<BlockLabel {}>'.format(self.Text)
-
-class ChatbotSession(db.Model):
-
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    if BaseConfig.USE_ENCRYPTION:
-        Data = db.Column(EncryptedType(JsonEncodedDict, BaseConfig.SECRET_KEY_DB, AesEngine, 'pkcs5'), nullable=False)
-    else:
-        Data = db.Column(JsonEncodedDict, nullable=False)
-    FilePath = db.Column(db.String(250), nullable=True, default=None)
-    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
-    TimeSpent = db.Column(db.Integer, nullable=False, default=0)
-    SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
-    QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
-
-
-    # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')
-
-    def __repr__(self):
-        return '<ChatbotSession {}>'.format(self.Data)
-
-
 class Plan(db.Model):
-
     ID = db.Column(db.String(25), primary_key=True, unique=True)
     Nickname = db.Column(db.String(40), nullable=False, unique=True)
     MaxSolutions = db.Column(db.Integer, nullable=False, default=0)
@@ -435,7 +197,6 @@ class Plan(db.Model):
 
 
 class Newsletter(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Email = db.Column(db.String(64), nullable=False, unique=True)
 
@@ -447,7 +208,6 @@ class Newsletter(db.Model):
 
 
 class UserSettings(db.Model):
-
     ID = db.Column(db.Integer, db.ForeignKey("user.ID", ondelete='cascade'), primary_key=True, unique=True)
     TrackingData = db.Column(db.Boolean, nullable=False, default=False)
     TechnicalSupport = db.Column(db.Boolean, nullable=False, default=False)
@@ -461,10 +221,153 @@ class UserSettings(db.Model):
         return '<UserSettings {}>'.format(self.ID)
 
 
+class ChatbotSession(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Data = db.Column(MagicJSON, nullable=False)
+    FilePath = db.Column(db.String(250), nullable=True, default=None)
+    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+    TimeSpent = db.Column(db.Integer, nullable=False, default=0)
+    SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
+    QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
+    UserType = db.Column(Enum(enums.UserType), nullable=False)
+
+    # Relationships:
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')
+
+    def __repr__(self):
+        return '<ChatbotSession {}>'.format(self.Data)
+
+
+# @db.validates("ChatbotSession")
+# def testing():
+#     print("SOOOOO")
+#     return True
+
+
+# def testing():
+#     print("HIIIIIIII")
+#     return True
+#
+#
+# trigger = db.DDL(
+#     ""
+# )
+#
+# db.event.listen(
+#     ChatbotSession,
+#     'before_delete',
+#     trigger.execute_if(testing)
+# )
+
+
+class Database(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(64), nullable=False)
+    Type = db.Column(Enum(enums.DatabaseType), nullable=False)
+
+    # Relationships:
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
+    Company = db.relationship('Company', back_populates='Databases')
+
+    # Constraints:
+    # Cannot have two databases with the same name under one company
+    __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_database'),)
+
+    def __repr__(self):
+        return '<Database {}>'.format(self.Name)
+
+
+class Candidate(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(64), nullable=False)
+    Email = db.Column(db.String(64), nullable=True)
+    Telephone = db.Column(db.String(64), nullable=True)
+    LinkdinURL = db.Column(db.String(512), nullable=True)
+    PostCode = db.Column(db.String(64), nullable=True)
+
+    Gender = db.Column(db.String(24), nullable=True)
+    Degree = db.Column(db.String(64), nullable=True)
+    # Resume = db.Column(db.String(64), nullable=True) # this will be a file
+    ContactTime = db.Column(db.String(64), nullable=True)
+    CurrentSalary = db.Column(db.Float(), nullable=True)
+    Currency = db.Column(CurrencyType)
+    CurrentRole = db.Column(db.String(64), nullable=True)
+    JobTitle = db.Column(db.String(64), nullable=True)
+    CurrentEmployer = db.Column(db.String(64), nullable=True)
+    CurrentEmploymentType = db.Column(db.String(64), nullable=True)
+
+    DesiredSalary = db.Column(db.Float(), nullable=True)
+    DesiredPosition = db.Column(db.String(64), nullable=True)
+    CandidateSkills = db.Column(db.String(64), nullable=True)
+    YearsExp = db.Column(db.Float(), nullable=True)
+    PreferredLocation = db.Column(db.String(64), nullable=True)
+    PreferredEmploymentType = db.Column(db.String(64), nullable=True)
+    DesiredPayRate = db.Column(db.Float(), nullable=True)
+
+    # Relationships:
+    DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
+    Database = db.relationship('Database')
+
+    def __repr__(self):
+        return '<Candidate {}>'.format(self.Name)
+
+
+class Job(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Title = db.Column(db.String(64), nullable=False)
+    Description = db.Column(db.String(5000), nullable=False)
+    Availability = db.Column(db.String(64), nullable=True)
+    Location = db.Column(db.String(64), nullable=True)
+    PositionType = db.Column(db.String(64), nullable=True)
+    EmploymentType = db.Column(db.String(64), nullable=True)
+    EssentialSkills = db.Column(db.String(512), nullable=True)
+    Salary = db.Column(db.Float(), nullable=True)
+    PayRate = db.Column(db.Float(), nullable=True)
+    Currency = db.Column(CurrencyType)
+    StartDate = db.Column(db.DateTime(), nullable=True)
+
+    # Relationships:
+
+    DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
+    Database = db.relationship('Database')
+
+    def __repr__(self):
+        return '<Job {}>'.format(self.JobTitle)
+
+
+# class Client(db.Model):
+#
+#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+#     Name = db.Column(db.String(64), nullable=False)
+#     Email = db.Column(db.String(64), nullable=True)
+#     Telephone = db.Column(db.String(64), nullable=True)
+#     LinkdinURL = db.Column(db.String(128), nullable=True)
+#     PostCode = db.Column(db.String(64), nullable=True)
+#
+#     Location = db.Column(db.String(64), nullable=True)
+#     NearbyStation = db.Column(db.String(64), nullable=True)
+#     JobSalaryOffered = db.Column(db.Float(), nullable=True)
+#     Currency = db.Column(CurrencyType)
+#     EmploymentTypeOffered = db.Column(db.String(64), nullable=True)
+#     CandidatesNeeded = db.Column(db.Integer(), nullable=True)
+#     EssentialSkills = db.Column(db.String(512), nullable=True)
+#     EssentialYearsExp = db.Column(db.Float(), nullable=True)
+#     ContractRate = db.Column(db.Float(), nullable=True)
+#     JobDescription = db.Column(db.String(512), nullable=True)
+#     JobAvailability = db.Column(db.String(64), nullable=True)
+#
+#     # Relationships:
+#
+#     DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
+#     Database = db.relationship('Database')
+#
+#     def __repr__(self):
+#         return '<Client {}>'.format(self.Name)
+
+
 class Callback():
     def __init__(self, success: bool, message: str, data: str or dict or bool = None):
         self.Success: bool = success
         self.Message: str = message
         self.Data: str or dict or bool = data
-    pass
-    # if success else 'Error: ' + message

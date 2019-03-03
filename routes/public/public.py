@@ -1,25 +1,55 @@
-from flask import Blueprint, render_template, request, session, redirect, url_for
-from utilities import helpers
-from models import Callback
-from itsdangerous import URLSafeTimedSerializer
-from services import user_services, auth_services, mail_services
-from flask_cors import CORS
-import base64
+import os
 
-public_router = Blueprint('public_router', __name__, template_folder="../templates")
+from flask import Blueprint, render_template, request, send_from_directory, redirect
+from flask_cors import CORS
+from itsdangerous import URLSafeTimedSerializer
+
+from models import Callback
+from services import user_services
+from utilities import helpers
+
+public_router = Blueprint('public_router', __name__, template_folder="../templates", static_folder='static')
 CORS(public_router)
-verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
+
+
+
+# ======== Server React =========== #
+def serve(path=''):
+    if path != "" and os.path.exists("static/react_app/" + path):
+        return send_from_directory('static/react_app', path)
+    else:
+        return send_from_directory('static/react_app', 'index.html')
+
+# Serve React App
+@public_router.route('/login')
+def login():
+   return serve()
+
+@public_router.route('/signup')
+def signup():
+    return serve()
+
+@public_router.route('/forget_password')
+def forget_password():
+    return serve()
+
+@public_router.route('/reset_password/<payload>')
+def reset_password(payload):
+    return serve()
+
+@public_router.route('/dashboard', defaults={'path': ''})
+@public_router.route('/dashboard/<path:path>')
+def dashboard(path):
+    return serve(path)
+
+# ============================================
 
 
 
 @public_router.route("/", methods=['GET'])
-def indexpage():
+def index_page():
     if request.method == "GET":
-        print(helpers.encrypt_id(1))
-        print(helpers.decrypt_id('YJkLo'))
-        print(helpers.encrypt_id(1) == helpers.decrypt_id('YJkLo')[0])
         return render_template("index.html")
-
 
 @public_router.route("/features", methods=['GET'])
 def features():
@@ -64,15 +94,6 @@ def contactpage():
     if request.method == "GET":
         return render_template("contact.html")
 
-
-
-# # Sitemap route
-# @public_router.route('/robots.txt')
-# @public_router.route('/sitemap.xml')
-# def static_from_root():
-#     return send_from_directory(app.static_folder, request.path[1:])
-
-
 # Terms and conditions page route
 @public_router.route("/termsandconditions", methods=['GET'])
 def terms_and_conditions():
@@ -111,96 +132,17 @@ def sendEmail():
         return render_template("index.html")
 
 
-@public_router.route("/login", methods=['GET', 'POST'])
-def login():
-    if request.method == "GET":
-        msg = helpers.checkForMessage()
-        return render_template("login.html", msg=msg)
-
-    elif request.method == "POST":
-        session.permanent = True
-
-        email: str = request.form.get("email", default=None)
-        password_to_check :str = request.form.get("password", default=None)
-        callback: Callback = auth_services.login(email,password_to_check)
-
-        if callback.Success:
-            return redirect("/admin/dashboard", code=302)
-        else:
-            return helpers.redirectWithMessage("login", callback.Message)
-
-
-@public_router.route('/logout',  methods=['GET'])
-def logout():
-
-    # Will clear out the session.
-    session.pop('UserID', None)
-    session.pop('UserEmail', None)
-    session.pop('UserPlan', None)
-    session.pop('CompanyID', None)
-    session.pop('Logged_in', False)
-    session.clear()
-
-
-    return redirect(url_for('public_router.login'))
-
-
-# TODO improve verification
-@public_router.route("/signup", methods=['GET', 'POST'])
-def signup():
-
-    if request.method == "GET":
-        msg = helpers.checkForMessage()
-        return render_template("signup.html", msg=msg)
-
-    elif request.method == "POST":
-
-        # User info
-        email = request.form.get("email", default=None)
-        fullname = request.form.get("fullname", default=None)
-        password = request.form.get("password", default=None)
-
-        # Company info
-        name = request.form.get("companyName", default=None)
-        # size = request.form.get("companySize", default=None)
-        url = request.form.get("websiteURL", default=None)
-        phone = request.form.get("phoneNumber", default=None)
-
-        if not (fullname and email and password
-                and name and url):
-            return helpers.redirectWithMessage("signup", "Error in getting all input information.")
-
-        # Split fullname
-        firstname = fullname.strip().split(" ")[0]
-        surname = fullname.strip().split(" ")[1]
-
-        # Signup new user
-        signup_callback: Callback = auth_services.signup(email.lower(), firstname, surname, password, name, phone, url)
-        if not signup_callback.Success:
-            print(signup_callback.Message)
-            return helpers.redirectWithMessage("signup", signup_callback.Message)
-
-        # Send verification email
-        mail_callback: Callback = mail_services.sendVerificationEmail(email, name)
-
-        # If error while sending verification email
-        if not mail_callback.Success:
-            helpers.redirectWithMessage('signup', 'Signed up successfully but > ' + mail_callback.Message
-                                        + '. Please contact TheSearchBaseStaff to activate your account.')
-
-        return helpers.redirectWithMessage("login", "We have sent you a verification email. Please use it to complete the sign up process.")
-
 @public_router.route("/account/verify/<payload>", methods=['GET'])
 def verify_account(payload):
     if request.method == "GET":
         try:
-            data = verificationSigner.loads(payload)
+            data = helpers.verificationSigner.loads(payload, salt='email-confirm-key')
             email = data.split(";")[0]
-            user_callback : Callback = user_services.verifyByEmail(email)
+            user_callback: Callback = user_services.verifyByEmail(email)
             if not user_callback.Success: raise Exception(user_callback.Message)
 
-            return helpers.redirectWithMessage("login", "Your email has been verified. You can now access your account.")
+            return redirect("/login")
 
         except Exception as e:
             print(e)
-            return helpers.redirectWithMessage("login", "Email verification link failed. Please contact Customer Support in order to resolve this.")
+            return redirect("/login")

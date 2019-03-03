@@ -1,31 +1,38 @@
-from flask import jsonify, json
-from services import user_services, admin_services, role_services, company_services, mail_services
-from models import Callback, db, User, Company
-from flask import Blueprint, request, redirect, session
-from utilities import helpers, json_utils
-import string
 import random
+import string
+
+from flask import Blueprint, request, redirect
+from flask import json
+
+from models import Callback, db, User
+from services import user_services, admin_services, role_services, mail_services
+from utilities import helpers
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 users_router: Blueprint = Blueprint('users_router', __name__, template_folder="../../templates")
 
 
 # Update roles
-@users_router.route("/admin/roles", methods=['PUT'])
+@users_router.route("/roles", methods=['PUT'])
+@jwt_required
 def update_roles():
+    user = get_jwt_identity()['user']
+
     if request.method == "PUT":
 
         # Get the admin user who is logged in and wants to edit.
-        callback: Callback = user_services.getByID(session.get('UserID', 0))
+        callback: Callback = user_services.getByID(user.get('id', 0))
         if not callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry, your account doesn't exist. Try again please!")
         adminUser: User = callback.Data
 
         # Check if the admin user is authorised for such an operation.
         if not adminUser.Role.Name == 'Owner':
-            return helpers.jsonResponse(False, 401, "Sorry, You're not authorised. Only owners are allowed to edit user's permissions.")
+            return helpers.jsonResponse(False, 401,
+                                        "Sorry, You're not authorised. Only owners are allowed to edit user's permissions.")
 
         # New roles values
-        values = request.form.get("data", default=None)
+        values = request.form.get("data", None)
         if not values:
             return helpers.jsonResponse(False, 400, "Please provide all required info for the roles.")
         values = json.loads(values)
@@ -51,11 +58,15 @@ def update_roles():
 
 
 # Get all users for logged in company
-@users_router.route("/admin/users", methods=['GET'])
-def admin_users():
+@users_router.route("/users", methods=['GET'])
+@jwt_required
+def users():
+    user = get_jwt_identity()['user']
+
     if request.method == "GET":
-        users_callback: Callback = user_services.getAllByCompanyID(session.get('CompanyID', 0))
-        role_callback: Callback =  role_services.getAllByCompanyID(session.get('CompanyID', 0))
+
+        users_callback: Callback = user_services.getAllByCompanyID(user.get('companyID', 0))
+        role_callback: Callback = role_services.getAllByCompanyID(user.get('companyID', 0))
 
         roles = []
         userWithRoles = []
@@ -64,16 +75,20 @@ def admin_users():
             roles = helpers.getListFromSQLAlchemyList(role_callback.Data)
             userWithRoles = helpers.mergeRolesToUserLists(users, roles)
 
-        return admin_services.render("admin/users.html", users=userWithRoles, roles=roles)
+        return helpers.jsonResponse(True, 200, "Users have been retrieved",
+                                    {"users": userWithRoles, "roles": roles})
 
 
 # Create a new user under the logged in user's company
-@users_router.route("/admin/user", methods=['POST'])
-def admin_users_add():
-    if request.method == "POST":
+@users_router.route("/user", methods=['PUT', 'POST'])
+@jwt_required
+def user():
+    user = get_jwt_identity()['user']
+
+    if request.method == "PUT":
 
         # Get the admin user who is logged in and wants to create a new user.
-        callback: Callback = user_services.getByID(session.get('UserID', 0))
+        callback: Callback = user_services.getByID(user.get('id', 0))
         if not callback.Success:
             return redirect("login")
         adminUser: User = callback.Data
@@ -84,11 +99,15 @@ def admin_users_add():
 
         # If authorised then complete the process
         # Get submitted user info
-        firstname = request.form.get("firstname", default='').strip()
-        surname = request.form.get("surname", default='').strip()
-        email = request.form.get("email", default='').strip()
-        role = request.form.get("role", default='').strip()
+        name = request.form.get("name", '').strip()
+        firstname = name.split(" ")[0]
+        surname = name.split(" ")[len(name.split(" ")) - 1]
+        email = request.form.get("email", '').strip()
+        role = request.form.get("type", "")
         password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
+
+        if role != "Admin" and role != "User":
+            return helpers.jsonResponse(False, 400, "Role must be Admin or User")
 
         # Check if info valid
         if not helpers.isStringsLengthGreaterThanZero(firstname, surname, email, role):
@@ -99,8 +118,8 @@ def admin_users_add():
             return helpers.jsonResponse(False, 400, "Please provide a valid email.")
 
         # Check if email is already used
-        user: User = user_services.getByEmail(email).Data
-        if user:
+        userTest: User = user_services.getByEmail(email).Data
+        if userTest:
             return helpers.jsonResponse(False, 400, "Email is already on use.")
 
         # Get the role to be assigned for the user
@@ -115,25 +134,23 @@ def admin_users_add():
         if not callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry couldn't create the user. Try again!")
 
-        email_callback : Callback = mail_services.addedNewUserEmail(session.get('UserEmail', "Error"), email, password)
+        email_callback: Callback = mail_services.addedNewUserEmail(user.get('email', "Error"), email, password)
         if not email_callback.Success:
-            return json.dumps({'success': False, 'msg': " New user was created but could not send email with login information. Please delete and readd the user."}), \
+            return json.dumps({'success': False,
+                               'msg': " New user was created but could not send email with login information. Please delete and readd the user."}), \
                    400, {'ContentType': 'application/json'}
 
         return json.dumps({'success': True, 'msg': " User has been created successfully!"}), \
-                   200, {'ContentType': 'application/json'}
+               200, {'ContentType': 'application/json'}
 
-
-# Update user with id <userID>
-@users_router.route("/admin/user/<userID>", methods=['PUT'])
-def update_user(userID):
-    if request.method == "PUT":
+    if request.method == "POST":
 
         # User info
-        firstname = request.form.get("firstname", default='').strip()
-        surname = request.form.get("surname", default='').strip()
-        email = request.form.get("email", default='').strip()
-        role = request.form.get("role", default='').strip()
+        userID = request.json.get("ID", 0)
+        firstname = request.json.get("Firstname", '').strip()
+        surname = request.json.get("Surname", '').strip()
+        email = request.json.get("Email", '').strip()
+        role = request.json.get("Role", {}).get("Name", None)
 
         if not helpers.isStringsLengthGreaterThanZero(firstname, surname, email, role):
             return helpers.jsonResponse(False, 400, "Please provide all required info for the new user.")
@@ -150,7 +167,7 @@ def update_user(userID):
         userToUpdate: User = callback.Data
 
         # Get the admin user who is logged in and wants to edit.
-        callback: Callback = user_services.getByID(session.get('UserID', 0))
+        callback: Callback = user_services.getByID(user.get('id', 0))
         if not callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry, you account doesn't exist. Try again please!")
         adminUser: User = callback.Data
@@ -174,12 +191,15 @@ def update_user(userID):
         return helpers.jsonResponse(True, 200, "User updated successfully!")
 
 
+@users_router.route("/user_delete", methods=['POST'])
+@jwt_required
+def user_delete():
+    user = get_jwt_identity()['user']
 
-@users_router.route("/admin/user/<userID>", methods=['DELETE'])
-def delete_user(userID):
-    if request.method == "DELETE":
+    if request.method == "POST":
 
         # Get the user to be deleted.
+        userID = request.json.get("ID", 0)
         if not userID: userID = 0
         callback: Callback = user_services.getByID(userID)
         if not callback.Success:
@@ -187,7 +207,7 @@ def delete_user(userID):
         userToBeDeleted: User = callback.Data
 
         # Get the admin user who is logged in and wants to delete.
-        callback: Callback = user_services.getByID(session.get('UserID', 0))
+        callback: Callback = user_services.getByID(user.get('id', 0))
         if not callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry, error occurred. Try again please!")
         adminUser: User = callback.Data
@@ -201,5 +221,4 @@ def delete_user(userID):
         if not callback.Success:
             return helpers.jsonResponse(False, 500, "Sorry, error occurred. Try again please!")
 
-        print("Success.  " + userID)
         return helpers.jsonResponse(True, 200, "User deleted successfully!")

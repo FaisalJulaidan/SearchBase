@@ -1,8 +1,8 @@
-from flask import redirect, url_for, session, render_template, json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, Block, BlockType, Solution, ChatbotSession
-from services import assistant_services, user_services
-from datetime import datetime
-from sqlalchemy import inspect
+from flask import json, after_this_request, request
+from models import db, Role, Company, Assistant, Plan, ChatbotSession, Database, Candidate
+from services import user_services
+from datetime import datetime, timedelta
+from enum import Enum
 from hashids import Hashids
 from config import BaseConfig
 import stripe
@@ -10,17 +10,23 @@ import re
 from io import BytesIO
 import gzip
 import functools
+import enums
+from itsdangerous import URLSafeTimedSerializer
+
+# Signer
+verificationSigner = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
 
 
+# ID Hasher
+# IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
-
-
 def encrypt_id(id):
     return hashids.encrypt(id)
 
 
 def decrypt_id(id):
     return hashids.decrypt(id)
+
 
 
 # Generates dummy data for testing
@@ -34,83 +40,42 @@ def gen_dummy_data():
     aramco = Company.query.filter(Company.Name == "Aramco").first()
     sabic = Company.query.filter(Company.Name == "Sabic").first()
 
-    # Create Assistatns for Aramco and Sabic companies
-    reader_a = Assistant(Name="Reader", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
+    # Create Assistants for Aramco and Sabic companies
+    reader_a = Assistant(Name="Reader", Message="Hey there",
+                         TopBarText="Aramco Bot", SecondsUntilPopup=1,
+                         Active=True, Company=aramco,
+                         Flow= {
+                             "groups": [
+                                 {
+                                     "id": "tisd83f4",
+                                     "name": "group 1",
+                                     "description": "The best group",
+                                     "blocks": [
+                                         {
+                                             "ID": "834hf",
+                                             "DataType": {
+                                                 "name": "Email",
+                                                 "validation": "Email"
+                                             },
+                                             "Type": "User Input",
+                                             "StoreInDB": True,
+                                             "Skippable": False,
+                                             "Content": {
+                                                 "action": "Go To Next Block",
+                                                 "text": "What's your email?",
+                                                 "blockToGoID": None,
+                                                 "afterMessage": "Your input is being processed..."
+                                             }
+                                         }
+                                     ]
+                                 }
+                             ]
+                         })
     helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
 
     reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
     helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
 
-    ## Create Blocks
-    #db.session.add(Block(Type=BlockType.Question, Order=1, StoreInDB=True, Assistant=reader_a, Content={
-    #    "answers": [
-    #      {
-    #        "action": "Go To Next Block",
-    #        "text": "Yes",
-    #        "timesClicked": 0,
-    #        "keywords": [
-    #          "smoker",
-    #          "sad"
-    #        ],
-    #        "blockToGoId": 0,
-    #        "afterMessage": 'Yesss!!'
-    #      },
-    #      {
-    #        "action": "Go To Next Block",
-    #        "text": "No",
-    #        "timesClicked": 0,
-    #        "keywords": [
-    #          "smoker",
-    #          "sad"
-    #        ],
-    #        "blockToGoId": 1,
-    #        "afterMessage": 'NOOOO!!'
-
-    #      }
-    #    ],
-    #    "text": "Do you smoke?",
-    #  }))
-    db.session.add(Block(Type=BlockType.UserInput, Order=1, StoreInDB=True, Assistant=reader_a, Content={
-        "action": "Go To Next Block",
-        "text": "What's your email?",
-        "blockToGoID": None,
-        "storeInDB": True,
-        "validation": "Email",
-        "afterMessage": 'Your input is being processed...'
-    }))
-    db.session.add(Block(Type=BlockType.UserInput, Order=2, StoreInDB=True, Assistant=reader_a, Content={
-        "action": "Go To Next Block",
-        "text": "Give me some input",
-        "blockToGoID": None,
-        "storeInDB": True,
-        "validation": "Ignore",
-        "afterMessage": 'Your input is being processed...'
-    }))
-
-    #db.session.add(Block(Type=BlockType.FileUpload, Order=3, StoreInDB=True, Assistant=reader_a, Content={
-    #    "action": "Go To Next Block",
-    #    "fileTypes": [
-    #    "doc",
-    #    "pdf"
-    #    ],
-    #    "text": "Upload your CV",
-    #    "blockToGoID": None,
-    #    "afterMessage": 'File is being uploaded...'
-    #}))
-
-    #db.session.add(Block(Type=BlockType.Solutions, Order=4, StoreInDB=True, Assistant=reader_a, Content={
-    #    "showTop": 5,
-    #    "afterMessage": 'DONE!!!!',
-    #    "action": "End Chat",
-    #    "blockToGoID": 0
-    #}))
-
-    db.session.add(Block(Type=BlockType.Solutions, Order=3, StoreInDB=True, Assistant=reader_a, Content={
-        "showTop": 5,
-        "afterMessage": 'DONE!!!!',
-        "action": "End Chat",
-        "blockToGoID": 0
-    }))
 
     # Create Roles
     db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
@@ -120,6 +85,7 @@ def gen_dummy_data():
     db.session.add(Role(Name="Owner", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
     db.session.add(Role(Name="Admin", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
     db.session.add(Role(Name="User", Company= sabic, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
+
 
     # Get Roles
     owner_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "Owner").first()
@@ -131,8 +97,10 @@ def gen_dummy_data():
     user_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "User").first()
 
     # Create Users
-    user_services.create(firstname='Ahmad', surname='Hadi', email='aa@aa.com', password='123', phone='4344423',
+    user_services.create(firstname='Sylvester', surname='Stallone', email='aa@aa.com', password='123', phone='4344423',
                          company=aramco, role=owner_aramco, verified=True)
+    user_services.create(firstname='Evg', surname='Test', email='evgeniy67@abv.bg', password='123', phone='4344423',
+                         company=aramco, role=admin_aramco, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='4344423', company=aramco,
                          role=admin_aramco, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', phone='4344423', company=aramco,
@@ -142,54 +110,113 @@ def gen_dummy_data():
                          role=owner_sabic, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='4344423', company=sabic,
                          role=admin_sabic, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e6@e.com', password='123', phone='4344423', company=sabic,
-                         role=user_sabic, verified=True)
+    user_services.create(firstname='Faisal', surname='Julaidan', email='julaidan.faisal@gmail.com', password='123', phone='4344423', company=sabic,
+                         role=user_sabic, verified=False)
+
+
+    # Chatbot Sessions
+    data = {
+        "collectedData": [
+            {
+                "blockID": 1,
+                "questionText": "What is your email?",
+                "dataType": 'Email',
+                "input": "faisal@gmail.com",
+                "keywords": ['faisal', 'developer', 'email']
+            },
+            {
+                "blockID": 2,
+                "questionText": "How are you doing?",
+                "dataType": 'No Type',
+                "input": "I am fine thank you",
+                "keywords": []
+            },
+            {
+                "blockID": 3,
+                "questionText": "When are you available?",
+                "dataType": 'Availability',
+                "input": "Only weekend days",
+                "keywords": []
+            },
+            {
+                "blockID": 4,
+                "questionText": "What is your friend's email?",
+                "dataType": "Email",
+                "input": "friend@hotmail.com",
+                "keywords": []
+            }
+        ]
+    }
+
+    db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now(),
+                                  TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
+                                  UserType=enums.UserType.JobSeeker, Assistant=reader_a))
+
+    db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now() - timedelta(days=10),
+                                  TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
+                                  UserType=enums.UserType.CandidateSeeker, Assistant=reader_a))
+
+    # add chatbot session in bulk
+    for i in range(50):
+        db.session.add(ChatbotSession(Data=data, FilePath=None, DateTime=datetime.now() - timedelta(days=i),
+                                      TimeSpent=i+40, SolutionsReturned=i+3, QuestionsAnswered=i+4,
+                                      UserType=enums.UserType.JobSeeker, Assistant=reader_a))
+
+
+    db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidates, Company=aramco)
+    db2: Database = Database(Name='db2', Type=enums.DatabaseType.Candidates, Company=aramco)
+
+    db.session.add(db1)
+    db.session.add(db2)
+
+    db.session.add(addCandidate(db1, 'Faisal', 2000, "Software Engineer", "python, java, javascript, SQL",
+                                5, "London","contract", 30))
+
+    db.session.add(addCandidate(db1, 'Mohammed', 4000, "Software Engineer", "python, SQL",
+                                10, "Cardiff","Contract", 50))
+
+    db.session.add(addCandidate(db2, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
+                                2, "Cardiff","Contract", 20))
+
+    seed() # will save changes as well
+
+
+def addCandidate(db, name, ds, dp, cs, ye, pl, pe, ehr):
+    return Candidate(Database=db, Name=name,
+                     DesiredSalary=ds,
+                     DesiredPosition=dp,
+                     CandidateSkills =cs,
+                     YearsExp = ye,
+                     PreferredLocation = pl,
+                     PreferredEmploymentType = pe,
+                     DesiredPayRate = ehr)
+
+
+
+
+def seed():
 
     # Plans
-    db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic', MaxSolutions=600, MaxBlocks=20, ActiveBotsCap=2, InactiveBotsCap=3,
+    db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic', MaxSolutions=600, MaxBlocks=100, ActiveBotsCap=2,
+                        InactiveBotsCap=3,
                         AdditionalUsersCap=5, ExtendedLogic=False, ImportDatabase=False, CompanyNameOnChatbot=False))
 
     db.session.add(
-        Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate', MaxSolutions=5000, MaxBlocks=20, ActiveBotsCap=4, InactiveBotsCap=8,
+        Plan(ID='plan_D3lpeLZ3EV8IfA', Nickname='ultimate', MaxSolutions=5000, MaxBlocks=100, ActiveBotsCap=4,
+             InactiveBotsCap=8,
              AdditionalUsersCap=10, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
     db.session.add(
-        Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=20, ActiveBotsCap=10, InactiveBotsCap=30,
+        Plan(ID='plan_D3lp9R7ombKmSO', Nickname='advanced', MaxSolutions=30000, MaxBlocks=100, ActiveBotsCap=10,
+             InactiveBotsCap=30,
              AdditionalUsersCap=999, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
-    db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=30,  ActiveBotsCap=2, InactiveBotsCap=2,
+    db.session.add(Plan(ID='plan_D48N4wxwAWEMOH', Nickname='debug', MaxSolutions=100, MaxBlocks=100, ActiveBotsCap=2,
+                        InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
-    # Save all changes
+
     db.session.commit()
-
-
-def hardRedirectWithMessage(route, message):
-    session["returnMessage"] = message
-    return redirect(route)
-
-
-def redirectWithMessage(route, message):
-    session["returnMessage"] = message
-    if "/" in route:
-        return redirect(route)
-    else:
-        return redirect(url_for("." + route))
-
-
-def redirectWithMessageAndAssistantID(route, assistantID, message):
-    session["returnMessage"] = message
-    return redirect(url_for("." + route, assistantID=assistantID))
-    if "/" in route:
-        return redirect(route)
-    else:
-        return redirect(url_for("." + route, assistantID=assistantID))
-
-def checkForMessage():
-    message = session.get('returnMessage', "")
-    if message:
-        session["returnMessage"] = ""
-    return message
 
 
 def getPlanNickname(SubID=None):
@@ -216,8 +243,16 @@ def isValidEmail(email: str) -> bool:
 
 # Convert a SQLAlchemy object to a single dict
 def getDictFromSQLAlchemyObj(obj):
-    return {c.key: getattr(obj, c.key)
-            for c in inspect(obj).mapper.column_attrs if c.key not in ("Password")}
+    d = {}
+    for attr in obj.__table__.columns:
+        key = attr.name
+        if not key == 'Password':
+            d[key] = getattr(obj, key)
+            if isinstance(d[attr.name], Enum):
+                d[key] = d[key].value
+    return d
+    # return {c.key: getattr(obj, c.key)
+    #         for c in inspect(obj).mapper.column_attrs if c.key not in ("Password")}
 
 
 # Convert a SQLAlchemy list of objects to a list of dicts
@@ -245,10 +280,6 @@ def isStringsLengthGreaterThanZero(*args):
 
 
 def jsonResponse(success: bool, http_code: int, msg: str, data=None):
-    # print("success: ", success)
-    # print("http_code: ", http_code)
-    # print("msg: ", msg)
-    # print("data: ", data)
     return json.dumps({'success': success, 'code': http_code, 'msg': msg, 'data': data}), \
         http_code, {'ContentType': 'application/json'}
 

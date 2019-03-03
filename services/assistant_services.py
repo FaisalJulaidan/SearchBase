@@ -1,46 +1,46 @@
 from models import db, Company, Assistant, Callback
+from sqlalchemy import and_
 from utilities import helpers
-from flask import request
 
-def getByID(id) -> Callback:
+
+def getAssistantByHashID(hashID):
+    try:
+        assistantID = helpers.decrypt_id(hashID)
+        if len(assistantID) == 0:
+            return Callback(False, "Assistant not found!", None)
+
+        # Get result and check if None then raise exception
+        assistant: Assistant = db.session.query(Assistant).get(assistantID[0])
+        if not assistant: raise Exception
+        return Callback(True, "", assistant)
+
+
+    except Exception as exc:
+        print("getAssistantByHashID() ERROR:" + str(exc))
+        return Callback(False, "Assistant not found!")
+
+    # finally:
+            # db.session.close()
+
+def getByID(id, companyID) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(Assistant).get(id)
+        result = db.session.query(Assistant)\
+            .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).first()
         if not result: raise Exception
-        return Callback(True, "Got assistant by id successfully.", result)
+        return Callback(True, "Got assistant successfully.", result)
 
     except Exception as exc:
         print(exc)
-        db.session.rollback()
-        return Callback(False, 'Assistant not found.')
+        return Callback(False, 'Could not get the assistant.')
     # finally:
        # db.session.close()
 
 
-def getAssistantByHashID(hashID):
-
-    assistantID = helpers.decrypt_id(hashID)
-    # If was decrypted successfully
-    if len(assistantID) == 0:
-        return Callback(False, "Assistant not found.", None)
-
-    # Get the assistant and check if it is there
-    assistant_cb = getByID(assistantID[0])
-    if not assistant_cb.Success:
-        return assistant_cb
-
-    # check if its deactivated excluding on test page. The test page is connect.html
-    requestHeader = str(request.headers.get("Referer"))
-    if not assistant_cb.Data.Active and ("connect" not in requestHeader or "/admin/assistant/" not in requestHeader):
-        return Callback(False, "Assistant not active.", None)
-
-    return assistant_cb
-
-
-def getByName(nickname) -> Callback:
+def getByName(name) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(Assistant).filter(Assistant.Name == nickname).first()
+        result = db.session.query(Assistant).filter(Assistant.Name == name).first()
         if not result: raise Exception
 
         return Callback(True,
@@ -49,8 +49,7 @@ def getByName(nickname) -> Callback:
     except Exception as exc:
         print(exc)
         db.session.rollback()
-        return Callback(False,
-                        'Could not get the assistant by nickname.')
+        return Callback(False, 'Could not get the assistant by nickname.')
     # finally:
        # db.session.close()
 
@@ -74,11 +73,11 @@ def getAll(companyID) -> Callback:
        # db.session.close()
 
 
-def create(nickname, route, message, topBarText, secondsUntilPopup, company: Company) -> Assistant or None:
+def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, companyID) -> Assistant or None:
     try:
-        assistant = Assistant(Name=nickname, Route=route, Message=message, TopBarText=topBarText,
-                              SecondsUntilPopup=secondsUntilPopup,
-                              Company=company)
+        assistant = Assistant(Name=name, Route=None, Message=message, TopBarText=topBarText,
+                              SecondsUntilPopup=secondsUntilPopup, MailEnabled=mailEnabled, MailPeriod=mailPeriod,
+                              CompanyID=companyID)
         db.session.add(assistant)
         # Save
         db.session.commit()
@@ -91,40 +90,41 @@ def create(nickname, route, message, topBarText, secondsUntilPopup, company: Com
        # db.session.close()
 
 
-def update(id, nickname, message, topBarText, secondsUntilPopup)-> Callback:
+def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod)-> Callback:
     try:
-        db.session.query(Assistant).filter(Assistant.ID == id).update({'Name': nickname,
+        db.session.query(Assistant).filter(Assistant.ID == id).update({'Name': name,
                                                                        'Message': message,
                                                                        'TopBarText': topBarText,
-                                                                       'SecondsUntilPopup': secondsUntilPopup})
+                                                                       'SecondsUntilPopup': secondsUntilPopup,
+                                                                       "MailEnabled": mailEnabled,
+                                                                       "MailPeriod": mailPeriod})
         db.session.commit()
-        return Callback(True, nickname+' Updated Successfully')
+        return Callback(True, name + ' Updated Successfully')
 
     except Exception as exc:
         print(exc)
         db.session.rollback()
         return Callback(False,
-                        "Couldn't update assistant "+nickname)
+                        "Couldn't update assistant "+name)
     # finally:
        # db.session.close()
 
 
 
-def changeStatus(id, active):
+def changeStatus(assistant: Assistant, status):
     try:
-        if type(active) is str:
-            if active == "True": active = True
-            elif active == "False": active = False
-            else: raise Exception
+        isActive = False
+        if status:
+           isActive = True
 
-        db.session.query(Assistant).filter(Assistant.ID == id).update({'Active': active})
+        assistant.Active = isActive
         db.session.commit()
         return Callback(True, 'Assistant status has been changed.')
 
     except Exception as exc:
         print("Error in assistant_services.changeStatus(): ", exc)
         db.session.rollback()
-        return Callback(False, 'Sorry, Could not change the assistant\' status.')
+        return Callback(False, "Could not change the assistant's status.")
     # finally:
        # db.session.close()
 
@@ -144,7 +144,7 @@ def removeByID(id) -> Callback:
 
 def checkOwnership(assistantID, companyID):
     try:
-        assistant_callback : Callback = getByID(assistantID)
+        assistant_callback : Callback = getByID(assistantID, companyID)
         if not assistant_callback.Success: 
             return Callback(False, "Error in retrieving necessary information.")
 
@@ -157,5 +157,33 @@ def checkOwnership(assistantID, companyID):
         print("Error in assistant_services.checkOwnership(): ", exc)
         db.session.rollback()
         return Callback(False, 'Error in verifying ownership over assistant.')
-    # finally:
-       # db.session.close()
+
+
+# def getNotificationsRegisterByID(id):
+#     try:
+#         # Get result and check if None then raise exception
+#         result = db.session.query(NotificationsRegister).filter(NotificationsRegister.AssistantID == id).all()
+#         if not result: raise Exception
+#
+#         return Callback(True,
+#                         "Got NotificationsRegister by assistant ID successfully.",
+#                         result)
+#     except Exception as exc:
+#         print(exc)
+#         db.session.rollback()
+#         return Callback(False, 'Could not get the NotificationsRegister by assistant ID.')
+#
+#
+# def getAllNotificationsRegisters():
+#     try:
+#         # Get result and check if None then raise exception
+#         result = db.session.query(NotificationsRegister).all()
+#         if not result: raise Exception
+#
+#         return Callback(True,
+#                         "Got NotificationsRegisters successfully.",
+#                         result)
+#     except Exception as exc:
+#         print(exc)
+#         db.session.rollback()
+#         return Callback(False, 'Could not get the NotificationsRegisters.')

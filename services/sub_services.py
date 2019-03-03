@@ -115,10 +115,8 @@ def getPlanByID(planID) -> Callback:
         result = db.session.query(Plan).filter(Plan.ID == planID).first()
         if not result: raise Exception
 
-        return Callback(True, 'Plan found.',
-                        result)
+        return Callback(True, 'Plan found.', result)
     except Exception as e:
-        db.session.rollback()
         return Callback(False, 'Could not find a plan with ID ' + planID)
 
     # finally:
@@ -133,7 +131,6 @@ def getPlanByNickname(nickname) -> Callback:
         return Callback(True, 'No message.',
                         result)
     except Exception as e:
-        db.session.rollback()
         return Callback(False, 'Could not find a plan with ' + nickname + ' nickname')
 
     # finally:
@@ -147,7 +144,6 @@ def getStripePlan(planID) -> Callback:
 
         return Callback(True, 'No message.', result)
     except Exception as e:
-        db.session.rollback()
         return Callback(False, "This plan doesn't exist! Make sure the plan ID is correct.")
 
     # finally:

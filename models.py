@@ -150,9 +150,7 @@ class Assistant(db.Model):
     Company = db.relationship('Company', back_populates='Assistants')
 
     # NotificationsRegister = db.relationship('NotificationsRegister', back_populates='Assistant')
-    Solutions = db.relationship('Solution', back_populates='Assistant')
     Statistics = db.relationship('Statistics', back_populates='Assistant')
-    BlockGroups = db.relationship('BlockGroup', back_populates='Assistant')
     ChatbotSessions = db.relationship('ChatbotSession', back_populates='Assistant')
 
     # Constraints:
@@ -176,9 +174,6 @@ class Solution(db.Model):
     IDReference = db.Column(db.String(64), nullable=True)
     automaticSolutionAlerts = db.Column(db.Boolean(), nullable=False, default=False)
 
-    # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='Solutions')
 
     def __repr__(self):
         return '<Solution {}>'.format(self.ID)
@@ -281,63 +276,6 @@ class StoredFile(db.Model):
 
     def __repr__(self):
         return '<StoredFile {}>'.format(self.ID)
-
-
-class BlockGroup(db.Model):
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Name = db.Column(db.String(128), nullable=False)
-    Description = db.Column(db.String(128), nullable=False)
-
-    # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='BlockGroups')
-    Blocks = db.relationship('Block', back_populates='Group', order_by='Block.Order',
-                             cascade="all, delete, delete-orphan")
-
-    # Constraints:
-    # __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
-
-    def __repr__(self):
-        return '<BlockGroup {}>'.format(self.Name)
-
-
-class Block(db.Model):
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Type = db.Column(Enum(enums.BlockType), nullable=False)
-    DataType = db.Column(Enum(enums.DataType), nullable=False)
-    Order = db.Column(db.Integer, nullable=False)
-    Content = db.Column(MagicJSON, nullable=False)
-    StoreInDB = db.Column(db.Boolean(), nullable=False, default=True)
-    Skippable = db.Column(db.Boolean(), nullable=False, default=False)
-
-    # Relationships:
-    GroupID = db.Column(db.Integer, db.ForeignKey('block_group.ID', ondelete='cascade'), nullable=False)
-    Group = db.relationship('BlockGroup', back_populates='Blocks')
-
-    #
-    # DataCategoryID = db.Column(db.Integer, db.ForeignKey('data_category.ID', ondelete='SET NULL'))
-    # DataCategory = db.relationship('DataCategory', back_populates='Blocks')
-
-    # Labels = db.relationship('BlockLabel', back_populates='Blocks', secondary=BlocksLabels)
-
-    # Constraints:
-    # __table_args__ = (db.UniqueConstraint('AssistantID', 'Order', name='uix1_question'),)
-
-    def __repr__(self):
-        return '<Block {}>'.format(self.Type)
-
-
-class BlockLabel(db.Model):
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Text = db.Column(db.String(128), nullable=False)
-    Colour = db.Column(db.String(128), nullable=False)
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )
-
-    # Relationships:
-    # Blocks = db.relationship('Block', back_populates='Labels', secondary=BlocksLabels)
-
-    def __repr__(self):
-        return '<BlockLabel {}>'.format(self.Text)
 
 
 class Database(db.Model):

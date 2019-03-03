@@ -9,9 +9,6 @@ users_router: Blueprint = users_router
 from .account.changePassword import changePassword_router
 changePassword_router: Blueprint = changePassword_router
 
-from .assistant.solutions import solutions_router
-solutions_router: Blueprint = solutions_router
-
 from .subscription.sub import sub_router
 sub_router: Blueprint = sub_router
 

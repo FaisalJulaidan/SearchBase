@@ -3,12 +3,11 @@ from threading import Thread
 
 from flask import render_template, current_app
 from flask_mail import Mail, Message
-from itsdangerous import URLSafeTimedSerializer
 
 from models import Callback
 from services import user_services, assistant_services, analytics_services
+from utilities import helpers
 
-verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 mail = Mail()
 
 
@@ -47,7 +46,8 @@ def sendVerificationEmail(email, companyName) -> Callback:
     try:
 
         payload = email + ";" + companyName
-        link = "https://www.thesearchbase.com/account/verify/" + verificationSigner.dumps(payload)
+        link = "https://www.thesearchbase.com/account/verify/" +\
+               helpers.verificationSigner.dumps(payload, salt='email-confirm-key')
 
         send_email((email), 'Account verification',
                    '/emails/verification.html', link=link)
@@ -57,6 +57,23 @@ def sendVerificationEmail(email, companyName) -> Callback:
     except Exception as e:
         print("sendVerificationEmail() Error: ", e)
         return Callback(False, 'Could not send a verification email to ' + email)
+
+
+def sendPasswordResetEmail(email, companyID):
+    try:
+
+        payload = email + ";" + str(companyID)
+        link = "https://www.thesearchbase.com/reset_password/" +\
+               helpers.verificationSigner.dumps(payload, salt='reset-pass-key')
+
+        send_email((email), 'Password reset',
+                   '/emails/reset_password.html', link=link)
+
+        return Callback(True, 'Password reset email is on its way to ' + email)
+
+    except Exception as e:
+        print("sendPasswordResetEmail() Error: ", e)
+        return Callback(False, 'Could not send a password reset email to ' + email)
 
 
 def sendNewUserHasRegistered(name, email, companyName, tel):
@@ -70,22 +87,6 @@ def sendNewUserHasRegistered(name, email, companyName, tel):
     except Exception as e:
         print("sendNewUserHasRegistered() Error: ", e)
         return Callback(False, 'Could not send a signed up email')
-
-
-def sendPasswordResetEmail(email, companyID):
-    try:
-
-        payload = email + ";" + str(companyID)
-        link = "https://www.thesearchbase.com/reset_password/" + verificationSigner.dumps(payload)
-
-        send_email((email), 'Password reset',
-                   '/emails/reset_password.html', link=link)
-
-        return Callback(True, 'Password reset email is on its way to ' + email)
-
-    except Exception as e:
-        print("sendPasswordResetEmail() Error: ", e)
-        return Callback(False, 'Could not send a password reset email to ' + email)
 
 
 def addedNewUserEmail(adminEmail, targetEmail, password):

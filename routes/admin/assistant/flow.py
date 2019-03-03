@@ -1,6 +1,6 @@
 from flask import Blueprint, request
-from services import assistant_services, flow_services, user_services
-from models import Callback, Assistant, User, BlockGroup
+from services import assistant_services, flow_services
+from models import Callback, Assistant
 from utilities import helpers
 from flask_jwt_extended import jwt_required, get_jwt_identity
 

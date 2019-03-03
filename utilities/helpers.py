@@ -1,9 +1,8 @@
 from flask import json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, Block, ChatbotSession, BlockGroup, Database, Candidate
+from models import db, Role, Company, Assistant, Plan, ChatbotSession, Database, Candidate
 from services import user_services
 from datetime import datetime, timedelta
 from enum import Enum
-from sqlalchemy import inspect
 from hashids import Hashids
 from config import BaseConfig
 import stripe
@@ -12,6 +11,10 @@ from io import BytesIO
 import gzip
 import functools
 import enums
+from itsdangerous import URLSafeTimedSerializer
+
+# Signer
+verificationSigner = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
 
 
 # ID Hasher

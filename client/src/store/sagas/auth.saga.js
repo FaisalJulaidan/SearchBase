@@ -42,9 +42,10 @@ function* login({email, password}) {
 
     } catch (error) {
         console.log(error);
-        yield destroyMessage();
-        yield errorMessage(error.response.data.msg, 0);
         yield put(authActions.loginFailure(error.response.data));
+        yield errorMessage(error.response.data.msg, 0);
+
+
     }
 }
 
@@ -70,7 +71,7 @@ function* signup({signupDetails}) {
     } catch (error) {
         console.log(error);
         yield put(authActions.signupFailure(error.response.data));
-        return yield errorMessage(error.response.data.msg, 0);
+        yield errorMessage(error.response.data.msg, 0);
     }
 }
 
@@ -80,7 +81,7 @@ function* watchSignup() {
 
 
 // Reset Password
-function* resetPassword({data}) {
+function* forgetPassword({data}) {
     try {
         loadingMessage('Sending reset password email...', 0);
         yield axios.post(`/api/reset_password`, {...data}, {
@@ -96,8 +97,8 @@ function* resetPassword({data}) {
     }
 }
 
-function* watchResetPassword() {
-    yield takeLatest(actionTypes.RESET_PASSWORD_REQUEST, resetPassword)
+function* watchForgetPassword() {
+    yield takeLatest(actionTypes.RESET_PASSWORD_REQUEST, forgetPassword)
 }
 
 function* newResetPassword({data}) {
@@ -109,7 +110,7 @@ function* newResetPassword({data}) {
         yield successMessage('The password for your account has been updated');
         yield put(authActions.newResetPasswordSuccess());
         yield history.push('/login');
-        yield successMessage('Login using your new password');
+        yield successMessage('Login using your new password', 0);
 
     } catch (error) {
         console.log(error);
@@ -166,7 +167,7 @@ export function* authSaga() {
     yield all([
         watchLogin(),
         watchSignup(),
-        watchResetPassword(),
+        watchForgetPassword(),
         watchLogout(),
         watchCheckAuthTimeout(),
         watchRefreshToken(),

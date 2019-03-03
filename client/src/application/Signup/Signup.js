@@ -56,9 +56,6 @@ class Signup extends React.Component {
         callback();
     };
 
-    // handleLogout = () => {
-    //     this.props.dispatch(authActions.logout());
-    // };
 
     render() {
         const {getFieldDecorator} = this.props.form;
@@ -200,7 +197,7 @@ class Signup extends React.Component {
 
                         <Row type="flex" justify="center">
                             <Col>
-                                <Link to="/login">Already have an account?</Link>
+                                <Link style={{color: "#9254de"}} to="/login">Already have an account?</Link>
                             </Col>
                         </Row>
 

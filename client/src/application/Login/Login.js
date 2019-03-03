@@ -76,13 +76,13 @@ class Login extends React.Component {
 
                         <Row type="flex" justify="center">
                             <Col>
-                                <Link to="/forget_password">Forgot password?</Link>
+                                <Link style={{color: "#9254de"}} to="/forget_password">Forgot password?</Link>
                             </Col>
                         </Row>
 
                         <Row type="flex" justify="center">
                             <Col>
-                                <Link to="/signup">Don't have an account?</Link>
+                                <Link style={{color: "#9254de"}} to="/signup">Don't have an account?</Link>
                             </Col>
                         </Row>
                         <br/>

@@ -8,7 +8,6 @@ import {
     authSaga,
     profileSaga,
     chatbotSessions,
-    solutionsSaga,
     usersManagementSaga,
     databaseSaga,
     optionsSaga
@@ -35,7 +34,6 @@ sagaMiddleware.run(assistantSaga);
 sagaMiddleware.run(authSaga);
 sagaMiddleware.run(profileSaga);
 sagaMiddleware.run(chatbotSessions);
-sagaMiddleware.run(solutionsSaga);
 sagaMiddleware.run(usersManagementSaga);
 sagaMiddleware.run(databaseSaga);
 sagaMiddleware.run(optionsSaga);

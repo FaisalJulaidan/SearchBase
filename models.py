@@ -224,7 +224,6 @@ class UserSettings(db.Model):
 class ChatbotSession(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Data = db.Column(MagicJSON, nullable=False)
-    FilePath = db.Column(db.String(250), nullable=True, default=None)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     TimeSpent = db.Column(db.Integer, nullable=False, default=0)
     SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
@@ -235,30 +234,30 @@ class ChatbotSession(db.Model):
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')
 
+    StoredFile = db.relationship('StoredFile', back_populates='ChatbotSession')
+
     def __repr__(self):
         return '<ChatbotSession {}>'.format(self.Data)
 
 
-# @db.validates("ChatbotSession")
-# def testing():
-#     print("SOOOOO")
-#     return True
+class StoredFile(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    FilePath = db.Column(db.String(250), nullable=True, default=None)
 
+    # Relationships:
+    ChatbotSessionID = db.Column(db.Integer, db.ForeignKey('chatbot_session.ID', ondelete='SET NULL'))
+    ChatbotSession = db.relationship('ChatbotSession', back_populates='StoredFile')
 
-# def testing():
-#     print("HIIIIIIII")
-#     return True
-#
-#
-# trigger = db.DDL(
-#     ""
-# )
-#
-# db.event.listen(
-#     ChatbotSession,
-#     'before_delete',
-#     trigger.execute_if(testing)
-# )
+    # @db.validates("ChatbotSession")
+    # def testing(self, key, value):
+    #     print("SOOOOO")
+    #     print(self)
+    #     print(key)
+    #     print(value)
+    #     return value
+
+    def __repr__(self):
+        return '<StoredFile {}>'.format(self.ID)
 
 
 class Database(db.Model):

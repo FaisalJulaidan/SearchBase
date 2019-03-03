@@ -2,15 +2,13 @@ import os
 
 from flask import Blueprint, render_template, request, send_from_directory, redirect
 from flask_cors import CORS
-from itsdangerous import URLSafeTimedSerializer
 
 from models import Callback
-from services import user_services
+from services import user_services, mail_services
 from utilities import helpers
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates", static_folder='static')
 CORS(public_router)
-
 
 
 # ======== Server React =========== #
@@ -20,36 +18,68 @@ def serve(path=''):
     else:
         return send_from_directory('static/react_app', 'index.html')
 
+
 # Serve React App
 @public_router.route('/login')
 def login():
-   return serve()
+    return serve()
+
 
 @public_router.route('/signup')
 def signup():
     return serve()
 
+
 @public_router.route('/forget_password')
 def forget_password():
     return serve()
 
+
 @public_router.route('/reset_password/<payload>')
 def reset_password(payload):
     return serve()
+
 
 @public_router.route('/dashboard', defaults={'path': ''})
 @public_router.route('/dashboard/<path:path>')
 def dashboard(path):
     return serve(path)
 
-# ============================================
 
+# ============================================
 
 
 @public_router.route("/", methods=['GET'])
 def index_page():
     if request.method == "GET":
         return render_template("index.html")
+
+
+@public_router.route("/mail/arrange_demo", methods=['POST'])
+def register_interest():
+    if request.method == "POST":
+        email = request.form.get("user_email", default=None)
+
+        if not email:
+            return "Could not retrieve some of your inputs"
+
+        requestDemo_callback: Callback = mail_services.sendDemoRequest(email)
+        return requestDemo_callback.Message
+
+
+@public_router.route("/mail/contact_us", methods=['POST'])
+def contact_us():
+    if request.method == "POST":
+        name = request.form.get("sendingName", default=None)
+        email = request.form.get("sendingEmail", default=None)
+        message = request.form.get("sendMessage", default=None)
+
+        if not name or not email or not message:
+            return "Could not retrieve some of your inputs"
+
+        contactUs_callback: Callback = mail_services.contactUsIndex(name, email, message)
+        return contactUs_callback.Message
+
 
 @public_router.route("/features", methods=['GET'])
 def features():
@@ -74,13 +104,11 @@ def cv_parsing():
     if request.method == "GET":
         return render_template("CvParsing.html")
 
+
 @public_router.route("/FeedbackCollector", methods=['GET'])
 def feedback_collector():
     if request.method == "GET":
         return render_template("Feedback.html")
-
-
-
 
 
 @public_router.route("/about", methods=['GET'])
@@ -93,6 +121,7 @@ def about():
 def contactpage():
     if request.method == "GET":
         return render_template("contact.html")
+
 
 # Terms and conditions page route
 @public_router.route("/termsandconditions", methods=['GET'])

@@ -10,6 +10,8 @@ from utilities import helpers
 
 mail = Mail()
 
+tsbEmail = "info@thesearchbase.com"
+
 
 def timer_tick():
     now = datetime.now()
@@ -40,6 +42,25 @@ def timer_tick():
             for sub in subs:
                 if session in sub["sessions"]:
                     notifyNewRecordsForLastXHours(sub["interval"])
+
+
+def sendDemoRequest(email) -> Callback:
+    try:
+        send_email(tsbEmail, 'Demo Request', '/emails/arrange_demo.html', email=email)
+        return Callback(True, "Demo has been requested. We will be in touch soon.")
+    except Exception as e:
+        print("mail_services.sendDemoRequest() ERROR: ", e)
+        return Callback(False, "Demo Request could not be sent at this time")
+
+
+def contactUsIndex(name, email, message) -> Callback:
+    try:
+        send_email(tsbEmail, 'TheSearchBase Contact Us', '/emails/contact_us.html', name=name, email=email,
+                   message=message)
+        return Callback(True, "Thank you. We will contact you as soon as possible.")
+    except Exception as e:
+        print("mail_services.contactUsIndex() ERROR: ", e)
+        return Callback(False, "We could not send your message at this time. Please try again later.")
 
 
 def sendVerificationEmail(email, companyName) -> Callback:
@@ -79,7 +100,7 @@ def sendPasswordResetEmail(email, companyID):
 def sendNewUserHasRegistered(name, email, companyName, tel):
     try:
 
-        send_email(("thesearchbase@gmail.com"), companyName + ' has signed up',
+        send_email(tsbEmail, companyName + ' has signed up',
                    '/emails/company_signup.html', name=name, email=email, companyName=companyName, tel=tel)
 
         return Callback(True, 'Signed up email is on its way')
@@ -161,16 +182,16 @@ def notifyNewRecordsForLastXHours(hours):
         print("mail_services.notifyNewRecordsForLastXHours() ERROR: ", e)
 
 
-def sendNewRecordsNotification(reciever, data):
+def sendNewRecordsNotification(receiver, data):
     try:
-        send_email((reciever), 'Your new data',
+        send_email(receiver, 'Your new data',
                    'emails/user_notification.html', data=data)
 
-        return Callback(True, 'Email sent and it\'s on its way to ' + reciever)
+        return Callback(True, 'Email sent and it\'s on its way to ' + receiver)
 
     except Exception as e:
         print("addedNewUserEmail() Error: ", e)
-        return Callback(False, 'Could not send email to ' + reciever)
+        return Callback(False, 'Could not send email to ' + receiver)
 
 
 # def async(f):

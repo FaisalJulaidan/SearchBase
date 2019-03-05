@@ -55,7 +55,7 @@ function* changePassword({newPassword, oldPassword}) {
         loadingMessage('Updating passwords...', 0);
         const res = yield http.post(`/profile/password`, {newPassword, oldPassword});
         yield put(profileActions.changePasswordSuccess(res.data.msg));
-        yield successMessage('Password updated');
+        successMessage('Password updated');
 
     } catch (error) {
         console.log(error);

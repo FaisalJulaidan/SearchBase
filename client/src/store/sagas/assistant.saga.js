@@ -22,7 +22,7 @@ function* addAssistant({type, newAssistant}) {
         const res = yield http.post(`/assistants`, newAssistant);
         yield put(assistantActions.addAssistantSuccess(res.data.msg));
         yield put(assistantActions.fetchAssistants());
-        yield successMessage('Assistant added!');
+        successMessage('Assistant added!');
 
     } catch (error) {
         console.log(error);

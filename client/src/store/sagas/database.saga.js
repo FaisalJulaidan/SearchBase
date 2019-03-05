@@ -27,7 +27,7 @@ function* fetchDatabase({databaseID}) {
         loadingMessage('Loading database...', 0);
         const res = yield http.get(`/databases/${databaseID}`);
         yield put(databaseActions.fetchDatabaseSuccess(res.data.msg, res.data.data));
-        yield successMessage('Database loaded');
+        successMessage('Database loaded');
     } catch (error) {
         console.log(error);
         yield errorMessage("Couldn't load database");
@@ -41,10 +41,9 @@ function* watchFetchDatabase() {
 
 function* uploadDatabase({newDatabase}) {
     try {
-        yield loadingMessage('Uploading database...', 0);
+        loadingMessage('Uploading database...', 0);
         const res = yield http.post(`/databases`, newDatabase);
-
-        yield successMessage('Database uploaded');
+        successMessage('Database uploaded');
         yield put(databaseActions.uploadDatabaseSuccess(res.data.msg, res.data.data));
 
     } catch (error) {

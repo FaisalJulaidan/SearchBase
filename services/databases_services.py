@@ -77,7 +77,6 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
         def uploadCandidates(databaseData, newDatabase):
             candidates = []
             for record in databaseData["records"]:
-                print(record)
                 new_record = Candidate(
                                        Database=newDatabase,
                                        Name=record.get('Name',{}).get('data'),
@@ -85,23 +84,24 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
                                        Telephone=record.get('Telephone',{}).get('data'),
                                        LinkdinURL=record.get('LinkdinURL',{}).get('data'),
                                        PostCode=record.get('PostCode',{}).get('data'),
-                                       Gender=record.get('Gender',{}).get('data'),
+
+                    Gender=record.get('Gender',{}).get('data'),
                                        Degree=record.get('Degree',{}).get('data'),
                                        ContactTime=record.get('ContactTime',{}).get('data'),
-                                       Availability=record.get('Availability',{}).get('data'),
                                        CurrentSalary=record.get('CurrentSalary',{}).get('data') or None,
                                        Currency=createCurrency(record.get('Currency', {})),
                                        CurrentRole=record.get('CurrentRole',{}).get('data'),
                                        JobTitle=record.get('JobTitle',{}).get('data'),
                                        CurrentEmployer=record.get('CurrentEmployer',{}).get('data'),
                                        CurrentEmploymentType=record.get('CurrentEmploymentType',{}).get('data'),
-                                       DesiredSalary=record.get('DesiredSalary',{}).get('data') or None,
+
+                    DesiredSalary=record.get('DesiredSalary',{}).get('data') or None,
                                        DesiredPosition=record.get('DesiredPosition',{}).get('data'),
                                        CandidateSkills=record.get('CandidateSkills',{}).get('data'),
                                        YearsExp=record.get('YearsExp',{}).get('data') or None,
                                        PreferredLocation=record.get('PreferredLocation',{}).get('data'),
                                        PreferredEmploymentType=record.get('PreferredEmploymentType',{}).get('data'),
-                                       DesiredHourlyRate=record.get('DesiredHourlyRate',{}).get('data') or None
+                    DesiredPayRate=record.get('DesiredPayRate', {}).get('data') or None
                 )
                 candidates.append(new_record)
             db.session.add_all(candidates)
@@ -124,6 +124,7 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
                     PositionType=record.get('PositionType', {}).get('data'),
                     EmploymentType=record.get('EmploymentType', {}).get('data'),
                     Salary=record.get('Salary', {}).get('data') or None,
+                    PayRate=record.get('PayRate', {}).get('data') or None,
                     Currency=createCurrency(record.get('Currency', {})),
                     StartDate=startDate,
                 )

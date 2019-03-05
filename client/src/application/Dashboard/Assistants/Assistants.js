@@ -57,7 +57,7 @@ class Assistants extends Component {
                     <div className={styles.Panel_Body}>
                         <div className={styles.AssistantsList}>
                             {
-                                this.props.assistantList[0] ?
+                                !this.props.isLoading ?
                                     (
                                         this.props.assistantList.map((assistant, i) => <Assistant assistant={assistant}
                                                                                                   key={i}

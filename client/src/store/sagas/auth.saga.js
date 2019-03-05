@@ -107,10 +107,10 @@ function* newResetPassword({data}) {
         yield axios.post(`/api/reset_password/`+data["payload"], {...data}, {
             headers: {'Content-Type': 'application/json'},
         });
-        yield successMessage('The password for your account has been updated');
+        successMessage('The password for your account has been updated');
         yield put(authActions.newResetPasswordSuccess());
         yield history.push('/login');
-        yield successMessage('Login using your new password', 0);
+        successMessage('Login using your new password', 0);
 
     } catch (error) {
         console.log(error);

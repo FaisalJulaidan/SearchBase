@@ -1,16 +1,15 @@
-from flask import Blueprint, request, redirect
+from flask import Blueprint, request
 
 from models import Callback
 from services import user_services, company_services, mail_services
 from utilities import helpers
 
-
 resetPassword_router: Blueprint = Blueprint('resetPassword_router', __name__, template_folder="../../templates")
+
 
 # Send reset email
 @resetPassword_router.route("/reset_password", methods=["POST"])
 def reset_password():
-
     if request.method == "POST":
         email = request.json.get("email", "").lower()
 

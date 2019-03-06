@@ -15,7 +15,6 @@ class Login extends React.Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 //this.setState({isLoggin: true});
-                console.log('Received values of form: ', values);
                 this.props.dispatch(authActions.login(values.email, values.password));
             }
         });

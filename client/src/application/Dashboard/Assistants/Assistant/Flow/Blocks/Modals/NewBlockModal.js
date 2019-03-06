@@ -56,19 +56,20 @@ class NewBlockModal extends Component {
                        footer={null}>
 
                     <Tabs type="card" onChange={this.onChangeTab}>
-                        <TabPane tab={<span><Icon type="form"/>User Input</span>}
-                                 key="UserInput">
-                            <UserInput modalState={this.state}
-                                       addNewDataCategory={this.showNewDataCategoryModal}
-                                       handleNewBlock={this.handleNewBlock}
-                                       options={this.props.options}/>
-                        </TabPane>
 
                         <TabPane tab={<span><Icon type="question-circle"/>Question</span>}
                                  key="Question">
                             <Question modalState={this.state}
                                       handleNewBlock={this.handleNewBlock}
                                       options={this.props.options}/>
+                        </TabPane>
+
+                        <TabPane tab={<span><Icon type="form"/>User Input</span>}
+                                 key="UserInput">
+                            <UserInput modalState={this.state}
+                                       addNewDataCategory={this.showNewDataCategoryModal}
+                                       handleNewBlock={this.handleNewBlock}
+                                       options={this.props.options}/>
                         </TabPane>
 
                         <TabPane tab={<span><Icon type="file-add"/>File Upload</span>}

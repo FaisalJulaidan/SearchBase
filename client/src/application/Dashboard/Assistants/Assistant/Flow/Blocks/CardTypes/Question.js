@@ -67,7 +67,7 @@ class Question extends Component {
                     blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                     action: values.action === "Go To Group" ? "Go To Specific Block" : values.action,
                     afterMessage: values.afterMessage || "",
-                    timeCreated: Date.now()
+                    ID: values.answer + "%" + Date.now()
                 };
                 let answers = [answer].concat(this.state.answers);
                 this.setState({answers, tags: []});
@@ -77,7 +77,7 @@ class Question extends Component {
     showAddAnswer = () => this.setState({modalVisible: true});
     hideAddAnswer = () => this.setState({modalVisible: false});
     removeAnswer = deletedAnswer => this.setState({
-        answers: [...this.state.answers].filter(answer => (answer.timeCreated !== deletedAnswer.timeCreated) && (answer.text !== deletedAnswer.text))
+        answers: [...this.state.answers].filter(answer => answer.ID !== deletedAnswer.ID)
     });
 
     //Tags component's functions

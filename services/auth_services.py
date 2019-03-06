@@ -5,7 +5,7 @@ from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity
 from models import Callback, User, UserSettings, db
 from services import user_services, role_services, sub_services, company_services, mail_services
 from utilities import helpers
-
+from config import BaseConfig
 jwt = JWTManager()
 tokenExpiresIn = 15 # in minutes
 
@@ -114,7 +114,7 @@ def authenticate(email: str, password_to_check: str) -> Callback:
         refresh_token = create_refresh_token(identity=data)
         data['token'] = access_token
         data['refresh'] = refresh_token
-        data['expiresIn'] = datetime.now() + timedelta(minutes=tokenExpiresIn) # add 15 minutes from now
+        data['expiresIn'] = datetime.now() + BaseConfig.JWT_ACCESS_TOKEN_EXPIRES
 
         # Set LastAccess
         user.LastAccess = datetime.now()
@@ -133,7 +133,7 @@ def refreshToken() -> Callback:
     try:
         current_user = get_jwt_identity()
         data = {'token': create_access_token(identity=current_user),
-                'expiresIn': datetime.now() + timedelta(minutes=refreshTokenExpiresIn)}
+                'expiresIn': datetime.now() + BaseConfig.JWT_REFRESH_TOKEN_EXPIRES}
         return Callback(True, "Authorised!", data)
     except Exception as e:
         return Callback(False, "Unauthorised!", None)

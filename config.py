@@ -47,12 +47,16 @@ class BaseConfig(object):
     USER_FILES = os.path.join(APP_ROOT, 'static/file_uploads/user_files')
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
 
+    # Secret keys
     SECRET_KEY = os.urandom(24)
     CSRF_SESSION_KEY = os.urandom(24)
     JWT_SECRET_KEY = os.urandom(24)
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
-    SESSION_TYPE = 'filesystem'
 
+    # JWT tokens expires in
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
+
+    SESSION_TYPE = 'filesystem'
     USE_ENCRYPTION = True
     SECRET_KEY_DB = 'FakeKey'
     SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']

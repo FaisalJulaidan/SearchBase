@@ -33,17 +33,18 @@ def reset_password_verify(payload):
     if request.method == "POST":
 
         try:
-            data = helpers.verificationSigner.loads(payload, salt='reset-pass-key', max_age=1800) # expires in 30mins
+            data = helpers.verificationSigner.loads(payload, salt='reset-pass-key', max_age=1800)  # expires in 30mins
             email = data.split(";")[0].lower()
-            password = request.json.get("password", "").lower()
+            password = request.json.get("password", None)
 
             if not password:
                 return helpers.jsonResponse(False, 400, "Server did not manage to receive your new password")
 
-            changePassword_callback: Callback = user_services.changePasswordByEmail(email, password)
-            if not changePassword_callback.Success:
-                return helpers.jsonResponse(False, 400, changePassword_callback.Message)
+            resetPassword_callback: Callback = user_services.changePasswordByEmail(email, password)
+            if not resetPassword_callback.Success:
+                return helpers.jsonResponse(False, 400, resetPassword_callback.Message)
 
-            return helpers.jsonResponse(True, 200, changePassword_callback.Message)
-        except Exception:
+            return helpers.jsonResponse(True, 200, resetPassword_callback.Message)
+        except Exception as e:
+            print(e)
             return helpers.jsonResponse(False, 400, "Could not update your password")

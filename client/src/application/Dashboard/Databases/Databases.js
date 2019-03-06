@@ -1,19 +1,20 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Menu, Table, Spin, Button} from 'antd';
+import {Menu, Spin, Button} from 'antd';
 
 import styles from "./Databases.module.less"
 import NewDatabaseModal from "./NewDatabaseModal/NewDatabaseModal";
 import Header from "../../../components/Header/Header";
-import {http} from "../../../helpers";
 import {databaseActions} from "../../../store/actions";
 
 import DatabaseInfo from "./DatabaseInfo/DatabaseInfo"
+import DatabaseDetailsModal from "./DatabaseDetailsModal/DatabaseDetailsModal"
 
 class Databases extends Component {
 
     state = {
         visible: false,
+        dbDetailsVisible: false
     };
 
 
@@ -24,6 +25,9 @@ class Databases extends Component {
 
     showModal = () => this.setState({visible: true});
     hideModal = () => this.setState({visible: false});
+
+    showDBDetails = () => this.setState({dbDetailsVisible: true});
+    hideDBDetails = () => this.setState({dbDetailsVisible: false});
 
 
     uploadDatabase = newDatabase => this.props.dispatch(databaseActions.uploadDatabase({newDatabase: newDatabase}));
@@ -84,19 +88,19 @@ class Databases extends Component {
                                 <div>
                                     <h3>Databases Information</h3>
                                 </div>
-                                <div>
-                                    <Button className={styles.Panel_Header_Button}
-                                            disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}
-                                            type="primary" icon="info"
-                                            onClick={this.showDBInfo}>
-                                        Info
-                                    </Button>
-                                    <Button className={styles.Panel_Header_Button} type="danger" icon="delete"
-                                            disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}
-                                            onClick={this.deleteDB}>
-                                        Delete Database
-                                    </Button>
-                                </div>
+                                {/*<div>*/}
+                                    {/*<Button className={styles.Panel_Header_Button}*/}
+                                            {/*disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}*/}
+                                            {/*type="primary" icon="info"*/}
+                                            {/*onClick={this.showDBDetails}>*/}
+                                        {/*Details*/}
+                                    {/*</Button>*/}
+                                    {/*<Button className={styles.Panel_Header_Button} type="danger" icon="delete"*/}
+                                            {/*disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}*/}
+                                            {/*onClick={this.deleteDB}>*/}
+                                        {/*Delete Database*/}
+                                    {/*</Button>*/}
+                                {/*</div>*/}
                             </div>
 
 
@@ -135,9 +139,16 @@ class Databases extends Component {
                 </div>
 
                 <NewDatabaseModal visible={this.state.visible}
-                                   databaseOptions={this.props.options?.databases}
-                                   uploadDatabase={this.uploadDatabase}
-                                   hideModal={this.hideModal}/>
+                                  databaseOptions={this.props.options?.databases}
+                                  uploadDatabase={this.uploadDatabase}
+                                  hideModal={this.hideModal}/>
+
+
+                <DatabaseDetailsModal visible={this.state.dbDetailsVisible}
+                                      databaseInfo={this.props.fetchedDatabase.databaseInfo}
+                                      hideModal={this.hideDBDetails}
+                />
+
 
             </div>
         );

@@ -1,17 +1,16 @@
-import sqlalchemy.exc
+from sqlalchemy.sql import exists
 
-from services import mail_services, company_services, role_services, newsletter_services
 from models import db, Callback, User, Company, Role, UserSettings
+from services import mail_services, company_services, newsletter_services
 from utilities import helpers
-from sqlalchemy.sql import exists, func
 
 
 def create(firstname, surname, email, password, phone, company: Company, role: Role, verified=False) -> Callback:
     try:
         # Create a new user with its associated company and role
-        newUser : User = User(Firstname=firstname, Surname=surname, Email=email.lower(), Verified=verified,
-                       Password=password, PhoneNumber=phone, Company=company,
-                       Role=role)
+        newUser: User = User(Firstname=firstname, Surname=surname, Email=email.lower(), Verified=verified,
+                             Password=password, PhoneNumber=phone, Company=company,
+                             Role=role)
         db.session.add(newUser)
         db.session.flush()
 
@@ -50,7 +49,8 @@ def getByID(id) -> Callback:
                         'User with ID ' + str(id) + ' does not exist')
 
     # finally:
-       # db.session.close()
+    # db.session.close()
+
 
 def getByEmail(email) -> User or None:
     try:
@@ -67,7 +67,8 @@ def getByEmail(email) -> User or None:
                         'User with email ' + email + ' does not exist.')
 
     # finally:
-       # db.session.close()
+    # db.session.close()
+
 
 def getAllByCompanyID(companyID) -> Callback:
     try:
@@ -84,9 +85,10 @@ def getAllByCompanyID(companyID) -> Callback:
                         'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
     # finally:
-       # db.session.close()
+    # db.session.close()
 
-def getProfile (userID):
+
+def getProfile(userID):
     try:
         result: UserSettings = db.session.query(UserSettings).filter(UserSettings.ID == userID).first()
         if not result: raise Exception
@@ -119,6 +121,7 @@ def getAllUserSettings():
     # finally:
     # db.session.close()
 
+
 def getUserSettings(userID):
     try:
         result = db.session.query(UserSettings).filter(UserSettings.ID == userID).first()
@@ -134,8 +137,6 @@ def getUserSettings(userID):
 
     # finally:
     # db.session.close()
-
-
 
 
 # ----- Updaters ----- #
@@ -161,8 +162,9 @@ def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
         return Callback(False, 'Sorry, Could not create the user.')
 
     # finally:
-       # db.session.close()
+    # db.session.close()
     # Save
+
 
 def updateUserSettings(userID, trackingData, techSupport, accountSpecialist, notifications):
     try:
@@ -190,8 +192,8 @@ def updateUserSettings(userID, trackingData, techSupport, accountSpecialist, not
     # finally:
     # db.session.close()
 
-def updateSubID(email, subID: str):
 
+def updateSubID(email, subID: str):
     try:
         db.session.query(User).filter(User.Email == email.lower()).update({"SubID": subID})
 
@@ -206,8 +208,8 @@ def updateSubID(email, subID: str):
     # finally:
     # db.session.close()
 
-def updateStripeID(email, cusID: str):
 
+def updateStripeID(email, cusID: str):
     try:
         db.session.query(User).filter(User.Email == email.lower()).update({"StripeID": (cusID)})
 
@@ -221,6 +223,7 @@ def updateStripeID(email, cusID: str):
 
     # finally:
     # db.session.close()
+
 
 def updateUser(firstname, surname, newEmail, userID):
     try:
@@ -242,17 +245,18 @@ def updateUser(firstname, surname, newEmail, userID):
     # finally:
     # db.session.close()
 
+
 def changePasswordByID(userID, newPassword, oldPassword=None):
     try:
-        user_callback : Callback = getByID(userID)
-        if not user_callback.Success:
+        result = db.session.query(User).filter(User.ID == userID).first()
+        if not result:
             return Callback(False, "Could not find user's records")
 
         if oldPassword is not None:
-            if not oldPassword == user_callback.Data.Password:
-                return Callback(False, "old Password is incorrect")
+            if not oldPassword == result:
+                return Callback(False, "Old Password is incorrect")
 
-        user_callback.Data.Password = newPassword
+        result.Password = newPassword
         db.session.commit()
         return Callback(True, "Password has been changed.")
 
@@ -261,9 +265,10 @@ def changePasswordByID(userID, newPassword, oldPassword=None):
         db.session.rollback()
         return Callback(False, "Error in updating password")
 
+
 def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
     try:
-        user_callback : Callback = getByEmail(userEmail.lower())
+        user_callback: Callback = getByEmail(userEmail.lower())
         if not user_callback.Success:
             return Callback(False, "Could not find user's records")
 
@@ -281,21 +286,19 @@ def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
         db.session.rollback()
         return Callback(False, "Error in changing password")
 
-    # finally:
-       # db.session.close()
 
 def verifyByEmail(email: str):
-
     try:
         user = db.session.query(User).filter(User.Email == email.lower()).update({"Verified": True})
         if not user: raise Exception
 
-        #send us mail
+        # send us mail
         user = db.session.query(User).filter(User.Email == email.lower()).first()
         company_callback = company_services.getByID(user.CompanyID)
         companyName = "Error"
-        if company_callback : companyName = company_callback.Data.Name
-        mail_callback : Callback = mail_services.sendNewUserHasRegistered(user.Firstname + user.Surname, user.Email, companyName, user.PhoneNumber)
+        if company_callback: companyName = company_callback.Data.Name
+        mail_callback: Callback = mail_services.sendNewUserHasRegistered(user.Firstname + user.Surname, user.Email,
+                                                                         companyName, user.PhoneNumber)
         if not mail_callback.Success: print("Could not send signed up user email")
 
         db.session.commit()
@@ -313,7 +316,6 @@ def verifyByEmail(email: str):
 # ----- Removers ----- #
 
 def removeByEmail(email) -> Callback:
-
     try:
         if not db.session.query(exists().where(User.Email == email.lower())).scalar():
             return Callback(False, "The user with email '" + str(email) + "' doesn't exist")
@@ -328,11 +330,10 @@ def removeByEmail(email) -> Callback:
         return Callback(False, 'User with email ' + email + " could not be removed.")
 
     # finally:
-       # db.session.close()
+    # db.session.close()
 
 
 def removeByID(id) -> Callback:
-
     try:
         if not db.session.query(exists().where(User.ID == id)).scalar():
             return Callback(False, "the user with id '" + str(id) + "' doesn't exist")
@@ -347,11 +348,4 @@ def removeByID(id) -> Callback:
         return Callback(False, 'User with id ' + str(id) + " could not be removed.")
 
     # finally:
-       # db.session.close()
-
-
-
-
-
-
-
+    # db.session.close()

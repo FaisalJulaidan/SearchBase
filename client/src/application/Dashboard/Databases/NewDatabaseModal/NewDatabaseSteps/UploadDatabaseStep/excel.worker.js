@@ -1,8 +1,12 @@
 if ('function' === typeof importScripts) {
-    importScripts('http://localhost:5000/static/xlsx/shim.min.js');
-    importScripts('http://localhost:5000/static/xlsx/cpexcel.js');
-    importScripts('http://localhost:5000/static/xlsx/jszip.js');
-    importScripts('http://localhost:5000/static/xlsx/xlsx.js');
+    const {protocol, port, hostname} = location;
+    const colon = port ? ":" : "";
+    const uri = protocol + '//' + hostname + colon + port;
+
+    importScripts(`${uri}/static/xlsx/shim.min.js`);
+    importScripts(`${uri}/static/xlsx/cpexcel.js`);
+    importScripts(`${uri}/static/xlsx/jszip.js`);
+    importScripts(`${uri}/static/xlsx/xlsx.js`);
 }
 
 //eslint-disable-next-line

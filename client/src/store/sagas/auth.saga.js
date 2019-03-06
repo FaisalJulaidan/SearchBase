@@ -30,8 +30,10 @@ function* login({email, password}) {
         yield localStorage.setItem("token", token);
         yield localStorage.setItem("refresh", refresh);
         yield localStorage.setItem("expiresIn", expiresIn);
+        
         // When access token expires in seconds
         const secondsToExpire = yield (new Date(expiresIn).getTime() - new Date().getTime()) / 1000;
+
         // Dispatch actions
         yield destroyMessage();
         yield put(profileActions.getProfile());
@@ -107,10 +109,10 @@ function* newResetPassword({data}) {
         yield axios.post(`/api/reset_password/`+data["payload"], {...data}, {
             headers: {'Content-Type': 'application/json'},
         });
-        yield successMessage('The password for your account has been updated');
+        successMessage('The password for your account has been updated');
         yield put(authActions.newResetPasswordSuccess());
         yield history.push('/login');
-        yield successMessage('Login using your new password', 0);
+        successMessage('Login using your new password', 0);
 
     } catch (error) {
         console.log(error);
@@ -149,8 +151,8 @@ function* refreshToken({refresh}) {
         yield localStorage.setItem("token", token);
         yield localStorage.setItem("expiresIn", expiresIn);
         const secondsToExpire = yield (new Date(expiresIn).getTime() - new Date().getTime()) / 1000;
-        yield put(authActions.checkAuthTimeout(secondsToExpire, refresh));
 
+        yield put(authActions.checkAuthTimeout(secondsToExpire, refresh));
 
     } catch (error) {
         console.log(error);

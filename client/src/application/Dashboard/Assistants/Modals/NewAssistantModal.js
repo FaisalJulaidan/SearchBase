@@ -66,8 +66,7 @@ class NewAssistantModal extends Component {
                 width={800}
                 title="Create New Assistant"
                 visible={this.props.visible}
-                onOk={this.handleOk}
-                onCancel={this.handleCancel}
+                onCancel={this.props.hideModal}
                 destroyOnClose={true}
                 footer={[
                     <Button key="cancel" onClick={this.props.hideModal}>Cancel</Button>,

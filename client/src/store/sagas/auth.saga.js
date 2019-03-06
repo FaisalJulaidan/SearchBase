@@ -30,8 +30,10 @@ function* login({email, password}) {
         yield localStorage.setItem("token", token);
         yield localStorage.setItem("refresh", refresh);
         yield localStorage.setItem("expiresIn", expiresIn);
+        
         // When access token expires in seconds
         const secondsToExpire = yield (new Date(expiresIn).getTime() - new Date().getTime()) / 1000;
+
         // Dispatch actions
         yield destroyMessage();
         yield put(profileActions.getProfile());
@@ -148,8 +150,8 @@ function* refreshToken({refresh}) {
         yield localStorage.setItem("token", token);
         yield localStorage.setItem("expiresIn", expiresIn);
         const secondsToExpire = yield (new Date(expiresIn).getTime() - new Date().getTime()) / 1000;
-        yield put(authActions.checkAuthTimeout(secondsToExpire, refresh));
 
+        yield put(authActions.checkAuthTimeout(secondsToExpire, refresh));
 
     } catch (error) {
         console.log(error);

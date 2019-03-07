@@ -84,9 +84,6 @@ def getAllByCompanyID(companyID) -> Callback:
         return Callback(False,
                         'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
-    # finally:
-    # db.session.close()
-
 
 def getProfile(userID):
     try:
@@ -99,6 +96,14 @@ def getProfile(userID):
             'userSettings': helpers.getDictFromSQLAlchemyObj(result),
             'newsletters': newsletter_services.checkForNewsletter(result.User.Email).Success
         }
+
+        # For security purposes IMPORTANT!
+        del profile['user']['ID']
+        del profile['user']['CompanyID']
+        del profile['user']['RoleID']
+        del profile['company']['ID']
+        del profile['company']['StripeID']
+        del profile['company']['SubID']
 
         return Callback(True, 'User settings were successfully retrieved.', profile)
     except Exception as exc:
@@ -118,9 +123,6 @@ def getAllUserSettings():
         db.session.rollback()
         return Callback(False, 'Error in getting records')
 
-    # finally:
-    # db.session.close()
-
 
 def getUserSettings(userID):
     try:
@@ -134,10 +136,6 @@ def getUserSettings(userID):
         db.session.rollback()
         return Callback(False,
                         'User settings for this user does not exist.')
-
-    # finally:
-    # db.session.close()
-
 
 # ----- Updaters ----- #
 def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
@@ -160,10 +158,6 @@ def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
         print(exc)
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')
-
-    # finally:
-    # db.session.close()
-    # Save
 
 
 def updateUserSettings(userID, trackingData, techSupport, accountSpecialist, notifications):
@@ -189,9 +183,6 @@ def updateUserSettings(userID, trackingData, techSupport, accountSpecialist, not
         return Callback(False,
                         'User settings could not be updated.')
 
-    # finally:
-    # db.session.close()
-
 
 def updateSubID(email, subID: str):
     try:
@@ -205,9 +196,6 @@ def updateSubID(email, subID: str):
         db.session.rollback()
         return Callback(False, 'Could not update subID for ' + email)
 
-    # finally:
-    # db.session.close()
-
 
 def updateStripeID(email, cusID: str):
     try:
@@ -220,9 +208,6 @@ def updateStripeID(email, cusID: str):
         print(exc)
         db.session.rollback()
         return Callback(False, 'Could not update subID for ' + email)
-
-    # finally:
-    # db.session.close()
 
 
 def updateUser(firstname, surname, newEmail, userID):
@@ -242,8 +227,6 @@ def updateUser(firstname, surname, newEmail, userID):
         db.session.rollback()
         return Callback(False, "User could not be updated")
 
-    # finally:
-    # db.session.close()
 
 
 def changePasswordByID(userID, newPassword, oldPassword=None):
@@ -309,9 +292,6 @@ def verifyByEmail(email: str):
         db.session.rollback()
         return Callback(False, 'Could not verify account with email  ' + email)
 
-    # finally:
-    # db.session.close()
-
 
 # ----- Removers ----- #
 
@@ -329,8 +309,6 @@ def removeByEmail(email) -> Callback:
         db.session.rollback()
         return Callback(False, 'User with email ' + email + " could not be removed.")
 
-    # finally:
-    # db.session.close()
 
 
 def removeByID(id) -> Callback:
@@ -346,6 +324,3 @@ def removeByID(id) -> Callback:
         print(exc)
         db.session.rollback()
         return Callback(False, 'User with id ' + str(id) + " could not be removed.")
-
-    # finally:
-    # db.session.close()

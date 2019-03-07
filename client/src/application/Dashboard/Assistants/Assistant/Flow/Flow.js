@@ -44,7 +44,7 @@ class Flow extends Component {
         console.log('componentDidMount');
         const {assistantList, match} = this.props;
         const assistant = assistantList.find(assistant => assistant.ID === +match.params.id);
-        console.log(assistant?.Flow?.groups[0] !== undefined ? this.selectGroup(assistant.Flow.groups[0]) : null);
+        // console.log(assistant?.Flow?.groups[0] !== undefined ? this.selectGroup(assistant.Flow.groups[0]) : null);
         this.setState({assistant: assistant},
             () => console.log(this.state.assistant)
         )

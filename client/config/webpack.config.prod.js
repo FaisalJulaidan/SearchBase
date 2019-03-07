@@ -21,6 +21,8 @@ const getClientEnvironment = require('./env');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin-alt');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+
 
 
 // Webpack uses `publicPath` to determine where the app is being served from.
@@ -145,6 +147,29 @@ module.exports = {
   optimization: {
     noEmitOnErrors: false,
     minimizer: [
+      new UglifyJsPlugin({
+        cache: true,
+        parallel: true,
+        uglifyOptions:{
+          output: {
+            comments: false, // remove comments
+          },
+          compress: {
+            loops: true,
+            unused: true,
+            dead_code: true, // big one--strip code that will never execute
+            warnings: false, // good for prod apps so users can't peek behind curtain
+            drop_debugger: true,
+            conditionals: true,
+            evaluate: true,
+            drop_console: true, // strips console statements
+            sequences: true,
+            booleans: true,
+            if_return: true,
+            join_vars: true,
+          }
+        },
+      }),
       new TerserPlugin({
         terserOptions: {
           parse: {

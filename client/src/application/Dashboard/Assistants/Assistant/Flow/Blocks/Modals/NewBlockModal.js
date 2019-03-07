@@ -49,26 +49,27 @@ class NewBlockModal extends Component {
         return (
             <div>
                 <Modal width={800}
-                       title="Add New Block"
+                       title="Add New Question"
                        visible={this.props.visible}
                        onCancel={this.props.closeModal}
                        destroyOnClose={true}
                        footer={null}>
 
                     <Tabs type="card" onChange={this.onChangeTab}>
-                        <TabPane tab={<span><Icon type="form"/>User Input</span>}
+
+                        <TabPane tab={<span><Icon type="question-circle"/>Pre-Selected Answers</span>}
+                                 key="Question">
+                            <Question modalState={this.state}
+                                      handleNewBlock={this.handleNewBlock}
+                                      options={this.props.options}/>
+                        </TabPane>
+
+                        <TabPane tab={<span><Icon type="form"/>Open Answer</span>}
                                  key="UserInput">
                             <UserInput modalState={this.state}
                                        addNewDataCategory={this.showNewDataCategoryModal}
                                        handleNewBlock={this.handleNewBlock}
                                        options={this.props.options}/>
-                        </TabPane>
-
-                        <TabPane tab={<span><Icon type="question-circle"/>Question</span>}
-                                 key="Question">
-                            <Question modalState={this.state}
-                                      handleNewBlock={this.handleNewBlock}
-                                      options={this.props.options}/>
                         </TabPane>
 
                         <TabPane tab={<span><Icon type="file-add"/>File Upload</span>}
@@ -78,7 +79,7 @@ class NewBlockModal extends Component {
                                         options={this.props.options}/>
                         </TabPane>
 
-                        <TabPane tab={<span><Icon type="tag"/>Solutions</span>}
+                        <TabPane tab={<span><Icon type="tag"/>Data Scan and Return</span>}
                                  key="Solutions">
                             <Solutions modalState={this.state}
                                        handleNewBlock={this.handleNewBlock}

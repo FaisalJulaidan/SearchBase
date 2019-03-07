@@ -345,11 +345,15 @@ def scanJobs(session, dbIDs):
 
         #  =======================================
 
-        # Received DataType: DesiredPosition <> Column: DesiredPosition | points= 1
+        # Received DataType: DesiredPosition <> Column: Description | points= 1
         if keywords.get(DT.DesiredPosition.value['name']):
             df['count'] += df[Job.Description.name].str.count('|'.join(keywords[DT.DesiredPosition.value['name']]),
                                                                         flags=re.IGNORECASE)
 
+        # Received DataType: DesiredPosition <> Column: Title | points= 1
+        if keywords.get(DT.DesiredPosition.value['name']):
+            df['count'] += df[Job.Title.name].str.count('|'.join(keywords[DT.DesiredPosition.value['name']]),
+                                                              flags=re.IGNORECASE)
 
         # Received DataType: CandidateSkills <> Column: EssentialSkills | points= 1
         if keywords.get(DT.CandidateSkills.value['name']):

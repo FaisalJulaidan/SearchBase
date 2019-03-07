@@ -78,12 +78,12 @@ class Blocks extends Component {
             <div className={styles.Panel}>
                 <div className={styles.Panel_Header_With_Button}>
                     <div>
-                        <h3>{this.props.currentGroup.name} Blocks</h3>
+                        <h3>{this.props.currentGroup.name} Questions</h3>
                     </div>
                     <div>
                         <Button className={styles.Panel_Header_Button} type="primary" icon="plus"
                                 onClick={this.showAddBlockModal} disabled={!this.props.currentGroup.id}>
-                            Add Block
+                            Add Question
                         </Button>
                     </div>
                 </div>

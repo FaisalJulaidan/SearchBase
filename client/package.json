@@ -153,6 +153,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.2.0",
     "babel-plugin-transform-optional-chaining": "^7.0.0-beta.3",
-    "prop-types": "latest"
+    "prop-types": "latest",
+    "uglifyjs-webpack-plugin": "^2.1.2"
   }
 }

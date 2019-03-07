@@ -80,13 +80,11 @@ def updateFlow(flow, assistant: Assistant) -> Callback:
                     return callback
 
         # Update flow and save
-        print(flow)
         assistant.Flow = flow
         db.session.commit()
         return Callback(True, "Flow updated successfully!")
 
     except Exception as exc:
-        print("EROROROROROROROR")
         print(exc.args)
         return Callback(False, "The submitted Flow doesn't follow the correct format")
 

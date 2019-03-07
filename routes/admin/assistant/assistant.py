@@ -33,7 +33,6 @@ def assistants():
                                                     })
     if request.method == "POST":
         data = request.json
-        print(data)
         callback: Callback = assistant_services.create(data.get('assistantName'),
                                                        data.get('welcomeMessage'),
                                                        data.get('topBarTitle'),

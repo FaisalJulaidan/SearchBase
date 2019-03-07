@@ -99,19 +99,20 @@ def authenticate(email: str, password_to_check: str) -> Callback:
             return Callback(False, "Account is not verified.")
 
         # If all the tests are valid then do login process
-        data = {'user': {"id": user.ID,
-                         "companyID": user.CompanyID,
+        data = {'user': {
                          "email": user.Email,
                          "username": user.Firstname + ' ' + user.Surname,
                          "lastAccess": user.LastAccess,
                          "phoneNumber": user.PhoneNumber,
                          "plan": helpers.getPlanNickname(user.Company.SubID),
-                         "roleID": user.RoleID
                          }
                 }
+        # for security, hide them in the token
+        tokenData = {'user': {"id": user.ID, "companyID": user.CompanyID}}
 
-        access_token = create_access_token(identity=data)
-        refresh_token = create_refresh_token(identity=data)
+        # Create the JWT token
+        access_token = create_access_token(identity=tokenData)
+        refresh_token = create_refresh_token(identity=tokenData)
         data['token'] = access_token
         data['refresh'] = refresh_token
         data['expiresIn'] = datetime.now() + BaseConfig.JWT_ACCESS_TOKEN_EXPIRES

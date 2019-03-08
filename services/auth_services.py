@@ -134,7 +134,7 @@ def refreshToken() -> Callback:
     try:
         current_user = get_jwt_identity()
         data = {'token': create_access_token(identity=current_user),
-                'expiresIn': datetime.now() + BaseConfig.JWT_REFRESH_TOKEN_EXPIRES}
+                'expiresIn': datetime.now() + BaseConfig.JWT_ACCESS_TOKEN_EXPIRES}
         return Callback(True, "Authorised!", data)
     except Exception as e:
         return Callback(False, "Unauthorised!", None)

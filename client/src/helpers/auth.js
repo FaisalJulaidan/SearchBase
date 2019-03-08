@@ -1,3 +1,4 @@
+import {store} from '../store/store'
 
 export const authHeader = () => {
     // return authorization header with jwt token
@@ -27,7 +28,6 @@ export const updateUsername = (firstname, surname) => {
 
 
 export const checkAuthenticity = () => {
-    return !(!getUser() || !authHeader());
-
+    return (getUser() && authHeader());
 };
 

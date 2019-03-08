@@ -41,29 +41,6 @@ function* watchLogin() {
     yield takeLatest(actionTypes.LOGIN_REQUEST, login)
 }
 
-
-function* refreshToken({refresh}) {
-    try {
-        if(!checkAuthenticity()){throw new Error('Authentication Failed!')}
-        const res = yield axios.post(`/api/auth/refresh`, null,{
-            headers: {'Authorization': 'Bearer ' + refresh},
-        });
-
-        const {token, expiresIn} = res.data.data;
-        yield localStorage.setItem("token", token);
-        yield localStorage.setItem("expiresIn", expiresIn);
-
-    } catch (error) {
-        console.log(error);
-        // Log the user out
-        yield put(authActions.logout());
-    }
-}
-
-function* watchRefreshToken() {
-    yield takeLatest(actionTypes.REFRESH_TOKEN, refreshToken)
-}
-
 // Signup
 function* signup({signupDetails}) {
 
@@ -154,7 +131,6 @@ export function* authSaga() {
         watchSignup(),
         watchForgetPassword(),
         watchLogout(),
-        watchRefreshToken(),
         watchNewResetPassword()
     ])
 }

@@ -6,10 +6,9 @@ export const PrivateRoute = ({ component: Component, ...rest }) => {
     console.log("Check Authenticity", checkAuthenticity());
     return (
         <Route {...rest} render={props => (
-            // checkAuthenticity()
-            //     ? <Component {...props} />
-            //     : <Redirect to={{pathname: '/login', state: {from: props.location}}}/>
-                <Component {...props} />
+            checkAuthenticity()
+                ? <Component {...props} />
+                : <Redirect to={{pathname: '/login', state: {from: props.location}}}/>
         )}/>
     )
-}
+};

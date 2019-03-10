@@ -54,7 +54,7 @@ class BaseConfig(object):
 
     # JWT tokens expires in
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=2)
 
     SESSION_TYPE = 'filesystem'
     USE_ENCRYPTION = True

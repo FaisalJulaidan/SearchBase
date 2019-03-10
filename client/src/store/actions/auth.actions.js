@@ -92,19 +92,6 @@ const logout = () => {
     };
 };
 
-const checkAuthTimeout = (expirationTime, refresh) => {
-    return {
-        type: actionTypes.AUTH_CHECK_TIMEOUT,
-        expirationTime, refresh
-    };
-};
-
-const refreshToken = (refresh) => {
-    return {
-        type: actionTypes.REFRESH_TOKEN,
-        refresh
-    };
-};
 
 export const authActions = {
     login,
@@ -124,6 +111,4 @@ export const authActions = {
     newResetPasswordFailure,
 
     logout,
-    refreshToken,
-    checkAuthTimeout
 };

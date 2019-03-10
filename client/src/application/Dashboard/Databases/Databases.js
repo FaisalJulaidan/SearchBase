@@ -29,6 +29,8 @@ class Databases extends Component {
     showDBDetails = () => this.setState({dbDetailsVisible: true});
     hideDBDetails = () => this.setState({dbDetailsVisible: false});
 
+    updateDatabase = updatedDatabase => this.props.dispatch(databaseActions.updateDatabase({updatedDatabase}));
+    deleteDatabase = deletedDatabase => this.props.dispatch(databaseActions.deleteDatabase({deletedDatabase}));
 
     uploadDatabase = newDatabase => this.props.dispatch(databaseActions.uploadDatabase({newDatabase: newDatabase}));
     showDatabaseInfo = (databaseID) => this.props.dispatch(databaseActions.fetchDatabase(databaseID));
@@ -88,19 +90,19 @@ class Databases extends Component {
                                 <div>
                                     <h3>Databases Information</h3>
                                 </div>
-                                {/*<div>*/}
-                                    {/*<Button className={styles.Panel_Header_Button}*/}
-                                            {/*disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}*/}
-                                            {/*type="primary" icon="info"*/}
-                                            {/*onClick={this.showDBDetails}>*/}
-                                        {/*Details*/}
-                                    {/*</Button>*/}
-                                    {/*<Button className={styles.Panel_Header_Button} type="danger" icon="delete"*/}
-                                            {/*disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}*/}
-                                            {/*onClick={this.deleteDB}>*/}
-                                        {/*Delete Database*/}
-                                    {/*</Button>*/}
-                                {/*</div>*/}
+                                <div>
+                                    <Button className={styles.Panel_Header_Button}
+                                            disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}
+                                            type="primary" icon="info"
+                                            onClick={this.showDBDetails}>
+                                        Details
+                                    </Button>
+                                    <Button className={styles.Panel_Header_Button} type="danger" icon="delete"
+                                            disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}
+                                            onClick={() => this.deleteDatabase(this.props.fetchedDatabase)}>
+                                        Delete Database
+                                    </Button>
+                                </div>
                             </div>
 
 
@@ -145,8 +147,10 @@ class Databases extends Component {
 
 
                 <DatabaseDetailsModal visible={this.state.dbDetailsVisible}
+                                      databaseOptions={this.props.options?.databases}
                                       databaseInfo={this.props.fetchedDatabase.databaseInfo}
                                       hideModal={this.hideDBDetails}
+                                      updateDatabase={this.updateDatabase}
                 />
 
 

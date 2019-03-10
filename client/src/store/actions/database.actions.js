@@ -75,13 +75,14 @@ const resetFetchedDtabase = () => {
 };
 
 // Delete
-const DeleteDatabase = () => {
+const deleteDatabase = ({deletedDatabase}) => {
     return {
         type: actionTypes.DELETE_DATABASE_REQUEST,
+        deletedDatabase
     }
 };
 
-const DeleteDatabaseSuccess = (successMessage, databaseID) => {
+const deleteDatabaseSuccess = (successMessage, databaseID) => {
     return {
         type: actionTypes.DELETE_DATABASE_SUCCESS,
         successMessage,
@@ -89,9 +90,32 @@ const DeleteDatabaseSuccess = (successMessage, databaseID) => {
     }
 };
 
-const DeleteDatabaseFailure = (error) => {
+const deleteDatabaseFailure = (error) => {
     return {
         type: actionTypes.DELETE_DATABASE_FAILURE,
+        error
+    }
+};
+
+// Update Database
+const updateDatabase = (updatedDatabase) => {
+    return {
+        type: actionTypes.UPDATE_DATABASE_REQUEST,
+        updatedDatabase
+    }
+};
+
+const updateDatabaseSuccess = (successMessage, databaseID) => {
+    return {
+        type: actionTypes.UPDATE_DATABASE_SUCCESS,
+        successMessage,
+        databaseID
+    }
+};
+
+const updateDatabaseFailure = (error) => {
+    return {
+        type: actionTypes.UPDATE_DATABASE_FAILURE,
         error
     }
 };
@@ -110,7 +134,11 @@ export const databaseActions = {
     fetchDatabaseFailure,
     resetFetchedDtabase,
 
-    DeleteDatabase,
-    DeleteDatabaseSuccess,
-    DeleteDatabaseFailure,
+    updateDatabase,
+    updateDatabaseSuccess,
+    updateDatabaseFailure,
+
+    deleteDatabase,
+    deleteDatabaseSuccess,
+    deleteDatabaseFailure,
 };

@@ -81,13 +81,14 @@ Question = {
             "items": {
                 "type": "object",
                 "properties": {
+                    "id": {"type": "string"},
                     "text": { "type": "string" },
                     "keywords": { "type": "array", "items": { "type": "string" } },
                     "blockToGoID": { "type": [ "string",  "null" ] },
                     "action": { "enum": [e.value for e in enums.BlockAction]},
                     "afterMessage": { "type": "string"}
                 },
-                "required": ["text", "keywords", "action", "afterMessage", "blockToGoID"],
+                "required": ["id", "text", "keywords", "action", "afterMessage", "blockToGoID"],
                 "additionalProperties": False
             }
         }

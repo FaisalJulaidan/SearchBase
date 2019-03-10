@@ -11,7 +11,7 @@ class Block extends Component {
 
     render() {
         const {block, options} = this.props;
-        const {databases} = options ? options : null;
+        const databases = options ? options.databases : null;
 
         return (
             <Collapse bordered={true}>

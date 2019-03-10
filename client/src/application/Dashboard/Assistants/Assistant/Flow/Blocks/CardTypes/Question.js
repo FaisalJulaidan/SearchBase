@@ -13,6 +13,7 @@ import {
     SkippableFormItem,
     StoreInDBFormItem
 } from './CardTypesFormItems'
+import shortid from 'shortid';
 
 const FormItem = Form.Item;
 
@@ -27,6 +28,7 @@ class Question extends Component {
         inputVisible: false,
         inputValue: '',
         answers: [],
+        editedAnswer: {},
 
         groupName: ''
     };
@@ -62,23 +64,32 @@ class Question extends Component {
         (err, values) => {
             if (!err) {
                 const answer = {
+                    id: shortid.generate(),
                     text: values.answer,
                     keywords: this.state.tags,
                     blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                     action: values.action === "Go To Group" ? "Go To Specific Block" : values.action,
-                    afterMessage: values.afterMessage || "",
-                    ID: values.answer + "%" + Date.now()
+                    afterMessage: values.afterMessage || ""
                 };
-                let answers = [answer].concat(this.state.answers);
-                this.setState({answers, tags: []});
-                this.hideAddAnswer();
+
+                // remove old edited answer
+                this.removeAnswer({id: this.state.editedAnswer?.id})
+                    .then(() => {
+                        let answers = [answer].concat(this.state.answers);
+                        this.setState({answers, tags: []});
+                        this.hideAddAnswer();
+                    });
             }
         });
     showAddAnswer = () => this.setState({modalVisible: true});
-    hideAddAnswer = () => this.setState({modalVisible: false});
-    removeAnswer = deletedAnswer => this.setState({
-        answers: [...this.state.answers].filter(answer => answer.ID !== deletedAnswer.ID)
+    hideAddAnswer = () => this.setState({modalVisible: false, editedAnswer: {}, tags: []});
+    removeAnswer = deletedAnswer => new Promise(res => {
+        this.setState({
+            answers: [...this.state.answers].filter(answer => answer.id !== deletedAnswer.id)
+        }, () => res('done'));
     });
+
+    showEditAnswer = answer => this.setState({modalVisible: true, editedAnswer: answer, tags: answer.keywords});
 
     //Tags component's functions
     removeTag = (removedTag) => this.setState({tags: this.state.tags.filter(tag => tag !== removedTag)});
@@ -125,21 +136,26 @@ class Question extends Component {
                                       options={this.props.options}
                                       layout={layout}/>
 
-                    <FormItem label="Answers"
-                              {...layout}>
+                    <FormItem label="Answers"{...layout}>
                         <Button onClick={this.showAddAnswer}
                                 type="primary" icon="plus" shape="circle" size={"small"}></Button>
                         {
                             this.state.answers.map((answer, i) => (
-
                                 <Card title={answer.text} key={i}
                                       extra={
-                                          <Popconfirm placement="topRight" title="Are you sure delete this answer?"
-                                                      onConfirm={() => this.removeAnswer(answer)}
-                                                      okText="Yes" cancelText="No">
-                                              <Button type="danger" icon="delete" shape="circle"
+                                          <div>
+                                              <Button type="default" icon="edit" shape="circle"
+                                                      onClick={() => this.showEditAnswer(answer)}
                                                       size={"small"}></Button>
-                                          </Popconfirm>
+                                              <Popconfirm placement="topRight" title="Are you sure delete this answer?"
+                                                          onConfirm={() => this.removeAnswer(answer)}
+                                                          okText="Yes" cancelText="No">
+                                                  <Button type="danger" icon="delete" shape="circle"
+                                                          style={{marginLeft: 5}}
+                                                          size={"small"}></Button>
+                                              </Popconfirm>
+                                          </div>
+
                                       }
                                       style={{width: 200, margin: 10}}>
                                     <p>Action: {answer.action}</p>
@@ -170,6 +186,7 @@ class Question extends Component {
                                   extra="This will be shown as answer in chatbot"
                                   {...layout}>
                             {getFieldDecorator('answer', {
+                                initialValue: this.state.editedAnswer?.text,
                                 rules: [{
                                     required: true,
                                     message: "Please input answer field",
@@ -214,14 +231,15 @@ class Question extends Component {
                             </div>
                         </FormItem>
 
-                        <ActionFormItem FormItem={FormItem} blockOptions={blockOptions}
-                                        block={block}
+                        <ActionFormItem FormItem={FormItem}
+                                        blockOptions={blockOptions}
+                                        block={{Content: {action: this.state.editedAnswer?.action}}}
                                         setStateHandler={(state) => this.setState(state)}
                                         getFieldDecorator={getFieldDecorator}
                                         layout={layout}/>
 
                         <ShowGoToBlockFormItem FormItem={FormItem}
-                                               block={block}
+                                               block={{Content: {blockToGoID: this.state.editedAnswer?.blockToGoID}}}
                                                allBlocks={allBlocks}
                                                showGoToBlock={this.state.showGoToBlock}
                                                getFieldDecorator={getFieldDecorator}

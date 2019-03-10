@@ -104,7 +104,7 @@ class DataSettings extends React.Component {
                 <FormItem
                     label={"New Users Counter:"}
                     extra={"If allowed we will send you the number of new user records your assistants " +
-                              "have stored every 12 hours through email."}
+                              "have stored through email. How often you will receive this is defined in the assistant settings"}
                     {...formItemLayout}>
                     {getFieldDecorator("statNotifications", {
                         initialValue: this.state.statNotifications,

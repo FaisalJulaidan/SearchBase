@@ -75,7 +75,7 @@ class Flow extends Component {
         this.setState({
             assistant: updatedAssistant,
             isSaved: false
-        })
+        });
         destroyMessage();
         successMessage('Group added!');
     };

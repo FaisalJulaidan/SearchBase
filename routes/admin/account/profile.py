@@ -56,7 +56,12 @@ def profile_settings():
     user = get_jwt_identity()['user']
     if request.method == "POST":
         userID = user.get("id", 0)
-        email = user.get("email", None)
+
+        user_callback: Callback = user_services.getByID(userID)
+        if not user_callback.Success:
+            return helpers.jsonResponse(False, 400, "User could not be received", None)
+
+        email = user_callback.Data.Email
 
         newsletters = request.json.get("newsletters", "Error")
         tracking = request.json.get("trackData", "Error")

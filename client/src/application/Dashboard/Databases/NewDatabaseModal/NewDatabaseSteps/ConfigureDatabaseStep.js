@@ -29,10 +29,10 @@ class ConfigureDatabaseStep extends Component {
                             initialValue: this.props.databaseConfiguration.databaseName,
                             rules: [{
                                 required: true,
-                                message: 'Please input your assistant name',
+                                message: 'Please input your database name',
                             }],
                         })(
-                            <Input placeholder="Ex: London candidates, Jobs in europ, etc..."/>
+                            <Input placeholder="Ex: London candidates, Jobs in Europe, etc..."/>
                         )}
                     </FormItem>
 

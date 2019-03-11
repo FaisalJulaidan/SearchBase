@@ -61,13 +61,13 @@ function* watchAddDatabase() {
 
 // ==================================================================
 
-function* deleteDatabase({deletedDatabase}) {
+function* deleteDatabase({databaseID}) {
     try {
-        console.log(deletedDatabase)
-        loadingMessage('Deleteing database...', 0);
-        const res = yield http.delete(`/databases`, {deletedDatabase: deletedDatabase.databaseInfo});
-        successMessage('Database Deleted');
-        yield put(databaseActions.deleteDatabaseSuccess(res.data.msg, res.data.data));
+        console.log(databaseID);
+        loadingMessage('Deleting database...', 0);
+        const res = yield http.delete(`/databases/${databaseID}`);
+        successMessage('Database deleted');
+        yield put(databaseActions.deleteDatabaseSuccess(res.data.msg, databaseID));
 
     } catch (error) {
         console.log(error);
@@ -75,19 +75,19 @@ function* deleteDatabase({deletedDatabase}) {
         errorMessage("Couldn't delete database");
     }
 }
-
 function* watchDeleteDatabase() {
     yield takeLatest(actionTypes.DELETE_DATABASE_REQUEST, deleteDatabase)
 }
 
 // ==================================================================
 
-function* updateDatabase({updatedDatabase}) {
+function* updateDatabase({data, databaseID}) {
     try {
         loadingMessage('Updating database...', 0);
-        const res = yield http.put(`/databases`, updatedDatabase);
+        const res = yield http.put(`/databases/${databaseID}`, data);
         successMessage('Database updated');
         yield put(databaseActions.updateDatabaseSuccess(res.data.msg, res.data.data));
+        yield put(databaseActions.getDatabasesList());
 
     } catch (error) {
         yield put(databaseActions.updateDatabaseFailure(error.response.data));

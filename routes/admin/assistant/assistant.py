@@ -28,9 +28,8 @@ def assistants():
         # else:
         #     registers = {}
 
-        return helpers.jsonResponse(True, 200, "Assistants Returned!", {
-                                                        "assistants": helpers.getListFromSQLAlchemyList(callback.Data)
-                                                    })
+        return helpers.jsonResponse(True, 200, "Assistants Returned!",
+                                    {"assistants": helpers.getListFromSQLAlchemyList(callback.Data)})
     if request.method == "POST":
         data = request.json
         callback: Callback = assistant_services.create(data.get('assistantName'),

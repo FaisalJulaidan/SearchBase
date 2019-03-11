@@ -11,23 +11,31 @@ class DatabaseDetailsModal extends Component {
         super(props);
     }
 
-    render() {
+    checkName = (rule, value, callback) => {
+        if (!this.props.isDatabaseNameValid(value)) {
+            callback('Database name already exists. Choose another one');
+        } else {
+            callback();
+        }
+    };
 
+    handleSave = () => this.props.form.validateFields((errors, values) => {
+        const {databaseInfo, updateDatabase, hideModal} = this.props;
+        if (!errors){
+            hideModal();
+            return updateDatabase(values, databaseInfo.ID)
+        }
+
+    });
+
+    render() {
+        const {getFieldDecorator} = this.props.form;
+        const {databaseInfo, databaseOptions} = this.props;
         const formItemLayout = {
             labelCol: {span: 6},
             wrapperCol: {span: 14},
         };
-
-
-        const {getFieldDecorator, validateFields} = this.props.form;
-
-        const {databaseInfo, databaseOptions, updateDatabase} = this.props;
-
-        const handleSave = () => validateFields((errors, columns) => {
-            if (!errors)
-                return updateDatabase(columns)
-        });
-
+        
         return (
             <Modal width={"60%"}
                    title="Update Database"
@@ -36,22 +44,22 @@ class DatabaseDetailsModal extends Component {
                    destroyOnClose={true}
                    footer={[
                        <Button key="cancel" onClick={this.props.hideModal}>Cancel</Button>,
-                       <Button key="submit" type="primary" onClick={handleSave}>Save</Button>,
+                       <Button key="submit" type="primary" onClick={this.handleSave}>Save</Button>,
                    ]}>
                 <Form layout='horizontal'>
                     <FormItem
                         label="Database Name"
-                        extra="Enter a name for your assistant to easily identify it in the dashboard"
+                        extra="Enter unique name for your database"
                         {...formItemLayout}>
                         {
                             getFieldDecorator('databaseName', {
                                 initialValue: databaseInfo?.Name,
-                                rules: [{
-                                    required: true,
-                                    message: 'Please input your assistant name',
-                                }],
+                                rules: [
+                                    {required: true, message: 'Please input your database name'},
+                                    {validator: this.checkName},
+                                    ],
                             })
-                            (<Input placeholder="Ex: My first assistant, Sales Assistant"/>)
+                            (<Input placeholder="Ex: London candidates, Jobs in Europe, etc..."/>)
                         }
                     </FormItem>
 
@@ -60,11 +68,10 @@ class DatabaseDetailsModal extends Component {
                         {getFieldDecorator('databaseType', {
                             initialValue: databaseInfo?.Type?.name,
                             rules: [{
-                                required: true,
-                                message: 'Please input your assistant name',
+                                required: false,
                             }],
                         })(
-                            <Select placeholder="Please select type" loading={!(!!databaseOptions)}>
+                            <Select disabled={true} placeholder="Please select type" loading={!(!!databaseOptions)}>
                                 {
                                     databaseOptions ?
                                         databaseOptions.types.map((type, key) =>

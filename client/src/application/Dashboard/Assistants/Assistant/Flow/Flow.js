@@ -9,7 +9,7 @@ import styles from "./Flow.module.less"
 import {Modal, Spin} from "antd";
 import shortid from 'shortid';
 import { Prompt } from "react-router-dom";
-import {destroyMessage, successMessage} from "../../../../../helpers";
+import {destroyMessage, successMessage, history} from "../../../../../helpers";
 
 const confirm = Modal.confirm;
 
@@ -44,7 +44,11 @@ class Flow extends Component {
         console.log('componentDidMount');
         const {assistantList, match} = this.props;
         const assistant = assistantList.find(assistant => assistant.ID === +match.params.id);
-        // console.log(assistant?.Flow?.groups[0] !== undefined ? this.selectGroup(assistant.Flow.groups[0]) : null);
+        // if the user try to access assistant that does not exist using the URL, he will be redirected
+        if (!(assistant)){
+            history.push('/dashboard/assistants');
+            return;
+        }
         this.setState({assistant: assistant},
             () => console.log(this.state.assistant)
         )

@@ -42,19 +42,18 @@ export const database = (state = initialState, action) => {
 
         case actionTypes.DELETE_DATABASE_REQUEST:
             return updateObject(state, {
-                isDeletingGroup: true
+                isDeletingDatabase: true
             });
         case actionTypes.DELETE_DATABASE_SUCCESS:
-            let databasesList = [...state.databasesList];
-            const databaseToDeleteIndex =  databasesList.findIndex(db => db.ID === action.databaseID);
-            databasesList.splice(databaseToDeleteIndex, 1);
+            let databasesList = [...state.databasesList].filter(db => db.ID !== action.databaseID);
             return updateObject(state, {
-                isDeletingGroup: false,
-                databasesList: action.databasesList
+                isDeletingDatabase: false,
+                databasesList: databasesList,
+                fetchedDatabase: {}
             });
         case actionTypes.DELETE_DATABASE_FAILURE:
             return updateObject(state, {
-                isDeletingGroup: false,
+                isDeletingDatabase: false,
                 errorMsg: action.error.msg
             });
 

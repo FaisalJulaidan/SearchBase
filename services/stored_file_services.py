@@ -78,7 +78,7 @@ def create(filePath, chatbotSession) -> StoredFile or None:
 def updateStoredFile(id, filePath, chatbotSession):
     try:
         callback: Callback = getByID(id)
-        if not callback.Success: return Callback(False, "Could not find storedFile")
+        if not callback.Success: return callback
         callback.Data.FilePath = filePath
         if chatbotSession:
             callback.Data.ChatbotSession = chatbotSession

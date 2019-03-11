@@ -46,6 +46,7 @@ class NewDatabaseModal extends Component {
             content: () => this.props.databaseOptions ?
                 <ConfigureDatabaseStep ref={this.configureDatabaseStep}
                                        databaseOptions={this.props.databaseOptions}
+                                       isDatabaseNameValid={this.props.isDatabaseNameValid}
                                        databaseConfiguration={this.state.databaseConfiguration}/>
                 : <Spin/>
         },

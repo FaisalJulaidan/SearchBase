@@ -100,12 +100,10 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                 else:
                     filenames+= ',' + filename
 
-            print(1)
-            # Store filepaths in the DB
+            # Store filePaths in the DB
             saveFile_callback: Callback = stored_file_services.create(filenames, session)
             if not saveFile_callback.Success:
                 raise Exception(saveFile_callback.Message)
-            print(2)
 
         except Exception as exc:
             print(exc)

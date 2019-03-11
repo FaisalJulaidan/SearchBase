@@ -67,7 +67,6 @@ export const assistant = (state = initialState, action) => {
         case actionTypes.DELETE_ASSISTANT_SUCCESS:
 
             let assistantList = [...state.assistantList].filter(assistant => assistant.ID !== action.assistantID);
-            console.log(assistantList);
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isDeleting: false,

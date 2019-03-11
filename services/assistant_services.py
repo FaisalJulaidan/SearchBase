@@ -106,10 +106,6 @@ def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPe
         db.session.rollback()
         return Callback(False,
                         "Couldn't update assistant "+name)
-    # finally:
-       # db.session.close()
-
-
 
 def changeStatus(assistant: Assistant, status):
     try:
@@ -125,8 +121,6 @@ def changeStatus(assistant: Assistant, status):
         print("Error in assistant_services.changeStatus(): ", exc)
         db.session.rollback()
         return Callback(False, "Could not change the assistant's status.")
-    # finally:
-       # db.session.close()
 
 
 def removeByID(id) -> Callback:

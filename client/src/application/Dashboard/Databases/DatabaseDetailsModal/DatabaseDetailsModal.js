@@ -13,7 +13,7 @@ class DatabaseDetailsModal extends Component {
 
     checkName = (rule, value, callback) => {
         if (!this.props.isDatabaseNameValid(value)) {
-            callback('Database name already exists. Choose another one');
+            callback('Database name already exists. Choose another one, please!');
         } else {
             callback();
         }

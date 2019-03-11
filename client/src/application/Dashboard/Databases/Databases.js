@@ -160,6 +160,7 @@ class Databases extends Component {
                 <NewDatabaseModal visible={this.state.visible}
                                   databaseOptions={this.props.options?.databases}
                                   uploadDatabase={this.uploadDatabase}
+                                  isDatabaseNameValid={this.isDatabaseNameValid}
                                   hideModal={this.hideModal}/>
 
 

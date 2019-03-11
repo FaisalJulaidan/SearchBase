@@ -325,9 +325,9 @@ class Job(db.Model):
     PayRate = db.Column(db.Float(), nullable=True)
     Currency = db.Column(CurrencyType)
     StartDate = db.Column(db.DateTime(), nullable=True)
+    JobLink = db.Column(db.String(612), nullable=True)
 
     # Relationships:
-
     DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
     Database = db.relationship('Database')
 

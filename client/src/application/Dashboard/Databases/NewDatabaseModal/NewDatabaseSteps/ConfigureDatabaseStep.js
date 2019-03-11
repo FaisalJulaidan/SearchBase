@@ -5,6 +5,18 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 
 class ConfigureDatabaseStep extends Component {
+
+
+    checkName = (rule, value, callback) => {
+        if (!this.props.isDatabaseNameValid(value)) {
+            callback('Database name already exists. Choose another one, please!');
+        } else {
+            callback();
+        }
+    };
+
+
+
     render() {
         const formItemLayout = {
             labelCol: {span: 6},
@@ -27,10 +39,10 @@ class ConfigureDatabaseStep extends Component {
                               {...formItemLayout}>
                         {getFieldDecorator('databaseName', {
                             initialValue: this.props.databaseConfiguration.databaseName,
-                            rules: [{
-                                required: true,
-                                message: 'Please input your database name',
-                            }],
+                            rules: [
+                                {required: true, message: 'Please input your database name'},
+                                {validator: this.checkName}
+                                ],
                         })(
                             <Input placeholder="Ex: London candidates, Jobs in Europe, etc..."/>
                         )}

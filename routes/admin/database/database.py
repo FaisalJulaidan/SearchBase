@@ -19,6 +19,7 @@ def get_databaseOptions():
         return helpers.jsonResponse(True, 200, "These are the options the database provides.", callback.Data)
 
 
+# Get databases list, and create a new database
 @database_router.route("/databases", methods=['GET', 'POST'])
 @jwt_required
 def get_databasesList():
@@ -43,24 +44,26 @@ def get_databasesList():
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
-@database_router.route("/databases/<int:databaseID>", methods=['GET', 'DELETE'])
+@database_router.route("/databases/<int:databaseID>", methods=['GET', 'DELETE', 'PUT'])
 @jwt_required
 def get_database(databaseID):
 
     # Authenticate
     user = get_jwt_identity()['user']
 
+    callback: Callback = Callback(False, "")
     if request.method == "GET":
-        callback: Callback = databases_services.fetchDatabase(databaseID, user['companyID'])
-        # Return response
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
-        print(callback.Data)
-        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+        callback = databases_services.fetchDatabase(databaseID, user['companyID'])
 
     if request.method == "DELETE":
-        callback: Callback = databases_services.deleteDatabase(databaseID, user['companyID'])
-        # Return response
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message)
-        return helpers.jsonResponse(True, 200, callback.Message)
+        callback = databases_services.deleteDatabase(databaseID, user['companyID'])
+
+    if request.method == "PUT":
+        data = request.json
+
+        callback = databases_services.updateDatabase(databaseID, data.get('databaseName'), user['companyID'])
+
+    # Return response
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)

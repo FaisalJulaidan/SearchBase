@@ -21,7 +21,6 @@ def fetchDatabase(id, companyID: int) -> Callback:
         databaseContent = None
         # TODO Ensure it works
         if database.Type == DatabaseType.Candidates:
-            print('fetch from candidate table')
             # result = helpers.getListFromSQLAlchemyList(getAllCandidates(id))
             # databaseContent = result['records']
             databaseContent = helpers.getListFromSQLAlchemyList(getAllCandidates(id))
@@ -32,7 +31,6 @@ def fetchDatabase(id, companyID: int) -> Callback:
                     databaseContent[i]['Currency'] = temp
 
         elif database.Type == DatabaseType.Jobs:
-            print('fetch from candidate table')
             databaseContent = helpers.getListFromSQLAlchemyList(getAllJobs(id))
             for i, _ in enumerate(databaseContent):
                 if databaseContent[i]['Currency']:
@@ -55,8 +53,21 @@ def fetchDatabase(id, companyID: int) -> Callback:
         print(exc)
         db.session.rollback()
         return Callback(False, 'Could not fetch the database.')
-    # finally:
-        # db.session.close()
+
+
+def updateDatabase(id, newName, companyID)-> Callback:
+    try:
+        if not newName: raise  Exception
+        db.session.query(Database).filter(and_(Database.ID == id, Database.CompanyID == companyID))\
+            .update({'Name': newName})
+        db.session.commit()
+        return Callback(True, newName + ' database updated successfully')
+
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False,
+                        "Couldn't update database ")
 
 
 # ----- Uploader ----- #
@@ -301,8 +312,6 @@ def scanCandidates(session, dbIDs):
             df['count'] += df[Candidate.DesiredPosition.name].str.count('|'.join(keywords[DT.JobDescription.value['name']]),
                                                                         flags=re.IGNORECASE)
 
-        print(df)
-
         topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 2), 'count')
                                 .to_json(orient='records'))
         data = []
@@ -312,7 +321,7 @@ def scanCandidates(session, dbIDs):
                 "description": tr[Candidate.CandidateSkills.name],
                 "tail": "Salary: " + str(tr[Candidate.DesiredSalary.name])
             })
-        print(data)
+
         return Callback(True, '', data)
 
     except Exception as exc:
@@ -403,7 +412,7 @@ def scanJobs(session, dbIDs):
                 "description": tr[Job.Description.name],
                 "tail": "Salary: " + str(tr[Job.Salary.name])
             })
-        print(data)
+
         return Callback(True, '', data)
 
     except Exception as exc:

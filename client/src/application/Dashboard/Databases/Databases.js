@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Menu, Spin, Button} from 'antd';
+import {Menu, Spin, Button, Modal} from 'antd';
 
 import styles from "./Databases.module.less"
 import NewDatabaseModal from "./NewDatabaseModal/NewDatabaseModal";
@@ -9,6 +9,8 @@ import {databaseActions} from "../../../store/actions";
 
 import DatabaseInfo from "./DatabaseInfo/DatabaseInfo"
 import DatabaseDetailsModal from "./DatabaseDetailsModal/DatabaseDetailsModal"
+
+const confirm = Modal.confirm;
 
 class Databases extends Component {
 
@@ -20,6 +22,7 @@ class Databases extends Component {
 
     componentWillMount() {
         this.props.dispatch(databaseActions.getDatabasesList());
+        console.log('DFGDFGDFGDGDFGDFGSDFGSWETHWRTHERTH');
     }
 
 
@@ -29,13 +32,29 @@ class Databases extends Component {
     showDBDetails = () => this.setState({dbDetailsVisible: true});
     hideDBDetails = () => this.setState({dbDetailsVisible: false});
 
+    updateDatabase = (updatedDatabase, databaseID) => {
+        this.props.dispatch(databaseActions.updateDatabase(updatedDatabase, databaseID));
+    };
+    deleteDatabase = deletedDatabase => {
+        confirm({
+            title: `Delete database confirmation`,
+            content: `If you click OK, this database will be deleted with its content forever`,
+            onOk: () => {
+                this.props.dispatch(databaseActions.deleteDatabase(deletedDatabase.databaseInfo.ID));
+            }
+        });
+    };
+
+    isDatabaseNameValid = (name) => {
+        return !(this.props.databasesList.findIndex(db => db.Name === name) >= 0)
+    };
 
     uploadDatabase = newDatabase => this.props.dispatch(databaseActions.uploadDatabase({newDatabase: newDatabase}));
     showDatabaseInfo = (databaseID) => this.props.dispatch(databaseActions.fetchDatabase(databaseID));
 
 
     componentWillUnmount() {
-        this.props.dispatch(databaseActions.resetFetchedDtabase())
+        this.props.dispatch(databaseActions.resetFetchedDatabase())
     }
 
     getRecordsData = records => {
@@ -88,26 +107,26 @@ class Databases extends Component {
                                 <div>
                                     <h3>Databases Information</h3>
                                 </div>
-                                {/*<div>*/}
-                                    {/*<Button className={styles.Panel_Header_Button}*/}
-                                            {/*disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}*/}
-                                            {/*type="primary" icon="info"*/}
-                                            {/*onClick={this.showDBDetails}>*/}
-                                        {/*Details*/}
-                                    {/*</Button>*/}
-                                    {/*<Button className={styles.Panel_Header_Button} type="danger" icon="delete"*/}
-                                            {/*disabled={!(!!this.props.fetchedDatabase.databaseContent?.length)}*/}
-                                            {/*onClick={this.deleteDB}>*/}
-                                        {/*Delete Database*/}
-                                    {/*</Button>*/}
-                                {/*</div>*/}
+                                <div>
+                                    <Button className={styles.Panel_Header_Button}
+                                            disabled={!(!!this.props.fetchedDatabase?.databaseContent?.length)}
+                                            type="primary" icon="info"
+                                            onClick={this.showDBDetails}>
+                                        Details
+                                    </Button>
+                                    <Button className={styles.Panel_Header_Button} type="danger" icon="delete"
+                                            disabled={!(!!this.props.fetchedDatabase?.databaseContent?.length)}
+                                            onClick={() => this.deleteDatabase(this.props.fetchedDatabase)}>
+                                        Delete Database
+                                    </Button>
+                                </div>
                             </div>
 
 
                             <div className={styles.Panel_Body} style={{padding: 0}}>
                                 {
                                     (
-                                        (!!this.props.fetchedDatabase.databaseContent?.length)
+                                        (!!this.props.fetchedDatabase?.databaseContent?.length)
                                         &&
                                         (!!this.props.options.databases)
                                     ) ?
@@ -141,12 +160,16 @@ class Databases extends Component {
                 <NewDatabaseModal visible={this.state.visible}
                                   databaseOptions={this.props.options?.databases}
                                   uploadDatabase={this.uploadDatabase}
+                                  isDatabaseNameValid={this.isDatabaseNameValid}
                                   hideModal={this.hideModal}/>
 
 
                 <DatabaseDetailsModal visible={this.state.dbDetailsVisible}
-                                      databaseInfo={this.props.fetchedDatabase.databaseInfo}
+                                      databaseOptions={this.props.options?.databases}
+                                      databaseInfo={this.props.fetchedDatabase?.databaseInfo}
                                       hideModal={this.hideDBDetails}
+                                      isDatabaseNameValid={this.isDatabaseNameValid}
+                                      updateDatabase={this.updateDatabase}
                 />
 
 

@@ -1,9 +1,9 @@
-import {Button, Divider, Modal, Steps, Spin, message, Form, Input, Switch, InputNumber, Slider} from 'antd';
+import {Button, Divider, Modal, Steps, Spin, message, Form, Input, Switch, InputNumber, Slider, Select} from 'antd';
 
 import React, {Component} from 'react';
 
 const FormItem = Form.Item;
-
+const Option = Select.Option;
 
 class DatabaseDetailsModal extends Component {
 
@@ -11,49 +11,76 @@ class DatabaseDetailsModal extends Component {
         super(props);
     }
 
-    render() {
+    checkName = (rule, value, callback) => {
+        if (!this.props.isDatabaseNameValid(value)) {
+            callback('Database name already exists. Choose another one, please!');
+        } else {
+            callback();
+        }
+    };
 
+    handleSave = () => this.props.form.validateFields((errors, values) => {
+        const {databaseInfo, updateDatabase, hideModal} = this.props;
+        if (!errors){
+            hideModal();
+            return updateDatabase(values, databaseInfo.ID)
+        }
+
+    });
+
+    render() {
+        const {getFieldDecorator} = this.props.form;
+        const {databaseInfo, databaseOptions} = this.props;
         const formItemLayout = {
             labelCol: {span: 6},
             wrapperCol: {span: 14},
         };
-
-
-        const {getFieldDecorator} = this.props.form;
-
-        const {databaseInfo} = this.props;
-
+        
         return (
             <Modal width={"60%"}
-                   title="Upload New Database"
+                   title="Update Database"
                    visible={this.props.visible}
                    onCancel={this.props.hideModal}
                    destroyOnClose={true}
                    footer={[
-                       <Button key="delete" type="danger" onClick={this.props.handleDelete}>
-                           Delete
-                       </Button>,
-                       <Button key="cancel" onClick={this.props.handleCancel}>Cancel</Button>,
-                       <Button key="submit" type="primary" onClick={this.handleSave}>
-                           Save
-                       </Button>,
+                       <Button key="cancel" onClick={this.props.hideModal}>Cancel</Button>,
+                       <Button key="submit" type="primary" onClick={this.handleSave}>Save</Button>,
                    ]}>
                 <Form layout='horizontal'>
                     <FormItem
-                        label="Assistant Name"
-                        extra="Enter a name for your assistant to easily identify it in the dashboard"
+                        label="Database Name"
+                        extra="Enter unique name for your database"
                         {...formItemLayout}>
                         {
-                            getFieldDecorator('assistantName', {
-                                rules: [{
-                                    required: true,
-                                    message: 'Please input your assistant name',
-                                }],
+                            getFieldDecorator('databaseName', {
+                                initialValue: databaseInfo?.Name,
+                                rules: [
+                                    {required: true, message: 'Please input your database name'},
+                                    {validator: this.checkName},
+                                    ],
                             })
-                            (<Input placeholder="Ex: My first assistant, Sales Assistant"/>)
+                            (<Input placeholder="Ex: London candidates, Jobs in Europe, etc..."/>)
                         }
                     </FormItem>
 
+                    <FormItem label="Database Type" extra="Select one of the supported types"
+                              {...formItemLayout}>
+                        {getFieldDecorator('databaseType', {
+                            initialValue: databaseInfo?.Type?.name,
+                            rules: [{
+                                required: false,
+                            }],
+                        })(
+                            <Select disabled={true} placeholder="Please select type" loading={!(!!databaseOptions)}>
+                                {
+                                    databaseOptions ?
+                                        databaseOptions.types.map((type, key) =>
+                                            <Option key={key} value={type}>{type}</Option>)
+                                        : null
+                                }
+                            </Select>
+                        )}
+                    </FormItem>
 
                 </Form>
             </Modal>

@@ -7,6 +7,7 @@ import Block from "./Block/Block";
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
 import NewBlockModal from "./Modals/NewBlockModal";
 import EditBlockModal from "./Modals/EditBlockModal1";
+import AssistantToolsModal from "./Modals/AssistantToolsModal";
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -26,6 +27,7 @@ class Blocks extends Component {
         addBlockVisible: false,
         editBlockVisible: false,
         deleteBlockVisible: false,
+        assistantToolsBlockVisible: false,
         blocks: [],
         edittedBlock: {},
         deletedBlock: {content: {}}
@@ -72,6 +74,10 @@ class Blocks extends Component {
     // this called from block.js & editBlockModal when you click on delete block button
     handleDeleteBlock = deletedBlock => this.props.deleteBlock(deletedBlock);
 
+    // ASSISTANT TOOLS MODAL
+    showAssistantToolsModal = () => this.setState({assistantToolsBlockVisible: true});
+    closeAssistantToolsModal = () => this.setState({assistantToolsBlockVisible: false});
+
 
     render() {
         return (
@@ -81,6 +87,10 @@ class Blocks extends Component {
                         <h3>{this.props.currentGroup.name} Questions</h3>
                     </div>
                     <div>
+                        {/*<Button className={styles.Panel_Header_Button} type="primary" icon="tool"*/}
+                                {/*onClick={this.showAssistantToolsModal}>*/}
+                            {/*Tools*/}
+                        {/*</Button>*/}
                         <Button className={styles.Panel_Header_Button} type="primary" icon="plus"
                                 onClick={this.showAddBlockModal} disabled={!this.props.currentGroup.id}>
                             Add Question
@@ -137,6 +147,9 @@ class Blocks extends Component {
                                 allBlocks={this.state.blocks}
                                 allGroups={this.props.allGroups}
                                 options={this.props.options}/>
+
+                <AssistantToolsModal visible={this.state.assistantToolsBlockVisible}
+                               closeModal={this.closeAssistantToolsModal}/>
             </div>
         );
     }

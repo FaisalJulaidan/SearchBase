@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Form, Input} from "antd";
+import {Button, Form, Input, Switch} from "antd";
 import {isEmpty} from "lodash";
 
 const FormItem = Form.Item;
@@ -61,11 +61,15 @@ class DataSettings extends React.Component {
         });
     };
 
-    handleChange = (e) => {
-        let name = e.target.name;
-        let checked = e.target.checked;
-        this.setState({[name]: checked});
-    };
+    handleChangeNewsletters = e => this.setState({newsletters: e});
+
+    handleChangeStatNotifications = e => this.setState({statNotifications: e});
+
+    handleChangeTrackData = e => this.setState({trackData: e});
+
+    handleChangeTechSupport = e => this.setState({techSupport: e});
+
+    handleChangeAccountSpecialist = e => this.setState({accountSpecialist: e});
 
     render() {
         const {getFieldDecorator} = this.props.form;
@@ -73,7 +77,7 @@ class DataSettings extends React.Component {
             labelCol: {span: 6},
             wrapperCol: {span: 14}
         };
-
+        console.log(this.state)
         return(
             <Form onSubmit={this.handleSubmit}>
                 <h2>Data Sharing Settings</h2>
@@ -95,7 +99,7 @@ class DataSettings extends React.Component {
                     {getFieldDecorator("newsletters", {
                         initialValue: this.state.newsletters,
                     })(
-                        <Input type={"checkbox"} name={"newsletters"} onChange={this.handleChange} checked={this.state.newsletters}/>
+                        <Switch checked={this.state.newsletters} onChange={this.handleChangeNewsletters} style={{marginRight: '5px'}}/>
                     )}
                 </FormItem>
 
@@ -109,7 +113,7 @@ class DataSettings extends React.Component {
                     {getFieldDecorator("statNotifications", {
                         initialValue: this.state.statNotifications,
                     })(
-                        <Input type={"checkbox"} name={"statNotifications"} onChange={this.handleChange} checked={this.state.statNotifications}/>
+                        <Switch checked={this.state.statNotifications} onChange={this.handleChangeStatNotifications} style={{marginRight: '5px'}}/>
                     )}
                 </FormItem>
 
@@ -129,7 +133,7 @@ class DataSettings extends React.Component {
                     {getFieldDecorator("trackData", {
                         initialValue: this.state.trackData,
                     })(
-                        <Input type={"checkbox"} name={"trackData"} onChange={this.handleChange} checked={this.state.trackData}/>
+                        <Switch checked={this.state.trackData} onChange={this.handleChangeTrackData} style={{marginRight: '5px'}}/>
                     )}
                 </FormItem>
 
@@ -142,7 +146,7 @@ class DataSettings extends React.Component {
                     {getFieldDecorator("techSupport", {
                         initialValue: this.state.techSupport,
                     })(
-                        <Input type={"checkbox"} name={"techSupport"} onChange={this.handleChange} checked={this.state.techSupport}/>
+                        <Switch checked={this.state.techSupport} onChange={this.handleChangeTechSupport} style={{marginRight: '5px'}}/>
                     )}
                 </FormItem>
 
@@ -157,7 +161,7 @@ class DataSettings extends React.Component {
                     {getFieldDecorator("accountSpecialist", {
                         initialValue: this.state.accountSpecialist,
                     })(
-                        <Input type={"checkbox"} name={"accountSpecialist"} onChange={this.handleChange} checked={this.state.accountSpecialist}/>
+                        <Switch checked={this.state.accountSpecialist} onChange={this.handleChangeAccountSpecialist} style={{marginRight: '5px'}}/>
                     )}
                 </FormItem>
 

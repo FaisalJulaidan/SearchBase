@@ -1,4 +1,4 @@
-import {put, takeEvery, all} from 'redux-saga/effects'
+import {put, takeLatest, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {http, updateUsername} from "../../helpers";
 import {profileActions} from "../actions";
@@ -9,14 +9,15 @@ import {alertError, alertSuccess, destroyMessage, loadingMessage, errorMessage, 
 function* getProfileData() {
     try {
         const res = yield http.get(`/profile`);
-        const profile = res.data.data;
+        const profile = yield res.data?.data;
+
         // Update username in localStorage
         yield updateUsername(profile.user.Firstname, profile.user.Surname);
-        return yield put(profileActions.getProfileSuccess(profile))
+        yield put(profileActions.getProfileSuccess(profile))
 
     } catch (error) {
         console.log(error);
-        return yield put(profileActions.getProfileFailure(error.response.data));
+        yield put(profileActions.getProfileFailure("Couldn't get profile data"));
     }
 
 }
@@ -27,8 +28,8 @@ function* saveProfileData(action) {
         const res = yield http.post(`/profile`, action.profileData);
         yield put(profileActions.saveProfileDetailsSuccess(res.data.msg));
         yield successMessage('Profile saved');
+        yield put(profileActions.getProfile())
 
-        return yield put(profileActions.getProfile())
     } catch (error) {
         console.log(error);
         yield put(profileActions.saveProfileDetailsFailure(error.response.data));
@@ -42,7 +43,8 @@ function* saveDataSettings(action) {
         const res = yield http.post(`/profile/settings`, action.dataSettings);
         yield put(profileActions.saveDataSettingsSuccess(res.data.msg));
         yield successMessage('Data Settings saved');
-        return yield put(profileActions.getProfile())
+        yield put(profileActions.getProfile())
+
     } catch (error) {
         console.log(error);
         yield put(profileActions.saveDataSettingsFailure(error.response.data));
@@ -66,19 +68,19 @@ function* changePassword({newPassword, oldPassword}) {
 
 
 function* watchProfileRequests(){
-    yield takeEvery(actionTypes.GET_PROFILE_REQUEST, getProfileData)
+    yield takeLatest(actionTypes.GET_PROFILE_REQUEST, getProfileData)
 }
 
 function* watchProfileUpdates() {
-    yield takeEvery(actionTypes.SAVE_PROFILE_DETAILS_REQUEST, saveProfileData)
+    yield takeLatest(actionTypes.SAVE_PROFILE_DETAILS_REQUEST, saveProfileData)
 }
 
 function* watchDataSettingsUpdates() {
-    yield takeEvery(actionTypes.SAVE_DATA_SETTINGS_REQUEST, saveDataSettings)
+    yield takeLatest(actionTypes.SAVE_DATA_SETTINGS_REQUEST, saveDataSettings)
 }
 
 function* watchChangePassword(){
-    yield takeEvery(actionTypes.CHANGE_PASS_REQUEST, changePassword)
+    yield takeLatest(actionTypes.CHANGE_PASS_REQUEST, changePassword)
 }
 
 export function* profileSaga() {

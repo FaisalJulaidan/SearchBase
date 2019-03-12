@@ -10,10 +10,9 @@ from sqlalchemy_utils import PasswordType, CurrencyType, Currency
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
 
+
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
-
-
 # force_auto_coercion()
 
 
@@ -24,6 +23,7 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
+
 
 
 class JsonEncodedDict(types.TypeDecorator):
@@ -94,6 +94,7 @@ class User(db.Model):
 
     Settings = db.relationship("UserSettings", uselist=False, back_populates="User",
                                cascade="all, delete, delete-orphan")
+
 
     # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
 
@@ -363,6 +364,16 @@ class Job(db.Model):
 #
 #     def __repr__(self):
 #         return '<Client {}>'.format(self.Name)
+
+
+# =================== Triggers ============================
+
+# Example of how triggers works
+# Also check: https://docs.sqlalchemy.org/en/latest/orm/session_events.html
+
+# @event.listens_for(Assistant, 'before_insert')
+# def receive_after_insert(mapper, connection, target):
+#     print(target) # prints Assistant
 
 
 class Callback():

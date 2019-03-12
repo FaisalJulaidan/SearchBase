@@ -22,7 +22,7 @@ function* login({email, password}) {
         yield localStorage.setItem("expiresIn", expiresIn);
 
         // Dispatch actions
-        yield put(profileActions.getProfile());
+        // yield put(profileActions.getProfile());
         yield put(authActions.loginSuccess(user));
 
         // Redirect to dashboard page

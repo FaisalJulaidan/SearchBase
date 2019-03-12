@@ -162,16 +162,13 @@ def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
 
 def updateUserSettings(userID, trackingData, techSupport, accountSpecialist, notifications):
     try:
-        result = db.session.query(UserSettings).filter(UserSettings.ID == userID).first()
-        if not result:
-            newUserSettings = UserSettings(ID=userID, TrackingData=trackingData, TechnicalSupport=techSupport,
-                                           AccountSpecialist=accountSpecialist, UserInputNotifications=notifications)
-            db.session.add(newUserSettings)
-        else:
-            result.TrackingData = trackingData
-            result.TechnicalSupport = techSupport
-            result.AccountSpecialist = accountSpecialist
-            result.UserInputNotifications = notifications
+
+        result = db.session.query(UserSettings).filter(UserSettings.ID == userID)\
+            .update({
+              'TrackingData': trackingData,
+              'TechnicalSupport': techSupport,
+              'AccountSpecialist': accountSpecialist,
+              "UserInputNotifications": notifications})
 
         db.session.commit()
         return Callback(True,

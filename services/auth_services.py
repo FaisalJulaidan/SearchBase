@@ -108,7 +108,7 @@ def authenticate(email: str, password_to_check: str) -> Callback:
                          }
                 }
         # for security, hide them in the token
-        tokenData = {'user': {"id": user.ID, "companyID": user.CompanyID}}
+        tokenData = {'user': {"id": user.ID, "companyID": user.CompanyID, "email": user.Email}}
 
         # Create the JWT token
         access_token = create_access_token(identity=tokenData)

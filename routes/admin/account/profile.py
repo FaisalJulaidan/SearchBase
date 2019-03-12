@@ -55,43 +55,31 @@ def profile():
 def profile_settings():
     user = get_jwt_identity()['user']
     if request.method == "POST":
-        userID = user.get("id", 0)
 
-        user_callback: Callback = user_services.getByID(userID)
-        if not user_callback.Success:
-            return helpers.jsonResponse(False, 400, "User could not be received", None)
 
-        email = user_callback.Data.Email
-
-        newsletters = request.json.get("newsletters", "Error")
-        tracking = request.json.get("trackData", "Error")
-        techSupport = request.json.get("techSupport", "Error")
-        notifications = request.json.get("statNotifications", "Error")
-        accountSpecialist = request.json.get("accountSpecialist", "Error")
-
-        if newsletters == "Error" or tracking == "Error" or techSupport == "Error" or notifications == "Error" or accountSpecialist == "Error":
-            return helpers.jsonResponse(False, 400, "Input could not be received", None)
+        data = request.json
 
         # update newsletters
-        if newsletters:
-            newsletter_callback: Callback = newsletter_services.checkForNewsletter(email)
+        newsletter_callback = (False, "")
+        if data.get("newsletters"):
+            newsletter_callback: Callback = newsletter_services.checkForNewsletter(user.get("email"))
             if not newsletter_callback.Success:
-                newsletter_callback: Callback = newsletter_services.addNewsletterPerson(email)
-        else:
-            newsletter_callback: Callback = newsletter_services.removeNewsletterPerson(email)
+                newsletter_callback: Callback = newsletter_services.addNewsletterPerson(user.get("email"))
+        elif data.get("newsletters") is False:
+            newsletter_callback: Callback = newsletter_services.removeNewsletterPerson(user.get("email"))
+
         if not newsletter_callback.Success:
-            return helpers.jsonResponse(False, 400,
-                                        newsletter_callback.Message + " Company and User information has been updated.",
-                                        None)
+            return helpers.jsonResponse(False, 400, newsletter_callback.Message)
 
         # update user settings
-        userSettings_callback: Callback = user_services.updateUserSettings(userID, tracking, techSupport,
-                                                                           accountSpecialist, notifications)
+        userSettings_callback: Callback = user_services.updateUserSettings(data.get("id"),
+                                                                           data.get("tracking"),
+                                                                           data.get("techSupport"),
+                                                                           data.get("accountSpecialist"),
+                                                                           data.get("notifications"))
 
         if not userSettings_callback.Success:
-            return helpers.jsonResponse(False, 400,
-                                        userSettings_callback.Message + " Company, User information and newsletters has been updated.",
-                                        None)
+            return helpers.jsonResponse(False, 400, userSettings_callback.Message)
 
         return helpers.jsonResponse(True, 200, "Data Settings have been updated.", None)
 

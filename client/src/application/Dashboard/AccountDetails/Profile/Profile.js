@@ -25,7 +25,8 @@ class Profile extends React.Component {
     };
 
 
-    componentDidMount() {
+    componentWillMount() {
+        console.log("HEEHHEHEHEHEEH");
         this.props.dispatch(profileActions.getProfile());
     }
 

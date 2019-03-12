@@ -170,11 +170,6 @@ def updateUserSettings(userID, trackingData, techSupport, accountSpecialist, not
               'AccountSpecialist': accountSpecialist,
               "UserInputNotifications": notifications})
 
-        if not result:
-            newUserSettings = UserSettings(ID=userID, TrackingData=trackingData, TechnicalSupport=techSupport,
-                                           AccountSpecialist=accountSpecialist, UserInputNotifications=notifications)
-            db.session.add(newUserSettings)
-
         db.session.commit()
         return Callback(True,
                         'User settings were successfully updated.',

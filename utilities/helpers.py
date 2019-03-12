@@ -222,7 +222,6 @@ def seed():
                         InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
-
     db.session.commit()
 
 

@@ -77,7 +77,7 @@ class DataSettings extends React.Component {
             labelCol: {span: 6},
             wrapperCol: {span: 14}
         };
-
+        console.log(this.state)
         return(
             <Form onSubmit={this.handleSubmit}>
                 <h2>Data Sharing Settings</h2>
@@ -99,7 +99,7 @@ class DataSettings extends React.Component {
                     {getFieldDecorator("newsletters", {
                         initialValue: this.state.newsletters,
                     })(
-                        <Switch onChange={this.handleChangeNewsletters} style={{marginRight: '5px'}}/>
+                        <Switch checked={this.state.newsletters} onChange={this.handleChangeNewsletters} style={{marginRight: '5px'}}/>
                     )}
                 </FormItem>
 
@@ -113,7 +113,7 @@ class DataSettings extends React.Component {
                     {getFieldDecorator("statNotifications", {
                         initialValue: this.state.statNotifications,
                     })(
-                        <Switch onChange={this.handleChangeStatNotifications} style={{marginRight: '5px'}}/>
+                        <Switch checked={this.state.statNotifications} onChange={this.handleChangeStatNotifications} style={{marginRight: '5px'}}/>
                     )}
                 </FormItem>
 
@@ -133,7 +133,7 @@ class DataSettings extends React.Component {
                     {getFieldDecorator("trackData", {
                         initialValue: this.state.trackData,
                     })(
-                        <Switch onChange={this.handleChangeTrackData} style={{marginRight: '5px'}}/>
+                        <Switch checked={this.state.trackData} onChange={this.handleChangeTrackData} style={{marginRight: '5px'}}/>
                     )}
                 </FormItem>
 
@@ -146,7 +146,7 @@ class DataSettings extends React.Component {
                     {getFieldDecorator("techSupport", {
                         initialValue: this.state.techSupport,
                     })(
-                        <Switch onChange={this.handleChangeTechSupport} style={{marginRight: '5px'}}/>
+                        <Switch checked={this.state.techSupport} onChange={this.handleChangeTechSupport} style={{marginRight: '5px'}}/>
                     )}
                 </FormItem>
 
@@ -161,7 +161,7 @@ class DataSettings extends React.Component {
                     {getFieldDecorator("accountSpecialist", {
                         initialValue: this.state.accountSpecialist,
                     })(
-                        <Switch onChange={this.handleChangeAccountSpecialist} style={{marginRight: '5px'}}/>
+                        <Switch checked={this.state.accountSpecialist} onChange={this.handleChangeAccountSpecialist} style={{marginRight: '5px'}}/>
                     )}
                 </FormItem>
 

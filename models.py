@@ -10,6 +10,8 @@ from sqlalchemy_utils import PasswordType, CurrencyType, Currency
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
 
+from services import user_services
+
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
 
@@ -94,6 +96,15 @@ class User(db.Model):
 
     Settings = db.relationship("UserSettings", uselist=False, back_populates="User",
                                cascade="all, delete, delete-orphan")
+
+    @db.validates("Email")
+    def testing(self, key, value):
+        print("SOOOOOOOOOOOOOOOOOOOOOOOOOO")
+        print("self: ", self)
+        print("key: ", key)
+        print("value: ", value)
+        createSettings_callback: Callback = user_services.
+        return value
 
     # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
 

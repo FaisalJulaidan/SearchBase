@@ -172,18 +172,25 @@ def getDatabasesList(companyID: int) -> Callback:
         print(exc)
         return Callback(False, 'Could not fetch the databases list.')
 
-def getAllCandidates(dbID) -> dict:
+def getAllCandidates(dbID, page) -> dict:
     try:
-        return db.session.query(Candidate).filter(Candidate.DatabaseID == dbID).all()
-        result = db.session.query(Candidate).filter(Candidate.DatabaseID == dbID).paginate(1, 1, False)
-        # data = {
-        #     'records': result.items,
-        #     'hasNext': result.has_next,
-        #     'hasPrev': result.has_prev,
-        #     'nextNum': result.next_num,
-        #     'prevNum': result.prev_num,
-        # }
-        # return data
+        result = db.session.query(Candidate)\
+            .filter(Candidate.DatabaseID == dbID)\
+            .paginate(page=page, error_out=False, max_per_page=100)
+
+        # for i, _ in enumerate(candidates):
+        #     if candidates[i]['Currency']:
+        #         temp = databaseContent[i]['Currency'].code
+        #         del databaseContent[i]['Currency']
+        #         databaseContent[i]['Currency'] = temp
+        data = {
+            'records': helpers.getListFromSQLAlchemyList(result.items),
+            'hasNext': result.has_next,
+            'hasPrev': result.has_prev,
+            'nextNum': result.next_num,
+            'prevNum': result.prev_num,
+        }
+        return data
 
     except Exception as exc:
         print("fetchCandidates() ERROR: ", exc)

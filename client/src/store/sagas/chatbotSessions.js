@@ -17,6 +17,24 @@ function* watchFetchChatbotSessions() {
     yield takeEvery(actionTypes.FETCH_CHATBOT_SESSIONS_REQUEST, fetchChatbotSessions)
 }
 
+function* deleteChatbotSession({sessionID, assistantID}) {
+    try {
+        loadingMessage('Removing session...', 0);
+        const res = yield http.delete(`/assistant/${assistantID}/chatbotSessions/${sessionID}`);
+        yield put(chatbotSessionsActions.deleteChatbotSessionSuccess(sessionID));
+        yield successMessage('Session removed');
+    } catch (error) {
+        console.log(error);
+        yield put(chatbotSessionsActions.deleteChatbotSessionFailure(error));
+        yield errorMessage("Couldn't remove session");
+    }
+}
+
+function* watchDeleteChatbotSession() {
+    yield takeEvery(actionTypes.DELETE_CHATBOT_SESSION_REQUEST, deleteChatbotSession)
+}
+
+
 function* clearAllChatbotSessions({assistantID}) {
     try {
         loadingMessage('Removing all sessions...', 0);
@@ -38,6 +56,7 @@ function* watchClearAllChatbotSessions() {
 export function* chatbotSessions() {
     yield all([
         watchFetchChatbotSessions(),
+        watchDeleteChatbotSession(),
         watchClearAllChatbotSessions(),
     ])
 }

@@ -22,8 +22,6 @@ def getAssistantByHashID(hashID):
         print("getAssistantByHashID() ERROR:" + str(exc))
         return Callback(False, "Assistant not found!")
 
-    # finally:
-            # db.session.close()
 
 def getByID(id, companyID) -> Callback:
     try:

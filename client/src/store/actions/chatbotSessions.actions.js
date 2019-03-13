@@ -22,6 +22,28 @@ const fetchChatbotSessionsFailure = (error) => {
     };
 };
 
+const deleteChatbotSession = (sessionID, assistantID) => {
+    return {
+        type: actionTypes.DELETE_CHATBOT_SESSION_REQUEST,
+        sessionID,
+        assistantID
+    };
+};
+
+const deleteChatbotSessionSuccess = (sessionID) => {
+    return {
+        type: actionTypes.DELETE_CHATBOT_SESSION_SUCCESS,
+        sessionID
+    };
+};
+
+const deleteChatbotSessionFailure = (error) => {
+    return {
+        type: actionTypes.DELETE_CHATBOT_SESSION_FAILURE,
+        error
+    };
+};
+
 
 const clearAllChatbotSessions = (assistantID) => {
     return {
@@ -48,6 +70,10 @@ export const chatbotSessionsActions = {
     fetchChatbotSessions,
     fetchChatbotSessionsSuccess,
     fetchChatbotSessionsFailure,
+
+    deleteChatbotSession,
+    deleteChatbotSessionSuccess,
+    deleteChatbotSessionFailure,
 
     clearAllChatbotSessions,
     clearAllChatbotSessionsSuccess,

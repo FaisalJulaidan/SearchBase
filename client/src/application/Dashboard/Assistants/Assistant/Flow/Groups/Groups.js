@@ -54,6 +54,7 @@ class Groups extends Component {
         confirm({
             title: `Delete group confirmation`,
             content: `If you click OK, this group will be deleted with its associated blocks forever`,
+            okType: 'danger',
             onOk: () => {
                 this.props.deleteGroup(deletedGroup);
                 this.setState({editGroupModal: false, selectedGroupToEdit: {}});

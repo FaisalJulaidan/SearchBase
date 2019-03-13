@@ -27,19 +27,8 @@ def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
             databaseContent = getAllCandidates(id, pageNumber)
 
         elif database.Type == DatabaseType.Jobs:
-            databaseContent = helpers.getListFromSQLAlchemyList(getAllJobs(id))
-            for i, _ in enumerate(databaseContent):
-                if databaseContent[i]['Currency']:
-                    temp = databaseContent[i]['Currency'].code
-                    del databaseContent[i]['Currency']
-                    databaseContent[i]['Currency'] = temp
+            databaseContent = getAllJobs(id, pageNumber)
 
-                if databaseContent[i]['StartDate']:
-                    day = databaseContent[i]['StartDate'].day
-                    month = databaseContent[i]['StartDate'].month
-                    year = databaseContent[i]['StartDate'].year
-                    del databaseContent[i]['StartDate']
-                    databaseContent[i]['StartDate'] = '/'.join(map(str, [year, month, day]))
 
         if not databaseContent:
             raise Exception()
@@ -177,12 +166,6 @@ def getAllCandidates(dbID, page) -> dict:
             .filter(Candidate.DatabaseID == dbID) \
             .paginate(page=page, error_out=False, max_per_page=1000, per_page=100)
 
-        # for i, _ in enumerate(candidates):
-        #     if candidates[i]['Currency']:
-        #         temp = databaseContent[i]['Currency'].code
-        #         del databaseContent[i]['Currency']
-        #         databaseContent[i]['Currency'] = temp
-
         data = {
             'records': helpers.getListFromSQLAlchemyList(result.items),
             'hasNext': result.has_next,
@@ -196,9 +179,22 @@ def getAllCandidates(dbID, page) -> dict:
         print("fetchCandidates() ERROR: ", exc)
         raise Exception
 
-def getAllJobs(dbID) -> Callback:
+
+def getAllJobs(dbID, page) -> Callback:
     try:
-        return db.session.query(Job).filter(Job.DatabaseID == dbID).all()
+        result = db.session.query(Job) \
+            .filter(Job.DatabaseID == dbID) \
+            .paginate(page=page, error_out=False, max_per_page=1000, per_page=100)
+
+        data = {
+            'records': helpers.getListFromSQLAlchemyList(result.items),
+            'hasNext': result.has_next,
+            'hasPrev': result.has_prev,
+            'nextNum': result.next_num,
+            'prevNum': result.prev_num,
+        }
+        return data
+
     except Exception as exc:
         print("fetchCandidates() ERROR: ", exc)
         raise Exception('Error: getAllJobs()')

@@ -255,6 +255,8 @@ def getDictFromSQLAlchemyObj(obj):
                 d[key] = d[key].value
             if key == 'Currency' and d[key]:
                 d[key] = d[key].code
+            if key == 'StartDate' and d[key]:
+                d[key] = '/'.join(map(str, [d[key].year, d[key].month, d[key].day]))
     return d
 
 

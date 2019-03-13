@@ -8,27 +8,23 @@ from datetime import datetime
 from sqlalchemy_utils import Currency
 from utilities import helpers
 from sqlalchemy import and_
-from enums import  DatabaseType, DataType as DT
+from enums import DatabaseType, DataType as DT
 import json
 
-def fetchDatabase(id, companyID: int) -> Callback:
+
+def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
     try:
         # Get result and check if None then raise exception
         database: Database = db.session.query(Database)\
             .filter(and_(Database.CompanyID == companyID, Database.ID == id)).first()
-        if not database: raise Exception
+
+        if not database:
+            raise Exception
 
         databaseContent = None
-        # TODO Ensure it works
+
         if database.Type == DatabaseType.Candidates:
-            # result = helpers.getListFromSQLAlchemyList(getAllCandidates(id))
-            # databaseContent = result['records']
-            databaseContent = helpers.getListFromSQLAlchemyList(getAllCandidates(id))
-            for i, _ in enumerate(databaseContent):
-                if databaseContent[i]['Currency']:
-                    temp = databaseContent[i]['Currency'].code
-                    del databaseContent[i]['Currency']
-                    databaseContent[i]['Currency'] = temp
+            databaseContent = getAllCandidates(id, pageNumber)
 
         elif database.Type == DatabaseType.Jobs:
             databaseContent = helpers.getListFromSQLAlchemyList(getAllJobs(id))
@@ -45,7 +41,9 @@ def fetchDatabase(id, companyID: int) -> Callback:
                     del databaseContent[i]['StartDate']
                     databaseContent[i]['StartDate'] = '/'.join(map(str, [year, month, day]))
 
-        if not databaseContent: raise Exception()
+        if not databaseContent:
+            raise Exception()
+
         return Callback(True, "", {'databaseInfo': helpers.getDictFromSQLAlchemyObj(database),
                                    'databaseContent': databaseContent})
 
@@ -172,17 +170,19 @@ def getDatabasesList(companyID: int) -> Callback:
         print(exc)
         return Callback(False, 'Could not fetch the databases list.')
 
+
 def getAllCandidates(dbID, page) -> dict:
     try:
         result = db.session.query(Candidate)\
-            .filter(Candidate.DatabaseID == dbID)\
-            .paginate(page=page, error_out=False, max_per_page=100)
+            .filter(Candidate.DatabaseID == dbID) \
+            .paginate(page=page, error_out=False, max_per_page=1000, per_page=100)
 
         # for i, _ in enumerate(candidates):
         #     if candidates[i]['Currency']:
         #         temp = databaseContent[i]['Currency'].code
         #         del databaseContent[i]['Currency']
         #         databaseContent[i]['Currency'] = temp
+
         data = {
             'records': helpers.getListFromSQLAlchemyList(result.items),
             'hasNext': result.has_next,

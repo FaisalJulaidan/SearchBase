@@ -253,7 +253,8 @@ class Question extends Component {
                                                getFieldDecorator={getFieldDecorator}
                                                layout={layout}/>
 
-                        <AfterMessageFormItem FormItem={FormItem} block={block}
+                        <AfterMessageFormItem FormItem={FormItem}
+                                              block={{Content: {afterMessage: this.state.editedAnswer?.afterMessage}}}
                                               getFieldDecorator={getFieldDecorator}
                                               layout={layout}/>
                     </Form>

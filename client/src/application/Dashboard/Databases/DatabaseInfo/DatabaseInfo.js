@@ -16,9 +16,10 @@ class DatabaseInfo extends Component {
             }
         });
         return (
-            <div style={{height: '100%'}}>
-                <HotTable id="hot" data={data} colHeaders={columns} columns={colHeaders} rowHeaders={true}/>
-            </div>
+            <HotTable id="hot" data={data}
+                      colHeaders={columns}
+                      columns={colHeaders}
+                      />
         );
     }
 }

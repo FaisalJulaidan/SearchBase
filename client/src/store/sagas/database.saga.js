@@ -12,7 +12,7 @@ function* getDatabasesList() {
         successMessage('Databases loaded')
     } catch (error) {
         console.log(error);
-        yield put(databaseActions.getDatabasesListFailure(error.response.data));
+        yield put(databaseActions.getDatabasesListFailure(error.response?.data));
         errorMessage("Couldn't load databases list");
 
     }
@@ -23,10 +23,10 @@ function* watchGetDatabaseList() {
 
 // ==================================================================
 
-function* fetchDatabase({databaseID}) {
+function* fetchDatabase({databaseID, pageNumber}) {
     try {
         loadingMessage('Loading database...', 0);
-        const res = yield http.get(`/databases/${databaseID}`);
+        const res = yield http.get(`/databases/${databaseID}/page/${pageNumber ? pageNumber : 1}`);
         yield put(databaseActions.fetchDatabaseSuccess(res.data.msg, res.data.data));
         successMessage('Database loaded');
     } catch (error) {

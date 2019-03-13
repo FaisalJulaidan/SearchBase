@@ -60,7 +60,7 @@ class Assistant extends Component {
         });
     };
 
-    onActiveChanged = (checked) => this.props.activeHandler(checked, this.props.assistant.ID);
+    onActiveChanged = (checked) => this.props.activateHandler(checked, this.props.assistant.ID);
 
     render() {
         const {assistant, isStatusChanging} = this.props;

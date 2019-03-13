@@ -60,10 +60,7 @@ def gen_dummy_data():
                                      "blocks": [
                                          {
                                              "ID": "834hf",
-                                             "DataType": {
-                                                 "name": "Email",
-                                                 "validation": "Email"
-                                             },
+                                             "DataType": enums.DataType.Email.value,
                                              "Type": "User Input",
                                              "StoreInDB": True,
                                              "Skippable": False,

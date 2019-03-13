@@ -1,7 +1,10 @@
 from models import db, Company, Assistant, Callback
 from sqlalchemy import and_
 from utilities import helpers
-
+from os.path import join, dirname
+import json
+from config import BaseConfig
+from services import flow_services
 
 def getAssistantByHashID(hashID):
     try:
@@ -54,7 +57,6 @@ def getByName(name) -> Callback:
        # db.session.close()
 
 
-
 def getAll(companyID) -> Callback:
     try:
         if companyID:
@@ -73,9 +75,21 @@ def getAll(companyID) -> Callback:
        # db.session.close()
 
 
-def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, companyID) -> Assistant or None:
+def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, template, companyID) -> Assistant or None:
     try:
-        assistant = Assistant(Name=name, Route=None, Message=message, TopBarText=topBarText,
+
+        flow = None
+        if template and template != 'none':
+            # Get json template
+            relative_path = join('static/assistant_templates', template + '.json')
+            absolute_path = join(BaseConfig.APP_ROOT, relative_path)
+            flow = json.load(open(absolute_path))
+            # Validate template
+            callback: Callback = flow_services.isValidFlow(flow)
+            if not callback.Success:
+                raise Exception(callback.Message)
+
+        assistant = Assistant(Name=name, Flow=flow, Route=None, Message=message, TopBarText=topBarText,
                               SecondsUntilPopup=secondsUntilPopup, MailEnabled=mailEnabled, MailPeriod=mailPeriod,
                               CompanyID=companyID)
         db.session.add(assistant)

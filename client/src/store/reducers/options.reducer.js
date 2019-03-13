@@ -18,7 +18,7 @@ export const options = (state = initialState, action) => {
         case actionTypes.FETCH_OPTIONS_FAILURE:
             return updateObject(state, {
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
         default:
             return state

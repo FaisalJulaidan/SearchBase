@@ -5,12 +5,11 @@ import {connect} from "react-redux";
 import {assistantActions} from "../../../../store/actions";
 
 const FormItem = Form.Item;
-const Option = Select.Option;
+const { Option, OptGroup } = Select;
 
 
-const loading = () => {
-    message.loading('Adding assistant', 0);
-};
+
+
 
 class NewAssistantModal extends Component {
 
@@ -19,6 +18,7 @@ class NewAssistantModal extends Component {
         isAlertsEnabled: false,
         alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
     };
+
 
     togglePopupSwitch = () => {
         this.setState({isPopupDisabled: !this.state.isPopupDisabled})
@@ -33,21 +33,11 @@ class NewAssistantModal extends Component {
             if (!err) {
                 if(this.state.isPopupDisabled) {values.secondsUntilPopup = 0}
                 values["alertsEnabled"] = this.state.isAlertsEnabled;
-                console.log(values);
-                // send to server
-                this.props.dispatch(assistantActions.addAssistant(values));
-                loading();
+                this.props.addAssistant(values)
             }
         });
     };
 
-    componentDidUpdate(prevProps) {
-        if (!this.props.isAdding && this.props.isAdding !== prevProps.isAdding) {
-            this.props.hideModal();
-            message.destroy();
-            message.success(this.props.successMsg)
-        }
-    }
 
 
     render() {
@@ -154,29 +144,39 @@ class NewAssistantModal extends Component {
                     </FormItem>
 
                     <FormItem {...formItemLayout}
-                              label="Assistant Template">
+                              label="Assistant Templates">
 
                         {
-                            getFieldDecorator('template')(
-                                <Select placeholder="Please select template">
-                                    <Option value="recruitment">Recruitment</Option>
-                                    <Option value="Shopping">Shopping</Option>
-                                    <Option value="Sales">Sales</Option>
-                                </Select>
+                            getFieldDecorator('template', {
+                                initialValue: 'none',
+                                rules: [{
+                                    required: true,
+                                    message: "Please select a template or None",
+                                }]
+                            })(
+                                <Select>
+                                    <Option key={-1} value='none'>None</Option>
+                                    {this.props.options.assistantTemplates.map((t, i) => {
+                                        return (
+                                            <OptGroup key={i} label={t.group}>
+                                                {t.children.map((c, i) => {
+                                                    return (<Option key={i} value={c.fileName}>{c.label}</Option>)
+                                                })}
+                                            </OptGroup>
+                                        )
+                                    })}
+                                </Select>,
                             )
                         }
                     </FormItem>
+
+
+
                 </Form>
             </Modal>
         );
     }
 }
 
-function mapStateToProps(state) {
-    return {
-        successMsg: state.assistant.successMsg,
-        isAdding: state.assistant.isAdding
-    };
-}
 
-export default connect(mapStateToProps)(Form.create()(NewAssistantModal))
+export default Form.create()(NewAssistantModal)

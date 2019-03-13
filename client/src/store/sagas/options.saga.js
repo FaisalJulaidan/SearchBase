@@ -10,7 +10,7 @@ function* fetchOptions() {
         yield put(optionsActions.getOptionsSuccess(res.data.data));
     } catch (error) {
         console.log(error);
-        return yield put(optionsActions.getOptionsFailure(error.response.data));
+        return yield put(optionsActions.getOptionsFailure("Get options error"));
     }
 
 }

@@ -10,7 +10,7 @@ function* fetchAssistants() {
         yield put(assistantActions.fetchAssistantsSuccess(res.data.data));
     } catch (error) {
         console.log(error);
-        yield errorMessage(error.response.data.msg);
+        errorMessage(error.response.data.msg);
         yield put(assistantActions.fetchAssistantsFailure(error.response.data));
     }
 
@@ -18,7 +18,7 @@ function* fetchAssistants() {
 
 function* addAssistant({type, newAssistant}) {
     try {
-        loadingMessage('Removing all sessions...', 0);
+        loadingMessage('Creating assistant...', 0);
         const res = yield http.post(`/assistants`, newAssistant);
         yield put(assistantActions.addAssistantSuccess(res.data.msg));
         yield put(assistantActions.fetchAssistants());
@@ -26,7 +26,7 @@ function* addAssistant({type, newAssistant}) {
 
     } catch (error) {
         console.log(error);
-        yield errorMessage(error.response.data.msg);
+        yield errorMessage("Couldn't create a new assistant");
         yield put(assistantActions.addAssistantFailure(error.response.data));
     }
 }
@@ -36,10 +36,10 @@ function* updateAssistant({assistantID, updatedSettings}) {
         const res = yield http.put(`assistant/${assistantID}`, updatedSettings);
         yield put(assistantActions.updateAssistantSuccess(res.data.msg));
         yield put(assistantActions.fetchAssistants());
-        yield successMessage('Assistant updated!');
+        successMessage('Assistant updated!');
     } catch (error) {
         console.log(error);
-        yield errorMessage(error.response.data.msg);
+        errorMessage(error.response.data.msg);
         yield put(assistantActions.updateAssistantFailure(error.response.data));
 
     }
@@ -51,11 +51,11 @@ function* deleteAssistant({assistantID}) {
         loadingMessage('Removing assistant...', 0);
         const res = yield http.delete(`/assistant/${assistantID}`);
         yield put(assistantActions.deleteAssistantSuccess(assistantID, res.data.msg));
-        yield successMessage('Assistant deleted');
+        successMessage('Assistant deleted');
     } catch (error) {
         console.log(error);
         yield put(assistantActions.deleteAssistantFailure(error.response.data));
-        yield errorMessage("Error in deleting assistant");
+        errorMessage("Error in deleting assistant");
     }
 }
 
@@ -65,12 +65,12 @@ function* updateFlow({assistant}) {
         loadingMessage('Updating Flow', 0);
 
         const res = yield http.put(`/assistant/${assistant.ID}/flow`, {flow: assistant.Flow});
-        yield successMessage('Flow Updated');
+        successMessage('Flow Updated');
         yield put(assistantActions.updateFlowSuccess(assistant, res.data.msg));
     } catch (error) {
         console.log(error);
         yield put(assistantActions.updateFlowFailure(error.response.data));
-        yield errorMessage("Error in updating flow");
+        errorMessage("Error in updating flow");
     }
 }
 

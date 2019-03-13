@@ -52,6 +52,23 @@ def getChatbot(assistantHashID) -> Callback:
 # ----- Updaters ----- #
 def updateFlow(flow, assistant: Assistant) -> Callback:
     try:
+
+        callback: Callback = isValidFlow(flow)
+        if not callback.Success:
+            return callback
+
+        # Update flow and save
+        assistant.Flow = flow
+        db.session.commit()
+        return Callback(True, "Flow updated successfully!")
+
+    except Exception as exc:
+        print(exc.args)
+        return Callback(False, "The submitted Flow doesn't follow the correct format")
+
+
+def isValidFlow(flow):
+    try:
         # Validate the flow in high level
         validate(flow, json_schemas.flow)
 
@@ -71,18 +88,14 @@ def updateFlow(flow, assistant: Assistant) -> Callback:
                     blockIDs.append(id)
                 else:
                     return Callback(False, "two blocks shouldn't have the same id."
-                                       " Check Block with ID '" + str(block['id']) +
-                                       "' in Group of ID '" + str(group['id']) + "'")
+                                           " Check Block with ID '" + str(block['id']) +
+                                    "' in Group of ID '" + str(group['id']) + "'")
 
                 # Validate the individual block against the json_schemas based on block's type
                 callback: Callback = isValidBlock(block, str(enums.BlockType(block.get('Type')).name))
                 if not callback.Success:
                     return callback
-
-        # Update flow and save
-        assistant.Flow = flow
-        db.session.commit()
-        return Callback(True, "Flow updated successfully!")
+        return Callback(True, "Flow is valid")
 
     except Exception as exc:
         print(exc.args)

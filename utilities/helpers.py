@@ -257,6 +257,8 @@ def getDictFromSQLAlchemyObj(obj):
                 d[key] = d[key].code
             if key == 'StartDate' and d[key]:
                 d[key] = '/'.join(map(str, [d[key].year, d[key].month, d[key].day]))
+    if hasattr(obj, "FilePath"):
+        d["FilePath"] = obj.FilePath
     return d
 
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from "./Sessions.module.less"
 import ViewsModal from "./ViewModal/ViewsModal";
-import {Button, Modal, Table, Tag} from 'antd';
+import {Button, Modal, Table, Tag, Divider} from 'antd';
 import moment from 'moment';
 import {chatbotSessionsActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
@@ -31,11 +31,6 @@ class Sessions extends React.Component {
         this.props.dispatch(chatbotSessionsActions.fetchChatbotSessions(assistant.ID))
     };
 
-    clearAllChatbotSessions = () => {
-        const {assistant} = this.props.location.state;
-        this.props.dispatch(chatbotSessionsActions.clearAllChatbotSessions(assistant.ID))
-    };
-
 
     handleFilter = (pagination, filters, sorter) => {
         console.log('Various parameters', pagination, filters, sorter);
@@ -51,17 +46,28 @@ class Sessions extends React.Component {
     };
 
 
-    showConfirmForClearing = () => {
-        const clear = this.clearAllChatbotSessions;
+    clearAllChatbotSessions = (assistantID) => {
         confirm({
             title: 'Do you want to delete all records?',
             content: 'By clicking OK, there will be no way to get these records back!',
             okType: 'danger',
-            onOk() {clear()},
-            onCancel() {},
+            onOk: ()=> {
+                this.props.dispatch(chatbotSessionsActions.clearAllChatbotSessions(assistantID))
+            },
         });
     };
 
+
+    deleteSession = (sessionID, assistantID) => {
+        confirm({
+            title: `Delete session confirmation`,
+            content: `If you click OK, this session will be deleted with its associated data forever`,
+            okType: 'danger',
+            onOk: () => {
+                this.props.dispatch(chatbotSessionsActions.deleteChatbotSession(sessionID, assistantID))
+            }
+        });
+    };
 
 
     // Nested table that has all the answered questions per session (Not being used)
@@ -176,12 +182,13 @@ class Sessions extends React.Component {
             key: 'action',
             render: (text, record, index) => (
                 <span>
-              <a onClick={()=> {
-                  this.setState({viewModal: true, selectedSession: record})
-              }
-              }> View</a>
-                    {/*<Divider type="vertical" />*/}
-                    {/*<a>Delete</a>*/}
+              <a onClick={()=> {this.setState({viewModal: true, selectedSession: record})}}>
+                  View
+              </a>
+                    <Divider type="vertical" />
+              <a onClick={()=> {this.deleteSession(record.ID, assistant.ID)}}>
+                  Delete
+              </a>
             </span>
             ),
         }];
@@ -206,7 +213,7 @@ class Sessions extends React.Component {
 
 
                             <Button className={styles.Panel_Header_Button} type="primary" icon="delete"
-                                    onClick={this.showConfirmForClearing} loading={this.props.isClearingAll}>
+                                    onClick={()=> {this.clearAllChatbotSessions(assistant.ID)}} loading={this.props.isClearingAll}>
                                 Clear All
                             </Button>
                         </div>

@@ -60,10 +60,7 @@ def gen_dummy_data():
                                      "blocks": [
                                          {
                                              "ID": "834hf",
-                                             "DataType": {
-                                                 "name": "Email",
-                                                 "validation": "Email"
-                                             },
+                                             "DataType": enums.DataType.Email.value,
                                              "Type": "User Input",
                                              "StoreInDB": True,
                                              "Skippable": False,
@@ -222,7 +219,6 @@ def seed():
                         InactiveBotsCap=2,
                         AdditionalUsersCap=3, ExtendedLogic=True, ImportDatabase=True, CompanyNameOnChatbot=True))
 
-
     db.session.commit()
 
 
@@ -257,11 +253,13 @@ def getDictFromSQLAlchemyObj(obj):
             d[key] = getattr(obj, key)
             if isinstance(d[attr.name], Enum):
                 d[key] = d[key].value
+            if key == 'Currency' and d[key]:
+                d[key] = d[key].code
+            if key == 'StartDate' and d[key]:
+                d[key] = '/'.join(map(str, [d[key].year, d[key].month, d[key].day]))
     if hasattr(obj, "FilePath"):
         d["FilePath"] = obj.FilePath
     return d
-    # return {c.key: getattr(obj, c.key)
-    #         for c in inspect(obj).mapper.column_attrs if c.key not in ("Password")}
 
 
 # Convert a SQLAlchemy list of objects to a list of dicts

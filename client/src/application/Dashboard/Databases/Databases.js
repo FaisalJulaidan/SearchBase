@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Menu, Spin, Button, Modal} from 'antd';
+import {Menu, Spin, Button, Modal, Pagination, Row} from 'antd';
 
 import styles from "./Databases.module.less"
 import NewDatabaseModal from "./NewDatabaseModal/NewDatabaseModal";
@@ -16,13 +16,13 @@ class Databases extends Component {
 
     state = {
         visible: false,
-        dbDetailsVisible: false
+        dbDetailsVisible: false,
+        pageNumber: 1
     };
 
 
     componentWillMount() {
         this.props.dispatch(databaseActions.getDatabasesList());
-        console.log('DFGDFGDFGDGDFGDFGSDFGSWETHWRTHERTH');
     }
 
 
@@ -50,8 +50,9 @@ class Databases extends Component {
     };
 
     uploadDatabase = newDatabase => this.props.dispatch(databaseActions.uploadDatabase({newDatabase: newDatabase}));
-    showDatabaseInfo = (databaseID) => this.props.dispatch(databaseActions.fetchDatabase(databaseID));
+    showDatabaseInfo = (databaseID) => this.props.dispatch(databaseActions.fetchDatabase(databaseID, this.state.pageNumber));
 
+    updatePage = (id, page) => this.setState({pageNumber: page}, () => this.showDatabaseInfo(id));
 
     componentWillUnmount() {
         this.props.dispatch(databaseActions.resetFetchedDatabase())
@@ -93,7 +94,12 @@ class Databases extends Component {
                                     {
                                         this.props.databasesList.map((database, index) =>
                                             <Menu.Item key={index}
-                                                       onClick={() => this.showDatabaseInfo(database.ID)}>{database.Name}</Menu.Item>)
+                                                       onClick={() => this.setState({pageNumber: 1},
+                                                           () => this.showDatabaseInfo(database.ID))
+                                                       }>
+                                                {database.Name}
+                                            </Menu.Item>
+                                        )
                                     }
                                 </Menu>
                             </div>
@@ -123,16 +129,16 @@ class Databases extends Component {
                             </div>
 
 
-                            <div className={styles.Panel_Body} style={{padding: 0}}>
+                            <div className={[styles.Panel_Body, styles.WithPaging].join(' ')}>
                                 {
                                     (
-                                        (!!this.props.fetchedDatabase?.databaseContent?.length)
+                                        (!!this.props.fetchedDatabase?.databaseContent?.records?.length)
                                         &&
                                         (!!this.props.options.databases)
                                     ) ?
                                         <DatabaseInfo databaseOptions={this.props.options.databases}
                                                       databaseInfo={this.props.fetchedDatabase.databaseInfo}
-                                                      data={this.getRecordsData(this.props.fetchedDatabase.databaseContent)}/>
+                                                      data={this.getRecordsData(this.props.fetchedDatabase.databaseContent.records)}/>
                                         :
                                         <Spin spinning={this.props.isLoadingDatabase}>
                                             <div>
@@ -153,6 +159,20 @@ class Databases extends Component {
                                         </Spin>
                                 }
                             </div>
+                            {
+                                (
+                                    (!!this.props.fetchedDatabase?.databaseContent?.records?.length)
+                                    &&
+                                    (!!this.props.options.databases)
+                                ) ?
+                                    <Row type="flex" justify="center" align="top"
+                                         style={{marginBottom: 3, marginTop: 4}}>
+                                        <Pagination current={this.state.pageNumber}
+                                                    onChange={(page) => this.updatePage(this.props.fetchedDatabase.databaseInfo.ID, page)}
+                                                    total={100}
+                                                    />
+                                    </Row> : null
+                            }
                         </div>
                     </div>
                 </div>

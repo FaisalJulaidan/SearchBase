@@ -257,6 +257,8 @@ def getDictFromSQLAlchemyObj(obj):
             d[key] = getattr(obj, key)
             if isinstance(d[attr.name], Enum):
                 d[key] = d[key].value
+    if hasattr(obj, "FilePath"):
+        d["FilePath"] = obj.FilePath
     return d
     # return {c.key: getattr(obj, c.key)
     #         for c in inspect(obj).mapper.column_attrs if c.key not in ("Password")}

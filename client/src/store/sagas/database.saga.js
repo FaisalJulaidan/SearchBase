@@ -12,7 +12,7 @@ function* getDatabasesList() {
         successMessage('Databases loaded')
     } catch (error) {
         console.log(error);
-        yield put(databaseActions.getDatabasesListFailure(error.response?.data));
+        yield put(databaseActions.getDatabasesListFailure("Database list error"));
         errorMessage("Couldn't load databases list");
 
     }

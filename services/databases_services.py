@@ -164,14 +164,14 @@ def getAllCandidates(dbID, page) -> dict:
     try:
         result = db.session.query(Candidate)\
             .filter(Candidate.DatabaseID == dbID) \
-            .paginate(page=page, error_out=False, max_per_page=1000, per_page=100)
+            .paginate(page=page, error_out=False, per_page=100)
 
         data = {
             'records': helpers.getListFromSQLAlchemyList(result.items),
-            'hasNext': result.has_next,
-            'hasPrev': result.has_prev,
-            'nextNum': result.next_num,
-            'prevNum': result.prev_num,
+            'currentPage': result.page,
+            'totalItems': result.total,
+            'totalPages': result.pages,
+            'totalPerPage': result.per_page
         }
         return data
 
@@ -180,18 +180,18 @@ def getAllCandidates(dbID, page) -> dict:
         raise Exception
 
 
-def getAllJobs(dbID, page) -> Callback:
+def getAllJobs(dbID, page) -> dict:
     try:
         result = db.session.query(Job) \
             .filter(Job.DatabaseID == dbID) \
-            .paginate(page=page, error_out=False, max_per_page=1000, per_page=100)
+            .paginate(page=page, error_out=False, per_page=100)
 
         data = {
             'records': helpers.getListFromSQLAlchemyList(result.items),
-            'hasNext': result.has_next,
-            'hasPrev': result.has_prev,
-            'nextNum': result.next_num,
-            'prevNum': result.prev_num,
+            'currentPage': result.page,
+            'totalItems': result.total,
+            'totalPages': result.pages,
+            'totalPerPage': result.per_page
         }
         return data
 
@@ -332,7 +332,6 @@ def scanCandidates(session, dbIDs):
         return Callback(False, 'Error while search the database for matches!')
 
 
-
 def scanJobs(session, dbIDs):
     try:
 
@@ -421,6 +420,7 @@ def scanJobs(session, dbIDs):
     except Exception as exc:
         print("scanJobs() ERROR: ", exc)
         return Callback(False, 'Error while search the database for matches!')
+
 
 def getOptions() -> Callback:
     options =  {

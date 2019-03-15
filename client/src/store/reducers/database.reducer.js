@@ -18,7 +18,7 @@ export const database = (state = initialState, action) => {
         case actionTypes.GET_DATABASES_LIST_FAILURE:
             return updateObject(state, {
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
 

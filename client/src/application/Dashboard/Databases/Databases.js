@@ -51,7 +51,6 @@ class Databases extends Component {
 
     uploadDatabase = newDatabase => this.props.dispatch(databaseActions.uploadDatabase({newDatabase: newDatabase}));
     showDatabaseInfo = (databaseID) => this.props.dispatch(databaseActions.fetchDatabase(databaseID, this.state.pageNumber));
-
     updatePage = (id, page) => this.setState({pageNumber: page}, () => this.showDatabaseInfo(id));
 
     componentWillUnmount() {
@@ -77,6 +76,7 @@ class Databases extends Component {
 
 
     render() {
+        const {fetchedDatabase} = this.props;
         return (
             <div style={{height: '100%'}}>
                 <Header display={'Databases'} showBackButton={false}
@@ -97,7 +97,7 @@ class Databases extends Component {
                                                        onClick={() => this.setState({pageNumber: 1},
                                                            () => this.showDatabaseInfo(database.ID))
                                                        }>
-                                                {database.Name}
+                                                {database.Name} ({database.Type.name})
                                             </Menu.Item>
                                         )
                                     }
@@ -115,14 +115,14 @@ class Databases extends Component {
                                 </div>
                                 <div>
                                     <Button className={styles.Panel_Header_Button}
-                                            disabled={!(!!this.props.fetchedDatabase?.databaseContent?.length)}
+                                            disabled={!(!!fetchedDatabase?.databaseContent?.length)}
                                             type="primary" icon="info"
                                             onClick={this.showDBDetails}>
                                         Details
                                     </Button>
                                     <Button className={styles.Panel_Header_Button} type="danger" icon="delete"
-                                            disabled={!(!!this.props.fetchedDatabase?.databaseContent?.length)}
-                                            onClick={() => this.deleteDatabase(this.props.fetchedDatabase)}>
+                                            disabled={!(!!fetchedDatabase?.databaseContent?.length)}
+                                            onClick={() => this.deleteDatabase(fetchedDatabase)}>
                                         Delete Database
                                     </Button>
                                 </div>
@@ -132,13 +132,13 @@ class Databases extends Component {
                             <div className={[styles.Panel_Body, styles.WithPaging].join(' ')}>
                                 {
                                     (
-                                        (!!this.props.fetchedDatabase?.databaseContent?.records?.length)
+                                        (!!fetchedDatabase?.databaseContent?.records?.length)
                                         &&
                                         (!!this.props.options.databases)
                                     ) ?
                                         <DatabaseInfo databaseOptions={this.props.options.databases}
-                                                      databaseInfo={this.props.fetchedDatabase.databaseInfo}
-                                                      data={this.getRecordsData(this.props.fetchedDatabase.databaseContent.records)}/>
+                                                      databaseInfo={fetchedDatabase.databaseInfo}
+                                                      data={this.getRecordsData(fetchedDatabase.databaseContent.records)}/>
                                         :
                                         <Spin spinning={this.props.isLoadingDatabase}>
                                             <div>
@@ -161,15 +161,16 @@ class Databases extends Component {
                             </div>
                             {
                                 (
-                                    (!!this.props.fetchedDatabase?.databaseContent?.records?.length)
+                                    (!!fetchedDatabase?.databaseContent?.records?.length)
                                     &&
                                     (!!this.props.options.databases)
                                 ) ?
                                     <Row type="flex" justify="center" align="top"
-                                         style={{marginBottom: 3, marginTop: 4}}>
-                                        <Pagination current={this.state.pageNumber}
-                                                    onChange={(page) => this.updatePage(this.props.fetchedDatabase.databaseInfo.ID, page)}
-                                                    total={100}
+                                         style={{marginBottom: 5, marginTop: 4}}>
+                                        <Pagination current={fetchedDatabase.databaseContent.currentPage}
+                                                    onChange={(page) => this.updatePage(fetchedDatabase.databaseInfo.ID, page)}
+                                                    pageSize={fetchedDatabase.databaseContent.totalPerPage}
+                                                    total={fetchedDatabase.databaseContent.totalItems}
                                                     />
                                     </Row> : null
                             }

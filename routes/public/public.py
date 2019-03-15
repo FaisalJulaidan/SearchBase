@@ -2,9 +2,11 @@ import os
 
 from flask import Blueprint, render_template, request, send_from_directory, redirect
 from flask_cors import CORS
+from flask_mail import Message
 
 from models import Callback
 from services import user_services, mail_services
+from services.mail_services import mail
 from utilities import helpers
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates", static_folder='static')

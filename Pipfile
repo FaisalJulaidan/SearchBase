@@ -70,6 +70,7 @@ PyJWT = "==1.6.4"
 pandas = "*"
 flask-babel = "*"
 babel = "*"
+self = "*"
 
 [requires]
 python_version = "3.7"

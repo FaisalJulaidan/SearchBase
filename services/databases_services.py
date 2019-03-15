@@ -273,7 +273,7 @@ def scanCandidates(session, dbIDs):
             df.loc[df[Candidate.YearsExp.name] >= float(keywords[DT.YearsExp.value['name']][-1]), 'count'] += 5
 
 
-        # Received DataType: YearsExp <> Column: YearsExp | points=5
+        # Received DataType: DesiredPayRate <> Column: DesiredPayRate | points=5
         if keywords.get(DT.DesiredPayRate.value['name']):
             df.loc[df[Candidate.DesiredPayRate.name] <= float(keywords[DT.DesiredPayRate.value['name']][-1]), 'count'] += 3
 

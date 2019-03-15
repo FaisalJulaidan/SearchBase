@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 
 from config import BaseConfig
 from models import Callback, db, ChatbotSession
-from services import chatbotSession_services, flow_services, databases_services, stored_file_services
+from services import chatbotSession_services, flow_services, databases_services, stored_file_services, mail_services
 from utilities import helpers
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
@@ -41,6 +41,8 @@ def chatbot(assistantIDAsHash):
 
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
+
+        sendNotification_callback: Callback = mail_services.notifyNewRecord(assistantIDAsHash)
 
         return helpers.jsonResponse(True, 200, "Collected data is successfully processed", {'sessionID': callback.Data.ID})
 

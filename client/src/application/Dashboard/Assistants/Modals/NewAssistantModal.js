@@ -156,7 +156,7 @@ class NewAssistantModal extends Component {
                             })(
                                 <Select>
                                     <Option key={-1} value='none'>None</Option>
-                                    {this.props.options.assistantTemplates.map((t, i) => {
+                                    {this.props?.options?.assistantTemplates.map((t, i) => {
                                         return (
                                             <OptGroup key={i} label={t.group}>
                                                 {t.children.map((c, i) => {

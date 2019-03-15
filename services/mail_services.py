@@ -41,6 +41,7 @@ def timer_tick():
             print(session[0], " > ", now, " > ", session[1])
             for sub in subs:
                 if session in sub["sessions"]:
+                    print("notifying")
                     notifyNewRecordsForLastXHours(sub["interval"])
 
 
@@ -67,7 +68,7 @@ def sendVerificationEmail(email, companyName) -> Callback:
     try:
 
         payload = email + ";" + companyName
-        link = "https://www.thesearchbase.com/account/verify/" +\
+        link = "https://www.thesearchbase.com/account/verify/" + \
                helpers.verificationSigner.dumps(payload, salt='email-confirm-key')
 
         send_email((email), 'Account verification',
@@ -84,7 +85,7 @@ def sendPasswordResetEmail(email, companyID):
     try:
 
         payload = email + ";" + str(companyID)
-        link = "https://www.thesearchbase.com/reset_password/" +\
+        link = "https://www.thesearchbase.com/reset_password/" + \
                helpers.verificationSigner.dumps(payload, salt='reset-pass-key')
 
         send_email((email), 'Password reset',
@@ -137,24 +138,27 @@ def sendSolutionAlert(record, solutions):
 
     except Exception as e:
         print("mail_services.sendSolutionAlert ERROR: ", e)
-        return Callback(False, 'Could not send email to ' + targetEmail)
+        return Callback(False, 'Could not send email')
 
 
 # NOTIFICATIONS
 def notifyNewRecordsForLastXHours(hours):
     try:
         userSettings_callback: Callback = user_services.getAllUserSettings()
-        if not userSettings_callback.Success: raise Exception("userSettings_callback: ", userSettings_callback.Message)
+        if not userSettings_callback.Success:
+            raise Exception("userSettings_callback: ", userSettings_callback.Message)
 
         for record in userSettings_callback.Data:
             if not record.UserInputNotifications:
                 continue
 
             user_callback: Callback = user_services.getByID(record.ID)
-            if not user_callback.Success: raise Exception("user_callback: ", user_callback.Message)
+            if not user_callback.Success:
+                raise Exception("user_callback: ", user_callback.Message)
 
             assistants_callback: Callback = assistant_services.getAll(user_callback.Data.CompanyID)
-            if not assistants_callback.Success: raise Exception("assistants_callback: ", assistants_callback.Message)
+            if not assistants_callback.Success:
+                raise Exception("assistants_callback: ", assistants_callback.Message)
 
             information = []
 
@@ -180,6 +184,37 @@ def notifyNewRecordsForLastXHours(hours):
 
     except Exception as e:
         print("mail_services.notifyNewRecordsForLastXHours() ERROR: ", e)
+
+
+def notifyNewRecord(assistantHashID):
+    try:
+        callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
+        if not callback.Success:
+            return Callback(False, "Assistant not found!")
+        assistant = callback.Data
+        if not assistant.MailEnabled or assistant.MailPeriod is not 0:
+            return Callback(False, "Assistant is not set to instant notification!")
+
+        users_callback: Callback = user_services.getAllByCompanyID(assistant.CompanyID)
+        if not users_callback.Success:
+            return Callback(False, "Users not found!")
+
+        information = [{"assistantName": assistant.Name, "data": 1, "assistantID": assistant.ID}]
+
+        for user in users_callback.Data:
+            userSettings_callback: Callback = user_services.getUserSettings(user.ID)
+            if not userSettings_callback.Success:
+                raise Exception(userSettings_callback.Message)
+
+            if not userSettings_callback.Data.UserInputNotifications:
+                continue
+
+            sendRecords_callback: Callback = sendNewRecordsNotification(user.Email, information)
+            if not sendRecords_callback.Success:
+                return Callback(False, sendRecords_callback.Message)
+
+    except Exception as e:
+        print("mail_services.notifyNewRecord() ERROR: ", e)
 
 
 def sendNewRecordsNotification(receiver, data):

@@ -1,15 +1,16 @@
-from models import db, Callback, ChatbotSession, Assistant
-from utilities import helpers, json_schemas
-from jsonschema import validate
 from typing import List
-from sqlalchemy.sql import desc
-from services import assistant_services, stored_file_services
+
+from jsonschema import validate
 from sqlalchemy.sql import and_
+from sqlalchemy.sql import desc
+
+from models import db, Callback, ChatbotSession, Assistant
+from services import assistant_services, stored_file_services
+from utilities import json_schemas
 
 
 # Process chatbot session data
 def processSession(assistantHashID, data: dict) -> Callback:
-
     callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
     if not callback.Success:
         return Callback(False, "Assistant not found!")
@@ -30,7 +31,7 @@ def processSession(assistantHashID, data: dict) -> Callback:
                                         TimeSpent=44,
                                         SolutionsReturned=data['solutionsReturned'],
                                         QuestionsAnswered=len(collectedData),
-                                        UserType= data['userType'],
+                                        UserType=data['userType'],
                                         Assistant=assistant)
         db.session.add(chatbotSession)
         db.session.commit()
@@ -43,10 +44,12 @@ def processSession(assistantHashID, data: dict) -> Callback:
     # finally:
     # db.session.close()
 
+
 # ----- Getters ----- #
 def getAllByAssistantID(assistantID):
     try:
-        sessions: List[ChatbotSession]= db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID) \
+        sessions: List[ChatbotSession] = db.session.query(ChatbotSession).filter(
+            ChatbotSession.AssistantID == assistantID) \
             .order_by(desc(ChatbotSession.DateTime)).all()
 
         for session in sessions:
@@ -64,7 +67,7 @@ def getAllByAssistantID(assistantID):
 
 def getByID(sessionID, assistantID):
     try:
-        session = db.session.query(ChatbotSession)\
+        session = db.session.query(ChatbotSession) \
             .filter(and_(ChatbotSession.AssistantID == assistantID, ChatbotSession.ID == sessionID)).first()
         if not session:
             raise Exception
@@ -81,7 +84,6 @@ def getByID(sessionID, assistantID):
         return Callback(False, 'Could not retrieve the session.')
 
 
-
 # ----- Filters ----- #
 def filterForContainEmails(records):
     try:
@@ -90,7 +92,7 @@ def filterForContainEmails(records):
             record = record.Data["collectedInformation"]
             for question in record:
                 if "@" in question["input"]:
-                    result.append({"record" : record, "email" : question["input"]})
+                    result.append({"record": record, "email": question["input"]})
                     break
 
         return Callback(True, "Data has been filtered.", result)
@@ -113,7 +115,8 @@ def deleteByID(id):
         db.session.rollback()
         return Callback(False, 'Record could not be removed.')
     # finally:
-       # db.session.close()
+    # db.session.close()
+
 
 def deleteAll(assistantID):
     try:
@@ -125,4 +128,4 @@ def deleteAll(assistantID):
         db.session.rollback()
         return Callback(False, 'Records could not be removed.')
     # finally:
-       # db.session.close()
+    # db.session.close()

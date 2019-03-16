@@ -60,17 +60,48 @@ def gen_dummy_data():
                                      "blocks": [
                                          {
                                              "ID": "834hf",
-                                             "DataType": enums.DataType.Email.value,
+                                             "DataType": enums.DataType.DesiredSalary.value,
                                              "Type": "User Input",
                                              "StoreInDB": True,
                                              "Skippable": False,
                                              "Content": {
                                                  "action": "Go To Next Block",
-                                                 "text": "What's your email?",
-                                                 "blockToGoID": None,
+                                                 "text": "What's salary are you offering",
+                                                 "blockToGoID": "by_GnLY-f",
                                                  "afterMessage": "Your input is being processed..."
                                              }
-                                         }
+                                         },
+                                         {
+                                            "ID":"by_GnLY-f",
+                                            "Type":"Solutions",
+                                            "StoreInDB":False,
+                                            "Skippable":False,
+                                            "DataType":{
+                                                "name":"No Type",
+                                                "userTypes":[],
+                                                "validation":"Ignore"
+                                            },
+                                             "Content":{
+                                                 "showTop":3,
+                                                 "action":"Go To Next Block",
+                                                 "blockToGoID":"gje6D",
+                                                 "afterMessage":"Here are you solutions",
+                                                 "databaseType":"Candidates"
+                                             },
+                                         },
+                                         {
+                                             "ID": "gje6D",
+                                             "DataType": enums.DataType.Email.value,
+                                             "Type": "User Input",
+                                             "StoreInDB": True,
+                                             "Skippable": False,
+                                             "Content": {
+                                                 "action": "End Chat",
+                                                 "text": "What's your email",
+                                                 "blockToGoID": None,
+                                                 "afterMessage": "Your email is in good hands :) Bye!"
+                                             }
+                                         },
                                      ]
                                  }
                              ]

@@ -289,8 +289,6 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
 
         keywords = session['keywordsByDataType']
         df['count'] = 0 # add column for tracking score
-        # Delete sensitive columns e.g. candidate name
-        # df.drop(['ID', 'Name', 'Email', 'Telephone'], axis=1, inplace=True) # No need
 
         # Numbers
         # Received DataType: DesiredSalary <> Column: DesiredSalary | points=3
@@ -372,8 +370,6 @@ def scanJobs(session, dbIDs, databaseType: DatabaseType):
 
         keywords = session['keywordsByDataType']
         df['count'] = 0 # add column for tracking score
-        # Delete sensitive columns e.g. candidate name
-        df.drop(['ID'], axis=1, inplace=True)
 
         # Numbers
         # Received DataType: DesiredSalary <> Column: DesiredSalary | points=3
@@ -442,7 +438,7 @@ def scanJobs(session, dbIDs, databaseType: DatabaseType):
         for tr in topResults:
             data.append({
                 "id": tr["ID"],
-                "databaseType": databaseType,
+                "databaseType": databaseType.name,
                 "title": tr[Job.Title.name],
                 "description": tr[Job.Description.name],
                 "tail": "Salary: " + str(tr[Job.Salary.name])

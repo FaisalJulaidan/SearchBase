@@ -14,7 +14,7 @@ const customPanelStyle = {
 
 class SelectedSolutions extends Component {
 
-    removeNulls = (obj) => Object.keys(obj).filter(e => obj[e] !== null && e !== 'ID')
+    removeNulls = (obj) => Object.keys(obj).filter(e => obj[e] !== null && e !== 'ID' && e !== 'DatabaseID')
         .reduce((o, e) => {
             o[e] = obj[e];
             return o;

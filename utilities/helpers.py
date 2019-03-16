@@ -180,7 +180,8 @@ def gen_dummy_data():
                 "input": "friend@hotmail.com",
                 "keywords": []
             }
-        ]
+        ],
+        'selectedSolutions': None
     }
 
     db.session.add(ChatbotSession(Data=data, DateTime=datetime.now(),

@@ -160,6 +160,21 @@ def getDatabasesList(companyID: int) -> Callback:
         return Callback(False, 'Could not fetch the databases list.')
 
 
+def getCandidate(candidateID):
+    try:
+        candidate = db.session.query(Candidate) \
+            .filter(Candidate.ID == candidateID).first()
+        if not candidate: raise Exception
+
+        return Callback(True, "Candidate retrieved successfully.", candidate)
+
+    except Exception as exc:
+        print("databases_services.getCandidate() Error: ", exc)
+        db.session.rollback()
+        return Callback(False, 'Could not retrieve the candidate.')
+
+
+
 def getAllCandidates(dbID, page) -> dict:
     try:
         result = db.session.query(Candidate)\
@@ -180,6 +195,20 @@ def getAllCandidates(dbID, page) -> dict:
         raise Exception
 
 
+def getJob(jobID):
+    try:
+        candidate = db.session.query(Job) \
+            .filter(Job.ID == jobID).first()
+        if not candidate: raise Exception
+
+        return Callback(True, "Job retrieved successfully.", candidate)
+
+    except Exception as exc:
+        print("databases_services.getJob() Error: ", exc)
+        db.session.rollback()
+        return Callback(False, 'Could not retrieve the job.')
+
+
 def getAllJobs(dbID, page) -> dict:
     try:
         result = db.session.query(Job) \
@@ -198,6 +227,7 @@ def getAllJobs(dbID, page) -> dict:
     except Exception as exc:
         print("fetchCandidates() ERROR: ", exc)
         raise Exception('Error: getAllJobs()')
+
 
 
 # ----- Deletion ----- #
@@ -236,9 +266,9 @@ def scan(session, assistantHashID):
 
         # Scan database for solutions based on database type
         if databaseType == enums.DatabaseType.Candidates:
-            return scanCandidates(session, [d[0] for d in databases])
+            return scanCandidates(session, [d[0] for d in databases], databaseType)
         elif databaseType == enums.DatabaseType.Jobs:
-            return scanJobs(session, [d[0] for d in databases])
+            return scanJobs(session, [d[0] for d in databases], databaseType)
         else:
             return Callback(False, "Database type is not recognised", None)
 
@@ -250,7 +280,7 @@ def scan(session, assistantHashID):
 
 
 # Data analysis using Pandas library
-def scanCandidates(session, dbIDs):
+def scanCandidates(session, dbIDs, databaseType: DatabaseType):
     try:
 
         df = pandas.read_sql(db.session.query(Candidate).filter(Candidate.DatabaseID.in_(dbIDs)).statement,
@@ -321,6 +351,7 @@ def scanCandidates(session, dbIDs):
         for tr in topResults:
             data.append({
                 "id": tr["ID"],
+                "databaseType": databaseType.name,
                 "title": tr[Candidate.DesiredPosition.name],
                 "description": tr[Candidate.CandidateSkills.name],
                 "tail": "Salary: " + str(tr[Candidate.DesiredSalary.name])
@@ -333,12 +364,11 @@ def scanCandidates(session, dbIDs):
         return Callback(False, 'Error while search the database for matches!')
 
 
-def scanJobs(session, dbIDs):
+def scanJobs(session, dbIDs, databaseType: DatabaseType):
     try:
 
         df = pandas.read_sql(db.session.query(Job).filter(Job.DatabaseID.in_(dbIDs)).statement,
                              con=db.session.bind)
-
 
         keywords = session['keywordsByDataType']
         df['count'] = 0 # add column for tracking score
@@ -412,6 +442,7 @@ def scanJobs(session, dbIDs):
         for tr in topResults:
             data.append({
                 "id": tr["ID"],
+                "databaseType": databaseType,
                 "title": tr[Job.Title.name],
                 "description": tr[Job.Description.name],
                 "tail": "Salary: " + str(tr[Job.Salary.name])

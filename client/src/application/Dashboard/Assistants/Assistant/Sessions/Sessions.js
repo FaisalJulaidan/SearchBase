@@ -114,7 +114,7 @@ class Sessions extends React.Component {
 
     render() {
         const {assistant} = this.props.location.state;
-        const {sessions} = this.props;
+        const {sessions, options} = this.props;
         let { sortedInfo, filteredInfo } = this.state;
         sortedInfo = sortedInfo || {};
         filteredInfo = filteredInfo || {};
@@ -232,7 +232,7 @@ class Sessions extends React.Component {
                         <ViewsModal visible={this.state.viewModal}
                                     closeViewModal={this.closeViewModal}
                                     filesPath={sessions.filesPath}
-                                    dataTypes={sessions.dataTypes}
+                                    flowOptions={options.flow}
                                     session={this.state.selectedSession}
                                     assistant={assistant}
                         />
@@ -246,6 +246,7 @@ class Sessions extends React.Component {
 const mapStateToProps = state =>  {
     const {chatbotSessions} = state;
     return {
+        options: state.options.options,
         sessions: chatbotSessions.chatbotSessions,
         isLoading: chatbotSessions.isLoading,
         errorMsg: chatbotSessions.errorMsg,

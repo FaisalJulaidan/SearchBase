@@ -68,7 +68,7 @@ class ViewsModal extends Component {
 
 
     render() {
-        const {session, dataTypes} = this.props;
+        const {session, flowOptions} = this.props;
         const userType = session ? session.UserType : 'Unknown';
 
         return (
@@ -91,7 +91,12 @@ class ViewsModal extends Component {
 
                     <TabPane tab={`Profile (${userType})`} key={"2"}>
                         <Profile session={session} downloadFile={this.downloadFileHandler}
-                                 dataTypes={dataTypes} />
+                                 dataTypes={flowOptions.dataTypes} />
+                    </TabPane>
+
+                    <TabPane tab={"Conversation"} key={"3"}>
+                        <Conversation session={session}
+                                      downloadFile={this.downloadFileHandler} />
                     </TabPane>
 
                 </Tabs>

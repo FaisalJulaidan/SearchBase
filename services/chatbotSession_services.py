@@ -28,7 +28,7 @@ def processSession(assistantHashID, data: dict) -> Callback:
         # collectedData is an array, and timeSpent is in seconds.
         collectedData = data['collectedData']
         chatbotSession = ChatbotSession(Data={'collectedData': collectedData},
-                                        TimeSpent=44,
+                                        TimeSpent=data['timeSpent'],
                                         SolutionsReturned=data['solutionsReturned'],
                                         QuestionsAnswered=len(collectedData),
                                         UserType=data['userType'],

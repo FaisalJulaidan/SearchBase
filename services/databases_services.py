@@ -320,6 +320,7 @@ def scanCandidates(session, dbIDs):
         data = []
         for tr in topResults:
             data.append({
+                "id": tr["ID"],
                 "title": tr[Candidate.DesiredPosition.name],
                 "description": tr[Candidate.CandidateSkills.name],
                 "tail": "Salary: " + str(tr[Candidate.DesiredSalary.name])
@@ -410,6 +411,7 @@ def scanJobs(session, dbIDs):
         data = []
         for tr in topResults:
             data.append({
+                "id": tr["ID"],
                 "title": tr[Job.Title.name],
                 "description": tr[Job.Description.name],
                 "tail": "Salary: " + str(tr[Job.Salary.name])

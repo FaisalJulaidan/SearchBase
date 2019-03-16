@@ -87,10 +87,10 @@ class Blocks extends Component {
                         <h3>{this.props.currentGroup.name} Questions</h3>
                     </div>
                     <div>
-                        {/*<Button className={styles.Panel_Header_Button} type="primary" icon="tool"*/}
-                                {/*onClick={this.showAssistantToolsModal}>*/}
-                            {/*Tools*/}
-                        {/*</Button>*/}
+                        <Button className={styles.Panel_Header_Button} type="primary" icon="tool"
+                                onClick={this.showAssistantToolsModal}>
+                            Tools
+                        </Button>
                         <Button className={styles.Panel_Header_Button} type="primary" icon="plus"
                                 onClick={this.showAddBlockModal} disabled={!this.props.currentGroup.id}>
                             Add Question

@@ -35,14 +35,17 @@ def processSession(assistantHashID, data: dict) -> Callback:
             callback = databases_services.getJob(solution['id'])
 
         if callback.Success:
-            selectedSolutions.append(callback.Data)
+            selectedSolutions.append({
+                'data': helpers.getDictFromSQLAlchemyObj(callback.Data),
+                'type': solution['databaseType']
+            })
 
     try:
         # collectedData is an array, and timeSpent is in seconds.
         collectedData = data['collectedData']
         chatbotSession = ChatbotSession(Data={
                                             'collectedData': collectedData,
-                                            'selectedSolutions': helpers.getListFromSQLAlchemyList(selectedSolutions)
+                                            'selectedSolutions': selectedSolutions
                                         },
                                         TimeSpent=data['timeSpent'],
                                         SolutionsReturned=data['solutionsReturned'],

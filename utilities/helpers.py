@@ -81,12 +81,12 @@ def gen_dummy_data():
                                                 "userTypes":[],
                                                 "validation":"Ignore"
                                             },
-                                             "Content":{
-                                                 "showTop":3,
-                                                 "action":"Go To Next Block",
-                                                 "blockToGoID":"gje6D",
-                                                 "afterMessage":"Here are you solutions",
-                                                 "databaseType":"Candidates"
+                                             "Content": {
+                                                 "showTop": 3,
+                                                 "action": "Go To Next Block",
+                                                 "blockToGoID": "gje6D",
+                                                 "afterMessage": "Your response is recieved",
+                                                 "databaseType": "Candidates"
                                              },
                                          },
                                          {

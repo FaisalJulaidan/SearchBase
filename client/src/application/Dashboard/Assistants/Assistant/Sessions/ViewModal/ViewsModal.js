@@ -4,6 +4,7 @@ import {http, alertError} from '../../../../../../helpers';
 import saveAs from 'file-saver';
 import Profile from '../Profile/Profile'
 import Conversation from '../Conversation/Conversation'
+import SelectedSolutions from "../SelectedSolutions/SelectedSolutions";
 
 const TabPane = Tabs.TabPane;
 
@@ -94,9 +95,8 @@ class ViewsModal extends Component {
                                  dataTypes={flowOptions.dataTypes} />
                     </TabPane>
 
-                    <TabPane tab={"Conversation"} key={"3"}>
-                        <Conversation session={session}
-                                      downloadFile={this.downloadFileHandler} />
+                    <TabPane tab={"Solutions"} key={"3"}>
+                        <SelectedSolutions solutions={session?.Data?.selectedSolutions}/>
                     </TabPane>
 
                 </Tabs>

@@ -42,7 +42,7 @@ def chatbot(assistantIDAsHash):
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
 
-        sendNotification_callback: Callback = mail_services.notifyNewRecord(assistantIDAsHash)
+        sendNotification_callback: Callback = mail_services.notifyNewChatbotSession(assistantIDAsHash)
 
         return helpers.jsonResponse(True, 200, "Collected data is successfully processed", {'sessionID': callback.Data.ID})
 

@@ -5,7 +5,7 @@ from flask import render_template, current_app
 from flask_mail import Mail, Message
 
 from models import Callback
-from services import user_services, assistant_services, analytics_services
+from services import user_services, assistant_services, analytics_services, chatbotSession_services
 from utilities import helpers
 
 mail = Mail()
@@ -16,20 +16,30 @@ tsbEmail = "info@thesearchbase.com"
 def timer_tick():
     now = datetime.now()
 
+    #  sessions -> splitting the day in 6 parts of 4 hour periods to determine which part of the day it is
+    #  12pm - 4am
     session1 = [now.replace(hour=0, minute=0, second=0, microsecond=0),
                 now.replace(hour=3, minute=59, second=59, microsecond=999999)]
+    #  4am - 8am
     session2 = [now.replace(hour=4, minute=0, second=0, microsecond=0),
                 now.replace(hour=7, minute=59, second=59, microsecond=999999)]
+    #  8am - 12am
     session3 = [now.replace(hour=8, minute=0, second=0, microsecond=0),
                 now.replace(hour=11, minute=59, second=59, microsecond=999999)]
+    #  12am - 16am
     session4 = [now.replace(hour=12, minute=0, second=0, microsecond=0),
                 now.replace(hour=15, minute=59, second=59, microsecond=999999)]
+    #  16am - 20am
     session5 = [now.replace(hour=16, minute=0, second=0, microsecond=0),
                 now.replace(hour=19, minute=59, second=59, microsecond=999999)]
+    #  20am - 24
     session6 = [now.replace(hour=20, minute=0, second=0, microsecond=0),
                 now.replace(hour=23, minute=59, second=59, microsecond=999999)]
+
     sessions = [session1, session2, session3, session4, session5, session6]
 
+    #  sub -> subscriptions -> determines when a chatbot is enabled for a specific interval ex. 4 hours...
+    #  ... which sessions it should activate notification in
     sub4 = {"interval": 4, "sessions": [session1, session2, session3, session4, session5, session6]}
     sub8 = {"interval": 8, "sessions": [session1, session3, session5]}
     sub12 = {"interval": 12, "sessions": [session2, session5]}
@@ -37,12 +47,14 @@ def timer_tick():
     subs = [sub4, sub8, sub12, sub24]
 
     for session in sessions:
+        # find which session the timer is currently in
         if session[0] < now < session[1]:
             print(session[0], " > ", now, " > ", session[1])
+            # check which subscriptions should activate depending if they are subscribed to this session or not
             for sub in subs:
                 if session in sub["sessions"]:
                     print("notifying")
-                    notifyNewRecordsForLastXHours(sub["interval"])
+                    notifyNewChatbotSessionsCountForLastXHours(sub["interval"])
 
 
 def sendDemoRequest(email) -> Callback:
@@ -142,82 +154,80 @@ def sendSolutionAlert(record, solutions):
 
 
 # NOTIFICATIONS
-def notifyNewRecordsForLastXHours(hours):
+def notifyNewChatbotSessionsCountForLastXHours(hours):
     try:
-        userSettings_callback: Callback = user_services.getAllUserSettings()
+        # get all user settings
+        userSettings_callback: Callback = user_services.getAllUserSettingsWithEnabled("UserInputNotifications")
         if not userSettings_callback.Success:
             raise Exception("userSettings_callback: ", userSettings_callback.Message)
 
+        # loop through every user setting
         for record in userSettings_callback.Data:
-            if not record.UserInputNotifications:
-                continue
-
+            # get the user
             user_callback: Callback = user_services.getByID(record.ID)
             if not user_callback.Success:
                 raise Exception("user_callback: ", user_callback.Message)
 
-            assistants_callback: Callback = assistant_services.getAll(user_callback.Data.CompanyID)
+            # get their assistants by company id
+            assistants_callback: Callback = assistant_services.getAllWithInstantNotifications(user_callback.Data.CompanyID)
             if not assistants_callback.Success:
                 raise Exception("assistants_callback: ", assistants_callback.Message)
 
+            # empty information to send by email
             information = []
 
+            # for every assistant
             for assistant in assistants_callback.Data:
-                if not assistant.MailEnabled or not hours == assistant.MailPeriod:
-                    continue
-
-                records_callback: Callback = analytics_services.getAllRecordsByAssistantIDInTheLast(hours, assistant.ID)
+                # get all chatbot sessions for the last X hours for the assistant
+                records_callback: Callback = chatbotSession_services.getAllRecordsByAssistantIDInTheLast(hours, assistant.ID)
                 if not records_callback.Success:
                     raise Exception("records_callback: ", records_callback.Message)
 
-                if not records_callback.Data:
-                    continue
-
+                # add to information to be sent
                 information.append(
                     {"assistantName": assistant.Name, "data": records_callback.Data, "assistantID": assistant.ID})
 
+            # if no information to send - skip
             if not information:
                 continue
 
-            sendRecords_callback: Callback = sendNewRecordsNotification(user_callback.Data.Email, information)
-            if not sendRecords_callback.Success: raise Exception("sendRecords_callback: ", sendRecords_callback.Message)
+            # send email
+            sendRecords_callback: Callback = mailNewChatbotSessionsCount(user_callback.Data.Email, information)
+            if not sendRecords_callback.Success:
+                raise Exception("sendRecords_callback: ", sendRecords_callback.Message)
 
     except Exception as e:
-        print("mail_services.notifyNewRecordsForLastXHours() ERROR: ", e)
+        print("mail_services.notifyNewChatbotSessionsCountForLastXHours() ERROR: ", e)
+        return Callback(False, "Error in notifying for new chatbot sessions")
 
 
-def notifyNewRecord(assistantHashID):
+def notifyNewChatbotSession(assistantHashID):
     try:
         callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
         if not callback.Success:
             return Callback(False, "Assistant not found!")
         assistant = callback.Data
         if not assistant.MailEnabled or assistant.MailPeriod is not 0:
-            return Callback(False, "Assistant is not set to instant notification!")
+            return Callback(False, "Assistant is not set to receive instant notification!")
 
-        users_callback: Callback = user_services.getAllByCompanyID(assistant.CompanyID)
+        users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID)
         if not users_callback.Success:
             return Callback(False, "Users not found!")
 
         information = [{"assistantName": assistant.Name, "data": 1, "assistantID": assistant.ID}]
 
+        # send emails
         for user in users_callback.Data:
-            userSettings_callback: Callback = user_services.getUserSettings(user.ID)
-            if not userSettings_callback.Success:
-                raise Exception(userSettings_callback.Message)
-
-            if not userSettings_callback.Data.UserInputNotifications:
-                continue
-
-            sendRecords_callback: Callback = sendNewRecordsNotification(user.Email, information)
+            sendRecords_callback: Callback = mailNewChatbotSessionsCount(user.Email, information)
             if not sendRecords_callback.Success:
                 return Callback(False, sendRecords_callback.Message)
 
     except Exception as e:
-        print("mail_services.notifyNewRecord() ERROR: ", e)
+        print("mail_services.notifyNewChatbotSession() ERROR: ", e)
+        return Callback(False, "Error in notifying for new chatbot session")
 
 
-def sendNewRecordsNotification(receiver, data):
+def mailNewChatbotSessionsCount(receiver, data):
     try:
         send_email(receiver, 'Your new data',
                    'emails/user_notification.html', data=data)
@@ -225,7 +235,7 @@ def sendNewRecordsNotification(receiver, data):
         return Callback(True, 'Email sent and it\'s on its way to ' + receiver)
 
     except Exception as e:
-        print("addedNewUserEmail() Error: ", e)
+        print("mail_services.mailNewChatbotSessionsCount() ERROR: ", e)
         return Callback(False, 'Could not send email to ' + receiver)
 
 

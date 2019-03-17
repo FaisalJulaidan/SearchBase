@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import List
 
 from jsonschema import validate
@@ -102,6 +103,23 @@ def filterForContainEmails(records):
         print("userInput_services.filterForContainEmails ERROR: ", exc)
         db.session.rollback()
         return Callback(False, 'Could not filter the data.')
+
+
+def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
+    try:
+        result = db.session.query(ChatbotSession).filter(
+            ChatbotSession.AssistantID == assistantID,
+            ChatbotSession.DateTime < datetime.now(),
+            ChatbotSession.DateTime >= datetime.now() - timedelta(hours=hours)).count()
+
+        if not result:
+            raise Exception("Empty")
+
+        return Callback(True, "Records retrieved", )
+    except Exception as e:
+        db.session.rollback()
+        print("analytics_services.getAllRecordsByAssistantIDInTheLast() ERROR: ", e)
+        return Callback(False, "Error in returning records")
 
 
 # ----- Deletions ----- #

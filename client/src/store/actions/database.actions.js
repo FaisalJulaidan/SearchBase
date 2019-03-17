@@ -47,10 +47,11 @@ const uploadDatabaseFailure = (error) => {
 
 
 // Fetch
-const fetchDatabase = (databaseID) => {
+const fetchDatabase = (databaseID, pageNumber) => {
     return {
         type: actionTypes.FETCH_DATABASE_REQUEST,
-        databaseID
+        databaseID,
+        pageNumber
     }
 };
 

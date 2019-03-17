@@ -23,6 +23,29 @@ export const chatbotSessions = (state = initialState, action) => {
                 errorMsg: action.error.msg
             });
 
+        // Delete chatbot sessions
+        case actionTypes.DELETE_CHATBOT_SESSION_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isDeletingSession: true
+            });
+        case actionTypes.DELETE_CHATBOT_SESSION_SUCCESS:
+
+            const chatbotSessionsCopy = {...state.chatbotSessions,
+                sessionsList: state.chatbotSessions.sessionsList.filter(session => session.ID !== action.sessionID)};
+
+            return updateObject(state, {
+                isDeletingSession: false,
+                chatbotSessions: chatbotSessionsCopy,
+                errorMsg: null,
+            });
+        case actionTypes.DELETE_CHATBOT_SESSION_FAILURE:
+            return updateObject(state, {
+                isDeletingSession: false,
+                errorMsg: action.error.msg
+            });
+
+
         //Clearing all chatbot sessions
         case actionTypes.CLEAR_ALL_CHATBOT_SESSIONS_REQUEST:
             return updateObject(state, {

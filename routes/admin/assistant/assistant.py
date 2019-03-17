@@ -38,6 +38,7 @@ def assistants():
                                                        data.get('secondsUntilPopup'),
                                                        data.get('alertsEnabled'),
                                                        data.get('alertEvery'),
+                                                       data.get('template'),
                                                        user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, "Cannot add Assistant")

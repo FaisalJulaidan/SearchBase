@@ -22,7 +22,13 @@ class Assistants extends Component {
 
     showModal = () => this.setState({visible: true});
     hideModal = () => this.setState({visible: false});
-    activeHandler = (checked, assistantID) => {
+
+    addAssistant = (values) => {
+        this.props.dispatch(assistantActions.addAssistant(values));
+        this.hideModal();
+    };
+
+    activateHandler = (checked, assistantID) => {
         if(!checked){
             confirm({
                 title: `Deactivate assistant`,
@@ -63,7 +69,7 @@ class Assistants extends Component {
                                                                                                   key={i}
                                                                                                   index={i}
                                                                                                   isStatusChanging={this.props.isStatusChanging}
-                                                                                                  activeHandler={this.activeHandler}
+                                                                                                  activateHandler={this.activateHandler}
                                                                                                   isLoading={this.props.isLoading}
                                         />)
                                     )
@@ -75,6 +81,8 @@ class Assistants extends Component {
                 </div>
 
                 <NewAssistantModal visible={this.state.visible}
+                                   options={this.props.options}
+                                   addAssistant={this.addAssistant}
                                    hideModal={this.hideModal}/>
 
             </div>
@@ -88,6 +96,7 @@ function mapStateToProps(state) {
         registerList: state.assistant.registerList,
         isLoading: state.assistant.isLoading,
         isStatusChanging: state.assistant.isStatusChanging,
+        options: state.options.options,
     };
 }
 

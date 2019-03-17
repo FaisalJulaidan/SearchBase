@@ -160,14 +160,10 @@ elif os.environ['FLASK_ENV'] == 'development':
     scheduler.init_app(app)
     scheduler.start()
 
-    # databases_services.scan({'databaseType': 'Candidates',
-    #                          'keywordsByDataType': {'Desired Salary': [1500]} },
-    #                         "YJkLo")
-
-    # print(databases_services.getAllCandidates(1))
 
     # Run the app server
     print('Development mode running...')
 
 else:
     print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")
+

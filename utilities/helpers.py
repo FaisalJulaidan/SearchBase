@@ -58,22 +58,78 @@ def gen_dummy_data():
                                      "name": "group 1",
                                      "description": "The best group",
                                      "blocks": [
+                                         # {
+                                         #     "ID": "834hf",
+                                         #     "DataType": enums.DataType.DesiredSalary.value,
+                                         #     "Type": "User Input",
+                                         #     "StoreInDB": True,
+                                         #     "Skippable": False,
+                                         #     "Content": {
+                                         #         "action": "Go To Next Block",
+                                         #         "text": "What's salary are you offering",
+                                         #         "blockToGoID": "by_GnLY-f",
+                                         #         "afterMessage": "Your input is being processed..."
+                                         #     }
+                                         # },
+                                         # {
+                                         #    "ID":"by_GnLY-f",
+                                         #    "Type":"Solutions",
+                                         #    "StoreInDB":False,
+                                         #    "Skippable":False,
+                                         #    "DataType":{
+                                         #        "name":"No Type",
+                                         #        "userTypes":[],
+                                         #        "validation":"Ignore"
+                                         #    },
+                                         #     "Content": {
+                                         #         "showTop": 3,
+                                         #         "action": "Go To Next Block",
+                                         #         "blockToGoID": "gje6D",
+                                         #         "afterMessage": "Your response is recieved",
+                                         #         "databaseType": "Candidates"
+                                         #     },
+                                         # },
+                                         # {
+                                         #     "ID": "gje6D",
+                                         #     "DataType": enums.DataType.Email.value,
+                                         #     "Type": "User Input",
+                                         #     "StoreInDB": True,
+                                         #     "Skippable": False,
+                                         #     "Content": {
+                                         #         "action": "End Chat",
+                                         #         "text": "What's your email",
+                                         #         "blockToGoID": None,
+                                         #         "afterMessage": "Your email is in good hands :) Bye!"
+                                         #     }
+                                         # },
                                          {
-                                             "ID": "834hf",
-                                             "DataType": {
-                                                 "name": "Email",
-                                                 "validation": "Email"
-                                             },
-                                             "Type": "User Input",
+                                             "ID": "hkwt845",
+                                             "DataType": enums.DataType.CandidateSkills.value,
+                                             "Type": "File Upload",
                                              "StoreInDB": True,
-                                             "Skippable": False,
+                                             "Skippable": True,
                                              "Content": {
                                                  "action": "Go To Next Block",
-                                                 "text": "What's your email?",
-                                                 "blockToGoID": None,
-                                                 "afterMessage": "Your input is being processed..."
+                                                 "text": "Upload CV1",
+                                                 "blockToGoID": "gjdfl34",
+                                                 "afterMessage": "File processed!",
+                                                 "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
                                              }
-                                         }
+                                         },
+                                         {
+                                             "ID": "gjdfl34",
+                                             "DataType": enums.DataType.CandidateSkills.value,
+                                             "Type": "File Upload",
+                                             "StoreInDB": True,
+                                             "Skippable": True,
+                                             "Content": {
+                                                 "action": "End Chat",
+                                                 "text": "Upload CV2",
+                                                 "blockToGoID": None,
+                                                 "afterMessage": "File processed!",
+                                                 "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
+                                             }
+                                         },
                                      ]
                                  }
                              ]
@@ -152,13 +208,16 @@ def gen_dummy_data():
                 "input": "friend@hotmail.com",
                 "keywords": []
             }
-        ]
+        ],
+        "selectedSolutions": None,
+        "keywordsByDataType": {"Email": ["faisal@gmail.com", "friend@hotmail.com"],
+                               "Availability": ["Only weekend days"],
+                               "No Type": ["I am fine thank you"]}
     }
-
-    db.session.add(ChatbotSession(Data=data, DateTime=datetime.now(),
-                                  TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
-                                  UserType=enums.UserType.JobSeeker, Assistant=reader_a))
-
+    s1 = ChatbotSession(Data=data, DateTime=datetime.now(),
+                        TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
+                        UserType=enums.UserType.JobSeeker, Assistant=reader_a)
+    db.session.add(s1)
     db.session.add(ChatbotSession(Data=data, DateTime=datetime.now() - timedelta(days=10),
                                   TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
                                   UserType=enums.UserType.CandidateSeeker, Assistant=reader_a))
@@ -186,6 +245,8 @@ def gen_dummy_data():
                                 2, "Cardiff","Contract", 20))
 
     seed() # will save changes as well
+    db.session.delete(s1)
+
 
 
 def addCandidate(db, name, ds, dp, cs, ye, pl, pe, ehr):
@@ -256,9 +317,13 @@ def getDictFromSQLAlchemyObj(obj):
             d[key] = getattr(obj, key)
             if isinstance(d[attr.name], Enum):
                 d[key] = d[key].value
+            if key == 'Currency' and d[key]:
+                d[key] = d[key].code
+            if key == 'StartDate' and d[key]:
+                d[key] = '/'.join(map(str, [d[key].year, d[key].month, d[key].day]))
+    if hasattr(obj, "FilePath"):
+        d["FilePath"] = obj.FilePath
     return d
-    # return {c.key: getattr(obj, c.key)
-    #         for c in inspect(obj).mapper.column_attrs if c.key not in ("Password")}
 
 
 # Convert a SQLAlchemy list of objects to a list of dicts

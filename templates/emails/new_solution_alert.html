@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8"> <!-- utf-8 works for most cases -->
     <meta name="viewport" content="width=device-width"> <!-- Forcing initial-scale shouldn't be necessary -->
@@ -64,13 +64,14 @@
             table-layout: fixed !important;
             margin: 0 auto !important;
         }
+
         table table table {
             table-layout: auto;
         }
 
         /* What it does: Uses a better rendering method when resizing images in IE. */
         img {
-            -ms-interpolation-mode:bicubic;
+            -ms-interpolation-mode: bicubic;
         }
 
         /* What it does: Prevents Windows 10 Mail from underlining links despite inline CSS. Styles for underlined links should be inline. */
@@ -79,7 +80,7 @@
         }
 
         /* What it does: A work-around for email clients meddling in triggered links. */
-        *[x-apple-data-detectors],  /* iOS */
+        *[x-apple-data-detectors], /* iOS */
         .unstyle-auto-detected-links *,
         .aBn {
             border-bottom: 0 !important;
@@ -102,6 +103,7 @@
             display: none !important;
             opacity: 0.01 !important;
         }
+
         /* If the above doesn't work, add a .g-img class to any image in question. */
         img.g-img + div {
             display: none !important;
@@ -116,12 +118,14 @@
                 min-width: 320px !important;
             }
         }
+
         /* iPhone 6, 6S, 7, 8, and X */
         @media only screen and (min-device-width: 375px) and (max-device-width: 413px) {
             u ~ div .email-container {
                 min-width: 375px !important;
             }
         }
+
         /* iPhone 6+, 7+, and 8+ */
         @media only screen and (min-device-width: 414px) {
             u ~ div .email-container {
@@ -131,8 +135,8 @@
 
     </style>
     <!-- CSS Reset : END -->
-	<!-- Reset list spacing because Outlook ignores much of our inline CSS. -->
-	<!--[if mso]>
+    <!-- Reset list spacing because Outlook ignores much of our inline CSS. -->
+    <!--[if mso]>
 	<style type="text/css">
 		ul,
 		ol {
@@ -153,59 +157,62 @@
     <!-- Progressive Enhancements : BEGIN -->
     <style>
 
-	    /* What it does: Hover styles for buttons */
-	    .button-td,
-	    .button-a {
-	        transition: all 100ms ease-in;
-	    }
-	    .button-td-primary:hover,
-	    .button-a-primary:hover {
-	        background: #555555 !important;
-	        border-color: #555555 !important;
-	    }
+        /* What it does: Hover styles for buttons */
+        .button-td,
+        .button-a {
+            transition: all 100ms ease-in;
+        }
 
-	    /* Media Queries */
-	    @media screen and (max-width: 480px) {
+        .button-td-primary:hover,
+        .button-a-primary:hover {
+            background: #555555 !important;
+            border-color: #555555 !important;
+        }
 
-	        /* What it does: Forces elements to resize to the full width of their container. Useful for resizing images beyond their max-width. */
-	        .fluid {
-	            width: 100% !important;
-	            max-width: 100% !important;
-	            height: auto !important;
-	            margin-left: auto !important;
-	            margin-right: auto !important;
-	        }
+        /* Media Queries */
+        @media screen and (max-width: 480px) {
 
-	        /* What it does: Forces table cells into full-width rows. */
-	        .stack-column,
-	        .stack-column-center {
-	            display: block !important;
-	            width: 100% !important;
-	            max-width: 100% !important;
-	            direction: ltr !important;
-	        }
-	        /* And center justify these ones. */
-	        .stack-column-center {
-	            text-align: center !important;
-	        }
+            /* What it does: Forces elements to resize to the full width of their container. Useful for resizing images beyond their max-width. */
+            .fluid {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
 
-	        /* What it does: Generic utility class for centering. Useful for images, buttons, and nested tables. */
-	        .center-on-narrow {
-	            text-align: center !important;
-	            display: block !important;
-	            margin-left: auto !important;
-	            margin-right: auto !important;
-	            float: none !important;
-	        }
-	        table.center-on-narrow {
-	            display: inline-block !important;
-	        }
+            /* What it does: Forces table cells into full-width rows. */
+            .stack-column,
+            .stack-column-center {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                direction: ltr !important;
+            }
 
-	        /* What it does: Adjust typography on small screens to improve readability */
-	        .email-container p {
-	            font-size: 17px !important;
-	        }
-	    }
+            /* And center justify these ones. */
+            .stack-column-center {
+                text-align: center !important;
+            }
+
+            /* What it does: Generic utility class for centering. Useful for images, buttons, and nested tables. */
+            .center-on-narrow {
+                text-align: center !important;
+                display: block !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+                float: none !important;
+            }
+
+            table.center-on-narrow {
+                display: inline-block !important;
+            }
+
+            /* What it does: Adjust typography on small screens to improve readability */
+            .email-container p {
+                font-size: 17px !important;
+            }
+        }
 
     </style>
     <!-- Progressive Enhancements : END -->
@@ -228,132 +235,149 @@
 	3. mso conditional: For Windows 10 Mail
 -->
 <body width="100%" style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: #ffffff;">
-	<center style="width: 100%; background-color: #ffffff;">
+<center style="width: 100%; background-color: #ffffff;">
     <!--[if mso | IE]>
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff;">
     <tr>
     <td>
     <![endif]-->
 
-        <!-- Visually Hidden Preheader Text : BEGIN -->
-        <div style="display: none; font-size: 1px; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all; font-family: sans-serif;">
-            (Optional) This text will appear in the inbox preview, but not the email body. It can be used to supplement the email subject line or even summarize the email's contents. Extended text preheaders (~490 characters) seems like a better UX for anyone using a screenreader or voice-command apps like Siri to dictate the contents of an email. If this text is not included, email clients will automatically populate it using the text (including image alt text) at the start of the email's body.
-        </div>
-        <!-- Visually Hidden Preheader Text : END -->
+    <!-- Visually Hidden Preheader Text : BEGIN -->
+    <div style="display: none; font-size: 1px; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all; font-family: sans-serif;">
+        (Optional) This text will appear in the inbox preview, but not the email body. It can be used to supplement the
+        email subject line or even summarize the email's contents. Extended text preheaders (~490 characters) seems like
+        a better UX for anyone using a screenreader or voice-command apps like Siri to dictate the contents of an email.
+        If this text is not included, email clients will automatically populate it using the text (including image alt
+        text) at the start of the email's body.
+    </div>
+    <!-- Visually Hidden Preheader Text : END -->
 
-        <!-- Create white space after the desired preview text so email clients don’t pull other distracting text into the inbox preview. Extend as necessary. -->
-        <!-- Preview Text Spacing Hack : BEGIN -->
-        <div style="display: none; font-size: 1px; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all; font-family: sans-serif;">
-	        &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
-        </div>
-        <!-- Preview Text Spacing Hack : END -->
+    <!-- Create white space after the desired preview text so email clients don’t pull other distracting text into the inbox preview. Extend as necessary. -->
+    <!-- Preview Text Spacing Hack : BEGIN -->
+    <div style="display: none; font-size: 1px; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all; font-family: sans-serif;">
+        &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+    </div>
+    <!-- Preview Text Spacing Hack : END -->
 
-        <!--
-            Set the email width. Defined in two places:
-            1. max-width for all clients except Desktop Windows Outlook, allowing the email to squish on narrow but never go wider than 680px.
-            2. MSO tags for Desktop Windows Outlook enforce a 680px width.
-            Note: The Fluid and Responsive templates have a different width (600px). The hybrid grid is more "fragile", and I've found that 680px is a good width. Change with caution.
-        -->
-        <div style="max-width: 680px; margin: 0 auto;" class="email-container">
-            <!--[if mso]>
+    <!--
+        Set the email width. Defined in two places:
+        1. max-width for all clients except Desktop Windows Outlook, allowing the email to squish on narrow but never go wider than 680px.
+        2. MSO tags for Desktop Windows Outlook enforce a 680px width.
+        Note: The Fluid and Responsive templates have a different width (600px). The hybrid grid is more "fragile", and I've found that 680px is a good width. Change with caution.
+    -->
+    <div style="max-width: 680px; margin: 0 auto;" class="email-container">
+        <!--[if mso]>
             <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="680">
             <tr>
             <td>
             <![endif]-->
-            <br />
-            <br />
+        <br/>
+        <br/>
 
 
-	        <!-- Email Body : BEGIN -->
-	        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0 auto;">
-	            <!-- Hero Image, Flush : BEGIN -->
-                <tr>
-                    <td style="background-color: #ffffff;">
-                        <img src="https://www.thesearchbase.com/static/email_assets/images/email-image.png" width="680" height="" alt="alt_text" border="0" style="width: 100%; max-width: 680px; height: auto; background: #dddddd; font-family: sans-serif; font-size: 15px; line-height: 15px; color: #555555; margin: auto;" class="fluid g-img">
-                    </td>
-                </tr>
-                <!-- Hero Image, Flush : END -->
+        <!-- Email Body : BEGIN -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0 auto;">
+            <!-- Hero Image, Flush : BEGIN -->
+            <tr>
+                <td style="background-color: #ffffff;">
+                    <img src="https://www.thesearchbase.com/static/email_assets/images/email-image.png" width="680"
+                         height="" alt="alt_text" border="0"
+                         style="width: 100%; max-width: 680px; height: auto; background: #dddddd; font-family: sans-serif; font-size: 15px; line-height: 15px; color: #555555; margin: auto;"
+                         class="fluid g-img">
+                </td>
+            </tr>
+            <!-- Hero Image, Flush : END -->
 
-                <!-- Thumbnail Left, Text Right : BEGIN -->
-                <tr>
-                    <!-- dir=ltr is where the magic happens. This can be changed to dir=rtl to swap the alignment on wide while maintaining stack order on narrow. -->
-                    <td dir="ltr" height="100%" valign="top" width="100%" style="padding: 10px 0; background-color: #ffffff;">
-                        <!--[if mso]>
+            <!-- Thumbnail Left, Text Right : BEGIN -->
+            <tr>
+                <!-- dir=ltr is where the magic happens. This can be changed to dir=rtl to swap the alignment on wide while maintaining stack order on narrow. -->
+                <td dir="ltr" height="100%" valign="top" width="100%"
+                    style="padding: 10px 0; background-color: #ffffff;">
+                    <!--[if mso]>
                         <table align="center" role="presentation" border="0" cellspacing="0" cellpadding="0" width="660" style="width: 660px;">
                         <tr>
                         <td valign="top" width="660" style="width: 660px;">
                         <![endif]-->
-                        <table align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:660px;">
-                            <tr>
-                                <td align="center" valign="top" style="font-size:0; padding: 10px 0;">
-                                    <!--[if mso]>
+                    <table align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"
+                           style="max-width:660px;">
+                        <tr>
+                            <td align="center" valign="top" style="font-size:0; padding: 10px 0;">
+                                <!--[if mso]>
                                     <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="660" style="width: 660px;">
                                     <tr>
                                     <td valign="top" width="220" style="width: 220px;">
                                     <![endif]-->
-                                    <!--[if mso]>
+                                <!--[if mso]>
                                     </td>
                                     <td valign="top" width="440" style="width: 440px;">
                                     <![endif]-->
-                                    <div style="display:inline-block; margin: 0 -2px; max-width:66.66%; min-width:320px; vertical-align:top;" class="stack-column">
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                                                                    {%for solution in solutions%}
+                                <div style="display:inline-block; margin: 0 -2px; max-width:66.66%; min-width:320px; vertical-align:top;"
+                                     class="stack-column">
+                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                        {% for solution in solutions %}
                                             <tr>
-                                                <td dir="ltr" style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555; padding: 10px 10px 0; text-align: left;" class="center-on-narrow">
-                                                                                    {% for display in solution["displayData"] %}
-                                                    <label style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 18px; line-height: 22px; color: #333333; font-weight: bold;">{{ display }}</label>
-                                                                                    {% endfor %}
+                                                <td dir="ltr"
+                                                    style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555; padding: 10px 10px 0; text-align: left;"
+                                                    class="center-on-narrow">
+                                                    {% for display in solution["displayData"] %}
+                                                        <label style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 18px; line-height: 22px; color: #333333; font-weight: bold;">{{ display }}</label>
+                                                    {% endfor %}
                                                     <!-- Button : BEGIN -->
-                                                                                {%if solution["buttonURL"]%}
-                                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="center-on-narrow" style="float:left;">
-                                                        <tr>
-				                                            <td class="button-td button-td-primary" style="border-radius: 4px; background: #6610f2;">
-																<a class="button-a button-a-primary" href="{{solution["buttonURL"]}}" style="background: #6610f2; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 8px 15px; color: #ffffff; display: block; border-radius: 4px;">View</a>
-															</td>
-                                                        </tr>
-                                                    </table>
-                                                                                {%endif%}
+                                                    {% if solution["buttonURL"] %}
+                                                        <table role="presentation" cellspacing="0" cellpadding="0"
+                                                               border="0" class="center-on-narrow" style="float:left;">
+                                                            <tr>
+                                                                <td class="button-td button-td-primary"
+                                                                    style="border-radius: 4px; background: #6610f2;">
+                                                                    <a class="button-a button-a-primary"
+                                                                       href="{{ solution["buttonURL"] }}"
+                                                                       style="background: #6610f2; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 8px 15px; color: #ffffff; display: block; border-radius: 4px;">View</a>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    {% endif %}
                                                     <!-- Button : END -->
                                                 </td>
                                             </tr>
-                                                                    {%endfor%}
-                                        </table>
-                                    </div>
-                                    <!--[if mso]>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                                <!--[if mso]>
                                     </td>
                                     </tr>
                                     </table>
                                     <![endif]-->
-                                </td>
-                            </tr>
-                        </table>
-                        <!--[if mso]>
+                            </td>
+                        </tr>
+                    </table>
+                    <!--[if mso]>
                         </td>
                         </tr>
                         </table>
                         <![endif]-->
-                    </td>
-                </tr>
-                <!-- Thumbnail Left, Text Right : END -->
+                </td>
+            </tr>
+            <!-- Thumbnail Left, Text Right : END -->
+
+
+            <!-- Thumbnail Left, Text Right : BEGIN -->
 
 
 
-                <!-- Thumbnail Left, Text Right : BEGIN -->
 
 
-
-
-
-                {%for solution in solutions%}
+            {% for solution in solutions %}
                 <tr>
                     <!-- dir=ltr is where the magic happens. This can be changed to dir=rtl to swap the alignment on wide while maintaining stack order on narrow. -->
-                    <td dir="ltr" height="100%" valign="top" width="100%" style="padding: 10px 0; background-color: #ffffff;">
+                    <td dir="ltr" height="100%" valign="top" width="100%"
+                        style="padding: 10px 0; background-color: #ffffff;">
                         <!--[if mso]>
                         <table align="center" role="presentation" border="0" cellspacing="0" cellpadding="0" width="660" style="width: 660px;">
                         <tr>
                         <td valign="top" width="660" style="width: 660px;">
                         <![endif]-->
-                        <table align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:660px;">
+                        <table align="center" role="presentation" border="0" cellpadding="0" cellspacing="0"
+                               width="100%" style="max-width:660px;">
                             <tr>
                                 <td align="center" valign="top" style="font-size:0; padding: 10px 0;">
                                     <!--[if mso]>
@@ -365,22 +389,30 @@
                                     </td>
                                     <td valign="top" width="440" style="width: 440px;">
                                     <![endif]-->
-                                    <div style="display:inline-block; margin: 0 -2px; max-width:66.66%; min-width:320px; vertical-align:top;" class="stack-column">
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                    <div style="display:inline-block; margin: 0 -2px; max-width:66.66%; min-width:320px; vertical-align:top;"
+                                         class="stack-column">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0"
+                                               width="100%">
                                             <tr>
-                                                <td dir="ltr" style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555; padding: 10px 10px 0; text-align: left;" class="center-on-narrow">
+                                                <td dir="ltr"
+                                                    style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555; padding: 10px 10px 0; text-align: left;"
+                                                    class="center-on-narrow">
                                                     {% for display in solution["displayData"] %}
-                                                    <h2 style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 18px; line-height: 22px; color: #333333; font-weight: bold;">{{display}}</h2>
+                                                        <h2 style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 18px; line-height: 22px; color: #333333; font-weight: bold;">{{ display }}</h2>
                                                     {% endfor %}
                                                     <p style="margin: 0 0 10px 0;">[Job description]</p>
                                                     <!-- Button : BEGIN -->
-                                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="center-on-narrow" style="float:left;">
+                                                    <table role="presentation" cellspacing="0" cellpadding="0"
+                                                           border="0" class="center-on-narrow" style="float:left;">
                                                         <tr>
-				                                            <td class="button-td button-td-primary" style="border-radius: 4px; background: #6610f2;">
-                                                                {%if solution["buttonURL"]%}
-																<a class="button-a button-a-primary" href="{{solution["buttonURL"]}}" style="background: #6610f2; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 8px 15px; color: #ffffff; display: block; border-radius: 4px;">View</a>
-                                                                {%endif%}
-															</td>
+                                                            <td class="button-td button-td-primary"
+                                                                style="border-radius: 4px; background: #6610f2;">
+                                                                {% if solution["buttonURL"] %}
+                                                                    <a class="button-a button-a-primary"
+                                                                       href="{{ solution["buttonURL"] }}"
+                                                                       style="background: #6610f2; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 8px 15px; color: #ffffff; display: block; border-radius: 4px;">View</a>
+                                                                {% endif %}
+                                                            </td>
                                                         </tr>
                                                     </table>
                                                     <!-- Button : END -->
@@ -403,114 +435,129 @@
                         <![endif]-->
                     </td>
                 </tr>
-                {%endfor%}
+            {% endfor %}
 
 
 
 
 
-                <!-- Thumbnail Left, Text Right : END -->
+            <!-- Thumbnail Left, Text Right : END -->
 
 
-                <!-- Thumbnail Left, Text Right : BEGIN -->
-                <tr>
-                    <!-- dir=ltr is where the magic happens. This can be changed to dir=rtl to swap the alignment on wide while maintaining stack order on narrow. -->
-                    <td dir="ltr" height="100%" valign="top" width="100%" style="padding: 10px 0; background-color: #ffffff;">
-                        <!--[if mso]>
+            <!-- Thumbnail Left, Text Right : BEGIN -->
+            <tr>
+                <!-- dir=ltr is where the magic happens. This can be changed to dir=rtl to swap the alignment on wide while maintaining stack order on narrow. -->
+                <td dir="ltr" height="100%" valign="top" width="100%"
+                    style="padding: 10px 0; background-color: #ffffff;">
+                    <!--[if mso]>
                         <table align="center" role="presentation" border="0" cellspacing="0" cellpadding="0" width="660" style="width: 660px;">
                         <tr>
                         <td valign="top" width="660" style="width: 660px;">
                         <![endif]-->
-                        <table align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:660px;">
-                            <tr>
-                                <td align="center" valign="top" style="font-size:0; padding: 10px 0;">
-                                    <!--[if mso]>
+                    <table align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"
+                           style="max-width:660px;">
+                        <tr>
+                            <td align="center" valign="top" style="font-size:0; padding: 10px 0;">
+                                <!--[if mso]>
                                     <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="660" style="width: 660px;">
                                     <tr>
                                     <td valign="top" width="220" style="width: 220px;">
                                     <![endif]-->
-                                    <!--[if mso]>
+                                <!--[if mso]>
                                     </td>
                                     <td valign="top" width="440" style="width: 440px;">
                                     <![endif]-->
-                                    <div style="display:inline-block; margin: 0 -2px; max-width:66.66%; min-width:320px; vertical-align:top;" class="stack-column">
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                                            <tr>
-                                                <td dir="ltr" style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555; padding: 10px 10px 0; text-align: left;" class="center-on-narrow">
-                                                    <h2 style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 18px; line-height: 22px; color: #333333; font-weight: bold;">[Job Title]</h2>
-                                                    <p style="margin: 0 0 10px 0;">[Job description]</p>
-                                                    <!-- Button : BEGIN -->
-                                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="center-on-narrow" style="float:left;">
-                                                        <tr>
-				                                            <td class="button-td button-td-primary" style="border-radius: 4px; background: #6610f2;">
-																<a class="button-a button-a-primary" href="https://google.com/" style="background: #6610f2; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 8px 15px; color: #ffffff; display: block; border-radius: 4px;">Apply</a>
-															</td>
-                                                        </tr>
-                                                    </table>
-                                                    <!-- Button : END -->
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                    <!--[if mso]>
+                                <div style="display:inline-block; margin: 0 -2px; max-width:66.66%; min-width:320px; vertical-align:top;"
+                                     class="stack-column">
+                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                        <tr>
+                                            <td dir="ltr"
+                                                style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555; padding: 10px 10px 0; text-align: left;"
+                                                class="center-on-narrow">
+                                                <h2 style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 18px; line-height: 22px; color: #333333; font-weight: bold;">
+                                                    [Job Title]</h2>
+                                                <p style="margin: 0 0 10px 0;">[Job description]</p>
+                                                <!-- Button : BEGIN -->
+                                                <table role="presentation" cellspacing="0" cellpadding="0" border="0"
+                                                       class="center-on-narrow" style="float:left;">
+                                                    <tr>
+                                                        <td class="button-td button-td-primary"
+                                                            style="border-radius: 4px; background: #6610f2;">
+                                                            <a class="button-a button-a-primary"
+                                                               href="https://google.com/"
+                                                               style="background: #6610f2; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 8px 15px; color: #ffffff; display: block; border-radius: 4px;">Apply</a>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <!-- Button : END -->
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <!--[if mso]>
                                     </td>
                                     </tr>
                                     </table>
                                     <![endif]-->
-                                </td>
-                            </tr>
+                            </td>
+                        </tr>
 
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                             <tr>
                                 <td style="padding: 20px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555;">
-                                    <small style="margin: 0 0 10px 0;">This email has been delivered to you through ThesearchBase on behalf of [companyName]. We respect that you may not wish to
-                                    receive further emails from us and you can simply click the 'unsubscribe' button to stop receiving these notifications.</small>
+                                    <small style="margin: 0 0 10px 0;">This email has been delivered to you through
+                                        ThesearchBase on behalf of [companyName]. We respect that you may not wish to
+                                        receive further emails from us and you can simply click the 'unsubscribe' button
+                                        to stop receiving these notifications.
+                                    </small>
                                 </td>
                             </tr>
-                            </table>
-
-
-                            <!-- Email Footer : BEGIN -->
-            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 680px;">
-                <tr>
-                    <td style="padding: 20px; font-family: sans-serif; font-size: 12px; line-height: 15px; text-align: center; color: #888888;">
-                      <!-- <webversion style="color: #cccccc; text-decoration: underline; font-weight: bold;">View as a Web Page</webversion> -->
-                        <br><br>
-		                TheSearchBase Limited<br><span class="unstyle-auto-detected-links">Cardiff, UK<br></span>
-                        <br><br>
-                        <unsubscribe style="color: #888888; text-decoration: underline;">unsubscribe</unsubscribe>
-                    </td>
-                </tr>
-            </table>
-            <!-- Email Footer : END -->
-
                         </table>
-                        <!--[if mso]>
+
+
+                        <!-- Email Footer : BEGIN -->
+                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+                               style="max-width: 680px;">
+                            <tr>
+                                <td style="padding: 20px; font-family: sans-serif; font-size: 12px; line-height: 15px; text-align: center; color: #888888;">
+                                    <!-- <webversion style="color: #cccccc; text-decoration: underline; font-weight: bold;">View as a Web Page</webversion> -->
+                                    <br><br>
+                                    TheSearchBase Limited<br><span
+                                        class="unstyle-auto-detected-links">Cardiff, UK<br></span>
+                                    <br><br>
+                                    <unsubscribe style="color: #888888; text-decoration: underline;">unsubscribe
+                                    </unsubscribe>
+                                </td>
+                            </tr>
+                        </table>
+                        <!-- Email Footer : END -->
+
+                    </table>
+                    <!--[if mso]>
                         </td>
                         </tr>
                         </table>
                         <![endif]-->
-                    </td>
-                </tr>
-                <!-- Thumbnail Left, Text Right : END -->
+                </td>
+            </tr>
+            <!-- Thumbnail Left, Text Right : END -->
 
-            </table>
-            <!-- Email Body : END -->
+        </table>
+        <!-- Email Body : END -->
 
 
-
-            <!--[if mso]>
+        <!--[if mso]>
             </td>
             </tr>
             </table>
             <![endif]-->
-        </div>
+    </div>
 
     <!--[if mso | IE]>
     </td>
     </tr>
     </table>
     <![endif]-->
-    </center>
+</center>
 </body>
 </html>

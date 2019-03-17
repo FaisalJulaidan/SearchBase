@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from "./Sessions.module.less"
 import ViewsModal from "./ViewModal/ViewsModal";
-import {Button, Modal, Table, Tag} from 'antd';
+import {Button, Modal, Table, Tag, Divider} from 'antd';
 import moment from 'moment';
 import {chatbotSessionsActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
@@ -31,11 +31,6 @@ class Sessions extends React.Component {
         this.props.dispatch(chatbotSessionsActions.fetchChatbotSessions(assistant.ID))
     };
 
-    clearAllChatbotSessions = () => {
-        const {assistant} = this.props.location.state;
-        this.props.dispatch(chatbotSessionsActions.clearAllChatbotSessions(assistant.ID))
-    };
-
 
     handleFilter = (pagination, filters, sorter) => {
         console.log('Various parameters', pagination, filters, sorter);
@@ -51,17 +46,28 @@ class Sessions extends React.Component {
     };
 
 
-    showConfirmForClearing = () => {
-        const clear = this.clearAllChatbotSessions;
+    clearAllChatbotSessions = (assistantID) => {
         confirm({
             title: 'Do you want to delete all records?',
             content: 'By clicking OK, there will be no way to get these records back!',
             okType: 'danger',
-            onOk() {clear()},
-            onCancel() {},
+            onOk: ()=> {
+                this.props.dispatch(chatbotSessionsActions.clearAllChatbotSessions(assistantID))
+            },
         });
     };
 
+
+    deleteSession = (sessionID, assistantID) => {
+        confirm({
+            title: `Delete session confirmation`,
+            content: `If you click OK, this session will be deleted with its associated data forever`,
+            okType: 'danger',
+            onOk: () => {
+                this.props.dispatch(chatbotSessionsActions.deleteChatbotSession(sessionID, assistantID))
+            }
+        });
+    };
 
 
     // Nested table that has all the answered questions per session (Not being used)
@@ -108,7 +114,7 @@ class Sessions extends React.Component {
 
     render() {
         const {assistant} = this.props.location.state;
-        const {sessions} = this.props;
+        const {sessions, options} = this.props;
         let { sortedInfo, filteredInfo } = this.state;
         sortedInfo = sortedInfo || {};
         filteredInfo = filteredInfo || {};
@@ -130,13 +136,13 @@ class Sessions extends React.Component {
             title: 'User Type',
             dataIndex: 'UserType',
             key: 'UserType',
-            filters: [
-                { text: 'Candidate', value: 'Candidate' },
-                { text: 'Client', value: 'Client' },
-            ],
-            onFilter: (value, record) => {
-                console.log(value);
-                record.UserType.includes(value)},
+            // filters: [
+            //     { text: 'Candidate', value: 'Candidate' },
+            //     { text: 'Client', value: 'Client' },
+            // ],
+            // onFilter: (value, record) => {
+            //     console.log(value);
+            //     record.UserType.includes(value)},
             render: (text, record) => (<Tag key={record.UserType}>{record.UserType}</Tag>),
 
         },{
@@ -159,11 +165,16 @@ class Sessions extends React.Component {
             dataIndex: 'TimeSpent',
             key: 'TimeSpent',
             sorter: (a, b) => a.TimeSpent - b.TimeSpent,
-            render: (text, record) => (<p style={{textAlign:'center'}}>{
-                moment.duration(parseInt(record.TimeSpent), 'seconds').asMinutes().toFixed(2) + " minute(s)"
-            }
-            </p>),
+            render: (_, record) => {
+                let date = new Date(null);
+                date.setSeconds(record.TimeSpent); // specify value for SECONDS here
+                let mm = date.getUTCMinutes();
+                let ss = date.getSeconds();
+                if (mm < 10) mm = "0" + mm;
+                if (ss < 10) ss = "0" + ss;
 
+                return <p >{`${mm}:${ss}`} mins</p>
+            }
         },{
             title: 'Date & Time',
             dataIndex: 'DateTime',
@@ -176,12 +187,13 @@ class Sessions extends React.Component {
             key: 'action',
             render: (text, record, index) => (
                 <span>
-              <a onClick={()=> {
-                  this.setState({viewModal: true, selectedSession: record})
-              }
-              }> View</a>
-                    {/*<Divider type="vertical" />*/}
-                    {/*<a>Delete</a>*/}
+              <a onClick={()=> {this.setState({viewModal: true, selectedSession: record})}}>
+                  View
+              </a>
+                    <Divider type="vertical" />
+              <a onClick={()=> {this.deleteSession(record.ID, assistant.ID)}}>
+                  Delete
+              </a>
             </span>
             ),
         }];
@@ -206,7 +218,7 @@ class Sessions extends React.Component {
 
 
                             <Button className={styles.Panel_Header_Button} type="primary" icon="delete"
-                                    onClick={this.showConfirmForClearing} loading={this.props.isClearingAll}>
+                                    onClick={()=> {this.clearAllChatbotSessions(assistant.ID)}} loading={this.props.isClearingAll}>
                                 Clear All
                             </Button>
                         </div>
@@ -225,7 +237,7 @@ class Sessions extends React.Component {
                         <ViewsModal visible={this.state.viewModal}
                                     closeViewModal={this.closeViewModal}
                                     filesPath={sessions.filesPath}
-                                    dataTypes={sessions.dataTypes}
+                                    flowOptions={options?.flow}
                                     session={this.state.selectedSession}
                                     assistant={assistant}
                         />
@@ -239,6 +251,7 @@ class Sessions extends React.Component {
 const mapStateToProps = state =>  {
     const {chatbotSessions} = state;
     return {
+        options: state.options.options,
         sessions: chatbotSessions.chatbotSessions,
         isLoading: chatbotSessions.isLoading,
         errorMsg: chatbotSessions.errorMsg,

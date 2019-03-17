@@ -8,44 +8,31 @@ from datetime import datetime
 from sqlalchemy_utils import Currency
 from utilities import helpers
 from sqlalchemy import and_
-from enums import  DatabaseType, DataType as DT
+from enums import DatabaseType, DataType as DT
 import json
 
-def fetchDatabase(id, companyID: int) -> Callback:
+
+def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
     try:
         # Get result and check if None then raise exception
         database: Database = db.session.query(Database)\
             .filter(and_(Database.CompanyID == companyID, Database.ID == id)).first()
-        if not database: raise Exception
+
+        if not database:
+            raise Exception
 
         databaseContent = None
-        # TODO Ensure it works
+
         if database.Type == DatabaseType.Candidates:
-            # result = helpers.getListFromSQLAlchemyList(getAllCandidates(id))
-            # databaseContent = result['records']
-            databaseContent = helpers.getListFromSQLAlchemyList(getAllCandidates(id))
-            for i, _ in enumerate(databaseContent):
-                if databaseContent[i]['Currency']:
-                    temp = databaseContent[i]['Currency'].code
-                    del databaseContent[i]['Currency']
-                    databaseContent[i]['Currency'] = temp
+            databaseContent = getAllCandidates(id, pageNumber)
 
         elif database.Type == DatabaseType.Jobs:
-            databaseContent = helpers.getListFromSQLAlchemyList(getAllJobs(id))
-            for i, _ in enumerate(databaseContent):
-                if databaseContent[i]['Currency']:
-                    temp = databaseContent[i]['Currency'].code
-                    del databaseContent[i]['Currency']
-                    databaseContent[i]['Currency'] = temp
+            databaseContent = getAllJobs(id, pageNumber)
 
-                if databaseContent[i]['StartDate']:
-                    day = databaseContent[i]['StartDate'].day
-                    month = databaseContent[i]['StartDate'].month
-                    year = databaseContent[i]['StartDate'].year
-                    del databaseContent[i]['StartDate']
-                    databaseContent[i]['StartDate'] = '/'.join(map(str, [year, month, day]))
 
-        if not databaseContent: raise Exception()
+        if not databaseContent:
+            raise Exception()
+
         return Callback(True, "", {'databaseInfo': helpers.getDictFromSQLAlchemyObj(database),
                                    'databaseContent': databaseContent})
 
@@ -172,29 +159,75 @@ def getDatabasesList(companyID: int) -> Callback:
         print(exc)
         return Callback(False, 'Could not fetch the databases list.')
 
-def getAllCandidates(dbID) -> dict:
+
+def getCandidate(candidateID):
     try:
-        return db.session.query(Candidate).filter(Candidate.DatabaseID == dbID).all()
-        result = db.session.query(Candidate).filter(Candidate.DatabaseID == dbID).paginate(1, 1, False)
-        # data = {
-        #     'records': result.items,
-        #     'hasNext': result.has_next,
-        #     'hasPrev': result.has_prev,
-        #     'nextNum': result.next_num,
-        #     'prevNum': result.prev_num,
-        # }
-        # return data
+        candidate = db.session.query(Candidate) \
+            .filter(Candidate.ID == candidateID).first()
+        if not candidate: raise Exception
+
+        return Callback(True, "Candidate retrieved successfully.", candidate)
+
+    except Exception as exc:
+        print("databases_services.getCandidate() Error: ", exc)
+        db.session.rollback()
+        return Callback(False, 'Could not retrieve the candidate.')
+
+
+
+def getAllCandidates(dbID, page) -> dict:
+    try:
+        result = db.session.query(Candidate)\
+            .filter(Candidate.DatabaseID == dbID) \
+            .paginate(page=page, error_out=False, per_page=100)
+
+        data = {
+            'records': helpers.getListFromSQLAlchemyList(result.items),
+            'currentPage': result.page,
+            'totalItems': result.total,
+            'totalPages': result.pages,
+            'totalPerPage': result.per_page
+        }
+        return data
 
     except Exception as exc:
         print("fetchCandidates() ERROR: ", exc)
         raise Exception
 
-def getAllJobs(dbID) -> Callback:
+
+def getJob(jobID):
     try:
-        return db.session.query(Job).filter(Job.DatabaseID == dbID).all()
+        candidate = db.session.query(Job) \
+            .filter(Job.ID == jobID).first()
+        if not candidate: raise Exception
+
+        return Callback(True, "Job retrieved successfully.", candidate)
+
+    except Exception as exc:
+        print("databases_services.getJob() Error: ", exc)
+        db.session.rollback()
+        return Callback(False, 'Could not retrieve the job.')
+
+
+def getAllJobs(dbID, page) -> dict:
+    try:
+        result = db.session.query(Job) \
+            .filter(Job.DatabaseID == dbID) \
+            .paginate(page=page, error_out=False, per_page=100)
+
+        data = {
+            'records': helpers.getListFromSQLAlchemyList(result.items),
+            'currentPage': result.page,
+            'totalItems': result.total,
+            'totalPages': result.pages,
+            'totalPerPage': result.per_page
+        }
+        return data
+
     except Exception as exc:
         print("fetchCandidates() ERROR: ", exc)
         raise Exception('Error: getAllJobs()')
+
 
 
 # ----- Deletion ----- #
@@ -233,9 +266,9 @@ def scan(session, assistantHashID):
 
         # Scan database for solutions based on database type
         if databaseType == enums.DatabaseType.Candidates:
-            return scanCandidates(session, [d[0] for d in databases])
+            return scanCandidates(session, [d[0] for d in databases], databaseType)
         elif databaseType == enums.DatabaseType.Jobs:
-            return scanJobs(session, [d[0] for d in databases])
+            return scanJobs(session, [d[0] for d in databases], databaseType)
         else:
             return Callback(False, "Database type is not recognised", None)
 
@@ -247,7 +280,7 @@ def scan(session, assistantHashID):
 
 
 # Data analysis using Pandas library
-def scanCandidates(session, dbIDs):
+def scanCandidates(session, dbIDs, databaseType: DatabaseType):
     try:
 
         df = pandas.read_sql(db.session.query(Candidate).filter(Candidate.DatabaseID.in_(dbIDs)).statement,
@@ -256,8 +289,6 @@ def scanCandidates(session, dbIDs):
 
         keywords = session['keywordsByDataType']
         df['count'] = 0 # add column for tracking score
-        # Delete sensitive columns e.g. candidate name
-        # df.drop(['ID', 'Name', 'Email', 'Telephone'], axis=1, inplace=True) # No need
 
         # Numbers
         # Received DataType: DesiredSalary <> Column: DesiredSalary | points=3
@@ -270,7 +301,7 @@ def scanCandidates(session, dbIDs):
             df.loc[df[Candidate.YearsExp.name] >= float(keywords[DT.YearsExp.value['name']][-1]), 'count'] += 5
 
 
-        # Received DataType: YearsExp <> Column: YearsExp | points=5
+        # Received DataType: DesiredPayRate <> Column: DesiredPayRate | points=5
         if keywords.get(DT.DesiredPayRate.value['name']):
             df.loc[df[Candidate.DesiredPayRate.name] <= float(keywords[DT.DesiredPayRate.value['name']][-1]), 'count'] += 3
 
@@ -317,6 +348,8 @@ def scanCandidates(session, dbIDs):
         data = []
         for tr in topResults:
             data.append({
+                "id": tr["ID"],
+                "databaseType": databaseType.name,
                 "title": tr[Candidate.DesiredPosition.name],
                 "description": tr[Candidate.CandidateSkills.name],
                 "tail": "Salary: " + str(tr[Candidate.DesiredSalary.name])
@@ -329,18 +362,14 @@ def scanCandidates(session, dbIDs):
         return Callback(False, 'Error while search the database for matches!')
 
 
-
-def scanJobs(session, dbIDs):
+def scanJobs(session, dbIDs, databaseType: DatabaseType):
     try:
 
         df = pandas.read_sql(db.session.query(Job).filter(Job.DatabaseID.in_(dbIDs)).statement,
                              con=db.session.bind)
 
-
         keywords = session['keywordsByDataType']
         df['count'] = 0 # add column for tracking score
-        # Delete sensitive columns e.g. candidate name
-        df.drop(['ID'], axis=1, inplace=True)
 
         # Numbers
         # Received DataType: DesiredSalary <> Column: DesiredSalary | points=3
@@ -408,6 +437,8 @@ def scanJobs(session, dbIDs):
         data = []
         for tr in topResults:
             data.append({
+                "id": tr["ID"],
+                "databaseType": databaseType.name,
                 "title": tr[Job.Title.name],
                 "description": tr[Job.Description.name],
                 "tail": "Salary: " + str(tr[Job.Salary.name])
@@ -418,6 +449,7 @@ def scanJobs(session, dbIDs):
     except Exception as exc:
         print("scanJobs() ERROR: ", exc)
         return Callback(False, 'Error while search the database for matches!')
+
 
 def getOptions() -> Callback:
     options =  {

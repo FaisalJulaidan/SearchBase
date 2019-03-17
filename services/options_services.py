@@ -49,6 +49,16 @@ def getOptions(industry=None) -> Callback:
                                            for c in Job.__table__.columns
                                            if (c.key != 'ID' and c.key != 'DatabaseID')],
             'currencyCodes': ['GBP', 'USD', 'EUR', 'AED', 'CAD']
-        }
+        },
+        'assistantTemplates':
+        [
+            {
+                'group': 'Recruitment',
+                'children': [
+                    {'label': 'Recruitment 1', 'fileName': 'recruitment1'},
+                ]
+             }
+        ]
+
     }
     return Callback(True, '', options)

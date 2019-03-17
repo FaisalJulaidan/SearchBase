@@ -1,14 +1,16 @@
-import sqlalchemy.exc
-from models import db, Statistics, Callback, ChatbotSession, Assistant
+from models import db, Callback, ChatbotSession
 from datetime import datetime, timedelta
+
 from monthdelta import monthdelta
-from sqlalchemy.sql import exists, func, extract
+from sqlalchemy.sql import func, extract
+
+from models import db, Callback, ChatbotSession
 
 
 def getAnalytics(assistant, periodSpace: int, topSolustions: int):
     id = assistant.ID
     try:
-        #result = {
+        # result = {
         #          'popularSolutions': getPopularSolutions(id, topSolustions),
         #          'totalReturnedSolutions': getTotalReturnedSolutions(id),
         #          'timeSpentAvgOvertime': getTimeSpentAvgOvertime(id, periodSpace),
@@ -17,32 +19,31 @@ def getAnalytics(assistant, periodSpace: int, topSolustions: int):
         #          'TotalSolutionsOverMonth':getTotalSolutionsOverMonth(id),
         #          'TotalUsers': getTotalUsers(id)}
         result = {
-                  'UsersOvertime': getUsersOvertime(id, periodSpace),
-                  'TotalUsers': getTotalUsers(id)}
-
+            'UsersOvertime': getUsersOvertime(id, periodSpace),
+            'TotalUsers': getTotalUsers(id)}
 
         return Callback(True, 'Analytics processed successfully.', result)
     except Exception as e:
-        #print("getPopularSolutions(id, topSolustions): ", getPopularSolutions(id, topSolustions))
-        #print("getTotalReturnedSolutions(id): ", getTotalReturnedSolutions(id))
-        #print("getTimeSpentAvgOvertime(id, periodSpace): ", getTimeSpentAvgOvertime(id, periodSpace))
-        #print("getTotalQuestionsOverMonth(id): ", getTotalQuestionsOverMonth(id))
-        #print("getTotalSolutionsOverMonth(id): ", getTotalSolutionsOverMonth(id))
+        # print("getPopularSolutions(id, topSolustions): ", getPopularSolutions(id, topSolustions))
+        # print("getTotalReturnedSolutions(id): ", getTotalReturnedSolutions(id))
+        # print("getTimeSpentAvgOvertime(id, periodSpace): ", getTimeSpentAvgOvertime(id, periodSpace))
+        # print("getTotalQuestionsOverMonth(id): ", getTotalQuestionsOverMonth(id))
+        # print("getTotalSolutionsOverMonth(id): ", getTotalSolutionsOverMonth(id))
         print("getUsersOvertime(id, periodSpace): ", getUsersOvertime(id, periodSpace))
         print("getTotalUsers(id): ", getTotalUsers(id))
         print(e)
         return Callback(False, 'Error while finding analytics')
 
-def getUsersOvertime(assistantID, periodSpace):
 
+def getUsersOvertime(assistantID, periodSpace):
     try:
 
         oldestDate = db.session.query(func.min(ChatbotSession.DateTime)).first()[0]
         newestDate = db.session.query(func.max(ChatbotSession.DateTime)).first()[0]
         now = datetime.now()
         result = []
-        begginingOfYear = datetime.strptime(str(now).split('-')[0]+"-01-01",'%Y-%m-%d')
-        endOfYear = datetime.strptime(str(now).split('-')[0]+"-12-30",'%Y-%m-%d')
+        begginingOfYear = datetime.strptime(str(now).split('-')[0] + "-01-01", '%Y-%m-%d')
+        endOfYear = datetime.strptime(str(now).split('-')[0] + "-12-30", '%Y-%m-%d')
         if not oldestDate:
             oldestDate = begginingOfYear
             newestDate = endOfYear
@@ -51,14 +52,14 @@ def getUsersOvertime(assistantID, periodSpace):
             now -= timedelta(days=7 * periodSpace)
 
             if current >= oldestDate:
-                result.append({'x': now.strftime('%Y-%m-%d'), 'y':db.session.query(ChatbotSession).filter(
+                result.append({'x': now.strftime('%Y-%m-%d'), 'y': db.session.query(ChatbotSession).filter(
                     ChatbotSession.AssistantID == assistantID,
                     ChatbotSession.DateTime < current,
                     ChatbotSession.DateTime >= now).count()})
             else:
                 if current >= begginingOfYear:
-                    #result.append({'x':now.strftime('%Y-%m-%d'), 'y':random.randint(420,500)}) random data for empty
-                    result.append({'x':now.strftime('%Y-%m-%d'), 'y':0})
+                    # result.append({'x':now.strftime('%Y-%m-%d'), 'y':random.randint(420,500)}) random data for empty
+                    result.append({'x': now.strftime('%Y-%m-%d'), 'y': 0})
                 else:
                     break
         now = datetime.now()
@@ -66,8 +67,8 @@ def getUsersOvertime(assistantID, periodSpace):
             now += timedelta(days=7 * periodSpace)
             if now >= newestDate:
                 if now <= endOfYear:
-                    #result = [{'x': now.strftime('%Y-%m-%d'), 'y': random.randint(360,500)}] + result random data for empty
-                    result = [{'x': now.strftime('%Y-%m-%d'), 'y':0}] + result
+                    # result = [{'x': now.strftime('%Y-%m-%d'), 'y': random.randint(360,500)}] + result random data for empty
+                    result = [{'x': now.strftime('%Y-%m-%d'), 'y': 0}] + result
                 else:
                     break
         return result
@@ -75,7 +76,7 @@ def getUsersOvertime(assistantID, periodSpace):
         db.session.rollback()
         return Callback(False, 'getUsersOvertime error')
     # finally:
-       # db.session.close()
+    # db.session.close()
 
 
 def getTotalUsersForCompany(assistants):
@@ -83,15 +84,16 @@ def getTotalUsersForCompany(assistants):
         totalClicks = 0
 
         for assistant in assistants:
-            totalClicks += db.session.query(ChatbotSession).filter( ChatbotSession.AssistantID == assistant.ID, ChatbotSession.DateTime < datetime.now()).count()
-            
+            totalClicks += db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistant.ID,
+                                                                   ChatbotSession.DateTime < datetime.now()).count()
+
         return Callback(True, 'Users successfully counted.', totalClicks)
     except Exception as e:
         db.session.rollback()
         print("analytics_services.getTotalUsersForCompany() ERROR: ", e)
         return Callback(False, 'Error while counting Users.')
     # finally:
-       # db.session.close()
+    # db.session.close()
 
 
 def getTotalUsers(assistantID):
@@ -103,7 +105,7 @@ def getTotalUsers(assistantID):
         print("getTotalUsers ERROR: ", e)
         return Callback(False, 'getTotalUsers error')
     # finally:
-       # db.session.close()
+    # db.session.close()
 
 
 def getTotalQuestionsOverMonth(assistantID):
@@ -115,15 +117,14 @@ def getTotalQuestionsOverMonth(assistantID):
         while True:
             current = now
 
-
             # total = db.session.query(func.sum(ChatbotSession.QuestionsAnswered)).filter(
             #     ChatbotSession.AssistantID == assistantID,
             #     ChatbotSession.DateTime < current,
             #     ChatbotSession.DateTime >= now).scalar()
             total = db.session.query(func.sum(ChatbotSession.QuestionsAnswered)).filter(
-                    ChatbotSession.AssistantID == assistantID,
-                    extract('month', ChatbotSession.DateTime) == now.month,
-                    ).scalar()
+                ChatbotSession.AssistantID == assistantID,
+                extract('month', ChatbotSession.DateTime) == now.month,
+            ).scalar()
             if not total:
                 total = 0
             result.append([now.month, total])
@@ -132,7 +133,7 @@ def getTotalQuestionsOverMonth(assistantID):
                 break
         position = 0
         returnArray = []
-        for i in range(12,0,-1):
+        for i in range(12, 0, -1):
             if not result:
                 returnArray.append(0)
                 continue
@@ -154,8 +155,7 @@ def getTotalQuestionsOverMonth(assistantID):
         print("getTotalQuestionsOverMonth ERROR: ", e)
         return Callback(False, 'getTotalQuestionsOverMonth error')
     # finally:
-       # db.session.close()
-
+    # db.session.close()
 
 
 def getTimeSpentAvgOvertime(assistantID, days):
@@ -167,7 +167,7 @@ def getTimeSpentAvgOvertime(assistantID, days):
         while True:
             current = now
             now -= timedelta(days=days)
-            avg =db.session.query(func.avg(ChatbotSession.TimeSpent)).filter(
+            avg = db.session.query(func.avg(ChatbotSession.TimeSpent)).filter(
                 ChatbotSession.AssistantID == assistantID,
                 ChatbotSession.DateTime < current,
                 ChatbotSession.DateTime >= now).scalar()
@@ -183,23 +183,21 @@ def getTimeSpentAvgOvertime(assistantID, days):
         print("getTimeSpentAvgOvertime ERROR: ", e)
         return Callback(False, 'getTimeSpentAvgOvertime error')
     # finally:
-       # db.session.close()
+    # db.session.close()
 
 
 def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
-
     try:
         return Callback(True, "Records retrieved", db.session.query(ChatbotSession).filter(
-                        ChatbotSession.AssistantID == assistantID,
-                        ChatbotSession.DateTime < datetime.now(),
-                        ChatbotSession.DateTime >= datetime.now() - timedelta(hours = hours)).count())
+            ChatbotSession.AssistantID == assistantID,
+            ChatbotSession.DateTime < datetime.now(),
+            ChatbotSession.DateTime >= datetime.now() - timedelta(hours=hours)).count())
     except Exception as e:
         db.session.rollback()
         print("analytics_services.getAllRecordsByAssistantIDInTheLast() ERROR: ", e)
         return Callback(False, "Error in returning records")
     # finally:
-       # db.session.close()
-
+    # db.session.close()
 
 # Old Solution Stuff
 

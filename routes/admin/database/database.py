@@ -44,16 +44,16 @@ def get_databasesList():
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
-@database_router.route("/databases/<int:databaseID>", methods=['GET', 'DELETE', 'PUT'])
+@database_router.route("/databases/<int:databaseID>/page/<int:pageNumber>", methods=['GET', 'DELETE', 'PUT'])
 @jwt_required
-def get_database(databaseID):
+def get_database(databaseID, pageNumber):
 
     # Authenticate
     user = get_jwt_identity()['user']
 
     callback: Callback = Callback(False, "")
     if request.method == "GET":
-        callback = databases_services.fetchDatabase(databaseID, user['companyID'])
+        callback = databases_services.fetchDatabase(databaseID, user['companyID'], pageNumber)
 
     if request.method == "DELETE":
         callback = databases_services.deleteDatabase(databaseID, user['companyID'])

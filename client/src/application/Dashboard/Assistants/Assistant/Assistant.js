@@ -60,7 +60,7 @@ class Assistant extends Component {
         });
     };
 
-    onActiveChanged = (checked) => this.props.activeHandler(checked, this.props.assistant.ID);
+    onActiveChanged = (checked) => this.props.activateHandler(checked, this.props.assistant.ID);
 
     render() {
         const {assistant, isStatusChanging} = this.props;
@@ -93,7 +93,8 @@ class Assistant extends Component {
 
                           <Dropdown overlay={menu(assistant)} trigger={['click']}>
                               <a className="ant-dropdown-link">
-                                  ...
+                                  <Icon type="down-circle"/>
+                              <span> More</span>
                               </a>
                           </Dropdown>]}>
                     <Meta description={assistant.TopBarText}/>

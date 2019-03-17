@@ -46,6 +46,7 @@ def chatbotSession(assistantID):
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
+# Download files
 @chatbotSession_router.route("/assistant/<int:assistantID>/chatbotSessions/<path:path>", methods=['GET'])
 @jwt_required
 @helpers.gzipped
@@ -81,19 +82,17 @@ def chatbotSession_file_uploads(assistantID, path):
 
 
 @chatbotSession_router.route("/assistant/<assistantID>/chatbotSessions/<sessionID>", methods=["DELETE"])
+@jwt_required
 def chatbotSession_delete_record(assistantID, sessionID):
 
     # Authenticate
     user = get_jwt_identity()['user']
-    # For all type of requests methods, get the assistant
+    # check if the assistant that has the session is owned by this company (user)
     security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
     if not security_callback.Success:
         return helpers.jsonResponse(False, 404, "Assistant not found.", None)
-    assistant: Assistant = security_callback.Data
-
 
     if request.method == "DELETE":
-
         callback : Callback = chatbotSession_services.deleteByID(sessionID)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)

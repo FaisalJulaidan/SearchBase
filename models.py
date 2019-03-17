@@ -5,7 +5,7 @@ from sqlalchemy.ext import mutable
 from datetime import datetime
 import json
 import enums
-from sqlalchemy_utils import PasswordType, CurrencyType, Currency
+from sqlalchemy_utils import PasswordType, CurrencyType
 
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
@@ -235,7 +235,7 @@ class ChatbotSession(db.Model):
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')
 
-    StoredFile = db.relationship('StoredFile', back_populates='ChatbotSession')
+    StoredFile = db.relationship('StoredFile', uselist=False, back_populates='ChatbotSession')
 
     def __repr__(self):
         return '<ChatbotSession {}>'.format(self.Data)
@@ -248,14 +248,6 @@ class StoredFile(db.Model):
     # Relationships:
     ChatbotSessionID = db.Column(db.Integer, db.ForeignKey('chatbot_session.ID', ondelete='SET NULL'))
     ChatbotSession = db.relationship('ChatbotSession', back_populates='StoredFile')
-
-    # @db.validates("ChatbotSession")
-    # def testing(self, key, value):
-    #     print("SOOOOO")
-    #     print(self)
-    #     print(key)
-    #     print(value)
-    #     return value
 
     def __repr__(self):
         return '<StoredFile {}>'.format(self.ID)
@@ -336,44 +328,21 @@ class Job(db.Model):
         return '<Job {}>'.format(self.JobTitle)
 
 
-# class Client(db.Model):
-#
-#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-#     Name = db.Column(db.String(64), nullable=False)
-#     Email = db.Column(db.String(64), nullable=True)
-#     Telephone = db.Column(db.String(64), nullable=True)
-#     LinkdinURL = db.Column(db.String(128), nullable=True)
-#     PostCode = db.Column(db.String(64), nullable=True)
-#
-#     Location = db.Column(db.String(64), nullable=True)
-#     NearbyStation = db.Column(db.String(64), nullable=True)
-#     JobSalaryOffered = db.Column(db.Float(), nullable=True)
-#     Currency = db.Column(CurrencyType)
-#     EmploymentTypeOffered = db.Column(db.String(64), nullable=True)
-#     CandidatesNeeded = db.Column(db.Integer(), nullable=True)
-#     EssentialSkills = db.Column(db.String(512), nullable=True)
-#     EssentialYearsExp = db.Column(db.Float(), nullable=True)
-#     ContractRate = db.Column(db.Float(), nullable=True)
-#     JobDescription = db.Column(db.String(512), nullable=True)
-#     JobAvailability = db.Column(db.String(64), nullable=True)
-#
-#     # Relationships:
-#
-#     DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
-#     Database = db.relationship('Database')
-#
-#     def __repr__(self):
-#         return '<Client {}>'.format(self.Name)
-
-
 # =================== Triggers ============================
 
 # Example of how triggers works
 # Also check: https://docs.sqlalchemy.org/en/latest/orm/session_events.html
 
-# @event.listens_for(Assistant, 'before_insert')
+# @event.listens_for(ChatbotSession, 'before_delete')
 # def receive_after_insert(mapper, connection, target):
-#     print(target) # prints Assistant
+#     print("before_delete")
+#     print(target) # prints ChatbotSession
+#
+# @event.listens_for(ChatbotSession, 'after_delete')
+# def receive_after_insert(mapper, connection, target):
+#     print("after_delete")
+#     print(target) # prints ChatbotSession
+#
 
 
 class Callback():

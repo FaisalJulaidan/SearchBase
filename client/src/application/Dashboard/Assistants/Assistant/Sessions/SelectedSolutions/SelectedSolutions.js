@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Collapse, Icon} from 'antd';
+import {Collapse, Icon, Empty} from 'antd';
 import ReactJson from 'react-json-view'
 
 const Panel = Collapse.Panel;
@@ -22,14 +22,16 @@ class SelectedSolutions extends Component {
 
 
     render() {
-
+        const {solutions} = this.props;
         return (
+
+            solutions ?
             <Collapse
                 bordered={false}
                 defaultActiveKey={['1']}
                 expandIcon={({isActive}) => <Icon type="caret-right" rotate={isActive ? 90 : 0}/>}>
                 {
-                    this.props.solutions.map((solution, i) =>
+                    solutions.map((solution, i) =>
                         <Panel header={`${solution.type.substring(0, solution.type.length - 1)} ${i + 1} ✅`}
                                key={i}
                                style={customPanelStyle}>
@@ -39,7 +41,7 @@ class SelectedSolutions extends Component {
                         </Panel>
                     )
                 }
-            </Collapse>
+            </Collapse> : <Empty description={'Noting selected'}/>
         );
     }
 }

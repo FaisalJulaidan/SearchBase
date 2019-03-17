@@ -16,31 +16,6 @@ class ViewsModal extends Component {
         fileNames: []
     };
 
-    columns = [{
-        title: 'Question',
-        key: 'questionText',
-        render: (text, record, index) => (<p>{record.questionText}</p>),
-    }, {
-        title: 'Input',
-        key: 'input',
-        render: (text, record, index) => {
-
-            if (record.input === '&FILE_UPLOAD&') {
-                this.counter+=1;
-                return (<Button hreftype="primary" data-index={this.counter} icon="download" size="small"
-                                onClick={(e) => {this.downloadFile(e)}}>
-                    Download File
-                </Button>);
-            }
-
-            else {
-               return (<p>
-                   {record.input}
-               </p>);
-            }
-        },
-    }];
-
     componentWillReceiveProps(nextProps, nextContext) {
         if(nextProps.session && nextProps.session.FilePath){
             this.setState({fileNames: nextProps.session.FilePath.split(',')})
@@ -95,7 +70,7 @@ class ViewsModal extends Component {
                                  dataTypes={flowOptions.dataTypes} />
                     </TabPane>
 
-                    <TabPane tab={"Solutions"} key={"3"}>
+                    <TabPane tab={"Selected Solutions (Candidates, Jobs)"} key={"3"}>
                         <SelectedSolutions solutions={session?.Data?.selectedSolutions}/>
                     </TabPane>
 

@@ -7,7 +7,7 @@ from sqlalchemy.sql import desc
 from models import db, Callback, ChatbotSession, Assistant
 from services import assistant_services, stored_file_services, databases_services
 from utilities import json_schemas, helpers
-from enums import DatabaseType
+from enums import DatabaseType, UserType
 
 
 # Process chatbot session data
@@ -45,12 +45,13 @@ def processSession(assistantHashID, data: dict) -> Callback:
         collectedData = data['collectedData']
         chatbotSession = ChatbotSession(Data={
                                             'collectedData': collectedData,
-                                            'selectedSolutions': selectedSolutions
+                                            'selectedSolutions': selectedSolutions,
+                                            'keywordsByDataType': data['keywordsByDataType'],
                                         },
                                         TimeSpent=data['timeSpent'],
                                         SolutionsReturned=data['solutionsReturned'],
                                         QuestionsAnswered=len(collectedData),
-                                        UserType=data['userType'],
+                                        UserType=UserType[data['userType'].replace(" ", "")],
                                         Assistant=assistant)
         db.session.add(chatbotSession)
         db.session.commit()
@@ -71,11 +72,13 @@ def getAllByAssistantID(assistantID):
             ChatbotSession.AssistantID == assistantID) \
             .order_by(desc(ChatbotSession.DateTime)).all()
 
+
         for session in sessions:
+            filePaths = ""
             storedFile_callback: Callback = stored_file_services.getBySession(session)
             if storedFile_callback.Success:
-                session.FilePath = storedFile_callback.Data.FilePath
-
+                filePaths = storedFile_callback.Data.FilePath
+            session.FilePath =  filePaths
         return Callback(True, "User inputs retrieved successfully.", sessions)
 
     except Exception as exc:

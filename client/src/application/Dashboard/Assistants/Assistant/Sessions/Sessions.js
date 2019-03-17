@@ -237,7 +237,7 @@ class Sessions extends React.Component {
                         <ViewsModal visible={this.state.viewModal}
                                     closeViewModal={this.closeViewModal}
                                     filesPath={sessions.filesPath}
-                                    flowOptions={options.flow}
+                                    flowOptions={options?.flow}
                                     session={this.state.selectedSession}
                                     assistant={assistant}
                         />

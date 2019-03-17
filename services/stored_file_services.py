@@ -1,4 +1,4 @@
-from models import db, Callback, StoredFile
+from models import db, Callback, StoredFile, ChatbotSession
 
 
 def getByID(id) -> StoredFile or None:
@@ -21,25 +21,16 @@ def getByID(id) -> StoredFile or None:
                         'StoredFile with ID ' + str(id) + ' does not exist')
 
 
-def getBySession(session) -> StoredFile or None:
+def getBySession(session: ChatbotSession) -> StoredFile or None:
     try:
-        if session:
-            # Get result and check if None then raise exception
-            result = db.session.query(StoredFile).filter(StoredFile.ChatbotSession == session).first()
-            if not result:
-                raise Exception
+        # Get result and check if None then raise exception
+        result = db.session.query(StoredFile).filter(StoredFile.ChatbotSession == session).first()
+        if not result: return Callback(False, '')
+        return Callback(True, 'StoredFile was successfully retrieved', result)
 
-            return Callback(True,
-                            'StoredFile with ID ' + str(id) + ' was successfully retrieved',
-                            result)
-        else:
-            raise Exception
     except Exception as exc:
-        db.session.rollback()
-        if exc:
-            print("stored_file_services.getBySession() ERROR: ", exc)
-        return Callback(False,
-                        'StoredFile with ID ' + str(id) + ' does not exist')
+        print("stored_file_services.getBySession() ERROR: ", exc)
+        return Callback(False,'StoredFile with ID ' + str(id) + ' does not exist')
 
 
 def getAll():

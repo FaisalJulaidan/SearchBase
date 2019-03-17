@@ -20,55 +20,23 @@ class Profile extends Component {
         title: 'Value',
         key: 'input',
         render: (text, dataType, index) => {
-
-            // Find the session with that current dataType in the row from the list of collectedData
-            let sessions = this.props.session.Data.collectedData
-                .filter((data)=> data.dataType === dataType.name);
-            if (sessions.length < 1) return null;
-
-            // If there are more than one inputs of the same dataType then concat them
-            let input = "";
-            let downloadFilesBtns = [];
-            let isFiles = false;
-
-            // If there are multiple records of the same data type
-            if (sessions.length > 1){
-                sessions.forEach(session => {
-                    console.log(session);
-                    // Only when file upload do the following
-                    if(session.input === '&FILE_UPLOAD&'){
+            let values = this.props.session.Data.keywordsByDataType[dataType.name];
+            let inputs = [];
+            if(values){
+                values.forEach(input => {
+                    if (input === '&FILE_UPLOAD&'){
                         this.counter += 1;
-                        downloadFilesBtns.push(this.createDownloadFileBtn(this.counter));
-                        console.log(downloadFilesBtns);
-                        isFiles = true;
+                        inputs.push(this.createDownloadFileBtn(this.counter))
                     } else {
-                        input += session.input + " | ";
+                        inputs.push(<p>{input} </p>)
                     }
                 });
-
-            // If there is one record of the same data type
-            } else {
-                if(sessions[0].input === '&FILE_UPLOAD&'){
-                    this.counter += 1;
-                    input = this.createDownloadFileBtn(this.counter);
-                } else {
-                    input = sessions[0].input;
-                }
             }
-
-            // If there are files to be download
-            if (isFiles){
-                return (
+            return (
                     <React.Fragment>
-                        {downloadFilesBtns.map((fileBtn) => fileBtn)}
-                        | {input}
+                        {inputs.map((input) => input)}
                     </React.Fragment>
                 )
-            }
-
-            // If only normal text and no files
-            return (<p>{input}</p>);
-
         }
     }];
 

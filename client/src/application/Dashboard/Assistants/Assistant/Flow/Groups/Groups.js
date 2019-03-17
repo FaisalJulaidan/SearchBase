@@ -98,7 +98,6 @@ class Groups extends Component {
 
                 <div className={styles.Panel_Body}>
 
-
                     <Menu mode="inline">
                         {
                             groupsList ?
@@ -106,7 +105,9 @@ class Groups extends Component {
                                 <Menu.Item onClick={() => this.props.selectGroup(group)} key={index}>
                                     {group.name}
                                 </Menu.Item>
-                            ) : null
+                            ) : <Empty description={'No groups yet'}>
+                                    <Button type="primary" onClick={this.showNewGroupModal}>Create Now</Button>
+                                </Empty>
                         }
                     </Menu>
 

@@ -163,6 +163,7 @@ class Flow extends Component {
         let counter = 0;
         updatedAssistant.Flow.groups.forEach((group) => {
             group.blocks.map((block) => {
+                // TODO: add answers to the just like what happing in reorderBlocks
                 if (block.Content.blockToGoID === deletedBlock.ID) {
                     block.Content.blockToGoID = null;
                     counter++;

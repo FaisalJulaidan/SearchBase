@@ -4,6 +4,7 @@ import {http, alertError} from '../../../../../../helpers';
 import saveAs from 'file-saver';
 import Profile from '../Profile/Profile'
 import Conversation from '../Conversation/Conversation'
+import SelectedSolutions from "../SelectedSolutions/SelectedSolutions";
 
 const TabPane = Tabs.TabPane;
 
@@ -14,31 +15,6 @@ class ViewsModal extends Component {
     state = {
         fileNames: []
     };
-
-    columns = [{
-        title: 'Question',
-        key: 'questionText',
-        render: (text, record, index) => (<p>{record.questionText}</p>),
-    }, {
-        title: 'Input',
-        key: 'input',
-        render: (text, record, index) => {
-
-            if (record.input === '&FILE_UPLOAD&') {
-                this.counter+=1;
-                return (<Button hreftype="primary" data-index={this.counter} icon="download" size="small"
-                                onClick={(e) => {this.downloadFile(e)}}>
-                    Download File
-                </Button>);
-            }
-
-            else {
-               return (<p>
-                   {record.input}
-               </p>);
-            }
-        },
-    }];
 
     componentWillReceiveProps(nextProps, nextContext) {
         if(nextProps.session && nextProps.session.FilePath){
@@ -68,7 +44,7 @@ class ViewsModal extends Component {
 
 
     render() {
-        const {session, dataTypes} = this.props;
+        const {session, flowOptions} = this.props;
         const userType = session ? session.UserType : 'Unknown';
 
         return (
@@ -91,7 +67,11 @@ class ViewsModal extends Component {
 
                     <TabPane tab={`Profile (${userType})`} key={"2"}>
                         <Profile session={session} downloadFile={this.downloadFileHandler}
-                                 dataTypes={dataTypes} />
+                                 dataTypes={flowOptions.dataTypes} />
+                    </TabPane>
+
+                    <TabPane tab={"Selected Solutions (Candidates, Jobs)"} key={"3"}>
+                        <SelectedSolutions solutions={session?.Data?.selectedSolutions}/>
                     </TabPane>
 
                 </Tabs>

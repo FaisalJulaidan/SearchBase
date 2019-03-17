@@ -114,7 +114,7 @@ class Sessions extends React.Component {
 
     render() {
         const {assistant} = this.props.location.state;
-        const {sessions} = this.props;
+        const {sessions, options} = this.props;
         let { sortedInfo, filteredInfo } = this.state;
         sortedInfo = sortedInfo || {};
         filteredInfo = filteredInfo || {};
@@ -136,13 +136,13 @@ class Sessions extends React.Component {
             title: 'User Type',
             dataIndex: 'UserType',
             key: 'UserType',
-            filters: [
-                { text: 'Candidate', value: 'Candidate' },
-                { text: 'Client', value: 'Client' },
-            ],
-            onFilter: (value, record) => {
-                console.log(value);
-                record.UserType.includes(value)},
+            // filters: [
+            //     { text: 'Candidate', value: 'Candidate' },
+            //     { text: 'Client', value: 'Client' },
+            // ],
+            // onFilter: (value, record) => {
+            //     console.log(value);
+            //     record.UserType.includes(value)},
             render: (text, record) => (<Tag key={record.UserType}>{record.UserType}</Tag>),
 
         },{
@@ -165,11 +165,16 @@ class Sessions extends React.Component {
             dataIndex: 'TimeSpent',
             key: 'TimeSpent',
             sorter: (a, b) => a.TimeSpent - b.TimeSpent,
-            render: (text, record) => (<p style={{textAlign:'center'}}>{
-                moment.duration(parseInt(record.TimeSpent), 'seconds').asMinutes().toFixed(2) + " minute(s)"
-            }
-            </p>),
+            render: (_, record) => {
+                let date = new Date(null);
+                date.setSeconds(record.TimeSpent); // specify value for SECONDS here
+                let mm = date.getUTCMinutes();
+                let ss = date.getSeconds();
+                if (mm < 10) mm = "0" + mm;
+                if (ss < 10) ss = "0" + ss;
 
+                return <p >{`${mm}:${ss}`} mins</p>
+            }
         },{
             title: 'Date & Time',
             dataIndex: 'DateTime',
@@ -232,7 +237,7 @@ class Sessions extends React.Component {
                         <ViewsModal visible={this.state.viewModal}
                                     closeViewModal={this.closeViewModal}
                                     filesPath={sessions.filesPath}
-                                    dataTypes={sessions.dataTypes}
+                                    flowOptions={options?.flow}
                                     session={this.state.selectedSession}
                                     assistant={assistant}
                         />
@@ -246,6 +251,7 @@ class Sessions extends React.Component {
 const mapStateToProps = state =>  {
     const {chatbotSessions} = state;
     return {
+        options: state.options.options,
         sessions: chatbotSessions.chatbotSessions,
         isLoading: chatbotSessions.isLoading,
         errorMsg: chatbotSessions.errorMsg,

@@ -6,8 +6,9 @@ from sqlalchemy.sql import and_
 from sqlalchemy.sql import desc
 
 from models import db, Callback, ChatbotSession, Assistant
-from services import assistant_services, stored_file_services
-from utilities import json_schemas
+from services import assistant_services, stored_file_services, databases_services
+from utilities import json_schemas, helpers
+from enums import DatabaseType, UserType
 
 
 # Process chatbot session data
@@ -24,15 +25,34 @@ def processSession(assistantHashID, data: dict) -> Callback:
         print(exc.args)
         return Callback(False, "The submitted chatbot data doesn't follow the correct format.", exc.args[0])
 
-    try:
 
+    callback: Callback = (False, '')
+    selectedSolutions = []
+    for solution in data['selectedSolutions']:
+        if solution['databaseType'] == DatabaseType.Candidates.name:
+            callback = databases_services.getCandidate(solution['id'])
+
+        elif solution['databaseType'] == DatabaseType.Jobs.name:
+            callback = databases_services.getJob(solution['id'])
+
+        if callback.Success:
+            selectedSolutions.append({
+                'data': helpers.getDictFromSQLAlchemyObj(callback.Data),
+                'type': solution['databaseType']
+            })
+
+    try:
         # collectedData is an array, and timeSpent is in seconds.
         collectedData = data['collectedData']
-        chatbotSession = ChatbotSession(Data={'collectedData': collectedData},
-                                        TimeSpent=44,
+        chatbotSession = ChatbotSession(Data={
+                                            'collectedData': collectedData,
+                                            'selectedSolutions': selectedSolutions,
+                                            'keywordsByDataType': data['keywordsByDataType'],
+                                        },
+                                        TimeSpent=data['timeSpent'],
                                         SolutionsReturned=data['solutionsReturned'],
                                         QuestionsAnswered=len(collectedData),
-                                        UserType=data['userType'],
+                                        UserType=UserType[data['userType'].replace(" ", "")],
                                         Assistant=assistant)
         db.session.add(chatbotSession)
         db.session.commit()
@@ -53,11 +73,13 @@ def getAllByAssistantID(assistantID):
             ChatbotSession.AssistantID == assistantID) \
             .order_by(desc(ChatbotSession.DateTime)).all()
 
+
         for session in sessions:
+            filePaths = ""
             storedFile_callback: Callback = stored_file_services.getBySession(session)
             if storedFile_callback.Success:
-                session.FilePath = storedFile_callback.Data.FilePath
-
+                filePaths = storedFile_callback.Data.FilePath
+            session.FilePath =  filePaths
         return Callback(True, "User inputs retrieved successfully.", sessions)
 
     except Exception as exc:

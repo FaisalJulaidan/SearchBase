@@ -10,8 +10,8 @@ function* fetchAssistants() {
         yield put(assistantActions.fetchAssistantsSuccess(res.data.data));
     } catch (error) {
         console.log(error);
-        errorMessage(error.response.data.msg);
-        yield put(assistantActions.fetchAssistantsFailure(error.response.data));
+        errorMessage(error.response?.data.msg);
+        yield put(assistantActions.fetchAssistantsFailure(error.response?.data));
     }
 
 }
@@ -39,8 +39,8 @@ function* updateAssistant({assistantID, updatedSettings}) {
         successMessage('Assistant updated!');
     } catch (error) {
         console.log(error);
-        errorMessage(error.response.data.msg);
-        yield put(assistantActions.updateAssistantFailure(error.response.data));
+        errorMessage(error.response?.data.msg);
+        yield put(assistantActions.updateAssistantFailure(error.response?.data));
 
     }
 }
@@ -54,7 +54,7 @@ function* deleteAssistant({assistantID}) {
         successMessage('Assistant deleted');
     } catch (error) {
         console.log(error);
-        yield put(assistantActions.deleteAssistantFailure(error.response.data));
+        yield put(assistantActions.deleteAssistantFailure(error.response?.data));
         errorMessage("Error in deleting assistant");
     }
 }
@@ -69,7 +69,7 @@ function* updateFlow({assistant}) {
         yield put(assistantActions.updateFlowSuccess(assistant, res.data.msg));
     } catch (error) {
         console.log(error);
-        yield put(assistantActions.updateFlowFailure(error.response.data));
+        yield put(assistantActions.updateFlowFailure(error.response?.data));
         errorMessage("Error in updating flow");
     }
 }
@@ -84,7 +84,7 @@ function* updateStatus({status, assistantID}) {
                                                                             status, assistantID));
     } catch (error) {
         console.log(error);
-        yield put(assistantActions.changeAssistantStatusFailure(error.response.data));
+        yield put(assistantActions.changeAssistantStatusFailure(error.response?.data));
         yield destroyMessage();
         yield errorMessage("Error in updating assistant status");
     }
@@ -124,6 +124,5 @@ export function* assistantSaga() {
         watchDeleteAssistant(),
         watchUpdateFlow(),
         watchUpdateStatus(),
-
     ])
 }

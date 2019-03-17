@@ -24,12 +24,16 @@ class Integration extends React.Component {
         defer: true
     };
 
+    firstHead = null;
+
     componentDidMount() {
         this.setState({
             assistantID: hasher.encode(this.props.match.params.id),
             source: this.getWidgetSrc()
         });
+        this.firstHead = document.head.innerHTML;
     }
+
 
     componentWillUnmount(){
         this.removeChatbot();
@@ -42,6 +46,7 @@ class Integration extends React.Component {
         if (oldBot) oldBot.remove();
         let oldBotScript = document.getElementById("oldBotScript");
         if (oldBotScript) oldBotScript.remove();
+        document.head.innerHTML = this.firstHead;
     };
 
     copyScriptPaste = () => {

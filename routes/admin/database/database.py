@@ -44,7 +44,7 @@ def get_databasesList():
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
-@database_router.route("/databases/<int:databaseID>/page/<int:pageNumber>", methods=['GET', 'DELETE', 'PUT'])
+@database_router.route("/databases/<int:databaseID>/page/<int:pageNumber>", methods=['GET'])
 @jwt_required
 def get_database(databaseID, pageNumber):
 
@@ -55,12 +55,26 @@ def get_database(databaseID, pageNumber):
     if request.method == "GET":
         callback = databases_services.fetchDatabase(databaseID, user['companyID'], pageNumber)
 
+
+    # Return response
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+
+
+@database_router.route("/databases/<int:databaseID>", methods=['DELETE', 'PUT'])
+@jwt_required
+def delete_update_database(databaseID):
+
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    callback: Callback = Callback(False, "")
     if request.method == "DELETE":
         callback = databases_services.deleteDatabase(databaseID, user['companyID'])
 
     if request.method == "PUT":
         data = request.json
-
         callback = databases_services.updateDatabase(databaseID, data.get('databaseName'), user['companyID'])
 
     # Return response

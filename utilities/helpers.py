@@ -60,7 +60,7 @@ def gen_dummy_data():
                                      "blocks": [
                                          # {
                                          #     "ID": "834hf",
-                                         #     "DataType": enums.DataType.DesiredSalary.value,
+                                         #     "DataType": enums.DataType.CandidateDesiredSalary.value,
                                          #     "Type": "User Input",
                                          #     "StoreInDB": True,
                                          #     "Skippable": False,
@@ -91,7 +91,7 @@ def gen_dummy_data():
                                          # },
                                          # {
                                          #     "ID": "gje6D",
-                                         #     "DataType": enums.DataType.Email.value,
+                                         #     "DataType": enums.DataType.CandidateEmail.value,
                                          #     "Type": "User Input",
                                          #     "StoreInDB": True,
                                          #     "Skippable": False,
@@ -216,17 +216,17 @@ def gen_dummy_data():
     }
     s1 = ChatbotSession(Data=data, DateTime=datetime.now(),
                         TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
-                        UserType=enums.UserType.JobSeeker, Assistant=reader_a)
+                        UserType=enums.UserType.Candidate, Assistant=reader_a)
     db.session.add(s1)
     db.session.add(ChatbotSession(Data=data, DateTime=datetime.now() - timedelta(days=10),
                                   TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
-                                  UserType=enums.UserType.CandidateSeeker, Assistant=reader_a))
+                                  UserType=enums.UserType.Client, Assistant=reader_a))
 
     # add chatbot session in bulk
     for i in range(50):
         db.session.add(ChatbotSession(Data=data, DateTime=datetime.now() - timedelta(days=i),
                                       TimeSpent=i+40, SolutionsReturned=i+3, QuestionsAnswered=i+4,
-                                      UserType=enums.UserType.JobSeeker, Assistant=reader_a))
+                                      UserType=enums.UserType.Candidate, Assistant=reader_a))
 
 
     db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidates, Company=aramco)
@@ -236,27 +236,26 @@ def gen_dummy_data():
     db.session.add(db2)
 
     db.session.add(addCandidate(db1, 'Faisal', 2000, "Software Engineer", "python, java, javascript, SQL",
-                                5, "London","contract", 30))
+                                5, "London"))
 
     db.session.add(addCandidate(db1, 'Mohammed', 4000, "Software Engineer", "python, SQL",
-                                10, "Cardiff","Contract", 50))
+                                10, "Cardiff"))
 
     db.session.add(addCandidate(db2, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
-                                2, "Cardiff","Contract", 20))
+                                2, "Cardiff"))
 
     seed() # will save changes as well
 
 
 
-def addCandidate(db, name, ds, dp, cs, ye, pl, pe, ehr):
-    return Candidate(Database=db, Name=name,
-                     DesiredSalary=ds,
-                     DesiredPosition=dp,
-                     CandidateSkills =cs,
-                     YearsExp = ye,
-                     PreferredLocation = pl,
-                     PreferredEmploymentType = pe,
-                     DesiredPayRate = ehr)
+def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
+    return Candidate(Database=db,
+                     CandidateName=name,
+                     CandidateDesiredSalary=desiredSalary,
+                     CandidateJobTitle=jobTitle,
+                     CandidateSkills =skills,
+                     CandidateYearsExperience = exp,
+                     CandidateLocation = location)
 
 
 

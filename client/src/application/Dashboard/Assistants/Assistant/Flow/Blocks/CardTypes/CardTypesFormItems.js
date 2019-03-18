@@ -1,4 +1,4 @@
-import {Button, Checkbox, Input, Select, Spin} from "antd";
+import {Button, Checkbox, Input, Select, Spin, Cascader} from "antd";
 import React from 'react';
 import {onCancel, onDelete, onFileTypeChange, onSelectAction} from "./CardTypesHelpers";
 
@@ -25,27 +25,42 @@ export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block, pl
     )
 };
 
-export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, options, block}) => (
-    <FormItem label="Data Type" {...layout}
-              extra="Selecting a Data Type will result in a smarter AI processing and accurate data collection">
-        {
-            getFieldDecorator('dataType', {
-                initialValue: block.DataType ? block.DataType.name : undefined,
-                rules: [{
-                    required: true,
-                    message: "Please specify the data type",
-                }]
-            })(
-                <Select placeholder="Will validate the input and categorise user inputs">
-                    {
-                        options.flow.dataTypes.map((type, i) =>
-                            <Option key={i} value={type.name}>{type.name}</Option>)
-                    }
-                </Select>
-            )
-        }
-    </FormItem>
-);
+export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, options, block}) => {
+
+    // This will create the Cascader content and will put every userType's associated dataType in a category
+    const dataTypes = [];
+    options.flow.dataTypeSections.forEach((dts, i) => {
+        dataTypes[i] = {
+            value: dts,
+            label: dts,
+            children: options.flow.dataTypes
+                .filter(dt => dt.dataTypeSection === dts && dt.dataTypeSection !== 'No Type')
+                .map(dt => {
+                return {value: dt.name, label: dt.name}
+            }),
+        };
+    });
+
+    // Define initial value. Because cascader only accepts array as initial value we need to create one
+    let initialValue = [block.DataType?.dataTypeSection, block.DataType?.name];
+    if (!(initialValue[0])) initialValue =undefined;
+
+
+    return (
+        <FormItem label="Data Type" {...layout}
+                  extra="Selecting a Data Type will result in a smarter AI processing and accurate data collection">
+            {
+
+                getFieldDecorator('dataType', {
+                    initialValue: initialValue,
+                    rules: [{ type: 'array', required: true, message: 'Please specify the data type!' }]
+                })(
+                    <Cascader options={dataTypes} />
+                )
+            }
+        </FormItem>
+    );
+};
 
 export const SkippableFormItem = ({FormItem, layout, getFieldDecorator, block}) => (
     <FormItem label="Skippable?" {...layout}>

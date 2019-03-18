@@ -319,6 +319,18 @@ def scanCandidates(session, dbIDs):
                                 .to_json(orient='records'))
         data = []
         for tr in topResults:
+
+            # A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q
+
+            ########################
+            #      Candidate A     #
+            #        Cardiff       #
+            #   Skills: C#, Python #
+            #                      #
+            #----------------------#
+            #       Enquire        #
+            #----------------------#
+
             data.append({
                 "title": tr[Candidate.DesiredPosition.name],
                 "description": tr[Candidate.CandidateSkills.name],

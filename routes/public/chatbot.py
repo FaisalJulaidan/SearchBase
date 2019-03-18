@@ -43,7 +43,7 @@ def chatbot(assistantIDAsHash):
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
 
         # Notify company about the new chatbot session
-        mail_services.notifyNewRecord(assistantIDAsHash)
+        mail_services.notifyNewChatbotSession(assistantIDAsHash)
 
         return helpers.jsonResponse(True, 200, "Collected data is successfully processed", {'sessionID': callback.Data.ID})
 

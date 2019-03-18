@@ -2,36 +2,6 @@ from models import db, Callback, Company, User, Role
 import stripe
 
 
-def getByID(id) -> Company or None:
-    try:
-        if id:
-            # Get result and check if None then raise exception
-            result = db.session.query(Company).get(id)
-            if not result: raise Exception
-
-            return Callback(True,
-                            'Company with ID ' + str(id) + ' was successfully retrieved',
-                            result)
-        else:
-            raise Exception
-    except Exception as exc:
-        db.session.rollback()
-        return Callback(False,
-                        'Company with ID ' + str(id) + ' does not exist')
-
-    # finally:
-       # db.session.close()
-
-
-def getAll() -> list:
-    try:
-        return db.session.query(Company)
-    except:
-        db.session.rollback()
-        return None
-    # finally:
-       # db.session.close()
-
 def create(name, url, ownerEmail) -> Company or None:
 
     try:
@@ -53,9 +23,35 @@ def create(name, url, ownerEmail) -> Company or None:
         print(exc)
         db.session.rollback()
         return Callback(False, "Couldn't create a company entity.")
-    # finally:
-       # db.session.close()
-    # Save
+
+
+
+def getByID(id) -> Company or None:
+    try:
+        if id:
+            # Get result and check if None then raise exception
+            result = db.session.query(Company).get(id)
+            if not result: raise Exception
+
+            return Callback(True,
+                            'Company with ID ' + str(id) + ' was successfully retrieved',
+                            result)
+        else:
+            raise Exception
+    except Exception as exc:
+        db.session.rollback()
+        return Callback(False,
+                        'Company with ID ' + str(id) + ' does not exist')
+
+
+def getAll() -> list or None:
+    try:
+        return db.session.query(Company)
+    except:
+        db.session.rollback()
+        return None
+
+
 
 def removeByName(name) -> bool:
 

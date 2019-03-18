@@ -321,6 +321,18 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
                                 .to_json(orient='records'))
         data = []
         for tr in topResults:
+
+            # A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q
+
+            ########################
+            #      Candidate A     #
+            #        Cardiff       #
+            #   Skills: C#, Python #
+            #                      #
+            #----------------------#
+            #       Enquire        #
+            #----------------------#
+
             data.append({
                 "id": tr["ID"],
                 "databaseType": databaseType.name,

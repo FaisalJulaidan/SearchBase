@@ -2,6 +2,7 @@ import axios from 'axios';
 import {authHeader} from './auth';
 import { store } from '../store/store'
 import { authActions } from "../store/actions";
+import {warningMessage} from "./alert";
 
 export const http = axios.create({
     baseURL: '/api',
@@ -20,7 +21,6 @@ http.interceptors.request.use(
     },
     function (error) {
         console.log(error);
-        console.log("SDFSFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
         return Promise.reject(error);
     }
 );

@@ -1,7 +1,7 @@
 import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
-const initialState = {assistantList: [], isLoading: false, errorMsg: null};
+const initialState = {assistantList: [], isLoading: false, errorMsg: null, isUpdatingFlow: false};
 
 export const assistant = (state = initialState, action) => {
     switch (action.type) {
@@ -20,7 +20,7 @@ export const assistant = (state = initialState, action) => {
             return updateObject(state, {
                 assistantList: [],
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
         // Add
@@ -37,7 +37,7 @@ export const assistant = (state = initialState, action) => {
         case actionTypes.ADD_ASSISTANT_FAILURE:
             return updateObject(state, {
                 isAdding: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
         // Update
@@ -55,7 +55,7 @@ export const assistant = (state = initialState, action) => {
         case actionTypes.UPDATE_ASSISTANT_FAILURE:
             return updateObject(state, {
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
         // Delete
@@ -75,7 +75,7 @@ export const assistant = (state = initialState, action) => {
         case actionTypes.DELETE_ASSISTANT_FAILURE:
             return updateObject(state, {
                 isDeleting: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
 
@@ -99,7 +99,7 @@ export const assistant = (state = initialState, action) => {
         case actionTypes.CHANGE_ASSISTANT_STATUS_FAILURE:
             return updateObject(state, {
                 isStatusChanging: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
         case actionTypes.UPDATE_FLOW_REQUEST:
@@ -122,7 +122,7 @@ export const assistant = (state = initialState, action) => {
         case actionTypes.UPDATE_FLOW_FAILURE:
             return updateObject(state, {
                 isUpdatingFlow: false,
-                updateFlowErrorMsg: action.error.msg
+                updateFlowErrorMsg: action.error
             });
 
         default:

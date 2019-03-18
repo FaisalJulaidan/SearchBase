@@ -18,7 +18,7 @@ export const database = (state = initialState, action) => {
         case actionTypes.GET_DATABASES_LIST_FAILURE:
             return updateObject(state, {
                 isLoading: false,
-                errorMsg: action.error
+                errorMsg: action
             });
 
 
@@ -34,7 +34,7 @@ export const database = (state = initialState, action) => {
         case actionTypes.FETCH_DATABASE_FAILURE:
             return updateObject(state, {
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
         case actionTypes.RESET_DATABASE:
             return updateObject(state, {fetchedDatabase: {}});
@@ -54,7 +54,7 @@ export const database = (state = initialState, action) => {
         case actionTypes.DELETE_DATABASE_FAILURE:
             return updateObject(state, {
                 isDeletingDatabase: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
 
@@ -72,7 +72,7 @@ export const database = (state = initialState, action) => {
         case actionTypes.UPLOAD_DATABASE_FAILURE:
             return updateObject(state, {
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
         default:

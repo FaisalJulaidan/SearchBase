@@ -245,7 +245,6 @@ def gen_dummy_data():
                                 2, "Cardiff","Contract", 20))
 
     seed() # will save changes as well
-    db.session.delete(s1)
 
 
 

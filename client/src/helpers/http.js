@@ -10,16 +10,17 @@ export const http = axios.create({
 
 http.interceptors.request.use(
     function (config) {
-        const header = authHeader();
-        if (!header) {
+        const token = authHeader();
+        if (!token) {
             console.log("Token required!");
             store.dispatch(authActions.logout());
         }
-        config.headers = header;
+        config.headers = {...token, 'Content-Type': 'application/json'};
         return config;
     },
     function (error) {
         console.log(error);
+        console.log("SDFSFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
         return Promise.reject(error);
     }
 );
@@ -30,22 +31,23 @@ http.interceptors.response.use(response => {
         // If token has expired then refresh the token using refreshToken
         if (error.config && error.response && error.response.status === 401) {
             console.log('Refresh Token...');
+
             return axios.post(`/api/auth/refresh`, null,{
-                headers: {'Authorization': 'Bearer ' + localStorage.getItem('refresh')},
+                headers: {'Authorization': 'Bearer ' + localStorage.getItem('refresh'),
+                          'Content-Type': 'application/json' },
             }).then(res => {
                 // Set new access token
-                const {token, expiresIn} = res.data.data;
-                localStorage.setItem("token", token);
-                localStorage.setItem("expiresIn", expiresIn);
+                localStorage.setItem("token", res.data.data.token);
                 // Make sure to remove the /api because it is by in http instance by default
                 error.config.baseURL="";
                 // Retry the request with the new token
                 return http.request(error.config)
             }).catch(error => {
                 console.log('Axios Unauthorised');
-                store.dispatch(authActions.logout());
+                console.log(error);
+                return store.dispatch(authActions.logout());
             });
         }
-    return Promise.reject(error);
+    // return Promise.reject(error);
     }
 );

@@ -73,8 +73,6 @@ class Databases extends Component {
         return x;
     };
 
-
-
     render() {
         const {fetchedDatabase} = this.props;
         return (
@@ -115,13 +113,13 @@ class Databases extends Component {
                                 </div>
                                 <div>
                                     <Button className={styles.Panel_Header_Button}
-                                            disabled={!(!!fetchedDatabase?.databaseContent?.length)}
+                                            disabled={!(!!fetchedDatabase?.databaseContent?.records.length)}
                                             type="primary" icon="info"
                                             onClick={this.showDBDetails}>
                                         Details
                                     </Button>
                                     <Button className={styles.Panel_Header_Button} type="danger" icon="delete"
-                                            disabled={!(!!fetchedDatabase?.databaseContent?.length)}
+                                            disabled={!(!!fetchedDatabase?.databaseContent?.records.length)}
                                             onClick={() => this.deleteDatabase(fetchedDatabase)}>
                                         Delete Database
                                     </Button>

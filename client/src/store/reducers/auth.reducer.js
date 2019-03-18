@@ -23,7 +23,7 @@ export const auth = (state = initialState, action) => {
                 isLoggingIn: false,
                 isAuthenticated: false,
                 user: null,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
 
@@ -39,7 +39,7 @@ export const auth = (state = initialState, action) => {
         case actionTypes.SIGNUP_FAILURE:
             return updateObject(state, {
                 isSigningUp: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
 
@@ -51,7 +51,7 @@ export const auth = (state = initialState, action) => {
             });
         case actionTypes.RESET_PASSWORD_FAILURE:
             return updateObject(state, {
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
 
@@ -63,7 +63,7 @@ export const auth = (state = initialState, action) => {
             });
         case actionTypes.NEW_RESET_PASSWORD_FAILURE:
             return updateObject(state, {
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
         case actionTypes.LOGOUT:

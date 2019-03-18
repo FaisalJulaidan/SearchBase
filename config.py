@@ -53,7 +53,7 @@ class BaseConfig(object):
     JWT_SECRET_KEY = os.urandom(24)
 
     # JWT tokens expires in
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=4)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=2)
 
     SESSION_TYPE = 'filesystem'

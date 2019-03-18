@@ -25,8 +25,7 @@ def create(firstname, surname, email, password, phone, company: Company, role: R
         print(exc)
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')
-    # finally:
-    # db.session.close()
+
 
 
 # ----- Getters ----- #

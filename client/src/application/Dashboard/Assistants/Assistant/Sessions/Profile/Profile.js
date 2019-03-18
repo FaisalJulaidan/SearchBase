@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Table} from "antd";
+import {Button, Table, Empty} from "antd";
 
 
 
@@ -52,13 +52,15 @@ class Profile extends Component {
         const {session, dataTypes} = this.props;
         console.log(this.state);
         return (
-            <Table columns={this.columns}
-                   dataSource={dataTypes.filter((type) => type.userTypes.includes(session.UserType))}
-                   size='middle'
-                   pagination={false}
-            />
+            session?.UserType !== "Unknown" ?
+                <Table
+                    columns={this.columns}
+                    dataSource={dataTypes.filter((type) => type.userTypes.includes(session.UserType))}
+                    size='middle'
+                    pagination={false}
+                />
+                : <Empty description={"Profile cannot be auto-generated for Unknown user type 😞"}/>
         );
     }
 }
-
 export default Profile;

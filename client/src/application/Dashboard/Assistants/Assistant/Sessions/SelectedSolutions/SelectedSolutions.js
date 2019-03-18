@@ -24,8 +24,7 @@ class SelectedSolutions extends Component {
     render() {
         const {solutions} = this.props;
         return (
-
-            solutions ?
+            solutions?.length ?
             <Collapse
                 bordered={false}
                 defaultActiveKey={['1']}

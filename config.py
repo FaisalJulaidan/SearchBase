@@ -54,7 +54,7 @@ class BaseConfig(object):
 
     # JWT tokens expires in
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=2)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=20)
 
     SESSION_TYPE = 'filesystem'
     USE_ENCRYPTION = True
@@ -79,7 +79,7 @@ class BaseConfig(object):
             'func': 'services.mail_services:timer_tick',
             'args': (),
             'trigger': 'interval',
-            'seconds': 14400
+            'seconds': 14400  # 4 hours
         }
     ]
 

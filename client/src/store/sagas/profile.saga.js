@@ -2,7 +2,7 @@ import {put, takeLatest, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {http, updateUsername} from "../../helpers";
 import {profileActions} from "../actions";
-import {alertError, alertSuccess, destroyMessage, loadingMessage, errorMessage, successMessage} from "../../helpers/alert";
+import {loadingMessage, errorMessage, successMessage} from "../../helpers/alert";
 
 
 
@@ -17,7 +17,9 @@ function* getProfileData() {
 
     } catch (error) {
         console.log(error);
-        yield put(profileActions.getProfileFailure("Couldn't get profile data"));
+        const msg = "Couldn't load profile";
+        yield put(profileActions.getProfileFailure(msg));
+        errorMessage(msg);
     }
 
 }
@@ -27,13 +29,14 @@ function* saveProfileData(action) {
         loadingMessage('Saving profile...', 0);
         const res = yield http.post(`/profile`, action.profileData);
         yield put(profileActions.saveProfileDetailsSuccess(res.data.msg));
-        yield successMessage('Profile saved');
-        yield put(profileActions.getProfile())
+        yield put(profileActions.getProfile());
+        successMessage('Profile saved');
 
     } catch (error) {
         console.log(error);
-        yield put(profileActions.saveProfileDetailsFailure(error.response.data));
-        yield errorMessage("Couldn't save your profile");
+        const msg = "Couldn't save profile";
+        yield put(profileActions.saveProfileDetailsFailure(msg));
+        errorMessage(msg);
     }
 }
 
@@ -42,13 +45,13 @@ function* saveDataSettings(action) {
         loadingMessage('Saving Data Settings...', 0);
         const res = yield http.post(`/profile/settings`, action.dataSettings);
         yield put(profileActions.saveDataSettingsSuccess(res.data.msg));
-        yield successMessage('Data Settings saved');
-        yield put(profileActions.getProfile())
-
+        yield put(profileActions.getProfile());
+        successMessage('Data Settings saved');
     } catch (error) {
         console.log(error);
-        yield put(profileActions.saveDataSettingsFailure(error.response.data));
-        yield errorMessage("Couldn't your settings");
+        const msg = "Couldn't save settings";
+        yield put(profileActions.saveDataSettingsFailure(msg));
+        errorMessage(msg);
     }
 }
 
@@ -61,8 +64,9 @@ function* changePassword({newPassword, oldPassword}) {
 
     } catch (error) {
         console.log(error);
-        yield put(profileActions.changePasswordFailure(error.response.data));
-        yield errorMessage(error.response.data.msg);
+        const msg = "Couldn't update password";
+        yield put(profileActions.changePasswordFailure(msg));
+        errorMessage(msg);
     }
 }
 

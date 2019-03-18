@@ -20,7 +20,7 @@ export const usersManagement = (state = initialState, action) => {
             return updateObject(state, {
                 usersList: [],
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
         case actionTypes.ADD_USER_REQUEST:
             return updateObject(state, {
@@ -34,7 +34,7 @@ export const usersManagement = (state = initialState, action) => {
         case actionTypes.ADD_USER_FAILURE:
             return updateObject(state, {
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
         case actionTypes.EDIT_USER_REQUEST:
             return updateObject(state, {
@@ -48,7 +48,7 @@ export const usersManagement = (state = initialState, action) => {
         case actionTypes.EDIT_USER_FAILURE:
             return updateObject(state, {
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
         case actionTypes.DELETE_USER_REQUEST:
             return updateObject(state, {
@@ -62,7 +62,7 @@ export const usersManagement = (state = initialState, action) => {
         case actionTypes.DELETE_USER_FAILURE:
             return updateObject(state, {
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
         default:

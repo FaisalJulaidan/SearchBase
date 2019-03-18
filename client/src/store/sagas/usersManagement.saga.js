@@ -1,7 +1,7 @@
 import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {solutionsActions, usersManagementActions} from "../actions";
-import {http, alertError, alertSuccess, destroyMessage, loadingMessage, successMessage, errorMessage} from "../../helpers";
+import {http, loadingMessage, successMessage, errorMessage} from "../../helpers";
 
 function* getUsers() {
     try {
@@ -9,7 +9,9 @@ function* getUsers() {
         return yield put(usersManagementActions.getUsersSuccess(res.data.data))
     } catch (error) {
         console.log(error);
-        return yield put(usersManagementActions.getUsersFailure(error.response.data));
+        const msg = "Couldn't load users";
+        yield put(usersManagementActions.getUsersFailure(msg));
+        errorMessage(msg);
     }
 }
 
@@ -17,14 +19,15 @@ function* addUser(action) {
     try {
         loadingMessage('Adding new user...');
         const res = yield http.put(`/user`, action.params.user);
-
-        yield successMessage('User Added');
         yield put(usersManagementActions.addUserSuccess(res.message));
         yield put(usersManagementActions.getUsers());
+        successMessage('New user added');
+
     } catch (error) {
-        console.log(error.response);
-        yield errorMessage('Error in adding User');
-        yield put(usersManagementActions.addUserFailure(error.response.data));
+        console.log(error);
+        const msg = "Couldn't add a new user";
+        yield put(usersManagementActions.addUserFailure(msg));
+        errorMessage(msg);
     }
 }
 
@@ -32,14 +35,15 @@ function* editUser(action) {
     try {
         loadingMessage('Editing user...');
         const res = yield http.post(`/user`, action.params.user);
-
-        yield successMessage('User edited');
         yield put(usersManagementActions.editUserSuccess(res.message));
         yield put(usersManagementActions.getUsers())
+        successMessage('User edited');
+
     } catch (error) {
-        console.log(error.response);
-        yield errorMessage('Error in editing user');
-        yield put(usersManagementActions.editUserFailure(error.response.data));
+        console.log(error);
+        const msg = "Couldn't update the user";
+        yield put(usersManagementActions.editUserFailure(msg));
+        errorMessage(msg);
     }
 }
 
@@ -47,14 +51,15 @@ function* deleteUser(action) {
     try {
         loadingMessage('Deleting user...');
         const res = yield http.post(`/user_delete`, action.params.user);
-
-        yield successMessage('User deleted');
         yield put(usersManagementActions.deleteUserSuccess(res.message));
-        yield put(usersManagementActions.getUsers())
+        yield put(usersManagementActions.getUsers());
+        successMessage('User deleted');
+
     } catch (error) {
         console.log(error.response);
-        yield errorMessage('Error in deleting User');
-        yield put(usersManagementActions.deleteUserFailure(error.response.data));
+        const msg = "Couldn't delete the user";
+        yield put(usersManagementActions.deleteUserFailure(msg));
+        errorMessage(msg);
     }
 }
 

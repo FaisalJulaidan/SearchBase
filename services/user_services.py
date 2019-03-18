@@ -3,6 +3,7 @@ from sqlalchemy.sql import exists
 from models import db, Callback, User, Company, Role, UserSettings
 from services import mail_services, company_services, newsletter_services
 from utilities import helpers
+from sqlalchemy import and_
 
 
 def create(firstname, surname, email, password, phone, company: Company, role: Role, verified=False) -> Callback:
@@ -25,8 +26,7 @@ def create(firstname, surname, email, password, phone, company: Company, role: R
         print(exc)
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')
-    # finally:
-    # db.session.close()
+
 
 
 # ----- Getters ----- #
@@ -85,6 +85,22 @@ def getAllByCompanyID(companyID) -> Callback:
                         'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
 
+def getAllByCompanyIDWithEnabledNotifications(companyID) -> Callback:
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(User)\
+            .filter(and_(User.CompanyID == companyID, User.Settings.UserInputNotifications)).all()
+        if not result: raise Exception
+
+        return Callback(True,
+                        'Users with company ID ' + str(companyID) + ' were successfully retrieved.',
+                        result)
+    except Exception as exc:
+        db.session.rollback()
+        return Callback(False,
+                        'Users with company ID ' + str(companyID) + ' could not be retrieved.')
+
+
 def getProfile(userID):
     try:
         result: UserSettings = db.session.query(UserSettings).filter(UserSettings.ID == userID).first()
@@ -121,6 +137,20 @@ def getAllUserSettings():
                         result)
     except Exception as exc:
         db.session.rollback()
+        return Callback(False, 'Error in getting records')
+
+
+def getAllUserSettingsWithEnabled(USProperty):
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(UserSettings).filter(getattr(UserSettings, USProperty)).all()
+
+        return Callback(True,
+                        'Records successfully retrieved',
+                        result)
+    except Exception as exc:
+        db.session.rollback()
+        print("user_services.getAllUserSettingsWithEnabled() ERROR: ", str(exc))
         return Callback(False, 'Error in getting records')
 
 

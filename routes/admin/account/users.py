@@ -151,6 +151,7 @@ def user():
         surname = request.json.get("Surname", '').strip()
         email = request.json.get("Email", '').strip()
         role = request.json.get("Role", {}).get("Name", None)
+        newRole = request.json.get("RoleName", {}).strip()
 
         if not helpers.isStringsLengthGreaterThanZero(firstname, surname, email, role):
             return helpers.jsonResponse(False, 400, "Please provide all required info for the new user.")

@@ -1,7 +1,7 @@
 import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {chatbotSessionsActions} from "../actions";
-import {http, destroyMessage, successMessage, errorMessage, loadingMessage} from "../../helpers";
+import {http, successMessage, errorMessage, loadingMessage} from "../../helpers";
 
 function* fetchChatbotSessions({assistantID}) {
     try {
@@ -9,7 +9,9 @@ function* fetchChatbotSessions({assistantID}) {
         return yield put(chatbotSessionsActions.fetchChatbotSessionsSuccess(res.data.data))
     } catch (error) {
         console.log(error);
-        return yield put(chatbotSessionsActions.fetchChatbotSessionsFailure(error));
+        const msg = "Couldn't load conversations";
+        yield put(chatbotSessionsActions.fetchChatbotSessionsFailure(msg));
+        errorMessage(msg);
     }
 }
 
@@ -19,14 +21,15 @@ function* watchFetchChatbotSessions() {
 
 function* deleteChatbotSession({sessionID, assistantID}) {
     try {
-        loadingMessage('Removing session...', 0);
+        loadingMessage('Removing conversation...', 0);
         const res = yield http.delete(`/assistant/${assistantID}/chatbotSessions/${sessionID}`);
         yield put(chatbotSessionsActions.deleteChatbotSessionSuccess(sessionID));
-        yield successMessage('Session removed');
+        successMessage('Session removed');
     } catch (error) {
         console.log(error);
-        yield put(chatbotSessionsActions.deleteChatbotSessionFailure(error));
-        yield errorMessage("Couldn't remove session");
+        const msg = "Couldn't delete conversations";
+        yield put(chatbotSessionsActions.deleteChatbotSessionFailure(msg));
+        errorMessage(msg);
     }
 }
 
@@ -40,11 +43,12 @@ function* clearAllChatbotSessions({assistantID}) {
         loadingMessage('Removing all sessions...', 0);
         const res = yield http.delete(`/assistant/${assistantID}/chatbotSessions`);
         yield put(chatbotSessionsActions.clearAllChatbotSessionsSuccess());
-        yield successMessage('All sessions cleared');
+        successMessage('All sessions cleared');
     } catch (error) {
         console.log(error);
-        yield put(chatbotSessionsActions.clearAllChatbotSessionsFailure(error));
-        yield errorMessage(error.response.data.msg);
+        const msg = "Couldn't clear all conversations";
+        yield put(chatbotSessionsActions.clearAllChatbotSessionsFailure(msg));
+        errorMessage(msg);
     }
 }
 

@@ -10,8 +10,9 @@ function* fetchAssistants() {
         yield put(assistantActions.fetchAssistantsSuccess(res.data.data));
     } catch (error) {
         console.log(error);
-        errorMessage(error.response.data.msg);
-        yield put(assistantActions.fetchAssistantsFailure(error.response.data));
+        const msg = "Couldn't load assistants";
+        yield put(assistantActions.fetchAssistantsFailure(msg));
+        errorMessage(msg);
     }
 
 }
@@ -26,8 +27,9 @@ function* addAssistant({type, newAssistant}) {
 
     } catch (error) {
         console.log(error);
-        yield errorMessage("Couldn't create a new assistant");
-        yield put(assistantActions.addAssistantFailure(error.response.data));
+        const msg = "Couldn't create a new assistant";
+        yield put(assistantActions.addAssistantFailure(msg));
+        errorMessage(msg);
     }
 }
 
@@ -39,8 +41,9 @@ function* updateAssistant({assistantID, updatedSettings}) {
         successMessage('Assistant updated!');
     } catch (error) {
         console.log(error);
-        errorMessage(error.response.data.msg);
-        yield put(assistantActions.updateAssistantFailure(error.response.data));
+        const msg = "Couldn't update assistant";
+        yield put(assistantActions.updateAssistantFailure(msg));
+        errorMessage(msg);
 
     }
 }
@@ -54,8 +57,9 @@ function* deleteAssistant({assistantID}) {
         successMessage('Assistant deleted');
     } catch (error) {
         console.log(error);
-        yield put(assistantActions.deleteAssistantFailure(error.response.data));
-        errorMessage("Error in deleting assistant");
+        const msg = "Couldn't delete assistant";
+        yield put(assistantActions.deleteAssistantFailure(msg));
+        errorMessage(msg);
     }
 }
 
@@ -63,14 +67,14 @@ function* deleteAssistant({assistantID}) {
 function* updateFlow({assistant}) {
     try {
         loadingMessage('Updating Flow', 0);
-
         const res = yield http.put(`/assistant/${assistant.ID}/flow`, {flow: assistant.Flow});
-        successMessage('Flow Updated');
         yield put(assistantActions.updateFlowSuccess(assistant, res.data.msg));
+        successMessage('Flow updated');
     } catch (error) {
         console.log(error);
-        yield put(assistantActions.updateFlowFailure(error.response.data));
-        errorMessage("Error in updating flow");
+        const msg = "Couldn't update flow";
+        yield put(assistantActions.updateFlowFailure(msg));
+        errorMessage(msg);
     }
 }
 
@@ -78,15 +82,15 @@ function* updateStatus({status, assistantID}) {
     try {
         loadingMessage('Updating Status', 0);
         const res = yield http.put(`/assistant/${assistantID}/status`, {status});
-        yield destroyMessage();
-        yield successMessage('Status Updated');
         yield put(assistantActions.changeAssistantStatusSuccess('Status updated successfully',
                                                                             status, assistantID));
+        yield successMessage('Status Updated');
+
     } catch (error) {
         console.log(error);
-        yield put(assistantActions.changeAssistantStatusFailure(error.response.data));
-        yield destroyMessage();
-        yield errorMessage("Error in updating assistant status");
+        const msg = "Couldn't update assistant's status";
+        yield put(assistantActions.changeAssistantStatusFailure(msg));
+        errorMessage(msg);
     }
 }
 
@@ -124,6 +128,5 @@ export function* assistantSaga() {
         watchDeleteAssistant(),
         watchUpdateFlow(),
         watchUpdateStatus(),
-
     ])
 }

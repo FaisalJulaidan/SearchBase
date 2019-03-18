@@ -66,7 +66,7 @@ class Assistant extends Component {
         const {assistant, isStatusChanging} = this.props;
         return (
             <>
-                <Card loading={this.props.isLoading} style={{width: 300, margin: 15, float: 'left', height: 369}}
+                <Card loading={this.props.isLoading} style={{width: 300, margin: 15, float: 'left', height: 366}}
                       cover={
                           <img alt="example"
                                height={200}
@@ -93,7 +93,8 @@ class Assistant extends Component {
 
                           <Dropdown overlay={menu(assistant)} trigger={['click']}>
                               <a className="ant-dropdown-link">
-                                  ...
+                                  <Icon type="down-circle"/>
+                              <span> More</span>
                               </a>
                           </Dropdown>]}>
                     <Meta description={assistant.TopBarText}/>

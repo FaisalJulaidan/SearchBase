@@ -20,7 +20,7 @@ export const chatbotSessions = (state = initialState, action) => {
             return updateObject(state, {
                 chatbotSessions: [],
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
         // Delete chatbot sessions
@@ -42,7 +42,7 @@ export const chatbotSessions = (state = initialState, action) => {
         case actionTypes.DELETE_CHATBOT_SESSION_FAILURE:
             return updateObject(state, {
                 isDeletingSession: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
 
@@ -61,7 +61,7 @@ export const chatbotSessions = (state = initialState, action) => {
         case actionTypes.CLEAR_ALL_CHATBOT_SESSIONS_FAILURE:
             return updateObject(state, {
                 isClearingAll: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
         default:
             return state

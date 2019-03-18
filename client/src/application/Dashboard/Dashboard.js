@@ -48,7 +48,7 @@ class Dashboard extends Component {
     };
 
     handleMenuClick = (e) => {
-        if (e.key === 'logout'){this.logout()}
+        if (e.key === 'logout'){return this.logout()}
         e.key === 'dashboard' ? history.push(`/dashboard`) : history.push(`/dashboard/${e.key}`)
     };
 

@@ -58,37 +58,37 @@ def gen_dummy_data():
                                      "name": "group 1",
                                      "description": "The best group",
                                      "blocks": [
-                                         # {
-                                         #     "ID": "834hf",
-                                         #     "DataType": enums.DataType.CandidateDesiredSalary.value,
-                                         #     "Type": "User Input",
-                                         #     "StoreInDB": True,
-                                         #     "Skippable": False,
-                                         #     "Content": {
-                                         #         "action": "Go To Next Block",
-                                         #         "text": "What's salary are you offering",
-                                         #         "blockToGoID": "by_GnLY-f",
-                                         #         "afterMessage": "Your input is being processed..."
-                                         #     }
-                                         # },
-                                         # {
-                                         #    "ID":"by_GnLY-f",
-                                         #    "Type":"Solutions",
-                                         #    "StoreInDB":False,
-                                         #    "Skippable":False,
-                                         #    "DataType":{
-                                         #        "name":"No Type",
-                                         #        "userTypes":[],
-                                         #        "validation":"Ignore"
-                                         #    },
-                                         #     "Content": {
-                                         #         "showTop": 3,
-                                         #         "action": "Go To Next Block",
-                                         #         "blockToGoID": "gje6D",
-                                         #         "afterMessage": "Your response is recieved",
-                                         #         "databaseType": "Candidates"
-                                         #     },
-                                         # },
+                                         {
+                                            "ID": "834hf",
+                                            "DataType": enums.DataType.JobSalary.value,
+                                            "Type": "User Input",
+                                            "StoreInDB": True,
+                                            "Skippable": False,
+                                            "Content": {
+                                                "action": "Go To Next Block",
+                                                "text": "What's salary are you offering",
+                                                "blockToGoID": "by_GnLY-f",
+                                                "afterMessage": "Your input is being processed..."
+                                            }
+                                         },
+                                         {
+                                            "ID":"by_GnLY-f",
+                                            "Type":"Solutions",
+                                            "StoreInDB":False,
+                                            "Skippable":False,
+                                            "DataType":{
+                                                "name":"No Type",
+                                                "userTypes":[],
+                                                "validation":"Ignore"
+                                            },
+                                             "Content": {
+                                                 "showTop": 3,
+                                                 "action": "Go To Next Block",
+                                                 "blockToGoID": "gje6D",
+                                                 "afterMessage": "We will contact you with this candidate",
+                                                 "databaseType": "Candidates"
+                                             },
+                                         },
                                          # {
                                          #     "ID": "gje6D",
                                          #     "DataType": enums.DataType.CandidateEmail.value,
@@ -102,34 +102,34 @@ def gen_dummy_data():
                                          #         "afterMessage": "Your email is in good hands :) Bye!"
                                          #     }
                                          # },
-                                         {
-                                             "ID": "hkwt845",
-                                             "DataType": enums.DataType.CandidateSkills.value,
-                                             "Type": "File Upload",
-                                             "StoreInDB": True,
-                                             "Skippable": True,
-                                             "Content": {
-                                                 "action": "Go To Next Block",
-                                                 "text": "Upload CV1",
-                                                 "blockToGoID": "gjdfl34",
-                                                 "afterMessage": "File processed!",
-                                                 "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
-                                             }
-                                         },
-                                         {
-                                             "ID": "gjdfl34",
-                                             "DataType": enums.DataType.CandidateSkills.value,
-                                             "Type": "File Upload",
-                                             "StoreInDB": True,
-                                             "Skippable": True,
-                                             "Content": {
-                                                 "action": "End Chat",
-                                                 "text": "Upload CV2",
-                                                 "blockToGoID": None,
-                                                 "afterMessage": "File processed!",
-                                                 "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
-                                             }
-                                         },
+                                         # {
+                                         #     "ID": "hkwt845",
+                                         #     "DataType": enums.DataType.CandidateSkills.value,
+                                         #     "Type": "File Upload",
+                                         #     "StoreInDB": True,
+                                         #     "Skippable": True,
+                                         #     "Content": {
+                                         #         "action": "Go To Next Block",
+                                         #         "text": "Upload CV1",
+                                         #         "blockToGoID": "gjdfl34",
+                                         #         "afterMessage": "File processed!",
+                                         #         "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
+                                         #     }
+                                         # },
+                                         # {
+                                         #     "ID": "gjdfl34",
+                                         #     "DataType": enums.DataType.CandidateSkills.value,
+                                         #     "Type": "File Upload",
+                                         #     "StoreInDB": True,
+                                         #     "Skippable": True,
+                                         #     "Content": {
+                                         #         "action": "End Chat",
+                                         #         "text": "Upload CV2",
+                                         #         "blockToGoID": None,
+                                         #         "afterMessage": "File processed!",
+                                         #         "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
+                                         #     }
+                                         # },
                                      ]
                                  }
                              ]

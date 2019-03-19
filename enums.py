@@ -44,8 +44,9 @@ class UserType(Enum):
 
 
 class DatabaseType(Enum):
-    Candidates = {'name': 'Candidates'}
-    Jobs = {'name': 'Jobs'}
+    # multiplying userTypes by 3 will help detect the user type in the chatbot
+    Candidates = {'name': 'Candidates', 'userTypes':[UserType.Client.value] * 3}
+    Jobs = {'name': 'Jobs', 'userTypes':[UserType.Candidate.value] * 3}
 
 
 @unique
@@ -91,7 +92,7 @@ class DataType(Enum):
                                     [UserType.Candidate])
 
     CandidateCV = dataTypeCreator('Candidate CV',
-                                    ValidationType.String,
+                                    ValidationType.Ignore,
                                     DataTypeSection.Candidate,
                                     [UserType.Candidate])
 
@@ -150,7 +151,7 @@ class DataType(Enum):
                                 [UserType.Candidate, UserType.Client])
 
     JobSalary = dataTypeCreator('Job Salary',
-                                ValidationType.String,
+                                ValidationType.Number,
                                 DataTypeSection.Job,
                                 [UserType.Candidate, UserType.Client])
 

@@ -224,10 +224,6 @@ def scan(session, assistantHashID):
             .filter(and_(Database.CompanyID == assistant.CompanyID,
                          Database.Type == databaseType)).all()
 
-
-        # if len(databases) == 0 : raise Exception
-        print([d[0] for d in databases])
-
         # Scan database for solutions based on database type
         if databaseType == enums.DatabaseType.Candidates:
             return scanCandidates(session, [d[0] for d in databases], databaseType)
@@ -255,9 +251,13 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
         df['count'] = 0 # add column for tracking score
 
         # Numbers
-        # Received DataType: DesiredSalary <> Column: DesiredSalary | points=3
+        # Received DataType: CandidateDesiredSalary <> Column: CandidateDesiredSalary | points=3
         if keywords.get(DT.CandidateDesiredSalary.value['name']):
             df.loc[df[Candidate.CandidateDesiredSalary.name] <= float(keywords[DT.CandidateDesiredSalary.value['name']][-1]), 'count'] += 3
+
+        # Received DataType: JobSalary <> Column: DesiredSalary | points=3
+        if keywords.get(DT.JobSalary.value['name']):
+            df.loc[df[Candidate.CandidateDesiredSalary.name] <= float(keywords[DT.JobSalary.value['name']][-1]), 'count'] += 3
 
 
         # Received DataType: CandidateYearsExperience <> Column: CandidateYearsExperience | points=5
@@ -316,13 +316,11 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
             df['count'] += df[Candidate.CandidateAvailability.name].str.count('|'.join(keywords[DT.CandidateAvailability.value['name']]),
                                                                                 flags=re.IGNORECASE)
 
-
         topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 2), 'count')
                                 .to_json(orient='records'))
         data = []
-        for tr in topResults:
-
-            # A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q
+        indexes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+        for i, record in enumerate(topResults):
 
             ########################
             #      Candidate A     #
@@ -334,11 +332,11 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
             #----------------------#
 
             data.append({
-                "id": tr["ID"],
-                "databaseType": databaseType.name,
-                "title": tr[Candidate.DesiredPosition.name],
-                "description": tr[Candidate.CandidateSkills.name],
-                "tail": "Salary: " + str(tr[Candidate.DesiredSalary.name])
+                "id": record["ID"],
+                "databaseType": databaseType.value,
+                "title": "Candidate " + indexes[i],
+                "subTitle": "Location: " + str(record[Candidate.CandidateLocation.name]),
+                "description": "Skills: " + record[Candidate.CandidateSkills.name],
             })
 
         return Callback(True, '', data)
@@ -426,7 +424,7 @@ def scanJobs(session, dbIDs, databaseType: DatabaseType):
         for tr in topResults:
             data.append({
                 "id": tr["ID"],
-                "databaseType": databaseType.name,
+                "databaseType": databaseType.value,
                 "title": tr[Job.Title.name],
                 "description": tr[Job.Description.name],
                 "tail": "Salary: " + str(tr[Job.Salary.name])

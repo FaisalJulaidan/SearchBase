@@ -78,7 +78,6 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
     if not callback.Success:
         return helpers.jsonResponse(False, 404, "Session not found.", None)
     session: ChatbotSession = callback.Data
-    print(2)
 
     if request.method == 'POST':
 

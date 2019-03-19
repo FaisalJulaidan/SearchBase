@@ -75,7 +75,7 @@ class Solutions extends Component {
                                 message: "Please set how many solutions to return",
                             }],
                         })(
-                            <Input min="1" type="number" placeholder="Ex: 5"/>
+                            <Input min="1" max="10" type="number" placeholder="Ex: 5"/>
                         )}
                     </FormItem>
 

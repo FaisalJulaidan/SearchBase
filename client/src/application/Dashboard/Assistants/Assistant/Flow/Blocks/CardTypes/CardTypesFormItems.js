@@ -205,7 +205,7 @@ export const ButtonsForm = (handleNewBlock, handleEditBlock, handleDeleteBlock, 
 };
 
 
-export const FileTypesFormItem = ({FormItem, block, layout, getFieldDecorator, typesAllowed, setStateHandler}) => (
+export const FileTypesFormItem = ({FormItem, block, layout, getFieldDecorator, typesAllowed}) => (
     <FormItem label="File Types" {...layout}>
         {
             typesAllowed ?
@@ -216,8 +216,7 @@ export const FileTypesFormItem = ({FormItem, block, layout, getFieldDecorator, t
                         message: "Please select the accepted file type",
                     }]
                 })(
-                    <CheckboxGroup options={typesAllowed}
-                                   onChange={(checkedValues) => setStateHandler(onFileTypeChange(checkedValues))}/>
+                    <CheckboxGroup options={typesAllowed}/>
                 )
                 : <Spin/>
         }

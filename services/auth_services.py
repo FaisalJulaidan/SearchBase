@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, create_refresh_token
 
-from models import Callback, User, UserSettings, db
+from models import Callback, User, db
 from services import user_services, role_services, sub_services, company_services, mail_services
 from utilities import helpers
 from config import BaseConfig
@@ -50,9 +50,6 @@ def signup(details) -> Callback:
                                          details['telephone'],
                                          company,
                                          ownerRole.Data)
-
-    # Create userSettings for this user
-    db.session.add(UserSettings(User=user_callback.Data))
 
 
     # Subscribe to basic plan with 14 trial days

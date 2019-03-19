@@ -21,6 +21,8 @@ class Profile extends Component {
         key: 'input',
         render: (text, dataType, index) => {
             let values = this.props.session.Data.keywordsByDataType[dataType.name];
+            console.log(dataType.name);
+            console.log(this.props.session.Data.keywordsByDataType);
             let inputs = [];
             if(values){
                 values.forEach(input => {

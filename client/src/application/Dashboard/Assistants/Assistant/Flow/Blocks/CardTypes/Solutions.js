@@ -28,13 +28,14 @@ class Solutions extends Component {
     onSubmit = (formBlock) => this.props.form.validateFields((err, values) => {
         if (!err) {
             const flowOptions = this.props.options.flow;
+            const showTop = Number(values.showTop) > 10 ? 10 : Number(values.showTop);
             let options = {
                     Type: 'Solutions',
                     StoreInDB: false,
                     Skippable: false,
                     DataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
                     Content: {
-                        showTop: Number(values.showTop),
+                        showTop: showTop,
                         action: values.action,
                         blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                         afterMessage: values.afterMessage || "" ,
@@ -66,7 +67,7 @@ class Solutions extends Component {
                 <Form layout='horizontal'>
 
                     <FormItem label="Show Top Results"
-                              extra="Number of results you want to return (Best matches e.g. Clients, Candidates, etc.)"
+                              extra="Number of results you want to return (Best matches e.g. Clients, Candidates, etc.) max: 10"
                               {...layout}>
                         {getFieldDecorator('showTop', {
                             initialValue: block.Content.showTop,
@@ -75,7 +76,7 @@ class Solutions extends Component {
                                 message: "Please set how many solutions to return",
                             }],
                         })(
-                            <Input min="1" type="number" placeholder="Ex: 5"/>
+                            <Input min="1" max="10" type="number" placeholder="Ex: 5"/>
                         )}
                     </FormItem>
 

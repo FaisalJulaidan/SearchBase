@@ -15,6 +15,7 @@ def getOptions(industry=None) -> Callback:
             'types': [a.value for a in enums.BlockType],
             'userTypes': [uiv.value for uiv in enums.UserType],
             'dataTypes': [uiv.value for uiv in enums.DataType],
+            'dataTypeSections': [dts.value for dts in enums.DataTypeSection],
             'blockTypes': [
                 {
                     'name': enums.BlockType.UserInput.value,
@@ -55,7 +56,7 @@ def getOptions(industry=None) -> Callback:
             {
                 'group': 'Recruitment',
                 'children': [
-                    {'label': 'Recruitment 1', 'fileName': 'recruitment1'},
+                    {'label': 'Recruitment', 'fileName': 'recruitment1'},
                     {'label': 'Appointment Scheduler', 'fileName': 'appointment-scheduler'},
                     {'label': 'Join Us', 'fileName': 'join-us'},
                 ]

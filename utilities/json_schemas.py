@@ -47,10 +47,12 @@ flow = {
                         "DataType": {"type": "object",
                                      "properties": {
                                          "name": {"enum": [e.value['name'] for e in enums.DataType]},
-                                         "validation": {"enum": [e.value for e in enums.ValidationType]}
+                                         "validation": {"enum": [e.value for e in enums.ValidationType]},
+                                         'dataTypeSection': {"enum": [e.value for e in enums.DataTypeSection]},
+                                         'userTypes': {"type": "array", "items": {"type": "string"}},
                                      },
-                                     "required": ["name", "validation"],
-                                     "additionalProperties": True
+                                     "required": ["name", "validation", "dataTypeSection", "userTypes"],
+                                     "additionalProperties": False
                                      },
 
                         "Type": {"enum": [e.value for e in enums.BlockType]},

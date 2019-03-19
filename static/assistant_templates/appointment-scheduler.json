@@ -1,0 +1,237 @@
+{
+  "groups": [
+    {
+      "blocks": [
+        {
+          "Type": "User Input",
+          "StoreInDB": true,
+          "Skippable": false,
+          "DataType": {
+            "name": "Name",
+            "userTypes": [
+              "Job Seeker",
+              "Candidate Seeker"
+            ],
+            "validation": "String"
+          },
+          "Content": {
+            "text": "What is your name?",
+            "blockToGoID": "X5EPQ4e2w",
+            "action": "Go To Next Block",
+            "afterMessage": "Thank you for that information."
+          },
+          "ID": "n78CGoEvf"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "Thank you for that information",
+            "blockToGoID": "5WtliE3_8",
+            "text": "What is the best date for us to get back to you? Enter a day such as 'Sunday' or 26/07/2019"
+          },
+          "DataType": {
+            "name": "Contact Time",
+            "userTypes": [
+              "Candidate Seeker",
+              "Job Seeker"
+            ],
+            "validation": "Ignore"
+          },
+          "ID": "X5EPQ4e2w",
+          "Skippable": true,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "answers": [
+              {
+                "action": "Go To Next Block",
+                "afterMessage": "",
+                "blockToGoID": "LC_Rr7ZUg",
+                "id": "7wXv4ZtTv",
+                "keywords": [],
+                "text": "Morning"
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "",
+                "blockToGoID": "0RQj3XDlU",
+                "id": "4SlLW8Qsg",
+                "keywords": [],
+                "text": "Evening"
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "",
+                "blockToGoID": "AgolpOovG",
+                "id": "1q8de5yi0",
+                "keywords": [],
+                "text": "Afternoon"
+              }
+            ],
+            "text": "When is the best time for us to get back to you?"
+          },
+          "DataType": {
+            "name": "Contact Time",
+            "userTypes": [
+              "Candidate Seeker",
+              "Job Seeker"
+            ],
+            "validation": "Ignore"
+          },
+          "ID": "5WtliE3_8",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "Question"
+        },
+        {
+          "Content": {
+            "answers": [
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "Great, lets take some contact details from you.",
+                "blockToGoID": "dggA9XO3Y",
+                "id": "2bbUo9_O6",
+                "keywords": [],
+                "text": "9-10am"
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "Great, lets take some contact details from you.",
+                "blockToGoID": "dggA9XO3Y",
+                "id": "kqH2SzJhi",
+                "keywords": [],
+                "text": "10-11am"
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "Great, lets take some contact details from you.",
+                "blockToGoID": "dggA9XO3Y",
+                "id": "7GCTGkTMJ",
+                "keywords": [],
+                "text": "11-12pm"
+              }
+            ],
+            "text": "What time in the morning is best for you?"
+          },
+          "DataType": {
+            "name": "Contact Time",
+            "userTypes": [
+              "Candidate Seeker",
+              "Job Seeker"
+            ],
+            "validation": "Ignore"
+          },
+          "ID": "LC_Rr7ZUg",
+          "Skippable": false,
+          "StoreInDB": false,
+          "Type": "Question"
+        },
+        {
+          "Content": {
+            "answers": [
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "Great, let's take some contact details from you",
+                "blockToGoID": "dggA9XO3Y",
+                "id": "P5-04gpwa",
+                "keywords": [],
+                "text": "12-2pm"
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "Great, let's take some contact details from you",
+                "blockToGoID": "dggA9XO3Y",
+                "id": "DJMXASXGV",
+                "keywords": [],
+                "text": "2-4pm"
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "Great, let's take some contact details from you",
+                "blockToGoID": "dggA9XO3Y",
+                "id": "JSHvXtggu",
+                "keywords": [],
+                "text": "4-5pm"
+              }
+            ],
+            "text": "What time in the afternoon is best for us to contact you on?"
+          },
+          "DataType": {
+            "name": "No Type",
+            "userTypes": [],
+            "validation": "Ignore"
+          },
+          "ID": "AgolpOovG",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "Question"
+        },
+        {
+          "Content": {
+            "action": "Go To Specific Block",
+            "afterMessage": "Thank you for your information. We'll be in-touch with you soon.",
+            "blockToGoID": "dggA9XO3Y",
+            "text": "We may not be able to contact you in the evening, but provide us with a time that's best for you and we'll try our best. Enter a time such as '7pm' in the message box below"
+          },
+          "DataType": {
+            "name": "Contact Time",
+            "userTypes": [
+              "Candidate Seeker",
+              "Job Seeker"
+            ],
+            "validation": "Ignore"
+          },
+          "ID": "0RQj3XDlU",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "",
+            "blockToGoID": "zIb-G7MUG",
+            "text": "What is the best email address to contact you on?"
+          },
+          "DataType": {
+            "name": "Email",
+            "userTypes": [
+              "Job Seeker",
+              "Candidate Seeker"
+            ],
+            "validation": "Email"
+          },
+          "ID": "dggA9XO3Y",
+          "Skippable": true,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "action": "End Chat",
+            "afterMessage": "That's all of the information we need. One of our team members will be in touch with you soon.",
+            "blockToGoID": null,
+            "text": "What is the best mobile number to contact you on?"
+          },
+          "DataType": {
+            "name": "Telephone",
+            "userTypes": [
+              "Job Seeker",
+              "Candidate Seeker"
+            ],
+            "validation": "Telephone"
+          },
+          "ID": "zIb-G7MUG",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        }
+      ],
+      "description": "Chat",
+      "id": "VwCD92dIY",
+      "name": "Main"
+    }
+  ]
+}

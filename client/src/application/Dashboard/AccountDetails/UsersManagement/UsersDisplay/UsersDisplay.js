@@ -1,6 +1,6 @@
 import React from "react";
 
-import {Button, Form, Input, InputNumber, Popconfirm, Table,} from 'antd';
+import {Button, Form, Input, Select, Popconfirm, Table,} from 'antd';
 import {isEmpty} from "lodash";
 import UserModal from "./UserModal/UserModal";
 import styles from "./UsersDisplay.less"
@@ -8,6 +8,7 @@ import styles from "./UsersDisplay.less"
 
 const data = [];
 const FormItem = Form.Item;
+const Option = Select.Option;
 const EditableContext = React.createContext();
 
 const EditableRow = ({form, index, ...props}) => (
@@ -16,12 +17,19 @@ const EditableRow = ({form, index, ...props}) => (
     </EditableContext.Provider>
 );
 
+
 const EditableFormRow = Form.create()(EditableRow);
 
 class EditableCell extends React.Component {
     getInput = () => {
-        if (this.props.inputType === 'number') {
-            return <InputNumber/>;
+        const {record} = this.props;
+        if (this.props.inputType === 'role') {
+            return (
+                <Select disabled={record.Role.Name === "Owner"} placeholder="Select a role">
+                    <Option value="Admin">Admin</Option>
+                    <Option value="User">User</Option>
+                </Select>
+            );
         }
         return <Input/>;
     };
@@ -177,8 +185,8 @@ class UsersDisplay extends React.Component {
                 const item = newData[index];
                 const newRecord = {...item, ...row};
 
-                console.log("item", item)
-                console.log("newRecord", newRecord)
+                console.log("item", item);
+                console.log("newRecord", newRecord);
                 this.props.editUser(newRecord);
 
                 newData.splice(index, 1, newRecord);
@@ -218,7 +226,7 @@ class UsersDisplay extends React.Component {
                 ...col,
                 onCell: record => ({
                     record,
-                    inputType: col.dataIndex === 'age' ? 'number' : 'text',
+                    inputType: col.dataIndex === 'RoleName' ? 'role' : 'text',
                     dataIndex: col.dataIndex,
                     title: col.title,
                     editing: this.isEditing(record),

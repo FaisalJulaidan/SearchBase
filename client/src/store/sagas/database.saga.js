@@ -9,11 +9,11 @@ function* getDatabasesList() {
         loadingMessage('Loading databases list');
         const res = yield http.get(`/databases`);
         yield put(databaseActions.getDatabasesListSuccess(res.data.data));
-        successMessage('Databases loaded')
     } catch (error) {
         console.log(error);
-        yield put(databaseActions.getDatabasesListFailure("Database list error"));
-        errorMessage("Couldn't load databases list");
+        const msg = "Couldn't load databases list";
+        yield put(databaseActions.getDatabasesListFailure(msg));
+        errorMessage(msg);
 
     }
 }
@@ -31,8 +31,10 @@ function* fetchDatabase({databaseID, pageNumber}) {
         successMessage('Database loaded');
     } catch (error) {
         console.log(error);
-        errorMessage("Couldn't load database");
-        yield put(databaseActions.fetchDatabaseFailure(error.response.data));
+        const msg = "Couldn't load database's content";
+        yield put(databaseActions.fetchDatabaseFailure(msg));
+        errorMessage(msg);
+
     }
 }
 function* watchFetchDatabase() {
@@ -46,13 +48,14 @@ function* uploadDatabase({newDatabase}) {
     try {
         loadingMessage('Uploading database...', 0);
         const res = yield http.post(`/databases`, newDatabase);
-        successMessage('Database uploaded');
         yield put(databaseActions.uploadDatabaseSuccess(res.data.msg, res.data.data));
+        successMessage('Database uploaded');
 
     } catch (error) {
         console.log(error);
-        yield put(databaseActions.uploadDatabaseFailure(error.response.data));
-        errorMessage("Couldn't upload database");
+        const msg = "Couldn't upload new database";
+        yield put(databaseActions.uploadDatabaseFailure(msg));
+        errorMessage(msg);
     }
 }
 function* watchAddDatabase() {
@@ -71,8 +74,9 @@ function* deleteDatabase({databaseID}) {
 
     } catch (error) {
         console.log(error);
-        yield put(databaseActions.deleteDatabaseFailure(error.response.data));
-        errorMessage("Couldn't delete database");
+        const msg = "Couldn't delete database";
+        yield put(databaseActions.deleteDatabaseFailure(msg));
+        errorMessage(msg);
     }
 }
 function* watchDeleteDatabase() {
@@ -85,13 +89,15 @@ function* updateDatabase({data, databaseID}) {
     try {
         loadingMessage('Updating database...', 0);
         const res = yield http.put(`/databases/${databaseID}`, data);
-        successMessage('Database updated');
         yield put(databaseActions.updateDatabaseSuccess(res.data.msg, res.data.data));
         yield put(databaseActions.getDatabasesList());
+        successMessage('Database updated');
 
     } catch (error) {
-        yield put(databaseActions.updateDatabaseFailure(error.response.data));
-        errorMessage("Couldn't update database");
+        console.log(error);
+        const msg = "Couldn't update database";
+        yield put(databaseActions.updateDatabaseFailure(msg));
+        errorMessage(msg);
     }
 }
 

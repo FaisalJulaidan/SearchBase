@@ -31,9 +31,7 @@ function* login({email, password}) {
     } catch (error) {
         console.log(error);
         yield put(authActions.loginFailure(error.response.data));
-        yield errorMessage(error.response.data.msg, 0);
-
-
+        errorMessage(error.response.data.msg, 0);
     }
 }
 
@@ -49,16 +47,18 @@ function* signup({signupDetails}) {
         const res = yield axios.post(`/api/signup`, {...signupDetails}, {
             headers: {'Content-Type': 'application/json'},
         });
-        yield successMessage('Account created');
         yield put(authActions.signupSuccess());
+        successMessage('Account created');
 
+
+        // Redirect to login ans ask user to verify account
         yield history.push('/login');
-        yield warningMessage('Please verify your account', 0);
+        warningMessage('Please check your email to verify your account', 0);
 
     } catch (error) {
         console.log(error);
         yield put(authActions.signupFailure(error.response.data));
-        yield errorMessage(error.response.data.msg, 0);
+        errorMessage(error.response.data.msg, 0);
     }
 }
 
@@ -74,13 +74,14 @@ function* forgetPassword({data}) {
         yield axios.post(`/api/reset_password`, {...data}, {
             headers: {'Content-Type': 'application/json'},
         });
-        yield successMessage('Email to reset your password has been sent');
         yield put(authActions.resetPasswordSuccess());
-
+        successMessage('Email to reset your password has been sent');
     } catch (error) {
         console.log(error);
-        yield errorMessage('Could not send reset password email', 0);
-        yield put(authActions.resetPasswordFailure(error.response.data));
+        const msg = "Couldn't send reset password to this email";
+        yield put(authActions.resetPasswordFailure(msg));
+        errorMessage(msg, 0);
+
     }
 }
 
@@ -91,18 +92,20 @@ function* watchForgetPassword() {
 function* newResetPassword({data}) {
     try {
         loadingMessage('Saving new password...', 0);
-        yield axios.post(`/api/reset_password/`+data["payload"], {...data}, {
+        yield axios.post(`/api/reset_password/`+ data["payload"], {...data}, {
             headers: {'Content-Type': 'application/json'},
         });
-        successMessage('The password for your account has been updated');
         yield put(authActions.newResetPasswordSuccess());
+        successMessage('The password for your account has been updated');
+
         yield history.push('/login');
         successMessage('Login using your new password', 0);
 
     } catch (error) {
         console.log(error);
-        yield errorMessage('Could not update account password', 0);
-        yield put(authActions.newResetPasswordFailure(error.response.data));
+        const msg = "Couldn't update account password";
+        yield put(authActions.newResetPasswordFailure(msg));
+        errorMessage(msg, 0);
     }
 }
 
@@ -116,8 +119,7 @@ function* logout() {
     // Clear local storage from user, token...
     yield localStorage.clear();
     yield history.push('/login');
-    yield successMessage('You have been logged out');
-
+    successMessage('You have been logged out');
 }
 
 function* watchLogout() {

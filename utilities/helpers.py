@@ -58,40 +58,36 @@ def gen_dummy_data():
                                      "name": "group 1",
                                      "description": "The best group",
                                      "blocks": [
-                                         # {
-                                         #     "ID": "834hf",
-                                         #     "DataType": enums.DataType.DesiredSalary.value,
-                                         #     "Type": "User Input",
-                                         #     "StoreInDB": True,
-                                         #     "Skippable": False,
-                                         #     "Content": {
-                                         #         "action": "Go To Next Block",
-                                         #         "text": "What's salary are you offering",
-                                         #         "blockToGoID": "by_GnLY-f",
-                                         #         "afterMessage": "Your input is being processed..."
-                                         #     }
-                                         # },
-                                         # {
-                                         #    "ID":"by_GnLY-f",
-                                         #    "Type":"Solutions",
-                                         #    "StoreInDB":False,
-                                         #    "Skippable":False,
-                                         #    "DataType":{
-                                         #        "name":"No Type",
-                                         #        "userTypes":[],
-                                         #        "validation":"Ignore"
-                                         #    },
-                                         #     "Content": {
-                                         #         "showTop": 3,
-                                         #         "action": "Go To Next Block",
-                                         #         "blockToGoID": "gje6D",
-                                         #         "afterMessage": "Your response is recieved",
-                                         #         "databaseType": "Candidates"
-                                         #     },
-                                         # },
+                                         {
+                                            "ID": "834hf",
+                                            "DataType": enums.DataType.CandidateSkills.value,
+                                            "Type": "User Input",
+                                            "StoreInDB": True,
+                                            "Skippable": False,
+                                            "Content": {
+                                                "action": "Go To Next Block",
+                                                "text": "What's salary are you offering",
+                                                "blockToGoID": "by_GnLY-f",
+                                                "afterMessage": "Your input is being processed..."
+                                            }
+                                         },
+                                         {
+                                            "ID":"by_GnLY-f",
+                                            "Type":"Solutions",
+                                            "StoreInDB":False,
+                                            "Skippable":False,
+                                            "DataType":enums.DataType.NoType.value,
+                                             "Content": {
+                                                 "showTop": 3,
+                                                 "action": "Go To Next Block",
+                                                 "blockToGoID": "gje6D",
+                                                 "afterMessage": "We will contact you with this candidate",
+                                                 "databaseType": "Candidates"
+                                             },
+                                         },
                                          # {
                                          #     "ID": "gje6D",
-                                         #     "DataType": enums.DataType.Email.value,
+                                         #     "DataType": enums.DataType.CandidateEmail.value,
                                          #     "Type": "User Input",
                                          #     "StoreInDB": True,
                                          #     "Skippable": False,
@@ -102,34 +98,34 @@ def gen_dummy_data():
                                          #         "afterMessage": "Your email is in good hands :) Bye!"
                                          #     }
                                          # },
-                                         {
-                                             "ID": "hkwt845",
-                                             "DataType": enums.DataType.CandidateSkills.value,
-                                             "Type": "File Upload",
-                                             "StoreInDB": True,
-                                             "Skippable": True,
-                                             "Content": {
-                                                 "action": "Go To Next Block",
-                                                 "text": "Upload CV1",
-                                                 "blockToGoID": "gjdfl34",
-                                                 "afterMessage": "File processed!",
-                                                 "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
-                                             }
-                                         },
-                                         {
-                                             "ID": "gjdfl34",
-                                             "DataType": enums.DataType.CandidateSkills.value,
-                                             "Type": "File Upload",
-                                             "StoreInDB": True,
-                                             "Skippable": True,
-                                             "Content": {
-                                                 "action": "End Chat",
-                                                 "text": "Upload CV2",
-                                                 "blockToGoID": None,
-                                                 "afterMessage": "File processed!",
-                                                 "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
-                                             }
-                                         },
+                                         # {
+                                         #     "ID": "hkwt845",
+                                         #     "DataType": enums.DataType.CandidateSkills.value,
+                                         #     "Type": "File Upload",
+                                         #     "StoreInDB": True,
+                                         #     "Skippable": True,
+                                         #     "Content": {
+                                         #         "action": "Go To Next Block",
+                                         #         "text": "Upload CV1",
+                                         #         "blockToGoID": "gjdfl34",
+                                         #         "afterMessage": "File processed!",
+                                         #         "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
+                                         #     }
+                                         # },
+                                         # {
+                                         #     "ID": "gjdfl34",
+                                         #     "DataType": enums.DataType.CandidateSkills.value,
+                                         #     "Type": "File Upload",
+                                         #     "StoreInDB": True,
+                                         #     "Skippable": True,
+                                         #     "Content": {
+                                         #         "action": "End Chat",
+                                         #         "text": "Upload CV2",
+                                         #         "blockToGoID": None,
+                                         #         "afterMessage": "File processed!",
+                                         #         "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
+                                         #     }
+                                         # },
                                      ]
                                  }
                              ]
@@ -216,17 +212,17 @@ def gen_dummy_data():
     }
     s1 = ChatbotSession(Data=data, DateTime=datetime.now(),
                         TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
-                        UserType=enums.UserType.JobSeeker, Assistant=reader_a)
+                        UserType=enums.UserType.Candidate, Assistant=reader_a)
     db.session.add(s1)
     db.session.add(ChatbotSession(Data=data, DateTime=datetime.now() - timedelta(days=10),
                                   TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
-                                  UserType=enums.UserType.CandidateSeeker, Assistant=reader_a))
+                                  UserType=enums.UserType.Client, Assistant=reader_a))
 
     # add chatbot session in bulk
     for i in range(50):
         db.session.add(ChatbotSession(Data=data, DateTime=datetime.now() - timedelta(days=i),
                                       TimeSpent=i+40, SolutionsReturned=i+3, QuestionsAnswered=i+4,
-                                      UserType=enums.UserType.JobSeeker, Assistant=reader_a))
+                                      UserType=enums.UserType.Candidate, Assistant=reader_a))
 
 
     db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidates, Company=aramco)
@@ -236,28 +232,26 @@ def gen_dummy_data():
     db.session.add(db2)
 
     db.session.add(addCandidate(db1, 'Faisal', 2000, "Software Engineer", "python, java, javascript, SQL",
-                                5, "London","contract", 30))
+                                5, "London"))
 
     db.session.add(addCandidate(db1, 'Mohammed', 4000, "Software Engineer", "python, SQL",
-                                10, "Cardiff","Contract", 50))
+                                10, "Cardiff"))
 
     db.session.add(addCandidate(db2, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
-                                2, "Cardiff","Contract", 20))
+                                2, "Cardiff"))
 
     seed() # will save changes as well
-    db.session.delete(s1)
 
 
 
-def addCandidate(db, name, ds, dp, cs, ye, pl, pe, ehr):
-    return Candidate(Database=db, Name=name,
-                     DesiredSalary=ds,
-                     DesiredPosition=dp,
-                     CandidateSkills =cs,
-                     YearsExp = ye,
-                     PreferredLocation = pl,
-                     PreferredEmploymentType = pe,
-                     DesiredPayRate = ehr)
+def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
+    return Candidate(Database=db,
+                     CandidateName=name,
+                     CandidateDesiredSalary=desiredSalary,
+                     CandidateJobTitle=jobTitle,
+                     CandidateSkills =skills,
+                     CandidateYearsExperience = exp,
+                     CandidateLocation = location)
 
 
 

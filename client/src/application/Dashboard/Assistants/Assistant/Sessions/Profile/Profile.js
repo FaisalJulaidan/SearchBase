@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Table} from "antd";
+import {Button, Table, Empty} from "antd";
 
 
 
@@ -21,6 +21,8 @@ class Profile extends Component {
         key: 'input',
         render: (text, dataType, index) => {
             let values = this.props.session.Data.keywordsByDataType[dataType.name];
+            console.log(dataType.name);
+            console.log(this.props.session.Data.keywordsByDataType);
             let inputs = [];
             if(values){
                 values.forEach(input => {
@@ -28,13 +30,13 @@ class Profile extends Component {
                         this.counter += 1;
                         inputs.push(this.createDownloadFileBtn(this.counter))
                     } else {
-                        inputs.push(<p>{input} </p>)
+                        inputs.push(input + " ")
                     }
                 });
             }
             return (
                     <React.Fragment>
-                        {inputs.map((input) => input)}
+                        {inputs.map((input) => (input))}
                     </React.Fragment>
                 )
         }
@@ -52,13 +54,15 @@ class Profile extends Component {
         const {session, dataTypes} = this.props;
         console.log(this.state);
         return (
-            <Table columns={this.columns}
-                   dataSource={dataTypes.filter((type) => type.userTypes.includes(session.UserType))}
-                   size='middle'
-                   pagination={false}
-            />
+            session?.UserType !== "Unknown" ?
+                <Table
+                    columns={this.columns}
+                    dataSource={dataTypes.filter((type) => type.userTypes.includes(session.UserType))}
+                    size='middle'
+                    pagination={false}
+                />
+                : <Empty description={"Profile cannot be auto-generated for Unknown user type 😞"}/>
         );
     }
 }
-
 export default Profile;

@@ -20,7 +20,7 @@ export const profile = (state = initialState, action) => {
             return updateObject(state, {
                 profile: {},
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
 
@@ -38,7 +38,7 @@ export const profile = (state = initialState, action) => {
         case actionTypes.SAVE_PROFILE_DETAILS_FAILURE:
             return updateObject(state, {
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
 
 
@@ -56,7 +56,7 @@ export const profile = (state = initialState, action) => {
         case actionTypes.SAVE_DATA_SETTINGS_FAILURE:
             return updateObject(state, {
                 isLoading: false,
-                errorMsg: action.error.msg
+                errorMsg: action.error
             });
         default:
             return state

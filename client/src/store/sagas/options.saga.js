@@ -1,7 +1,7 @@
 import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {optionsActions} from "../actions";
-import {http} from "../../helpers";
+import {errorMessage, warningMessage, http} from "../../helpers";
 
 
 function* fetchOptions() {
@@ -10,9 +10,10 @@ function* fetchOptions() {
         yield put(optionsActions.getOptionsSuccess(res.data.data));
     } catch (error) {
         console.log(error);
-        return yield put(optionsActions.getOptionsFailure("Get options error"));
+        const msg = "Couldn't load dashboard options";
+        yield put(optionsActions.getOptionsFailure(msg));
+        warningMessage("Server has been updated, login again please to avoid errors!", 0);
     }
-
 }
 
 function* watchFetchOptions() {

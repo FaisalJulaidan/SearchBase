@@ -67,7 +67,7 @@ class ViewsModal extends Component {
 
                     <TabPane tab={`Profile (${userType})`} key={"2"}>
                         <Profile session={session} downloadFile={this.downloadFileHandler}
-                                 dataTypes={flowOptions.dataTypes} />
+                                 dataTypes={flowOptions?.dataTypes} />
                     </TabPane>
 
                     <TabPane tab={"Selected Solutions (Candidates, Jobs)"} key={"3"}>

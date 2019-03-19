@@ -180,7 +180,12 @@ class NewDatabaseModal extends Component {
                         }
                         {
                             current === this.steps.length - 1
-                            && <Button type="primary" onClick={this.submitDatabase}>Done</Button>
+                            && <Button type="primary"
+                                       onClick={this.submitDatabase}
+                                       disabled={!!(!this.state.validRecords.length)}
+                            >
+                                {!!this.state.validRecords.length ? "Done" : "No valid data to submit"}
+                            </Button>
                         }
                     </div>
                 </Spin>

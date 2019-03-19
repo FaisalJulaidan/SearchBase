@@ -36,13 +36,17 @@ class Question extends Component {
     //Submit whole block
     onSubmit = (formBlock) => this.props.form.validateFields(['text', 'isSkippable', 'storeInDB', 'dataType'],
         (err, values) => {
+
+            console.log("FORM SUBMSSHER ===>");
+            console.log(values);
+            console.log(values.dataType[values.dataType.length-1]);
             if (!err) {
                 const flowOptions = this.props.options.flow;
                 let options = {
                     Type: 'Question',
                     StoreInDB: values.storeInDB,
                     Skippable: values.isSkippable || false,
-                    DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType),
+                    DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType[values.dataType.length-1]),
                     Content: {
                         text: values.text,
                         answers: this.state.answers

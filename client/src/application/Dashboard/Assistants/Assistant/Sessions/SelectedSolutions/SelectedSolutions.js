@@ -31,7 +31,7 @@ class SelectedSolutions extends Component {
                 expandIcon={({isActive}) => <Icon type="caret-right" rotate={isActive ? 90 : 0}/>}>
                 {
                     solutions.map((solution, i) =>
-                        <Panel header={`${solution.type.substring(0, solution.type.length - 1)} ${i + 1} ✅`}
+                        <Panel header={`${solution.databaseType.substring(0, solution.databaseType.length - 1)} ${i + 1} ✅`}
                                key={i}
                                style={customPanelStyle}>
                             <ReactJson src={this.removeNulls(solution.data)}

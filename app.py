@@ -13,6 +13,7 @@ from services.auth_services import jwt
 from utilities import helpers
 from flask_babel import Babel
 from services import databases_services
+import enums
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router,\
@@ -152,14 +153,14 @@ elif os.environ['FLASK_ENV'] == 'development':
     mail.init_app(app)
     app.app_context().push()
 
-    print('Reinitialize the database...')
-    db.drop_all()
-    db.create_all()
-    helpers.gen_dummy_data()
+    if os.environ['REFRESH_DB_IN_DEV'] == 'yes':
+        print('Reinitialize the database...')
+        db.drop_all()
+        db.create_all()
+        helpers.gen_dummy_data()
 
     scheduler.init_app(app)
     scheduler.start()
-
 
     # Run the app server
     print('Development mode running...')

@@ -1,5 +1,5 @@
 from flask import json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, ChatbotSession, Database, Candidate
+from models import db, Role, Company, Assistant, Plan, ChatbotSession, Database, Candidate, Job
 from services import user_services
 from datetime import datetime, timedelta
 from enum import Enum
@@ -311,9 +311,9 @@ def getDictFromSQLAlchemyObj(obj):
             d[key] = getattr(obj, key)
             if isinstance(d[attr.name], Enum):
                 d[key] = d[key].value
-            if key == 'Currency' and d[key]:
+            if key == Candidate.Currency.name and d[key]:
                 d[key] = d[key].code
-            if key == 'StartDate' and d[key]:
+            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and d[key]:
                 d[key] = '/'.join(map(str, [d[key].year, d[key].month, d[key].day]))
     if hasattr(obj, "FilePath"):
         d["FilePath"] = obj.FilePath

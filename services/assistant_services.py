@@ -71,14 +71,13 @@ def getAll(companyID) -> Callback:
         return Callback(False, 'Could not get all assistants.')
 
 
-def getAllWithInstantNotifications(companyID) -> Callback:
+def getAllWithEnabledNotifications(companyID) -> Callback:
     try:
         if companyID:
             # Get result and check if None then raise exception
-            result = db.session.query(Assistant).filter(and_(Assistant.CompanyID == companyID, Assistant.MailEnabled,
-                                                             Assistant.MailPeriod == 0)).all()
+            result = db.session.query(Assistant).filter(and_(Assistant.CompanyID == companyID, Assistant.MailEnabled)).all()
             if len(result) == 0:
-                return Callback(True,"No assistants  to be retrieved.", [])
+                return Callback(True, "No assistants  to be retrieved.", [])
 
             return Callback(True, "Got all assistants  successfully.", result)
 

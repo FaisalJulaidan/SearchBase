@@ -9,6 +9,8 @@ from typing import List
 # 2. Migrate the Database accordingly
 # ===============================================================================================
 
+# TODO What should be stored in the json is the enum name not value this will need a new parsing system for flow and
+# TODO Chatbot session. but is important before the lunch as it will have significant benefits to the system
 
 class ValidationType(Enum):
     Ignore = 'Ignore'
@@ -45,8 +47,8 @@ class UserType(Enum):
 
 class DatabaseType(Enum):
     # multiplying userTypes by 3 will help detect the user type in the chatbot
-    Candidates = {'name': 'Candidates', 'userTypes':[UserType.Client.value] * 3}
-    Jobs = {'name': 'Jobs', 'userTypes':[UserType.Candidate.value] * 3}
+    Candidates = {'name': 'Candidates', 'userTypes':[UserType.Client.value] * 5}
+    Jobs = {'name': 'Jobs', 'userTypes':[UserType.Candidate.value] * 5}
 
 
 @unique
@@ -115,7 +117,7 @@ class DataType(Enum):
     CandidateJobTitle = dataTypeCreator('Candidate Job Title',
                                     ValidationType.String,
                                     DataTypeSection.Candidate,
-                                    [UserType.Candidate])
+                                    [UserType.Client])
 
     CandidateEducation = dataTypeCreator('Candidate Education',
                                     ValidationType.String,
@@ -182,23 +184,26 @@ class DataType(Enum):
 
     # ======================================================================
     # Client
+    # The chances of asking a question with a client data type is very low. however when is it asked it means most of
+    # the time that this user type is a client. For that reason we multiplied Client UserType by 5 to increase
+    # the probability of the userType being a Client at the end :)
 
     ClientName = dataTypeCreator('Client Name',
                                   ValidationType.String,
                                   DataTypeSection.Client,
-                                  [UserType.Client])
+                                  [UserType.Client] * 6)
 
     ClientEmail = dataTypeCreator('Client Email',
                                   ValidationType.Email,
                                   DataTypeSection.Client,
-                                  [UserType.Client])
+                                  [UserType.Client] * 6)
 
     ClientTelephone = dataTypeCreator('Client Telephone',
                                     ValidationType.Telephone,
                                     DataTypeSection.Client,
-                                    [UserType.Client])
+                                    [UserType.Client] * 6)
 
     ClientLocation = dataTypeCreator('Client Location',
                                     ValidationType.String,
                                     DataTypeSection.Client,
-                                    [UserType.Client])
+                                    [UserType.Client] * 6)

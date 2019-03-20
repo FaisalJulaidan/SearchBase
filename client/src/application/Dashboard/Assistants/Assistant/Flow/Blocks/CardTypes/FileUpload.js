@@ -27,15 +27,16 @@ class FileUpload extends Component {
     onSubmit = () => this.props.form.validateFields((err, values) => {
         if (!err) {
             const flowOptions = this.props.options.flow;
+            console.log(values);
             let options = {
                 Type: 'File Upload',
                 StoreInDB: true,
                 Skippable: values.isSkippable || false,
-                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
+                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType[values.dataType.length-1]),
                 Content: {
                     text: values.text,
                     action: values.action,
-                    fileTypes: this.state.fileTypes,
+                    fileTypes: values.fileTypes,
                     blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                     afterMessage: values.afterMessage || ""
                 }
@@ -81,7 +82,6 @@ class FileUpload extends Component {
                                       layout={layout}/>
 
                     <FileTypesFormItem FormItem={FormItem} typesAllowed={typesAllowed} block={block}
-                                       setStateHandler={(state) => this.setState(state)}
                                        getFieldDecorator={getFieldDecorator}
                                        layout={layout}/>
 

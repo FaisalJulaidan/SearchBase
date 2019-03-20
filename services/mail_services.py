@@ -156,20 +156,15 @@ def sendSolutionAlert(record, solutions):
 # NOTIFICATIONS
 def notifyNewChatbotSessionsCountForLastXHours(hours):
     try:
-        # get all user settings
-        userSettings_callback: Callback = user_services.getAllUserSettingsWithEnabled("UserInputNotifications")
-        if not userSettings_callback.Success:
-            raise Exception("userSettings_callback: ", userSettings_callback.Message)
+        # get all users with enabled notifications
+        user_callback: Callback = user_services.getAllUsersWithEnabled("UserInputNotifications")
+        if not user_callback.Success:
+            raise Exception("userSettings_callback: ", user_callback.Message)
 
         # loop through every user setting
-        for record in userSettings_callback.Data:
-            # get the user
-            user_callback: Callback = user_services.getByID(record.ID)
-            if not user_callback.Success:
-                raise Exception("user_callback: ", user_callback.Message)
-
+        for record in user_callback.Data:
             # get their assistants by company id
-            assistants_callback: Callback = assistant_services.getAllWithInstantNotifications(user_callback.Data.CompanyID)
+            assistants_callback: Callback = assistant_services.getAllWithEnabledNotifications(record.CompanyID)
             if not assistants_callback.Success:
                 raise Exception("assistants_callback: ", assistants_callback.Message)
 

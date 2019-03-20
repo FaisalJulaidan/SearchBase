@@ -30,13 +30,13 @@ class Profile extends Component {
                         this.counter += 1;
                         inputs.push(this.createDownloadFileBtn(this.counter))
                     } else {
-                        inputs.push(<p>{input} </p>)
+                        inputs.push(input + " ")
                     }
                 });
             }
             return (
                     <React.Fragment>
-                        {inputs.map((input) => input)}
+                        {inputs.map((input) => (input))}
                     </React.Fragment>
                 )
         }

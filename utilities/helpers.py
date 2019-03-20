@@ -60,7 +60,7 @@ def gen_dummy_data():
                                      "blocks": [
                                          {
                                             "ID": "834hf",
-                                            "DataType": enums.DataType.JobSalary.value,
+                                            "DataType": enums.DataType.CandidateSkills.value,
                                             "Type": "User Input",
                                             "StoreInDB": True,
                                             "Skippable": False,
@@ -76,11 +76,7 @@ def gen_dummy_data():
                                             "Type":"Solutions",
                                             "StoreInDB":False,
                                             "Skippable":False,
-                                            "DataType":{
-                                                "name":"No Type",
-                                                "userTypes":[],
-                                                "validation":"Ignore"
-                                            },
+                                            "DataType":enums.DataType.NoType.value,
                                              "Content": {
                                                  "showTop": 3,
                                                  "action": "Go To Next Block",

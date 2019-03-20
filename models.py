@@ -80,6 +80,12 @@ class User(db.Model):
         deprecated=['md5_crypt']
     ))
     Verified = db.Column(db.Boolean(), nullable=False, default=False)
+
+    TrackingData = db.Column(db.Boolean, nullable=False, default=False)
+    TechnicalSupport = db.Column(db.Boolean, nullable=False, default=False)
+    AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
+    UserInputNotifications = db.Column(db.Boolean, nullable=False, default=False)
+
     LastAccess = db.Column(db.DateTime(), nullable=True)
     CreatedOn = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
@@ -91,9 +97,6 @@ class User(db.Model):
     Role = db.relationship('Role', back_populates='Users')
 
     # NotificationsRegister = db.relationship('NotificationsRegister', back_populates='User')
-
-    Settings = db.relationship("UserSettings", uselist=False, back_populates="User",
-                               cascade="all, delete, delete-orphan")
 
 
     # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
@@ -206,20 +209,6 @@ class Newsletter(db.Model):
 
     def __repr__(self):
         return '<Newsletters {}>'.format(self.Email)
-
-
-class UserSettings(db.Model):
-    ID = db.Column(db.Integer, db.ForeignKey("user.ID", ondelete='cascade'), primary_key=True, unique=True)
-    TrackingData = db.Column(db.Boolean, nullable=False, default=False)
-    TechnicalSupport = db.Column(db.Boolean, nullable=False, default=False)
-    AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
-    UserInputNotifications = db.Column(db.Boolean, nullable=False, default=False)
-
-    # Relationships:
-    User = db.relationship('User', back_populates='Settings')
-
-    def __repr__(self):
-        return '<UserSettings {}>'.format(self.ID)
 
 
 class ChatbotSession(db.Model):

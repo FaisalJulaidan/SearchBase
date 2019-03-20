@@ -1,6 +1,6 @@
 from sqlalchemy.sql import exists
 
-from models import db, Callback, User, Company, Role, UserSettings
+from models import db, Callback, User, Company, Role
 from services import mail_services, company_services, newsletter_services
 from utilities import helpers
 from sqlalchemy import and_
@@ -14,10 +14,6 @@ def create(firstname, surname, email, password, phone, company: Company, role: R
                              Role=role)
         db.session.add(newUser)
         db.session.flush()
-
-        # Create user settings with its default values
-        newUserSettings = UserSettings(ID=newUser.ID)
-        db.session.add(newUserSettings)
 
         db.session.commit()
         return Callback(True, 'User has been created successfully!', newUser)
@@ -89,7 +85,7 @@ def getAllByCompanyIDWithEnabledNotifications(companyID) -> Callback:
     try:
         # Get result and check if None then raise exception
         result = db.session.query(User)\
-            .filter(and_(User.CompanyID == companyID, User.Settings.UserInputNotifications)).all()
+            .filter(and_(User.CompanyID == companyID, User.UserInputNotifications)).all()
         if not result: raise Exception
 
         return Callback(True,
@@ -101,16 +97,30 @@ def getAllByCompanyIDWithEnabledNotifications(companyID) -> Callback:
                         'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
 
+def getAllUsersWithEnabled(USProperty):
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(User).filter(getattr(User, USProperty)).all()
+
+        return Callback(True,
+                        'Records successfully retrieved',
+                        result)
+    except Exception as exc:
+        db.session.rollback()
+        print("user_services.getAllUsersWithEnabled() ERROR: ", str(exc))
+        return Callback(False, 'Error in getting records')
+
+
 def getProfile(userID):
     try:
-        result: UserSettings = db.session.query(UserSettings).filter(UserSettings.ID == userID).first()
-        if not result: raise Exception
+        result: User = db.session.query(User).filter(User.ID == userID).first()
+        if not result:
+            raise Exception
 
         profile = {
-            'user': helpers.getDictFromSQLAlchemyObj(result.User),
-            'company': helpers.getDictFromSQLAlchemyObj(result.User.Company),
-            'userSettings': helpers.getDictFromSQLAlchemyObj(result),
-            'newsletters': newsletter_services.checkForNewsletter(result.User.Email).Success
+            'user': helpers.getDictFromSQLAlchemyObj(result),
+            'company': helpers.getDictFromSQLAlchemyObj(result.Company),
+            'newsletters': newsletter_services.checkForNewsletter(result.Email).Success
         }
 
         # For security purposes IMPORTANT!
@@ -126,46 +136,6 @@ def getProfile(userID):
         print("user_services.getProfile() ERROR: ", exc)
         return Callback(False, 'User settings for this user does not exist.')
 
-
-def getAllUserSettings():
-    try:
-        # Get result and check if None then raise exception
-        result = db.session.query(UserSettings).all()
-
-        return Callback(True,
-                        'Records successfully retrieved',
-                        result)
-    except Exception as exc:
-        db.session.rollback()
-        return Callback(False, 'Error in getting records')
-
-
-def getAllUserSettingsWithEnabled(USProperty):
-    try:
-        # Get result and check if None then raise exception
-        result = db.session.query(UserSettings).filter(getattr(UserSettings, USProperty)).all()
-
-        return Callback(True,
-                        'Records successfully retrieved',
-                        result)
-    except Exception as exc:
-        db.session.rollback()
-        print("user_services.getAllUserSettingsWithEnabled() ERROR: ", str(exc))
-        return Callback(False, 'Error in getting records')
-
-
-def getUserSettings(userID):
-    try:
-        result = db.session.query(UserSettings).filter(UserSettings.ID == userID).first()
-        if not result: raise Exception
-        return Callback(True,
-                        'User settings were successfully retrieved.',
-                        result)
-    except Exception as exc:
-        print("user_services.getUserSettings() ERROR: ", exc)
-        db.session.rollback()
-        return Callback(False,
-                        'User settings for this user does not exist.')
 
 # ----- Updaters ----- #
 def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
@@ -193,7 +163,7 @@ def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
 def updateUserSettings(userID, trackingData, techSupport, accountSpecialist, notifications):
     try:
 
-        result = db.session.query(UserSettings).filter(UserSettings.ID == userID)\
+        result = db.session.query(User).filter(User.ID == userID)\
             .update({
               'TrackingData': trackingData,
               'TechnicalSupport': techSupport,
@@ -205,7 +175,7 @@ def updateUserSettings(userID, trackingData, techSupport, accountSpecialist, not
                         'User settings were successfully updated.',
                         result)
     except Exception as exc:
-        print("user_services.getUserSettings() ERROR: ", exc)
+        print("user_services.updateUserSettings() ERROR: ", exc)
         db.session.rollback()
         return Callback(False,
                         'User settings could not be updated.')

@@ -98,7 +98,7 @@ class Groups extends Component {
 
                 <div className={styles.Panel_Body}>
 
-                    <Menu mode="inline">
+                    <Menu mode="inline" defaultSelectedKeys={['0']}>
                         {
                             groupsList ?
                             this.props.groupsList.map((group, index) =>

@@ -79,7 +79,7 @@ class BaseConfig(object):
             'func': 'services.mail_services:timer_tick',
             'args': (),
             'trigger': 'interval',
-            'seconds': 14400  # 4 hours
+            'seconds': 15#14400  # 4 hours
         }
     ]
 

@@ -25,7 +25,7 @@ class TextWebLink extends React.Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 // this.props.saveProfileDetails(values);
-                this.setState({output: "*&&TEXT:" + values["text"] + "*&&LINK:" + values["link"] + "*&&END*"});
+                this.setState({output: "*&&TEXT:" + values["text"] + "*&&LINK:http://" + values["link"] + "*&&END*"});
             }
         });
     };
@@ -46,7 +46,7 @@ class TextWebLink extends React.Component {
                             {required: true, message: 'Please type in the text to display!'},
                         ],
                     })(
-                        <Input prefix={<Icon type="font-size" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                        <Input  prefix={<Icon type="font-size" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                placeholder="Click me"/>
                     )}
                 </FormItem>
@@ -59,8 +59,8 @@ class TextWebLink extends React.Component {
                             {required: true, message: 'Please input the link!'},
                         ],
                     })(
-                        <Input prefix={<Icon type="link" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                               placeholder="https://www.google.com"/>
+                        <Input addonBefore="http://" prefix={<Icon type="link" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                               placeholder="www.google.com"/>
                     )}
                 </FormItem>
                 <br/>

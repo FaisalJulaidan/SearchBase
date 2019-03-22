@@ -142,6 +142,7 @@ if os.environ['FLASK_ENV'] == 'production':
         print('Production mode running...')
 
 elif os.environ['FLASK_ENV'] == 'development':
+
     app.config.from_object('config.DevelopmentConfig')
     config.BaseConfig.USE_ENCRYPTION = False
     # Server Setup
@@ -153,8 +154,10 @@ elif os.environ['FLASK_ENV'] == 'development':
     mail.init_app(app)
     app.app_context().push()
 
+    url = os.environ['SQLALCHEMY_DATABASE_URI'] # get database URL
     if os.environ['REFRESH_DB_IN_DEV'] == 'yes':
         print('Reinitialize the database...')
+        create_database(url)
         db.drop_all()
         db.create_all()
         helpers.gen_dummy_data()

@@ -246,7 +246,7 @@ def send_email(to, subject, template, **kwargs):
         # import app. importing it in the beginning of the file will raise an error as it is still not created
         from app import app
 
-        # create Message with the Email Title, recipients and sender
+        # create Message with the Email title, recipients and sender
         msg = Message(subject, recipients=[to], sender="thesearchbase@gmail.com")
 
         # use application context to load the template which the email will use

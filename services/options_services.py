@@ -56,8 +56,8 @@ def getOptions(industry=None) -> Callback:
             {
                 'group': 'Recruitment',
                 'children': [
-                    {'label': 'Recruitment', 'fileName': 'recruitment1'},
-                    {'label': 'Appointment Scheduler', 'fileName': 'appointment-scheduler'},
+                    {'label': 'Appointment Scheduler', 'fileName': 'appointment'},
+                    {'label': 'Main Website', 'fileName': 'main'},
                     {'label': 'Join Us', 'fileName': 'join-us'},
                 ]
              }

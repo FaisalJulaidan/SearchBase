@@ -49,9 +49,10 @@ class Flow extends Component {
             history.push('/dashboard/assistants');
             return;
         }
-        this.setState({assistant: assistant},
-            () => console.log(this.state.assistant)
-        )
+        this.setState({assistant: assistant}, () =>{
+            if(this.state.assistant?.Flow?.groups.length)
+               this.selectGroup(this.state.assistant.Flow.groups[0])
+        })
     }
 
     getUpdatableState = () => {

@@ -16,16 +16,17 @@ chatbot_session = {
             },
             "required": ["blockID", "questionText", "dataType", "input", "keywords"],
             "additionalProperties": False
-        }
-                          },
-        "keywords": {"type": "array", "items": {"type": "string"}},
+        }},
         "keywordsByDataType": {"type": "object", "items": {"type": "object"}},
-        "selectedSolutions": {"type": "array", "items": {"type": "object"}},
-        "solutionsReturned": {"type": "integer"},
-        "userType": {"enum": [e.value for e in enums.UserType]},
-        "timeSpent": {"type": "integer"},
+        "selectedSolutions": {"type": "array", "items": {
+            "type": "object",
+            "properties":{
+                "data": {"type": "object"},
+                "databaseType": {"enum": [e.value['name'] for e in enums.DatabaseType]},
+            },
+        }},
     },
-    "required": ["collectedData", "keywords", "keywordsByDataType", "solutionsReturned", "userType", "timeSpent"],
+    "required": ["collectedData", "keywordsByDataType", "selectedSolutions"],
     "additionalProperties": False
 }
 

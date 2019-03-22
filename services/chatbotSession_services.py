@@ -18,37 +18,35 @@ def processSession(assistantHashID, data: dict) -> Callback:
         return Callback(False, "Assistant not found!")
     assistant: Assistant = callback.Data
 
-    # Validate submitted session
+    # Fetch selected solutions from the database to get their complete details as they were hidden in the chatbot
+    selectedSolutions = []
+    for solution in data['selectedSolutions']:
+        callback = databases_services.getRecord(solution['id'],
+                                                DatabaseType[solution.get('databaseType')['name'].replace(" ", "")])
+        if callback.Success:
+            selectedSolutions.append({
+                'data': helpers.getDictFromSQLAlchemyObj(callback.Data),
+                'databaseType': solution.get('databaseType')['name'].replace(" ", "")
+            })
+
+    collectedData = data['collectedData']
+    sessionData = {
+        'collectedData': collectedData,
+        'selectedSolutions': selectedSolutions,
+        'keywordsByDataType': data['keywordsByDataType'],
+    }
+
+    # Validate submitted session after adding the modified version of selected solutions
     try:
-        validate(data, json_schemas.chatbot_session)
+        validate(sessionData, json_schemas.chatbot_session)
     except Exception as exc:
         print(exc.args)
         return Callback(False, "The submitted chatbot data doesn't follow the correct format.", exc.args[0])
 
-
-    callback: Callback = (False, '')
-    selectedSolutions = []
-    for solution in data['selectedSolutions']:
-        if solution['databaseType'] == DatabaseType.Candidates.name:
-            callback = databases_services.getCandidate(solution['id'])
-
-        elif solution['databaseType'] == DatabaseType.Jobs.name:
-            callback = databases_services.getJob(solution['id'])
-
-        if callback.Success:
-            selectedSolutions.append({
-                'data': helpers.getDictFromSQLAlchemyObj(callback.Data),
-                'type': solution['databaseType']
-            })
-
     try:
         # collectedData is an array, and timeSpent is in seconds.
-        collectedData = data['collectedData']
-        chatbotSession = ChatbotSession(Data={
-                                            'collectedData': collectedData,
-                                            'selectedSolutions': selectedSolutions,
-                                            'keywordsByDataType': data['keywordsByDataType'],
-                                        },
+
+        chatbotSession = ChatbotSession(Data= sessionData,
                                         TimeSpent=data['timeSpent'],
                                         SolutionsReturned=data['solutionsReturned'],
                                         QuestionsAnswered=len(collectedData),

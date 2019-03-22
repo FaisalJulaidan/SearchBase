@@ -228,12 +228,12 @@ def updateUser(firstname, surname, newEmail, userID):
 
 def changePasswordByID(userID, newPassword, oldPassword=None):
     try:
-        result = db.session.query(User).filter(User.ID == userID).first()
+        result: User = db.session.query(User).filter(User.ID == userID).first()
         if not result:
             return Callback(False, "Could not find user's records")
 
         if oldPassword is not None:
-            if not oldPassword == result:
+            if not oldPassword == result.Password:
                 return Callback(False, "Old Password is incorrect")
 
         result.Password = newPassword

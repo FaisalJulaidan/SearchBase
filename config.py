@@ -93,7 +93,6 @@ class ProductionConfig(BaseConfig):
     USE_ENCRYPTION = True
 
 
-
 class DevelopmentConfig(BaseConfig):
     ENV = 'development'
     DEBUG = True

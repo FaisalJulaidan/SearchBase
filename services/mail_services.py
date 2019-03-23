@@ -187,7 +187,7 @@ def notifyNewChatbotSessionsCountForLastXHours(hours):
                 continue
 
             # send email
-            sendRecords_callback: Callback = mailNewChatbotSessionsCount(user_callback.Data.Email, information)
+            sendRecords_callback: Callback = mailNewChatbotSessionsCount(record.Email, information)
             if not sendRecords_callback.Success:
                 raise Exception("sendRecords_callback: ", sendRecords_callback.Message)
 
@@ -234,14 +234,6 @@ def mailNewChatbotSessionsCount(receiver, data):
         return Callback(False, 'Could not send email to ' + receiver)
 
 
-# def async(f):
-#    def wrapper(*args, **kwargs):
-#        thr = Thread(target=f, args=args, kwargs=kwargs)
-#        thr.start()
-#    return wrapper
-
-
-# SEND CODE
 # @async
 def send_async_email(app, msg):
     with app.app_context():
@@ -251,12 +243,20 @@ def send_async_email(app, msg):
 
 def send_email(to, subject, template, **kwargs):
     try:
-        app = current_app._get_current_object()
+        # import app. importing it in the beginning of the file will raise an error as it is still not created
+        from app import app
+
+        # create Message with the Email title, recipients and sender
         msg = Message(subject, recipients=[to], sender="thesearchbase@gmail.com")
-        msg.html = render_template(template, **kwargs)
+
+        # use application context to load the template which the email will use
+        with app.app_context():
+            msg.html = render_template(template, **kwargs)
+
+        # create and start the Thread of the email sending
         thr = Thread(target=send_async_email, args=[app, msg])
         thr.start()
+
         return thr
     except Exception as e:
         print("mail_services.send_email() ERROR / TEMPLATE ERROR: ", e)
-    # send_async_email(app, msg)

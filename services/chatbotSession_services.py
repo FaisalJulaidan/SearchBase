@@ -135,7 +135,7 @@ def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
         if not result:
             raise Exception("Empty")
 
-        return Callback(True, "Records retrieved", )
+        return Callback(True, "Records retrieved", result)
     except Exception as e:
         db.session.rollback()
         print("analytics_services.getAllRecordsByAssistantIDInTheLast() ERROR: ", e)

@@ -7,7 +7,7 @@ from models import db, Candidate
 from services.mail_services import mail
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand, command
-from sqlalchemy_utils import create_database, database_exists
+from sqlalchemy_utils import create_database, database_exists, drop_database
 from flask_apscheduler import APScheduler
 from services.auth_services import jwt
 from utilities import helpers
@@ -157,7 +157,8 @@ elif os.environ['FLASK_ENV'] == 'development':
     url = os.environ['SQLALCHEMY_DATABASE_URI'] # get database URL
     if os.environ['REFRESH_DB_IN_DEV'] == 'yes':
         print('Reinitialize the database...')
-        create_database(url)
+        # drop_database(url)
+        # create_database(url)
         db.drop_all()
         db.create_all()
         helpers.gen_dummy_data()

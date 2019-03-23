@@ -35,7 +35,8 @@ class UserInput extends Component {
                 Type: 'User Input',
                 StoreInDB: values.storeInDB,
                 Skippable: values.isSkippable || false,
-                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === values.dataType[values.dataType.length-1]),
+                DataType: flowOptions.dataTypes
+                    .find((dataType) => dataType.name === values.dataType[values.dataType.length-1]),
                 Content: {
                     text: values.text,
                     blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,

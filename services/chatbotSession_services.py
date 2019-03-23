@@ -22,11 +22,11 @@ def processSession(assistantHashID, data: dict) -> Callback:
     selectedSolutions = []
     for solution in data['selectedSolutions']:
         callback = databases_services.getRecord(solution['id'],
-                                                DatabaseType[solution.get('databaseType')['name'].replace(" ", "")])
+                                                DatabaseType[solution.get('databaseType')['enumName']])
         if callback.Success:
             selectedSolutions.append({
                 'data': helpers.getDictFromSQLAlchemyObj(callback.Data),
-                'databaseType': solution.get('databaseType')['name'].replace(" ", "")
+                'databaseType': solution.get('databaseType')['enumName']
             })
 
     collectedData = data['collectedData']

@@ -36,7 +36,7 @@ def getOptions(industry=None) -> Callback:
                 },
                 {
                     'name': enums.BlockType.Solutions.value,
-                    'maxSolutions': 5,
+                    'maxSolutions': 10,
                     'actions': [a.value for a in enums.BlockAction],
                 },
             ]

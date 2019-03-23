@@ -133,13 +133,14 @@ def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
             ChatbotSession.DateTime >= datetime.now() - timedelta(hours=hours)).count()
 
         if not result:
-            raise Exception("Empty")
+            raise Exception("No Chatbot sessions to return")
 
         return Callback(True, "Records retrieved", result)
     except Exception as e:
         db.session.rollback()
-        print("analytics_services.getAllRecordsByAssistantIDInTheLast() ERROR: ", e)
-        return Callback(False, "Error in returning records")
+        print("chatbotSession_services.getAllRecordsByAssistantIDInTheLast() ERROR / EMPTY: ", e)
+        return Callback(False, "Error in returning records for the last " + str(hours) +
+                        " hours for assistant with ID: " + str(assistantID))
 
 
 # ----- Deletions ----- #

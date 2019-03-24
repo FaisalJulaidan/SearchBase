@@ -7,7 +7,6 @@ from services import user_services, role_services, sub_services, company_service
 from utilities import helpers
 from config import BaseConfig
 jwt = JWTManager()
-tokenExpiresIn = 15 # in minutes
 
 @jwt.invalid_token_loader
 def my_expired_token_callback(error):

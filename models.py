@@ -284,6 +284,7 @@ class Candidate(db.Model):
         return '<Candidate {}>'.format(self.CandidateName)
 
 
+
 class Job(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)

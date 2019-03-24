@@ -3,17 +3,16 @@ import os
 import config
 from flask import Flask, render_template
 from flask_api import status
-from models import db, Candidate
+from models import db
 from services.mail_services import mail
 from flask_script import Manager
-from flask_migrate import Migrate, MigrateCommand, command
-from sqlalchemy_utils import create_database, database_exists
+from flask_migrate import Migrate, MigrateCommand
+from sqlalchemy_utils import create_database, database_exists, drop_database
 from flask_apscheduler import APScheduler
 from services.auth_services import jwt
-from utilities import helpers
+from utilities import helpers, commands
 from flask_babel import Babel
-from services import databases_services
-import enums
+
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router,\
@@ -23,7 +22,6 @@ from routes.admin.routers import profile_router, analytics_router, sub_router,\
 from routes.public.routers import public_router, resetPassword_router, chatbot_router, auth_router
 
 app = Flask(__name__, static_folder='static')
-db.app = app
 
 
 # Register Routes:
@@ -105,25 +103,34 @@ def not_implemented(e):
         return render_template('errors/501.html'), status.HTTP_501_NOT_IMPLEMENTED
 
 
+
 # Server Setup
+db.app = app
 migrate_var = Migrate(app, db)
 manager = Manager(app)
-manager.add_command('db', MigrateCommand)
-scheduler = APScheduler()
-jwt.init_app(app)
 babel = Babel(app)
+scheduler = APScheduler()
+manager.add_command('db', MigrateCommand)
+
+
+# will be used for migration purposes
+@manager.command
+def script():
+    commands.hello()
 
 print("Run the server...")
 if os.environ['FLASK_ENV'] == 'production':
-
+    # Server Setup
     app.config.from_object('config.ProductionConfig')
     url = os.environ['SQLALCHEMY_DATABASE_URI']
 
-    # Server Setup
     app.config['SECRET_KEY_DB'] = config.set_encrypt_key() # IMPORTANT!
+    jwt.init_app(app)
     db.init_app(app)
     mail.init_app(app)
+    scheduler.init_app(app)
     app.app_context().push()
+
 
     if not database_exists(url):
         print('Create db tables')
@@ -131,43 +138,37 @@ if os.environ['FLASK_ENV'] == 'production':
         db.create_all()
         helpers.seed()
 
-    scheduler.init_app(app)
     scheduler.start()
-
-    # Run the migration if in .env, migration = yes
-    if os.environ['DB_MIGRATION'] == 'yes':
-        print('Database migration mode...')
-        manager.run()
-    else:
-        print('Production mode running...')
+    print('Production mode running...')
 
 elif os.environ['FLASK_ENV'] == 'development':
-
+    # Server Setup
     app.config.from_object('config.DevelopmentConfig')
     config.BaseConfig.USE_ENCRYPTION = False
-    # Server Setup
-    print("Use Encryption:", app.config['USE_ENCRYPTION'])
-    print("Secret DB Key:", app.config['SECRET_KEY_DB'])
     config.BaseConfig.USE_ENCRYPTION = False
 
+    jwt.init_app(app)
     db.init_app(app)
     mail.init_app(app)
-    app.app_context().push()
+    scheduler.init_app(app)
 
     url = os.environ['SQLALCHEMY_DATABASE_URI'] # get database URL
     if os.environ['REFRESH_DB_IN_DEV'] == 'yes':
         print('Reinitialize the database...')
-        create_database(url)
+        # drop_database(url)
+        # create_database(url)
         db.drop_all()
         db.create_all()
         helpers.gen_dummy_data()
 
-    scheduler.init_app(app)
     scheduler.start()
-
-    # Run the app server
     print('Development mode running...')
 
 else:
     print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")
 
+
+# Run the migration if in .env, MIGRATION = ues
+if os.environ['MIGRATION'] == 'yes':
+    print('Migration mode running...')
+    manager.run()

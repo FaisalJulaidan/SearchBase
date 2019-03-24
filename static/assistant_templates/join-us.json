@@ -6,14 +6,7 @@
           "Type": "Question",
           "StoreInDB": false,
           "Skippable": false,
-          "DataType": {
-            "dataTypeSection": "No Type",
-            "name": "No Type",
-            "userTypes": [
-              "Unknown"
-            ],
-            "validation": "Ignore"
-          },
+          "DataType": "NoType",
           "Content": {
             "text": "We see you're on our careers page. Are you interested in joining our team?",
             "answers": [
@@ -67,14 +60,7 @@
             ],
             "text": "Great, let's ask you some qualifying questions. Have you worked in recruitment before?"
           },
-          "DataType": {
-            "dataTypeSection": "No Type",
-            "name": "No Type",
-            "userTypes": [
-              "Unknown"
-            ],
-            "validation": "Ignore"
-          },
+          "DataType": "NoType",
           "ID": "5d_P5lCNQ",
           "Skippable": false,
           "StoreInDB": true,
@@ -84,14 +70,7 @@
           "Type": "User Input",
           "StoreInDB": true,
           "Skippable": false,
-          "DataType": {
-            "dataTypeSection": "No Type",
-            "name": "No Type",
-            "userTypes": [
-              "Unknown"
-            ],
-            "validation": "Ignore"
-          },
+          "DataType": "NoType",
           "Content": {
             "text": "How many years of recruiting experience do you have?",
             "blockToGoID": "YbdX9N2vD",
@@ -107,14 +86,7 @@
             "blockToGoID": "KglnbwoTC",
             "text": "What areas in recruitment have you recruited for?"
           },
-          "DataType": {
-            "dataTypeSection": "No Type",
-            "name": "No Type",
-            "userTypes": [
-              "Unknown"
-            ],
-            "validation": "Ignore"
-          },
+          "DataType": "NoType",
           "ID": "YbdX9N2vD",
           "Skippable": false,
           "StoreInDB": true,
@@ -124,14 +96,7 @@
           "Type": "User Input",
           "StoreInDB": true,
           "Skippable": false,
-          "DataType": {
-            "dataTypeSection": "Candidate",
-            "name": "Candidate Email",
-            "userTypes": [
-              "Candidate"
-            ],
-            "validation": "Email"
-          },
+          "DataType": "CandidateEmail",
           "Content": {
             "text": "For us to get back to you, could you provide us with your email address? ",
             "blockToGoID": "Jl3hmTDS-",
@@ -147,14 +112,7 @@
             "blockToGoID": null,
             "text": "Great, let's ask you some qualifying questions. Have you worked in recruitment before?"
           },
-          "DataType": {
-            "dataTypeSection": "No Type",
-            "name": "No Type",
-            "userTypes": [
-              "Unknown"
-            ],
-            "validation": "Ignore"
-          },
+          "DataType": "NoType",
           "ID": "XPEEnNGZT",
           "Skippable": false,
           "StoreInDB": true,
@@ -164,14 +122,7 @@
           "Type": "Question",
           "StoreInDB": true,
           "Skippable": false,
-          "DataType": {
-            "dataTypeSection": "No Type",
-            "name": "No Type",
-            "userTypes": [
-              "Unknown"
-            ],
-            "validation": "Ignore"
-          },
+          "DataType": "NoType",
           "Content": {
             "text": "Recruitment, can be a tough field. But we're always looking for the right individuals to join our team. Would you like to arrange a call back with a member of the team?",
             "answers": [
@@ -217,14 +168,7 @@
             ],
             "text": "Have you ever worked in job that is sales based role before?"
           },
-          "DataType": {
-            "dataTypeSection": "No Type",
-            "name": "No Type",
-            "userTypes": [
-              "Unknown"
-            ],
-            "validation": "Ignore"
-          },
+          "DataType": "NoType",
           "ID": "C1try2etv",
           "Skippable": false,
           "StoreInDB": true,
@@ -237,14 +181,7 @@
             "blockToGoID": "Jl3hmTDS-",
             "text": "Let's take some information from you. What is the best email address for us to contact you on?"
           },
-          "DataType": {
-            "dataTypeSection": "Candidate",
-            "name": "Candidate Email",
-            "userTypes": [
-              "Candidate"
-            ],
-            "validation": "Email"
-          },
+          "DataType": "CandidateEmail",
           "ID": "7PiGKNjxd",
           "Skippable": true,
           "StoreInDB": true,
@@ -257,14 +194,7 @@
             "blockToGoID": null,
             "text": "What is the best mobile number to contact you on?"
           },
-          "DataType": {
-            "dataTypeSection": "Candidate",
-            "name": "Candidate Mobile",
-            "userTypes": [
-              "Candidate"
-            ],
-            "validation": "Telephone"
-          },
+          "DataType": "CandidateMobile",
           "ID": "Jl3hmTDS-",
           "Skippable": false,
           "StoreInDB": true,

@@ -1,7 +1,7 @@
 import {put, takeEvery,takeLatest, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {assistantActions, flowActions} from "../actions";
-import {http, destroyMessage, loadingMessage, successMessage, errorMessage} from "../../helpers";
+import {http, loadingMessage, successMessage, errorMessage, flow} from "../../helpers";
 
 
 function* fetchAssistants() {
@@ -67,7 +67,7 @@ function* deleteAssistant({assistantID}) {
 function* updateFlow({assistant}) {
     try {
         loadingMessage('Updating Flow', 0);
-        const res = yield http.put(`/assistant/${assistant.ID}/flow`, {flow: assistant.Flow});
+        const res = yield http.put(`/assistant/${assistant.ID}/flow`, {flow: flow.parse(assistant.Flow)});
         yield put(assistantActions.updateFlowSuccess(assistant, res.data.msg));
         successMessage('Flow updated');
     } catch (error) {

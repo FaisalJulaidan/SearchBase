@@ -6,14 +6,7 @@
           "Type": "User Input",
           "StoreInDB": true,
           "Skippable": false,
-          "DataType": {
-            "dataTypeSection": "Candidate",
-            "name": "Candidate Name",
-            "userTypes": [
-              "Candidate"
-            ],
-            "validation": "String"
-          },
+          "DataType": "CandidateName",
           "Content": {
             "text": "Can you please provide us with your name?",
             "blockToGoID": "QVeeOgHuj",
@@ -29,14 +22,7 @@
             "blockToGoID": "87HfGerXi",
             "text": "What day is best for us to contact you? Enter a date such as 20/03/2019 or 'Monday '"
           },
-          "DataType": {
-            "dataTypeSection": "No Type",
-            "name": "No Type",
-            "userTypes": [
-              "Unknown"
-            ],
-            "validation": "Ignore"
-          },
+          "DataType": "NoType",
           "ID": "QVeeOgHuj",
           "Skippable": false,
           "StoreInDB": true,
@@ -72,14 +58,7 @@
             ],
             "text": "What time of the day is best for us to contact you on?"
           },
-          "DataType": {
-            "dataTypeSection": "No Type",
-            "name": "No Type",
-            "userTypes": [
-              "Unknown"
-            ],
-            "validation": "Ignore"
-          },
+          "DataType": "NoType",
           "ID": "87HfGerXi",
           "Skippable": false,
           "StoreInDB": true,
@@ -115,14 +94,7 @@
             ],
             "text": "What time in the morning is best for us to contact you?"
           },
-          "DataType": {
-            "dataTypeSection": "No Type",
-            "name": "No Type",
-            "userTypes": [
-              "Unknown"
-            ],
-            "validation": "Ignore"
-          },
+          "DataType": "NoType",
           "ID": "f0OowXgsK",
           "Skippable": false,
           "StoreInDB": true,
@@ -158,14 +130,7 @@
             ],
             "text": "What time in the afternoon is best for us to contact you on?"
           },
-          "DataType": {
-            "dataTypeSection": "No Type",
-            "name": "No Type",
-            "userTypes": [
-              "Unknown"
-            ],
-            "validation": "Ignore"
-          },
+          "DataType": "NoType",
           "ID": "MzfST-zwS",
           "Skippable": false,
           "StoreInDB": false,
@@ -178,14 +143,7 @@
             "blockToGoID": "ElgkX_xtr",
             "text": "We may not be able to contact you in the evening, but provide us with a time and we will be in touch as soon as we're free. "
           },
-          "DataType": {
-            "dataTypeSection": "No Type",
-            "name": "No Type",
-            "userTypes": [
-              "Unknown"
-            ],
-            "validation": "Ignore"
-          },
+          "DataType": "NoType",
           "ID": "2iI4wk1hy",
           "Skippable": false,
           "StoreInDB": true,
@@ -198,14 +156,7 @@
             "blockToGoID": "SeInkWaTR",
             "text": "Thank you for that information. What is the best email address for us to contact you on?"
           },
-          "DataType": {
-            "dataTypeSection": "Candidate",
-            "name": "Candidate Email",
-            "userTypes": [
-              "Candidate"
-            ],
-            "validation": "Email"
-          },
+          "DataType": "CandidateEmail",
           "ID": "ElgkX_xtr",
           "Skippable": true,
           "StoreInDB": true,
@@ -218,14 +169,7 @@
             "blockToGoID": null,
             "text": "What is the best mobile number for us to contact you on?"
           },
-          "DataType": {
-            "dataTypeSection": "Candidate",
-            "name": "Candidate Mobile",
-            "userTypes": [
-              "Candidate"
-            ],
-            "validation": "Telephone"
-          },
+          "DataType": "CandidateMobile",
           "ID": "SeInkWaTR",
           "Skippable": false,
           "StoreInDB": true,

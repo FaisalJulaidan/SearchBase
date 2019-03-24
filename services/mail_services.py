@@ -176,7 +176,7 @@ def notifyNewChatbotSessionsCountForLastXHours(hours):
                 # get all chatbot sessions for the last X hours for the assistant
                 records_callback: Callback = chatbotSession_services.getAllRecordsByAssistantIDInTheLast(hours, assistant.ID)
                 if not records_callback.Success:
-                    raise Exception("records_callback: ", records_callback.Message)
+                    raise Exception("records_callback: " + records_callback.Message)
 
                 # add to information to be sent
                 information.append(

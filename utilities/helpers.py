@@ -1,6 +1,6 @@
 from flask import json, after_this_request, request
 from models import db, Role, Company, Assistant, Plan, ChatbotSession, Database, Candidate, Job
-from services import user_services
+from services import user_services, flow_services
 from datetime import datetime, timedelta
 from enum import Enum
 from hashids import Hashids
@@ -60,7 +60,7 @@ def gen_dummy_data():
                                      "blocks": [
                                          {
                                             "ID": "834hf",
-                                            "DataType": enums.DataType.CandidateSkills.value,
+                                            "DataType": enums.DataType.CandidateSkills.name,
                                             "Type": "User Input",
                                             "StoreInDB": True,
                                             "Skippable": False,
@@ -76,7 +76,7 @@ def gen_dummy_data():
                                             "Type":"Solutions",
                                             "StoreInDB":False,
                                             "Skippable":False,
-                                            "DataType":enums.DataType.NoType.value,
+                                            "DataType":enums.DataType.NoType.name,
                                              "Content": {
                                                  "showTop": 3,
                                                  "action": "Go To Next Block",
@@ -87,7 +87,7 @@ def gen_dummy_data():
                                          },
                                          # {
                                          #     "ID": "gje6D",
-                                         #     "DataType": enums.DataType.CandidateEmail.value,
+                                         #     "DataType": enums.DataType.CandidateEmail.name,
                                          #     "Type": "User Input",
                                          #     "StoreInDB": True,
                                          #     "Skippable": False,
@@ -100,7 +100,7 @@ def gen_dummy_data():
                                          # },
                                          # {
                                          #     "ID": "hkwt845",
-                                         #     "DataType": enums.DataType.CandidateSkills.value,
+                                         #     "DataType": enums.DataType.CandidateSkills.name,
                                          #     "Type": "File Upload",
                                          #     "StoreInDB": True,
                                          #     "Skippable": True,
@@ -309,12 +309,18 @@ def getDictFromSQLAlchemyObj(obj):
         key = attr.name
         if not key == 'Password':
             d[key] = getattr(obj, key)
-            if isinstance(d[attr.name], Enum):
+            if isinstance(d[attr.name], Enum): # Convert Enums
                 d[key] = d[key].value
-            if key == Candidate.Currency.name and d[key]:
+
+            if key == Candidate.Currency.name and d[key]: # Convert Currency
                 d[key] = d[key].code
-            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and d[key]:
+
+            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and d[key]: # Convert Datetime
                 d[key] = '/'.join(map(str, [d[key].year, d[key].month, d[key].day]))
+
+            if key == Assistant.Flow.name and d[key]: # Parse Flow !!
+                flow_services.parseFlow(d[key]) # pass by reference
+
     if hasattr(obj, "FilePath"):
         d["FilePath"] = obj.FilePath
     return d

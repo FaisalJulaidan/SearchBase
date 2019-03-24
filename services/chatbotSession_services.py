@@ -22,11 +22,11 @@ def processSession(assistantHashID, data: dict) -> Callback:
     selectedSolutions = []
     for solution in data['selectedSolutions']:
         callback = databases_services.getRecord(solution['id'],
-                                                DatabaseType[solution.get('databaseType')['name'].replace(" ", "")])
+                                                DatabaseType[solution.get('databaseType')['enumName']])
         if callback.Success:
             selectedSolutions.append({
                 'data': helpers.getDictFromSQLAlchemyObj(callback.Data),
-                'databaseType': solution.get('databaseType')['name'].replace(" ", "")
+                'databaseType': solution.get('databaseType')['enumName']
             })
 
     collectedData = data['collectedData']
@@ -133,13 +133,14 @@ def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
             ChatbotSession.DateTime >= datetime.now() - timedelta(hours=hours)).count()
 
         if not result:
-            raise Exception("Empty")
+            raise Exception("No Chatbot sessions to return")
 
         return Callback(True, "Records retrieved", result)
     except Exception as e:
         db.session.rollback()
-        print("analytics_services.getAllRecordsByAssistantIDInTheLast() ERROR: ", e)
-        return Callback(False, "Error in returning records")
+        print("chatbotSession_services.getAllRecordsByAssistantIDInTheLast() ERROR / EMPTY: ", e)
+        return Callback(False, "Error in returning records for the last " + str(hours) +
+                        " hours for assistant with ID: " + str(assistantID))
 
 
 # ----- Deletions ----- #

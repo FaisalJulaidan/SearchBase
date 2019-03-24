@@ -22,7 +22,7 @@ chatbot_session = {
             "type": "object",
             "properties":{
                 "data": {"type": "object"},
-                "databaseType": {"enum": [e.value['name'] for e in enums.DatabaseType]},
+                "databaseType": {"enum": [e.name for e in enums.DatabaseType]},
             },
         }},
     },
@@ -45,17 +45,7 @@ flow = {
                     "type": "object",
                     "properties":{
                         "ID": {"type": "string"},
-                        "DataType": {"type": "object",
-                                     "properties": {
-                                         "name": {"enum": [e.value['name'] for e in enums.DataType]},
-                                         "validation": {"enum": [e.value for e in enums.ValidationType]},
-                                         'dataTypeSection': {"enum": [e.value for e in enums.DataTypeSection]},
-                                         'userTypes': {"type": "array", "items": {"type": "string"}},
-                                     },
-                                     "required": ["name", "validation", "dataTypeSection", "userTypes"],
-                                     "additionalProperties": False
-                                     },
-
+                        "DataType": {"enum": [e.name for e in enums.DataType]},
                         "Type": {"enum": [e.value for e in enums.BlockType]},
                         "StoreInDB": {"type": "boolean"},
                         "Skippable": { "type": "boolean" },

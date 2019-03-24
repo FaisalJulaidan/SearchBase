@@ -2,13 +2,12 @@
 
 import enums
 from models import db, Callback, Assistant
-from utilities import helpers
 from services import assistant_services
 
 bot_currentVersion = "1.0.0"
 
 from jsonschema import validate
-from utilities import json_schemas
+from utilities import json_schemas, helpers
 
 # ----- Getters ----- #
 # Get the chatbot for the public to use
@@ -18,34 +17,22 @@ def getChatbot(assistantHashID) -> Callback:
         callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
         if not callback.Success:
             return Callback(False, "Assistant not found!")
-        assistant: Assistant = callback.Data
+        assistant: Assistant = helpers.getDictFromSQLAlchemyObj(callback.Data)
 
-        # Get the assistant without the flow
+        assistant['ID'] = assistantHashID  # Use the assistant hashID instead of the integer one
+        del assistant['CompanyID']
+        del assistant['MailEnabled']
+        del assistant['MailPeriod']
+
         data = {
-            'assistant':
-                {
-                    'ID': assistant.Name,
-                    'Message': assistant.Message,
-                    'TopBarText': assistant.TopBarText,
-                    'SecondsUntilPopup': assistant.SecondsUntilPopup,
-                    'Active': assistant.Active
-                },
+            "assistant": assistant,
+            # "dataTypes": [dt.value for dt in enums.DataType]
         }
-        # Use the assistant hashID instead of the integer one
-        data['assistant']['ID'] = assistantHashID
-
-        # Add the flow to data object as blocks without groups
-        blocks = []
-        if assistant.Flow:
-            for group in assistant.Flow.get('groups'):
-                blocks += group['blocks']
-        data['blocks'] = blocks
 
         return Callback(True, '', data)
 
     except Exception as e:
         print("ERROR: getChatbot()", e)
-        db.session.rollback()
         return Callback(False, 'Could not retrieve the chatbot flow. Contact TSB team please!')
 
 
@@ -101,7 +88,6 @@ def isValidFlow(flow):
         print(exc.args)
         return Callback(False, "The submitted Flow doesn't follow the correct format")
 
-
 # Check if the block valid using json_schema.py based on the block's type
 def isValidBlock(block: dict, blockType: str):
     try:
@@ -115,3 +101,12 @@ def isValidBlock(block: dict, blockType: str):
                   + str(enums.BlockType(blockType).value) + " block type"
         return Callback(False, msg, exc.args[0])
     return Callback(True, "Valid block")
+
+
+# This function will be used to replace all enum.name to enums.value
+# flow is passed by reference so no need to return  a new one
+def parseFlow (flow: dict):
+    for group in flow['groups']:
+        for block in group['blocks']:
+            block['DataType'] = enums.DataType[block['DataType']].value
+

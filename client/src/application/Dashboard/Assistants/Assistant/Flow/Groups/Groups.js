@@ -73,7 +73,7 @@ class Groups extends Component {
 
                 <div className={styles.Panel_Body}>
 
-                    <Row type="flex" justify="center">
+                    <Row type="flex" justify="center" style={{marginBottom: '5px'}}>
                         <Col>
                             <Button
                                 style={{marginRight: 10}}
@@ -99,19 +99,24 @@ class Groups extends Component {
                               handleSave={this.handleAddGroup}/>
 
 
-                    <Menu mode="inline" defaultSelectedKeys={['0']}>
-                        {
-                            groupsList ?
-                            this.props.groupsList.map((group, index) =>
-                                <Menu.Item onClick={() => this.props.selectGroup(group)} key={index}>
-                                    {group.name}
-                                </Menu.Item>
-                            ) : <Empty description={'No groups yet'}>
-                                    <Button type="primary" onClick={this.showNewGroupModal}>Create Now</Button>
-                                </Empty>
-                        }
-                    </Menu>
+                    {
+                        groupsList ?
+                            <Menu mode="inline" defaultSelectedKeys={['0']}>
+                                {
 
+                                    this.props.groupsList.map((group, index) =>
+                                        <Menu.Item onClick={() => this.props.selectGroup(group)} key={index}>
+                                            {group.name}
+                                        </Menu.Item>
+                                    )
+                                }
+                            </Menu>
+                            :
+                            <Empty description={'No groups yet'} style={{mariginTop: '5px'}}>
+                                <Button type="primary" onClick={this.showNewGroupModal}>Create Now</Button>
+                            </Empty>
+
+                    }
                 </div>
 
                 <EditGroup group={this.props.currentGroup}

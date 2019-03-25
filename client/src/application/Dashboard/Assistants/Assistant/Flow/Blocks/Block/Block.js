@@ -38,7 +38,7 @@ class Block extends Component {
                         <Row>
                             <Col span={6}><b>Question::</b></Col>
                             <Col span={12}>
-                                <Paragraph ellipsis={{rows: 1, expandable: false}}>
+                                <Paragraph ellipsis={{rows: 1, expandable: true}}>
                                     {block.Content.text}
                                 </Paragraph>
                             </Col>

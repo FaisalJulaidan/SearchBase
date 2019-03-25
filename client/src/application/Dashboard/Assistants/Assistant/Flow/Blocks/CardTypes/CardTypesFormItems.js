@@ -78,7 +78,7 @@ export const StoreInDBFormItem = ({FormItem, layout, getFieldDecorator, block, b
     <FormItem label="Store responses?" {...layout}>
         {getFieldDecorator('storeInDB', {
             valuePropName: 'checked',
-            initialValue: block.alwaysStoreInDB ? block.alwaysStoreInDB : blockOptions.alwaysStoreInDB,
+            initialValue: block.alwaysStoreInDB ? block.alwaysStoreInDB : true,
         })(
             <Checkbox disabled={blockOptions.alwaysStoreInDB}>
                 Users' responses should be recorded</Checkbox>

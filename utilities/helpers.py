@@ -20,7 +20,7 @@ verificationSigner = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
 # Configure logging system
 logging.basicConfig(filename='errors.log',
                     level=logging.ERROR,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+                    format='%(asctime)s -- %(levelname)s -- %(message)s')
 
 # logging.error("Error example")
 

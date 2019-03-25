@@ -43,7 +43,7 @@ export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, options, 
 
     // Define initial value. Because cascader only accepts array as initial value we need to create one
     let initialValue = [block.DataType?.dataTypeSection, block.DataType?.name];
-    if (!(initialValue[0])) initialValue =undefined;
+    if (!(initialValue[0])) initialValue = ['No Type'];
 
 
     return (
@@ -125,6 +125,7 @@ export const ActionFormItem = ({FormItem, layout, getFieldDecorator, setStateHan
 );
 
 export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allBlocks, showGoToBlock, block}) => {
+    let currentBlock = block;
     return (
         showGoToBlock ?
             (
@@ -132,16 +133,17 @@ export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allB
                     {
                         getFieldDecorator('blockToGoID',
                             {
-                                initialValue: block.Content.blockToGoID ? block.Content.blockToGoID : undefined,
+                                initialValue: currentBlock.Content.blockToGoID ? currentBlock.Content.blockToGoID : undefined,
                                 rules: [{required: true, message: "Please select your next block"}]
                             }
                         )(
                             <Select placeholder="The next block to go to">{
-                                allBlocks.map((block, i) =>
-                                    <Option key={i} value={block.ID}>
-                                        {`${block.ID}- (${block.Type}) ${block.Content.text ? block.Content.text : ''}`}
-                                    </Option>
-                                )
+                                allBlocks.map((block, i) => {
+                                    if (block.ID !== currentBlock.Content.ID)
+                                        return <Option key={i} value={block.ID}>
+                                            {`(${block.Type}) ${block.Content.text ? block.Content.text : ''}`}
+                                        </Option>;
+                                })
                             }</Select>
                         )
                     }

@@ -17,7 +17,7 @@ def users():
     if request.method == "GET":
 
         # Data is already converted to javascript lists (needed)
-        callback: Callback = user_services.getUsersWithRolesByCompanyID(user.get('companyID', 0))
+        callback: Callback = user_services.getUsersWithRolesByCompanyID(user.get('companyID'))
         if not callback.Success:
             return helpers.jsonResponse(False, 400, "Users could not been retrieved")
 
@@ -31,7 +31,7 @@ def users():
         role = request.form.get("type")
 
         # Get the admin user who is logged in and wants to create a new user.
-        user_callback: Callback = user_services.getByID(user.get('id', 0))
+        user_callback: Callback = user_services.getByID(user.get('id'))
         if not user_callback.Success:
             return helpers.jsonResponse(False, 400, user_callback.Message)
 
@@ -41,8 +41,7 @@ def users():
             return helpers.jsonResponse(False, 400, "Please make sure you entered all data correctly and have the " +
                                         "necessary permission to do this action")
 
-        addUser_callback: Callback = user_services.addAdditionalUser(name, email, role,
-                                                                     user_callback.Data)
+        addUser_callback: Callback = user_services.addAdditionalUser(name, email, role, user_callback.Data)
         if not addUser_callback.Success:
             return helpers.jsonResponse(False, 400, addUser_callback.Message)
 

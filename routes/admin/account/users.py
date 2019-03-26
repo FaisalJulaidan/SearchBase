@@ -13,7 +13,6 @@ users_router: Blueprint = Blueprint('users_router', __name__, template_folder=".
 @jwt_required
 def users():
     user = get_jwt_identity()['user']
-    print("user: ", user)
 
     if request.method == "GET":
 

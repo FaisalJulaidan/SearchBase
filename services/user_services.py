@@ -96,6 +96,7 @@ def getAllByCompanyIDWithEnabledNotifications(companyID) -> Callback:
                         'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
 
+# takes in attribute name for Users ex. Users.
 def getAllUsersWithEnabled(USProperty):
     try:
         # Get result and check if None then raise exception

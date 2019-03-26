@@ -114,6 +114,7 @@ class Blocks extends Component {
                                                             <Block block={block}
                                                                    editBlock={this.editBlock}
                                                                    deleteBlock={this.handleDeleteBlock}
+                                                                   allGroups={this.props.allGroups}
                                                                    options={this.props.options}/>
                                                         </div>
                                                     )}

@@ -147,7 +147,7 @@ class Question extends Component {
                                 this.state.answers.map((answer, i) => (
                                     <Collapse.Panel header={answer.text} key={i}
                                                     extra={
-                                                        <div style={{marginRight: 5}}>
+                                                        <div style={{marginRight: 10}}>
                                                             <Button type="default" icon="edit"
                                                                     onClick={(event) => {
                                                                         this.showEditAnswer(answer);
@@ -162,9 +162,7 @@ class Question extends Component {
                                                                         }}
                                                                         okText="Yes" cancelText="No">
                                                                 <Button type="danger" icon="delete"
-                                                                        onConfirm={(event) => {
-                                                                            event.stopPropagation();
-                                                                        }}
+                                                                        onClick={(event) => event.stopPropagation()}
                                                                         style={{marginLeft: 5}}
                                                                         size={"small"}></Button>
                                                             </Popconfirm>

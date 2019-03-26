@@ -41,7 +41,6 @@ class Flow extends Component {
 
 
     componentDidMount() {
-        console.log('componentDidMount');
         const {assistantList, match} = this.props;
         const assistant = assistantList.find(assistant => assistant.ID === +match.params.id);
         // if the user try to access assistant that does not exist using the URL, he will be redirected
@@ -70,15 +69,19 @@ class Flow extends Component {
         const {updatedAssistant} = this.getUpdatableState();
         if(!updatedAssistant.Flow)
             updatedAssistant.Flow = {groups: []};
-        updatedAssistant.Flow.groups.push({
+
+        newGroup = {
             id: shortid.generate(),
             name: newGroup.name,
             description: newGroup.description,
             blocks: []
-        });
+        };
+
+        updatedAssistant.Flow.groups.push(newGroup);
 
         this.setState({
             assistant: updatedAssistant,
+            currentGroup: newGroup,
             isSaved: false
         });
         destroyMessage();
@@ -123,8 +126,15 @@ class Flow extends Component {
 
         if (updatedGroup.blocks.length > 0) {
             const lastBlock = updatedGroup.blocks[updatedGroup.blocks.length - 1];
-            if (lastBlock.Content.action === "Go To Next Block")
-                lastBlock.Content.blockToGoID = ID;
+            // update if last block is question each answer should point to newBlock.ID
+            if (lastBlock.Type === "Question") {
+                lastBlock.Content.answers.map((answer) => {
+                    if (answer.action === "Go To Next Block")
+                        answer.blockToGoID = newBlock.ID;
+                    return answer
+                })
+            } else if (lastBlock.Content.action === "Go To Next Block")
+                lastBlock.Content.blockToGoID = newBlock.ID;
         }
 
         updatedGroup.blocks.push(newBlock);
@@ -141,6 +151,17 @@ class Flow extends Component {
     editBlock = (edittedBlock) => {
         const {updatedAssistant, updatedGroup} = this.getUpdatableState();
         const nextBlock = updatedGroup.blocks[updatedGroup.blocks.findIndex(b => b.ID === edittedBlock.ID) + 1];
+
+        if (edittedBlock.Type === "Question") {
+            edittedBlock.Content.answers.map((answer) => {
+                if (answer.action === "Go To Next Block")
+                    if (nextBlock?.ID)
+                        answer.blockToGoID = nextBlock.ID;
+                    else
+                        edittedBlock.Content.blockToGoID = null;
+                return answer
+            })
+        }
 
         if (edittedBlock.Content.action === "Go To Next Block")
             if (nextBlock?.ID)
@@ -164,14 +185,23 @@ class Flow extends Component {
         let counter = 0;
         updatedAssistant.Flow.groups.forEach((group) => {
             group.blocks.map((block) => {
-                // TODO: add answers to the just like what happing in reorderBlocks
-                if (block.Content.blockToGoID === deletedBlock.ID) {
+                if (block.Type === "Question") {
+                    // if it is question update each answer
+                    block.Content.answers.map((answer) => {
+                        if (answer.blockToGoID === deletedBlock.ID) {
+                            answer.blockToGoID = null;
+                            counter++;
+                        }
+                        return answer
+                    })
+                } else if (block.Content.blockToGoID === deletedBlock.ID) {
                     block.Content.blockToGoID = null;
                     counter++;
                 }
                 return block;
             })
         });
+
 
         confirm({
             title: `Delete block with type: ${deletedBlock.Type}`,
@@ -273,16 +303,10 @@ class Flow extends Component {
                     </div>
                 </div>
 
-                <Prompt
-                    when={!this.state.isSaved}
-                    message={location =>
-                        `Your flow is not saved are you sure you want leave without saving it?`
-                    }
-                />
-
+                <Prompt when={!this.state.isSaved}
+                        message={() => `Your flow is not saved are you sure you want leave without saving it?`}/>
 
             </Spin>
-
         );
     }
 

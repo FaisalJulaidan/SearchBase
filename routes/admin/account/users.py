@@ -27,8 +27,8 @@ def users():
 
     if request.method == "POST":
 
-        name = request.form.get("name").strip()
-        email = request.form.get("email").strip()
+        name = request.form.get("name")
+        email = request.form.get("email")
         role = request.form.get("type")
 
         # Get the admin user who is logged in and wants to create a new user.
@@ -41,8 +41,8 @@ def users():
                 or not helpers.isValidEmail(email):
             return helpers.jsonResponse(False, 400, "Please make sure you entered all data correctly and have the " +
                                         "necessary permission to do this action")
-        names = name.split(" ")
-        addUser_callback: Callback = user_services.addAdditionalUser(names[0], names[-1], email, role,
+
+        addUser_callback: Callback = user_services.addAdditionalUser(name, email, role,
                                                                      user_callback.Data)
         if not addUser_callback.Success:
             return helpers.jsonResponse(False, 400, addUser_callback.Message)

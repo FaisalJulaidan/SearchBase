@@ -28,8 +28,14 @@ def create(firstname, surname, email, password, phone, company: Company, role: R
 
 
 # from Users Management
-def addAdditionalUser(firstname, surname, email, role, adminUser):
+def addAdditionalUser(name, email, role, adminUser):
     try:
+        # removed empty spaces around the strings and split the full name into first name and surname
+        names = name.strip().split(" ")
+        email = email.strip()
+        firstname = names[0]
+        surname = names[-1]
+
         # Check if email is already used
         test_callback: Callback = getByEmail(email)
         if test_callback.Success:

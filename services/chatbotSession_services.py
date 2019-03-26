@@ -40,7 +40,7 @@ def processSession(assistantHashID, data: dict) -> Callback:
     try:
         validate(sessionData, json_schemas.chatbot_session)
     except Exception as exc:
-        print(exc.args)
+        print("chatbotSession_services.processSession ERROR 1: " + str(exc.args))
         return Callback(False, "The submitted chatbot data doesn't follow the correct format.", exc.args[0])
 
     try:
@@ -57,7 +57,7 @@ def processSession(assistantHashID, data: dict) -> Callback:
         return Callback(True, 'Chatbot data has been processed successfully!', chatbotSession)
 
     except Exception as exc:
-        print(exc)
+        print("chatbotSession_services.processSession ERROR 1: " + str(exc))
         db.session.rollback()
         return Callback(False, "An error occurred while processing chatbot data.")
     # finally:

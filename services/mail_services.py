@@ -216,6 +216,7 @@ def notifyNewChatbotSession(assistantHashID):
             sendRecords_callback: Callback = mailNewChatbotSessionsCount(user.Email, information)
             if not sendRecords_callback.Success:
                 return Callback(False, sendRecords_callback.Message)
+        return Callback(True, "Emails have been sent")
 
     except Exception as e:
         print("mail_services.notifyNewChatbotSession() ERROR: ", e)
@@ -243,15 +244,20 @@ def send_async_email(app, msg):
 
 def send_email(to, subject, template, **kwargs):
     try:
-        # import app. importing it in the beginning of the file will raise an error as it is still not created
-        from app import app
-
-        # create Message with the Email title, recipients and sender
         msg = Message(subject, recipients=[to], sender="thesearchbase@gmail.com")
+        try:
+            # get app context / if it fails assume its working outside the app
+            app = current_app._get_current_object()
 
-        # use application context to load the template which the email will use
-        with app.app_context():
+            # load the template which the email will use
             msg.html = render_template(template, **kwargs)
+        except Exception as exc:
+            # import app. importing it in the beginning of the file will raise an error as it is still not created
+            from app import app
+
+            # use application context to load the template which the email will use
+            with app.app_context():
+                msg.html = render_template(template, **kwargs)
 
         # create and start the Thread of the email sending
         thr = Thread(target=send_async_email, args=[app, msg])

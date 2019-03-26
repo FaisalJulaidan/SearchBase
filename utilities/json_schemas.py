@@ -134,3 +134,14 @@ Solutions = {
     "required": ["showTop", "action", "afterMessage", "blockToGoID", "databaseType"],
     "additionalProperties": False
 }
+
+RawText = {
+    "type": "object",
+    "properties": {
+        "text": { "enum": [e.value for e in enums.BlockAction]},
+        "action": { "enum": [e.value for e in enums.BlockAction]},
+        "blockToGoID": { "type": [ "string",  "null" ] },
+    },
+    "required": ["text", "action","blockToGoID"],
+    "additionalProperties": False
+}

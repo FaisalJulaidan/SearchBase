@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Card, Form, Icon, Input, Modal, Popconfirm, Tag, Tooltip} from "antd";
+import {Button, Card, Form, Icon, Input, Modal, Popconfirm, Tag, Tooltip, Collapse} from "antd";
 
 import {getInitialVariables, initActionType} from './CardTypesHelpers'
 import {
@@ -90,7 +90,10 @@ class Question extends Component {
         }, () => res('done'));
     });
 
-    showEditAnswer = answer => this.setState({modalVisible: true, editedAnswer: answer, tags: answer.keywords});
+    showEditAnswer = answer => this.setState({
+        modalVisible: true, editedAnswer: answer, tags: answer.keywords,
+        ...initActionType({Content: answer}, this.props.modalState.allGroups)
+    });
 
     //Tags component's functions
     removeTag = (removedTag) => this.setState({tags: this.state.tags.filter(tag => tag !== removedTag)});
@@ -109,7 +112,6 @@ class Question extends Component {
     componentWillMount() {
         const {modalState, options} = this.props;
         const {block} = getInitialVariables(options.flow, modalState);
-        this.setState(initActionType(block, this.props.modalState.allGroups));
         this.setState({answers: block.Content.answers || []})
     }
 
@@ -138,33 +140,43 @@ class Question extends Component {
                                       layout={layout}/>
 
                     <FormItem label="Answers"{...layout}>
-                        <Button onClick={this.showAddAnswer}
-                                type="primary" icon="plus" shape="circle" size={"small"}></Button>
-                        {
-                            this.state.answers.map((answer, i) => (
-                                <Card title={answer.text} key={i}
-                                      extra={
-                                          <div>
-                                              <Button type="default" icon="edit" shape="circle"
-                                                      onClick={() => this.showEditAnswer(answer)}
-                                                      size={"small"}></Button>
-                                              <Popconfirm placement="topRight" title="Are you sure delete this answer?"
-                                                          onConfirm={() => this.removeAnswer(answer)}
-                                                          okText="Yes" cancelText="No">
-                                                  <Button type="danger" icon="delete" shape="circle"
-                                                          style={{marginLeft: 5}}
-                                                          size={"small"}></Button>
-                                              </Popconfirm>
-                                          </div>
-
-                                      }
-                                      style={{width: 200, margin: 10}}>
-                                    <p>Action: {answer.action}</p>
-                                    Tags: <br/>
-                                    {answer.keywords.map((keyword, i) => <Tag key={i}>{keyword}</Tag>)}
-                                </Card>
-                            ))
-                        }
+                        <Button onClick={this.showAddAnswer} type="primary" icon="plus" size={"small"}>Add
+                            Answer</Button>
+                        <Collapse accordion>
+                            {
+                                this.state.answers.map((answer, i) => (
+                                    <Collapse.Panel header={answer.text} key={i}
+                                                    extra={
+                                                        <div style={{marginRight: 5}}>
+                                                            <Button type="default" icon="edit"
+                                                                    onClick={(event) => {
+                                                                        this.showEditAnswer(answer);
+                                                                        event.stopPropagation();
+                                                                    }}
+                                                                    size={"small"}></Button>
+                                                            <Popconfirm placement="topRight"
+                                                                        title="Are you sure delete this answer?"
+                                                                        onConfirm={(event) => {
+                                                                            this.removeAnswer(answer);
+                                                                            event.stopPropagation();
+                                                                        }}
+                                                                        okText="Yes" cancelText="No">
+                                                                <Button type="danger" icon="delete"
+                                                                        onConfirm={(event) => {
+                                                                            event.stopPropagation();
+                                                                        }}
+                                                                        style={{marginLeft: 5}}
+                                                                        size={"small"}></Button>
+                                                            </Popconfirm>
+                                                        </div>
+                                                    }>
+                                        <p>Action: {answer.action}</p>
+                                        Keywords: <br/>
+                                        {answer.keywords.map((keyword, i) => <Tag key={i}>{keyword}</Tag>)}
+                                    </Collapse.Panel>
+                                ))
+                            }
+                        </Collapse>
                     </FormItem>
 
 
@@ -234,13 +246,18 @@ class Question extends Component {
 
                         <ActionFormItem FormItem={FormItem}
                                         blockOptions={blockOptions}
-                                        block={{Content: {action: this.state.editedAnswer?.action}}}
+                                        block={{Content: {ID: block.ID, action: this.state.editedAnswer?.action}}}
                                         setStateHandler={(state) => this.setState(state)}
                                         getFieldDecorator={getFieldDecorator}
                                         layout={layout}/>
 
                         <ShowGoToBlockFormItem FormItem={FormItem}
-                                               block={{Content: {blockToGoID: this.state.editedAnswer?.blockToGoID}}}
+                                               block={{
+                                                   Content: {
+                                                       ID: block.ID,
+                                                       blockToGoID: this.state.editedAnswer?.blockToGoID
+                                                   }
+                                               }}
                                                allBlocks={allBlocks}
                                                showGoToBlock={this.state.showGoToBlock}
                                                getFieldDecorator={getFieldDecorator}
@@ -255,7 +272,12 @@ class Question extends Component {
                                                layout={layout}/>
 
                         <AfterMessageFormItem FormItem={FormItem}
-                                              block={{Content: {afterMessage: this.state.editedAnswer?.afterMessage}}}
+                                              block={{
+                                                  Content: {
+                                                      ID: block.ID,
+                                                      afterMessage: this.state.editedAnswer?.afterMessage
+                                                  }
+                                              }}
                                               getFieldDecorator={getFieldDecorator}
                                               layout={layout}/>
                     </Form>

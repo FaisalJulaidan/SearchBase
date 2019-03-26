@@ -118,19 +118,19 @@ manager.add_command('db', MigrateCommand)
 def script():
     commands.hello()
 
+
 print("Run the server...")
 if os.environ['FLASK_ENV'] == 'production':
     # Server Setup
     app.config.from_object('config.ProductionConfig')
     url = os.environ['SQLALCHEMY_DATABASE_URI']
 
-    app.config['SECRET_KEY_DB'] = config.set_encrypt_key() # IMPORTANT!
+    app.config['SECRET_KEY_DB'] = config.set_encrypt_key()  # IMPORTANT!
     jwt.init_app(app)
     db.init_app(app)
     mail.init_app(app)
     scheduler.init_app(app)
     app.app_context().push()
-
 
     if not database_exists(url):
         print('Create db tables')

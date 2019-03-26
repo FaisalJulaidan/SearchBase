@@ -18,6 +18,7 @@ class BlockType(Enum):
     Question = 'Question'
     FileUpload = 'File Upload'
     Solutions = 'Solutions'
+    RawText = 'Raw Text'
 
 
 class BlockAction(Enum):

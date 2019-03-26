@@ -1,7 +1,7 @@
 from sqlalchemy.sql import exists
 
 from models import db, Callback, User, Company, Role
-from services import mail_services, company_services, newsletter_services
+from services import mail_services, company_services, newsletter_services, role_services
 from utilities import helpers
 from sqlalchemy import and_
 
@@ -22,6 +22,42 @@ def create(firstname, surname, email, password, phone, company: Company, role: R
         print(exc)
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')
+
+
+# from Users Management
+def createAdditional(firstname, surname, email, role, adminUser):
+    try:
+        # password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
+
+        # Check if email is already used
+        test_callback: Callback = getByEmail(email)
+        if test_callback.Success:
+            return Callback(False, 'Email is already on use.')
+
+        # Get the role to be assigned for the user
+        role_callback: Callback = role_services.getByNameAndCompanyID(role, adminUser.CompanyID)
+        if not role_callback.Success:
+            return helpers.jsonResponse(False, 400, role_callback.Message)
+
+        # Create the new user for the company
+        callback: Callback = user_services.create(firstname, surname, email, password, "00000",
+                                                  user_callback.Data.Company, role_callback.Data, verified=True)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, "Sorry couldn't create the user. Try again!")
+
+        email_callback: Callback = mail_services.addedNewUserEmail(user.get('email', "Error"), email, password)
+        if not email_callback.Success:
+            return json.dumps({'success': False,
+                               'msg': " New user was created but could not send email with login information. Please delete and readd the user."}), \
+                   400, {'ContentType': 'application/json'}
+
+        return Callback(True, 'User has been created successfully!')
+
+    except Exception as exc:
+        print("user_services.createAdditional ERROR: " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Sorry, Could not create the user.')
+
 
 
 
@@ -133,8 +169,39 @@ def getProfile(userID):
 
         return Callback(True, 'User settings were successfully retrieved.', profile)
     except Exception as exc:
+        db.session.rollback()
         print("user_services.getProfile() ERROR: ", exc)
         return Callback(False, 'User settings for this user does not exist.')
+
+
+def getUsersWithRolesByCompanyID(companyID):
+    try:
+        # Get users and check if None then raise exception
+        users = db.session.query(User).filter(User.CompanyID == companyID).all()
+        if not users:
+            raise Exception("No Records")
+
+        # Get roles
+        role_callback: Callback = role_services.getAllByCompanyID(companyID)
+        if not role_callback.Success:
+            raise Exception("Roles could not be retrieved")
+
+        # Convert to lists
+        users = helpers.getListFromSQLAlchemyList(users)
+        roles = helpers.getListFromSQLAlchemyList(role_callback.Data)
+
+        # Put the user's role in his user record
+        for user in users:
+            user["Role"] = next((x for x in roles if x["ID"] == user["RoleID"]), [None])
+
+        result = {"users": users, "roles": roles}
+
+        return Callback(True, 'Users with company ID ' + str(companyID) + ' were successfully retrieved.', result)
+    except Exception as exc:
+        db.session.rollback()
+        print("user_services.getUsersWithRolesByCompanyID ERROR / EMPTY: ", exc)
+        return Callback(False, 'Users with company ID ' + str(companyID) + ' could not be retrieved.')
+
 
 
 # ----- Updaters ----- #
@@ -246,7 +313,7 @@ def changePasswordByID(userID, newPassword, oldPassword=None):
         return Callback(False, "Error in updating password")
 
 
-def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
+def updatePasswordByEmail(userEmail, newPassword, currentPassword=None):
     try:
         user_callback: Callback = getByEmail(userEmail.lower())
         if not user_callback.Success:
@@ -262,7 +329,7 @@ def changePasswordByEmail(userEmail, newPassword, currentPassword=None):
         return Callback(True, "Password has been changed.")
 
     except Exception as exc:
-        print("user_services.changePasswordByEmail() ERROR: ", exc)
+        print("user_services.updatePasswordByEmail() ERROR: ", exc)
         db.session.rollback()
         return Callback(False, "Error in changing password")
 

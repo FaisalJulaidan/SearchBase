@@ -38,7 +38,6 @@ def chatbot(assistantIDAsHash):
         # Chatbot collected information
         data = request.json
         callback: Callback = chatbotSession_services.processSession(assistantIDAsHash, data)
-
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
 

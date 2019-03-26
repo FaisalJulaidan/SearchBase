@@ -9,7 +9,7 @@ from utilities import helpers
 users_router: Blueprint = Blueprint('users_router', __name__, template_folder="../../templates")
 
 
-@users_router.route("/users", methods=['GET'])
+@users_router.route("/users", methods=['GET', 'POST', 'PUT', 'DELETE'])
 @jwt_required
 def users():
     user = get_jwt_identity()['user']
@@ -25,14 +25,11 @@ def users():
         return helpers.jsonResponse(True, 200, "Users have been retrieved",
                                     {"users": callback.Data["users"], "roles": callback.Data["roles"]})
 
-    if request.method == "PUT":
+    if request.method == "POST":
 
-        name = request.form.get("name", None)  # .strip() them
-        email = request.form.get("email", None)
-        role = request.form.get("type", None)
-
-        if not (name and email and role):
-            return helpers.jsonResponse(False, 400, "Could not retrieve all of the submitted data")
+        name = request.form.get("name").strip()
+        email = request.form.get("email").strip()
+        role = request.form.get("type")
 
         # Get the admin user who is logged in and wants to create a new user.
         user_callback: Callback = user_services.getByID(user.get('id', 0))
@@ -42,18 +39,18 @@ def users():
         if not user_callback.Data.Role.EditUsers \
                 or (role != "Admin" and role != "User") \
                 or not helpers.isValidEmail(email):
-            return helpers.jsonResponse(False, 401, "Please make sure you entered all data correctly and have the " +
+            return helpers.jsonResponse(False, 400, "Please make sure you entered all data correctly and have the " +
                                         "necessary permission to do this action")
-        names = name.strip().split(" ")
-        addUser_callback: Callback = user_services.createAdditional(names[0], names[-1], email, role,
-                                                                    user_callback.Data)
+        names = name.split(" ")
+        addUser_callback: Callback = user_services.addAdditionalUser(names[0], names[-1], email, role,
+                                                                     user_callback.Data)
         if not addUser_callback.Success:
             return helpers.jsonResponse(False, 400, addUser_callback.Message)
 
         return helpers.jsonResponse(True, 200,
                                     "User has been added and an email with his login details is on its way to him")
 
-    if request.method == "POST":
+    if request.method == "PUT":
 
         # User info
         userID = request.json.get("ID", 0)

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import styles from "./Groups.module.less";
-import {Button, List, Skeleton, Spin, Modal, Menu, Empty} from "antd";
+import {Button, List, Skeleton, Row, Modal, Menu, Empty, Col} from "antd";
 import NewGroup from "./NewGroup/NewGroup";
 import EditGroup from "./EditGroup/EditGroup";
 
@@ -67,50 +67,56 @@ class Groups extends Component {
         const {groupsList} = this.props;
         return (
             <div className={styles.Panel}>
-                <div className={styles.Panel_Header_With_Button}>
-                    <div>
-                        <h3>Groups</h3>
-                    </div>
-                    <div>
-                        <Button className={styles.Panel_Header_Button}
-                                type="default"
-                                size={"small"}
-                                icon="plus"
-                                onClick={this.showNewGroupModal}>
-                            Add
-                        </Button>
-
-                        <Button className={styles.Panel_Header_Button}
-                                type="default"
-                                size={"small"}
-                                icon="plus"
-                                disabled={!(!!this.props.currentGroup.name)}
-                                onClick={() => this.showEditGroupModal()}>
-                            Edit
-                        </Button>
-
-                        <NewGroup visible={this.state.newGroupModal}
-                                  handleCancel={this.handleAddGroupCancel}
-                                  handleSave={this.handleAddGroup}/>
-                    </div>
+                <div className={styles.Panel_Header}>
+                    <h3>Groups</h3>
                 </div>
-
 
                 <div className={styles.Panel_Body}>
 
-                    <Menu mode="inline" defaultSelectedKeys={['0']}>
-                        {
-                            groupsList ?
-                            this.props.groupsList.map((group, index) =>
-                                <Menu.Item onClick={() => this.props.selectGroup(group)} key={index}>
-                                    {group.name}
-                                </Menu.Item>
-                            ) : <Empty description={'No groups yet'}>
-                                    <Button type="primary" onClick={this.showNewGroupModal}>Create Now</Button>
-                                </Empty>
-                        }
-                    </Menu>
+                    <Row type="flex" justify="center" style={{marginBottom: '5px'}}>
+                        <Col>
+                            <Button
+                                style={{marginRight: 10}}
+                                onClick={this.showNewGroupModal}
+                                type="default"
+                                size={"small"}
+                                icon="plus"
+                            >Add</Button>
+                            <Button
+                                type="default"
+                                size={"small"}
+                                icon="edit"
+                                disabled={!(!!this.props.currentGroup.name)}
+                                onClick={() => this.showEditGroupModal()}>
+                                Edit
+                            </Button>
+                        </Col>
+                    </Row>
 
+
+                    <NewGroup visible={this.state.newGroupModal}
+                              handleCancel={this.handleAddGroupCancel}
+                              handleSave={this.handleAddGroup}/>
+
+
+                    {
+                        groupsList ?
+                            <Menu mode="inline" defaultSelectedKeys={['0']}>
+                                {
+
+                                    this.props.groupsList.map((group, index) =>
+                                        <Menu.Item onClick={() => this.props.selectGroup(group)} key={index}>
+                                            {group.name}
+                                        </Menu.Item>
+                                    )
+                                }
+                            </Menu>
+                            :
+                            <Empty description={'No groups yet'} style={{mariginTop: '5px'}}>
+                                <Button type="primary" onClick={this.showNewGroupModal}>Create Now</Button>
+                            </Empty>
+
+                    }
                 </div>
 
                 <EditGroup group={this.props.currentGroup}

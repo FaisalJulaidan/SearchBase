@@ -36,7 +36,11 @@ def getOptions(industry=None) -> Callback:
                 },
                 {
                     'name': enums.BlockType.Solutions.value,
-                    'maxSolutions': 5,
+                    'maxSolutions': 10,
+                    'actions': [a.value for a in enums.BlockAction],
+                },
+                {
+                    'name': enums.BlockType.RawText.value,
                     'actions': [a.value for a in enums.BlockAction],
                 },
             ]
@@ -45,10 +49,12 @@ def getOptions(industry=None) -> Callback:
             'types': [dt.name for dt in enums.DatabaseType ],
             enums.DatabaseType.Candidates.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
                                                  for c in Candidate.__table__.columns
-                                                 if (c.key != 'ID' and c.key != 'DatabaseID')],
+                                                 if (c.key != 'ID' and c.key != 'DatabaseID')
+                                                 ],
             enums.DatabaseType.Jobs.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
                                            for c in Job.__table__.columns
-                                           if (c.key != 'ID' and c.key != 'DatabaseID')],
+                                           if (c.key != 'ID' and c.key != 'DatabaseID')
+                                           ],
             'currencyCodes': ['GBP', 'USD', 'EUR', 'AED', 'CAD']
         },
         'assistantTemplates':

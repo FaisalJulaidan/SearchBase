@@ -6,9 +6,9 @@ export const onDelete = (id, type, handler) => handler({
 export const onCancel = (handleNewBlock, handleEditBlock) => handleNewBlock ? handleNewBlock(false) : handleEditBlock(false);
 
 
-export const initActionType = (block, allGroups, handleSetState) => {
+export const initActionType = (block, allGroups) => {
     if (block.Content.action === "Go To Specific Block")
-        return {showGoToBlock: true, showGoToGroup: false}
+        return {showGoToBlock: true, showGoToGroup: false};
     else if (block.Content.action === "Go To Group") {
         // because here we dont' have column in each block contains all the group
         // this is a workaround to have the group name from the block id

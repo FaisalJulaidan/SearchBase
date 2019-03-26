@@ -246,7 +246,7 @@ class Flow extends Component {
                             }}/>
 
                     <div className={styles.Panel_Body_Only}>
-                        <div style={{margin: '0 5px 0 0', width: '27%'}}>
+                        <div style={{margin: '0 5px 0 0', width: '12%'}}>
                             {
                                 assistant && <Groups selectGroup={this.selectGroup}
                                                 isLoading={this.props.isLoading}
@@ -258,7 +258,7 @@ class Flow extends Component {
                             }
                         </div>
 
-                        <div style={{margin: '0 0 0 5px', width: '73%'}}>
+                        <div style={{margin: '0 0 0 5px', width: '88%'}}>
                             {
                                 assistant && <Blocks addBlock={this.addBlock}
                                                 editBlock={this.editBlock}

@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
-import {Button, Card, Checkbox, Col, Collapse, Divider, Row, Tag} from "antd";
+import {Button, Card, Checkbox, Col, Collapse, Divider, Row, Tag, Typography} from "antd";
 
 const Panel = Collapse.Panel;
 const {Meta} = Card;
+const {Paragraph} = Typography;
+
 
 class Block extends Component {
 
@@ -18,12 +20,16 @@ class Block extends Component {
                 <Panel header={(
                     <>
                         {block.Type} <Divider type="vertical"/>
-                        {block.Content.text} <Divider type="vertical"/>
+                        {block.Content.text?.substring(0, 90)}
+                        {block.Content.text?.length > 90 ? '...' : null}
 
-                        <Button icon={'edit'} size={"small"} onClick={() => this.editBlock(block)}/>
-                        <Divider type="vertical"/>
-                        <Button icon={'delete'} size={"small"} type={"danger"}
-                                onClick={() => this.deleteBlock(block)}/>
+                        <div style={{float: 'right', marginRight: 10}}>
+                            <Divider type="vertical"/>
+                            <Button icon={'edit'} size={"small"} onClick={() => this.editBlock(block)}/>
+                            <Divider type="vertical"/>
+                            <Button icon={'delete'} size={"small"} type={"danger"}
+                                    onClick={() => this.deleteBlock(block)}/>
+                        </div>
                     </>
                 )}
                        key={this.props.key}>
@@ -31,7 +37,11 @@ class Block extends Component {
                     {block.Content.text ?
                         <Row>
                             <Col span={6}><b>Question::</b></Col>
-                            <Col span={12}>{block.Content.text}</Col>
+                            <Col span={12}>
+                                <Paragraph ellipsis={{rows: 1, expandable: true}}>
+                                    {block.Content.text}
+                                </Paragraph>
+                            </Col>
                             <Divider/>
                         </Row>
                         : null

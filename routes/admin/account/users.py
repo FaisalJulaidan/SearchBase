@@ -3,7 +3,7 @@ from flask import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback, db, User
-from services import user_services, role_services
+from services import user_services, role_services, user_management_services
 from utilities import helpers
 
 users_router: Blueprint = Blueprint('users_router', __name__, template_folder="../../templates")
@@ -41,7 +41,7 @@ def users():
             return helpers.jsonResponse(False, 400, "Please make sure you entered all data correctly and have the " +
                                         "necessary permission to do this action")
 
-        addUser_callback: Callback = user_services.addAdditionalUser(name, email, role, user_callback.Data)
+        addUser_callback: Callback = user_management_services.addAdditionalUser(name, email, role, user_callback.Data)
         if not addUser_callback.Success:
             return helpers.jsonResponse(False, 400, addUser_callback.Message)
 

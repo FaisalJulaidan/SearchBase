@@ -9,7 +9,7 @@ from utilities import helpers
 users_router: Blueprint = Blueprint('users_router', __name__, template_folder="../../templates")
 
 
-@users_router.route("/users", methods=['GET', 'PUT', 'POST', 'DELETE'])
+@users_router.route("/users", methods=['GET'])
 @jwt_required
 def users():
     user = get_jwt_identity()['user']

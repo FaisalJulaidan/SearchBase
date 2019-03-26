@@ -39,7 +39,7 @@ def reset_password_verify(payload):
             if not password:
                 return helpers.jsonResponse(False, 400, "Server did not manage to receive your new password")
 
-            resetPassword_callback: Callback = user_services.changePasswordByEmail(email, password)
+            resetPassword_callback: Callback = user_services.updatePasswordByEmail(email, password)
             if not resetPassword_callback.Success:
                 return helpers.jsonResponse(False, 400, resetPassword_callback.Message)
 

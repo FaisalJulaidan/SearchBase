@@ -325,18 +325,6 @@ def getListFromSQLAlchemyList(SQLAlchemyList):
     return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
 
 
-def mergeRolesToUserLists(users: list, roles: list):
-    for user in users:
-        if 'Role' not in user:
-            for role in roles:
-                if user['RoleID'] == role['ID']:
-                    user['Role']= role
-                    break
-                else:
-                    user['Role']= None
-    return users
-
-
 def isStringsLengthGreaterThanZero(*args):
     for arg in args:
         if len(arg.strip()) == 0:

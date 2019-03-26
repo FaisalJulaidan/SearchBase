@@ -18,7 +18,7 @@ function* getUsers() {
 function* addUser(action) {
     try {
         loadingMessage('Adding new user...');
-        const res = yield http.put(`/user`, action.params.user);
+        const res = yield http.put(`/users`, action.params.user);
         yield put(usersManagementActions.addUserSuccess(res.message));
         yield put(usersManagementActions.getUsers());
         successMessage('New user added');
@@ -34,7 +34,7 @@ function* addUser(action) {
 function* editUser(action) {
     try {
         loadingMessage('Editing user...');
-        const res = yield http.post(`/user`, action.params.user);
+        const res = yield http.post(`/users`, action.params.user);
         yield put(usersManagementActions.editUserSuccess(res.message));
         yield put(usersManagementActions.getUsers())
         successMessage('User edited');
@@ -50,7 +50,7 @@ function* editUser(action) {
 function* deleteUser(action) {
     try {
         loadingMessage('Deleting user...');
-        const res = yield http.post(`/user_delete`, action.params.user);
+        const res = yield http.delete(`/users`, action.params.user);
         yield put(usersManagementActions.deleteUserSuccess(res.message));
         yield put(usersManagementActions.getUsers());
         successMessage('User deleted');

@@ -79,8 +79,10 @@ def gen_dummy_data():
                                             "DataType":enums.DataType.NoType.name,
                                              "Content": {
                                                  "showTop": 3,
-                                                 "action": "Go To Next Block",
-                                                 "blockToGoID": "gje6D",
+                                                 "action": "End Chat",
+                                                 "blockToGoID": None,
+                                                 "notInterestedAction": "End Chat",
+                                                 "notInterestedBlockToGoID": None,
                                                  "afterMessage": "We will contact you with this candidate",
                                                  "databaseType": "Candidates"
                                              },

@@ -251,8 +251,8 @@ class Question extends Component {
 
                         <ShowGoToBlockFormItem FormItem={FormItem}
                                                block={{
+                                                   ID: block.ID,
                                                    Content: {
-                                                       ID: block.ID,
                                                        blockToGoID: this.state.editedAnswer?.blockToGoID
                                                    }
                                                }}
@@ -271,8 +271,8 @@ class Question extends Component {
 
                         <AfterMessageFormItem FormItem={FormItem}
                                               block={{
+                                                  ID: block.ID,
                                                   Content: {
-                                                      ID: block.ID,
                                                       afterMessage: this.state.editedAnswer?.afterMessage
                                                   }
                                               }}

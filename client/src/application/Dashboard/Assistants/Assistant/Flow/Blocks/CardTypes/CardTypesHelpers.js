@@ -20,13 +20,36 @@ export const initActionType = (block, allGroups) => {
         return {showGoToBlock: false, showGoToGroup: false};
 };
 
-export const onSelectAction = (action) => {
-    if (action === "Go To Specific Block")
-        return {showGoToBlock: true, showGoToGroup: false};
-    else if (action === "Go To Group")
-        return {showGoToBlock: false, showGoToGroup: true};
-    else
-        return {showGoToBlock: false, showGoToGroup: false};
+export const initActionTypeNotInterested = (block, allGroups) => {
+    if (block.Content.notInterestedAction === "Go To Specific Block")
+        return {showGoToBlockNotInterested: true, showGoToGroupNotInterested: false};
+    else if (block.Content.notInterestedAction === "Go To Group") {
+        // because here we dont' have column in each block contains all the group
+        // this is a workaround to have the group name from the block id
+        const {notInterestedBlockToGoID} = block.Content;
+        for (const group of allGroups)
+            if (group.blocks[0].ID === notInterestedBlockToGoID)
+                return {showGoToBlockNotInterested: false, showGoToGroupNotInterested: true};
+    } else
+        return {showGoToBlockNotInterested: false, showGoToGroupNotInterested: false};
+};
+
+export const onSelectAction = (action, isNotInterested = false) => {
+    if (isNotInterested)
+        if (action === "Go To Specific Block")
+            return {showGoToBlockNotInterested: true, showGoToGroupNotInterested: false};
+        else if (action === "Go To Group")
+            return {showGoToBlockNotInterested: false, showGoToGroupNotInterested: true};
+        else
+            return {showGoToBlockNotInterested: false, showGoToGroupNotInterested: false};
+    else {
+        if (action === "Go To Specific Block")
+            return {showGoToBlock: true, showGoToGroup: false};
+        else if (action === "Go To Group")
+            return {showGoToBlock: false, showGoToGroup: true};
+        else
+            return {showGoToBlock: false, showGoToGroup: false};
+    }
 };
 
 export const onFileTypeChange = (checkedValues) => {

@@ -30,6 +30,8 @@ class Block extends Component {
                 return <Tag color="blue">Data Scan and Return</Tag>;
             case 'File Upload':
                 return <Tag color="cyan">{type}</Tag>;
+            case 'Raw Text':
+                return <Tag color="magenta">{type}</Tag>;
         }
     };
 
@@ -84,23 +86,6 @@ class Block extends Component {
                         : null
                     }
 
-                    {block.Content.action ?
-                        <Row>
-                            <Col span={6}><b>Action:</b></Col>
-                            <Col span={12}>{block.Content.action}</Col>
-                            <Divider/>
-                        </Row>
-                        : null
-                    }
-
-                    {block.Content.afterMessage ?
-                        <Row>
-                            <Col span={6}><b>After Message:</b></Col>
-                            <Col span={12}>{block.Content.afterMessage}</Col>
-                            <Divider/>
-                        </Row>
-                        : null
-                    }
 
                     {block.Content.showTop ?
                         <Row>
@@ -195,6 +180,15 @@ class Block extends Component {
                         : null
                     }
 
+                    {block.Content.action ?
+                        <Row>
+                            <Col span={6}><b>Action:</b></Col>
+                            <Col span={12}>{block.Content.action}</Col>
+                            <Divider/>
+                        </Row>
+                        : null
+                    }
+
                     {
                         block.Type !== 'Question' &&
                         <Row>
@@ -202,6 +196,40 @@ class Block extends Component {
                             <Col span={12}>
                                 {
                                     this.getBlockToGO(block.Content.blockToGoID || null)
+                                }
+                            </Col>
+                            <Divider/>
+                        </Row>
+                    }
+
+                    {block.Content.afterMessage ?
+                        <Row>
+                            <Col span={6}><b>After Message:</b></Col>
+                            <Col span={12}>{block.Content.afterMessage}</Col>
+                            <Divider/>
+                        </Row>
+                        : null
+                    }
+
+                    <Divider dashed={true} style={{fontWeight: 'normal', fontSize: '14px'}}>
+                        Not Interested Button</Divider>
+
+                    {block.Content.notInterestedAction ?
+                        <Row>
+                            <Col span={6}><b>Action When Not Interested:</b></Col>
+                            <Col span={12}>{block.Content.notInterestedAction}</Col>
+                            <Divider/>
+                        </Row>
+                        : null
+                    }
+
+                    {
+                        block.Type === 'Solutions' &&
+                        <Row>
+                            <Col span={6}><b>Block To Go Text When Not Interested:</b></Col>
+                            <Col span={12}>
+                                {
+                                    this.getBlockToGO(block.Content.notInterestedBlockToGoID || null)
                                 }
                             </Col>
                             <Divider/>

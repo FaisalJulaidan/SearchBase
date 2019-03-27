@@ -113,7 +113,7 @@ class Flow extends Component {
         });
         destroyMessage();
         successMessage('Group deleted!');
-        // Todo: run the blocksRelation checker function
+        // TODO: Check the related blocks to this group
     };
 
 
@@ -133,10 +133,16 @@ class Flow extends Component {
                         answer.blockToGoID = newBlock.ID;
                     return answer
                 })
+            } else if (lastBlock.Type === "Solutions") {
+                if (lastBlock.Content.action === "Go To Next Block")
+                    lastBlock.Content.blockToGoID = newBlock.ID;
+
+                if (lastBlock.Content.notInterestedAction === "Go To Next Block")
+                    lastBlock.Content.notInterestedBlockToGoID = newBlock.ID;
+
             } else if (lastBlock.Content.action === "Go To Next Block")
                 lastBlock.Content.blockToGoID = newBlock.ID;
         }
-
         updatedGroup.blocks.push(newBlock);
 
         this.setState({
@@ -161,9 +167,15 @@ class Flow extends Component {
                         edittedBlock.Content.blockToGoID = null;
                 return answer
             })
-        }
+        } else if (edittedBlock.Type === "Solutions") {
 
-        if (edittedBlock.Content.action === "Go To Next Block")
+            if (edittedBlock.Content.action === "Go To Next Block")
+                edittedBlock.Content.blockToGoID = nextBlock.ID;
+
+            if (edittedBlock.Content.notInterestedAction === "Go To Next Block")
+                edittedBlock.Content.notInterestedBlockToGoID = nextBlock.ID;
+
+        } else if (edittedBlock.Content.action === "Go To Next Block")
             if (nextBlock?.ID)
                 edittedBlock.Content.blockToGoID = nextBlock.ID;
             else
@@ -194,6 +206,20 @@ class Flow extends Component {
                         }
                         return answer
                     })
+                } else if (block.Type === "Solutions") {
+                    let shallIncreament = false;
+                    if (block.Content.blockToGoID === deletedBlock.ID) {
+                        shallIncreament = true;
+                        block.Content.blockToGoID = null;
+                    }
+
+                    if (block.Content.notInterestedBlockToGoID === deletedBlock.ID) {
+                        shallIncreament = true;
+                        block.Content.notInterestedBlockToGoID = null;
+                    }
+
+                    if (shallIncreament) counter++;
+
                 } else if (block.Content.blockToGoID === deletedBlock.ID) {
                     block.Content.blockToGoID = null;
                     counter++;
@@ -232,6 +258,19 @@ class Flow extends Component {
                             answer.blockToGoID = null;
                     return answer
                 })
+            } else if (block.Type === "Solutions") {
+                if (block.Content.action === "Go To Next Block")
+                    if (array[index + 1]?.ID)
+                        block.Content.blockToGoID = array[index + 1].ID;
+                    else
+                        block.Content.blockToGoID = null;
+
+                if (block.Content.notInterestedAction === "Go To Next Block")
+                    if (array[index + 1]?.ID)
+                        block.Content.notInterestedBlockToGoID = array[index + 1].ID;
+                    else
+                        block.Content.notInterestedBlockToGoID = null;
+
             } else {
                 if (block.Content.action === "Go To Next Block")
                     if (array[index + 1]?.ID)

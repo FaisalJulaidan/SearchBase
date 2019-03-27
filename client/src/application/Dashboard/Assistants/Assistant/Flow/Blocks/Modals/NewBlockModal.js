@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 
-import {http} from "../../../../../../../helpers";
 
 import {Icon, Modal, Tabs} from 'antd';
 
@@ -8,9 +7,10 @@ import UserInput from "../CardTypes/UserInput";
 import Question from "../CardTypes/Question";
 import FileUpload from "../CardTypes/FileUpload";
 import Solutions from "../CardTypes/Solutions";
+import RawText from "../CardTypes/RawText";
 
 const TabPane = Tabs.TabPane;
-
+const MyModal = Modal;
 class NewBlockModal extends Component {
 
     state = {
@@ -23,11 +23,6 @@ class NewBlockModal extends Component {
         currentGroup: null,
         block: null
     };
-
-    // componentDidMount() {
-    //     http.get(`/assistant/flow/options`)
-    //         .then(res => this.setState({flowOptions: res.data.data}))
-    // }
 
     componentWillReceiveProps(nextProps) {
         this.setState({
@@ -48,12 +43,12 @@ class NewBlockModal extends Component {
     render() {
         return (
             <div>
-                <Modal width={800}
-                       title="Add New Question"
-                       visible={this.props.visible}
-                       onCancel={this.props.closeModal}
-                       destroyOnClose={true}
-                       footer={null}>
+                <MyModal width={800}
+                         title="Add New Question"
+                         visible={this.props.visible}
+                         onCancel={this.props.closeModal}
+                         destroyOnClose={true}
+                         footer={null}>
 
                     <Tabs type="card" onChange={this.onChangeTab}>
 
@@ -86,8 +81,15 @@ class NewBlockModal extends Component {
                                        options={this.props.options}/>
                         </TabPane>
 
+                        <TabPane tab={<span><Icon type="font-size"/>Raw Text</span>}
+                                 key="RawText">
+                            <RawText modalState={this.state}
+                                     handleNewBlock={this.handleNewBlock}
+                                     options={this.props.options}/>
+                        </TabPane>
+
                     </Tabs>
-                </Modal>
+                </MyModal>
 
 
             </div>

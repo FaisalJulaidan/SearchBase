@@ -1,9 +1,10 @@
-import {Button, Checkbox, Input, Select, Spin, Cascader} from "antd";
+import {Button, Checkbox, Input, Select, Spin, Cascader,} from "antd";
 import React from 'react';
-import {onCancel, onDelete, onFileTypeChange, onSelectAction} from "./CardTypesHelpers";
+import {onCancel, onDelete, onSelectAction} from "./CardTypesHelpers";
 
 const Option = Select.Option;
 const CheckboxGroup = Checkbox.Group;
+const {TextArea} = Input;
 
 // Common Components
 ////////////////////////////////////////////
@@ -102,6 +103,22 @@ export const AfterMessageFormItem = ({FormItem, layout, getFieldDecorator, block
     </FormItem>
 );
 
+export const RawTextFormItem = ({FormItem, layout, getFieldDecorator, block, placeholder}) => (
+    <FormItem label="Raw Text"
+              extra="This message will displayed straight after the previous block"
+              {...layout}>
+        {getFieldDecorator('rawText', {
+            initialValue: block.Content.text ? block.Content.text : undefined,
+            rules: [{
+                required: true,
+                message: "Please input raw text field",
+            }],
+        })(
+            <TextArea placeholder={placeholder} autosize={{minRows: 2, maxRows: 6}}/>
+        )}
+    </FormItem>
+);
+
 export const ActionFormItem = ({FormItem, layout, getFieldDecorator, setStateHandler, blockOptions, block}) => (
     <FormItem label="Action" {...layout}>
         {
@@ -114,6 +131,28 @@ export const ActionFormItem = ({FormItem, layout, getFieldDecorator, setStateHan
                     }],
                 })(
                     <Select onSelect={(action) => setStateHandler(onSelectAction(action))}
+                            placeholder="The next step after this block">{
+                        blockOptions.actions.map((action, i) =>
+                            <Option key={i} value={action}>{action}</Option>)
+                    }</Select>
+                )
+                : <Spin><Select placeholder="The next step after this block"></Select></Spin>
+        }
+    </FormItem>
+);
+
+export const NotInterstedActionFormItem = ({FormItem, layout, getFieldDecorator, setStateHandler, blockOptions, block}) => (
+    <FormItem label="Not Interested Action" {...layout}>
+        {
+            blockOptions.actions ?
+                getFieldDecorator('notInterestedAction', {
+                    initialValue: block.Content.notInterestedAction ? block.Content.notInterestedAction : undefined,
+                    rules: [{
+                        required: true,
+                        message: "Please select an action",
+                    }],
+                })(
+                    <Select onSelect={(action) => setStateHandler(onSelectAction(action, true))}
                             placeholder="The next step after this block">{
                         blockOptions.actions.map((action, i) =>
                             <Option key={i} value={action}>{action}</Option>)
@@ -139,7 +178,7 @@ export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allB
                         )(
                             <Select placeholder="The next block to go to">{
                                 allBlocks.map((block, i) => {
-                                    if (block.ID !== currentBlock.Content.ID)
+                                    if (block.ID !== currentBlock.ID)
                                         return <Option key={i} value={block.ID}>
                                             {`(${block.Type}) ${block.Content.text ? block.Content.text : ''}`}
                                         </Option>;
@@ -152,10 +191,10 @@ export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allB
     );
 };
 
-export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, currentBlock, currentGroup, allGroups, showGoToGroup}) => {
+export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, block, currentGroup, allGroups, showGoToGroup}) => {
 
     allGroups = allGroups.filter(group => group.id !== currentGroup.id);
-    const selectedGroup = allGroups.find(group => !!group.blocks.find(block => block.id === currentBlock?.Content?.goToBlockID));
+    const selectedGroup = allGroups.find(group => !!group.blocks.find(block => block.id === block?.Content?.goToBlockID));
 
     return (
         showGoToGroup ?
@@ -166,11 +205,13 @@ export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, curr
                     {
                         getFieldDecorator('blockToGoIDGroup',
                             {
-                                initialValue: currentBlock && selectedGroup ? selectedGroup.blocks[0].ID : undefined,
+                                initialValue: block && selectedGroup ? selectedGroup.blocks[0].ID : undefined,
                                 rules: [{required: true, message: "Please select your next group"}]
                             }
                         )(
-                            <Select placeholder="The first next block of a group">{
+                            <Select placeholder="The first next block of a group">
+                                {console.log(block, selectedGroup)}
+                                {
                                 allGroups.map((group, i) => {
                                     if (group.blocks[0]) {
                                         return <Option key={i} value={group.blocks[0].ID}>
@@ -178,6 +219,75 @@ export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, curr
                                             </Option>;
                                     } else
                                         return <Option disabled key={i} value={group.name}>
+                                                {`${group.name}`}
+                                            </Option>
+                                    }
+                                )
+                            }</Select>
+                        )
+                    }
+                </FormItem>
+            ) : null
+    );
+};
+
+
+export const ShowGoToBlockNotInterestedFormItem = ({FormItem, layout, getFieldDecorator, allBlocks, showGoToBlock, block}) => {
+    let currentBlock = block;
+    return (
+        showGoToBlock ?
+            (
+                <FormItem label="Go To Specific Block"
+                          extra="The selected block will be shown after clicking on 'Not Interested' button"
+                          {...layout}>
+                    {
+                        getFieldDecorator('notInterestedBlockToGoID',
+                            {
+                                initialValue: currentBlock.Content.blockToGoID ? currentBlock.Content.blockToGoID : undefined,
+                                rules: [{required: true, message: "Please select your next block"}]
+                            }
+                        )(
+                            <Select placeholder="The next block to go to">{
+                                allBlocks.map((block, i) => {
+                                    if (block.ID !== currentBlock.ID)
+                                        return <Option key={i} value={block.ID}>
+                                            {`(${block.Type}) ${block.Content.text ? block.Content.text : ''}`}
+                                        </Option>;
+                                })
+                            }</Select>
+                        )
+                    }
+                </FormItem>
+            ) : null
+    );
+};
+
+export const ShowGoToGroupNotInterestedFormItem = ({FormItem, layout, getFieldDecorator, block, currentGroup, allGroups, showGoToGroup}) => {
+
+    allGroups = allGroups.filter(group => group.id !== currentGroup.id);
+    const selectedGroup = allGroups.find(group => !!group.blocks.find(block => block.id === block?.Content?.goToBlockID));
+
+    return (
+        showGoToGroup ?
+            (
+                <FormItem label="Go To Specific Group"
+                          extra="The selected group will start from its first block"
+                          {...layout}>
+                    {
+                        getFieldDecorator('notInterestedBlockToGoIDGroup',
+                            {
+                                initialValue: block && selectedGroup ? selectedGroup.blocks[0].ID : undefined,
+                                rules: [{required: true, message: "Please select your next group"}]
+                            }
+                        )(
+                            <Select placeholder="The first next block of a group">{
+                                allGroups.map((group, i) => {
+                                        if (group.blocks[0]) {
+                                            return <Option key={i} value={group.blocks[0].ID}>
+                                                {`${group.name}`}
+                                            </Option>;
+                                        } else
+                                            return <Option disabled key={i} value={group.name}>
                                                 {`${group.name}`}
                                             </Option>
                                     }

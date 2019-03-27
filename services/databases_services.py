@@ -10,6 +10,7 @@ from utilities import helpers
 from sqlalchemy import and_
 from enums import DatabaseType, DataType as DT
 import json
+import random
 
 
 def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
@@ -328,25 +329,44 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
 
         topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 2), 'count')
                                 .to_json(orient='records'))
+
         data = []
+
+
+        location = ["Their preferred location for work would be [location].",
+                    "They prefer to work in [location]."]
+
+        yearsExp = ["This candidate has [yearsExp] years of experience in  [skills].",
+                    "They have experience with [skills] for [yearsExp] years."]
+
+        desiredSalary = ["This candidate desired salary is £[desiredSalary].",
+                         "Their desired salary is £[desiredSalary]."]
+
+
+
         indexes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
         for i, record in enumerate(topResults):
+            desc = []
+            # Build random dynamic candidate description
+            if record[Candidate.CandidateLocation.name]:
+                desc.append(random.choice(location).replace("[location]",
+                                                            record[Candidate.CandidateLocation.name]))
 
-            ########################
-            #      Candidate A     #
-            #        Cardiff       #
-            #   Skills: C#, Python #
-            #                      #
-            #----------------------#
-            #       Enquire        #
-            #----------------------#
+            if record[Candidate.CandidateYearsExperience.name] and record[Candidate.CandidateSkills.name]:
+                desc.append(random.choice(yearsExp)
+                            .replace("[yearsExp]", str(int(record[Candidate.CandidateYearsExperience.name])))
+                            .replace("[skills]", record[Candidate.CandidateSkills.name]))
 
+            if record[Candidate.CandidateDesiredSalary.name]:
+                desc.append(random.choice(desiredSalary).replace("[desiredSalary]",
+                                                            str(record[Candidate.CandidateDesiredSalary.name])))
+            random.shuffle(desc)
             data.append({
                 "id": record["ID"],
                 "databaseType": databaseType.value,
                 "title": "Candidate " + indexes[i],
-                "subTitle": "Location: " + (str(record[Candidate.CandidateLocation.name]) or "Unavailable"),
-                "description": "Skills: " + (record[Candidate.CandidateSkills.name] or "Unavailable"),
+                # "subTitle": "Location: " + (record[Candidate.CandidateLocation.name] or "Unavailable"),
+                "description": " ".join(desc),
                 "buttonText": "Enquire"
             })
 

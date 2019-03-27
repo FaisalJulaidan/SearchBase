@@ -170,10 +170,16 @@ class Flow extends Component {
         } else if (edittedBlock.Type === "Solutions") {
 
             if (edittedBlock.Content.action === "Go To Next Block")
-                edittedBlock.Content.blockToGoID = nextBlock.ID;
+                if (nextBlock?.ID)
+                    edittedBlock.Content.blockToGoID = nextBlock.ID;
+                else
+                    edittedBlock.Content.blockToGoID = null;
 
             if (edittedBlock.Content.notInterestedAction === "Go To Next Block")
-                edittedBlock.Content.notInterestedBlockToGoID = nextBlock.ID;
+                if (nextBlock?.ID)
+                    edittedBlock.Content.notInterestedBlockToGoID = nextBlock.ID;
+                else
+                    edittedBlock.Content.blockToGoID = null;
 
         } else if (edittedBlock.Content.action === "Go To Next Block")
             if (nextBlock?.ID)

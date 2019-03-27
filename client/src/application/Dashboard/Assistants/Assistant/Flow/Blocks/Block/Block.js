@@ -211,15 +211,19 @@ class Block extends Component {
                         : null
                     }
 
-                    <Divider dashed={true} style={{fontWeight: 'normal', fontSize: '14px'}}>
-                        Not Interested Button</Divider>
+
 
                     {block.Content.notInterestedAction ?
-                        <Row>
-                            <Col span={6}><b>Action When Not Interested:</b></Col>
-                            <Col span={12}>{block.Content.notInterestedAction}</Col>
-                            <Divider/>
-                        </Row>
+                        <>
+                            <Divider dashed={true} style={{fontWeight: 'normal', fontSize: '14px'}}>
+                                Not Interested Button</Divider>
+                            <Row>
+
+                                <Col span={6}><b>Action When Not Interested:</b></Col>
+                                <Col span={12}>{block.Content.notInterestedAction}</Col>
+                                <Divider/>
+                            </Row>
+                        </>
                         : null
                     }
 

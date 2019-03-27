@@ -244,14 +244,16 @@ def send_async_email(app, msg):
 
 def send_email(to, subject, template, **kwargs):
     try:
+        # create Message with the Email: title, recipients and sender
         msg = Message(subject, recipients=[to], sender="thesearchbase@gmail.com")
+
         try:
             # get app context / if it fails assume its working outside the app
             app = current_app._get_current_object()
 
             # load the template which the email will use
             msg.html = render_template(template, **kwargs)
-        except Exception as exc:
+        except Exception as exc:  # TODO check error code raise exception
             # import app. importing it in the beginning of the file will raise an error as it is still not created
             from app import app
 

@@ -77,11 +77,11 @@ Question = {
                 "type": "object",
                 "properties": {
                     "id": {"type": "string"},
-                    "text": { "type": "string" },
-                    "keywords": { "type": "array", "items": { "type": "string" } },
-                    "blockToGoID": { "type": [ "string",  "null" ] },
-                    "action": { "enum": [e.value for e in enums.BlockAction]},
-                    "afterMessage": { "type": "string"}
+                    "text": {"type": "string"},
+                    "keywords": {"type": "array", "items": {"type": "string"}},
+                    "blockToGoID": {"type": ["string", "null"]},
+                    "action": {"enum": [e.value for e in enums.BlockAction]},
+                    "afterMessage": {"type": "string"}
                 },
                 "required": ["id", "text", "keywords", "action", "afterMessage", "blockToGoID"],
                 "additionalProperties": False
@@ -92,20 +92,17 @@ Question = {
     "additionalProperties": False
 }
 
-
 UserInput = {
     "type": "object",
     "properties": {
         "text": {"type": "string"},
         "blockToGoID": {"type": ["string", "null"]},
-        "action": { "enum": [e.value for e in enums.BlockAction]},
+        "action": {"enum": [e.value for e in enums.BlockAction]},
         "afterMessage": {"type": "string"}
     },
     "required": ["text", "action", "afterMessage", "blockToGoID"],
     "additionalProperties": False
 }
-
-
 
 FileUpload = {
     "type": "object",
@@ -113,35 +110,36 @@ FileUpload = {
         "text": {"type": "string"},
         "action": {"enum": [e.value for e in enums.BlockAction]},
         "fileTypes": {"type": "array", "items": {"type": "string", "enum": [t for t in BaseConfig.ALLOWED_EXTENSIONS]}},
-        "blockToGoID": { "type": [ "string", "null" ] },
+        "blockToGoID": {"type": ["string", "null"]},
         "afterMessage": {"type": "string"}
     },
     "required": ["text", "action", "blockToGoID", "afterMessage"
-    ],
+                 ],
     "additionalProperties": False
 }
-
 
 Solutions = {
     "type": "object",
     "properties": {
         "showTop": {"type": "integer", "minimum": 1},
-        "action": { "enum": [e.value for e in enums.BlockAction]},
-        "blockToGoID": { "type": [ "string",  "null" ] },
+        "action": {"enum": [e.value for e in enums.BlockAction]},
+        "notInterestedAction": {"enum": [e.value for e in enums.BlockAction]},
+        "blockToGoID": {"type": ["string", "null"]},
+        "notInterestedBlockToGoID": {"type": ["string", "null"]},
         "afterMessage": {"type": "string"},
-        "databaseType": { "enum": [dbt.name for dbt in enums.DatabaseType]},
+        "databaseType": {"enum": [dbt.name for dbt in enums.DatabaseType]},
     },
-    "required": ["showTop", "action", "afterMessage", "blockToGoID", "databaseType"],
+    "required": ["showTop", "action", "notInterestedAction", "afterMessage", "blockToGoID", "databaseType"],
     "additionalProperties": False
 }
 
 RawText = {
     "type": "object",
     "properties": {
-        "text": { "enum": [e.value for e in enums.BlockAction]},
-        "action": { "enum": [e.value for e in enums.BlockAction]},
-        "blockToGoID": { "type": [ "string",  "null" ] },
+        "text": {"type": "string"},
+        "action": {"enum": [e.value for e in enums.BlockAction]},
+        "blockToGoID": {"type": ["string", "null"]},
     },
-    "required": ["text", "action","blockToGoID"],
+    "required": ["text", "action", "blockToGoID"],
     "additionalProperties": False
 }

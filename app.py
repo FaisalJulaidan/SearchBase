@@ -10,7 +10,7 @@ from flask_migrate import Migrate, MigrateCommand
 from sqlalchemy_utils import create_database, database_exists, drop_database
 from flask_apscheduler import APScheduler
 from services.auth_services import jwt
-from utilities import helpers, commands
+from utilities import helpers, tasks
 from flask_babel import Babel
 
 
@@ -115,8 +115,8 @@ manager.add_command('db', MigrateCommand)
 
 # will be used for migration purposes
 @manager.command
-def script():
-    commands.hello()
+def run_tasks():
+    tasks.migrate_flow()
 
 
 print("Run the server...")

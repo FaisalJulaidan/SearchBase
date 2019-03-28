@@ -11,24 +11,53 @@ class Block extends Component {
     editBlock = (block) => this.props.editBlock(block);
     deleteBlock = (block) => this.props.deleteBlock(block);
 
+    getBlockToGO = (ID) => {
+        const {allGroups} = this.props;
+        if (!ID)
+            return 'None';
+        let allBlocks = allGroups.map(group => group.blocks.flat(1)).flat(1);
+        let blockToGo = allBlocks.find(block => block.ID === ID);
+        return blockToGo?.Content?.text || `Data Scan and Return Block Type`
+    };
+
+    switchBlockTypes = (type) => {
+        switch (type) {
+            case 'User Input':
+                return <Tag color="geekblue">Open Answers</Tag>;
+            case 'Question':
+                return <Tag color="purple">Pre-Selected Answers</Tag>;
+            case 'Solutions':
+                return <Tag color="blue">Data Scan and Return</Tag>;
+            case 'File Upload':
+                return <Tag color="cyan">{type}</Tag>;
+            case 'Raw Text':
+                return <Tag color="magenta">{type}</Tag>;
+        }
+    };
+
     render() {
         const {block, options} = this.props;
         const databases = options ? options.databases : null;
-
         return (
             <Collapse bordered={true}>
                 <Panel header={(
                     <>
-                        {block.Type} <Divider type="vertical"/>
+                        {this.switchBlockTypes(block.Type)} <Divider type="vertical"/>
                         {block.Content.text?.substring(0, 90)}
                         {block.Content.text?.length > 90 ? '...' : null}
 
                         <div style={{float: 'right', marginRight: 10}}>
                             <Divider type="vertical"/>
-                            <Button icon={'edit'} size={"small"} onClick={() => this.editBlock(block)}/>
+                            <Button icon={'edit'} size={"small"} onClick={(event) => {
+                                this.editBlock(block);
+                                event.stopPropagation();
+                            }}/>
                             <Divider type="vertical"/>
                             <Button icon={'delete'} size={"small"} type={"danger"}
-                                    onClick={() => this.deleteBlock(block)}/>
+                                    onClick={(event) => {
+                                        this.deleteBlock(block);
+                                        event.stopPropagation();
+                                    }}/>
                         </div>
                     </>
                 )}
@@ -57,23 +86,6 @@ class Block extends Component {
                         : null
                     }
 
-                    {block.Content.action ?
-                        <Row>
-                            <Col span={6}><b>Action:</b></Col>
-                            <Col span={12}>{block.Content.action}</Col>
-                            <Divider/>
-                        </Row>
-                        : null
-                    }
-
-                    {block.Content.afterMessage ?
-                        <Row>
-                            <Col span={6}><b>After Message:</b></Col>
-                            <Col span={12}>{block.Content.afterMessage}</Col>
-                            <Divider/>
-                        </Row>
-                        : null
-                    }
 
                     {block.Content.showTop ?
                         <Row>
@@ -110,40 +122,123 @@ class Block extends Component {
                     {block.Content.answers ?
                         <div>
                             <b>Answers:</b>
-                            {
-                                block.Content.answers.map((answer, i) =>
-                                    <Card key={i} style={{margin: 5, width: 300}}>
-                                        <Meta
-                                            title={answer.text}
-                                            description={
-                                                (<>Keywords: {answer.keywords.map((keyword, i) =>
-                                                    <Tag key={i}>{keyword}</Tag>)}</>)
-                                            }
-                                        />
-                                        <Row>
-                                            <Divider/>
-                                            <Col span={6}>Action:</Col>
-                                            <Col span={12}>{answer.action}</Col>
-                                        </Row>
+                            <div style={{width: '70%', margin: '0 auto 15px'}}>
+                                <Collapse accordion>
+                                    {
+                                        block.Content.answers.map((answer, i) => (
+                                            <Collapse.Panel header={answer.text} key={i}>
+                                                <Row>
+                                                    <Col span={8}>Answer:</Col>
+                                                    <Col span={16}>
+                                                        {answer.text}
+                                                    </Col>
+                                                </Row>
 
-                                        <Row>
-                                            <Divider/>
-                                            <Col span={6}>After Message</Col>
-                                            <Col span={12}>{answer.afterMessage}</Col>
-                                        </Row>
+                                                <Row>
+                                                    <Divider/>
+                                                    <Col span={8}>Action:</Col>
+                                                    <Col span={16}>{answer.action}</Col>
+                                                </Row>
 
-                                    </Card>
-                                )
-                            }
+                                                <Row>
+                                                    <Divider/>
+                                                    <Col span={8}>Question To Go Text:</Col>
+                                                    <Col span={16}>
+                                                        {this.getBlockToGO(answer.blockToGoID || null)}
+                                                    </Col>
+                                                </Row>
+
+
+                                                <Row>
+                                                    <Divider/>
+                                                    <Col span={8}>Keywords:</Col>
+                                                    <Col span={16}>
+                                                        {
+                                                            answer.keywords[0] ?
+                                                                answer.keywords.map((keyword, i) =>
+                                                                    <Tag key={i}>{keyword}</Tag>)
+                                                                : 'No Keywords'
+                                                        }
+                                                    </Col>
+                                                </Row>
+
+                                                {
+                                                    answer.afterMessage &&
+                                                    <Row>
+                                                        <Divider/>
+                                                        <Col span={8}>After Message:</Col>
+                                                        <Col span={16}>{answer.afterMessage}</Col>
+                                                    </Row>
+                                                }
+
+                                            </Collapse.Panel>
+                                        ))
+                                    }
+                                </Collapse>
+                            </div>
                         </div>
                         : null
                     }
 
-                    <Row>
-                        <Col span={6}><b>Block To Go ID:</b></Col>
-                        <Col span={12}>{block.Content.blockToGoID || `None`}</Col>
-                        <Divider/>
-                    </Row>
+                    {block.Content.action ?
+                        <Row>
+                            <Col span={6}><b>Action:</b></Col>
+                            <Col span={12}>{block.Content.action}</Col>
+                            <Divider/>
+                        </Row>
+                        : null
+                    }
+
+                    {
+                        block.Type !== 'Question' &&
+                        <Row>
+                            <Col span={6}><b>Question To Go Text:</b></Col>
+                            <Col span={12}>
+                                {
+                                    this.getBlockToGO(block.Content.blockToGoID || null)
+                                }
+                            </Col>
+                            <Divider/>
+                        </Row>
+                    }
+
+                    {block.Content.afterMessage ?
+                        <Row>
+                            <Col span={6}><b>After Message:</b></Col>
+                            <Col span={12}>{block.Content.afterMessage}</Col>
+                            <Divider/>
+                        </Row>
+                        : null
+                    }
+
+
+
+                    {block.Content.notInterestedAction ?
+                        <>
+                            <Divider dashed={true} style={{fontWeight: 'normal', fontSize: '14px'}}>
+                                Not Interested Button</Divider>
+                            <Row>
+
+                                <Col span={6}><b>Action When Not Interested:</b></Col>
+                                <Col span={12}>{block.Content.notInterestedAction}</Col>
+                                <Divider/>
+                            </Row>
+                        </>
+                        : null
+                    }
+
+                    {
+                        block.Type === 'Solutions' &&
+                        <Row>
+                            <Col span={6}><b>Question To Go Text When Not Interested:</b></Col>
+                            <Col span={12}>
+                                {
+                                    this.getBlockToGO(block.Content.notInterestedBlockToGoID || null)
+                                }
+                            </Col>
+                            <Divider/>
+                        </Row>
+                    }
 
                 </Panel>
             </Collapse>

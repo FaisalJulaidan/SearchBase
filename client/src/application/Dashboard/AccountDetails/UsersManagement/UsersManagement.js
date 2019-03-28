@@ -55,9 +55,9 @@ class UsersManagement extends React.Component {
                                 />
                             </TabPane>
 
-                            <TabPane tab={"Permissions"} key={"2"}>
-                                Coming soon...
-                            </TabPane>
+                            {/*<TabPane tab={"Permissions"} key={"2"}>*/}
+                                {/*Coming soon...*/}
+                            {/*</TabPane>*/}
                         </Tabs>
                     </div>
                 </div>

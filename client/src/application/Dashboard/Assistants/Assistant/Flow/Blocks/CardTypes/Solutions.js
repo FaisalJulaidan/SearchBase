@@ -1,13 +1,16 @@
 import React, {Component} from 'react';
-import {Card, Form, Input} from "antd";
-import {getBlockId, getInitialVariables, initActionType} from './CardTypesHelpers'
+import {Card, Form, Input, Divider} from "antd";
+import {initActionTypeNotInterested, getInitialVariables, initActionType} from './CardTypesHelpers'
 import {
     ActionFormItem,
     AfterMessageFormItem,
     ButtonsForm,
     ShowGoToBlockFormItem,
     ShowGoToGroupFormItem,
-    DatabaseTypeFormItem
+    DatabaseTypeFormItem,
+    NotInterstedActionFormItem,
+    ShowGoToBlockNotInterestedFormItem,
+    ShowGoToGroupNotInterestedFormItem
 } from './CardTypesFormItems'
 
 const FormItem = Form.Item;
@@ -17,15 +20,20 @@ class Solutions extends Component {
     state = {
         showGoToBlock: false,
         showGoToGroup: false,
+        showGoToBlockNotInterested: false,
+        showGoToGroupNotInterested: false
     };
 
     componentWillMount() {
         const {modalState, options} = this.props;
         const {block} = getInitialVariables(options.flow, modalState);
-        this.setState(initActionType(block, this.props.modalState.allGroups));
+        this.setState({
+            ...initActionType(block, this.props.modalState.allGroups),
+            ...initActionTypeNotInterested(block, this.props.modalState.allGroups)
+        });
     }
 
-    onSubmit = (formBlock) => this.props.form.validateFields((err, values) => {
+    onSubmit = () => this.props.form.validateFields((err, values) => {
         if (!err) {
             const flowOptions = this.props.options.flow;
             const showTop = Number(values.showTop) > 10 ? 10 : Number(values.showTop);
@@ -37,11 +45,14 @@ class Solutions extends Component {
                     Content: {
                         showTop: showTop,
                         action: values.action,
+                        notInterestedAction: values.notInterestedAction,
                         blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
+                        notInterestedBlockToGoID: values.notInterestedBlockToGoID || values.notInterestedBlockToGoIDGroup || null,
                         afterMessage: values.afterMessage || "" ,
                         databaseType: values.databaseType,
                     }
             };
+
 
             if (this.props.handleNewBlock)
                 this.props.handleNewBlock(options);
@@ -106,6 +117,28 @@ class Solutions extends Component {
                     <AfterMessageFormItem FormItem={FormItem} block={block}
                                           getFieldDecorator={getFieldDecorator}
                                           layout={layout}/>
+
+                    <Divider dashed={true} style={{fontWeight: 'normal', fontSize: '14px'}}>
+                        Not Interested Button</Divider>
+
+                    <NotInterstedActionFormItem FormItem={FormItem}
+                                                blockOptions={blockOptions}
+                                                block={block} layout={layout}
+                                                setStateHandler={(state) => this.setState(state)}
+                                                getFieldDecorator={getFieldDecorator}/>
+
+                    <ShowGoToBlockNotInterestedFormItem FormItem={FormItem} allBlocks={allBlocks} block={block}
+                                                        showGoToBlock={this.state.showGoToBlockNotInterested}
+                                                        getFieldDecorator={getFieldDecorator}
+                                                        layout={layout}/>
+
+                    <ShowGoToGroupNotInterestedFormItem FormItem={FormItem}
+                                                        block={block}
+                                                        allGroups={allGroups}
+                                                        currentGroup={currentGroup}
+                                                        showGoToGroup={this.state.showGoToGroupNotInterested}
+                                                        getFieldDecorator={getFieldDecorator}
+                                                        layout={layout}/>
 
                 </Form>
             </Card>

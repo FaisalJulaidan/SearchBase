@@ -142,7 +142,7 @@ class Block extends Component {
 
                                                 <Row>
                                                     <Divider/>
-                                                    <Col span={8}>Block To Go Text:</Col>
+                                                    <Col span={8}>Question To Go Text:</Col>
                                                     <Col span={16}>
                                                         {this.getBlockToGO(answer.blockToGoID || null)}
                                                     </Col>
@@ -192,7 +192,7 @@ class Block extends Component {
                     {
                         block.Type !== 'Question' &&
                         <Row>
-                            <Col span={6}><b>Block To Go Text:</b></Col>
+                            <Col span={6}><b>Question To Go Text:</b></Col>
                             <Col span={12}>
                                 {
                                     this.getBlockToGO(block.Content.blockToGoID || null)
@@ -230,7 +230,7 @@ class Block extends Component {
                     {
                         block.Type === 'Solutions' &&
                         <Row>
-                            <Col span={6}><b>Block To Go Text When Not Interested:</b></Col>
+                            <Col span={6}><b>Question To Go Text When Not Interested:</b></Col>
                             <Col span={12}>
                                 {
                                     this.getBlockToGO(block.Content.notInterestedBlockToGoID || null)

@@ -154,7 +154,9 @@
             "afterMessage": "",
             "blockToGoID": "iBUbQP89w",
             "databaseType": "Jobs",
-            "showTop": 5
+            "showTop": 5,
+            "notInterestedAction": "Go To Specific Block",
+            "notInterestedBlockToGoID": "iBUbQP89w"
           },
           "DataType": "NoType",
           "ID": "y4yLRWDwj",
@@ -294,7 +296,9 @@
             "afterMessage": "To inquire about the candidates, select your ideal candidate and click 'inquire'",
             "blockToGoID": "fuxQj2wPL",
             "databaseType": "Candidates",
-            "showTop": 5
+            "showTop": 5,
+            "notInterestedAction": "Go To Specific Block",
+            "notInterestedBlockToGoID": "fuxQj2wPL"
           },
           "DataType": "NoType",
           "ID": "nUO25eG3p",

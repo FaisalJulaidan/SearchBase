@@ -339,8 +339,8 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
         yearsExp = ["This candidate has [yearsExp] years of experience in  [skills].",
                     "They have experience with [skills] for [yearsExp] years."]
 
-        desiredSalary = ["This candidate desired salary is £[desiredSalary].",
-                         "Their desired salary is £[desiredSalary]."]
+        desiredSalary = ["This candidate desired salary is £[desiredSalary]",
+                         "Their desired salary is £[desiredSalary]"]
 
 
 

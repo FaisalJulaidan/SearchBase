@@ -9,7 +9,7 @@ from utilities import helpers
 users_router: Blueprint = Blueprint('users_router', __name__, template_folder="../../templates")
 
 
-@users_router.route("/users", methods=['GET', 'POST', 'PUT', 'DELETE'])
+@users_router.route("/users", methods=['GET', 'POST', 'PUT'])
 @jwt_required
 def users():
     user = get_jwt_identity()['user']
@@ -61,9 +61,7 @@ def users():
         if not user_callback.Success:
             return helpers.jsonResponse(False, 400, user_callback.Message)
 
-        if not (first_name and surname and email)\
-                or not helpers.isValidEmail(email)\
-                or not user_callback.Data.Role.EditUsers:
+        if not helpers.isValidEmail(email) or not user_callback.Data.Role.EditUsers:
             return helpers.jsonResponse(False, 400, "Please make sure you entered all data correctly and have the " +
                                         "necessary permission to do this action")
 
@@ -75,10 +73,13 @@ def users():
 
         return helpers.jsonResponse(True, 200, "User updated successfully!")
 
-    if request.method == "DELETE":
 
-        # Get the user to be deleted.
-        user_id = request.json.get("ID")
+@users_router.route("/user/<int:user_id>", methods=['DELETE'])
+@jwt_required
+def user(user_id):
+    user = get_jwt_identity()['user']
+
+    if request.method == "DELETE":
 
         # Get the admin user who is logged in and wants to delete.
         user_callback: Callback = user_services.getByID(user.get('id'))
@@ -96,46 +97,46 @@ def users():
 
         return helpers.jsonResponse(True, 200, "User deleted successfully!")
 
-
-@users_router.route("/roles", methods=['PUT'])
-@jwt_required
-def update_roles():
-    user = get_jwt_identity()['user']
-
-    if request.method == "PUT":
-
-        # Get the admin user who is logged in and wants to edit.
-        callback: Callback = user_services.getByID(user.get('id', 0))
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, "Sorry, your account doesn't exist. Try again please!")
-        adminUser: User = callback.Data
-
-        # Check if the admin user is authorised for such an operation.
-        if not adminUser.Role.Name == 'Owner':
-            return helpers.jsonResponse(False, 401,
-                                        "Sorry, You're not authorised. Only owners are allowed to edit user's permissions.")
-
-        # New roles values
-        values = request.form.get("data", None)
-        if not values:
-            return helpers.jsonResponse(False, 400, "Please provide all required info for the roles.")
-        values = json.loads(values)
-
-        try:
-            currentRoles = adminUser.Company.Roles
-            for role in currentRoles:
-                for new_role in values:
-                    if role.ID == int(new_role['ID']):
-                        role.EditChatbots = new_role['EditChatbots']
-                        role.EditUsers = new_role['EditUsers']
-                        role.DeleteUsers = new_role['DeleteUsers']
-                        role.AccessBilling = new_role['AccessBilling']
-            # Save changes
-            db.session.commit()
-
-        except Exception as e:
-            db.session.rollback()
-            return helpers.jsonResponse(False, 400, "An error occurred! Try again please.")
-
-        print("Success >> roles updated")
-        return helpers.jsonResponse(True, 200, "Roles updated successfully!")
+# commented out until decision is made if roles are going to be implemented or not
+# @users_router.route("/roles", methods=['PUT'])
+# @jwt_required
+# def update_roles():
+#     user = get_jwt_identity()['user']
+#
+#     if request.method == "PUT":
+#
+#         # Get the admin user who is logged in and wants to edit.
+#         callback: Callback = user_services.getByID(user.get('id', 0))
+#         if not callback.Success:
+#             return helpers.jsonResponse(False, 400, "Sorry, your account doesn't exist. Try again please!")
+#         adminUser: User = callback.Data
+#
+#         # Check if the admin user is authorised for such an operation.
+#         if not adminUser.Role.Name == 'Owner':
+#             return helpers.jsonResponse(False, 401,
+#                                  "Sorry, You're not authorised. Only owners are allowed to edit user's permissions.")
+#
+#         # New roles values
+#         values = request.form.get("data", None)
+#         if not values:
+#             return helpers.jsonResponse(False, 400, "Please provide all required info for the roles.")
+#         values = json.loads(values)
+#
+#         try:
+#             currentRoles = adminUser.Company.Roles
+#             for role in currentRoles:
+#                 for new_role in values:
+#                     if role.ID == int(new_role['ID']):
+#                         role.EditChatbots = new_role['EditChatbots']
+#                         role.EditUsers = new_role['EditUsers']
+#                         role.DeleteUsers = new_role['DeleteUsers']
+#                         role.AccessBilling = new_role['AccessBilling']
+#             # Save changes
+#             db.session.commit()
+#
+#         except Exception as e:
+#             db.session.rollback()
+#             return helpers.jsonResponse(False, 400, "An error occurred! Try again please.")
+#
+#         print("Success >> roles updated")
+#         return helpers.jsonResponse(True, 200, "Roles updated successfully!")

@@ -140,7 +140,9 @@ class UsersDisplay extends React.Component {
                 //add records needed by the columns
                 // needs key
                 const user = getUser();
-                data = data.filter(record => { if(record.Email !== user.email){ return record; } });
+                data = data.filter(record => {
+                    if(record.Email !== user.email && record.Role.Name !== "Owner"){ return record; }
+                });
 
                 data = data.map((record, index) => {
                     data[index]["key"] = data[index]["ID"];

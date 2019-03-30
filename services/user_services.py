@@ -168,28 +168,6 @@ def getUsersWithRolesByCompanyID(companyID):
 
 
 # ----- Updaters ----- #
-def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
-    try:
-        user_callback: Callback = getByID(userID)
-        if not user_callback.Success:
-            return Callback(False, "Could not find user's records")
-        user: User = user_callback.Data
-
-        # Update user
-        user.Firstname = firstname
-        user.Surname = surname
-        user.Email = email.lower()
-        user.Role = role
-
-        db.session.commit()
-        return Callback(True, 'User has been edited successfully!')
-
-    except Exception as exc:
-        print(exc)
-        db.session.rollback()
-        return Callback(False, 'Sorry, Could not create the user.')
-
-
 def updateUserSettings(userID, trackingData, techSupport, accountSpecialist, notifications):
     try:
 

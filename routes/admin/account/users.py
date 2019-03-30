@@ -49,51 +49,31 @@ def users():
                                     "User has been added and an email with his login details is on its way to him")
 
     if request.method == "PUT":
-
+        print(request.json)
+        print(user)
         # User info
         userID = request.json.get("ID", 0)
-        firstname = request.json.get("Firstname", '').strip()
-        surname = request.json.get("Surname", '').strip()
-        email = request.json.get("Email", '').strip()
-        role = request.json.get("Role", {}).get("Name", None)
-        newRole = request.json.get("RoleName", {}).strip()
-
-        if not helpers.isStringsLengthGreaterThanZero(firstname, surname, email, role):
-            return helpers.jsonResponse(False, 400, "Please provide all required info for the new user.")
-
-        # Validate the given email
-        if not helpers.isValidEmail(email):
-            return helpers.jsonResponse(False, 400, "Please provide a valid email.")
-
-        # Get the user to be updated.
-        if not userID: userID = 0
-        callback: Callback = user_services.getByID(userID)
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, "Sorry, but this user doesn't exist")
-        userToUpdate: User = callback.Data
+        firstname = request.json.get("Firstname")
+        surname = request.json.get("Surname")
+        email = request.json.get("Email")
+        newRole = request.json.get("RoleName")
 
         # Get the admin user who is logged in and wants to edit.
-        callback: Callback = user_services.getByID(user.get('id', 0))
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, "Sorry, you account doesn't exist. Try again please!")
-        adminUser: User = callback.Data
+        user_callback: Callback = user_services.getByID(user.get('id'))
+        if not user_callback.Success:
+            return helpers.jsonResponse(False, 400, user_callback.Message)
 
-        # Check if the admin user is authorised for such an operation.
-        if not adminUser.Role.EditUsers:
-            return helpers.jsonResponse(False, 401, "Sorry, You're not authorised")
-
-        # Get the role to be assigned for the userToUpdate
-        callback: Callback = role_services.getByNameAndCompanyID(role, adminUser.Company.ID)
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, role + " role does not exist.")
-        role = callback.Data
+        if not (firstname and surname and email)\
+                or not helpers.isValidEmail(email)\
+                or not user_callback.Data.Role.EditUsers:
+            return helpers.jsonResponse(False, 400, "Please make sure you entered all data correctly and have the " +
+                                        "necessary permission to do this action")
 
         # Update the user (userToUpdate)
-        callback: Callback = user_services.updateAsOwner(userToUpdate.ID, firstname, surname, email, role)
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, "Sorry couldn't update the user. Please try again!")
+        update_callback: Callback = user_management_services.updateAsOwner(userID, firstname, surname, email, newRole)
+        if not update_callback.Success:
+            return helpers.jsonResponse(False, 400, update_callback.Message)
 
-        print("Success >> user updated")
         return helpers.jsonResponse(True, 200, "User updated successfully!")
 
     if request.method == "DELETE":

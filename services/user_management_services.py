@@ -1,7 +1,7 @@
 import random
 import string
 
-from models import Callback, db
+from models import Callback, db, User
 from services import user_services, role_services, mail_services
 
 
@@ -43,5 +43,32 @@ def addAdditionalUser(name, email, role, adminUser):
 
     except Exception as exc:
         print("user_services.addAdditionalUser ERROR: " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Sorry, Could not create the user.')
+
+
+def updateAsOwner(userID, firstname, surname, email, role) -> Callback:
+    try:
+        user_callback: Callback = user_services.getByID(userID)
+        if not user_callback.Success:
+            return Callback(False, "Could not find user's records")
+        user: User = user_callback.Data
+
+        # Get the role to be assigned for the userToUpdate
+        role_callback: Callback = role_services.getByNameAndCompanyID(role.strip(), user.CompanyID)
+        if not role_callback.Success:
+            return Callback(False, role_callback.Message)
+
+        # Update user
+        user.Firstname = firstname.strip()
+        user.Surname = surname.strip()
+        user.Email = email.strip().lower()
+        user.Role = role_callback.Data
+
+        db.session.commit()
+        return Callback(True, 'User has been edited successfully!')
+
+    except Exception as exc:
+        print(exc)
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')

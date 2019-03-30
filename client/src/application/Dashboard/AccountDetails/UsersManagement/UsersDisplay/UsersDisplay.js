@@ -178,15 +178,13 @@ class UsersDisplay extends React.Component {
             if (error) {
                 return;
             }
-            console.log("row", row);
+
             const newData = [...this.state.data];
             const index = newData.findIndex(item => key === item.key);
             if (index > -1) {
                 const item = newData[index];
                 const newRecord = {...item, ...row};
 
-                console.log("item", item);
-                console.log("newRecord", newRecord);
                 this.props.editUser(newRecord);
 
                 newData.splice(index, 1, newRecord);

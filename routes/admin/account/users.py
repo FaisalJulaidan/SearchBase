@@ -1,9 +1,8 @@
 from flask import Blueprint, request
-from flask import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from models import Callback, db, User
-from services import user_services, role_services, user_management_services
+from models import Callback
+from services import user_services, user_management_services
 from utilities import helpers
 
 users_router: Blueprint = Blueprint('users_router', __name__, template_folder="../../templates")
@@ -26,6 +25,7 @@ def users():
 
     if request.method == "POST":
 
+        # get the new user's details
         name = request.form.get("name")
         email = request.form.get("email")
         role = request.form.get("type")
@@ -35,12 +35,14 @@ def users():
         if not user_callback.Success:
             return helpers.jsonResponse(False, 400, user_callback.Message)
 
+        # check if the user can edit users, the email is valid and the role of the new user is valid
         if not user_callback.Data.Role.EditUsers \
                 or (role != "Admin" and role != "User") \
                 or not helpers.isValidEmail(email):
             return helpers.jsonResponse(False, 400, "Please make sure you entered all data correctly and have the " +
                                         "necessary permission to do this action")
 
+        # add the user
         add_user_callback: Callback = user_management_services.addAdditionalUser(name, email, role, user_callback.Data)
         if not add_user_callback.Success:
             return helpers.jsonResponse(False, 400, add_user_callback.Message)
@@ -49,10 +51,9 @@ def users():
                                     "User has been added and an email with his login details is on its way to him")
 
     if request.method == "PUT":
-        # User info
+        # get the new information
         user_id = request.json.get("ID", 0)
-        first_name = request.json.get("Firstname")
-        surname = request.json.get("Surname")
+        names = request.json.get("Fullname").split(" ")
         email = request.json.get("Email")
         new_role = request.json.get("RoleName")
 
@@ -61,12 +62,14 @@ def users():
         if not user_callback.Success:
             return helpers.jsonResponse(False, 400, user_callback.Message)
 
-        if not helpers.isValidEmail(email) or not user_callback.Data.Role.EditUsers:
+        # check if the email is valid and if the user has permission to edit users and if his new role is valid
+        if not helpers.isValidEmail(email) or not user_callback.Data.Role.EditUsersor \
+                or (new_role != "Admin" and new_role != "User"):
             return helpers.jsonResponse(False, 400, "Please make sure you entered all data correctly and have the " +
                                         "necessary permission to do this action")
 
         # Update the user (userToUpdate)
-        update_callback: Callback = user_management_services.updateAsOwner(user_id, first_name, surname, email,
+        update_callback: Callback = user_management_services.updateAsOwner(user_id, names[0], names[-1], email,
                                                                            new_role)
         if not update_callback.Success:
             return helpers.jsonResponse(False, 400, update_callback.Message)
@@ -96,47 +99,3 @@ def user(user_id):
             return helpers.jsonResponse(False, 400, remove_callback.Message)
 
         return helpers.jsonResponse(True, 200, "User deleted successfully!")
-
-# commented out until decision is made if roles are going to be implemented or not
-# @users_router.route("/roles", methods=['PUT'])
-# @jwt_required
-# def update_roles():
-#     user = get_jwt_identity()['user']
-#
-#     if request.method == "PUT":
-#
-#         # Get the admin user who is logged in and wants to edit.
-#         callback: Callback = user_services.getByID(user.get('id', 0))
-#         if not callback.Success:
-#             return helpers.jsonResponse(False, 400, "Sorry, your account doesn't exist. Try again please!")
-#         adminUser: User = callback.Data
-#
-#         # Check if the admin user is authorised for such an operation.
-#         if not adminUser.Role.Name == 'Owner':
-#             return helpers.jsonResponse(False, 401,
-#                                  "Sorry, You're not authorised. Only owners are allowed to edit user's permissions.")
-#
-#         # New roles values
-#         values = request.form.get("data", None)
-#         if not values:
-#             return helpers.jsonResponse(False, 400, "Please provide all required info for the roles.")
-#         values = json.loads(values)
-#
-#         try:
-#             currentRoles = adminUser.Company.Roles
-#             for role in currentRoles:
-#                 for new_role in values:
-#                     if role.ID == int(new_role['ID']):
-#                         role.EditChatbots = new_role['EditChatbots']
-#                         role.EditUsers = new_role['EditUsers']
-#                         role.DeleteUsers = new_role['DeleteUsers']
-#                         role.AccessBilling = new_role['AccessBilling']
-#             # Save changes
-#             db.session.commit()
-#
-#         except Exception as e:
-#             db.session.rollback()
-#             return helpers.jsonResponse(False, 400, "An error occurred! Try again please.")
-#
-#         print("Success >> roles updated")
-#         return helpers.jsonResponse(True, 200, "Roles updated successfully!")

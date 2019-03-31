@@ -11,6 +11,7 @@ from sqlalchemy import and_
 from enums import DatabaseType, DataType as DT
 import json
 import random
+import logging
 
 
 def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
@@ -39,6 +40,7 @@ def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
 
     except Exception as exc:
         print(exc)
+        logging.error("databases_service.fetchDatabase(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not fetch the database.')
 
@@ -53,6 +55,7 @@ def updateDatabase(id, newName, companyID)-> Callback:
 
     except Exception as exc:
         print(exc)
+        logging.error("databases_service.updateDatabase(): " + str(exc))
         db.session.rollback()
         return Callback(False,
                         "Couldn't update database ")
@@ -112,6 +115,7 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
         return Callback(True, "Databases was successfully uploaded!", newDatabase)
     except Exception as exc:
         print(exc)
+        logging.error("databases_service.uploadDatabase(): " + str(exc))
         return Callback(False, 'Could not upload the databases.')
 
 
@@ -124,6 +128,7 @@ def getDatabasesList(companyID: int) -> Callback:
 
     except Exception as exc:
         print(exc)
+        logging.error("databases_service.getDatabasesList(): " + str(exc))
         return Callback(False, 'Could not fetch the databases list.')
 
 
@@ -147,6 +152,7 @@ def getCandidate(candidateID):
 
     except Exception as exc:
         print("databases_services.getCandidate() Error: ", exc)
+        logging.error("databases_service.getCandidate(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not retrieve the candidate.')
 
@@ -160,6 +166,7 @@ def getJob(jobID):
 
     except Exception as exc:
         print("databases_services.getJob() Error: ", exc)
+        logging.error("databases_service.getJob(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not retrieve the job.')
 
@@ -183,6 +190,7 @@ def getAllCandidates(dbID, page) -> dict:
 
     except Exception as exc:
         print("fetchCandidates() ERROR: ", exc)
+        logging.error("databases_service.getAllCandidates(): " + str(exc))
         raise Exception
 
 
@@ -203,6 +211,7 @@ def getAllJobs(dbID, page) -> dict:
 
     except Exception as exc:
         print("fetchCandidates() ERROR: ", exc)
+        logging.error("databases_service.getAllJobs(): " + str(exc))
         raise Exception('Error: getAllJobs()')
 
 
@@ -217,6 +226,7 @@ def deleteDatabase(databaseID, companyID) -> Callback:
 
     except Exception as exc:
         print("Error in deleteDatabase(): ", exc)
+        logging.error("databases_service.deleteDatabase(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not remove the database.')
 
@@ -246,7 +256,8 @@ def scan(session, assistantHashID):
 
 
     except Exception as exc:
-        print("scan() ERROR: ", exc)
+        print("databases_service.scan() ERROR: ", exc)
+        logging.error("databases_service.scan(): " + str(exc))
         return Callback(False, 'Error while scanning the database')
 
 
@@ -374,6 +385,7 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
 
     except Exception as exc:
         print("scanCandidates() ERROR: ", exc)
+        logging.error("databases_service.scanCandidates(): " + str(exc))
         return Callback(False, 'Error while search the database for matches!')
 
 
@@ -464,6 +476,7 @@ def scanJobs(session, dbIDs, databaseType: DatabaseType):
 
     except Exception as exc:
         print("scanJobs() ERROR: ", exc)
+        logging.error("databases_service.scanJobs(): " + str(exc))
         return Callback(False, 'Error while search the database for matches!')
 
 

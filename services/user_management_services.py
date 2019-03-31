@@ -3,6 +3,7 @@ import string
 
 from models import Callback, db, User
 from services import user_services, role_services, mail_services
+import logging
 
 
 def addAdditionalUser(name, email, role, adminUser):
@@ -43,6 +44,7 @@ def addAdditionalUser(name, email, role, adminUser):
 
     except Exception as exc:
         print("user_services.addAdditionalUser ERROR: " + str(exc))
+        logging.error("user_services.addAdditionalUser(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')
 
@@ -70,5 +72,6 @@ def updateAsOwner(userID, firstname, surname, email, role) -> Callback:
 
     except Exception as exc:
         print(exc)
+        logging.error("user_services.updateAsOwner(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')

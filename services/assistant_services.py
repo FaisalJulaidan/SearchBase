@@ -1,10 +1,11 @@
-from models import db, Company, Assistant, Callback
+from models import db, Assistant, Callback
 from sqlalchemy import and_
 from utilities import helpers
-from os.path import join, dirname
+from os.path import join
 import json
 from config import BaseConfig
 from services import flow_services
+import logging
 
 def getAssistantByHashID(hashID):
     try:
@@ -20,6 +21,7 @@ def getAssistantByHashID(hashID):
 
     except Exception as exc:
         print("getAssistantByHashID() ERROR:" + str(exc))
+        logging.error("assistant_services.getAssistantByHashID(): " + str(exc))
         return Callback(False, "Assistant not found!")
 
 
@@ -33,6 +35,7 @@ def getByID(id, companyID) -> Callback:
 
     except Exception as exc:
         print(exc)
+        logging.error("assistant_services.getByID(): " + str(exc))
         return Callback(False, 'Could not get the assistant.')
     # finally:
        # db.session.close()
@@ -49,6 +52,7 @@ def getByName(name) -> Callback:
                         result)
     except Exception as exc:
         print(exc)
+        logging.error("assistant_services.getByName(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not get the assistant by nickname.')
     # finally:
@@ -68,6 +72,7 @@ def getAll(companyID) -> Callback:
     except Exception as exc:
         print(exc)
         db.session.rollback()
+        logging.error("assistant_services.getAll(): " + str(exc))
         return Callback(False, 'Could not get all assistants.')
 
 
@@ -83,6 +88,7 @@ def getAllWithEnabledNotifications(companyID) -> Callback:
 
     except Exception as exc:
         print(exc)
+        logging.error("assistant_services.getAllWithEnabledNotifications(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not get all assistants.')
 
@@ -110,6 +116,7 @@ def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod
         return Callback(True, 'Assistant has ben created successfully!', assistant)
     except Exception as exc:
         print(exc)
+        logging.error("assistant_services.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Failed to create the assistant', None)
     # finally:
@@ -130,6 +137,7 @@ def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPe
     except Exception as exc:
         print(exc)
         db.session.rollback()
+        logging.error("assistant_services.update(): " + str(exc))
         return Callback(False,
                         "Couldn't update assistant "+name)
 
@@ -145,6 +153,7 @@ def changeStatus(assistant: Assistant, status):
 
     except Exception as exc:
         print("Error in assistant_services.changeStatus(): ", exc)
+        logging.error("assistant_services.changeStatus(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Could not change the assistant's status.")
 
@@ -157,6 +166,7 @@ def removeByID(id) -> Callback:
 
     except Exception as exc:
         print("Error in assistant_services.removeByID(): ", exc)
+        logging.error("assistant_services.removeByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in deleting assistant.')
     # finally:
@@ -175,6 +185,7 @@ def checkOwnership(assistantID, companyID):
         return Callback(True, 'Ownership check passed')
     except Exception as exc:
         print("Error in assistant_services.checkOwnership(): ", exc)
+        logging.error("assistant_services.checkOwnership(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in verifying ownership over assistant.')
 

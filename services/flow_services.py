@@ -8,6 +8,7 @@ bot_currentVersion = "1.0.0"
 
 from jsonschema import validate
 from utilities import json_schemas, helpers
+import logging
 
 # ----- Getters ----- #
 # Get the chatbot for the public to use
@@ -31,8 +32,9 @@ def getChatbot(assistantHashID) -> Callback:
 
         return Callback(True, '', data)
 
-    except Exception as e:
-        print("ERROR: getChatbot()", e)
+    except Exception as exc:
+        print(" flow_service.getChatbot() ERROR: ", exc)
+        logging.error("flow_service.getChatbot(): " + str(exc))
         return Callback(False, 'Could not retrieve the chatbot flow. Contact TSB team please!')
 
 
@@ -51,6 +53,7 @@ def updateFlow(flow, assistant: Assistant) -> Callback:
 
     except Exception as exc:
         print(exc.args)
+        logging.error("flow_service.updateFlow(): " + str(exc.args))
         return Callback(False, "The submitted Flow doesn't follow the correct format")
 
 
@@ -86,6 +89,7 @@ def isValidFlow(flow):
 
     except Exception as exc:
         print(exc.args)
+        logging.error("flow_service.isValidFlow(): " + str(exc.args))
         return Callback(False, "The submitted Flow doesn't follow the correct format")
 
 # Check if the block valid using json_schema.py based on the block's type
@@ -93,7 +97,10 @@ def isValidBlock(block: dict, blockType: str):
     try:
         validate(block.get('Content'), getattr(json_schemas, blockType))
     except Exception as exc:
+
         print(exc.args[0])
+        logging.error("flow_service.getChatbot(): " + str(exc.args[0]))
+
         blockType = block.get('Type')
         msg = "Block data doesn't follow the correct format"
         if blockType:

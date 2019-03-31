@@ -9,6 +9,7 @@ from models import db, Callback, ChatbotSession, Assistant
 from services import assistant_services, stored_file_services, databases_services
 from utilities import json_schemas, helpers
 from enums import DatabaseType, UserType
+import logging
 
 
 # Process chatbot session data
@@ -41,6 +42,7 @@ def processSession(assistantHashID, data: dict) -> Callback:
         validate(sessionData, json_schemas.chatbot_session)
     except Exception as exc:
         print("chatbotSession_services.processSession ERROR 1: " + str(exc.args))
+        logging.error("chatbotSession_services.processSession(): " + str(exc.args))
         return Callback(False, "The submitted chatbot data doesn't follow the correct format.", exc.args[0])
 
     try:
@@ -58,6 +60,7 @@ def processSession(assistantHashID, data: dict) -> Callback:
 
     except Exception as exc:
         print("chatbotSession_services.processSession ERROR 1: " + str(exc))
+        logging.error("chatbotSession_services.processSession(): " + str(exc))
         db.session.rollback()
         return Callback(False, "An error occurred while processing chatbot data.")
     # finally:
@@ -81,7 +84,8 @@ def getAllByAssistantID(assistantID):
         return Callback(True, "User inputs retrieved successfully.", sessions)
 
     except Exception as exc:
-        print("chatbotSession_services.getByAssistantID() Error: ", exc)
+        print("chatbotSession_services.getAllByAssistantID() Error: ", exc)
+        logging.error("chatbotSession_services.getAllByAssistantID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not retrieve the data.')
 
@@ -101,6 +105,7 @@ def getByID(sessionID, assistantID):
 
     except Exception as exc:
         print("chatbotSession_services.getByID() Error: ", exc)
+        logging.error("chatbotSession_services.getByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not retrieve the session.')
 
@@ -121,6 +126,7 @@ def filterForContainEmails(records):
     except Exception as exc:
 
         print("userInput_services.filterForContainEmails ERROR: ", exc)
+        logging.error("chatbotSession_services.filterForContainEmails(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not filter the data.')
 
@@ -136,9 +142,10 @@ def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
             raise Exception("No Chatbot sessions to return")
 
         return Callback(True, "Records retrieved", result)
-    except Exception as e:
+    except Exception as exc:
+        print("chatbotSession_services.getAllRecordsByAssistantIDInTheLast() ERROR / EMPTY: ", exc)
+        logging.error("chatbotSession_services.getAllRecordsByAssistantIDInTheLast(): " + str(exc))
         db.session.rollback()
-        print("chatbotSession_services.getAllRecordsByAssistantIDInTheLast() ERROR / EMPTY: ", e)
         return Callback(False, "Error in returning records for the last " + str(hours) +
                         " hours for assistant with ID: " + str(assistantID))
 
@@ -151,6 +158,7 @@ def deleteByID(id):
         return Callback(True, 'Record has been removed successfully.')
     except Exception as exc:
         print("userInput_services.deleteByID() Error: ", exc)
+        logging.error("chatbotSession_services.deleteByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Record could not be removed.')
     # finally:
@@ -164,6 +172,7 @@ def deleteAll(assistantID):
         return Callback(True, 'Records have been removed successfully.')
     except Exception as exc:
         print("userInput_services.deleteAll() Error: ", exc)
+        logging.error("chatbotSession_services.deleteAll(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Records could not be removed.')
     # finally:

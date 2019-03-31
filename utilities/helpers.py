@@ -18,11 +18,9 @@ import logging
 verificationSigner = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
 
 # Configure logging system
-logging.basicConfig(filename='errors.log',
+logging.basicConfig(filename='logs/errors.log',
                     level=logging.ERROR,
                     format='%(asctime)s -- %(levelname)s -- %(message)s')
-
-# logging.error("Error example")
 
 # ID Hasher
 # IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan

@@ -1,5 +1,5 @@
 from models import db, Callback, StoredFile, ChatbotSession
-
+import logging
 
 def getByID(id) -> StoredFile or None:
     try:
@@ -15,10 +15,9 @@ def getByID(id) -> StoredFile or None:
             raise Exception
     except Exception as exc:
         db.session.rollback()
-        if exc:
-            print("stored_file_services.getByID() ERROR: ", exc)
+        logging.error("stored_file_services.getByID(): " + str(exc))
         return Callback(False,
-                        'StoredFile with ID ' + str(id) + ' does not exist')
+                        'Stored file with ID ' + str(id) + ' does not exist')
 
 
 def getBySession(session: ChatbotSession) -> StoredFile or None:
@@ -30,6 +29,7 @@ def getBySession(session: ChatbotSession) -> StoredFile or None:
 
     except Exception as exc:
         print("stored_file_services.getBySession() ERROR: ", exc)
+        logging.error("stored_file_services.getBySession(): " + str(exc))
         return Callback(False,'StoredFile with ID ' + str(id) + ' does not exist')
 
 
@@ -37,18 +37,14 @@ def getAll():
     try:
         # Get result and check if None then raise exception
         result = db.session.query(StoredFile).all()
-        if not result:
-            raise Exception
-
-        return Callback(True,
-                        'StoredFiles were successfully retrieved',
-                        result)
+        if not result: raise Exception
+        return Callback(True, 'StoredFiles were successfully retrieved', result)
     
     except Exception as exc:
-        db.session.rollback()
         print("stored_file_services.getAll() ERROR: ", exc)
-        return Callback(False,
-                        'StoredFiles could not be retrieved/empty')
+        logging.error("stored_file_services.getAll(): " + str(exc))
+        db.session.rollback()
+        return Callback(False,'StoredFiles could not be retrieved/empty')
 
 
 def create(filePath, chatbotSession) -> StoredFile or None:
@@ -62,6 +58,7 @@ def create(filePath, chatbotSession) -> StoredFile or None:
 
     except Exception as exc:
         print("stored_file_services.create() ERROR: ", exc)
+        logging.error("stored_file_services.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Couldn't create a storedFile entity.")
     
@@ -78,6 +75,7 @@ def updateStoredFile(id, filePath, chatbotSession):
         return Callback(True, "StoredFile has been updated")
     except Exception as exc:
         print("stored_file_services.updateStoredFile() ERROR: ", exc)
+        logging.error("stored_file_services.updateStoredFile(): " + str(exc))
         db.session.rollback()
         return Callback(False, "StoredFile cold not be updated")
     
@@ -90,6 +88,7 @@ def removeByID(id):
         
         return Callback(True, "StoredFile has been deleted")
     except Exception as exc:
-        db.session.rollback()
         print("stored_file_services.removeByID() ERROR: ", exc)
+        logging.error("stored_file_services.removeByID(): " + str(exc))
+        db.session.rollback()
         return Callback(False, "StoredFile cold not be deleted")

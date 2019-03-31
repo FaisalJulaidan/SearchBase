@@ -6,11 +6,12 @@ from models import Callback, User, db
 from services import user_services, role_services, sub_services, company_services, mail_services
 from utilities import helpers
 from config import BaseConfig
+import logging
 jwt = JWTManager()
 
 @jwt.invalid_token_loader
 def my_expired_token_callback(error):
-    return helpers.jsonResponse(False, 401, "Token expired")
+    return helpers.jsonResponse(False, 401, "Session has expired!")
 
 
 def signup(details) -> Callback:
@@ -73,8 +74,9 @@ def signup(details) -> Callback:
         # Return a callback with a message
         return Callback(True, 'Signed up successfully!')
 
-    except Exception as e:
-        print(e)
+    except Exception as exc:
+        print(exc)
+        logging.error("auth_services.signup(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Failed to signup!", None)
 
@@ -125,8 +127,9 @@ def authenticate(email: str, password_to_check: str) -> Callback:
         db.session.commit()
 
         return Callback(True, "Authorised!", data)
-    except Exception as e:
-        print(e)
+    except Exception as exc:
+        print(exc)
+        logging.error("auth_services.authenticate(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Unauthorised!", None)
     # finally:
@@ -139,5 +142,6 @@ def refreshToken() -> Callback:
         data = {'token': create_access_token(identity=current_user),
                 'expiresIn': datetime.now() + BaseConfig.JWT_ACCESS_TOKEN_EXPIRES}
         return Callback(True, "Authorised!", data)
-    except Exception as e:
+    except Exception as exc:
+        logging.error("auth_services.refreshToken(): " + str(exc))
         return Callback(False, "Unauthorised!", None)

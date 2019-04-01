@@ -62,6 +62,9 @@ def gen_dummy_data():
                                             "Type": "User Input",
                                             "StoreInDB": True,
                                             "Skippable": False,
+                                            "SkipText": "Skip!",
+                                            "SkipAction": "End Chat",
+                                            "SkipBlockToGoID": None,
                                             "Content": {
                                                 "action": "Go To Next Block",
                                                 "text": "What's salary are you offering",
@@ -74,6 +77,9 @@ def gen_dummy_data():
                                             "Type":"Solutions",
                                             "StoreInDB":False,
                                             "Skippable":False,
+                                            "SkipText": "Skip!",
+                                            "SkipAction": "End Chat",
+                                            "SkipBlockToGoID": None,
                                             "DataType":enums.DataType.NoType.name,
                                              "Content": {
                                                  "showTop": 3,

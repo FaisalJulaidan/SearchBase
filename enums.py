@@ -110,7 +110,7 @@ class DataType(Enum):
 
     CandidateCV = dataTypeCreator(
         'Candidate CV',
-       'CandidateCV',
+        'CandidateCV',
         ValidationType.Ignore,
         DataTypeSection.Candidate,
         [UserType.Candidate])
@@ -198,7 +198,7 @@ class DataType(Enum):
 
     JobEssentialSkills = dataTypeCreator(
         'Job Essential Skills',
-        'Job Essential Skills',
+        'JobEssentialSkills',
         ValidationType.String,
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])

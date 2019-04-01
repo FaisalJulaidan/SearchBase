@@ -462,13 +462,23 @@ def scanJobs(session, dbIDs, databaseType: DatabaseType):
         topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 0), 'count')
                                 .to_json(orient='records'))
         data = []
+
+
         for record in topResults:
+
+            subTitle = ""
+            description = ""
+            if record[Job.JobLocation.name]:
+               subTitle =  "Location: " + record[Job.JobLocation.name]
+            if record[Job.JobEssentialSkills.name]:
+                subTitle =  "Skills: " + record[Job.JobEssentialSkills.name]
+
             data.append({
                 "id": record["ID"],
                 "databaseType": databaseType.value,
                 "title": record[Job.JobTitle.name],
-                "subTitle": "Location: " + (record[Job.JobLocation.name] or "Unavailable"),
-                "description": "Skills: " + (record[Job.JobEssentialSkills.name] or "Unavailable"),
+                "subTitle": subTitle,
+                "description": description,
                 "buttonText": "Apply"
             })
 

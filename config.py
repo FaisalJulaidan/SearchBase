@@ -50,7 +50,7 @@ class BaseConfig(object):
     # Secret keys
     SECRET_KEY = os.urandom(24)
     CSRF_SESSION_KEY = os.urandom(24)
-    JWT_SECRET_KEY = os.urandom(24)
+    JWT_SECRET_KEY = b'ZGyL\x01\xf8\xc5Ge\xb0\x80\xa0\xfc[(\xc9t\x15\x05\xa3\x82\xd3\x1c\xa4'
 
     # JWT tokens expires in
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)

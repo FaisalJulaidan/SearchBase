@@ -141,6 +141,7 @@ def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPe
         return Callback(False,
                         "Couldn't update assistant "+name)
 
+
 def changeStatus(assistant: Assistant, status):
     try:
         isActive = False

@@ -48,14 +48,14 @@ flow = {
                         "DataType": {"enum": [e.name for e in enums.DataType]},
                         "Type": {"enum": [e.value for e in enums.BlockType]},
                         "StoreInDB": {"type": "boolean"},
-                        "Skippable": { "type": "boolean" },
+                        "Skippable": {"type": "boolean"},
                         "SkipText": {"type": ["string"]},
                         "SkipAction": {"enum": [e.value for e in enums.BlockAction]},
                         "SkipBlockToGoID": {"type": ["string", "null"]},
                         "Content": {"type": "object"}
                     },
                     "required": ["ID", "DataType", "Type", "StoreInDB", "Skippable", "SkipAction",
-                                 "SkipBlockToGoID", "Content"],
+                                 "SkipBlockToGoID", "SkipText", "Content"],
                     "additionalProperties": False
                     }
                 }
@@ -131,7 +131,7 @@ Solutions = {
         "afterMessage": {"type": "string"},
         "databaseType": {"enum": [dbt.name for dbt in enums.DatabaseType]},
     },
-    "required": ["showTop", "action", "notInterestedAction", "afterMessage", "blockToGoID", "databaseType"],
+    "required": ["showTop", "action", "afterMessage", "blockToGoID", "databaseType"],
     "additionalProperties": False
 }
 

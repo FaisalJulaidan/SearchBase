@@ -6,7 +6,10 @@
           "Type": "Question",
           "StoreInDB": false,
           "Skippable": false,
-          "DataType":"NoType",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "DataType": "NoType",
           "Content": {
             "text": "What best describes you?",
             "answers": [
@@ -63,6 +66,9 @@
           "DataType": "NoType",
           "ID": "5hMpPvT9H",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": false,
           "Type": "Question"
         },
@@ -99,6 +105,9 @@
           "DataType": "NoType",
           "ID": "5eAd2vVgW",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": false,
           "Type": "Question"
         },
@@ -119,6 +128,9 @@
           "DataType": "NoType",
           "ID": "hk5_59I0M",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "File Upload"
         },
@@ -132,6 +144,9 @@
           "DataType": "NoType",
           "ID": "_RvKGKYem",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -145,6 +160,9 @@
           "DataType": "NoType",
           "ID": "R8m0Tq6nP",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -154,13 +172,14 @@
             "afterMessage": "",
             "blockToGoID": "iBUbQP89w",
             "databaseType": "Jobs",
-            "showTop": 5,
-            "notInterestedAction": "Go To Specific Block",
-            "notInterestedBlockToGoID": "iBUbQP89w"
+            "showTop": 5
           },
           "DataType": "NoType",
           "ID": "y4yLRWDwj",
           "Skippable": false,
+          "SkipText": "Not found what you're looking for?",
+          "SkipAction": "Go To Specific Block",
+          "SkipBlockToGoID": "iBUbQP89w",
           "StoreInDB": false,
           "Type": "Solutions"
         },
@@ -174,6 +193,9 @@
           "DataType": "CandidateYearsExperience",
           "ID": "iBUbQP89w",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -202,6 +224,9 @@
           "DataType": "NoType",
           "ID": "CjnoZTFmy",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": false,
           "Type": "Question"
         },
@@ -222,6 +247,9 @@
           "DataType": "NoType",
           "ID": "x83jMijT4",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "File Upload"
         },
@@ -235,6 +263,9 @@
           "DataType": "CandidateEmail",
           "ID": "_uMa9nRct",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -248,6 +279,9 @@
           "DataType": "CandidateMobile",
           "ID": "1kFwtj0IU",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -261,6 +295,9 @@
           "DataType": "CandidateSkills",
           "ID": "2fbf_Mw0B",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -274,6 +311,9 @@
           "DataType": "CandidateYearsExperience",
           "ID": "Vc0IQQ6X7",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -287,6 +327,9 @@
           "DataType": "CandidateLocation",
           "ID": "tKrnfH_VE",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -296,13 +339,14 @@
             "afterMessage": "To inquire about the candidates, select your ideal candidate and click 'inquire'",
             "blockToGoID": "fuxQj2wPL",
             "databaseType": "Candidates",
-            "showTop": 5,
-            "notInterestedAction": "Go To Specific Block",
-            "notInterestedBlockToGoID": "fuxQj2wPL"
+            "showTop": 5
           },
           "DataType": "NoType",
           "ID": "nUO25eG3p",
           "Skippable": false,
+          "SkipText": "Not found what you're looking for?",
+          "SkipAction": "Go To Specific Block",
+          "SkipBlockToGoID": "fuxQj2wPL",
           "StoreInDB": false,
           "Type": "Solutions"
         },
@@ -316,6 +360,9 @@
           "DataType": "ClientEmail",
           "ID": "fuxQj2wPL",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "Go To Specific Block",
+          "SkipBlockToGoID": "iBUbQP89w",
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -329,6 +376,9 @@
           "DataType": "ClientTelephone",
           "ID": "VlwxYCdgI",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -342,6 +392,9 @@
           "DataType": "CandidateJobTitle",
           "ID": "ZLkTzYU6Y",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -370,6 +423,9 @@
           "DataType": "JobType",
           "ID": "J07rXKEP2",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "Question"
         },
@@ -383,6 +439,9 @@
           "DataType": "JobSalary",
           "ID": "BgH4udu2H",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -396,6 +455,9 @@
           "DataType": "JobSalary",
           "ID": "X90w_ByqN",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -409,6 +471,9 @@
           "DataType": "CandidateSkills",
           "ID": "7qd9wHi8s",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -422,6 +487,9 @@
           "DataType": "CandidateSkills",
           "ID": "BXRqkIvu6",
           "Skippable": true,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -435,6 +503,9 @@
           "DataType": "NoType",
           "ID": "GjdoXjsTK",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -448,6 +519,9 @@
           "DataType": "CandidateLocation",
           "ID": "T_f-Iip1R",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -461,6 +535,9 @@
           "DataType": "ClientEmail",
           "ID": "Edm56jsJ9",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -474,6 +551,9 @@
           "DataType": "ClientTelephone",
           "ID": "1rbjEfSbv",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "User Input"
         }

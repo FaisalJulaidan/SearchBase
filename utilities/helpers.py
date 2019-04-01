@@ -61,7 +61,7 @@ def gen_dummy_data():
                                             "DataType": enums.DataType.CandidateSkills.name,
                                             "Type": "User Input",
                                             "StoreInDB": True,
-                                            "Skippable": False,
+                                            "Skippable": True,
                                             "SkipText": "Skip!",
                                             "SkipAction": "End Chat",
                                             "SkipBlockToGoID": None,
@@ -85,8 +85,6 @@ def gen_dummy_data():
                                                  "showTop": 3,
                                                  "action": "End Chat",
                                                  "blockToGoID": None,
-                                                 "notInterestedAction": "End Chat",
-                                                 "notInterestedBlockToGoID": None,
                                                  "afterMessage": "We will contact you with this candidate",
                                                  "databaseType": "Candidates"
                                              },

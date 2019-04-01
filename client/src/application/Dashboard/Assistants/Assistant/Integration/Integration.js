@@ -44,8 +44,10 @@ class Integration extends React.Component {
     removeChatbot = () => {
         let oldBot = document.getElementById("TheSearchBase_Chatbot");
         if (oldBot) oldBot.remove();
+
         let oldBotScript = document.getElementById("oldBotScript");
         if (oldBotScript) oldBotScript.remove();
+
         document.head.innerHTML = this.firstHead;
     };
 

@@ -26,6 +26,9 @@ class RawText extends Component {
                 Type: 'Raw Text',
                 StoreInDB: false,
                 Skippable: false,
+                SkipText: "",
+                SkipAction: "End Chat",
+                SkipBlockToGoID: null,
                 DataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
                 Content: {
                     text: values.rawText,

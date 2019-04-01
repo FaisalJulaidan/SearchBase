@@ -6,6 +6,9 @@
           "Type": "User Input",
           "StoreInDB": true,
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "DataType": "CandidateName",
           "Content": {
             "text": "Can you please provide us with your name?",
@@ -25,6 +28,9 @@
           "DataType": "NoType",
           "ID": "QVeeOgHuj",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -61,6 +67,9 @@
           "DataType": "NoType",
           "ID": "87HfGerXi",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "Question"
         },
@@ -97,6 +106,9 @@
           "DataType": "NoType",
           "ID": "f0OowXgsK",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "Question"
         },
@@ -133,6 +145,9 @@
           "DataType": "NoType",
           "ID": "MzfST-zwS",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": false,
           "Type": "Question"
         },
@@ -146,6 +161,9 @@
           "DataType": "NoType",
           "ID": "2iI4wk1hy",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -158,7 +176,10 @@
           },
           "DataType": "CandidateEmail",
           "ID": "ElgkX_xtr",
-          "Skippable": true,
+          "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -172,6 +193,9 @@
           "DataType": "CandidateMobile",
           "ID": "SeInkWaTR",
           "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "StoreInDB": true,
           "Type": "User Input"
         }

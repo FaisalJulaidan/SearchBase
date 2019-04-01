@@ -350,10 +350,6 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
         yearsExp = ["This candidate has [yearsExp] years of experience in  [skills].",
                     "They have experience with [skills] for [yearsExp] years."]
 
-        desiredSalary = ["This candidate desired salary is £[desiredSalary]",
-                         "Their desired salary is £[desiredSalary]"]
-
-
 
         indexes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
         for i, record in enumerate(topResults):
@@ -368,9 +364,7 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
                             .replace("[yearsExp]", str(int(record[Candidate.CandidateYearsExperience.name])))
                             .replace("[skills]", record[Candidate.CandidateSkills.name]))
 
-            if record[Candidate.CandidateDesiredSalary.name]:
-                desc.append(random.choice(desiredSalary).replace("[desiredSalary]",
-                                                            str(record[Candidate.CandidateDesiredSalary.name])))
+
             random.shuffle(desc)
             data.append({
                 "id": record["ID"],

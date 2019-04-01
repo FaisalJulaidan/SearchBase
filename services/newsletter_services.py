@@ -14,12 +14,11 @@ def addNewsletterPerson(email):
         print("newsletter_service.addNewsletterPerson() Error: ", exc)
         logging.error("newsletter_service.addNewsletterPerson(): " + str(exc))
         db.session.rollback()
-        return Callback(False, 'Couldnot register' + email+ ' for newsletters.')
+        return Callback(False, 'Could not register' + email+ ' for newsletters.')
 
 def checkForNewsletter(email):
     try:
         result = db.session.query(Newsletter).filter(Newsletter.Email == email).first()
-        print(result)
         if not result: raise Exception
 
         return Callback(True, email + ' is registered for newsletters')

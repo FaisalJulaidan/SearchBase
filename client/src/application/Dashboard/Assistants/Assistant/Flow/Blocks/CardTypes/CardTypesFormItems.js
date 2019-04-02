@@ -222,7 +222,8 @@ export const SkipTextFormItem = ({FormItem, layout, getFieldDecorator, block, te
                 initialValue: block.SkipText || text,
                 rules: [{
                     required: true,
-                    message: "Please text to be shown on the button",
+                    max: 37,
+                    message: "Text it should not exceed 37 character",
                 }],
             })(
                 <Input/>

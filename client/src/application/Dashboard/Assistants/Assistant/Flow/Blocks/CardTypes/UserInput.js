@@ -104,7 +104,7 @@ class UserInput extends Component {
                                            layout={layout}/>
 
                     <ShowGoToGroupFormItem FormItem={FormItem}
-                                           currentBlock={block}
+                                           block={block}
                                            allGroups={allGroups}
                                            currentGroup={currentGroup}
                                            showGoToGroup={this.state.showGoToGroup}

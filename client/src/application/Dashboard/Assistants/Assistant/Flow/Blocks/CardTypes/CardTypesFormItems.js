@@ -173,7 +173,7 @@ export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allB
 
 export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, block, currentGroup, allGroups, showGoToGroup}) => {
     allGroups = allGroups.filter(group => group.id !== currentGroup.id);
-    const selectedGroup = allGroups.find(group => !!group.blocks.find(block => block.id === block?.Content?.goToBlockID));
+    const selectedGroup = allGroups.find(group => !!group.blocks.find(groupBlock => block.Content?.blockToGoID === groupBlock.ID));
 
     return (
         showGoToGroup ?
@@ -284,10 +284,8 @@ export const ShowGoToBlockSkipFormItem = ({FormItem, layout, getFieldDecorator, 
 };
 
 export const ShowGoToGroupSkipFormItem = ({FormItem, layout, getFieldDecorator, block, currentGroup, allGroups, showGoToGroup}) => {
-
     allGroups = allGroups.filter(group => group.id !== currentGroup.id);
-    const selectedGroup = allGroups.find(group => !!group.blocks.find(block => block.id === block?.Content?.goToBlockID));
-
+    const selectedGroup = allGroups.find(group => !!group.blocks.find(groupBlock => block.SkipBlockToGoID === groupBlock?.ID));
     return (
         showGoToGroup ?
             (

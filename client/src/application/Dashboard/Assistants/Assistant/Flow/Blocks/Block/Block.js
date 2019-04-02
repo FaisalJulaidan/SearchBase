@@ -212,10 +212,11 @@ class Block extends Component {
                     }
 
 
-                    {block.SkipAction ?
+                    {block.Skippable && block.SkipAction ?
                         <>
                             <Divider dashed={true} style={{fontWeight: 'normal', fontSize: '14px'}}>
-                                Skip/Not Found Button</Divider>
+                                {block.Type === 'Solutions' ? 'Not Found' : 'Skip'} Button
+                            </Divider>
                             <Row>
 
                                 <Col span={6}><b>Action:</b></Col>
@@ -224,7 +225,11 @@ class Block extends Component {
                             </Row>
 
                             <Row>
-                                <Col span={6}><b>Question To Go Text When Not Found/Skipped:</b></Col>
+                                <Col span={6}>
+                                    <b>
+                                        Question_To_Go Text When {block.Type === 'Solutions' ? 'Not Found' : 'Skip'}:
+                                    </b>
+                                </Col>
                                 <Col span={12}>
                                     {this.getBlockToGO(block.SkipBlockToGoID || null)}
                                 </Col>

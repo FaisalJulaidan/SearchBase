@@ -48,8 +48,8 @@ class Question extends Component {
                     Type: 'Question',
                     StoreInDB: values.storeInDB,
                     Skippable: values.isSkippable || false,
-                    SkipText: values.SkipText,
-                    SkipAction: values.SkipAction,
+                    SkipText: values.SkipText || "Skip!",
+                    SkipAction: values.SkipAction || "End Chat",
                     SkipBlockToGoID: values.skipBlockToGoID || values.skipBlockToGoIDGroup || null,
                     DataType: flowOptions.dataTypes
                         .find((dataType) => dataType.name === values.dataType[values.dataType.length-1]),
@@ -78,7 +78,7 @@ class Question extends Component {
                     text: values.answer,
                     keywords: this.state.tags,
                     blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
-                    action: values.action === "Go To Group" ? "Go To Specific Block" : values.action,
+                    action: values.action,
                     afterMessage: values.afterMessage || ""
                 };
 
@@ -311,7 +311,12 @@ class Question extends Component {
                                                layout={layout}/>
 
                         <ShowGoToGroupFormItem FormItem={FormItem}
-                                               block={block}
+                                               block={{
+                                                   ID: block.ID,
+                                                   Content: {
+                                                       blockToGoID: this.state.editedAnswer?.blockToGoID
+                                                   }
+                                               }}
                                                allGroups={allGroups}
                                                currentGroup={currentGroup}
                                                showGoToGroup={this.state.showGoToGroup}

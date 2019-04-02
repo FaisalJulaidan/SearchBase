@@ -26,9 +26,8 @@ export const initActionTypeSkip = (block, allGroups) => {
     else if (block.SkipAction === "Go To Group") {
         // because here we dont' have column in each block contains all the group
         // this is a workaround to have the group name from the block id
-        const {SkipBlockToGoID} = block.Content;
         for (const group of allGroups)
-            if (group.blocks[0].ID === SkipBlockToGoID)
+            if (group.blocks[0].ID === block.SkipBlockToGoID)
                 return {showGoToBlockSkip: false, showGoToGroupSkip: true};
     } else
         return {showGoToBlockSkip: false, showGoToGroupSkip: false};

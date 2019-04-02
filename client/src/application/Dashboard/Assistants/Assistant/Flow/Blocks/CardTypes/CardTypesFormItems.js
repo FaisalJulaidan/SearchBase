@@ -172,7 +172,6 @@ export const ShowGoToBlockFormItem = ({FormItem, layout, getFieldDecorator, allB
 };
 
 export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, block, currentGroup, allGroups, showGoToGroup}) => {
-
     allGroups = allGroups.filter(group => group.id !== currentGroup.id);
     const selectedGroup = allGroups.find(group => !!group.blocks.find(block => block.id === block?.Content?.goToBlockID));
 
@@ -190,10 +189,10 @@ export const ShowGoToGroupFormItem = ({FormItem, layout, getFieldDecorator, bloc
                             }
                         )(
                             <Select placeholder="The first next block of a group">
-                                {console.log(block, selectedGroup)}
                                 {
                                 allGroups.map((group, i) => {
                                     if (group.blocks[0]) {
+                                        {console.log(group.blocks[0].ID)}
                                         return <Option key={i} value={group.blocks[0].ID}>
                                                 {`${group.name}`}
                                             </Option>;
@@ -265,7 +264,7 @@ export const ShowGoToBlockSkipFormItem = ({FormItem, layout, getFieldDecorator, 
                     {
                         getFieldDecorator('skipBlockToGoID',
                             {
-                                initialValue: currentBlock.Content.blockToGoID ? currentBlock.Content.blockToGoID : undefined,
+                                initialValue: currentBlock.SkipBlockToGoID ? currentBlock.SkipBlockToGoID : undefined,
                                 rules: [{required: true, message: "Please select your next block"}]
                             }
                         )(

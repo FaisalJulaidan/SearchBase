@@ -142,7 +142,7 @@ class DataType(Enum):
         'CandidateJobTitle',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Client])
+        [UserType.Candidate])
 
     CandidateEducation = dataTypeCreator(
         'Candidate Education',
@@ -164,6 +164,42 @@ class DataType(Enum):
         ValidationType.Number,
         DataTypeSection.Candidate,
         [UserType.Candidate])
+
+
+    # ======================================================================
+    # Client
+    # The chances of asking a question with a client data type is very low. however when is it asked it means most of
+    # the time that this user type is a client. For that reason we multiplied Client UserType by 5 to increase
+    # the probability of the userType being a Client at the end :)
+
+    ClientName = dataTypeCreator(
+        'Client Name',
+        'ClientName',
+        ValidationType.String,
+        DataTypeSection.Client,
+        [UserType.Client] * 6)
+
+    ClientEmail = dataTypeCreator(
+        'Client Email',
+        'ClientEmail',
+        ValidationType.Email,
+        DataTypeSection.Client,
+        [UserType.Client] * 6)
+
+    ClientTelephone = dataTypeCreator(
+        'Client Telephone',
+        'ClientTelephone',
+        ValidationType.Telephone,
+        DataTypeSection.Client,
+        [UserType.Client] * 6)
+
+    ClientLocation = dataTypeCreator(
+        'Client Location',
+        'ClientLocation',
+        ValidationType.String,
+        DataTypeSection.Client,
+        [UserType.Client] * 6)
+
 
     # ======================================================================
     # Job
@@ -230,37 +266,3 @@ class DataType(Enum):
         ValidationType.DateTime,
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])
-
-    # ======================================================================
-    # Client
-    # The chances of asking a question with a client data type is very low. however when is it asked it means most of
-    # the time that this user type is a client. For that reason we multiplied Client UserType by 5 to increase
-    # the probability of the userType being a Client at the end :)
-
-    ClientName = dataTypeCreator(
-        'Client Name',
-        'ClientName',
-        ValidationType.String,
-        DataTypeSection.Client,
-        [UserType.Client] * 6)
-
-    ClientEmail = dataTypeCreator(
-        'Client Email',
-        'ClientEmail',
-        ValidationType.Email,
-        DataTypeSection.Client,
-        [UserType.Client] * 6)
-
-    ClientTelephone = dataTypeCreator(
-        'Client Telephone',
-        'ClientTelephone',
-        ValidationType.Telephone,
-        DataTypeSection.Client,
-        [UserType.Client] * 6)
-
-    ClientLocation = dataTypeCreator(
-        'Client Location',
-        'ClientLocation',
-        ValidationType.String,
-        DataTypeSection.Client,
-        [UserType.Client] * 6)

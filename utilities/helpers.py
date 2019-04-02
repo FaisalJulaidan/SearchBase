@@ -76,7 +76,7 @@ def gen_dummy_data():
                                             "ID":"by_GnLY-f",
                                             "Type":"Solutions",
                                             "StoreInDB":False,
-                                            "Skippable":False,
+                                            "Skippable":True,
                                             "SkipText": "Skip!",
                                             "SkipAction": "End Chat",
                                             "SkipBlockToGoID": None,

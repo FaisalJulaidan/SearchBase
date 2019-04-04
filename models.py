@@ -28,7 +28,6 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
 
 class JsonEncodedDict(types.TypeDecorator):
     """Stores and retrieves JSON as TEXT."""
-
     impl = types.TEXT
 
     def process_bind_param(self, value, dialect):
@@ -38,6 +37,9 @@ class JsonEncodedDict(types.TypeDecorator):
 
     def process_result_value(self, value, dialect):
         if value is not None:
+            print()
+            print("process_result_value: ", value)
+            print()
             value = json.loads(value)
         return value
 

@@ -1,18 +1,20 @@
-from flask import json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, ChatbotSession, Database, Candidate, Job
-from services import user_services, flow_services
+import functools
+import gzip
+import logging
+import re
 from datetime import datetime, timedelta
 from enum import Enum
-from hashids import Hashids
-from config import BaseConfig
-import stripe
-import re
 from io import BytesIO
-import gzip
-import functools
-import enums
+
+import stripe
+from flask import json, after_this_request, request
+from hashids import Hashids
 from itsdangerous import URLSafeTimedSerializer
-import logging
+
+import enums
+from config import BaseConfig
+from models import db, Role, Company, Assistant, Plan, ChatbotSession, Database, Candidate, Job
+from services import user_services, flow_services
 
 # Signer
 verificationSigner = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
@@ -27,6 +29,8 @@ logging.basicConfig(filename='errors.log',
 # ID Hasher
 # IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
+
+
 def encrypt_id(id):
     return hashids.encrypt(id)
 
@@ -35,10 +39,8 @@ def decrypt_id(id):
     return hashids.decrypt(id)
 
 
-
 # Generates dummy data for testing
 def gen_dummy_data():
-
     # Companies creation
     db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_00000000000000', SubID='sub_00000000000000'))
     db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly'))
@@ -51,7 +53,7 @@ def gen_dummy_data():
     reader_a = Assistant(Name="Reader", Message="Hey there",
                          TopBarText="Aramco Bot", SecondsUntilPopup=1,
                          Active=True, Company=aramco,
-                         Flow= {
+                         Flow={
                              "groups": [
                                  {
                                      "id": "tisd83f4",
@@ -59,24 +61,25 @@ def gen_dummy_data():
                                      "description": "The best group",
                                      "blocks": [
                                          {
-                                            "ID": "834hf",
-                                            "DataType": enums.DataType.CandidateSkills.name,
-                                            "Type": "User Input",
-                                            "StoreInDB": True,
-                                            "Skippable": False,
-                                            "Content": {
-                                                "action": "Go To Next Block",
-                                                "text": "What's salary are you offering",
-                                                "blockToGoID": "by_GnLY-f",
-                                                "afterMessage": "Your input is being processed..."
-                                            }
+                                             "ID": "834hf",
+                                             "DataType": enums.DataType.CandidateSkills.name,
+                                             "Type": "User Input",
+                                             "StoreInDB": True,
+                                             "Skippable": False,
+                                             "Content": {
+                                                 "action": "Go To Next Block",
+                                                 "text": "What's salary are you offering",
+                                                 "blockToGoID": "by_GnLY-f",
+                                                 "afterMessage": "Your input is being processed..."
+                                             }
                                          },
                                          {
-                                            "ID":"by_GnLY-f",
-                                            "Type":"Solutions",
-                                            "StoreInDB":False,
-                                            "Skippable":False,
-                                            "DataType":enums.DataType.NoType.name,
+                                             "ID": "by_GnLY-f",
+                                             "Type": "Solutions",
+                                             "StoreInDB": False,
+                                             "Skippable": False,
+                                             "SOME SHIT": "TTTTTTTTTTTTTTTTTTTTTTTT",
+                                             "DataType": enums.DataType.NoType.name,
                                              "Content": {
                                                  "showTop": 3,
                                                  "action": "End Chat",
@@ -132,21 +135,28 @@ def gen_dummy_data():
                                  }
                              ]
                          })
-    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
+    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True,
+                         Company=aramco)
 
-    reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
-    helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
-
+    reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True,
+                         Company=sabic)
+    helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True,
+                         Company=sabic)
 
     # Create Roles
-    db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="Admin", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="User", Company= aramco, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
+    db.session.add(
+        Role(Name="Owner", Company=aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(
+        Role(Name="Admin", Company=aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(
+        Role(Name="User", Company=aramco, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
 
-    db.session.add(Role(Name="Owner", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="Admin", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="User", Company= sabic, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
-
+    db.session.add(
+        Role(Name="Owner", Company=sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(
+        Role(Name="Admin", Company=sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(
+        Role(Name="User", Company=sabic, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
 
     # Get Roles
     owner_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "Owner").first()
@@ -162,18 +172,22 @@ def gen_dummy_data():
                          company=aramco, role=owner_aramco, verified=True)
     user_services.create(firstname='Evg', surname='Test', email='evgeniy67@abv.bg', password='123', phone='4344423',
                          company=aramco, role=admin_aramco, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='4344423', company=aramco,
+    user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='4344423',
+                         company=aramco,
                          role=admin_aramco, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', phone='4344423', company=aramco,
+    user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', phone='4344423',
+                         company=aramco,
                          role=user_aramco, verified=True)
 
-    user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', phone='4344423', company=sabic,
+    user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', phone='4344423',
+                         company=sabic,
                          role=owner_sabic, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='4344423', company=sabic,
+    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='4344423',
+                         company=sabic,
                          role=admin_sabic, verified=True)
-    user_services.create(firstname='Faisal', surname='Julaidan', email='julaidan.faisal@gmail.com', password='123', phone='4344423', company=sabic,
+    user_services.create(firstname='Faisal', surname='Julaidan', email='julaidan.faisal@gmail.com', password='123',
+                         phone='4344423', company=sabic,
                          role=user_sabic, verified=False)
-
 
     # Chatbot Sessions
     data = {
@@ -223,9 +237,8 @@ def gen_dummy_data():
     # add chatbot session in bulk
     for i in range(50):
         db.session.add(ChatbotSession(Data=data, DateTime=datetime.now() - timedelta(days=i),
-                                      TimeSpent=i+40, SolutionsReturned=i+3, QuestionsAnswered=i+4,
+                                      TimeSpent=i + 40, SolutionsReturned=i + 3, QuestionsAnswered=i + 4,
                                       UserType=enums.UserType.Candidate, Assistant=reader_a))
-
 
     db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidates, Company=aramco)
     db2: Database = Database(Name='db2', Type=enums.DatabaseType.Candidates, Company=aramco)
@@ -242,8 +255,7 @@ def gen_dummy_data():
     db.session.add(addCandidate(db2, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
                                 2, "Cardiff"))
 
-    seed() # will save changes as well
-
+    seed()  # will save changes as well
 
 
 def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
@@ -251,15 +263,12 @@ def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
                      CandidateName=name,
                      CandidateDesiredSalary=desiredSalary,
                      CandidateJobTitle=jobTitle,
-                     CandidateSkills =skills,
-                     CandidateYearsExperience = exp,
-                     CandidateLocation = location)
-
-
+                     CandidateSkills=skills,
+                     CandidateYearsExperience=exp,
+                     CandidateLocation=location)
 
 
 def seed():
-
     # Plans
     db.session.add(Plan(ID='plan_D3lp2yVtTotk2f', Nickname='basic', MaxSolutions=600, MaxBlocks=100, ActiveBotsCap=2,
                         InactiveBotsCap=3,
@@ -311,17 +320,17 @@ def getDictFromSQLAlchemyObj(obj):
         key = attr.name
         if not key == 'Password':
             d[key] = getattr(obj, key)
-            if isinstance(d[attr.name], Enum): # Convert Enums
+            if isinstance(d[attr.name], Enum):  # Convert Enums
                 d[key] = d[key].value
 
-            if key == Candidate.Currency.name and d[key]: # Convert Currency
+            if key == Candidate.Currency.name and d[key]:  # Convert Currency
                 d[key] = d[key].code
 
-            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and d[key]: # Convert Datetime
+            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and d[key]:  # Convert Datetime
                 d[key] = '/'.join(map(str, [d[key].year, d[key].month, d[key].day]))
 
-            if key == Assistant.Flow.name and d[key]: # Parse Flow !!
-                flow_services.parseFlow(d[key]) # pass by reference
+            if key == Assistant.Flow.name and d[key]:  # Parse Flow !!
+                flow_services.parseFlow(d[key])  # pass by reference
 
     if hasattr(obj, "FilePath"):
         d["FilePath"] = obj.FilePath
@@ -342,7 +351,7 @@ def isStringsLengthGreaterThanZero(*args):
 
 def jsonResponse(success: bool, http_code: int, msg: str, data=None):
     return json.dumps({'success': success, 'code': http_code, 'msg': msg, 'data': data}), \
-        http_code, {'ContentType': 'application/json'}
+           http_code, {'ContentType': 'application/json'}
 
 
 def gzipped(f):
@@ -358,8 +367,8 @@ def gzipped(f):
             response.direct_passthrough = False
 
             if (response.status_code < 200 or
-                response.status_code >= 300 or
-                'Content-Encoding' in response.headers):
+                    response.status_code >= 300 or
+                    'Content-Encoding' in response.headers):
                 return response
             gzip_buffer = BytesIO()
             gzip_file = gzip.GzipFile(mode='wb',

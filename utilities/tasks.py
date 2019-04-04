@@ -10,6 +10,8 @@ def migrate_flow():
                 for block in group['blocks']:
                     if block['Type'] == "Solutions":
                         block['GGGGG'] = 'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG'
-            print(newFlow)
+            # print(newFlow)
             assistant.Flow = newFlow
-        db.session.commit()
+            print("Flow Before commit: ", assistant.Flow)
+            db.session.commit()
+            print("Flow After commit: ", assistant.Flow)

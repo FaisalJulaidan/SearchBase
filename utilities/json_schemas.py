@@ -127,7 +127,7 @@ Solutions = {
         "blockToGoID": {"type": ["string", "null"]},
         "notInterestedBlockToGoID": {"type": ["string", "null"]},
         "afterMessage": {"type": "string"},
-        "databaseType": {"enum": [dbt.name for dbt in enums.DatabaseType]},
+        "databaseType": {"enum": [dbt.name for dbt in enums.DatabaseType]}
     },
     "required": ["showTop", "action", "notInterestedAction", "afterMessage", "blockToGoID", "databaseType"],
     "additionalProperties": False

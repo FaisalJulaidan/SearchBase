@@ -83,12 +83,12 @@ class AssistantSettingsModal extends Component {
                                     message: 'Please input your assistant name',
                                 }],
                             })
-                            (<Input placeholder="Ex: My first assistant, Sales Assistant"/>)
+                            (<Input placeholder="Recruitment Chatbot"/>)
                         }
                     </FormItem>
 
                     <FormItem
-                        label="Welcome Message"
+                        label="Introduction Message"
                         extra="This will be sent as first message"
                         {...formItemLayout}>
 
@@ -107,7 +107,7 @@ class AssistantSettingsModal extends Component {
 
                     <FormItem
                         label="Header Title"
-                        extra="This will apear on top of your chatbot"
+                        extra="This will appear on top of your Chatbot"
                         {...formItemLayout}>
                         {
                             getFieldDecorator('topBarTitle', {
@@ -124,8 +124,8 @@ class AssistantSettingsModal extends Component {
 
                     <FormItem
                         {...formItemLayout}
-                        label="Time to Popup"
-                        extra="This will enforce the assistants' (chatbot) to popup automatically"
+                        label="Pop up"
+                        extra="This will make your chatbot pop up automatically on your website"
                     >
                         <Switch checked={!this.state.isPopupDisabled} onChange={this.togglePopupSwitch}
                                 style={{marginRight: '5px'}}/>
@@ -137,8 +137,8 @@ class AssistantSettingsModal extends Component {
 
                     <FormItem
                         {...formItemLayout}
-                        label="New Record Alert"
-                        extra="Turning this on will make the assistant alert you when it has been used"
+                        label="Notifications (Recommended)"
+                        extra="If you turn this on, we will notify you through your email"
                     >
                         <Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}
                                 style={{marginRight: '5px'}}/>
@@ -146,8 +146,8 @@ class AssistantSettingsModal extends Component {
 
                     <FormItem
                         {...formItemLayout}
-                        label="Alerts Every:"
-                        extra="Select in what period of time the bot to check for new records and alert you. Note: 'Immediately' could spam your email if your assistant is used a lot"
+                        label="Alert Me Every:"
+                        extra="Select how often you would like to be notified"
                     >
                         {getFieldDecorator('alertEvery', {
                             initialValue: this.props.assistant.MailPeriod

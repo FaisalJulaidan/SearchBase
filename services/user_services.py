@@ -4,6 +4,7 @@ from models import db, Callback, User, Company, Role
 from services import mail_services, company_services, newsletter_services, role_services
 from utilities import helpers
 from sqlalchemy import and_
+import logging
 
 
 def create(firstname, surname, email, password, phone, company: Company, role: Role, verified=False) -> Callback:
@@ -20,6 +21,7 @@ def create(firstname, surname, email, password, phone, company: Company, role: R
 
     except Exception as exc:
         print(exc)
+        logging.error("user_services.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')
 
@@ -39,12 +41,11 @@ def getByID(id) -> Callback:
         else:
             raise Exception
     except Exception as exc:
+        logging.error("user_services.getByID(): " + str(exc))
         db.session.rollback()
         return Callback(False,
                         'User with ID ' + str(id) + ' does not exist')
 
-    # finally:
-    # db.session.close()
 
 
 def getByEmail(email) -> User or None:
@@ -57,12 +58,10 @@ def getByEmail(email) -> User or None:
                         'User with email ' + email + ' was successfully retrieved.',
                         result)
     except Exception as exc:
+        logging.error("user_services.getByEmail(): " + str(exc))
         db.session.rollback()
         return Callback(False,
                         'User with email ' + email + ' does not exist.')
-
-    # finally:
-    # db.session.close()
 
 
 def getAllByCompanyID(companyID) -> Callback:
@@ -75,6 +74,7 @@ def getAllByCompanyID(companyID) -> Callback:
                         'Users with company ID ' + str(companyID) + ' were successfully retrieved.',
                         result)
     except Exception as exc:
+        logging.error("user_services.getAllByCompanyID(): " + str(exc))
         db.session.rollback()
         return Callback(False,
                         'Users with company ID ' + str(companyID) + ' could not be retrieved.')
@@ -91,6 +91,7 @@ def getAllByCompanyIDWithEnabledNotifications(companyID) -> Callback:
                         'Users with company ID ' + str(companyID) + ' were successfully retrieved.',
                         result)
     except Exception as exc:
+        logging.error("user_services.getAllByCompanyIDWithEnabledNotifications(): " + str(exc))
         db.session.rollback()
         return Callback(False,
                         'Users with company ID ' + str(companyID) + ' could not be retrieved.')
@@ -106,8 +107,9 @@ def getAllUsersWithEnabled(USProperty):
                         'Records successfully retrieved',
                         result)
     except Exception as exc:
-        db.session.rollback()
         print("user_services.getAllUsersWithEnabled() ERROR: ", str(exc))
+        logging.error("user_services.getAllUsersWithEnabled(): " + str(exc))
+        db.session.rollback()
         return Callback(False, 'Error in getting records')
 
 
@@ -133,6 +135,7 @@ def getProfile(userID):
 
         return Callback(True, 'User settings were successfully retrieved.', profile)
     except Exception as exc:
+        logging.error("user_services.getProfile(): " + str(exc))
         db.session.rollback()
         print("user_services.getProfile() ERROR: ", exc)
         return Callback(False, 'User settings for this user does not exist.')
@@ -162,34 +165,13 @@ def getUsersWithRolesByCompanyID(companyID):
 
         return Callback(True, 'Users with company ID ' + str(companyID) + ' were successfully retrieved.', result)
     except Exception as exc:
+        print("user_services.getUsersWithRolesByCompanyID ERROR: ", exc)
+        logging.error("user_services.getUsersWithRolesByCompanyID(): " + str(exc))
         db.session.rollback()
-        print("user_services.getUsersWithRolesByCompanyID ERROR / EMPTY: ", exc)
         return Callback(False, 'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
 
 # ----- Updaters ----- #
-def updateAsOwner(userID, firstname, surname, email, role: Role) -> Callback:
-    try:
-        user_callback: Callback = getByID(userID)
-        if not user_callback.Success:
-            return Callback(False, "Could not find user's records")
-        user: User = user_callback.Data
-
-        # Update user
-        user.Firstname = firstname
-        user.Surname = surname
-        user.Email = email.lower()
-        user.Role = role
-
-        db.session.commit()
-        return Callback(True, 'User has been edited successfully!')
-
-    except Exception as exc:
-        print(exc)
-        db.session.rollback()
-        return Callback(False, 'Sorry, Could not create the user.')
-
-
 def updateUserSettings(userID, trackingData, techSupport, accountSpecialist, notifications):
     try:
 
@@ -206,6 +188,7 @@ def updateUserSettings(userID, trackingData, techSupport, accountSpecialist, not
                         result)
     except Exception as exc:
         print("user_services.updateUserSettings() ERROR: ", exc)
+        logging.error("user_services.updateUserSettings(): " + str(exc))
         db.session.rollback()
         return Callback(False,
                         'User settings could not be updated.')
@@ -220,6 +203,7 @@ def updateSubID(email, subID: str):
 
     except Exception as exc:
         print(exc)
+        logging.error("user_services.updateSubID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not update subID for ' + email)
 
@@ -233,6 +217,7 @@ def updateStripeID(email, cusID: str):
 
     except Exception as exc:
         print(exc)
+        logging.error("user_services.updateStripeID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not update subID for ' + email)
 
@@ -251,6 +236,7 @@ def updateUser(firstname, surname, newEmail, userID):
         return Callback(True, "User has been updated")
     except Exception as exc:
         print("profile_services.updateUser() ERROR: ", exc)
+        logging.error("user_services.updateUser(): " + str(exc))
         db.session.rollback()
         return Callback(False, "User could not be updated")
 
@@ -271,6 +257,7 @@ def changePasswordByID(userID, newPassword, oldPassword=None):
 
     except Exception as exc:
         print("user_services.changePasswordByID() ERROR: ", exc)
+        logging.error("user_services.changePasswordByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Error in updating password")
 
@@ -292,6 +279,7 @@ def updatePasswordByEmail(userEmail, newPassword, currentPassword=None):
 
     except Exception as exc:
         print("user_services.updatePasswordByEmail() ERROR: ", exc)
+        logging.error("user_services.updatePasswordByEmail(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Error in changing password")
 
@@ -315,6 +303,7 @@ def verifyByEmail(email: str):
 
     except Exception as exc:
         print(exc)
+        logging.error("user_services.verifyByEmail(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not verify account with email  ' + email)
 
@@ -332,6 +321,7 @@ def removeByEmail(email) -> Callback:
 
     except Exception as exc:
         print(exc)
+        logging.error("user_services.removeByEmail(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'User with email ' + email + " could not be removed.")
 
@@ -347,5 +337,6 @@ def removeByID(id) -> Callback:
 
     except Exception as exc:
         print(exc)
+        logging.error("user_services.removeByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'User with id ' + str(id) + " could not be removed.")

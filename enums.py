@@ -110,7 +110,7 @@ class DataType(Enum):
 
     CandidateCV = dataTypeCreator(
         'Candidate CV',
-       'CandidateCV',
+        'CandidateCV',
         ValidationType.Ignore,
         DataTypeSection.Candidate,
         [UserType.Candidate])
@@ -142,7 +142,7 @@ class DataType(Enum):
         'CandidateJobTitle',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Client])
+        [UserType.Candidate])
 
     CandidateEducation = dataTypeCreator(
         'Candidate Education',
@@ -165,71 +165,6 @@ class DataType(Enum):
         DataTypeSection.Candidate,
         [UserType.Candidate])
 
-    # ======================================================================
-    # Job
-
-    JobTitle = dataTypeCreator(
-        'Job Title',
-        'JobTitle',
-        ValidationType.String,
-        DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client])
-
-    JobLocation = dataTypeCreator(
-        'Job Location',
-        'JobLocation',
-        ValidationType.String,
-        DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client])
-
-    JobType = dataTypeCreator(
-        'Job Type',
-        'JobType',
-        ValidationType.String,
-        DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client])
-
-    JobSalary = dataTypeCreator(
-        'Job Salary',
-        'JobSalary',
-        ValidationType.Number,
-        DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client])
-
-    JobEssentialSkills = dataTypeCreator(
-        'Job Essential Skills',
-        'Job Essential Skills',
-        ValidationType.String,
-        DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client])
-
-    JobDesiredSkills = dataTypeCreator(
-        'Job Desired Skills',
-        'JobDesiredSkills',
-         ValidationType.String,
-         DataTypeSection.Job,
-         [UserType.Candidate, UserType.Client])
-
-    JobLinkURL = dataTypeCreator(
-        'Job Link URL',
-        'JobLinkURL',
-        ValidationType.URL,
-        DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client])
-
-    JobEndDate = dataTypeCreator(
-        'Job End Date',
-        'JobEndDate',
-         ValidationType.DateTime,
-         DataTypeSection.Job,
-         [UserType.Candidate, UserType.Client])
-
-    JobStartDate = dataTypeCreator(
-        'Job Start Date',
-        'JobStartDate',
-        ValidationType.DateTime,
-        DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client])
 
     # ======================================================================
     # Client
@@ -264,3 +199,70 @@ class DataType(Enum):
         ValidationType.String,
         DataTypeSection.Client,
         [UserType.Client] * 6)
+
+
+    # ======================================================================
+    # Job
+
+    JobTitle = dataTypeCreator(
+        'Job Title',
+        'JobTitle',
+        ValidationType.String,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])
+
+    JobLocation = dataTypeCreator(
+        'Job Location',
+        'JobLocation',
+        ValidationType.String,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])
+
+    JobType = dataTypeCreator(
+        'Job Type',
+        'JobType',
+        ValidationType.String,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])
+
+    JobSalary = dataTypeCreator(
+        'Job Salary',
+        'JobSalary',
+        ValidationType.Number,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])
+
+    JobEssentialSkills = dataTypeCreator(
+        'Job Essential Skills',
+        'JobEssentialSkills',
+        ValidationType.String,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])
+
+    JobDesiredSkills = dataTypeCreator(
+        'Job Desired Skills',
+        'JobDesiredSkills',
+         ValidationType.String,
+         DataTypeSection.Job,
+         [UserType.Candidate, UserType.Client])
+
+    JobLinkURL = dataTypeCreator(
+        'Job Link URL',
+        'JobLinkURL',
+        ValidationType.URL,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])
+
+    JobEndDate = dataTypeCreator(
+        'Job End Date',
+        'JobEndDate',
+         ValidationType.DateTime,
+         DataTypeSection.Job,
+         [UserType.Candidate, UserType.Client])
+
+    JobStartDate = dataTypeCreator(
+        'Job Start Date',
+        'JobStartDate',
+        ValidationType.DateTime,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])

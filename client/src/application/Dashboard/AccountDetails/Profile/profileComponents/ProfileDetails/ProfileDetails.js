@@ -61,7 +61,7 @@ class ProfileDetails extends React.Component {
 
                 <FormItem
                     label={"Email:"}
-                    extra={"Enter your email here (For your security we have temporarily disabled this box)"}
+                    extra={"For your security we have temporarily disabled this box"}
                     {...formItemLayout}>
                     {getFieldDecorator("email", {
                         initialValue: this.state.email,

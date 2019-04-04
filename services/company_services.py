@@ -1,5 +1,6 @@
 from models import db, Callback, Company, User, Role
 import stripe
+import logging
 
 
 def create(name, url, ownerEmail) -> Company or None:
@@ -18,9 +19,11 @@ def create(name, url, ownerEmail) -> Company or None:
     except stripe.error as exc:
         print(exc)
         db.session.rollback()
+        logging.error("company_service.create() Stripe Issue: " + str(exc))
         return Callback(False, "An error occurred while creating a stripe customer for the new company.")
     except Exception as exc:
         print(exc)
+        logging.error("company_service.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Couldn't create a company entity.")
 
@@ -39,6 +42,7 @@ def getByID(id) -> Company or None:
         else:
             raise Exception
     except Exception as exc:
+        logging.error("company_service.getByID(): " + str(exc))
         db.session.rollback()
         return Callback(False,
                         'Company with ID ' + str(id) + ' does not exist')
@@ -47,7 +51,8 @@ def getByID(id) -> Company or None:
 def getAll() -> list or None:
     try:
         return db.session.query(Company)
-    except:
+    except Exception as exc:
+        logging.error("company_service.getAll(): " + str(exc))
         db.session.rollback()
         return None
 
@@ -60,11 +65,11 @@ def removeByName(name) -> bool:
         db.session.commit()
         return True
     except Exception as exc:
-        db.session.rollback()
         print(exc)
+        logging.error("company_service.removeByName(): " + str(exc))
+        db.session.rollback()
         return False
-    # finally:
-       # db.session.close()
+
 
 def getByEmail(email) -> Callback:
     try:
@@ -77,10 +82,10 @@ def getByEmail(email) -> Callback:
         return Callback(True, 'Company was successfully retrieved.', result)
     except Exception as exc:
         print("company_services.getByEmail() ERROR: ", exc)
+        logging.error("company_service.getByEmail(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Company could not be retrieved')
-    # finally:
-       # db.session.close()
+
 
 def getByCompanyID(id) -> Callback:
     try:
@@ -89,11 +94,12 @@ def getByCompanyID(id) -> Callback:
 
         return Callback(True, 'Company was successfully retrieved.', result)
     except Exception as exc:
-        db.session.rollback()
         print("company_services.getByCompanyID() ERROR: ", exc)
+        logging.error("company_service.getByCompanyID(): " + str(exc))
+        db.session.rollback()
         return Callback(False, 'Company could not be retrieved')
-    # finally:
-       # db.session.close()
+
+
 
 def getByStripeID(id) -> Callback:
     try:
@@ -105,10 +111,10 @@ def getByStripeID(id) -> Callback:
 
     except Exception as exc:
         print(exc)
+        logging.error("company_service.getByStripeID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not get the assistant by nickname.')
-    # finally:
-       # db.session.close()
+
 
 def updateCompany(companyName, companyID):
     try:
@@ -119,9 +125,7 @@ def updateCompany(companyName, companyID):
 
         return Callback(True, "Company has been updated")
     except Exception as exc:
-        print("profile_services.updateCompany() ERROR: ", exc)
+        print("company_service.updateCompany() ERROR: ", exc)
+        logging.error("company_service.updateCompany(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Company cold not be updated")
-
-    # finally:
-    # db.session.close()

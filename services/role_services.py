@@ -1,6 +1,6 @@
-import sqlalchemy.exc
-
 from models import Callback, db, Role, Company
+from sqlalchemy import and_
+import logging
 
 
 def create(name, editChatbots: bool, editUsers: bool, deleteUsers: bool, accessBilling: bool, company: Company) -> Callback:
@@ -14,17 +14,15 @@ def create(name, editChatbots: bool, editUsers: bool, deleteUsers: bool, accessB
 
     except Exception as exc:
         print(exc)
+        logging.error("role_service.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the role.', )
-
-    # finally:
-       # db.session.close()
 
 
 def getByNameAndCompanyID(name: str, companyID: int) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(Role).filter(Role.CompanyID == companyID).filter(Role.Name == name).first()
+        result = db.session.query(Role).filter(and_(Role.CompanyID == companyID, Role.Name == name)).first()
         if not result: raise Exception
 
         return Callback(True,
@@ -32,11 +30,9 @@ def getByNameAndCompanyID(name: str, companyID: int) -> Callback:
                         result)
     except Exception as exc:
         db.session.rollback()
+        logging.error("role_service.getByNameAndCompanyID(): " + str(exc))
         return Callback(False,
                         'Role could not be retrieved.')
-
-    # finally:
-       # db.session.close()
 
 
 def getAllByCompanyID(companyID: int) -> Callback:
@@ -49,16 +45,13 @@ def getAllByCompanyID(companyID: int) -> Callback:
                         'Roles with company ID ' + str(companyID) + ' were successfully retrieved.',
                         result)
     except Exception as exc:
+        logging.error("role_service.getAllByCompanyID(): " + str(exc))
         db.session.rollback()
         return Callback(False,
                         'Roles with company ID ' + str(companyID) + ' could not be retrieved.')
 
-    # finally:
-       # db.session.close()
-
 
 def removeAllByCompany(company: Company) -> Callback:
-
     try:
      db.session.query(Role).filter(Role.Company == company).delete()
      db.session.commit()
@@ -66,11 +59,9 @@ def removeAllByCompany(company: Company) -> Callback:
 
     except Exception as exc:
         print(exc)
+        logging.error("role_service.removeAllByCompany(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Role could not be removed.')
-
-    # finally:
-       # db.session.close()
 
 
 def getByID(id) -> Role or None:
@@ -79,12 +70,11 @@ def getByID(id) -> Role or None:
         result = db.session.query(Role).get(id)
         if not result: raise Exception
         return Callback(True, 'Role does exist.', result)
-    except Exception as e:
+    except Exception as exc:
+        logging.error("role_service.getByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Role with id ' + str(id) + ' does not exist')
 
-    # finally:
-       # db.session.close()
 
 
 def getByName(name) -> Role or None:
@@ -93,9 +83,7 @@ def getByName(name) -> Role or None:
         result = db.session.query(Role).filter(Role.Name == name).first()
         if not result: raise Exception
         return Callback(True, 'Role does exist.', result)
-    except Exception as e:
+    except Exception as exc:
+        logging.error("role_service.getByName(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Role ' + str(name) + ' does not exist')
-
-    # finally:
-       # db.session.close()

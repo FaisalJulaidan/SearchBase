@@ -20,28 +20,27 @@ export const initActionType = (block, allGroups) => {
         return {showGoToBlock: false, showGoToGroup: false};
 };
 
-export const initActionTypeNotInterested = (block, allGroups) => {
-    if (block.Content.notInterestedAction === "Go To Specific Block")
-        return {showGoToBlockNotInterested: true, showGoToGroupNotInterested: false};
-    else if (block.Content.notInterestedAction === "Go To Group") {
+export const initActionTypeSkip = (block, allGroups) => {
+    if (block.SkipAction === "Go To Specific Block")
+        return {showGoToBlockSkip: true, showGoToGroupSkip: false};
+    else if (block.SkipAction === "Go To Group") {
         // because here we dont' have column in each block contains all the group
         // this is a workaround to have the group name from the block id
-        const {notInterestedBlockToGoID} = block.Content;
         for (const group of allGroups)
-            if (group.blocks[0].ID === notInterestedBlockToGoID)
-                return {showGoToBlockNotInterested: false, showGoToGroupNotInterested: true};
+            if (group.blocks[0].ID === block.SkipBlockToGoID)
+                return {showGoToBlockSkip: false, showGoToGroupSkip: true};
     } else
-        return {showGoToBlockNotInterested: false, showGoToGroupNotInterested: false};
+        return {showGoToBlockSkip: false, showGoToGroupSkip: false};
 };
 
-export const onSelectAction = (action, isNotInterested = false) => {
-    if (isNotInterested)
+export const onSelectAction = (action, isSkip = false) => {
+    if (isSkip)
         if (action === "Go To Specific Block")
-            return {showGoToBlockNotInterested: true, showGoToGroupNotInterested: false};
+            return {showGoToBlockSkip: true, showGoToGroupSkip: false};
         else if (action === "Go To Group")
-            return {showGoToBlockNotInterested: false, showGoToGroupNotInterested: true};
+            return {showGoToBlockSkip: false, showGoToGroupSkip: true};
         else
-            return {showGoToBlockNotInterested: false, showGoToGroupNotInterested: false};
+            return {showGoToBlockSkip: false, showGoToGroupSkip: false};
     else {
         if (action === "Go To Specific Block")
             return {showGoToBlock: true, showGoToGroup: false};

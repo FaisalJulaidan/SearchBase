@@ -1,5 +1,6 @@
 from models import db, Company, Statistics, Callback
 from services import user_services
+import logging
 
 def getByAssistantID(id) -> Statistics:
     try:
@@ -30,9 +31,7 @@ def getTotalAll(assistants) -> Callback:
 
     except Exception as exc:
         print(exc)
+        logging.error("statistics_services.getTotalAll(): " + str(exc))
         db.session.rollback()
         return Callback(False,
                         "Error: Couldn't get total numbers for all assistants")
-
-    # finally:
-       # db.session.close()

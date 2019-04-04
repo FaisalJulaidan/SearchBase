@@ -1,15 +1,15 @@
 import React, {Component} from 'react';
-import {Card, Form} from "antd";
-import {getInitialVariables, initActionType, getBlockId} from './CardTypesHelpers'
+import {Card, Divider, Form} from "antd";
+import {getInitialVariables, initActionType, getBlockId, initActionTypeSkip} from './CardTypesHelpers'
 import {
     ActionFormItem,
     AfterMessageFormItem,
     ButtonsForm,
     DataTypeFormItem,
     QuestionFormItem,
-    ShowGoToBlockFormItem,
-    ShowGoToGroupFormItem,
-    SkippableFormItem,
+    ShowGoToBlockFormItem, ShowGoToBlockSkipFormItem,
+    ShowGoToGroupFormItem, ShowGoToGroupSkipFormItem, SkipFormItem,
+    SkippableFormItem, SkipTextFormItem,
     StoreInDBFormItem
 } from './CardTypesFormItems'
 
@@ -20,12 +20,20 @@ class UserInput extends Component {
     state = {
         showGoToBlock: false,
         showGoToGroup: false,
+
+        showGoToBlockSkip: false,
+        showGoToGroupSkip: false,
+
     };
 
     componentDidMount() {
         const {modalState, options} = this.props;
         const {block} = getInitialVariables(options.flow, modalState);
-        this.setState(initActionType(block, this.props.modalState.allGroups));
+        this.setState({
+            ...initActionType(block, this.props.modalState.allGroups),
+            ...initActionTypeSkip(block, this.props.modalState.allGroups),
+            showSkip: block.Skippable || false
+        });
     }
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
@@ -34,7 +42,12 @@ class UserInput extends Component {
             let options = {
                 Type: 'User Input',
                 StoreInDB: values.storeInDB,
+
                 Skippable: values.isSkippable || false,
+                SkipText: values.SkipText,
+                SkipAction: values.SkipAction,
+                SkipBlockToGoID: values.skipBlockToGoID || values.skipBlockToGoIDGroup || null,
+
                 DataType: flowOptions.dataTypes
                     .find((dataType) => dataType.name === values.dataType[values.dataType.length-1]),
                 Content: {
@@ -63,6 +76,7 @@ class UserInput extends Component {
         const {allGroups, allBlocks, currentGroup, layout} = modalState;
         const {getFieldDecorator} = form;
 
+        const {showSkip} = this.state;
 
         const buttons = ButtonsForm(handleNewBlock, handleEditBlock, handleDeleteBlock, this.onSubmit, block);
 
@@ -90,7 +104,7 @@ class UserInput extends Component {
                                            layout={layout}/>
 
                     <ShowGoToGroupFormItem FormItem={FormItem}
-                                           currentBlock={block}
+                                           block={block}
                                            allGroups={allGroups}
                                            currentGroup={currentGroup}
                                            showGoToGroup={this.state.showGoToGroup}
@@ -101,13 +115,47 @@ class UserInput extends Component {
                                           getFieldDecorator={getFieldDecorator}
                                           layout={layout}/>
 
-                    <SkippableFormItem FormItem={FormItem} block={block}
-                                       getFieldDecorator={getFieldDecorator}
-                                       layout={layout}/>
 
                     <StoreInDBFormItem FormItem={FormItem} block={block} blockOptions={blockOptions}
                                        getFieldDecorator={getFieldDecorator}
                                        layout={layout}/>
+
+                    <SkippableFormItem FormItem={FormItem} block={block}
+                                       setStateHandler={(state) => this.setState(state)}
+                                       getFieldDecorator={getFieldDecorator}
+                                       layout={layout}/>
+                    {
+                        showSkip &&
+                        <>
+                            <Divider dashed={true} style={{fontWeight: 'normal', fontSize: '14px'}}>
+                                Skip Button
+                            </Divider>
+
+                            <SkipTextFormItem FormItem={FormItem}
+                                              layout={layout}
+                                              getFieldDecorator={getFieldDecorator}
+                                              block={block}/>
+
+                            <SkipFormItem FormItem={FormItem}
+                                          blockOptions={blockOptions}
+                                          block={block} layout={layout}
+                                          setStateHandler={(state) => this.setState(state)}
+                                          getFieldDecorator={getFieldDecorator}/>
+
+                            <ShowGoToBlockSkipFormItem FormItem={FormItem} allBlocks={allBlocks} block={block}
+                                                       showGoToBlock={this.state.showGoToBlockSkip}
+                                                       getFieldDecorator={getFieldDecorator}
+                                                       layout={layout}/>
+
+                            <ShowGoToGroupSkipFormItem FormItem={FormItem}
+                                                       block={block}
+                                                       allGroups={allGroups}
+                                                       currentGroup={currentGroup}
+                                                       showGoToGroup={this.state.showGoToGroupSkip}
+                                                       getFieldDecorator={getFieldDecorator}
+                                                       layout={layout}/>
+                        </>
+                    }
 
                 </Form>
             </Card>

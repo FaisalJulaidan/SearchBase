@@ -50,7 +50,8 @@ function* editUser(action) {
 function* deleteUser(action) {
     try {
         loadingMessage('Deleting user...');
-        const res = yield http.delete(`/users`, action.params.user);
+        const user = action.params.user;
+        const res = yield http.delete(`/user/` + user.ID);
         yield put(usersManagementActions.deleteUserSuccess(res.message));
         yield put(usersManagementActions.getUsers());
         successMessage('User deleted');

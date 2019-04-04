@@ -107,9 +107,9 @@ class DataSettings extends React.Component {
                 <br/>
 
                 <FormItem
-                    label={"New Users Counter:"}
-                    extra={"If allowed we will send you the number of new user records your assistants " +
-                    "have stored through email. How often you will receive this is defined in the assistant settings"}
+                    label={"Email Notifications:"}
+                    extra={"If switched on, we will send you an email notification with users that have interacted with the chatbot.  " +
+                    "You can change the frequency of the notifications from the chatbot settings page. "}
                     {...formItemLayout}>
                     {getFieldDecorator("statNotifications", {
                         initialValue: this.state.statNotifications,

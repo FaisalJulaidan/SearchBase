@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Card, Form, Input, Divider} from "antd";
-import {initActionTypeNotInterested, getInitialVariables, initActionType} from './CardTypesHelpers'
+import {initActionTypeSkip, getInitialVariables, initActionType} from './CardTypesHelpers'
 import {
     ActionFormItem,
     AfterMessageFormItem,
@@ -8,9 +8,9 @@ import {
     ShowGoToBlockFormItem,
     ShowGoToGroupFormItem,
     DatabaseTypeFormItem,
-    NotInterstedActionFormItem,
-    ShowGoToBlockNotInterestedFormItem,
-    ShowGoToGroupNotInterestedFormItem
+    SkipFormItem,
+    ShowGoToBlockSkipFormItem,
+    ShowGoToGroupSkipFormItem, SkippableFormItem, SkipTextFormItem
 } from './CardTypesFormItems'
 
 const FormItem = Form.Item;
@@ -20,16 +20,20 @@ class Solutions extends Component {
     state = {
         showGoToBlock: false,
         showGoToGroup: false,
-        showGoToBlockNotInterested: false,
-        showGoToGroupNotInterested: false
+
+        showGoToBlockSkip: false,
+        showGoToGroupSkip: false,
+
     };
 
     componentWillMount() {
         const {modalState, options} = this.props;
         const {block} = getInitialVariables(options.flow, modalState);
+
         this.setState({
             ...initActionType(block, this.props.modalState.allGroups),
-            ...initActionTypeNotInterested(block, this.props.modalState.allGroups)
+            ...initActionTypeSkip(block, this.props.modalState.allGroups),
+            showSkip: block.Skippable || true
         });
     }
 
@@ -38,19 +42,22 @@ class Solutions extends Component {
             const flowOptions = this.props.options.flow;
             const showTop = Number(values.showTop) > 10 ? 10 : Number(values.showTop);
             let options = {
-                    Type: 'Solutions',
-                    StoreInDB: false,
-                    Skippable: false,
-                    DataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
-                    Content: {
-                        showTop: showTop,
-                        action: values.action,
-                        notInterestedAction: values.notInterestedAction,
-                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
-                        notInterestedBlockToGoID: values.notInterestedBlockToGoID || values.notInterestedBlockToGoIDGroup || null,
-                        afterMessage: values.afterMessage || "" ,
-                        databaseType: values.databaseType,
-                    }
+                Type: 'Solutions',
+                StoreInDB: false,
+
+                Skippable: values.isSkippable || false,
+                SkipText: values.SkipText,
+                SkipAction: values.SkipAction,
+                SkipBlockToGoID: values.skipBlockToGoID || values.skipBlockToGoIDGroup || null,
+
+                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),
+                Content: {
+                    showTop: showTop,
+                    action: values.action,
+                    blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
+                    afterMessage: values.afterMessage || "",
+                    databaseType: values.databaseType,
+                }
             };
 
 
@@ -72,6 +79,8 @@ class Solutions extends Component {
         const {getFieldDecorator} = form;
 
         const buttons = ButtonsForm(handleNewBlock, handleEditBlock, handleDeleteBlock, this.onSubmit, block);
+
+        const {showSkip} = this.state;
 
         return (
             <Card style={{width: '100%'}} actions={buttons}>
@@ -118,27 +127,47 @@ class Solutions extends Component {
                                           getFieldDecorator={getFieldDecorator}
                                           layout={layout}/>
 
-                    <Divider dashed={true} style={{fontWeight: 'normal', fontSize: '14px'}}>
-                        Not Interested Button</Divider>
+                    <SkippableFormItem FormItem={FormItem} block={block}
+                                       label={'When Not Found'}
+                                       toShow={true}
+                                       setStateHandler={(state) => this.setState(state)}
+                                       getFieldDecorator={getFieldDecorator}
+                                       layout={layout}/>
 
-                    <NotInterstedActionFormItem FormItem={FormItem}
-                                                blockOptions={blockOptions}
-                                                block={block} layout={layout}
-                                                setStateHandler={(state) => this.setState(state)}
-                                                getFieldDecorator={getFieldDecorator}/>
+                    {
+                        showSkip &&
+                        <>
+                            <Divider dashed={true} style={{fontWeight: 'normal', fontSize: '14px'}}>
+                                Not Found Button
+                            </Divider>
 
-                    <ShowGoToBlockNotInterestedFormItem FormItem={FormItem} allBlocks={allBlocks} block={block}
-                                                        showGoToBlock={this.state.showGoToBlockNotInterested}
-                                                        getFieldDecorator={getFieldDecorator}
-                                                        layout={layout}/>
+                            <SkipTextFormItem FormItem={FormItem}
+                                              layout={layout}
+                                              getFieldDecorator={getFieldDecorator}
+                                              block={block}
+                                              text={`Not found what you're looking for?`}/>
 
-                    <ShowGoToGroupNotInterestedFormItem FormItem={FormItem}
-                                                        block={block}
-                                                        allGroups={allGroups}
-                                                        currentGroup={currentGroup}
-                                                        showGoToGroup={this.state.showGoToGroupNotInterested}
-                                                        getFieldDecorator={getFieldDecorator}
-                                                        layout={layout}/>
+                            <SkipFormItem FormItem={FormItem}
+                                          blockOptions={blockOptions}
+                                          label={'Not Found Action'}
+                                          block={block} layout={layout}
+                                          setStateHandler={(state) => this.setState(state)}
+                                          getFieldDecorator={getFieldDecorator}/>
+
+                            <ShowGoToBlockSkipFormItem FormItem={FormItem} allBlocks={allBlocks} block={block}
+                                                       showGoToBlock={this.state.showGoToBlockSkip}
+                                                       getFieldDecorator={getFieldDecorator}
+                                                       layout={layout}/>
+
+                            <ShowGoToGroupSkipFormItem FormItem={FormItem}
+                                                       block={block}
+                                                       allGroups={allGroups}
+                                                       currentGroup={currentGroup}
+                                                       showGoToGroup={this.state.showGoToGroupSkip}
+                                                       getFieldDecorator={getFieldDecorator}
+                                                       layout={layout}/>
+                        </>
+                    }
 
                 </Form>
             </Card>

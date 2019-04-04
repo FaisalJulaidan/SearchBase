@@ -7,6 +7,7 @@ from flask_mail import Mail, Message
 from models import Callback
 from services import user_services, assistant_services, analytics_services, chatbotSession_services
 from utilities import helpers
+import logging
 
 mail = Mail()
 
@@ -61,8 +62,9 @@ def sendDemoRequest(email) -> Callback:
     try:
         send_email(tsbEmail, 'Demo Request', '/emails/arrange_demo.html', email=email)
         return Callback(True, "Demo has been requested. We will be in touch soon.")
-    except Exception as e:
-        print("mail_services.sendDemoRequest() ERROR: ", e)
+    except Exception as exc:
+        print("mail_services.sendDemoRequest() ERROR: ", exc)
+        logging.error("mail_service.sendDemoRequest(): " + str(exc))
         return Callback(False, "Demo Request could not be sent at this time")
 
 
@@ -71,8 +73,9 @@ def contactUsIndex(name, email, message) -> Callback:
         send_email(tsbEmail, 'TheSearchBase Contact Us', '/emails/contact_us.html', name=name, email=email,
                    message=message)
         return Callback(True, "Thank you. We will contact you as soon as possible.")
-    except Exception as e:
-        print("mail_services.contactUsIndex() ERROR: ", e)
+    except Exception as exc:
+        print("mail_services.contactUsIndex() ERROR: ", exc)
+        logging.error("mail_service.contactUsIndex(): " + str(exc))
         return Callback(False, "We could not send your message at this time. Please try again later.")
 
 
@@ -88,8 +91,9 @@ def sendVerificationEmail(email, companyName) -> Callback:
 
         return Callback(True, 'Verification email is on its way to ' + email)
 
-    except Exception as e:
-        print("sendVerificationEmail() Error: ", e)
+    except Exception as exc:
+        print("sendVerificationEmail() Error: ", exc)
+        logging.error("mail_service.sendVerificationEmail(): " + str(exc))
         return Callback(False, 'Could not send a verification email to ' + email)
 
 
@@ -105,8 +109,9 @@ def sendPasswordResetEmail(email, companyID):
 
         return Callback(True, 'Password reset email is on its way to ' + email)
 
-    except Exception as e:
-        print("sendPasswordResetEmail() Error: ", e)
+    except Exception as exc:
+        print("sendPasswordResetEmail() Error: ", exc)
+        logging.error("mail_service.sendPasswordResetEmail(): " + str(exc))
         return Callback(False, 'Could not send a password reset email to ' + email)
 
 
@@ -118,8 +123,9 @@ def sendNewUserHasRegistered(name, email, companyName, tel):
 
         return Callback(True, 'Signed up email is on its way')
 
-    except Exception as e:
-        print("sendNewUserHasRegistered() Error: ", e)
+    except Exception as exc:
+        print("sendNewUserHasRegistered() Error: ", exc)
+        logging.error("mail_service.sendNewUserHasRegistered(): " + str(exc))
         return Callback(False, 'Could not send a signed up email')
 
 
@@ -132,8 +138,9 @@ def addedNewUserEmail(adminEmail, targetEmail, password):
 
         return Callback(True, 'Email sent is on its way to ' + targetEmail)
 
-    except Exception as e:
-        print("addedNewUserEmail() Error: ", e)
+    except Exception as exc:
+        print("addedNewUserEmail() Error: ", exc)
+        logging.error("mail_service.addedNewUserEmail(): " + str(exc))
         return Callback(False, 'Could not send email to ' + targetEmail)
 
 
@@ -148,8 +155,9 @@ def sendSolutionAlert(record, solutions):
 
         return Callback(True, 'Email sent is on its way to ' + targetEmail)
 
-    except Exception as e:
-        print("mail_services.sendSolutionAlert ERROR: ", e)
+    except Exception as exc:
+        print("mail_services.sendSolutionAlert ERROR: ", exc)
+        logging.error("mail_service.sendSolutionAlert(): " + str(exc))
         return Callback(False, 'Could not send email')
 
 
@@ -191,8 +199,9 @@ def notifyNewChatbotSessionsCountForLastXHours(hours):
             if not sendRecords_callback.Success:
                 raise Exception("sendRecords_callback: ", sendRecords_callback.Message)
 
-    except Exception as e:
-        print("mail_services.notifyNewChatbotSessionsCountForLastXHours() ERROR: ", e)
+    except Exception as exc:
+        print("mail_services.notifyNewChatbotSessionsCountForLastXHours() ERROR: ", exc)
+        logging.error("mail_service.notifyNewChatbotSessionsCountForLastXHours(): " + str(exc))
         return Callback(False, "Error in notifying for new chatbot sessions")
 
 
@@ -218,8 +227,9 @@ def notifyNewChatbotSession(assistantHashID):
                 return Callback(False, sendRecords_callback.Message)
         return Callback(True, "Emails have been sent")
 
-    except Exception as e:
-        print("mail_services.notifyNewChatbotSession() ERROR: ", e)
+    except Exception as exc:
+        print("mail_services.notifyNewChatbotSession() ERROR: ", exc)
+        logging.error("mail_service.notifyNewChatbotSession(): " + str(exc))
         return Callback(False, "Error in notifying for new chatbot session")
 
 
@@ -230,8 +240,9 @@ def mailNewChatbotSessionsCount(receiver, data):
 
         return Callback(True, 'Email sent and it\'s on its way to ' + receiver)
 
-    except Exception as e:
-        print("mail_services.mailNewChatbotSessionsCount() ERROR: ", e)
+    except Exception as exc:
+        print("mail_services.mailNewChatbotSessionsCount() ERROR: ", exc)
+        logging.error("mail_service.mailNewChatbotSessionsCount(): " + str(exc))
         return Callback(False, 'Could not send email to ' + receiver)
 
 
@@ -266,5 +277,6 @@ def send_email(to, subject, template, **kwargs):
         thr.start()
 
         return thr
-    except Exception as e:
-        print("mail_services.send_email() ERROR / TEMPLATE ERROR: ", e)
+    except Exception as exc:
+        print("mail_services.send_email() TEMPLATE ERROR: ", exc)
+        logging.error("mail_service.send_email(): " + str(exc))

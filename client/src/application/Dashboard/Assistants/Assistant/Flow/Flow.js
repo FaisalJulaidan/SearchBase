@@ -133,15 +133,13 @@ class Flow extends Component {
                         answer.blockToGoID = newBlock.ID;
                     return answer
                 })
-            } else if (lastBlock.Type === "Solutions") {
-                if (lastBlock.Content.action === "Go To Next Block")
-                    lastBlock.Content.blockToGoID = newBlock.ID;
+            }
 
-                if (lastBlock.Content.notInterestedAction === "Go To Next Block")
-                    lastBlock.Content.notInterestedBlockToGoID = newBlock.ID;
-
-            } else if (lastBlock.Content.action === "Go To Next Block")
+            if (lastBlock.Content.action === "Go To Next Block")
                 lastBlock.Content.blockToGoID = newBlock.ID;
+
+            if (lastBlock.SkipAction === "Go To Next Block")
+                lastBlock.SkipBlockToGoID = newBlock.ID;
         }
         updatedGroup.blocks.push(newBlock);
 
@@ -164,26 +162,20 @@ class Flow extends Component {
                     if (nextBlock?.ID)
                         answer.blockToGoID = nextBlock.ID;
                     else
-                        edittedBlock.Content.blockToGoID = null;
+                        answer.blockToGoID = null;
                 return answer
             })
-        } else if (edittedBlock.Type === "Solutions") {
+        }
 
-            if (edittedBlock.Content.action === "Go To Next Block")
-                if (nextBlock?.ID)
-                    edittedBlock.Content.blockToGoID = nextBlock.ID;
-                else
-                    edittedBlock.Content.blockToGoID = null;
-
-            if (edittedBlock.Content.notInterestedAction === "Go To Next Block")
-                if (nextBlock?.ID)
-                    edittedBlock.Content.notInterestedBlockToGoID = nextBlock.ID;
-                else
-                    edittedBlock.Content.blockToGoID = null;
-
-        } else if (edittedBlock.Content.action === "Go To Next Block")
+        if (edittedBlock.Content.action === "Go To Next Block")
             if (nextBlock?.ID)
                 edittedBlock.Content.blockToGoID = nextBlock.ID;
+            else
+                edittedBlock.Content.blockToGoID = null;
+
+        if (edittedBlock.SkipAction === "Go To Next Block")
+            if (nextBlock?.ID)
+                edittedBlock.SkipBlockToGoID = nextBlock.ID;
             else
                 edittedBlock.Content.blockToGoID = null;
 
@@ -212,24 +204,21 @@ class Flow extends Component {
                         }
                         return answer
                     })
-                } else if (block.Type === "Solutions") {
-                    let shallIncreament = false;
-                    if (block.Content.blockToGoID === deletedBlock.ID) {
-                        shallIncreament = true;
-                        block.Content.blockToGoID = null;
-                    }
-
-                    if (block.Content.notInterestedBlockToGoID === deletedBlock.ID) {
-                        shallIncreament = true;
-                        block.Content.notInterestedBlockToGoID = null;
-                    }
-
-                    if (shallIncreament) counter++;
-
-                } else if (block.Content.blockToGoID === deletedBlock.ID) {
-                    block.Content.blockToGoID = null;
-                    counter++;
                 }
+
+                let shallIncreament = false;
+                if (block.Content.blockToGoID === deletedBlock.ID) {
+                    shallIncreament = true;
+                    block.Content.blockToGoID = null;
+                }
+
+                if (block.SkipBlockToGoID === deletedBlock.ID) {
+                    shallIncreament = true;
+                    block.SkipBlockToGoID = null;
+                }
+
+                if (shallIncreament) counter++;
+
                 return block;
             })
         });
@@ -264,26 +253,19 @@ class Flow extends Component {
                             answer.blockToGoID = null;
                     return answer
                 })
-            } else if (block.Type === "Solutions") {
-                if (block.Content.action === "Go To Next Block")
-                    if (array[index + 1]?.ID)
-                        block.Content.blockToGoID = array[index + 1].ID;
-                    else
-                        block.Content.blockToGoID = null;
-
-                if (block.Content.notInterestedAction === "Go To Next Block")
-                    if (array[index + 1]?.ID)
-                        block.Content.notInterestedBlockToGoID = array[index + 1].ID;
-                    else
-                        block.Content.notInterestedBlockToGoID = null;
-
-            } else {
-                if (block.Content.action === "Go To Next Block")
-                    if (array[index + 1]?.ID)
-                        block.Content.blockToGoID = array[index + 1].ID;
-                    else
-                        block.Content.blockToGoID = null;
             }
+
+            if (block.Content.action === "Go To Next Block")
+                if (array[index + 1]?.ID)
+                    block.Content.blockToGoID = array[index + 1].ID;
+                else
+                    block.Content.blockToGoID = null;
+
+            if (block.SkipAction === "Go To Next Block")
+                if (array[index + 1]?.ID)
+                    block.SkipBlockToGoID = array[index + 1].ID;
+                else
+                    block.SkipBlockToGoID = null;
 
             return block
         });

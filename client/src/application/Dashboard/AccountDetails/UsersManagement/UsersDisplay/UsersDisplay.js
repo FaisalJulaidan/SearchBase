@@ -4,12 +4,13 @@ import {Button, Form, Input, Select, Popconfirm, Table,} from 'antd';
 import {isEmpty} from "lodash";
 import UserModal from "./UserModal/UserModal";
 import styles from "./UsersDisplay.less"
+import {getUser} from '../../../../../helpers';
 
 
 const data = [];
 const FormItem = Form.Item;
 const Option = Select.Option;
-const EditableContext = React.createContext();
+const EditableContext = React.createContext();  // is used even though IDE may not detect it
 
 const EditableRow = ({form, index, ...props}) => (
     <EditableContext.Provider value={form}>
@@ -138,6 +139,11 @@ class UsersDisplay extends React.Component {
             if (data !== this.state.data) {
                 //add records needed by the columns
                 // needs key
+                const user = getUser();
+                data = data.filter(record => {
+                    if(record.Email !== user.email && record.Role.Name !== "Owner"){ return record; }
+                });
+
                 data = data.map((record, index) => {
                     data[index]["key"] = data[index]["ID"];
                     return record

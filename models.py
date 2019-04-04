@@ -268,7 +268,7 @@ class Candidate(db.Model):
     CandidateEmail = db.Column(db.String(64), nullable=True)
     CandidateMobile = db.Column(db.String(20), nullable=True)
     CandidateLocation = db.Column(db.String(64), nullable=False) # Required
-    CandidateSkills = db.Column(db.String(64), nullable=False) # Required
+    CandidateSkills = db.Column(db.String(150), nullable=False) # Required
     CandidateLinkdinURL = db.Column(db.String(512), nullable=True)
     CandidateAvailability = db.Column(db.String(64), nullable=True)
     CandidateJobTitle = db.Column(db.String(64), nullable=True)

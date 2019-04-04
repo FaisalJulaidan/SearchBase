@@ -142,7 +142,7 @@ class Block extends Component {
 
                                                 <Row>
                                                     <Divider/>
-                                                    <Col span={8}>Block To Go Text:</Col>
+                                                    <Col span={8}>Question To Go Text:</Col>
                                                     <Col span={16}>
                                                         {this.getBlockToGO(answer.blockToGoID || null)}
                                                     </Col>
@@ -192,7 +192,7 @@ class Block extends Component {
                     {
                         block.Type !== 'Question' &&
                         <Row>
-                            <Col span={6}><b>Block To Go Text:</b></Col>
+                            <Col span={6}><b>Question To Go Text:</b></Col>
                             <Col span={12}>
                                 {
                                     this.getBlockToGO(block.Content.blockToGoID || null)
@@ -212,33 +212,34 @@ class Block extends Component {
                     }
 
 
-
-                    {block.Content.notInterestedAction ?
+                    {block.Skippable && block.SkipAction ?
                         <>
                             <Divider dashed={true} style={{fontWeight: 'normal', fontSize: '14px'}}>
-                                Not Interested Button</Divider>
+                                {block.Type === 'Solutions' ? 'Not Found' : 'Skip'} Button
+                            </Divider>
                             <Row>
 
-                                <Col span={6}><b>Action When Not Interested:</b></Col>
-                                <Col span={12}>{block.Content.notInterestedAction}</Col>
+                                <Col span={6}><b>Action:</b></Col>
+                                <Col span={12}>{block.SkipAction}</Col>
                                 <Divider/>
                             </Row>
+
+                            <Row>
+                                <Col span={6}>
+                                    <b>
+                                        Question_To_Go Text When {block.Type === 'Solutions' ? 'Not Found' : 'Skip'}:
+                                    </b>
+                                </Col>
+                                <Col span={12}>
+                                    {this.getBlockToGO(block.SkipBlockToGoID || null)}
+                                </Col>
+                                <Divider/>
+                            </Row>
+
                         </>
                         : null
                     }
 
-                    {
-                        block.Type === 'Solutions' &&
-                        <Row>
-                            <Col span={6}><b>Block To Go Text When Not Interested:</b></Col>
-                            <Col span={12}>
-                                {
-                                    this.getBlockToGO(block.Content.notInterestedBlockToGoID || null)
-                                }
-                            </Col>
-                            <Divider/>
-                        </Row>
-                    }
 
                 </Panel>
             </Collapse>

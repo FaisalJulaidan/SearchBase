@@ -6,6 +6,9 @@
           "Type": "Question",
           "StoreInDB": false,
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "DataType": "NoType",
           "Content": {
             "text": "We see you're on our careers page. Are you interested in joining our team?",
@@ -63,6 +66,9 @@
           "DataType": "NoType",
           "ID": "5d_P5lCNQ",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "Question"
         },
@@ -70,6 +76,9 @@
           "Type": "User Input",
           "StoreInDB": true,
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "DataType": "NoType",
           "Content": {
             "text": "How many years of recruiting experience do you have?",
@@ -89,6 +98,9 @@
           "DataType": "NoType",
           "ID": "YbdX9N2vD",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -96,6 +108,9 @@
           "Type": "User Input",
           "StoreInDB": true,
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "DataType": "CandidateEmail",
           "Content": {
             "text": "For us to get back to you, could you provide us with your email address? ",
@@ -115,6 +130,9 @@
           "DataType": "NoType",
           "ID": "XPEEnNGZT",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -122,6 +140,9 @@
           "Type": "Question",
           "StoreInDB": true,
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "DataType": "NoType",
           "Content": {
             "text": "Recruitment, can be a tough field. But we're always looking for the right individuals to join our team. Would you like to arrange a call back with a member of the team?",
@@ -171,6 +192,9 @@
           "DataType": "NoType",
           "ID": "C1try2etv",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "Question"
         },
@@ -183,7 +207,10 @@
           },
           "DataType": "CandidateEmail",
           "ID": "7PiGKNjxd",
-          "Skippable": true,
+          "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -197,6 +224,9 @@
           "DataType": "CandidateMobile",
           "ID": "Jl3hmTDS-",
           "Skippable": false,
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
           "StoreInDB": true,
           "Type": "User Input"
         }

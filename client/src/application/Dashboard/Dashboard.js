@@ -157,10 +157,10 @@ class Dashboard extends Component {
                                 <Icon type="pound"/>
                                 Billing
                             </Menu.Item>
-                            <Menu.Item key="users-management" style={{fontSize: '9pt'}}>
-                                <Icon type="usergroup-add"/>
-                                Users Management
-                            </Menu.Item>
+                            {/*<Menu.Item key="users-management" style={{fontSize: '9pt'}}>*/}
+                                {/*<Icon type="usergroup-add"/>*/}
+                                {/*Users Management*/}
+                            {/*</Menu.Item>*/}
                         </SubMenu>
 
                         <Menu.Item key="documentation">

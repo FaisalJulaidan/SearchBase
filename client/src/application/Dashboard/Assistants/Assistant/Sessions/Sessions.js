@@ -115,9 +115,6 @@ class Sessions extends React.Component {
     render() {
         const {assistant} = this.props.location.state;
         const {sessions, options} = this.props;
-        let { sortedInfo, filteredInfo } = this.state;
-        sortedInfo = sortedInfo || {};
-        filteredInfo = filteredInfo || {};
 
         const columns = [{
             title: '#',
@@ -136,13 +133,11 @@ class Sessions extends React.Component {
             title: 'User Type',
             dataIndex: 'UserType',
             key: 'UserType',
-            // filters: [
-            //     { text: 'Candidate', value: 'Candidate' },
-            //     { text: 'Client', value: 'Client' },
-            // ],
-            // onFilter: (value, record) => {
-            //     console.log(value);
-            //     record.UserType.includes(value)},
+            filters: [
+                { text: 'Candidate', value: 'Candidate' },
+                { text: 'Client', value: 'Client' },
+            ],
+            onFilter: (value, record) => record.UserType ? record.UserType.indexOf(value) === 0 : false,
             render: (text, record) => (<Tag key={record.UserType}>{record.UserType}</Tag>),
 
         },{

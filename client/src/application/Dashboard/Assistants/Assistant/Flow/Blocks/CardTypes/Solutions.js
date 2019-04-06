@@ -46,8 +46,8 @@ class Solutions extends Component {
                 StoreInDB: false,
 
                 Skippable: values.isSkippable || false,
-                SkipText: values.SkipText,
-                SkipAction: values.SkipAction,
+                SkipText: values.SkipText || "Skip!",
+                SkipAction: values.SkipAction || "End Chat",
                 SkipBlockToGoID: values.skipBlockToGoID || values.skipBlockToGoIDGroup || null,
 
                 DataType: flowOptions.dataTypes.find((dataType) => dataType.name === "No Type"),

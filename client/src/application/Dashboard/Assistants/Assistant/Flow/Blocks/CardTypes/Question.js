@@ -47,10 +47,12 @@ class Question extends Component {
                 let options = {
                     Type: 'Question',
                     StoreInDB: values.storeInDB,
+
                     Skippable: values.isSkippable || false,
                     SkipText: values.SkipText || "Skip!",
                     SkipAction: values.SkipAction || "End Chat",
                     SkipBlockToGoID: values.skipBlockToGoID || values.skipBlockToGoIDGroup || null,
+
                     DataType: flowOptions.dataTypes
                         .find((dataType) => dataType.name === values.dataType[values.dataType.length-1]),
                     Content: {

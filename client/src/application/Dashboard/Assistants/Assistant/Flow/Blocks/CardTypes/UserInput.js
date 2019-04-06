@@ -44,8 +44,8 @@ class UserInput extends Component {
                 StoreInDB: values.storeInDB,
 
                 Skippable: values.isSkippable || false,
-                SkipText: values.SkipText,
-                SkipAction: values.SkipAction,
+                SkipText: values.SkipText || "Skip!",
+                SkipAction: values.SkipAction || "End Chat",
                 SkipBlockToGoID: values.skipBlockToGoID || values.skipBlockToGoIDGroup || null,
 
                 DataType: flowOptions.dataTypes

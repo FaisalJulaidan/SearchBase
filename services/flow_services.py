@@ -3,12 +3,12 @@
 import enums
 from models import db, Callback, Assistant
 from services import assistant_services
-
-bot_currentVersion = "1.0.0"
-
 from jsonschema import validate
 from utilities import json_schemas, helpers
 import logging
+
+bot_currentVersion = "1.0.0"
+
 
 # ----- Getters ----- #
 # Get the chatbot for the public to use

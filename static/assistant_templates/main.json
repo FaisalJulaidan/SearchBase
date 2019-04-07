@@ -4,11 +4,11 @@
       "blocks": [
         {
           "Type": "Question",
-          "StoreInDB": false,
+          "StoreInDB": true,
           "Skippable": false,
-          "SkipBlockToGoID": null,
           "SkipText": "Skip!",
           "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "DataType": "NoType",
           "Content": {
             "text": "What best describes you?",
@@ -38,38 +38,46 @@
             "answers": [
               {
                 "action": "Go To Specific Block",
-                "afterMessage": "Cool, before we can start a search, tell us a bit as to what you're looking for",
-                "blockToGoID": "ZLkTzYU6Y",
-                "id": "G2n8Sr9Uu",
+                "afterMessage": "Great, lets find you some candidates!",
+                "blockToGoID": "2fbf_Mw0B",
+                "id": "r--lI08lW",
                 "keywords": [],
-                "text": "Request Candidate Search"
+                "text": "Search Our Talent Pool"
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "Great",
+                "blockToGoID": "8B8TRlEnM",
+                "id": "MDZ-uoQpk",
+                "keywords": [],
+                "text": "Upload Job Specification"
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "Cool, before we can register a vacancy, tell us a bit as to what you're looking for now",
+                "blockToGoID": "zl1pQPS9y",
+                "id": "Js8n3TvwE",
+                "keywords": [],
+                "text": "Register a Vacancy"
               },
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "",
-                "blockToGoID": "VlwxYCdgI",
-                "id": "HIOAj-B45",
+                "blockToGoID": "ndkYjBirU",
+                "id": "GtEaVQ2Vc",
                 "keywords": [],
-                "text": "Arrange Call Back"
-              },
-              {
-                "action": "Go To Specific Block",
-                "afterMessage": "Great, lets find you some candidates!",
-                "blockToGoID": "2fbf_Mw0B",
-                "id": "0AJafmsWu",
-                "keywords": [],
-                "text": "Search Talent Pool"
+                "text": "Contact Me"
               }
             ],
             "text": "How can we help you today?"
           },
           "DataType": "NoType",
           "ID": "5hMpPvT9H",
-          "Skippable": false,
+          "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
-          "SkipAction": "End Chat",
-          "StoreInDB": false,
+          "Skippable": false,
+          "StoreInDB": true,
           "Type": "Question"
         },
         {
@@ -78,37 +86,37 @@
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "",
+                "blockToGoID": "_RvKGKYem",
+                "id": "t1nAj3Qzw",
+                "keywords": [],
+                "text": "Job Search"
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "",
                 "blockToGoID": "hk5_59I0M",
-                "id": "xfYk4RXAs",
+                "id": "jBOd4hjuE",
                 "keywords": [],
                 "text": "Upload CV "
               },
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "Cool",
-                "blockToGoID": "1kFwtj0IU",
-                "id": "Z8-8uMbOU",
+                "blockToGoID": "ndkYjBirU",
+                "id": "xYens9IcD",
                 "keywords": [],
-                "text": "Arrange Call Back"
-              },
-              {
-                "action": "Go To Specific Block",
-                "afterMessage": "",
-                "blockToGoID": "_RvKGKYem",
-                "id": "mt6BDeAGc",
-                "keywords": [],
-                "text": "Job Search"
+                "text": "Contact Me"
               }
             ],
             "text": "How can we help you today?"
           },
           "DataType": "NoType",
           "ID": "5eAd2vVgW",
-          "Skippable": false,
+          "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
-          "SkipAction": "End Chat",
-          "StoreInDB": false,
+          "Skippable": false,
+          "StoreInDB": true,
           "Type": "Question"
         },
         {
@@ -127,10 +135,10 @@
           },
           "DataType": "NoType",
           "ID": "hk5_59I0M",
-          "Skippable": false,
+          "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
-          "SkipAction": "End Chat",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "File Upload"
         },
@@ -139,14 +147,14 @@
             "action": "Go To Specific Block",
             "afterMessage": "Great, just one more question...",
             "blockToGoID": "R8m0Tq6nP",
-            "text": "To help you find the best jobs, tell me what job you're looking for? Search for terms such as 'Python', 'C# Developer', 'DevOps Engineer'"
+            "text": "To help you find the best jobs, tell me what job you're looking for? Search for terms such as 'Copywriter', 'Finance', 'Account Manager'"
           },
-          "DataType": "NoType",
+          "DataType": "JobTitle",
           "ID": "_RvKGKYem",
-          "Skippable": false,
+          "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
-          "SkipAction": "End Chat",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -155,14 +163,14 @@
             "action": "Go To Specific Block",
             "afterMessage": "Fantastic, let me see what jobs are available for you...",
             "blockToGoID": "y4yLRWDwj",
-            "text": "What is the best location for you? Enter terms such as 'Cardiff', 'London', 'Manchester'"
+            "text": "What is the best city for you to work in? Enter terms such as 'Cardiff', 'London', 'Manchester'"
           },
-          "DataType": "NoType",
+          "DataType": "JobLocation",
           "ID": "R8m0Tq6nP",
-          "Skippable": false,
+          "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
-          "SkipAction": "End Chat",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -176,10 +184,10 @@
           },
           "DataType": "NoType",
           "ID": "y4yLRWDwj",
-          "Skippable": false,
-          "SkipText": "Not found what you're looking for?",
           "SkipAction": "Go To Specific Block",
-          "SkipBlockToGoID": "iBUbQP89w",
+          "SkipBlockToGoID": "JtN8UqCMi",
+          "SkipText": "I didn't find what I was looking for.",
+          "Skippable": true,
           "StoreInDB": false,
           "Type": "Solutions"
         },
@@ -192,10 +200,10 @@
           },
           "DataType": "CandidateYearsExperience",
           "ID": "iBUbQP89w",
-          "Skippable": false,
+          "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
-          "SkipAction": "End Chat",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -223,10 +231,10 @@
           },
           "DataType": "NoType",
           "ID": "CjnoZTFmy",
-          "Skippable": false,
+          "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
-          "SkipAction": "End Chat",
+          "Skippable": false,
           "StoreInDB": false,
           "Type": "Question"
         },
@@ -246,10 +254,10 @@
           },
           "DataType": "NoType",
           "ID": "x83jMijT4",
-          "Skippable": false,
+          "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
-          "SkipAction": "End Chat",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "File Upload"
         },
@@ -262,10 +270,10 @@
           },
           "DataType": "CandidateEmail",
           "ID": "_uMa9nRct",
-          "Skippable": false,
+          "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
-          "SkipAction": "End Chat",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -278,10 +286,10 @@
           },
           "DataType": "CandidateMobile",
           "ID": "1kFwtj0IU",
-          "Skippable": false,
-          "SkipBlockToGoID": null,
-          "SkipText": "Skip!",
           "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip",
+          "Skippable": true,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -289,15 +297,62 @@
           "Content": {
             "action": "Go To Specific Block",
             "afterMessage": "Got it!",
-            "blockToGoID": "Vc0IQQ6X7",
-            "text": "What skills should the candidates have? Search terms such as 'Python', 'PHP', 'Django Framework'"
+            "blockToGoID": "Z95cvxwBC",
+            "text": "What essential skills should the candidates have? Search terms such as 'Account Manager', 'Finance Analyst', 'Marketing Manager'"
           },
           "DataType": "CandidateSkills",
           "ID": "2fbf_Mw0B",
-          "Skippable": false,
+          "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "answers": [
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "",
+                "blockToGoID": "w9D_ZKtgd",
+                "id": "Hz-6o8AuS",
+                "keywords": [],
+                "text": "Permanent "
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "",
+                "blockToGoID": "w9D_ZKtgd",
+                "id": "GZAWbL43U",
+                "keywords": [],
+                "text": "Contract"
+              }
+            ],
+            "text": "Are you looking to recruit for a Permanent or a Contract candidate?"
+          },
+          "DataType": "NoType",
+          "ID": "Z95cvxwBC",
           "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "Question"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "",
+            "blockToGoID": "Vc0IQQ6X7",
+            "text": "Are there any desirable skills should the candidates have?"
+          },
+          "DataType": "CandidateSkills",
+          "ID": "w9D_ZKtgd",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -310,10 +365,10 @@
           },
           "DataType": "CandidateYearsExperience",
           "ID": "Vc0IQQ6X7",
-          "Skippable": false,
+          "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
-          "SkipAction": "End Chat",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -322,49 +377,80 @@
             "action": "Go To Specific Block",
             "afterMessage": "",
             "blockToGoID": "nUO25eG3p",
-            "text": "Where will the candidates be working?"
+            "text": "In what city will the candidates be working?"
           },
           "DataType": "CandidateLocation",
           "ID": "tKrnfH_VE",
-          "Skippable": false,
+          "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
-          "SkipAction": "End Chat",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
         },
         {
           "Content": {
             "action": "Go To Specific Block",
-            "afterMessage": "To inquire about the candidates, select your ideal candidate and click 'inquire'",
+            "afterMessage": "Thank you for choosing a candidate",
             "blockToGoID": "fuxQj2wPL",
             "databaseType": "Candidates",
             "showTop": 5
           },
           "DataType": "NoType",
           "ID": "nUO25eG3p",
-          "Skippable": false,
-          "SkipText": "Not found what you're looking for?",
           "SkipAction": "Go To Specific Block",
-          "SkipBlockToGoID": "fuxQj2wPL",
+          "SkipBlockToGoID": "lh0qqhr8T",
+          "SkipText": "I didn't find what I was looking for.",
+          "Skippable": true,
           "StoreInDB": false,
           "Type": "Solutions"
         },
         {
           "Content": {
-            "action": "Go To Next Block",
+            "action": "Go To Specific Block",
             "afterMessage": "Last question...",
             "blockToGoID": "VlwxYCdgI",
-            "text": "Now that you've selected a candidate, what is the best email address to contact you on?"
+            "text": "What is the best email address to contact you on?"
           },
           "DataType": "ClientEmail",
           "ID": "fuxQj2wPL",
-          "Skippable": false,
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
           "SkipText": "Skip!",
-          "SkipAction": "Go To Specific Block",
-          "SkipBlockToGoID": "iBUbQP89w",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
+        },
+        {
+          "Content": {
+            "answers": [
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "",
+                "blockToGoID": "J07rXKEP2",
+                "id": "us4Zjfw0z",
+                "keywords": [],
+                "text": "Register A Vacancy"
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "",
+                "blockToGoID": "1rbjEfSbv",
+                "id": "iEgM4q_E6",
+                "keywords": [],
+                "text": "Contact me"
+              }
+            ],
+            "text": "Sorry, you couldn't find what you're looking for. But we can search a much bigger talent pool to help you find the right candidate."
+          },
+          "DataType": "NoType",
+          "ID": "lh0qqhr8T",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "Question"
         },
         {
           "Content": {
@@ -375,26 +461,26 @@
           },
           "DataType": "ClientTelephone",
           "ID": "VlwxYCdgI",
-          "Skippable": false,
-          "SkipText": "Skip!",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
         },
         {
           "Content": {
             "action": "Go To Next Block",
-            "afterMessage": "Great",
+            "afterMessage": "Thanks",
             "blockToGoID": "J07rXKEP2",
-            "text": "Thank you for requesting a candidate search. For what role are you looking to recruit?"
+            "text": "For what role are you looking to recruit for?"
           },
           "DataType": "CandidateJobTitle",
-          "ID": "ZLkTzYU6Y",
-          "Skippable": false,
-          "SkipText": "Skip!",
+          "ID": "zl1pQPS9y",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -402,30 +488,30 @@
           "Content": {
             "answers": [
               {
-                "action": "Go To Next Block",
+                "action": "Go To Specific Block",
                 "afterMessage": "",
-                "blockToGoID": "BgH4udu2H",
-                "id": "fIkw8o8Cr",
+                "blockToGoID": "X90w_ByqN",
+                "id": "ehhgrF1-t",
                 "keywords": [],
-                "text": "Contract"
+                "text": " Permanent"
               },
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "",
-                "blockToGoID": "X90w_ByqN",
-                "id": "-BFZg1kWp",
+                "blockToGoID": "BgH4udu2H",
+                "id": "g7wQC-u6K",
                 "keywords": [],
-                "text": " Permanent"
+                "text": "Contract"
               }
             ],
             "text": "Are you looking to recruit for a  permanent or contract position?"
           },
           "DataType": "JobType",
           "ID": "J07rXKEP2",
-          "Skippable": false,
-          "SkipText": "Skip!",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "Question"
         },
@@ -438,10 +524,10 @@
           },
           "DataType": "JobSalary",
           "ID": "BgH4udu2H",
-          "Skippable": false,
-          "SkipText": "Skip!",
-          "SkipAction": "End Chat",
-          "SkipBlockToGoID": null,
+          "SkipAction": "Go To Specific Block",
+          "SkipBlockToGoID": "7qd9wHi8s",
+          "SkipText": "Competitive Rate ",
+          "Skippable": true,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -454,42 +540,42 @@
           },
           "DataType": "JobSalary",
           "ID": "X90w_ByqN",
-          "Skippable": false,
-          "SkipText": "Skip!",
-          "SkipAction": "End Chat",
-          "SkipBlockToGoID": null,
+          "SkipAction": "Go To Specific Block",
+          "SkipBlockToGoID": "7qd9wHi8s",
+          "SkipText": "Competitive Salary",
+          "Skippable": true,
           "StoreInDB": true,
           "Type": "User Input"
         },
         {
           "Content": {
-            "action": "Go To Next Block",
-            "afterMessage": "very nice",
+            "action": "Go To Specific Block",
+            "afterMessage": "got it",
             "blockToGoID": "BXRqkIvu6",
             "text": "What essential skills do the candidates need to have?"
           },
           "DataType": "CandidateSkills",
           "ID": "7qd9wHi8s",
-          "Skippable": false,
-          "SkipText": "Skip!",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
         },
         {
           "Content": {
-            "action": "Go To Next Block",
+            "action": "Go To Specific Block",
             "afterMessage": "got it",
             "blockToGoID": "GjdoXjsTK",
             "text": "Are there any desired skills which the candidates should have?"
           },
           "DataType": "CandidateSkills",
           "ID": "BXRqkIvu6",
-          "Skippable": true,
+          "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
-          "SkipAction": "End Chat",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -502,42 +588,42 @@
           },
           "DataType": "NoType",
           "ID": "GjdoXjsTK",
-          "Skippable": false,
-          "SkipText": "Skip!",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
         },
         {
           "Content": {
-            "action": "Go To Next Block",
+            "action": "Go To Specific Block",
             "afterMessage": "Just a few more questions",
-            "blockToGoID": "Edm56jsJ9",
+            "blockToGoID": "1rbjEfSbv",
             "text": "And where will the candidates be working? "
           },
           "DataType": "CandidateLocation",
           "ID": "T_f-Iip1R",
-          "Skippable": false,
-          "SkipText": "Skip!",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
         },
         {
           "Content": {
-            "action": "Go To Next Block",
-            "afterMessage": "Last question...",
-            "blockToGoID": "1rbjEfSbv",
-            "text": "Fantastic. Very useful information. What is the best email address to contact you on?"
+            "action": "Go To Specific Block",
+            "afterMessage": "Last question",
+            "blockToGoID": "Edm56jsJ9",
+            "text": "What is the best mobile number for us to contact you on?"
           },
-          "DataType": "ClientEmail",
-          "ID": "Edm56jsJ9",
-          "Skippable": false,
-          "SkipText": "Skip!",
-          "SkipAction": "End Chat",
-          "SkipBlockToGoID": null,
+          "DataType": "ClientTelephone",
+          "ID": "1rbjEfSbv",
+          "SkipAction": "Go To Next Block",
+          "SkipBlockToGoID": "Edm56jsJ9",
+          "SkipText": "Skip Question",
+          "Skippable": true,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -546,16 +632,189 @@
             "action": "End Chat",
             "afterMessage": "Thank you for your information. One of our team members will be in touch with you as soon as possible.",
             "blockToGoID": null,
-            "text": "What is the best mobile number for us to contact you on?"
+            "text": "What is the best email address to contact you on?"
           },
-          "DataType": "ClientTelephone",
-          "ID": "1rbjEfSbv",
-          "Skippable": false,
-          "SkipText": "Skip!",
+          "DataType": "ClientEmail",
+          "ID": "Edm56jsJ9",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
           "StoreInDB": true,
           "Type": "User Input"
+        },
+        {
+          "Content": {
+            "answers": [
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "",
+                "blockToGoID": "d9maoDXuo",
+                "id": "nf-Rm40at",
+                "keywords": [],
+                "text": "Mobile"
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "",
+                "blockToGoID": "25yEgKegE",
+                "id": "2oZtX263_",
+                "keywords": [],
+                "text": "Email"
+              }
+            ],
+            "text": "What is your preferred method of contact?"
+          },
+          "DataType": "NoType",
+          "ID": "ndkYjBirU",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "Question"
+        },
+        {
+          "Content": {
+            "action": "Go To Specific Block",
+            "afterMessage": "",
+            "blockToGoID": "dI9LI9u2A",
+            "text": "What date is best for us to contact you? Enter dates such as 'Friday' or 26/04/2019"
+          },
+          "DataType": "NoType",
+          "ID": "d9maoDXuo",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "answers": [
+              {
+                "action": "Go To Next Block",
+                "afterMessage": "",
+                "blockToGoID": "ZteTRB7BM",
+                "id": "O_ntExlYw",
+                "keywords": [],
+                "text": "Evening"
+              },
+              {
+                "action": "Go To Next Block",
+                "afterMessage": "",
+                "blockToGoID": "ZteTRB7BM",
+                "id": "_QgbgzZqs",
+                "keywords": [],
+                "text": "Morning"
+              },
+              {
+                "action": "Go To Next Block",
+                "afterMessage": "",
+                "blockToGoID": "ZteTRB7BM",
+                "id": "T7oYDSeVy",
+                "keywords": [],
+                "text": "Afternoon"
+              }
+            ],
+            "text": "What time of the day is best for us to contact you on?"
+          },
+          "DataType": "NoType",
+          "ID": "dI9LI9u2A",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "Question"
+        },
+        {
+          "Content": {
+            "action": "End Chat",
+            "afterMessage": "Great, that's all of the information we need. We'll be in touch shortly.",
+            "blockToGoID": null,
+            "text": "What is the best mobile number to contact you on?"
+          },
+          "DataType": "ClientTelephone",
+          "ID": "ZteTRB7BM",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "action": "End Chat",
+            "afterMessage": "Thank you for your email address. We'll be in touch as soon as possible.",
+            "blockToGoID": null,
+            "text": "What is the best email address to contact you on?"
+          },
+          "DataType": "ClientEmail",
+          "ID": "25yEgKegE",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "answers": [
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "",
+                "blockToGoID": "ndkYjBirU",
+                "id": "0OMVN6EjR",
+                "keywords": [],
+                "text": "Contact me with jobs"
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "",
+                "blockToGoID": "hk5_59I0M",
+                "id": "R5FcPR5ft",
+                "keywords": [],
+                "text": "Upload CV"
+              }
+            ],
+            "text": "We're sorry you couldn't find the right job. But we can help search for your next opportunity"
+          },
+          "DataType": "NoType",
+          "ID": "JtN8UqCMi",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "Question"
+        },
+        {
+          "Content": {
+            "action": "Go To Specific Block",
+            "afterMessage": "Thank you for uploading your job specification",
+            "blockToGoID": "ndkYjBirU",
+            "fileTypes": [
+              "doc",
+              "docx",
+              "png",
+              "txt",
+              "jpg",
+              "pdf"
+            ],
+            "text": "To upload a job specification. click on the attachment icon and choose the job specification file."
+          },
+          "DataType": "ClientLocation",
+          "ID": "8B8TRlEnM",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "File Upload"
         }
       ],
       "description": "Chat",

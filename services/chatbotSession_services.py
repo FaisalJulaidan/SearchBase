@@ -7,6 +7,7 @@ from sqlalchemy.sql import desc
 
 from models import db, Callback, ChatbotSession, Assistant
 from services import assistant_services, stored_file_services, databases_services
+from services.CRM import CRM_base
 from utilities import json_schemas, helpers
 from enums import DatabaseType, UserType
 import logging
@@ -46,16 +47,23 @@ def processSession(assistantHashID, data: dict) -> Callback:
         return Callback(False, "The submitted chatbot data doesn't follow the correct format.", exc.args[0])
 
     try:
-        # collectedData is an array, and timeSpent is in seconds.
 
+
+
+        # collectedData is an array, and timeSpent is in seconds.
         chatbotSession = ChatbotSession(Data= sessionData,
                                         TimeSpent=data['timeSpent'],
                                         SolutionsReturned=data['solutionsReturned'],
                                         QuestionsAnswered=len(collectedData),
                                         UserType=UserType[data['userType'].replace(" ", "")],
                                         Assistant=assistant)
+        # CRM integration
+        # callback: Callback = CRM_base.processSession(chatbotSession, assistant)
+        # print(callback.Message)
         db.session.add(chatbotSession)
         db.session.commit()
+
+
         return Callback(True, 'Chatbot data has been processed successfully!', chatbotSession)
 
     except Exception as exc:

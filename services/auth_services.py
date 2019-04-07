@@ -140,10 +140,13 @@ def refreshToken() -> Callback:
     try:
         current_user = get_jwt_identity()
 
+        # get the user requesting token refresh
         user_callback: Callback = user_services.getByEmail(current_user.get("user").get("email").lower())
         if not user_callback.Success:
             raise Exception("Your login was not recognised")
 
+        # check if the LastAccess token in the db is the same as the one the jwt user has.
+        # the db one would change if another user logs in after them
         if not str(user_callback.Data.LastAccess) == current_user.get("user").get("log_time"):
             raise Exception("Your account was logged in somewhere else")
 

@@ -37,9 +37,6 @@ class JsonEncodedDict(types.TypeDecorator):
 
     def process_result_value(self, value, dialect):
         if value is not None:
-            print()
-            print("process_result_value: ", value)
-            print()
             value = json.loads(value)
         return value
 

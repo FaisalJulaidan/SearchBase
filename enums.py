@@ -12,6 +12,8 @@ from typing import List
 # TODO What should be stored in the json is the enum name not value this will need a new parsing system for flow and
 # TODO Chatbot session. but is important before the lunch as it will have significant benefits to the system
 
+class CRM(Enum):
+    Adapt = 'Adapt'
 
 class BlockType(Enum):
     UserInput = 'User Input'

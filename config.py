@@ -53,12 +53,12 @@ class BaseConfig(object):
     JWT_SECRET_KEY = os.urandom(24)
 
     # JWT tokens expires in
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=5)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=20)
 
     SESSION_TYPE = 'filesystem'
     USE_ENCRYPTION = True
-    SECRET_KEY_DB = 'FakeKey'
+    SECRET_KEY_DB = b"\xedb<\xd3\x88\xedR[0\xf2\xa6;\xf5'FB\xf8\x0c\xe8|Br\xedQ" # FakeKey
     SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

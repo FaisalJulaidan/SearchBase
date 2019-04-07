@@ -137,7 +137,7 @@ class AssistantSettingsModal extends Component {
 
                     <FormItem
                         {...formItemLayout}
-                        label="Notifications (Recommended)"
+                        label="New Records Notifications"
                         extra="If you turn this on, we will notify you through your email"
                     >
                         <Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}

@@ -9,6 +9,8 @@ from sqlalchemy_utils import PasswordType, CurrencyType
 
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
+from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
+
 
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
@@ -28,7 +30,6 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
 
 class JsonEncodedDict(types.TypeDecorator):
     """Stores and retrieves JSON as TEXT."""
-
     impl = types.TEXT
 
     def process_bind_param(self, value, dialect):
@@ -148,6 +149,9 @@ class Assistant(db.Model):
     MailEnabled = db.Column(db.Boolean, nullable=False, default=False)
     MailPeriod = db.Column(db.Integer, nullable=False, default=12)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
+
+    # CRM = db.Column(Enum(enums.CRM), nullable=False)
+    # CRMAuth = db.Column(MagicJSON, nullable=True)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )

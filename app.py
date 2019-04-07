@@ -13,7 +13,6 @@ from services.auth_services import jwt
 from utilities import helpers, tasks
 from flask_babel import Babel
 
-
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router,\
     connection_router, chatbotSession_router, users_router, changePassword_router, flow_router, assistant_router,\
@@ -144,7 +143,7 @@ if os.environ['FLASK_ENV'] == 'production':
 elif os.environ['FLASK_ENV'] == 'development':
     # Server Setup
     app.config.from_object('config.DevelopmentConfig')
-    config.BaseConfig.USE_ENCRYPTION = False
+    # app.config['SECRET_KEY_DB'] = config.set_encrypt_key()  # IMPORTANT!
     config.BaseConfig.USE_ENCRYPTION = False
 
     jwt.init_app(app)
@@ -163,6 +162,8 @@ elif os.environ['FLASK_ENV'] == 'development':
 
     scheduler.start()
     print('Development mode running...')
+    # CRM_base.insertCandidate("PartnerDomain9", "SD9USR7", "P@55word", enums.CRM.Adapt)
+
 
 else:
     print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")

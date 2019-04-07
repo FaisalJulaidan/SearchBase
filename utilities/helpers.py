@@ -13,6 +13,8 @@ import functools
 import enums
 from itsdangerous import URLSafeTimedSerializer
 import logging
+from cryptography.fernet import Fernet
+
 
 # Signer
 verificationSigner = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
@@ -20,7 +22,7 @@ verificationSigner = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
 # Configure logging system
 logging.basicConfig(filename='logs/errors.log',
                     level=logging.ERROR,
-                    format='%(asctime)s -- %(levelname)s -- %(message)s')
+                    format='%(asctime)s -- %(message)s')
 
 # ID Hasher
 # IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
@@ -32,6 +34,15 @@ def encrypt_id(id):
 def decrypt_id(id):
     return hashids.decrypt(id)
 
+
+# Encryption
+def encrypt(data):
+    f = Fernet(BaseConfig.SECRET_KEY_DB)
+    return f.encrypt(data)
+
+def decrypt(token):
+    f = Fernet(BaseConfig.SECRET_KEY_DB)
+    return f.decrypt(token)
 
 
 # Generates dummy data for testing

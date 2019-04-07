@@ -13,7 +13,7 @@ from typing import List
 # TODO Chatbot session. but is important before the lunch as it will have significant benefits to the system
 
 class CRM(Enum):
-    Adapt = {'name': 'Adapt', 'enumName': 'Adapt'}
+    Adapt = 'Adapt'
 
 class BlockType(Enum):
     UserInput = 'User Input'

@@ -7,7 +7,7 @@ from sqlalchemy.sql import desc
 
 from models import db, Callback, ChatbotSession, Assistant
 from services import assistant_services, stored_file_services, databases_services
-from services.CRM import CRM_base
+from services.CRM import CRM_services
 from utilities import json_schemas, helpers
 from enums import DatabaseType, UserType
 import logging

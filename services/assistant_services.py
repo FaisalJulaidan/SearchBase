@@ -119,8 +119,7 @@ def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod
         logging.error("assistant_services.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Failed to create the assistant', None)
-    # finally:
-       # db.session.close()
+
 
 
 def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod)-> Callback:
@@ -170,25 +169,8 @@ def removeByID(id) -> Callback:
         logging.error("assistant_services.removeByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in deleting assistant.')
-    # finally:
-       # db.session.close()
 
-def checkOwnership(assistantID, companyID):
-    try:
-        assistant_callback : Callback = getByID(assistantID, companyID)
-        if not assistant_callback.Success: 
-            return Callback(False, "Error in retrieving necessary information.")
 
-        # Check if the user is from the company that owns the assistant
-        if companyID != assistant_callback.Data.CompanyID:
-            return Callback(False, 'Security check failed. Process terminated.')
-
-        return Callback(True, 'Ownership check passed')
-    except Exception as exc:
-        print("Error in assistant_services.checkOwnership(): ", exc)
-        logging.error("assistant_services.checkOwnership(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Error in verifying ownership over assistant.')
 
 
 # def getNotificationsRegisterByID(id):

@@ -112,8 +112,10 @@ def authenticate(email: str, password_to_check: str) -> Callback:
                          "plan": helpers.getPlanNickname(user.Company.SubID),
                          }
                 }
+
+        time_now = datetime.now()
         # for security, hide them in the token
-        tokenData = {'user': {"id": user.ID, "companyID": user.CompanyID, "email": user.Email}}
+        tokenData = {'user': {"id": user.ID, "companyID": user.CompanyID, "email": user.Email, "log_time": str(time_now)}}
 
         # Create the JWT token
         access_token = create_access_token(identity=tokenData)
@@ -123,7 +125,7 @@ def authenticate(email: str, password_to_check: str) -> Callback:
         data['expiresIn'] = datetime.now() + BaseConfig.JWT_ACCESS_TOKEN_EXPIRES
 
         # Set LastAccess
-        user.LastAccess = datetime.now()
+        user.LastAccess = time_now
         db.session.commit()
 
         return Callback(True, "Authorised!", data)
@@ -132,13 +134,19 @@ def authenticate(email: str, password_to_check: str) -> Callback:
         logging.error("auth_services.authenticate(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Unauthorised!", None)
-    # finally:
-    # db.session.close()
 
 
 def refreshToken() -> Callback:
     try:
         current_user = get_jwt_identity()
+
+        user_callback: Callback = user_services.getByEmail(current_user.get("user").get("email").lower())
+        if not user_callback.Success:
+            raise Exception("Your login was not recognised")
+
+        if not str(user_callback.Data.LastAccess) == current_user.get("user").get("log_time"):
+            raise Exception("Your account was logged in somewhere else")
+
         data = {'token': create_access_token(identity=current_user),
                 'expiresIn': datetime.now() + BaseConfig.JWT_ACCESS_TOKEN_EXPIRES}
         return Callback(True, "Authorised!", data)

@@ -33,8 +33,10 @@ class AssistantSettings extends Component {
     render() {
         return (
             <AssistantSettingsModal assistant={this.props.assistant} visible={this.props.visible}
-                                    handleSave={this.handleSave} handleCancel={this.props.hideModal}
-                                    handleDelete={this.handleDelete}/>
+                                    handleSave={this.handleSave}
+                                    handleCancel={this.props.hideModal}
+                                    handleDelete={this.handleDelete}
+                                    isAssistantNameValid={this.props.isAssistantNameValid}/>
         )
     }
 

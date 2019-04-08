@@ -19,6 +19,13 @@ class NewAssistantModal extends Component {
         alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
     };
 
+    checkName = (rule, value, callback) => {
+        if (!this.props.isAssistantNameValid(value)) {
+            callback('Assistant name already exists. Choose another one, please!');
+        } else {
+            callback();
+        }
+    };
 
     togglePopupSwitch = () => {
         this.setState({isPopupDisabled: !this.state.isPopupDisabled})
@@ -70,10 +77,10 @@ class NewAssistantModal extends Component {
                         extra="Enter a name for your assistant to easily identify it in the dashboard"
                         {...formItemLayout}>
                         {getFieldDecorator('assistantName', {
-                            rules: [{
-                                required: true,
-                                message: 'Please input your assistant name',
-                            }],
+                            rules: [
+                                {required: true, message: 'Please input your assistant name'},
+                                {validator: this.checkName}
+                            ]
                         })(
                             <Input placeholder="Ex: My first assistant, Sales Assistant"/>
                         )}

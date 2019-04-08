@@ -11,6 +11,14 @@ class AssistantSettingsModal extends Component {
         alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
     };
 
+    checkName = (rule, value, callback) => {
+        if (!this.props.isAssistantNameValid(value) && this.props.assistant.Name !== value) {
+            callback('Assistant name already exists. Choose another one, please!');
+        } else {
+            callback();
+        }
+    };
+
     togglePopupSwitch = () => {
         this.setState({isPopupDisabled: !this.state.isPopupDisabled})
     };
@@ -78,10 +86,10 @@ class AssistantSettingsModal extends Component {
                         {
                             getFieldDecorator('assistantName', {
                                 initialValue: assistant.Name,
-                                rules: [{
-                                    required: true,
-                                    message: 'Please input your assistant name',
-                                }],
+                                rules: [
+                                    {required: true, message: 'Please input your assistant name'},
+                                    {validator: this.checkName}
+                                ]
                             })
                             (<Input placeholder="Recruitment Chatbot"/>)
                         }

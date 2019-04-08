@@ -28,6 +28,10 @@ class Assistants extends Component {
         this.hideModal();
     };
 
+    isAssistantNameValid = (name) => {
+        return !(this.props.assistantList.findIndex(a => a.Name.toLowerCase() === name.toLowerCase()) >= 0)
+    };
+
     activateHandler = (checked, assistantID) => {
         if(!checked){
             confirm({
@@ -70,6 +74,7 @@ class Assistants extends Component {
                                                                                                   index={i}
                                                                                                   isStatusChanging={this.props.isStatusChanging}
                                                                                                   activateHandler={this.activateHandler}
+                                                                                                  isAssistantNameValid={this.isAssistantNameValid}
                                                                                                   isLoading={this.props.isLoading}
                                         />)
                                     )
@@ -83,6 +88,7 @@ class Assistants extends Component {
                 <NewAssistantModal visible={this.state.visible}
                                    options={this.props.options}
                                    addAssistant={this.addAssistant}
+                                   isAssistantNameValid={this.isAssistantNameValid}
                                    hideModal={this.hideModal}/>
 
             </div>

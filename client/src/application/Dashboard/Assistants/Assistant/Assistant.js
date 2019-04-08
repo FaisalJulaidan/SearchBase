@@ -102,6 +102,7 @@ class Assistant extends Component {
 
                 <AssistantSettings assistant={assistant}
                                    hideModal={this.hideModal}
+                                   isAssistantNameValid={this.props.isAssistantNameValid}
                                    visible={this.state.visible}/>
 
             </>

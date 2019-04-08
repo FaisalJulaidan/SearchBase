@@ -148,8 +148,8 @@ def refreshToken() -> Callback:
 
         # check if the LastAccess token in the db is the same as the one the jwt user has.
         # the db one would change if another user logs in after them
-        if not str(user_callback.Data.LastAccess) == current_user.get("user").get("log_time"):
-            raise Exception("Your account was logged in somewhere else")
+        # if not str(user_callback.Data.LastAccess) == current_user.get("user").get("log_time"):
+        #     raise Exception("Your account was logged in somewhere else")
 
         data = {'token': create_access_token(identity=current_user),
                 'expiresIn': datetime.now() + BaseConfig.JWT_ACCESS_TOKEN_EXPIRES}

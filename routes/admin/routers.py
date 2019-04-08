@@ -15,14 +15,14 @@ assistant_router: Blueprint = assistant_router
 from .assistant.analytics import analytics_router
 analytics_router: Blueprint = analytics_router
 
-from .assistant.connection import connection_router
-connection_router: Blueprint = connection_router
-
 from .assistant.chatbotSession import chatbotSession_router
 chatbotSession_router: Blueprint = chatbotSession_router
 
 from .assistant.flow import flow_router
 flow_router: Blueprint = flow_router
+
+from .assistant.crm import crm_router
+crm_router: Blueprint = crm_router
 
 from .account.users import users_router
 users_router: Blueprint = users_router

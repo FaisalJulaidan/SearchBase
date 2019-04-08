@@ -46,7 +46,7 @@ class Databases extends Component {
     };
 
     isDatabaseNameValid = (name) => {
-        return !(this.props.databasesList.findIndex(db => db.Name === name) >= 0)
+        return !(this.props.databasesList.findIndex(db => db.Name.toLowerCase() === name.toLowerCase()) >= 0)
     };
 
     uploadDatabase = newDatabase => this.props.dispatch(databaseActions.uploadDatabase({newDatabase: newDatabase}));

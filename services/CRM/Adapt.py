@@ -3,45 +3,34 @@ from models import Callback, ChatbotSession
 import json
 import logging
 from enums import DataType as DT
-def login(domain, username, password):
+
+
+def login(auth):
     try:
-
-        url =  "https://developerconnection.adaptondemand.com/WebApp/api/domains/" + domain + "/logon"
+        url =  "https://developerconnection.adaptondemand.com/WebApp/api/domains/" + auth['domain'] + "/logon"
         headers = {'Content-Type': 'application/json'}
-
-        # Credentials
-        body = {
-            "username":username,
-            "password":password,
-            "profile":"CoreProfile",
-            "locale":"en_GB",
-            "timezone":"GMT",
-            "dateFormat":0,
-            "timeFormat":0
-        }
-
         # Send request
-        r = requests.post(url, headers=headers, data= json.dumps(body))
+        r = requests.post(url, headers=headers, data=json.dumps(auth))
+
+        del auth['domain'] # because Adapt doesn't require this in the auth POST request
 
         # When not ok
-        if not r.ok:
-            print("CRM.Adapt.login() Unsuccessful Login: " + r.text)
-            logging.error("CRM.Adapt.login() Unsuccessful Login for Username: "
-                          + username + " Domain: " + domain + " Error: " + r.text)
-            return Callback(False, 'Cannot login to Adapt CRM')
+        if not r.ok: raise Exception
 
+        # Logged in successfully
         return Callback(True, 'Logged in successfully', r.json()['SID'])
 
     except Exception as exc:
         print("CRM.Adapt.login() ERROR: ", exc)
         logging.error("CRM.Adapt.login() ERROR: " + str(exc)
-                      + " Username: " + username
-                      + " Domain: " + domain)
+                      + " Username: " + auth['username']
+                      + " Domain: " + auth['domain'])
+        return Callback(False, 'Cannot login to Adapt CRM')
 
 
-def insertCandidate(domain, username, password, session: ChatbotSession) -> Callback:
+def insertCandidate(auth, session: ChatbotSession) -> Callback:
     try:
-        callback: Callback = login(domain, username, password)
+        callback: Callback = login(auth)
         if not callback.Success:
             return callback
 
@@ -82,25 +71,23 @@ def insertCandidate(domain, username, password, session: ChatbotSession) -> Call
 
         # Send request
         r = requests.post(url, headers=headers, data= json.dumps(body))
-        if not r.ok:
-            print("CRM.Adapt.insertCandidate() Unsuccessful Insertion" + " Error: " + r.text)
-            logging.error("CRM.Adapt.insertCandidate() Unsuccessful Insertion for Username: "
-                          + username + " Domain: " + domain + " Error: " + r.text)
-            return Callback(False, 'Cannot insert candidate')
 
-        print(r.text)
+        # When not ok
+        if not r.ok: raise Exception
+
         return Callback(True, 'Candidate inserted successfully')
 
     except Exception as exc:
         print("CRM.Adapt.insertCandidate() ERROR: ", exc)
         logging.error("CRM.Adapt.insertCandidate() ERROR: " + str(exc)
-                      + " Username: " + username
-                      + " Domain: " + domain)
+                      + " Username: " + auth['username']
+                      + " Domain: " + auth['domain'])
+        return Callback(False, 'Cannot insert candidate')
 
 
-def insertClient(domain, username, password, session: ChatbotSession) -> Callback:
+def insertClient(auth, session: ChatbotSession) -> Callback:
     try:
-        callback: Callback = login(domain, username, password)
+        callback: Callback = login(auth)
         if not callback.Success:
             return callback
 
@@ -132,17 +119,15 @@ def insertClient(domain, username, password, session: ChatbotSession) -> Callbac
 
         # Send request
         r = requests.post(url, headers=headers, data= json.dumps(body))
-        if not r.ok:
-            print("CRM.Adapt.insertClient() Unsuccessful Insertion" + " Error: " + r.text)
-            logging.error("CRM.Adapt.insertClient() Unsuccessful Insertion for Username: "
-                          + username + " Domain: " + domain + " Error: " + r.text)
-            return Callback(False, 'Cannot insert client')
 
-        print(r.text)
+        # When not ok
+        if not r.ok: raise Exception
+
         return Callback(True, 'Client inserted successfully')
 
     except Exception as exc:
         print("CRM.Adapt.insertClient() ERROR: ", exc)
         logging.error("CRM.Adapt.insertClient() ERROR: " + str(exc)
-                      + " Username: " + username
-                      + " Domain: " + domain)
+                      + " Username: " + auth['username']
+                      + " Domain: " + auth['domain'])
+        return Callback(False, 'Cannot insert client')

@@ -66,13 +66,13 @@ function* deleteAssistant({assistantID}) {
 
 function* updateFlow({assistant}) {
     try {
-        loadingMessage('Updating Flow', 0);
+        loadingMessage('Updating Script', 0);
         const res = yield http.put(`/assistant/${assistant.ID}/flow`, {flow: flow.parse(assistant.Flow)});
         yield put(assistantActions.updateFlowSuccess(assistant, res.data.msg));
-        successMessage('Flow updated');
+        successMessage('Script updated!');
     } catch (error) {
         console.log(error);
-        const msg = "Couldn't update flow";
+        const msg = "Couldn't update script";
         yield put(assistantActions.updateFlowFailure(msg));
         errorMessage(msg);
     }

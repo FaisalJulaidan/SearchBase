@@ -189,7 +189,7 @@ class Dashboard extends Component {
                             <TransitionGroup style={{height: '100%'}}>
                                 <CSSTransition key={location.key} classNames="fade" timeout={550}>
                                     <Switch location={location} style={{height: '100%'}}>
-                                        <Route path={`${match.path}/assistants/:id/flow`} component={Flow}/>
+                                        <Route path={`${match.path}/assistants/:id/script`} component={Flow}/>
                                         <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
                                         <Route path={`${match.path}/assistants/:id/sessions`} component={Sessions}/>
                                         <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>

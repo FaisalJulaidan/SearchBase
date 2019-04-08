@@ -83,11 +83,11 @@ class Assistant extends Component {
 
                           <div>
                               <Link to={{
-                                      pathname: `assistants/${assistant.ID}/flow`,
+                                      pathname: `assistants/${assistant.ID}/script`,
                                       state: {assistant: assistant}
                                   }}>
                                   <Icon type="build"/>
-                                  <span> Flow</span>
+                                  <span> Script</span>
                               </Link>
                           </div>,
 

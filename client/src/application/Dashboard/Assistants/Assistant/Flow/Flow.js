@@ -297,7 +297,7 @@ class Flow extends Component {
                             button={{
                                 icon: "save",
                                 onClick: this.saveFlow,
-                                text: 'Save Flow',
+                                text: 'Save Script',
                                 disabled: this.state.isSaved,
                                 loading: this.props.isUpdatingFlow
                             }}/>
@@ -331,7 +331,7 @@ class Flow extends Component {
                 </div>
 
                 <Prompt when={!this.state.isSaved}
-                        message={() => `Your flow is not saved are you sure you want leave without saving it?`}/>
+                        message={() => `Your script is not saved are you sure you want leave without saving it?`}/>
 
             </Spin>
         );

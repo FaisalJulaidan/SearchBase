@@ -9,6 +9,7 @@ from config import BaseConfig
 import logging
 jwt = JWTManager()
 
+
 @jwt.invalid_token_loader
 def my_expired_token_callback(error):
     return helpers.jsonResponse(False, 401, "Session has expired!")

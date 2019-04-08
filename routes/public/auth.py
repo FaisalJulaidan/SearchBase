@@ -45,7 +45,7 @@ def signup_process():
             return helpers.jsonResponse(False, 401, callback.Message, callback.Data)
 
 
-@auth_router.route("/account/verify/<payload>", methods=['GET'])
+@auth_router.route("/account/verify/<payload>", methods=['GET'])  # TODO
 def verify_account(payload):
     if request.method == "GET":
         try:

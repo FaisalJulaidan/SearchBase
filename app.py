@@ -16,7 +16,7 @@ from services.CRM import CRM_base
 import enums
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router,\
-    connection_router, chatbotSession_router, users_router, changePassword_router, flow_router, assistant_router,\
+    connection_router, chatbotSession_router, users_router, flow_router, assistant_router,\
     database_router, options_router
 
 from routes.public.routers import public_router, resetPassword_router, chatbot_router, auth_router
@@ -34,7 +34,6 @@ app.register_blueprint(sub_router)
 app.register_blueprint(analytics_router, url_prefix='/api')
 app.register_blueprint(connection_router, url_prefix='/api')
 app.register_blueprint(chatbotSession_router, url_prefix='/api')
-app.register_blueprint(changePassword_router)
 app.register_blueprint(users_router, url_prefix='/api')
 app.register_blueprint(chatbot_router, url_prefix='/api')
 app.register_blueprint(auth_router, url_prefix='/api')

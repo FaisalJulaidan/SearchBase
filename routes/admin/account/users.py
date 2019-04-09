@@ -63,7 +63,7 @@ def users():
             return helpers.jsonResponse(False, 400, user_callback.Message)
 
         # check if the email is valid and if the user has permission to edit users and if his new role is valid
-        if not helpers.isValidEmail(email) or not user_callback.Data.Role.EditUsersor \
+        if not helpers.isValidEmail(email) or not user_callback.Data.Role.EditUsers \
                 or (new_role != "Admin" and new_role != "User"):
             return helpers.jsonResponse(False, 400, "Please make sure you entered all data correctly and have the " +
                                         "necessary permission to do this action")

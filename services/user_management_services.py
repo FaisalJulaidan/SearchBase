@@ -8,7 +8,7 @@ import logging
 from utilities import helpers
 
 
-def addAdditionalUser(name, email, role, admin_id):
+def add_user_with_permission(name, email, role, admin_id):
     try:
         # Get the admin user who is logged in and wants to create a new user.
         user_callback: Callback = user_services.getByID(admin_id)
@@ -22,7 +22,7 @@ def addAdditionalUser(name, email, role, admin_id):
             return Callback(False, "Please make sure you entered all data correctly and have the necessary permission" +
                                    " to do this action")
 
-        adminUser = user_callback.Data
+        admin_user = user_callback.Data
 
         # removed empty spaces around the strings and split the full name into first name and surname
         names = name.strip().split(" ")
@@ -36,7 +36,7 @@ def addAdditionalUser(name, email, role, admin_id):
             return Callback(False, 'Email is already on use.')
 
         # Get the role to be assigned for the user
-        role_callback: Callback = role_services.getByNameAndCompanyID(role, adminUser.CompanyID)
+        role_callback: Callback = role_services.getByNameAndCompanyID(role, admin_user.CompanyID)
         if not role_callback.Success:
             return Callback(False, role_callback.Message)
 
@@ -45,11 +45,11 @@ def addAdditionalUser(name, email, role, admin_id):
 
         # Create the new user for the company
         create_callback: Callback = user_services.create(first_name, surname, email, password, "00000000000", 
-                                                         adminUser.Company, role_callback.Data, verified=True)
+                                                         admin_user.Company, role_callback.Data, verified=True)
         if not create_callback.Success:
             return Callback(False, create_callback.Message)
 
-        email_callback: Callback = mail_services.addedNewUserEmail(adminUser.Email, email, password)
+        email_callback: Callback = mail_services.addedNewUserEmail(admin_user.Email, email, password)
         if not email_callback.Success:
             remove_callback: Callback = user_services.removeByID(create_callback.Data.ID)
             if not remove_callback.Success:
@@ -59,13 +59,13 @@ def addAdditionalUser(name, email, role, admin_id):
         return Callback(True, 'User has been created successfully!')
 
     except Exception as exc:
-        print("user_services.addAdditionalUser ERROR: " + str(exc))
-        logging.error("user_services.addAdditionalUser(): " + str(exc))
+        print("user_services.add_user_with_permission ERROR: " + str(exc))
+        logging.error("user_services.add_user_with_permission(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')
 
 
-def updateWithPermission(user_id, first_name, surname, email, role, admin_id) -> Callback:
+def update_user_with_permission(user_id, first_name, surname, email, role, admin_id) -> Callback:
     try:
         # Get the admin user who is logged in and wants to edit.
         user_callback: Callback = user_services.getByID(admin_id)
@@ -99,12 +99,12 @@ def updateWithPermission(user_id, first_name, surname, email, role, admin_id) ->
 
     except Exception as exc:
         print(exc)
-        logging.error("user_services.updateWithPermission(): " + str(exc))
+        logging.error("user_services.update_user_with_permission(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Sorry, Could not update the user.')
 
 
-def deleteUserWithPermission(user_id, admin_id):
+def delete_user_with_permission(user_id, admin_id):
     try:
         # Get the admin user who is logged in and wants to delete.
         user_callback: Callback = user_services.getByID(admin_id)
@@ -124,6 +124,6 @@ def deleteUserWithPermission(user_id, admin_id):
 
     except Exception as exc:
         print(exc)
-        logging.error("user_services.deleteUserWithPermission(): " + str(exc))
+        logging.error("user_services.delete_user_with_permission(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Sorry, Could not delete the user.')

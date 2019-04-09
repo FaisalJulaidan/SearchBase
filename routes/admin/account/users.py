@@ -25,10 +25,10 @@ def users():
 
     if request.method == "POST":
 
-        add_user_callback: Callback = user_management_services.addAdditionalUser(request.form.get("name"),
-                                                                                 request.form.get("email"),
-                                                                                 request.form.get("type"),
-                                                                                 user.get('id'))
+        add_user_callback: Callback = user_management_services.add_user_with_permission(request.form.get("name"),
+                                                                                        request.form.get("email"),
+                                                                                        request.form.get("type"),
+                                                                                        user.get('id'))
         if not add_user_callback.Success:
             return helpers.jsonResponse(False, 400, add_user_callback.Message)
 
@@ -37,12 +37,12 @@ def users():
 
     if request.method == "PUT":
 
-        update_callback: Callback = user_management_services.updateWithPermission(request.json.get("ID", 0),
-                                                                                  request.json.get("Fullname").split(" ")[0],
-                                                                                  request.json.get("Fullname").split(" ")[-1],
-                                                                                  request.json.get("Email"),
-                                                                                  request.json.get("RoleName"),
-                                                                                  user.get('id'))
+        update_callback: Callback = user_management_services.update_user_with_permission(request.json.get("ID", 0),
+                                                                                         request.json.get("Fullname").split(" ")[0],
+                                                                                         request.json.get("Fullname").split(" ")[-1],
+                                                                                         request.json.get("Email"),
+                                                                                         request.json.get("RoleName"),
+                                                                                         user.get('id'))
         if not update_callback.Success:
             return helpers.jsonResponse(False, 400, update_callback.Message)
 
@@ -56,7 +56,7 @@ def user(user_id):
 
     if request.method == "DELETE":
 
-        remove_callback: Callback = user_management_services.deleteUserWithPermission(user_id, user.get("id"))
+        remove_callback: Callback = user_management_services.delete_user_with_permission(user_id, user.get("id"))
         if not remove_callback.Success:
             return helpers.jsonResponse(False, 400, remove_callback.Message)
 

@@ -139,9 +139,10 @@ const updateFlowFailure = (error) => {
 
 
 // CRM
-const connectCRM = (CRM) => {
+const connectCRM = (CRM, assistant) => {
     return {
         type: actionTypes.CONNECT_CRM_REQUEST,
+        assistant,
         CRM
     };
 };

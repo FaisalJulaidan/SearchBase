@@ -14,9 +14,9 @@ const FormItem = Form.Item;
 class CRMModal extends React.Component {
 
     state = {
-        adapt: false,
-        bullhorn: false,
-        vincere: false
+        Adapt: false,
+        Bullhorn: false,
+        Vincere: false
     };
 
     changeCRM = CRM => {
@@ -34,8 +34,8 @@ class CRMModal extends React.Component {
         if (!err) {
             const state = {...this.state};
             this.props.handleConnect({
-                CRMType: Object.keys(state).find((CRM) => state[CRM] === true),
-                details: {...values},
+                type: Object.keys(state).find((CRM) => state[CRM] === true),
+                auth: {...values},
             })
         }
     });
@@ -57,7 +57,7 @@ class CRMModal extends React.Component {
                    footer={[
                        <Button key="cancel" onClick={this.props.handleCancel}>Cancel</Button>,
                        <Button key="submit" type="primary"
-                               disabled={!this.state.adapt}
+                               disabled={!this.state.Adapt}
                                onClick={this.connectCRM}>
                            Connect
                        </Button>,
@@ -65,27 +65,27 @@ class CRMModal extends React.Component {
 
                 <Row type="flex" justify="center" gutter={16}>
                     <Col span={6}>
-                        <AuroraCard title={'Adapt'} selected={this.state.adapt}
-                                    onClick={() => this.changeCRM('adapt')}
+                        <AuroraCard title={'Adapt'} selected={this.state.Adapt}
+                                    onClick={() => this.changeCRM('Adapt')}
                                     image={getLink('/static/images/CRM/adapt.png')}
                                     selectImage={getLink('/static/images/CRM/select_adapt.png')}
-                                    desc={<Tag color={this.state.adapt ? "purple" : "#87d068"}>Connect Now</Tag>}/>
+                                    desc={<Tag color={this.state.Adapt ? "purple" : "#87d068"}>Connect Now</Tag>}/>
                     </Col>
 
                     <Col span={6}>
-                        <AuroraCard title={'Bullhorn'} selected={this.state.bullhorn}
-                                    onClick={() => this.changeCRM('bullhorn')}
+                        <AuroraCard title={'Bullhorn'} selected={this.state.Bullhorn}
+                                    onClick={() => this.changeCRM('Bullhorn')}
                                     image={getLink('/static/images/CRM/bullhorn.png')}
                                     selectImage={getLink('/static/images/CRM/select_bullhorn.png')}
-                                    desc={<Tag color={this.state.bullhorn ? "purple" : "grey"}>Coming Soon</Tag>}/>
+                                    desc={<Tag color={this.state.Bullhorn ? "purple" : "grey"}>Coming Soon</Tag>}/>
                     </Col>
 
                     <Col span={6}>
-                        <AuroraCard title={'Vencier'} selected={this.state.vincere}
-                                    onClick={() => this.changeCRM('vincere')}
+                        <AuroraCard title={'Vencier'} selected={this.state.Vincere}
+                                    onClick={() => this.changeCRM('Vincere')}
                                     image={getLink('/static/images/CRM/vincere.png')}
                                     selectImage={getLink('/static/images/CRM/select_vincere.png')}
-                                    desc={<Tag color={this.state.vincere ? "purple" : "grey"}>Coming Soon</Tag>}/>
+                                    desc={<Tag color={this.state.Vincere ? "purple" : "grey"}>Coming Soon</Tag>}/>
                     </Col>
                 </Row>
 
@@ -94,21 +94,21 @@ class CRMModal extends React.Component {
 
                 <Form layout='horizontal'>
                     {
-                        this.state.adapt &&
+                        this.state.Adapt &&
                         <AdaptFormItems getFieldDecorator={getFieldDecorator}
                                         layout={layout}
                                         FormItem={FormItem}/>
                     }
 
                     {
-                        this.state.bullhorn &&
+                        this.state.Bullhorn &&
                         <BullhornFormItems getFieldDecorator={getFieldDecorator}
                                            layout={layout}
                                            FormItem={FormItem}/>
                     }
 
                     {
-                        this.state.vincere &&
+                        this.state.Vincere &&
                         <VincereFormItems getFieldDecorator={getFieldDecorator}
                                           layout={layout}
                                           FormItem={FormItem}/>

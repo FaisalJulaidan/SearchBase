@@ -10,6 +10,7 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
             <FormItem label="Domain"
                       {...layout}>
                 {getFieldDecorator('domain', {
+                    initialValue: 'sfgdwe',
                     rules: [{
                         required: true,
                         message: "Please add your domain name",
@@ -22,6 +23,7 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
             <FormItem label="Username"
                       {...layout}>
                 {getFieldDecorator('username', {
+                    initialValue: 'sgsfg',
                     rules: [{
                         required: true,
                         max: 20,
@@ -38,6 +40,7 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
             <FormItem label="Password"
                       {...layout}>
                 {getFieldDecorator('password', {
+                    initialValue: 'erewr',
                     rules: [{
                         required: true,
                         max: 32,
@@ -55,6 +58,7 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
             <FormItem label="Profile"
                       {...layout}>
                 {getFieldDecorator('profile', {
+                    initialValue: 'd',
                     rules: [{
                         required: true,
                         message: "Profile is required field",
@@ -67,6 +71,7 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
             <FormItem label="Timezone"
                       {...layout}>
                 {getFieldDecorator('timezone', {
+                    initialValue: 'GMT',
                     rules: [{
                         required: true,
                         message: "Timezone is required field",
@@ -79,6 +84,7 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
             <FormItem label="Date Format"
                       {...layout}>
                 {getFieldDecorator('dateFormat', {
+                    initialValue: 0,
                     rules: [{
                         required: true,
                         message: "Date Format is required field",
@@ -88,9 +94,31 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
                         <Option value="0">0 – default</Option>
                         <Option value="1">1 – Long</Option>
                         <Option value="2">2 – Medium</Option>
+                        <Option value="3">3 – Short</Option>
                     </Select>
                 )}
             </FormItem>
+
+
+            <FormItem label="Time Format"
+                      {...layout}>
+                {getFieldDecorator('timeFormat', {
+                    initialValue: 0,
+                    rules: [{
+                        required: true,
+                        message: "Time Format is required field",
+                    }],
+                })(
+                    <Select placeholder={'Select one of the Time Formats'}>
+                        <Option value="0">0 – Full</Option>
+                        <Option value="1">1 – Long</Option>
+                        <Option value="2">2 – Medium</Option>
+                        <Option value="3">3 – Short</Option>
+                    </Select>
+                )}
+            </FormItem>
+
+
 
 
         </div>

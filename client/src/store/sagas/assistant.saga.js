@@ -17,6 +17,23 @@ function* fetchAssistants() {
 
 }
 
+function* a() {
+    try {
+        loadingMessage('Creating assistant...', 0);
+        const res = yield http.post(`/assistant/${2}/crm/connect`, {}).then((x)=> {console.log(x)});
+        console.log(res)
+        // yield put(assistantActions.addAssistantSuccess(res.data.msg));
+        // yield put(assistantActions.fetchAssistants());
+        successMessage('Assistant added!');
+
+    } catch (error) {
+        console.log(error);
+        const msg = "Couldn't create a new assistant";
+        yield put(assistantActions.addAssistantFailure(msg));
+        errorMessage(msg);
+    }
+}
+
 function* addAssistant({type, newAssistant}) {
     try {
         loadingMessage('Creating assistant...', 0);
@@ -64,6 +81,7 @@ function* deleteAssistant({assistantID}) {
 }
 
 
+
 function* updateFlow({assistant}) {
     try {
         loadingMessage('Updating Script', 0);
@@ -77,6 +95,7 @@ function* updateFlow({assistant}) {
         errorMessage(msg);
     }
 }
+
 
 function* updateStatus({status, assistantID}) {
     try {
@@ -94,19 +113,27 @@ function* updateStatus({status, assistantID}) {
     }
 }
 
-function* connectCRM({CRM}) {
+
+function* sd({CRM, assistant}) {
     try {
-        loadingMessage('Connecting to ' + CRM.CRMType, 0);
-        // const res = yield http.put(`/assistant/${assistantID}/status`, {status});
-        // yield put(assistantActions.connectCRMSuccess({}, 'Status updated successfully'));
-        setTimeout(yield successMessage('Status Updated'), 2000)
+        // loadingMessage('Connecting to ' + CRM.type, 0);
+        const res = yield http.post(`/assistants`, {});
+
+        // const res = yield http.post(`/assistant/${assistant.ID}/crm/connect`, {...CRM});
+        setTimeout(()=> {console.log(res)}, 2000);
+        console.log(res);
+        // yield put(assistantActions.connectCRMSuccess({}, 'CRM connected successfully'));
+        // // yield put(assistantActions.fetchAssistants());
+        // yield successMessage('Connected successfully to ' + CRM.type);
     } catch (error) {
+        debugger;
         console.error(error);
-        const msg = "Couldn't update assistant's status";
+        const msg = "Couldn't connect to CRM";
         yield put(assistantActions.connectCRMFailure(msg));
         errorMessage(msg);
     }
 }
+
 
 
 function* watchUpdateStatus() {
@@ -134,7 +161,7 @@ function* watchDeleteAssistant() {
 }
 
 function* watchConnectCRM() {
-    yield takeEvery(actionTypes.CONNECT_CRM_REQUEST, connectCRM)
+    yield takeEvery(actionTypes.CONNECT_CRM_REQUEST, a)
 }
 
 

@@ -13,6 +13,8 @@ crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../..
 @jwt_required
 def connect_crm(assistantID):
 
+
+
     # Authenticate
     user = get_jwt_identity()['user']
     security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
@@ -23,7 +25,8 @@ def connect_crm(assistantID):
     # Connect to crm
     callback: Callback = Callback(False, '')
     if request.method == "POST":
-        callback: Callback = crm_services.connect(assistant, request.json)
+        return helpers.jsonResponse(False, 400, "Cannot add Assistant")
+        callback: Callback = crm_services.connect(assistant, request.json) # crm details passed (auth, type)
 
 
     if not callback.Success:

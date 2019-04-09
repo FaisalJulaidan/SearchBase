@@ -9,13 +9,15 @@ def login(auth):
     try:
         url =  "https://developerconnection.adaptondemand.com/WebApp/api/domains/" + auth['domain'] + "/logon"
         headers = {'Content-Type': 'application/json'}
+
         # Send request
+        del auth['domain'] # because Adapt doesn't require this in the auth POST request
         r = requests.post(url, headers=headers, data=json.dumps(auth))
 
-        del auth['domain'] # because Adapt doesn't require this in the auth POST request
+
 
         # When not ok
-        if not r.ok: raise Exception
+        if not r.ok: raise Exception(r.text)
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully', r.json()['SID'])

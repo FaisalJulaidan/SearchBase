@@ -145,13 +145,15 @@ class Assistant(db.Model):
     Message = db.Column(db.String(500), nullable=False)
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
-    Config = db.Column(MagicJSON, nullable=True)
+
     MailEnabled = db.Column(db.Boolean, nullable=False, default=False)
     MailPeriod = db.Column(db.Integer, nullable=False, default=12)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
 
-    # CRM = db.Column(Enum(enums.CRM), nullable=False)
-    # CRMAuth = db.Column(MagicJSON, nullable=True)
+    CRM = db.Column(Enum(enums.CRM), nullable=True)
+    CRMAuth = db.Column(MagicJSON, nullable=True)
+    CRMConnected = db.Column(db.Boolean, nullable=False, default=False)
+
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )

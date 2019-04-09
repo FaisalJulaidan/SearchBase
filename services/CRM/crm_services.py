@@ -31,7 +31,7 @@ def connect(assistant: Assistant, details) -> Callback:
         crm_auth = details['auth']
 
         # test connection
-        test: Callback = testConnection(crm_type, crm_auth)
+        test: Callback = testConnection(details)
         if not test.Success:
             return test
 

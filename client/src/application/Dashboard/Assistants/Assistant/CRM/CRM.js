@@ -13,7 +13,7 @@ class CRM extends React.Component {
     handleConnect = (CRM) => {
         this.props.hideModal();
         // dispatch redux action
-        this.props.dispatch(assistantActions.connectCRM(CRM));
+        this.props.dispatch(assistantActions.connectCRM(CRM, this.props.assistant));
     };
 
     render = () => <CRMModal assistant={this.props.assistant}

@@ -8,10 +8,10 @@ import logging
 from utilities import helpers
 
 
-def addAdditionalUser(name, email, role, adminID):
+def addAdditionalUser(name, email, role, admin_id):
     try:
         # Get the admin user who is logged in and wants to create a new user.
-        user_callback: Callback = user_services.getByID(adminID)
+        user_callback: Callback = user_services.getByID(admin_id)
         if not user_callback.Success:
             return Callback(False, user_callback.Message)
 
@@ -19,8 +19,8 @@ def addAdditionalUser(name, email, role, adminID):
         if not user_callback.Data.Role.EditUsers \
                 or (role != "Admin" and role != "User") \
                 or not helpers.isValidEmail(email):
-            return Callback(False, "Please make sure you entered all data correctly and have the " +
-                                        "necessary permission to do this action")
+            return Callback(False, "Please make sure you entered all data correctly and have the necessary permission" +
+                                   " to do this action")
 
         adminUser = user_callback.Data
 
@@ -44,8 +44,8 @@ def addAdditionalUser(name, email, role, adminID):
         password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
 
         # Create the new user for the company
-        create_callback: Callback = user_services.create(firstname, surname, email, password, "00000000000", adminUser.Company,
-                                           role_callback.Data, verified=True)
+        create_callback: Callback = user_services.create(firstname, surname, email, password, "00000000000", 
+                                                         adminUser.Company, role_callback.Data, verified=True)
         if not create_callback.Success:
             return Callback(False, create_callback.Message)
 
@@ -65,18 +65,18 @@ def addAdditionalUser(name, email, role, adminID):
         return Callback(False, 'Sorry, Could not create the user.')
 
 
-def updateWithPermission(userID, firstname, surname, email, role, adminID) -> Callback:
+def updateWithPermission(userID, firstname, surname, email, role, admin_id) -> Callback:
     try:
         # Get the admin user who is logged in and wants to edit.
-        user_callback: Callback = user_services.getByID(adminID)
+        user_callback: Callback = user_services.getByID(admin_id)
         if not user_callback.Success:
             return Callback(False, user_callback.Message)
 
         # check if the email is valid and if the user has permission to edit users and if his new role is valid
         if not helpers.isValidEmail(email) or not user_callback.Data.Role.EditUsers \
                 or (role != "Admin" and role != "User"):
-            return Callback(False, "Please make sure you entered all data correctly and have the " +
-                                        "necessary permission to do this action")
+            return Callback(False, "Please make sure you entered all data correctly and have the necessary permission" +
+                                   " to do this action")
 
         user_callback: Callback = user_services.getByID(userID)
         if not user_callback.Success:
@@ -104,10 +104,10 @@ def updateWithPermission(userID, firstname, surname, email, role, adminID) -> Ca
         return Callback(False, 'Sorry, Could not update the user.')
 
 
-def deleteUserWithPermission(userID, adminID):
+def deleteUserWithPermission(userID, admin_id):
     try:
         # Get the admin user who is logged in and wants to delete.
-        user_callback: Callback = user_services.getByID(adminID)
+        user_callback: Callback = user_services.getByID(admin_id)
         if not user_callback.Success:
             return Callback(False, user_callback.Message)
 

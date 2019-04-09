@@ -137,6 +137,32 @@ const updateFlowFailure = (error) => {
     };
 };
 
+
+// CRM
+const connectCRM = (CRM) => {
+    return {
+        type: actionTypes.CONNECT_CRM_REQUEST,
+        CRM
+    };
+};
+
+const connectCRMSuccess = (assistant, msg) => {
+    return {
+        type: actionTypes.CONNECT_CRM_SUCCESS,
+        assistant,
+        msg
+    };
+};
+
+const connectCRMFailure = (error) => {
+    return {
+        type: actionTypes.CONNECT_CRM_FAILURE,
+        error
+    };
+};
+
+
+
 export const assistantActions = {
     fetchAssistants,
     fetchAssistantsSuccess,
@@ -160,5 +186,9 @@ export const assistantActions = {
 
     updateFlow,
     updateFlowSuccess,
-    updateFlowFailure
+    updateFlowFailure,
+
+    connectCRM,
+    connectCRMSuccess,
+    connectCRMFailure,
 };

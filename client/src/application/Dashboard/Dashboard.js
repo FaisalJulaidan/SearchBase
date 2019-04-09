@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 
-import {Avatar, Dropdown, Icon, Layout, Menu, notification} from 'antd';
+import {Avatar, Dropdown, Icon, Layout, Menu} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
 import Assistants from './Assistants/Assistants';
 import Databases from './Databases/Databases';
-import {getUser, history} from '../../helpers';
+import {getUser, history} from "helpers";
 import {Route, Switch, withRouter} from 'react-router-dom';
 import Flow from "./Assistants/Assistant/Flow/Flow";
 import Profile from "./AccountDetails/Profile/Profile";
@@ -24,6 +24,7 @@ import {TransitionGroup, CSSTransition} from "react-transition-group";
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
+import CRM from "./Assistants/Assistant/CRM/CRM";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -193,6 +194,7 @@ class Dashboard extends Component {
                                         <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
                                         <Route path={`${match.path}/assistants/:id/sessions`} component={Sessions}/>
                                         <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
+                                        <Route path={`${match.path}/assistants/:id/CRMIntegration`} component={CRM}/>
                                         <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                                         <Route path={`${match.path}/databases`} component={Databases} exact/>
                                         <Route path={`${match.path}/profile`} component={Profile} exact/>

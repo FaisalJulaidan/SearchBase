@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import connect from "react-redux/es/connect/connect";
-import {assistantActions} from "../../../../../store/actions";
+import {assistantActions} from "store/actions";
 import AssistantSettingsModal from "./AssistantSettingsModal/AssistantSettingsModal";
 import {Modal} from "antd";
 

@@ -2,7 +2,6 @@ import React from 'react';
 import styles from "./Sessions.module.less"
 import ViewsModal from "./ViewModal/ViewsModal";
 import {Button, Modal, Table, Tag, Divider} from 'antd';
-import moment from 'moment';
 import {chatbotSessionsActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
 import Header from "../../../../../components/Header/Header";
@@ -58,14 +57,19 @@ class Sessions extends React.Component {
     };
 
 
-    deleteSession = (sessionID, assistantID) => {
+    deleteSession = (deletedSession) => {
+        const {ID, AssistantID} = deletedSession;
+
         confirm({
             title: `Delete session confirmation`,
             content: `If you click OK, this session will be deleted with its associated data forever`,
             okType: 'danger',
             onOk: () => {
-                this.props.dispatch(chatbotSessionsActions.deleteChatbotSession(sessionID, assistantID))
-            }
+                if (this.state.viewModal)
+                    this.getNextSession(deletedSession);
+                this.props.dispatch(chatbotSessionsActions.deleteChatbotSession(ID, AssistantID))
+            },
+            maskClosable: true
         });
     };
 
@@ -111,6 +115,22 @@ class Sessions extends React.Component {
         );
     };
 
+    getNextSession = currentSession => {
+        const sessions = [...this.props.sessions?.sessionsList];
+        if (sessions) {
+            const index = sessions.findIndex(session => session.ID === currentSession.ID);
+            this.setState({selectedSession: sessions[index + 1] ? sessions[index + 1] : sessions[index]})
+        }
+    };
+
+    getBackSession = currentSession => {
+        const sessions = [...this.props.sessions?.sessionsList];
+        if (sessions) {
+            const index = sessions.findIndex(session => session.ID === currentSession.ID);
+            this.setState({selectedSession: sessions[index - 1] ? sessions[index - 1] : sessions[index]})
+        }
+    };
+
 
     render() {
         const {assistant} = this.props.location.state;
@@ -120,40 +140,40 @@ class Sessions extends React.Component {
             title: '#',
             dataIndex: '#',
             key: '#',
-            render: (text, record, index) => (<p>{index+1}</p>),
+            render: (text, record, index) => (<p>{index + 1}</p>),
 
-        },{
+        }, {
             title: 'ID',
             dataIndex: 'ID',
             key: 'ID',
             sorter: (a, b) => a.ID - b.ID,
             render: (text, record) => (<p>{record.ID}</p>),
 
-        },{
+        }, {
             title: 'User Type',
             dataIndex: 'UserType',
             key: 'UserType',
             filters: [
-                { text: 'Candidate', value: 'Candidate' },
-                { text: 'Client', value: 'Client' },
+                {text: 'Candidate', value: 'Candidate'},
+                {text: 'Client', value: 'Client'},
             ],
             onFilter: (value, record) => record.UserType ? record.UserType.indexOf(value) === 0 : false,
             render: (text, record) => (<Tag key={record.UserType}>{record.UserType}</Tag>),
 
-        },{
+        }, {
             title: 'Questions Answered',
             dataIndex: 'QuestionsAnswered',
             key: 'QuestionsAnswered',
             sorter: (a, b) => a.QuestionsAnswered - b.QuestionsAnswered,
             render: (text, record) => (
-                <p style={{textAlign:''}}>{text}</p>),
+                <p style={{textAlign: ''}}>{text}</p>),
 
         }, {
             title: 'Solutions Returned',
             dataIndex: 'SolutionsReturned',
             sorter: (a, b) => a.SolutionsReturned - b.SolutionsReturned,
             render: (text, record) => (
-                <p style={{textAlign:''}}>{text}</p>),
+                <p style={{textAlign: ''}}>{text}</p>),
 
         }, {
             title: 'Time Spent',
@@ -168,9 +188,9 @@ class Sessions extends React.Component {
                 if (mm < 10) mm = "0" + mm;
                 if (ss < 10) ss = "0" + ss;
 
-                return <p >{`${mm}:${ss}`} mins</p>
+                return <p>{`${mm}:${ss}`} mins</p>
             }
-        },{
+        }, {
             title: 'Date & Time',
             dataIndex: 'DateTime',
             key: 'DateTime',
@@ -186,14 +206,14 @@ class Sessions extends React.Component {
                   View
               </a>
                     <Divider type="vertical" />
-              <a onClick={()=> {this.deleteSession(record.ID, assistant.ID)}}>
+              <a onClick={() => {
+                  this.deleteSession(record)
+              }}>
                   Delete
               </a>
             </span>
             ),
         }];
-
-
 
         return (
             <div style={{height: '100%'}}>
@@ -213,7 +233,9 @@ class Sessions extends React.Component {
 
 
                             <Button className={styles.Panel_Header_Button} type="primary" icon="delete"
-                                    onClick={()=> {this.clearAllChatbotSessions(assistant.ID)}} loading={this.props.isClearingAll}>
+                                    onClick={() => {
+                                        this.clearAllChatbotSessions(assistant.ID)
+                                    }} loading={this.props.isClearingAll}>
                                 Clear All
                             </Button>
                         </div>
@@ -235,6 +257,9 @@ class Sessions extends React.Component {
                                     flowOptions={options?.flow}
                                     session={this.state.selectedSession}
                                     assistant={assistant}
+                                    getNextSession={this.getNextSession}
+                                    getBackSession={this.getBackSession}
+                                    deleteSession={this.deleteSession}
                         />
                     </div>
                 </div>

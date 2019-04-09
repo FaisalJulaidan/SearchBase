@@ -1,7 +1,7 @@
 import {put, takeEvery,takeLatest, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {assistantActions, flowActions} from "../actions";
-import {http, loadingMessage, successMessage, errorMessage, flow} from "../../helpers";
+import {http, loadingMessage, successMessage, errorMessage, flow} from "helpers";
 
 
 function* fetchAssistants() {
@@ -94,6 +94,20 @@ function* updateStatus({status, assistantID}) {
     }
 }
 
+function* connectCRM({CRM}) {
+    try {
+        loadingMessage('Connecting to ' + CRM.CRMType, 0);
+        // const res = yield http.put(`/assistant/${assistantID}/status`, {status});
+        // yield put(assistantActions.connectCRMSuccess({}, 'Status updated successfully'));
+        setTimeout(yield successMessage('Status Updated'), 2000)
+    } catch (error) {
+        console.error(error);
+        const msg = "Couldn't update assistant's status";
+        yield put(assistantActions.connectCRMFailure(msg));
+        errorMessage(msg);
+    }
+}
+
 
 function* watchUpdateStatus() {
     yield takeLatest(actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST, updateStatus)
@@ -119,6 +133,10 @@ function* watchDeleteAssistant() {
     yield takeEvery(actionTypes.DELETE_ASSISTANT_REQUEST, deleteAssistant)
 }
 
+function* watchConnectCRM() {
+    yield takeEvery(actionTypes.CONNECT_CRM_REQUEST, connectCRM)
+}
+
 
 export function* assistantSaga() {
     yield all([
@@ -128,5 +146,6 @@ export function* assistantSaga() {
         watchDeleteAssistant(),
         watchUpdateFlow(),
         watchUpdateStatus(),
+        watchConnectCRM(),
     ])
 }

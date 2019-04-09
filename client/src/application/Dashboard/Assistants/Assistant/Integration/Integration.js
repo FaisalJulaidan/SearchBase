@@ -5,7 +5,7 @@ import Header from "../../../../../components/Header/Header"
 
 import styles from "./Integration.module.less"
 import ReactDOMServer from 'react-dom/server'
-import {hasher} from "../../../../../helpers"
+import {hasher} from "helpers";
 import {SwatchesPicker} from 'react-color';
 
 

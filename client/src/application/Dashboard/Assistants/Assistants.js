@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import styles from "./Assistants.module.less"
 import Assistant from "./Assistant/Assistant"
 
-import {assistantActions} from "../../../store/actions/assistant.actions";
+import {assistantActions} from "store/actions";
 import NewAssistantModal from "./Modals/NewAssistantModal";
 const confirm = Modal.confirm;
 
@@ -69,14 +69,13 @@ class Assistants extends Component {
                             {
                                 !this.props.isLoading ?
                                     (
-                                        this.props.assistantList.map((assistant, i) => <Assistant assistant={assistant}
-                                                                                                  key={i}
-                                                                                                  index={i}
-                                                                                                  isStatusChanging={this.props.isStatusChanging}
-                                                                                                  activateHandler={this.activateHandler}
-                                                                                                  isAssistantNameValid={this.isAssistantNameValid}
-                                                                                                  isLoading={this.props.isLoading}
-                                        />)
+                                        this.props.assistantList.map((assistant, i) =>
+                                            <Assistant assistant={assistant}
+                                                       key={i}
+                                                       index={i}
+                                                       isStatusChanging={this.props.isStatusChanging}
+                                                       activateHandler={this.activateHandler}
+                                                       isAssistantNameValid={this.isAssistantNameValid}isLoading={this.props.isLoading}/>)
                                     )
                                     : <Skeleton active/>
                             }

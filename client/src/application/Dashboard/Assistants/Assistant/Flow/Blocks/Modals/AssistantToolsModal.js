@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
 
-import {http} from "../../../../../../../helpers";
-
 import {Icon, Modal, Tabs} from 'antd';
 
 import TextWebLink from "../Tools/TextWebLink";

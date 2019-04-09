@@ -3,13 +3,13 @@ import React, {Component} from 'react';
 import Groups from "./Groups/Groups";
 import Blocks from "./Blocks/Blocks";
 import Header from "../../../../../components/Header/Header";
-import {assistantActions} from "../../../../../store/actions";
+import {assistantActions} from "store/actions";
 import connect from "react-redux/es/connect/connect";
 import styles from "./Flow.module.less"
 import {Modal, Spin} from "antd";
 import shortid from 'shortid';
 import { Prompt } from "react-router-dom";
-import {destroyMessage, successMessage, history} from "../../../../../helpers";
+import {destroyMessage, successMessage, history} from "helpers";
 
 const confirm = Modal.confirm;
 

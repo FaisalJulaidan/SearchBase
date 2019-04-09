@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Button, Modal, Table, Tabs} from "antd";
-import {http, alertError} from '../../../../../../helpers';
+import {Button, Modal, Tabs, Row, Col, Icon} from "antd";
+import {http, alertError} from "helpers";
 import saveAs from 'file-saver';
 import Profile from '../Profile/Profile'
 import Conversation from '../Conversation/Conversation'
@@ -11,9 +11,27 @@ const TabPane = Tabs.TabPane;
 
 class ViewsModal extends Component {
 
-    counter = -1;
+    constructor(props) {
+        super(props);
+        this.handleKeyPress = this.handleKeyPress.bind(this);
+    }
+
     state = {
         fileNames: []
+    };
+
+    componentDidMount() {
+        document.addEventListener('keydown', this.handleKeyPress);
+    }
+
+    handleKeyPress = (e) => {
+        e.preventDefault();
+        if (e.keyCode === 37)// left arrow
+            this.props.getBackSession(this.props.session);
+        else if (e.keyCode === 39) // right arrow
+            this.props.getNextSession(this.props.session);
+        else if (e.keyCode === 8 || e.keyCode === 46) // delete or backspace
+            this.props.deleteSession(this.props.session)
     };
 
     componentWillReceiveProps(nextProps, nextContext) {
@@ -50,24 +68,45 @@ class ViewsModal extends Component {
         return (
             <Modal
                 width={800}
-                title="Session Details"
+                title={'Session Details'}
                 destroyOnClose={true}
                 visible={this.props.visible}
                 onCancel={this.props.closeViewModal}
                 onOk={this.props.closeViewModal}
                 footer={[
-                    <Button key="Cancel" onClick={this.props.closeViewModal}>OK</Button>
+                    <Button key="Cancel" onClick={this.props.closeViewModal}>OK</Button>,
+                    <Button key="Delete" onClick={() => this.props.deleteSession(session)}
+                            type={'danger'}>Delete</Button>
                 ]}>
+
+                <Row type={'flex'} justify={'center'}>
+                    <Col span={3}>
+                        <Button block onClick={() => this.props.getBackSession(session)}>
+                            <Icon type="left"/>Back
+                        </Button>
+                    </Col>
+
+                    <Col span={18}>
+                        <h3 style={{textAlign: 'center'}}>Navigate</h3>
+                    </Col>
+
+                    <Col span={3}>
+                        <Button block onClick={() => this.props.getNextSession(session)}>
+                            Next<Icon type="right"/>
+                        </Button>
+                    </Col>
+                </Row>
+
                 <Tabs defaultActiveKey={"1"}>
 
                     <TabPane tab={"Conversation"} key={"1"}>
                         <Conversation session={session}
-                                      downloadFile={this.downloadFileHandler} />
+                                      downloadFile={this.downloadFileHandler}/>
                     </TabPane>
 
                     <TabPane tab={`Profile (${userType})`} key={"2"}>
                         <Profile session={session} downloadFile={this.downloadFileHandler}
-                                 dataTypes={flowOptions?.dataTypes} />
+                                 dataTypes={flowOptions?.dataTypes}/>
                     </TabPane>
 
                     <TabPane tab={"Selected Solutions (Candidates, Jobs)"} key={"3"}>

@@ -226,6 +226,9 @@ class ChatbotSession(db.Model):
     QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
     UserType = db.Column(Enum(enums.UserType), nullable=False)
 
+    CRMSynced = db.Column(db.Boolean, nullable=False, default=False)
+    CRMResponse = db.Column(db.String(250), nullable=True)
+
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')

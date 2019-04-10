@@ -58,7 +58,7 @@ class BaseConfig(object):
 
     SESSION_TYPE = 'filesystem'
     USE_ENCRYPTION = True
-    SECRET_KEY_DB = b"\xedb<\xd3\x88\xedR[0\xf2\xa6;\xf5'FB\xf8\x0c\xe8|Br\xedQ" # FakeKey
+    SECRET_KEY_DB = b'wJ8vm5GlRu2YhWGYZFFkDuCk6IzM1y_ydZmeGugkCSI=' # FakeKey
     SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

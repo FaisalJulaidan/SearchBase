@@ -1,25 +1,25 @@
 from enums import CRM, UserType
-from utilities import helpers
 from models import db, Callback, ChatbotSession, Assistant
 from services.CRM import Adapt
 import logging
 
-# First Step
-def processSession (assistant: Assistant, session: ChatbotSession):
+# Process chatbot session
+def processSession (assistant: Assistant, session: ChatbotSession) -> Callback:
+    # Insert base on userType
     if session.UserType is UserType.Candidate:
-        print("process session insert Candidate")
         return insertCandidate(assistant, session)
     elif session.UserType is UserType.Client:
-        print("process session insert Client")
         return insertClient(assistant, session)
 
 
 def insertCandidate(assistant: Assistant, session: ChatbotSession):
+    # Check CRM type
    if assistant.CRM is CRM.Adapt:
        return Adapt.insertCandidate(assistant.CRMAuth, session)
 
 
 def insertClient(assistant: Assistant, session: ChatbotSession):
+    # Check CRM type
     if assistant.CRM is CRM.Adapt:
         return Adapt.insertClient(assistant.CRMAuth, session)
 
@@ -36,8 +36,10 @@ def connect(assistant: Assistant, details) -> Callback:
         if not test_callback.Success:
             return test_callback
 
-        crm_auth['username'] = helpers.encrypt(crm_auth['username'])
-        crm_auth['password'] = helpers.encrypt(crm_auth['password'])
+        # print(bytes(crm_auth['username'], "utf-8"))
+        # print(helpers.encrypt(bytes(crm_auth['username'], "utf-8")))
+        # crm_auth['username'] = helpers.encrypt(bytes(crm_auth['username'], "utf-8"))
+        # crm_auth['password'] = helpers.encrypt(bytes(crm_auth['password'], "utf-8"))
 
         assistant.CRM = crm_type
         assistant.CRMAuth = crm_auth
@@ -74,5 +76,4 @@ def testConnection(details) -> Callback:
 
     except Exception as exc:
         logging.error("CRM_services.connect(): " + login_callback.Message)
-        db.session.rollback()
         return Callback(False, login_callback.Message)

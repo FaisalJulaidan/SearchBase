@@ -322,7 +322,7 @@ def getDictFromSQLAlchemyObj(obj):
     d = {}
     for attr in obj.__table__.columns:
         key = attr.name
-        if not key == 'Password':
+        if key not in ['Password', 'CRMAuth']:
             d[key] = getattr(obj, key)
             if isinstance(d[attr.name], Enum): # Convert Enums
                 d[key] = d[key].value

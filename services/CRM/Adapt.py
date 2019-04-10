@@ -7,12 +7,14 @@ from enums import DataType as DT
 
 def login(auth):
     try:
-        url =  "https://developerconnection.adaptondemand.com/WebApp/api/domains/" + auth['domain'] + "/logon"
+        authCopy = dict(auth) # we took copy to delete domain later only from the copy
+        url =  "https://developerconnection.adaptondemand.com/WebApp/api/domains/" \
+               + auth.get('domain', 'Unknown') + "/logon"
         headers = {'Content-Type': 'application/json'}
 
         # Send request
-        del auth['domain'] # because Adapt doesn't require this in the auth POST request
-        r = requests.post(url, headers=headers, data=json.dumps(auth))
+        authCopy.pop('domain', '') # because Adapt doesn't require this in the auth POST request
+        r = requests.post(url, headers=headers, data=json.dumps(authCopy))
 
 
 
@@ -74,15 +76,15 @@ def insertCandidate(auth, session: ChatbotSession) -> Callback:
         r = requests.post(url, headers=headers, data= json.dumps(body))
 
         # When not ok
-        if not r.ok: raise Exception
+        if not r.ok: raise Exception(r.text)
 
-        return Callback(True, 'Candidate inserted successfully')
+        return Callback(True, r.text)
 
     except Exception as exc:
         logging.error("CRM.Adapt.insertCandidate() ERROR: " + str(exc)
                       + " Username: " + auth.get('username', 'Unknown')
                       + " Domain: " + auth.get('domain', 'Unknown'))
-        return Callback(False, 'Cannot insert candidate')
+        return Callback(False, str(exc))
 
 
 def insertClient(auth, session: ChatbotSession) -> Callback:
@@ -121,12 +123,12 @@ def insertClient(auth, session: ChatbotSession) -> Callback:
         r = requests.post(url, headers=headers, data= json.dumps(body))
 
         # When not ok
-        if not r.ok: raise Exception
+        if not r.ok: raise Exception(r.text)
 
-        return Callback(True, 'Client inserted successfully')
+        return Callback(True, r.text)
 
     except Exception as exc:
         logging.error("CRM.Adapt.insertClient() ERROR: " + str(exc)
                       + " Username: " + auth.get('username', 'Unknown')
                       + " Domain: " + auth.get('domain', 'Unknown'))
-        return Callback(False, 'Cannot insert client')
+        return Callback(False, str(exc))

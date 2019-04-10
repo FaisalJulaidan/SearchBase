@@ -35,7 +35,7 @@ def decrypt_id(id):
     return hashids.decrypt(id)
 
 
-# Encryption
+# Data Encryption
 def encrypt(data):
     f = Fernet(BaseConfig.SECRET_KEY_DB)
     return f.encrypt(data)

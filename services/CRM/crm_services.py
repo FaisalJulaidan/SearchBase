@@ -1,4 +1,5 @@
 from enums import CRM, UserType
+from utilities import helpers
 from models import db, Callback, ChatbotSession, Assistant
 from services.CRM import Adapt
 import logging
@@ -35,6 +36,9 @@ def connect(assistant: Assistant, details) -> Callback:
         if not test_callback.Success:
             return test_callback
 
+        crm_auth['username'] = helpers.encrypt(crm_auth['username'])
+        crm_auth['password'] = helpers.encrypt(crm_auth['password'])
+
         assistant.CRM = crm_type
         assistant.CRMAuth = crm_auth
         assistant.CRMConnected = True
@@ -59,14 +63,11 @@ def testConnection(details) -> Callback:
 
         # test connection
         login_callback: Callback = Callback(False, 'Connection failure. Please check entered details')
-        print(crm_type == CRM.Adapt)
-        print(CRM.Adapt)
         if crm_type == CRM.Adapt:
             login_callback = Adapt.login(crm_auth)
 
         # When connection failed
         if not login_callback.Success:
-            print("here I go")
             return login_callback
 
         return Callback(True, 'Successful connection')

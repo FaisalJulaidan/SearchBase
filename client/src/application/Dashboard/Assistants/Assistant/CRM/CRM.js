@@ -10,8 +10,12 @@ class CRM extends React.Component {
     componentDidMount() {
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.connectCRMSuccessMsg && this.props.visible)
+            this.props.hideModal();
+    }
+
     handleConnect = (CRM) => {
-        this.props.hideModal();
         // dispatch redux action
         this.props.dispatch(assistantActions.connectCRM(CRM, this.props.assistant));
     };
@@ -23,4 +27,10 @@ class CRM extends React.Component {
 
 }
 
-export default connect()(CRM);
+function mapStateToProps(state) {
+    return {
+        connectCRMSuccessMsg: state.assistant.connectCRMSuccessMsg
+    };
+}
+
+export default connect(mapStateToProps)(CRM);

@@ -17,23 +17,6 @@ function* fetchAssistants() {
 
 }
 
-function* a() {
-    try {
-        loadingMessage('Creating assistant...', 0);
-        const res = yield http.post(`/assistant/${2}/crm/connect`, {}).then((x)=> {console.log(x)});
-        console.log(res)
-        // yield put(assistantActions.addAssistantSuccess(res.data.msg));
-        // yield put(assistantActions.fetchAssistants());
-        successMessage('Assistant added!');
-
-    } catch (error) {
-        console.log(error);
-        const msg = "Couldn't create a new assistant";
-        yield put(assistantActions.addAssistantFailure(msg));
-        errorMessage(msg);
-    }
-}
-
 function* addAssistant({type, newAssistant}) {
     try {
         loadingMessage('Creating assistant...', 0);
@@ -113,28 +96,21 @@ function* updateStatus({status, assistantID}) {
     }
 }
 
-
-function* sd({CRM, assistant}) {
+function* connectCRM({CRM, assistant}) {
     try {
-        // loadingMessage('Connecting to ' + CRM.type, 0);
-        const res = yield http.post(`/assistants`, {});
-
-        // const res = yield http.post(`/assistant/${assistant.ID}/crm/connect`, {...CRM});
-        setTimeout(()=> {console.log(res)}, 2000);
+        loadingMessage('Connecting to ' + CRM.type, 0);
+        const res = yield http.post(`/assistant/${assistant.ID}/crm/connect`, {...CRM});
         console.log(res);
-        // yield put(assistantActions.connectCRMSuccess({}, 'CRM connected successfully'));
-        // // yield put(assistantActions.fetchAssistants());
-        // yield successMessage('Connected successfully to ' + CRM.type);
+        yield put(assistantActions.connectCRMSuccess({}, 'CRM API Error: ' + res.data.msg));
+        yield put(assistantActions.fetchAssistants());
+        yield successMessage('Connected successfully to ' + CRM.type);
     } catch (error) {
-        debugger;
         console.error(error);
-        const msg = "Couldn't connect to CRM";
+        const msg = 'CRM API Error:' + error.response.data.msg;
         yield put(assistantActions.connectCRMFailure(msg));
         errorMessage(msg);
     }
 }
-
-
 
 function* watchUpdateStatus() {
     yield takeLatest(actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST, updateStatus)
@@ -161,7 +137,7 @@ function* watchDeleteAssistant() {
 }
 
 function* watchConnectCRM() {
-    yield takeEvery(actionTypes.CONNECT_CRM_REQUEST, a)
+    yield takeEvery(actionTypes.CONNECT_CRM_REQUEST, connectCRM)
 }
 
 

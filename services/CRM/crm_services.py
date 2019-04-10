@@ -31,12 +31,13 @@ def connect(assistant: Assistant, details) -> Callback:
         crm_auth = details['auth']
 
         # test connection
-        test: Callback = testConnection(details)
-        if not test.Success:
-            return test
+        test_callback: Callback = testConnection(details)
+        if not test_callback.Success:
+            return test_callback
 
         assistant.CRM = crm_type
         assistant.CRMAuth = crm_auth
+        assistant.CRMConnected = True
 
         # Save
         db.session.commit()
@@ -44,9 +45,9 @@ def connect(assistant: Assistant, details) -> Callback:
 
     except Exception as exc:
         print(exc)
-        logging.error("CRM_services.connect(): " + str(exc))
+        logging.error("CRM_services.connect(): " + test_callback.Message)
         db.session.rollback()
-        return Callback(False, 'CRM connection failure', None)
+        return Callback(False, test_callback.Message)
 
 
 
@@ -58,17 +59,19 @@ def testConnection(details) -> Callback:
 
         # test connection
         login_callback: Callback = Callback(False, 'Connection failure. Please check entered details')
-        if crm_type is CRM.Adapt:
+        print(crm_type == CRM.Adapt)
+        print(CRM.Adapt)
+        if crm_type == CRM.Adapt:
             login_callback = Adapt.login(crm_auth)
 
         # When connection failed
         if not login_callback.Success:
+            print("here I go")
             return login_callback
 
         return Callback(True, 'Successful connection')
 
     except Exception as exc:
-        print(exc)
-        logging.error("CRM_services.connect(): " + str(exc))
+        logging.error("CRM_services.connect(): " + login_callback.Message)
         db.session.rollback()
-        return Callback(False, 'CRM connection failure', None)
+        return Callback(False, login_callback.Message)

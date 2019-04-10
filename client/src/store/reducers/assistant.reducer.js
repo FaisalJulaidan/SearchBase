@@ -129,16 +129,18 @@ export const assistant = (state = initialState, action) => {
         case actionTypes.CONNECT_CRM_REQUEST:
             return updateObject(state, {
                 isConnecting: true,
+                connectCRMSuccessMsg: '',
+                connectCRMErrorMsg: ''
             });
         case actionTypes.CONNECT_CRM_SUCCESS:
             return updateObject(state, {
                 isConnecting: false,
-                updateFlowSuccessMsg: action.msg,
+                connectCRMSuccessMsg: action.msg,
             });
         case actionTypes.CONNECT_CRM_FAILURE:
             return updateObject(state, {
                 isConnecting: false,
-                updateFlowErrorMsg: action.error
+                connectCRMErrorMsg: action.error
             });
 
         default:

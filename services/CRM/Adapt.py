@@ -23,11 +23,10 @@ def login(auth):
         return Callback(True, 'Logged in successfully', r.json()['SID'])
 
     except Exception as exc:
-        print("CRM.Adapt.login() ERROR: ", exc)
         logging.error("CRM.Adapt.login() ERROR: " + str(exc)
-                      + " Username: " + auth['username']
-                      + " Domain: " + auth['domain'])
-        return Callback(False, 'Cannot login to Adapt CRM')
+                      + " Username: " + auth.get('username', 'Unknown')
+                      + " Domain: " + auth.get('domain', 'Unknown'))
+        return Callback(False, str(exc))
 
 
 def insertCandidate(auth, session: ChatbotSession) -> Callback:
@@ -36,8 +35,8 @@ def insertCandidate(auth, session: ChatbotSession) -> Callback:
         if not callback.Success:
             return callback
 
-        url =  "https://developerconnection.adaptondemand.com/WebApp/api/v1/candidates"
-        headers = {'Content-Type': 'application/json', 'x-adapt-sid': callback.Data }
+        url = "https://developerconnection.adaptondemand.com/WebApp/api/v1/candidates"
+        headers = {'Content-Type': 'application/json', 'x-adapt-sid': callback.Data}
 
         # New candidate details
         body = {
@@ -80,10 +79,9 @@ def insertCandidate(auth, session: ChatbotSession) -> Callback:
         return Callback(True, 'Candidate inserted successfully')
 
     except Exception as exc:
-        print("CRM.Adapt.insertCandidate() ERROR: ", exc)
         logging.error("CRM.Adapt.insertCandidate() ERROR: " + str(exc)
-                      + " Username: " + auth['username']
-                      + " Domain: " + auth['domain'])
+                      + " Username: " + auth.get('username', 'Unknown')
+                      + " Domain: " + auth.get('domain', 'Unknown'))
         return Callback(False, 'Cannot insert candidate')
 
 
@@ -128,8 +126,7 @@ def insertClient(auth, session: ChatbotSession) -> Callback:
         return Callback(True, 'Client inserted successfully')
 
     except Exception as exc:
-        print("CRM.Adapt.insertClient() ERROR: ", exc)
         logging.error("CRM.Adapt.insertClient() ERROR: " + str(exc)
-                      + " Username: " + auth['username']
-                      + " Domain: " + auth['domain'])
+                      + " Username: " + auth.get('username', 'Unknown')
+                      + " Domain: " + auth.get('domain', 'Unknown'))
         return Callback(False, 'Cannot insert client')

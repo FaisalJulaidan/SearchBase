@@ -10,7 +10,7 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
             <FormItem label="Domain"
                       {...layout}>
                 {getFieldDecorator('domain', {
-                    initialValue: 'sfgdwe',
+                    initialValue: 'PartnerDomain9',
                     rules: [{
                         required: true,
                         message: "Please add your domain name",
@@ -23,7 +23,7 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
             <FormItem label="Username"
                       {...layout}>
                 {getFieldDecorator('username', {
-                    initialValue: 'sgsfg',
+                    initialValue: 'SD9USR7',
                     rules: [{
                         required: true,
                         max: 20,
@@ -40,7 +40,7 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
             <FormItem label="Password"
                       {...layout}>
                 {getFieldDecorator('password', {
-                    initialValue: 'erewr',
+                    initialValue: 'P@55word',
                     rules: [{
                         required: true,
                         max: 32,
@@ -58,7 +58,7 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
             <FormItem label="Profile"
                       {...layout}>
                 {getFieldDecorator('profile', {
-                    initialValue: 'd',
+                    initialValue: 'CoreProfile',
                     rules: [{
                         required: true,
                         message: "Profile is required field",
@@ -81,10 +81,23 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
                 )}
             </FormItem>
 
+            <FormItem label="Locale" {...layout}>
+                {getFieldDecorator('locale', {
+                    initialValue: 'en_GB',
+                    rules: [{
+                        required: true,
+                        message: "Locale is required field",
+                    }],
+                })(
+                    <Input placeholder={"Locale is like: en_GB"}/>
+                )}
+            </FormItem>
+
+
             <FormItem label="Date Format"
                       {...layout}>
                 {getFieldDecorator('dateFormat', {
-                    initialValue: 0,
+                    initialValue: "0",
                     rules: [{
                         required: true,
                         message: "Date Format is required field",
@@ -103,7 +116,7 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
             <FormItem label="Time Format"
                       {...layout}>
                 {getFieldDecorator('timeFormat', {
-                    initialValue: 0,
+                    initialValue: "0",
                     rules: [{
                         required: true,
                         message: "Time Format is required field",
@@ -117,8 +130,6 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
                     </Select>
                 )}
             </FormItem>
-
-
 
 
         </div>

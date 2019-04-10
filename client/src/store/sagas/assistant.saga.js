@@ -1,4 +1,4 @@
-import {put, takeEvery,takeLatest, all} from 'redux-saga/effects'
+import {put, takeEvery, takeLatest, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {assistantActions, flowActions} from "../actions";
 import {http, loadingMessage, successMessage, errorMessage, flow} from "helpers";
@@ -64,7 +64,6 @@ function* deleteAssistant({assistantID}) {
 }
 
 
-
 function* updateFlow({assistant}) {
     try {
         loadingMessage('Updating Script', 0);
@@ -85,7 +84,7 @@ function* updateStatus({status, assistantID}) {
         loadingMessage('Updating Status', 0);
         const res = yield http.put(`/assistant/${assistantID}/status`, {status});
         yield put(assistantActions.changeAssistantStatusSuccess('Status updated successfully',
-                                                                            status, assistantID));
+            status, assistantID));
         yield successMessage('Status Updated');
 
     } catch (error) {
@@ -100,15 +99,28 @@ function* connectCRM({CRM, assistant}) {
     try {
         loadingMessage('Connecting to ' + CRM.type, 0);
         const res = yield http.post(`/assistant/${assistant.ID}/crm/connect`, {...CRM});
-        console.log(res);
-        yield put(assistantActions.connectCRMSuccess({}, 'CRM API Error: ' + res.data.msg));
-        yield put(assistantActions.fetchAssistants());
+        yield put(assistantActions.connectCRMSuccess({}, res.data.msg));
+        // yield put(assistantActions.fetchAssistants());
         yield successMessage('Connected successfully to ' + CRM.type);
     } catch (error) {
         console.error(error);
         const msg = 'CRM API Error:' + error.response.data.msg;
-        yield put(assistantActions.connectCRMFailure(msg));
+        yield put(assistantActions.connectCRMFailure(msg), 3.5);
         errorMessage(msg);
+    }
+}
+
+function* testCRM({CRM, assistant}) {
+    try {
+        loadingMessage('Testing ' + CRM.type, 0);
+        const res = yield http.post(`/assistant/${assistant.ID}/crm/test`, {...CRM});
+        yield put(assistantActions.testCRMSuccess({}, res.data.msg));
+        yield successMessage('Tested successfully ' + CRM.type);
+    } catch (error) {
+        console.error(error);
+        const msg = 'CRM API Error:' + error.response.data.msg;
+        yield put(assistantActions.testCRMFailure(msg));
+        errorMessage(msg, 3.5);
     }
 }
 
@@ -140,6 +152,10 @@ function* watchConnectCRM() {
     yield takeEvery(actionTypes.CONNECT_CRM_REQUEST, connectCRM)
 }
 
+function* watchTestCRM() {
+    yield takeEvery(actionTypes.TEST_CRM_REQUEST, testCRM)
+}
+
 
 export function* assistantSaga() {
     yield all([
@@ -150,5 +166,6 @@ export function* assistantSaga() {
         watchUpdateFlow(),
         watchUpdateStatus(),
         watchConnectCRM(),
+        watchTestCRM(),
     ])
 }

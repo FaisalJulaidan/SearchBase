@@ -4,6 +4,7 @@ import {Link} from "react-router-dom";
 import AssistantSettings from "./AssistantSettings/AssistantSettings";
 import CRM from "./CRM/CRM";
 import './Assistant.less';
+import AuroraBlink from "components/AuroraBlink/AuroraBlink";
 
 const {Meta} = Card;
 
@@ -67,7 +68,10 @@ class Assistant extends Component {
 
                         <Col span={8}>
                             {/*3*/}
-                            <Button block onClick={this.showCRMModal} icon={'cluster'}>CRM</Button>
+                            <Button block onClick={this.showCRMModal} icon={'cluster'}>
+                                CRM
+                                {assistant.CRMConnected ? <AuroraBlink color={'#00c878'}/> : null}
+                            </Button>
                         </Col>
                     </Row>
 

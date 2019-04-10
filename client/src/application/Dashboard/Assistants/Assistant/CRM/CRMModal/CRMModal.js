@@ -1,12 +1,14 @@
 import React from 'react';
 import {Button, Form, Modal, Row, Col, Tag} from "antd";
 
-import AuroraCard from "components/AuroraCard/AuroraCard.js"
 import {getLink} from "helpers";
-
 import AdaptFormItems from "./Forms/Adapt"
+
 import BullhornFormItems from "./Forms/Bullhorn"
 import VincereFormItems from "./Forms/Vincere"
+import AuroraCard from "components/AuroraCard/AuroraCard"
+import AuroraSuccess from "components/AuroraSuccess/AuroraSuccess";
+import AuroraBlink from "components/AuroraBlink/AuroraBlink";
 
 const FormItem = Form.Item;
 
@@ -40,6 +42,16 @@ class CRMModal extends React.Component {
         }
     });
 
+    testCRM = () => this.props.form.validateFields((err, values) => {
+        if (!err) {
+            const state = {...this.state};
+            this.props.handleTest({
+                type: Object.keys(state).find((CRM) => state[CRM] === true),
+                auth: {...values},
+            })
+        }
+    });
+
     render() {
         const layout = {
             labelCol: {span: 6},
@@ -56,6 +68,12 @@ class CRMModal extends React.Component {
                    onCancel={this.props.handleCancel}
                    footer={[
                        <Button key="cancel" onClick={this.props.handleCancel}>Cancel</Button>,
+                       <Button key="test" type={this.props.isTestFaild ? 'danger' : 'default'}
+                               icon={this.props.isTestFails ? 'exclamation-circle' : ''}
+                               disabled={!this.state.Adapt}
+                               onClick={this.testCRM}>
+                           Test
+                       </Button>,
                        <Button key="submit" type="primary"
                                disabled={!this.state.Adapt}
                                onClick={this.connectCRM}>
@@ -69,7 +87,8 @@ class CRMModal extends React.Component {
                                     onClick={() => this.changeCRM('Adapt')}
                                     image={getLink('/static/images/CRM/adapt.png')}
                                     selectImage={getLink('/static/images/CRM/select_adapt.png')}
-                                    desc={<Tag color={this.state.Adapt ? "purple" : "#87d068"}>Connect Now</Tag>}/>
+                                    desc={<Tag color={this.state.Adapt ? "purple" : "#00c878"}>
+                                        {this.props.assistant.CRMConnected ? 'Connected' : 'Connect Now'}</Tag>}/>
                     </Col>
 
                     <Col span={6}>
@@ -77,7 +96,8 @@ class CRMModal extends React.Component {
                                     onClick={() => this.changeCRM('Bullhorn')}
                                     image={getLink('/static/images/CRM/bullhorn.png')}
                                     selectImage={getLink('/static/images/CRM/select_bullhorn.png')}
-                                    desc={<Tag color={this.state.Bullhorn ? "purple" : "grey"}>Coming Soon</Tag>}/>
+                                    desc={<Tag color={this.state.Bullhorn ? "purple" : "grey"}>Coming
+                                        Soon</Tag>}/>
                     </Col>
 
                     <Col span={6}>
@@ -85,7 +105,8 @@ class CRMModal extends React.Component {
                                     onClick={() => this.changeCRM('Vincere')}
                                     image={getLink('/static/images/CRM/vincere.png')}
                                     selectImage={getLink('/static/images/CRM/select_vincere.png')}
-                                    desc={<Tag color={this.state.Vincere ? "purple" : "grey"}>Coming Soon</Tag>}/>
+                                    desc={<Tag color={this.state.Vincere ? "purple" : "grey"}>Coming
+                                        Soon</Tag>}/>
                     </Col>
                 </Row>
 
@@ -114,6 +135,7 @@ class CRMModal extends React.Component {
                                           FormItem={FormItem}/>
                     }
                 </Form>
+
             </Modal>
         );
     }

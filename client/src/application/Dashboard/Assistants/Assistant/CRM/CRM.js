@@ -12,7 +12,7 @@ class CRM extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.connectCRMSuccessMsg && this.props.visible)
-            this.props.hideModal();
+            this.props.hideModal()
     }
 
     handleConnect = (CRM) => {
@@ -20,16 +20,23 @@ class CRM extends React.Component {
         this.props.dispatch(assistantActions.connectCRM(CRM, this.props.assistant));
     };
 
+    handleTest = (CRM) => {
+        // dispatch redux action
+        this.props.dispatch(assistantActions.testCRM(CRM, this.props.assistant));
+    };
+
     render = () => <CRMModal assistant={this.props.assistant}
                              visible={this.props.visible}
                              handleConnect={this.handleConnect}
-                             handleCancel={this.props.hideModal}/>
-
+                             handleTest={this.handleTest}
+                             handleCancel={this.props.hideModal}
+                             isTestFaild={this.props.testCRMErrorMsg}/>
 }
 
 function mapStateToProps(state) {
     return {
-        connectCRMSuccessMsg: state.assistant.connectCRMSuccessMsg
+        connectCRMSuccessMsg: state.assistant.connectCRMSuccessMsg,
+        testCRMErrorMsg: state.assistant.testCRMErrorMsg
     };
 }
 

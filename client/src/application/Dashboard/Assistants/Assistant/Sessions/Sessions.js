@@ -58,19 +58,22 @@ class Sessions extends React.Component {
 
 
     deleteSession = (deletedSession) => {
-        const {ID, AssistantID} = deletedSession;
+        const ID = deletedSession?.ID;
+        const AssistantID = deletedSession.AssistantID;
 
-        confirm({
-            title: `Delete session confirmation`,
-            content: `If you click OK, this session will be deleted with its associated data forever`,
-            okType: 'danger',
-            onOk: () => {
-                if (this.state.viewModal)
-                    this.getNextSession(deletedSession);
-                this.props.dispatch(chatbotSessionsActions.deleteChatbotSession(ID, AssistantID))
-            },
-            maskClosable: true
-        });
+
+        if (ID && AssistantID)
+            confirm({
+                title: `Delete session confirmation`,
+                content: `If you click OK, this session will be deleted with its associated data forever`,
+                okType: 'danger',
+                onOk: () => {
+                    if (this.state.viewModal)
+                        this.getNextSession(deletedSession);
+                    this.props.dispatch(chatbotSessionsActions.deleteChatbotSession(ID, AssistantID))
+                },
+                maskClosable: true
+            });
     };
 
 

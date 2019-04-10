@@ -164,6 +164,32 @@ const connectCRMFailure = (error) => {
 
 
 
+// CRM TEST
+const testCRM = (CRM, assistant) => {
+    return {
+        type: actionTypes.TEST_CRM_REQUEST,
+        assistant,
+        CRM
+    };
+};
+
+const testCRMSuccess = (assistant, msg) => {
+    return {
+        type: actionTypes.TEST_CRM_SUCCESS,
+        assistant,
+        msg
+    };
+};
+
+const testCRMFailure = (error) => {
+    return {
+        type: actionTypes.TEST_CRM_FAILURE,
+        error
+    };
+};
+
+
+
 export const assistantActions = {
     fetchAssistants,
     fetchAssistantsSuccess,
@@ -192,4 +218,8 @@ export const assistantActions = {
     connectCRM,
     connectCRMSuccess,
     connectCRMFailure,
+
+    testCRM,
+    testCRMSuccess,
+    testCRMFailure,
 };

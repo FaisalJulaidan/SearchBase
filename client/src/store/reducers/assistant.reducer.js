@@ -9,7 +9,12 @@ export const assistant = (state = initialState, action) => {
             return updateObject(state, {
                 assistantList: [],
                 errorMsg: null,
-                isLoading: true
+                isLoading: true,
+
+                connectCRMSuccessMsg: '',
+                connectCRMErrorMsg: '',
+                testCRMSuccessMsg: '',
+                testCRMErrorMsg: ''
             });
         case actionTypes.FETCH_ASSISTANTS_SUCCESS:
             return updateObject(state, {
@@ -130,7 +135,9 @@ export const assistant = (state = initialState, action) => {
             return updateObject(state, {
                 isConnecting: true,
                 connectCRMSuccessMsg: '',
-                connectCRMErrorMsg: ''
+                connectCRMErrorMsg: '',
+                testCRMSuccessMsg: '',
+                testCRMErrorMsg: ''
             });
         case actionTypes.CONNECT_CRM_SUCCESS:
             return updateObject(state, {
@@ -141,6 +148,25 @@ export const assistant = (state = initialState, action) => {
             return updateObject(state, {
                 isConnecting: false,
                 connectCRMErrorMsg: action.error
+            });
+
+
+        //CRM TEST
+        case actionTypes.TEST_CRM_REQUEST:
+            return updateObject(state, {
+                isConnecting: true,
+                testCRMSuccessMsg: '',
+                testCRMErrorMsg: ''
+            });
+        case actionTypes.TEST_CRM_SUCCESS:
+            return updateObject(state, {
+                isConnecting: false,
+                testCRMSuccessMsg: action.msg,
+            });
+        case actionTypes.TEST_CRM_FAILURE:
+            return updateObject(state, {
+                isConnecting: false,
+                testCRMErrorMsg: action.error
             });
 
         default:

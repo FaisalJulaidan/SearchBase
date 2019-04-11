@@ -1,4 +1,5 @@
 from enums import CRM, UserType
+from utilities import helpers
 from models import db, Callback, ChatbotSession, Assistant
 from services.CRM import Adapt
 import logging
@@ -36,10 +37,6 @@ def connect(assistant: Assistant, details) -> Callback:
         if not test_callback.Success:
             return test_callback
 
-        # print(bytes(crm_auth['username'], "utf-8"))
-        # print(helpers.encrypt(bytes(crm_auth['username'], "utf-8")))
-        # crm_auth['username'] = helpers.encrypt(bytes(crm_auth['username'], "utf-8"))
-        # crm_auth['password'] = helpers.encrypt(bytes(crm_auth['password'], "utf-8"))
 
         assistant.CRM = crm_type
         assistant.CRMAuth = crm_auth

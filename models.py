@@ -3,19 +3,20 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum, event, types
 from sqlalchemy.ext import mutable
 from datetime import datetime
+import os
 import json
 import enums
 from sqlalchemy_utils import PasswordType, CurrencyType
 
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
+from sqlalchemy_utils import EncryptedType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
 
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
-# force_auto_coercion()
 
 
 # Activate Foreign Keys
@@ -151,7 +152,7 @@ class Assistant(db.Model):
     Active = db.Column(db.Boolean(), nullable=False, default=True)
 
     CRM = db.Column(Enum(enums.CRM), nullable=True)
-    CRMAuth = db.Column(MagicJSON, nullable=True)
+    CRMAuth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
     CRMConnected = db.Column(db.Boolean, nullable=False, default=False)
 
 

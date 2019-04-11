@@ -16,10 +16,8 @@ def login(auth):
         authCopy.pop('domain', '') # because Adapt doesn't require this in the auth POST request
         r = requests.post(url, headers=headers, data=json.dumps(authCopy))
 
-
-
         # When not ok
-        if not r.ok: raise Exception(r.text)
+        if not r.ok: raise Exception(r.json().get('ERROR_MSG', r.text))
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully', r.json()['SID'])
@@ -76,7 +74,7 @@ def insertCandidate(auth, session: ChatbotSession) -> Callback:
         r = requests.post(url, headers=headers, data= json.dumps(body))
 
         # When not ok
-        if not r.ok: raise Exception(r.text)
+        if not r.ok: raise Exception(r.json().get('ERROR_MSG', r.text))
 
         return Callback(True, r.text)
 
@@ -123,7 +121,7 @@ def insertClient(auth, session: ChatbotSession) -> Callback:
         r = requests.post(url, headers=headers, data= json.dumps(body))
 
         # When not ok
-        if not r.ok: raise Exception(r.text)
+        if not r.ok: raise Exception(r.json().get('ERROR_MSG', r.text))
 
         return Callback(True, r.text)
 

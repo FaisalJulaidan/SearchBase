@@ -74,3 +74,20 @@ def testConnection(details) -> Callback:
     except Exception as exc:
         logging.error("CRM_services.connect(): " + login_callback.Message)
         return Callback(False, login_callback.Message)
+
+
+def disconnect(assistant: Assistant) -> Callback:
+    try:
+
+        assistant.CRM = None
+        assistant.CRMAuth = None
+        assistant.CRMConnected = False
+
+        # Save
+        db.session.commit()
+        return Callback(True, 'CRM has been disconnected successfully', assistant)
+
+    except Exception as exc:
+        logging.error("CRM_services.connect(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, str(exc))

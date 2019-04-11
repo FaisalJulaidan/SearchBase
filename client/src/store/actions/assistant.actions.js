@@ -188,6 +188,30 @@ const testCRMFailure = (error) => {
     };
 };
 
+// CRM DISCONNECT
+const disconnectCRM = (CRM, assistant) => {
+    return {
+        type: actionTypes.DISCONNECT_CRM_REQUEST,
+        assistant,
+        CRM
+    };
+};
+
+const disconnectCRMSuccess = (assistant, msg) => {
+    return {
+        type: actionTypes.DISCONNECT_CRM_SUCCESS,
+        assistant,
+        msg
+    };
+};
+
+const disconnectCRMFailure = (error) => {
+    return {
+        type: actionTypes.DISCONNECT_CRM_FAILURE,
+        error
+    };
+};
+
 
 
 export const assistantActions = {
@@ -222,4 +246,8 @@ export const assistantActions = {
     testCRM,
     testCRMSuccess,
     testCRMFailure,
+
+    disconnectCRM,
+    disconnectCRMSuccess,
+    disconnectCRMFailure,
 };

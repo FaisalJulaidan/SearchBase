@@ -70,7 +70,8 @@ class Assistant extends Component {
                             {/*3*/}
                             <Button block onClick={this.showCRMModal} icon={'cluster'}>
                                 CRM
-                                {assistant.CRMConnected ? <AuroraBlink color={'#00c878'}/> : null}
+                                {assistant.CRMConnected ?
+                                    <AuroraBlink color={'#00c878'} style={{top: 7, right: 28}}/> : null}
                             </Button>
                         </Col>
                     </Row>

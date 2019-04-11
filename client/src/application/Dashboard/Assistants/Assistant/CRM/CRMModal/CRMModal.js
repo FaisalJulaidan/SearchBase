@@ -7,8 +7,6 @@ import AdaptFormItems from "./Forms/Adapt"
 import BullhornFormItems from "./Forms/Bullhorn"
 import VincereFormItems from "./Forms/Vincere"
 import AuroraCard from "components/AuroraCard/AuroraCard"
-import AuroraSuccess from "components/AuroraSuccess/AuroraSuccess";
-import AuroraBlink from "components/AuroraBlink/AuroraBlink";
 
 const FormItem = Form.Item;
 
@@ -52,6 +50,14 @@ class CRMModal extends React.Component {
         }
     });
 
+
+    disconnectCRM = () => {
+        const state = {...this.state};
+        this.props.handleDisconnect({
+            type: Object.keys(state).find((CRM) => state[CRM] === true),
+        })
+    };
+
     render() {
         const layout = {
             labelCol: {span: 6},
@@ -68,17 +74,24 @@ class CRMModal extends React.Component {
                    onCancel={this.props.handleCancel}
                    footer={[
                        <Button key="cancel" onClick={this.props.handleCancel}>Cancel</Button>,
-                       <Button key="test" type={this.props.isTestFaild ? 'danger' : 'default'}
-                               icon={this.props.isTestFails ? 'exclamation-circle' : ''}
-                               disabled={!this.state.Adapt}
-                               onClick={this.testCRM}>
-                           Test
-                       </Button>,
-                       <Button key="submit" type="primary"
-                               disabled={!this.state.Adapt}
-                               onClick={this.connectCRM}>
-                           Connect
-                       </Button>,
+                       this.props.assistant.CRMConnected ? null :
+                           <Button key="test" type={this.props.isTestFaild ? 'danger' : 'default'}
+                                   icon={this.props.isTestFails ? 'exclamation-circle' : ''}
+                                   disabled={!this.state.Adapt}
+                                   onClick={this.testCRM}>
+                               Test
+                           </Button>,
+                       this.props.assistant.CRMConnected ?
+                           <Button key="disconnect" type="danger"
+                                   disabled={!this.state.Adapt}
+                                   onClick={this.disconnectCRM}>
+                               Disconnect
+                           </Button> :
+                           <Button key="submit" type="primary"
+                                   disabled={!this.state.Adapt}
+                                   onClick={this.connectCRM}>
+                               Connect
+                           </Button>,
                    ]}>
 
                 <Row type="flex" justify="center" gutter={16}>
@@ -87,7 +100,7 @@ class CRMModal extends React.Component {
                                     onClick={() => this.changeCRM('Adapt')}
                                     image={getLink('/static/images/CRM/adapt.png')}
                                     selectImage={getLink('/static/images/CRM/select_adapt.png')}
-                                    desc={<Tag color={this.state.Adapt ? "purple" : "#00c878"}>
+                                    desc={<Tag color={this.state.Adapt ? "purple" : "#87d068"}>
                                         {this.props.assistant.CRMConnected ? 'Connected' : 'Connect Now'}</Tag>}/>
                     </Col>
 
@@ -105,36 +118,38 @@ class CRMModal extends React.Component {
                                     onClick={() => this.changeCRM('Vincere')}
                                     image={getLink('/static/images/CRM/vincere.png')}
                                     selectImage={getLink('/static/images/CRM/select_vincere.png')}
-                                    desc={<Tag color={this.state.Vincere ? "purple" : "grey"}>Coming
-                                        Soon</Tag>}/>
+                                    desc={<Tag color={this.state.Vincere ? "purple" : "grey"}>Coming Soon</Tag>}/>
                     </Col>
                 </Row>
 
                 <br/>
                 <br/>
 
-                <Form layout='horizontal'>
-                    {
-                        this.state.Adapt &&
-                        <AdaptFormItems getFieldDecorator={getFieldDecorator}
-                                        layout={layout}
-                                        FormItem={FormItem}/>
-                    }
+                {
+                    this.props.assistant.CRMConnected ? null :
+                        <Form layout='horizontal'>
+                            {
+                                this.state.Adapt &&
+                                <AdaptFormItems getFieldDecorator={getFieldDecorator}
+                                                layout={layout}
+                                                FormItem={FormItem}/>
+                            }
 
-                    {
-                        this.state.Bullhorn &&
-                        <BullhornFormItems getFieldDecorator={getFieldDecorator}
-                                           layout={layout}
-                                           FormItem={FormItem}/>
-                    }
+                            {
+                                this.state.Bullhorn &&
+                                <BullhornFormItems getFieldDecorator={getFieldDecorator}
+                                                   layout={layout}
+                                                   FormItem={FormItem}/>
+                            }
 
-                    {
-                        this.state.Vincere &&
-                        <VincereFormItems getFieldDecorator={getFieldDecorator}
-                                          layout={layout}
-                                          FormItem={FormItem}/>
-                    }
-                </Form>
+                            {
+                                this.state.Vincere &&
+                                <VincereFormItems getFieldDecorator={getFieldDecorator}
+                                                  layout={layout}
+                                                  FormItem={FormItem}/>
+                            }
+                        </Form>
+                }
 
             </Modal>
         );

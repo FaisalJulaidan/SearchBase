@@ -250,7 +250,6 @@ class Sessions extends React.Component {
                                dataSource={sessions.sessionsList ? sessions.sessionsList : null}
                                onChange={this.handleFilter}
                                loading={this.props.isLoading}
-                            // expandedRowRender={this.expandedRowRender}
                                size='middle'
                         />
 

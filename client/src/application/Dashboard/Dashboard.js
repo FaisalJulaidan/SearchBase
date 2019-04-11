@@ -25,6 +25,7 @@ import {TransitionGroup, CSSTransition} from "react-transition-group";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import CRM from "./Assistants/Assistant/CRM/CRM";
+// import SentryBoundary from "components/SentryBoundary/SentryBoundary";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -185,29 +186,35 @@ class Dashboard extends Component {
                     </Header>
 
                     {/*HERE GOES ALL THE ROUTES*/}
-                    <Content style={{margin: 16, marginTop: 10, marginBottom: 0, height: '100%'}}>
-                        <Route render={() =>
-                            <TransitionGroup style={{height: '100%'}}>
-                                <CSSTransition key={location.key} classNames="fade" timeout={550}>
-                                    <Switch location={location} style={{height: '100%'}}>
-                                        <Route path={`${match.path}/assistants/:id/script`} component={Flow}/>
-                                        <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
-                                        <Route path={`${match.path}/assistants/:id/sessions`} component={Sessions}/>
-                                        <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
-                                        <Route path={`${match.path}/assistants/:id/CRMIntegration`} component={CRM}/>
-                                        <Route path={`${match.path}/assistants`} component={Assistants} exact/>
-                                        <Route path={`${match.path}/databases`} component={Databases} exact/>
-                                        <Route path={`${match.path}/profile`} component={Profile} exact/>
-                                        <Route path={`${match.path}/billing`} component={Billing} exact/>
-                                        <Route path={`${match.path}/users-management`} component={UsersManagement} exact/>
-                                        <Route path={`${match.path}/documentation`} component={Documentation} exact/>
-                                        <Route path="/dashboard" component={Home}/>
-                                    </Switch>
-                                </CSSTransition>
-                            </TransitionGroup>
-                        }/>
-
-                    </Content>
+                    {/*<SentryBoundary>*/}
+                        <Content style={{margin: 16, marginTop: 10, marginBottom: 0, height: '100%'}}>
+                            <Route render={() =>
+                                <TransitionGroup style={{height: '100%'}}>
+                                    <CSSTransition key={location.key} classNames="fade" timeout={550}>
+                                        <Switch location={location} style={{height: '100%'}}>
+                                            <Route path={`${match.path}/assistants/:id/script`} component={Flow}/>
+                                            <Route path={`${match.path}/assistants/:id/integration`}
+                                                   component={Integration}/>
+                                            <Route path={`${match.path}/assistants/:id/sessions`} component={Sessions}/>
+                                            <Route path={`${match.path}/assistants/:id/analytics`}
+                                                   component={Analytics}/>
+                                            <Route path={`${match.path}/assistants/:id/CRMIntegration`}
+                                                   component={CRM}/>
+                                            <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+                                            <Route path={`${match.path}/databases`} component={Databases} exact/>
+                                            <Route path={`${match.path}/profile`} component={Profile} exact/>
+                                            <Route path={`${match.path}/billing`} component={Billing} exact/>
+                                            <Route path={`${match.path}/users-management`} component={UsersManagement}
+                                                   exact/>
+                                            <Route path={`${match.path}/documentation`} component={Documentation}
+                                                   exact/>
+                                            <Route path="/dashboard" component={Home}/>
+                                        </Switch>
+                                    </CSSTransition>
+                                </TransitionGroup>
+                            }/>
+                        </Content>
+                    {/*</SentryBoundary>*/}
 
                     <Footer style={{textAlign: 'center', padding: 10, zIndex:1}}>
                         Copyright TheSearchBase Limited 2019. All rights reserved.

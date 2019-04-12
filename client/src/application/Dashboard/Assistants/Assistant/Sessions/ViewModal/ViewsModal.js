@@ -5,6 +5,7 @@ import saveAs from 'file-saver';
 import Profile from '../Profile/Profile'
 import Conversation from '../Conversation/Conversation'
 import SelectedSolutions from "../SelectedSolutions/SelectedSolutions";
+import CRMResponse from "../CRMResponse/CRMResponse";
 
 const TabPane = Tabs.TabPane;
 
@@ -67,7 +68,7 @@ class ViewsModal extends Component {
 
         return (
             <Modal
-                width={800}
+                width={900}
                 title={'Session Details'}
                 destroyOnClose={true}
                 visible={this.props.visible}
@@ -111,6 +112,10 @@ class ViewsModal extends Component {
 
                     <TabPane tab={"Selected Solutions (Candidates, Jobs)"} key={"3"}>
                         <SelectedSolutions solutions={session?.Data?.selectedSolutions}/>
+                    </TabPane>
+
+                    <TabPane tab={"CRM Status"} key={"4"} disabled={!(session?.CRMSynced && session?.CRMResponse)}>
+                        <CRMResponse session={session}/>
                     </TabPane>
 
                 </Tabs>

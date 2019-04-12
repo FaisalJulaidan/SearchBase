@@ -73,7 +73,7 @@ class Dashboard extends Component {
         } else {
 
             let avatar = (
-                <Avatar size="large" style={{ backgroundColor: '#9254de', verticalAlign: 'middle' }}>
+                <Avatar size="large" style={{ backgroundColor: '#6c62ff', verticalAlign: 'middle' }}>
                     {this.getInitials(user.username || '')}
                 </Avatar>
             );
@@ -118,11 +118,11 @@ class Dashboard extends Component {
                             this.state.collapsed ?
                                 <div style={{display: 'flex'}}>
                                     <FontAwesomeIcon size="2x" icon={faCloud}
-                                                     style={{color: '#673AB7', marginLeft: 7}}/>
+                                                     style={{color: '#6c62ff', marginLeft: 7}}/>
                                 </div>
                                 :
                                 <div style={{display: 'flex'}}>
-                                    <FontAwesomeIcon size="2x" icon={faCloud} style={{color: '#673AB7'}}/>
+                                    <FontAwesomeIcon size="2x" icon={faCloud} style={{color: '#6c62ff'}}/>
                                     <div style={{lineHeight: '32px', marginLeft: 18}}>TheSearchBase</div>
                                 </div>
                         }

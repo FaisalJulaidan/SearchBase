@@ -35,9 +35,8 @@ def connect_crm(assistantID):
 @crm_router.route("/assistant/<int:assistantID>/crm/test", methods=['POST'])
 @jwt_required
 def test_crm_connection(assistantID):
-
     # No need for assistant authentication because testing crm connection should be public however at least
-    # at least the user has to be logged in and has to token included in the request to minimise security risks
+    # the user has to be logged in and has the token included in the request to minimise security risks
 
     # Connect to crm
     callback: Callback = Callback(False, '')
@@ -48,3 +47,4 @@ def test_crm_connection(assistantID):
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
     return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+

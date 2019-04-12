@@ -55,8 +55,8 @@ const getStyleLoaders = (cssOptions, preProcessor) => {
                 importLoaders: 1,
                 javascriptEnabled: true,
                 modifyVars: {
-                    'primary-color': '#9254de',
-                    'link-color': '#9254de',
+                    'primary-color': '#6c62ff',
+                    'link-color': '#6c62ff',
                 }
             },
         },

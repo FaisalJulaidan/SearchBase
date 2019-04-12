@@ -19,7 +19,7 @@ class Integration extends React.Component {
         dataName: "tsb-widget",
         assistantID: "assistantid",
         // dataIcon: "#ffffff",
-        dataCircle: "#9254de",
+        dataCircle: "#6c62ff",
         async: true,
         defer: true
     };

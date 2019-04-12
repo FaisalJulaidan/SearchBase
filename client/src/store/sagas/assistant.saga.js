@@ -103,14 +103,14 @@ function* connectCRM({CRM, assistant}) {
     try {
         loadingMessage('Connecting to ' + CRM.type, 0);
         const res = yield http.post(`/assistant/${assistant.ID}/crm/connect`, {...CRM});
+
         yield put(assistantActions.connectCRMSuccess(res.data.data, res.data?.msg));
-        // yield put(assistantActions.fetchAssistants());
         yield successMessage('Connected successfully to ' + CRM.type);
     } catch (error) {
         console.error(error);
-        const msg = 'CRM API Error:' + error.response.data.msg;
-        yield put(assistantActions.connectCRMFailure(msg), 3.5);
-        errorMessage(msg);
+        const msg = 'CRM API Error: ' + error.response?.data?.msg || 'CRM API Error';
+        yield put(assistantActions.connectCRMFailure(msg));
+        errorMessage(msg, 3.5);
     }
 }
 
@@ -122,7 +122,7 @@ function* testCRM({CRM, assistant}) {
         yield successMessage('Tested successfully ' + CRM.type);
     } catch (error) {
         console.error(error);
-        const msg = 'CRM API Error:' + error.response.data.msg;
+        const msg = 'CRM API Error: ' + error.response?.data?.msg || 'CRM API Error';
         yield put(assistantActions.testCRMFailure(msg));
         errorMessage(msg, 3.5);
     }

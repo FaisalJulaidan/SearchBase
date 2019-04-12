@@ -100,7 +100,7 @@ class CRMModal extends React.Component {
                                     onClick={() => this.changeCRM('Adapt')}
                                     image={getLink('/static/images/CRM/adapt.png')}
                                     selectImage={getLink('/static/images/CRM/select_adapt.png')}
-                                    desc={<Tag color={this.state.Adapt ? "purple" : "#87d068"}>
+                                    desc={<Tag color={this.state.Adapt ? "#6c62ff" : "#87d068"}>
                                         {this.props.assistant.CRMConnected ? 'Connected' : 'Connect Now'}</Tag>}/>
                     </Col>
 
@@ -109,7 +109,7 @@ class CRMModal extends React.Component {
                                     onClick={() => this.changeCRM('Bullhorn')}
                                     image={getLink('/static/images/CRM/bullhorn.png')}
                                     selectImage={getLink('/static/images/CRM/select_bullhorn.png')}
-                                    desc={<Tag color={this.state.Bullhorn ? "purple" : "grey"}>Coming
+                                    desc={<Tag color={this.state.Bullhorn ? "#6c62ff" : "grey"}>Coming
                                         Soon</Tag>}/>
                     </Col>
 
@@ -118,7 +118,7 @@ class CRMModal extends React.Component {
                                     onClick={() => this.changeCRM('Vincere')}
                                     image={getLink('/static/images/CRM/vincere.png')}
                                     selectImage={getLink('/static/images/CRM/select_vincere.png')}
-                                    desc={<Tag color={this.state.Vincere ? "purple" : "grey"}>Coming Soon</Tag>}/>
+                                    desc={<Tag color={this.state.Vincere ? "#6c62ff" : "grey"}>Coming Soon</Tag>}/>
                     </Col>
                 </Row>
 

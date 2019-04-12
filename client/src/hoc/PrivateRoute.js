@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import {checkAuthenticity} from  '../helpers'
+import {checkAuthenticity} from "helpers";
 
 export const PrivateRoute = ({ component: Component, ...rest }) => {
     return (

@@ -1,7 +1,7 @@
 import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {optionsActions} from "../actions";
-import {errorMessage, warningMessage, http} from "../../helpers";
+import {warningMessage, http} from "helpers";
 
 
 function* fetchOptions() {

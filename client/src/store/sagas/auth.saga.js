@@ -1,9 +1,8 @@
 import * as actionTypes from '../actions/actionTypes';
-import { delay } from "redux-saga";
 import { put, takeLatest, all } from 'redux-saga/effects'
-import {authActions, profileActions} from "../actions";
-import {history, checkAuthenticity, successMessage} from '../../helpers'
-import {loadingMessage, errorMessage, warningMessage} from "../../helpers/alert";
+import {authActions} from "../actions";
+import {history, successMessage} from "helpers";
+import {loadingMessage, errorMessage, warningMessage} from "helpers/alert";
 import axios from 'axios';
 
 

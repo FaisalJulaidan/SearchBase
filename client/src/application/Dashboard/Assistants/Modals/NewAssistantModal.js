@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
 
 import {Button, Form, Input, Modal, Select, InputNumber, message, Switch, Slider} from 'antd';
-import {connect} from "react-redux";
-import {assistantActions} from "../../../../store/actions";
 
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;

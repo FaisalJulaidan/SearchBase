@@ -73,7 +73,6 @@ if os.environ['FLASK_ENV'] == 'production':
     app.config.from_object('config.ProductionConfig')
     url = os.environ['SQLALCHEMY_DATABASE_URI']
 
-    app.config['SECRET_KEY_DB'] = config.set_encrypt_key()  # IMPORTANT!
     jwt.init_app(app)
     db.init_app(app)
     mail.init_app(app)
@@ -92,7 +91,6 @@ if os.environ['FLASK_ENV'] == 'production':
 elif os.environ['FLASK_ENV'] == 'development':
     # Server Setup
     app.config.from_object('config.DevelopmentConfig')
-    # app.config['SECRET_KEY_DB'] = config.set_encrypt_key()  # IMPORTANT!
     config.BaseConfig.USE_ENCRYPTION = False
 
     jwt.init_app(app)
@@ -103,15 +101,12 @@ elif os.environ['FLASK_ENV'] == 'development':
     url = os.environ['SQLALCHEMY_DATABASE_URI'] # get database URL
     if os.environ['REFRESH_DB_IN_DEV'] == 'yes':
         print('Reinitialize the database...')
-        # drop_database(url)
-        # create_database(url)
         db.drop_all()
         db.create_all()
         helpers.gen_dummy_data()
 
     scheduler.start()
     print('Development mode running...')
-    # CRM_base.insertCandidate("PartnerDomain9", "SD9USR7", "P@55word", enums.CRM.Adapt)
 
 
 else:

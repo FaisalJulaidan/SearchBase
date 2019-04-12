@@ -137,6 +137,83 @@ const updateFlowFailure = (error) => {
     };
 };
 
+
+// CRM
+const connectCRM = (CRM, assistant) => {
+    return {
+        type: actionTypes.CONNECT_CRM_REQUEST,
+        assistant,
+        CRM
+    };
+};
+
+const connectCRMSuccess = (assistant, msg) => {
+    return {
+        type: actionTypes.CONNECT_CRM_SUCCESS,
+        assistant,
+        msg
+    };
+};
+
+const connectCRMFailure = (error) => {
+    return {
+        type: actionTypes.CONNECT_CRM_FAILURE,
+        error
+    };
+};
+
+
+
+// CRM TEST
+const testCRM = (CRM, assistant) => {
+    return {
+        type: actionTypes.TEST_CRM_REQUEST,
+        assistant,
+        CRM
+    };
+};
+
+const testCRMSuccess = (assistant, msg) => {
+    return {
+        type: actionTypes.TEST_CRM_SUCCESS,
+        assistant,
+        msg
+    };
+};
+
+const testCRMFailure = (error) => {
+    return {
+        type: actionTypes.TEST_CRM_FAILURE,
+        error
+    };
+};
+
+// CRM DISCONNECT
+const disconnectCRM = (CRM, assistant) => {
+    return {
+        type: actionTypes.DISCONNECT_CRM_REQUEST,
+        assistant,
+        CRM
+    };
+};
+
+const disconnectCRMSuccess = (assistant, msg) => {
+    return {
+        type: actionTypes.DISCONNECT_CRM_SUCCESS,
+        assistant,
+        msg
+    };
+};
+
+const disconnectCRMFailure = (error) => {
+    return {
+        type: actionTypes.DISCONNECT_CRM_FAILURE,
+        error
+    };
+};
+
+
+
 export const assistantActions = {
     fetchAssistants,
     fetchAssistantsSuccess,
@@ -160,5 +237,17 @@ export const assistantActions = {
 
     updateFlow,
     updateFlowSuccess,
-    updateFlowFailure
+    updateFlowFailure,
+
+    connectCRM,
+    connectCRMSuccess,
+    connectCRMFailure,
+
+    testCRM,
+    testCRMSuccess,
+    testCRMFailure,
+
+    disconnectCRM,
+    disconnectCRMSuccess,
+    disconnectCRMFailure,
 };

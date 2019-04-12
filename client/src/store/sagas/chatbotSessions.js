@@ -1,7 +1,7 @@
 import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {chatbotSessionsActions} from "../actions";
-import {http, successMessage, errorMessage, loadingMessage} from "../../helpers";
+import {http, successMessage, errorMessage, loadingMessage} from "helpers";
 
 function* fetchChatbotSessions({assistantID}) {
     try {

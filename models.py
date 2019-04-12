@@ -3,19 +3,20 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum, event, types
 from sqlalchemy.ext import mutable
 from datetime import datetime
+import os
 import json
 import enums
 from sqlalchemy_utils import PasswordType, CurrencyType
 
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
+from sqlalchemy_utils import EncryptedType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
 
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
-# force_auto_coercion()
 
 
 # Activate Foreign Keys
@@ -145,13 +146,15 @@ class Assistant(db.Model):
     Message = db.Column(db.String(500), nullable=False)
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
-    Config = db.Column(MagicJSON, nullable=True)
+
     MailEnabled = db.Column(db.Boolean, nullable=False, default=False)
     MailPeriod = db.Column(db.Integer, nullable=False, default=12)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
 
-    # CRM = db.Column(Enum(enums.CRM), nullable=False)
-    # CRMAuth = db.Column(MagicJSON, nullable=True)
+    CRM = db.Column(Enum(enums.CRM), nullable=True)
+    CRMAuth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
+    CRMConnected = db.Column(db.Boolean, nullable=False, default=False)
+
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )
@@ -223,6 +226,9 @@ class ChatbotSession(db.Model):
     SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
     QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
     UserType = db.Column(Enum(enums.UserType), nullable=False)
+
+    CRMSynced = db.Column(db.Boolean, nullable=False, default=False)
+    CRMResponse = db.Column(db.String(250), nullable=True)
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)

@@ -9,7 +9,12 @@ export const assistant = (state = initialState, action) => {
             return updateObject(state, {
                 assistantList: [],
                 errorMsg: null,
-                isLoading: true
+                isLoading: true,
+
+                connectCRMSuccessMsg: '',
+                connectCRMErrorMsg: '',
+                testCRMSuccessMsg: '',
+                testCRMErrorMsg: ''
             });
         case actionTypes.FETCH_ASSISTANTS_SUCCESS:
             return updateObject(state, {
@@ -123,6 +128,77 @@ export const assistant = (state = initialState, action) => {
             return updateObject(state, {
                 isUpdatingFlow: false,
                 updateFlowErrorMsg: action.error
+            });
+
+        //CRM
+        case actionTypes.CONNECT_CRM_REQUEST:
+            return updateObject(state, {
+                isConnecting: true,
+                connectCRMSuccessMsg: '',
+                connectCRMErrorMsg: '',
+                testCRMSuccessMsg: '',
+                testCRMErrorMsg: ''
+            });
+        case actionTypes.CONNECT_CRM_SUCCESS:
+
+            let newAssistantConnection = JSON.parse(JSON.stringify(state.assistantList)).map(assistant => {
+                if (assistant.ID === action.assistant.ID)
+                    assistant = action.assistant;
+                return assistant
+            });
+
+            return updateObject(state, {
+                isConnecting: false,
+                connectCRMSuccessMsg: action.msg,
+                assistantList: newAssistantConnection,
+            });
+        case actionTypes.CONNECT_CRM_FAILURE:
+            return updateObject(state, {
+                isConnecting: false,
+                connectCRMErrorMsg: action.error
+            });
+
+
+        //CRM TEST
+        case actionTypes.TEST_CRM_REQUEST:
+            return updateObject(state, {
+                isConnecting: true,
+                testCRMSuccessMsg: '',
+                testCRMErrorMsg: ''
+            });
+        case actionTypes.TEST_CRM_SUCCESS:
+            return updateObject(state, {
+                isConnecting: false,
+                testCRMSuccessMsg: action.msg,
+            });
+        case actionTypes.TEST_CRM_FAILURE:
+            return updateObject(state, {
+                isConnecting: false,
+                testCRMErrorMsg: action.error
+            });
+
+        //CRM TEST
+        case actionTypes.DISCONNECT_CRM_REQUEST:
+            return updateObject(state, {
+                isDisconnecting: true,
+                disconnectCRMSuccessMsg: '',
+                disconnectCRMErrorMsg: ''
+            });
+        case actionTypes.DISCONNECT_CRM_SUCCESS:
+            let newAssistantDisconnect = JSON.parse(JSON.stringify(state.assistantList)).map(assistant => {
+                if (assistant.ID === action.assistant.ID)
+                    assistant = action.assistant;
+                return assistant
+            });
+            return updateObject(state, {
+                isDisconnecting: false,
+                disconnectCRMSuccessMsg: action.msg,
+                assistantList: newAssistantDisconnect
+            });
+        case actionTypes.DISCONNECT_CRM_FAILURE:
+            return updateObject(state, {
+                isDisconnecting: false,
+                disconnectCRMErrorMsg: action.error
             });
 
         default:

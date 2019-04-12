@@ -12,13 +12,13 @@ class CRMResponse extends Component {
     render() {
         const {session} = this.props;
         return (
-            session.CRMSynced && session.CRMResponse ?
+            session.CRMResponse ?
                 <div>
                     <h3>
                         CRM Status:
                         <Tag color={session.CRMSynced ? "#87d068" : "red"}
                              style={{marginLeft: 5}}>
-                            {session.CRMSynced ? 'Sucess' : 'Failed'}
+                            {session.CRMSynced ? 'Success' : 'Failed'}
                         </Tag>
                     </h3>
 

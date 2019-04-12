@@ -116,7 +116,7 @@ class ViewsModal extends Component {
                         <SelectedSolutions solutions={session?.Data?.selectedSolutions}/>
                     </TabPane>
 
-                    <TabPane tab={"CRM Status"} key={"4"} disabled={!(session?.CRMSynced && session?.CRMResponse)}>
+                    <TabPane tab={"CRM Status"} key={"4"} disabled={!(session?.CRMResponse)}>
                         <CRMResponse session={session}/>
                     </TabPane>
 

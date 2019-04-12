@@ -11,6 +11,9 @@ def processSession (assistant: Assistant, session: ChatbotSession) -> Callback:
         return insertCandidate(assistant, session)
     elif session.UserType is UserType.Client:
         return insertClient(assistant, session)
+    else:
+        return Callback(False, "The data couldn't be synced with the CRM due to lack of information" +
+                               " whether user is a Candidate or Client ")
 
 
 def insertCandidate(assistant: Assistant, session: ChatbotSession):

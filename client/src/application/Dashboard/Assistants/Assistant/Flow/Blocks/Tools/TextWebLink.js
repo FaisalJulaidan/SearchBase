@@ -1,6 +1,6 @@
 import React from "react";
 import {Button, Form, Icon, Input} from "antd";
-import {successMessage} from '../../../../../../../helpers'
+import {successMessage} from "helpers";
 
 const FormItem = Form.Item;
 

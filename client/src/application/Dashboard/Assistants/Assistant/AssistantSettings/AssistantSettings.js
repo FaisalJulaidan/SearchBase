@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import connect from "react-redux/es/connect/connect";
-import {assistantActions} from "../../../../../store/actions";
+import {assistantActions} from "store/actions";
 import AssistantSettingsModal from "./AssistantSettingsModal/AssistantSettingsModal";
 import {Modal} from "antd";
 
@@ -33,8 +33,10 @@ class AssistantSettings extends Component {
     render() {
         return (
             <AssistantSettingsModal assistant={this.props.assistant} visible={this.props.visible}
-                                    handleSave={this.handleSave} handleCancel={this.props.hideModal}
-                                    handleDelete={this.handleDelete}/>
+                                    handleSave={this.handleSave}
+                                    handleCancel={this.props.hideModal}
+                                    handleDelete={this.handleDelete}
+                                    isAssistantNameValid={this.props.isAssistantNameValid}/>
         )
     }
 

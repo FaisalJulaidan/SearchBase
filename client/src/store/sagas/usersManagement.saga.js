@@ -1,7 +1,7 @@
 import {put, takeEvery, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
-import {solutionsActions, usersManagementActions} from "../actions";
-import {http, loadingMessage, successMessage, errorMessage} from "../../helpers";
+import {usersManagementActions} from "../actions";
+import {http, loadingMessage, successMessage, errorMessage} from "helpers";
 
 function* getUsers() {
     try {

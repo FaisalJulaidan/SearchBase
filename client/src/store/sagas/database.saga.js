@@ -1,7 +1,7 @@
 import * as actionTypes from '../actions/actionTypes';
 import {put, takeEvery, takeLatest, all} from 'redux-saga/effects'
 import {databaseActions, flowActions} from "../actions";
-import {http, successMessage, loadingMessage, errorMessage} from "../../helpers";
+import {http, successMessage, loadingMessage, errorMessage} from "helpers";
 
 
 function* getDatabasesList() {

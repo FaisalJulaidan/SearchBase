@@ -7,7 +7,7 @@ from sqlalchemy.sql import desc
 
 from models import db, Callback, ChatbotSession, Assistant
 from services import assistant_services, stored_file_services, databases_services
-from services.CRM import CRM_services
+from services.CRM import crm_services
 from utilities import json_schemas, helpers
 from enums import DatabaseType, UserType
 import logging
@@ -58,11 +58,14 @@ def processSession(assistantHashID, data: dict) -> Callback:
                                         UserType=UserType[data['userType'].replace(" ", "")],
                                         Assistant=assistant)
         # CRM integration
-        # callback: Callback = CRM_base.processSession(chatbotSession, assistant)
-        # print(callback.Message)
+        if assistant.CRMConnected:
+            crm_callback: Callback = crm_services.processSession(assistant, chatbotSession)
+            if crm_callback.Success:
+                chatbotSession.CRMSynced = True
+            chatbotSession.CRMResponse = crm_callback.Message
+
         db.session.add(chatbotSession)
         db.session.commit()
-
 
         return Callback(True, 'Chatbot data has been processed successfully!', chatbotSession)
 

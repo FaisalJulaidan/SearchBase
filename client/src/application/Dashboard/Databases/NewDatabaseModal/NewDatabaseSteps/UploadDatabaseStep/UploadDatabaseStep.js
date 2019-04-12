@@ -2,6 +2,7 @@ import {Button, Icon, Upload, message} from "antd";
 import React, {Component} from 'react';
 
 import Worker from "./excel.worker";
+import {getLink} from "helpers";
 
 class UploadDatabaseStep extends Component {
 
@@ -58,7 +59,7 @@ class UploadDatabaseStep extends Component {
                 });
             },
             beforeUpload: file => {
-                file.thumbUrl = 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/files1_9ool.svg';
+                file.thumbUrl = getLink('/static/images/undraw/files.svg');
                 setStateHandler(() => ({fileList: [file]}));
                 return false;
             },

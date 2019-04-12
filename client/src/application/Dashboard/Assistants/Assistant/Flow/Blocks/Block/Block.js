@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Button, Card, Checkbox, Col, Collapse, Divider, Row, Tag, Typography} from "antd";
+import styles from "./Block.module.less";
 
 const Panel = Collapse.Panel;
 const {Meta} = Card;
@@ -43,10 +44,12 @@ class Block extends Component {
                 <Panel header={(
                     <>
                         {this.switchBlockTypes(block.Type)} <Divider type="vertical"/>
+
                         {block.Content.text?.substring(0, 90)}
                         {block.Content.text?.length > 90 ? '...' : null}
 
                         <div style={{float: 'right', marginRight: 10}}>
+                            <Tag>{block.DataType.name}</Tag>
                             <Divider type="vertical"/>
                             <Button icon={'edit'} size={"small"} onClick={(event) => {
                                 this.editBlock(block);
@@ -227,7 +230,7 @@ class Block extends Component {
                             <Row>
                                 <Col span={6}>
                                     <b>
-                                        Question_To_Go Text When {block.Type === 'Solutions' ? 'Not Found' : 'Skip'}:
+                                        Question To Go Text When {block.Type === 'Solutions' ? 'Not Found' : 'Skip'}:
                                     </b>
                                 </Col>
                                 <Col span={12}>

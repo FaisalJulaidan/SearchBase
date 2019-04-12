@@ -7,25 +7,26 @@ from enums import DataType as DT
 
 def login(auth):
     try:
-        url =  "https://developerconnection.adaptondemand.com/WebApp/api/domains/" + auth['domain'] + "/logon"
+        authCopy = dict(auth) # we took copy to delete domain later only from the copy
+        url =  "https://developerconnection.adaptondemand.com/WebApp/api/domains/" \
+               + auth.get('domain', 'Unknown') + "/logon"
         headers = {'Content-Type': 'application/json'}
-        # Send request
-        r = requests.post(url, headers=headers, data=json.dumps(auth))
 
-        del auth['domain'] # because Adapt doesn't require this in the auth POST request
+        # Send request
+        authCopy.pop('domain', '') # because Adapt doesn't require this in the auth POST request
+        r = requests.post(url, headers=headers, data=json.dumps(authCopy))
 
         # When not ok
-        if not r.ok: raise Exception
+        if not r.ok: raise Exception(r.json().get('ERROR_MSG', r.text))
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully', r.json()['SID'])
 
     except Exception as exc:
-        print("CRM.Adapt.login() ERROR: ", exc)
         logging.error("CRM.Adapt.login() ERROR: " + str(exc)
-                      + " Username: " + auth['username']
-                      + " Domain: " + auth['domain'])
-        return Callback(False, 'Cannot login to Adapt CRM')
+                      + " Username: " + auth.get('username', 'Unknown')
+                      + " Domain: " + auth.get('domain', 'Unknown'))
+        return Callback(False, str(exc))
 
 
 def insertCandidate(auth, session: ChatbotSession) -> Callback:
@@ -34,8 +35,8 @@ def insertCandidate(auth, session: ChatbotSession) -> Callback:
         if not callback.Success:
             return callback
 
-        url =  "https://developerconnection.adaptondemand.com/WebApp/api/v1/candidates"
-        headers = {'Content-Type': 'application/json', 'x-adapt-sid': callback.Data }
+        url = "https://developerconnection.adaptondemand.com/WebApp/api/v1/candidates"
+        headers = {'Content-Type': 'application/json', 'x-adapt-sid': callback.Data}
 
         # New candidate details
         body = {
@@ -73,16 +74,15 @@ def insertCandidate(auth, session: ChatbotSession) -> Callback:
         r = requests.post(url, headers=headers, data= json.dumps(body))
 
         # When not ok
-        if not r.ok: raise Exception
+        if not r.ok: raise Exception(r.json().get('ERROR_MSG', r.text))
 
-        return Callback(True, 'Candidate inserted successfully')
+        return Callback(True, r.text)
 
     except Exception as exc:
-        print("CRM.Adapt.insertCandidate() ERROR: ", exc)
         logging.error("CRM.Adapt.insertCandidate() ERROR: " + str(exc)
-                      + " Username: " + auth['username']
-                      + " Domain: " + auth['domain'])
-        return Callback(False, 'Cannot insert candidate')
+                      + " Username: " + auth.get('username', 'Unknown')
+                      + " Domain: " + auth.get('domain', 'Unknown'))
+        return Callback(False, str(exc))
 
 
 def insertClient(auth, session: ChatbotSession) -> Callback:
@@ -121,13 +121,12 @@ def insertClient(auth, session: ChatbotSession) -> Callback:
         r = requests.post(url, headers=headers, data= json.dumps(body))
 
         # When not ok
-        if not r.ok: raise Exception
+        if not r.ok: raise Exception(r.json().get('ERROR_MSG', r.text))
 
-        return Callback(True, 'Client inserted successfully')
+        return Callback(True, r.text)
 
     except Exception as exc:
-        print("CRM.Adapt.insertClient() ERROR: ", exc)
         logging.error("CRM.Adapt.insertClient() ERROR: " + str(exc)
-                      + " Username: " + auth['username']
-                      + " Domain: " + auth['domain'])
-        return Callback(False, 'Cannot insert client')
+                      + " Username: " + auth.get('username', 'Unknown')
+                      + " Domain: " + auth.get('domain', 'Unknown'))
+        return Callback(False, str(exc))

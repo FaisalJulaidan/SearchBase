@@ -25,25 +25,10 @@ def users():
 
     if request.method == "POST":
 
-        # get the new user's details
-        name = request.form.get("name")
-        email = request.form.get("email")
-        role = request.form.get("type")
-
-        # Get the admin user who is logged in and wants to create a new user.
-        user_callback: Callback = user_services.getByID(user.get('id'))
-        if not user_callback.Success:
-            return helpers.jsonResponse(False, 400, user_callback.Message)
-
-        # check if the user can edit users, the email is valid and the role of the new user is valid
-        if not user_callback.Data.Role.EditUsers \
-                or (role != "Admin" and role != "User") \
-                or not helpers.isValidEmail(email):
-            return helpers.jsonResponse(False, 400, "Please make sure you entered all data correctly and have the " +
-                                        "necessary permission to do this action")
-
-        # add the user
-        add_user_callback: Callback = user_management_services.addAdditionalUser(name, email, role, user_callback.Data)
+        add_user_callback: Callback = user_management_services.add_user_with_permission(request.form.get("name"),
+                                                                                        request.form.get("email"),
+                                                                                        request.form.get("type"),
+                                                                                        user.get('id'))
         if not add_user_callback.Success:
             return helpers.jsonResponse(False, 400, add_user_callback.Message)
 
@@ -51,26 +36,13 @@ def users():
                                     "User has been added and an email with his login details is on its way to him")
 
     if request.method == "PUT":
-        # get the new information
-        user_id = request.json.get("ID", 0)
-        names = request.json.get("Fullname").split(" ")
-        email = request.json.get("Email")
-        new_role = request.json.get("RoleName")
 
-        # Get the admin user who is logged in and wants to edit.
-        user_callback: Callback = user_services.getByID(user.get('id'))
-        if not user_callback.Success:
-            return helpers.jsonResponse(False, 400, user_callback.Message)
-
-        # check if the email is valid and if the user has permission to edit users and if his new role is valid
-        if not helpers.isValidEmail(email) or not user_callback.Data.Role.EditUsersor \
-                or (new_role != "Admin" and new_role != "User"):
-            return helpers.jsonResponse(False, 400, "Please make sure you entered all data correctly and have the " +
-                                        "necessary permission to do this action")
-
-        # Update the user (userToUpdate)
-        update_callback: Callback = user_management_services.updateAsOwner(user_id, names[0], names[-1], email,
-                                                                           new_role)
+        update_callback: Callback = user_management_services.update_user_with_permission(request.json.get("ID", 0),
+                                                                                         request.json.get("Fullname").split(" ")[0],
+                                                                                         request.json.get("Fullname").split(" ")[-1],
+                                                                                         request.json.get("Email"),
+                                                                                         request.json.get("RoleName"),
+                                                                                         user.get('id'))
         if not update_callback.Success:
             return helpers.jsonResponse(False, 400, update_callback.Message)
 
@@ -84,17 +56,7 @@ def user(user_id):
 
     if request.method == "DELETE":
 
-        # Get the admin user who is logged in and wants to delete.
-        user_callback: Callback = user_services.getByID(user.get('id'))
-        if not user_callback.Success:
-            return helpers.jsonResponse(False, 400, user_callback.Message)
-
-        # Check if the admin user is authorised for such an operation.
-        if not user_callback.Data.Role.DeleteUsers:
-            return helpers.jsonResponse(False, 400, "You're not authorised to delete users")
-
-        # Delete the user
-        remove_callback: Callback = user_services.removeByID(user_id)
+        remove_callback: Callback = user_management_services.delete_user_with_permission(user_id, user.get("id"))
         if not remove_callback.Success:
             return helpers.jsonResponse(False, 400, remove_callback.Message)
 

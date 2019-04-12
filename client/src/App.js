@@ -10,7 +10,7 @@ import Signup from './application/Signup/Signup'
 import ForgetPassword from './application/ForgetPassword/ForgetPassword'
 import NewResetPassword from './application/ForgetPassword/NewResetPassword/NewResetPassword'
 import {destroyMessage} from './helpers/alert';
-
+import SentryBoundary from "components/SentryBoundary/SentryBoundary";
 class App extends Component {
     constructor(props) {
         super(props);
@@ -22,15 +22,17 @@ class App extends Component {
 
     render() {
         return (
-            <Switch>
-                {/* <Route exact path="/" component={Home} /> */}
-                <Route path="/login" component={Login}/>
-                <Route path="/signup" component={Signup}/>
-                <Route path="/forget_password" component={ForgetPassword}/>
-                <Route path="/reset_password/" component={NewResetPassword}/>
-                <PrivateRoute path="/dashboard" component={Dashboard}/>
-                <Redirect to={{pathname: '/dashboard'}}/>
-            </Switch>
+            <SentryBoundary>
+                <Switch>
+                    {/* <Route exact path="/" component={Home} /> */}
+                    <Route path="/login" component={Login}/>
+                    <Route path="/signup" component={Signup}/>
+                    <Route path="/forget_password" component={ForgetPassword}/>
+                    <Route path="/reset_password/" component={NewResetPassword}/>
+                    <PrivateRoute path="/dashboard" component={Dashboard}/>
+                    <Redirect to={{pathname: '/dashboard'}}/>
+                </Switch>
+            </SentryBoundary>
         );
     }
 }

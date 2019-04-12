@@ -1,8 +1,8 @@
 import {put, takeLatest, all} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
-import {http, updateUsername} from "../../helpers";
 import {profileActions} from "../actions";
-import {loadingMessage, errorMessage, successMessage} from "../../helpers/alert";
+import {http, updateUsername} from "helpers";
+import {loadingMessage, errorMessage, successMessage} from "helpers/alert";
 
 
 

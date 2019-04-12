@@ -1,5 +1,6 @@
 import {Form, Input, Select} from "antd";
 import React, {Component} from 'react'
+import {getLink} from "helpers";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -28,10 +29,9 @@ class ConfigureDatabaseStep extends Component {
         return (
             <div>
                 <div style={{textAlign: 'center'}}>
-                    <img
-                        src="https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/setup_wizard_r6mr.svg"
-                        alt="Upload Data Iamge"
-                        style={{height: 150, marginBottom: 10}}/>
+                    <img src={getLink('/static/images/undraw/setup.svg')}
+                         alt="Upload Data Iamge"
+                         style={{height: 150, marginBottom: 10}}/>
                 </div>
                 <Form layout='horizontal'>
                     <FormItem label="Database Name"

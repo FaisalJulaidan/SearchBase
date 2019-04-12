@@ -9,6 +9,7 @@ import {databaseActions} from "../../../store/actions";
 
 import DatabaseInfo from "./DatabaseInfo/DatabaseInfo"
 import DatabaseDetailsModal from "./DatabaseDetailsModal/DatabaseDetailsModal"
+import {getLink} from "helpers";
 
 const confirm = Modal.confirm;
 
@@ -46,7 +47,7 @@ class Databases extends Component {
     };
 
     isDatabaseNameValid = (name) => {
-        return !(this.props.databasesList.findIndex(db => db.Name === name) >= 0)
+        return !(this.props.databasesList.findIndex(db => db.Name.toLowerCase() === name.toLowerCase()) >= 0)
     };
 
     uploadDatabase = newDatabase => this.props.dispatch(databaseActions.uploadDatabase({newDatabase: newDatabase}));
@@ -140,10 +141,9 @@ class Databases extends Component {
                                         :
                                         <Spin spinning={this.props.isLoadingDatabase}>
                                             <div>
-                                                <img
-                                                    src="https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/following_q0cr.svg"
-                                                    width={"50%"}
-                                                    style={{
+                                                <img src={getLink('/static/images/undraw/following.svg')}
+                                                     width={"50%"}
+                                                     style={{
                                                         display: "block",
                                                         marginTop:20,
                                                         marginLeft: "auto",

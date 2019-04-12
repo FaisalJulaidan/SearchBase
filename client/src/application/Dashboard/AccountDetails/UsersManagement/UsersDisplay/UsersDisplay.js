@@ -4,7 +4,7 @@ import {Button, Form, Input, Select, Popconfirm, Table,} from 'antd';
 import {isEmpty} from "lodash";
 import UserModal from "./UserModal/UserModal";
 import styles from "./UsersDisplay.less"
-import {getUser} from '../../../../../helpers';
+import {getUser} from "helpers";
 
 
 const data = [];

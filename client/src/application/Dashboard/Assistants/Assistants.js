@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import styles from "./Assistants.module.less"
 import Assistant from "./Assistant/Assistant"
 
-import {assistantActions} from "../../../store/actions/assistant.actions";
+import {assistantActions} from "store/actions";
 import NewAssistantModal from "./Modals/NewAssistantModal";
 const confirm = Modal.confirm;
 
@@ -26,6 +26,10 @@ class Assistants extends Component {
     addAssistant = (values) => {
         this.props.dispatch(assistantActions.addAssistant(values));
         this.hideModal();
+    };
+
+    isAssistantNameValid = (name) => {
+        return !(this.props.assistantList.findIndex(a => a.Name.toLowerCase() === name.toLowerCase()) >= 0)
     };
 
     activateHandler = (checked, assistantID) => {
@@ -65,13 +69,13 @@ class Assistants extends Component {
                             {
                                 !this.props.isLoading ?
                                     (
-                                        this.props.assistantList.map((assistant, i) => <Assistant assistant={assistant}
-                                                                                                  key={i}
-                                                                                                  index={i}
-                                                                                                  isStatusChanging={this.props.isStatusChanging}
-                                                                                                  activateHandler={this.activateHandler}
-                                                                                                  isLoading={this.props.isLoading}
-                                        />)
+                                        this.props.assistantList.map((assistant, i) =>
+                                            <Assistant assistant={assistant}
+                                                       key={i}
+                                                       index={i}
+                                                       isStatusChanging={this.props.isStatusChanging}
+                                                       activateHandler={this.activateHandler}
+                                                       isAssistantNameValid={this.isAssistantNameValid}isLoading={this.props.isLoading}/>)
                                     )
                                     : <Skeleton active/>
                             }
@@ -83,6 +87,7 @@ class Assistants extends Component {
                 <NewAssistantModal visible={this.state.visible}
                                    options={this.props.options}
                                    addAssistant={this.addAssistant}
+                                   isAssistantNameValid={this.isAssistantNameValid}
                                    hideModal={this.hideModal}/>
 
             </div>

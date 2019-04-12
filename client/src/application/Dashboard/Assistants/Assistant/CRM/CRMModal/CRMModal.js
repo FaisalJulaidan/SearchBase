@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Form, Modal, Row, Col, Tag} from "antd";
+import {Button, Form, Modal, Row, Col, Tag, Tooltip} from "antd";
 
 import {getLink} from "helpers";
 import AdaptFormItems from "./Forms/Adapt"
@@ -64,6 +64,19 @@ class CRMModal extends React.Component {
             wrapperCol: {span: 14},
         };
 
+        const bullhornCard = <AuroraCard title={'Bullhorn'} selected={this.state.Bullhorn}
+                                         onClick={() => this.changeCRM('Bullhorn')}
+                                         image={getLink('/static/images/CRM/bullhorn.png')}
+                                         selectImage={getLink('/static/images/CRM/select_bullhorn.png')}
+                                         desc={<Tag color={this.state.Bullhorn ? "#9254de" : "grey"}>Coming
+                                             Soon</Tag>}/>;
+
+        const vencierCard = <AuroraCard title={'Vencier'} selected={this.state.Vincere}
+                                        onClick={() => this.changeCRM('Vincere')}
+                                        image={getLink('/static/images/CRM/vincere.png')}
+                                        selectImage={getLink('/static/images/CRM/select_vincere.png')}
+                                        desc={<Tag color={this.state.Vincere ? "#9254de" : "grey"}>Coming Soon</Tag>}/>
+
         const {getFieldDecorator} = this.props.form;
 
         return (
@@ -100,25 +113,33 @@ class CRMModal extends React.Component {
                                     onClick={() => this.changeCRM('Adapt')}
                                     image={getLink('/static/images/CRM/adapt.png')}
                                     selectImage={getLink('/static/images/CRM/select_adapt.png')}
-                                    desc={<Tag color={this.state.Adapt ? "#6c62ff" : "#87d068"}>
+                                    desc={<Tag color={this.state.Adapt ? "#9254de" : "#87d068"}>
                                         {this.props.assistant.CRMConnected ? 'Connected' : 'Connect Now'}</Tag>}/>
                     </Col>
 
+
                     <Col span={6}>
-                        <AuroraCard title={'Bullhorn'} selected={this.state.Bullhorn}
-                                    onClick={() => this.changeCRM('Bullhorn')}
-                                    image={getLink('/static/images/CRM/bullhorn.png')}
-                                    selectImage={getLink('/static/images/CRM/select_bullhorn.png')}
-                                    desc={<Tag color={this.state.Bullhorn ? "#6c62ff" : "grey"}>Coming
-                                        Soon</Tag>}/>
+                        {
+                            this.props.assistant.CRMConnected ?
+                                <Tooltip title={`Disconnect from ${this.props.assistant.CRM} first`}>
+                                    <div>
+                                        {bullhornCard}
+                                    </div>
+                                </Tooltip>
+                                : bullhornCard
+                        }
                     </Col>
 
                     <Col span={6}>
-                        <AuroraCard title={'Vencier'} selected={this.state.Vincere}
-                                    onClick={() => this.changeCRM('Vincere')}
-                                    image={getLink('/static/images/CRM/vincere.png')}
-                                    selectImage={getLink('/static/images/CRM/select_vincere.png')}
-                                    desc={<Tag color={this.state.Vincere ? "#6c62ff" : "grey"}>Coming Soon</Tag>}/>
+                        {
+                            this.props.assistant.CRMConnected ?
+                                <Tooltip title={`Disconnect from ${this.props.assistant.CRM} first`}>
+                                    <div>
+                                        {vencierCard}
+                                    </div>
+                                </Tooltip>
+                                : vencierCard
+                        }
                     </Col>
                 </Row>
 

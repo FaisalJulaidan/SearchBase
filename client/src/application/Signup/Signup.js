@@ -197,7 +197,7 @@ class Signup extends React.Component {
 
                         <Row type="flex" justify="center">
                             <Col>
-                                <Link style={{color: "#6c62ff"}} to="/login">Already have an account?</Link>
+                                <Link style={{color: "#9254de"}} to="/login">Already have an account?</Link>
                             </Col>
                         </Row>
 

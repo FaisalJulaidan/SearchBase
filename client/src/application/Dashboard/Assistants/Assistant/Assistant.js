@@ -5,6 +5,7 @@ import AssistantSettings from "./AssistantSettings/AssistantSettings";
 import CRM from "./CRM/CRM";
 import './Assistant.less';
 import AuroraBlink from "components/AuroraBlink/AuroraBlink";
+import {getLink} from "helpers";
 
 const {Meta} = Card;
 
@@ -13,7 +14,7 @@ const covers = [
     // 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/voice_control_ofo1.svg',
     // 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/group_chat_v059.svg',
     // 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/status_update_jjgk.svg',
-    'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/messages1_9ah2.svg'
+    getLink('/static/images/undraw/messages.svg'),
 ];
 
 

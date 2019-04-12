@@ -1,11 +1,13 @@
 import React, {Component} from 'react';
-import {Button, Modal, Tabs, Row, Col, Icon} from "antd";
+import {Button, Modal, Tabs, Row, Col, Icon, Typography} from "antd";
 import {http, alertError} from "helpers";
 import saveAs from 'file-saver';
 import Profile from '../Profile/Profile'
 import Conversation from '../Conversation/Conversation'
 import SelectedSolutions from "../SelectedSolutions/SelectedSolutions";
 import CRMResponse from "../CRMResponse/CRMResponse";
+
+const {Text} = Typography;
 
 const TabPane = Tabs.TabPane;
 
@@ -69,7 +71,7 @@ class ViewsModal extends Component {
         return (
             <Modal
                 width={900}
-                title={'Session Details'}
+                title={<h3>Session Details <span><Text type="secondary">#{session?.ID}</Text></span></h3>}
                 destroyOnClose={true}
                 visible={this.props.visible}
                 onCancel={this.props.closeViewModal}

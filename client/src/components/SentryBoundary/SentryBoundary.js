@@ -1,47 +1,54 @@
 import React, {Component} from "react";
 import * as Sentry from '@sentry/browser';
 import {connect} from 'react-redux';
+import styles from './SentryBoundary.module.less';
+import {getLink} from "helpers";
+import {Button} from 'antd';
 
 Sentry.init({
-    dsn: "https://12d2940f9cae4c8bb456358a2d550217@sentry.io/1436966"
+    dsn: "https://12d2940f9cae4c8bb456358a2d550217@sentry.io/1436966",
+    enabled: !(process.env.NODE_ENV === 'development')
 });
 
 class SentryBoundary extends Component {
 
-
     constructor(props) {
         super(props);
         this.state = {error: null};
-
-
-        // should have been called before using it here
-        // ideally before even rendering your react app
     }
 
     componentDidCatch(error, errorInfo) {
         this.setState({error});
-        // Sentry.withScope(scope => {
-        //     scope.setExtras({
-        //         ...errorInfo,
-        //         debuggingState: this.props.debuggingState
-        //     });
-        //     const eventId = Sentry.captureException(error);
-        //     this.setState({eventId})
-        // });
+        Sentry.withScope(scope => {
+            scope.setExtras({
+                errorInfo,
+                debuggingState: this.props.debuggingState
+            });
+            const eventId = Sentry.captureException(error);
+            this.setState({eventId})
+        });
     }
 
     render() {
         if (this.state.error) {
             return (
-                <div className="snap">
-                    <img src={'https://wiggly-power.glitch.me/static/media/sentry-aw-snap.afe2fd59.svg'}/>
-                    <div className="snap-message">
-                        <p>We're sorry - something's gone wrong.</p>
+                <div className={styles.Container}>
+                    <div className={styles.NotFound}>
+                        <div className={styles.NotFound404}>
+                            <img src={getLink('/static/images/error.svg')} alt="" height={'100%'}/>
+                        </div>
+                        <h1>404</h1>
+                        <h2>We're sorry - something's gone wrong.</h2>
                         <p>Our team has been notified</p>
-                        <a onClick={() => Sentry.showReportDialog({eventId: this.state.eventId})}>Report feedback</a>
 
+                        <br/>
+
+                        <Button onClick={() => Sentry.showReportDialog({eventId: this.state.eventId})}
+                                type={'primary'} style={{marginRight: 5}}>
+                            Report Feedback
+                        </Button>
+                        <Button onClick={() => window.location.reload()} type={'default'}>Refresh Page</Button>
                     </div>
-
                 </div>
             );
         } else {

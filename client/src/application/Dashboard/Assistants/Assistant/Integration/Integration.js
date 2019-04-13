@@ -12,6 +12,32 @@ import {SwatchesPicker} from 'react-color';
 const {TextArea} = Input;
 
 
+(function (arr) {
+    arr.forEach(function (item) {
+        if (item.hasOwnProperty('remove')) {
+            return;
+        }
+        Object.defineProperty(item, 'remove', {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value: function remove() {
+                this.parentNode.removeChild(this);
+            }
+        })
+    })
+})([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+
+const isNodeExist = (element, inArray) => {
+    let isExist = false;
+    for (const inArray_element of inArray)
+        if (element.isEqualNode(inArray_element)) {
+            isExist = true;
+            break;
+        }
+    return isExist
+};
+
 class Integration extends React.Component {
 
     state = {
@@ -21,7 +47,8 @@ class Integration extends React.Component {
         // dataIcon: "#ffffff",
         dataCircle: "#9254de",
         async: true,
-        defer: true
+        defer: true,
+        isTestButtonDisabled: false
     };
 
     firstHead = null;
@@ -31,7 +58,7 @@ class Integration extends React.Component {
             assistantID: hasher.encode(this.props.match.params.id),
             source: this.getWidgetSrc()
         });
-        this.firstHead = document.head.innerHTML;
+        this.firstHead = [...document.head.children];
     }
 
 
@@ -48,7 +75,18 @@ class Integration extends React.Component {
         let oldBotScript = document.getElementById("oldBotScript");
         if (oldBotScript) oldBotScript.remove();
 
-        document.head.innerHTML = this.firstHead;
+
+        let newHead = document.head.children;
+        let elements = [];
+
+        // find all new css
+        for (const element of newHead)
+            if (!isNodeExist(element, this.firstHead))
+                elements.push(element);
+
+        // remove all new css
+        for (let i = 0; i < elements.length; i++)
+            elements[i].remove();
     };
 
     copyScriptPaste = () => {
@@ -58,7 +96,18 @@ class Integration extends React.Component {
     };
 
     testIntegration = () => {
-        this.removeChatbot();
+        // set time out to avoid many chatbot calling
+        this.setState({isTestButtonDisabled: true},
+            () => setTimeout(
+                () => this.setState({isTestButtonDisabled: false}),
+                1500
+            )
+        );
+        let oldBot = document.getElementById("TheSearchBase_Chatbot");
+
+        if (oldBot)
+            this.removeChatbot();
+
         const script = document.createElement("script");
 
         script.src = this.state.source;
@@ -163,7 +212,9 @@ class Integration extends React.Component {
                                       style={{width: "100%", height: "110px", fontWeight: "600", margin: "1.5% 0"}}
                                       readOnly/>
                             <Button onClick={this.copyScriptPaste} className={"ant-btn-primary"}>Copy</Button>
-                            <Button style={{marginLeft: "5px"}} onClick={this.testIntegration}
+                            <Button style={{marginLeft: "5px"}}
+                                    disabled={this.state.isTestButtonDisabled}
+                                    onClick={this.testIntegration}
                                     className={"ant-btn-primary"}>Test</Button>
                             <Button style={{marginLeft: "5px"}} onClick={this.generateDirectLink}
                                     className={"ant-btn-primary"}>Generate Direct Link</Button>

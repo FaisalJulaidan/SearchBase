@@ -531,9 +531,10 @@ __pycache__/
 
 # End of https://www.gitignore.io/api/macos,linux,python,windows,pycharm,visualstudio
 
-.db
+Development.db
 *.db
 /static/file_uploads/user_files
 virtual
 venv
 /Development.db-journal
+static/react_app/*

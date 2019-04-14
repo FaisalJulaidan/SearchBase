@@ -35,7 +35,6 @@ class AssistantSettingsModal extends Component {
     }
 
     handleSave = () => {
-        this.props.notfound.makerror = 'x';
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 if (this.state.isPopupDisabled) {

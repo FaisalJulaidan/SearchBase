@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql
+    ports:
+      - 3306
+    restart: always
+    environment:
+      - MYSQL_DATABASE=thesearchbase
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - frontend
+
+  ngnix:
+    container_name: ngnix
+    build:
+      context: .
+      dockerfile: docker/ngnix/Dockerfile
+    depends_on:
+      - web
+    ports:
+      - 80:80
+    networks:
+      - frontend
+    restart: always
+
+  web:
+    build: .
+    ports:
+      - 5000
+    networks:
+      - frontend
+    restart: always
+
+networks:
+  frontend:

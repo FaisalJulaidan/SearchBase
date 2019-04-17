@@ -27,6 +27,11 @@ class ViewsModal extends Component {
         document.addEventListener('keydown', this.handleKeyPress);
     }
 
+    componentWillUnmount() {
+        // you need to unbind the same listener that was binded.
+        document.removeEventListener('keydown', this.handleKeyPress, false);
+    }
+
     handleKeyPress = (e) => {
         e.preventDefault();
         if (e.keyCode === 37)// left arrow

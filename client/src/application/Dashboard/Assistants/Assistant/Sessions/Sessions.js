@@ -123,18 +123,16 @@ class Sessions extends React.Component {
 
     getNextSession = currentSession => {
         const sessions = [...this.props.sessions?.sessionsList];
-        if (sessions && sessions.ID) {
-            const index = sessions.findIndex(session => session.ID === currentSession.ID);
+        const index = sessions.findIndex(session => session?.ID === currentSession?.ID);
+        if (index)
             this.setState({selectedSession: sessions[index + 1] ? sessions[index + 1] : sessions[index]})
-        }
     };
 
     getBackSession = currentSession => {
         const sessions = [...this.props.sessions?.sessionsList];
-        if (sessions && sessions.ID) {
-            const index = sessions.findIndex(session => session.ID === currentSession.ID);
+        const index = sessions.findIndex(session => session?.ID === currentSession?.ID);
+        if (index)
             this.setState({selectedSession: sessions[index - 1] ? sessions[index - 1] : sessions[index]})
-        }
     };
 
 

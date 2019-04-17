@@ -82,9 +82,9 @@ class ViewsModal extends Component {
                 onCancel={this.props.closeViewModal}
                 onOk={this.props.closeViewModal}
                 footer={[
-                    <Button key="Cancel" onClick={this.props.closeViewModal}>OK</Button>,
                     <Button key="Delete" onClick={() => this.props.deleteSession(session)}
-                            type={'danger'}>Delete</Button>
+                            type={'danger'}>Delete</Button>,
+                    <Button key="Cancel" onClick={this.props.closeViewModal}>OK</Button>,
                 ]}>
 
                 <Row type={'flex'} justify={'center'}>

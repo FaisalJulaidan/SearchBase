@@ -47,9 +47,6 @@ def processSession(assistantHashID, data: dict) -> Callback:
         return Callback(False, "The submitted chatbot data doesn't follow the correct format.", exc.args[0])
 
     try:
-
-
-
         # collectedData is an array, and timeSpent is in seconds.
         chatbotSession = ChatbotSession(Data= sessionData,
                                         TimeSpent=data['timeSpent'],
@@ -74,9 +71,6 @@ def processSession(assistantHashID, data: dict) -> Callback:
         logging.error("chatbotSession_services.processSession(): " + str(exc))
         db.session.rollback()
         return Callback(False, "An error occurred while processing chatbot data.")
-    # finally:
-    # db.session.close()
-
 
 # ----- Getters ----- #
 def getAllByAssistantID(assistantID):

@@ -121,9 +121,9 @@
         },
         {
           "Content": {
-            "action": "End Chat",
-            "afterMessage": "Great! Thanks for uploading your CV. One of our team members will be in touch as soon as possible.",
-            "blockToGoID": null,
+            "action": "Go To Specific Block",
+            "afterMessage": "Great! Thanks for uploading your CV.",
+            "blockToGoID": "KODRc35r0",
             "fileTypes": [
               "doc",
               "docx",
@@ -133,7 +133,7 @@
             ],
             "text": "To Upload your CV, click on the attachment icon below and select your file. We allow doc, docx, pdf, jpeg and png files."
           },
-          "DataType": "NoType",
+          "DataType": "CandidateCV",
           "ID": "hk5_59I0M",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
@@ -600,7 +600,7 @@
             "action": "Go To Specific Block",
             "afterMessage": "Just a few more questions",
             "blockToGoID": "1rbjEfSbv",
-            "text": "And where will the candidates be working? "
+            "text": "And in what city will the candidates be working? "
           },
           "DataType": "CandidateLocation",
           "ID": "T_f-Iip1R",
@@ -697,15 +697,7 @@
                 "action": "Go To Next Block",
                 "afterMessage": "",
                 "blockToGoID": "ZteTRB7BM",
-                "id": "O_ntExlYw",
-                "keywords": [],
-                "text": "Evening"
-              },
-              {
-                "action": "Go To Next Block",
-                "afterMessage": "",
-                "blockToGoID": "ZteTRB7BM",
-                "id": "_QgbgzZqs",
+                "id": "b7TKAVQAE",
                 "keywords": [],
                 "text": "Morning"
               },
@@ -713,9 +705,17 @@
                 "action": "Go To Next Block",
                 "afterMessage": "",
                 "blockToGoID": "ZteTRB7BM",
-                "id": "T7oYDSeVy",
+                "id": "bzu22tA1w",
                 "keywords": [],
                 "text": "Afternoon"
+              },
+              {
+                "action": "Go To Next Block",
+                "afterMessage": "",
+                "blockToGoID": "ZteTRB7BM",
+                "id": "O_ntExlYw",
+                "keywords": [],
+                "text": "Evening"
               }
             ],
             "text": "What time of the day is best for us to contact you on?"
@@ -738,10 +738,10 @@
           },
           "DataType": "ClientTelephone",
           "ID": "ZteTRB7BM",
-          "SkipAction": "End Chat",
-          "SkipBlockToGoID": null,
-          "SkipText": "Skip!",
-          "Skippable": false,
+          "SkipAction": "Go To Specific Block",
+          "SkipBlockToGoID": "jZVxF_7a0",
+          "SkipText": "Skip Question",
+          "Skippable": true,
           "StoreInDB": true,
           "Type": "User Input"
         },
@@ -815,6 +815,92 @@
           "Skippable": false,
           "StoreInDB": true,
           "Type": "File Upload"
+        },
+        {
+          "Content": {
+            "action": "End Chat",
+            "blockToGoID": null,
+            "text": "Thank you for all of the information. We will be in touch as soon as possible."
+          },
+          "DataType": "NoType",
+          "ID": "jZVxF_7a0",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": false,
+          "Type": "Raw Text"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "Last question...",
+            "blockToGoID": "F_ORS2LK9",
+            "text": "Can you provide us with an email to contact you on?"
+          },
+          "DataType": "CandidateEmail",
+          "ID": "KODRc35r0",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "Great",
+            "blockToGoID": "2gZyBDhbE",
+            "text": "Could you also provide your mobile number?"
+          },
+          "DataType": "CandidateMobile",
+          "ID": "F_ORS2LK9",
+          "SkipAction": "Go To Next Block",
+          "SkipBlockToGoID": "2gZyBDhbE",
+          "SkipText": "Skip Question",
+          "Skippable": true,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "answers": [
+              {
+                "action": "End Chat",
+                "afterMessage": "Fantastic. We'll be in touch then. ",
+                "blockToGoID": null,
+                "id": "iFDZHEJo3",
+                "keywords": [],
+                "text": "Morning"
+              },
+              {
+                "action": "End Chat",
+                "afterMessage": "Great, we'll be in touch.",
+                "blockToGoID": null,
+                "id": "CzToL5JrF",
+                "keywords": [],
+                "text": "Afternoon"
+              },
+              {
+                "action": "End Chat",
+                "afterMessage": "Great, thank you for your feedback.",
+                "blockToGoID": null,
+                "id": "pNPdkE-tX",
+                "keywords": [],
+                "text": "Evening"
+              }
+            ],
+            "text": "What time of the day is best for us to contact you on?"
+          },
+          "DataType": "NoType",
+          "ID": "2gZyBDhbE",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "Question"
         }
       ],
       "description": "Chat",

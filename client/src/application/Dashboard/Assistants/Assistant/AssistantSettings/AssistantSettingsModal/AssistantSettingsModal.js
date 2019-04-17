@@ -35,7 +35,6 @@ class AssistantSettingsModal extends Component {
     }
 
     handleSave = () => {
-        this.props.notfound.makerror = 'x';
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 if (this.state.isPopupDisabled) {
@@ -146,7 +145,7 @@ class AssistantSettingsModal extends Component {
 
                     <FormItem
                         {...formItemLayout}
-                        label="New Records Notifications"
+                        label="Records Notifications"
                         extra="If you turn this on, we will notify you through your email"
                     >
                         <Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}

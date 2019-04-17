@@ -731,5 +731,14 @@
             "version": "==0.1.9"
         }
     },
-    "develop": {}
+    "develop": {
+        "pbr": {
+            "hashes": [
+                "sha256:8257baf496c8522437e8a6cfe0f15e00aedc6c0e0e7c9d55eeeeab31e0853843",
+                "sha256:8c361cc353d988e4f5b998555c88098b9d5964c2e11acf7b0d21925a66bb5824"
+            ],
+            "index": "pypi",
+            "version": "==5.1.3"
+        }
+    }
 }

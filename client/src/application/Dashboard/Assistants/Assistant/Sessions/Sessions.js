@@ -82,57 +82,18 @@ class Sessions extends React.Component {
     };
 
 
-    // Nested table that has all the answered questions per session (Not being used)
-    expandedRowRender = (record, index, indent, expanded) => {
-        const columns = [
-            {
-                title: 'Question',
-                key: 'questionText',
-                render: (text, record, index) => (<p>{record.questionText}</p>),
-            },
-            {
-                title: 'Input',
-                key: 'input',
-                render: (text, record, index) => {
-
-                    if (record.input === '&FILE_UPLOAD&') {
-                        this.filesCounter+=1;
-                        return (<Button hreftype="primary" data-index={this.filesCounter} icon="download" size="small"
-                                        onClick={(e) => {this.downloadFile(e)}}>
-                            Download File
-                        </Button>);
-                    }
-
-                    else {
-                        return (<p>
-                            {record.input}
-                        </p>);
-                    }
-                },
-            }
-        ];
-
-
-        return (
-            <Table columns={columns}
-                   dataSource={record.Data.collectedData}
-                   pagination={false}
-                   scroll={{y: 500}}/>
-        );
-    };
-
     getNextSession = currentSession => {
-        const sessions = [...this.props.sessions?.sessionsList];
-        const index = sessions.findIndex(session => session?.ID === currentSession?.ID);
-        if (index)
-            this.setState({selectedSession: sessions[index + 1] ? sessions[index + 1] : sessions[index]})
+        const {sessionsList} = this.props.sessions;
+        const index = sessionsList?.findIndex(session => session?.ID === currentSession?.ID);
+        if (index > -1)
+            this.setState({selectedSession: sessionsList[index + 1] ? sessionsList[index + 1] : sessionsList[index]})
     };
 
     getBackSession = currentSession => {
-        const sessions = [...this.props.sessions?.sessionsList];
-        const index = sessions.findIndex(session => session?.ID === currentSession?.ID);
-        if (index)
-            this.setState({selectedSession: sessions[index - 1] ? sessions[index - 1] : sessions[index]})
+        const {sessionsList} = this.props.sessions;
+        const index = sessionsList?.findIndex(session => session?.ID === currentSession?.ID);
+        if (index > -1)
+            this.setState({selectedSession: sessionsList[index - 1] ? sessionsList[index - 1] : sessionsList[index]})
     };
 
 
@@ -240,6 +201,7 @@ class Sessions extends React.Component {
 
 
                             <Button className={styles.Panel_Header_Button} type="primary" icon="delete"
+                                    disabled={!!(!sessions.sessionsList.length)}
                                     onClick={() => {
                                         this.clearAllChatbotSessions(assistant.ID)
                                     }} loading={this.props.isClearingAll}>
@@ -249,9 +211,8 @@ class Sessions extends React.Component {
                     </div>
 
                     <div className={styles.Panel_Body}>
-
                         <Table columns={columns}
-                               dataSource={sessions.sessionsList ? sessions.sessionsList : null}
+                               dataSource={sessions.sessionsList}
                                onChange={this.handleFilter}
                                loading={this.props.isLoading}
                                size='middle'

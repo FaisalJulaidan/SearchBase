@@ -126,7 +126,7 @@ class NewAssistantModal extends Component {
 
                     <FormItem
                         {...formItemLayout}
-                        label="New Record Alert"
+                        label="Record Alert"
                         extra="Turning this on will make the assistant alert you when it has been used"
                     >
                         <Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}

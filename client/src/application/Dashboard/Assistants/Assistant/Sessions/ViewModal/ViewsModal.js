@@ -19,10 +19,6 @@ class ViewsModal extends Component {
         this.handleKeyPress = this.handleKeyPress.bind(this);
     }
 
-    state = {
-        fileNames: []
-    };
-
     componentDidMount() {
         document.addEventListener('keydown', this.handleKeyPress);
     }
@@ -42,16 +38,9 @@ class ViewsModal extends Component {
             this.props.deleteSession(this.props.session)
     };
 
-    componentWillReceiveProps(nextProps, nextContext) {
-        if(nextProps.session && nextProps.session.FilePath){
-            this.setState({fileNames: nextProps.session.FilePath.split(',')})
-        }
-    }
-
     downloadFileHandler = (filenameIndex) => {
-        console.log(filenameIndex);
         // Get file name by index. indexes stored in each button corresponds to filenames stored in the state
-        const fileName = this.state.fileNames[filenameIndex];
+        const fileName = this.props.session.FilePath.split(',')[filenameIndex];
         if (!fileName){
             alertError("File Error", "Sorry, but file doesn't exist!");
             return;

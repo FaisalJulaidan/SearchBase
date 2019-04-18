@@ -5,9 +5,6 @@ import {Button, Table, Tag} from "antd";
 class Conversation extends Component {
 
     counter = -1; // this is important for specifying what is the file name's index
-    state = {
-        fileNames: []
-    };
 
     columns = [{
         title: 'Question',

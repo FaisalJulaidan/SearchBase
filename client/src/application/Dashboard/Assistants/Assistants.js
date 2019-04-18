@@ -7,6 +7,8 @@ import Assistant from "./Assistant/Assistant"
 
 import {assistantActions} from "store/actions";
 import NewAssistantModal from "./Modals/NewAssistantModal";
+// import CreateNewBox from "components/CreateNewBox/CreateNewBox"
+
 const confirm = Modal.confirm;
 
 class Assistants extends Component {

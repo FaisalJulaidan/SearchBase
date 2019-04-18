@@ -7,7 +7,7 @@ from models import db
 from services.mail_services import mail
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from sqlalchemy_utils import create_database, database_exists, drop_database
+from sqlalchemy_utils import create_database, database_exists
 from flask_apscheduler import APScheduler
 from services.auth_services import jwt
 from utilities import helpers, tasks

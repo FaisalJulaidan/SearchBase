@@ -299,35 +299,40 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
         # ======================= Candidate Location ===================================
         # Received DataType: CandidateLocation <> Column: CandidateLocation | points= 1
         if keywords.get(DT.CandidateLocation.value['name']):
-            df['count'] += df[Candidate.CandidateLocation.name].str.count('|'.join(keywords[DT.CandidateLocation.value['name']]),
+            df['count'] += 6 * df[Candidate.CandidateLocation.name].str.count('|'.join(keywords[DT.CandidateLocation.value['name']]),
                                                                  flags=re.IGNORECASE) | 0
 
         # Received DataType: JobLocation <> Column: CandidateLocation | points= 1
         if keywords.get(DT.JobLocation.value['name']):
-            df['count'] += df[Candidate.CandidateLocation.name].str.count('|'.join(keywords[DT.JobLocation.value['name']]),
+            df['count'] += 6 * df[Candidate.CandidateLocation.name].str.count('|'.join(keywords[DT.JobLocation.value['name']]),
                                                                           flags=re.IGNORECASE) | 0
 
 
+        # ======================= Candidate Job Title ===================================
         # Received DataType: CandidateJobTitle <> Column: CandidateJobTitle | points= 1
         if keywords.get(DT.CandidateJobTitle.value['name']):
             df['count'] += df[Candidate.CandidateJobTitle.name].str.count('|'.join(keywords[DT.CandidateJobTitle.value['name']]),
                                                                         flags=re.IGNORECASE) | 0
 
+        # Received DataType: CandidateJobTitle <> Column: CandidateJobTitle | points= 1
+        if keywords.get(DT.JobTitle.value['name']):
+            df['count'] += df[Candidate.CandidateJobTitle.name].str.count('|'.join(keywords[DT.JobTitle.value['name']]),
+                                                                          flags=re.IGNORECASE) | 0
 
         # ======================= Candidate Skills ===================================
         # Received DataType: CandidateSkills <> Column: CandidateSkills | points= 1
         if keywords.get(DT.CandidateSkills.value['name']):
-            df['count'] += df[Candidate.CandidateSkills.name].str.count('|'.join(keywords[DT.CandidateSkills.value['name']]),
+            df['count'] += 2 * df[Candidate.CandidateSkills.name].str.count('|'.join(keywords[DT.CandidateSkills.value['name']]),
                                                                                 flags=re.IGNORECASE) | 0
 
         # Received DataType: JobDesiredSkills <> Column: CandidateSkills | points= 1
         if keywords.get(DT.JobDesiredSkills.value['name']):
-            df['count'] += df[Candidate.CandidateSkills.name].str.count('|'.join(keywords[DT.JobDesiredSkills.value['name']]),
+            df['count'] += 2 * df[Candidate.CandidateSkills.name].str.count('|'.join(keywords[DT.JobDesiredSkills.value['name']]),
                                                                         flags=re.IGNORECASE) | 0
 
         # Received DataType: JobEssentialSkills <> Column: CandidateSkills | points= 1
         if keywords.get(DT.JobEssentialSkills.value['name']):
-            df['count'] += df[Candidate.CandidateSkills.name].str.count('|'.join(keywords[DT.JobEssentialSkills.value['name']]),
+            df['count'] += 2 * df[Candidate.CandidateSkills.name].str.count('|'.join(keywords[DT.JobEssentialSkills.value['name']]),
                                                                         flags=re.IGNORECASE) | 0
         #  =============================================================================
 
@@ -337,7 +342,7 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
         if keywords.get(DT.CandidateAvailability.value['name']):
             df['count'] += df[Candidate.CandidateAvailability.name].str.count('|'.join(keywords[DT.CandidateAvailability.value['name']]),
                                                                                 flags=re.IGNORECASE) | 0
-
+        print(df)
         topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 2), 'count')
                                 .to_json(orient='records'))
 

@@ -6,6 +6,12 @@ class Conversation extends Component {
 
     counter = -1; // this is important for specifying what is the file name's index
 
+    componentWillReceiveProps(nextProps, nextContext) {
+        if(nextProps.session !== this.props.session){
+            this.counter = -1;
+        }
+    }
+
     columns = [{
         title: 'Question',
         key: 'questionText',

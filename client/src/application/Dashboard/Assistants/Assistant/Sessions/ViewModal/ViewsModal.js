@@ -39,8 +39,10 @@ class ViewsModal extends Component {
     };
 
     downloadFileHandler = (filenameIndex) => {
-        // Get file name by index. indexes stored in each button corresponds to filenames stored in the state
-        const fileName = this.props.session.FilePath.split(',')[filenameIndex];
+        // Get file name by index
+        let fileName = this.props.session.FilePath.split(',')[filenameIndex];
+        console.log(this.props.session.FilePath.split(','))
+        console.log(filenameIndex)
         if (!fileName){
             alertError("File Error", "Sorry, but file doesn't exist!");
             return;
@@ -55,6 +57,7 @@ class ViewsModal extends Component {
         }).catch(error => {
             alertError("File Error", "Sorry, cannot download this file!")
         });
+        return;
     };
 
 

@@ -7,6 +7,12 @@ class Profile extends Component {
 
     counter = -1;
 
+    componentWillReceiveProps(nextProps, nextContext) {
+        if(nextProps.session !== this.props.session){
+            this.counter = -1;
+        }
+    }
+
     columns = [{
         title: 'Data Type',
         key: 'dataType',

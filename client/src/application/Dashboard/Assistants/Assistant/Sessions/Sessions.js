@@ -201,7 +201,7 @@ class Sessions extends React.Component {
 
 
                             <Button className={styles.Panel_Header_Button} type="primary" icon="delete"
-                                    disabled={!!(!sessions?.sessionsList.length)}
+                                    disabled={!!(!sessions?.sessionsList?.length)}
                                     onClick={() => {
                                         this.clearAllChatbotSessions(assistant.ID)
                                     }} loading={this.props.isClearingAll}>

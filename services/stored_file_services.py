@@ -1,6 +1,9 @@
 from models import db, Callback, StoredFile, ChatbotSession
 import logging
-
+import boto3
+import botocore
+import os
+from config import BaseConfig
 def getByID(id) -> StoredFile or None:
     try:
         if id:
@@ -47,14 +50,14 @@ def getAll():
         return Callback(False,'StoredFiles could not be retrieved/empty')
 
 
-def create(filePath, chatbotSession) -> StoredFile or None:
+def createRef(filePath, chatbotSession) -> StoredFile or None:
 
     try:
+        if not filePath: raise Exception;
         newStoredFile = StoredFile(FilePath=filePath, ChatbotSession=chatbotSession)
         db.session.add(newStoredFile)
-
         db.session.commit()
-        return Callback(True, "StoredFile uas been created successfully.", newStoredFile)
+        return Callback(True, "Stored files reference was created successfully.", newStoredFile)
 
     except Exception as exc:
         print("stored_file_services.create() ERROR: ", exc)
@@ -63,25 +66,9 @@ def create(filePath, chatbotSession) -> StoredFile or None:
         return Callback(False, "Couldn't create a storedFile entity.")
     
 
-def updateStoredFile(id, filePath, chatbotSession):
-    try:
-        callback: Callback = getByID(id)
-        if not callback.Success: return callback
-        callback.Data.FilePath = filePath
-        if chatbotSession:
-            callback.Data.ChatbotSession = chatbotSession
-        db.session.commit()
 
-        return Callback(True, "StoredFile has been updated")
-    except Exception as exc:
-        print("stored_file_services.updateStoredFile() ERROR: ", exc)
-        logging.error("stored_file_services.updateStoredFile(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, "StoredFile cold not be updated")
-    
 
 def removeByID(id):
-
     try:
         db.session.query(StoredFile).filter(StoredFile.ID == id).first().delete()
         db.session.commit()
@@ -92,3 +79,47 @@ def removeByID(id):
         logging.error("stored_file_services.removeByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, "StoredFile cold not be deleted")
+
+def uploadFile(file, filename):
+
+    try:
+        session = boto3.session.Session()
+        s3 = session.client('s3',
+                            region_name='sfo2',
+                            endpoint_url='https://sfo2.digitaloceanspaces.com',
+                            aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
+                            aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
+
+        s3.upload_fileobj(file, 'tsb', os.environ['UPLOAD_FOLDER'] + filename)
+        return Callback(True, "File uploaded successfully")
+
+    except Exception as exc:
+        print("stored_file_services.uploadFile() ERROR: ", exc)
+        logging.error("stored_file_services.uploadFile(): " + str(exc))
+        return Callback(False, "Couldn't upload file")
+
+
+def downloadFile(filename):
+    try:
+        session = boto3.session.Session()
+        s3 = session.resource('s3',
+                                region_name='sfo2',
+                                endpoint_url='https://sfo2.digitaloceanspaces.com',
+                                aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
+                                aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
+        file = s3.Object('tsb', os.environ['UPLOAD_FOLDER'] + filename)
+
+        # Check if file exists
+        try:
+            file.load()
+        except botocore.exceptions.ClientError as e:
+            return Callback(False, "File not found")
+
+
+        return Callback(True, "File downloaded successfully", file)
+
+
+    except Exception as exc:
+        print("stored_file_services.downloadFile() ERROR: ", exc)
+        logging.error("stored_file_services.uploadFile(): " + str(exc))
+        return Callback(False, "Couldn't upload file")

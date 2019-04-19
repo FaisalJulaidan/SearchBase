@@ -158,11 +158,11 @@ def getCandidate(candidateID):
 
 def getJob(jobID):
     try:
-        candidate = db.session.query(Job) \
+        job = db.session.query(Job) \
             .filter(Job.ID == jobID).first()
-        if not candidate: raise Exception
+        if not job: raise Exception
 
-        return Callback(True, "Job retrieved successfully.", candidate)
+        return Callback(True, "Job retrieved successfully.", job)
 
     except Exception as exc:
         print("databases_services.getJob() Error: ", exc)

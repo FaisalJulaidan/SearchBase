@@ -12,6 +12,7 @@ from flask_apscheduler import APScheduler
 from services.auth_services import jwt
 from utilities import helpers, tasks
 from flask_babel import Babel
+from services import stored_file_services
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router,\
@@ -155,7 +156,7 @@ elif os.environ['FLASK_ENV'] == 'development':
         db.create_all()
         helpers.gen_dummy_data()
 
-    scheduler.start()
+    # scheduler.start()
     print('Development mode running...')
 
 

@@ -116,26 +116,6 @@ def getByID(sessionID, assistantID):
 
 
 # ----- Filters ----- #
-def filterForContainEmails(records):
-    try:
-        result = []
-        for record in records:
-            record = record.Data["collectedInformation"]
-            for question in record:
-                if "@" in question["input"]:
-                    result.append({"record": record, "email": question["input"]})
-                    break
-
-        return Callback(True, "Data has been filtered.", result)
-
-    except Exception as exc:
-
-        print("userInput_services.filterForContainEmails ERROR: ", exc)
-        logging.error("chatbotSession_services.filterForContainEmails(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Could not filter the data.')
-
-
 def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
     try:
         result = db.session.query(ChatbotSession).filter(
@@ -166,8 +146,6 @@ def deleteByID(id):
         logging.error("chatbotSession_services.deleteByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Record could not be removed.')
-    # finally:
-    # db.session.close()
 
 
 def deleteAll(assistantID):
@@ -180,5 +158,3 @@ def deleteAll(assistantID):
         logging.error("chatbotSession_services.deleteAll(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Records could not be removed.')
-    # finally:
-    # db.session.close()

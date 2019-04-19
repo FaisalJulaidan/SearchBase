@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Button, Modal, Tabs, Row, Col, Icon, Typography} from "antd";
-import {http, alertError} from "helpers";
+import {http, alertError, loadingMessage, errorMessage, successMessage} from "helpers";
 import saveAs from 'file-saver';
 import Profile from '../Profile/Profile'
 import Conversation from '../Conversation/Conversation'
@@ -13,6 +13,10 @@ const TabPane = Tabs.TabPane;
 
 
 class ViewsModal extends Component {
+
+    state = {
+        isDownloadingFile: false
+    };
 
     constructor(props) {
         super(props);
@@ -41,23 +45,28 @@ class ViewsModal extends Component {
     downloadFileHandler = (filenameIndex) => {
         // Get file name by index
         let fileName = this.props.session.FilePath.split(',')[filenameIndex];
-        console.log(this.props.session.FilePath.split(','))
-        console.log(filenameIndex)
+
+
         if (!fileName){
-            alertError("File Error", "Sorry, but file doesn't exist!");
+            errorMessage("File doesn't exist!");
             return;
         }
 
+        loadingMessage("Downloading file...", 0);
+        this.setState({isDownloadingFile: true});
         http({
             url: `/assistant/${this.props.assistant.ID}/chatbotSessions/${fileName}`,
             method: 'GET',
             responseType: 'blob', // important
         }).then((response) => {
             saveAs(new Blob([response.data]), fileName);
+            successMessage("File downloaded successfully!");
+            this.setState({isDownloadingFile: false});
         }).catch(error => {
-            alertError("File Error", "Sorry, cannot download this file!")
+            errorMessage("File is corrupted!");
+            this.setState({isDownloadingFile: false});
         });
-        return;
+
     };
 
 
@@ -101,12 +110,14 @@ class ViewsModal extends Component {
 
                     <TabPane tab={"Conversation"} key={"1"}>
                         <Conversation session={session}
-                                      downloadFile={this.downloadFileHandler}/>
+                                      downloadFile={this.downloadFileHandler}
+                                      isDownloadingFile={this.state.isDownloadingFile}/>
                     </TabPane>
 
                     <TabPane tab={`Profile (${userType})`} key={"2"}>
                         <Profile session={session} downloadFile={this.downloadFileHandler}
-                                 dataTypes={flowOptions?.dataTypes}/>
+                                 dataTypes={flowOptions?.dataTypes}
+                                 isDownloadingFile={this.state.isDownloadingFile}/>
                     </TabPane>
 
                     <TabPane tab={"Selected Solutions (Candidates, Jobs)"} key={"3"}>

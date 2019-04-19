@@ -6,10 +6,8 @@ class Conversation extends Component {
 
     counter = -1; // this is important for specifying what is the file name's index
 
-    componentWillReceiveProps(nextProps, nextContext) {
-        if(nextProps.session !== this.props.session){
-            this.counter = -1;
-        }
+    componentWillUpdate(nextProps, nextState, nextContext) {
+        this.counter = -1;
     }
 
     columns = [{
@@ -23,8 +21,10 @@ class Conversation extends Component {
 
             if (record.input === '&FILE_UPLOAD&') {
                 this.counter+=1;
-                return (<Button hreftype="primary" file-path-index={this.counter} icon="download" size="small"
-                                onClick={(e) => {this.props.downloadFile(e.target.getAttribute('file-path-index'))}}>
+                return (<Button
+                    disabled={this.props.isDownloadingFile}
+                    hreftype="primary" file-path-index={this.counter} icon="download" size="small"
+                    onClick={(e) => {this.props.downloadFile(e.target.getAttribute('file-path-index'))}}>
                     Download File
                 </Button>);
             }

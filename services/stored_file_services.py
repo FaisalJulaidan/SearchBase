@@ -85,8 +85,8 @@ def uploadFile(file, filename):
     try:
         session = boto3.session.Session()
         s3 = session.client('s3',
-                            region_name='sfo2',
-                            endpoint_url='https://sfo2.digitaloceanspaces.com',
+                            region_name='ams3',
+                            endpoint_url='https://ams3.digitaloceanspaces.com',
                             aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
                             aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
 
@@ -103,8 +103,8 @@ def downloadFile(filename):
     try:
         session = boto3.session.Session()
         s3 = session.resource('s3',
-                                region_name='sfo2',
-                                endpoint_url='https://sfo2.digitaloceanspaces.com',
+                                region_name='ams3',
+                                endpoint_url='https://ams3.digitaloceanspaces.com',
                                 aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
                                 aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
         file = s3.Object('tsb', os.environ['UPLOAD_FOLDER'] + filename)

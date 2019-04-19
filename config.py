@@ -40,7 +40,7 @@ def set_encrypt_key():
 
 class BaseConfig(object):
 
-    ALLOWED_EXTENSIONS = {'png', 'jpg','json', 'xls','txt', 'pdf', 'doc', 'docx'}
+    ALLOWED_EXTENSIONS = {'png', 'jpg','json', 'xml', 'xls','txt', 'pdf', 'doc', 'docx'}
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))

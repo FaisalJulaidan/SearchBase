@@ -1,14 +1,13 @@
 import os
 
-from flask import Blueprint, render_template, request, send_from_directory, redirect, send_file
+from flask import Blueprint, render_template, request, send_from_directory, redirect
 from flask_cors import CORS
 from flask_mail import Message
 
 from models import Callback
-from services import user_services, mail_services, stored_file_services
+from services import user_services, mail_services
 from services.mail_services import mail
 from utilities import helpers
-import io
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates", static_folder='static')
 CORS(public_router)
@@ -138,13 +137,6 @@ def privacy():
     if request.method == "GET":
         return render_template("privacy-policy.html")
 
-
-# Affiliate page route
-@public_router.route("/affiliate", methods=['GET'])
-def affiliate():
-    if request.method == "GET":
-        abort(status.HTTP_501_NOT_IMPLEMENTED, "Affiliate program coming soon")
-        # return render_template("affiliate.html")
 
 
 @public_router.route("/send/mail", methods=['GET', 'POST'])

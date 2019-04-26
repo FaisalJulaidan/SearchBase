@@ -9,6 +9,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../../templates")
 
 
+
 @crm_router.route("/assistant/<int:assistantID>/crm/connect", methods=['POST', 'DELETE'])
 @jwt_required
 def connect_crm(assistantID):
@@ -16,7 +17,7 @@ def connect_crm(assistantID):
     user = get_jwt_identity()['user']
     security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
     if not security_callback.Success:
-        return helpers.jsonResponse(False, security_callback.Data, security_callback.Message, None)
+        return helpers.jsonResponse(False, 404, security_callback.Message)
     assistant: Assistant = security_callback.Data
 
     # Connect to crm

@@ -21,7 +21,7 @@ def chatbotSession(assistantID):
     # For all type of requests methods, get the assistant
     security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
     if not security_callback.Success:
-        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+        return helpers.jsonResponse(False, 404, "Assistant not found.")
     assistant: Assistant = security_callback.Data
 
     #############
@@ -58,7 +58,7 @@ def chatbotSession_file_uploads(assistantID, filename):
     # For all type of requests methods, get the assistant
     security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
     if not security_callback.Success:
-        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+        return helpers.jsonResponse(False, 404, "Assistant not found.")
     assistant: Assistant = security_callback.Data
 
     # Security procedure ->
@@ -67,12 +67,12 @@ def chatbotSession_file_uploads(assistantID, filename):
         id = helpers.decrypt_id(filename[filename.index('_')+1:filename.index('.')])[0]
         if not id: raise Exception
     except Exception as exc:
-        return helpers.jsonResponse(False, 404, "File not found.", None)
+        return helpers.jsonResponse(False, 404, "File not found.")
 
     # Get associated chatbotSession with this file
     cs_callback: Callback = chatbotSession_services.getByID(id, assistantID)
     if not cs_callback.Success:
-        return helpers.jsonResponse(False, 404, "File not found.", None)
+        return helpers.jsonResponse(False, 404, "File not found.")
     session: ChatbotSession = cs_callback.Data
 
     # Check if this user has access to user input session
@@ -83,7 +83,7 @@ def chatbotSession_file_uploads(assistantID, filename):
     if request.method == "GET":
         callback: Callback = stored_file_services.downloadFile(filename)
         if not callback.Success:
-            return helpers.jsonResponse(False, 404, "File not found.", None)
+            return helpers.jsonResponse(False, 404, "File not found.")
 
         file = callback.Data
         return send_file(
@@ -101,7 +101,7 @@ def chatbotSession_delete_record(assistantID, sessionID):
     # check if the assistant that has the session is owned by this company (user)
     security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
     if not security_callback.Success:
-        return helpers.jsonResponse(False, 404, "Assistant not found.", None)
+        return helpers.jsonResponse(False, 404, "Assistant not found.")
 
     if request.method == "DELETE":
         callback : Callback = chatbotSession_services.deleteByID(sessionID)

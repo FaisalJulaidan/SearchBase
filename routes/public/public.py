@@ -138,13 +138,6 @@ def privacy():
         return render_template("privacy-policy.html")
 
 
-# Affiliate page route
-@public_router.route("/affiliate", methods=['GET'])
-def affiliate():
-    if request.method == "GET":
-        abort(status.HTTP_501_NOT_IMPLEMENTED, "Affiliate program coming soon")
-        # return render_template("affiliate.html")
-
 
 @public_router.route("/send/mail", methods=['GET', 'POST'])
 def sendEmail():

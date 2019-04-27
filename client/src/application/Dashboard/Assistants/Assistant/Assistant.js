@@ -53,8 +53,13 @@ class Assistant extends Component {
 
                     <Row type={'flex'} justify={'center'} gutter={8}>
                         <Col span={8}>
-                            {/*1*/}
-                            <Button block icon={'setting'} onClick={this.showSettingsModal}>Settings</Button>
+                            {/*4*/}
+                            <Link to={{
+                                pathname: `assistants/${assistant.ID}/sessions`,
+                                state: {assistant: assistant}
+                            }}>
+                                <Button block icon={'code'}>Conversations</Button>
+                            </Link>
                         </Col>
 
                         <Col span={8}>
@@ -79,13 +84,8 @@ class Assistant extends Component {
 
                     <Row type={'flex'} justify={'center'} gutter={8}>
                         <Col span={8}>
-                            {/*4*/}
-                            <Link to={{
-                                pathname: `assistants/${assistant.ID}/sessions`,
-                                state: {assistant: assistant}
-                            }}>
-                                <Button block icon={'code'}>Conversations</Button>
-                            </Link>
+                            {/*1*/}
+                            <Button block icon={'setting'} onClick={this.showSettingsModal}>Settings</Button>
                         </Col>
 
                         <Col span={8}>

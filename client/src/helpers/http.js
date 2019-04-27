@@ -51,14 +51,17 @@ http.interceptors.response.use(
                 error.config.headers.Authorization = 'Bearer ' + res.data.data.token;
                 return axios.request(error.config)
                     .then(res => res)
-                    .catch(error => Promise.reject({isRetry: true}));
+                    .catch(error => Promise.reject({...error, isRetry: true}));
             }).catch(error => {
+                // error: error from token refresher || error from retry request
+
                 // I need to logout if there is an error with token refresher ONLY
                 if (!error.isRetry) {
+                    // we will catch the token refresher errors
                     console.log('Axios Unauthorised', error);
-                    return store.dispatch(authActions.logout());
+                    store.dispatch(authActions.logout());
                 }
-                return Promise.reject('Error not from refresh');
+                return Promise.reject(error);
             });
         } else
             return Promise.reject(error);

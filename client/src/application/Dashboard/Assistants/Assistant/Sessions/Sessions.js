@@ -16,7 +16,8 @@ class Sessions extends React.Component {
         filteredInfo: null,
         sortedInfo: null,
         selectedSession: null,
-        viewModal: false
+        viewModal: false,
+        destroyModal: false
     };
 
 
@@ -41,7 +42,11 @@ class Sessions extends React.Component {
 
 
     closeViewModal = () => {
-        this.setState({viewModal: false, selectedSession: null})
+        this.setState({viewModal: false, selectedSession: null}, () => {
+            setTimeout(function () { //Start the timer
+                this.setState({destroyModal: false}) //After 0.5 second, set render to true
+            }.bind(this), 170)
+        })
     };
 
 
@@ -59,7 +64,7 @@ class Sessions extends React.Component {
 
     deleteSession = (deletedSession) => {
         const ID = deletedSession?.ID;
-        const AssistantID = deletedSession.AssistantID;
+        const AssistantID = deletedSession?.AssistantID;
 
 
         if (ID && AssistantID)
@@ -77,61 +82,18 @@ class Sessions extends React.Component {
     };
 
 
-    // Nested table that has all the answered questions per session (Not being used)
-    expandedRowRender = (record, index, indent, expanded) => {
-        const columns = [
-            {
-                title: 'Question',
-                key: 'questionText',
-                render: (text, record, index) => (<p>{record.questionText}</p>),
-            },
-            {
-                title: 'Input',
-                key: 'input',
-                render: (text, record, index) => {
-
-                    if (record.input === '&FILE_UPLOAD&') {
-                        this.filesCounter+=1;
-                        return (<Button hreftype="primary" data-index={this.filesCounter} icon="download" size="small"
-                                        onClick={(e) => {this.downloadFile(e)}}>
-                            Download File
-                        </Button>);
-                    }
-
-                    else {
-                        return (<p>
-                            {record.input}
-                        </p>);
-                    }
-                },
-            }
-        ];
-
-
-        return (
-            <Table
-                columns={columns}
-                dataSource={record.Data.collectedData}
-                pagination={false}
-                scroll={{ y: 500 }}
-            />
-        );
-    };
-
     getNextSession = currentSession => {
-        const sessions = [...this.props.sessions?.sessionsList];
-        if (sessions) {
-            const index = sessions.findIndex(session => session.ID === currentSession.ID);
-            this.setState({selectedSession: sessions[index + 1] ? sessions[index + 1] : sessions[index]})
-        }
+        const {sessionsList} = this.props.sessions;
+        const index = sessionsList?.findIndex(session => session?.ID === currentSession?.ID);
+        if (index > -1)
+            this.setState({selectedSession: sessionsList[index + 1] ? sessionsList[index + 1] : sessionsList[index]})
     };
 
     getBackSession = currentSession => {
-        const sessions = [...this.props.sessions?.sessionsList];
-        if (sessions) {
-            const index = sessions.findIndex(session => session.ID === currentSession.ID);
-            this.setState({selectedSession: sessions[index - 1] ? sessions[index - 1] : sessions[index]})
-        }
+        const {sessionsList} = this.props.sessions;
+        const index = sessionsList?.findIndex(session => session?.ID === currentSession?.ID);
+        if (index > -1)
+            this.setState({selectedSession: sessionsList[index - 1] ? sessionsList[index - 1] : sessionsList[index]})
     };
 
 
@@ -205,7 +167,9 @@ class Sessions extends React.Component {
             key: 'action',
             render: (text, record, index) => (
                 <span>
-              <a onClick={()=> {this.setState({viewModal: true, selectedSession: record})}}>
+              <a onClick={() => {
+                  this.setState({viewModal: true, selectedSession: record, destroyModal: true})
+              }}>
                   View
               </a>
                     <Divider type="vertical" />
@@ -217,6 +181,7 @@ class Sessions extends React.Component {
             </span>
             ),
         }];
+
 
         return (
             <div style={{height: '100%'}}>
@@ -236,6 +201,7 @@ class Sessions extends React.Component {
 
 
                             <Button className={styles.Panel_Header_Button} type="primary" icon="delete"
+                                    disabled={!!(!sessions?.sessionsList?.length)}
                                     onClick={() => {
                                         this.clearAllChatbotSessions(assistant.ID)
                                     }} loading={this.props.isClearingAll}>
@@ -245,24 +211,24 @@ class Sessions extends React.Component {
                     </div>
 
                     <div className={styles.Panel_Body}>
-
                         <Table columns={columns}
-                               dataSource={sessions.sessionsList ? sessions.sessionsList : null}
+                               dataSource={sessions.sessionsList}
                                onChange={this.handleFilter}
                                loading={this.props.isLoading}
                                size='middle'
                         />
 
-                        <ViewsModal visible={this.state.viewModal}
-                                    closeViewModal={this.closeViewModal}
-                                    filesPath={sessions.filesPath}
-                                    flowOptions={options?.flow}
-                                    session={this.state.selectedSession}
-                                    assistant={assistant}
-                                    getNextSession={this.getNextSession}
-                                    getBackSession={this.getBackSession}
-                                    deleteSession={this.deleteSession}
-                        />
+                        {
+                            this.state.destroyModal && <ViewsModal visible={this.state.viewModal}
+                                                                   closeViewModal={this.closeViewModal}
+                                                                   filesPath={sessions.filesPath}
+                                                                   flowOptions={options?.flow}
+                                                                   session={this.state.selectedSession}
+                                                                   assistant={assistant}
+                                                                   getNextSession={this.getNextSession}
+                                                                   getBackSession={this.getBackSession}
+                                                                   deleteSession={this.deleteSession}/>
+                        }
                     </div>
                 </div>
             </div>

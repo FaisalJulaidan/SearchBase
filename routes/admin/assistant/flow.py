@@ -16,7 +16,7 @@ def flow(assistantID):
     user = get_jwt_identity()['user']
     security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
     if not security_callback.Success:
-        return helpers.jsonResponse(False, security_callback.Data, security_callback.Message, None)
+        return helpers.jsonResponse(False, 404, security_callback.Message)
     assistant: Assistant = security_callback.Data
 
     # Update the blocks

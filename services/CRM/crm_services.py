@@ -94,3 +94,7 @@ def disconnect(assistant: Assistant) -> Callback:
         logging.error("CRM_services.connect(): " + str(exc))
         db.session.rollback()
         return Callback(False, str(exc))
+
+
+def getCRM (crmID, companyID):
+    pass

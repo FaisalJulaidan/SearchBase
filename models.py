@@ -63,6 +63,7 @@ class Company(db.Model):
     Assistants = db.relationship('Assistant', back_populates='Company', cascade="all, delete, delete-orphan")
     Databases = db.relationship('Database', back_populates='Company', cascade="all, delete, delete-orphan")
     Roles = db.relationship('Role', back_populates='Company', cascade="all, delete, delete-orphan")
+    CRM = db.relationship('CRM', back_populates='Company')
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)
@@ -151,14 +152,12 @@ class Assistant(db.Model):
     MailPeriod = db.Column(db.Integer, nullable=False, default=12)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
 
-    CRM = db.Column(Enum(enums.CRM), nullable=True)
-    CRMAuth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
-    CRMConnected = db.Column(db.Boolean, nullable=False, default=False)
-
-
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )
     Company = db.relationship('Company', back_populates='Assistants')
+
+    CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='cascade'))
+    CRM = db.relationship('CRM', back_populates='Assistants')
 
     # NotificationsRegister = db.relationship('NotificationsRegister', back_populates='Assistant')
     Statistics = db.relationship('Statistics', back_populates='Assistant')
@@ -170,6 +169,21 @@ class Assistant(db.Model):
 
     def __repr__(self):
         return '<Assistant {}>'.format(self.Name)
+
+
+class CRM(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Type = db.Column(Enum(enums.CRM), nullable=True)
+    Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
+
+    # Relationships:
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )
+    Company = db.relationship('Company', back_populates='CRM')
+
+    Assistants = db.relationship('Assistant', back_populates='CRM')
+
+    def __repr__(self):
+        return '<CRM {}>'.format(self.CRM)
 
 
 class Statistics(db.Model):

@@ -1,5 +1,7 @@
 from models import db, Assistant, Callback
 from sqlalchemy import and_
+
+from services.CRM import crm_services
 from utilities import helpers
 from os.path import join
 import json
@@ -171,33 +173,34 @@ def removeByID(id) -> Callback:
         return Callback(False, 'Error in deleting assistant.')
 
 
+def connect_to_crm(assistant: Assistant, crm_id):
+    try:
+
+        crm_callback: Callback = crm_services.get_crm_by_company_id(crm_id, assistant.CompanyID)
+        if not crm_callback.Success:
+            raise Exception(crm_callback.Message)
+
+        assistant.CRM = crm_callback.Data
+
+        db.session.commit()
+        return Callback(True, 'Assistant has been connected to CRM.')
+
+    except Exception as exc:
+        print("assistant_services.connect_to_crm(): ", exc)
+        logging.error("assistant_services.connect_to_crm(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in connecting assistant to CRM.')
 
 
-# def getNotificationsRegisterByID(id):
-#     try:
-#         # Get result and check if None then raise exception
-#         result = db.session.query(NotificationsRegister).filter(NotificationsRegister.AssistantID == id).all()
-#         if not result: raise Exception
-#
-#         return Callback(True,
-#                         "Got NotificationsRegister by assistant ID successfully.",
-#                         result)
-#     except Exception as exc:
-#         print(exc)
-#         db.session.rollback()
-#         return Callback(False, 'Could not get the NotificationsRegister by assistant ID.')
-#
-#
-# def getAllNotificationsRegisters():
-#     try:
-#         # Get result and check if None then raise exception
-#         result = db.session.query(NotificationsRegister).all()
-#         if not result: raise Exception
-#
-#         return Callback(True,
-#                         "Got NotificationsRegisters successfully.",
-#                         result)
-#     except Exception as exc:
-#         print(exc)
-#         db.session.rollback()
-#         return Callback(False, 'Could not get the NotificationsRegisters.')
+def disconnect_from_crm(assistant: Assistant):
+    try:
+        assistant.CRM = None
+
+        db.session.commit()
+        return Callback(True, 'Assistant has been disconnected from CRM.')
+
+    except Exception as exc:
+        print("assistant_services.disconnect_from_crm(): ", exc)
+        logging.error("assistant_services.disconnect_from_crm(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in disconnecting assistant from CRM.')

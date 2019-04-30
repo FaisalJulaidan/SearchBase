@@ -25,6 +25,7 @@ import {TransitionGroup, CSSTransition} from "react-transition-group";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import CRM from "./Assistants/Assistant/CRM/CRM";
+import Integrations from "./Integrations/Integrations";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -33,8 +34,7 @@ const {Header, Content, Footer, Sider} = Layout;
 
 class Dashboard extends Component {
     state = {
-        collapsed: false,
-        marginLeft: 200,
+        collapsed: true,
     };
 
     componentWillMount() {
@@ -147,6 +147,11 @@ class Dashboard extends Component {
                             <span>Databases</span>
                         </Menu.Item>
 
+                        <Menu.Item key="integrations">
+                            <Icon type="interation"/>
+                            <span>Integrations</span>
+                        </Menu.Item>
+
                         <Divider/>
 
                         <SubMenu key="sub2" title={<span><Icon type="user"/><span>Account Details</span></span>}>
@@ -171,7 +176,7 @@ class Dashboard extends Component {
                     </Menu>
                 </Sider>
 
-                <Layout style={{marginLeft: this.state.marginLeft, height: '100%'}}>
+                <Layout style={{marginLeft: this.state.collapsed ? 81 : 200, height: '100%'}}>
 
                     <Header className={styles.Header}>
                         <Icon
@@ -200,6 +205,7 @@ class Dashboard extends Component {
                                         <Route path={`${match.path}/assistants/:id/CRMIntegration`}
                                                component={CRM}/>
                                         <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+                                        <Route path={`${match.path}/integrations`} component={Integrations} exact/>
                                         <Route path={`${match.path}/databases`} component={Databases} exact/>
                                         <Route path={`${match.path}/profile`} component={Profile} exact/>
                                         <Route path={`${match.path}/billing`} component={Billing} exact/>

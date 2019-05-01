@@ -38,7 +38,6 @@ def connect(company_id, details) -> Callback:
     try:
         crm_type: CRM = CRM[details['type']]
         crm_auth = details['auth']
-
         # test connection
         test_callback: Callback = testConnection(details)
         if not test_callback.Success:
@@ -52,9 +51,9 @@ def connect(company_id, details) -> Callback:
 
     except Exception as exc:
         print(exc)
-        logging.error("CRM_services.connect(): " + test_callback.Message)
+        logging.error("CRM_services.connect(): " + str(exc))
         db.session.rollback()
-        return Callback(False, test_callback.Message)
+        return Callback(False, str(exc))
 
 
 # Update CRM Details
@@ -111,7 +110,7 @@ def disconnect(crm_id, company_id) -> Callback:
         if not crm_callback:
             raise Exception(crm_callback.Message)
 
-        crm_callback.Data.delete()
+        db.session.delete(crm_callback.Data)
         db.session.commit()
         return Callback(True, 'CRM has been disconnected successfully')
 

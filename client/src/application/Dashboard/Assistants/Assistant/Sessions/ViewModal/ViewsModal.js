@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Button, Modal, Tabs, Row, Col, Icon, Typography} from "antd";
-import {http, alertError} from "helpers";
+import {http, alertError, loadingMessage, errorMessage, successMessage} from "helpers";
 import saveAs from 'file-saver';
 import Profile from '../Profile/Profile'
 import Conversation from '../Conversation/Conversation'
@@ -14,17 +14,22 @@ const TabPane = Tabs.TabPane;
 
 class ViewsModal extends Component {
 
+    state = {
+        isDownloadingFile: false
+    };
+
     constructor(props) {
         super(props);
         this.handleKeyPress = this.handleKeyPress.bind(this);
     }
 
-    state = {
-        fileNames: []
-    };
-
     componentDidMount() {
         document.addEventListener('keydown', this.handleKeyPress);
+    }
+
+    componentWillUnmount() {
+        // you need to unbind the same listener that was binded.
+        document.removeEventListener('keydown', this.handleKeyPress, false);
     }
 
     handleKeyPress = (e) => {
@@ -37,30 +42,31 @@ class ViewsModal extends Component {
             this.props.deleteSession(this.props.session)
     };
 
-    componentWillReceiveProps(nextProps, nextContext) {
-        if(nextProps.session && nextProps.session.FilePath){
-            this.setState({fileNames: nextProps.session.FilePath.split(',')})
-        }
-    }
-
     downloadFileHandler = (filenameIndex) => {
-        console.log(filenameIndex);
-        // Get file name by index. indexes stored in each button corresponds to filenames stored in the state
-        const fileName = this.state.fileNames[filenameIndex];
+        // Get file name by index
+        let fileName = this.props.session.FilePath.split(',')[filenameIndex];
+
+
         if (!fileName){
-            alertError("File Error", "Sorry, but file doesn't exist!");
+            errorMessage("File doesn't exist!");
             return;
         }
 
+        loadingMessage("Downloading file...", 0);
+        this.setState({isDownloadingFile: true});
         http({
             url: `/assistant/${this.props.assistant.ID}/chatbotSessions/${fileName}`,
             method: 'GET',
             responseType: 'blob', // important
         }).then((response) => {
             saveAs(new Blob([response.data]), fileName);
+            successMessage("File downloaded successfully!");
+            this.setState({isDownloadingFile: false});
         }).catch(error => {
-            alertError("File Error", "Sorry, cannot download this file!")
+            errorMessage("File is corrupted!");
+            this.setState({isDownloadingFile: false});
         });
+
     };
 
 
@@ -77,9 +83,9 @@ class ViewsModal extends Component {
                 onCancel={this.props.closeViewModal}
                 onOk={this.props.closeViewModal}
                 footer={[
-                    <Button key="Cancel" onClick={this.props.closeViewModal}>OK</Button>,
                     <Button key="Delete" onClick={() => this.props.deleteSession(session)}
-                            type={'danger'}>Delete</Button>
+                            type={'danger'}>Delete</Button>,
+                    <Button key="Cancel" onClick={this.props.closeViewModal}>OK</Button>,
                 ]}>
 
                 <Row type={'flex'} justify={'center'}>
@@ -104,12 +110,14 @@ class ViewsModal extends Component {
 
                     <TabPane tab={"Conversation"} key={"1"}>
                         <Conversation session={session}
-                                      downloadFile={this.downloadFileHandler}/>
+                                      downloadFile={this.downloadFileHandler}
+                                      isDownloadingFile={this.state.isDownloadingFile}/>
                     </TabPane>
 
                     <TabPane tab={`Profile (${userType})`} key={"2"}>
                         <Profile session={session} downloadFile={this.downloadFileHandler}
-                                 dataTypes={flowOptions?.dataTypes}/>
+                                 dataTypes={flowOptions?.dataTypes}
+                                 isDownloadingFile={this.state.isDownloadingFile}/>
                     </TabPane>
 
                     <TabPane tab={"Selected Solutions (Candidates, Jobs)"} key={"3"}>

@@ -71,6 +71,9 @@ pandas = "*"
 flask-babel = "*"
 babel = "*"
 self = "*"
+boto3 = "*"
+pygeoip2 = "*"
+geoip2 = "*"
 
 [requires]
 python_version = "3.7"

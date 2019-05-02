@@ -64,18 +64,6 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
                 )}
             </FormItem>
 
-            <FormItem label="Timezone"
-                      {...layout}>
-                {getFieldDecorator('timezone', {
-                    rules: [{
-                        required: true,
-                        message: "Timezone is required field",
-                    }],
-                })(
-                    <Input placeholder={"Time zone identifier (e.g. GMT)"}/>
-                )}
-            </FormItem>
-
             <FormItem label="Locale" {...layout}>
                 {getFieldDecorator('locale', {
                     rules: [{
@@ -87,6 +75,17 @@ const AdaptFormItems = ({FormItem, layout, getFieldDecorator}) => {
                 )}
             </FormItem>
 
+            <FormItem label="Timezone"
+                      {...layout}>
+                {getFieldDecorator('timezone', {
+                    rules: [{
+                        required: true,
+                        message: "Timezone is required field",
+                    }],
+                })(
+                    <Input placeholder={"Time zone identifier (e.g. GMT)"}/>
+                )}
+            </FormItem>
 
             <FormItem label="Date Format"
                       {...layout}>

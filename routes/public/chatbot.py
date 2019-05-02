@@ -1,15 +1,12 @@
-import os
 import uuid
-
 from flask import Blueprint, request, send_from_directory
 from flask import render_template
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
-
-from config import BaseConfig
 from models import Callback, db, ChatbotSession
 from services import chatbotSession_services, flow_services, databases_services, stored_file_services, mail_services
 from utilities import helpers
+import logging
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
@@ -92,22 +89,26 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                 # Generate unique name: hash_sessionIDEncrypted.extension
                 filename = str(uuid.uuid4()) + '_' + helpers.encrypt_id(sessionID) + '.' + \
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
-                # Save file in the server
-                file.save(os.path.join(BaseConfig.USER_FILES, filename))
 
-                # if there is multiple files, split there name by commas
-                if filenames == '':
-                    filenames = filename
-                else:
-                    filenames+= ',' + filename
+                # Upload file to DigitalOcean Space
+                upload_callback : Callback = stored_file_services.uploadFile(file, filename)
 
-            # Store filePaths in the DB
-            saveFile_callback: Callback = stored_file_services.create(filenames, session)
-            if not saveFile_callback.Success:
-                raise Exception(saveFile_callback.Message)
+                if not upload_callback.Success:
+                    filename = 'fileCorrupted'
+
+                # if there is multiple files, split there name by commas to store a ref of the uploaded files in DB
+                if filenames == '': filenames = filename
+                else: filenames+= ',' + filename
+
+            # Store filePaths in the DB as reference
+            dbRef_callback : Callback = stored_file_services.createRef(filenames, session)
+            if not dbRef_callback.Success:
+                logging.error("Couldn't Save Stored Files Reference For: " + str(filenames))
+                raise Exception(dbRef_callback.Message)
 
         except Exception as exc:
             print(exc)
+
             return helpers.jsonResponse(False, 404, "Couldn't save the file")
         # Save changes
         db.session.commit()

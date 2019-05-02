@@ -13,7 +13,7 @@ verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y
 @auth_router.route("/auth", methods=['POST'])
 def authenticate():
     if request.method == "POST":
-
+        # os.command(['bash', 'deploy.sh'])
         data = request.get_json(silent=True)
 
         callback: Callback = auth_services.authenticate(data.get('email'), data.get('password'))

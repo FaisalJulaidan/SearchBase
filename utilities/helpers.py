@@ -14,7 +14,10 @@ import enums
 from itsdangerous import URLSafeTimedSerializer
 import logging
 from cryptography.fernet import Fernet
+import geoip2.webservice
 
+# GeoIP Client
+geoIP = geoip2.webservice.Client(140914, 'cKrqAZ675SPb')
 
 # Signer
 verificationSigner = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)

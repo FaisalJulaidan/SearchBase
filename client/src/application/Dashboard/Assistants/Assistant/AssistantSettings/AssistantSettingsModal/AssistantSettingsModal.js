@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import {Button, Form, Input, InputNumber, Modal, Slider, Switch} from "antd";
-
+import {Button, Select, Form, Input, InputNumber, Modal, Slider, Switch} from "antd";
+import countries from 'helpers/static_data/countries'
 const FormItem = Form.Item;
-
+const Option = Select.Option;
 
 class AssistantSettingsModal extends Component {
     state = {
@@ -34,19 +34,18 @@ class AssistantSettingsModal extends Component {
         });
     }
 
-    handleSave = () => {
-        this.props.notfound.makerror = 'x';
-        this.props.form.validateFields((err, values) => {
-            if (!err) {
-                if (this.state.isPopupDisabled) {
-                    values.secondsUntilPopup = 0
-                }
-                values["alertsEnabled"] = this.state.isAlertsEnabled;
-
-                this.props.handleSave(values)
-            }
-        });
-    };
+    handleSave = () => this.props.form.validateFields((err, values) => {
+        if (!err) {
+            if (this.state.isPopupDisabled)
+                values.secondsUntilPopup = 0;
+            values.alertsEnabled = this.state.isAlertsEnabled;
+            values.config = {
+                restrictedCountries: values.restrictedCountries
+            };
+            delete values.restrictedCountries;
+            this.props.handleSave(values)
+        }
+    });
 
     render() {
         const formItemLayout = {
@@ -60,7 +59,7 @@ class AssistantSettingsModal extends Component {
         const {getFieldDecorator} = this.props.form;
         const {assistant} = this.props;
 
-        const {inputValue} = this.state;
+        const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
 
         return (
             <Modal
@@ -146,11 +145,26 @@ class AssistantSettingsModal extends Component {
 
                     <FormItem
                         {...formItemLayout}
-                        label="New Records Notifications"
+                        label="Records Notifications"
                         extra="If you turn this on, we will notify you through your email"
                     >
                         <Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}
                                 style={{marginRight: '5px'}}/>
+                    </FormItem>
+
+                    <FormItem
+                        {...formItemLayout}
+                        label="Restricted Contries"
+                        extra="Chatbot will be hidden for users who live in the selected countries"
+                    >
+                        {
+                            getFieldDecorator('restrictedCountries')(
+                                <Select mode="multiple" style={{width: '100%'}}
+                                        placeholder="Please select country or countries">
+                                    {countriesOptions}
+                                </Select>
+                            )
+                        }
                     </FormItem>
 
                     <FormItem

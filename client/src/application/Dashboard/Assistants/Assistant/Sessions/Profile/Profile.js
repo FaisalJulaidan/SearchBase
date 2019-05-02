@@ -6,9 +6,12 @@ import {Button, Table, Empty} from "antd";
 class Profile extends Component {
 
     counter = -1;
-    state = {
-        fileNames: []
-    };
+
+    componentWillReceiveProps(nextProps, nextContext) {
+        if(nextProps.session !== this.props.session){
+            this.counter = -1;
+        }
+    }
 
     columns = [{
         title: 'Data Type',
@@ -21,8 +24,7 @@ class Profile extends Component {
         key: 'input',
         render: (text, dataType, index) => {
             let values = this.props.session.Data.keywordsByDataType[dataType.name];
-            console.log(dataType.name);
-            console.log(this.props.session.Data.keywordsByDataType);
+
             let inputs = [];
             if(values){
                 values.forEach(input => {

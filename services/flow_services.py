@@ -21,11 +21,16 @@ def getChatbot(assistantHashID) -> Callback:
             return Callback(False, "Assistant not found!")
         assistant = helpers.getDictFromSQLAlchemyObj(callback.Data)
 
+        if not assistant['Active']:
+            return Callback(True, '', {'isDisabled': True})
 
+        # Check for restricted countries
         ip = request.remote_addr
-        if ip != '127.0.0.1':
-            if helpers.geoIP.country(ip).iso_code in assistant['Config'].get('restrictedCountries', []):
-                return Callback(True, '', {'isDisabled': True})
+        if ip != '127.0.0.1' and assistant.get('Config'):
+            restrictedCountries = assistant['Config'].get('restrictedCountries', [])
+            if len(restrictedCountries):
+                if helpers.geoIP.country(ip).country.iso_code in restrictedCountries:
+                    return Callback(True, '', {'isDisabled': True})
 
         assistant['ID'] = assistantHashID  # Use the assistant hashID instead of the integer one
         del assistant['CompanyID']

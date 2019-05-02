@@ -142,7 +142,6 @@ class Assistant(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     Flow = db.Column(MagicJSON, nullable=True)
-    Route = db.Column(db.String(64), unique=True)
     Message = db.Column(db.String(500), nullable=False)
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
@@ -150,6 +149,7 @@ class Assistant(db.Model):
     MailEnabled = db.Column(db.Boolean, nullable=False, default=False)
     MailPeriod = db.Column(db.Integer, nullable=False, default=12)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
+    Config = db.Column(MagicJSON, nullable=True)
 
     CRM = db.Column(Enum(enums.CRM), nullable=True)
     CRMAuth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)

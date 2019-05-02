@@ -162,6 +162,7 @@ class AssistantSettingsModal extends Component {
                                 initialValue: assistant.Config?.restrictedCountries,
                             })(
                                 <Select mode="multiple" style={{width: '100%'}}
+                                        filterOption={(inputValue, option) => option.props.children.toLowerCase().includes(inputValue.toLowerCase())}
                                         placeholder="Please select country or countries">
                                     {countriesOptions}
                                 </Select>

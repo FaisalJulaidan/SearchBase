@@ -155,7 +155,7 @@ class AssistantSettingsModal extends Component {
                     <FormItem
                         {...formItemLayout}
                         label="Restricted Contries"
-                        extra="Chatbot will be hidden for users who live in the selected countries"
+                        extra="Chatbot will be disabled for users who live in the selected countries"
                     >
                         {
                             getFieldDecorator('restrictedCountries')(

@@ -158,7 +158,9 @@ class AssistantSettingsModal extends Component {
                         extra="Chatbot will be disabled for users who live in the selected countries"
                     >
                         {
-                            getFieldDecorator('restrictedCountries')(
+                            getFieldDecorator('restrictedCountries', {
+                                initialValue: assistant.Config?.restrictedCountries,
+                            })(
                                 <Select mode="multiple" style={{width: '100%'}}
                                         placeholder="Please select country or countries">
                                     {countriesOptions}

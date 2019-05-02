@@ -72,7 +72,6 @@ flask-babel = "*"
 babel = "*"
 self = "*"
 boto3 = "*"
-pygeoip2 = "*"
 geoip2 = "*"
 
 [requires]

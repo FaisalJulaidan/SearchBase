@@ -173,10 +173,10 @@ def removeByID(id) -> Callback:
         return Callback(False, 'Error in deleting assistant.')
 
 
-def connect_to_crm(assistant: Assistant, crm_id):
+def connectToCRM(assistant: Assistant, crm_id):
     try:
 
-        crm_callback: Callback = crm_services.get_crm_by_company_id(crm_id, assistant.CompanyID)
+        crm_callback: Callback = crm_services.getCRMByCompanyID(crm_id, assistant.CompanyID)
         if not crm_callback.Success:
             raise Exception(crm_callback.Message)
 
@@ -192,7 +192,7 @@ def connect_to_crm(assistant: Assistant, crm_id):
         return Callback(False, 'Error in connecting assistant to CRM.')
 
 
-def disconnect_from_crm(assistant: Assistant):
+def disconnectFromCRM(assistant: Assistant):
     try:
         assistant.CRM = None
 

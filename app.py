@@ -99,7 +99,7 @@ elif os.environ['FLASK_ENV'] == 'development':
     mail.init_app(app)
     scheduler.init_app(app)
 
-    url = os.environ['SQLALCHEMY_DATABASE_URI'] # get database URL
+    url = os.environ['SQLALCHEMY_DATABASE_URI']  # get database URL
     if os.environ['REFRESH_DB_IN_DEV'] == 'yes':
         print('Reinitialize the database...')
         db.drop_all()

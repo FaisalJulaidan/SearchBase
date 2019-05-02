@@ -63,7 +63,7 @@ class Company(db.Model):
     Assistants = db.relationship('Assistant', back_populates='Company', cascade="all, delete, delete-orphan")
     Databases = db.relationship('Database', back_populates='Company', cascade="all, delete, delete-orphan")
     Roles = db.relationship('Role', back_populates='Company', cascade="all, delete, delete-orphan")
-    CRM = db.relationship('CRM', back_populates='Company')
+    CRM = db.relationship('CRM', back_populates='Company', cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)
@@ -99,9 +99,6 @@ class User(db.Model):
     RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
     Role = db.relationship('Role', back_populates='Users')
 
-    # NotificationsRegister = db.relationship('NotificationsRegister', back_populates='User')
-
-
     # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
 
     def __repr__(self):
@@ -129,16 +126,6 @@ class Role(db.Model):
         return '<Role {}>'.format(self.Name)
 
 
-# class NotificationsRegister(db.Model):
-#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-#     AssistantID = db.Column(db.Integer, db.ForeignKey("assistant.ID", ondelete='cascade'), nullable=False)
-#     UserID = db.Column(db.Integer, db.ForeignKey("user.ID", ondelete='cascade'), nullable=False)
-#
-#     # Relationships:
-#     Assistant = db.relationship('Assistant', back_populates='NotificationsRegister')
-#     User = db.relationship('User', back_populates='NotificationsRegister')
-
-
 class Assistant(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
@@ -156,10 +143,9 @@ class Assistant(db.Model):
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )
     Company = db.relationship('Company', back_populates='Assistants')
 
-    CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='cascade'))
+    CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID'))
     CRM = db.relationship('CRM', back_populates='Assistants')
 
-    # NotificationsRegister = db.relationship('NotificationsRegister', back_populates='Assistant')
     Statistics = db.relationship('Statistics', back_populates='Assistant')
     ChatbotSessions = db.relationship('ChatbotSession', back_populates='Assistant')
 
@@ -177,13 +163,13 @@ class CRM(db.Model):
     Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
 
     # Relationships:
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='CRM')
 
     Assistants = db.relationship('Assistant', back_populates='CRM')
 
     def __repr__(self):
-        return '<CRM {}>'.format(self.CRM)
+        return '<CRM {}>'.format(self.ID)
 
 
 class Statistics(db.Model):

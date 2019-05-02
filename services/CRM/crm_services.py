@@ -4,7 +4,6 @@ from sqlalchemy.sql import and_
 
 from enums import CRM, UserType
 from models import db, Callback, ChatbotSession, Assistant, CRM as modelsCRM
-from services import company_services
 from services.CRM import Adapt
 
 
@@ -43,9 +42,11 @@ def connect(company_id, details) -> Callback:
         if not test_callback.Success:
             return test_callback
 
-        save_callback = save_connection(company_id, crm_type, crm_auth)
-        if not save_callback.Success:
-            raise Exception(save_callback.Message)
+        connection = modelsCRM(Type=crm_type, Auth=crm_auth, CompanyID=company_id)
+
+        # Save
+        db.session.add(connection)
+        db.session.commit()
 
         return Callback(True, 'CRM has been connected successfully')
 
@@ -68,9 +69,17 @@ def update(crm_id, company_id, details) -> Callback:
         if not test_callback.Success:
             return test_callback
 
-        update_callback = update_connection(crm_id, company_id, crm_type, crm_auth)
-        if not update_callback.Success:
-            raise Exception(update_callback.Message)
+        connection_callback: Callback = getCRMByCompanyID(crm_id, company_id)
+        if not connection_callback.Success:
+            raise Exception(connection_callback.Message)
+
+        crm = connection_callback.Data
+
+        crm.Type = crm_type
+        crm.Auth = crm_auth
+
+        # Save
+        db.session.commit()
 
         return Callback(True, 'CRM has been updated successfully')
 
@@ -106,7 +115,7 @@ def testConnection(details) -> Callback:
 def disconnect(crm_id, company_id) -> Callback:
     try:
 
-        crm_callback: Callback = get_crm_by_company_id(crm_id, company_id)
+        crm_callback: Callback = getCRMByCompanyID(crm_id, company_id)
         if not crm_callback:
             raise Exception(crm_callback.Message)
 
@@ -122,7 +131,7 @@ def disconnect(crm_id, company_id) -> Callback:
 
 # get crm with id and company_id
 # also checking if the crm is under that company
-def get_crm_by_company_id(crm_id, company_id):
+def getCRMByCompanyID(crm_id, company_id):
     try:
         crm = db.session.query(modelsCRM) \
             .filter(and_(modelsCRM.CompanyID == company_id, modelsCRM.ID == crm_id)).first()
@@ -132,55 +141,7 @@ def get_crm_by_company_id(crm_id, company_id):
         return Callback(True, "CRM retrieved successfully.", crm)
 
     except Exception as exc:
-        print("CRM_services.get_crm_by_company_id() Error: ", exc)
-        logging.error("CRM_services.get_crm_by_company_id(): " + str(exc))
+        print("CRM_services.getCRMByCompanyID() Error: ", exc)
+        logging.error("CRM_services.getCRMByCompanyID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not retrieve CRM.')
-
-
-# save the connection to the CRM in the DB
-def save_connection(company_id, type, auth):
-    try:
-
-        company_callback = company_services.getByID(company_id)
-        if not company_callback.Success:
-            raise Exception(company_callback.Message)
-
-        connection = modelsCRM(Type=type, Auth=auth, Company=company_callback.Data)
-
-        # Save
-        db.session.add(connection)
-        db.session.commit()
-        return Callback(True, 'CRM has been saved successfully')
-
-    except Exception as exc:
-        logging.error("CRM_services.save_connection(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, str(exc))
-
-
-# update the connection to the CRM in the db
-def update_connection(crm_id, company_id, crm_type, crm_auth):
-    try:
-
-        company_callback = company_services.getByID(company_id)
-        if not company_callback.Success:
-            raise Exception(company_callback.Message)
-
-        connection_callback: Callback = get_crm_by_company_id(crm_id, company_id)
-        if not connection_callback.Success:
-            raise Exception(connection_callback.Message)
-
-        crm = connection_callback.Data
-
-        crm.Type = crm_type
-        crm.Auth = crm_auth
-
-        # Save
-        db.session.commit()
-        return Callback(True, 'CRM has been updated successfully')
-
-    except Exception as exc:
-        logging.error("CRM_services.update_connection(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, str(exc))

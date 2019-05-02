@@ -114,7 +114,7 @@ def assistant_crm_connect(assistant_id, crm_id):
 
     callback: Callback = Callback(False, 'Error!')
     if request.method == "POST":
-        callback: Callback = assistant_services.connect_to_crm(assistant, crm_id)
+        callback: Callback = assistant_services.connectToCRM(assistant, crm_id)
 
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)
@@ -135,7 +135,7 @@ def assistant_crm_disconnect(assistant_id):
 
     callback: Callback = Callback(False, 'Error!')
     if request.method == "DELETE":
-        callback: Callback = assistant_services.disconnect_from_crm(assistant)
+        callback: Callback = assistant_services.disconnectFromCRM(assistant)
 
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)

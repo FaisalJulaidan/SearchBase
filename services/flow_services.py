@@ -6,6 +6,7 @@ from services import assistant_services
 from jsonschema import validate
 from utilities import json_schemas, helpers
 import logging
+from flask import request
 
 bot_currentVersion = "1.0.0"
 
@@ -18,7 +19,13 @@ def getChatbot(assistantHashID) -> Callback:
         callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
         if not callback.Success:
             return Callback(False, "Assistant not found!")
-        assistant: Assistant = helpers.getDictFromSQLAlchemyObj(callback.Data)
+        assistant = helpers.getDictFromSQLAlchemyObj(callback.Data)
+
+
+        ip = request.remote_addr
+        if ip != '127.0.0.1':
+            if helpers.geoIP.country(ip).iso_code in assistant['Config'].get('restrictedCountries', []):
+                return Callback(True, '', {'isDisabled': True})
 
         assistant['ID'] = assistantHashID  # Use the assistant hashID instead of the integer one
         del assistant['CompanyID']
@@ -27,7 +34,7 @@ def getChatbot(assistantHashID) -> Callback:
 
         data = {
             "assistant": assistant,
-            # "dataTypes": [dt.value for dt in enums.DataType]
+            "isDisabled": False
         }
 
         return Callback(True, '', data)

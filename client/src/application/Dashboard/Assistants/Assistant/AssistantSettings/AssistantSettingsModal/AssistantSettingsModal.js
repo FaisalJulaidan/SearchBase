@@ -38,9 +38,9 @@ class AssistantSettingsModal extends Component {
         if (!err) {
             if (this.state.isPopupDisabled)
                 values.secondsUntilPopup = 0;
-            values.alertsEnabled = this.state.isAlertsEnabled;
-            values.config = {
-                restrictedCountries: values.restrictedCountries
+                values.alertsEnabled = this.state.isAlertsEnabled;
+                values.config = {
+                restrictedCountries: values.restrictedCountries || []
             };
             delete values.restrictedCountries;
             this.props.handleSave(values)

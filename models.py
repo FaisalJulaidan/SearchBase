@@ -98,7 +98,6 @@ class User(db.Model):
     RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
     Role = db.relationship('Role', back_populates='Users')
 
-    # NotificationsRegister = db.relationship('NotificationsRegister', back_populates='User')
 
 
     # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)

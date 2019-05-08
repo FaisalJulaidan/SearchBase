@@ -470,7 +470,7 @@ def scanJobs(session, dbIDs, databaseType: DatabaseType):
             if record[Job.JobLocation.name]:
                subTitle =  "Location: " + record[Job.JobLocation.name]
             if record[Job.JobEssentialSkills.name]:
-                subTitle =  "Skills: " + record[Job.JobEssentialSkills.name]
+                subTitle +=  "Skills: " + record[Job.JobEssentialSkills.name]
 
             data.append({
                 "id": record["ID"],

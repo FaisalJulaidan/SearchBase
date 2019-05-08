@@ -1,49 +1,49 @@
 import React from 'react';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import AuroraCard from 'components/AuroraCard/AuroraCard'
-import {Typography} from 'antd';
-import {LoremIpsum} from "lorem-ipsum";
-
+import AuroraCardAvatar from 'components/AuroraCardAvatar/AuroraCardAvatar'
+import {Typography, Button} from 'antd';
 
 import styles from './Integrations.module.less'
 import {getLink} from "helpers";
+import PropTypes from 'prop-types';
 
 const {Title} = Typography;
-const lorem = new LoremIpsum({
-    sentencesPerParagraph: {
-        max: 8,
-        min: 4
-    },
-    wordsPerSentence: {
-        max: 16,
-        min: 4
-    }
-});
-
 
 class Integrations extends React.Component {
 
-    state = {
-        i: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    static contextTypes = {
+        router: PropTypes.object
     };
 
     render() {
         return (
             <NoHeaderPanel>
                 <div className={styles.Title}>
+                    <Button onClick={this.context.router?.history?.goBack}
+                            className={styles.BackButton}
+                            type="primary" icon="left" shape="circle"/>
                     <Title>All Integrations</Title>
                 </div>
 
                 <div className={styles.Body}>
-                    {
-                        this.state.i.map((_, i) =>
-                            <div className={styles.CardFrame}>
-                                <AuroraCard title={lorem.generateWords(1)}
-                                            desc={lorem.generateWords(7)}
-                                            image={getLink('/static/images/CRM/adapt.png')}/>
-                            </div>
-                        )
-                    }
+                    <div className={styles.CardFrame}>
+                        <AuroraCardAvatar title={'bullhorn'}
+                                          desc={'bullhorn desc'}
+                                          image={getLink('/static/images/CRM/bullhorn.png')}/>
+                    </div>
+
+                    <div className={styles.CardFrame}>
+                        <AuroraCardAvatar title={'vincere'}
+                                          desc={'vincere desc'}
+                                          image={getLink('/static/images/CRM/vincere.png')}/>
+                    </div>
+
+                    <div className={styles.CardFrame}>
+                        <AuroraCardAvatar title={'adapt'}
+                                          desc={'adapt desc'}
+                                          image={getLink('/static/images/CRM/adapt.png')}/>
+                    </div>
+
                 </div>
 
             </NoHeaderPanel>

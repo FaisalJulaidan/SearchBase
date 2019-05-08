@@ -4,8 +4,8 @@ import {Menu, Spin, Button, Modal, Pagination, Row} from 'antd';
 
 import styles from "./Databases.module.less"
 import NewDatabaseModal from "./NewDatabaseModal/NewDatabaseModal";
-import Header from "../../../components/Header/Header";
-import {databaseActions} from "../../../store/actions";
+import Header from "components/Header/Header";
+import {databaseActions} from "store/actions";
 
 import DatabaseInfo from "./DatabaseInfo/DatabaseInfo"
 import DatabaseDetailsModal from "./DatabaseDetailsModal/DatabaseDetailsModal"

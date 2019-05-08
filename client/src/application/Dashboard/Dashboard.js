@@ -26,6 +26,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import CRM from "./Assistants/Assistant/CRM/CRM";
 import Integrations from "./Integrations/Integrations";
+import CrmView from "./Integrations/CrmView/CrmView";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -34,7 +35,8 @@ const {Header, Content, Footer, Sider} = Layout;
 
 class Dashboard extends Component {
     state = {
-        collapsed: true,
+        collapsed: false,
+        marginLeft: 200,
     };
 
     componentWillMount() {
@@ -176,7 +178,7 @@ class Dashboard extends Component {
                     </Menu>
                 </Sider>
 
-                <Layout style={{marginLeft: this.state.collapsed ? 81 : 200, height: '100%'}}>
+                <Layout style={{marginLeft: this.state.marginLeft, height: '100%'}}>
 
                     <Header className={styles.Header}>
                         <Icon
@@ -206,6 +208,7 @@ class Dashboard extends Component {
                                                component={CRM}/>
                                         <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                                         <Route path={`${match.path}/integrations`} component={Integrations} exact/>
+                                        <Route path={`${match.path}/integrations/:id`} component={CrmView} exact/>
                                         <Route path={`${match.path}/databases`} component={Databases} exact/>
                                         <Route path={`${match.path}/profile`} component={Profile} exact/>
                                         <Route path={`${match.path}/billing`} component={Billing} exact/>

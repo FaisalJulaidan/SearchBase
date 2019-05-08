@@ -1,6 +1,16 @@
 import enums
 from config import BaseConfig
 
+assistant_config = {
+    "type": "object",
+    "properties": {
+        "restrictedCountries": {"type": "array", "items": {"type": "string"}},
+        # "buttonColor": {"type": "string"},
+    },
+    "required": ["restrictedCountries"],
+    "additionalProperties": False
+}
+
 
 chatbot_session = {
     "type": "object",

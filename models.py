@@ -168,6 +168,10 @@ class CRM(db.Model):
 
     Assistants = db.relationship('Assistant', back_populates='CRM')
 
+    # Constraints:
+    # each company will have one CRM of each type
+    __table_args__ = (db.UniqueConstraint('Type', 'CompanyID', name='uix1_crm'),)
+
     def __repr__(self):
         return '<CRM {}>'.format(self.ID)
 

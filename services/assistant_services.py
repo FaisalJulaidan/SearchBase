@@ -176,7 +176,7 @@ def removeByID(id) -> Callback:
 def connectToCRM(assistant: Assistant, crm_id):
     try:
 
-        crm_callback: Callback = crm_services.getCRMByCompanyID(crm_id, assistant.CompanyID)
+        crm_callback: Callback = crm_services.getCRMByID(crm_id, assistant.CompanyID)
         if not crm_callback.Success:
             raise Exception(crm_callback.Message)
 

@@ -136,9 +136,9 @@ def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
 
 
 # ----- Deletions ----- #
-def deleteByID(id):
+def deleteByID(sessionID):
     try:
-        db.session.query(ChatbotSession).filter(ChatbotSession.ID == id).delete()
+        db.session.query(ChatbotSession).filter(ChatbotSession.ID == sessionID).delete()
         db.session.commit()
         return Callback(True, 'Record has been removed successfully.')
     except Exception as exc:

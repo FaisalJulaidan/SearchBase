@@ -108,7 +108,7 @@ elif os.environ['FLASK_ENV'] == 'development':
 
     # scheduler.start()
     print('Development mode running...')
-
+    stored_file_services.getAll()
 
 else:
     print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")

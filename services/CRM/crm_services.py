@@ -3,7 +3,7 @@ import logging
 from sqlalchemy.sql import and_
 
 from enums import CRM, UserType
-from models import db, Callback, ChatbotSession, Assistant, CRM as modelsCRM
+from models import db, Callback, ChatbotSession, Assistant, CRM as CRM_Model
 from services.CRM import Adapt
 
 
@@ -42,7 +42,7 @@ def connect(company_id, details) -> Callback:
         if not test_callback.Success:
             return test_callback
 
-        connection = modelsCRM(Type=crm_type, Auth=crm_auth, CompanyID=company_id)
+        connection = CRM_Model(Type=crm_type, Auth=crm_auth, CompanyID=company_id)
 
         # Save
         db.session.add(connection)
@@ -54,7 +54,7 @@ def connect(company_id, details) -> Callback:
         print(exc)
         logging.error("CRM_services.connect(): " + str(exc))
         db.session.rollback()
-        return Callback(False, str(exc))
+        return Callback(False, "CRM connection failed")
 
 
 # Update CRM Details
@@ -69,7 +69,7 @@ def update(crm_id, company_id, details) -> Callback:
         if not test_callback.Success:
             return test_callback
 
-        connection_callback: Callback = getCRMByCompanyID(crm_id, company_id)
+        connection_callback: Callback = getCRMByID(crm_id, company_id)
         if not connection_callback.Success:
             raise Exception(connection_callback.Message)
 
@@ -85,9 +85,9 @@ def update(crm_id, company_id, details) -> Callback:
 
     except Exception as exc:
         print(exc)
-        logging.error("CRM_services.update(): " + test_callback.Message)
+        logging.error("CRM_services.update(): " + str(exc))
         db.session.rollback()
-        return Callback(False, test_callback.Message)
+        return Callback(False, "Update CRM details failed.")
 
 
 # Test connection to a CRM
@@ -108,16 +108,16 @@ def testConnection(details) -> Callback:
         return Callback(True, 'Successful connection')
 
     except Exception as exc:
-        logging.error("CRM_services.connect(): " + login_callback.Message)
-        return Callback(False, login_callback.Message)
+        logging.error("CRM_services.connect(): " + str(exc))
+        return Callback(False, "CRM connection failed.")
 
 
 def disconnect(crm_id, company_id) -> Callback:
     try:
 
-        crm_callback: Callback = getCRMByCompanyID(crm_id, company_id)
+        crm_callback: Callback = getCRMByID(crm_id, company_id)
         if not crm_callback:
-            raise Exception(crm_callback.Message)
+            return Callback(False, "Could not find CRM.")
 
         db.session.delete(crm_callback.Data)
         db.session.commit()
@@ -126,15 +126,14 @@ def disconnect(crm_id, company_id) -> Callback:
     except Exception as exc:
         logging.error("CRM_services.disconnect(): " + str(exc))
         db.session.rollback()
-        return Callback(False, str(exc))
 
 
 # get crm with id and company_id
 # also checking if the crm is under that company
-def getCRMByCompanyID(crm_id, company_id):
+def getCRMByID(crm_id, company_id):
     try:
-        crm = db.session.query(modelsCRM) \
-            .filter(and_(modelsCRM.CompanyID == company_id, modelsCRM.ID == crm_id)).first()
+        crm = db.session.query(CRM_Model) \
+            .filter(and_(CRM_Model.CompanyID == company_id, CRM_Model.ID == crm_id)).first()
         if not crm:
             raise Exception("CRM not found")
 
@@ -143,5 +142,16 @@ def getCRMByCompanyID(crm_id, company_id):
     except Exception as exc:
         print("CRM_services.getCRMByCompanyID() Error: ", exc)
         logging.error("CRM_services.getCRMByCompanyID(): " + str(exc))
-        db.session.rollback()
         return Callback(False, 'Could not retrieve CRM.')
+
+
+def getAll(companyID) -> Callback:
+    try:
+        result = db.session.query(CRM_Model).filter(CRM_Model.CompanyID == companyID).all()
+
+        return Callback(True, "fetched all CRMs  successfully.", result)
+
+    except Exception as exc:
+        print(exc)
+        logging.error("crm_services.getAll(): " + str(exc))
+        return Callback(False, 'Could not fetch all CRMs.')

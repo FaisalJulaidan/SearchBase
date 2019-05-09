@@ -3,7 +3,8 @@ import logging
 import boto3
 import botocore
 import os
-from config import BaseConfig
+
+
 def getByID(id) -> StoredFile or None:
     try:
         if id:
@@ -40,7 +41,6 @@ def getAll():
     try:
         # Get result and check if None then raise exception
         result = db.session.query(StoredFile).all()
-        if not result: raise Exception
         return Callback(True, 'StoredFiles were successfully retrieved', result)
     
     except Exception as exc:

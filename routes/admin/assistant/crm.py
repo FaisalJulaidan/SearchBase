@@ -7,6 +7,20 @@ from utilities import helpers
 
 crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../../templates")
 
+# Get all company CRMs
+@crm_router.route("/crm", methods=["GET"])
+@jwt_required
+def crm_connect():
+    user = get_jwt_identity()['user']
+
+    callback: Callback = Callback(False, '')
+    if request.method == "GET":
+        callback: Callback = crm_services.getAll(user.get("companyID"))  # crm details passed: auth, type
+
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message)
+
 
 # Connect CRM
 @crm_router.route("/crm/connect", methods=["POST"])

@@ -7,19 +7,22 @@ from utilities import helpers
 
 crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../../templates")
 
-# Get all company CRMs
+# Get all company CRMs and check their connections before returning them
 @crm_router.route("/crm", methods=["GET"])
 @jwt_required
 def get_crms():
     user = get_jwt_identity()['user']
 
-    callback: Callback = Callback(False, '')
     if request.method == "GET":
-        callback: Callback = crm_services.getAll(user.get("companyID"))  # crm details passed: auth, type
+        callback: Callback = crm_services.getAll(user.get("companyID"))
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
 
-    if not callback.Success:
-        return helpers.jsonResponse(False, 400, callback.Message)
-    return helpers.jsonResponse(True, 200, callback.Message)
+        crms = helpers.getListFromSQLAlchemyList(callback.Data)
+        for crm in crms:
+            crm['status'] = crm_services.testConnection({'auth': crm['Auth'], 'type': crm['Type']}).Success
+
+        return helpers.jsonResponse(True, 200, callback.Message, crms)
 
 
 # Connect CRM
@@ -69,5 +72,5 @@ def test_crm_connection():
 
     # Return response
     if not callback.Success:
-        return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
-    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+        return helpers.jsonResponse(False, 400, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message)

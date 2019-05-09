@@ -1,5 +1,5 @@
 from flask import json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, ChatbotSession, Database, Candidate, Job
+from models import db, Role, Company, Assistant, Plan, ChatbotSession, Database, Candidate, Job, CRM
 from services import user_services, flow_services
 from datetime import datetime, timedelta
 from enum import Enum
@@ -258,6 +258,18 @@ def gen_dummy_data():
     db.session.add(addCandidate(db2, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
                                 2, "Cardiff"))
 
+
+    # Add CRM conncetion for aramco company
+    db.session.add(CRM(Type=enums.CRM.Adapt, Company=aramco, Auth={
+                                            "domain": "PartnerDomain9",
+                                            "username":"SD9USR7",
+                                            "password":"P@55word",
+                                            "profile":"CoreProfile",
+                                            "locale":"en_GB",
+                                            "timezone":"GMT",
+                                            "dateFormat":0,
+                                            "timeFormat":0}))
+
     seed() # will save changes as well
 
 
@@ -270,8 +282,6 @@ def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
                      CandidateSkills =skills,
                      CandidateYearsExperience = exp,
                      CandidateLocation = location)
-
-
 
 
 def seed():

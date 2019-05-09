@@ -148,7 +148,6 @@ def getCRMByID(crm_id, company_id):
 def getAll(companyID) -> Callback:
     try:
         result = db.session.query(CRM_Model).filter(CRM_Model.CompanyID == companyID).all()
-
         return Callback(True, "fetched all CRMs  successfully.", result)
 
     except Exception as exc:

@@ -10,7 +10,7 @@ crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../..
 # Get all company CRMs
 @crm_router.route("/crm", methods=["GET"])
 @jwt_required
-def crm_connect():
+def get_crms():
     user = get_jwt_identity()['user']
 
     callback: Callback = Callback(False, '')

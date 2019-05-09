@@ -99,6 +99,8 @@ class User(db.Model):
     RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
     Role = db.relationship('Role', back_populates='Users')
 
+
+
     # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
 
     def __repr__(self):
@@ -130,7 +132,6 @@ class Assistant(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     Flow = db.Column(MagicJSON, nullable=True)
-    Route = db.Column(db.String(64), unique=True)
     Message = db.Column(db.String(500), nullable=False)
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
@@ -138,6 +139,7 @@ class Assistant(db.Model):
     MailEnabled = db.Column(db.Boolean, nullable=False, default=False)
     MailPeriod = db.Column(db.Integer, nullable=False, default=12)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
+    Config = db.Column(MagicJSON, nullable=True)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )

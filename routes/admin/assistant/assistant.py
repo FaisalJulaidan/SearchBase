@@ -39,6 +39,7 @@ def assistants():
                                                        data.get('alertsEnabled'),
                                                        data.get('alertEvery'),
                                                        data.get('template'),
+                                                       data.get('config'),
                                                        user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, "Cannot add Assistant")
@@ -62,12 +63,14 @@ def assistant(assistantID):
     if request.method == "PUT":
         updatedSettings = request.json
         callback: Callback = assistant_services.update(assistantID,
-                                                       updatedSettings.get("assistantName", "None"),
-                                                       updatedSettings.get("welcomeMessage", "None"),
-                                                       updatedSettings.get("topBarTitle", "None"),
-                                                       updatedSettings.get("secondsUntilPopup", "None"),
+                                                       updatedSettings.get("assistantName"),
+                                                       updatedSettings.get("welcomeMessage"),
+                                                       updatedSettings.get("topBarTitle"),
+                                                       updatedSettings.get("secondsUntilPopup"),
                                                        updatedSettings.get("alertsEnabled", False),
-                                                       updatedSettings.get("alertEvery", 24))
+                                                       updatedSettings.get("alertEvery", 24),
+                                                       updatedSettings.get('config'),
+                                                       )
     # Delete assistant
     if request.method == "DELETE":
         callback: Callback = assistant_services.removeByID(assistantID)

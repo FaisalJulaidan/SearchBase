@@ -1,13 +1,14 @@
 from models import db, Assistant, Callback
 from sqlalchemy import and_
-
+from utilities import helpers, json_schemas
 from services.CRM import crm_services
-from utilities import helpers
 from os.path import join
 import json
 from config import BaseConfig
 from services import flow_services
 import logging
+from jsonschema import validate
+
 
 def getAssistantByHashID(hashID):
     try:
@@ -95,8 +96,11 @@ def getAllWithEnabledNotifications(companyID) -> Callback:
         return Callback(False, 'Could not get all assistants.')
 
 
-def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, template, companyID) -> Assistant or None:
+def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, template, config, companyID) -> Assistant or None:
     try:
+
+        # Validate the json config
+        validate(config, json_schemas.assistant_config)
 
         flow = None
         if template and template != 'none':
@@ -111,8 +115,9 @@ def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod
 
         assistant = Assistant(Name=name, Flow=flow, Route=None, Message=message, TopBarText=topBarText,
                               SecondsUntilPopup=secondsUntilPopup, MailEnabled=mailEnabled, MailPeriod=mailPeriod,
-                              CompanyID=companyID)
+                              Config=config, CompanyID=companyID)
         db.session.add(assistant)
+
         # Save
         db.session.commit()
         return Callback(True, 'Assistant has ben created successfully!', assistant)
@@ -124,14 +129,19 @@ def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod
 
 
 
-def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod)-> Callback:
+def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, config)-> Callback:
     try:
+        # Validate the json config
+        validate(config, json_schemas.assistant_config)
+
         db.session.query(Assistant).filter(Assistant.ID == id).update({'Name': name,
                                                                        'Message': message,
                                                                        'TopBarText': topBarText,
                                                                        'SecondsUntilPopup': secondsUntilPopup,
                                                                        "MailEnabled": mailEnabled,
-                                                                       "MailPeriod": mailPeriod})
+                                                                       "MailPeriod": mailPeriod,
+                                                                       "Config": config
+                                                                       })
         db.session.commit()
         return Callback(True, name + ' Updated Successfully')
 

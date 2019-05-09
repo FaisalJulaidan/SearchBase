@@ -342,7 +342,7 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
         if keywords.get(DT.CandidateAvailability.value['name']):
             df['count'] += df[Candidate.CandidateAvailability.name].str.count('|'.join(keywords[DT.CandidateAvailability.value['name']]),
                                                                                 flags=re.IGNORECASE) | 0
-        print(df)
+
         topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 2), 'count')
                                 .to_json(orient='records'))
 
@@ -470,7 +470,7 @@ def scanJobs(session, dbIDs, databaseType: DatabaseType):
             if record[Job.JobLocation.name]:
                subTitle =  "Location: " + record[Job.JobLocation.name]
             if record[Job.JobEssentialSkills.name]:
-                subTitle =  "Skills: " + record[Job.JobEssentialSkills.name]
+                subTitle +=  "Skills: " + record[Job.JobEssentialSkills.name]
 
             data.append({
                 "id": record["ID"],

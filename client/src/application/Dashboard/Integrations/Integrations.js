@@ -2,11 +2,12 @@ import React from 'react';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import AuroraCardAvatar from 'components/AuroraCardAvatar/AuroraCardAvatar'
 import {Typography, Spin} from 'antd';
-
+import {connect} from 'react-redux';
 import styles from './Integrations.module.less'
-import {getLink, history, http} from "helpers";
+import {getLink, history} from "helpers";
 import PropTypes from 'prop-types';
 import shortid from 'shortid';
+import {integrationsActions} from "store/actions";
 const {Title} = Typography;
 
 
@@ -45,7 +46,7 @@ class Integrations extends React.Component {
                 link: () => history.push(`/dashboard/integrations/3`),
                 image: getLink('/static/images/CRM/vincere.png'),
                 type: "Vincere",
-                status: 'NOT_CONNECTED'
+                status: 'FAILED'
             },
             {
                 title: 'Adapt',
@@ -60,11 +61,14 @@ class Integrations extends React.Component {
     };
 
     componentDidMount() {
-        http.get(`/crm`).then((res) => {
-            const {data} = res.data;
-            data.forEach((serverCRM) => {
+        this.props.dispatch(integrationsActions.getConnectedCRMs())
+    }
+
+    componentWillReceiveProps(nextProps) {
+        nextProps.CRMsList
+            .forEach(serverCRM => {
                 /** @type {CRM} */
-                let currentCRM = this.state.CRMs.find((crm) => crm.type === serverCRM.Type);
+                let currentCRM = this.state.CRMs.find(crm => crm.type === serverCRM.Type);
 
                 if (currentCRM.status)
                     currentCRM.status = "CONNECTED";
@@ -76,7 +80,6 @@ class Integrations extends React.Component {
                     isLoading: false
                 })
             });
-        })
     }
 
     render() {
@@ -109,4 +112,10 @@ class Integrations extends React.Component {
     }
 }
 
-export default Integrations;
+function mapStateToProps(state) {
+    return {
+        CRMsList: state.integrations.CRMsList,
+    };
+}
+
+export default connect(mapStateToProps)(Integrations);

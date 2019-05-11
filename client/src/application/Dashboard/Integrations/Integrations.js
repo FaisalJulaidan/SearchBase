@@ -1,13 +1,26 @@
 import React from 'react';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import AuroraCardAvatar from 'components/AuroraCardAvatar/AuroraCardAvatar'
-import {Typography} from 'antd';
+import {Typography, Spin} from 'antd';
 
 import styles from './Integrations.module.less'
-import {getLink, history} from "helpers";
+import {getLink, history, http} from "helpers";
 import PropTypes from 'prop-types';
-
+import shortid from 'shortid';
 const {Title} = Typography;
+
+
+/**
+ * Date type
+ @typedef CRM
+ @type {Object}
+ @property {string} title
+ @property {string} desc
+ @property {function} link
+ @property {string} image
+ @property {('CONNECTED'|'NOT_CONNECTED'|'FAILED')} status
+ */
+
 
 class Integrations extends React.Component {
 
@@ -15,37 +28,83 @@ class Integrations extends React.Component {
         router: PropTypes.object
     };
 
+    state = {
+        /** @type {CRM[]} */
+        CRMs: [
+            {
+                title: 'Bullhorn',
+                desc: 'Bullhorn Desc',
+                link: () => history.push(`/dashboard/integrations/2`),
+                image: getLink('/static/images/CRM/bullhorn.png'),
+                type: "Bullhorn",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Vincere',
+                desc: 'Vincere Desc',
+                link: () => history.push(`/dashboard/integrations/3`),
+                image: getLink('/static/images/CRM/vincere.png'),
+                type: "Vincere",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push(`/dashboard/integrations/1`),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            }
+        ],
+        isLoading: true
+    };
+
+    componentDidMount() {
+        http.get(`/crm`).then((res) => {
+            const {data} = res.data;
+            data.forEach((serverCRM) => {
+                /** @type {CRM} */
+                let currentCRM = this.state.CRMs.find((crm) => crm.type === serverCRM.Type);
+
+                if (currentCRM.status)
+                    currentCRM.status = "CONNECTED";
+                else
+                    currentCRM.status = "FAILED";
+
+                this.setState({
+                    CRMs: [...this.state.CRMs],
+                    isLoading: false
+                })
+            });
+        })
+    }
+
     render() {
+        const {CRMs} = this.state;
         return (
-            <NoHeaderPanel>
-                <div className={styles.Title}>
-                    <Title>All Integrations</Title>
-                </div>
-
-                <div className={styles.Body}>
-                    <div className={styles.CardFrame}>
-                        <AuroraCardAvatar title={'bullhorn'}
-                                          onClick={() => history.push(`/dashboard/integrations/1`)}
-                                          desc={'bullhorn desc'}
-                                          image={getLink('/static/images/CRM/bullhorn.png')}/>
+            <Spin spinning={this.state.isLoading}>
+                <NoHeaderPanel>
+                    <div className={styles.Title}>
+                        <Title>All Integrations</Title>
                     </div>
 
-                    <div className={styles.CardFrame}>
-                        <AuroraCardAvatar title={'vincere'}
-                                          onClick={() => history.push(`/dashboard/integrations/2`)}
-                                          desc={'vincere desc'}
-                                          image={getLink('/static/images/CRM/vincere.png')}/>
+                    <div className={styles.Body}>
+                        {
+                            CRMs.map(CRM =>
+                                <div className={styles.CardFrame}
+                                     key={shortid.generate()}>
+                                    <AuroraCardAvatar title={CRM.title}
+                                                      onClick={CRM.link}
+                                                      desc={CRM.desc}
+                                                      image={CRM.image}
+                                                      status={CRM.status}
+                                    />
+                                </div>
+                            )
+                        }
                     </div>
-
-                    <div className={styles.CardFrame}>
-                        <AuroraCardAvatar title={'adapt'}
-                                          onClick={() => history.push(`/dashboard/integrations/3`)}
-                                          desc={'adapt desc'}
-                                          image={getLink('/static/images/CRM/adapt.png')}/>
-                    </div>
-                </div>
-
-            </NoHeaderPanel>
+                </NoHeaderPanel>
+            </Spin>
         );
     }
 }

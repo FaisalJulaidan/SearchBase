@@ -7,6 +7,7 @@ from utilities import helpers
 
 crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../../templates")
 
+
 # Get all company CRMs and check their connections before returning them
 @crm_router.route("/crm", methods=["GET"])
 @jwt_required
@@ -20,7 +21,7 @@ def get_crms():
 
         crms = helpers.getListFromSQLAlchemyList(callback.Data)
         for crm in crms:
-            crm['status'] = crm_services.testConnection({'auth': crm['Auth'], 'type': crm['Type']}).Success
+            crm['Status'] = crm_services.testConnection({'auth': crm['Auth'], 'type': crm['Type']}).Success
 
         return helpers.jsonResponse(True, 200, callback.Message, crms)
 

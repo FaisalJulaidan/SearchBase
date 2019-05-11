@@ -35,8 +35,7 @@ const {Header, Content, Footer, Sider} = Layout;
 
 class Dashboard extends Component {
     state = {
-        collapsed: false,
-        marginLeft: 200,
+        collapsed: true,
     };
 
     componentWillMount() {
@@ -131,7 +130,8 @@ class Dashboard extends Component {
 
                     </div>
 
-                    <Menu theme="light" defaultSelectedKeys={this.state.selectedMenuKey}
+                    <Menu theme="light"
+                          defaultSelectedKeys={this.state.selectedMenuKey}
                           selectedKeys={location.pathname.split('/')[2] ? [location.pathname.split('/')[2]] : [location.pathname.split('/')[1]]}
                           mode="inline" onClick={this.handleMenuClick}>
                         <Menu.Item key="dashboard">
@@ -178,7 +178,7 @@ class Dashboard extends Component {
                     </Menu>
                 </Sider>
 
-                <Layout style={{marginLeft: this.state.marginLeft, height: '100%'}}>
+                <Layout style={{marginLeft: this.state.collapsed ? 81 : 200, height: '100%'}}>
 
                     <Header className={styles.Header}>
                         <Icon

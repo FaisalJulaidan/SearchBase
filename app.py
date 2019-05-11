@@ -12,7 +12,7 @@ from flask_apscheduler import APScheduler
 from services.auth_services import jwt
 from utilities import helpers, tasks
 from flask_babel import Babel
-from services import stored_file_services
+from services.CRM import crm_services
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router,\
@@ -42,16 +42,6 @@ app.register_blueprint(options_router, url_prefix='/api')
 
 
 ## Error Handlers ##
-@app.errorhandler(status.HTTP_400_BAD_REQUEST)
-def bad_request(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/400.html', error=e.description), status.HTTP_400_BAD_REQUEST
-    except:
-        print("Error without description")
-        return render_template('errors/400.html'), status.HTTP_400_BAD_REQUEST
-
-
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
     try:
@@ -60,46 +50,6 @@ def page_not_found(e):
     except:
         print("Error without description")
         return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
-
-
-@app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-def unsupported_media(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/415.html', error=e.description), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
-    except:
-        print("Error without description")
-        return render_template('errors/415.html'), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
-
-
-@app.errorhandler(418)
-def im_a_teapot(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/418.html', error=e.description), 418
-    except:
-        print("Error without description")
-        return render_template('errors/418.html'), 418
-
-
-@app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
-def internal_server_error(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/500.html', error=e.description), status.HTTP_500_INTERNAL_SERVER_ERROR
-    except:
-        print("Error without description")
-        return render_template('errors/500.html'), status.HTTP_500_INTERNAL_SERVER_ERROR
-
-
-@app.errorhandler(status.HTTP_501_NOT_IMPLEMENTED)
-def not_implemented(e):
-    try:
-        print("Error Handler:" + e.description)
-        return render_template('errors/501.html', error=e.description), status.HTTP_501_NOT_IMPLEMENTED
-    except:
-        print("Error without description")
-        return render_template('errors/501.html'), status.HTTP_501_NOT_IMPLEMENTED
 
 
 
@@ -149,7 +99,7 @@ elif os.environ['FLASK_ENV'] == 'development':
     mail.init_app(app)
     scheduler.init_app(app)
 
-    url = os.environ['SQLALCHEMY_DATABASE_URI'] # get database URL
+    url = os.environ['SQLALCHEMY_DATABASE_URI']  # get database URL
     if os.environ['REFRESH_DB_IN_DEV'] == 'yes':
         print('Reinitialize the database...')
         db.drop_all()

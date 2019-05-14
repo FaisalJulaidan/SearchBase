@@ -63,6 +63,7 @@ class Company(db.Model):
     Assistants = db.relationship('Assistant', back_populates='Company', cascade="all, delete, delete-orphan")
     Databases = db.relationship('Database', back_populates='Company', cascade="all, delete, delete-orphan")
     Roles = db.relationship('Role', back_populates='Company', cascade="all, delete, delete-orphan")
+    CRM = db.relationship('CRM', back_populates='Company', cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)
@@ -98,7 +99,6 @@ class User(db.Model):
     RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
     Role = db.relationship('Role', back_populates='Users')
 
-    # NotificationsRegister = db.relationship('NotificationsRegister', back_populates='User')
 
 
     # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
@@ -128,16 +128,6 @@ class Role(db.Model):
         return '<Role {}>'.format(self.Name)
 
 
-# class NotificationsRegister(db.Model):
-#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-#     AssistantID = db.Column(db.Integer, db.ForeignKey("assistant.ID", ondelete='cascade'), nullable=False)
-#     UserID = db.Column(db.Integer, db.ForeignKey("user.ID", ondelete='cascade'), nullable=False)
-#
-#     # Relationships:
-#     Assistant = db.relationship('Assistant', back_populates='NotificationsRegister')
-#     User = db.relationship('User', back_populates='NotificationsRegister')
-
-
 class Assistant(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
@@ -151,25 +141,41 @@ class Assistant(db.Model):
     Active = db.Column(db.Boolean(), nullable=False, default=True)
     Config = db.Column(MagicJSON, nullable=True)
 
-    CRM = db.Column(Enum(enums.CRM), nullable=True)
-    CRMAuth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
-    CRMConnected = db.Column(db.Boolean, nullable=False, default=False)
-
-
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )
     Company = db.relationship('Company', back_populates='Assistants')
 
-    # NotificationsRegister = db.relationship('NotificationsRegister', back_populates='Assistant')
+    CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID'))
+    CRM = db.relationship('CRM', back_populates='Assistants')
+
     Statistics = db.relationship('Statistics', back_populates='Assistant')
     ChatbotSessions = db.relationship('ChatbotSession', back_populates='Assistant')
 
     # Constraints:
-    # Cannot have two assistants with the same name under one company
+    # cannot have two assistants with the same name under one company
     __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
 
     def __repr__(self):
         return '<Assistant {}>'.format(self.Name)
+
+
+class CRM(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Type = db.Column(Enum(enums.CRM), nullable=True)
+    Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
+
+    # Relationships:
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
+    Company = db.relationship('Company', back_populates='CRM')
+
+    Assistants = db.relationship('Assistant', back_populates='CRM')
+
+    # Constraints:
+    # each company will have one CRM of each type
+    __table_args__ = (db.UniqueConstraint('Type', 'CompanyID', name='uix1_crm'),)
+
+    def __repr__(self):
+        return '<CRM {}>'.format(self.ID)
 
 
 class Statistics(db.Model):

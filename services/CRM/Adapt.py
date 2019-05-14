@@ -17,7 +17,7 @@ def login(auth):
         r = requests.post(url, headers=headers, data=json.dumps(authCopy))
 
         # When not ok
-        if not r.ok: raise Exception(r.json().get('ERROR_MSG', r.text))
+        if not r.ok: return Callback(False, r.json().get('ERROR_MSG', r.text))
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully', r.json()['SID'])

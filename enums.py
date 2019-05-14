@@ -14,6 +14,7 @@ from typing import List
 
 class CRM(Enum):
     Adapt = 'Adapt'
+    Bullhorn = 'Bullhorn'
 
 class BlockType(Enum):
     UserInput = 'User Input'

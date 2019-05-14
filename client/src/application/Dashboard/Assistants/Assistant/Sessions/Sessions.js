@@ -105,48 +105,60 @@ class Sessions extends React.Component {
         const sessionsList = sessions.sessionsList;
 
         let data = [["ID", "User Type", "Questions Answered", "Solutions Returned", "Time Spent", "Date & Time",
-            "Conversation", "Selected Results"]]; // Sessions Page Headers
+            "Conversation", "User Profile", "Selected Results"]]; // Sessions Page Headers
         let dataRecord = undefined; // CSV line to push into data
-        let record = undefined; // the individual record being looped through
         let recordData = undefined; // the questions and answers of the record
         let conversation = ""; // the questions and answers of the record in format to be pushed into dataRecord
+        let profile = ""; // profile in format to be put in the CSV
+        let keywordsByDataType = undefined;
         let selectedSolutions = undefined; // the selected solutions of the record
         let selectedSolutionsData = undefined; // the selected solutions of the record in the format to be put in the CSV
 
         // go through the to-be-rendered sessions
-        for(let i = 0; i < sessionsList.length;i++){
-            record = sessionsList[i];
+        sessionsList.forEach(record => {
             conversation = "";
 
             // Sessions Page Base Table
             dataRecord = [record["ID"], record["UserType"], record["QuestionsAnswered"], record["SolutionsReturned"],
                 record["TimeSpent"], record["DateTime"]];
 
-            // Conversations(View)   ex. "What is your name? : Bob House (Name)"
+            // Conversation Questions and Answers   ex. "What is your name? : Bob House (Name)"
             recordData = record["Data"]["collectedData"];
-            for(let c = 0;c < recordData.length;c++){
-                conversation += recordData[c]["questionText"] + " : " + recordData[c]["input"] +
-                    (recordData[c]["dataType"] !== "No Type" ? " (" + recordData[c]["dataType"] + ")" : "") + "\r\n\r\n";
-            }
+            recordData.forEach(conversationData => {
+                conversation += conversationData["questionText"] + " : " + conversationData["input"] +
+                    (conversationData["dataType"] !== "No Type" ? " (" + conversationData["dataType"] + ")" : "") + "\r\n\r\n";
+            });
             dataRecord.push(conversation);
+
+            // User Profile
+            profile = "";
+            keywordsByDataType = record["Data"]["keywordsByDataType"]
+            for (let key in keywordsByDataType){
+                if (keywordsByDataType.hasOwnProperty(key) && key.includes(record["UserType"])){
+                    profile += key + " : ";
+                    keywordsByDataType[key].forEach(word => { profile += word + " " });
+                    profile += "\r\n"
+                }
+            }
+            dataRecord.push(profile);
 
             // Selected Solutions
             selectedSolutions = record["Data"]["selectedSolutions"] ? record["Data"]["selectedSolutions"] : [];
             selectedSolutionsData = "";
-            for(let c = 0;c < selectedSolutions.length;c++){
-                selectedSolutionsData += "Result " + (c+1) + "\r\n";
-                for (let key in selectedSolutions[i]["data"]){
-                    if (selectedSolutions[i]["data"].hasOwnProperty(key)){
-                        selectedSolutionsData += selectedSolutions[i]["data"][key] ? key + " is " +
-                            selectedSolutions[i]["data"][key] + "\r\n" : "";
+            selectedSolutions.forEach(solutionsRecord => {
+                selectedSolutionsData += "Selected Result " + (selectedSolutions.indexOf(solutionsRecord)+1) + "\r\n";
+                for (let key in solutionsRecord["data"]){
+                    if (solutionsRecord["data"].hasOwnProperty(key)){
+                        selectedSolutionsData += solutionsRecord["data"][key] ? key + " : " +
+                            solutionsRecord["data"][key] + "\r\n" : "";
                     }
                 }
                 selectedSolutionsData += "\r\n";
-            }
+            });
             dataRecord.push(selectedSolutionsData);
 
             data.push(dataRecord);
-        }
+        });
 
         // put the data in the state and set refresh to false
         this.setState({downloadData:data, sessionsRefreshed:false});

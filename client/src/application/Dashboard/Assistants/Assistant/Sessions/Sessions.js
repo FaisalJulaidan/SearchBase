@@ -132,7 +132,7 @@ class Sessions extends React.Component {
 
             // User Profile
             profile = "";
-            keywordsByDataType = record["Data"]["keywordsByDataType"]
+            keywordsByDataType = record["Data"]["keywordsByDataType"];
             for (let key in keywordsByDataType){
                 if (keywordsByDataType.hasOwnProperty(key) && key.includes(record["UserType"])){
                     profile += key + " : ";

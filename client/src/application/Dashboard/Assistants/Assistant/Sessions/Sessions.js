@@ -113,9 +113,9 @@ class Sessions extends React.Component {
         let keywordsByDataType = undefined;
         let selectedSolutions = undefined; // the selected solutions of the record
         let selectedSolutionsData = undefined; // the selected solutions of the record in the format to be put in the CSV
-
+        console.log(sessions)
         // go through the to-be-rendered sessions
-        sessionsList.forEach(record => {
+        if(sessionsList){sessionsList.forEach(record => {
             conversation = "";
 
             // Sessions Page Base Table
@@ -145,8 +145,8 @@ class Sessions extends React.Component {
             // Selected Solutions
             selectedSolutions = record["Data"]["selectedSolutions"] ? record["Data"]["selectedSolutions"] : [];
             selectedSolutionsData = "";
-            selectedSolutions.forEach(solutionsRecord => {
-                selectedSolutionsData += "Selected Result " + (selectedSolutions.indexOf(solutionsRecord)+1) + "\r\n";
+            selectedSolutions.forEach((solutionsRecord, index) => {
+                selectedSolutionsData += "Selected Result " + (index+1) + "\r\n";
                 for (let key in solutionsRecord["data"]){
                     if (solutionsRecord["data"].hasOwnProperty(key)){
                         selectedSolutionsData += solutionsRecord["data"][key] ? key + " : " +
@@ -158,7 +158,7 @@ class Sessions extends React.Component {
             dataRecord.push(selectedSolutionsData);
 
             data.push(dataRecord);
-        });
+        });}
 
         // put the data in the state and set refresh to false
         this.setState({downloadData:data, sessionsRefreshed:false});
@@ -241,8 +241,8 @@ class Sessions extends React.Component {
               }}>
                   View
               </a>
-                    <Divider type="vertical" />
-              <a onClick={() => {
+                    <Divider hidden type="vertical" />
+              <a hidden onClick={() => {
                   this.deleteSession(record)
               }}>
                   Delete
@@ -275,7 +275,7 @@ class Sessions extends React.Component {
                             </Button>
 
 
-                            <Button className={styles.Panel_Header_Button} type="primary" icon="delete"
+                            <Button hidden className={styles.Panel_Header_Button} type="primary" icon="delete"
                                     disabled={!!(!sessions?.sessionsList?.length)}
                                     onClick={() => {
                                         this.clearAllChatbotSessions(assistant.ID)

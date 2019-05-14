@@ -4,23 +4,13 @@ import AuroraCardAvatar from 'components/AuroraCardAvatar/AuroraCardAvatar'
 import {Typography, Spin} from 'antd';
 import {connect} from 'react-redux';
 import styles from './Integrations.module.less'
-import {getLink, history} from "helpers";
+import {getLink, history, deepClone} from "helpers";
 import PropTypes from 'prop-types';
 import shortid from 'shortid';
 import {integrationsActions} from "store/actions";
-const {Title} = Typography;
+import 'types/CRM_Types';
 
-
-/**
- * Date type
- @typedef CRM
- @type {Object}
- @property {string} title
- @property {string} desc
- @property {function} link
- @property {string} image
- @property {('CONNECTED'|'NOT_CONNECTED'|'FAILED')} status
- */
+const {Title, Paragraph, Text} = Typography;
 
 
 class Integrations extends React.Component {
@@ -35,7 +25,7 @@ class Integrations extends React.Component {
             {
                 title: 'Bullhorn',
                 desc: 'Bullhorn Desc',
-                link: () => history.push(`/dashboard/integrations/2`),
+                link: () => history.push(`/dashboard/integrations/bullhorn`),
                 image: getLink('/static/images/CRM/bullhorn.png'),
                 type: "Bullhorn",
                 status: 'NOT_CONNECTED'
@@ -43,7 +33,10 @@ class Integrations extends React.Component {
             {
                 title: 'Vincere',
                 desc: 'Vincere Desc',
-                link: () => history.push(`/dashboard/integrations/3`),
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/vincere`,
+                    state: {CRMs: this.state.CRMs}
+                }),
                 image: getLink('/static/images/CRM/vincere.png'),
                 type: "Vincere",
                 status: 'FAILED'
@@ -51,7 +44,197 @@ class Integrations extends React.Component {
             {
                 title: 'Adapt',
                 desc: 'Adapt Desc',
-                link: () => history.push(`/dashboard/integrations/1`),
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
+                image: getLink('/static/images/CRM/adapt.png'),
+                type: "Adapt",
+                status: 'NOT_CONNECTED'
+            },
+            {
+                title: 'Adapt',
+                desc: 'Adapt Desc',
+                link: () => history.push({
+                    pathname: `/dashboard/integrations/adapt`,
+                    state: {CRMs: this.state.CRMs}
+                }),
                 image: getLink('/static/images/CRM/adapt.png'),
                 type: "Adapt",
                 status: 'NOT_CONNECTED'
@@ -59,6 +242,7 @@ class Integrations extends React.Component {
         ],
         isLoading: true
     };
+
 
     componentDidMount() {
         this.props.dispatch(integrationsActions.getConnectedCRMs())
@@ -85,29 +269,38 @@ class Integrations extends React.Component {
     render() {
         const {CRMs} = this.state;
         return (
-            <Spin spinning={this.state.isLoading}>
-                <NoHeaderPanel>
-                    <div className={styles.Title}>
+            <NoHeaderPanel>
+                <div className={styles.Title}>
+                    <div className={styles.Details}>
                         <Title>All Integrations</Title>
+                        <Paragraph type="secondary">
+                            We supply a series of design principles, practical patterns and high quality design
+                            resources
+                            (<Text code>Sketch</Text> and <Text code>Axure</Text>), to help people create their
+                            product
+                            prototypes beautifully and efficiently.
+                        </Paragraph>
                     </div>
 
-                    <div className={styles.Body}>
-                        {
-                            CRMs.map(CRM =>
-                                <div className={styles.CardFrame}
-                                     key={shortid.generate()}>
+                </div>
+
+                <div className={styles.Body}>
+                    {
+                        CRMs.map(/**CRM*/CRM =>
+                            <div className={styles.CardFrame} key={shortid.generate()}>
+                                <Spin spinning={this.state.isLoading}>
                                     <AuroraCardAvatar title={CRM.title}
-                                                      onClick={CRM.link}
+                                                      onClick={() => history.push(`/dashboard/integrations/${CRM.type}`, {CRM: deepClone(CRM)})}
                                                       desc={CRM.desc}
                                                       image={CRM.image}
                                                       status={CRM.status}
                                     />
-                                </div>
-                            )
-                        }
-                    </div>
-                </NoHeaderPanel>
-            </Spin>
+                                </Spin>
+                            </div>
+                        )
+                    }
+                </div>
+            </NoHeaderPanel>
         );
     }
 }

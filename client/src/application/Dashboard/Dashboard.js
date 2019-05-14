@@ -16,8 +16,8 @@ import Integration from "./Assistants/Assistant/Integration/Integration";
 import Sessions from "./Assistants/Assistant/Sessions/Sessions";
 import Home from "./Home/Home";
 import Analytics from "./Assistants/Assistant/Analytics/Analytics";
-import {authActions, optionsActions} from "../../store/actions";
-import {store} from '../../store/store'
+import {authActions, optionsActions} from "store/actions";
+import {store} from "store/store";
 import {connect} from 'react-redux';
 
 import {TransitionGroup, CSSTransition} from "react-transition-group";
@@ -50,7 +50,9 @@ class Dashboard extends Component {
     };
 
     handleMenuClick = (e) => {
-        if (e.key === 'logout'){return this.logout()}
+        if (e.key === 'logout') {
+            return this.logout()
+        }
         e.key === 'dashboard' ? history.push(`/dashboard`) : history.push(`/dashboard/${e.key}`)
     };
 
@@ -81,16 +83,16 @@ class Dashboard extends Component {
             let userInfoMenu = (
                 <Menu onClick={this.handleMenuClick}>
                     <Menu.Item key="profile">
-                        <div style={{display:'flex', marginTop:'10px'}}>
+                        <div style={{display: 'flex', marginTop: '10px'}}>
                             {avatar}
-                            <div style={{marginLeft:'10px'}}>
+                            <div style={{marginLeft: '10px'}}>
                                 <h3>{user.username}</h3>
                                 <p>{user.email}</p>
                             </div>
                         </div>
                     </Menu.Item>
-                    <Menu.Divider />
-                    <Menu.Item key="logout" >
+                    <Menu.Divider/>
+                    <Menu.Item key="logout">
                         <Icon type="logout"/>
                         <span>Logout</span>
                     </Menu.Item>
@@ -98,20 +100,23 @@ class Dashboard extends Component {
             );
 
             userInfo = (
-                <Dropdown overlay={userInfoMenu} overlayStyle={{width:'255px'}}>
+                <Dropdown overlay={userInfoMenu} overlayStyle={{width: '255px'}}>
                     {avatar}
                 </Dropdown>
             );
         }
         // End of User Information
 
-
+        const isIntegartionPage = this.props.location.pathname.indexOf("/dashboard/integrations") > -1;
         return (
             <Layout style={{height: '100%'}}>
                 <Sider
                     trigger={null}
                     collapsible
                     collapsed={this.state.collapsed}
+                    style={{
+                        backgroundColor: isIntegartionPage ? '#20252e' : ''
+                    }}
                     className={styles.Sider}>
 
                     <div className={styles.Logo}>
@@ -124,13 +129,18 @@ class Dashboard extends Component {
                                 :
                                 <div style={{display: 'flex'}}>
                                     <FontAwesomeIcon size="2x" icon={faCloud} style={{color: '#9254de'}}/>
-                                    <div style={{lineHeight: '32px', marginLeft: 18}}>TheSearchBase</div>
+                                    <div style={{
+                                        lineHeight: '32px',
+                                        marginLeft: 18,
+                                        color: isIntegartionPage ? 'white' : '#9254de'
+                                    }}>TheSearchBase
+                                    </div>
                                 </div>
                         }
 
                     </div>
 
-                    <Menu theme="light"
+                    <Menu theme={isIntegartionPage ? "dark" : "light"}
                           defaultSelectedKeys={this.state.selectedMenuKey}
                           selectedKeys={location.pathname.split('/')[2] ? [location.pathname.split('/')[2]] : [location.pathname.split('/')[1]]}
                           mode="inline" onClick={this.handleMenuClick}>
@@ -162,8 +172,8 @@ class Dashboard extends Component {
                                 Profile
                             </Menu.Item>
                             {/*<Menu.Item key="billing">*/}
-                                {/*<Icon type="pound"/>*/}
-                                {/*Billing*/}
+                            {/*<Icon type="pound"/>*/}
+                            {/*Billing*/}
                             {/*</Menu.Item>*/}
                             <Menu.Item key="users-management" style={{fontSize: '9pt'}}>
                                 <Icon type="usergroup-add"/>
@@ -178,13 +188,20 @@ class Dashboard extends Component {
                     </Menu>
                 </Sider>
 
-                <Layout style={{marginLeft: this.state.collapsed ? 81 : 200, height: '100%'}}>
+                <Layout style={
+                    {marginLeft: this.state.collapsed ? 81 : 200, height: '100%'}}>
 
-                    <Header className={styles.Header}>
-                        <Icon
-                            className={styles.Trigger}
-                            type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
-                            onClick={this.toggle}
+                    <Header className={styles.Header}
+                            style={
+                                isIntegartionPage ?
+                                    {position: 'fixed', width: 'calc(100% - 80px)', zIndex: 1}
+                                    :
+                                    {}
+                            }
+                    >
+                        <Icon className={styles.Trigger}
+                              type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
+                              onClick={this.toggle}
                         />
                         <div className={styles.UserInfo}>
                             {userInfo}
@@ -193,7 +210,12 @@ class Dashboard extends Component {
 
                     {/*HERE GOES ALL THE ROUTES*/}
 
-                    <Content style={{margin: 16, marginTop: 10, marginBottom: 0, height: '100%'}}>
+                    <Content style={
+                        isIntegartionPage ?
+                            {minHeight: 'auto', marginTop: 64}
+                            :
+                            {margin: 16, marginTop: 10, marginBottom: 0, height: '100%'}
+                    }>
                         <Route render={() =>
                             <TransitionGroup style={{height: '100%'}}>
                                 <CSSTransition key={location.key} classNames="fade" timeout={550}>
@@ -208,7 +230,7 @@ class Dashboard extends Component {
                                                component={CRM}/>
                                         <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                                         <Route path={`${match.path}/integrations`} component={Integrations} exact/>
-                                        <Route path={`${match.path}/integrations/:id`} component={CrmView} exact/>
+                                        <Route path={`${match.path}/integrations/:crm`} component={CrmView} exact/>
                                         <Route path={`${match.path}/databases`} component={Databases} exact/>
                                         <Route path={`${match.path}/profile`} component={Profile} exact/>
                                         <Route path={`${match.path}/billing`} component={Billing} exact/>
@@ -223,7 +245,7 @@ class Dashboard extends Component {
                         }/>
                     </Content>
 
-                    <Footer style={{textAlign: 'center', padding: 10, zIndex:1}}>
+                    <Footer style={{textAlign: 'center', padding: 10, zIndex: 1}}>
                         Copyright TheSearchBase Limited 2019. All rights reserved.
                     </Footer>
                 </Layout>

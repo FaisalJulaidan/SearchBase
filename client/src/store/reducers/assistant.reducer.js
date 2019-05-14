@@ -1,5 +1,6 @@
 import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
+import {deepClone} from "helpers";
 
 const initialState = {assistantList: [], isLoading: false, errorMsg: null, isUpdatingFlow: false};
 
@@ -115,7 +116,7 @@ export const assistant = (state = initialState, action) => {
             });
         case actionTypes.UPDATE_FLOW_SUCCESS:
 
-            let newAssistantList = JSON.parse(JSON.stringify(state.assistantList));
+            let newAssistantList = deepClone(state.assistantList);
             newAssistantList =  newAssistantList.filter(assistant => assistant.id !== action.assistant.id);
             newAssistantList.push(action.assistant);
 
@@ -141,7 +142,7 @@ export const assistant = (state = initialState, action) => {
             });
         case actionTypes.CONNECT_CRM_SUCCESS:
 
-            let newAssistantConnection = JSON.parse(JSON.stringify(state.assistantList)).map(assistant => {
+            let newAssistantConnection = deepClone(state.assistantList).map(assistant => {
                 if (assistant.ID === action.assistant.ID)
                     assistant = action.assistant;
                 return assistant
@@ -185,7 +186,7 @@ export const assistant = (state = initialState, action) => {
                 disconnectCRMErrorMsg: ''
             });
         case actionTypes.DISCONNECT_CRM_SUCCESS:
-            let newAssistantDisconnect = JSON.parse(JSON.stringify(state.assistantList)).map(assistant => {
+            let newAssistantDisconnect = deepClone(state.assistantList).map(assistant => {
                 if (assistant.ID === action.assistant.ID)
                     assistant = action.assistant;
                 return assistant

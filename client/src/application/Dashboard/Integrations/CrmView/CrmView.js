@@ -1,37 +1,57 @@
-import React from 'react';
+import React from 'react'
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Typography, Button} from 'antd';
+import {Typography, Avatar, Tabs} from 'antd';
+
 
 import styles from './CrmView.module.less'
-import {getLink, history} from "helpers";
-import PropTypes from 'prop-types';
+import {history} from "helpers";
+import 'types/CRM_Types';
 
-const {Title} = Typography;
+const TabPane = Tabs.TabPane;
+const {Title, Paragraph, Text} = Typography;
 
 class CrmView extends React.Component {
-    static contextTypes = {
-        router: PropTypes.object
+
+
+    state = {
+        /** @type {CRM} */
+        CRM: {}
     };
 
-    CRMID = this.props.match.params.id;
-
     componentDidMount() {
-        console.log('I should send request to the server with this id ' + this.CRMID)
+
+        this.setState({CRM: this.props.location?.state?.CRM}, () => {
+            // If the state is not passed from the parent page redirect the user to integration page to
+            // click on the needed CRM to show its data (or use its state)
+            if (!this.state.CRM?.type)
+                history.push('/dashboard/integrations')
+        });
     }
+
 
 
     render() {
         return (
             <NoHeaderPanel>
                 <div className={styles.Title}>
-                    <Button onClick={this.context.router?.history?.goBack}
-                            className={styles.BackButton}
-                            type="primary" icon="left" shape="circle"/>
-                    <Title>All Integrations</Title>
+                    <Avatar shape="square" size={80} src={this.state.CRM.image} className={styles.Avatar}/>
+                    <div className={styles.DetailsWithAvatar}>
+                        <Title level={2}>{this.state.CRM?.type}</Title>
+                        <Paragraph type="secondary">
+                            We supply a series of design principles, practical patterns and high quality design
+                            resources
+                            (<Text code>Sketch</Text> and <Text code>Axure</Text>), to help people create their
+                            product
+                            prototypes beautifully and efficiently.
+                        </Paragraph>
+                    </div>
                 </div>
 
                 <div className={styles.Body}>
-
+                    <Tabs defaultActiveKey="1">
+                        <TabPane tab="Connection" key="1">Content of Tab Pane 1</TabPane>
+                        <TabPane tab="Feature" key="2">Content of Tab Pane 2</TabPane>
+                    </Tabs>
 
                 </div>
 

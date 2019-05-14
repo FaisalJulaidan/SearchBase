@@ -1,11 +1,29 @@
 .Title {
   padding: 10px;
-  height: 80px;
   display: flex;
 }
 
+.DetailsWithAvatar {
+  width: calc(100% - 95px);
+  margin-left: 15px;
+}
+
+.Details {
+  width: calc(100% - 95px);
+}
+
+.Details h1,
+.DetailsWithAvatar h2 {
+  margin-bottom: 0;
+}
+
+.Details > div,
+.DetailsWithAvatar > div {
+  font-size: 17px;
+}
+
 .Body {
-  height: calc(100% - 80px);
+  //height: calc(100% - 152px);
   overflow-y: auto;
 }
 
@@ -18,4 +36,8 @@
 .BackButton {
   margin-top: 8px;
   margin-right: 10px;
+}
+
+.Avatar {
+  border: 1px solid #9254de;
 }

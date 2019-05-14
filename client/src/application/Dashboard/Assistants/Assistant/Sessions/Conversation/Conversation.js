@@ -10,7 +10,7 @@ class Conversation extends Component {
         this.counter = -1;
     }
 
-    emailUser(email){
+    static emailUser(email){
         window.location.href = "mailto:"+email;
     }
 
@@ -34,7 +34,7 @@ class Conversation extends Component {
             }
             else if (record.dataType === "Email"){
                 return (<p>
-                   {record.input} <Icon type="mail" onClick={()=>{console.log(record.input);this.emailUser(record.input)}}/>
+                   {record.input} <Icon type="mail" onClick={()=>{console.log(record.input);Conversation.emailUser(record.input)}}/>
                </p>);
             }
             else {

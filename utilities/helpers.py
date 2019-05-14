@@ -73,11 +73,11 @@ def gen_dummy_data():
                                          {
                                             "ID": "834hf",
                                             "DataType": enums.DataType.CandidateSkills.name,
-                                            "Type": "User Input",
+                                            "Type": enums.BlockType.UserInput.value,
                                             "StoreInDB": True,
                                             "Skippable": True,
                                             "SkipText": "Skip!",
-                                            "SkipAction": "End Chat",
+                                            "SkipAction": enums.BlockAction.EndChat.value,
                                             "SkipBlockToGoID": None,
                                             "Content": {
                                                 "action": "Go To Next Block",
@@ -88,11 +88,11 @@ def gen_dummy_data():
                                          },
                                          {
                                             "ID":"by_GnLY-f",
-                                            "Type":"Solutions",
+                                            "Type": enums.BlockType.Solutions.value,
                                             "StoreInDB":False,
                                             "Skippable":True,
                                             "SkipText": "Skip!",
-                                            "SkipAction": "End Chat",
+                                            "SkipAction": enums.BlockAction.EndChat.value,
                                             "SkipBlockToGoID": None,
                                             "DataType":enums.DataType.NoType.name,
                                              "Content": {
@@ -100,7 +100,7 @@ def gen_dummy_data():
                                                  "action": "End Chat",
                                                  "blockToGoID": None,
                                                  "afterMessage": "We will contact you with this candidate",
-                                                 "databaseType": "Candidates"
+                                                 "databaseType": enums.DatabaseType.Candidates.value['enumName']
                                              },
                                          },
                                          # {

@@ -272,86 +272,53 @@ def scanCandidates(session, dbIDs, databaseType: DatabaseType):
         keywords = session['keywordsByDataType']
         df['count'] = 0 # add column for tracking score
 
-        # Numbers
-        # Received DataType: CandidateDesiredSalary <> Column: CandidateDesiredSalary | points=3
-        if keywords.get(DT.CandidateDesiredSalary.value['name']):
-            df.loc[df[Candidate.CandidateDesiredSalary.name] <= float(keywords[DT.CandidateDesiredSalary.value['name']][-1]), 'count'] += 3
+        def wordsCounter(dataType: DT, dbColumn, x=1):
+            if keywords.get(dataType.value['name']):
+                df['count'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
+                                                           flags=re.IGNORECASE) | 0
 
-        # Received DataType: JobSalary <> Column: DesiredSalary | points=3
-        if keywords.get(DT.JobSalary.value['name']):
-            df.loc[df[Candidate.CandidateDesiredSalary.name] <= float(keywords[DT.JobSalary.value['name']][-1]), 'count'] += 3
+        def greaterCounter(dataType: DT, dbColumn, plus=1):
+            if keywords.get(dataType.value['name']):
+                df.loc[df[dbColumn.name] <=
+                       float(keywords[dataType.value['name']][-1]), 'count'] += plus
 
+        def lessCounter(dataType: DT, dbColumn, plus=1):
+            if keywords.get(dataType.value['name']):
+                df.loc[df[dbColumn.name] >=
+                       float(keywords[dataType.value['name']][-1]), 'count'] += plus
 
-        # Received DataType: CandidateYearsExperience <> Column: CandidateYearsExperience | points=5
-        if keywords.get(DT.CandidateYearsExperience.value['name']):
-            df.loc[df[Candidate.CandidateYearsExperience.name] >= float(keywords[DT.CandidateYearsExperience.value['name']][-1]), 'count'] += 5
+        # Desired Salary
+        greaterCounter(DT.CandidateDesiredSalary, Candidate.CandidateDesiredSalary, 3)
+        greaterCounter(DT.JobSalary, Candidate.CandidateDesiredSalary, 3)
+        # Years of EXP
+        lessCounter(DT.CandidateYearsExperience, Candidate.CandidateYearsExperience, 5)
 
+        # Education
+        wordsCounter(DT.CandidateEducation, Candidate.CandidateEducation)
 
-        #  ================================================================================
+        # Location
+        wordsCounter(DT.JobLocation, Candidate.CandidateLocation, 6)
+        wordsCounter(DT.CandidateLocation, Candidate.CandidateLocation, 6)
 
+        # JobTitle
+        wordsCounter(DT.CandidateJobTitle, Candidate.CandidateJobTitle)
+        wordsCounter(DT.JobTitle, Candidate.CandidateJobTitle)
 
-        # Received DataType: CandidateEducation <> Column: CandidateEducation | points= 1
-        if keywords.get(DT.CandidateEducation.value['name']):
-            df['count'] += df[Candidate.CandidateEducation.name].str.count('|'.join(keywords[DT.CandidateEducation.value['name']]),
-                                                                 flags=re.IGNORECASE) | 0
+        # Skills
+        wordsCounter(DT.CandidateSkills, Candidate.CandidateSkills, 2)
+        wordsCounter(DT.JobDesiredSkills, Candidate.CandidateSkills, 2)
+        wordsCounter(DT.JobEssentialSkills, Candidate.CandidateSkills, 2)
 
+        # Availability
+        wordsCounter(DT.CandidateAvailability, Candidate.CandidateAvailability)
 
-        # ======================= Candidate Location ===================================
-        # Received DataType: CandidateLocation <> Column: CandidateLocation | points= 1
-        if keywords.get(DT.CandidateLocation.value['name']):
-            df['count'] += 6 * df[Candidate.CandidateLocation.name].str.count('|'.join(keywords[DT.CandidateLocation.value['name']]),
-                                                                 flags=re.IGNORECASE) | 0
-
-        # Received DataType: JobLocation <> Column: CandidateLocation | points= 1
-        if keywords.get(DT.JobLocation.value['name']):
-            df['count'] += 6 * df[Candidate.CandidateLocation.name].str.count('|'.join(keywords[DT.JobLocation.value['name']]),
-                                                                          flags=re.IGNORECASE) | 0
-
-
-        # ======================= Candidate Job Title ===================================
-        # Received DataType: CandidateJobTitle <> Column: CandidateJobTitle | points= 1
-        if keywords.get(DT.CandidateJobTitle.value['name']):
-            df['count'] += df[Candidate.CandidateJobTitle.name].str.count('|'.join(keywords[DT.CandidateJobTitle.value['name']]),
-                                                                        flags=re.IGNORECASE) | 0
-
-        # Received DataType: CandidateJobTitle <> Column: CandidateJobTitle | points= 1
-        if keywords.get(DT.JobTitle.value['name']):
-            df['count'] += df[Candidate.CandidateJobTitle.name].str.count('|'.join(keywords[DT.JobTitle.value['name']]),
-                                                                          flags=re.IGNORECASE) | 0
-
-        # ======================= Candidate Skills ===================================
-        # Received DataType: CandidateSkills <> Column: CandidateSkills | points= 1
-        if keywords.get(DT.CandidateSkills.value['name']):
-            df['count'] += 2 * df[Candidate.CandidateSkills.name].str.count('|'.join(keywords[DT.CandidateSkills.value['name']]),
-                                                                                flags=re.IGNORECASE) | 0
-
-        # Received DataType: JobDesiredSkills <> Column: CandidateSkills | points= 1
-        if keywords.get(DT.JobDesiredSkills.value['name']):
-            df['count'] += 2 * df[Candidate.CandidateSkills.name].str.count('|'.join(keywords[DT.JobDesiredSkills.value['name']]),
-                                                                        flags=re.IGNORECASE) | 0
-
-        # Received DataType: JobEssentialSkills <> Column: CandidateSkills | points= 1
-        if keywords.get(DT.JobEssentialSkills.value['name']):
-            df['count'] += 2 * df[Candidate.CandidateSkills.name].str.count('|'.join(keywords[DT.JobEssentialSkills.value['name']]),
-                                                                        flags=re.IGNORECASE) | 0
-        #  =============================================================================
-
-
-        # ======================= Candidate Availability ===================================
-        # Received DataType: CandidateAvailability <> Column: CandidateAvailability | points= 1
-        if keywords.get(DT.CandidateAvailability.value['name']):
-            df['count'] += df[Candidate.CandidateAvailability.name].str.count('|'.join(keywords[DT.CandidateAvailability.value['name']]),
-                                                                                flags=re.IGNORECASE) | 0
 
         topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 2), 'count')
                                 .to_json(orient='records'))
 
         data = []
-
-
         location = ["Their preferred location for work would be [location].",
                     "They prefer to work in [location]."]
-
         yearsExp = ["This candidate has [yearsExp] years of experience in  [skills].",
                     "They have experience with [skills] for [yearsExp] years."]
 
@@ -397,72 +364,46 @@ def scanJobs(session, dbIDs, databaseType: DatabaseType):
         keywords = session['keywordsByDataType']
         df['count'] = 0 # add column for tracking score
 
-        # ======================= Numbers Comparision ===================================
-        # Received DataType: JobSalary <> Column: JobSalary | points=3
-        if keywords.get(DT.JobSalary.value['name']):
-            df.loc[df[Job.JobSalary.name] >= float(keywords[DT.JobSalary.value['name']][-1]), 'count'] += 3
-        #  ================================================================================
+        def wordsCounter(dataType: DT, dbColumn, x=1):
+            if keywords.get(dataType.value['name']):
+                df['count'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
+                                                               flags=re.IGNORECASE) | 0
 
-        # ======================= Job Title ===================================
-        # Received DataType: JobTitle <> Column: JobTitle | points= 1
-        if keywords.get(DT.JobTitle.value['name']):
-            df['count'] += df[Job.JobTitle.name].str.count('|'.join(keywords[DT.JobTitle.value['name']]),
-                                                                        flags=re.IGNORECASE) | 0
+        def greaterCounter(dataType: DT, dbColumn, plus=1):
+            if keywords.get(dataType.value['name']):
+                df.loc[df[dbColumn.name] <=
+                       float(keywords[dataType.value['name']][-1]), 'count'] += plus
 
-        # Received DataType: JobTitle <> Column: JobDescription | points= 1
-        if keywords.get(DT.JobTitle.value['name']):
-            df['count'] += df[Job.JobDescription.name].str.count('|'.join(keywords[DT.JobTitle.value['name']]),
-                                                           flags=re.IGNORECASE) | 0
+        def lessCounter(dataType: DT, dbColumn, plus=1):
+            if keywords.get(dataType.value['name']):
+                df.loc[df[dbColumn.name] >=
+                       float(keywords[dataType.value['name']][-1]), 'count'] += plus
 
-        # Received DataType: JobType <> Column: JobType | points= 1
-        if keywords.get(DT.JobType.value['name']):
-            df['count'] += df[Job.JobType.name].str.count('|'.join(keywords[DT.JobType.value['name']]),
-                                                              flags=re.IGNORECASE) | 0
-        #  =======================================================================
+        # Salary
+        lessCounter(DT.JobSalary, Job.JobSalary, 3)
+        lessCounter(DT.CandidateDesiredSalary, Job.JobSalary, 3)
 
+        # Job Title
+        wordsCounter(DT.JobTitle, Job.JobTitle)
+        wordsCounter(DT.JobTitle, Job.JobDescription)
 
-        # ======================= Job Location ===================================
-        # Received DataType: JobLocation <> Column: JobLocation | points= 1
-        if keywords.get(DT.JobLocation.value['name']):
-            df['count'] += df[Job.JobLocation.name].str.count('|'.join(keywords[DT.JobLocation.value['name']]),
-                                                           flags=re.IGNORECASE) | 0
+        # Type
+        wordsCounter(DT.JobType, Job.JobType)
 
+        # Location
+        wordsCounter(DT.JobLocation, Job.JobLocation, 3)
+        wordsCounter(DT.CandidateLocation, Job.JobLocation, 3)
 
-        # Received DataType: CandidateLocation <> Column: JobLocation | points= 1
-        if keywords.get(DT.CandidateLocation.value['name']):
-            df['count'] += df[Job.JobLocation.name].str.count('|'.join(keywords[DT.CandidateLocation.value['name']]),
-                                                              flags=re.IGNORECASE) | 0
-        # =========================================================================
+        # Skills
+        wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, 2)
+        wordsCounter(DT.JobDesiredSkills, Job.JobDesiredSkills, 2)
+        wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, 2)
+        wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, 2)
 
-
-        # ======================= Job Skills ===================================
-        # Received DataType: JobEssentialSkills <> Column: JobEssentialSkills | points= 1
-        if keywords.get(DT.JobEssentialSkills.value['name']):
-            df['count'] += df[Job.JobEssentialSkills.name].str.count('|'.join(keywords[DT.JobEssentialSkills.value['name']]),
-                                                                        flags=re.IGNORECASE) | 0
-
-        # Received DataType: JobDesiredSkills <> Column: JobDesiredSkills | points= 1
-        if keywords.get(DT.JobDesiredSkills.value['name']):
-            df['count'] += df[Job.JobDesiredSkills.name].str.count('|'.join(keywords[DT.JobDesiredSkills.value['name']]),
-                                                                  flags=re.IGNORECASE) | 0
-
-
-        # Received DataType: CandidateSkills <> Column: JobEssentialSkills | points= 1
-        if keywords.get(DT.CandidateSkills.value['name']):
-            df['count'] += df[Job.JobEssentialSkills.name].str.count('|'.join(keywords[DT.CandidateSkills.value['name']]),
-                                                                     flags=re.IGNORECASE) | 0
-
-        # Received DataType: CandidateSkills <> Column: JobDesiredSkills | points= 1
-        if keywords.get(DT.CandidateSkills.value['name']):
-            df['count'] += df[Job.JobDesiredSkills.name].str.count('|'.join(keywords[DT.CandidateSkills.value['name']]),
-                                                                   flags=re.IGNORECASE) | 0
-        # =========================================================================
-
+        # Results
         topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 0), 'count')
                                 .to_json(orient='records'))
         data = []
-
-
         for record in topResults:
 
             subTitle = ""

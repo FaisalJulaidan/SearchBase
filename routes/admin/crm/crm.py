@@ -7,6 +7,7 @@ from utilities import helpers
 
 crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../../templates")
 
+
 # Get all company CRMs and check their connections before returning them
 @crm_router.route("/crm", methods=["GET"])
 @jwt_required

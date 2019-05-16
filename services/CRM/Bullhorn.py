@@ -10,8 +10,12 @@ from models import Callback, ChatbotSession
 def login(auth):
     try:
         authCopy = dict(auth)  # we took copy to delete domain later only from the copy
-        url = "https://developerconnection.adaptondemand.com/WebApp/api/domains/" \
-              + auth.get('domain', 'Unknown') + "/logon"
+        url = "https://auth.bullhornstaffing.com/oauth/token?" +\
+              "grant_type=authorization_code&" +\
+              "code={auth_code}& " +\
+              "client_id=" + authCopy.get("client_id", "Undefined") + "&" +\
+              "client_secret=" + authCopy.get("client_secret", "Undefined") + "&" +\
+              "redirect_uri=http://www.bullhorn.com/"
         headers = {'Content-Type': 'application/json'}
 
         # Send request

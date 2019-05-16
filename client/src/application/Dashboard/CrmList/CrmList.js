@@ -3,17 +3,17 @@ import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import AuroraCardAvatar from 'components/AuroraCardAvatar/AuroraCardAvatar'
 import {Typography, Spin} from 'antd';
 import {connect} from 'react-redux';
-import styles from './Integrations.module.less'
+import styles from './CrmList.module.less'
 import {getLink, history, deepClone} from "helpers";
 import PropTypes from 'prop-types';
 import shortid from 'shortid';
-import {integrationsActions} from "store/actions";
+import {crmListActions} from "store/actions";
 import 'types/CRM_Types';
 
 const {Title, Paragraph, Text} = Typography;
 
 
-class Integrations extends React.Component {
+class CrmList extends React.Component {
 
     static contextTypes = {
         router: PropTypes.object
@@ -25,7 +25,7 @@ class Integrations extends React.Component {
             {
                 title: 'Bullhorn',
                 desc: 'Bullhorn Desc',
-                link: () => history.push(`/dashboard/integrations/bullhorn`),
+                link: () => history.push(`/dashboard/crmlist/bullhorn`),
                 image: getLink('/static/images/CRM/bullhorn.png'),
                 type: "Bullhorn",
                 status: 'NOT_CONNECTED',
@@ -34,7 +34,7 @@ class Integrations extends React.Component {
                 title: 'Vincere',
                 desc: 'Vincere Desc',
                 link: () => history.push({
-                    pathname: `/dashboard/integrations/vincere`,
+                    pathname: `/dashboard/crmlist/vincere`,
                     state: {CRMs: this.state.CRMs}
                 }),
                 image: getLink('/static/images/CRM/vincere.png'),
@@ -45,7 +45,7 @@ class Integrations extends React.Component {
                 title: 'Adapt',
                 desc: 'Adapt Desc',
                 link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
+                    pathname: `/dashboard/crmlist/adapt`,
                     state: {CRMs: this.state.CRMs}
                 }),
                 image: getLink('/static/images/CRM/adapt.png'),
@@ -58,7 +58,7 @@ class Integrations extends React.Component {
 
 
     componentDidMount() {
-        this.props.dispatch(integrationsActions.getConnectedCRMs())
+        this.props.dispatch(crmListActions.getConnectedCRMs())
     }
 
     componentWillReceiveProps(nextProps) {
@@ -84,7 +84,7 @@ class Integrations extends React.Component {
             <NoHeaderPanel>
                 <div className={styles.Title}>
                     <div className={styles.Details}>
-                        <Title>All Integrations</Title>
+                        <Title>CRMs List</Title>
                         <Paragraph type="secondary">
                             We supply a series of design principles, practical patterns and high quality design
                             resources
@@ -102,7 +102,7 @@ class Integrations extends React.Component {
                             <div className={styles.CardFrame} key={shortid.generate()}>
                                 <Spin spinning={this.state.isLoading}>
                                     <AuroraCardAvatar title={CRM.title}
-                                                      onClick={() => history.push(`/dashboard/integrations/${CRM.type}`, {CRM: deepClone(CRM)})}
+                                                      onClick={() => history.push(`/dashboard/crmlist/${CRM.type}`, {CRM: deepClone(CRM)})}
                                                       desc={CRM.desc}
                                                       image={CRM.image}
                                                       status={CRM.status}
@@ -119,8 +119,8 @@ class Integrations extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        CRMsList: state.integrations.CRMsList,
+        CRMsList: state.crmlist.CRMsList,
     };
 }
 
-export default connect(mapStateToProps)(Integrations);
+export default connect(mapStateToProps)(CrmList);

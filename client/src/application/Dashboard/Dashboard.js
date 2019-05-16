@@ -25,8 +25,8 @@ import {TransitionGroup, CSSTransition} from "react-transition-group";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import CRM from "./Assistants/Assistant/CRM/CRM";
-import Integrations from "./Integrations/Integrations";
-import CrmView from "./Integrations/CrmView/CrmView";
+import CrmView from "./CrmList/CrmView/CrmView";
+import CrmList from "./CrmList/CrmList";
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -107,7 +107,7 @@ class Dashboard extends Component {
         }
         // End of User Information
 
-        const isIntegartionPage = this.props.location.pathname.indexOf("/dashboard/integrations") > -1;
+        const isCRMPage = this.props.location.pathname.indexOf("/dashboard/crmlist") > -1;
         return (
             <Layout style={{height: '100%'}}>
                 <Sider
@@ -115,7 +115,7 @@ class Dashboard extends Component {
                     collapsible
                     collapsed={this.state.collapsed}
                     style={{
-                        // backgroundColor: isIntegartionPage ? '#20252e' : ''
+                        // backgroundColor: isCRMPage ? '#20252e' : ''
                     }}
                     className={styles.Sider}>
 
@@ -132,7 +132,7 @@ class Dashboard extends Component {
                                     <div style={{
                                         lineHeight: '32px',
                                         marginLeft: 18,
-                                        // color: isIntegartionPage ? 'white' : '#9254de'
+                                        // color: isCRMPage ? 'white' : '#9254de'
                                         color: "#9254de"
                                     }}>TheSearchBase
                                     </div>
@@ -142,7 +142,7 @@ class Dashboard extends Component {
                     </div>
 
                     <Menu
-                        // theme={isIntegartionPage ? "dark" : "light"}
+                        // theme={isCRMPage ? "dark" : "light"}
                         theme={"light"}
                         defaultSelectedKeys={this.state.selectedMenuKey}
                         selectedKeys={location.pathname.split('/')[2] ? [location.pathname.split('/')[2]] : [location.pathname.split('/')[1]]}
@@ -162,9 +162,9 @@ class Dashboard extends Component {
                             <span>Databases</span>
                         </Menu.Item>
 
-                        <Menu.Item key="integrations">
+                        <Menu.Item key="crmlist">
                             <Icon type="interation"/>
-                            <span>Integrations</span>
+                            <span>CRMs List</span>
                         </Menu.Item>
 
                         <Divider/>
@@ -196,7 +196,7 @@ class Dashboard extends Component {
 
                     <Header className={styles.Header}
                             style={
-                                isIntegartionPage ?
+                                isCRMPage ?
                                     {
                                         position: 'fixed',
                                         width: `calc(100% - ${this.state.collapsed ? 80 : 200}px)`,
@@ -218,7 +218,7 @@ class Dashboard extends Component {
                     {/*HERE GOES ALL THE ROUTES*/}
 
                     <Content style={
-                        isIntegartionPage ?
+                        isCRMPage ?
                             {minHeight: 'auto', marginTop: 64}
                             :
                             {margin: 16, marginTop: 10, marginBottom: 0, height: '100%'}
@@ -236,8 +236,8 @@ class Dashboard extends Component {
                                         <Route path={`${match.path}/assistants/:id/CRMIntegration`}
                                                component={CRM}/>
                                         <Route path={`${match.path}/assistants`} component={Assistants} exact/>
-                                        <Route path={`${match.path}/integrations`} component={Integrations} exact/>
-                                        <Route path={`${match.path}/integrations/:crm`} component={CrmView} exact/>
+                                        <Route path={`${match.path}/crmlist`} component={CrmList} exact/>
+                                        <Route path={`${match.path}/crmlist/:crm`} component={CrmView} exact/>
                                         <Route path={`${match.path}/databases`} component={Databases} exact/>
                                         <Route path={`${match.path}/profile`} component={Profile} exact/>
                                         <Route path={`${match.path}/billing`} component={Billing} exact/>

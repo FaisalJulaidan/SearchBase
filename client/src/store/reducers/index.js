@@ -6,7 +6,7 @@ import {chatbotSessions} from "./chatbotSessions.reducer";
 import {usersManagement} from "./usersManagement.reducer";
 import {database} from "./database.reducer";
 import {options} from "./options.reducer";
-import {integrations} from "./integrations.reducer";
+import {crmlist} from "./crmlist.reducer";
 import * as actionTypes from '../actions/actionTypes';
 import storage from 'redux-persist/lib/storage'
 
@@ -15,7 +15,7 @@ import storage from 'redux-persist/lib/storage'
 
 const appReducer = combineReducers({
     auth,
-    integrations,
+    crmlist,
     assistant,
     profile,
     chatbotSessions,

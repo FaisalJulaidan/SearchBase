@@ -11,7 +11,7 @@ import {
     usersManagementSaga,
     databaseSaga,
     optionsSaga,
-    integrationsSaga
+    crmlistSaga
 } from './sagas'
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -41,7 +41,7 @@ sagaMiddleware.run(chatbotSessions);
 sagaMiddleware.run(usersManagementSaga);
 sagaMiddleware.run(databaseSaga);
 sagaMiddleware.run(optionsSaga);
-sagaMiddleware.run(integrationsSaga);
+sagaMiddleware.run(crmlistSaga);
 
 
 export { store, persistor }

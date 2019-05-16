@@ -22,7 +22,7 @@ const getConnectedCRMsFailure = (error) => {
 };
 
 
-export const integrationsActions = {
+export const crmListActions = {
     getConnectedCRMs,
     getConnectedCRMsSuccess,
     getConnectedCRMsFailure,

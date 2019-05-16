@@ -3,7 +3,7 @@ import {updateObject} from '../utility';
 
 const initialState = {CRMsList: [], errorMsg: null};
 
-export const integrations = (state = initialState, action) => {
+export const crmlist = (state = initialState, action) => {
     state = initialState;
     switch (action.type) {
         case actionTypes.GET_CONNECTED_CRMS_REQUEST:

@@ -30,7 +30,7 @@ class CrmView extends React.Component {
             // If the state is not passed from the parent page redirect the user to integration page to
             // click on the needed CRM to show its data (or use its state)
             if (!this.state.CRM?.type)
-                history.push('/dashboard/integrations')
+                history.push('/dashboard/crmlist')
         });
     }
 
@@ -102,8 +102,8 @@ class CrmView extends React.Component {
                     <Breadcrumb>
                         <Breadcrumb.Item>
                             <a href={"javascript:void(0);"}
-                               onClick={() => history.push('/dashboard/integrations')}>
-                                Integrations
+                               onClick={() => history.push('/dashboard/crmlist')}>
+                                CRMs List
                             </a>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>{CRM.type}</Breadcrumb.Item>

@@ -269,3 +269,11 @@ class DataType(Enum):
         ValidationType.DateTime,
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])
+
+
+    JobYearsRequired = dataTypeCreator(
+        'Job Years Required',
+        'JobYearsRequired',
+        ValidationType.Number,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])

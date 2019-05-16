@@ -102,7 +102,7 @@ class ColumnSelectionStep extends Component {
             }
         }
 
-        if (TSBcolumnOption.type === "FLOAT") {
+        if (TSBcolumnOption.type === "FLOAT" || TSBcolumnOption.type === "INTEGER") {
             if (validatedData) {
                 validatedData = Number(validatedData);
                 if (isNaN(validatedData)) {

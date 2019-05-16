@@ -172,8 +172,8 @@ class Sessions extends React.Component {
               }}>
                   View
               </a>
-                    <Divider type="vertical" />
-              <a onClick={() => {
+                    <Divider hidden type="vertical" />
+              <a hidden onClick={() => {
                   this.deleteSession(record)
               }}>
                   Delete
@@ -200,7 +200,7 @@ class Sessions extends React.Component {
                             </Button>
 
 
-                            <Button className={styles.Panel_Header_Button} type="primary" icon="delete"
+                            <Button hidden className={styles.Panel_Header_Button} type="primary" icon="delete"
                                     disabled={!!(!sessions?.sessionsList?.length)}
                                     onClick={() => {
                                         this.clearAllChatbotSessions(assistant.ID)

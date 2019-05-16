@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Table, Tag} from "antd";
+import {Button, Table, Tag, Icon} from "antd";
 
 
 class Conversation extends Component {
@@ -8,6 +8,10 @@ class Conversation extends Component {
 
     componentWillUpdate(nextProps, nextState, nextContext) {
         this.counter = -1;
+    }
+
+    emailUser(email){
+        window.location.href = "mailto:"+email;
     }
 
     columns = [{
@@ -28,7 +32,11 @@ class Conversation extends Component {
                     Download File
                 </Button>);
             }
-
+            else if (record.dataType === "Email"){
+                return (<p>
+                   {record.input} <Icon type="mail" onClick={()=>{console.log(record.input);this.emailUser(record.input)}}/>
+               </p>);
+            }
             else {
                return (<p>
                    {record.input}

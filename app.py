@@ -41,7 +41,13 @@ app.register_blueprint(database_router, url_prefix='/api')
 app.register_blueprint(options_router, url_prefix='/api')
 
 
-## Error Handlers ##
+@app.after_request
+def apply_caching(response):
+    response.headers["X-Frame-Options"] = "DENY"
+    return response
+
+
+# 404 Error Handler
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def page_not_found(e):
     try:

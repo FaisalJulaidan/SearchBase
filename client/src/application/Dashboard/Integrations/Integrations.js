@@ -28,7 +28,7 @@ class Integrations extends React.Component {
                 link: () => history.push(`/dashboard/integrations/bullhorn`),
                 image: getLink('/static/images/CRM/bullhorn.png'),
                 type: "Bullhorn",
-                status: 'NOT_CONNECTED'
+                status: 'NOT_CONNECTED',
             },
             {
                 title: 'Vincere',
@@ -39,7 +39,7 @@ class Integrations extends React.Component {
                 }),
                 image: getLink('/static/images/CRM/vincere.png'),
                 type: "Vincere",
-                status: 'FAILED'
+                status: 'NOT_CONNECTED',
             },
             {
                 title: 'Adapt',
@@ -50,194 +50,7 @@ class Integrations extends React.Component {
                 }),
                 image: getLink('/static/images/CRM/adapt.png'),
                 type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
-            },
-            {
-                title: 'Adapt',
-                desc: 'Adapt Desc',
-                link: () => history.push({
-                    pathname: `/dashboard/integrations/adapt`,
-                    state: {CRMs: this.state.CRMs}
-                }),
-                image: getLink('/static/images/CRM/adapt.png'),
-                type: "Adapt",
-                status: 'NOT_CONNECTED'
+                status: 'NOT_CONNECTED',
             }
         ],
         isLoading: true
@@ -253,7 +66,6 @@ class Integrations extends React.Component {
             .forEach(serverCRM => {
                 /** @type {CRM} */
                 let currentCRM = this.state.CRMs.find(crm => crm.type === serverCRM.Type);
-
                 if (currentCRM.status)
                     currentCRM.status = "CONNECTED";
                 else

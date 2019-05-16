@@ -115,7 +115,7 @@ class Dashboard extends Component {
                     collapsible
                     collapsed={this.state.collapsed}
                     style={{
-                        backgroundColor: isIntegartionPage ? '#20252e' : ''
+                        // backgroundColor: isIntegartionPage ? '#20252e' : ''
                     }}
                     className={styles.Sider}>
 
@@ -132,7 +132,8 @@ class Dashboard extends Component {
                                     <div style={{
                                         lineHeight: '32px',
                                         marginLeft: 18,
-                                        color: isIntegartionPage ? 'white' : '#9254de'
+                                        // color: isIntegartionPage ? 'white' : '#9254de'
+                                        color: "#9254de"
                                     }}>TheSearchBase
                                     </div>
                                 </div>
@@ -140,10 +141,12 @@ class Dashboard extends Component {
 
                     </div>
 
-                    <Menu theme={isIntegartionPage ? "dark" : "light"}
-                          defaultSelectedKeys={this.state.selectedMenuKey}
-                          selectedKeys={location.pathname.split('/')[2] ? [location.pathname.split('/')[2]] : [location.pathname.split('/')[1]]}
-                          mode="inline" onClick={this.handleMenuClick}>
+                    <Menu
+                        // theme={isIntegartionPage ? "dark" : "light"}
+                        theme={"light"}
+                        defaultSelectedKeys={this.state.selectedMenuKey}
+                        selectedKeys={location.pathname.split('/')[2] ? [location.pathname.split('/')[2]] : [location.pathname.split('/')[1]]}
+                        mode="inline" onClick={this.handleMenuClick}>
                         <Menu.Item key="dashboard">
                             <Icon type="home"/>
                             <span>Home</span>
@@ -194,7 +197,11 @@ class Dashboard extends Component {
                     <Header className={styles.Header}
                             style={
                                 isIntegartionPage ?
-                                    {position: 'fixed', width: 'calc(100% - 80px)', zIndex: 1}
+                                    {
+                                        position: 'fixed',
+                                        width: `calc(100% - ${this.state.collapsed ? 80 : 200}px)`,
+                                        zIndex: 1
+                                    }
                                     :
                                     {}
                             }

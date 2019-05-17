@@ -15,6 +15,7 @@ from models import Callback, ChatbotSession
 # submitting a new candidate has no required* fields
 
 
+# failing at fetch_token() currently, wants access_token, requests.post(authorization_url) returns html login page
 def login(auth):
     try:
         authCopy = dict(auth)  # we took copy to delete domain later only from the copy
@@ -74,7 +75,9 @@ def retrieveRestToken():  # acquired by using access_token, which can be generat
 
 def insertCandidate(auth, session: ChatbotSession) -> Callback:
     try:
-        callback: Callback = retrieveRestToken()  # takes auth?
+        # retrieve refresh_token and try to use it
+        # if error TokenExpiredError or simmiliar - request new rest token from retrieveRestToken
+        callback: Callback = retrieveRestToken()
         if not callback.Success:
             return callback
 
@@ -109,7 +112,7 @@ def insertCandidate(auth, session: ChatbotSession) -> Callback:
         return Callback(False, str(exc))
 
 
-def insertClient(auth, session: ChatbotSession) -> Callback:
+def insertClient(auth, session: ChatbotSession) -> Callback:  # still Adapt version
     try:
         callback: Callback = retrieveRestToken()
         if not callback.Success:

@@ -4,7 +4,7 @@ from sqlalchemy.sql import and_
 
 from enums import CRM, UserType
 from models import db, Callback, ChatbotSession, Assistant, CRM as CRM_Model
-from services.CRM import Adapt
+from services.CRM import Adapt, Bullhorn
 
 
 # Process chatbot session
@@ -100,6 +100,8 @@ def testConnection(details) -> Callback:
         login_callback: Callback = Callback(False, 'Connection failure. Please check entered details')
         if crm_type == CRM.Adapt:
             login_callback = Adapt.login(crm_auth)
+        elif crm_type == CRM.Bullhorn:
+            login_callback = Bullhorn.login(crm_auth)
 
         # When connection failed
         if not login_callback.Success:

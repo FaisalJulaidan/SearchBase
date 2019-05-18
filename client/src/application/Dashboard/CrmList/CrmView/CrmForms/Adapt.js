@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Icon, Input, Select, Modal, Slider, Switch, Typography, Col} from "antd";
+import {Button, Icon, Input, Select, Typography, Col} from "antd";
 import styles from "../CrmView.module.less";
 
 const {Option} = Select;

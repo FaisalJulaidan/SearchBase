@@ -1,13 +1,13 @@
 import React from 'react';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import AuroraCardAvatar from 'components/AuroraCardAvatar/AuroraCardAvatar'
-import {Typography, Spin} from 'antd';
+import {Spin, Typography} from 'antd';
 import {connect} from 'react-redux';
 import styles from './CrmList.module.less'
-import {getLink, history, deepClone} from "helpers";
+import {deepClone, getLink, history} from "helpers";
 import PropTypes from 'prop-types';
 import shortid from 'shortid';
-import {crmListActions} from "store/actions";
+import {crmActions} from "store/actions";
 import 'types/CRM_Types';
 
 const {Title, Paragraph, Text} = Typography;
@@ -58,24 +58,25 @@ class CrmList extends React.Component {
 
 
     componentDidMount() {
-        this.props.dispatch(crmListActions.getConnectedCRMs())
+        this.props.dispatch(crmActions.getConnectedCRMs())
     }
 
     componentWillReceiveProps(nextProps) {
-        nextProps.CRMsList
-            .forEach(serverCRM => {
-                /** @type {CRM} */
-                let currentCRM = this.state.CRMs.find(crm => crm.type === serverCRM.Type);
-                if (currentCRM.status)
-                    currentCRM.status = "CONNECTED";
-                else
-                    currentCRM.status = "FAILED";
+        if (nextProps.CRMsList[0])
+            nextProps.CRMsList
+                .forEach(serverCRM => {
+                    /** @type {CRM} */
+                    let currentCRM = this.state.CRMs.find(crm => crm.type === serverCRM.Type);
+                    currentCRM.ID = serverCRM.ID;
+                    currentCRM.status = serverCRM.Status ? "CONNECTED" : "FAILED";
 
-                this.setState({
-                    CRMs: [...this.state.CRMs],
-                    isLoading: false
-                })
-            });
+                    this.setState({
+                        CRMs: [...this.state.CRMs],
+                        isLoading: false
+                    })
+                });
+        else
+            this.setState({isLoading: false})
     }
 
     render() {
@@ -119,7 +120,7 @@ class CrmList extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        CRMsList: state.crmlist.CRMsList,
+        CRMsList: state.crm.CRMsList,
     };
 }
 

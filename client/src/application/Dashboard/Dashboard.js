@@ -115,7 +115,7 @@ class Dashboard extends Component {
                     collapsible
                     collapsed={this.state.collapsed}
                     style={{
-                        // backgroundColor: isCRMPage ? '#20252e' : ''
+                        backgroundColor: isCRMPage ? '#20252e' : ''
                     }}
                     className={styles.Sider}>
 
@@ -132,8 +132,8 @@ class Dashboard extends Component {
                                     <div style={{
                                         lineHeight: '32px',
                                         marginLeft: 18,
-                                        // color: isCRMPage ? 'white' : '#9254de'
-                                        color: "#9254de"
+                                        color: isCRMPage ? 'white' : '#9254de'
+                                        // color: "#9254de"
                                     }}>TheSearchBase
                                     </div>
                                 </div>
@@ -142,8 +142,8 @@ class Dashboard extends Component {
                     </div>
 
                     <Menu
-                        // theme={isCRMPage ? "dark" : "light"}
-                        theme={"light"}
+                        theme={isCRMPage ? "dark" : "light"}
+                        // theme={"light"}
                         defaultSelectedKeys={this.state.selectedMenuKey}
                         selectedKeys={location.pathname.split('/')[2] ? [location.pathname.split('/')[2]] : [location.pathname.split('/')[1]]}
                         mode="inline" onClick={this.handleMenuClick}>

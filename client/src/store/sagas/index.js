@@ -5,4 +5,4 @@ export * from './chatbotSessions';
 export * from './usersManagement.saga';
 export * from './database.saga';
 export * from './options.saga';
-export * from './crmlist.saga';
+export * from './crm.saga';

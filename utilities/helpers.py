@@ -1,20 +1,22 @@
-from flask import json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, ChatbotSession, Database, Candidate, Job, CRM
-from services import user_services, flow_services
+import functools
+import gzip
+import logging
+import re
 from datetime import datetime, timedelta
 from enum import Enum
-from hashids import Hashids
-from config import BaseConfig
-import stripe
-import re
 from io import BytesIO
-import gzip
-import functools
-import enums
-from itsdangerous import URLSafeTimedSerializer
-import logging
-from cryptography.fernet import Fernet
+
 import geoip2.webservice
+import stripe
+from cryptography.fernet import Fernet
+from flask import json, after_this_request, request
+from hashids import Hashids
+from itsdangerous import URLSafeTimedSerializer
+
+import enums
+from config import BaseConfig
+from models import db, Role, Company, Assistant, Plan, ChatbotSession, Database, Candidate, Job, CRM
+from services import user_services, flow_services
 
 # GeoIP Client
 geoIP = geoip2.webservice.Client(140914, 'cKrqAZ675SPb')
@@ -261,14 +263,14 @@ def gen_dummy_data():
 
     # Add CRM conncetion for aramco company
     db.session.add(CRM(Type=enums.CRM.Adapt, Company=aramco, Auth={
-                                            "domain": "PartnerDomain9",
-                                            "username":"SD9USR7",
-                                            "password":"P@55word",
-                                            "profile":"CoreProfile",
-                                            "locale":"en_GB",
-                                            "timezone":"GMT",
-                                            "dateFormat":0,
-                                            "timeFormat":0}))
+        "domain": "PartnerDomain9",
+        "username": "SD9USR8",
+        "password": "P@55word",
+        "profile": "CoreProfile",
+        "locale": "en_GB",
+        "timezone": "GMT",
+        "dateFormat": 0,
+        "timeFormat": 0}))
 
     seed() # will save changes as well
 

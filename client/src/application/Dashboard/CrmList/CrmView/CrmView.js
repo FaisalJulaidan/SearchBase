@@ -1,14 +1,14 @@
 import React from 'react'
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Typography, Avatar, Tabs, Breadcrumb, Form, Modal, Col, Button, Icon} from 'antd';
-
-
+import {Avatar, Breadcrumb, Form, Modal, Tabs, Typography} from 'antd';
 import styles from './CrmView.module.less'
 import {history} from "helpers";
 import 'types/CRM_Types';
 import AdaptFormItems from "./CrmForms/Adapt";
 import BullhornFormItems from "./CrmForms/Bullhorn";
 import VincereFormItems from "./CrmForms/Vincere";
+import {connect} from 'react-redux';
+import {crmActions} from "store/actions";
 
 const TabPane = Tabs.TabPane;
 const {Title, Paragraph, Text} = Typography;
@@ -34,28 +34,48 @@ class CrmView extends React.Component {
         });
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.connectedCRM_ID)
+            this.setState({
+                CRM: {
+                    ...this.state.CRM,
+                    ID: nextProps.connectedCRM_ID,
+                    status: 'CONNECTED'
+                }
+            });
+
+        if (nextProps.connectedCRM_ID === "disconnect")
+            this.setState({
+                CRM: {
+                    ...this.state.CRM,
+                    ID: null,
+                    status: 'DISCONNECTED'
+                }
+            });
+    }
 
     connectCRM = () => this.props.form.validateFields((err, values) => {
-        const {/** @type {CRM} */CRM} = this.state;
-        console.log(values)
-        // if (!err)
-        //     this.props.dispatch(assistantActions.connectCRM(
-        //         {
-        //             type: CRM.type,
-        //             auth: {...values},
-        //         }, this.props.assistant));
-
+        if (err) return;
+        this.props.dispatch(
+            crmActions.connectCrm(
+                {
+                    type: this.state.CRM.type,
+                    auth: {...values}
+                }
+            )
+        );
     });
 
-    testCRM = () => this.props.form.validateFields((err, values) => {
-        console.log(values)
-        // if (!err)
-        //     this.props.dispatch(assistantActions.testCRM(
-        //         {
-        //             type: CRM.type,
-        //             auth: {...values},
-        //         }, this.props.assistant));
-
+    testCRM = () => this.props.form.validateFields(async (err, values) => {
+        if (err) return;
+        this.props.dispatch(
+            crmActions.testCrm(
+                {
+                    type: this.state.CRM.type,
+                    auth: {...values}
+                }
+            )
+        );
     });
 
     disconnectCRM = () => {
@@ -64,9 +84,13 @@ class CrmView extends React.Component {
             title: `Disconnect from ${CRM.type}`,
             content: <p>Chatbot conversations will no longer be synced with {CRM.type} account</p>,
             onOk: () => {
-                // this.props.dispatch(assistantActions.disconnectCRM({
-                //     Type: CRM.type
-                // }, this.props.assistant));
+                this.props.dispatch(
+                    crmActions.disconnectCrm(
+                        {
+                            ID: this.state.CRM.ID,
+                        }
+                    )
+                )
             }
         });
     };
@@ -111,12 +135,11 @@ class CrmView extends React.Component {
                     <br/>
                     <Tabs defaultActiveKey="2">
                         <TabPane tab="Feature" key="1">
-                            <Typography style={{
-                                padding: '0 60px'
-                            }}>
+                            <Typography style={{padding: '0 60px'}}>
                                 <Title>Introduction</Title>
                                 <Paragraph>
-                                    In the process of internal desktop applications development, many different design
+                                    In the process of internal desktop applications development, many different
+                                    design
                                     specs and
                                     implementations would be involved, which might cause designers and developers
                                     difficulties and
@@ -136,9 +159,11 @@ class CrmView extends React.Component {
                                 </Paragraph>
                                 <Title level={2}>Guidelines and Resources</Title>
                                 <Paragraph>
-                                    We supply a series of design principles, practical patterns and high quality design
+                                    We supply a series of design principles, practical patterns and high quality
+                                    design
                                     resources
-                                    (<Text code>Sketch</Text> and <Text code>Axure</Text>), to help people create their
+                                    (<Text code>Sketch</Text> and <Text code>Axure</Text>), to help people create
+                                    their
                                     product
                                     prototypes beautifully and efficiently.
                                 </Paragraph>
@@ -212,5 +237,13 @@ class CrmView extends React.Component {
     }
 }
 
-export default Form.create()(CrmView);
+function
+
+mapStateToProps(state) {
+    return {
+        connectedCRM_ID: state.crm.connectedCRM_ID,
+    };
+}
+
+export default connect(mapStateToProps)(Form.create()(CrmView));
 

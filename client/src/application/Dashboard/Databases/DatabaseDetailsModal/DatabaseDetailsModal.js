@@ -1,4 +1,4 @@
-import {Button, Divider, Modal, Steps, Spin, message, Form, Input, Switch, InputNumber, Slider, Select} from 'antd';
+import {Button, Modal, Form, Input, Select} from 'antd';
 
 import React, {Component} from 'react';
 
@@ -35,7 +35,7 @@ class DatabaseDetailsModal extends Component {
             labelCol: {span: 6},
             wrapperCol: {span: 14},
         };
-        
+
         return (
             <Modal width={"60%"}
                    title="Update Database"

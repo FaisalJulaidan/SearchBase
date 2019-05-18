@@ -5,6 +5,6 @@ export * from "./profile.actions";
 export * from "./chatbotSessions.actions";
 export * from "./usersManagement.actions";
 export * from "./options.actions";
-export * from "./crmList.actions";
+export * from "./crm.actions";
 
 

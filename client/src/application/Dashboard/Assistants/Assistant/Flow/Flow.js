@@ -9,7 +9,7 @@ import styles from "./Flow.module.less"
 import {Modal, Spin} from "antd";
 import shortid from 'shortid';
 import { Prompt } from "react-router-dom";
-import {destroyMessage, successMessage, history} from "helpers";
+import {destroyMessage, successMessage, history, deepClone} from "helpers";
 
 const confirm = Modal.confirm;
 
@@ -56,7 +56,7 @@ class Flow extends Component {
 
     getUpdatableState = () => {
         const {assistant, currentGroup} = this.state;
-        let updatedAssistant = JSON.parse(JSON.stringify(assistant));
+        let updatedAssistant = deepClone(assistant);
         let updatedGroup = updatedAssistant.Flow?.groups[updatedAssistant.Flow.groups.findIndex(group => group.id === currentGroup.id)];
         return {updatedAssistant, updatedGroup}
     };

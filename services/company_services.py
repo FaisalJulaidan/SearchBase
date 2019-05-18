@@ -1,6 +1,5 @@
 from models import db, Callback, Company, User, Role
-import stripe
-import logging
+import logging , stripe
 
 
 def create(name, url, ownerEmail) -> Company or None:

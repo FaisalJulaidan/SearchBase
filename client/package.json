@@ -47,7 +47,7 @@
     "jest-pnp-resolver": "1.0.1",
     "jest-resolve": "23.6.0",
     "less": "^3.8.1",
-    "less-loader": "^4.1.0",
+    "less-loader": "latest",
     "lodash": "latest",
     "mini-css-extract-plugin": "0.4.3",
     "moment": "^2.24.0",
@@ -156,6 +156,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.2.0",
     "babel-plugin-transform-optional-chaining": "^7.0.0-beta.3",
+    "lorem-ipsum": "^2.0.1",
     "prop-types": "latest",
     "uglifyjs-webpack-plugin": "^2.1.2"
   }

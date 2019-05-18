@@ -12,7 +12,6 @@ from flask_apscheduler import APScheduler
 from services.auth_services import jwt
 from utilities import helpers, tasks
 from flask_babel import Babel
-from services.CRM import crm_services
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router,\
@@ -115,12 +114,11 @@ elif os.environ['FLASK_ENV'] == 'development':
     # scheduler.start()
     print('Development mode running...')
 
-
 else:
     print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")
 
 
-# Run the migration if in .env, MIGRATION = ues
+# Run the migration if in .env, MIGRATION = yes
 if os.environ['MIGRATION'] == 'yes':
     print('Migration mode running...')
     manager.run()

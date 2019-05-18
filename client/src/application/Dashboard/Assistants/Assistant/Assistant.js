@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Card, Row, Col, Divider, Switch, Button} from 'antd';
+import {Button, Card, Col, Row, Switch} from 'antd';
 import {Link} from "react-router-dom";
 import AssistantSettings from "./AssistantSettings/AssistantSettings";
 import CRM from "./CRM/CRM";
@@ -117,6 +117,7 @@ class Assistant extends Component {
                                    visible={this.state.assistantSettingsVisible}/>
 
                 <CRM assistant={assistant}
+                     CRMsList={this.props.CRMsList}
                      hideModal={this.hideCRMModal}
                      visible={this.state.CRMVisible}/>
 

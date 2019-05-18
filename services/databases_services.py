@@ -1,17 +1,13 @@
 from models import db, Callback, Database, Candidate, Assistant, Job
 from services import assistant_services
 from typing import List
-import pandas
-import re
-import enums
 from datetime import datetime
 from sqlalchemy_utils import Currency
 from utilities import helpers
 from sqlalchemy import and_
 from enums import DatabaseType, DataType as DT
-import json
-import random
-import logging
+import json, random, logging, pandas, re, enums
+
 
 
 def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
@@ -156,6 +152,7 @@ def getCandidate(candidateID):
         db.session.rollback()
         return Callback(False, 'Could not retrieve the candidate.')
 
+
 def getJob(jobID):
     try:
         job = db.session.query(Job) \
@@ -240,7 +237,7 @@ def scan(session, assistantHashID):
             return Callback(False, "Assistant not found!")
         assistant: Assistant = callback.Data
 
-        databaseType: DatabaseType = DatabaseType[session['databaseType'].replace(" ", "")]
+        databaseType: DatabaseType = DatabaseType[session['databaseType']]
         databases: List[Database] = db.session.query(Database.ID) \
             .filter(and_(Database.CompanyID == assistant.CompanyID,
                          Database.Type == databaseType)).all()
@@ -262,34 +259,40 @@ def scan(session, assistantHashID):
 
 
 # Data analysis using Pandas library
-def scanCandidates(session, dbIDs):
+def scanCandidates(session, dbIDs, extraCandidates=None):
     try:
 
         df = pandas.read_sql(db.session.query(Candidate).filter(Candidate.DatabaseID.in_(dbIDs)).statement,
                              con=db.session.bind)
-
+        df = df.drop('DatabaseID', axis=1) # Drop column
 
         keywords = session['keywordsByDataType']
-        df['count'] = 0 # add column for tracking score
+        df['Score'] = 0 # Add column for tracking score
+        df['Source'] = "Internal Database" # Source of solution e.g. Bullhorn, Adapt...
+
+
+        if extraCandidates:
+            df = df.append(extraCandidates, ignore_index=True)
 
         def wordsCounter(dataType: DT, dbColumn, x=1):
             if keywords.get(dataType.value['name']):
-                df['count'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
+                df['Score'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
                                                            flags=re.IGNORECASE) | 0
 
         def greaterCounter(dataType: DT, dbColumn, plus=1):
             if keywords.get(dataType.value['name']):
                 df.loc[df[dbColumn.name] <=
-                       float(keywords[dataType.value['name']][-1]), 'count'] += plus
+                       float(keywords[dataType.value['name']][-1]), 'Score'] += plus
 
         def lessCounter(dataType: DT, dbColumn, plus=1):
             if keywords.get(dataType.value['name']):
                 df.loc[df[dbColumn.name] >=
-                       float(keywords[dataType.value['name']][-1]), 'count'] += plus
+                       float(keywords[dataType.value['name']][-1]), 'Score'] += plus
 
         # Desired Salary
         greaterCounter(DT.CandidateDesiredSalary, Candidate.CandidateDesiredSalary, 3)
         greaterCounter(DT.JobSalary, Candidate.CandidateDesiredSalary, 3)
+
         # Years of EXP
         lessCounter(DT.CandidateYearsExperience, Candidate.CandidateYearsExperience, 5)
 
@@ -313,7 +316,7 @@ def scanCandidates(session, dbIDs):
         wordsCounter(DT.CandidateAvailability, Candidate.CandidateAvailability)
 
 
-        topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 2), 'count')
+        topResults = json.loads(df[df['Score']>0].nlargest(session.get('showTop', 2), 'Score')
                                 .to_json(orient='records'))
 
         data = [] # List of candidates
@@ -336,7 +339,6 @@ def scanCandidates(session, dbIDs):
                             .replace("[yearsExp]", str(int(record[Candidate.CandidateYearsExperience.name])))
                             .replace("[skills]", record[Candidate.CandidateSkills.name]))
 
-
             random.shuffle(desc)
             data.append({
                 "id": record["ID"],
@@ -344,7 +346,8 @@ def scanCandidates(session, dbIDs):
                 "title": "Candidate " + indexes[i],
                 "subTitles": [],
                 "description": " ".join(desc),
-                "buttonText": "Enquire"
+                "buttonText": "Enquire",
+                "output": helpers.encrypt(record, True)
             })
 
         return Callback(True, '', data)
@@ -355,29 +358,34 @@ def scanCandidates(session, dbIDs):
         return Callback(False, 'Error while search the database for matches!')
 
 
-def scanJobs(session, dbIDs):
+def scanJobs(session, dbIDs, extraJobs=None):
     try:
 
         df = pandas.read_sql(db.session.query(Job).filter(Job.DatabaseID.in_(dbIDs)).statement,
                              con=db.session.bind)
+        df = df.drop('DatabaseID', axis=1) # Drop column
 
         keywords = session['keywordsByDataType']
-        df['count'] = 0 # add column for tracking score
+        df['Score'] = 0 # Add column for tracking score
+        df['Source'] = "Internal Database" # Source of solution e.g. Bullhorn, Adapt...
+
+        if extraJobs:
+            df = df.append(extraJobs, ignore_index=True)
 
         def wordsCounter(dataType: DT, dbColumn, x=1):
             if keywords.get(dataType.value['name']):
-                df['count'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
+                df['Score'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
                                                                flags=re.IGNORECASE) | 0
 
         def greaterCounter(dataType: DT, dbColumn, plus=1):
             if keywords.get(dataType.value['name']):
                 df.loc[df[dbColumn.name] <=
-                       float(keywords[dataType.value['name']][-1]), 'count'] += plus
+                       float(keywords[dataType.value['name']][-1]), 'Score'] += plus
 
         def lessCounter(dataType: DT, dbColumn, plus=1):
             if keywords.get(dataType.value['name']):
                 df.loc[df[dbColumn.name] >=
-                       float(keywords[dataType.value['name']][-1]), 'count'] += plus
+                       float(keywords[dataType.value['name']][-1]), 'Score'] += plus
 
         # Salary
         lessCounter(DT.JobSalary, Job.JobSalary, 3)
@@ -402,12 +410,11 @@ def scanJobs(session, dbIDs):
         wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, 3)
 
         # Results
-        topResults = json.loads(df[df['count']>0].nlargest(session.get('showTop', 0), 'count')
+        topResults = json.loads(df[df['Score']>0].nlargest(session.get('showTop', 0), 'Score')
                                 .to_json(orient='records'))
 
 
 
-        data = [] # List of jobs
         jobType = ["This role is a [jobType]", "This job is a [jobType]"]
         location = [" located in [location]. "]
         requiredYearsSkills = ["It requires [yearsRequired] year(s) with [essentialSkills]. ",
@@ -416,10 +423,8 @@ def scanJobs(session, dbIDs):
                          "Desirable skills include [desirableSkills]."]
 
 
-
         data = []
         for record in topResults:
-
             desc = []
             # Build random dynamic job description
             if record[Job.JobType.name]:
@@ -453,7 +458,8 @@ def scanJobs(session, dbIDs):
                 "title": record[Job.JobTitle.name],
                 "subTitles": subTitles,
                 "description": " ".join(desc),
-                "buttonText": "Apply"
+                "buttonText": "Apply",
+                "output": helpers.encrypt(record, True)
             })
 
         return Callback(True, '', data)
@@ -462,6 +468,48 @@ def scanJobs(session, dbIDs):
         print("scanJobs() ERROR: ", exc)
         logging.error("databases_service.scanJobs(): " + str(exc))
         return Callback(False, 'Error while search the database for matches!')
+
+
+
+def createPandaCandidate(id, name, email, mobile, location, skills,
+                         linkdinURL, availability, jobTitle, education,
+                         yearsExperience: int, desiredSalary: float, currency, source):
+    return {"ID": id,
+            "CandidateName": name,
+            "CandidateEmail": email,
+            "CandidateMobile": mobile,
+            "CandidateLocation": location,
+            "CandidateSkills": skills,
+            "CandidateLinkdinURL": linkdinURL,
+            "CandidateAvailability": availability,
+            "CandidateJobTitle": jobTitle,
+            "CandidateEducation": education,
+            "CandidateYearsExperience": yearsExperience,
+            "CandidateDesiredSalary": desiredSalary,
+            "Currency": currency,
+            "Score": 0,
+            "Source": source,
+            }
+
+
+def createPandaJob(id, title, desc, location, type, salary: float, essentialSkills, desiredSkills, yearsRequired,
+                   startDate, endDate, linkURL, currency, source):
+    return {"ID": id,
+            "JobTitle": title,
+            "JobDescription": desc,
+            "JobLocation": location,
+            "JobType": type,
+            "JobSalary": salary,
+            "JobEssentialSkills": essentialSkills,
+            "JobDesiredSkills": desiredSkills,
+            "JobYearsRequired": yearsRequired,
+            "JobStartDate": startDate,
+            "JobEndDate": endDate,
+            "JobLinkURL": linkURL,
+            "Currency": currency,
+            "Score": 0,
+            "Source": source,
+            }
 
 
 def getOptions() -> Callback:
@@ -476,3 +524,30 @@ def getOptions() -> Callback:
         'currencyCodes': ['GBP', 'USD', 'EUR', 'AED', 'CAD']
     }
     return Callback(True, '', options)
+
+
+def test():
+    # df = pandas.read_sql(db.session.query(Candidate).filter(Candidate.DatabaseID.in_([1,2])).statement,
+    #                      con=db.session.bind)
+    #
+    # print(df)
+    #
+    # d = {"f":"g"}
+    # s = json.dumps(d)
+    #
+    # a = helpers.encryptor.encrypt(bytes((s.encode('utf-8'))))
+    # # print(helpers.encryptor.decrypt(json.loads(a['f'])))
+    # r = helpers.encryptor.decrypt(bytes('gAAAAABc34DnlnV_xIPtwcMMLH_qZ4JQv36Cdxpg_YgMQ1vw9OjX-yD7QyZ3LAsPTv9XP1EGRB4YoBEUg54s295yy8dOD7BtZw=='.encode('utf-8')))
+    # r2 = json.loads(r)
+    # print(r2['f'])
+
+
+    d = {"f":"g"}
+    e = helpers.encrypt(d, isDict=True)
+    print(e)
+    # r = helpers.decrypt(e, isDict=True)
+    # print(r['f'])
+
+    print(helpers.decrypt(e,True, True))
+
+

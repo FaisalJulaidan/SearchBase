@@ -4,19 +4,13 @@ import logging
 import re
 from datetime import datetime, timedelta
 from enum import Enum
-from io import BytesIO
-
-import geoip2.webservice
-import stripe
-from cryptography.fernet import Fernet
-from flask import json, after_this_request, request
 from hashids import Hashids
-from itsdangerous import URLSafeTimedSerializer
-
-import enums
 from config import BaseConfig
-from models import db, Role, Company, Assistant, Plan, ChatbotSession, Database, Candidate, Job, CRM
-from services import user_services, flow_services
+from io import BytesIO
+from itsdangerous import URLSafeTimedSerializer
+from cryptography.fernet import Fernet
+import enums, re, os, stripe, gzip, functools, logging, geoip2.webservice
+
 
 # GeoIP Client
 geoIP = geoip2.webservice.Client(140914, 'cKrqAZ675SPb')
@@ -29,25 +23,28 @@ logging.basicConfig(filename='logs/errors.log',
                     level=logging.ERROR,
                     format='%(asctime)s -- %(message)s')
 
+# Fernet for encryption
+fernet = Fernet(os.environ['SECRET_KEY_TEMP'])
+
+
 # ID Hasher
 # IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
-def encrypt_id(id):
+def encode_id(id):
     return hashids.encrypt(id)
 
-
-def decrypt_id(id):
+def decode_id(id):
     return hashids.decrypt(id)
 
+# Encryptors
+def encrypt(value, isDict=False):
+    if isDict: value=json.dumps(value)
+    return fernet.encrypt(bytes((value.encode('utf-8'))))
 
-# Data Encryption
-def encrypt(data):
-    f = Fernet(BaseConfig.SECRET_KEY_DB)
-    return f.encrypt(data)
-
-def decrypt(token):
-    f = Fernet(BaseConfig.SECRET_KEY_DB)
-    return f.decrypt(token)
+def decrypt(token, isDict=False):
+    value = fernet.decrypt(token)
+    if isDict: value=json.loads(value)
+    return value
 
 
 # Generates dummy data for testing

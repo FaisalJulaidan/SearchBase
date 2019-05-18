@@ -1,7 +1,5 @@
-import stripe
-from models import Callback, db, Role, Plan, User, Company
-from services import assistant_services, user_services
-import logging
+from models import Callback, db, Plan, Company
+import logging, stripe
 
 
 def unsubscribe(company: Company) -> Callback:

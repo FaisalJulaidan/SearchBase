@@ -1,17 +1,13 @@
 from models import db, Callback, Database, Candidate, Assistant, Job
 from services import assistant_services
 from typing import List
-import pandas
-import re
-import enums
 from datetime import datetime
 from sqlalchemy_utils import Currency
 from utilities import helpers
 from sqlalchemy import and_
 from enums import DatabaseType, DataType as DT
-import json
-import random
-import logging
+import json, random, logging, pandas, re, enums
+
 
 
 def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
@@ -156,6 +152,7 @@ def getCandidate(candidateID):
         db.session.rollback()
         return Callback(False, 'Could not retrieve the candidate.')
 
+
 def getJob(jobID):
     try:
         job = db.session.query(Job) \
@@ -290,6 +287,7 @@ def scanCandidates(session, dbIDs):
         # Desired Salary
         greaterCounter(DT.CandidateDesiredSalary, Candidate.CandidateDesiredSalary, 3)
         greaterCounter(DT.JobSalary, Candidate.CandidateDesiredSalary, 3)
+
         # Years of EXP
         lessCounter(DT.CandidateYearsExperience, Candidate.CandidateYearsExperience, 5)
 
@@ -476,3 +474,45 @@ def getOptions() -> Callback:
         'currencyCodes': ['GBP', 'USD', 'EUR', 'AED', 'CAD']
     }
     return Callback(True, '', options)
+
+def test():
+    # df = pandas.read_sql(db.session.query(Candidate).filter(Candidate.DatabaseID.in_([1,2])).statement,
+    #                      con=db.session.bind)
+    #
+    # e = [
+    #     {"ID": 1,
+    #      "CandidateName": "ALII",
+    #      "CandidateEmail": "aa@aa.com",
+    #      "CandidateMobile": "234234234234",
+    #      "CandidateLocation": "London",
+    #      "CandidateSkills": "sd,ger,erg,erg,erg",
+    #      "CandidateLinkdinURL": "ALIIIIIIII",
+    #      "CandidateAvailability": "ALIIIIIIII",
+    #      "CandidateJobTitle": "ALIIIIIIII",
+    #      "CandidateEducation": "ALIIIIIIII",
+    #      "CandidateYearsExperience": 4,
+    #      "CandidateDesiredSalary": 4000,
+    #      "Currency": "GBP",
+    #      "DatabaseID": 1,
+    #      },
+    #     ]
+    # if e:
+    #     df = df.append(e, ignore_index=True)
+    #
+    # print(df)
+    #
+    # d = {"f":"g"}
+    # s = json.dumps(d)
+    #
+    # a = helpers.encryptor.encrypt(bytes((s.encode('utf-8'))))
+    # # print(helpers.encryptor.decrypt(json.loads(a['f'])))
+    # r = helpers.encryptor.decrypt(bytes('gAAAAABc34DnlnV_xIPtwcMMLH_qZ4JQv36Cdxpg_YgMQ1vw9OjX-yD7QyZ3LAsPTv9XP1EGRB4YoBEUg54s295yy8dOD7BtZw=='.encode('utf-8')))
+    # r2 = json.loads(r)
+    # print(r2['f'])
+
+
+    d = {"f":"g"}
+    e = helpers.encrypt(d, isDict=True)
+
+    r = helpers.decrypt(e, isDict=True)
+    print(r['f'])

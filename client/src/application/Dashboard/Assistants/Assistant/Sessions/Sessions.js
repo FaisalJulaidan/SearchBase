@@ -5,6 +5,7 @@ import {Button, Modal, Table, Tag, Divider} from 'antd';
 import {chatbotSessionsActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
 import Header from "../../../../../components/Header/Header";
+import {CSVLink, CSVDownload} from "react-csv";
 
 const confirm = Modal.confirm;
 
@@ -17,7 +18,9 @@ class Sessions extends React.Component {
         sortedInfo: null,
         selectedSession: null,
         viewModal: false,
-        destroyModal: false
+        destroyModal: false,
+        downloadData: [],
+        sessionsRefreshed: true
     };
 
 
@@ -28,6 +31,7 @@ class Sessions extends React.Component {
 
     refreshSessions = () => {
         const {assistant} = this.props.location.state;
+        this.setState({sessionsRefreshed:true});
         this.props.dispatch(chatbotSessionsActions.fetchChatbotSessions(assistant.ID))
     };
 
@@ -96,10 +100,75 @@ class Sessions extends React.Component {
             this.setState({selectedSession: sessionsList[index - 1] ? sessionsList[index - 1] : sessionsList[index]})
     };
 
+    // get the sessions to be rendered and save them in the state in format which can be downloaded by the CSV
+    populateDownloadData(sessions){
+        const sessionsList = sessions.sessionsList;
+
+        let data = [["ID", "User Type", "Questions Answered", "Solutions Returned", "Time Spent", "Date & Time",
+            "Conversation", "User Profile", "Selected Results"]]; // Sessions Page Headers
+        let dataRecord = undefined; // CSV line to push into data
+        let recordData = undefined; // the questions and answers of the record
+        let conversation = ""; // the questions and answers of the record in format to be pushed into dataRecord
+        let profile = ""; // profile in format to be put in the CSV
+        let keywordsByDataType = undefined;
+        let selectedSolutions = undefined; // the selected solutions of the record
+        let selectedSolutionsData = undefined; // the selected solutions of the record in the format to be put in the CSV
+        console.log(sessions)
+        // go through the to-be-rendered sessions
+        if(sessionsList){sessionsList.forEach(record => {
+            conversation = "";
+
+            // Sessions Page Base Table
+            dataRecord = [record["ID"], record["UserType"], record["QuestionsAnswered"], record["SolutionsReturned"],
+                record["TimeSpent"], record["DateTime"]];
+
+            // Conversation Questions and Answers   ex. "What is your name? : Bob House (Name)"
+            recordData = record["Data"]["collectedData"];
+            recordData.forEach(conversationData => {
+                conversation += conversationData["questionText"] + " : " + conversationData["input"] +
+                    (conversationData["dataType"] !== "No Type" ? " (" + conversationData["dataType"] + ")" : "") + "\r\n\r\n";
+            });
+            dataRecord.push(conversation);
+
+            // User Profile
+            profile = "";
+            keywordsByDataType = record["Data"]["keywordsByDataType"];
+            for (let key in keywordsByDataType){
+                if (keywordsByDataType.hasOwnProperty(key) && key.includes(record["UserType"])){
+                    profile += key + " : ";
+                    keywordsByDataType[key].forEach(word => { profile += word + " " });
+                    profile += "\r\n"
+                }
+            }
+            dataRecord.push(profile);
+
+            // Selected Solutions
+            selectedSolutions = record["Data"]["selectedSolutions"] ? record["Data"]["selectedSolutions"] : [];
+            selectedSolutionsData = "";
+            selectedSolutions.forEach((solutionsRecord, index) => {
+                selectedSolutionsData += "Selected Result " + (index+1) + "\r\n";
+                for (let key in solutionsRecord["data"]){
+                    if (solutionsRecord["data"].hasOwnProperty(key)){
+                        selectedSolutionsData += solutionsRecord["data"][key] ? key + " : " +
+                            solutionsRecord["data"][key] + "\r\n" : "";
+                    }
+                }
+                selectedSolutionsData += "\r\n";
+            });
+            dataRecord.push(selectedSolutionsData);
+
+            data.push(dataRecord);
+        });}
+
+        // put the data in the state and set refresh to false
+        this.setState({downloadData:data, sessionsRefreshed:false});
+    }
 
     render() {
         const {assistant} = this.props.location.state;
         const {sessions, options} = this.props;
+
+        if(this.state.sessionsRefreshed){this.populateDownloadData(sessions)}
 
         const columns = [{
             title: '#',
@@ -194,9 +263,15 @@ class Sessions extends React.Component {
                         </div>
 
                         <div>
+
                             <Button className={styles.Panel_Header_Button} type="primary" icon="sync"
                                     onClick={this.refreshSessions} loading={this.props.isLoading}>
                                 Refresh
+                            </Button>
+
+                            <Button className={styles.Panel_Header_Button} type="primary" icon="download"
+                                    loading={this.props.isLoading}>
+                                <CSVLink data={this.state.downloadData} style={{color:"white"}}> Export CSV</CSVLink>
                             </Button>
 
 

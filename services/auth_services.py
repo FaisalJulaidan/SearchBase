@@ -1,14 +1,14 @@
 from datetime import datetime, timedelta
-
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, create_refresh_token
-
 from models import Callback, User, db
 from services import user_services, role_services, sub_services, company_services, mail_services
 from utilities import helpers
 from config import BaseConfig
 import logging
-jwt = JWTManager()
 
+
+
+jwt = JWTManager()
 
 @jwt.invalid_token_loader
 def my_expired_token_callback(error):

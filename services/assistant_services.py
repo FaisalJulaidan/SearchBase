@@ -3,16 +3,16 @@ from sqlalchemy import and_
 from utilities import helpers, json_schemas
 from services.CRM import crm_services
 from os.path import join
-import json
 from config import BaseConfig
 from services import flow_services
-import logging
 from jsonschema import validate
+import logging, json
+
 
 
 def getAssistantByHashID(hashID):
     try:
-        assistantID = helpers.decrypt_id(hashID)
+        assistantID = helpers.decode_id(hashID)
         if len(assistantID) == 0:
             return Callback(False, "Assistant not found!", None)
 

@@ -1,8 +1,5 @@
 from models import db, Callback, StoredFile, ChatbotSession
-import logging
-import boto3
-import botocore
-import os
+import logging, boto3, botocore, os
 
 
 def getByID(id) -> StoredFile or None:

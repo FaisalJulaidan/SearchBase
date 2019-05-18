@@ -5,16 +5,11 @@ from datetime import datetime, timedelta
 from enum import Enum
 from hashids import Hashids
 from config import BaseConfig
-import stripe
-import re
 from io import BytesIO
-import gzip
-import functools
-import enums
 from itsdangerous import URLSafeTimedSerializer
-import logging
 from cryptography.fernet import Fernet
-import geoip2.webservice
+import enums, re, os, stripe, gzip, functools, logging, geoip2.webservice
+
 
 # GeoIP Client
 geoIP = geoip2.webservice.Client(140914, 'cKrqAZ675SPb')
@@ -27,25 +22,28 @@ logging.basicConfig(filename='logs/errors.log',
                     level=logging.ERROR,
                     format='%(asctime)s -- %(message)s')
 
+# Fernet for encryption
+fernet = Fernet(os.environ['SECRET_KEY_TEMP'])
+
+
 # ID Hasher
 # IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
-def encrypt_id(id):
+def encode_id(id):
     return hashids.encrypt(id)
 
-
-def decrypt_id(id):
+def decode_id(id):
     return hashids.decrypt(id)
 
+# Encryptors
+def encrypt(value, isDict=False):
+    if isDict: value=json.dumps(value)
+    return fernet.encrypt(bytes((value.encode('utf-8'))))
 
-# Data Encryption
-def encrypt(data):
-    f = Fernet(BaseConfig.SECRET_KEY_DB)
-    return f.encrypt(data)
-
-def decrypt(token):
-    f = Fernet(BaseConfig.SECRET_KEY_DB)
-    return f.decrypt(token)
+def decrypt(token, isDict=False):
+    value = fernet.decrypt(token)
+    if isDict: value=json.loads(value)
+    return value
 
 
 # Generates dummy data for testing

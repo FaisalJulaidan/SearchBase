@@ -40,7 +40,8 @@ def encrypt(value, isDict=False):
     if isDict: value=json.dumps(value)
     return fernet.encrypt(bytes((value.encode('utf-8'))))
 
-def decrypt(token, isDict=False):
+def decrypt(token, isDict=False, isBtye=False):
+    if not isBtye: token=bytes(token.encode('utf-8'))
     value = fernet.decrypt(token)
     if isDict: value=json.loads(value)
     return value

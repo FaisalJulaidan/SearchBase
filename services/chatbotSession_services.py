@@ -23,13 +23,10 @@ def processSession(assistantHashID, data: dict) -> Callback:
     # Fetch selected solutions from the database to get their complete details as they were hidden in the chatbot
     selectedSolutions = []
     for solution in data['selectedSolutions']:
-        callback = databases_services.getRecord(solution['id'],
-                                                DatabaseType[solution.get('databaseType')['enumName']])
-        if callback.Success:
-            selectedSolutions.append({
-                'data': helpers.getDictFromSQLAlchemyObj(callback.Data),
-                'databaseType': solution.get('databaseType')['enumName']
-            })
+        selectedSolutions.append({
+            'data': helpers.decrypt(solution['output'], isDict=True),
+            'databaseType': solution.get('databaseType')['enumName']
+        })
 
     collectedData = data['collectedData']
     sessionData = {
@@ -50,6 +47,7 @@ def processSession(assistantHashID, data: dict) -> Callback:
         # collectedData is an array, and timeSpent is in seconds.
         chatbotSession = ChatbotSession(Data= sessionData,
                                         TimeSpent=data['timeSpent'],
+                                        Completed=data['isSessionCompleted'],
                                         SolutionsReturned=data['solutionsReturned'],
                                         QuestionsAnswered=len(collectedData),
                                         UserType=UserType[data['userType'].replace(" ", "")],

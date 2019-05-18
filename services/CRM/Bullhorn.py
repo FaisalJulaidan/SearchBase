@@ -120,39 +120,38 @@ def retrieveRestToken(auth, companyID):  # acquired by using access_token, which
 
 
 # create query url and also tests the BhRestToken to see if it still valid, if not it generates a new one and new url
-def createQueryURL(auth, companyID):
+def sendQuery(auth, body, companyID):
     try:
         authCopy = dict(auth)
+
+        # set up initial url
         url = authCopy.get("rest_url", "") + "entity/Candidate" + "?BhRestToken=" + authCopy.get("rest_token", "")
         headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
-        test = requests.put(url, headers=headers)
+        test = requests.put(url, headers=headers, data=json.dumps(body))
         if test.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
                 url = authCopy.get("rest_url", "") + "entity/Candidate" + "?BhRestToken=" + \
                       callback.Data.get("rest_token", "")
+                r = requests.put(url, headers=headers, data=json.dumps(body))
+                if not r.ok:
+                    raise Exception(r.text + ". Query could not be sent")
             else:
                 raise Exception(callback.Message)
-        elif test.status_code != 400:
+        elif test.status_code != 400:  # token correct but no submitted data
             raise Exception("Rest url for query is incorrect")
 
         return Callback(True, "URL has been created", url)
 
     except Exception as exc:
-        logging.error("CRM.Bullhorn.createQueryURL() ERROR: " + str(exc))
+        logging.error("CRM.Bullhorn.sendQuery() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
 def insertCandidate(auth, session: ChatbotSession) -> Callback:
     try:
-
-        createURL_callback: Callback = createQueryURL(auth, session.Assistant.CompanyID)
-        if not createURL_callback.Success:
-            raise Exception(createURL_callback.Message)
-
-        headers = {'Content-Type': 'application/json'}
 
         # New candidate details
         body = {
@@ -168,14 +167,12 @@ def insertCandidate(auth, session: ChatbotSession) -> Callback:
                 session.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'])),
         }
 
-        # Send request
-        r = requests.put(createURL_callback.Data, headers=headers, data=json.dumps(body))
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, body, session.Assistant.CompanyID)
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
 
-        # When not ok
-        if not r.ok:
-            raise Exception(r.text)
-
-        return Callback(True, r.text)
+        return Callback(True, sendQuery_callback.Message)
 
     except Exception as exc:
         logging.error("CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
@@ -184,7 +181,7 @@ def insertCandidate(auth, session: ChatbotSession) -> Callback:
 
 def insertClient(auth, session: ChatbotSession) -> Callback:
     try:
-
+        # get query url
         insertCompany_callback: Callback = insertCompany(auth, session)
         if not insertCompany_callback.Success:
             raise Exception(insertCompany_callback.Message)
@@ -204,12 +201,6 @@ def insertClient(auth, session: ChatbotSession) -> Callback:
 def insertClientContact(auth, session: ChatbotSession, bhCompanyID) -> Callback:
     try:
 
-        createURL_callback: Callback = createQueryURL(auth, session.Assistant.CompanyID)
-        if not createURL_callback.Success:
-            raise Exception(createURL_callback.Message)
-
-        headers = {'Content-Type': 'application/json'}
-
         # New candidate details
         body = {
             "name": " ".join(
@@ -225,14 +216,12 @@ def insertClientContact(auth, session: ChatbotSession, bhCompanyID) -> Callback:
             "clientCorporation": {"id": bhCompanyID}
         }
 
-        # Send request
-        r = requests.put(createURL_callback.Data, headers=headers, data=json.dumps(body))
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, body, session.Assistant.CompanyID)
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
 
-        # When not ok
-        if not r.ok:
-            raise Exception(r.text)
-
-        return Callback(True, r.text)
+        return Callback(True, sendQuery_callback.Message)
 
     except Exception as exc:
         logging.error("CRM.Bullhorn.insertClientContact() ERROR: " + str(exc))
@@ -242,25 +231,18 @@ def insertClientContact(auth, session: ChatbotSession, bhCompanyID) -> Callback:
 def insertCompany(auth, session: ChatbotSession) -> Callback:
     try:
 
-        createURL_callback: Callback = createQueryURL(auth, session.Assistant.CompanyID)
-        if not createURL_callback.Success:
-            raise Exception(createURL_callback.Message)
-        headers = {'Content-Type': 'application/json'}
-
         # New candidate details
         body = {
             "name": " ".join(
                 session.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'], ["Undefined Company - TSB"])),
         }
 
-        # Send request
-        r = requests.put(createURL_callback.Data, headers=headers, data=json.dumps(body))
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, body, session.Assistant.CompanyID)
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
 
-        # When not ok
-        if not r.ok:
-            raise Exception(r.text)
-
-        return Callback(True, r.text)
+        return Callback(True, sendQuery_callback.Message)
 
     except Exception as exc:
         logging.error("CRM.Bullhorn.insertCompany() ERROR: " + str(exc))

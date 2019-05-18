@@ -75,7 +75,6 @@ def update(crm_id, company_id, details) -> Callback:
 
         crm = connection_callback.Data
 
-        crm.Type = crm_type
         crm.Auth = crm_auth
 
         # Save
@@ -88,6 +87,37 @@ def update(crm_id, company_id, details) -> Callback:
         logging.error("CRM_services.update(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Update CRM details failed.")
+
+
+def updateByCompanyAndType(crm_type, company_id, auth):
+    try:
+        crm_type: CRM = CRM[crm_type]
+        crm_auth = auth
+
+        # test connection
+        test_callback: Callback = testConnection({"auth": auth})
+        if not test_callback.Success:
+            return test_callback
+
+        connection_callback: Callback = getCRMByType(crm_type, company_id)
+        if not connection_callback.Success:
+            raise Exception(connection_callback.Message)
+
+        crm = connection_callback.Data
+
+        crm.Auth = crm_auth
+
+        # Save
+        db.session.commit()
+
+        return Callback(True, 'CRM has been updated successfully')
+
+    except Exception as exc:
+        print(exc)
+        logging.error("CRM_services.update(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Update CRM details failed.")
+
 
 
 # Test connection to a CRM
@@ -136,6 +166,21 @@ def getCRMByID(crm_id, company_id):
     try:
         crm = db.session.query(CRM_Model) \
             .filter(and_(CRM_Model.CompanyID == company_id, CRM_Model.ID == crm_id)).first()
+        if not crm:
+            raise Exception("CRM not found")
+
+        return Callback(True, "CRM retrieved successfully.", crm)
+
+    except Exception as exc:
+        print("CRM_services.getCRMByCompanyID() Error: ", exc)
+        logging.error("CRM_services.getCRMByCompanyID(): " + str(exc))
+        return Callback(False, 'Could not retrieve CRM.')
+
+
+def getCRMByType(crm_type, company_id):
+    try:
+        crm = db.session.query(CRM_Model) \
+            .filter(and_(CRM_Model.CompanyID == company_id, CRM_Model.Type == crm_type)).first()
         if not crm:
             raise Exception("CRM not found")
 

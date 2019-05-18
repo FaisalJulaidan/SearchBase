@@ -3,9 +3,10 @@ import logging
 
 import requests
 from requests_oauthlib import OAuth2Session
+from sqlalchemy import and_
 
 from enums import DataType as DT
-from models import Callback, ChatbotSession
+from models import Callback, ChatbotSession, db, CRM
 
 
 # Bullhorn Notes:
@@ -18,16 +19,13 @@ from models import Callback, ChatbotSession
 
 
 # failing at fetch_token() currently, wants access_token, requests.post(authorization_url) returns html login page
-from services.CRM.crm_services import updateByCompanyAndType
-
-
 def login(auth):
     try:
         authCopy = dict(auth)  # we took copy to delete domain later only from the copy
-        print("authCopy :", authCopy)
+
         # request token by using callback URL, auth url, access token url, client id, client secret
         oauth = OAuth2Session(client_id=authCopy.get("client_id", ""), redirect_uri=authCopy.get("redirect_uri", ""))
-        print("oauth :", oauth)
+
         authorization_url, state = oauth.authorization_url("https://auth9.bullhornstaffing.com/oauth/authorize")
         print("authorization_url :", authorization_url)
         print("state :", state)
@@ -105,9 +103,10 @@ def retrieveRestToken(auth, companyID):  # acquired by using access_token, which
         authCopy["rest_token"] = result_body.get("BhRestToken")
         authCopy["rest_url"] = result_body.get("restUrl")
 
-        updateAuth_callback = updateByCompanyAndType("Bullhorn", companyID, authCopy)
-        if not updateAuth_callback.Success:
-            raise Exception("Could not store new auth for crm")
+        # done here as cannot import crm_services while it is importing Bullhorn.py
+        crm = db.session.query(CRM).filter(and_(CRM.CompanyID == companyID, CRM.Type == "Bullhorn")).first()
+        crm.Auth = dict(authCopy)
+        db.session.commit()
 
         return Callback(True, 'Logged in successfully', {
             "rest_token": authCopy.get("rest_token"),
@@ -115,6 +114,7 @@ def retrieveRestToken(auth, companyID):  # acquired by using access_token, which
         })
 
     except Exception as exc:
+        db.session.rollback()
         logging.error("CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
         return Callback(False, str(exc))
 

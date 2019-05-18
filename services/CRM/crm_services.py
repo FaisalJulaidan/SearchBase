@@ -61,7 +61,6 @@ def connect(company_id, details) -> Callback:
 # details is a dict that has {auth, type}
 def update(crm_id, company_id, details) -> Callback:
     try:
-        crm_type: CRM = CRM[details['type']]
         crm_auth = details['auth']
 
         # test connection

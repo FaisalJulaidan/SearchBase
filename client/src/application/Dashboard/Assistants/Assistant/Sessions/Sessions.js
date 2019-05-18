@@ -271,7 +271,7 @@ class Sessions extends React.Component {
 
                             <Button className={styles.Panel_Header_Button} type="primary" icon="download"
                                     loading={this.props.isLoading}>
-                                <CSVLink filename={"Conversations_Export.csv"} data={this.state.downloadData} 
+                                <CSVLink filename={"Conversations_Export.csv"} data={this.state.downloadData}
                                          style={{color:"white"}}> Export CSV</CSVLink>
                             </Button>
 

@@ -7,6 +7,7 @@ from requests_oauthlib import OAuth2Session
 from enums import DataType as DT
 from models import Callback, ChatbotSession
 
+
 # Bullhorn Notes:
 # access_token (used to generate rest_token) lasts 10 minutes, needs to be requested by using the auth from the client
 # refresh_token (can be used to generate access_token) - generated with access_token on auth, ...
@@ -44,7 +45,7 @@ def login(auth):
         print("r :", r)
 
         if not r.ok:
-            return Callback(False, r.json().get('ERROR_MSG', r.text))
+            return Callback(False, r.text)
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully')
@@ -75,35 +76,40 @@ def retrieveRestToken():  # acquired by using access_token, which can be generat
 
 def insertCandidate(auth, session: ChatbotSession) -> Callback:
     try:
-        # retrieve refresh_token and try to use it
-        # if error TokenExpiredError or simmiliar - request new rest token from retrieveRestToken
-        callback: Callback = retrieveRestToken()
-        if not callback.Success:
-            return callback
+        # retrieve rest_token and try to use it
+        # if error TokenExpiredError or similar - request new rest token from retrieveRestToken
+        authCopy = dict(auth)
+        rest_token = authCopy.get("rest_token", "")
 
-        url = callback.Data.get("rest_url", "") + "entity/Candidate" + "?BhRestToken=" + callback.Data.get("rest_token",
-                                                                                                           "")
+        callback: Callback = retrieveRestToken()
+        if callback.Success:
+            rest_token = callback.Data.get("rest_token", "")
+        else:
+            raise Exception(callback.Message)
+
+        url = callback.Data.get("rest_url", "") + "entity/Candidate" + "?BhRestToken=" + rest_token
         headers = {'Content-Type': 'application/json'}
 
         # New candidate details
         body = {
             "name": " ".join(
-                session.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], ["Unavailable - TSB"])),
+                session.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'])),
             "mobile":
-                session.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'], "Unavailable - TSB")[0],
+                session.Data.get('keywordsByDataType').get(DT.CandidateTelephone.value['name'])[0],
             "address": {
                 "city": " ".join(
-                    session.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], ["Unavailable - TSB"])),
+                    session.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'])),
             },
             "email": " ".join(
-                session.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], ["Unavailable - TSB"])),
+                session.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'])),
         }
 
         # Send request
         r = requests.put(url, headers=headers, data=json.dumps(body))
 
         # When not ok
-        if not r.ok: raise Exception(r.json().get('ERROR_MSG', r.text))
+        if not r.ok:
+            raise Exception(r.text)
 
         return Callback(True, r.text)
 
@@ -112,48 +118,96 @@ def insertCandidate(auth, session: ChatbotSession) -> Callback:
         return Callback(False, str(exc))
 
 
-def insertClient(auth, session: ChatbotSession) -> Callback:  # still Adapt version
+def insertClient(auth, session: ChatbotSession) -> Callback:
     try:
+
+        insertCompany_callback: Callback = insertCompany(auth, session)
+        if not insertCompany_callback.Success:
+            raise Exception(insertCompany_callback.Message)
+
+        insertClient_callback: Callback = insertClientContact(auth, session,
+                                                              insertCompany_callback.Data.get("changedEntityId"))
+        if not insertClient_callback.Success:
+            raise Exception(insertClient_callback.Message)
+
+        return Callback(True, "Client has been added")
+
+    except Exception as exc:
+        logging.error("CRM.Bullhorn.insertClient() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def insertClientContact(auth, session: ChatbotSession, companyID) -> Callback:
+    try:
+        # retrieve rest_token and try to use it
+        # if error TokenExpiredError or similar - request new rest token from retrieveRestToken
         callback: Callback = retrieveRestToken()
         if not callback.Success:
             return callback
 
-        url = "https://developerconnection.adaptondemand.com/WebApp/api/v1/companies"
-        headers = {'Content-Type': 'application/json', 'x-adapt-sid': callback.Data}
+        # add client contact -----------
+        url = callback.Data.get("rest_url", "") + "entity/ClientContact" + "?BhRestToken=" + \
+                                                            callback.Data.get("rest_token", "")
+        headers = {'Content-Type': 'application/json'}
 
         # New candidate details
         body = {
-            "CLIENT_GEN": {
-                "CLIENT_TYPE": 8252178,
-                "NAME": " ".join(session.Data.get('keywordsByDataType')
-                                 .get(DT.ClientName.value['name'], "Unavailable - TSB"))
+            "name": " ".join(
+                session.Data.get('keywordsByDataType').get(DT.ClientName.value['name'])),
+            "mobile":
+                session.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'])[0],
+            "address": {
+                "city": " ".join(
+                    session.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'])),
             },
-            "TELEPHONE": [
-                {
-                    "OCC_ID": "Work",
-                    "TEL_NUMBER": session.Data.get('keywordsByDataType')
-                        .get(DT.ClientTelephone.value['name'], ["Unavailable - TSB"])[0]
-                }
-            ],
-            "ADDRESS": [{
-                "OCC_ID": "Primary",
-                "STREET1": " ".join(session.Data.get('keywordsByDataType')
-                                    .get(DT.ClientLocation.value['name'], "Unavailable - TSB")),
-            }],
-            "NOTES": " ".join(session.Data.get('keywordsByDataType')
-                              .get(DT.ClientEmail.value['name'], "Unavailable - TSB")),
+            "email": " ".join(
+                session.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'])),
+            "clientCorporation": {"id": companyID}
         }
 
         # Send request
-        r = requests.post(url, headers=headers, data=json.dumps(body))
+        r = requests.put(url, headers=headers, data=json.dumps(body))
 
         # When not ok
-        if not r.ok: raise Exception(r.json().get('ERROR_MSG', r.text))
+        if not r.ok:
+            raise Exception(r.text)
 
         return Callback(True, r.text)
 
     except Exception as exc:
-        logging.error("CRM.Adapt.insertClient() ERROR: " + str(exc)
-                      + " Username: " + auth.get('username', 'Unknown')
-                      + " Domain: " + auth.get('domain', 'Unknown'))
+        logging.error("CRM.Bullhorn.insertClientContact() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def insertCompany(auth, session: ChatbotSession) -> Callback:
+    try:
+        # retrieve rest_token and try to use it
+        # if error TokenExpiredError or similar - request new rest token from retrieveRestToken
+        callback: Callback = retrieveRestToken()
+        if not callback.Success:
+            return callback
+
+        # add company ------------
+        url = callback.Data.get("rest_url", "") + "entity/ClientCorporation" + "?BhRestToken=" + callback.Data.get(
+            "rest_token",
+            "")
+        headers = {'Content-Type': 'application/json'}
+
+        # New candidate details
+        body = {
+            "name": " ".join(
+                session.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'], ["Undefined Company - TSB"])),
+        }
+
+        # Send request
+        r = requests.put(url, headers=headers, data=json.dumps(body))
+
+        # When not ok
+        if not r.ok:
+            raise Exception(r.text)
+
+        return Callback(True, r.text)
+
+    except Exception as exc:
+        logging.error("CRM.Bullhorn.insertCompany() ERROR: " + str(exc))
         return Callback(False, str(exc))

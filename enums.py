@@ -48,6 +48,7 @@ class DatabaseType(Enum):
 class DataTypeSection(Enum):
     NoType = 'No Type'
     Client = 'Client'
+    Company = 'Company'
     Candidate = 'Candidate'
     Job = 'Job'
 
@@ -169,6 +170,13 @@ class DataType(Enum):
         [UserType.Candidate])
 
 
+    CompanyName = dataTypeCreator(
+        'Company Name',
+        'CompanyName',
+        ValidationType.String,
+        DataTypeSection.Company,
+        [UserType.Client, UserType.Candidate])
+
     # ======================================================================
     # Client
     # The chances of asking a question with a client data type is very low. however when is it asked it means most of
@@ -202,6 +210,7 @@ class DataType(Enum):
         ValidationType.String,
         DataTypeSection.Client,
         [UserType.Client] * 6)
+
 
 
     # ======================================================================
@@ -267,5 +276,13 @@ class DataType(Enum):
         'Job Start Date',
         'JobStartDate',
         ValidationType.DateTime,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])
+
+
+    JobYearsRequired = dataTypeCreator(
+        'Job Years Required',
+        'JobYearsRequired',
+        ValidationType.Number,
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])

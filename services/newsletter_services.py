@@ -1,7 +1,6 @@
-import sqlalchemy.exc
 from models import db, Callback, Newsletter
 from utilities import helpers
-import logging
+import logging, sqlalchemy.exc
 
 def addNewsletterPerson(email):
     try:

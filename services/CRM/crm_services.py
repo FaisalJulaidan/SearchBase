@@ -48,7 +48,7 @@ def connect(company_id, details) -> Callback:
         db.session.add(connection)
         db.session.commit()
 
-        return Callback(True, 'CRM has been connected successfully')
+        return Callback(True, 'CRM has been connected successfully', connection.ID)
 
     except Exception as exc:
         print(exc)

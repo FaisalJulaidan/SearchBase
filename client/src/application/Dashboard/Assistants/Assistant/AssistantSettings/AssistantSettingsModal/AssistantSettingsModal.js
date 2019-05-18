@@ -8,7 +8,8 @@ class AssistantSettingsModal extends Component {
     state = {
         isPopupDisabled: this.props.assistant.SecondsUntilPopup <= 0,
         isAlertsEnabled: this.props.assistant.MailEnabled,
-        alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
+        // alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
+        alertOptions: {0: "Immediately"}
     };
 
     checkName = (rule, value, callback) => {
@@ -145,15 +146,6 @@ class AssistantSettingsModal extends Component {
 
                     <FormItem
                         {...formItemLayout}
-                        label="Records Notifications"
-                        extra="If you turn this on, we will notify you through your email"
-                    >
-                        <Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}
-                                style={{marginRight: '5px'}}/>
-                    </FormItem>
-
-                    <FormItem
-                        {...formItemLayout}
                         label="Restricted Contries"
                         extra="Chatbot will be disabled for users who live in the selected countries"
                     >
@@ -168,6 +160,15 @@ class AssistantSettingsModal extends Component {
                                 </Select>
                             )
                         }
+                    </FormItem>
+
+                    <FormItem
+                        {...formItemLayout}
+                        label="Records Notifications"
+                        extra="If you turn this on, we will notify you through your email"
+                    >
+                        <Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}
+                                style={{marginRight: '5px'}}/>
                     </FormItem>
 
                     <FormItem

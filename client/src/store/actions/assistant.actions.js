@@ -137,77 +137,45 @@ const updateFlowFailure = (error) => {
     };
 };
 
-
-// CRM
-const connectCRM = (CRM, assistant) => {
+const selectAssistantCRM = (CRMID, assistantID) => {
     return {
-        type: actionTypes.CONNECT_CRM_REQUEST,
-        assistant,
-        CRM
+        type: actionTypes.SELECT_ASSISTANT_CRM_REQUEST,
+        CRMID,
+        assistantID
     };
 };
 
-const connectCRMSuccess = (assistant, msg) => {
+const selectAssistantCRMSuccess = (msg) => {
     return {
-        type: actionTypes.CONNECT_CRM_SUCCESS,
-        assistant,
+        type: actionTypes.SELECT_ASSISTANT_CRM_SUCCESS,
         msg
     };
 };
 
-const connectCRMFailure = (error) => {
+const selectAssistantCRMFailure = (error) => {
     return {
-        type: actionTypes.CONNECT_CRM_FAILURE,
+        type: actionTypes.SELECT_ASSISTANT_CRM_FAILURE,
         error
     };
 };
 
-
-
-// CRM TEST
-const testCRM = (CRM, assistant) => {
+const resetAssistantCRM = (assistantID) => {
     return {
-        type: actionTypes.TEST_CRM_REQUEST,
-        assistant,
-        CRM
+        type: actionTypes.RESET_ASSISTANT_CRM_REQUEST,
+        assistantID
     };
 };
 
-const testCRMSuccess = (assistant, msg) => {
+const resetAssistantCRMSuccess = (msg) => {
     return {
-        type: actionTypes.TEST_CRM_SUCCESS,
-        assistant,
+        type: actionTypes.RESET_ASSISTANT_CRM_SUCCESS,
         msg
     };
 };
 
-const testCRMFailure = (error) => {
+const resetAssistantCRMFailure = (error) => {
     return {
-        type: actionTypes.TEST_CRM_FAILURE,
-        error
-    };
-};
-
-// CRM DISCONNECT
-const disconnectCRM = (CRM, assistant) => {
-    return {
-        type: actionTypes.DISCONNECT_CRM_REQUEST,
-        assistant,
-        CRM
-    };
-};
-
-const disconnectCRMSuccess = (assistant, msg) => {
-    return {
-        type: actionTypes.DISCONNECT_CRM_SUCCESS,
-        assistant,
-        msg
-    };
-};
-
-const disconnectCRMFailure = (error) => {
-    return {
-        type: actionTypes.DISCONNECT_CRM_FAILURE,
+        type: actionTypes.RESET_ASSISTANT_CRM_FAILURE,
         error
     };
 };
@@ -239,15 +207,12 @@ export const assistantActions = {
     updateFlowSuccess,
     updateFlowFailure,
 
-    connectCRM,
-    connectCRMSuccess,
-    connectCRMFailure,
+    selectAssistantCRM,
+    selectAssistantCRMSuccess,
+    selectAssistantCRMFailure,
 
-    testCRM,
-    testCRMSuccess,
-    testCRMFailure,
+    resetAssistantCRM,
+    resetAssistantCRMSuccess,
+    resetAssistantCRMFailure,
 
-    disconnectCRM,
-    disconnectCRMSuccess,
-    disconnectCRMFailure,
 };

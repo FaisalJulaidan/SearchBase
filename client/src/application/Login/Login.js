@@ -10,18 +10,30 @@ import {Link} from "react-router-dom";
 const FormItem = Form.Item;
 class Login extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.handleEnter = this.handleEnter.bind(this);
+    }
+
+    handleEnter = e => e.keyCode === 13 ? this.handleSubmit() : null;
+
+    componentDidMount() {
+        document.addEventListener("keydown", this.handleEnter, false);
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener("keydown", this.handleEnter, false);
+    }
+
     handleSubmit = (e) => {
-        e.preventDefault();
+        if (e)
+            e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 //this.setState({isLoggin: true});
                 this.props.dispatch(authActions.login(values.email, values.password));
             }
         });
-    };
-
-    handleLogout = () => {
-        this.props.dispatch(authActions.logout());
     };
 
     render() {

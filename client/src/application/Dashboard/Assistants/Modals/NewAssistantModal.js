@@ -14,7 +14,8 @@ class NewAssistantModal extends Component {
     state = {
         isPopupDisabled: true,
         isAlertsEnabled: false,
-        alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
+        // alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
+        alertOptions: {0: "Immediately"}
     };
 
     checkName = (rule, value, callback) => {

@@ -1,5 +1,4 @@
 from sqlalchemy.sql import exists
-
 from models import db, Callback, User, Company, Role
 from services import mail_services, company_services, newsletter_services, role_services
 from utilities import helpers
@@ -27,7 +26,6 @@ def create(firstname, surname, email, password, phone, company: Company, role: R
 
 
 # ----- Getters ----- #
-
 def getByID(id) -> Callback:
     try:
         if id:

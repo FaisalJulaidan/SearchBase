@@ -21,7 +21,7 @@ def get_crms():
 
         crms = helpers.getListFromSQLAlchemyList(callback.Data)
         for crm in crms:
-            crm['status'] = crm_services.testConnection({'auth': crm['Auth'], 'type': crm['Type']}).Success
+            crm['Status'] = crm_services.testConnection({'auth': crm['Auth'], 'type': crm['Type']}).Success
 
         return helpers.jsonResponse(True, 200, callback.Message, crms)
 
@@ -37,8 +37,8 @@ def crm_connect():
         callback: Callback = crm_services.connect(user.get("companyID"), request.json)  # crm details passed: auth, type
 
     if not callback.Success:
-        return helpers.jsonResponse(False, 400, callback.Message)
-    return helpers.jsonResponse(True, 200, callback.Message)
+        return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
+    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
 # Edit/Disconnect CRM

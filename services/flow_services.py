@@ -1,14 +1,9 @@
-
-
-import enums
 from models import db, Callback, Assistant
 from services import assistant_services
 from jsonschema import validate
 from utilities import json_schemas, helpers
-import logging
 from flask import request
-
-bot_currentVersion = "1.0.0"
+import logging, enums
 
 
 # ----- Getters ----- #

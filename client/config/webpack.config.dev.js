@@ -177,6 +177,7 @@ module.exports = {
             'components': path.resolve(__dirname, '../src/components/'),
             'helpers': path.resolve(__dirname, '../src/helpers/'),
             'store': path.resolve(__dirname, '../src/store/'),
+            'types': path.resolve(__dirname, '../src/types/'),
         },
         plugins: [
             // Adds support for installing with Plug'n'Play, leading to faster installs and adding

@@ -3,7 +3,6 @@ import createSagaMiddleware from 'redux-saga';
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import rootReducer from './reducers';
-import {authActions} from "./actions";
 import {
     assistantSaga,
     authSaga,
@@ -11,7 +10,8 @@ import {
     chatbotSessions,
     usersManagementSaga,
     databaseSaga,
-    optionsSaga
+    optionsSaga,
+    crmSaga
 } from './sagas'
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -41,6 +41,7 @@ sagaMiddleware.run(chatbotSessions);
 sagaMiddleware.run(usersManagementSaga);
 sagaMiddleware.run(databaseSaga);
 sagaMiddleware.run(optionsSaga);
+sagaMiddleware.run(crmSaga);
 
 
 export { store, persistor }

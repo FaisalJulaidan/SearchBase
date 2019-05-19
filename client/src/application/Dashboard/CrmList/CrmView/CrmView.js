@@ -113,11 +113,11 @@ class CrmView extends React.Component {
                     <div className={styles.DetailsWithAvatar}>
                         <Title level={2}>{this.state.CRM?.type}</Title>
                         <Paragraph type="secondary">
-                            We supply a series of design principles, practical patterns and high quality design
-                            resources
-                            (<Text code>Sketch</Text> and <Text code>Axure</Text>), to help people create their
-                            product
-                            prototypes beautifully and efficiently.
+                            Bond Adapt, specialist portfolio of recruitment software applications has earned a
+                            reputation for increasing business growth and profitability throughout the global staffing
+                            market. 100% configurable and fully scalable, Adapt manages the entire placement cycle and
+                            is chosen by leading recruitment organisations including <Text code>Hays</Text>,
+                            <Text code>Adecco</Text> and <Text code>Michael Page</Text> .
                         </Paragraph>
                     </div>
                 </div>
@@ -133,53 +133,60 @@ class CrmView extends React.Component {
                         <Breadcrumb.Item>{CRM.type}</Breadcrumb.Item>
                     </Breadcrumb>
                     <br/>
-                    <Tabs defaultActiveKey="2">
+                    <Tabs defaultActiveKey="1">
                         <TabPane tab="Feature" key="1">
                             <Typography style={{padding: '0 60px'}}>
                                 <Title>Introduction</Title>
                                 <Paragraph>
-                                    In the process of internal desktop applications development, many different
-                                    design
-                                    specs and
-                                    implementations would be involved, which might cause designers and developers
-                                    difficulties and
-                                    duplication and reduce the efficiency of development.
+                                    Adapt users can very simply benefit from using their systems directly by logging in
+                                    through our software to connect their CRM to our platform.
                                 </Paragraph>
                                 <Paragraph>
-                                    After massive project practice and summaries, Ant Design, a design language for
-                                    background
-                                    applications, is refined by Ant UED Team, which aims to{' '}
-                                    <Text strong>
-                                        uniform the user interface specs for internal background projects, lower the
-                                        unnecessary
-                                        cost of design differences and implementation and liberate the resources of
-                                        design and
-                                        front-end development
-                                    </Text>
+                                    Once you have the required information and have successfully logged in – you are all
+                                    done.
+                                </Paragraph>
+                                <Paragraph>
+                                    What you’ll need:
+                                    <ul>
+                                        <li>
+                                            Adapt Domain
+                                        </li>
+                                        <li>
+                                            Username
+                                        </li>
+                                        <li>
+                                            Password
+                                        </li>
+                                        <li>
+                                            Profile
+                                        </li>
+                                        <li>
+                                            Locale
+                                        </li>
+                                        <li>
+                                            (Location e.g. en_GB, en_US)
+                                        </li>
+                                        <li>
+                                            Timezone (e.g. GMT)
+                                        </li>
+                                    </ul>
+                                </Paragraph>
+                                <Paragraph>
+                                    We can start using your data to connect to the chatbots and help you with the
+                                    automation of your tasks.
                                 </Paragraph>
                                 <Title level={2}>Guidelines and Resources</Title>
                                 <Paragraph>
-                                    We supply a series of design principles, practical patterns and high quality
-                                    design
-                                    resources
-                                    (<Text code>Sketch</Text> and <Text code>Axure</Text>), to help people create
-                                    their
-                                    product
-                                    prototypes beautifully and efficiently.
-                                </Paragraph>
-
-                                <Paragraph>
-                                    <ul>
-                                        <li>
-                                            <a href="/docs/spec/proximity">Principles</a>
-                                        </li>
-                                        <li>
-                                            <a href="/docs/pattern/navigation">Patterns</a>
-                                        </li>
-                                        <li>
-                                            <a href="/docs/resource/download">Resource Download</a>
-                                        </li>
-                                    </ul>
+                                    From the list below, choose your CRM or ATS for your account to be directly
+                                    connected.
+                                    If you need help with the setup or wish to contact us to arrange an integration with
+                                    your
+                                    provider,
+                                    please contact us at:
+                                    <Text code><a target={'_blank'}
+                                                  href={"mailto:info@thesearchbase.com"}>
+                                        info@thesearchbase.com
+                                    </a></Text>.
                                 </Paragraph>
                             </Typography>
                         </TabPane>

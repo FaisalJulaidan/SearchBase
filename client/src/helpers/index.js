@@ -6,5 +6,6 @@ export * from './hashids';
 export * from './flow';
 export * from './links';
 export * from './deepClone';
+export * from './errorHandler';
 
 

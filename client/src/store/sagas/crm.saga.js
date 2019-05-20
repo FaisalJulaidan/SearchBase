@@ -1,7 +1,7 @@
 import {all, put, takeEvery} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {crmActions} from "../actions";
-import {errorMessage, http, successMessage} from "helpers";
+import {errorHandler, errorMessage, http, successMessage} from "helpers";
 import * as Sentry from '@sentry/browser';
 
 function* fetchCRMs() {
@@ -22,48 +22,30 @@ function* fetchCRMs() {
 }
 
 function* connectCrm({connectedCRM}) {
-    let msg = "Coulnd't connect to CRM";
+    const defaultMsg = "Couldn't Connect CRM";
     try {
         const res = yield http.post(`/crm/connect`, {type: connectedCRM.type, auth: connectedCRM.auth});
-
-        if (!res.data?.success) {
-            errorMessage(res.data?.msg || msg);
-            yield put(crmActions.connectCrmFailure(msg));
-        }
-
-        if (res.data?.msg)
-            successMessage(res.data.msg);
-
-        yield put(crmActions.connectCrmSuccess(res.data.data));
+        successMessage(res.data?.msg || defaultMsg);
+        yield put(crmActions.connectCrmSuccess());
     } catch (error) {
-        msg = error.response?.data?.msg;
-        console.error(error);
-        yield put(crmActions.connectCrmFailure(msg));
-        Sentry.captureException(error);
-        errorMessage(msg);
+        let data = error.response?.data;
+        errorMessage(data.msg || defaultMsg);
+        yield put(crmActions.connectCrmFailure(data.msg || defaultMsg));
+        if (!data.msg) errorHandler(error)
     }
 }
 
 function* testCrm({testedCRM}) {
-    let msg = "Couldn't Test CRM";
+    const defaultMsg = "Couldn't Test CRM";
     try {
         const res = yield http.post(`/crm/test`, {type: testedCRM.type, auth: testedCRM.auth});
-
-        if (!res.data?.success) {
-            errorMessage(res.data?.msg || msg);
-            yield put(crmActions.testCrmFailure(msg));
-        }
-
-        if (res.data?.msg)
-            successMessage(res.data.msg);
-
+        successMessage(res.data?.msg || defaultMsg);
         yield put(crmActions.testCrmSuccess());
     } catch (error) {
-        msg = error.response?.data?.msg;
-        console.error(error);
-        yield put(crmActions.testCrmFailure(msg));
-        Sentry.captureException(error);
-        errorMessage(msg);
+        let data = error.response?.data;
+        errorMessage(data.msg || defaultMsg);
+        yield put(crmActions.testCrmFailure(data.msg || defaultMsg));
+        if (!data.msg) errorHandler(error)
     }
 }
 

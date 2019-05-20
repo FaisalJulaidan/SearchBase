@@ -129,38 +129,30 @@ const createSaga = (sagaName, actionName) => {
     return `COPY AND PASTE THIS IN .saga.js file:
     
     function* ${placeholder_camel}(payload) {
-        let msg = "WRITE DEFAULT MESSAGE";
+        const defaultMsg = "CHANGE THIS";
         try {
-            // TODO:
+            // TODO: CHANGE THE HTTP TYPE & API NAME & PAYLOAD 
             const res = yield http.post('TODO', {});
-            
-            if (!res.data?.success) {
-                errorMessage(res.data?.msg || msg);
-                yield put(${actionFile}.${placeholder_camel}Failure(msg));
-            }
-
-            if (res.data?.msg)
-                successMessage(res.data.msg);
-
-            yield put(${actionFile}.${placeholder_camel}Success(res.data.data));
+            successMessage(res.data?.msg || defaultMsg);
+            yield put(${actionFile}.${placeholder_camel}Success());
         } catch (error) {
-            msg = error.response?.data?.msg;
-            console.error(error);
-            yield put(${actionFile}.${placeholder_camel}Failure(msg));
-            Sentry.captureException(error);
-            errorMessage(msg);
+            let data = error.response?.data;
+            errorMessage(data.msg || defaultMsg);
+            yield put(${actionFile}.${placeholder_camel}Failure(data.msg || defaultMsg));
+            if (!data.msg) errorHandler(error)
         }
     }
 
     function* watch${placeholder_pascal}() {
         yield takeEvery(actionTypes.${placeholder_Upper}_REQUEST, ${placeholder_camel})
     }
-
+    
+    
+    //TODO: ADD THIS TO WATCHER FUNCTIONS
     watch${placeholder_pascal}()
       
     `;
 };
-
 
 const run = async () => {
     // show script introduction

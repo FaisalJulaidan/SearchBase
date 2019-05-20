@@ -83,7 +83,7 @@ def test_crm_123():
     if request.method == "POST":
         callback: Callback = Bullhorn.login({
             "client_id": "7719607b-7fe7-4715-b723-809cc57e2714",
-            "redirect_uri": "https://thesearchbase.com/bullhorn_callback",
+            "redirect_uri": "https://www.thesearchbase.com/api/bullhorn_callback",
             "client_secret": "0ZiVSILQ7CY0bf054LPiX4kN"
         })  # crm details passed (auth, type)
 

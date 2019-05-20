@@ -159,6 +159,7 @@ class Sessions extends React.Component {
 
             data.push(dataRecord);
         });}
+        console.log(data)
 
         // put the data in the state and set refresh to false
         this.setState({downloadData:data, sessionsRefreshed:false});
@@ -255,8 +256,8 @@ class Sessions extends React.Component {
               }}>
                   View
               </a>
-                    <Divider hidden type="vertical" />
-              <a hidden onClick={() => {
+                    <Divider type="vertical" />
+              <a onClick={() => {
                   this.deleteSession(record)
               }}>
                   Delete
@@ -285,7 +286,7 @@ class Sessions extends React.Component {
 
                             <Button className={styles.Panel_Header_Button} type="primary" icon="download"
                                     loading={this.props.isLoading}>
-                                <CSVLink filename={"Conversations_Export.csv"} data={this.state.downloadData} 
+                                <CSVLink filename={"Conversations_Export.csv"} data={this.state.downloadData}
                                          style={{color:"white"}}> Export CSV</CSVLink>
                             </Button>
 

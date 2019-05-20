@@ -159,6 +159,7 @@ class Sessions extends React.Component {
 
             data.push(dataRecord);
         });}
+        console.log(data)
 
         // put the data in the state and set refresh to false
         this.setState({downloadData:data, sessionsRefreshed:false});
@@ -231,6 +232,20 @@ class Sessions extends React.Component {
             sorter: (a, b) => new Date(a.DateTime).valueOf() - new Date(b.DateTime).valueOf(),
             render: (text, record) => (<p>{record.DateTime}</p>),
 
+        },{
+            title: 'Status',
+            dataIndex: 'Completed',
+            key: 'Completed',
+            // filters: [
+            //     {text: 'Completed', value: 'Completed'},
+            //     {text: 'Incomplete', value: 'Incomplete'},
+            // ],
+            // onFilter: (value, record) => record.Completed ? record.UserType.indexOf(value) === 0 : false,
+            render: (text, record) => (
+                record.Completed ?
+                    <Tag color="#87d068">Completed</Tag> :
+                    <Tag color="red">Incomplete</Tag>),
+
         }, {
             title: 'Action',
             key: 'action',
@@ -241,8 +256,8 @@ class Sessions extends React.Component {
               }}>
                   View
               </a>
-                    <Divider hidden type="vertical" />
-              <a hidden onClick={() => {
+                    <Divider type="vertical" />
+              <a onClick={() => {
                   this.deleteSession(record)
               }}>
                   Delete

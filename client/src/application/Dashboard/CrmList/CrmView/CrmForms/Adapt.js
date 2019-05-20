@@ -1,6 +1,7 @@
 import React from 'react';
-import {Button, Icon, Input, Select, Typography, Col} from "antd";
+import {Button, Col, Icon, Input, Select, Typography} from "antd";
 import styles from "../CrmView.module.less";
+import {getLink} from "helpers";
 
 const {Option} = Select;
 
@@ -138,8 +139,7 @@ const AdaptFormItems = ({
         {
             CRM.status === "CONNECTED" &&
             <div style={{textAlign: 'center'}}>
-                <Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a"
-                      style={{fontSize: 120}}/>
+                <img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>
                 <Typography.Title>
                     {CRM.type} is connected
                 </Typography.Title>

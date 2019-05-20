@@ -23,12 +23,16 @@ def insertCandidate(assistant: Assistant, session: ChatbotSession):
     # Check CRM type
     if assistant.CRM is CRM.Adapt:
         return Adapt.insertCandidate(assistant.CRMAuth, session)
+    if assistant.CRM is CRM.Bullhorn:
+        return Bullhorn.insertCandidate(assistant.CRMAuth, session)
 
 
 def insertClient(assistant: Assistant, session: ChatbotSession):
     # Check CRM type
     if assistant.CRM is CRM.Adapt:
         return Adapt.insertClient(assistant.CRMAuth, session)
+    if assistant.CRM is CRM.Bullhorn:
+        return Bullhorn.insertClient(assistant.CRMAuth, session)
 
 
 # Connect to a new CRM
@@ -116,7 +120,6 @@ def updateByCompanyAndType(crm_type, company_id, auth):
         logging.error("CRM_services.update(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Update CRM details failed.")
-
 
 
 # Test connection to a CRM

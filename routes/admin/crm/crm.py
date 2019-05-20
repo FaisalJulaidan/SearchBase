@@ -78,11 +78,10 @@ def test_crm_connection():
 
 # Tests
 @crm_router.route("/crm/testing123", methods=['POST'])
-@jwt_required
 def test_crm_123():
     callback: Callback = Callback(False, '')
     if request.method == "POST":
-        callback: Callback = Bullhorn.insertCandidate({
+        callback: Callback = Bullhorn.login({
             "client_id": "7719607b-7fe7-4715-b723-809cc57e2714",
             "redirect_uri": "https://thesearchbase.com/bullhorn_callback",
             "client_secret": "0ZiVSILQ7CY0bf054LPiX4kN"

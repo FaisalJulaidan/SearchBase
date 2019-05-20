@@ -53,11 +53,11 @@ def processSession(assistantHashID, data: dict) -> Callback:
                                         UserType=UserType[data['userType'].replace(" ", "")],
                                         Assistant=assistant)
         # CRM integration
-        if assistant.CRM:
-            crm_callback: Callback = crm_services.processSession(assistant, chatbotSession)
-            if crm_callback.Success:
-                chatbotSession.CRMSynced = True
-            chatbotSession.CRMResponse = crm_callback.Message
+        # if assistant.CRM:
+        #     crm_callback: Callback = crm_services.processSession(assistant, chatbotSession)
+        #     if crm_callback.Success:
+        #         chatbotSession.CRMSynced = True
+        #     chatbotSession.CRMResponse = crm_callback.Message
 
         db.session.add(chatbotSession)
         db.session.commit()

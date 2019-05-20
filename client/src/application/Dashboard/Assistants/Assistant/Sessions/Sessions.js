@@ -74,7 +74,7 @@ class Sessions extends React.Component {
         if (ID && AssistantID)
             confirm({
                 title: `Delete session confirmation`,
-                content: `If you click OK, this session will be deleted with its associated data forever`,
+                content: `If you click OK, this conversation will be deleted with its associated data forever`,
                 okType: 'danger',
                 onOk: () => {
                     if (this.state.viewModal)
@@ -84,8 +84,7 @@ class Sessions extends React.Component {
                 maskClosable: true
             });
     };
-
-
+    
     getNextSession = currentSession => {
         const {sessionsList} = this.props.sessions;
         const index = sessionsList?.findIndex(session => session?.ID === currentSession?.ID);
@@ -165,6 +164,14 @@ class Sessions extends React.Component {
         this.setState({downloadData:data, sessionsRefreshed:false});
     }
 
+    findUserName = (keywords, userType) => {
+        if ('Client Name' in keywords && userType === 'Client')
+            return keywords['Client Name'].join(' ');
+        else if ('Candidate Name' in keywords && userType === 'Candidate')
+            return keywords['Candidate Name'].join(' ');
+        return 'Unavailable';
+    };
+
     render() {
         const {assistant} = this.props.location.state;
         const {sessions, options} = this.props;
@@ -194,6 +201,13 @@ class Sessions extends React.Component {
             ],
             onFilter: (value, record) => record.UserType ? record.UserType.indexOf(value) === 0 : false,
             render: (text, record) => (<Tag key={record.UserType}>{record.UserType}</Tag>),
+
+        }, {
+            title: 'Name',
+            dataIndex: 'Name',
+            key: 'Name',
+            render: (text, record) => (
+                <p style={{textTransform: 'capitalize'}}>{this.findUserName(record.Data.keywordsByDataType, record.UserType)}</p>),
 
         }, {
             title: 'Questions Answered',

@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 
-import {Button, Form, Input, Modal, Select, InputNumber, message, Switch, Slider} from 'antd';
+import {Button, Form, Input, Modal, Select, InputNumber, Switch, Slider} from 'antd';
+import countries from 'helpers/static_data/countries'
 
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
-
-
 
 
 
@@ -39,6 +38,11 @@ class NewAssistantModal extends Component {
             if (!err) {
                 if(this.state.isPopupDisabled) {values.secondsUntilPopup = 0}
                 values["alertsEnabled"] = this.state.isAlertsEnabled;
+                values.config = {
+                    restrictedCountries: values.restrictedCountries || []
+                };
+                delete values.restrictedCountries;
+
                 this.props.addAssistant(values)
             }
         });
@@ -56,6 +60,7 @@ class NewAssistantModal extends Component {
         const maxAlertsLength = parseInt(alertsKeys[alertsKeys.length - 1]);
 
         const {getFieldDecorator} = this.props.form;
+        const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
 
         return (
             <Modal
@@ -123,6 +128,22 @@ class NewAssistantModal extends Component {
                         <InputNumber disabled={this.state.isPopupDisabled} min={1} />
                     )}
                     <span className="ant-form-text"> seconds</span>
+                    </FormItem>
+
+                    <FormItem
+                        {...formItemLayout}
+                        label="Restricted Contries"
+                        extra="Chatbot will be disabled for users who live in the selected countries"
+                    >
+                        {
+                            getFieldDecorator('restrictedCountries')(
+                                <Select mode="multiple" style={{width: '100%'}}
+                                        filterOption={(inputValue, option) => option.props.children.toLowerCase().includes(inputValue.toLowerCase())}
+                                        placeholder="Please select country or countries">
+                                    {countriesOptions}
+                                </Select>
+                            )
+                        }
                     </FormItem>
 
                     <FormItem

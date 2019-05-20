@@ -113,7 +113,7 @@ def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod
             if not callback.Success:
                 raise Exception(callback.Message)
 
-        assistant = Assistant(Name=name, Flow=flow, Route=None, Message=message, TopBarText=topBarText,
+        assistant = Assistant(Name=name, Flow=flow, Message=message, TopBarText=topBarText,
                               SecondsUntilPopup=secondsUntilPopup, MailEnabled=mailEnabled, MailPeriod=mailPeriod,
                               Config=config, CompanyID=companyID)
         db.session.add(assistant)

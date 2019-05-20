@@ -32,7 +32,7 @@ class Conversation extends Component {
                     Download File
                 </Button>);
             }
-            else if (record.dataType === "Email"){
+            else if (record.dataType.includes("Email")){
                 return (<p>
                    {record.input} <Icon type="mail" onClick={()=>{console.log(record.input);this.emailUser(record.input)}}/>
                </p>);

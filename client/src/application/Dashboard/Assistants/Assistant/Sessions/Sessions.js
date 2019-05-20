@@ -159,6 +159,7 @@ class Sessions extends React.Component {
 
             data.push(dataRecord);
         });}
+        console.log(data)
 
         // put the data in the state and set refresh to false
         this.setState({downloadData:data, sessionsRefreshed:false});
@@ -255,8 +256,8 @@ class Sessions extends React.Component {
               }}>
                   View
               </a>
-                    <Divider hidden type="vertical" />
-              <a hidden onClick={() => {
+                    <Divider type="vertical" />
+              <a onClick={() => {
                   this.deleteSession(record)
               }}>
                   Delete

@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Menu, Spin, Button, Modal, Pagination, Row} from 'antd';
+import {Button, Menu, Modal, Pagination, Row, Spin} from 'antd';
 
 import styles from "./Databases.module.less"
 import NewDatabaseModal from "./NewDatabaseModal/NewDatabaseModal";
-import Header from "../../../components/Header/Header";
-import {databaseActions} from "../../../store/actions";
+import Header from "components/Header/Header";
+import {databaseActions} from "store/actions";
 
 import DatabaseInfo from "./DatabaseInfo/DatabaseInfo"
 import DatabaseDetailsModal from "./DatabaseDetailsModal/DatabaseDetailsModal"

@@ -1,11 +1,7 @@
-import random
-import string
-
 from models import Callback, db, User
 from services import user_services, role_services, mail_services
-import logging
-
 from utilities import helpers
+import random, string, logging
 
 
 def add_user_with_permission(name, email, role, admin_id):

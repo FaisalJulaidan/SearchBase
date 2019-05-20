@@ -70,7 +70,7 @@ def get_widget(path):
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/session/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(assistantIDAsHash, sessionID):
 
-    callback: Callback = chatbotSession_services.getByID(sessionID, helpers.decrypt_id(assistantIDAsHash)[0])
+    callback: Callback = chatbotSession_services.getByID(sessionID, helpers.decode_id(assistantIDAsHash)[0])
     if not callback.Success:
         return helpers.jsonResponse(False, 404, "Session not found.", None)
     session: ChatbotSession = callback.Data
@@ -87,7 +87,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                     return helpers.jsonResponse(False, 404, "No selected file")
 
                 # Generate unique name: hash_sessionIDEncrypted.extension
-                filename = str(uuid.uuid4()) + '_' + helpers.encrypt_id(sessionID) + '.' + \
+                filename = str(uuid.uuid4()) + '_' + helpers.encode_id(sessionID) + '.' + \
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
                 # Upload file to DigitalOcean Space

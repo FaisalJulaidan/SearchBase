@@ -62,7 +62,7 @@ flow = {
                         "SkipText": {"type": ["string"]},
                         "SkipAction": {"enum": [e.value for e in enums.BlockAction]},
                         "SkipBlockToGoID": {"type": ["string", "null"]},
-                        "Content": {"type": "object"}
+                        "Content": {"type": "object"},
                     },
                     "required": ["ID", "DataType", "Type", "StoreInDB", "Skippable", "SkipAction",
                                  "SkipBlockToGoID", "SkipText", "Content"],

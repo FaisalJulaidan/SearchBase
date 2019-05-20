@@ -1,6 +1,6 @@
-from flask import render_template, redirect, session, flash
-from services import auth_services, assistant_services, user_services
-from models import Callback, User, Company
+from flask import render_template, redirect, session
+from services import assistant_services, user_services
+from models import Callback, User
 from utilities import helpers
 
 

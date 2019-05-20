@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import styles from "./Assistants.module.less"
 import Assistant from "./Assistant/Assistant"
 
-import {assistantActions} from "store/actions";
+import {assistantActions, crmActions} from "store/actions";
 import NewAssistantModal from "./Modals/NewAssistantModal";
 // import CreateNewBox from "components/CreateNewBox/CreateNewBox"
 
@@ -20,7 +20,6 @@ class Assistants extends Component {
     componentDidMount() {
         this.props.dispatch(assistantActions.fetchAssistants());
     }
-
 
     showModal = () => this.setState({visible: true});
     hideModal = () => this.setState({visible: false});
@@ -77,7 +76,9 @@ class Assistants extends Component {
                                                        index={i}
                                                        isStatusChanging={this.props.isStatusChanging}
                                                        activateHandler={this.activateHandler}
-                                                       isAssistantNameValid={this.isAssistantNameValid}isLoading={this.props.isLoading}/>)
+                                                       isAssistantNameValid={this.isAssistantNameValid}
+                                                       CRMsList={this.props.CRMsList}
+                                                       isLoading={this.props.isLoading}/>)
                                     )
                                     : <Skeleton active/>
                             }
@@ -104,6 +105,7 @@ function mapStateToProps(state) {
         isLoading: state.assistant.isLoading,
         isStatusChanging: state.assistant.isStatusChanging,
         options: state.options.options,
+        CRMsList: state.crm.CRMsList,
     };
 }
 

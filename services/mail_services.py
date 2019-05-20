@@ -5,7 +5,7 @@ from flask import render_template, current_app
 from flask_mail import Mail, Message
 
 from models import Callback
-from services import user_services, assistant_services, analytics_services, chatbotSession_services
+from services import user_services, assistant_services, chatbotSession_services
 from utilities import helpers
 import logging
 
@@ -70,7 +70,7 @@ def sendDemoRequest(email) -> Callback:
 
 def contactUsIndex(name, email, message) -> Callback:
     try:
-        send_email(tsbEmail, 'TheSearchBase Contact Us', '/emails/contact_us.html', name=name, email=email,
+        send_email(tsbEmail, 'TheSearchBase Contact Us', '/emails/message_sent.html', name=name, email=email,
                    message=message)
         return Callback(True, "Thank you. We will contact you as soon as possible.")
     except Exception as exc:

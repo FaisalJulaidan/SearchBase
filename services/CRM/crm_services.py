@@ -1,11 +1,14 @@
-from enums import CRM, UserType
-from utilities import helpers
-from models import db, Callback, ChatbotSession, Assistant
-from services.CRM import Adapt
 import logging
 
+from sqlalchemy.sql import and_
+
+from enums import CRM, UserType
+from models import db, Callback, ChatbotSession, Assistant, CRM as CRM_Model
+from services.CRM import Adapt
+
+
 # Process chatbot session
-def processSession (assistant: Assistant, session: ChatbotSession) -> Callback:
+def processSession(assistant: Assistant, session: ChatbotSession) -> Callback:
     # Insert base on userType
     if session.UserType is UserType.Candidate:
         return insertCandidate(assistant, session)
@@ -13,13 +16,13 @@ def processSession (assistant: Assistant, session: ChatbotSession) -> Callback:
         return insertClient(assistant, session)
     else:
         return Callback(False, "The data couldn't be synced with the CRM due to lack of information" +
-                               " whether user is a Candidate or Client ")
+                        " whether user is a Candidate or Client ")
 
 
 def insertCandidate(assistant: Assistant, session: ChatbotSession):
     # Check CRM type
-   if assistant.CRM is CRM.Adapt:
-       return Adapt.insertCandidate(assistant.CRMAuth, session)
+    if assistant.CRM is CRM.Adapt:
+        return Adapt.insertCandidate(assistant.CRMAuth, session)
 
 
 def insertClient(assistant: Assistant, session: ChatbotSession):
@@ -28,9 +31,35 @@ def insertClient(assistant: Assistant, session: ChatbotSession):
         return Adapt.insertClient(assistant.CRMAuth, session)
 
 
-# Connect assistant to a new CRM
+# Connect to a new CRM
 # details is a dict that has {auth, type}
-def connect(assistant: Assistant, details) -> Callback:
+def connect(company_id, details) -> Callback:
+    try:
+        crm_type: CRM = CRM[details['type']]
+        crm_auth = details['auth']
+        # test connection
+        test_callback: Callback = testConnection(details)
+        if not test_callback.Success:
+            return test_callback
+
+        connection = CRM_Model(Type=crm_type, Auth=crm_auth, CompanyID=company_id)
+
+        # Save
+        db.session.add(connection)
+        db.session.commit()
+
+        return Callback(True, 'CRM has been connected successfully', connection.ID)
+
+    except Exception as exc:
+        print(exc)
+        logging.error("CRM_services.connect(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "CRM connection failed")
+
+
+# Update CRM Details
+# details is a dict that has {auth, type}
+def update(crm_id, company_id, details) -> Callback:
     try:
         crm_type: CRM = CRM[details['type']]
         crm_auth = details['auth']
@@ -40,21 +69,25 @@ def connect(assistant: Assistant, details) -> Callback:
         if not test_callback.Success:
             return test_callback
 
+        connection_callback: Callback = getCRMByID(crm_id, company_id)
+        if not connection_callback.Success:
+            raise Exception(connection_callback.Message)
 
-        assistant.CRM = crm_type
-        assistant.CRMAuth = crm_auth
-        assistant.CRMConnected = True
+        crm = connection_callback.Data
+
+        crm.Type = crm_type
+        crm.Auth = crm_auth
 
         # Save
         db.session.commit()
-        return Callback(True, 'CRM has been connected successfully', assistant)
+
+        return Callback(True, 'CRM has been updated successfully')
 
     except Exception as exc:
         print(exc)
-        logging.error("CRM_services.connect(): " + test_callback.Message)
+        logging.error("CRM_services.update(): " + str(exc))
         db.session.rollback()
-        return Callback(False, test_callback.Message)
-
+        return Callback(False, "Update CRM details failed.")
 
 
 # Test connection to a CRM
@@ -75,26 +108,49 @@ def testConnection(details) -> Callback:
         return Callback(True, 'Successful connection')
 
     except Exception as exc:
-        logging.error("CRM_services.connect(): " + login_callback.Message)
-        return Callback(False, login_callback.Message)
+        logging.error("CRM_services.connect(): " + str(exc))
+        return Callback(False, "CRM connection failed.")
 
 
-def disconnect(assistant: Assistant) -> Callback:
+def disconnect(crm_id, company_id) -> Callback:
     try:
 
-        assistant.CRM = None
-        assistant.CRMAuth = None
-        assistant.CRMConnected = False
+        crm_callback: Callback = getCRMByID(crm_id, company_id)
+        if not crm_callback:
+            return Callback(False, "Could not find CRM.")
 
-        # Save
+        db.session.delete(crm_callback.Data)
         db.session.commit()
-        return Callback(True, 'CRM has been disconnected successfully', assistant)
+        return Callback(True, 'CRM has been disconnected successfully')
 
     except Exception as exc:
-        logging.error("CRM_services.connect(): " + str(exc))
+        logging.error("CRM_services.disconnect(): " + str(exc))
         db.session.rollback()
-        return Callback(False, str(exc))
 
 
-def getCRM (crmID, companyID):
-    pass
+# get crm with id and company_id
+# also checking if the crm is under that company
+def getCRMByID(crm_id, company_id):
+    try:
+        crm = db.session.query(CRM_Model) \
+            .filter(and_(CRM_Model.CompanyID == company_id, CRM_Model.ID == crm_id)).first()
+        if not crm:
+            raise Exception("CRM not found")
+
+        return Callback(True, "CRM retrieved successfully.", crm)
+
+    except Exception as exc:
+        print("CRM_services.getCRMByCompanyID() Error: ", exc)
+        logging.error("CRM_services.getCRMByCompanyID(): " + str(exc))
+        return Callback(False, 'Could not retrieve CRM.')
+
+
+def getAll(companyID) -> Callback:
+    try:
+        result = db.session.query(CRM_Model).filter(CRM_Model.CompanyID == companyID).all()
+        return Callback(True, "fetched all CRMs  successfully.", result)
+
+    except Exception as exc:
+        print(exc)
+        logging.error("crm_services.getAll(): " + str(exc))
+        return Callback(False, 'Could not fetch all CRMs.')

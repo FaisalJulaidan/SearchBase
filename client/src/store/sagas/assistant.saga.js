@@ -1,12 +1,13 @@
-import {put, takeEvery, takeLatest, all} from 'redux-saga/effects'
+import {all, put, takeEvery, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
-import {assistantActions, flowActions} from "../actions";
-import {http, loadingMessage, successMessage, errorMessage, flow} from "helpers";
-
+import {assistantActions, crmActions, flowActions} from "../actions";
+import {errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
+import * as Sentry from '@sentry/browser';
 
 function* fetchAssistants() {
     try {
         const res = yield http.get(`/assistants`);
+        yield put(crmActions.getConnectedCRMs());
 
         if (!res.data?.data)
             throw Error(`Can't fetch assistants`);
@@ -99,47 +100,57 @@ function* updateStatus({status, assistantID}) {
     }
 }
 
-function* connectCRM({CRM, assistant}) {
-    try {
-        loadingMessage('Connecting to ' + CRM.type, 0);
-        const res = yield http.post(`/assistant/${assistant.ID}/crm/connect`, {...CRM});
 
-        yield put(assistantActions.connectCRMSuccess(res.data.data, res.data?.msg));
-        yield successMessage('Connected successfully to ' + CRM.type);
+function* selectAssistantCRM({assistantID, CRMID}) {
+    let msg = "Can't select CRM";
+    try {
+        const res = yield http.post(`/assistant/${assistantID}/crm`, {CRMID});
+        yield put(assistantActions.fetchAssistants());
+
+        if (!res.data?.success) {
+            errorMessage(res.data?.msg || msg);
+            yield put(assistantActions.selectAssistantCRMFailure(msg));
+        }
+
+        if (res.data?.msg)
+            successMessage(res.data.msg);
+
+        yield put(assistantActions.selectAssistantCRMSuccess(res.data.data));
     } catch (error) {
+        msg = error.response?.data?.msg;
         console.error(error);
-        const msg = 'CRM API Error: ' + error.response?.data?.msg || 'CRM API Error';
-        yield put(assistantActions.connectCRMFailure(msg));
-        errorMessage(msg, 3.5);
+        yield put(assistantActions.selectAssistantCRMFailure(msg));
+        Sentry.captureException(error);
+        errorMessage(msg);
     }
 }
 
-function* testCRM({CRM, assistant}) {
+function* resetAssistantCRM({assistantID}) {
+    let msg = "Can't reset CRM";
     try {
-        loadingMessage('Testing connection to' + CRM.type, 0);
-        const res = yield http.post(`/assistant/${assistant.ID}/crm/test`, {...CRM});
-        yield put(assistantActions.testCRMSuccess({}, res.data?.msg));
-        yield successMessage('Tested successfully ' + CRM.type);
+        const res = yield http.delete(`/assistant/${assistantID}/crm`);
+        yield put(assistantActions.fetchAssistants());
+
+        if (!res.data?.success) {
+            errorMessage(res.data?.msg || msg);
+            yield put(assistantActions.resetAssistantCRMFailure(msg));
+        }
+
+        if (res.data?.msg)
+            successMessage(res.data.msg);
+
+        yield put(assistantActions.resetAssistantCRMSuccess(res.data.data));
     } catch (error) {
+        msg = error.response?.data?.msg;
         console.error(error);
-        const msg = 'CRM API Error: ' + error.response?.data?.msg || 'CRM API Error';
-        yield put(assistantActions.testCRMFailure(msg));
-        errorMessage(msg, 3.5);
+        yield put(assistantActions.resetAssistantCRMFailure(msg));
+        Sentry.captureException(error);
+        errorMessage(msg);
     }
 }
 
-function* disconnectCRM({CRM, assistant}) {
-    try {
-        loadingMessage('Disconnecting from' + CRM.type, 0);
-        const res = yield http.delete(`/assistant/${assistant.ID}/crm/connect`);
-        yield put(assistantActions.disconnectCRMSuccess(res.data.data, res.data?.msg));
-        yield successMessage('Disconnected successfully from' + CRM.type);
-    } catch (error) {
-        console.error(error);
-        const msg = error.response.data.msg;
-        yield put(assistantActions.disconnectCRMFailure(msg));
-        errorMessage(msg, 3.5);
-    }
+function* watchResetAssistantCrm() {
+    yield takeEvery(actionTypes.RESET_ASSISTANT_CRM_REQUEST, resetAssistantCRM)
 }
 
 function* watchUpdateStatus() {
@@ -166,16 +177,8 @@ function* watchDeleteAssistant() {
     yield takeEvery(actionTypes.DELETE_ASSISTANT_REQUEST, deleteAssistant)
 }
 
-function* watchConnectCRM() {
-    yield takeEvery(actionTypes.CONNECT_CRM_REQUEST, connectCRM)
-}
-
-function* watchTestCRM() {
-    yield takeEvery(actionTypes.TEST_CRM_REQUEST, testCRM)
-}
-
-function* watchDisconnectCRM() {
-    yield takeEvery(actionTypes.DISCONNECT_CRM_REQUEST, disconnectCRM)
+function* watchSelectAssistantCrm() {
+    yield takeEvery(actionTypes.SELECT_ASSISTANT_CRM_REQUEST, selectAssistantCRM)
 }
 
 
@@ -187,8 +190,7 @@ export function* assistantSaga() {
         watchDeleteAssistant(),
         watchUpdateFlow(),
         watchUpdateStatus(),
-        watchConnectCRM(),
-        watchTestCRM(),
-        watchDisconnectCRM(),
+        watchSelectAssistantCrm(),
+        watchResetAssistantCrm()
     ])
 }

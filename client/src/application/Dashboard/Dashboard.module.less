@@ -1,5 +1,24 @@
 @import "../../../node_modules/antd/lib/style/color/colors";
 @import "../../../node_modules/antd/lib/style/themes/default";
+@import "../../../node_modules/antd/lib/menu/style/index.less";
+@import "../../../node_modules/antd/lib/menu/style/dark";
+
+@menu-dark-color: #fff;
+@menu-dark-bg: #20252e;
+@menu-dark-arrow-color: #fff;
+@menu-dark-submenu-bg: #2c303c;
+@menu-dark-highlight-color: #9254de;
+@menu-dark-item-active-bg: #f9f0ff;
+@disabled-color-dark: #fff;
+
+
+.ant-menu {
+  &-inline,
+  &-vertical,
+  &-vertical-left {
+    border-right: none
+  }
+}
 
 .Logo {
   height: 32px;

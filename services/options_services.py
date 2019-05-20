@@ -1,7 +1,6 @@
-
-import enums
 from config import BaseConfig
 from models import Callback, Candidate, Job
+import enums
 
 bot_currentVersion = "1.0.0"
 

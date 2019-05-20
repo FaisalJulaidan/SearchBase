@@ -102,3 +102,25 @@ def assistant_status(assistantID):
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)
     return helpers.jsonResponse(True, 200, callback.Message, None)
+
+
+# Connect assistant to CRM
+@assistant_router.route("/assistant/<int:assistant_id>/crm", methods=['POST', 'DELETE'])
+@jwt_required
+def assistant_crm_connect(assistant_id):
+    # Authenticate
+    user = get_jwt_identity()['user']
+    security_callback: Callback = assistant_services.getByID(assistant_id, user['companyID'])
+    if not security_callback.Success:
+        return helpers.jsonResponse(False, 404, security_callback.Message)
+    assistant: Assistant = security_callback.Data
+
+    callback: Callback = Callback(False, 'Error!')
+    if request.method == "POST":
+        callback: Callback = assistant_services.connectToCRM(assistant, request.json.get('CRMID'))
+
+    if request.method == "DELETE":
+        callback: Callback = assistant_services.disconnectFromCRM(assistant)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message, None)
+    return helpers.jsonResponse(True, 200, callback.Message, None)

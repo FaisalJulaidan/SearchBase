@@ -103,7 +103,7 @@ class Sessions extends React.Component {
     populateDownloadData(sessions){
         const sessionsList = sessions.sessionsList;
 
-        let data = [["ID", "User Type", "Questions Answered", "Solutions Returned", "Time Spent", "Date & Time",
+        let data = [["ID", "User Type", "Name", "Questions Answered", "Solutions Returned", "Time Spent", "Date & Time",
             "Conversation", "User Profile", "Selected Results"]]; // Sessions Page Headers
         let dataRecord = undefined; // CSV line to push into data
         let recordData = undefined; // the questions and answers of the record
@@ -112,13 +112,14 @@ class Sessions extends React.Component {
         let keywordsByDataType = undefined;
         let selectedSolutions = undefined; // the selected solutions of the record
         let selectedSolutionsData = undefined; // the selected solutions of the record in the format to be put in the CSV
-        console.log(sessions)
+        console.log(sessions);
         // go through the to-be-rendered sessions
         if(sessionsList){sessionsList.forEach(record => {
             conversation = "";
 
             // Sessions Page Base Table
-            dataRecord = [record["ID"], record["UserType"], record["QuestionsAnswered"], record["SolutionsReturned"],
+            dataRecord = [record["ID"], record["UserType"], this.findUserName(record["Data"]["keywordsByDataType"],
+                record["UserType"] ), record["QuestionsAnswered"], record["SolutionsReturned"],
                 record["TimeSpent"], record["DateTime"]];
 
             // Conversation Questions and Answers   ex. "What is your name? : Bob House (Name)"
@@ -158,7 +159,7 @@ class Sessions extends React.Component {
 
             data.push(dataRecord);
         });}
-        console.log(data)
+        console.log(data);
 
         // put the data in the state and set refresh to false
         this.setState({downloadData:data, sessionsRefreshed:false});
@@ -183,13 +184,6 @@ class Sessions extends React.Component {
             dataIndex: '#',
             key: '#',
             render: (text, record, index) => (<p>{index + 1}</p>),
-
-        }, {
-            title: 'ID',
-            dataIndex: 'ID',
-            key: 'ID',
-            sorter: (a, b) => a.ID - b.ID,
-            render: (text, record) => (<p>{record.ID}</p>),
 
         }, {
             title: 'User Type',

@@ -33,14 +33,14 @@ class CrmList extends React.Component {
                 type: "Adapt",
                 status: 'NOT_CONNECTED',
             },
-            // {
-            //     title: 'Bullhorn',
-            //     desc: 'Bullhorn Desc',
-            //     link: () => history.push(`/dashboard/crmlist/bullhorn`),
-            //     image: getLink('/static/images/CRM/bullhorn.png'),
-            //     type: "Bullhorn",
-            //     status: 'NOT_CONNECTED',
-            // },
+            {
+                title: 'Bullhorn',
+                desc: 'Bullhorn Desc',
+                link: () => history.push(`/dashboard/crmlist/bullhorn`),
+                image: getLink('/static/images/CRM/bullhorn.png'),
+                type: "Bullhorn",
+                status: 'NOT_CONNECTED',
+            },
             // {
             //     title: 'Vincere',
             //     desc: 'Vincere Desc',

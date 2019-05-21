@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from models import Callback
 from services.CRM import crm_services, Bullhorn
 from utilities import helpers
+import logging
 
 crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../../templates")
 
@@ -78,5 +79,5 @@ def test_crm_connection():
 
 
 @crm_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
-def bullhorn_callback():
+def bullhorn_callback():  # TODO check args
     return str(request.url)

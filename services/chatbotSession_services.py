@@ -45,19 +45,24 @@ def processSession(assistantHashID, data: dict) -> Callback:
 
     try:
         # collectedData is an array, and timeSpent is in seconds.
-        chatbotSession = ChatbotSession(Data= sessionData,
+        chatbotSession = ChatbotSession(Data=sessionData,
                                         TimeSpent=data['timeSpent'],
                                         Completed=data['isSessionCompleted'],
                                         SolutionsReturned=data['solutionsReturned'],
                                         QuestionsAnswered=len(collectedData),
                                         UserType=UserType[data['userType'].replace(" ", "")],
                                         Assistant=assistant)
+        print("assistant: ", assistant)
+        print("chatbotSession: ", chatbotSession)
         # CRM integration
-        # if assistant.CRM:
-        #     crm_callback: Callback = crm_services.processSession(assistant, chatbotSession)
-        #     if crm_callback.Success:
-        #         chatbotSession.CRMSynced = True
-        #     chatbotSession.CRMResponse = crm_callback.Message
+        if assistant.CRM:
+            crm_callback: Callback = crm_services.processSession(assistant, chatbotSession)
+            print("crm_callback: ", crm_callback)
+            print("crm_callback.Success: ", crm_callback.Success)
+            print("crm_callback.Message: ", crm_callback.Message)
+            if crm_callback.Success:
+                chatbotSession.CRMSynced = True
+            chatbotSession.CRMResponse = crm_callback.Message
 
         db.session.add(chatbotSession)
         db.session.commit()

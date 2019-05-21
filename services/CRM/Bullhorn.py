@@ -1,8 +1,8 @@
 import json
 import logging
+import urllib.parse
 
 import requests
-from requests_oauthlib import OAuth2Session
 from sqlalchemy import and_
 
 from enums import DataType as DT
@@ -18,55 +18,60 @@ from models import Callback, ChatbotSession, db, CRM
 # auth needs to contain auth data + rest_token, rest_url, access_token, refresh_token (retrieved upon connecting)
 
 
-# failing at fetch_token() currently, wants access_token, requests.post(authorization_url) returns html login page
+# login requires: client_id, client_secret, username, password
 def login(auth):
     try:
         authCopy = dict(auth)  # we took copy to delete domain later only from the copy
 
-        url = "https://auth.bullhornstaffing.com/oauth/authorize"
         headers = {'Content-Type': 'application/json'}
 
-        # test the BhRestToken (rest_token)
-        test = requests.put(url, headers=headers, data=json.dumps(body))
+        code_url = "https://auth.bullhornstaffing.com/oauth/authorize?" + \
+                   "response_type=code" + \
+                   "&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback" + \
+                   "&action=Login" + \
+                   "&client_id=" + authCopy.get("client_id", "") + \
+                   "&username=" + authCopy.get("username", "") + \
+                   "&password=" + urllib.parse.quote(authCopy.get("password", ""))
 
-        # request token by using callback URL, auth url, access token url, client id, client secret
-        oauth = OAuth2Session(client_id=authCopy.get("client_id", ""), redirect_uri=authCopy.get("redirect_uri", ""),
-                              response_type="code", action="Login", username="thesearchbase.api", password="j)GV.WS2e%236Y(fUh")
+        # get the authorization code
+        code_request = requests.post(code_url, headers=headers)
 
-        authorization_url, state = oauth.authorization_url("https://auth9.bullhornstaffing.com/oauth/authorize")
-        print("authorization_url :", authorization_url)
-        print("state :", state)
+        if not code_request.ok:
+            raise Exception(code_request.text)
 
-        print('Please go to %s and authorize access.' % authorization_url)
-        authorization_response = 'https://www.thesearchbase.com/api/bullhorn_callback'
-        print("authorization_response :", authorization_response)
-        # atoken = oauth.fetch_token(authorization_url)
-        r = requests.post(authorization_url)
-        print("r :", r.text)
+        # if length isnt 2 it means the "invalid credentials" log in page has been returned
+        if len(code_request.text.split("?code=")) != 2:
+            raise Exception("Invalid credentials")
 
-        token = oauth.fetch_token(
-            'https://auth9.bullhornstaffing.com/oauth/token',
-            code=authorization_response,
-            client_secret=authCopy.get("client_secret", ""))
-        print("token :", token)
+        # retrieve the auth code from the url string
+        authorization_code = code_request.text.split("?code=")[1].split("&client_id=")[0]
 
-        r = oauth.get('https://rest.bullhornstaffing.com/rest-services/login?version=*')
-        print("r :", r)
+        access_token_url = "https://auth9.bullhornstaffing.com/oauth/token?" + \
+                           "&grant_type=authorization_code" + \
+                           "&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback" + \
+                           "&client_id=" + authCopy.get("client_id", "") + \
+                           "&client_secret=" + authCopy.get("client_secret", "") + \
+                           "&code=" + authorization_code
 
-        if not r.ok:
-            raise Exception(r.text)
+        # get the access token and refresh token
+        access_token_request = requests.post(access_token_url, headers=headers)
 
-        result_body = json.loads(r.text)
+        if not access_token_request.ok:
+            raise Exception(access_token_request.text)
+
+        result_body = json.loads(access_token_request.text)
 
         authCopy["access_token"] = result_body.get("access_token")
         authCopy["refresh_token"] = result_body.get("refresh_token")
         authCopy["rest_token"] = ""
+        authCopy["rest_url"] = ""
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully', authCopy)
 
     except Exception as exc:
         logging.error("CRM.Bullhorn.login() ERROR: " + str(exc))
+        print(exc)
         return Callback(False, str(exc))
 
 
@@ -85,8 +90,6 @@ def retrieveRestToken(auth, companyID):
 
             get_access_token = requests.put(url, headers=headers)
             if get_access_token.ok:
-                print(get_access_token.text)
-                print(type(get_access_token.text))
                 result_body = json.loads(get_access_token.text)
                 authCopy["access_token"] = result_body.get("access_token")
                 authCopy["refresh_token"] = result_body.get("refresh_token")
@@ -116,7 +119,7 @@ def retrieveRestToken(auth, companyID):
         crm.Auth = dict(authCopy)
         db.session.commit()
 
-        return Callback(True, 'Logged in successfully', {
+        return Callback(True, 'Rest Token Retrieved', {
             "rest_token": authCopy.get("rest_token"),
             "rest_url": authCopy.get("rest_url")
         })
@@ -128,30 +131,32 @@ def retrieveRestToken(auth, companyID):
 
 
 # create query url and also tests the BhRestToken to see if it still valid, if not it generates a new one and new url
-def sendQuery(auth, body, companyID):
+def sendQuery(auth, query, body, companyID):
     try:
-        authCopy = dict(auth)
-
         # set up initial url
-        url = authCopy.get("rest_url", "") + "entity/Candidate" + "?BhRestToken=" + authCopy.get("rest_token", "")
+        url = auth.get("rest_url", "https://rest91.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
+              "?BhRestToken=" + auth.get("rest_token", "none")
         headers = {'Content-Type': 'application/json'}
-
+        print("url 1: ", url)
         # test the BhRestToken (rest_token)
         test = requests.put(url, headers=headers, data=json.dumps(body))
+        print("test.status_code: ", test.status_code)
+        print("test.text: ", test.text)
         if test.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
-                url = authCopy.get("rest_url", "") + "entity/Candidate" + "?BhRestToken=" + \
+                url = callback.Data.get("rest_url", "") + "entity/Candidate" + "?BhRestToken=" + \
                       callback.Data.get("rest_token", "")
+                print("url 2: ", url)
                 r = requests.put(url, headers=headers, data=json.dumps(body))
                 if not r.ok:
                     raise Exception(r.text + ". Query could not be sent")
             else:
-                raise Exception(callback.Message)
-        elif test.status_code != 400:  # token correct but no submitted data
+                raise Exception("Rest token could not be retrieved")
+        elif test.status_code != 400 and test.status_code != 200:  # token correct but no submitted data
             raise Exception("Rest url for query is incorrect")
 
-        return Callback(True, "URL has been created", url)
+        return Callback(True, "Query was successful", url)
 
     except Exception as exc:
         logging.error("CRM.Bullhorn.sendQuery() ERROR: " + str(exc))
@@ -160,23 +165,23 @@ def sendQuery(auth, body, companyID):
 
 def insertCandidate(auth, session: ChatbotSession) -> Callback:
     try:
-
         # New candidate details
         body = {
             "name": " ".join(
-                session.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'])),
+                session.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [])),
             "mobile":
-                session.Data.get('keywordsByDataType').get(DT.CandidateTelephone.value['name'])[0],
+                session.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [""])[0],
             "address": {
                 "city": " ".join(
-                    session.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'])),
+                    session.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [])),
             },
-            "email": " ".join(
-                session.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'])),
+            # check number of emails and submit them
+            "email": session.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [""])[0],
         }
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, body, session.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", body, session.Assistant.CompanyID)
+
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -208,24 +213,23 @@ def insertClient(auth, session: ChatbotSession) -> Callback:
 
 def insertClientContact(auth, session: ChatbotSession, bhCompanyID) -> Callback:
     try:
-
         # New candidate details
         body = {
             "name": " ".join(
-                session.Data.get('keywordsByDataType').get(DT.ClientName.value['name'])),
+                session.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], [])),
             "mobile":
-                session.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'])[0],
+                session.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'], [""])[0],
             "address": {
                 "city": " ".join(
-                    session.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'])),
+                    session.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
             },
-            "email": " ".join(
-                session.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'])),
+            # check number of emails and submit them
+            "email": session.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [""])[0],
             "clientCorporation": {"id": bhCompanyID}
         }
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, body, session.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientContact", body, session.Assistant.CompanyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -238,7 +242,6 @@ def insertClientContact(auth, session: ChatbotSession, bhCompanyID) -> Callback:
 
 def insertCompany(auth, session: ChatbotSession) -> Callback:
     try:
-
         # New candidate details
         body = {
             "name": " ".join(
@@ -246,7 +249,7 @@ def insertCompany(auth, session: ChatbotSession) -> Callback:
         }
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, body, session.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientCorporation", body, session.Assistant.CompanyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

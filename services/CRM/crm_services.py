@@ -21,18 +21,18 @@ def processSession(assistant: Assistant, session: ChatbotSession) -> Callback:
 
 def insertCandidate(assistant: Assistant, session: ChatbotSession):
     # Check CRM type
-    if assistant.CRM is CRM.Adapt:
-        return Adapt.insertCandidate(assistant.CRMAuth, session)
-    if assistant.CRM is CRM.Bullhorn:
-        return Bullhorn.insertCandidate(assistant.CRMAuth, session)
+    if assistant.CRM.Type is CRM.Adapt:
+        return Adapt.insertCandidate(assistant.CRM.Auth, session)
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.insertCandidate(assistant.CRM.Auth, session)
 
 
 def insertClient(assistant: Assistant, session: ChatbotSession):
     # Check CRM type
-    if assistant.CRM is CRM.Adapt:
-        return Adapt.insertClient(assistant.CRMAuth, session)
-    if assistant.CRM is CRM.Bullhorn:
-        return Bullhorn.insertClient(assistant.CRMAuth, session)
+    if assistant.CRM.Type is CRM.Adapt:
+        return Adapt.insertClient(assistant.CRM.Auth, session)
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.insertClient(assistant.CRM.Auth, session)
 
 
 # Connect to a new CRM

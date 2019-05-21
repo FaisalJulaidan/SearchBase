@@ -78,6 +78,5 @@ def test_crm_connection():
 
 
 @crm_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
-@jwt_required
 def bullhorn_callback():
-    return request.url
+    return {"request.url": request.url, "request.json": request.json}

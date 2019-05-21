@@ -164,7 +164,8 @@ const AdaptFormItems = ({
         <Col span={16} offset={4}>
             <div className={styles.Buttons}>
                 {
-                    CRM.status === "CONNECTED" || CRM.status === "FAILED" &&
+                    (CRM.status === "CONNECTED" || CRM.status === "FAILED")
+                    &&
                     <Button type="danger" onClick={disconnectCRM}>Disconnect</Button>
                 }
 

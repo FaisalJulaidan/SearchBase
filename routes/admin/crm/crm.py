@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from flask_apscheduler import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
@@ -76,18 +77,6 @@ def test_crm_connection():
     return helpers.jsonResponse(True, 200, callback.Message)
 
 
-# Tests
-@crm_router.route("/crm/testing123", methods=['POST'])
-def test_crm_123():
-    callback: Callback = Callback(False, '')
-    if request.method == "POST":
-        callback: Callback = Bullhorn.login({
-            "client_id": "7719607b-7fe7-4715-b723-809cc57e2714",
-            "redirect_uri": "https://www.thesearchbase.com/api/bullhorn_callback",
-            "client_secret": "0ZiVSILQ7CY0bf054LPiX4kN"
-        })  # crm details passed (auth, type)
-
-    # Return response
-    if not callback.Success:
-        return helpers.jsonResponse(False, 400, callback.Message)
-    return helpers.jsonResponse(True, 200, callback.Message)
+@crm_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
+def bullhorn_callback():
+    return str(request.url)

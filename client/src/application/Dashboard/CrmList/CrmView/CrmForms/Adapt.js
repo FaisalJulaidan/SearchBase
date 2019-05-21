@@ -4,6 +4,7 @@ import styles from "../CrmView.module.less";
 import {getLink} from "helpers";
 
 const {Option} = Select;
+const {Title, Paragraph} = Typography;
 
 
 const AdaptFormItems = ({
@@ -18,6 +19,7 @@ const AdaptFormItems = ({
     <div>
         {
             CRM.status !== "CONNECTED" &&
+            CRM.status !== "FAILED" &&
             <div>
                 <FormItem label="Domain"
                           {...layout}>
@@ -146,17 +148,33 @@ const AdaptFormItems = ({
             </div>
         }
 
+        {
+            CRM.status === "FAILED" &&
+            <div style={{textAlign: 'center'}}>
+                <img src={getLink('/static/images/undraw/failed.svg')} alt="" height={300}/>
+                <Title>
+                    {CRM.type} is failed
+                </Title>
+                <Paragraph type="secondary">
+                    {CRM.type} is failing this is usually not from us, please contact the CRM provider
+                </Paragraph>
+            </div>
+        }
+
         <Col span={16} offset={4}>
             <div className={styles.Buttons}>
                 {
-                    CRM.status === "CONNECTED" ?
-                        <Button type="danger" onClick={disconnectCRM}>Disconnect</Button>
-                        :
-                        <>
-                            <Button type="primary"
-                                    onClick={connectCRM}>Connect</Button>
-                            <Button onClick={testCRM}>Test</Button>
-                        </>
+                    CRM.status === "CONNECTED" || CRM.status === "FAILED" &&
+                    <Button type="danger" onClick={disconnectCRM}>Disconnect</Button>
+                }
+
+                {
+                    CRM.status === "NOT_CONNECTED" &&
+                    <>
+                        <Button type="primary"
+                                onClick={connectCRM}>Connect</Button>
+                        <Button onClick={testCRM}>Test</Button>
+                    </>
                 }
             </div>
         </Col>

@@ -23,8 +23,15 @@ def login(auth):
     try:
         authCopy = dict(auth)  # we took copy to delete domain later only from the copy
 
+        url = "https://auth.bullhornstaffing.com/oauth/authorize"
+        headers = {'Content-Type': 'application/json'}
+
+        # test the BhRestToken (rest_token)
+        test = requests.put(url, headers=headers, data=json.dumps(body))
+
         # request token by using callback URL, auth url, access token url, client id, client secret
-        oauth = OAuth2Session(client_id=authCopy.get("client_id", ""), redirect_uri=authCopy.get("redirect_uri", ""))
+        oauth = OAuth2Session(client_id=authCopy.get("client_id", ""), redirect_uri=authCopy.get("redirect_uri", ""),
+                              response_type="code", action="Login", username="thesearchbase.api", password="j)GV.WS2e%236Y(fUh")
 
         authorization_url, state = oauth.authorization_url("https://auth9.bullhornstaffing.com/oauth/authorize")
         print("authorization_url :", authorization_url)

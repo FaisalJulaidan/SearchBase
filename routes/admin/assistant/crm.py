@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from flask_apscheduler import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
@@ -79,4 +80,4 @@ def test_crm_connection():
 
 @crm_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
 def bullhorn_callback():
-    return {"request.url": request.url, "request.json": request.json}
+    return json.dumps({"request.url": request.url, "request.json": request.json})

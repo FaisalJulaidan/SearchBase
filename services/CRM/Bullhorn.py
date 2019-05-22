@@ -131,7 +131,7 @@ def retrieveRestToken(auth, companyID):
 
 
 # create query url and also tests the BhRestToken to see if it still valid, if not it generates a new one and new url
-def sendQuery(auth, query, body, companyID):
+def sendQuery(auth, query, method, body, companyID):
     try:
         # set up initial url
         url = auth.get("rest_url", "https://rest91.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
@@ -139,7 +139,7 @@ def sendQuery(auth, query, body, companyID):
         headers = {'Content-Type': 'application/json'}
         print("url 1: ", url)
         # test the BhRestToken (rest_token)
-        test = requests.put(url, headers=headers, data=json.dumps(body))
+        test = send_request(url, method, headers, json.dumps(body))
         print("test.status_code: ", test.status_code)
         print("test.text: ", test.text)
         if test.status_code == 401:  # wrong rest token
@@ -148,7 +148,7 @@ def sendQuery(auth, query, body, companyID):
                 url = callback.Data.get("rest_url", "") + "entity/Candidate" + "?BhRestToken=" + \
                       callback.Data.get("rest_token", "")
                 print("url 2: ", url)
-                r = requests.put(url, headers=headers, data=json.dumps(body))
+                r = send_request(url, method, headers, json.dumps(body))
                 if not r.ok:
                     raise Exception(r.text + ". Query could not be sent")
             else:
@@ -161,6 +161,15 @@ def sendQuery(auth, query, body, companyID):
     except Exception as exc:
         logging.error("CRM.Bullhorn.sendQuery() ERROR: " + str(exc))
         return Callback(False, str(exc))
+
+
+def send_request(url, method, headers, data):
+    test = None
+    if method is "post":
+        test = requests.post(url, headers=headers, data=data)
+    elif method is "get":
+        test = requests.get(url, headers=headers, data=data)
+    return test
 
 
 def insertCandidate(auth, session: ChatbotSession) -> Callback:
@@ -180,7 +189,7 @@ def insertCandidate(auth, session: ChatbotSession) -> Callback:
         }
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", body, session.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", "post", body, session.Assistant.CompanyID)
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -229,7 +238,8 @@ def insertClientContact(auth, session: ChatbotSession, bhCompanyID) -> Callback:
         }
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientContact", body, session.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientContact", "post", body,
+                                                 session.Assistant.CompanyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -249,7 +259,8 @@ def insertCompany(auth, session: ChatbotSession) -> Callback:
         }
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientCorporation", body, session.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientCorporation", "post", body,
+                                                 session.Assistant.CompanyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

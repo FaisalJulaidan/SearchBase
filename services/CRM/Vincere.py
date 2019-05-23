@@ -5,10 +5,9 @@ import requests
 from sqlalchemy import and_
 
 from enums import DataType as DT
-from models import Callback, ChatbotSession, db, CRM
+from models import Callback, Conversation, db, CRM
 
 
-# still bullhorn copy -----------------
 # Vincere Notes:
 # access_token (used to generate rest_token) lasts 10 minutes, needs to be requested by using the auth from the client
 # refresh_token (can be used to generate access_token) - generated with access_token on auth, ...
@@ -170,7 +169,7 @@ def send_request(url, method, headers, data):
     return test
 
 
-def insertCandidate(auth, session: ChatbotSession) -> Callback:
+def insertCandidate(auth, session: Conversation) -> Callback:
     try:
         # New candidate details
         body = {
@@ -199,7 +198,7 @@ def insertCandidate(auth, session: ChatbotSession) -> Callback:
         return Callback(False, str(exc))
 
 
-def insertClient(auth, session: ChatbotSession) -> Callback:
+def insertClient(auth, session: Conversation) -> Callback:
     try:
         # get query url
         insertCompany_callback: Callback = insertCompany(auth, session)
@@ -218,7 +217,7 @@ def insertClient(auth, session: ChatbotSession) -> Callback:
         return Callback(False, str(exc))
 
 
-def insertClientContact(auth, session: ChatbotSession, bhCompanyID) -> Callback:
+def insertClientContact(auth, session: Conversation, bhCompanyID) -> Callback:
     try:
         # New candidate details
         body = {
@@ -247,7 +246,7 @@ def insertClientContact(auth, session: ChatbotSession, bhCompanyID) -> Callback:
         return Callback(False, str(exc))
 
 
-def insertCompany(auth, session: ChatbotSession) -> Callback:
+def insertCompany(auth, session: Conversation) -> Callback:
     try:
         # New candidate details
         body = {

@@ -55,7 +55,7 @@ class Assistant extends Component {
                         <Col span={8}>
                             {/*4*/}
                             <Link to={{
-                                pathname: `assistants/${assistant.ID}/sessions`,
+                                pathname: `assistants/${assistant.ID}/conversations`,
                                 state: {assistant: assistant}
                             }}>
                                 <Button block icon={'code'}>Conversations</Button>

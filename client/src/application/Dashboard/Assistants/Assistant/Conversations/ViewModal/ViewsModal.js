@@ -35,16 +35,16 @@ class ViewsModal extends Component {
     handleKeyPress = (e) => {
         e.preventDefault();
         if (e.keyCode === 37)// left arrow
-            this.props.getBackSession(this.props.session);
+            this.props.getBackConversation(this.props.conversation);
         else if (e.keyCode === 39) // right arrow
-            this.props.getNextSession(this.props.session);
+            this.props.getNextConversation(this.props.conversation);
         else if (e.keyCode === 8 || e.keyCode === 46) // delete or backspace
-            this.props.deleteSession(this.props.session)
+            this.props.deleteConversation(this.props.conversation)
     };
 
     downloadFileHandler = (filenameIndex) => {
         // Get file name by index
-        let fileName = this.props.session.FilePath.split(',')[filenameIndex];
+        let fileName = this.props.conversation.FilePath.split(',')[filenameIndex];
 
 
         if (!fileName){
@@ -55,7 +55,7 @@ class ViewsModal extends Component {
         loadingMessage("Downloading file...", 0);
         this.setState({isDownloadingFile: true});
         http({
-            url: `/assistant/${this.props.assistant.ID}/chatbotSessions/${fileName}`,
+            url: `/assistant/${this.props.assistant.ID}/conversations/${fileName}`,
             method: 'GET',
             responseType: 'blob', // important
         }).then((response) => {
@@ -71,26 +71,26 @@ class ViewsModal extends Component {
 
 
     render() {
-        const {session, flowOptions} = this.props;
-        const userType = session ? session.UserType : 'Unknown';
+        const {conversation, flowOptions} = this.props;
+        const userType = conversation ? conversation.UserType : 'Unknown';
 
         return (
             <Modal
                 width={900}
-                title={<h3>Session Details <span><Text type="secondary">#{session?.ID}</Text></span></h3>}
+                title={<h3>Conversation Details <span><Text type="secondary">#{conversation?.ID}</Text></span></h3>}
                 destroyOnClose={true}
                 visible={this.props.visible}
                 onCancel={this.props.closeViewModal}
                 onOk={this.props.closeViewModal}
                 footer={[
-                    <Button hidden key="Delete" onClick={() => this.props.deleteSession(session)}
+                    <Button hidden key="Delete" onClick={() => this.props.deleteConversation(conversation)}
                             type={'danger'}>Delete</Button>,
                     <Button key="Cancel" onClick={this.props.closeViewModal}>OK</Button>,
                 ]}>
 
                 <Row type={'flex'} justify={'center'}>
                     <Col span={3}>
-                        <Button block onClick={() => this.props.getBackSession(session)}>
+                        <Button block onClick={() => this.props.getBackConversation(conversation)}>
                             <Icon type="left"/>Back
                         </Button>
                     </Col>
@@ -100,7 +100,7 @@ class ViewsModal extends Component {
                     </Col>
 
                     <Col span={3}>
-                        <Button block onClick={() => this.props.getNextSession(session)}>
+                        <Button block onClick={() => this.props.getNextConversation(conversation)}>
                             Next<Icon type="right"/>
                         </Button>
                     </Col>
@@ -109,23 +109,23 @@ class ViewsModal extends Component {
                 <Tabs defaultActiveKey={"1"}>
 
                     <TabPane tab={"Conversation"} key={"1"}>
-                        <Conversation session={session}
+                        <Conversation conversation={conversation}
                                       downloadFile={this.downloadFileHandler}
                                       isDownloadingFile={this.state.isDownloadingFile}/>
                     </TabPane>
 
                     <TabPane tab={`Profile (${userType})`} key={"2"}>
-                        <Profile session={session} downloadFile={this.downloadFileHandler}
+                        <Profile conversation={conversation} downloadFile={this.downloadFileHandler}
                                  dataTypes={flowOptions?.dataTypes}
                                  isDownloadingFile={this.state.isDownloadingFile}/>
                     </TabPane>
 
                     <TabPane tab={"Selected Solutions (Candidates, Jobs)"} key={"3"}>
-                        <SelectedSolutions solutions={session?.Data?.selectedSolutions}/>
+                        <SelectedSolutions solutions={conversation?.Data?.selectedSolutions}/>
                     </TabPane>
 
-                    <TabPane tab={"CRM Status"} key={"4"} disabled={!(session?.CRMResponse)}>
-                        <CRMResponse session={session}/>
+                    <TabPane tab={"CRM Status"} key={"4"} disabled={!(conversation?.CRMResponse)}>
+                        <CRMResponse conversation={conversation}/>
                     </TabPane>
 
                 </Tabs>

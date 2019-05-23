@@ -3,8 +3,8 @@ from flask import Blueprint, request, send_from_directory
 from flask import render_template
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
-from models import Callback, db, ChatbotSession
-from services import chatbotSession_services, flow_services, databases_services, stored_file_services, mail_services
+from models import Callback, db, Conversation
+from services import conversation_services, flow_services, databases_services, stored_file_services, mail_services
 from utilities import helpers
 import logging
 
@@ -34,12 +34,12 @@ def chatbot(assistantIDAsHash):
 
         # Chatbot collected information
         data = request.json
-        callback: Callback = chatbotSession_services.processSession(assistantIDAsHash, data)
+        callback: Callback = conversation_services.processConversation(assistantIDAsHash, data)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
 
         # Notify company about the new chatbot session
-        mail_services.notifyNewChatbotSession(assistantIDAsHash)
+        mail_services.notifyNewConversation(assistantIDAsHash)
 
         return helpers.jsonResponse(True, 200, "Collected data is successfully processed", {'sessionID': callback.Data.ID})
 
@@ -70,10 +70,10 @@ def get_widget(path):
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/session/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(assistantIDAsHash, sessionID):
 
-    callback: Callback = chatbotSession_services.getByID(sessionID, helpers.decode_id(assistantIDAsHash)[0])
+    callback: Callback = conversation_services.getByID(sessionID, helpers.decode_id(assistantIDAsHash)[0])
     if not callback.Success:
         return helpers.jsonResponse(False, 404, "Session not found.", None)
-    session: ChatbotSession = callback.Data
+    session: Conversation = callback.Data
 
     if request.method == 'POST':
 

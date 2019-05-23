@@ -15,8 +15,8 @@ assistant_router: Blueprint = assistant_router
 from .assistant.analytics import analytics_router
 analytics_router: Blueprint = analytics_router
 
-from .assistant.chatbotSession import chatbotSession_router
-chatbotSession_router: Blueprint = chatbotSession_router
+from .assistant.conversation import conversation_router
+conversation_router: Blueprint = conversation_router
 
 from .assistant.flow import flow_router
 flow_router: Blueprint = flow_router

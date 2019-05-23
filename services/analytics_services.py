@@ -1,10 +1,10 @@
-from models import db, Callback, ChatbotSession
+from models import db, Callback, Conversation
 from datetime import datetime, timedelta
 
 from monthdelta import monthdelta
 from sqlalchemy.sql import func, extract
 
-from models import db, Callback, ChatbotSession
+from models import db, Callback, Conversation
 
 
 def getAnalytics(assistant, periodSpace: int, topSolustions: int):
@@ -38,8 +38,8 @@ def getAnalytics(assistant, periodSpace: int, topSolustions: int):
 def getUsersOvertime(assistantID, periodSpace):
     try:
 
-        oldestDate = db.session.query(func.min(ChatbotSession.DateTime)).first()[0]
-        newestDate = db.session.query(func.max(ChatbotSession.DateTime)).first()[0]
+        oldestDate = db.session.query(func.min(Conversation.DateTime)).first()[0]
+        newestDate = db.session.query(func.max(Conversation.DateTime)).first()[0]
         now = datetime.now()
         result = []
         begginingOfYear = datetime.strptime(str(now).split('-')[0] + "-01-01", '%Y-%m-%d')
@@ -52,10 +52,10 @@ def getUsersOvertime(assistantID, periodSpace):
             now -= timedelta(days=7 * periodSpace)
 
             if current >= oldestDate:
-                result.append({'x': now.strftime('%Y-%m-%d'), 'y': db.session.query(ChatbotSession).filter(
-                    ChatbotSession.AssistantID == assistantID,
-                    ChatbotSession.DateTime < current,
-                    ChatbotSession.DateTime >= now).count()})
+                result.append({'x': now.strftime('%Y-%m-%d'), 'y': db.session.query(Conversation).filter(
+                    Conversation.AssistantID == assistantID,
+                    Conversation.DateTime < current,
+                    Conversation.DateTime >= now).count()})
             else:
                 if current >= begginingOfYear:
                     # result.append({'x':now.strftime('%Y-%m-%d'), 'y':random.randint(420,500)}) random data for empty
@@ -84,8 +84,8 @@ def getTotalUsersForCompany(assistants):
         totalClicks = 0
 
         for assistant in assistants:
-            totalClicks += db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistant.ID,
-                                                                   ChatbotSession.DateTime < datetime.now()).count()
+            totalClicks += db.session.query(Conversation).filter(Conversation.AssistantID == assistant.ID,
+                                                                 Conversation.DateTime < datetime.now()).count()
 
         return Callback(True, 'Users successfully counted.', totalClicks)
     except Exception as e:
@@ -98,8 +98,8 @@ def getTotalUsersForCompany(assistants):
 
 def getTotalUsers(assistantID):
     try:
-        return db.session.query(ChatbotSession).filter(ChatbotSession.AssistantID == assistantID,
-                                                       ChatbotSession.DateTime < datetime.now()).count()
+        return db.session.query(Conversation).filter(Conversation.AssistantID == assistantID,
+                                                     Conversation.DateTime < datetime.now()).count()
     except Exception as e:
         db.session.rollback()
         print("getTotalUsers ERROR: ", e)
@@ -110,7 +110,7 @@ def getTotalUsers(assistantID):
 
 def getTotalQuestionsOverMonth(assistantID):
     try:
-        oldestDate = db.session.query(func.min(ChatbotSession.DateTime)).scalar()
+        oldestDate = db.session.query(func.min(Conversation.DateTime)).scalar()
         now = datetime.now()
 
         result = []
@@ -121,9 +121,9 @@ def getTotalQuestionsOverMonth(assistantID):
             #     ChatbotSession.AssistantID == assistantID,
             #     ChatbotSession.DateTime < current,
             #     ChatbotSession.DateTime >= now).scalar()
-            total = db.session.query(func.sum(ChatbotSession.QuestionsAnswered)).filter(
-                ChatbotSession.AssistantID == assistantID,
-                extract('month', ChatbotSession.DateTime) == now.month,
+            total = db.session.query(func.sum(Conversation.QuestionsAnswered)).filter(
+                Conversation.AssistantID == assistantID,
+                extract('month', Conversation.DateTime) == now.month,
             ).scalar()
             if not total:
                 total = 0
@@ -160,17 +160,17 @@ def getTotalQuestionsOverMonth(assistantID):
 
 def getTimeSpentAvgOvertime(assistantID, days):
     try:
-        oldestDate = db.session.query(func.min(ChatbotSession.DateTime)).scalar()
+        oldestDate = db.session.query(func.min(Conversation.DateTime)).scalar()
         now = datetime.now()
 
         result = []
         while True:
             current = now
             now -= timedelta(days=days)
-            avg = db.session.query(func.avg(ChatbotSession.TimeSpent)).filter(
-                ChatbotSession.AssistantID == assistantID,
-                ChatbotSession.DateTime < current,
-                ChatbotSession.DateTime >= now).scalar()
+            avg = db.session.query(func.avg(Conversation.TimeSpent)).filter(
+                Conversation.AssistantID == assistantID,
+                Conversation.DateTime < current,
+                Conversation.DateTime >= now).scalar()
             if not avg:
                 avg = 0
             result.append(avg)

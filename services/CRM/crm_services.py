@@ -3,32 +3,32 @@ import logging
 from sqlalchemy.sql import and_
 
 from enums import CRM, UserType
-from models import db, Callback, ChatbotSession, Assistant, CRM as CRM_Model
+from models import db, Callback, Conversation, Assistant, CRM as CRM_Model
 from services.CRM import Adapt
 
 
 # Process chatbot session
-def processSession(assistant: Assistant, session: ChatbotSession) -> Callback:
+def processConversation(assistant: Assistant, conversation: Conversation) -> Callback:
     # Insert base on userType
-    if session.UserType is UserType.Candidate:
-        return insertCandidate(assistant, session)
-    elif session.UserType is UserType.Client:
-        return insertClient(assistant, session)
+    if conversation.UserType is UserType.Candidate:
+        return insertCandidate(assistant, conversation)
+    elif conversation.UserType is UserType.Client:
+        return insertClient(assistant, conversation)
     else:
         return Callback(False, "The data couldn't be synced with the CRM due to lack of information" +
                         " whether user is a Candidate or Client ")
 
 
-def insertCandidate(assistant: Assistant, session: ChatbotSession):
+def insertCandidate(assistant: Assistant, conversation: Conversation):
     # Check CRM type
     if assistant.CRM is CRM.Adapt:
-        return Adapt.insertCandidate(assistant.CRMAuth, session)
+        return Adapt.insertCandidate(assistant.CRMAuth, conversation)
 
 
-def insertClient(assistant: Assistant, session: ChatbotSession):
+def insertClient(assistant: Assistant, conversation: Conversation):
     # Check CRM type
     if assistant.CRM is CRM.Adapt:
-        return Adapt.insertClient(assistant.CRMAuth, session)
+        return Adapt.insertClient(assistant.CRMAuth, conversation)
 
 
 # Connect to a new CRM
@@ -45,15 +45,15 @@ def connect(company_id, details) -> Callback:
         connection = CRM_Model(Type=crm_type, Auth=crm_auth, CompanyID=company_id)
 
         # Save
-        db.session.add(connection)
-        db.session.commit()
+        db.conversation.add(connection)
+        db.conversation.commit()
 
         return Callback(True, 'CRM has been connected successfully', connection.ID)
 
     except Exception as exc:
         print(exc)
         logging.error("CRM_services.connect(): " + str(exc))
-        db.session.rollback()
+        db.conversation.rollback()
         return Callback(False, "CRM connection failed")
 
 

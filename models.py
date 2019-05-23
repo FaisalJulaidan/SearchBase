@@ -139,6 +139,7 @@ class Assistant(db.Model):
     MailEnabled = db.Column(db.Boolean, nullable=False, default=False)
     MailPeriod = db.Column(db.Integer, nullable=False, default=12)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
+    LogoName = db.Column(db.String(64), nullable=True)
     Config = db.Column(MagicJSON, nullable=True)
 
     # Relationships:
@@ -244,6 +245,7 @@ class Conversation(db.Model):
         return '<Conversation {}>'.format(self.Data)
 
 
+# Stored files for conversation
 class StoredFile(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     FilePath = db.Column(db.String(250), nullable=True, default=None)

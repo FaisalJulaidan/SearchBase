@@ -80,7 +80,7 @@ def conversation_file_uploads(assistantID, filename):
 
 
     if request.method == "GET":
-        callback: Callback = stored_file_services.downloadFile(filename)
+        callback: Callback = stored_file_services.downloadFile(filename, '/user_files')
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "File not found.")
 

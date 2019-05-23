@@ -1,4 +1,3 @@
-import uuid
 from flask import Blueprint, request, send_from_directory
 from flask import render_template
 from flask_cors import CORS
@@ -6,7 +5,7 @@ from werkzeug.utils import secure_filename
 from models import Callback, db, Conversation
 from services import conversation_services, flow_services, databases_services, stored_file_services, mail_services
 from utilities import helpers
-import logging
+import uuid, logging
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
@@ -91,7 +90,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
                 # Upload file to DigitalOcean Space
-                upload_callback : Callback = stored_file_services.uploadFile(file, filename)
+                upload_callback : Callback = stored_file_services.uploadFile(file, filename, '/user_files')
 
                 if not upload_callback.Success:
                     filename = 'fileCorrupted'

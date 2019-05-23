@@ -4,8 +4,9 @@ from utilities import helpers, json_schemas
 from services.CRM import crm_services
 from os.path import join
 from config import BaseConfig
-from services import flow_services
+from services import flow_services, stored_file_services
 from jsonschema import validate
+from werkzeug.utils import secure_filename
 import logging, json
 
 
@@ -214,3 +215,26 @@ def disconnectFromCRM(assistant: Assistant):
         logging.error("assistant_services.disconnect_from_crm(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in disconnecting assistant from CRM.')
+
+
+def uploadLogo(file, assistant: Assistant):
+    try:
+        # Generate unique name: hash_sessionIDEncrypted.extension
+        filename = helpers.encode_id(assistant.ID) + '.' + \
+                   secure_filename(file.filename).rsplit('.', 1)[1].lower()
+
+        # Upload file to DigitalOcean Space
+        upload_callback : Callback = stored_file_services.uploadFile(file, filename, '/chatbot_logos')
+        if not upload_callback.Success:
+            raise Exception(upload_callback.Message)
+
+        assistant.LogoName = filename
+        db.session.commit()
+
+        return Callback(True, 'Logo uploaded successfully.')
+
+    except Exception as exc:
+        print("assistant_services.uploadLogo(): ", exc)
+        logging.error("assistant_services.uploadLogo(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in uploading logo.')

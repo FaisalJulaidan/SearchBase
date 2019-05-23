@@ -63,8 +63,6 @@ def createRef(filePath, conversation) -> StoredFile or None:
         return Callback(False, "Couldn't create a storedFile entity.")
     
 
-
-
 def removeByID(id):
     try:
         db.session.query(StoredFile).filter(StoredFile.ID == id).first().delete()
@@ -77,7 +75,8 @@ def removeByID(id):
         db.session.rollback()
         return Callback(False, "StoredFile cold not be deleted")
 
-def uploadFile(file, filename):
+
+def uploadFile(file, filename, path):
 
     try:
         session = boto3.session.Session()
@@ -87,7 +86,7 @@ def uploadFile(file, filename):
                             aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
                             aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
 
-        s3.upload_fileobj(file, 'tsb', os.environ['UPLOAD_FOLDER'] + filename)
+        s3.upload_fileobj(file, 'tsb', os.environ['UPLOAD_FOLDER'] + path + '/' + filename)
         return Callback(True, "File uploaded successfully")
 
     except Exception as exc:
@@ -96,7 +95,7 @@ def uploadFile(file, filename):
         return Callback(False, "Couldn't upload file")
 
 
-def downloadFile(filename):
+def downloadFile(filename, path):
     try:
         session = boto3.session.Session()
         s3 = session.resource('s3',
@@ -104,7 +103,7 @@ def downloadFile(filename):
                                 endpoint_url='https://ams3.digitaloceanspaces.com',
                                 aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
                                 aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
-        file = s3.Object('tsb', os.environ['UPLOAD_FOLDER'] + filename)
+        file = s3.Object('tsb', os.environ['UPLOAD_FOLDER'] + path + '/' + filename)
 
         # Check if file exists
         try:
@@ -120,3 +119,22 @@ def downloadFile(filename):
         print("stored_file_services.downloadFile() ERROR: ", exc)
         logging.error("stored_file_services.uploadFile(): " + str(exc))
         return Callback(False, "Couldn't upload file")
+
+
+def deleteFile(filename, path):
+
+    try:
+        session = boto3.session.Session()
+        s3 = session.resource('s3',
+                            region_name='ams3',
+                            endpoint_url='https://ams3.digitaloceanspaces.com',
+                            aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
+                            aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
+
+        s3.Object('tsb', os.environ['UPLOAD_FOLDER'] + path + '/' + filename).delete()
+        return Callback(True, "File deleted successfully")
+
+    except Exception as exc:
+        print("stored_file_services.deleteFile() ERROR: ", exc)
+        logging.error("stored_file_services.deleteFile(): " + str(exc) + " >>> File Name: " + path + '/' + filename)
+        return Callback(False, "Couldn't delete file")

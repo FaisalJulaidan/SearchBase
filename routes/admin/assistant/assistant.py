@@ -105,12 +105,12 @@ def assistant_status(assistantID):
 
 
 # Connect assistant to CRM
-@assistant_router.route("/assistant/<int:assistant_id>/crm", methods=['POST', 'DELETE'])
+@assistant_router.route("/assistant/<int:assistantID>/crm", methods=['POST', 'DELETE'])
 @jwt_required
-def assistant_crm_connect(assistant_id):
+def assistant_crm_connect(assistantID):
     # Authenticate
     user = get_jwt_identity()['user']
-    security_callback: Callback = assistant_services.getByID(assistant_id, user['companyID'])
+    security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
     if not security_callback.Success:
         return helpers.jsonResponse(False, 404, security_callback.Message)
     assistant: Assistant = security_callback.Data
@@ -121,6 +121,31 @@ def assistant_crm_connect(assistant_id):
 
     if request.method == "DELETE":
         callback: Callback = assistant_services.disconnectFromCRM(assistant)
+
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message, None)
+    return helpers.jsonResponse(True, 200, callback.Message, None)
+
+
+@assistant_router.route("/assistant/<int:assistantID>/logo", methods=['POST'])
+def assistant_logo(assistantID):
+
+    # Authenticate
+    user = get_jwt_identity()['user']
+    security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
+    if not security_callback.Success:
+        return helpers.jsonResponse(False, 404, security_callback.Message)
+    assistant: Assistant = security_callback.Data
+
+    #############
+    callback: Callback = Callback(False, 'Error!', None)
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return helpers.jsonResponse(False, 404, "No file part")
+
+        # Upload the logo
+        callback: Callback = assistant_services.uploadLogo(request.files['file'], assistant)
+
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)
     return helpers.jsonResponse(True, 200, callback.Message, None)

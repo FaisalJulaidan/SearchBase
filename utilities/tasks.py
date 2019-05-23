@@ -11,12 +11,10 @@ def migrate_flow():
         for assistant in assistants:
             if assistant.Flow:
                 newFlow = assistant.Flow
-                newFlow['gg']= "llll"
                 for group in newFlow['groups']:
                     for block in group['blocks']:
                         # if block['Type'] == "Solutions":
 
-                        block['SubmitHalfway'] = False
                         block['SkipText'] = "DFFDDDFFDFFDDDFFDFFDDDFFDFFDDDFFDFFDDDFFDFFDDDFFDFFDDDFF"
                         # validate block
                         validate(block.get('Content'), getattr(json_schemas, str(enums.BlockType(block.get('Type')).name)))
@@ -33,8 +31,11 @@ def migrate_flow():
 
                 db.session.query(Assistant).filter(Assistant == assistant).update({"Flow": newFlow})
         print("Flow Before commit: ", assistants[0].Flow)
+
+        db.session.flush()
         db.session.commit()
         print("Flow After commit: ", assistants[0].Flow)
+
         print("Flow migration done successfully :)")
 
     except Exception as exc:

@@ -45,8 +45,8 @@ def connect(company_id, details) -> Callback:
         connection = CRM_Model(Type=crm_type, Auth=crm_auth, CompanyID=company_id)
 
         # Save
-        db.conversation.add(connection)
-        db.conversation.commit()
+        db.session.add(connection)
+        db.session.commit()
 
         return Callback(True, 'CRM has been connected successfully', connection.ID)
 

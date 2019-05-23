@@ -95,7 +95,8 @@ Question = {
                     "keywords": {"type": "array", "items": {"type": "string"}},
                     "blockToGoID": {"type": ["string", "null"]},
                     "action": {"enum": [e.value for e in enums.BlockAction]},
-                    "afterMessage": {"type": "string"}
+                    "afterMessage": {"type": "string"},
+                    # "score": {"type": "integer", "minimum": 0},
                 },
                 "required": ["id", "text", "keywords", "action", "afterMessage", "blockToGoID"],
                 "additionalProperties": False
@@ -112,7 +113,8 @@ UserInput = {
         "text": {"type": "string"},
         "blockToGoID": {"type": ["string", "null"]},
         "action": {"enum": [e.value for e in enums.BlockAction]},
-        "afterMessage": {"type": "string"}
+        "afterMessage": {"type": "string"},
+        # "keywords": {"type": "array", "items": {"type": "string"}},
     },
     "required": ["text", "action", "afterMessage", "blockToGoID"],
     "additionalProperties": False

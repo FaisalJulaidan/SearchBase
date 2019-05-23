@@ -56,10 +56,7 @@ def getByEmail(email) -> User or None:
                         'User with email ' + email + ' was successfully retrieved.',
                         result)
     except Exception as exc:
-        logging.error("user_services.getByEmail(): " + str(exc))
-        db.session.rollback()
-        return Callback(False,
-                        'User with email ' + email + ' does not exist.')
+        return Callback(False, 'User with email ' + email + ' does not exist.')
 
 
 def getAllByCompanyID(companyID) -> Callback:

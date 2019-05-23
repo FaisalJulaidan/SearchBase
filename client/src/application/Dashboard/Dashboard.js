@@ -13,7 +13,7 @@ import Billing from "./AccountDetails/Billing/Billing";
 import UsersManagement from "./AccountDetails/UsersManagement/UsersManagement";
 import Documentation from "./Documentation/Documentation";
 import Integration from "./Assistants/Assistant/Integration/Integration";
-import Sessions from "./Assistants/Assistant/Sessions/Sessions";
+import Conversations from "./Assistants/Assistant/Conversations/Conversations";
 import Home from "./Home/Home";
 import Analytics from "./Assistants/Assistant/Analytics/Analytics";
 import {authActions, optionsActions} from "store/actions";
@@ -231,7 +231,7 @@ class Dashboard extends Component {
                                         <Route path={`${match.path}/assistants/:id/script`} component={Flow}/>
                                         <Route path={`${match.path}/assistants/:id/integration`}
                                                component={Integration}/>
-                                        <Route path={`${match.path}/assistants/:id/sessions`} component={Sessions}/>
+                                        <Route path={`${match.path}/assistants/:id/conversations`} component={Conversations}/>
                                         <Route path={`${match.path}/assistants/:id/analytics`}
                                                component={Analytics}/>
                                         <Route path={`${match.path}/assistants/:id/CRMIntegration`}

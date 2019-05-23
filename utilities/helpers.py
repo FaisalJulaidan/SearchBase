@@ -1,5 +1,5 @@
 from flask import json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, ChatbotSession, Database, Candidate, Job, CRM
+from models import db, Role, Company, Assistant, Plan, Conversation, Database, Candidate, Job, CRM
 from services import user_services, flow_services
 from datetime import datetime, timedelta
 from enum import Enum
@@ -227,19 +227,19 @@ def gen_dummy_data():
                                "Availability": ["Only weekend days"],
                                "No Type": ["I am fine thank you"]}
     }
-    s1 = ChatbotSession(Data=data, DateTime=datetime.now(),
-                        TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
-                        UserType=enums.UserType.Candidate, Assistant=reader_a)
+    s1 = Conversation(Data=data, DateTime=datetime.now(),
+                      TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
+                      UserType=enums.UserType.Candidate, Assistant=reader_a)
     db.session.add(s1)
-    db.session.add(ChatbotSession(Data=data, DateTime=datetime.now() - timedelta(days=10),
-                                  TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
-                                  UserType=enums.UserType.Client, Assistant=reader_a))
+    db.session.add(Conversation(Data=data, DateTime=datetime.now() - timedelta(days=10),
+                                TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
+                                UserType=enums.UserType.Client, Assistant=reader_a))
 
     # add chatbot session in bulk
     for i in range(50):
-        db.session.add(ChatbotSession(Data=data, DateTime=datetime.now() - timedelta(days=i),
-                                      TimeSpent=i+40, SolutionsReturned=i+3, QuestionsAnswered=i+4,
-                                      UserType=enums.UserType.Candidate, Assistant=reader_a))
+        db.session.add(Conversation(Data=data, DateTime=datetime.now() - timedelta(days=i),
+                                    TimeSpent=i+40, SolutionsReturned=i+3, QuestionsAnswered=i+4,
+                                    UserType=enums.UserType.Candidate, Assistant=reader_a))
 
 
     db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidates, Company=aramco)

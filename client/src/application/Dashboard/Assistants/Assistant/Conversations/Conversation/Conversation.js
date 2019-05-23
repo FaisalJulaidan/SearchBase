@@ -10,9 +10,9 @@ class Conversation extends Component {
         this.counter = -1;
     }
 
-    emailUser(email){
+    emailUser = email => {
         window.location.href = "mailto:"+email;
-    }
+    };
 
     columns = [{
         title: 'Question',
@@ -34,7 +34,7 @@ class Conversation extends Component {
             }
             else if (record.dataType.includes("Email")){
                 return (<p>
-                   {record.input} <Icon type="mail" onClick={()=>{console.log(record.input);this.emailUser(record.input)}}/>
+                   {record.input} <Icon type="mail" onClick={()=>{this.emailUser(record.input)}}/>
                </p>);
             }
             else {
@@ -51,10 +51,10 @@ class Conversation extends Component {
 
 
     render() {
-        const {session} = this.props;
+        const {conversation} = this.props;
         return (
             <Table columns={this.columns}
-                   dataSource={session.Data.collectedData}
+                   dataSource={conversation.Data.collectedData}
                    size='middle'
                    pagination={false}
             />

@@ -10,7 +10,6 @@ def addNewsletterPerson(email):
         db.session.commit()
         return Callback(True, email + ' has been registered for newsletters.')
     except Exception as exc:
-        print("newsletter_service.addNewsletterPerson() Error: ", exc)
         logging.error("newsletter_service.addNewsletterPerson(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not register' + email+ ' for newsletters.')
@@ -22,7 +21,6 @@ def checkForNewsletter(email):
 
         return Callback(True, email + ' is registered for newsletters')
     except Exception as exc:
-        logging.error("newsletter_service.checkForNewsletter(): " + str(exc))
         db.session.rollback()
         return Callback(False, email + ' is not registered for newsletters')
 

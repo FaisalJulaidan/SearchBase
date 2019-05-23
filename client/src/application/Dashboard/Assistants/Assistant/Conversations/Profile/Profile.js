@@ -8,7 +8,7 @@ class Profile extends Component {
     counter = -1;
 
     componentWillReceiveProps(nextProps, nextContext) {
-        if(nextProps.session !== this.props.session){
+        if(nextProps.conversation !== this.props.conversation){
             this.counter = -1;
         }
     }
@@ -23,7 +23,7 @@ class Profile extends Component {
         title: 'Value',
         key: 'input',
         render: (text, dataType, index) => {
-            let values = this.props.session.Data.keywordsByDataType[dataType.name];
+            let values = this.props.conversation.Data.keywordsByDataType[dataType.name];
 
             let inputs = [];
             if(values){
@@ -53,13 +53,13 @@ class Profile extends Component {
     };
  
     render() {
-        const {session, dataTypes} = this.props;
+        const {conversation, dataTypes} = this.props;
         console.log(this.state);
         return (
-            session?.UserType !== "Unknown" ?
+            conversation?.UserType !== "Unknown" ?
                 <Table
                     columns={this.columns}
-                    dataSource={dataTypes.filter((type) => type.userTypes.includes(session.UserType))}
+                    dataSource={dataTypes.filter((type) => type.userTypes.includes(conversation.UserType))}
                     size='middle'
                     pagination={false}
                 />

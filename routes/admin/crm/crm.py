@@ -1,11 +1,11 @@
 from flask import Blueprint, request
 from flask_apscheduler import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
+import logging
 
 from models import Callback
 from services.CRM import crm_services, Bullhorn
 from utilities import helpers
-import logging
 
 crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../../templates")
 
@@ -79,5 +79,29 @@ def test_crm_connection():
 
 
 @crm_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
-def bullhorn_callback():  # TODO check args
+def bullhorn_callback():
+    logging.error("request.method: ")
+    logging.error(request.method)
+    logging.error("request.args: ")
+    logging.error(request.args)
+    logging.error("request.url: ")
+    logging.error(request.url)
+    logging.error("request.form: ")
+    logging.error(request.form)
+    logging.error("request.json: ")
+    logging.error(request.json)
+    logging.error("request.headers: ")
+    logging.error(request.headers)
+    print("request.method: ")
+    print(request.method)
+    print("request.args: ")
+    print(request.args)
+    print("request.url: ")
+    print(request.url)
+    print("request.form: ")
+    print(request.form)
+    print("request.json: ")
+    print(request.json)
+    print("request.headers: ")
+    print(request.headers)
     return str(request.url)

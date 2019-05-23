@@ -1,8 +1,8 @@
 import React from 'react';
-import styles from "./Sessions.module.less"
+import styles from "./Conversations.module.less"
 import ViewsModal from "./ViewModal/ViewsModal";
 import {Button, Modal, Table, Tag, Divider} from 'antd';
-import {chatbotSessionsActions} from "../../../../../store/actions";
+import {conversationActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
 import Header from "../../../../../components/Header/Header";
 import {CSVLink, CSVDownload} from "react-csv";
@@ -10,29 +10,28 @@ import {CSVLink, CSVDownload} from "react-csv";
 const confirm = Modal.confirm;
 
 
-class Sessions extends React.Component {
+class Conversations extends React.Component {
 
-    filesCounter=-1; // important for file uploads
     state = {
         filteredInfo: null,
         sortedInfo: null,
-        selectedSession: null,
+        selectedConversation: null,
         viewModal: false,
         destroyModal: false,
         downloadData: [],
-        sessionsRefreshed: true
+        ConversationsRefreshed: true
     };
 
 
     componentDidMount() {
         const {assistant} = this.props.location.state;
-        this.props.dispatch(chatbotSessionsActions.fetchChatbotSessions(assistant.ID))
+        this.props.dispatch(conversationActions.fetchConversations(assistant.ID))
     }
 
-    refreshSessions = () => {
+    refreshConversations = () => {
         const {assistant} = this.props.location.state;
-        this.setState({sessionsRefreshed:true});
-        this.props.dispatch(chatbotSessionsActions.fetchChatbotSessions(assistant.ID))
+        this.setState({ConversationsRefreshed:true});
+        this.props.dispatch(conversationActions.fetchConversations(assistant.ID))
     };
 
 
@@ -46,7 +45,7 @@ class Sessions extends React.Component {
 
 
     closeViewModal = () => {
-        this.setState({viewModal: false, selectedSession: null}, () => {
+        this.setState({viewModal: false, selectedConversation: null}, () => {
             setTimeout(function () { //Start the timer
                 this.setState({destroyModal: false}) //After 0.5 second, set render to true
             }.bind(this), 170)
@@ -54,57 +53,57 @@ class Sessions extends React.Component {
     };
 
 
-    clearAllChatbotSessions = (assistantID) => {
+    clearAllConversations = (assistantID) => {
         confirm({
             title: 'Do you want to delete all records?',
             content: 'By clicking OK, there will be no way to get these records back!',
             okType: 'danger',
             onOk: ()=> {
-                this.props.dispatch(chatbotSessionsActions.clearAllChatbotSessions(assistantID))
+                this.props.dispatch(conversationActions.clearAllConversations(assistantID))
             },
         });
     };
 
 
-    deleteSession = (deletedSession) => {
-        const ID = deletedSession?.ID;
-        const AssistantID = deletedSession?.AssistantID;
+    deleteConversation = (deletedConversation) => {
+        const ID = deletedConversation?.ID;
+        const AssistantID = deletedConversation?.AssistantID;
 
 
         if (ID && AssistantID)
             confirm({
-                title: `Delete session confirmation`,
+                title: `Delete Conversation confirmation`,
                 content: `If you click OK, this conversation will be deleted with its associated data forever`,
                 okType: 'danger',
                 onOk: () => {
                     if (this.state.viewModal)
-                        this.getNextSession(deletedSession);
-                    this.props.dispatch(chatbotSessionsActions.deleteChatbotSession(ID, AssistantID))
+                        this.getNextConversation(deletedConversation);
+                    this.props.dispatch(conversationActions.deleteConversation(ID, AssistantID))
                 },
                 maskClosable: true
             });
     };
     
-    getNextSession = currentSession => {
-        const {sessionsList} = this.props.sessions;
-        const index = sessionsList?.findIndex(session => session?.ID === currentSession?.ID);
+    getNextConversation = currentConversation => {
+        const {conversationsList} = this.props.conversations;
+        const index = conversationsList?.findIndex(Conversation => Conversation?.ID === currentConversation?.ID);
         if (index > -1)
-            this.setState({selectedSession: sessionsList[index + 1] ? sessionsList[index + 1] : sessionsList[index]})
+            this.setState({selectedConversation: conversationsList[index + 1] ? conversationsList[index + 1] : conversationsList[index]})
     };
 
-    getBackSession = currentSession => {
-        const {sessionsList} = this.props.sessions;
-        const index = sessionsList?.findIndex(session => session?.ID === currentSession?.ID);
+    getBackConversation = currentConversation => {
+        const {conversationsList} = this.props.conversations;
+        const index = conversationsList?.findIndex(Conversation => Conversation?.ID === currentConversation?.ID);
         if (index > -1)
-            this.setState({selectedSession: sessionsList[index - 1] ? sessionsList[index - 1] : sessionsList[index]})
+            this.setState({selectedConversation: conversationsList[index - 1] ? conversationsList[index - 1] : conversationsList[index]})
     };
 
-    // get the sessions to be rendered and save them in the state in format which can be downloaded by the CSV
-    populateDownloadData(sessions){
-        const sessionsList = sessions.sessionsList;
+    // get the conversation to be rendered and save them in the state in format which can be downloaded by the CSV
+    populateDownloadData(Conversations){
+        const conversationsList = Conversations.conversationsList;
 
         let data = [["ID", "User Type", "Name", "Questions Answered", "Solutions Returned", "Time Spent", "Date & Time",
-            "Conversation", "User Profile", "Selected Results"]]; // Sessions Page Headers
+            "Conversation", "User Profile", "Selected Results"]]; // Conversations Page Headers
         let dataRecord = undefined; // CSV line to push into data
         let recordData = undefined; // the questions and answers of the record
         let conversation = ""; // the questions and answers of the record in format to be pushed into dataRecord
@@ -112,12 +111,12 @@ class Sessions extends React.Component {
         let keywordsByDataType = undefined;
         let selectedSolutions = undefined; // the selected solutions of the record
         let selectedSolutionsData = undefined; // the selected solutions of the record in the format to be put in the CSV
-        console.log(sessions);
-        // go through the to-be-rendered sessions
-        if(sessionsList){sessionsList.forEach(record => {
+        console.log(Conversations);
+        // go through the to-be-rendered conversation
+        if(conversationsList){conversationsList.forEach(record => {
             conversation = "";
 
-            // Sessions Page Base Table
+            // Conversations Page Base Table
             dataRecord = [record["ID"], record["UserType"], this.findUserName(record["Data"]["keywordsByDataType"],
                 record["UserType"] ), record["QuestionsAnswered"], record["SolutionsReturned"],
                 record["TimeSpent"], record["DateTime"]];
@@ -162,7 +161,7 @@ class Sessions extends React.Component {
         console.log(data);
 
         // put the data in the state and set refresh to false
-        this.setState({downloadData:data, sessionsRefreshed:false});
+        this.setState({downloadData:data, ConversationsRefreshed:false});
     }
 
     findUserName = (keywords, userType) => {
@@ -175,9 +174,9 @@ class Sessions extends React.Component {
 
     render() {
         const {assistant} = this.props.location.state;
-        const {sessions, options} = this.props;
+        const {conversations, options} = this.props;
 
-        if(this.state.sessionsRefreshed){this.populateDownloadData(sessions)}
+        if(this.state.ConversationsRefreshed){this.populateDownloadData(conversations)}
 
         const columns = [{
             title: '#',
@@ -260,13 +259,13 @@ class Sessions extends React.Component {
             render: (text, record, index) => (
                 <span>
               <a onClick={() => {
-                  this.setState({viewModal: true, selectedSession: record, destroyModal: true})
+                  this.setState({viewModal: true, selectedConversation: record, destroyModal: true})
               }}>
                   View
               </a>
                     <Divider type="vertical" />
               <a onClick={() => {
-                  this.deleteSession(record)
+                  this.deleteConversation(record)
               }}>
                   Delete
               </a>
@@ -288,7 +287,7 @@ class Sessions extends React.Component {
                         <div>
 
                             <Button className={styles.Panel_Header_Button} type="primary" icon="sync"
-                                    onClick={this.refreshSessions} loading={this.props.isLoading}>
+                                    onClick={this.refreshConversations} loading={this.props.isLoading}>
                                 Refresh
                             </Button>
 
@@ -300,9 +299,9 @@ class Sessions extends React.Component {
 
 
                             <Button hidden className={styles.Panel_Header_Button} type="primary" icon="delete"
-                                    disabled={!!(!sessions?.sessionsList?.length)}
+                                    disabled={!!(!conversations?.conversationsList?.length)}
                                     onClick={() => {
-                                        this.clearAllChatbotSessions(assistant.ID)
+                                        this.clearAllConversations(assistant.ID)
                                     }} loading={this.props.isClearingAll}>
                                 Clear All
                             </Button>
@@ -311,7 +310,7 @@ class Sessions extends React.Component {
 
                     <div className={styles.Panel_Body}>
                         <Table columns={columns}
-                               dataSource={sessions.sessionsList}
+                               dataSource={conversations.conversationsList}
                                onChange={this.handleFilter}
                                loading={this.props.isLoading}
                                size='middle'
@@ -320,13 +319,13 @@ class Sessions extends React.Component {
                         {
                             this.state.destroyModal && <ViewsModal visible={this.state.viewModal}
                                                                    closeViewModal={this.closeViewModal}
-                                                                   filesPath={sessions.filesPath}
+                                                                   filesPath={conversations.filesPath}
                                                                    flowOptions={options?.flow}
-                                                                   session={this.state.selectedSession}
+                                                                   conversation={this.state.selectedConversation}
                                                                    assistant={assistant}
-                                                                   getNextSession={this.getNextSession}
-                                                                   getBackSession={this.getBackSession}
-                                                                   deleteSession={this.deleteSession}/>
+                                                                   getNextConversation={this.getNextConversation}
+                                                                   getBackConversation={this.getBackConversation}
+                                                                   deleteConversation={this.deleteConversation}/>
                         }
                     </div>
                 </div>
@@ -336,14 +335,14 @@ class Sessions extends React.Component {
 }
 
 const mapStateToProps = state =>  {
-    const {chatbotSessions} = state;
+    const {conversation} = state;
     return {
         options: state.options.options,
-        sessions: chatbotSessions.chatbotSessions,
-        isLoading: chatbotSessions.isLoading,
-        errorMsg: chatbotSessions.errorMsg,
+        conversations: conversation.conversations,
+        isLoading: conversation.isLoading,
+        errorMsg: conversation.errorMsg,
 
-        isClearingAll: chatbotSessions.isClearingAll
+        isClearingAll: conversation.isClearingAll
     };
 };
-export default connect(mapStateToProps)(Sessions);
+export default connect(mapStateToProps)(Conversations);

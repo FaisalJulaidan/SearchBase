@@ -7,7 +7,7 @@ import {
     assistantSaga,
     authSaga,
     profileSaga,
-    chatbotSessions,
+    conversationSaga,
     usersManagementSaga,
     databaseSaga,
     optionsSaga,
@@ -37,7 +37,7 @@ const persistor = persistStore(store);
 sagaMiddleware.run(assistantSaga);
 sagaMiddleware.run(authSaga);
 sagaMiddleware.run(profileSaga);
-sagaMiddleware.run(chatbotSessions);
+sagaMiddleware.run(conversationSaga);
 sagaMiddleware.run(usersManagementSaga);
 sagaMiddleware.run(databaseSaga);
 sagaMiddleware.run(optionsSaga);

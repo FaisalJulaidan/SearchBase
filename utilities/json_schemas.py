@@ -12,7 +12,7 @@ assistant_config = {
 }
 
 
-chatbot_session = {
+conversation = {
     "type": "object",
     "properties": {
         "collectedData": {"type": "array", "items": {

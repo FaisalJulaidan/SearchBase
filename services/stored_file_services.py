@@ -1,4 +1,4 @@
-from models import db, Callback, StoredFile, ChatbotSession
+from models import db, Callback, StoredFile, Conversation
 import logging, boto3, botocore, os
 
 
@@ -21,10 +21,10 @@ def getByID(id) -> StoredFile or None:
                         'Stored file with ID ' + str(id) + ' does not exist')
 
 
-def getBySession(session: ChatbotSession) -> StoredFile or None:
+def getByConversation(conversation: Conversation) -> StoredFile or None:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(StoredFile).filter(StoredFile.ChatbotSession == session).first()
+        result = db.session.query(StoredFile).filter(StoredFile.Conversation == conversation).first()
         if not result: return Callback(False, '')
         return Callback(True, 'StoredFile was successfully retrieved', result)
 
@@ -47,11 +47,11 @@ def getAll():
         return Callback(False,'StoredFiles could not be retrieved/empty')
 
 
-def createRef(filePath, chatbotSession) -> StoredFile or None:
+def createRef(filePath, conversation) -> StoredFile or None:
 
     try:
         if not filePath: raise Exception;
-        newStoredFile = StoredFile(FilePath=filePath, ChatbotSession=chatbotSession)
+        newStoredFile = StoredFile(FilePath=filePath, Conversation=conversation)
         db.session.add(newStoredFile)
         db.session.commit()
         return Callback(True, "Stored files reference was created successfully.", newStoredFile)

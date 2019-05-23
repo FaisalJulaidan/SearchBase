@@ -1,10 +1,11 @@
+import requests
+from models import Callback, Conversation
 import json
 import logging
 
 import requests
 
 from enums import DataType as DT
-from models import Callback, ChatbotSession
 
 
 def login(auth):
@@ -31,7 +32,7 @@ def login(auth):
         return Callback(False, str(exc))
 
 
-def insertCandidate(auth, session: ChatbotSession) -> Callback:
+def insertCandidate(auth, session: Conversation) -> Callback:
     try:
         callback: Callback = login(auth)
         if not callback.Success:
@@ -87,7 +88,7 @@ def insertCandidate(auth, session: ChatbotSession) -> Callback:
         return Callback(False, str(exc))
 
 
-def insertClient(auth, session: ChatbotSession) -> Callback:
+def insertClient(auth, session: Conversation) -> Callback:
     try:
         callback: Callback = login(auth)
         if not callback.Success:

@@ -149,7 +149,7 @@ class Assistant(db.Model):
     CRM = db.relationship('CRM', back_populates='Assistants')
 
     Statistics = db.relationship('Statistics', back_populates='Assistant')
-    ChatbotSessions = db.relationship('ChatbotSession', back_populates='Assistant')
+    Conversations = db.relationship('Conversation', back_populates='Assistant')
 
     # Constraints:
     # cannot have two assistants with the same name under one company
@@ -217,14 +217,11 @@ class Newsletter(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Email = db.Column(db.String(64), nullable=False, unique=True)
 
-    # Relationships:
-    ###
-
     def __repr__(self):
         return '<Newsletters {}>'.format(self.Email)
 
 
-class ChatbotSession(db.Model):
+class Conversation(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Data = db.Column(MagicJSON, nullable=False)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
@@ -239,12 +236,12 @@ class ChatbotSession(db.Model):
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='ChatbotSessions')
+    Assistant = db.relationship('Assistant', back_populates='Conversations')
 
-    StoredFile = db.relationship('StoredFile', uselist=False, back_populates='ChatbotSession')
+    StoredFile = db.relationship('StoredFile', uselist=False, back_populates='Conversation')
 
     def __repr__(self):
-        return '<ChatbotSession {}>'.format(self.Data)
+        return '<Conversation {}>'.format(self.Data)
 
 
 class StoredFile(db.Model):
@@ -252,8 +249,8 @@ class StoredFile(db.Model):
     FilePath = db.Column(db.String(250), nullable=True, default=None)
 
     # Relationships:
-    ChatbotSessionID = db.Column(db.Integer, db.ForeignKey('chatbot_session.ID', ondelete='SET NULL'))
-    ChatbotSession = db.relationship('ChatbotSession', back_populates='StoredFile')
+    ConversationID = db.Column(db.Integer, db.ForeignKey('conversation.ID', ondelete='SET NULL'))
+    Conversation = db.relationship('Conversation', back_populates='StoredFile')
 
     def __repr__(self):
         return '<StoredFile {}>'.format(self.ID)
@@ -331,15 +328,15 @@ class Job(db.Model):
 # Example of how triggers works
 # Also check: https://docs.sqlalchemy.org/en/latest/orm/session_events.html
 
-# @event.listens_for(ChatbotSession, 'before_delete')
+# @event.listens_for(Conversation, 'before_delete')
 # def receive_after_insert(mapper, connection, target):
 #     print("before_delete")
-#     print(target) # prints ChatbotSession
+#     print(target) # prints Conversation
 #
-# @event.listens_for(ChatbotSession, 'after_delete')
+# @event.listens_for(Conversation, 'after_delete')
 # def receive_after_insert(mapper, connection, target):
 #     print("after_delete")
-#     print(target) # prints ChatbotSession
+#     print(target) # prints Conversation
 #
 
 

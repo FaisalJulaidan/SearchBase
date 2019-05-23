@@ -91,11 +91,11 @@ class Login extends React.Component {
                             </Col>
                         </Row>
 
-                        <Row type="flex" justify="center">
-                            <Col>
-                                <Link style={{color: "#9254de"}} to="/signup">Don't have an account?</Link>
-                            </Col>
-                        </Row>
+                        {/*<Row type="flex" justify="center">*/}
+                            {/*<Col>*/}
+                                {/*<Link style={{color: "#9254de"}} to="/signup">Don't have an account?</Link>*/}
+                            {/*</Col>*/}
+                        {/*</Row>*/}
                         <br/>
                     </Spin>
                 </div>

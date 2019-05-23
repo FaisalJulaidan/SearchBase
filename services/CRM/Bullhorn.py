@@ -71,7 +71,6 @@ def login(auth):
 
     except Exception as exc:
         logging.error("CRM.Bullhorn.login() ERROR: " + str(exc))
-        print(exc)
         return Callback(False, str(exc))
 
 
@@ -137,18 +136,16 @@ def sendQuery(auth, query, method, body, companyID):
         url = auth.get("rest_url", "https://rest91.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
               "?BhRestToken=" + auth.get("rest_token", "none")
         headers = {'Content-Type': 'application/json'}
-        print("url 1: ", url)
+
         # test the BhRestToken (rest_token)
         r = send_request(url, method, headers, json.dumps(body))
-        print("r.status_code: ", r.status_code)
-        print("r.text: ", r.text)
+
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
                 url = callback.Data.get("rest_url", "") + query + "?BhRestToken=" + callback.Data.get("rest_token", "")
-                print("url 2: ", url)
+
                 r = send_request(url, method, headers, json.dumps(body))
-                print(r.text)
                 if not r.ok:
                     raise Exception(r.text + ". Query could not be sent")
             else:
@@ -207,29 +204,23 @@ def insertClient(auth, session: Conversation) -> Callback:
     try:
         # get query url
         insertCompany_callback: Callback = insertCompany(auth, session)
-        print("insertCompany_callback.Message: ", insertCompany_callback.Message)
-        print("insertCompany_callback.Success: ", insertCompany_callback.Success)
         if not insertCompany_callback.Success:
             raise Exception(insertCompany_callback.Message)
-        print("GOING IN")
+
         insertClient_callback: Callback = insertClientContact(auth, session,
                                                               insertCompany_callback.Data.get("changedEntityId"))
-        print("insertClient_callback.Message: ", insertClient_callback.Message)
-        print("insertClient_callback.Success: ", insertClient_callback.Success)
         if not insertClient_callback.Success:
             raise Exception(insertClient_callback.Message)
 
         return Callback(True, "Client has been added")
 
     except Exception as exc:
-        print("CRM.Bullhorn.insertClient() ERROR: " + str(exc))
         logging.error("CRM.Bullhorn.insertClient() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
 def insertClientContact(auth, session: Conversation, bhCompanyID) -> Callback:
     try:
-        print("HERE?")
         # New candidate details
         body = {
             "name": " ".join(
@@ -244,19 +235,16 @@ def insertClientContact(auth, session: Conversation, bhCompanyID) -> Callback:
             "email": session.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [""])[0],
             "clientCorporation": {"id": bhCompanyID}
         }
-        print("mah body: ", body)
+
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "entity/ClientContact", "put", body,
                                                  session.Assistant.CompanyID)
-        print("sendQuery_callback.Success: ", sendQuery_callback.Success)
-        print("sendQuery_callback.Message: ", sendQuery_callback.Message)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
         return Callback(True, sendQuery_callback.Message)
 
     except Exception as exc:
-        print("CRM.Bullhorn.insertClientContact() ERROR: " + str(exc))
         logging.error("CRM.Bullhorn.insertClientContact() ERROR: " + str(exc))
         return Callback(False, str(exc))
 

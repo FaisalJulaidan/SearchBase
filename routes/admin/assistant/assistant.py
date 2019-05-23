@@ -128,6 +128,7 @@ def assistant_crm_connect(assistantID):
 
 
 @assistant_router.route("/assistant/<int:assistantID>/logo", methods=['POST'])
+@jwt_required
 def assistant_logo(assistantID):
 
     # Authenticate

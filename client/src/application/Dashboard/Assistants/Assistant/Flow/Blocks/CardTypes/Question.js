@@ -1,17 +1,21 @@
 import React, {Component} from 'react';
-import {Button, Card, Form, Icon, Input, Modal, Popconfirm, Tag, Tooltip, Collapse, Divider} from "antd";
+import {Button, Card, Collapse, Divider, Form, Icon, Input, Modal, Popconfirm, Tag, Tooltip} from "antd";
 
 import {getInitialVariables, initActionType, initActionTypeSkip} from './CardTypesHelpers'
 import {
     ActionFormItem,
     AfterMessageFormItem,
     ButtonsForm,
-    DataTypeFormItem, SkipFormItem,
+    DataTypeFormItem,
     QuestionFormItem,
-    ShowGoToBlockFormItem, ShowGoToBlockSkipFormItem,
-    ShowGoToGroupFormItem, ShowGoToGroupSkipFormItem,
-    SkipTextFormItem,
+    ScoreFormItem,
+    ShowGoToBlockFormItem,
+    ShowGoToBlockSkipFormItem,
+    ShowGoToGroupFormItem,
+    ShowGoToGroupSkipFormItem,
+    SkipFormItem,
     SkippableFormItem,
+    SkipTextFormItem,
     StoreInDBFormItem
 } from './CardTypesFormItems'
 import shortid from 'shortid';
@@ -292,6 +296,9 @@ class Question extends Component {
                                 )}
                             </div>
                         </FormItem>
+
+                        <ScoreFormItem FormItem={FormItem} layout={layout} getFieldDecorator={getFieldDecorator}
+                                       block={{Content: {ID: block.ID, action: this.state.editedAnswer?.action}}}/>
 
                         <ActionFormItem FormItem={FormItem}
                                         blockOptions={blockOptions}

@@ -1,4 +1,4 @@
-import {Button, Checkbox, Input, Select, Spin, Cascader,} from "antd";
+import {Button, Cascader, Checkbox, Input, Select, Spin,} from "antd";
 import React from 'react';
 import {onCancel, onDelete, onSelectAction} from "./CardTypesHelpers";
 
@@ -374,6 +374,37 @@ export const DatabaseTypeFormItem = ({FormItem, block, getFieldDecorator, layout
                 <Select placeholder="EX: Jobs database">{options.databases.types.map((type, i) =>
                     <Option key={i} value={type}>{type}</Option>)
                 }</Select>
+            )
+        }
+    </FormItem>
+);
+
+// TODO: add edit record
+export const ScoreFormItem = ({FormItem, layout, block, getFieldDecorator}) => (
+    <FormItem label="Score Weight" {...layout}
+              extra="Score to be used for ranking candidates">
+        {
+            getFieldDecorator('scoreWeight', {
+                // initialValue: block.Content.databaseType ?
+                //     options.databases.types.find(type => type === block.Content.databaseType)
+                //     : undefined,
+                rules: [{
+                    required: true,
+                    message: "Please select score "
+                }],
+            })(
+                <Select placeholder="Select score weight">
+                    <Option value={1}>1</Option>
+                    <Option value={2}>2</Option>
+                    <Option value={3}>3</Option>
+                    <Option value={4}>4</Option>
+                    <Option value={5}>5</Option>
+                    <Option value={6}>6</Option>
+                    <Option value={7}>7</Option>
+                    <Option value={8}>8</Option>
+                    <Option value={9}>9</Option>
+                    <Option value={10}>10</Option>
+                </Select>
             )
         }
     </FormItem>

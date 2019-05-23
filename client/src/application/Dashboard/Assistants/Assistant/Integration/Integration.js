@@ -7,7 +7,8 @@ import styles from "./Integration.module.less"
 import ReactDOMServer from 'react-dom/server'
 import {hasher} from "helpers";
 import {SwatchesPicker} from 'react-color';
-
+import LogoUploader from "./LogoUploader/LogoUploader";
+import {connect} from 'react-redux';
 
 const {TextArea} = Input;
 
@@ -62,8 +63,16 @@ class Integration extends React.Component {
     }
 
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         this.removeChatbot();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.assistantList[0]) {
+            this.setState({
+                assistant: nextProps.assistantList.find(assistant => +this.props.match.params.id === assistant.ID)
+            });
+        }
     }
 
     handleChange = (color) => this.setState({dataCircle: color.hex || color.target.value});
@@ -126,7 +135,9 @@ class Integration extends React.Component {
     getWidgetSrc = () => {
         // include the colon if there is port number, which means localhost and not real server
         let colon = "";
-        if (window.location.port !== "") {colon = ":";}
+        if (window.location.port !== "") {
+            colon = ":";
+        }
         const {protocol, port, hostname} = window.location;
         return protocol + '//' + hostname + colon + port + "/api/widgets/chatbot.js";
     };
@@ -146,7 +157,7 @@ class Integration extends React.Component {
         return <script src={this.getWidgetSrc()}
                        data-name={this.state.dataName}
                        data-id={this.state.assistantID}
-                       // data-icon={this.state.dataIcon}
+            // data-icon={this.state.dataIcon}
                        data-circle={this.state.dataCircle}
                        async={this.state.async}
                        defer={this.state.defer}/>
@@ -158,6 +169,8 @@ class Integration extends React.Component {
                 <Header display={`Integration`}/>
 
                 <div className={styles.Panel_Body_Only}>
+
+                    {/*Left Panel*/}
                     <div style={{marginRight: 5, width: '45%'}} className={styles.Panel}>
 
                         <div className={styles.Panel_Header} style={{position: "inherit"}}>
@@ -165,6 +178,12 @@ class Integration extends React.Component {
                         </div>
 
                         <div className={styles.Panel_Body}>
+
+                            <Row type="flex" justify="center">
+                                <LogoUploader assistant={this.state.assistant}/>
+                            </Row>
+
+
                             <Row type="flex" justify="center">
                                 <Col>
                                     <p> Currently you can edit the colour setting of your assistant's button.
@@ -190,10 +209,13 @@ class Integration extends React.Component {
                                 </Col>
 
                             </Row>
+
+
                         </div>
                     </div>
 
 
+                    {/*Right Panel*/}
                     <div style={{marginLeft: 5, width: '55%'}} className={styles.Panel}>
 
                         <div className={styles.Panel_Header} style={{position: "inherit"}}>
@@ -227,4 +249,10 @@ class Integration extends React.Component {
     }
 }
 
-export default (Integration);
+function mapStateToProps(state) {
+    return {
+        assistantList: state.assistant.assistantList,
+    };
+}
+
+export default connect(mapStateToProps)(Integration);

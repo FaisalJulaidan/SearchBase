@@ -8,6 +8,8 @@ from config import BaseConfig
 from io import BytesIO
 from itsdangerous import URLSafeTimedSerializer
 from cryptography.fernet import Fernet
+from jsonschema import validate
+from utilities import json_schemas
 import enums, re, os, stripe, gzip, functools, logging, geoip2.webservice
 
 
@@ -58,95 +60,101 @@ def gen_dummy_data():
     aramco = Company.query.filter(Company.Name == "Aramco").first()
     sabic = Company.query.filter(Company.Name == "Sabic").first()
 
+    # Create and validate a flow for an assistant
+
+
     # Create Assistants for Aramco and Sabic companies
     reader_a = Assistant(Name="Reader", Message="Hey there",
                          TopBarText="Aramco Bot", SecondsUntilPopup=1,
-                         Active=True, Company=aramco,
-                         Flow= {
-                             "groups": [
-                                 {
-                                     "id": "tisd83f4",
-                                     "name": "group 1",
-                                     "description": "The best group",
-                                     "blocks": [
-                                         {
-                                            "ID": "834hf",
-                                            "DataType": enums.DataType.CandidateSkills.name,
-                                            "Type": enums.BlockType.UserInput.value,
-                                            "StoreInDB": True,
-                                            "Skippable": True,
-                                            "SkipText": "Skip!",
-                                            "SkipAction": enums.BlockAction.EndChat.value,
-                                            "SkipBlockToGoID": None,
-                                            "Content": {
-                                                "action": "Go To Next Block",
-                                                "text": "What's salary are you offering",
-                                                "blockToGoID": "by_GnLY-f",
-                                                "afterMessage": "Your input is being processed..."
-                                            }
-                                         },
-                                         {
-                                            "ID":"by_GnLY-f",
-                                            "Type": enums.BlockType.Solutions.value,
-                                            "StoreInDB":False,
-                                            "Skippable":True,
-                                            "SkipText": "Skip!",
-                                            "SkipAction": enums.BlockAction.EndChat.value,
-                                            "SkipBlockToGoID": None,
-                                            "DataType":enums.DataType.NoType.name,
-                                             "Content": {
-                                                 "showTop": 3,
-                                                 "action": "End Chat",
-                                                 "blockToGoID": None,
-                                                 "afterMessage": "We will contact you with this candidate",
-                                                 "databaseType": enums.DatabaseType.Candidates.value['enumName']
-                                             },
-                                         },
-                                         # {
-                                         #     "ID": "gje6D",
-                                         #     "DataType": enums.DataType.CandidateEmail.name,
-                                         #     "Type": "User Input",
-                                         #     "StoreInDB": True,
-                                         #     "Skippable": False,
-                                         #     "Content": {
-                                         #         "action": "End Chat",
-                                         #         "text": "What's your email",
-                                         #         "blockToGoID": None,
-                                         #         "afterMessage": "Your email is in good hands :) Bye!"
-                                         #     }
-                                         # },
-                                         # {
-                                         #     "ID": "hkwt845",
-                                         #     "DataType": enums.DataType.CandidateSkills.name,
-                                         #     "Type": "File Upload",
-                                         #     "StoreInDB": True,
-                                         #     "Skippable": True,
-                                         #     "Content": {
-                                         #         "action": "Go To Next Block",
-                                         #         "text": "Upload CV1",
-                                         #         "blockToGoID": "gjdfl34",
-                                         #         "afterMessage": "File processed!",
-                                         #         "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
-                                         #     }
-                                         # },
-                                         # {
-                                         #     "ID": "gjdfl34",
-                                         #     "DataType": enums.DataType.CandidateSkills.value,
-                                         #     "Type": "File Upload",
-                                         #     "StoreInDB": True,
-                                         #     "Skippable": True,
-                                         #     "Content": {
-                                         #         "action": "End Chat",
-                                         #         "text": "Upload CV2",
-                                         #         "blockToGoID": None,
-                                         #         "afterMessage": "File processed!",
-                                         #         "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
-                                         #     }
-                                         # },
-                                     ]
-                                 }
-                             ]
-                         })
+                         Active=True, Company=aramco)
+    flow = {
+        "groups": [
+            {
+                "id": "tisd83f4",
+                "name": "group 1",
+                "description": "The best group",
+                "blocks": [
+                    {
+                        "ID": "834hf",
+                        "DataType": enums.DataType.CandidateSkills.name,
+                        "Type": enums.BlockType.UserInput.value,
+                        "StoreInDB": True,
+                        "Skippable": True,
+                        "SkipText": "Skip!",
+                        "SkipAction": enums.BlockAction.EndChat.value,
+                        "SkipBlockToGoID": None,
+                        "Content": {
+                            "action": "Go To Next Block",
+                            "text": "What's salary are you offering",
+                            "blockToGoID": "by_GnLY-f",
+                            "afterMessage": "Your input is being processed...",
+                            # "keywords": ['python', 'sql', 'java']
+                        }
+                    },
+                    {
+                        "ID":"by_GnLY-f",
+                        "Type": enums.BlockType.Solutions.value,
+                        "StoreInDB":False,
+                        "Skippable":True,
+                        "SkipText": "Skip!",
+                        "SkipAction": enums.BlockAction.EndChat.value,
+                        "SkipBlockToGoID": None,
+                        "DataType":enums.DataType.NoType.name,
+                        "Content": {
+                            "showTop": 3,
+                            "action": "End Chat",
+                            "blockToGoID": None,
+                            "afterMessage": "We will contact you with this candidate",
+                            "databaseType": enums.DatabaseType.Candidates.value['enumName']
+                        },
+                    },
+                    # {
+                    #     "ID": "gje6D",
+                    #     "DataType": enums.DataType.CandidateEmail.name,
+                    #     "Type": "User Input",
+                    #     "StoreInDB": True,
+                    #     "Skippable": False,
+                    #     "Content": {
+                    #         "action": "End Chat",
+                    #         "text": "What's your email",
+                    #         "blockToGoID": None,
+                    #         "afterMessage": "Your email is in good hands :) Bye!"
+                    #     }
+                    # },
+                    # {
+                    #     "ID": "hkwt845",
+                    #     "DataType": enums.DataType.CandidateSkills.name,
+                    #     "Type": "File Upload",
+                    #     "StoreInDB": True,
+                    #     "Skippable": True,
+                    #     "Content": {
+                    #         "action": "Go To Next Block",
+                    #         "text": "Upload CV1",
+                    #         "blockToGoID": "gjdfl34",
+                    #         "afterMessage": "File processed!",
+                    #         "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
+                    #     }
+                    # },
+                    # {
+                    #     "ID": "gjdfl34",
+                    #     "DataType": enums.DataType.CandidateSkills.value,
+                    #     "Type": "File Upload",
+                    #     "StoreInDB": True,
+                    #     "Skippable": True,
+                    #     "Content": {
+                    #         "action": "End Chat",
+                    #         "text": "Upload CV2",
+                    #         "blockToGoID": None,
+                    #         "afterMessage": "File processed!",
+                    #         "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
+                    #     }
+                    # },
+                ]
+            }
+        ]
+    }
+    flow_services.updateFlow(flow, reader_a)
+
     helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
 
     reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)

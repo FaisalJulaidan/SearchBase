@@ -75,6 +75,48 @@ def gen_dummy_data():
                 "description": "The best group",
                 "blocks": [
                     {
+                        "ID":"8EDEBiDHa",
+                        "Type":"Question",
+                        "StoreInDB":True,
+                        "Skippable":False,
+                        "SkipText":"Skip!",
+                        "SkipAction":"End Chat",
+                        "SkipBlockToGoID": None,
+                        "DataType":"CandidateAvailability",
+                        "Content":{
+                            "text":"what?",
+                            "answers":[
+                                {
+                                    "id":"WZXp26mdL",
+                                    "text":"low",
+                                    "keywords":[],
+                                    "blockToGoID": '834hf',
+                                    "action":"Go To Next Block",
+                                    "afterMessage":"",
+                                    "score": 2
+                                },
+                                {
+                                    "id":"godj9rom5",
+                                    "text":"medium",
+                                    "keywords":[],
+                                    "blockToGoID": '834hf',
+                                    "action":"Go To Next Block",
+                                    "afterMessage":"",
+                                    "score": 5
+                                },
+                                {
+                                    "id":"E6phkGY5u",
+                                    "text":"high",
+                                    "keywords":[],
+                                    "blockToGoID": '834hf',
+                                    "action":"Go To Next Block",
+                                    "afterMessage":"",
+                                    "score": 8
+                                }
+                            ]
+                        },
+                    },
+                    {
                         "ID": "834hf",
                         "DataType": enums.DataType.CandidateSkills.name,
                         "Type": enums.BlockType.UserInput.value,
@@ -85,29 +127,29 @@ def gen_dummy_data():
                         "SkipBlockToGoID": None,
                         "Content": {
                             "action": "Go To Next Block",
-                            "text": "What's salary are you offering",
+                            "text": "What's are your skills?",
                             "blockToGoID": "by_GnLY-f",
                             "afterMessage": "Your input is being processed...",
                             "keywords": ['python', 'sql', 'java']
                         }
                     },
-                    {
-                        "ID":"by_GnLY-f",
-                        "Type": enums.BlockType.Solutions.value,
-                        "StoreInDB":False,
-                        "Skippable":True,
-                        "SkipText": "Skip!",
-                        "SkipAction": enums.BlockAction.EndChat.value,
-                        "SkipBlockToGoID": None,
-                        "DataType":enums.DataType.NoType.name,
-                        "Content": {
-                            "showTop": 3,
-                            "action": "End Chat",
-                            "blockToGoID": None,
-                            "afterMessage": "We will contact you with this candidate",
-                            "databaseType": enums.DatabaseType.Candidates.value['enumName']
-                        },
-                    },
+                    # {
+                    #     "ID":"by_GnLY-f",
+                    #     "Type": enums.BlockType.Solutions.value,
+                    #     "StoreInDB":False,
+                    #     "Skippable":True,
+                    #     "SkipText": "Skip!",
+                    #     "SkipAction": enums.BlockAction.EndChat.value,
+                    #     "SkipBlockToGoID": None,
+                    #     "DataType":enums.DataType.NoType.name,
+                    #     "Content": {
+                    #         "showTop": 3,
+                    #         "action": "End Chat",
+                    #         "blockToGoID": None,
+                    #         "afterMessage": "We will contact you with this candidate",
+                    #         "databaseType": enums.DatabaseType.Candidates.value['enumName']
+                    #     },
+                    # },
                     # {
                     #     "ID": "gje6D",
                     #     "DataType": enums.DataType.CandidateEmail.name,

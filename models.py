@@ -231,7 +231,7 @@ class Conversation(db.Model):
     QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
     UserType = db.Column(Enum(enums.UserType), nullable=False)
     Completed = db.Column(db.Boolean, nullable=False, default=True)
-    Type = db.Column(Enum(enums.ConversationStatus), nullable=False, default=enums.ConversationStatus.Pending)
+    Status = db.Column(Enum(enums.ConversationStatus), nullable=False, default=enums.ConversationStatus.Pending)
 
 
     CRMSynced = db.Column(db.Boolean, nullable=False, default=False)
@@ -332,16 +332,22 @@ class Job(db.Model):
 # Example of how triggers works
 # Also check: https://docs.sqlalchemy.org/en/latest/orm/session_events.html
 
+# @event.listens_for(Assistant, 'before_insert')
+# def receive_after_insert(mapper, connection, target):
+#     print("before_insert")
+#     print(target) # prints Assistant
+
 # @event.listens_for(Conversation, 'before_delete')
 # def receive_after_insert(mapper, connection, target):
 #     print("before_delete")
 #     print(target) # prints Conversation
 #
+#
 # @event.listens_for(Conversation, 'after_delete')
 # def receive_after_insert(mapper, connection, target):
 #     print("after_delete")
 #     print(target) # prints Conversation
-#
+
 
 
 class Callback():

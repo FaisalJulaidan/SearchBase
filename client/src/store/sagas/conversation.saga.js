@@ -5,7 +5,7 @@ import {http, successMessage, errorMessage, loadingMessage} from "helpers";
 
 function* fetchConversations({assistantID}) {
     try {
-        const res = yield http.get(`/assistant/${assistantID}/conversation`);
+        const res = yield http.get(`/assistant/${assistantID}/conversations`);
         return yield put(conversationActions.fetchConversationsSuccess(res.data.data))
     } catch (error) {
         console.log(error);

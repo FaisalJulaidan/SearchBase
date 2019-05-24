@@ -224,7 +224,7 @@ def uploadLogo(file, assistant: Assistant):
                    secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
         # Upload file to DigitalOcean Space
-        upload_callback : Callback = stored_file_services.uploadFile(file, filename, '/chatbot_logos')
+        upload_callback : Callback = stored_file_services.uploadFile(file, filename, '/chatbot_logos', public=True)
         if not upload_callback.Success:
             raise Exception(upload_callback.Message)
 

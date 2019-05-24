@@ -90,7 +90,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
                 # Upload file to DigitalOcean Space
-                upload_callback : Callback = stored_file_services.uploadFile(file, filename, '/user_files')
+                upload_callback : Callback = stored_file_services.uploadFile(file, filename, '/user_files', True)
 
                 if not upload_callback.Success:
                     filename = 'fileCorrupted'

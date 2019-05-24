@@ -11,7 +11,7 @@ conversation_router: Blueprint = Blueprint('conversation_router', __name__ , tem
 
 
 # Get all assistant's user inputs
-@conversation_router.route("/assistant/<int:assistantID>/conversation", methods=["GET", "DELETE"])
+@conversation_router.route("/assistant/<int:assistantID>/conversations", methods=["GET", "DELETE"])
 @jwt_required
 def conversation(assistantID):
 

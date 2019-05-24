@@ -88,7 +88,7 @@ def gen_dummy_data():
                             "text": "What's salary are you offering",
                             "blockToGoID": "by_GnLY-f",
                             "afterMessage": "Your input is being processed...",
-                            # "keywords": ['python', 'sql', 'java']
+                            "keywords": ['python', 'sql', 'java']
                         }
                     },
                     {

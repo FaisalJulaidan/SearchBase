@@ -16,6 +16,13 @@ class CRM(Enum):
     Adapt = 'Adapt'
     Bullhorn = 'Bullhorn'
 
+
+class ConversationStatus(Enum):
+    Pending = 'Pending'
+    Accepted = 'Accepted'
+    Rejected = 'Rejected'
+
+
 class BlockType(Enum):
     UserInput = 'User Input'
     Question = 'Question'

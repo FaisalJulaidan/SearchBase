@@ -96,9 +96,9 @@ Question = {
                     "blockToGoID": {"type": ["string", "null"]},
                     "action": {"enum": [e.value for e in enums.BlockAction]},
                     "afterMessage": {"type": "string"},
-                    # "score": {"type": "integer", "minimum": 0},
+                    "score": {"type": "integer", "minimum": 0},
                 },
-                "required": ["id", "text", "keywords", "action", "afterMessage", "blockToGoID"],
+                "required": ["id", "text", "keywords", "action", "afterMessage", "blockToGoID", "score"],
                 "additionalProperties": False
             }
         }
@@ -114,9 +114,9 @@ UserInput = {
         "blockToGoID": {"type": ["string", "null"]},
         "action": {"enum": [e.value for e in enums.BlockAction]},
         "afterMessage": {"type": "string"},
-        # "keywords": {"type": "array", "items": {"type": "string"}},
+        "keywords": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["text", "action", "afterMessage", "blockToGoID"],
+    "required": ["text", "action", "afterMessage", "blockToGoID", "keywords"],
     "additionalProperties": False
 }
 

@@ -108,3 +108,21 @@ def conversation_delete_record(assistantID, conversationID):
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
+
+@conversation_router.route("/assistant/<assistantID>/conversation/<conversationID>/status", methods=["PUT"])
+@jwt_required
+def conversation_status(assistantID, conversationID):
+
+    # Authenticate
+    user = get_jwt_identity()['user']
+    # check if the assistant that has the session is owned by this company (user)
+    security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
+    if not security_callback.Success:
+        return helpers.jsonResponse(False, 404, "Assistant not found.")
+
+    if request.method == "PUT":
+        data = request.json
+        callback : Callback = conversation_services.updateStatus(conversationID, assistantID, data.get('newStatus'))
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)

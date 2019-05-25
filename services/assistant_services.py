@@ -151,7 +151,7 @@ def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPe
         db.session.rollback()
         logging.error("assistant_services.update(): " + str(exc))
         return Callback(False,
-                        "Couldn't update assistant "+name)
+                        "Couldn't update assistant " + str(id))
 
 
 def changeStatus(assistant: Assistant, status):

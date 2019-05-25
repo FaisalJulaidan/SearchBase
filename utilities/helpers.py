@@ -279,17 +279,19 @@ def gen_dummy_data():
     }
     s1 = Conversation(Data=data, DateTime=datetime.now(),
                       TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
-                      UserType=enums.UserType.Candidate, Assistant=reader_a)
+                      UserType=enums.UserType.Candidate, Score= 1,
+                      Status=enums.ConversationStatus.Accepted, Assistant=reader_a)
     db.session.add(s1)
-    db.session.add(Conversation(Data=data, DateTime=datetime.now() - timedelta(days=10),
+    db.session.add(Conversation(Data=data, DateTime=datetime.now(),
                                 TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
-                                UserType=enums.UserType.Client, Assistant=reader_a))
+                                UserType=enums.UserType.Client, Score= 0.05, Completed=False,
+                                Status=enums.ConversationStatus.Rejected, Assistant=reader_a))
 
     # add chatbot session in bulk
     for i in range(50):
         db.session.add(Conversation(Data=data, DateTime=datetime.now() - timedelta(days=i),
                                     TimeSpent=i+40, SolutionsReturned=i+3, QuestionsAnswered=i+4,
-                                    UserType=enums.UserType.Candidate, Assistant=reader_a))
+                                    UserType=enums.UserType.Candidate, Score= 0.45, Assistant=reader_a))
 
 
     db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidates, Company=aramco)

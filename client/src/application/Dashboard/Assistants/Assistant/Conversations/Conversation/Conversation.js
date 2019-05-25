@@ -52,6 +52,7 @@ class Conversation extends Component {
 
     render() {
         const {conversation} = this.props;
+        console.log(conversation)
         return (
             <Table columns={this.columns}
                    dataSource={conversation.Data.collectedData}

@@ -63,7 +63,31 @@ export const conversation = (state = initialState, action) => {
                 isClearingAll: false,
                 errorMsg: action.error
             });
+
+
+        // Updating conversation status
+        case actionTypes.UPDATE_CONVERSATION_STATUS_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isUpdatingStatus: true
+            });
+        case actionTypes.UPDATE_CONVERSATION_STATUS_SUCCESS:
+            const conversationsCopy2 = {...state.conversations,
+                conversationsList: state.conversations.conversationsList
+                    .map(c => c.ID === action.conversationID ? {...c,Status: action.newStatus}: c)};
+
+            return updateObject(state, {
+                isUpdatingStatus: false,
+                conversations: conversationsCopy2,
+                errorMsg: null,
+            });
+        case actionTypes.UPDATE_CONVERSATION_STATUS_FAILURE:
+            return updateObject(state, {
+                isUpdatingStatus: false,
+                errorMsg: action.errorMsg
+            });
+
         default:
             return state
     }
-};
+}

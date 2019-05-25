@@ -9,7 +9,7 @@ from models import db, Callback, Conversation, Assistant
 from services import assistant_services, stored_file_services, databases_services
 from services.CRM import crm_services
 from utilities import json_schemas, helpers
-from enums import DatabaseType, UserType
+from enums import DatabaseType, UserType, ConversationStatus
 import logging
 
 
@@ -51,6 +51,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                                       SolutionsReturned=data['solutionsReturned'],
                                       QuestionsAnswered=len(collectedData),
                                       UserType=UserType[data['userType'].replace(" ", "")],
+                                      Score=data['score'],
                                       Assistant=assistant)
         # CRM integration
         # if assistant.CRM:
@@ -111,6 +112,22 @@ def getByID(conversationID, assistantID):
         logging.error("conversation_services.getByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not retrieve the conversation.')
+
+# ----- Updaters ----- #
+def updateStatus(conversationID, assistantID, newStatus):
+    try:
+        db.session.query(Conversation)\
+            .filter(and_(Conversation.AssistantID == assistantID, Conversation.ID == conversationID))\
+            .update({'Status': ConversationStatus[newStatus] })
+
+        db.session.commit()
+        return Callback(True, 'Status updated Successfully')
+
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        logging.error("conversation_services.updateStatus(): " + str(exc))
+        return Callback(False, "Couldn't update status")
 
 
 # ----- Filters ----- #

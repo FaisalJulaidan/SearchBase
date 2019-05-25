@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import {Button, Modal, Tabs, Row, Col, Icon, Typography} from "antd";
+import {Button, Modal, Tabs, Row, Col, Icon, Typography, Badge} from "antd";
 import {http, alertError, loadingMessage, errorMessage, successMessage} from "helpers";
 import saveAs from 'file-saver';
 import Profile from '../Profile/Profile'
 import Conversation from '../Conversation/Conversation'
 import SelectedSolutions from "../SelectedSolutions/SelectedSolutions";
 import CRMResponse from "../CRMResponse/CRMResponse";
+import styles from "./ViewModal.module.less";
 
 const {Text} = Typography;
 
@@ -71,22 +72,54 @@ class ViewsModal extends Component {
 
 
     render() {
-        const {conversation, flowOptions} = this.props;
+        const {conversation, flowOptions, updateStatus, isUpdatingStatus, buildStatusBadge} = this.props;
         const userType = conversation ? conversation.UserType : 'Unknown';
 
         return (
             <Modal
                 width={900}
-                title={<h3>Conversation Details <span><Text type="secondary">#{conversation?.ID}</Text></span></h3>}
+                title={
+                    <h3>
+                        {buildStatusBadge(conversation?.Status, false)}
+                        {conversation?.UserType === "Unknown" ? "Conversation" : conversation?.UserType} Details
+                        <span>
+                            <Text type="secondary"> #{conversation?.ID}</Text>
+                        </span>
+                    </h3>}
                 destroyOnClose={true}
                 visible={this.props.visible}
                 onCancel={this.props.closeViewModal}
                 onOk={this.props.closeViewModal}
                 footer={[
-                    <Button hidden key="Delete" onClick={() => this.props.deleteConversation(conversation)}
+                    <Button key="Delete" onClick={() => this.props.deleteConversation(conversation)}
                             type={'danger'}>Delete</Button>,
                     <Button key="Cancel" onClick={this.props.closeViewModal}>OK</Button>,
                 ]}>
+
+
+                <Row type={'flex'} justify={'center'} style={{marginBottom: '20px'}}>
+                    <Button className={styles.StatusChangeBtn} type="link"
+                            disabled={isUpdatingStatus}
+                            onClick={() => updateStatus("Rejected", conversation)}>
+                        <Icon type="close-circle" theme="filled"
+                              style={{color: "red", fontSize: "18px"}} />
+                    </Button>
+
+                    <Button className={styles.StatusChangeBtn} type="link"
+                            style={{fontSize: "18px"}}
+                            disabled={isUpdatingStatus}
+                            onClick={() => updateStatus("Pending", conversation)} >
+                        <Icon type="clock-circle"/>
+                    </Button>
+
+                    <Button className={styles.StatusChangeBtn} type="link"
+                            disabled={isUpdatingStatus}
+                            onClick={() => updateStatus("Accepted", conversation)} >
+                        <Icon type="check-circle" theme="filled"
+                              style={{color: "#52c41a", fontSize: "18px"}} />
+                    </Button>
+                </Row>
+
 
                 <Row type={'flex'} justify={'center'}>
                     <Col span={3}>

@@ -1,7 +1,8 @@
 import React from 'react';
 import styles from "./Conversations.module.less"
+import './Conversations.less';
 import ViewsModal from "./ViewModal/ViewsModal";
-import {Button, Modal, Table, Tag, Divider} from 'antd';
+import {Button, Modal, Table, Tag, Divider, Badge, Popover, Icon, Progress} from 'antd';
 import {conversationActions} from "../../../../../store/actions";
 import connect from "react-redux/es/connect/connect";
 import Header from "../../../../../components/Header/Header";
@@ -26,6 +27,17 @@ class Conversations extends React.Component {
     componentDidMount() {
         const {assistant} = this.props.location.state;
         this.props.dispatch(conversationActions.fetchConversations(assistant.ID))
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.conversations?.conversationsList[0] && this.state.selectedConversation){
+            const updatedConversation = nextProps.conversations.conversationsList
+                .find(c => this.state.selectedConversation.ID === c.ID);
+
+            if (updatedConversation)
+                this.setState({selectedConversation: updatedConversation })
+        }
+
     }
 
     refreshConversations = () => {
@@ -77,19 +89,26 @@ class Conversations extends React.Component {
                 okType: 'danger',
                 onOk: () => {
                     if (this.state.viewModal)
-                        this.getNextConversation(deletedConversation);
-                    this.props.dispatch(conversationActions.deleteConversation(ID, AssistantID))
+                        this.getNextConversation(deletedConversation)
+                            .then(() => this.props.dispatch(conversationActions.deleteConversation(ID, AssistantID)));
+
+
                 },
                 maskClosable: true
             });
     };
-    
-    getNextConversation = currentConversation => {
+
+
+    // The promise is for getNext before deletion conversations
+    getNextConversation = currentConversation => new Promise(resolve => {
         const {conversationsList} = this.props.conversations;
         const index = conversationsList?.findIndex(Conversation => Conversation?.ID === currentConversation?.ID);
         if (index > -1)
-            this.setState({selectedConversation: conversationsList[index + 1] ? conversationsList[index + 1] : conversationsList[index]})
-    };
+            this.setState({selectedConversation: conversationsList[index + 1] ?
+                    conversationsList[index + 1] :
+                    conversationsList[index]}
+            , () => resolve());
+    });
 
     getBackConversation = currentConversation => {
         const {conversationsList} = this.props.conversations;
@@ -103,7 +122,7 @@ class Conversations extends React.Component {
         const conversationsList = Conversations.conversationsList;
 
         let data = [["ID", "User Type", "Name", "Questions Answered", "Solutions Returned", "Time Spent", "Date & Time",
-            "Conversation", "User Profile", "Selected Results"]]; // Conversations Page Headers
+            "Score", "Statue", "Conversation", "User Profile", "Selected Results"]]; // Conversations Page Headers
         let dataRecord = undefined; // CSV line to push into data
         let recordData = undefined; // the questions and answers of the record
         let conversation = ""; // the questions and answers of the record in format to be pushed into dataRecord
@@ -111,7 +130,7 @@ class Conversations extends React.Component {
         let keywordsByDataType = undefined;
         let selectedSolutions = undefined; // the selected solutions of the record
         let selectedSolutionsData = undefined; // the selected solutions of the record in the format to be put in the CSV
-        console.log(Conversations);
+
         // go through the to-be-rendered conversation
         if(conversationsList){conversationsList.forEach(record => {
             conversation = "";
@@ -119,7 +138,7 @@ class Conversations extends React.Component {
             // Conversations Page Base Table
             dataRecord = [record["ID"], record["UserType"], this.findUserName(record["Data"]["keywordsByDataType"],
                 record["UserType"] ), record["QuestionsAnswered"], record["SolutionsReturned"],
-                record["TimeSpent"], record["DateTime"]];
+                record["TimeSpent"], record["DateTime"], record["Score"] * 100 + "%", record["Status"]];
 
             // Conversation Questions and Answers   ex. "What is your name? : Bob House (Name)"
             recordData = record["Data"]["collectedData"];
@@ -158,7 +177,7 @@ class Conversations extends React.Component {
 
             data.push(dataRecord);
         });}
-        console.log(data);
+
 
         // put the data in the state and set refresh to false
         this.setState({downloadData:data, ConversationsRefreshed:false});
@@ -172,6 +191,23 @@ class Conversations extends React.Component {
         return 'Unavailable';
     };
 
+    updateStatus = (newStatus, conversation) => {
+        const id = conversation?.ID;
+        const AssistantID = conversation?.AssistantID;
+        this.props.dispatch(conversationActions.updateConversationStatus(newStatus, id, AssistantID));
+    };
+
+    buildStatusBadge = (status, withText=true) => {
+        let text = "";
+        if (withText) text = status;
+
+        if (status === 'Accepted')
+            return <Badge status="success" text={text}/>;
+        else if (status === 'Rejected')
+            return <Badge status="error" text={text}/>;
+        return <Badge status="processing" text={text}/>;
+    };
+
     render() {
         const {assistant} = this.props.location.state;
         const {conversations, options} = this.props;
@@ -180,9 +216,9 @@ class Conversations extends React.Component {
 
         const columns = [{
             title: '#',
-            dataIndex: '#',
-            key: '#',
-            render: (text, record, index) => (<p>{index + 1}</p>),
+            dataIndex: 'ID',
+            key: 'ID',
+            render: (text, record, index) => (<p>{record.ID}</p>),
 
         }, {
             title: 'User Type',
@@ -203,19 +239,11 @@ class Conversations extends React.Component {
                 <p style={{textTransform: 'capitalize'}}>{this.findUserName(record.Data.keywordsByDataType, record.UserType)}</p>),
 
         }, {
-            title: 'Questions Answered',
-            dataIndex: 'QuestionsAnswered',
-            key: 'QuestionsAnswered',
-            sorter: (a, b) => a.QuestionsAnswered - b.QuestionsAnswered,
-            render: (text, record) => (
-                <p style={{textAlign: ''}}>{text}</p>),
-
-        }, {
-            title: 'Solutions Returned',
-            dataIndex: 'SolutionsReturned',
-            sorter: (a, b) => a.SolutionsReturned - b.SolutionsReturned,
-            render: (text, record) => (
-                <p style={{textAlign: ''}}>{text}</p>),
+            // title: 'Solutions Returned',
+            // dataIndex: 'SolutionsReturned',
+            // sorter: (a, b) => a.SolutionsReturned - b.SolutionsReturned,
+            // render: (text, record) => (
+            //     <p style={{textAlign: ''}}>{text}</p>),
 
         }, {
             title: 'Time Spent',
@@ -239,8 +267,67 @@ class Conversations extends React.Component {
             sorter: (a, b) => new Date(a.DateTime).valueOf() - new Date(b.DateTime).valueOf(),
             render: (text, record) => (<p>{record.DateTime}</p>),
 
-        },{
+        }, {
+            title: 'Score',
+            dataIndex: 'Score',
+            sorter: (a, b) => a.Score - b.Score,
+            render: (text, record) => {
+                return (
+                    <div style={{width: 100}}>
+                        {record.Score < 0.1 ?
+                            <Progress percent={record.Score * 100} size="small" status="exception" />
+                            :
+                            <Progress percent={record.Score * 100} size="small" status="active" />
+                        }
+                    </div>
+                );
+            }
+
+        }, {
             title: 'Status',
+            dataIndex: 'Status',
+            key: 'Status',
+            // filters: [
+            //     {text: 'Completed', value: 'Completed'},
+            //     {text: 'Incomplete', value: 'Incomplete'},
+            // ],
+            // onFilter: (value, record) => record.Completed ? record.UserType.indexOf(value) === 0 : false,
+            render: (text, record) => {
+                const {isUpdatingStatus} = this.props;
+                const content = (
+                    <div>
+                        <Button className={styles.StatusChangeBtn} type="link"
+                                disabled={isUpdatingStatus}
+                                onClick={() => this.updateStatus("Rejected", record)}>
+                            <Icon type="close-circle" theme="filled"
+                                  style={{color: "red", fontSize: "18px"}} />
+                        </Button>
+
+                        <Button className={styles.StatusChangeBtn} type="link"
+                                style={{fontSize: "18px"}}
+                                disabled={isUpdatingStatus}
+                                onClick={() => this.updateStatus("Pending", record)} >
+                            <Icon type="clock-circle"/>
+                        </Button>
+
+                        <Button className={styles.StatusChangeBtn} type="link"
+                                disabled={isUpdatingStatus}
+                                onClick={() => this.updateStatus("Accepted", record)} >
+                            <Icon type="check-circle" theme="filled"
+                                  style={{color: "#52c41a", fontSize: "18px"}} />
+                        </Button>
+                    </div>
+                );
+
+                return (
+                    <Popover placement="top" title="Change status?" content={content} trigger="hover">
+                        {this.buildStatusBadge(record.Status)}
+                    </Popover>
+                )
+            },
+
+        },{
+            title: 'Conversation',
             dataIndex: 'Completed',
             key: 'Completed',
             // filters: [
@@ -325,7 +412,12 @@ class Conversations extends React.Component {
                                                                    assistant={assistant}
                                                                    getNextConversation={this.getNextConversation}
                                                                    getBackConversation={this.getBackConversation}
-                                                                   deleteConversation={this.deleteConversation}/>
+                                                                   deleteConversation={this.deleteConversation}
+                                                                   updateStatus={this.updateStatus}
+                                                                   isUpdatingStatus={this.props.isUpdatingStatus}
+                                                                   buildStatusBadge={this.buildStatusBadge}
+
+                            />
                         }
                     </div>
                 </div>
@@ -342,7 +434,8 @@ const mapStateToProps = state =>  {
         isLoading: conversation.isLoading,
         errorMsg: conversation.errorMsg,
 
-        isClearingAll: conversation.isClearingAll
+        isClearingAll: conversation.isClearingAll,
+        isUpdatingStatus: conversation.isUpdatingStatus,
     };
 };
 export default connect(mapStateToProps)(Conversations);

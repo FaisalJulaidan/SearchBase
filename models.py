@@ -232,6 +232,7 @@ class Conversation(db.Model):
     UserType = db.Column(Enum(enums.UserType), nullable=False)
     Completed = db.Column(db.Boolean, nullable=False, default=True)
     Status = db.Column(Enum(enums.ConversationStatus), nullable=False, default=enums.ConversationStatus.Pending)
+    Score = db.Column(db.Float(), nullable=False)
 
 
     CRMSynced = db.Column(db.Boolean, nullable=False, default=False)
@@ -355,9 +356,3 @@ class Callback():
         self.Success: bool = success
         self.Message: str = message
         self.Data: str or dict or bool = data
-
-class CandidateDict():
-    def __init__(self, id, name: str, email: str, mobile: str, location: str, skills: str, linkdinURL: str,
-                 availability: str, jobTitle: str, education: str, yearsExperience: int, desiredSalary: float,
-                 currency: str, source: str):
-        self.C

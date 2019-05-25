@@ -66,6 +66,31 @@ const clearAllConversationsFailure = (error) => {
 };
 
 
+const updateConversationStatus = (newStatus, conversationID, assistantID) => {
+    return {
+        type: actionTypes.UPDATE_CONVERSATION_STATUS_REQUEST,
+        newStatus,
+        conversationID,
+        assistantID
+    };
+};
+
+const updateConversationStatusSuccess = (conversationID, newStatus) => {
+    return {
+        type: actionTypes.UPDATE_CONVERSATION_STATUS_SUCCESS,
+        conversationID,
+        newStatus
+    };
+};
+
+const updateConversationStatusFailure = (errorMsg) => {
+    return {
+        type: actionTypes.UPDATE_CONVERSATION_STATUS_FAILURE,
+        errorMsg,
+    };
+};
+
+
 export const conversationActions = {
     fetchConversations,
     fetchConversationsSuccess,
@@ -77,5 +102,9 @@ export const conversationActions = {
 
     clearAllConversations,
     clearAllConversationsSuccess,
-    clearAllConversationsFailure
+    clearAllConversationsFailure,
+
+    updateConversationStatus,
+    updateConversationStatusSuccess,
+    updateConversationStatusFailure,
 };

@@ -56,11 +56,31 @@ function* watchClearAllConversations() {
     yield takeEvery(actionTypes.CLEAR_ALL_CONVERSATIONS_REQUEST, clearAllConversations)
 }
 
+function* updateConversationStatus({newStatus, conversationID, assistantID}) {
+    try {
+        loadingMessage('Updating status...', 0);
+        const res = yield http.put(`/assistant/${assistantID}/conversation/${conversationID}/status`,
+                                   {newStatus: newStatus});
+        yield put(conversationActions.updateConversationStatusSuccess(conversationID, newStatus));
+        successMessage('Status updated');
+    } catch (error) {
+        console.log(error);
+        const msg = "Couldn't update status";
+        yield put(conversationActions.updateConversationStatusFailure(msg));
+        errorMessage(msg);
+    }
+}
+
+function* watchUpdateConversationStatus() {
+    yield takeEvery(actionTypes.UPDATE_CONVERSATION_STATUS_REQUEST, updateConversationStatus)
+}
+
 
 export function* conversationSaga() {
     yield all([
         watchFetchConversations(),
         watchDeleteConversation(),
         watchClearAllConversations(),
+        watchUpdateConversationStatus(),
     ])
 }

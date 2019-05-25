@@ -55,7 +55,7 @@ class ViewsModal extends Component {
         loadingMessage("Downloading file...", 0);
         this.setState({isDownloadingFile: true});
         http({
-            url: `/assistant/${this.props.assistant.ID}/conversations/${fileName}`,
+            url: `/assistant/${this.props.assistant.ID}/conversation/${fileName}`,
             method: 'GET',
             responseType: 'blob', // important
         }).then((response) => {

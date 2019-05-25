@@ -223,12 +223,13 @@ def uploadLogo(file, assistant: Assistant):
         filename = helpers.encode_id(assistant.ID) + '.' + \
                    secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
-        # Upload file to DigitalOcean Space
+        # Upload file to cloud Space
+        assistant.LogoName = filename
         upload_callback : Callback = stored_file_services.uploadFile(file, filename, '/chatbot_logos', public=True)
         if not upload_callback.Success:
             raise Exception(upload_callback.Message)
 
-        assistant.LogoName = filename
+
         db.session.commit()
 
         return Callback(True, 'Logo uploaded successfully.')
@@ -238,3 +239,24 @@ def uploadLogo(file, assistant: Assistant):
         logging.error("assistant_services.uploadLogo(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in uploading logo.')
+
+
+def deleteLogo(assistant: Assistant):
+    try:
+
+        logoName = assistant.LogoName
+        if not logoName: return Callback(False, 'No logo to delete')
+
+        # Delete file from cloud Space and reference from database
+        assistant.LogoName = None
+        delete_callback : Callback = stored_file_services.deleteFile(logoName, '/chatbot_logos')
+        if not delete_callback.Success:
+            raise Exception(delete_callback.Message)
+
+        db.session.commit()
+        return Callback(True, 'Logo deleted successfully.')
+
+    except Exception as exc:
+        logging.error("assistant_services.deleteLogo(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in deleting logo.')

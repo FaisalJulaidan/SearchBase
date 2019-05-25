@@ -79,9 +79,11 @@ def removeByID(id):
 def uploadFile(file, filename, path, public=False):
 
     try:
+        # Set config arguments
         ExtraArgs = {}
         if public: ExtraArgs['ACL'] = 'public-read'
 
+        # Connect to DigitalOcean Space
         session = boto3.session.Session()
         s3 = session.client('s3',
                             region_name='ams3',
@@ -89,6 +91,7 @@ def uploadFile(file, filename, path, public=False):
                             aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
                             aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
 
+        # Upload file
         s3.upload_fileobj(file, 'tsb', os.environ['UPLOAD_FOLDER'] + path + '/' + filename,
                           ExtraArgs=ExtraArgs)
         return Callback(True, "File uploaded successfully")
@@ -101,6 +104,7 @@ def uploadFile(file, filename, path, public=False):
 
 def downloadFile(filename, path):
     try:
+        # Connect to DigitalOcean Space
         session = boto3.session.Session()
         s3 = session.resource('s3',
                                 region_name='ams3',
@@ -128,14 +132,16 @@ def downloadFile(filename, path):
 def deleteFile(filename, path):
 
     try:
+        # Connect to DigitalOcean Space
         session = boto3.session.Session()
         s3 = session.resource('s3',
                             region_name='ams3',
                             endpoint_url='https://ams3.digitaloceanspaces.com',
                             aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
                             aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
-
+        # Delete file
         s3.Object('tsb', os.environ['UPLOAD_FOLDER'] + path + '/' + filename).delete()
+
         return Callback(True, "File deleted successfully")
 
     except Exception as exc:

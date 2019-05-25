@@ -127,7 +127,7 @@ def assistant_crm_connect(assistantID):
     return helpers.jsonResponse(True, 200, callback.Message, None)
 
 
-@assistant_router.route("/assistant/<int:assistantID>/logo", methods=['POST'])
+@assistant_router.route("/assistant/<int:assistantID>/logo", methods=['POST', 'DELETE'])
 @jwt_required
 def assistant_logo(assistantID):
 
@@ -143,9 +143,11 @@ def assistant_logo(assistantID):
     if request.method == 'POST':
         if 'file' not in request.files:
             return helpers.jsonResponse(False, 404, "No file part")
-
         # Upload the logo
         callback: Callback = assistant_services.uploadLogo(request.files['file'], assistant)
+
+    if request.method == 'DELETE':
+        callback: Callback = assistant_services.deleteLogo(assistant)
 
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)

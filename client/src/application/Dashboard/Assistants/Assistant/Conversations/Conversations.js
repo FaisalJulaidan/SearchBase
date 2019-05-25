@@ -30,7 +30,7 @@ class Conversations extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.conversations?.conversationsList[0] && this.state.selectedConversation){
+        if (nextProps.conversations?.conversationsList && this.state.selectedConversation){
             const updatedConversation = nextProps.conversations.conversationsList
                 .find(c => this.state.selectedConversation.ID === c.ID);
 

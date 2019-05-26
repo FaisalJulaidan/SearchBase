@@ -21,18 +21,50 @@ def processConversation(assistant: Assistant, conversation: Conversation) -> Cal
 
 def insertCandidate(assistant: Assistant, conversation: Conversation):
     # Check CRM type
-    if assistant.CRM.Type is CRM.Adapt:
-        return Adapt.insertCandidate(assistant.CRM.Auth, conversation)
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.insertCandidate(assistant.CRM.Auth, conversation)
+    elif assistant.CRM.Type is CRM.Adapt:
+        return Adapt.insertCandidate(assistant.CRM.Auth, conversation)
 
 
 def insertClient(assistant: Assistant, conversation: Conversation):
     # Check CRM type
-    if assistant.CRM.Type is CRM.Adapt:
-        return Adapt.insertClient(assistant.CRM.Auth, conversation)
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.insertClient(assistant.CRM.Auth, conversation)
+    elif assistant.CRM.Type is CRM.Adapt:
+        return Adapt.insertClient(assistant.CRM.Auth, conversation)
+
+
+def searchCandidates(assistant: Assistant, session):
+    # Check CRM type
+    # if assistant.CRM.Type is CRM.Adapt:
+    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
+
+
+def searchJobs(assistant: Assistant, session):
+    # Check CRM type
+    # if assistant.CRM.Type is CRM.Adapt:
+    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
+
+
+def getAllCandidates(assistant: Assistant):
+    # Check CRM type
+    # if assistant.CRM.Type is CRM.Adapt:
+    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.getAllCandidates(assistant.CRM.Auth, assistant.CompanyID)
+
+
+def getAllJobs(assistant: Assistant):
+    # Check CRM type
+    # if assistant.CRM.Type is CRM.Adapt:
+    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.getAllJobs(assistant.CRM.Auth, assistant.CompanyID)
 
 
 # Connect to a new CRM

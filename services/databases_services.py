@@ -1,19 +1,26 @@
+import enums
+import json
+import logging
+import pandas
+import random
+import re
+from datetime import datetime
+from typing import List
+
+from sqlalchemy import and_
+from sqlalchemy_utils import Currency
+
+from enums import DatabaseType, DataType as DT
 from models import db, Callback, Database, Candidate, Assistant, Job
 from services import assistant_services
-from typing import List
-from datetime import datetime
-from sqlalchemy_utils import Currency
+from services.CRM import crm_services
 from utilities import helpers
-from sqlalchemy import and_
-from enums import DatabaseType, DataType as DT
-import json, random, logging, pandas, re, enums
-
 
 
 def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
     try:
         # Get result and check if None then raise exception
-        database: Database = db.session.query(Database)\
+        database: Database = db.session.query(Database) \
             .filter(and_(Database.CompanyID == companyID, Database.ID == id)).first()
 
         if not database:
@@ -26,7 +33,6 @@ def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
 
         elif database.Type == DatabaseType.Jobs:
             databaseContent = getAllJobs(id, pageNumber)
-
 
         if not databaseContent:
             raise Exception()
@@ -41,10 +47,10 @@ def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
         return Callback(False, 'Could not fetch the database.')
 
 
-def updateDatabase(id, newName, companyID)-> Callback:
+def updateDatabase(id, newName, companyID) -> Callback:
     try:
-        if not newName: raise  Exception
-        db.session.query(Database).filter(and_(Database.ID == id, Database.CompanyID == companyID))\
+        if not newName: raise Exception
+        db.session.query(Database).filter(and_(Database.ID == id, Database.CompanyID == companyID)) \
             .update({'Name': newName})
         db.session.commit()
         return Callback(True, newName + ' database updated successfully')
@@ -59,12 +65,11 @@ def updateDatabase(id, newName, companyID)-> Callback:
 
 # ----- Uploader ----- #
 def uploadDatabase(data: dict, companyID: int) -> Callback:
-
     try:
 
         def parseRecord(record):
             parsed = {}
-            for key, content in record.items(): # loop through record's columns
+            for key, content in record.items():  # loop through record's columns
                 data = content.get('data', None)
                 if data:
                     if key in [Candidate.Currency.name, Job.Currency.name]:
@@ -94,6 +99,7 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
             for record in databaseData["records"]:
                 jobs.append(Job(Database=newDatabase, **parseRecord(record)))
             db.session.add_all(jobs)
+
         # ===========================
 
         databaseData = data.get('newDatabase')
@@ -168,11 +174,10 @@ def getJob(jobID):
         return Callback(False, 'Could not retrieve the job.')
 
 
-
 # Get All
 def getAllCandidates(dbID, page) -> dict:
     try:
-        result = db.session.query(Candidate)\
+        result = db.session.query(Candidate) \
             .filter(Candidate.DatabaseID == dbID) \
             .paginate(page=page, error_out=False, per_page=100)
 
@@ -212,7 +217,6 @@ def getAllJobs(dbID, page) -> dict:
         raise Exception('Error: getAllJobs()')
 
 
-
 # ----- Deletion ----- #
 def deleteDatabase(databaseID, companyID) -> Callback:
     try:
@@ -244,18 +248,33 @@ def scan(session, assistantHashID):
 
         # Scan database for solutions based on database type
         if databaseType == enums.DatabaseType.Candidates:
-            return scanCandidates(session, [d[0] for d in databases])
+            extraCandidates = getCRMData(assistant, "candidates", session)
+            return scanCandidates(session, [d[0] for d in databases], extraCandidates)
         elif databaseType == enums.DatabaseType.Jobs:
-            return scanJobs(session, [d[0] for d in databases])
+            extraCandidates = getCRMData(assistant, "jobs", session)
+            return scanJobs(session, [d[0] for d in databases], extraCandidates)
         else:
             return Callback(False, "Database type is not recognised", None)
-
-
 
     except Exception as exc:
         print("databases_service.scan() ERROR: ", exc)
         logging.error("databases_service.scan(): " + str(exc))
         return Callback(False, 'Error while scanning the database')
+
+
+def getCRMData(assistant, scanEntity, session):
+    # check CRM
+    if assistant.CRM:
+        crm_data_callback = None
+        if scanEntity is "jobs":
+            crm_data_callback = crm_services.searchJobs(assistant, session)
+        elif scanEntity is "candidates":
+            crm_data_callback = crm_services.searchCandidates(assistant, session)
+
+        if crm_data_callback.Success:
+            return crm_data_callback.Data
+
+    return None
 
 
 # Data analysis using Pandas library
@@ -264,20 +283,19 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
 
         df = pandas.read_sql(db.session.query(Candidate).filter(Candidate.DatabaseID.in_(dbIDs)).statement,
                              con=db.session.bind)
-        df = df.drop('DatabaseID', axis=1) # Drop column
+        df = df.drop('DatabaseID', axis=1)  # Drop column
 
         keywords = session['keywordsByDataType']
-        df['Score'] = 0 # Add column for tracking score
-        df['Source'] = "Internal Database" # Source of solution e.g. Bullhorn, Adapt...
-
+        df['Score'] = 0  # Add column for tracking score
+        df['Source'] = "Internal Database"  # Source of solution e.g. Bullhorn, Adapt...
 
         if extraCandidates:
-            df = df.append(extraCandidates, ignore_index=True)
+            df = df.append(extraCandidates, ignore_index=True)  # TODO
 
         def wordsCounter(dataType: DT, dbColumn, x=1):
             if keywords.get(dataType.value['name']):
                 df['Score'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
-                                                           flags=re.IGNORECASE) | 0
+                                                               flags=re.IGNORECASE) | 0
 
         def greaterCounter(dataType: DT, dbColumn, plus=1):
             if keywords.get(dataType.value['name']):
@@ -315,16 +333,14 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         # Availability
         wordsCounter(DT.CandidateAvailability, Candidate.CandidateAvailability)
 
-
-        topResults = json.loads(df[df['Score']>0].nlargest(session.get('showTop', 2), 'Score')
+        topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 2), 'Score')
                                 .to_json(orient='records'))
 
-        data = [] # List of candidates
+        data = []  # List of candidates
         location = ["Their preferred location for work would be [location].",
                     "They prefer to work in [location]."]
         yearsExp = ["This candidate has [yearsExp] years of experience in  [skills].",
                     "They have experience with [skills] for [yearsExp] years."]
-
 
         indexes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
         for i, record in enumerate(topResults):
@@ -363,11 +379,11 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
         df = pandas.read_sql(db.session.query(Job).filter(Job.DatabaseID.in_(dbIDs)).statement,
                              con=db.session.bind)
-        df = df.drop('DatabaseID', axis=1) # Drop column
+        df = df.drop('DatabaseID', axis=1)  # Drop column
 
         keywords = session['keywordsByDataType']
-        df['Score'] = 0 # Add column for tracking score
-        df['Source'] = "Internal Database" # Source of solution e.g. Bullhorn, Adapt...
+        df['Score'] = 0  # Add column for tracking score
+        df['Source'] = "Internal Database"  # Source of solution e.g. Bullhorn, Adapt...
 
         if extraJobs:
             df = df.append(extraJobs, ignore_index=True)
@@ -410,18 +426,15 @@ def scanJobs(session, dbIDs, extraJobs=None):
         wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, 3)
 
         # Results
-        topResults = json.loads(df[df['Score']>0].nlargest(session.get('showTop', 0), 'Score')
+        topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 0), 'Score')
                                 .to_json(orient='records'))
-
-
 
         jobType = ["This role is a [jobType]", "This job is a [jobType]"]
         location = [" located in [location]. "]
         requiredYearsSkills = ["It requires [yearsRequired] year(s) with [essentialSkills]. ",
-                          "This role requires [yearsRequired] year(s) with [essentialSkills]. "]
+                               "This role requires [yearsRequired] year(s) with [essentialSkills]. "]
         desiredSkills = ["Candidates who also have experience with [desirableSkills] are highly desired.",
                          "Desirable skills include [desirableSkills]."]
-
 
         data = []
         for record in topResults:
@@ -443,12 +456,12 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
             if record[Job.JobDesiredSkills.name]:
                 desc.append(random.choice(desiredSkills).replace("[desirableSkills]",
-                                                           record[Job.JobDesiredSkills.name]))
+                                                                 record[Job.JobDesiredSkills.name]))
 
             # Build job subtitles
             subTitles = []
             if record[Job.JobLocation.name]:
-               subTitles.append("Location: " + record[Job.JobLocation.name])
+                subTitles.append("Location: " + record[Job.JobLocation.name])
             if record[Job.JobEssentialSkills.name]:
                 subTitles.append("Essential Skills: " + record[Job.JobEssentialSkills.name])
 
@@ -468,7 +481,6 @@ def scanJobs(session, dbIDs, extraJobs=None):
         print("scanJobs() ERROR: ", exc)
         logging.error("databases_service.scanJobs(): " + str(exc))
         return Callback(False, 'Error while search the database for matches!')
-
 
 
 def createPandaCandidate(id, name, email, mobile, location, skills,
@@ -513,12 +525,12 @@ def createPandaJob(id, title, desc, location, type, salary: float, essentialSkil
 
 
 def getOptions() -> Callback:
-    options =  {
-        'types': [dt.name for dt in enums.DatabaseType ],
-        enums.DatabaseType.Candidates.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
+    options = {
+        'types': [dt.name for dt in enums.DatabaseType],
+        enums.DatabaseType.Candidates.name: [{'column': c.key, 'type': str(c.type), 'nullable': c.nullable}
                                              for c in Candidate.__table__.columns
                                              if (c.key != 'ID' and c.key != 'DatabaseID')],
-        enums.DatabaseType.Jobs.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
+        enums.DatabaseType.Jobs.name: [{'column': c.key, 'type': str(c.type), 'nullable': c.nullable}
                                        for c in Job.__table__.columns
                                        if (c.key != 'ID' and c.key != 'DatabaseID')],
         'currencyCodes': ['GBP', 'USD', 'EUR', 'AED', 'CAD']
@@ -541,13 +553,10 @@ def test():
     # r2 = json.loads(r)
     # print(r2['f'])
 
-
-    d = {"f":"g"}
+    d = {"f": "g"}
     e = helpers.encrypt(d, isDict=True)
     print(e)
     # r = helpers.decrypt(e, isDict=True)
     # print(r['f'])
 
-    print(helpers.decrypt(e,True, True))
-
-
+    print(helpers.decrypt(e, True, True))

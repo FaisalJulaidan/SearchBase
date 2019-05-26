@@ -79,6 +79,7 @@ def retrieveRestToken(auth, companyID):
     try:
         authCopy = dict(auth)
         headers = {'Content-Type': 'application/json'}
+
         # check if refresh_token exists
         # if it does use it to generate access_token and refresh_token
         if authCopy.get("refresh_token"):
@@ -86,8 +87,7 @@ def retrieveRestToken(auth, companyID):
                   authCopy.get("refresh_token") + \
                   "&client_id=" + authCopy.get("client_id") + \
                   "&client_secret=" + authCopy.get("client_secret")
-
-            get_access_token = requests.put(url, headers=headers)
+            get_access_token = requests.post(url, headers=headers)
             if get_access_token.ok:
                 result_body = json.loads(get_access_token.text)
                 authCopy["access_token"] = result_body.get("access_token")
@@ -130,22 +130,26 @@ def retrieveRestToken(auth, companyID):
 
 
 # create query url and also tests the BhRestToken to see if it still valid, if not it generates a new one and new url
-def sendQuery(auth, query, method, body, companyID):
+def sendQuery(auth, query, method, body, companyID, optionalParams: list = []):
     try:
-        # set up initial url
-        url = auth.get("rest_url", "https://rest91.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
-              "?BhRestToken=" + auth.get("rest_token", "none")
+        # get url
+        url = build_url(auth, query, optionalParams)
+        print("url 1: ", url)
+        # set headers
         headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
         r = send_request(url, method, headers, json.dumps(body))
+        print("r.text 1: ", r.text)
 
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
-                url = callback.Data.get("rest_url", "") + query + "?BhRestToken=" + callback.Data.get("rest_token", "")
+                url = build_url(callback.Data, query, optionalParams)
+                print("url 2: ", url)
 
                 r = send_request(url, method, headers, json.dumps(body))
+                print("r.text 2: ", r.text)
                 if not r.ok:
                     raise Exception(r.text + ". Query could not be sent")
             else:
@@ -160,6 +164,17 @@ def sendQuery(auth, query, method, body, companyID):
         return Callback(False, str(exc))
 
 
+def build_url(rest_data, query, optionalParams):
+    # set up initial url
+    url = rest_data.get("rest_url", "https://rest91.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
+          "?BhRestToken=" + rest_data.get("rest_token", "none")
+    # add additional params
+    for param in optionalParams:
+        url += "&" + param
+    # return the url
+    return url
+
+
 def send_request(url, method, headers, data):
     test = None
     if method is "put":
@@ -170,18 +185,18 @@ def send_request(url, method, headers, data):
         test = requests.get(url, headers=headers, data=data)
     return test
 
-
+# put as much as possible TODO
 def insertCandidate(auth, session: Conversation) -> Callback:
     try:
         # New candidate details
         body = {
             "name": " ".join(
-                session.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [])),
+                session.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [""])),
             "mobile":
                 session.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [""])[0],
             "address": {
                 "city": " ".join(
-                    session.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [])),
+                    session.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [""])),
             },
             # check number of emails and submit them
             "email": session.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [""])[0],
@@ -269,4 +284,76 @@ def insertCompany(auth, session: Conversation) -> Callback:
 
     except Exception as exc:
         logging.error("CRM.Bullhorn.insertCompany() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def searchCandidates(auth, companyID, session) -> Callback:
+    try:
+        query = "query=*:*"
+        keywords = session['keywordsByDataType']
+        # print("keywords: ", keywords)
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
+                                                 ["fields=*", query, "count=99999999"])
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return_body = json.loads(sendQuery_callback.Data.text)
+        print("return_body: ", return_body)
+        result = []
+        # not found match for Company Name, Years Experience, Job Title, CV, Linkdin URL
+        for record in return_body["data"]:
+            tempRecord = {}
+            tempRecord["id"] = record.get("id", "")
+            tempRecord["Candidate Name"] = record.get("name")
+            tempRecord["Candidate Email"] = record.get("email")
+            tempRecord["Candidate Mobile"] = record.get("mobile")
+            tempRecord["Candidate Availability"] = record.get("status")
+            tempRecord["Candidate Location"] = record.get("address", {}).get("city")
+            tempRecord["Candidate Skills"] = record.get("primarySkills", {}).get("data")
+            tempRecord["Candidate Education"] = record.get("educations", {}).get("data")
+            tempRecord["Candidate Desired Salary"] = record.get("dayRate", 0) * 365
+            if tempRecord["Candidate Desired Salary"] == 0:
+                tempRecord["Candidate Desired Salary"] = None
+            result.append(tempRecord)
+        print("result: ", result)
+
+        return Callback(True, sendQuery_callback.Message, result)
+
+    except Exception as exc:
+        print(exc)
+        logging.error("CRM.Bullhorn.getAllCandidates() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def getAllCandidates(auth, companyID) -> Callback:
+    try:
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "departmentCandidates", "get", {}, companyID, ["fields=*"])
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return_body = json.loads(sendQuery_callback.Data.text)
+
+        return Callback(True, sendQuery_callback.Message, return_body)
+
+    except Exception as exc:
+        logging.error("CRM.Bullhorn.getAllCandidates() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def getAllJobs(auth, companyID) -> Callback:
+    try:
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "departmentJobOrders", "get", {}, companyID, ["fields=*"])
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return_body = json.loads(sendQuery_callback.Data.text)
+
+        return Callback(True, sendQuery_callback.Message, return_body)
+
+    except Exception as exc:
+        logging.error("CRM.Bullhorn.getAllJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))

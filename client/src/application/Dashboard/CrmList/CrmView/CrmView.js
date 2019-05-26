@@ -107,7 +107,7 @@ class CrmView extends React.Component {
         return (
             <NoHeaderPanel>
                 <div className={styles.Title}>
-                    <Avatar shape="square" size={80}
+                    <Avatar shape="square"
                             src={this.state.CRM.image}
                             className={styles.Avatar}/>
                     <div className={styles.DetailsWithAvatar}>
@@ -116,8 +116,8 @@ class CrmView extends React.Component {
                             Bond Adapt, specialist portfolio of recruitment software applications has earned a
                             reputation for increasing business growth and profitability throughout the global staffing
                             market. 100% configurable and fully scalable, Adapt manages the entire placement cycle and
-                            is chosen by leading recruitment organisations including <Text code>Hays</Text>,
-                            <Text code>Adecco</Text> and <Text code>Michael Page</Text> .
+                            is chosen by leading recruitment organisations including Hays,
+                            Adecco and Michael Page.
                         </Paragraph>
                     </div>
                 </div>

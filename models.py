@@ -51,6 +51,31 @@ mutable.MutableDict.associate_with(JsonEncodedDict)
 
 # ============= Models ===================
 
+class Task(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    ApschedulerJobID1 = db.Column(db.VARCHAR(200), db.ForeignKey('apscheduler_jobs.id'), nullable=True, unique=True)
+    ApschedulerJob1 = db.relationship('ApschedulerJobs', foreign_keys=[ApschedulerJobID1], back_populates='ApschedulerJoba')
+
+    ApschedulerJobID2 = db.Column(db.VARCHAR(200), db.ForeignKey('apscheduler_jobs.id'), nullable=True, unique=True)
+    ApschedulerJob2 = db.relationship('ApschedulerJobs', foreign_keys=[ApschedulerJobID2], back_populates='ApschedulerJobb')
+
+    def __repr__(self):
+        return '<Task {}>'.format(self.ApschedulerJobID)
+
+
+# a hidden table was made by APScheduler being redefined to be able use foreign keys
+class ApschedulerJobs(db.Model):
+    id = db.Column(db.VARCHAR(200), primary_key=True)
+    next_run_time = db.Column(db.REAL)
+    job_state = db.Column(db.BLOB)
+
+    ApschedulerJoba = db.relationship('Task', back_populates='ApschedulerJob1', cascade="all, delete, delete-orphan")
+    ApschedulerJobb = db.relationship('Task', back_populates='ApschedulerJob2', cascade="all, delete, delete-orphan")
+
+
+
 class Company(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(80), nullable=False)
@@ -63,7 +88,7 @@ class Company(db.Model):
     Assistants = db.relationship('Assistant', back_populates='Company', cascade="all, delete, delete-orphan")
     Databases = db.relationship('Database', back_populates='Company', cascade="all, delete, delete-orphan")
     Roles = db.relationship('Role', back_populates='Company', cascade="all, delete, delete-orphan")
-    CRM = db.relationship('CRM', back_populates='Company', cascade="all, delete, delete-orphan")
+    CRMs = db.relationship('CRM', back_populates='Company', cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)
@@ -98,7 +123,6 @@ class User(db.Model):
 
     RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
     Role = db.relationship('Role', back_populates='Users')
-
 
 
     # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
@@ -167,7 +191,7 @@ class CRM(db.Model):
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
-    Company = db.relationship('Company', back_populates='CRM')
+    Company = db.relationship('Company', back_populates='CRMs')
 
     Assistants = db.relationship('Assistant', back_populates='CRM')
 

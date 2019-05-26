@@ -8,11 +8,11 @@ from services.mail_services import mail
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from sqlalchemy_utils import create_database, database_exists
-from flask_apscheduler import APScheduler
 from services.auth_services import jwt
 from utilities import helpers, tasks
 from flask_babel import Babel
-from services import stored_file_services
+
+from services.scheduler_services import scheduler
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router,\
@@ -63,7 +63,7 @@ db.app = app
 migrate_var = Migrate(app, db)
 manager = Manager(app)
 babel = Babel(app)
-scheduler = APScheduler()
+# scheduler = APScheduler()
 manager.add_command('db', MigrateCommand)
 
 
@@ -82,7 +82,6 @@ if os.environ['FLASK_ENV'] == 'production':
     jwt.init_app(app)
     db.init_app(app)
     mail.init_app(app)
-    scheduler.init_app(app)
     app.app_context().push()
 
     if not database_exists(url):
@@ -91,7 +90,7 @@ if os.environ['FLASK_ENV'] == 'production':
         db.create_all()
         helpers.seed()
 
-    scheduler.start()
+    # scheduler.start()
     print('Production mode running...')
 
 elif os.environ['FLASK_ENV'] == 'development':
@@ -102,7 +101,6 @@ elif os.environ['FLASK_ENV'] == 'development':
     jwt.init_app(app)
     db.init_app(app)
     mail.init_app(app)
-    scheduler.init_app(app)
 
     url = os.environ['SQLALCHEMY_DATABASE_URI']  # get database URL
     if os.environ['REFRESH_DB_IN_DEV'] == 'yes':

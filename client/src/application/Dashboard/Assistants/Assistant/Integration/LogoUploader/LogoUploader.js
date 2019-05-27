@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
-import {authHeader, http} from 'helpers'
 import {croppedImg} from 'helpers/cropImage'
 
-import {Icon, Modal, Upload} from 'antd';
+import {Button, Card, Icon, Modal, Upload} from 'antd';
 import Cropper from 'react-easy-crop'
 import styles from './LogoUploader.module.less'
+import connect from "react-redux/es/connect/connect";
+import {assistantActions} from "store/actions";
 
 const Dragger = Upload.Dragger;
 
@@ -21,13 +22,15 @@ class LogoUploader extends Component {
 
         croppedAreaPixels: null,
         croppedImage: null,
+
+        timeStamp: new Date().getTime()
     };
 
     componentDidMount() {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({assistant: nextProps.assistant});
+        this.setState({assistant: nextProps.assistant, timeStamp: nextProps.msg});
     }
 
 
@@ -43,10 +46,7 @@ class LogoUploader extends Component {
         const croppedImage = await croppedImg(this.state.imageSrc, this.state.croppedAreaPixels, this.state.mainFile.name);
         const formData = new FormData();
         formData.append('file', croppedImage);
-        http.post(
-            `http://localhost:3000/api/assistant/${this.state.assistant?.ID}/logo`,
-            formData
-        );
+        this.props.dispatch(assistantActions.uploadLogo(this.state.assistant?.ID, formData));
         this.setState({visible: false});
     };
 
@@ -63,26 +63,29 @@ class LogoUploader extends Component {
         }
     };
 
+    deleteLogo = () => this.props.dispatch(assistantActions.deleteLogo(this.state.assistant?.ID));
+
     render() {
         // Warning: Auth leakage
         const props = {
             name: 'file',
-            action: `http://localhost:3000/api/assistant/${this.state.assistant?.ID}/logo`,
-            headers: {
-                ...authHeader()
-            },
             beforeUpload: file => {
                 this.onFileChange(file);
                 this.setState({visible: true});
 
                 return false;
             },
+            multiple: false,
+            accept: 'image/png',
+            showUploadList: false
         };
+        const {assistant} = this.props;
 
         return (
             <div>
 
                 <div style={{width: 300}}>
+                    <h4>Logo uploader</h4>
                     <Dragger {...props}>
                         <p className="ant-upload-drag-icon">
                             <Icon type="inbox"/>
@@ -93,6 +96,22 @@ class LogoUploader extends Component {
                             band files
                         </p>
                     </Dragger>
+
+                    {
+                        assistant?.LogoName ?
+                            <div>
+                                <h4>The current logo</h4>
+                                <Card hoverable
+                                      style={{width: 300, textAlign: 'center'}}
+                                      cover={<img alt="example"
+                                                  src={`https://tsb.ams3.digitaloceanspaces.com/testing/chatbot_logos/${assistant?.LogoName}?timestamp=${this.state.timeStamp}`}/>}
+                                >
+                                    <Button type={'danger'} onClick={() => this.deleteLogo()}>Delete</Button>
+                                </Card>
+                            </div>
+                            :
+                            null
+                    }
                 </div>
 
                 <Modal title="Basic Modal"
@@ -120,11 +139,14 @@ class LogoUploader extends Component {
 
 function readFile(file) {
     return new Promise(resolve => {
-        const reader = new FileReader()
+        const reader = new FileReader();
         reader.addEventListener('load', () => resolve(reader.result), false)
         reader.readAsDataURL(file)
     })
 }
 
 
-export default LogoUploader;
+const mapStateToProps = (state) => ({
+    msg: state.assistant.successMsg,
+});
+export default connect(mapStateToProps)(LogoUploader);

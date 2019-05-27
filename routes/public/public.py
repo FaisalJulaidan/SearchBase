@@ -48,8 +48,7 @@ def dashboard(path):
     return serve(path)
 
 
-# ============================================
-
+# ======== Static Pages =========== #
 
 @public_router.route("/", methods=['GET'])
 def index_page():
@@ -155,7 +154,7 @@ def sendEmail():
         mail.send(msg)
         return render_template("index.html")
 
-
+# Account verification route
 @public_router.route("/account/verify/<payload>", methods=['GET'])
 def verify_account(payload):
     if request.method == "GET":
@@ -170,3 +169,18 @@ def verify_account(payload):
         except Exception as e:
             print(e)
             return redirect("/login")
+
+
+# Set Candidate meeting routes
+@public_router.route("/candidate-meeting/<payload>", methods=['GET', 'POST'])
+def candidate_meeting(payload):
+    if request.method == "GET":
+        data = helpers.verificationSigner.loads(payload, salt='email-confirm-key')
+        email = data.split(";")[0]
+        user_callback: Callback = user_services.verifyByEmail(email)
+        if not user_callback.Success: raise Exception(user_callback.Message)
+
+        return redirect("/login")
+
+    if request.method == "POST":
+        data = request.json

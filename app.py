@@ -3,7 +3,7 @@ import os
 import config
 from flask import Flask, render_template
 from flask_api import status
-from models import db, Task
+from models import db
 from services.mail_services import mail
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
@@ -109,17 +109,17 @@ elif os.environ['FLASK_ENV'] == 'development':
         db.create_all()
         helpers.gen_dummy_data()
 
-    job = scheduler.add_job(func=tasks.printSomething, trigger='interval', seconds=5,
-                            id="3559a1946b52419899e8841d4317d194", replace_existing=True)
-    # job = scheduler.get_job("3559a1946b52419899e8841d4317d194")
-
-
-    scheduler.start()
-    task: Task = Task(ApschedulerJobID1="3559a1946b52419899e8841d4317d194")
-    db.session.add(task)
-    print(task.ApschedulerJobID1)
-    db.session.commit()
-    scheduler.reschedule_job(job_id="3559a1946b52419899e8841d4317d194",trigger='interval', seconds=10)
+    # job = scheduler.add_job(func=tasks.printSomething, trigger='interval', seconds=5,
+    #                         id="3559a1946b52419899e8841d4317d194", replace_existing=True)
+    # # job = scheduler.get_job("3559a1946b52419899e8841d4317d194")
+    #
+    #
+    # scheduler.start()
+    # task: Task = Task(ApschedulerJobID1="3559a1946b52419899e8841d4317d194")
+    # db.session.add(task)
+    # print(task.ApschedulerJobID1)
+    # db.session.commit()
+    # scheduler.reschedule_job(job_id="3559a1946b52419899e8841d4317d194",trigger='interval', seconds=10)
 
     print('Development mode running...')
 

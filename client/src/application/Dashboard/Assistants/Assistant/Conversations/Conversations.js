@@ -138,7 +138,7 @@ class Conversations extends React.Component {
             // Conversations Page Base Table
             dataRecord = [record["ID"], record["UserType"], this.findUserName(record["Data"]["keywordsByDataType"],
                 record["UserType"] ), record["QuestionsAnswered"], record["SolutionsReturned"],
-                record["TimeSpent"], record["DateTime"], record["Score"] * 100 + "%", record["Status"]];
+                record["TimeSpent"], record["DateTime"], record["Score"] * 100 + "%", record["ApplicationStatus"]];
 
             // Conversation Questions and Answers   ex. "What is your name? : Bob House (Name)"
             recordData = record["Data"]["collectedData"];
@@ -284,9 +284,9 @@ class Conversations extends React.Component {
             }
 
         }, {
-            title: 'Status',
-            dataIndex: 'Status',
-            key: 'Status',
+            title: 'Application Status',
+            dataIndex: 'ApplicationStatus',
+            key: 'ApplicationStatus',
             // filters: [
             //     {text: 'Completed', value: 'Completed'},
             //     {text: 'Incomplete', value: 'Incomplete'},
@@ -321,7 +321,7 @@ class Conversations extends React.Component {
 
                 return (
                     <Popover placement="top" title="Change status?" content={content} trigger="hover">
-                        {this.buildStatusBadge(record.Status)}
+                        {this.buildStatusBadge(record.ApplicationStatus)}
                     </Popover>
                 )
             },

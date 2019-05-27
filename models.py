@@ -12,7 +12,7 @@ from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
 from sqlalchemy_utils import EncryptedType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
-
+from sqlalchemy.orm.interfaces import MapperExtension, SessionExtension
 
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
@@ -50,31 +50,6 @@ mutable.MutableDict.associate_with(JsonEncodedDict)
 
 
 # ============= Models ===================
-
-class Task(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-
-    ApschedulerJobID1 = db.Column(db.VARCHAR(200), db.ForeignKey('apscheduler_jobs.id'), nullable=True, unique=True)
-    ApschedulerJob1 = db.relationship('ApschedulerJobs', foreign_keys=[ApschedulerJobID1], back_populates='ApschedulerJoba')
-
-    ApschedulerJobID2 = db.Column(db.VARCHAR(200), db.ForeignKey('apscheduler_jobs.id'), nullable=True, unique=True)
-    ApschedulerJob2 = db.relationship('ApschedulerJobs', foreign_keys=[ApschedulerJobID2], back_populates='ApschedulerJobb')
-
-    def __repr__(self):
-        return '<Task {}>'.format(self.ApschedulerJobID)
-
-
-# a hidden table was made by APScheduler being redefined to be able use foreign keys
-class ApschedulerJobs(db.Model):
-    id = db.Column(db.VARCHAR(200), primary_key=True)
-    next_run_time = db.Column(db.REAL)
-    job_state = db.Column(db.BLOB)
-
-    ApschedulerJoba = db.relationship('Task', back_populates='ApschedulerJob1', cascade="all, delete, delete-orphan")
-    ApschedulerJobb = db.relationship('Task', back_populates='ApschedulerJob2', cascade="all, delete, delete-orphan")
-
-
 
 class Company(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
@@ -152,7 +127,9 @@ class Role(db.Model):
         return '<Role {}>'.format(self.Name)
 
 
+
 class Assistant(db.Model):
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     Flow = db.Column(MagicJSON, nullable=True)
@@ -182,6 +159,25 @@ class Assistant(db.Model):
 
     def __repr__(self):
         return '<Assistant {}>'.format(self.Name)
+
+
+# class AutoPilot(db.Model):
+#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+#
+#     AcceptanceAutoPilot = db.Column(db.Boolean, nullable=False, default=False)
+#     AcceptanceScore = db.Column(db.Float(), nullable=False, default=1)
+#
+#     RejectionAutoPilot = db.Column(db.Boolean, nullable=False, default=False)
+#     RejectionScore = db.Column(db.Float(), nullable=False, default=0.05)
+#
+#     AppointmentsAutoPilot = db.Column(db.Boolean, nullable=False, default=False)
+#
+#     # Relationships:
+#     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+#     Assistant = db.relationship('Assistant', back_populates='Conversations')
+#
+#     def __repr__(self):
+#         return '<AutoPilot {}>'.format(self.ID)
 
 
 class CRM(db.Model):
@@ -254,10 +250,13 @@ class Conversation(db.Model):
     SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
     QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
     UserType = db.Column(Enum(enums.UserType), nullable=False)
+
     Completed = db.Column(db.Boolean, nullable=False, default=True)
-    Status = db.Column(Enum(enums.ConversationStatus), nullable=False, default=enums.ConversationStatus.Pending)
+    ApplicationStatus = db.Column(Enum(enums.ApplicationStatus), nullable=False, default=enums.ApplicationStatus.Pending)
     Score = db.Column(db.Float(), nullable=False)
 
+    MeetingEmailSentAt = db.Column(db.DateTime(), default=None)
+    MeetingDateTime = db.Column(db.DateTime(), default=None)
 
     CRMSynced = db.Column(db.Boolean, nullable=False, default=False)
     CRMResponse = db.Column(db.String(250), nullable=True)
@@ -274,6 +273,7 @@ class Conversation(db.Model):
 
 # Stored files for conversation
 class StoredFile(db.Model):
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     FilePath = db.Column(db.String(250), nullable=True, default=None)
 
@@ -286,6 +286,7 @@ class StoredFile(db.Model):
 
 
 class Database(db.Model):
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(64), nullable=False)
     Type = db.Column(Enum(enums.DatabaseType), nullable=False)
@@ -351,6 +352,37 @@ class Job(db.Model):
     def __repr__(self):
         return '<Job {}>'.format(self.JobTitle)
 
+# class Task(db.Model):
+#
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#
+#     ApschedulerJobID1 = db.Column(db.VARCHAR(200), db.ForeignKey('apscheduler_jobs.id'), nullable=True, unique=True)
+#     ApschedulerJob1 = db.relationship('ApschedulerJobs', foreign_keys=[ApschedulerJobID1], back_populates='ApschedulerJoba')
+#
+#     ApschedulerJobID2 = db.Column(db.VARCHAR(200), db.ForeignKey('apscheduler_jobs.id'), nullable=True, unique=True)
+#     ApschedulerJob2 = db.relationship('ApschedulerJobs', foreign_keys=[ApschedulerJobID2], back_populates='ApschedulerJobb')
+#
+#     def __repr__(self):
+#         return '<Task {}>'.format(self.ApschedulerJobID)
+#
+#
+# # a hidden table was made by APScheduler being redefined to be able use foreign keys
+# class ApschedulerJobs(db.Model):
+#
+#     __table_args__ = {
+#         'mysql_engine': 'InnoDB',
+#         'mysql_charset': 'utf8'
+#     }
+#
+#     id = db.Column(db.VARCHAR(200), primary_key=True)
+#     next_run_time = db.Column(db.REAL)
+#     job_state = db.Column(db.BLOB)
+#
+#     ApschedulerJoba = db.relationship('Task', back_populates='ApschedulerJob1', cascade="all, delete, delete-orphan")
+#     ApschedulerJobb = db.relationship('Task', back_populates='ApschedulerJob2', cascade="all, delete, delete-orphan")
+
+
+
 
 # =================== Triggers ============================
 
@@ -360,6 +392,7 @@ class Job(db.Model):
 # @event.listens_for(Assistant, 'before_insert')
 # def receive_after_insert(mapper, connection, target):
 #     print("before_insert")
+#     print(mapper)
 #     print(target) # prints Assistant
 
 # @event.listens_for(Conversation, 'before_delete')

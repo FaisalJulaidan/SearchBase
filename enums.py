@@ -17,7 +17,7 @@ class CRM(Enum):
     Bullhorn = 'Bullhorn'
 
 
-class ConversationStatus(Enum):
+class ApplicationStatus(Enum):
     Pending = 'Pending'
     Accepted = 'Accepted'
     Rejected = 'Rejected'

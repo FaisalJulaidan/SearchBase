@@ -17,7 +17,7 @@ import enums, re, os, stripe, gzip, functools, logging, geoip2.webservice
 geoIP = geoip2.webservice.Client(140914, 'cKrqAZ675SPb')
 
 # Signer
-verificationSigner = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
+verificationSigner = URLSafeTimedSerializer(os.environ['SECRET_KEY_TEMP'])
 
 # Configure logging system
 logging.basicConfig(filename='logs/errors.log',
@@ -280,12 +280,12 @@ def gen_dummy_data():
     s1 = Conversation(Data=data, DateTime=datetime.now(),
                       TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
                       UserType=enums.UserType.Candidate, Score= 1,
-                      Status=enums.ConversationStatus.Accepted, Assistant=reader_a)
+                      ApplicationStatus=enums.ApplicationStatus.Accepted, Assistant=reader_a)
     db.session.add(s1)
     db.session.add(Conversation(Data=data, DateTime=datetime.now(),
                                 TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
                                 UserType=enums.UserType.Client, Score= 0.05, Completed=False,
-                                Status=enums.ConversationStatus.Rejected, Assistant=reader_a))
+                                ApplicationStatus=enums.ApplicationStatus.Rejected, Assistant=reader_a))
 
     # add chatbot session in bulk
     for i in range(50):

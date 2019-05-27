@@ -74,7 +74,7 @@ export const conversation = (state = initialState, action) => {
         case actionTypes.UPDATE_CONVERSATION_STATUS_SUCCESS:
             const conversationsCopy2 = {...state.conversations,
                 conversationsList: state.conversations.conversationsList
-                    .map(c => c.ID === action.conversationID ? {...c,Status: action.newStatus}: c)};
+                    .map(c => c.ID === action.conversationID ? {...c,ApplicationStatus: action.newStatus}: c)};
 
             return updateObject(state, {
                 isUpdatingStatus: false,

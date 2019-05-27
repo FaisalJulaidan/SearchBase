@@ -9,7 +9,7 @@ from models import db, Callback, Conversation, Assistant
 from services import assistant_services, stored_file_services, databases_services
 from services.CRM import crm_services
 from utilities import json_schemas, helpers
-from enums import DatabaseType, UserType, ConversationStatus
+from enums import DatabaseType, UserType, ApplicationStatus
 import logging
 
 
@@ -118,7 +118,7 @@ def updateStatus(conversationID, assistantID, newStatus):
     try:
         db.session.query(Conversation)\
             .filter(and_(Conversation.AssistantID == assistantID, Conversation.ID == conversationID))\
-            .update({'Status': ConversationStatus[newStatus] })
+            .update({'ApplicationStatus': ApplicationStatus[newStatus]})
 
         db.session.commit()
         return Callback(True, 'Status updated Successfully')

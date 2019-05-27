@@ -1,7 +1,7 @@
 import {all, put, takeEvery, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {assistantActions, crmActions, flowActions} from "../actions";
-import {errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
+import {destroyMessage, errorHandler, errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
 import * as Sentry from '@sentry/browser';
 
 function* fetchAssistants() {
@@ -149,6 +149,51 @@ function* resetAssistantCRM({assistantID}) {
     }
 }
 
+function* uploadLogo({assistantID, file}) {
+    const defaultMsg = "Can't upload logo";
+    try {
+        loadingMessage('Uploading logo', 0);
+        const res = yield http.post(`/assistant/${assistantID}/logo`, file);
+        destroyMessage();
+        successMessage(res.data?.msg || defaultMsg);
+        yield put(assistantActions.fetchAssistants());
+        yield put(assistantActions.uploadLogoSuccess(new Date().getTime()));
+    } catch (error) {
+        let data = error.response?.data;
+        errorMessage(data.msg || defaultMsg);
+        yield put(assistantActions.uploadLogoFailure(data.msg || defaultMsg));
+        if (!data.msg) errorHandler(error)
+    }
+}
+
+function* deleteLogo({assistantID}) {
+    const defaultMsg = "Can't delete logo";
+    try {
+        loadingMessage('Deleting logo', 0);
+        const res = yield http.delete(`/assistant/${assistantID}/logo`);
+        destroyMessage();
+        successMessage(res.data?.msg || defaultMsg);
+        yield put(assistantActions.fetchAssistants());
+        yield put(assistantActions.deleteLogoSuccess(new Date().getTime()));
+    } catch (error) {
+        let data = error.response?.data;
+        errorMessage(data.msg || defaultMsg);
+        yield put(assistantActions.deleteLogoFailure(data.msg || defaultMsg));
+        if (!data.msg) errorHandler(error)
+    }
+}
+
+
+function* watchDeleteLogo() {
+    yield takeEvery(actionTypes.DELETE_LOGO_REQUEST, deleteLogo)
+}
+
+
+function* watchUploadLogo() {
+    yield takeEvery(actionTypes.UPLOAD_LOGO_REQUEST, uploadLogo)
+}
+
+
 function* watchResetAssistantCrm() {
     yield takeEvery(actionTypes.RESET_ASSISTANT_CRM_REQUEST, resetAssistantCRM)
 }
@@ -191,6 +236,8 @@ export function* assistantSaga() {
         watchUpdateFlow(),
         watchUpdateStatus(),
         watchSelectAssistantCrm(),
-        watchResetAssistantCrm()
+        watchResetAssistantCrm(),
+        watchUploadLogo(),
+        watchDeleteLogo()
     ])
 }

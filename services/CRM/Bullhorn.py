@@ -7,6 +7,7 @@ from sqlalchemy import and_
 
 from enums import DataType as DT
 from models import Callback, Conversation, db, CRM
+from services import databases_services
 
 
 # Bullhorn Notes:
@@ -185,22 +186,39 @@ def send_request(url, method, headers, data):
         test = requests.get(url, headers=headers, data=data)
     return test
 
+
 # put as much as possible TODO
 def insertCandidate(auth, session: Conversation) -> Callback:
     try:
         # New candidate details
+        emails = session.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [""])
+        print("".join(session.Data.get('keywordsByDataType').get(DT.CandidateDesiredSalary.value['name'], [""])))
+        # availability, yearsExperience
         body = {
-            "name": " ".join(
+            "name": "".join(
                 session.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [""])),
             "mobile":
                 session.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [""])[0],
             "address": {
-                "city": " ".join(
+                "city": "".join(
                     session.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [""])),
             },
-            # check number of emails and submit them
-            "email": session.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [""])[0],
+            "email": emails[0],
+            "primarySkills": "".join(session.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [""])),
+            "educations": {
+                "data": session.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [])
+            },
+            "dayRate": str(float(session.Data.get('keywordsByDataType').get(DT.CandidateDesiredSalary.value['name'], [0])[0]) * 365)
         }
+
+        # add additional emails to email2 and email3
+        for email in emails:
+            index = emails.index(email)
+            if index != 0:
+                body["email" + str(index + 1)] = email
+
+        if body.get("dayRate") == 0:
+            body["dayRate"] = None
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", "put", body, session.Assistant.CompanyID)
@@ -208,9 +226,10 @@ def insertCandidate(auth, session: Conversation) -> Callback:
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
-        return Callback(True, sendQuery_callback.Message)
+        return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
+        print(exc)
         logging.error("CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
@@ -227,7 +246,7 @@ def insertClient(auth, session: Conversation) -> Callback:
         if not insertClient_callback.Success:
             raise Exception(insertClient_callback.Message)
 
-        return Callback(True, "Client has been added")
+        return Callback(True, insertClient_callback.Message)
 
     except Exception as exc:
         logging.error("CRM.Bullhorn.insertClient() ERROR: " + str(exc))
@@ -237,6 +256,8 @@ def insertClient(auth, session: Conversation) -> Callback:
 def insertClientContact(auth, session: Conversation, bhCompanyID) -> Callback:
     try:
         # New candidate details
+        emails = session.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [""])
+
         body = {
             "name": " ".join(
                 session.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], [])),
@@ -247,9 +268,15 @@ def insertClientContact(auth, session: Conversation, bhCompanyID) -> Callback:
                     session.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
             },
             # check number of emails and submit them
-            "email": session.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [""])[0],
+            "email": emails[0],
             "clientCorporation": {"id": bhCompanyID}
         }
+
+        # add additional emails to email2 and email3
+        for email in emails:
+            index = emails.index(email)
+            if index != 0:
+                body["email" + str(index + 1)] = email
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "entity/ClientContact", "put", body,
@@ -257,7 +284,7 @@ def insertClientContact(auth, session: Conversation, bhCompanyID) -> Callback:
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
-        return Callback(True, sendQuery_callback.Message)
+        return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
         logging.error("CRM.Bullhorn.insertClientContact() ERROR: " + str(exc))
@@ -289,9 +316,25 @@ def insertCompany(auth, session: Conversation) -> Callback:
 
 def searchCandidates(auth, companyID, session) -> Callback:
     try:
-        query = "query=*:*"
+        query = "query="
         keywords = session['keywordsByDataType']
-        # print("keywords: ", keywords)
+        print("keywords: ", keywords)
+
+        # populate filter
+        if keywords.get(DT.CandidateLocation.value["name"]):
+            query += "address.city:" + "".join(keywords[DT.CandidateLocation.value["name"]]) + " or"
+
+        # if keywords[DT.CandidateSkills.value["name"]]:
+        #     query += "address.city:" + keywords[DT.CandidateSkills.name] + "&"
+
+        if keywords.get(DT.CandidateDesiredSalary.value["name"]):
+            query += " dayRate:" + str((float(keywords[DT.CandidateDesiredSalary.value["name"]]) / 365)) + " or"
+
+        query = query[:-3]
+
+        # check if no conditions submitted
+        if len(query) < 6:
+            query = "query=*:*"
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
@@ -302,28 +345,74 @@ def searchCandidates(auth, companyID, session) -> Callback:
         return_body = json.loads(sendQuery_callback.Data.text)
         print("return_body: ", return_body)
         result = []
-        # not found match for Company Name, Years Experience, Job Title, CV, Linkdin URL
+
         for record in return_body["data"]:
-            tempRecord = {}
-            tempRecord["id"] = record.get("id", "")
-            tempRecord["Candidate Name"] = record.get("name")
-            tempRecord["Candidate Email"] = record.get("email")
-            tempRecord["Candidate Mobile"] = record.get("mobile")
-            tempRecord["Candidate Availability"] = record.get("status")
-            tempRecord["Candidate Location"] = record.get("address", {}).get("city")
-            tempRecord["Candidate Skills"] = record.get("primarySkills", {}).get("data")
-            tempRecord["Candidate Education"] = record.get("educations", {}).get("data")
-            tempRecord["Candidate Desired Salary"] = record.get("dayRate", 0) * 365
-            if tempRecord["Candidate Desired Salary"] == 0:
-                tempRecord["Candidate Desired Salary"] = None
-            result.append(tempRecord)
+            result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
+                                                                  name=record.get("name"),
+                                                                  email=record.get("email"),
+                                                                  mobile=record.get("mobile"),
+                                                                  location=record.get("address", {}).get("city") or "",
+                                                                  skills="".join(
+                                                                      record.get("primarySkills", {}).get("data")),
+                                                                  linkdinURL=None,
+                                                                  availability=record.get("status"),
+                                                                  jobTitle=None,
+                                                                  education="".join(
+                                                                      record.get("educations", {}).get("data")),
+                                                                  yearsExperience=0,
+                                                                  desiredSalary=record.get("dayRate", 0) * 365,
+                                                                  currency=None,
+                                                                  source="Bullhorn"))
         print("result: ", result)
 
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
         print(exc)
-        logging.error("CRM.Bullhorn.getAllCandidates() ERROR: " + str(exc))
+        logging.error("CRM.Bullhorn.searchCandidates() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def searchJobs(auth, companyID, session) -> Callback:
+    try:
+        query = "query=*:*"
+        keywords = session['keywordsByDataType']
+        # print("keywords: ", keywords)
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
+                                                 ["fields=*", query, "count=99999999"])
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return_body = json.loads(sendQuery_callback.Data.text)
+        print("return_body: ", return_body)
+        result = []
+        # not found match for JobLinkURL
+        for record in return_body["data"]:
+            result.append(databases_services.createPandaJob(id=record.get("id"),
+                                                            title=record.get("title"),
+                                                            desc=record.get("publicDescription", "") + " " +
+                                                                 record.get("description", ""),
+                                                            location=record.get("address", {}).get("city"),
+                                                            type=record.get("employmentType"),
+                                                            salary=record.get("salary"),
+                                                            essentialSkills=record.get("skills", {}).get("data"),
+                                                            desiredSkills=None,
+                                                            yearsRequired=record.get("yearsRequired", 0),
+                                                            startDate=record.get("startDate"),
+                                                            endDate=record.get("dateEnd"),
+                                                            linkURL=None,
+                                                            currency=None,
+                                                            source="Bullhorn"))
+
+        print("result: ", result)
+
+        return Callback(True, sendQuery_callback.Message, result)
+
+    except Exception as exc:
+        print(exc)
+        logging.error("CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 

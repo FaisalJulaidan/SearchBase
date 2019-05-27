@@ -246,13 +246,14 @@ def scan(session, assistantHashID):
             .filter(and_(Database.CompanyID == assistant.CompanyID,
                          Database.Type == databaseType)).all()
 
+        # get CRM Data
+        extraRecords = getCRMData(assistant, databaseType.name, session)
+
         # Scan database for solutions based on database type
         if databaseType == enums.DatabaseType.Candidates:
-            extraCandidates = getCRMData(assistant, "candidates", session)
-            return scanCandidates(session, [d[0] for d in databases], extraCandidates)
+            return scanCandidates(session, [d[0] for d in databases], extraRecords)
         elif databaseType == enums.DatabaseType.Jobs:
-            extraCandidates = getCRMData(assistant, "jobs", session)
-            return scanJobs(session, [d[0] for d in databases], extraCandidates)
+            return scanJobs(session, [d[0] for d in databases], extraRecords)
         else:
             return Callback(False, "Database type is not recognised", None)
 
@@ -265,14 +266,10 @@ def scan(session, assistantHashID):
 def getCRMData(assistant, scanEntity, session):
     # check CRM
     if assistant.CRM:
-        crm_data_callback = None
-        if scanEntity is "jobs":
-            crm_data_callback = crm_services.searchJobs(assistant, session)
-        elif scanEntity is "candidates":
-            crm_data_callback = crm_services.searchCandidates(assistant, session)
-
-        if crm_data_callback.Success:
-            return crm_data_callback.Data
+        if scanEntity is "Jobs":
+            return crm_services.searchJobs(assistant, session).Data
+        elif scanEntity is "Candidates":
+            return crm_services.searchCandidates(assistant, session).Data
 
     return None
 
@@ -288,9 +285,9 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         keywords = session['keywordsByDataType']
         df['Score'] = 0  # Add column for tracking score
         df['Source'] = "Internal Database"  # Source of solution e.g. Bullhorn, Adapt...
-
         if extraCandidates:
             df = df.append(extraCandidates, ignore_index=True)  # TODO
+            # print("df: ", df["CandidateLocation"])
 
         def wordsCounter(dataType: DT, dbColumn, x=1):
             if keywords.get(dataType.value['name']):

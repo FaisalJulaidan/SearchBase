@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import styles from './Calendar.module.less'
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Badge, Calendar as AntdCalendar, Col, Divider, Drawer, Icon, Row, Typography} from 'antd';
+import {Badge, Calendar as AntdCalendar, Col, Divider, Icon, Modal, Row, Typography} from 'antd';
 import moment from 'moment';
 import './Calendar.less'
 
@@ -25,13 +25,11 @@ const DescriptionItem = ({title, content}) => (
             color: 'rgba(0,0,0,0.65)',
         }}
     >
-        <p
-            style={{
+        <p style={{
                 marginRight: 8,
                 display: 'inline-block',
                 color: 'rgba(0,0,0,0.85)',
-            }}
-        >
+        }}>
             {title}:
         </p>
         {content}
@@ -46,7 +44,7 @@ class Calendar extends React.Component {
         drawerData: []
     };
 
-    onCloseDrawer = () => this.setState({visible: false, drawerData: []});
+    onCloseDrawer = () => this.setState({visible: false}, () => this.setState({drawerData: []}));
 
     onSelect = value => {
         const x = this.getListData(value);
@@ -132,16 +130,16 @@ class Calendar extends React.Component {
                     </div>
                 </div>
 
-                <div className={styles.Body}>
+                <div>
                     <AntdCalendar value={value} onSelect={this.onSelect} onPanelChange={this.onPanelChange}
                                   dateCellRender={this.dateCellRender} monthCellRender={this.monthCellRender}/>
 
-                    <Drawer title="Basic Drawer"
-                            placement="right"
-                            width={640}
-                            closable={false}
-                            onClose={this.onCloseDrawer}
-                            visible={this.state.visible}>
+                    <Modal title="Basic Drawer"
+                           width={640}
+                           className={'custom_calendar'}
+                           onCancel={this.onCloseDrawer}
+                           onOk={this.onCloseDrawer}
+                           visible={this.state.visible}>
                         {
                             this.state.drawerData.map((i, k) =>
                                 <div key={k}>
@@ -182,7 +180,7 @@ class Calendar extends React.Component {
                                 </div>
                             )
                         }
-                    </Drawer>
+                    </Modal>
                 </div>
             </NoHeaderPanel>
         );

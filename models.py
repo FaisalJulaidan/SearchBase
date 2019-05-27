@@ -164,13 +164,13 @@ class Assistant(db.Model):
 # class AutoPilot(db.Model):
 #     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
 #
-#     AcceptanceAutoPilot = db.Column(db.Boolean, nullable=False, default=False)
+#     ApplicationAcceptance = db.Column(db.Boolean, nullable=False, default=False)
 #     AcceptanceScore = db.Column(db.Float(), nullable=False, default=1)
 #
-#     RejectionAutoPilot = db.Column(db.Boolean, nullable=False, default=False)
+#     ApplicationRejection = db.Column(db.Boolean, nullable=False, default=False)
 #     RejectionScore = db.Column(db.Float(), nullable=False, default=0.05)
 #
-#     AppointmentsAutoPilot = db.Column(db.Boolean, nullable=False, default=False)
+#     SendCandidatesAppointments = db.Column(db.Boolean, nullable=False, default=False)
 #
 #     # Relationships:
 #     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
@@ -179,6 +179,35 @@ class Assistant(db.Model):
 #     def __repr__(self):
 #         return '<AutoPilot {}>'.format(self.ID)
 
+
+class Conversation(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Data = db.Column(MagicJSON, nullable=False)
+    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+    TimeSpent = db.Column(db.Integer, nullable=False, default=0)
+    SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
+    QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
+    UserType = db.Column(Enum(enums.UserType), nullable=False)
+
+    Completed = db.Column(db.Boolean, nullable=False, default=True)
+    ApplicationStatus = db.Column(Enum(enums.ApplicationStatus), nullable=False, default=enums.ApplicationStatus.Pending)
+    Score = db.Column(db.Float(), nullable=False)
+
+    MeetingEmailSentAt = db.Column(db.DateTime(), default=None)
+    MeetingDateTime = db.Column(db.DateTime(), default=None)
+
+    CRMSynced = db.Column(db.Boolean, nullable=False, default=False)
+    CRMResponse = db.Column(db.String(250), nullable=True)
+
+    # Relationships:
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='Conversations')
+
+    StoredFile = db.relationship('StoredFile', uselist=False, back_populates='Conversation')
+
+    def __repr__(self):
+        return '<Conversation {}>'.format(self.Data)
 
 class CRM(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
@@ -240,35 +269,6 @@ class Newsletter(db.Model):
 
     def __repr__(self):
         return '<Newsletters {}>'.format(self.Email)
-
-
-class Conversation(db.Model):
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Data = db.Column(MagicJSON, nullable=False)
-    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
-    TimeSpent = db.Column(db.Integer, nullable=False, default=0)
-    SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
-    QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
-    UserType = db.Column(Enum(enums.UserType), nullable=False)
-
-    Completed = db.Column(db.Boolean, nullable=False, default=True)
-    ApplicationStatus = db.Column(Enum(enums.ApplicationStatus), nullable=False, default=enums.ApplicationStatus.Pending)
-    Score = db.Column(db.Float(), nullable=False)
-
-    MeetingEmailSentAt = db.Column(db.DateTime(), default=None)
-    MeetingDateTime = db.Column(db.DateTime(), default=None)
-
-    CRMSynced = db.Column(db.Boolean, nullable=False, default=False)
-    CRMResponse = db.Column(db.String(250), nullable=True)
-
-    # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='Conversations')
-
-    StoredFile = db.relationship('StoredFile', uselist=False, back_populates='Conversation')
-
-    def __repr__(self):
-        return '<Conversation {}>'.format(self.Data)
 
 
 # Stored files for conversation

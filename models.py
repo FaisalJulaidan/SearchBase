@@ -2,7 +2,7 @@ from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum, event, types
 from sqlalchemy.ext import mutable
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import json
 import enums
@@ -13,7 +13,6 @@ from sqlite3 import Connection as SQLite3Connection
 from sqlalchemy_utils import EncryptedType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 from sqlalchemy.orm.interfaces import MapperExtension, SessionExtension
-
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
@@ -150,6 +149,8 @@ class Assistant(db.Model):
     CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID'))
     CRM = db.relationship('CRM', back_populates='Assistants')
 
+    AutoPilot = db.relationship("AutoPilot", uselist=False, back_populates="Assistant")
+
     Statistics = db.relationship('Statistics', back_populates='Assistant')
     Conversations = db.relationship('Conversation', back_populates='Assistant')
 
@@ -159,25 +160,6 @@ class Assistant(db.Model):
 
     def __repr__(self):
         return '<Assistant {}>'.format(self.Name)
-
-
-# class AutoPilot(db.Model):
-#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-#
-#     ApplicationAcceptance = db.Column(db.Boolean, nullable=False, default=False)
-#     AcceptanceScore = db.Column(db.Float(), nullable=False, default=1)
-#
-#     ApplicationRejection = db.Column(db.Boolean, nullable=False, default=False)
-#     RejectionScore = db.Column(db.Float(), nullable=False, default=0.05)
-#
-#     SendCandidatesAppointments = db.Column(db.Boolean, nullable=False, default=False)
-#
-#     # Relationships:
-#     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-#     Assistant = db.relationship('Assistant', back_populates='Conversations')
-#
-#     def __repr__(self):
-#         return '<AutoPilot {}>'.format(self.ID)
 
 
 class Conversation(db.Model):
@@ -195,7 +177,6 @@ class Conversation(db.Model):
     Score = db.Column(db.Float(), nullable=False)
 
     MeetingEmailSentAt = db.Column(db.DateTime(), default=None)
-    MeetingDateTime = db.Column(db.DateTime(), default=None)
 
     CRMSynced = db.Column(db.Boolean, nullable=False, default=False)
     CRMResponse = db.Column(db.String(250), nullable=True)
@@ -205,9 +186,74 @@ class Conversation(db.Model):
     Assistant = db.relationship('Assistant', back_populates='Conversations')
 
     StoredFile = db.relationship('StoredFile', uselist=False, back_populates='Conversation')
+    SelectedTimeSlot = db.relationship('SelectedTimeSlot', uselist=False, back_populates='Conversation')
 
     def __repr__(self):
         return '<Conversation {}>'.format(self.Data)
+
+
+class AutoPilot(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    AcceptApplications = db.Column(db.Boolean, nullable=False, default=False)
+    AcceptanceScore = db.Column(db.Float(), nullable=False, default=1)
+    RejectApplications = db.Column(db.Boolean, nullable=False, default=False)
+    RejectionScore = db.Column(db.Float(), nullable=False, default=0.05)
+    SendCandidatesAppointments = db.Column(db.Boolean, nullable=False, default=False)
+
+    # Relationships:
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='AutoPilot')
+
+    OpenTimeSlots = db.relationship('OpenTimeSlot', back_populates='AutoPilot')
+    SelectedTimeSlots = db.relationship('SelectedTimeSlot', back_populates='AutoPilot')
+
+
+def __repr__(self):
+        return '<AutoPilot {}>'.format(self.ID)
+
+class OpenTimeSlot(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Day = db.Column(db.Integer, nullable=False)
+    From = db.Column(types.TIME, nullable=False)
+    To = db.Column(types.TIME, nullable=False)
+    Duration = db.Column(db.Integer, nullable=False)
+    Active = db.Column(db.Boolean, nullable=False, default=False)
+
+    # Relationships:
+    AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID', ondelete='cascade'), nullable=False)
+    AutoPilot = db.relationship('AutoPilot', back_populates='OpenTimeSlots')
+
+    # Constraints:
+    __table_args__ = (
+        db.CheckConstraint(db.and_(Day >= 0, Day <= 6)),
+        db.CheckConstraint(From < To),
+        db.CheckConstraint(db.and_(Duration > 0, Duration <= 60)),
+        db.UniqueConstraint('Day','AutoPilotID', name='uix1_open_time_slot'),
+    )
+
+    def __repr__(self):
+        return '<OpenTimeSlot {}>'.format(self.Active)
+
+
+class SelectedTimeSlot(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+
+    # Relationships:
+    ConversationID = db.Column(db.Integer, db.ForeignKey('conversation.ID', ondelete='cascade'), nullable=False)
+    Conversation = db.relationship('Conversation', back_populates='SelectedTimeSlot')
+
+    AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID', ondelete='cascade'), nullable=False)
+    AutoPilot = db.relationship('AutoPilot', back_populates='SelectedTimeSlots')
+
+    # Constraints:
+    __table_args__ = (db.UniqueConstraint('AutoPilotID', 'DateTime', name='uix1_selected_time_slot'),)
+
+
+
 
 class CRM(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)

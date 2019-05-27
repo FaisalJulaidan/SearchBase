@@ -1,7 +1,8 @@
 from flask import json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, Conversation, Database, Candidate, Job, CRM
+from models import db, Role, Company, Assistant, Plan, Conversation, Database, Candidate, Job, CRM,\
+    OpenTimeSlot, AutoPilot, SelectedTimeSlot
 from services import user_services, flow_services
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from enum import Enum
 from hashids import Hashids
 from config import BaseConfig
@@ -277,11 +278,11 @@ def gen_dummy_data():
                                "Availability": ["Only weekend days"],
                                "No Type": ["I am fine thank you"]}
     }
-    s1 = Conversation(Data=data, DateTime=datetime.now(),
+    conversation1 = Conversation(Data=data, DateTime=datetime.now(),
                       TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
                       UserType=enums.UserType.Candidate, Score= 1,
                       ApplicationStatus=enums.ApplicationStatus.Accepted, Assistant=reader_a)
-    db.session.add(s1)
+    db.session.add(conversation1)
     db.session.add(Conversation(Data=data, DateTime=datetime.now(),
                                 TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
                                 UserType=enums.UserType.Client, Score= 0.05, Completed=False,
@@ -320,6 +321,20 @@ def gen_dummy_data():
         "timezone": "GMT",
         "dateFormat": 0,
         "timeFormat": 0}))
+
+    # Add AutoPilot with Open times
+    autoPilot = AutoPilot(Assistant=reader_a)
+    # print(datetime.combine(datetime.now(), time) - timedelta(minutes=15))
+    db.session.add(OpenTimeSlot(Day=5,
+                                From= time(10,30),
+                                To= time(10,32),
+                                Duration=60,
+                                AutoPilot=autoPilot,
+                                ))
+
+    # Add Selected TimeSlot
+    db.session.add(SelectedTimeSlot(DateTime=datetime.now(), Conversation=conversation1, AutoPilot=autoPilot))
+
 
     seed() # will save changes as well
 

@@ -12,7 +12,6 @@ from services.auth_services import jwt
 from utilities import helpers, tasks
 from flask_babel import Babel
 
-from services.scheduler_services import scheduler
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router,\
@@ -108,18 +107,6 @@ elif os.environ['FLASK_ENV'] == 'development':
         db.drop_all()
         db.create_all()
         helpers.gen_dummy_data()
-
-    # job = scheduler.add_job(func=tasks.printSomething, trigger='interval', seconds=5,
-    #                         id="3559a1946b52419899e8841d4317d194", replace_existing=True)
-    # # job = scheduler.get_job("3559a1946b52419899e8841d4317d194")
-    #
-    #
-    # scheduler.start()
-    # task: Task = Task(ApschedulerJobID1="3559a1946b52419899e8841d4317d194")
-    # db.session.add(task)
-    # print(task.ApschedulerJobID1)
-    # db.session.commit()
-    # scheduler.reschedule_job(job_id="3559a1946b52419899e8841d4317d194",trigger='interval', seconds=10)
 
     print('Development mode running...')
 

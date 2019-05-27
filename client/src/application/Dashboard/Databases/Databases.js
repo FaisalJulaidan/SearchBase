@@ -26,6 +26,9 @@ class Databases extends Component {
         this.props.dispatch(databaseActions.getDatabasesList());
     }
 
+    componentWillUnmount() {
+        this.props.dispatch(databaseActions.resetFetchedDatabase())
+    }
 
     showModal = () => this.setState({visible: true});
     hideModal = () => this.setState({visible: false});
@@ -36,6 +39,7 @@ class Databases extends Component {
     updateDatabase = (updatedDatabase, databaseID) => {
         this.props.dispatch(databaseActions.updateDatabase(updatedDatabase, databaseID));
     };
+
     deleteDatabase = deletedDatabase => {
         confirm({
             title: `Delete database confirmation`,
@@ -53,10 +57,6 @@ class Databases extends Component {
     uploadDatabase = newDatabase => this.props.dispatch(databaseActions.uploadDatabase({newDatabase: newDatabase}));
     showDatabaseInfo = (databaseID) => this.props.dispatch(databaseActions.fetchDatabase(databaseID, this.state.pageNumber));
     updatePage = (id, page) => this.setState({pageNumber: page}, () => this.showDatabaseInfo(id));
-
-    componentWillUnmount() {
-        this.props.dispatch(databaseActions.resetFetchedDatabase())
-    }
 
     getRecordsData = records => {
         let x = [];

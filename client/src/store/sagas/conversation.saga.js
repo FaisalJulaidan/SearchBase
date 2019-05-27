@@ -58,14 +58,14 @@ function* watchClearAllConversations() {
 
 function* updateConversationStatus({newStatus, conversationID, assistantID}) {
     try {
-        loadingMessage('Updating status...', 0);
+        loadingMessage('Updating application status...', 0);
         const res = yield http.put(`/assistant/${assistantID}/conversation/${conversationID}/status`,
                                    {newStatus: newStatus});
         yield put(conversationActions.updateConversationStatusSuccess(conversationID, newStatus));
-        successMessage('Status updated');
+        successMessage('Application status updated');
     } catch (error) {
         console.log(error);
-        const msg = "Couldn't update status";
+        const msg = "Couldn't update application status";
         yield put(conversationActions.updateConversationStatusFailure(msg));
         errorMessage(msg);
     }

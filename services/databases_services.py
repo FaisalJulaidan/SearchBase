@@ -526,28 +526,3 @@ def getOptions() -> Callback:
     return Callback(True, '', options)
 
 
-def test():
-    # df = pandas.read_sql(db.session.query(Candidate).filter(Candidate.DatabaseID.in_([1,2])).statement,
-    #                      con=db.session.bind)
-    #
-    # print(df)
-    #
-    # d = {"f":"g"}
-    # s = json.dumps(d)
-    #
-    # a = helpers.encryptor.encrypt(bytes((s.encode('utf-8'))))
-    # # print(helpers.encryptor.decrypt(json.loads(a['f'])))
-    # r = helpers.encryptor.decrypt(bytes('gAAAAABc34DnlnV_xIPtwcMMLH_qZ4JQv36Cdxpg_YgMQ1vw9OjX-yD7QyZ3LAsPTv9XP1EGRB4YoBEUg54s295yy8dOD7BtZw=='.encode('utf-8')))
-    # r2 = json.loads(r)
-    # print(r2['f'])
-
-
-    d = {"f":"g"}
-    e = helpers.encrypt(d, isDict=True)
-    print(e)
-    # r = helpers.decrypt(e, isDict=True)
-    # print(r['f'])
-
-    print(helpers.decrypt(e,True, True))
-
-

@@ -8,16 +8,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 database_router: Blueprint = Blueprint('database_router', __name__, template_folder="../../templates")
 
-@database_router.route("/databases/options", methods=['GET'])
-@jwt_required
-def get_databaseOptions():
-    if request.method == "GET":
-        callback: Callback = databases_services.getOptions()
-        # Return response
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
-        return helpers.jsonResponse(True, 200, "These are the options the database provides.", callback.Data)
-
 
 # Get databases list, and create a new database
 @database_router.route("/databases", methods=['GET', 'POST'])

@@ -99,6 +99,7 @@ def isValidFlow(flow):
         logging.error("flow_service.isValidFlow(): " + str(exc.args))
         return Callback(False, "The submitted Flow doesn't follow the correct format")
 
+
 # Check if the block valid using json_schema.py based on the block's type
 def isValidBlock(block: dict, blockType: str):
     try:

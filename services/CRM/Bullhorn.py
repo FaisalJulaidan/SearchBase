@@ -1,13 +1,15 @@
+import base64
 import json
 import logging
+import os
 import urllib.parse
 
 import requests
 from sqlalchemy import and_
 
 from enums import DataType as DT
-from models import Callback, Conversation, db, CRM
-from services import databases_services
+from models import Callback, Conversation, db, CRM, StoredFile
+from services import databases_services, stored_file_services
 
 
 # Bullhorn Notes:
@@ -131,7 +133,7 @@ def retrieveRestToken(auth, companyID):
 
 
 # create query url and also tests the BhRestToken to see if it still valid, if not it generates a new one and new url
-def sendQuery(auth, query, method, body, companyID, optionalParams: list = []):
+def sendQuery(auth, query, method, body, companyID, optionalParams=None):
     try:
         # get url
         url = build_url(auth, query, optionalParams)
@@ -142,7 +144,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams: list = []):
         # test the BhRestToken (rest_token)
         r = send_request(url, method, headers, json.dumps(body))
         print("r.text 1: ", r.text)
-
+        print("r.code 1: ", r.status_code)
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
@@ -155,7 +157,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams: list = []):
                     raise Exception(r.text + ". Query could not be sent")
             else:
                 raise Exception("Rest token could not be retrieved")
-        elif r.status_code != 400 and r.status_code != 200:  # token correct but no submitted data
+        elif str(r.status_code)[:1] != "2":  # token correct but no submitted data
             raise Exception("Rest url for query is incorrect")
 
         return Callback(True, "Query was successful", r)
@@ -165,13 +167,14 @@ def sendQuery(auth, query, method, body, companyID, optionalParams: list = []):
         return Callback(False, str(exc))
 
 
-def build_url(rest_data, query, optionalParams):
+def build_url(rest_data, query, optionalParams=None):
     # set up initial url
     url = rest_data.get("rest_url", "https://rest91.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
           "?BhRestToken=" + rest_data.get("rest_token", "none")
     # add additional params
-    for param in optionalParams:
-        url += "&" + param
+    if optionalParams:
+        for param in optionalParams:
+            url += "&" + param
     # return the url
     return url
 
@@ -187,28 +190,29 @@ def send_request(url, method, headers, data):
     return test
 
 
-# put as much as possible TODO
-def insertCandidate(auth, session: Conversation) -> Callback:
+def insertCandidate(auth, conversation: Conversation) -> Callback:
     try:
         # New candidate details
-        emails = session.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [""])
-        print("".join(session.Data.get('keywordsByDataType').get(DT.CandidateDesiredSalary.value['name'], [""])))
+        emails = conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [""])
+        print("".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateDesiredSalary.value['name'], [""])))
         # availability, yearsExperience
         body = {
             "name": "".join(
-                session.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [""])),
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [""])),
             "mobile":
-                session.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [""])[0],
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [""])[0],
             "address": {
                 "city": "".join(
-                    session.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [""])),
+                    conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [""])),
             },
             "email": emails[0],
-            "primarySkills": "".join(session.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [""])),
+            "primarySkills": "".join(
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [""])),
             "educations": {
-                "data": session.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [])
+                "data": conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [])
             },
-            "dayRate": str(float(session.Data.get('keywordsByDataType').get(DT.CandidateDesiredSalary.value['name'], [0])[0]) * 365)
+            "dayRate": str(float(
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateDesiredSalary.value['name'], [0])[0]) * 365)
         }
 
         # add additional emails to email2 and email3
@@ -221,7 +225,8 @@ def insertCandidate(auth, session: Conversation) -> Callback:
             body["dayRate"] = None
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", "put", body, session.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", "put", body,
+                                                 conversation.Assistant.CompanyID)
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -234,14 +239,60 @@ def insertCandidate(auth, session: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def insertClient(auth, session: Conversation) -> Callback:
+def uploadFile(auth, storedFile: StoredFile):
+    try:
+        conversation = storedFile.Conversation
+
+        if not conversation.CRMResponse:
+            raise Exception("Can't upload file for record with no CRM Response")
+
+        file_callback = stored_file_services.downloadFile(storedFile.FilePath)
+        if not file_callback.Success:
+            raise Exception(file_callback.Message)
+        file = file_callback.Data
+        file_content = file.get()["Body"].read()
+        file_content = base64.b64encode(file_content).decode('ascii')
+
+        body = {
+            "externalID": storedFile.ID,
+            "fileType": "SAMPLE",
+            "name": "TSB_" + storedFile.FilePath,
+            "fileContent": file_content
+        }
+
+        conversationResponse = json.loads(conversation.CRMResponse)
+        entityID = str(conversationResponse.get("changedEntityId"))
+
+        entity = None
+        print(conversation.UserType.name)
+        print(conversation.UserType.value)
+        if conversation.UserType.value is "Candidate":
+            entity = "Candidate"
+        elif conversation.UserType.value is "Client":
+            entity = "ClientContact"
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "file/" + entity + "/" + entityID,
+                                                 "put", body, conversation.Assistant.CompanyID)
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return Callback(True, sendQuery_callback.Data.text)
+
+    except Exception as exc:
+        print(exc)
+        logging.error("CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def insertClient(auth, conversation: Conversation) -> Callback:
     try:
         # get query url
-        insertCompany_callback: Callback = insertCompany(auth, session)
+        insertCompany_callback: Callback = insertCompany(auth, conversation)
         if not insertCompany_callback.Success:
             raise Exception(insertCompany_callback.Message)
 
-        insertClient_callback: Callback = insertClientContact(auth, session,
+        insertClient_callback: Callback = insertClientContact(auth, conversation,
                                                               insertCompany_callback.Data.get("changedEntityId"))
         if not insertClient_callback.Success:
             raise Exception(insertClient_callback.Message)
@@ -253,19 +304,19 @@ def insertClient(auth, session: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def insertClientContact(auth, session: Conversation, bhCompanyID) -> Callback:
+def insertClientContact(auth, conversation: Conversation, bhCompanyID) -> Callback:
     try:
         # New candidate details
-        emails = session.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [""])
+        emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [""])
 
         body = {
             "name": " ".join(
-                session.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], [])),
+                conversation.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], [])),
             "mobile":
-                session.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'], [""])[0],
+                conversation.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'], [""])[0],
             "address": {
                 "city": " ".join(
-                    session.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
+                    conversation.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
             },
             # check number of emails and submit them
             "email": emails[0],
@@ -280,7 +331,7 @@ def insertClientContact(auth, session: Conversation, bhCompanyID) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "entity/ClientContact", "put", body,
-                                                 session.Assistant.CompanyID)
+                                                 conversation.Assistant.CompanyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -291,17 +342,18 @@ def insertClientContact(auth, session: Conversation, bhCompanyID) -> Callback:
         return Callback(False, str(exc))
 
 
-def insertCompany(auth, session: Conversation) -> Callback:
+def insertCompany(auth, conversation: Conversation) -> Callback:
     try:
         # New candidate details
         body = {
             "name": " ".join(
-                session.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'], ["Undefined Company - TSB"])),
+                conversation.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'],
+                                                                ["Undefined Company - TSB"])),
         }
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "entity/ClientCorporation", "put", body,
-                                                 session.Assistant.CompanyID)
+                                                 conversation.Assistant.CompanyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -314,10 +366,10 @@ def insertCompany(auth, session: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchCandidates(auth, companyID, session) -> Callback:
+def searchCandidates(auth, companyID, conversation) -> Callback:
     try:
         query = "query="
-        keywords = session['keywordsByDataType']
+        keywords = conversation['keywordsByDataType']
         print("keywords: ", keywords)
 
         # populate filter
@@ -373,10 +425,10 @@ def searchCandidates(auth, companyID, session) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchJobs(auth, companyID, session) -> Callback:
+def searchJobs(auth, companyID, conversation) -> Callback:
     try:
         query = "query=*:*"
-        keywords = session['keywordsByDataType']
+        keywords = conversation['keywordsByDataType']
         # print("keywords: ", keywords)
 
         # send query

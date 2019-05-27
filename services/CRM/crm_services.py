@@ -3,7 +3,7 @@ import logging
 from sqlalchemy.sql import and_
 
 from enums import CRM, UserType
-from models import db, Callback, Conversation, Assistant, CRM as CRM_Model
+from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
 from services.CRM import Adapt, Bullhorn, Vincere
 
 
@@ -33,6 +33,12 @@ def insertClient(assistant: Assistant, conversation: Conversation):
         return Bullhorn.insertClient(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Adapt:
         return Adapt.insertClient(assistant.CRM.Auth, conversation)
+
+
+def uploadFile(assistant: Assistant, storedFile: StoredFile):
+    # Check CRM type
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.uploadFile(assistant.CRM.Auth, storedFile)
 
 
 def searchCandidates(assistant: Assistant, session):

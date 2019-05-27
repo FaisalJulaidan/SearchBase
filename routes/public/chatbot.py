@@ -5,6 +5,7 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from models import Callback, db, Conversation
 from services import conversation_services, flow_services, databases_services, stored_file_services, mail_services
+from services.CRM import crm_services
 from utilities import helpers
 import logging
 
@@ -106,10 +107,18 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                 logging.error("Couldn't Save Stored Files Reference For: " + str(filenames))
                 raise Exception(dbRef_callback.Message)
 
+            # Save changes
+            db.session.commit()
+
+            if callback.Data.Assistant.CRM:
+                # Send through CRM
+                sendCRMFile_callback: Callback = crm_services.uploadFile(callback.Data.Assistant, dbRef_callback.Data)
+                if not sendCRMFile_callback:
+                    raise Exception("Could not submit file to CRM")
+
         except Exception as exc:
-            print(exc)
+            print("CHATBOT: ", exc)
 
             return helpers.jsonResponse(False, 404, "Couldn't save the file")
-        # Save changes
-        db.session.commit()
+
         return helpers.jsonResponse(True, 200, "File uploaded successfully!!")

@@ -84,8 +84,8 @@ def uploadFile(file, filename):
         s3 = session.client('s3',
                             region_name='ams3',
                             endpoint_url='https://ams3.digitaloceanspaces.com',
-                            aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
-                            aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
+                            aws_access_key_id=os.environ['PUBLIC_KEY_SPACES'],
+                            aws_secret_access_key=os.environ['SECRET_KEY_SPACES'])
 
         s3.upload_fileobj(file, 'tsb', os.environ['UPLOAD_FOLDER'] + filename)
         return Callback(True, "File uploaded successfully")
@@ -112,9 +112,7 @@ def downloadFile(filename):
         except botocore.exceptions.ClientError as e:
             return Callback(False, "File not found")
 
-
         return Callback(True, "File downloaded successfully", file)
-
 
     except Exception as exc:
         print("stored_file_services.downloadFile() ERROR: ", exc)

@@ -181,6 +181,52 @@ const resetAssistantCRMFailure = (error) => {
 };
 
 
+const uploadLogo = (assistantID, file) => {
+    return {
+        type: actionTypes.UPLOAD_LOGO_REQUEST,
+        assistantID,
+        file
+    };
+};
+
+const uploadLogoSuccess = (msg) => {
+    return {
+        type: actionTypes.UPLOAD_LOGO_SUCCESS,
+        msg
+    };
+};
+
+const uploadLogoFailure = (error) => {
+    return {
+        type: actionTypes.UPLOAD_LOGO_FAILURE,
+        error
+    };
+};
+
+
+const deleteLogo = (assistantID) => {
+    return {
+        type: actionTypes.DELETE_LOGO_REQUEST,
+        assistantID
+    };
+};
+
+const deleteLogoSuccess = (msg) => {
+    return {
+        type: actionTypes.DELETE_LOGO_SUCCESS,
+        msg
+    };
+};
+
+const deleteLogoFailure = (error) => {
+    return {
+        type: actionTypes.DELETE_LOGO_FAILURE,
+        error
+    };
+};
+
+
+
 
 export const assistantActions = {
     fetchAssistants,
@@ -214,5 +260,15 @@ export const assistantActions = {
     resetAssistantCRM,
     resetAssistantCRMSuccess,
     resetAssistantCRMFailure,
+
+    uploadLogo,
+    uploadLogoSuccess,
+    uploadLogoFailure,
+
+    deleteLogo,
+    deleteLogoSuccess,
+    deleteLogoFailure,
+
+
 
 };

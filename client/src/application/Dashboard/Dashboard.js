@@ -14,13 +14,14 @@ import UsersManagement from "./AccountDetails/UsersManagement/UsersManagement";
 import Documentation from "./Documentation/Documentation";
 import Integration from "./Assistants/Assistant/Integration/Integration";
 import Conversations from "./Assistants/Assistant/Conversations/Conversations";
+import Calendar from './Calendar/Calendar'
 import Home from "./Home/Home";
 import Analytics from "./Assistants/Assistant/Analytics/Analytics";
 import {authActions, optionsActions} from "store/actions";
 import {store} from "store/store";
 import {connect} from 'react-redux';
 
-import {TransitionGroup, CSSTransition} from "react-transition-group";
+import {CSSTransition, TransitionGroup} from "react-transition-group";
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
@@ -107,7 +108,8 @@ class Dashboard extends Component {
         }
         // End of User Information
 
-        const isCRMPage = this.props.location.pathname.indexOf("/dashboard/crmlist") > -1;
+        const newLayoutRoutes = ["/dashboard/crmlist", "/dashboard/calendar"];
+        const isNewLyaout = newLayoutRoutes.includes(this.props.location.pathname);
         return (
             <Layout style={{height: '100%'}}>
                 <Sider
@@ -115,7 +117,7 @@ class Dashboard extends Component {
                     collapsible
                     collapsed={this.state.collapsed}
                     style={{
-                        // backgroundColor: isCRMPage ? '#20252e' : ''
+                        // backgroundColor: isNewLyaout ? '#20252e' : ''
                     }}
 
                     className={styles.Sider}>
@@ -133,7 +135,7 @@ class Dashboard extends Component {
                                     <div style={{
                                         lineHeight: '32px',
                                         marginLeft: 18,
-                                        // color: isCRMPage ? 'white' : '#9254de'
+                                        // color: isNewLyaout ? 'white' : '#9254de'
                                         color: "#9254de"
                                     }}>TheSearchBase
                                     </div>
@@ -143,7 +145,7 @@ class Dashboard extends Component {
                     </div>
 
                     <Menu
-                        // theme={isCRMPage ? "dark" : "light"}
+                        // theme={isNewLyaout ? "dark" : "light"}
                         theme={"light"}
                         defaultSelectedKeys={this.state.selectedMenuKey}
                         selectedKeys={location.pathname.split('/')[2] ? [location.pathname.split('/')[2]] : [location.pathname.split('/')[1]]}
@@ -166,6 +168,11 @@ class Dashboard extends Component {
                         <Menu.Item key="crmlist">
                             <Icon type="interation"/>
                             <span>CRMs List</span>
+                        </Menu.Item>
+
+                        <Menu.Item key="calendar">
+                            <Icon type="calendar"/>
+                            <span>Calendar</span>
                         </Menu.Item>
 
                         <Divider/>
@@ -197,7 +204,7 @@ class Dashboard extends Component {
 
                     <Header className={styles.Header}
                             style={
-                                isCRMPage ?
+                                isNewLyaout ?
                                     {
                                         position: 'fixed',
                                         width: `calc(100% - ${this.state.collapsed ? 80 : 200}px)`,
@@ -219,7 +226,7 @@ class Dashboard extends Component {
                     {/*HERE GOES ALL THE ROUTES*/}
 
                     <Content style={
-                        isCRMPage ?
+                        isNewLyaout ?
                             {minHeight: 'auto', marginTop: 64}
                             :
                             {margin: 16, marginTop: 10, marginBottom: 0, height: '100%'}
@@ -240,6 +247,7 @@ class Dashboard extends Component {
                                         <Route path={`${match.path}/crmlist`} component={CrmList} exact/>
                                         <Route path={`${match.path}/crmlist/:crm`} component={CrmView} exact/>
                                         <Route path={`${match.path}/databases`} component={Databases} exact/>
+                                        <Route path={`${match.path}/calendar`} component={Calendar} exact/>
                                         <Route path={`${match.path}/profile`} component={Profile} exact/>
                                         <Route path={`${match.path}/billing`} component={Billing} exact/>
                                         <Route path={`${match.path}/users-management`} component={UsersManagement}

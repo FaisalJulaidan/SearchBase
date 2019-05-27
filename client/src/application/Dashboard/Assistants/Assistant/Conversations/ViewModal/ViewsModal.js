@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Button, Modal, Tabs, Row, Col, Icon, Typography, Badge} from "antd";
-import {http, alertError, loadingMessage, errorMessage, successMessage} from "helpers";
+import {Button, Col, Icon, Modal, Progress, Row, Tabs, Typography} from "antd";
+import {errorMessage, http, loadingMessage, successMessage} from "helpers";
 import saveAs from 'file-saver';
 import Profile from '../Profile/Profile'
 import Conversation from '../Conversation/Conversation'
@@ -98,21 +98,30 @@ class ViewsModal extends Component {
 
 
                 <Row type={'flex'} justify={'center'} style={{marginBottom: '20px'}}>
-                    <Button className={styles.StatusChangeBtn} type="link"
+                    <h4 style={{marginRight: 5}}>Score</h4>
+
+                    <Progress percent={conversation?.Score * 100} size="small" style={{width: '50%'}}
+                              status={conversation?.Score < 0.1 ? "exception" : "active"}/>
+                </Row>
+                <Row type={'flex'} justify={'center'} style={{marginBottom: '20px'}}>
+                    <Button className={styles.StatusChangeBtn}
+                            type={conversation?.Status === "Rejected" ? "link" : "default"}
                             disabled={isUpdatingStatus}
                             onClick={() => updateStatus("Rejected", conversation)}>
                         <Icon type="close-circle" theme="filled"
                               style={{color: "red", fontSize: "18px"}} />
                     </Button>
 
-                    <Button className={styles.StatusChangeBtn} type="link"
+                    <Button className={styles.StatusChangeBtn}
+                            type={conversation?.Status === "Pending" ? "link" : "default"}
                             style={{fontSize: "18px"}}
                             disabled={isUpdatingStatus}
                             onClick={() => updateStatus("Pending", conversation)} >
                         <Icon type="clock-circle"/>
                     </Button>
 
-                    <Button className={styles.StatusChangeBtn} type="link"
+                    <Button className={styles.StatusChangeBtn}
+                            type={conversation?.Status === "Accepted" ? "link" : "default"}
                             disabled={isUpdatingStatus}
                             onClick={() => updateStatus("Accepted", conversation)} >
                         <Icon type="check-circle" theme="filled"

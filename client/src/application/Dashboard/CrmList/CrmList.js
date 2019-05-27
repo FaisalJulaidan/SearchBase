@@ -1,7 +1,7 @@
 import React from 'react';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import AuroraCardAvatar from 'components/AuroraCardAvatar/AuroraCardAvatar'
-import {Spin, Typography} from 'antd';
+import {Spin, Typography,Icon} from 'antd';
 import {connect} from 'react-redux';
 import styles from './CrmList.module.less'
 import {deepClone, getLink, history} from "helpers";
@@ -118,7 +118,7 @@ class CrmList extends React.Component {
             <NoHeaderPanel>
                 <div className={styles.Title}>
                     <div className={styles.Details}>
-                        <Title>CRMs List</Title>
+                        <Title> <Icon type="interation"/> CRMs List</Title>
                         <Paragraph type="secondary">
                             From the list below, choose your CRM or ATS for your account to be directly connected.
                             If you need help with the setup or wish to contact us to arrange an integration with your

@@ -2,11 +2,11 @@ import React from 'react';
 import styles from "./Conversations.module.less"
 import './Conversations.less';
 import ViewsModal from "./ViewModal/ViewsModal";
-import {Button, Modal, Table, Tag, Divider, Badge, Popover, Icon, Progress} from 'antd';
-import {conversationActions} from "../../../../../store/actions";
+import {Badge, Button, Divider, Icon, Modal, Popover, Progress, Table, Tag} from 'antd';
+import {conversationActions} from "store/actions";
 import connect from "react-redux/es/connect/connect";
-import Header from "../../../../../components/Header/Header";
-import {CSVLink, CSVDownload} from "react-csv";
+import Header from "components/Header/Header";
+import {CSVLink} from "react-csv";
 import AutomationModal from "./AutomationModal/AutomationModal";
 
 const confirm = Modal.confirm;
@@ -286,11 +286,8 @@ class Conversations extends React.Component {
             render: (text, record) => {
                 return (
                     <div style={{width: 100}}>
-                        {record.Score < 0.1 ?
-                            <Progress percent={record.Score * 100} size="small" status="exception" />
-                            :
-                            <Progress percent={record.Score * 100} size="small" status="active" />
-                        }
+                        <Progress percent={record.Score * 100} size="small"
+                                  status={record.Score < 0.1 ? "exception" : "active"}/>
                     </div>
                 );
             }

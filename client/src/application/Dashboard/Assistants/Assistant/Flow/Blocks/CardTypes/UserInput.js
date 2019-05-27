@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Card, Divider, Form} from "antd";
-import {getInitialVariables, initActionType, getBlockId, initActionTypeSkip} from './CardTypesHelpers'
+import {getInitialVariables, initActionType, initActionTypeSkip} from './CardTypesHelpers'
 import {
     ActionFormItem,
     AfterMessageFormItem,

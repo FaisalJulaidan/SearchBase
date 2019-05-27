@@ -76,7 +76,7 @@ class Question extends Component {
     });
 
     //Add single answer
-    addAnswer = () => this.props.form.validateFields(['answer', 'action', 'blockToGoID', 'blockToGoIDGroup', 'afterMessage'],
+    addAnswer = () => this.props.form.validateFields(['answer', 'action', 'blockToGoID', 'blockToGoIDGroup', 'afterMessage', 'scoreWeight'],
         (err, values) => {
             if (!err) {
                 const answer = {
@@ -85,7 +85,8 @@ class Question extends Component {
                     keywords: this.state.tags,
                     blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                     action: values.action,
-                    afterMessage: values.afterMessage || ""
+                    afterMessage: values.afterMessage || "",
+                    score: values.scoreWeight || 0
                 };
 
                 // remove old edited answer
@@ -269,7 +270,7 @@ class Question extends Component {
                                 {tags.map((tag) => {
                                     const isLongTag = tag.length > 20;
                                     const tagElem = (
-                                        <Tag key={tag} closable={true} afterClose={() => this.removeTag(tag)}>
+                                        <Tag key={tag} closable={true} onClose={() => this.removeTag(tag)}>
                                             {isLongTag ? `${tag.slice(0, 20)}...` : tag}
                                         </Tag>
                                     );
@@ -298,7 +299,7 @@ class Question extends Component {
                         </FormItem>
 
                         <ScoreFormItem FormItem={FormItem} layout={layout} getFieldDecorator={getFieldDecorator}
-                                       block={{Content: {ID: block.ID, action: this.state.editedAnswer?.action}}}/>
+                                       block={{Content: {ID: block.ID, score: this.state.editedAnswer?.score}}}/>
 
                         <ActionFormItem FormItem={FormItem}
                                         blockOptions={blockOptions}

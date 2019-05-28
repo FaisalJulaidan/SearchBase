@@ -137,22 +137,19 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
     try:
         # get url
         url = build_url(auth, query, optionalParams)
-        print("url 1: ", url)
+
         # set headers
         headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
         r = send_request(url, method, headers, json.dumps(body))
-        print("r.text 1: ", r.text)
-        print("r.code 1: ", r.status_code)
+
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
                 url = build_url(callback.Data, query, optionalParams)
-                print("url 2: ", url)
 
                 r = send_request(url, method, headers, json.dumps(body))
-                print("r.text 2: ", r.text)
                 if not r.ok:
                     raise Exception(r.text + ". Query could not be sent")
             else:
@@ -194,7 +191,7 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
     try:
         # New candidate details
         emails = conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [""])
-        print("".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateDesiredSalary.value['name'], [""])))
+
         # availability, yearsExperience
         body = {
             "name": "".join(
@@ -234,7 +231,6 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        print(exc)
         logging.error("CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
@@ -264,8 +260,6 @@ def uploadFile(auth, storedFile: StoredFile):
         entityID = str(conversationResponse.get("changedEntityId"))
 
         entity = None
-        print(conversation.UserType.name)
-        print(conversation.UserType.value)
         if conversation.UserType.value is "Candidate":
             entity = "Candidate"
         elif conversation.UserType.value is "Client":
@@ -280,7 +274,6 @@ def uploadFile(auth, storedFile: StoredFile):
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        print(exc)
         logging.error("CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
@@ -370,7 +363,6 @@ def searchCandidates(auth, companyID, conversation) -> Callback:
     try:
         query = "query="
         keywords = conversation['keywordsByDataType']
-        print("keywords: ", keywords)
 
         # populate filter
         if keywords.get(DT.CandidateLocation.value["name"]):
@@ -395,9 +387,8 @@ def searchCandidates(auth, companyID, conversation) -> Callback:
             raise Exception(sendQuery_callback.Message)
 
         return_body = json.loads(sendQuery_callback.Data.text)
-        print("return_body: ", return_body)
-        result = []
 
+        result = []
         for record in return_body["data"]:
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
@@ -415,12 +406,10 @@ def searchCandidates(auth, companyID, conversation) -> Callback:
                                                                   desiredSalary=record.get("dayRate", 0) * 365,
                                                                   currency=None,
                                                                   source="Bullhorn"))
-        print("result: ", result)
 
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        print(exc)
         logging.error("CRM.Bullhorn.searchCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
@@ -429,7 +418,7 @@ def searchJobs(auth, companyID, conversation) -> Callback:
     try:
         query = "query=*:*"
         keywords = conversation['keywordsByDataType']
-        # print("keywords: ", keywords)
+        # TODO ^
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
@@ -438,7 +427,6 @@ def searchJobs(auth, companyID, conversation) -> Callback:
             raise Exception(sendQuery_callback.Message)
 
         return_body = json.loads(sendQuery_callback.Data.text)
-        print("return_body: ", return_body)
         result = []
         # not found match for JobLinkURL
         for record in return_body["data"]:
@@ -458,12 +446,9 @@ def searchJobs(auth, companyID, conversation) -> Callback:
                                                             currency=None,
                                                             source="Bullhorn"))
 
-        print("result: ", result)
-
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        print(exc)
         logging.error("CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 

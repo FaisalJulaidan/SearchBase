@@ -117,8 +117,6 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                     raise Exception("Could not submit file to CRM")
 
         except Exception as exc:
-            print("CHATBOT: ", exc)
-
             return helpers.jsonResponse(False, 404, "Couldn't save the file")
 
         return helpers.jsonResponse(True, 200, "File uploaded successfully!!")

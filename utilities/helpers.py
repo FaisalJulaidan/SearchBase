@@ -1,6 +1,6 @@
 from flask import json, after_this_request, request
 from models import db, Role, Company, Assistant, Plan, Conversation, Database, Candidate, Job, CRM,\
-    OpenTimeSlot, AutoPilot, SelectedTimeSlot
+    OpenTimeSlot, AutoPilot, Appointment
 from services import user_services, flow_services
 from datetime import datetime, timedelta, time
 from enum import Enum
@@ -322,8 +322,11 @@ def gen_dummy_data():
         "dateFormat": 0,
         "timeFormat": 0}))
 
-    # Add AutoPilot with Open times
-    autoPilot = AutoPilot(Assistant=reader_a)
+    # Connect AutoPilot to an Assistant
+    autoPilot = AutoPilot(Company=aramco)
+    reader_a.AutoPilot = autoPilot
+
+    # Add open slots to the AutoPilot
     # print(datetime.combine(datetime.now(), time) - timedelta(minutes=15))
     db.session.add(OpenTimeSlot(Day=5,
                                 From= time(10,30),
@@ -332,8 +335,8 @@ def gen_dummy_data():
                                 AutoPilot=autoPilot,
                                 ))
 
-    # Add Selected TimeSlot
-    db.session.add(SelectedTimeSlot(DateTime=datetime.now(), Conversation=conversation1, AutoPilot=autoPilot))
+    # Add Appointment
+    db.session.add(Appointment(DateTime=datetime.now(), Conversation=conversation1, Assistant=reader_a))
 
 
     seed() # will save changes as well

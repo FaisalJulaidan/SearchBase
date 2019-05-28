@@ -1,5 +1,5 @@
 import React from 'react'
-import {Checkbox, Form, InputNumber, List, Modal, Switch, Tag, TimePicker, Row, Col} from 'antd'
+import {Checkbox, Col, Form, InputNumber, List, Modal, Switch, Tag, TimePicker} from 'antd'
 import moment from 'moment';
 import styles from './AutomationModal.module.less'
 
@@ -186,7 +186,8 @@ class AutomationModal extends React.Component {
                                   <List.Item>
                                               <Col span={12}>
                                                   {item.check}
-                                                  <Tag color={this.state.activeWeekDays[item.day] ? 'purple' : 'grey'}>
+                                                  <Tag style={{marginTop: 6}}
+                                                       color={this.state.activeWeekDays[item.day] ? 'purple' : 'grey'}>
                                                       {item.day}
                                                   </Tag>
                                               </Col>

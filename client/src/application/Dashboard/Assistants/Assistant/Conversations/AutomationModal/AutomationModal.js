@@ -1,5 +1,5 @@
 import React from 'react'
-import {Checkbox, Form, InputNumber, List, Modal, Switch, Tag, TimePicker} from 'antd'
+import {Checkbox, Form, InputNumber, List, Modal, Switch, Tag, TimePicker, Row, Col} from 'antd'
 import moment from 'moment';
 import styles from './AutomationModal.module.less'
 
@@ -33,11 +33,12 @@ class AutomationModal extends React.Component {
         const TimeRange = (day) => (
             <>
                 <span className={styles.TimeRange}>
-                    Start Time: <TimePicker defaultValue={moment('7:00', 'HH:mm')} format={'HH:mm'} minuteStep={30}
+                    <TimePicker defaultValue={moment('7:00', 'HH:mm')} format={'HH:mm'} minuteStep={30}
                                             disabled={!this.state.activeWeekDays[day]}/>
                 </span>
+                <span style={{marginRight: '5px', marginLeft: '5px'}}>-</span>
                 <span className={styles.TimeRange}>
-                    End Time: <TimePicker defaultValue={moment('16:00', 'HH:mm')} format={'HH:mm'} minuteStep={30}
+                    <TimePicker defaultValue={moment('16:00', 'HH:mm')} format={'HH:mm'} minuteStep={30}
                                           disabled={!this.state.activeWeekDays[day]}/>
                 </span>
             </>
@@ -177,25 +178,40 @@ class AutomationModal extends React.Component {
                     )}
                 </FormItem>
 
-                {
-                    this.state.showSetAppointment ?
-                        <div>
-                            {
-                                <List bordered
-                                      dataSource={weekDays}
-                                      renderItem={item => (
-                                          <List.Item>
-                                              {item.check}
-                                              <Tag color={this.state.activeWeekDays[item.day] ? 'purple' : 'grey'}
-                                                   style={{marginRight: 40}}>{item.day}</Tag> {item.input}
-                                          </List.Item>
-                                      )}/>
-                            }
-                        </div>
-                        : null
-                }
+                <div className={this.state.showSetAppointment ? null : styles.BlurContent }>
+                    {
+                        <List bordered
+                              dataSource={weekDays}
+                              renderItem={item => (
+                                  <List.Item>
+                                              <Col span={12}>
+                                                  {item.check}
+                                                  <Tag color={this.state.activeWeekDays[item.day] ? 'purple' : 'grey'}>
+                                                      {item.day}
+                                                  </Tag>
+                                              </Col>
+                                              <Col span={12}>
+                                                  {item.input}
+                                              </Col>
+                                  </List.Item>
+                              )}/>
+                    }
+                </div>
+
             </Form>
+
+            {/*Blur Effect (Hidden) */}
+            <div style={{display:'none'}}>
+                <svg id="svg-filter">
+                    <filter id="svg-blur">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="2"></feGaussianBlur>
+                    </filter>
+                </svg>
+            </div>
+
         </Modal>
+
+
     }
 }
 

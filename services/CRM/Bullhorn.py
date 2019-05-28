@@ -64,10 +64,7 @@ def login(auth):
 
         result_body = json.loads(access_token_request.text)
 
-        authCopy["access_token"] = result_body.get("access_token")
-        authCopy["refresh_token"] = result_body.get("refresh_token")
-        authCopy["rest_token"] = ""
-        authCopy["rest_url"] = ""
+        authCopy = {"refresh_token": result_body.get("refresh_token")}
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully', authCopy)
@@ -98,12 +95,6 @@ def retrieveRestToken(auth, companyID):
                 authCopy["rest_token"] = ""
             else:
                 raise Exception("CRM not set up properly")
-        # else if not go through login again with the saved auth
-        else:
-            login_callback: Callback = login(authCopy)
-            if not login_callback.Success:
-                raise Exception(login_callback.Message)
-            authCopy = dict(login_callback.Data)
 
         url = "https://rest.bullhornstaffing.com/rest-services/login?version=*&" + \
               "access_token=" + authCopy.get("access_token")
@@ -115,6 +106,7 @@ def retrieveRestToken(auth, companyID):
 
         authCopy["rest_token"] = result_body.get("BhRestToken")
         authCopy["rest_url"] = result_body.get("restUrl")
+        authCopy["access_token"] = ""
 
         # done here as cannot import crm_services while it is importing Bullhorn.py
         crm = db.session.query(CRM).filter(and_(CRM.CompanyID == companyID, CRM.Type == "Bullhorn")).first()
@@ -154,7 +146,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
                     raise Exception(r.text + ". Query could not be sent")
             else:
                 raise Exception("Rest token could not be retrieved")
-        elif str(r.status_code)[:1] != "2":  # token correct but no submitted data
+        elif str(r.status_code)[:1] != "2":  # check if error code is in the 200s
             raise Exception("Rest url for query is incorrect")
 
         return Callback(True, "Query was successful", r)
@@ -176,15 +168,15 @@ def build_url(rest_data, query, optionalParams=None):
     return url
 
 
-def send_request(url, method, headers, data):
-    test = None
+def send_request(url, method, headers, data=None):
+    request = None
     if method is "put":
-        test = requests.put(url, headers=headers, data=data)
+        request = requests.put(url, headers=headers, data=data)
     elif method is "post":
-        test = requests.post(url, headers=headers, data=data)
+        request = requests.post(url, headers=headers, data=data)
     elif method is "get":
-        test = requests.get(url, headers=headers, data=data)
-    return test
+        request = requests.get(url, headers=headers, data=data)
+    return request
 
 
 def insertCandidate(auth, conversation: Conversation) -> Callback:
@@ -259,11 +251,12 @@ def uploadFile(auth, storedFile: StoredFile):
         conversationResponse = json.loads(conversation.CRMResponse)
         entityID = str(conversationResponse.get("changedEntityId"))
 
-        entity = None
         if conversation.UserType.value is "Candidate":
             entity = "Candidate"
         elif conversation.UserType.value is "Client":
             entity = "ClientContact"
+        else:
+            raise Exception("Entity type to submit could not be retrieved")
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "file/" + entity + "/" + entityID,
@@ -362,6 +355,7 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
 def searchCandidates(auth, companyID, conversation) -> Callback:
     try:
         query = "query="
+        fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate"
         keywords = conversation['keywordsByDataType']
 
         # populate filter
@@ -369,7 +363,7 @@ def searchCandidates(auth, companyID, conversation) -> Callback:
             query += "address.city:" + "".join(keywords[DT.CandidateLocation.value["name"]]) + " or"
 
         # if keywords[DT.CandidateSkills.value["name"]]:
-        #     query += "address.city:" + keywords[DT.CandidateSkills.name] + "&"
+        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + "&"
 
         if keywords.get(DT.CandidateDesiredSalary.value["name"]):
             query += " dayRate:" + str((float(keywords[DT.CandidateDesiredSalary.value["name"]]) / 365)) + " or"
@@ -382,7 +376,7 @@ def searchCandidates(auth, companyID, conversation) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                 ["fields=*", query, "count=99999999"])
+                                                 [fields, query, "count=99999999"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -417,12 +411,43 @@ def searchCandidates(auth, companyID, conversation) -> Callback:
 def searchJobs(auth, companyID, conversation) -> Callback:
     try:
         query = "query=*:*"
+        fields = "fields=id,title,publicDescription,address,employmentType,salary,skills,yearsRequired,startDate,dateEnd"
         keywords = conversation['keywordsByDataType']
-        # TODO ^
+
+        # populate filter TODO
+        if keywords.get(DT.JobTitle.value["name"]):
+            query += "title:" + "".join(keywords[DT.JobTitle.value["name"]]) + " or"
+
+        if keywords.get(DT.JobLocation.value["name"]):
+            query += "address.city:" + "".join(keywords[DT.JobLocation.value["name"]]) + " or"
+
+        if keywords.get(DT.JobType.value["name"]):
+            query += "employmentType:" + "".join(keywords[DT.JobType.value["name"]]) + " or"
+
+        if keywords.get(DT.JobSalary.value["name"]):
+            query += "salary:" + "".join(keywords[DT.JobSalary.value["name"]]) + " or"
+
+        if keywords.get(DT.JobDesiredSkills.value["name"]):
+            query += "skills:" + "".join(keywords[DT.JobDesiredSkills.value["name"]]) + " or"
+
+        if keywords.get(DT.JobStartDate.value["name"]):
+            query += "startDate:" + "".join(keywords[DT.JobStartDate.value["name"]]) + " or"
+
+        if keywords.get(DT.JobEndDate.value["name"]):
+            query += "dateEnd:" + "".join(keywords[DT.JobEndDate.value["name"]]) + " or"
+
+        if keywords.get(DT.JobYearsRequired.value["name"]):
+            query += "yearsRequired:" + "".join(keywords[DT.JobYearsRequired.value["name"]]) + " or"
+
+        query = query[:-3]
+
+        # check if no conditions submitted
+        if len(query) < 6:
+            query = "query=*:*"
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 ["fields=*", query, "count=99999999"])
+                                                 [fields, query, "count=99999999"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

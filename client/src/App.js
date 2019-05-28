@@ -11,13 +11,13 @@ import ForgetPassword from './application/ForgetPassword/ForgetPassword'
 import NewResetPassword from './application/ForgetPassword/NewResetPassword/NewResetPassword'
 import {destroyMessage} from './helpers/alert';
 import SentryBoundary from "components/SentryBoundary/SentryBoundary";
+import AppointmentsPicker from "./application/AppointmentsPicker/AppointmentsPicker";
+
 class App extends Component {
     constructor(props) {
         super(props);
-        history.listen((location, action) => {
-            // Clear recent notifications boxes when route changes
-            destroyMessage();
-        });
+        // Clear recent notifications boxes when route changes
+        history.listen(() => destroyMessage());
     }
 
     render() {
@@ -29,6 +29,7 @@ class App extends Component {
                     <Route path="/signup" component={Signup}/>
                     <Route path="/forget_password" component={ForgetPassword}/>
                     <Route path="/reset_password/" component={NewResetPassword}/>
+                    <Route path="/appointmentspicker/" component={AppointmentsPicker}/>
                     <PrivateRoute path="/dashboard" component={Dashboard}/>
                     <Redirect to={{pathname: '/dashboard'}}/>
                 </Switch>

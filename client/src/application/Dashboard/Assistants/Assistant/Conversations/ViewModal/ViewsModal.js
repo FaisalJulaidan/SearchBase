@@ -80,7 +80,7 @@ class ViewsModal extends Component {
                 width={900}
                 title={
                     <h3>
-                        {buildStatusBadge(conversation.ApplicationStatus, false)}
+                        {buildStatusBadge(conversation?.ApplicationStatus, false)}
                         {conversation?.UserType === "Unknown" ? "Conversation" : conversation?.UserType} Details
                         <span>
                             <Text type="secondary"> #{conversation?.ID}</Text>

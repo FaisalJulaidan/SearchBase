@@ -22,7 +22,7 @@ class Conversations extends React.Component {
         destroyModal: false,
         downloadData: [],
         ConversationsRefreshed: true,
-        visibleAutomation: true
+        visibleAutomation: false
     };
 
 

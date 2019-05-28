@@ -2,40 +2,12 @@ import React from 'react';
 import {connect} from 'react-redux';
 import styles from './Calendar.module.less'
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Badge, Calendar as AntdCalendar, Col, Divider, Icon, Modal, Row, Typography, Input} from 'antd';
+import {Badge, Calendar as AntdCalendar, Col, Divider, Icon, Input, Modal, Row, Typography} from 'antd';
 import moment from 'moment';
 import './Calendar.less'
 
 const {Title, Paragraph} = Typography;
 const { TextArea } = Input;
-
-const pStyle = {
-    fontSize: 16,
-    color: 'rgba(0,0,0,0.85)',
-    lineHeight: '24px',
-    display: 'block',
-    marginBottom: 16,
-};
-
-const DescriptionItem = ({title, content}) => (
-    <div
-        style={{
-            fontSize: 14,
-            lineHeight: '22px',
-            marginBottom: 7,
-            color: 'rgba(0,0,0,0.65)',
-        }}
-    >
-        <p style={{
-                marginRight: 8,
-                display: 'inline-block',
-                color: 'rgba(0,0,0,0.85)',
-        }}>
-            {title}:
-        </p>
-        {content}
-    </div>
-);
 
 class Calendar extends React.Component {
 
@@ -149,7 +121,6 @@ class Calendar extends React.Component {
                            visible={this.state.visible}>
                         {
                             this.state.appointments.map((a, index) =>
-
                                 <div key={index}>
                                     {console.log(a.name)}
                                     <Title level={4}>{a.name}</Title>

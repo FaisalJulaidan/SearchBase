@@ -29,7 +29,7 @@ def getAssistantByHashID(hashID):
         return Callback(False, "Assistant not found!")
 
 
-def getByID(id, companyID) -> Callback:
+def getByID(id: int, companyID: int) -> Callback:
     try:
         # Get result and check if None then raise exception
         result = db.session.query(Assistant)\
@@ -41,8 +41,6 @@ def getByID(id, companyID) -> Callback:
         print(exc)
         logging.error("assistant_services.getByID(): " + str(exc))
         return Callback(False, 'Could not get the assistant.')
-    # finally:
-       # db.session.close()
 
 
 def getByName(name) -> Callback:

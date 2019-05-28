@@ -1,7 +1,7 @@
 from flask import json, after_this_request, request
 from models import db, Role, Company, Assistant, Plan, Conversation, Database, Candidate, Job, CRM,\
     OpenTimeSlot, AutoPilot, Appointment
-from services import user_services, flow_services
+from services import user_services, flow_services, auto_pilot_services
 from datetime import datetime, timedelta, time
 from enum import Enum
 from hashids import Hashids
@@ -58,8 +58,8 @@ def gen_dummy_data():
     db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly'))
 
     # Get Companies
-    aramco = Company.query.filter(Company.Name == "Aramco").first()
-    sabic = Company.query.filter(Company.Name == "Sabic").first()
+    aramco: Company = Company.query.filter(Company.Name == "Aramco").first()
+    sabic: Company = Company.query.filter(Company.Name == "Sabic").first()
 
     # Create and validate a flow for an assistant
 
@@ -323,20 +323,12 @@ def gen_dummy_data():
         "timeFormat": 0}))
 
     # Connect AutoPilot to an Assistant
-    autoPilot = AutoPilot(Company=aramco)
-    reader_a.AutoPilot = autoPilot
-
-    # Add open slots to the AutoPilot
-    # print(datetime.combine(datetime.now(), time) - timedelta(minutes=15))
-    db.session.add(OpenTimeSlot(Day=5,
-                                From= time(10,30),
-                                To= time(10,32),
-                                Duration=60,
-                                AutoPilot=autoPilot,
-                                ))
+    auto_pilot_services.create(aramco.ID)
+    auto_pilot_services.create(aramco.ID)
 
     # Add Appointment
-    db.session.add(Appointment(DateTime=datetime.now(), Conversation=conversation1, Assistant=reader_a))
+    db.session.add(Appointment(DateTime=datetime.now() + timedelta(days=5),
+                               Conversation=conversation1, Assistant=reader_a))
 
 
     seed() # will save changes as well

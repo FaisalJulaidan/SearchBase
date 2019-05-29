@@ -109,7 +109,7 @@ class Dashboard extends Component {
         // End of User Information
 
         const newLayoutRoutes = ["/dashboard/crmlist", "/dashboard/calendar"];
-        const isNewLyaout = newLayoutRoutes.includes(this.props.location.pathname);
+        const isNewLyaout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
             <Layout style={{height: '100%'}}>
                 <Sider

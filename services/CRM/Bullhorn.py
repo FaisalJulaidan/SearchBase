@@ -32,7 +32,7 @@ def login(auth):
                    "response_type=code" + \
                    "&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback" + \
                    "&action=Login" + \
-                   "&client_id=" + authCopy.get("client_id", "") + \
+                   "&client_id=7719607b-7fe7-4715-b723-809cc57e2714" \
                    "&username=" + authCopy.get("username", "") + \
                    "&password=" + urllib.parse.quote(authCopy.get("password", ""))
 
@@ -52,8 +52,8 @@ def login(auth):
         access_token_url = "https://auth9.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
                            "&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback" + \
-                           "&client_id=" + authCopy.get("client_id", "") + \
-                           "&client_secret=" + authCopy.get("client_secret", "") + \
+                           "&client_id=7719607b-7fe7-4715-b723-809cc57e2714" + \
+                           "&client_secret=0ZiVSILQ7CY0bf054LPiX4kN" + \
                            "&code=" + authorization_code
 
         # get the access token and refresh token
@@ -85,8 +85,8 @@ def retrieveRestToken(auth, companyID):
         if authCopy.get("refresh_token"):
             url = "https://auth.bullhornstaffing.com/oauth/token?grant_type=refresh_token&refresh_token=" + \
                   authCopy.get("refresh_token") + \
-                  "&client_id=" + authCopy.get("client_id") + \
-                  "&client_secret=" + authCopy.get("client_secret")
+                  "&client_id=7719607b-7fe7-4715-b723-809cc57e2714" + \
+                  "&client_secret=0ZiVSILQ7CY0bf054LPiX4kN"
             get_access_token = requests.post(url, headers=headers)
             if get_access_token.ok:
                 result_body = json.loads(get_access_token.text)

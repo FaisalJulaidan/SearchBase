@@ -6,7 +6,7 @@ from sqlalchemy.sql import and_
 from sqlalchemy.sql import desc
 
 from models import db, Callback, Conversation, Assistant
-from services import assistant_services, stored_file_services, databases_services
+from services import assistant_services, stored_file_services, databases_services, auto_pilot_services
 from services.CRM import crm_services
 from utilities import json_schemas, helpers
 from enums import DatabaseType, UserType, ApplicationStatus
@@ -15,35 +15,33 @@ import logging
 
 # Process chatbot conversation data
 def processConversation(assistantHashID, data: dict) -> Callback:
-    callback: Callback = assistant_services.getByHashID(assistantHashID)
-    if not callback.Success:
-        return Callback(False, "Assistant not found!")
-    assistant: Assistant = callback.Data
-
-    # Fetch selected solutions from the database to get their complete details as they were hidden in the chatbot
-    selectedSolutions = []
-    for solution in data['selectedSolutions']:
-        selectedSolutions.append({
-            'data': helpers.decrypt(solution['output'], isDict=True),
-            'databaseType': solution.get('databaseType')['enumName']
-        })
-
-    collectedData = data['collectedData']
-    conversationData = {
-        'collectedData': collectedData,
-        'selectedSolutions': selectedSolutions,
-        'keywordsByDataType': data['keywordsByDataType'],
-    }
-
-    # Validate submitted conversation after adding the modified version of selected solutions
     try:
+        callback: Callback = assistant_services.getByHashID(assistantHashID)
+        if not callback.Success:
+            return Callback(False, "Assistant not found!")
+        assistant: Assistant = callback.Data
+
+        # Fetch selected solutions from the database to get their complete details as they were hidden in the chatbot
+        selectedSolutions = []
+        for solution in data['selectedSolutions']:
+            selectedSolutions.append({
+                'data': helpers.decrypt(solution['output'], isDict=True),
+                'databaseType': solution.get('databaseType')['enumName']
+            })
+
+        collectedData = data['collectedData']
+        conversationData = {
+            'collectedData': collectedData,
+            'selectedSolutions': selectedSolutions,
+            'keywordsByDataType': data['keywordsByDataType'],
+        }
+
+
+        # Validate submitted conversation after adding the modified version of selected solutions
         validate(conversationData, json_schemas.conversation)
-    except Exception as exc:
-        print("conversation_services.processConversation ERROR 1: " + str(exc.args))
-        logging.error("conversation_services.processConversation(): " + str(exc.args))
-        return Callback(False, "The submitted chatbot data doesn't follow the correct format.", exc.args[0])
+        if data['score'] > 1:
+            raise Exception("Score is corrupted")
 
-    try:
         # collectedData is an array, and timeSpent is in seconds.
         conversation = Conversation(Data= conversationData,
                                       TimeSpent=data['timeSpent'],
@@ -53,12 +51,24 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                                       UserType=UserType[data['userType'].replace(" ", "")],
                                       Score=data['score'],
                                       Assistant=assistant)
+
+        # AutoPilot Operations
+        if assistant.AutoPilot:
+            ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot)
+            if ap_callback.Success:
+                conversation.AutoPilotStatus = True
+                conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
+                conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
+            conversation.AutoPilotResponse = ap_callback.Message
+
+
         # CRM integration
         # if assistant.CRM:
         #     crm_callback: Callback = crm_services.processConversation(assistant, conversation)
         #     if crm_callback.Success:
         #         conversation.CRMSynced = True
         #     conversation.CRMResponse = crm_callback.Message
+
 
         db.session.add(conversation)
         db.session.commit()

@@ -325,6 +325,7 @@ def gen_dummy_data():
     # Create an AutoPilot for a Company
     auto_pilot_services.create('First Pilot', aramco.ID)
     auto_pilot_services.create('Second Pilot', aramco.ID)
+    reader_a.AutoPilot = auto_pilot_services.getByID(1,1).Data
 
     # Add Appointment
     db.session.add(Appointment(DateTime=datetime.now() + timedelta(days=5),

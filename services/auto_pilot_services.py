@@ -1,10 +1,41 @@
 from sqlalchemy import and_
-from models import db, Callback, AutoPilot, OpenTimeSlot
+from models import db, Callback, AutoPilot, OpenTimeSlot, Assistant, Conversation
 from datetime import time
-import logging
+import logging, enums
 from utilities import helpers
 
 
+def processConversation(conversation: Conversation, autoPilot: AutoPilot):
+    try:
+        result = {
+            "applicationStatus": enums.ApplicationStatus.Pending,
+            "appointmentEmailSentAt": None,
+            "response": None
+        }
+        if autoPilot.Active:
+            result['applicationStatus'] = __getApplicationResult(conversation.Score, autoPilot)
+            result['appointmentEmailSentAt'] = __sendAppointmentEmail(conversation, autoPilot)
+
+        return Callback(True, "Automation done via " + autoPilot.Name + " pilot successfully.", result)
+
+    except Exception as exc:
+        print(exc)
+        logging.error("auto_pilot.processConversation(): " + str(exc))
+        return Callback(False,
+                        autoPilot.Name + " pilot failed to function. Please contact TSB support and let them know",
+                        None)
+
+
+def __getApplicationResult(score, autoPilot: AutoPilot) -> enums.ApplicationStatus:
+    result = enums.ApplicationStatus.Pending
+    if autoPilot.AcceptApplications and (score > autoPilot.AcceptanceScore):
+        result = enums.ApplicationStatus.Accepted
+    if autoPilot.RejectApplications and (score < autoPilot.RejectionScore):
+        result = enums.ApplicationStatus.Rejected
+    return result
+
+def __sendAppointmentEmail(conversation: Conversation, autoPilot):
+    return None
 
 # The new AutoPilot will be returned parsed
 def create(name, companyID: int) -> Callback:
@@ -30,7 +61,7 @@ def create(name, companyID: int) -> Callback:
         print(exc)
         logging.error("auto_pilot.create(): " + str(exc))
         db.session.rollback()
-        return Callback(False, 'Could create AutoPilot.')
+        return Callback(False, 'Could not create AutoPilot.')
 
 
 # ----- Getters ----- #

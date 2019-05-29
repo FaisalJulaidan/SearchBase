@@ -181,8 +181,10 @@ class Conversation(db.Model):
     Completed = db.Column(db.Boolean, nullable=False, default=True)
     ApplicationStatus = db.Column(Enum(enums.ApplicationStatus), nullable=False, default=enums.ApplicationStatus.Pending)
     Score = db.Column(db.Float(), nullable=False)
-
     AppointmentEmailSentAt = db.Column(db.DateTime(), default=None)
+
+    AutoPilotStatus = db.Column(db.Boolean, nullable=False, default=False)
+    AutoPilotResponse = db.Column(db.String(250), nullable=True)
 
     CRMSynced = db.Column(db.Boolean, nullable=False, default=False)
     CRMResponse = db.Column(db.String(250), nullable=True)

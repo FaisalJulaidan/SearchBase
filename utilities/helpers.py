@@ -67,6 +67,7 @@ def gen_dummy_data():
     reader_a = Assistant(Name="Reader", Message="Hey there",
                          TopBarText="Aramco Bot", SecondsUntilPopup=1,
                          Active=True, Company=aramco)
+
     flow = {
         "groups": [
             {
@@ -394,10 +395,12 @@ def isValidEmail(email: str) -> bool:
 def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
 
     dict = {} # Results
+    if not obj: return dict
+
     # A nested for loop for joining two tables
     for attr in obj.__table__.columns:
         key = attr.name
-        if key not in ['Password']:
+        if key not in ['Password', 'CompanyID']:
             dict[key] = getattr(obj, key)
             if isinstance(dict[attr.name], Enum): # Convert Enums
                 dict[key] = dict[key].value

@@ -19,7 +19,7 @@ def assistants():
         # Get all assistants
         callback: Callback = assistant_services.getAll(user['companyID'])
         if not callback.Success:
-            return helpers.jsonResponse(False, 404, "Cannot get Assistants!", callback.Data)
+            return helpers.jsonResponse(False, 404, "Cannot get Assistants!")
 
         # notifications_callback: Callback = assistant_services.getAllNotificationsRegisters()
         # if notifications_callback.Success:
@@ -52,18 +52,18 @@ def assistant(assistantID):
     # Authenticate
     user = get_jwt_identity()['user']
 
-    #############
     callback: Callback = Callback(False, 'Error!', None)
     # Update assistant
     if request.method == "PUT":
         updatedSettings = request.json
+        print(updatedSettings)
         callback: Callback = assistant_services.update(assistantID,
                                                        updatedSettings.get("assistantName"),
                                                        updatedSettings.get("welcomeMessage"),
                                                        updatedSettings.get("topBarTitle"),
                                                        updatedSettings.get("secondsUntilPopup"),
-                                                       updatedSettings.get("alertsEnabled", False),
-                                                       updatedSettings.get("alertEvery", 24),
+                                                       updatedSettings.get("alertsEnabled"),
+                                                       updatedSettings.get("alertEvery"),
                                                        updatedSettings.get('config'),
                                                        user['companyID']
                                                        )
@@ -73,7 +73,7 @@ def assistant(assistantID):
 
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)
-    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+    return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
 # Activate or deactivate assistant
@@ -112,6 +112,30 @@ def assistant_crm_connect(assistantID):
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)
     return helpers.jsonResponse(True, 200, callback.Message, None)
+
+
+# Connect assistant to AutoPilot
+@assistant_router.route("/assistant/<int:assistantID>/auto_pilot", methods=['POST', 'DELETE'])
+@jwt_required
+def assistant_auto_pilot_connect(assistantID):
+
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    callback: Callback = Callback(False, 'Error!')
+    if request.method == "POST":
+        callback: Callback = assistant_services.connectToAutoPilot(assistantID,
+                                                                   request.json.get('AutoPilotID'),
+                                                                   user['companyID'])
+
+    if request.method == "DELETE":
+        callback: Callback = assistant_services.disconnectFromCRM(assistantID,
+                                                                  user['companyID'])
+
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message, None)
+    return helpers.jsonResponse(True, 200, callback.Message, None)
+
 
 
 @assistant_router.route("/assistant/<int:assistantID>/logo", methods=['POST', 'DELETE'])

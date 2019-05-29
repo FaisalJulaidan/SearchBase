@@ -29,9 +29,10 @@ const addAssistant = (newAssistant) => {
     };
 };
 
-const addAssistantSuccess = (successMsg) => {
+const addAssistantSuccess = (newAssistant, successMsg) => {
     return {
         type: actionTypes.ADD_ASSISTANT_SUCCESS,
+        newAssistant,
         successMsg
     };
 };
@@ -43,7 +44,7 @@ const addAssistantFailure = (error) => {
     };
 };
 
-const updateAssistant = ({assistantID, updatedSettings}) => {
+const updateAssistant = (assistantID, updatedSettings) => {
     return {
         type: actionTypes.UPDATE_ASSISTANT_REQUEST,
         assistantID,
@@ -51,9 +52,11 @@ const updateAssistant = ({assistantID, updatedSettings}) => {
     };
 };
 
-const updateAssistantSuccess = (successMsg) => {
+const updateAssistantSuccess = (assistantID, updatedAssistant, successMsg) => {
     return {
         type: actionTypes.UPDATE_ASSISTANT_SUCCESS,
+        assistantID,
+        updatedAssistant,
         successMsg
     };
 };

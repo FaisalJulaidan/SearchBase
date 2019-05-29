@@ -31,9 +31,11 @@ export const assistant = (state = initialState, action) => {
                 isAdding: true
             });
         case actionTypes.ADD_ASSISTANT_SUCCESS:
+
             return updateObject(state, {
                 successMsg: action.successMsg,
-                isAdding: false
+                isAdding: false,
+                assistantList: state.assistantList.concat(action.newAssistant)
             });
         case actionTypes.ADD_ASSISTANT_FAILURE:
             return updateObject(state, {
@@ -43,15 +45,20 @@ export const assistant = (state = initialState, action) => {
 
         // Update
         case actionTypes.UPDATE_ASSISTANT_REQUEST:
+
             return updateObject(state, {
                 successMsg: null,
                 errorMsg: null,
                 isLoading: true
             });
         case actionTypes.UPDATE_ASSISTANT_SUCCESS:
+            const assistantsCopy = state.assistantList
+                .map(a => a.ID === action.assistantID ? {...action.updatedAssistant}: a);
+
             return updateObject(state, {
                 successMsg: action.successMsg,
-                isLoading: false
+                isLoading: false,
+                assistantList: assistantsCopy
             });
         case actionTypes.UPDATE_ASSISTANT_FAILURE:
             return updateObject(state, {

@@ -12,10 +12,7 @@ class AssistantSettings extends Component {
     handleSave = (updatedSettings) => {
         this.props.hideModal();
         // dispatch redux action
-        this.props.dispatch(assistantActions.updateAssistant({
-            assistantID: this.props.assistant.ID,
-            updatedSettings: updatedSettings
-        }));
+        this.props.dispatch(assistantActions.updateAssistant(this.props.assistant.ID, updatedSettings));
     };
 
     ////// DELETE GROUP

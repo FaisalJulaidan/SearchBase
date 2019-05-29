@@ -40,7 +40,7 @@ function* watchDeleteConversation() {
 
 function* clearAllConversations({assistantID}) {
     try {
-        loadingMessage('Removing all conversation...', 0);
+        loadingMessage('Removing all conversations...', 0);
         const res = yield http.delete(`/assistant/${assistantID}/conversation`);
         yield put(conversationActions.clearAllConversationsSuccess());
         successMessage('All conversation cleared');
@@ -58,11 +58,11 @@ function* watchClearAllConversations() {
 
 function* updateConversationStatus({newStatus, conversationID, assistantID}) {
     try {
-        loadingMessage('Updating status...', 0);
+        loadingMessage('Updating application status...', 0);
         const res = yield http.put(`/assistant/${assistantID}/conversation/${conversationID}/status`,
                                    {newStatus: newStatus});
         yield put(conversationActions.updateConversationStatusSuccess(conversationID, newStatus));
-        successMessage('Status updated');
+        successMessage('Application status updated');
     } catch (error) {
         console.log(error);
         const msg = "Couldn't update status";

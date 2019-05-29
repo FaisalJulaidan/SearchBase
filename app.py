@@ -111,9 +111,6 @@ elif os.environ['FLASK_ENV'] == 'development':
 
     print('Development mode running...')
 
-    db.session.query(Assistant).filter(Assistant.ID == 1).update({'Name': "ff", })
-    db.session.commit()
-
 else:
     print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")
 

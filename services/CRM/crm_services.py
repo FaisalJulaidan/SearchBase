@@ -105,7 +105,7 @@ def testConnection(details) -> Callback:
         if not login_callback.Success:
             return login_callback
 
-        return Callback(True, 'Successful connection.')
+        return Callback(True, 'Successful connection')
 
     except Exception as exc:
         logging.error("CRM_services.connect(): " + str(exc))

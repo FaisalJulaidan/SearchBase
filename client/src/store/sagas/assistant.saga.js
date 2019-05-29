@@ -26,8 +26,7 @@ function* addAssistant({type, newAssistant}) {
     try {
         loadingMessage('Creating assistant...', 0);
         const res = yield http.post(`/assistants`, newAssistant);
-        yield put(assistantActions.addAssistantSuccess(res.data?.msg));
-        yield put(assistantActions.fetchAssistants());
+        yield put(assistantActions.addAssistantSuccess(res.data?.data, res.data?.msg));
         successMessage('Assistant added!');
 
     } catch (error) {
@@ -41,15 +40,13 @@ function* addAssistant({type, newAssistant}) {
 function* updateAssistant({assistantID, updatedSettings}) {
     try {
         const res = yield http.put(`assistant/${assistantID}`, updatedSettings);
-        yield put(assistantActions.updateAssistantSuccess(res.data?.msg));
-        yield put(assistantActions.fetchAssistants());
+        yield put(assistantActions.updateAssistantSuccess(assistantID, res.data?.data, res.data?.msg));
         successMessage('Assistant updated!');
     } catch (error) {
         console.error(error);
         const msg = "Couldn't update assistant";
         yield put(assistantActions.updateAssistantFailure(msg));
         errorMessage(msg);
-
     }
 }
 

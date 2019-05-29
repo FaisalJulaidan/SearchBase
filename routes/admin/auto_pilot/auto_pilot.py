@@ -50,10 +50,13 @@ def auto_pilot(autoPilotID):
                     data.get('SendCandidatesAppointments'),
                     data.get('openTimeSlots'),
                     user['companyID'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+        return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
     # Delete assistant
     if request.method == "DELETE":
         callback: Callback = auto_pilot_services.removeByID(autoPilotID, user['companyID'])
-    if not callback.Success:
-        return helpers.jsonResponse(False, 400, callback.Message, None)
-    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)

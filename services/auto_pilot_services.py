@@ -96,7 +96,7 @@ def update(id, name, active, acceptApplications, acceptanceScore, rejectApplicat
 
         # Save all changes
         db.session.commit()
-        return Callback(True, "Updated the AutoPilot successfully.")
+        return Callback(True, "Updated the AutoPilot successfully.", autoPilot)
 
     except Exception as exc:
         print(exc)

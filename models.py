@@ -138,7 +138,7 @@ class Assistant(db.Model):
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
 
-    MailEnabled = db.Column(db.Boolean, nullable=False, default=False)
+    MailEnabled = db.Column(db.Boolean(), nullable=False, default=False)
     MailPeriod = db.Column(db.Integer, nullable=False, default=12)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
     LogoName = db.Column(db.String(64), nullable=True)

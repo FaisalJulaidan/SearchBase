@@ -21,7 +21,7 @@ from services import databases_services, stored_file_services
 # auth needs to contain auth data + rest_token, rest_url, access_token, refresh_token (retrieved upon connecting)
 
 
-# login requires: client_id, client_secret, username, password
+# login requires: username, password
 def login(auth):
     try:
         authCopy = dict(auth)  # we took copy to delete domain later only from the copy

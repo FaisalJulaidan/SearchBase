@@ -2,15 +2,14 @@ from flask import json, after_this_request, request
 from models import db, Role, Company, Assistant, Plan, Conversation, Database, Candidate, Job, CRM,\
     OpenTimeSlot, AutoPilot, Appointment
 from services import user_services, flow_services, auto_pilot_services
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta
 from enum import Enum
 from hashids import Hashids
 from config import BaseConfig
 from io import BytesIO
 from itsdangerous import URLSafeTimedSerializer
 from cryptography.fernet import Fernet
-from jsonschema import validate
-from utilities import json_schemas
+
 import enums, re, os, stripe, gzip, functools, logging, geoip2.webservice
 
 
@@ -322,9 +321,9 @@ def gen_dummy_data():
         "dateFormat": 0,
         "timeFormat": 0}))
 
-    # Connect AutoPilot to an Assistant
-    auto_pilot_services.create(aramco.ID)
-    auto_pilot_services.create(aramco.ID)
+    # Create an AutoPilot for a Company
+    auto_pilot_services.create('First Pilot', aramco.ID)
+    auto_pilot_services.create('Second Pilot', aramco.ID)
 
     # Add Appointment
     db.session.add(Appointment(DateTime=datetime.now() + timedelta(days=5),
@@ -392,35 +391,37 @@ def isValidEmail(email: str) -> bool:
 
 
 # Convert a SQLAlchemy object to a single dict
-def getDictFromSQLAlchemyObj(obj):
-    d = {}
+def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
+
+    dict = {} # Results
+    # A nested for loop for joining two tables
     for attr in obj.__table__.columns:
         key = attr.name
         if key not in ['Password']:
-            d[key] = getattr(obj, key)
-            if isinstance(d[attr.name], Enum): # Convert Enums
-                d[key] = d[key].value
+            dict[key] = getattr(obj, key)
+            if isinstance(dict[attr.name], Enum): # Convert Enums
+                dict[key] = dict[key].value
 
-            if key == Candidate.Currency.name and d[key]: # Convert Currency
-                d[key] = d[key].code
+            if key == Candidate.Currency.name and dict[key]: # Convert Currency
+                dict[key] = dict[key].code
 
-            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and d[key]: # Convert Datetime
-                d[key] = '/'.join(map(str, [d[key].year, d[key].month, d[key].day]))
+            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and dict[key]: # Convert Datetime
+                dict[key] = '/'.join(map(str, [dict[key].year, dict[key].month, dict[key].day]))
 
-            if key == Assistant.Flow.name and d[key]: # Parse Flow !!
-                flow_services.parseFlow(d[key]) # pass by reference
+            if key == Assistant.Flow.name and dict[key]: # Parse Flow !!
+                flow_services.parseFlow(dict[key]) # pass by reference
 
     if hasattr(obj, "FilePath"):
-        d["FilePath"] = obj.FilePath
-    return d
+        dict["FilePath"] = obj.FilePath
+    return dict
 
 
 # Convert a SQLAlchemy list of objects to a list of dicts
-def getListFromSQLAlchemyList(SQLAlchemyList):
+def getListFromSQLAlchemyList(SQLAlchemyList, excludedColumns: list = None) -> list:
     return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
 
 
-def isStringsLengthGreaterThanZero(*args):
+def isStringsLengthGreaterThanZero(*args) -> bool:
     for arg in args:
         if len(arg.strip()) == 0:
             return False

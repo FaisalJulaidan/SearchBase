@@ -11,7 +11,7 @@ import logging, enums
 def getChatbot(assistantHashID) -> Callback:
     try:
 
-        callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
+        callback: Callback = assistant_services.getByHashID(assistantHashID)
         if not callback.Success:
             return Callback(False, "Assistant not found!")
         assistant = helpers.getDictFromSQLAlchemyObj(callback.Data)
@@ -98,6 +98,7 @@ def isValidFlow(flow):
         print(exc.args)
         logging.error("flow_service.isValidFlow(): " + str(exc.args))
         return Callback(False, "The submitted Flow doesn't follow the correct format")
+
 
 # Check if the block valid using json_schema.py based on the block's type
 def isValidBlock(block: dict, blockType: str):

@@ -1,4 +1,4 @@
-from models import db, Callback, Company, User, Role
+from models import db, Callback, Company, User
 import logging , stripe
 
 
@@ -45,16 +45,6 @@ def getByID(id) -> Company or None:
         db.session.rollback()
         return Callback(False,
                         'Company with ID ' + str(id) + ' does not exist')
-
-
-def getAll() -> list or None:
-    try:
-        return db.session.query(Company)
-    except Exception as exc:
-        logging.error("company_service.getAll(): " + str(exc))
-        db.session.rollback()
-        return None
-
 
 
 def removeByName(name) -> bool:

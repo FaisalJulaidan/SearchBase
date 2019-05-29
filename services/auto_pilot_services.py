@@ -2,15 +2,18 @@ from sqlalchemy import and_
 from models import db, Callback, AutoPilot, OpenTimeSlot
 from datetime import time
 import logging
+from utilities import helpers
 
 
-def create(companyID: int) -> Callback:
+
+# The new AutoPilot will be returned parsed
+def create(name, companyID: int) -> Callback:
     try:
 
-        autoPilot= AutoPilot(CompanyID=companyID) # Create new AutoPilot
+        autoPilot= AutoPilot(Name=name, CompanyID=companyID) # Create new AutoPilot
 
-        # With default open time slots for all days of the week
-        default = {"From": time(8,30), "To": time(12,0), "Duration": 30, "AutoPilot": autoPilot, "Active": True}
+        # Create the AutoPilot with default open time slots
+        default = {"From": time(8,30), "To": time(12,0), "Duration": 30, "AutoPilot": autoPilot, "Active": False}
         openTimeSlots = [OpenTimeSlot(Day=0, **default), # Monday
                          OpenTimeSlot(Day=1, **default),
                          OpenTimeSlot(Day=2, **default),
@@ -21,6 +24,7 @@ def create(companyID: int) -> Callback:
                          ]
         db.session.add_all(openTimeSlots)
         db.session.commit()
+        return Callback(True, "Got AutoPilot successfully.", parseAutoPilot(autoPilot))
 
     except Exception as exc:
         print(exc)
@@ -29,41 +33,94 @@ def create(companyID: int) -> Callback:
         return Callback(False, 'Could create AutoPilot.')
 
 
+# ----- Getters ----- #
 def getByID(id: int, companyID: int) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(AutoPilot) \
+        result: AutoPilot = db.session.query(AutoPilot) \
             .filter(and_(AutoPilot.ID == id, AutoPilot.CompanyID == companyID)).first()
         if not result: raise Exception
+
         return Callback(True, "Got AutoPilot successfully.", result)
 
     except Exception as exc:
         print(exc)
         logging.error("auto_pilot.getByID(): " + str(exc))
-        return Callback(False, 'Could not get the assistant.')
+        return Callback(False, 'Could not get the AutoPilot.')
 
-
-def update(id, companyID, active, acceptApplications, acceptanceScore, rejectApplications,
-           rejectionScore, sendCandidatesAppointments) -> Callback:
+# AutoPilots will be returned parsed
+def fetchAll(companyID) -> Callback:
     try:
 
-        db.session.query(AutoPilot).filter(and_(AutoPilot.ID == id, AutoPilot.CompanyID == companyID))\
-            .update({
-                'Active': active,
-                'AcceptApplications': acceptApplications,
-                'AcceptanceScore': acceptanceScore,
-                'RejectApplications': rejectApplications,
-                "RejectionScore": rejectionScore,
-                "SendCandidatesAppointments": sendCandidatesAppointments,
-                   })
-        db.session.commit()
-        return Callback(True, 'AutPilot updated Successfully')
+        result: list = []
+        for autoPilot in db.session.query(AutoPilot).filter(AutoPilot.CompanyID == companyID).all():
+            result.append(parseAutoPilot(autoPilot))
+
+        return Callback(True, "Fetched all AutoPilots successfully.", result)
 
     except Exception as exc:
         print(exc)
-        db.session.rollback()
-        logging.error("auto_pilot.update(): " + str(exc))
-        return Callback(False,"Couldn't update AutPilot " + str(id))
+        logging.error("auto_pilot.fetchAll(): " + str(exc))
+        return Callback(False, 'Could not fetch all the AutoPilots.')
 
-def fetchOpenTimeSlots(autoPilotID, companyID):
-    pass
+
+# ----- Updaters ----- #
+def update(id, name, active, acceptApplications, acceptanceScore, rejectApplications,
+           rejectionScore, SendCandidatesAppointments, openTimeSlots: list, companyID: int) -> Callback:
+    try:
+
+        # Check all OpenTimeSlots are given
+        if len(openTimeSlots) != 7: raise Exception("Number of open time slots should be 7")
+
+        # Get AutoPilot
+        autoPilot_callback: Callback = getByID(id, companyID)
+        if not autoPilot_callback.Success: return autoPilot_callback
+        autoPilot = autoPilot_callback.Data
+
+        # Update the autoPilot
+        autoPilot.Name = name
+        autoPilot.Active = active
+        autoPilot.AcceptApplication = acceptApplications
+        autoPilot.AcceptanceScore = acceptanceScore
+        autoPilot.RejectApplications = rejectApplications
+        autoPilot.RejectionScore = rejectionScore
+        autoPilot.SendCandidatesAppointments = SendCandidatesAppointments
+
+        # Update the openTimeSlots
+        for (oldSlot, newSlot) in zip(AutoPilot.OpenTimeSlots, openTimeSlots):
+            if oldSlot.Day == newSlot['day']:
+                oldSlot.Active = newSlot['active']
+                oldSlot.From = time(newSlot['from'][0], newSlot['from'][1])
+                oldSlot.To = time(newSlot['to'][0], newSlot['to'][1])
+                oldSlot.Duration = newSlot['duration']
+
+        # Save all changes
+        db.session.commit()
+        return Callback(True, "Updated the AutoPilot successfully.")
+
+    except Exception as exc:
+        print(exc)
+        logging.error("auto_pilot.update(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Could update the AutoPilot.')
+
+
+def removeByID(id, companyID):
+    try:
+        db.session.query(AutoPilot).filter(and_(AutoPilot.ID == id, AutoPilot.CompanyID == companyID)).delete()
+        db.session.commit()
+        return Callback(True, 'AutoPilot has been deleted.')
+
+    except Exception as exc:
+        print("Error in auto_pilot.removeByID(): ", exc)
+        logging.error("auto_pilot.removeByID(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in deleting AutoPilot.')
+
+
+# It takes an autoPilot object and join all it children tables into one dict
+def parseAutoPilot(autoPilot: AutoPilot) -> dict:
+    return {
+        **helpers.getDictFromSQLAlchemyObj(autoPilot),
+        "OpenTimeSlots": helpers.getListFromSQLAlchemyList(autoPilot.OpenTimeSlots)
+    }

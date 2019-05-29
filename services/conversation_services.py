@@ -15,7 +15,7 @@ import logging
 
 # Process chatbot conversation data
 def processConversation(assistantHashID, data: dict) -> Callback:
-    callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
+    callback: Callback = assistant_services.getByHashID(assistantHashID)
     if not callback.Success:
         return Callback(False, "Assistant not found!")
     assistant: Assistant = callback.Data
@@ -74,8 +74,8 @@ def processConversation(assistantHashID, data: dict) -> Callback:
 # ----- Getters ----- #
 def getAllByAssistantID(assistantID):
     try:
-        conversations: List[Conversation] = db.session.query(Conversation).filter(
-            Conversation.AssistantID == assistantID) \
+        conversations: List[Conversation] = db.session.query(Conversation)\
+            .filter(Conversation.AssistantID == assistantID) \
             .order_by(desc(Conversation.DateTime)).all()
 
 
@@ -112,6 +112,7 @@ def getByID(conversationID, assistantID):
         logging.error("conversation_services.getByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not retrieve the conversation.')
+
 
 # ----- Updaters ----- #
 def updateStatus(conversationID, assistantID, newStatus):

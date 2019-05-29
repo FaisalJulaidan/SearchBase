@@ -10,8 +10,39 @@ from werkzeug.utils import secure_filename
 import logging, json
 
 
+def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, template, config, companyID) -> Assistant or None:
+    try:
 
-def getAssistantByHashID(hashID):
+        # Validate the json config
+        validate(config, json_schemas.assistant_config)
+
+        flow = None
+        if template and template != 'none':
+            # Get json template
+            relative_path = join('static/assistant_templates', template + '.json')
+            absolute_path = join(BaseConfig.APP_ROOT, relative_path)
+            flow = json.load(open(absolute_path))
+            # Validate template
+            callback: Callback = flow_services.isValidFlow(flow)
+            if not callback.Success:
+                raise Exception(callback.Message)
+
+        assistant = Assistant(Name=name, Flow=flow, Message=message, TopBarText=topBarText,
+                              SecondsUntilPopup=secondsUntilPopup, MailEnabled=mailEnabled, MailPeriod=mailPeriod,
+                              Config=config, CompanyID=companyID)
+        db.session.add(assistant)
+
+        # Save
+        db.session.commit()
+        return Callback(True, 'Assistant has ben created successfully!', assistant)
+    except Exception as exc:
+        print(exc)
+        logging.error("assistant_services.create(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Failed to create the assistant', None)
+
+
+def getByHashID(hashID):
     try:
         assistantID = helpers.decode_id(hashID)
         if len(assistantID) == 0:
@@ -57,8 +88,7 @@ def getByName(name) -> Callback:
         logging.error("assistant_services.getByName(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not get the assistant by nickname.')
-    # finally:
-       # db.session.close()
+
 
 
 def getAll(companyID) -> Callback:
@@ -95,52 +125,21 @@ def getAllWithEnabledNotifications(companyID) -> Callback:
         return Callback(False, 'Could not get all assistants.')
 
 
-def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, template, config, companyID) -> Assistant or None:
-    try:
-
-        # Validate the json config
-        validate(config, json_schemas.assistant_config)
-
-        flow = None
-        if template and template != 'none':
-            # Get json template
-            relative_path = join('static/assistant_templates', template + '.json')
-            absolute_path = join(BaseConfig.APP_ROOT, relative_path)
-            flow = json.load(open(absolute_path))
-            # Validate template
-            callback: Callback = flow_services.isValidFlow(flow)
-            if not callback.Success:
-                raise Exception(callback.Message)
-
-        assistant = Assistant(Name=name, Flow=flow, Message=message, TopBarText=topBarText,
-                              SecondsUntilPopup=secondsUntilPopup, MailEnabled=mailEnabled, MailPeriod=mailPeriod,
-                              Config=config, CompanyID=companyID)
-        db.session.add(assistant)
-
-        # Save
-        db.session.commit()
-        return Callback(True, 'Assistant has ben created successfully!', assistant)
-    except Exception as exc:
-        print(exc)
-        logging.error("assistant_services.create(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Failed to create the assistant', None)
-
-
-
-def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, config)-> Callback:
+def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, config, companyID)-> Callback:
     try:
         # Validate the json config
         validate(config, json_schemas.assistant_config)
 
-        db.session.query(Assistant).filter(Assistant.ID == id).update({'Name': name,
-                                                                       'Message': message,
-                                                                       'TopBarText': topBarText,
-                                                                       'SecondsUntilPopup': secondsUntilPopup,
-                                                                       "MailEnabled": mailEnabled,
-                                                                       "MailPeriod": mailPeriod,
-                                                                       "Config": config
-                                                                       })
+        db.session.query(Assistant).filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID))\
+            .update({
+                   "Name": name,
+                   "Message": message,
+                   "TopBarText": topBarText,
+                   "SecondsUntilPopup": secondsUntilPopup,
+                   "MailEnabled": mailEnabled,
+                   "MailPeriod": mailPeriod,
+                   "Config": config
+                   })
         db.session.commit()
         return Callback(True, name + ' Updated Successfully')
 
@@ -152,13 +151,13 @@ def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPe
                         "Couldn't update assistant " + str(id))
 
 
-def changeStatus(assistant: Assistant, status):
+def changeStatus(assistantID, newStatus, companyID):
     try:
-        isActive = False
-        if status:
-           isActive = True
 
-        assistant.Active = isActive
+        if not newStatus: raise Exception("Please provide the new status")
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"Active": newStatus})
+
         db.session.commit()
         return Callback(True, 'Assistant status has been changed.')
 
@@ -169,9 +168,9 @@ def changeStatus(assistant: Assistant, status):
         return Callback(False, "Could not change the assistant's status.")
 
 
-def removeByID(id) -> Callback:
+def removeByID(id, companyID) -> Callback:
     try:
-        db.session.query(Assistant).filter(Assistant.ID == id).delete()
+        db.session.query(Assistant).filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).delete()
         db.session.commit()
         return Callback(True, 'Assistant has been deleted.')
 
@@ -182,14 +181,15 @@ def removeByID(id) -> Callback:
         return Callback(False, 'Error in deleting assistant.')
 
 
-def connectToCRM(assistant: Assistant, crm_id):
+def connectToCRM(assistantID, CRMID, companyID):
     try:
 
-        crm_callback: Callback = crm_services.getCRMByID(crm_id, assistant.CompanyID)
+        crm_callback: Callback = crm_services.getCRMByID(CRMID, companyID)
         if not crm_callback.Success:
             raise Exception(crm_callback.Message)
 
-        assistant.CRM = crm_callback.Data
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"CRM": crm_callback.Data})
 
         db.session.commit()
         return Callback(True, 'Assistant has been connected to CRM.')
@@ -201,9 +201,11 @@ def connectToCRM(assistant: Assistant, crm_id):
         return Callback(False, 'Error in connecting assistant to CRM.')
 
 
-def disconnectFromCRM(assistant: Assistant):
+def disconnectFromCRM(assistantID, companyID):
     try:
-        assistant.CRM = None
+
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"CRM": None})
 
         db.session.commit()
         return Callback(True, 'Assistant has been disconnected from CRM.')
@@ -215,8 +217,13 @@ def disconnectFromCRM(assistant: Assistant):
         return Callback(False, 'Error in disconnecting assistant from CRM.')
 
 
-def uploadLogo(file, assistant: Assistant):
+def uploadLogo(assistantID, file, companyID):
     try:
+
+        assistant: Assistant = db.session.query(Assistant) \
+            .filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)).first()
+        if not assistant: raise Exception
+
         # Generate unique name: hash_sessionIDEncrypted.extension
         filename = helpers.encode_id(assistant.ID) + '.' + \
                    secure_filename(file.filename).rsplit('.', 1)[1].lower()
@@ -239,8 +246,12 @@ def uploadLogo(file, assistant: Assistant):
         return Callback(False, 'Error in uploading logo.')
 
 
-def deleteLogo(assistant: Assistant):
+def deleteLogo(assistantID, companyID):
     try:
+
+        assistant: Assistant = db.session.query(Assistant) \
+            .filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)).first()
+        if not assistant: raise Exception
 
         logoName = assistant.LogoName
         if not logoName: return Callback(False, 'No logo to delete')

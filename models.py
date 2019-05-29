@@ -182,7 +182,7 @@ class Conversation(db.Model):
     ApplicationStatus = db.Column(Enum(enums.ApplicationStatus), nullable=False, default=enums.ApplicationStatus.Pending)
     Score = db.Column(db.Float(), nullable=False)
 
-    MeetingEmailSentAt = db.Column(db.DateTime(), default=None)
+    AppointmentEmailSentAt = db.Column(db.DateTime(), default=None)
 
     CRMSynced = db.Column(db.Boolean, nullable=False, default=False)
     CRMResponse = db.Column(db.String(250), nullable=True)
@@ -201,6 +201,7 @@ class Conversation(db.Model):
 class AutoPilot(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(128), nullable=False)
     Active = db.Column(db.Boolean, nullable=False, default=True)
     AcceptApplications = db.Column(db.Boolean, nullable=False, default=False)
     AcceptanceScore = db.Column(db.Float(), nullable=False, default=1)
@@ -213,10 +214,15 @@ class AutoPilot(db.Model):
     Company = db.relationship('Company', back_populates='AutoPilots')
 
     Assistants = db.relationship('Assistant', back_populates='AutoPilot')
-    OpenTimeSlots = db.relationship('OpenTimeSlot', uselist=False, back_populates='AutoPilot')
+    OpenTimeSlots = db.relationship('OpenTimeSlot', back_populates='AutoPilot')
+
+    # Constraints:
+    # cannot have two auto pilot with the same name under one company
+    __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_auto_pilot'),)
 
     def __repr__(self):
         return '<AutoPilot {}>'.format(self.ID)
+
 
 class OpenTimeSlot(db.Model):
 
@@ -240,7 +246,7 @@ class OpenTimeSlot(db.Model):
     )
 
     def __repr__(self):
-        return '<OpenTimeSlot {}>'.format(self.Active)
+        return '<OpenTimeSlot {}>'.format(self.Day)
 
 
 class Appointment(db.Model):

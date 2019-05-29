@@ -35,3 +35,6 @@ database_router: Blueprint = database_router
 
 from .account.options import options_router
 options_router: Blueprint = options_router
+
+from .auto_pilot.auto_pilot import auto_pilot_router
+auto_Pilot_router: Blueprint = auto_pilot_router

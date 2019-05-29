@@ -105,7 +105,7 @@ def testConnection(details) -> Callback:
         if not login_callback.Success:
             return login_callback
 
-        return Callback(True, 'Successful connection')
+        return Callback(True, 'Successful connection.')
 
     except Exception as exc:
         logging.error("CRM_services.connect(): " + str(exc))
@@ -121,7 +121,7 @@ def disconnect(crm_id, company_id) -> Callback:
 
         db.session.delete(crm_callback.Data)
         db.session.commit()
-        return Callback(True, 'CRM has been disconnected successfully')
+        return Callback(True, 'CRM has been disconnected successfully.')
 
     except Exception as exc:
         logging.error("CRM_services.disconnect(): " + str(exc))

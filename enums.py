@@ -17,6 +17,7 @@ class CRM(Enum):
     Adapt = 'Adapt'
     Bullhorn = 'Bullhorn'
     Vincere = 'Vincere'
+    Greenhouse = 'Greenhouse'
 
 
 class BlockType(Enum):

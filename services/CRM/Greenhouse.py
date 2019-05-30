@@ -37,7 +37,6 @@ def login(auth):
         return Callback(True, 'Logged in successfully', authCopy)
 
     except Exception as exc:
-        print("LOGIN: ", exc)
         logging.error("CRM.Greenhouse.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
@@ -49,20 +48,18 @@ def sendQuery(auth, query, method, body, optionalParams=None):
 
         # set headers
         headers = {'Content-Type': 'application/json', "Authorization": auth.get("rest_token")}
-        print(headers)
+
         if query is not "get":
             headers["On-Behalf-Of"] = auth.get("user_id")
 
         r = sendRequest(url, method, headers, json.dumps(body))
-        print(r.status_code)
-        print(r.text)
+
         if str(r.status_code)[:1] != "2":  # check if error code is in the 200s
             raise Exception("Request to API servers failed with error " + str(r.status_code))
 
         return Callback(True, "Query was successful", r)
 
     except Exception as exc:
-        print("query: ", exc)
         logging.error("CRM.Greenhouse.sendQuery() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
@@ -129,7 +126,6 @@ def sendRequest(url, method, headers, data=None):
 #         return Callback(True, sendQuery_callback.Data.text)
 #
 #     except Exception as exc:
-#         print("candidate: ", exc)
 #         logging.error("CRM.Greenhouse.insertCandidate() ERROR: " + str(exc))
 #         return Callback(False, str(exc))
 
@@ -266,7 +262,6 @@ def searchJobs(auth, conversation) -> Callback:
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        print("ERRORRR: ", exc)
         logging.error("CRM.Greenhouse.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 

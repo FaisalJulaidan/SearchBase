@@ -359,11 +359,10 @@ def searchCandidates(auth, companyID, conversation) -> Callback:
         keywords = conversation['keywordsByDataType']
 
         # populate filter
-        if keywords.get(DT.CandidateLocation.value["name"]):
-            query += "address.city:" + "".join(keywords[DT.CandidateLocation.value["name"]]) + " or"
+        checkFilter(keywords, DT.CandidateLocation.value["name"], "address.city", query)
 
         # if keywords[DT.CandidateSkills.value["name"]]:
-        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + "&"
+        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
         if keywords.get(DT.CandidateDesiredSalary.value["name"]):
             query += " dayRate:" + str((float(keywords[DT.CandidateDesiredSalary.value["name"]]) / 365)) + " or"
@@ -415,29 +414,21 @@ def searchJobs(auth, companyID, conversation) -> Callback:
         keywords = conversation['keywordsByDataType']
 
         # populate filter TODO
-        if keywords.get(DT.JobTitle.value["name"]):
-            query += "title:" + "".join(keywords[DT.JobTitle.value["name"]]) + " or"
+        checkFilter(keywords, DT.JobTitle.value["name"], "title", query)
 
-        if keywords.get(DT.JobLocation.value["name"]):
-            query += "address.city:" + "".join(keywords[DT.JobLocation.value["name"]]) + " or"
+        checkFilter(keywords, DT.JobLocation.value["name"], "address.city", query)
 
-        if keywords.get(DT.JobType.value["name"]):
-            query += "employmentType:" + "".join(keywords[DT.JobType.value["name"]]) + " or"
+        checkFilter(keywords, DT.JobType.value["name"], "employmentType", query)
 
-        if keywords.get(DT.JobSalary.value["name"]):
-            query += "salary:" + "".join(keywords[DT.JobSalary.value["name"]]) + " or"
+        checkFilter(keywords, DT.JobSalary.value["name"], "salary", query)
 
-        if keywords.get(DT.JobDesiredSkills.value["name"]):
-            query += "skills:" + "".join(keywords[DT.JobDesiredSkills.value["name"]]) + " or"
+        checkFilter(keywords, DT.JobDesiredSkills.value["name"], "skills", query)
 
-        if keywords.get(DT.JobStartDate.value["name"]):
-            query += "startDate:" + "".join(keywords[DT.JobStartDate.value["name"]]) + " or"
+        checkFilter(keywords, DT.JobStartDate.value["name"], "startDate", query)
 
-        if keywords.get(DT.JobEndDate.value["name"]):
-            query += "dateEnd:" + "".join(keywords[DT.JobEndDate.value["name"]]) + " or"
+        checkFilter(keywords, DT.JobEndDate.value["name"], "dateEnd", query)
 
-        if keywords.get(DT.JobYearsRequired.value["name"]):
-            query += "yearsRequired:" + "".join(keywords[DT.JobYearsRequired.value["name"]]) + " or"
+        checkFilter(keywords, DT.JobYearsRequired.value["name"], "yearsRequired", query)
 
         query = query[:-3]
 
@@ -457,8 +448,7 @@ def searchJobs(auth, companyID, conversation) -> Callback:
         for record in return_body["data"]:
             result.append(databases_services.createPandaJob(id=record.get("id"),
                                                             title=record.get("title"),
-                                                            desc=record.get("publicDescription", "") + " " +
-                                                                 record.get("description", ""),
+                                                            desc=record.get("publicDescription", ""),
                                                             location=record.get("address", {}).get("city"),
                                                             type=record.get("employmentType"),
                                                             salary=record.get("salary"),
@@ -478,10 +468,17 @@ def searchJobs(auth, companyID, conversation) -> Callback:
         return Callback(False, str(exc))
 
 
+def checkFilter(keywords, filter, string, query):
+    if keywords.get(filter):
+        query += string + ":" + "".join(keywords[filter]) + " or"
+    return query
+
+
 def getAllCandidates(auth, companyID) -> Callback:
     try:
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "departmentCandidates", "get", {}, companyID, ["fields=*"])
+        sendQuery_callback: Callback = sendQuery(auth, "departmentCandidates", "get", {}, companyID, [
+            "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -497,7 +494,8 @@ def getAllCandidates(auth, companyID) -> Callback:
 def getAllJobs(auth, companyID) -> Callback:
     try:
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "departmentJobOrders", "get", {}, companyID, ["fields=*"])
+        sendQuery_callback: Callback = sendQuery(auth, "departmentJobOrders", "get", {}, companyID, [
+            "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

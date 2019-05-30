@@ -247,15 +247,15 @@ def uploadFile(auth, storedFile: StoredFile):
         entityID = str(conversationResponse.get("changedEntityId"))
 
         if conversation.UserType.value is "Candidate":
-            entity = "Candidate"
+            entity = "candidate"
         # elif conversation.UserType.value is "Client":  # Vincere does not have api call for client files
         #     entity = "ClientContact"
         else:
-            raise Exception("Entity type to submit could not be retrieved")
+            raise Exception("Entity type to submit could not be retrieved")  # -------------------------------
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "file/" + entity + "/" + entityID,
-                                                 "put", body, conversation.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, entity + "/" + entityID + "/file",
+                                                 "post", body, conversation.Assistant.CompanyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -285,14 +285,14 @@ def insertClient(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def insertClientContact(auth, conversation: Conversation, bhCompanyID) -> Callback:
+def insertClientContact(auth, conversation: Conversation, vincCompanyID) -> Callback:
     try:
         # New candidate details
         emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [""])
 
         body = {
-            "name": " ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], [])),
+            "first_name": conversation.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], [])[0],
+            "last_name": conversation.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], [])[-1],
             "mobile":
                 conversation.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'], [""])[0],
             "address": {
@@ -301,17 +301,11 @@ def insertClientContact(auth, conversation: Conversation, bhCompanyID) -> Callba
             },
             # check number of emails and submit them
             "email": emails[0],
-            "clientCorporation": {"id": bhCompanyID}
+            "company_id": vincCompanyID
         }
 
-        # add additional emails to email2 and email3
-        for email in emails:
-            index = emails.index(email)
-            if index != 0:
-                body["email" + str(index + 1)] = email
-
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientContact", "put", body,
+        sendQuery_callback: Callback = sendQuery(auth, "contact", "post", body,
                                                  conversation.Assistant.CompanyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -327,13 +321,13 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
     try:
         # New candidate details
         body = {
-            "name": " ".join(
+            "company_name": " ".join(
                 conversation.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'],
                                                                 ["Undefined Company - TSB"])),
         }
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientCorporation", "put", body,
+        sendQuery_callback: Callback = sendQuery(auth, "company", "post", body,
                                                  conversation.Assistant.CompanyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -429,6 +423,7 @@ def searchJobs(auth, companyID, conversation) -> Callback:
         if keywords.get(DT.JobEndDate.value["name"]):
             query += "dateEnd:" + "".join(keywords[DT.JobEndDate.value["name"]]) + " or"
 
+        checkFilter(keywords, DT.JobYearsRequired.value["name"], "yearsRequired", query)
         if keywords.get(DT.JobYearsRequired.value["name"]):
             query += "yearsRequired:" + "".join(keywords[DT.JobYearsRequired.value["name"]]) + " or"
 
@@ -469,6 +464,12 @@ def searchJobs(auth, companyID, conversation) -> Callback:
     except Exception as exc:
         logging.error("CRM.Vincere.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
+
+
+def checkFilter(keywords, filter, string, query):
+    if keywords.get(filter):
+        query += string + ":" + "".join(keywords[filter]) + " or"
+    return query
 
 
 def getAllCandidates(auth, companyID) -> Callback:

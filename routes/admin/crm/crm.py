@@ -4,7 +4,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
-from services.CRM import crm_services
+from services.CRM import crm_services, Bullhorn
 from utilities import helpers
 
 crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../../templates")
@@ -67,7 +67,6 @@ def crm_control(crm_id):
 def test_crm_connection():
     # No need for assistant authentication because testing crm connection should be public however at least
     # the user has to be logged in and has the token included in the request to minimise security risks
-
     # Connect to crm
     callback: Callback = Callback(False, '')
     if request.method == "POST":

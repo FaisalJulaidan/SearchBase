@@ -3,8 +3,8 @@ import logging
 from sqlalchemy.sql import and_
 
 from enums import CRM, UserType
-from models import db, Callback, Conversation, Assistant, CRM as CRM_Model
-from services.CRM import Adapt
+from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
+from services.CRM import Adapt, Bullhorn, Vincere
 
 
 # Process chatbot session
@@ -21,14 +21,56 @@ def processConversation(assistant: Assistant, conversation: Conversation) -> Cal
 
 def insertCandidate(assistant: Assistant, conversation: Conversation):
     # Check CRM type
-    if assistant.CRM is CRM.Adapt:
-        return Adapt.insertCandidate(assistant.CRMAuth, conversation)
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.insertCandidate(assistant.CRM.Auth, conversation)
+    elif assistant.CRM.Type is CRM.Adapt:
+        return Adapt.insertCandidate(assistant.CRM.Auth, conversation)
 
 
 def insertClient(assistant: Assistant, conversation: Conversation):
     # Check CRM type
-    if assistant.CRM is CRM.Adapt:
-        return Adapt.insertClient(assistant.CRMAuth, conversation)
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.insertClient(assistant.CRM.Auth, conversation)
+    elif assistant.CRM.Type is CRM.Adapt:
+        return Adapt.insertClient(assistant.CRM.Auth, conversation)
+
+
+def uploadFile(assistant: Assistant, storedFile: StoredFile):
+    # Check CRM type
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.uploadFile(assistant.CRM.Auth, storedFile)
+
+
+def searchCandidates(assistant: Assistant, session):
+    # Check CRM type
+    # if assistant.CRM.Type is CRM.Adapt:
+    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
+
+
+def searchJobs(assistant: Assistant, session):
+    # Check CRM type
+    # if assistant.CRM.Type is CRM.Adapt:
+    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
+
+
+def getAllCandidates(assistant: Assistant):
+    # Check CRM type
+    # if assistant.CRM.Type is CRM.Adapt:
+    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.getAllCandidates(assistant.CRM.Auth, assistant.CompanyID)
+
+
+def getAllJobs(assistant: Assistant):
+    # Check CRM type
+    # if assistant.CRM.Type is CRM.Adapt:
+    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
+    if assistant.CRM.Type is CRM.Bullhorn:
+        return Bullhorn.getAllJobs(assistant.CRM.Auth, assistant.CompanyID)
 
 
 # Connect to a new CRM
@@ -53,7 +95,7 @@ def connect(company_id, details) -> Callback:
     except Exception as exc:
         print(exc)
         logging.error("CRM_services.connect(): " + str(exc))
-        db.conversation.rollback()
+        db.session.rollback()
         return Callback(False, "CRM connection failed")
 
 
@@ -61,7 +103,6 @@ def connect(company_id, details) -> Callback:
 # details is a dict that has {auth, type}
 def update(crm_id, company_id, details) -> Callback:
     try:
-        crm_type: CRM = CRM[details['type']]
         crm_auth = details['auth']
 
         # test connection
@@ -75,7 +116,36 @@ def update(crm_id, company_id, details) -> Callback:
 
         crm = connection_callback.Data
 
-        crm.Type = crm_type
+        crm.Auth = crm_auth
+
+        # Save
+        db.session.commit()
+
+        return Callback(True, 'CRM has been updated successfully')
+
+    except Exception as exc:
+        print(exc)
+        logging.error("CRM_services.update(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Update CRM details failed.")
+
+
+def updateByCompanyAndType(crm_type, company_id, auth):
+    try:
+        crm_type: CRM = CRM[crm_type]
+        crm_auth = auth
+
+        # test connection
+        test_callback: Callback = testConnection({"auth": auth})
+        if not test_callback.Success:
+            return test_callback
+
+        connection_callback: Callback = getCRMByType(crm_type, company_id)
+        if not connection_callback.Success:
+            raise Exception(connection_callback.Message)
+
+        crm = connection_callback.Data
+
         crm.Auth = crm_auth
 
         # Save
@@ -100,6 +170,8 @@ def testConnection(details) -> Callback:
         login_callback: Callback = Callback(False, 'Connection failure. Please check entered details')
         if crm_type == CRM.Adapt:
             login_callback = Adapt.login(crm_auth)
+        elif crm_type == CRM.Bullhorn:
+            login_callback = Bullhorn.login(crm_auth)
 
         # When connection failed
         if not login_callback.Success:
@@ -134,6 +206,21 @@ def getCRMByID(crm_id, company_id):
     try:
         crm = db.session.query(CRM_Model) \
             .filter(and_(CRM_Model.CompanyID == company_id, CRM_Model.ID == crm_id)).first()
+        if not crm:
+            raise Exception("CRM not found")
+
+        return Callback(True, "CRM retrieved successfully.", crm)
+
+    except Exception as exc:
+        print("CRM_services.getCRMByCompanyID() Error: ", exc)
+        logging.error("CRM_services.getCRMByCompanyID(): " + str(exc))
+        return Callback(False, 'Could not retrieve CRM.')
+
+
+def getCRMByType(crm_type, company_id):
+    try:
+        crm = db.session.query(CRM_Model) \
+            .filter(and_(CRM_Model.CompanyID == company_id, CRM_Model.Type == crm_type)).first()
         if not crm:
             raise Exception("CRM not found")
 

@@ -73,7 +73,7 @@ class Crms extends React.Component {
                     {
                         this.state.CRMs.map((crm, i) =>
                             <div className={styles.CardFrame} key={i}>
-                                <Spin spinning={this.props.isLoading}>
+                                <Spin spinning={this.props.isLoadingCrms}>
                                     <Link to={{
                                         pathname: `/dashboard/crmlist/${crm.type}`,
                                         state: {crm: crm}
@@ -97,7 +97,7 @@ class Crms extends React.Component {
 function mapStateToProps(state) {
     return {
         CRMsList: state.crm.CRMsList,
-        isLoading: state.crm.isLoading
+        isLoadingCrms: state.crm.isLoadingCrms
     };
 }
 

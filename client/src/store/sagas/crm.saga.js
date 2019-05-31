@@ -26,7 +26,7 @@ function* connectCrm({connectedCRM}) {
     try {
         const res = yield http.post(`/crm/connect`, {type: connectedCRM.type, auth: connectedCRM.auth});
         successMessage(res.data?.msg || defaultMsg);
-        yield put(crmActions.connectCrmSuccess());
+        yield put(crmActions.connectCrmSuccess(res.data.data));
     } catch (error) {
         let data = error.response?.data;
         errorMessage(data.msg || defaultMsg);
@@ -49,10 +49,10 @@ function* testCrm({testedCRM}) {
     }
 }
 
-function* disconnectCrm({disconnectedCRM}) {
+function* disconnectCrm({disconnectedCRMID}) {
     let msg = "Couldn't disconnect";
     try {
-        const res = yield http.delete(`/crm/${disconnectedCRM.ID}`);
+        const res = yield http.delete(`/crm/${disconnectedCRMID}`);
 
         if (!res.data?.success) {
             errorMessage(res.data?.msg || msg);

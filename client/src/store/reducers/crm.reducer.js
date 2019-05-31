@@ -30,8 +30,11 @@ export const crm = (state = initialState, action) => {
                 errorMsg: null,
             });
         case actionTypes.CONNECT_CRM_SUCCESS:
+            tState = {...state};
+            tState.CRMsList.push(action.connectedCRM);
             return updateObject(state, {
-                connectedCRM_ID: action.connectedCRM_ID
+                connectedCRM_ID: action.connectedCRM,
+                CRMsList: tState.CRMsList
             });
         case actionTypes.CONNECT_CRM_FAILURE:
             return updateObject(state, {
@@ -50,6 +53,7 @@ export const crm = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
+        // DISCONNECT CRM
         case actionTypes.DISCONNECT_CRM_REQUEST:
             return updateObject(state, {
                 errorMsg: null,

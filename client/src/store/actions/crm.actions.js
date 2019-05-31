@@ -28,10 +28,10 @@ const connectCrm = (connectedCRM) => {
     };
 };
 
-const connectCrmSuccess = (connectedCRM_ID, msg) => {
+const connectCrmSuccess = (connectedCRM, msg) => {
     return {
         type: actionTypes.CONNECT_CRM_SUCCESS,
-        connectedCRM_ID,
+        connectedCRM,
         msg
     };
 };
@@ -63,10 +63,10 @@ const testCrmFailure = (error) => {
     };
 };
 
-const disconnectCrm = (disconnectedCRM) => {
+const disconnectCrm = (disconnectedCRMID) => {
     return {
         type: actionTypes.DISCONNECT_CRM_REQUEST,
-        disconnectedCRM
+        disconnectedCRMID
     };
 };
 

@@ -38,6 +38,9 @@ def crm_connect():
     if request.method == "POST":
         callback: Callback = crm_services.connect(user.get("companyID"), request.json)  # crm details passed: auth, type
 
+        callback.Data = helpers.getDictFromSQLAlchemyObj(callback.Data)
+        callback.Data['Status'] = True
+
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
     return helpers.jsonResponse(True, 200, callback.Message, callback.Data)

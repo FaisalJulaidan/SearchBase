@@ -4,7 +4,8 @@ from sqlalchemy.sql import and_
 
 from enums import CRM, UserType
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.CRM import Adapt, Bullhorn, Vincere
+from services.CRM import Adapt, Bullhorn
+from utilities import helpers
 
 
 # Process chatbot session
@@ -90,7 +91,7 @@ def connect(company_id, details) -> Callback:
         db.session.add(connection)
         db.session.commit()
 
-        return Callback(True, 'CRM has been connected successfully', connection.ID)
+        return Callback(True, 'CRM has been connected successfully', connection)
 
     except Exception as exc:
         print(exc)

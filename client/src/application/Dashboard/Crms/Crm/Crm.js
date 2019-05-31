@@ -23,7 +23,6 @@ class Crm extends React.Component {
             return history.push('/dashboard/crmlist')
     }
 
-
     componentWillReceiveProps(nextProps) {
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         const index = nextProps.CRMsList.findIndex(serverCRM => serverCRM.Type === crm.type);
@@ -88,7 +87,7 @@ class Crm extends React.Component {
                 <div className={styles.Title}>
                     <Avatar shape="square" src={crm.image} className={styles.Avatar}/>
                     <div className={styles.DetailsWithAvatar}>
-                        <Title level={2}>{crm?.type}</Title>
+                        <Title level={2}>{crm.type}</Title>
                         {
                             crm.type === "Adapt" &&
                             <AdaptHeader/>

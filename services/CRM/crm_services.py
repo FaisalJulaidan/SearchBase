@@ -4,7 +4,7 @@ from sqlalchemy.sql import and_
 
 from enums import CRM, UserType
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.CRM import Adapt, Bullhorn
+from services.CRM import Adapt, Bullhorn, Vincere, Greenhouse
 from utilities import helpers
 
 
@@ -26,6 +26,8 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
         return Bullhorn.insertCandidate(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Adapt:
         return Adapt.insertCandidate(assistant.CRM.Auth, conversation)
+    elif assistant.CRM.Type is CRM.Greenhouse:
+        return Callback(True, "Greenhouse does not accept candidates at this stage")
 
 
 def insertClient(assistant: Assistant, conversation: Conversation):
@@ -34,12 +36,16 @@ def insertClient(assistant: Assistant, conversation: Conversation):
         return Bullhorn.insertClient(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Adapt:
         return Adapt.insertClient(assistant.CRM.Auth, conversation)
+    elif assistant.CRM.Type is CRM.Greenhouse:
+        return Callback(True, "Greenhouse does not accept clients")
 
 
 def uploadFile(assistant: Assistant, storedFile: StoredFile):
     # Check CRM type
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.uploadFile(assistant.CRM.Auth, storedFile)
+    elif assistant.CRM.Type is CRM.Greenhouse:
+        return Greenhouse.uploadFile(assistant.CRM.Auth, storedFile)
 
 
 def searchCandidates(assistant: Assistant, session):
@@ -48,6 +54,8 @@ def searchCandidates(assistant: Assistant, session):
     #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
+    elif assistant.CRM.Type is CRM.Greenhouse:
+        return Greenhouse.searchCandidates(assistant.CRM.Auth)
 
 
 def searchJobs(assistant: Assistant, session):
@@ -56,6 +64,8 @@ def searchJobs(assistant: Assistant, session):
     #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
+    elif assistant.CRM.Type is CRM.Greenhouse:
+        return Greenhouse.searchJobs(assistant.CRM.Auth, session)
 
 
 def getAllCandidates(assistant: Assistant):
@@ -64,6 +74,8 @@ def getAllCandidates(assistant: Assistant):
     #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.getAllCandidates(assistant.CRM.Auth, assistant.CompanyID)
+    elif assistant.CRM.Type is CRM.Greenhouse:
+        return Greenhouse.getAllCandidates(assistant.CRM.Auth)
 
 
 def getAllJobs(assistant: Assistant):
@@ -72,6 +84,8 @@ def getAllJobs(assistant: Assistant):
     #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.getAllJobs(assistant.CRM.Auth, assistant.CompanyID)
+    elif assistant.CRM.Type is CRM.Greenhouse:
+        return Greenhouse.getAllJobs(assistant.CRM.Auth)
 
 
 # Connect to a new CRM
@@ -79,13 +93,12 @@ def getAllJobs(assistant: Assistant):
 def connect(company_id, details) -> Callback:
     try:
         crm_type: CRM = CRM[details['type']]
-        crm_auth = details['auth']
         # test connection
         test_callback: Callback = testConnection(details)
         if not test_callback.Success:
             return test_callback
 
-        connection = CRM_Model(Type=crm_type, Auth=crm_auth, CompanyID=company_id)
+        connection = CRM_Model(Type=crm_type, Auth=test_callback.Data, CompanyID=company_id)
 
         # Save
         db.session.add(connection)
@@ -94,7 +107,6 @@ def connect(company_id, details) -> Callback:
         return Callback(True, 'CRM has been connected successfully', connection)
 
     except Exception as exc:
-        print(exc)
         logging.error("CRM_services.connect(): " + str(exc))
         db.session.rollback()
         return Callback(False, "CRM connection failed")
@@ -173,12 +185,14 @@ def testConnection(details) -> Callback:
             login_callback = Adapt.login(crm_auth)
         elif crm_type == CRM.Bullhorn:
             login_callback = Bullhorn.login(crm_auth)
+        elif crm_type == CRM.Greenhouse:
+            login_callback = Greenhouse.login(crm_auth)
 
         # When connection failed
         if not login_callback.Success:
             return login_callback
 
-        return Callback(True, 'Successful connection')
+        return Callback(True, 'Successful connection', login_callback.Data)
 
     except Exception as exc:
         logging.error("CRM_services.connect(): " + str(exc))

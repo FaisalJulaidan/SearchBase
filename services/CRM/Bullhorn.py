@@ -24,7 +24,7 @@ from services import databases_services, stored_file_services
 # login requires: username, password
 def login(auth):
     try:
-        authCopy = dict(auth)  # we took copy to delete domain later only from the copy
+        authCopy = dict(auth)
 
         headers = {'Content-Type': 'application/json'}
 
@@ -128,20 +128,20 @@ def retrieveRestToken(auth, companyID):
 def sendQuery(auth, query, method, body, companyID, optionalParams=None):
     try:
         # get url
-        url = build_url(auth, query, optionalParams)
+        url = buildUrl(auth, query, optionalParams)
 
         # set headers
         headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
-        r = send_request(url, method, headers, json.dumps(body))
+        r = sendRequest(url, method, headers, json.dumps(body))
 
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
-                url = build_url(callback.Data, query, optionalParams)
+                url = buildUrl(callback.Data, query, optionalParams)
 
-                r = send_request(url, method, headers, json.dumps(body))
+                r = sendRequest(url, method, headers, json.dumps(body))
                 if not r.ok:
                     raise Exception(r.text + ". Query could not be sent")
             else:
@@ -156,7 +156,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         return Callback(False, str(exc))
 
 
-def build_url(rest_data, query, optionalParams=None):
+def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
     url = rest_data.get("rest_url", "https://rest91.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
           "?BhRestToken=" + rest_data.get("rest_token", "none")
@@ -168,7 +168,7 @@ def build_url(rest_data, query, optionalParams=None):
     return url
 
 
-def send_request(url, method, headers, data=None):
+def sendRequest(url, method, headers, data=None):
     request = None
     if method is "put":
         request = requests.put(url, headers=headers, data=data)

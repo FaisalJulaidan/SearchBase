@@ -228,9 +228,7 @@ class Conversations extends React.Component {
         const columns = [
             {
             title: '#',
-            dataIndex: 'ID',
-            key: 'ID',
-            render: (text, record, index) => (<p>{record.ID}</p>),
+            render: (text, record, index) => (<p>{index + 1}</p>),
 
         }, {
             title: 'User Type',

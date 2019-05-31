@@ -1,5 +1,5 @@
 from sqlalchemy import and_
-from models import db, Callback, AutoPilot, OpenTimeSlot, Assistant, Conversation
+from models import db, Callback, AutoPilot, OpenTimeSlot, Conversation
 from datetime import time
 import logging, enums
 from utilities import helpers
@@ -26,17 +26,6 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                         None)
 
 
-def __getApplicationResult(score, autoPilot: AutoPilot) -> enums.ApplicationStatus:
-    result = enums.ApplicationStatus.Pending
-    if autoPilot.AcceptApplications and (score > autoPilot.AcceptanceScore):
-        result = enums.ApplicationStatus.Accepted
-    if autoPilot.RejectApplications and (score < autoPilot.RejectionScore):
-        result = enums.ApplicationStatus.Rejected
-    return result
-
-def __sendAppointmentEmail(conversation: Conversation, autoPilot):
-    return None
-
 # The new AutoPilot will be returned parsed
 def create(name, companyID: int) -> Callback:
     try:
@@ -55,7 +44,7 @@ def create(name, companyID: int) -> Callback:
                          ]
         db.session.add_all(openTimeSlots)
         db.session.commit()
-        return Callback(True, "Got AutoPilot successfully.", parseAutoPilot(autoPilot))
+        return Callback(True, "Got AutoPilot successfully.", __parseAutoPilot(autoPilot))
 
     except Exception as exc:
         print(exc)
@@ -85,7 +74,7 @@ def fetchAll(companyID) -> Callback:
 
         result: list = []
         for autoPilot in db.session.query(AutoPilot).filter(AutoPilot.CompanyID == companyID).all():
-            result.append(parseAutoPilot(autoPilot))
+            result.append(__parseAutoPilot(autoPilot))
 
         return Callback(True, "Fetched all AutoPilots successfully.", result)
 
@@ -149,9 +138,21 @@ def removeByID(id, companyID):
         return Callback(False, 'Error in deleting AutoPilot.')
 
 
-# It takes an autoPilot object and join all it children tables into one dict
-def parseAutoPilot(autoPilot: AutoPilot) -> dict:
+# It takes an autoPilot object and join all its children tables into one dict
+def __parseAutoPilot(autoPilot: AutoPilot) -> dict:
     return {
         **helpers.getDictFromSQLAlchemyObj(autoPilot),
         "OpenTimeSlots": helpers.getListFromSQLAlchemyList(autoPilot.OpenTimeSlots)
     }
+
+
+def __getApplicationResult(score, autoPilot: AutoPilot) -> enums.ApplicationStatus:
+    result = enums.ApplicationStatus.Pending
+    if autoPilot.AcceptApplications and (score > autoPilot.AcceptanceScore):
+        result = enums.ApplicationStatus.Accepted
+    if autoPilot.RejectApplications and (score < autoPilot.RejectionScore):
+        result = enums.ApplicationStatus.Rejected
+    return result
+
+def __sendAppointmentEmail(conversation: Conversation, autoPilot):
+    return None

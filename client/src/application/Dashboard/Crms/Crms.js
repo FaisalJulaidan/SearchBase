@@ -24,7 +24,7 @@ class Crms extends React.Component {
             },
             {
                 title: 'Bullhorn',
-                desc: `Bond Adapt, specialist portfolio of recruitment software applications has earned a reputation for increasing business growth.`,
+                desc: `Bullhorn provides customer relationship management, applicant tracking system and operations software for the staffing industry.`,
                 image: getLink('/static/images/CRM/bullhorn.png'),
                 type: "Bullhorn",
                 status: 'NOT_CONNECTED',
@@ -64,7 +64,14 @@ class Crms extends React.Component {
                     <div className={styles.Details}>
                         <Title> <Icon type="interation"/> CRMs List</Title>
                         <Paragraph type="secondary">
-                            <Text>Desc</Text>
+                            <Text>From the list below, choose your CRM or ATS for your account to be directly connected.
+                                If you need help with the setup or wish to contact us to arrange an integration with
+                                your provider, please contact us at: <Text code><a target={'_blank'}
+                                                                                   href={"mailto:info@thesearchbase.com"}
+                                                                                   style={{cursor: 'pointer'}}>
+                                    info@thesearchbase.com
+                                </a></Text>.
+                            </Text>
                         </Paragraph>
                     </div>
                 </div>

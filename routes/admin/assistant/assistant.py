@@ -56,7 +56,6 @@ def assistant(assistantID):
     # Update assistant
     if request.method == "PUT":
         updatedSettings = request.json
-        print(updatedSettings)
         callback: Callback = assistant_services.update(assistantID,
                                                        updatedSettings.get("assistantName"),
                                                        updatedSettings.get("welcomeMessage"),

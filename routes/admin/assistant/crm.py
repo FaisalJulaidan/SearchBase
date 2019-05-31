@@ -24,6 +24,8 @@ def get_crms():
         crms = helpers.getListFromSQLAlchemyList(callback.Data)
         for crm in crms:
             crm['Status'] = crm_services.testConnection({'auth': crm['Auth'], 'type': crm['Type']}).Success
+            crm.pop('Auth')
+            crm.pop('CompanyID')
 
         return helpers.jsonResponse(True, 200, callback.Message, crms)
 

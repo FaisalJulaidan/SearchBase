@@ -11,7 +11,8 @@ import {
     usersManagementSaga,
     databaseSaga,
     optionsSaga,
-    crmSaga
+    crmSaga,
+    autoPilotSaga
 } from './sagas'
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -25,13 +26,11 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-
 const store = createStore(
     persistedReducer,
-    // { ...authActions.checkAuthTimeout(), ...window.__PRELOADED_STATE__ },
     composeEnhancers(applyMiddleware(sagaMiddleware))
-
 );
+
 const persistor = persistStore(store);
 
 sagaMiddleware.run(assistantSaga);
@@ -42,6 +41,7 @@ sagaMiddleware.run(usersManagementSaga);
 sagaMiddleware.run(databaseSaga);
 sagaMiddleware.run(optionsSaga);
 sagaMiddleware.run(crmSaga);
+sagaMiddleware.run(autoPilotSaga);
 
 
 export { store, persistor }

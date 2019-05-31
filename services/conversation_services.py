@@ -58,7 +58,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
             if ap_callback.Success:
                 conversation.AutoPilotStatus = True
                 conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
-                conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
+                # conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
             conversation.AutoPilotResponse = ap_callback.Message
 
 

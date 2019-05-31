@@ -7,6 +7,7 @@ import {usersManagement} from "./usersManagement.reducer";
 import {database} from "./database.reducer";
 import {options} from "./options.reducer";
 import {crm} from "./crm.reducer";
+import {autoPilot} from "./autoPilot.reducer";
 import * as actionTypes from '../actions/actionTypes';
 import storage from 'redux-persist/lib/storage'
 
@@ -15,6 +16,7 @@ const appReducer = combineReducers({
     auth,
     crm,
     assistant,
+    autoPilot,
     profile,
     conversation,
     usersManagement,

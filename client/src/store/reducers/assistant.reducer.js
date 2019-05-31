@@ -14,7 +14,7 @@ export const assistant = (state = initialState, action) => {
             });
         case actionTypes.FETCH_ASSISTANTS_SUCCESS:
             return updateObject(state, {
-                assistantList: action.assistantList.assistants,
+                assistantList: action.assistantList,
                 isLoading: false
             });
         case actionTypes.FETCH_ASSISTANTS_FAILURE:

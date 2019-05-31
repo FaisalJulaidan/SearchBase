@@ -69,7 +69,6 @@ const updateAssistantFailure = (error) => {
 };
 
 
-
 const deleteAssistant = (assistantID) => {
     return {
         type: actionTypes.DELETE_ASSISTANT_REQUEST,

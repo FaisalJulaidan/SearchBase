@@ -12,7 +12,7 @@ function* fetchAssistants() {
         if (!res.data?.data)
             throw Error(`Can't fetch assistants`);
 
-        yield put(assistantActions.fetchAssistantsSuccess(res.data?.data));
+        yield put(assistantActions.fetchAssistantsSuccess(res.data?.data.assistants));
     } catch (error) {
         console.error(error);
         const msg = "Couldn't load assistants";

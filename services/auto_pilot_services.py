@@ -9,12 +9,12 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
     try:
         result = {
             "applicationStatus": enums.ApplicationStatus.Pending,
-            "appointmentEmailSentAt": None,
+            # "appointmentEmailSentAt": None,
             "response": None
         }
         if autoPilot.Active:
             result['applicationStatus'] = __getApplicationResult(conversation.Score, autoPilot)
-            result['appointmentEmailSentAt'] = __sendAppointmentEmail(conversation, autoPilot)
+            # result['appointmentEmailSentAt'] = __sendAppointmentEmail(conversation, autoPilot)
 
         return Callback(True, "Automation done via " + autoPilot.Name + " pilot successfully.", result)
 
@@ -86,11 +86,12 @@ def fetchAll(companyID) -> Callback:
 
 # ----- Updaters ----- #
 def update(id, name, active, acceptApplications, acceptanceScore, rejectApplications,
-           rejectionScore, SendCandidatesAppointments, openTimeSlots: list, companyID: int) -> Callback:
+           rejectionScore, SendCandidatesAppointments, companyID: int) -> Callback:
     try:
 
+        # TODO OpenTimeSlots & Appointments Feature
         # Check all OpenTimeSlots are given
-        if len(openTimeSlots) != 7: raise Exception("Number of open time slots should be 7")
+        # if len(openTimeSlots) != 7: raise Exception("Number of open time slots should be 7")
 
         # Get AutoPilot
         autoPilot_callback: Callback = getByID(id, companyID)
@@ -106,13 +107,14 @@ def update(id, name, active, acceptApplications, acceptanceScore, rejectApplicat
         autoPilot.RejectionScore = rejectionScore
         autoPilot.SendCandidatesAppointments = SendCandidatesAppointments
 
+        # TODO OpenTimeSlots & Appointments Feature
         # Update the openTimeSlots
-        for (oldSlot, newSlot) in zip(AutoPilot.OpenTimeSlots, openTimeSlots):
-            if oldSlot.Day == newSlot['day']:
-                oldSlot.Active = newSlot['active']
-                oldSlot.From = time(newSlot['from'][0], newSlot['from'][1])
-                oldSlot.To = time(newSlot['to'][0], newSlot['to'][1])
-                oldSlot.Duration = newSlot['duration']
+        # for (oldSlot, newSlot) in zip(AutoPilot.OpenTimeSlots, openTimeSlots):
+        #     if oldSlot.Day == newSlot['day']:
+        #         oldSlot.Active = newSlot['active']
+        #         oldSlot.From = time(newSlot['from'][0], newSlot['from'][1])
+        #         oldSlot.To = time(newSlot['to'][0], newSlot['to'][1])
+        #         oldSlot.Duration = newSlot['duration']
 
         # Save all changes
         db.session.commit()

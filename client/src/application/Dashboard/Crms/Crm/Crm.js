@@ -66,13 +66,7 @@ class Crm extends React.Component {
 
     disconnectCRM = () => {
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
-        confirm({
-            title: `Disconnect from ${crm.type}`,
-            content: <p>Chatbot conversations will no longer be synced with {crm.type} account</p>,
-            onOk: () => {
-                this.props.dispatch(crmActions.disconnectCrm({ID: crm.ID}))
-            }
-        });
+        this.props.dispatch(crmActions.disconnectCrm({ID: crm.ID}))
     };
 
     render() {
@@ -135,6 +129,9 @@ class Crm extends React.Component {
                                                     layout={layout}
                                                     CRM={crm}
                                                     FormItem={FormItem}
+                                                    isConnecting={this.props.isConnecting}
+                                                    isTesting={this.props.isTesting}
+                                                    isDisconnecting={this.props.isDisconnecting}
                                                     disconnectCRM={this.disconnectCRM}
                                                     connectCRM={this.connectCRM}
                                                     testCRM={this.testCRM}/>
@@ -148,6 +145,9 @@ class Crm extends React.Component {
                                                        layout={layout}
                                                        FormItem={FormItem}
                                                        CRM={crm}
+                                                       isConnecting={this.props.isConnecting}
+                                                       isTesting={this.props.isTesting}
+                                                       isDisconnecting={this.props.isDisconnecting}
                                                        disconnectCRM={this.disconnectCRM}
                                                        connectCRM={this.connectCRM}
                                                        testCRM={this.testCRM}/>
@@ -160,6 +160,9 @@ class Crm extends React.Component {
                                                       layout={layout}
                                                       FormItem={FormItem}
                                                       CRM={crm}
+                                                      isConnecting={this.props.isConnecting}
+                                                      isTesting={this.props.isTesting}
+                                                      isDisconnecting={this.props.isDisconnecting}
                                                       disconnectCRM={this.disconnectCRM}
                                                       connectCRM={this.connectCRM}
                                                       testCRM={this.testCRM}/>
@@ -181,7 +184,9 @@ class Crm extends React.Component {
 function mapStateToProps(state) {
     return {
         CRMsList: state.crm.CRMsList,
-        isLoading: state.crm.isLoading
+        isConnecting: state.crm.isConnecting,
+        isTesting: state.crm.isTesting,
+        isDisconnecting: state.crm.isDisconnecting,
     };
 }
 

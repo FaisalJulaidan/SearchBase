@@ -1,9 +1,8 @@
 import React from 'react';
-import {Button, Col, Icon, Input, Select, Typography} from "antd";
+import {Button, Col, Icon, Input, Popconfirm, Typography} from "antd";
 import styles from "../Crm.module.less";
 import {getLink} from "helpers";
 
-const {Option} = Select;
 const {Title, Paragraph, Text} = Typography;
 
 export const BullhornFormItems = ({
@@ -13,7 +12,10 @@ export const BullhornFormItems = ({
                                       CRM,
                                       disconnectCRM,
                                       connectCRM,
-                                      testCRM
+                                      testCRM,
+                                      isConnecting,
+                                      isTesting,
+                                      isDisconnecting
                                   }) =>
     <div>
         {
@@ -85,15 +87,23 @@ export const BullhornFormItems = ({
                 {
                     (CRM.status === "CONNECTED" || CRM.status === "FAILED")
                     &&
-                    <Button type="danger" onClick={disconnectCRM}>Disconnect</Button>
+                    <Popconfirm
+                        title="Chatbot conversations will no longer be synced with Bullhorn account"
+                        onConfirm={disconnectCRM}
+                        okType={'danger'}
+                        okText="Disconnect"
+                        cancelText="No"
+                    >
+                        <Button type="danger" disabled={isDisconnecting}>Disconnect</Button>
+                    </Popconfirm>
                 }
 
                 {
                     CRM.status === "NOT_CONNECTED" &&
                     <>
-                        <Button type="primary"
+                        <Button type="primary" disabled={isConnecting || isTesting}
                                 onClick={connectCRM}>Connect</Button>
-                        <Button onClick={testCRM}>Test</Button>
+                        <Button onClick={testCRM} disabled={isConnecting || isTesting}>Test</Button>
                     </>
                 }
             </div>

@@ -1,7 +1,13 @@
 import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
-const initialState = {CRMsList: [], errorMsg: null, currentCRM: {}, isLoading: false};
+const initialState = {
+    CRMsList: [], errorMsg: null, currentCRM: {},
+    isLoadingCrms: false,
+    isConnecting: false,
+    isTesting: false,
+    isDisconnecting: false
+};
 
 export const crm = (state = initialState, action) => {
     let tState = {};
@@ -9,17 +15,16 @@ export const crm = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.GET_CONNECTED_CRMS_REQUEST:
             return updateObject(state, {
-                isLoading: true,
-                errorMsg: null,
+                isLoadingCrms: true,
             });
         case actionTypes.GET_CONNECTED_CRMS_SUCCESS:
             return updateObject(state, {
-                isLoading: false,
+                isLoadingCrms: false,
                 CRMsList: action.CRMsList,
             });
         case actionTypes.GET_CONNECTED_CRMS_FAILURE:
             return updateObject(state, {
-                isLoading: false,
+                isLoadingCrms: false,
                 errorMsg: action.error
             });
 
@@ -27,45 +32,53 @@ export const crm = (state = initialState, action) => {
         // CONNECT CRM
         case actionTypes.CONNECT_CRM_REQUEST:
             return updateObject(state, {
-                errorMsg: null,
+                isConnecting: true,
             });
         case actionTypes.CONNECT_CRM_SUCCESS:
             tState = {...state};
             tState.CRMsList.push(action.connectedCRM);
             return updateObject(state, {
+                isConnecting: false,
                 connectedCRM_ID: action.connectedCRM,
                 CRMsList: tState.CRMsList
             });
         case actionTypes.CONNECT_CRM_FAILURE:
             return updateObject(state, {
+                isConnecting: false,
                 errorMsg: action.error
             });
 
         // TEST CRM
         case actionTypes.TEST_CRM_REQUEST:
             return updateObject(state, {
-                errorMsg: null,
+                isTesting: true,
             });
         case actionTypes.TEST_CRM_SUCCESS:
-            return updateObject(state, {});
+            return updateObject(state, {
+                isTesting: false,
+            });
         case actionTypes.TEST_CRM_FAILURE:
             return updateObject(state, {
+                isTesting: false,
                 errorMsg: action.error
             });
 
         // DISCONNECT CRM
         case actionTypes.DISCONNECT_CRM_REQUEST:
             return updateObject(state, {
+                isDisconnecting: false,
                 errorMsg: null,
             });
         case actionTypes.DISCONNECT_CRM_SUCCESS:
             tState = {...state};
             return updateObject(state, {
+                isDisconnecting: false,
                 connectedCRM_ID: action.connectedCRM_ID,
                 CRMsList: tState.CRMsList.filter(x => x.ID !== action.connectedCRM_ID)
             });
         case actionTypes.DISCONNECT_CRM_FAILURE:
             return updateObject(state, {
+                isDisconnecting: false,
                 errorMsg: action.error
             });
 

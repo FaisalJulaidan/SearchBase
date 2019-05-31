@@ -1,7 +1,7 @@
 import {all, put, takeEvery} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {crmActions} from "../actions";
-import {errorHandler, errorMessage, http, successMessage} from "helpers";
+import {destroyMessage, errorHandler, errorMessage, http, loadingMessage, successMessage} from "helpers";
 import * as Sentry from '@sentry/browser';
 
 function* fetchCRMs() {
@@ -24,7 +24,9 @@ function* fetchCRMs() {
 function* connectCrm({connectedCRM}) {
     const defaultMsg = "Couldn't Connect CRM";
     try {
+        loadingMessage('Connecting to ' + connectedCRM.type, 0);
         const res = yield http.post(`/crm/connect`, {type: connectedCRM.type, auth: connectedCRM.auth});
+        destroyMessage();
         successMessage(res.data?.msg || defaultMsg);
         yield put(crmActions.connectCrmSuccess(res.data.data));
     } catch (error) {
@@ -38,7 +40,9 @@ function* connectCrm({connectedCRM}) {
 function* testCrm({testedCRM}) {
     const defaultMsg = "Couldn't Test CRM";
     try {
+        loadingMessage('Connecting to ' + testedCRM.type, 0);
         const res = yield http.post(`/crm/test`, {type: testedCRM.type, auth: testedCRM.auth});
+        destroyMessage();
         successMessage(res.data?.msg || defaultMsg);
         yield put(crmActions.testCrmSuccess());
     } catch (error) {
@@ -52,7 +56,7 @@ function* testCrm({testedCRM}) {
 function* disconnectCrm({disconnectedCRMID}) {
     let msg = "Couldn't disconnect";
     try {
-        const res = yield http.delete(`/crm/${disconnectedCRMID}`);
+        const res = yield http.delete(`/crm/${disconnectedCRMID.ID}`);
 
         if (!res.data?.success) {
             errorMessage(res.data?.msg || msg);
@@ -62,7 +66,6 @@ function* disconnectCrm({disconnectedCRMID}) {
         if (res.data?.msg)
             successMessage(res.data.msg);
 
-        console.log(res.data);
         yield put(crmActions.disconnectCrmSuccess(res.data.data));
     } catch (error) {
         msg = error.response?.data?.msg;

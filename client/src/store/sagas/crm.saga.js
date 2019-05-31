@@ -5,7 +5,7 @@ import {errorHandler, errorMessage, http, successMessage} from "helpers";
 import * as Sentry from '@sentry/browser';
 
 function* fetchCRMs() {
-    const msg = "Couldn't load CRMs";
+    let msg = "Couldn't load CRMs";
     try {
         const res = yield http.get(`/crm`);
         if (!res.data?.data)
@@ -62,7 +62,8 @@ function* disconnectCrm({disconnectedCRM}) {
         if (res.data?.msg)
             successMessage(res.data.msg);
 
-        yield put(crmActions.disconnectCrmSuccess('disconnect'));
+        console.log(res.data);
+        yield put(crmActions.disconnectCrmSuccess(res.data.data));
     } catch (error) {
         msg = error.response?.data?.msg;
         console.error(error);

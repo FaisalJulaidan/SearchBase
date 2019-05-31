@@ -121,7 +121,7 @@ def disconnect(crm_id, company_id) -> Callback:
 
         db.session.delete(crm_callback.Data)
         db.session.commit()
-        return Callback(True, 'CRM has been disconnected successfully')
+        return Callback(True, 'CRM has been disconnected successfully', crm_id)
 
     except Exception as exc:
         logging.error("CRM_services.disconnect(): " + str(exc))

@@ -1,77 +1,64 @@
 import React from 'react'
+import {history} from "helpers";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {Avatar, Breadcrumb, Form, Modal, Tabs, Typography} from 'antd';
-import styles from './CrmView.module.less'
-import {history} from "helpers";
+import styles from './Crm.module.less'
 import 'types/CRM_Types';
-import AdaptFormItems from "./CrmForms/Adapt";
-import BullhornFormItems from "./CrmForms/Bullhorn";
+import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./CrmForms/Adapt";
+import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./CrmForms/Bullhorn";
 import VincereFormItems from "./CrmForms/Vincere";
 import {connect} from 'react-redux';
 import {crmActions} from "store/actions";
 
 const TabPane = Tabs.TabPane;
-const {Title, Paragraph, Text} = Typography;
+const {Title} = Typography;
 const FormItem = Form.Item;
 
 const confirm = Modal.confirm;
 
-class CrmView extends React.Component {
+class Crm extends React.Component {
 
-    state = {
-        /** @type {CRM} */
-        CRM: {}
-    };
-
-    componentDidMount() {
-        this.setState({
-            ...this.props.location?.state
-        }, () => {
-            // If the state is not passed from the parent page redirect the user to integration page to
-            // click on the needed CRM to show its data (or use its state)
-            if (!this.state.CRM?.type)
-                history.push('/dashboard/crmlist')
-        });
+    componentWillMount() {
+        if (!this.props.location.state)
+            return history.push('/dashboard/crmlist')
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.connectedCRM_ID)
-            this.setState({
-                CRM: {
-                    ...this.state.CRM,
-                    ID: nextProps.connectedCRM_ID,
-                    status: 'CONNECTED'
-                }
-            });
 
-        if (nextProps.connectedCRM_ID === "disconnect")
-            this.setState({
-                CRM: {
-                    ...this.state.CRM,
-                    ID: null,
-                    status: 'DISCONNECTED'
-                }
-            });
+    componentWillReceiveProps(nextProps) {
+        const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
+        const index = nextProps.CRMsList.findIndex(serverCRM => serverCRM.Type === crm.type);
+        if (index === -1) {
+            // if there is not crm from the server
+            crm.status = 'NOT_CONNECTED';
+            delete crm.ID;
+        } else {
+            // if there is a crm, check if it is failed or connected
+            // and add the ID
+            crm.status = nextProps.CRMsList[index].Status ? "CONNECTED" : "FAILED";
+            crm.ID = nextProps.CRMsList[index].ID
+        }
     }
 
     connectCRM = () => this.props.form.validateFields((err, values) => {
         if (err) return;
+        const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         this.props.dispatch(
             crmActions.connectCrm(
                 {
-                    type: this.state.CRM.type,
+                    type: crm.type,
                     auth: {...values}
                 }
             )
         );
     });
 
-    testCRM = () => this.props.form.validateFields(async (err, values) => {
+    testCRM = () => this.props.form.validateFields((err, values) => {
         if (err) return;
+        const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         this.props.dispatch(
             crmActions.testCrm(
                 {
-                    type: this.state.CRM.type,
+                    type: crm.type,
                     auth: {...values}
                 }
             )
@@ -79,22 +66,15 @@ class CrmView extends React.Component {
     });
 
     disconnectCRM = () => {
-        const {/**{CRM}*/CRM} = this.state;
+        const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         confirm({
-            title: `Disconnect from ${CRM.type}`,
-            content: <p>Chatbot conversations will no longer be synced with {CRM.type} account</p>,
+            title: `Disconnect from ${crm.type}`,
+            content: <p>Chatbot conversations will no longer be synced with {crm.type} account</p>,
             onOk: () => {
-                this.props.dispatch(
-                    crmActions.disconnectCrm(
-                        {
-                            ID: this.state.CRM.ID,
-                        }
-                    )
-                )
+                this.props.dispatch(crmActions.disconnectCrm({ID: crm.ID}))
             }
         });
     };
-
 
     render() {
         const {getFieldDecorator} = this.props.form;
@@ -102,17 +82,20 @@ class CrmView extends React.Component {
             labelCol: {span: 6},
             wrapperCol: {span: 14},
         };
-
-        const {/**{CRM}*/CRM} = this.state;
+        const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         return (
             <NoHeaderPanel>
                 <div className={styles.Title}>
-                    <Avatar shape="square" src={this.state.CRM.image} className={styles.Avatar}/>
+                    <Avatar shape="square" src={crm.image} className={styles.Avatar}/>
                     <div className={styles.DetailsWithAvatar}>
-                        <Title level={2}>{this.state.CRM?.type}</Title>
+                        <Title level={2}>{crm?.type}</Title>
                         {
-                            CRM.type === "Adapt" &&
+                            crm.type === "Adapt" &&
                             <AdaptHeader/>
+                        }
+                        {
+                            crm.type === "Bullhorn" &&
+                            <BullhornHeader/>
                         }
                     </div>
                 </div>
@@ -120,18 +103,26 @@ class CrmView extends React.Component {
                 <div className={styles.Body}>
                     <Breadcrumb>
                         <Breadcrumb.Item>
-                            <a href={"javascript:void(0);"} onClick={() => history.push('/dashboard/crmlist')}>
+                            <a href={"javascript:void(0);"}
+                               onClick={() => history.push('/dashboard/crmlist')}>
                                 CRMs List
                             </a>
                         </Breadcrumb.Item>
-                        <Breadcrumb.Item>{CRM.type}</Breadcrumb.Item>
+                        <Breadcrumb.Item>{crm.type}</Breadcrumb.Item>
                     </Breadcrumb>
 
                     <br/>
 
                     <Tabs defaultActiveKey="1">
                         <TabPane tab="Feature" key="1">
-
+                            {
+                                crm.type === "Adapt" &&
+                                <AdaptFeatures/>
+                            }
+                            {
+                                crm.type === "Bullhorn" &&
+                                <BullhornFeatures/>
+                            }
                         </TabPane>
 
                         <TabPane tab="Connection" key="2" style={{
@@ -140,11 +131,11 @@ class CrmView extends React.Component {
                             <Form layout='horizontal'>
 
                                 {
-                                    CRM.type === "Adapt" &&
+                                    crm.type === "Adapt" &&
                                     <AdaptFormItems getFieldDecorator={getFieldDecorator}
                                                     layout={layout}
+                                                    CRM={crm}
                                                     FormItem={FormItem}
-                                                    CRM={CRM}
                                                     disconnectCRM={this.disconnectCRM}
                                                     connectCRM={this.connectCRM}
                                                     testCRM={this.testCRM}/>
@@ -153,11 +144,11 @@ class CrmView extends React.Component {
 
 
                                 {
-                                    CRM.type === "Bullhorn" &&
+                                    crm.type === "Bullhorn" &&
                                     <BullhornFormItems getFieldDecorator={getFieldDecorator}
                                                        layout={layout}
                                                        FormItem={FormItem}
-                                                       CRM={CRM}
+                                                       CRM={crm}
                                                        disconnectCRM={this.disconnectCRM}
                                                        connectCRM={this.connectCRM}
                                                        testCRM={this.testCRM}/>
@@ -165,11 +156,11 @@ class CrmView extends React.Component {
                                 }
 
                                 {
-                                    CRM.type === "Vincere" &&
+                                    crm.type === "Vincere" &&
                                     <VincereFormItems getFieldDecorator={getFieldDecorator}
                                                       layout={layout}
                                                       FormItem={FormItem}
-                                                      CRM={CRM}
+                                                      CRM={crm}
                                                       disconnectCRM={this.disconnectCRM}
                                                       connectCRM={this.connectCRM}
                                                       testCRM={this.testCRM}/>
@@ -183,17 +174,17 @@ class CrmView extends React.Component {
                 </div>
 
             </NoHeaderPanel>
-        );
+        )
     }
 }
 
-function
 
-mapStateToProps(state) {
+function mapStateToProps(state) {
     return {
-        connectedCRM_ID: state.crm.connectedCRM_ID,
+        CRMsList: state.crm.CRMsList,
+        isLoading: state.crm.isLoading
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(CrmView));
+export default connect(mapStateToProps)(Form.create()(Crm));
 

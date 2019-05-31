@@ -1,7 +1,7 @@
-from flask import Blueprint, request
-from flask_apscheduler import json
-from flask_jwt_extended import jwt_required, get_jwt_identity
 import logging
+
+from flask import Blueprint, request
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
 from services.CRM import crm_services
@@ -58,7 +58,7 @@ def crm_control(crm_id):
 
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message)
-    return helpers.jsonResponse(True, 200, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
 # Test CRM

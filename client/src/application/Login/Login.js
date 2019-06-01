@@ -33,7 +33,8 @@ class Login extends React.Component {
 
                 let prevPath = this.props.history.location.state?.from.pathname || null;
 
-                if (!prevPath.indexOf('/dashboard' > -1))
+                // prevPath has to have /dashboard keyword if not make it null
+                if (prevPath?.indexOf('/dashboard') < -1)
                     prevPath = null;
 
                 this.props.dispatch(authActions.login(values.email, values.password, prevPath));

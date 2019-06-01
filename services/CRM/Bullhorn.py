@@ -390,7 +390,7 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                 [fields, query, "count=99999999"])
+                                                 [fields, query, "count=500"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -454,7 +454,7 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, query, "count=99999999"])
+                                                 [fields, query, "count=500"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -497,7 +497,7 @@ def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, query, "count=99999999"])
+                                                 [fields, query, "count=500"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -538,7 +538,7 @@ def getAllJobs(auth, companyID, fields=None) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, "query=*:*", "count=99999999"])
+                                                 [fields, "query=*:*", "count=500"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

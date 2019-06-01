@@ -30,8 +30,13 @@ class Login extends React.Component {
             e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                //this.setState({isLoggin: true});
-                this.props.dispatch(authActions.login(values.email, values.password));
+
+                let prevPath = this.props.history.location.state?.from.pathname || null;
+
+                if (!prevPath.indexOf('/dashboard' > -1))
+                    prevPath = null;
+
+                this.props.dispatch(authActions.login(values.email, values.password, prevPath));
             }
         });
     };

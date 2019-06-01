@@ -1,11 +1,12 @@
 import * as actionTypes from './actionTypes';
 
 
-function login (email, password) {
+function login(email, password, prevPath) {
     return {
         type: actionTypes.LOGIN_REQUEST,
         email,
-        password
+        password,
+        prevPath
     };
 }
 

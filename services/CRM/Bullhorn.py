@@ -1,7 +1,6 @@
 import base64
 import json
 import logging
-import os
 import urllib.parse
 
 import requests
@@ -10,6 +9,7 @@ from sqlalchemy import and_
 from enums import DataType as DT
 from models import Callback, Conversation, db, CRM, StoredFile
 from services import databases_services, stored_file_services
+# login requires: username, password
 
 
 # Bullhorn Notes:
@@ -21,7 +21,23 @@ from services import databases_services, stored_file_services
 # auth needs to contain auth data + rest_token, rest_url, access_token, refresh_token (retrieved upon connecting)
 
 
-# login requires: username, password
+def testConnection(auth, companyID):
+    try:
+        if auth.get("refresh_token"):
+            callback: Callback = retrieveRestToken(auth, companyID)
+        else:
+            callback: Callback = login(auth)
+
+        if not callback.Success:
+            raise Exception("Testing failed")
+
+        return Callback(True, 'Logged in successfully', callback.Data)
+
+    except Exception as exc:
+        logging.error("CRM.Bullhorn.testConnection() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
 def login(auth):
     try:
         authCopy = dict(auth)
@@ -80,24 +96,21 @@ def retrieveRestToken(auth, companyID):
         authCopy = dict(auth)
         headers = {'Content-Type': 'application/json'}
 
-        # check if refresh_token exists
-        # if it does use it to generate access_token and refresh_token
-        if authCopy.get("refresh_token"):
-            url = "https://auth.bullhornstaffing.com/oauth/token?grant_type=refresh_token&refresh_token=" + \
-                  authCopy.get("refresh_token") + \
-                  "&client_id=7719607b-7fe7-4715-b723-809cc57e2714" + \
-                  "&client_secret=0ZiVSILQ7CY0bf054LPiX4kN"
-            get_access_token = requests.post(url, headers=headers)
-            if get_access_token.ok:
-                result_body = json.loads(get_access_token.text)
-                authCopy["access_token"] = result_body.get("access_token")
-                authCopy["refresh_token"] = result_body.get("refresh_token")
-                authCopy["rest_token"] = ""
-            else:
-                raise Exception("CRM not set up properly")
+        # use refresh_token to generate access_token and refresh_token
+        url = "https://auth.bullhornstaffing.com/oauth/token?grant_type=refresh_token&refresh_token=" + \
+              authCopy.get("refresh_token") + \
+              "&client_id=7719607b-7fe7-4715-b723-809cc57e2714" + \
+              "&client_secret=0ZiVSILQ7CY0bf054LPiX4kN"
+        get_access_token = requests.post(url, headers=headers)
+        if get_access_token.ok:
+            result_body = json.loads(get_access_token.text)
+            access_token = result_body.get("access_token")
+            authCopy["refresh_token"] = result_body.get("refresh_token")
+        else:
+            raise Exception("CRM not set up properly")
 
         url = "https://rest.bullhornstaffing.com/rest-services/login?version=*&" + \
-              "access_token=" + authCopy.get("access_token")
+              "access_token=" + access_token
 
         get_rest_token = requests.put(url, headers=headers)
         if not get_rest_token.ok:
@@ -106,7 +119,6 @@ def retrieveRestToken(auth, companyID):
 
         authCopy["rest_token"] = result_body.get("BhRestToken")
         authCopy["rest_url"] = result_body.get("restUrl")
-        authCopy["access_token"] = ""
 
         # done here as cannot import crm_services while it is importing Bullhorn.py
         crm = db.session.query(CRM).filter(and_(CRM.CompanyID == companyID, CRM.Type == "Bullhorn")).first()
@@ -114,8 +126,9 @@ def retrieveRestToken(auth, companyID):
         db.session.commit()
 
         return Callback(True, 'Rest Token Retrieved', {
-            "rest_token": authCopy.get("rest_token"),
-            "rest_url": authCopy.get("rest_url")
+            "rest_token": authCopy["rest_token"],
+            "rest_url": authCopy.get("rest_url"),
+            "refresh_token": authCopy["refresh_token"]
         })
 
     except Exception as exc:
@@ -135,7 +148,8 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # test the BhRestToken (rest_token)
         r = sendRequest(url, method, headers, json.dumps(body))
-
+        print(r.status_code)
+        print(r.text)
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
@@ -146,7 +160,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
                     raise Exception(r.text + ". Query could not be sent")
             else:
                 raise Exception("Rest token could not be retrieved")
-        elif str(r.status_code)[:1] != "2":  # check if error code is in the 200s
+        elif not r.ok:
             raise Exception("Rest url for query is incorrect")
 
         return Callback(True, "Query was successful", r)
@@ -352,10 +366,11 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchCandidates(auth, companyID, conversation) -> Callback:
+def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
     try:
         query = "query="
-        fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate"
+        if not fields:
+            fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate"
         keywords = conversation['keywordsByDataType']
 
         # populate filter
@@ -407,10 +422,11 @@ def searchCandidates(auth, companyID, conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchJobs(auth, companyID, conversation) -> Callback:
+def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
     try:
         query = "query=*:*"
-        fields = "fields=id,title,publicDescription,address,employmentType,salary,skills,yearsRequired,startDate,dateEnd"
+        if not fields:
+            fields = "fields=id,title,publicDescription,address,employmentType,salary,skills,yearsRequired,startDate,dateEnd"
         keywords = conversation['keywordsByDataType']
 
         # populate filter TODO
@@ -474,11 +490,34 @@ def checkFilter(keywords, filter, string, query):
     return query
 
 
-def getAllCandidates(auth, companyID) -> Callback:
+def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
     try:
+        if not fields:
+            fields = "fields=id,title,publicDescription,address,employmentType,salary,skills,yearsRequired,startDate,dateEnd"
+
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "departmentCandidates", "get", {}, companyID, [
-            "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate"])
+        sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
+                                                 [fields, query, "count=99999999"])
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return_body = json.loads(sendQuery_callback.Data.text)
+
+        return Callback(True, sendQuery_callback.Message, return_body)
+
+    except Exception as exc:
+        logging.error("CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def getAllCandidates(auth, companyID, fields=None) -> Callback:
+    try:
+        # custom fields?
+        if not fields:
+            fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate"
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "departmentCandidates", "get", {}, companyID, [fields])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -491,17 +530,44 @@ def getAllCandidates(auth, companyID) -> Callback:
         return Callback(False, str(exc))
 
 
-def getAllJobs(auth, companyID) -> Callback:
+def getAllJobs(auth, companyID, fields=None) -> Callback:
     try:
+        # custom fields?
+        if not fields:
+            fields = "fields=*"
+
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "departmentJobOrders", "get", {}, companyID, [
-            "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate"])
+        sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
+                                                 [fields, "query=*:*", "count=99999999"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
         return_body = json.loads(sendQuery_callback.Data.text)
 
         return Callback(True, sendQuery_callback.Message, return_body)
+
+    except Exception as exc:
+        logging.error("CRM.Bullhorn.getAllJobs() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def produceRecruitmentValueReport(companyID) -> Callback:
+    try:
+        crm = db.session.query(CRM) \
+            .filter(and_(CRM.CompanyID == companyID, CRM.Type == "Bullhorn")).first()
+        if not crm:
+            raise Exception("CRM not found")
+
+        getJobs_callback: Callback = searchJobsCustomQuery(
+            crm.Auth, companyID,
+            "query=employmentType:\"permanent\" AND status:\"accepting candidates\""
+            "fields=dateAdded,title,clientCorporation,salary,feeArrangement")
+        if not getJobs_callback.Success:
+            raise Exception("Jobs could not be retrieved")
+
+        return_body = getJobs_callback.Data
+
+        return Callback(True, "Report information has been retrieved", return_body)
 
     except Exception as exc:
         logging.error("CRM.Bullhorn.getAllJobs() ERROR: " + str(exc))

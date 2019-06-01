@@ -88,13 +88,19 @@ def getAllJobs(assistant: Assistant):
         return Greenhouse.getAllJobs(assistant.CRM.Auth)
 
 
+def produceRecruitmentValueReport(companyID, crmName):
+    # Check CRM type
+    if crmName == CRM.Bullhorn.name:
+        return Bullhorn.produceRecruitmentValueReport(companyID)
+
+
 # Connect to a new CRM
 # details is a dict that has {auth, type}
 def connect(company_id, details) -> Callback:
     try:
         crm_type: CRM = CRM[details['type']]
         # test connection
-        test_callback: Callback = testConnection(details)
+        test_callback: Callback = testConnection(details, company_id)
         if not test_callback.Success:
             return test_callback
 
@@ -119,7 +125,7 @@ def update(crm_id, company_id, details) -> Callback:
         crm_auth = details['auth']
 
         # test connection
-        test_callback: Callback = testConnection(details)
+        test_callback: Callback = testConnection(details, company_id)
         if not test_callback.Success:
             return test_callback
 
@@ -137,7 +143,6 @@ def update(crm_id, company_id, details) -> Callback:
         return Callback(True, 'CRM has been updated successfully')
 
     except Exception as exc:
-        print(exc)
         logging.error("CRM_services.update(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Update CRM details failed.")
@@ -149,7 +154,7 @@ def updateByCompanyAndType(crm_type, company_id, auth):
         crm_auth = auth
 
         # test connection
-        test_callback: Callback = testConnection({"auth": auth})
+        test_callback: Callback = testConnection({"auth": auth}, company_id)
         if not test_callback.Success:
             return test_callback
 
@@ -167,32 +172,31 @@ def updateByCompanyAndType(crm_type, company_id, auth):
         return Callback(True, 'CRM has been updated successfully')
 
     except Exception as exc:
-        print(exc)
         logging.error("CRM_services.update(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Update CRM details failed.")
 
 
 # Test connection to a CRM
-def testConnection(details) -> Callback:
+def testConnection(details, companyID) -> Callback:
     try:
         crm_type: CRM = CRM[details['type']]
         crm_auth = details['auth']
 
         # test connection
-        login_callback: Callback = Callback(False, 'Connection failure. Please check entered details')
+        test_callback: Callback = Callback(False, 'Connection failure. Please check entered details')
         if crm_type == CRM.Adapt:
-            login_callback = Adapt.login(crm_auth)
+            test_callback = Adapt.login(crm_auth)
         elif crm_type == CRM.Bullhorn:
-            login_callback = Bullhorn.login(crm_auth)
+            test_callback = Bullhorn.testConnection(crm_auth, companyID)
         elif crm_type == CRM.Greenhouse:
-            login_callback = Greenhouse.login(crm_auth)
+            test_callback = Greenhouse.login(crm_auth)
 
         # When connection failed
-        if not login_callback.Success:
-            return login_callback
+        if not test_callback.Success:
+            return test_callback
 
-        return Callback(True, 'Successful connection', login_callback.Data)
+        return Callback(True, 'Successful connection', test_callback.Data)
 
     except Exception as exc:
         logging.error("CRM_services.connect(): " + str(exc))
@@ -227,7 +231,6 @@ def getCRMByID(crm_id, company_id):
         return Callback(True, "CRM retrieved successfully.", crm)
 
     except Exception as exc:
-        print("CRM_services.getCRMByCompanyID() Error: ", exc)
         logging.error("CRM_services.getCRMByCompanyID(): " + str(exc))
         return Callback(False, 'Could not retrieve CRM.')
 
@@ -242,7 +245,6 @@ def getCRMByType(crm_type, company_id):
         return Callback(True, "CRM retrieved successfully.", crm)
 
     except Exception as exc:
-        print("CRM_services.getCRMByCompanyID() Error: ", exc)
         logging.error("CRM_services.getCRMByCompanyID(): " + str(exc))
         return Callback(False, 'Could not retrieve CRM.')
 
@@ -253,6 +255,5 @@ def getAll(companyID) -> Callback:
         return Callback(True, "fetched all CRMs  successfully.", result)
 
     except Exception as exc:
-        print(exc)
         logging.error("crm_services.getAll(): " + str(exc))
         return Callback(False, 'Could not fetch all CRMs.')

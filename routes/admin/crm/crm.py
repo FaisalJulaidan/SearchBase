@@ -23,7 +23,7 @@ def get_crms():
 
         crms = helpers.getListFromSQLAlchemyList(callback.Data)
         for crm in crms:
-            crm['Status'] = crm_services.testConnection({'auth': crm['Auth'], 'type': crm['Type']}).Success
+            crm['Status'] = crm_services.testConnection({'auth': crm['Auth'], 'type': crm['Type']}, user.get("companyID")).Success
 
         return helpers.jsonResponse(True, 200, callback.Message, crms)
 
@@ -71,9 +71,10 @@ def test_crm_connection():
     # No need for assistant authentication because testing crm connection should be public however at least
     # the user has to be logged in and has the token included in the request to minimise security risks
     # Connect to crm
+    user = get_jwt_identity()['user']
     callback: Callback = Callback(False, '')
     if request.method == "POST":
-        callback: Callback = crm_services.testConnection(request.json)  # crm details passed (auth, type)
+        callback: Callback = crm_services.testConnection(request.json, user.get("companyID"))  # crm details passed (auth, type)
 
     # Return response
     if not callback.Success:
@@ -81,30 +82,26 @@ def test_crm_connection():
     return helpers.jsonResponse(True, 200, callback.Message)
 
 
+@crm_router.route("/crm/recruiter_value_report", methods=['POST'])
+@jwt_required
+def recruiter_value_report():
+    user = get_jwt_identity()['user']
+
+    if request.method == "POST":
+        print("json: ", request.json)
+        data_callback: Callback = crm_services.produceRecruitmentValueReport(user.get("companyID"),
+                                                                             request.json.get("crm_name"))
+        if not data_callback.Success:
+            return helpers.jsonResponse(False, 400, data_callback.Message)
+
+        return helpers.jsonResponse(True, 200, data_callback.Message, data_callback.Data)
+
+
 @crm_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
 def bullhorn_callback():
-    logging.error("request.method: ")
-    logging.error(request.method)
-    logging.error("request.args: ")
-    logging.error(request.args)
-    logging.error("request.url: ")
-    logging.error(request.url)
-    logging.error("request.form: ")
-    logging.error(request.form)
-    logging.error("request.json: ")
-    logging.error(request.json)
-    logging.error("request.headers: ")
-    logging.error(request.headers)
-    print("request.method: ")
-    print(request.method)
-    print("request.args: ")
-    print(request.args)
-    print("request.url: ")
-    print(request.url)
-    print("request.form: ")
-    print(request.form)
-    print("request.json: ")
-    print(request.json)
-    print("request.headers: ")
-    print(request.headers)
+    return str(request.url)
+
+
+@crm_router.route("/crm_callback", methods=['GET', 'POST', 'PUT'])
+def crm_callback():
     return str(request.url)

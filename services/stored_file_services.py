@@ -1,6 +1,9 @@
 from models import db, Callback, StoredFile, Conversation
 import logging, boto3, botocore, os
 
+PUBLIC_URL = "https://tsb.ams3.digitaloceanspaces.com/"
+UPLOAD_FOLDER = os.environ['UPLOAD_FOLDER']
+COMPANIES_LOGOS_PATH = '/companies_logo'
 
 def getByID(id) -> StoredFile or None:
     try:
@@ -111,7 +114,7 @@ def downloadFile(filename, path):
                                 endpoint_url= os.environ['SERVER_SPACES'],
                                 aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
                                 aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
-        file = s3.Object('tsb', os.environ['UPLOAD_FOLDER'] + path + '/' + filename)
+        file = s3.Object('tsb', UPLOAD_FOLDER + path + '/' + filename)
 
         # Check if file exists
         try:
@@ -140,7 +143,7 @@ def deleteFile(filename, path):
                             aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
                             aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
         # Delete file
-        s3.Object('tsb', os.environ['UPLOAD_FOLDER'] + path + '/' + filename).delete()
+        s3.Object('tsb', UPLOAD_FOLDER + path + '/' + filename).delete()
 
         return Callback(True, "File deleted successfully")
 

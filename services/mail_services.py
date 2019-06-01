@@ -276,7 +276,8 @@ def send_email(to, subject, template, **kwargs):
         thr = Thread(target=send_async_email, args=[app, msg])
         thr.start()
 
-        return thr
+        return Callback(True, "Email sent to " + to + " successfully")
     except Exception as exc:
         print("mail_services.send_email() TEMPLATE ERROR: ", exc)
         logging.error("mail_service.send_email(): " + str(exc))
+        return Callback(False, "Sending email to " + to + " failed")

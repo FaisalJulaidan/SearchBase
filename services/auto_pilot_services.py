@@ -1,20 +1,44 @@
 from sqlalchemy import and_
 from models import db, Callback, AutoPilot, OpenTimeSlot, Conversation
-from datetime import time
-import logging, enums
+from datetime import datetime, time
+import logging
 from utilities import helpers
+from services import mail_services, stored_file_services as sfs
+from enums import UserType, DataType, ApplicationStatus
+import os
 
 
 def processConversation(conversation: Conversation, autoPilot: AutoPilot):
     try:
         result = {
-            "applicationStatus": enums.ApplicationStatus.Pending,
-            # "appointmentEmailSentAt": None,
-            "response": None
+            "applicationStatus": ApplicationStatus.Pending,
+            "appointmentEmailSentAt": None,
+            "acceptanceEmailSentAt": None,
+            # "response": None
         }
+
+        # Do automation only if the autoPilot is active
         if autoPilot.Active:
+            keywords = conversation.Data.get('keywordsByDataType')
+            email = keywords.get(DataType.CandidateEmail.value['name'], [""])[0]
+
+            # Get application status
             result['applicationStatus'] = __getApplicationResult(conversation.Score, autoPilot)
+
+            # Process appointment email if score is accepted
             # result['appointmentEmailSentAt'] = __sendAppointmentEmail(conversation, autoPilot)
+
+            # Process acceptance email if score is accepted
+            if conversation.UserType is UserType.Candidate and result['applicationStatus'] is ApplicationStatus.Accepted and email:
+                email_callback: Callback = __sendAcceptanceLetterEmail(
+                    email,
+                    " ".join(keywords.get(DataType.CandidateName.value['name'], [""])),
+                    autoPilot.Company.Name,
+                    conversation.Assistant.LogoName
+                )
+
+                if email_callback.Success:
+                    result['acceptanceEmailSentAt'] = datetime.now()
 
         return Callback(True, "Automation done via " + autoPilot.Name + " pilot successfully.", result)
 
@@ -140,6 +164,7 @@ def removeByID(id, companyID):
         return Callback(False, 'Error in deleting AutoPilot.')
 
 
+# ----- Private Functions (shouldn't be accessed from the outside) ----- #
 # It takes an autoPilot object and join all its children tables into one dict
 def __parseAutoPilot(autoPilot: AutoPilot) -> dict:
     return {
@@ -148,13 +173,19 @@ def __parseAutoPilot(autoPilot: AutoPilot) -> dict:
     }
 
 
-def __getApplicationResult(score, autoPilot: AutoPilot) -> enums.ApplicationStatus:
-    result = enums.ApplicationStatus.Pending
+def __getApplicationResult(score, autoPilot: AutoPilot) -> ApplicationStatus:
+    result = ApplicationStatus.Pending
     if autoPilot.AcceptApplications and (score > autoPilot.AcceptanceScore):
-        result = enums.ApplicationStatus.Accepted
+        result = ApplicationStatus.Accepted
     if autoPilot.RejectApplications and (score < autoPilot.RejectionScore):
-        result = enums.ApplicationStatus.Rejected
+        result = ApplicationStatus.Rejected
     return result
+
+
+def __sendAcceptanceLetterEmail(receiverEmail, userName, companyName, logoPath) -> Callback:
+    return mail_services.send_email(receiverEmail, 'Acceptance Letter', '/emails/acceptance_letter.html',
+                             companyName=companyName, logoPath=logoPath, userName=userName)
+
 
 def __sendAppointmentEmail(conversation: Conversation, autoPilot):
     return None

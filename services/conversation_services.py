@@ -60,6 +60,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
                 # conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
             conversation.AutoPilotResponse = ap_callback.Message
+            print(ap_callback.Data)
 
 
         # CRM integration

@@ -109,6 +109,8 @@ elif os.environ['FLASK_ENV'] == 'development':
         db.create_all()
         helpers.gen_dummy_data()
 
+    # auto_pilot_services.__sendAcceptanceLetterEmail()
+
     print('Development mode running...')
 
 else:

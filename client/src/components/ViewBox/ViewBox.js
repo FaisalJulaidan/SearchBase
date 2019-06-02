@@ -8,7 +8,7 @@ const {Paragraph} = Typography;
 
 const ViewBox = (props) => {
     return (
-        <div className={styles.Box}>
+        <div className={styles.Box} onClick={() => props.onClick()}>
             <div className={styles.Body}>
                 <div className={styles.Icon}>
                     {props.icon}

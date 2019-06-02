@@ -9,6 +9,7 @@ import {AutoPilotIcon} from "components/SVGs";
 import NewAutoPilotModal from './NewAutoPilotModal/NewAutoPilotModal'
 import {autoPilotActions} from "store/actions";
 import 'types/TimeSlots_Types'
+import {history} from "helpers";
 
 const {Title, Paragraph} = Typography;
 
@@ -41,10 +42,12 @@ class AutoPilot extends React.Component {
                         {
                             this.props.autoPilotsList.map(
                                 (/**@type AutoPilot*/ autoPilot, i) =>
-                                    <ViewBox key={i}
-                                             title={autoPilot.Name}
-                                             text={autoPilot.Description}
-                                             icon={<AutoPilotIcon/>}/>
+                                    <ViewBox
+                                        onClick={() => history.push('/dashboard/auto_pilot/configs', {autoPilot: autoPilot})}
+                                        key={i}
+                                        title={autoPilot.Name}
+                                        text={autoPilot.Description}
+                                        icon={<AutoPilotIcon/>}/>
                             )
                         }
 
@@ -57,9 +60,7 @@ class AutoPilot extends React.Component {
                     showModal={this.showModal}
                     closeModal={this.closeModal}
                 />
-
             </>
-
         )
     }
 }

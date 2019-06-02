@@ -30,6 +30,7 @@ const Integration = lazy(() => import('./Assistants/Assistant/Conversations/Conv
 const Conversations = lazy(() => import('./Assistants/Assistant/Conversations/Conversations'));
 const Calendar = lazy(() => import('./Calendar/Calendar'));
 const AutoPilot = lazy(() => import('./AutoPilot/AutoPilot'));
+const AutoPilotConfigs = lazy(() => import('./AutoPilot/AutoPilotConfigs/AutoPilotConfigs'));
 const Crms = lazy(() => import('./Crms/Crms'));
 const Crm = lazy(() => import('./Crms/Crm/Crm'));
 
@@ -264,6 +265,9 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/profile`} component={Profile} exact/>
                                             <Route path={`${match.path}/billing`} component={Billing} exact/>
                                             <Route path={`${match.path}/auto_pilot`} component={AutoPilot} exact/>
+                                            <Route path={`${match.path}/auto_pilot/configs`}
+                                                   component={AutoPilotConfigs}
+                                                   exact/>
                                             <Route path={`${match.path}/users_management`} component={UsersManagement}
                                                    exact/>
                                             <Route path={`${match.path}/documentation`} component={Documentation}

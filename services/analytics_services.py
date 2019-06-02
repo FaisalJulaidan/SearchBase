@@ -21,13 +21,12 @@ def getAnalytics(assistant=1, startDate=datetime.now() - timedelta(days=365), en
     print(startDate)
     print(endDate)
     try:
-        monthlyUses = db.session  .query(func.count(Conversation.ID).label('count'), Conversation.DateTime)\
+        #works but slightly iffy fix
+        monthlyUses = db.session  .query(func.count(Conversation.ID).label('count'), func.min(Conversation.DateTime).label('DateTime'))\
                             .filter(between(Conversation.DateTime, startDate, endDate))\
-                            .order_by(Conversation.DateTime.asc())\
-                            .group_by(func.month(Conversation.DateTime))\
+                            .group_by(func.date_format(Conversation.DateTime, '%Y-%m'))\
+                            .order_by(func.date_format(Conversation.DateTime, '%Y-%m'))\
                             .all()
-
-
         return Callback(True, 'Analytics successfully gathered', monthlyUses)
     except Exception as e:
         print(e)

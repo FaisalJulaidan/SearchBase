@@ -29,63 +29,25 @@ class Analytics extends React.Component {
     componentDidMount() {
         const height = this.chartDiv.clientHeight;
         this.setState({height});
-        console.log(this.props)
     }
     componentWillMount(){
         const {assistant} = this.props.location.state;
         this.props.dispatch(analyticsActions.fetchAnalytics(assistant.ID))
     }
 
-
-
-
     render() {
-        const data = [
-            {
-                year: "1991",
-                value: 3
-            },
-            {
-                year: "1992",
-                value: 4
-            },
-            {
-                year: "1993",
-                value: 3.5
-            },
-            {
-                year: "1994",
-                value: 5
-            },
-            {
-                year: "1995",
-                value: 4.9
-            },
-            {
-                year: "1996",
-                value: 6
-            },
-            {
-                year: "1997",
-                value: 7
-            },
-            {
-                year: "1998",
-                value: 9
-            },
-            {
-                year: "1999",
-                value: 13
-            }
-        ];
+        const {analytics} = this.props.analytics
+        const data = this.props.analytics.isLoading ? null : analytics.map(a => ({month: moment(a.DateTime).format("MMMM") , chats: a.count}));
         const cols = {
-            value: {
+            chats: {
                 min: 0
             },
-            year: {
+            month: {
                 range: [0, 1]
             }
         };
+        console.log(data)
+        console.log(data)
         return (
             <div style={{height: '100%'}}>
                 <div style={{padding: '0 5px'}}>
@@ -106,17 +68,17 @@ class Analytics extends React.Component {
                                 <div className={styles.Panel_Body}
                                      ref={chartDiv => this.chartDiv = chartDiv}>
                                     <Chart height={500} data={data} scale={cols} forceFit>
-                                        <Axis name="year" />
-                                        <Axis name="value" />
+                                        <Axis name="month" />
+                                        <Axis name="chats" />
                                         <Tooltip
                                             crosshairs={{
                                                 type: "y"
                                             }}
                                         />
-                                        <Geom type="line" position="year*value" size={2} />
+                                        <Geom type="line" position="month*chats" size={2} />
                                         <Geom
                                             type="point"
-                                            position="year*value"
+                                            position="month*chats"
                                             size={4}
                                             shape={"square"}
                                             style={{
@@ -179,10 +141,8 @@ class Analytics extends React.Component {
 }
 
 const mapStateToProps = state =>  {
-    // const {analytics} = state;
-    console.log(state)
     return {
-        options: state.options.options,
+        analytics: state.analytics,
     };
 };
 

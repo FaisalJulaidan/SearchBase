@@ -11,7 +11,6 @@ function* fetchAssistants() {
 
         if (!res.data?.data)
             throw Error(`Can't fetch assistants`);
-
         yield put(assistantActions.fetchAssistantsSuccess(res.data?.data));
     } catch (error) {
         console.error(error);

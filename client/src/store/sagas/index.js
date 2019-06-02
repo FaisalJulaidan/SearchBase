@@ -6,3 +6,4 @@ export * from './usersManagement.saga';
 export * from './database.saga';
 export * from './options.saga';
 export * from './crm.saga';
+export * from './analytics.saga';

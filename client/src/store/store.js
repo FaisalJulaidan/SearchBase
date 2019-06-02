@@ -5,6 +5,7 @@ import storage from 'redux-persist/lib/storage'
 import rootReducer from './reducers';
 import {
     assistantSaga,
+    analyticsSaga,
     authSaga,
     profileSaga,
     conversationSaga,
@@ -42,6 +43,7 @@ sagaMiddleware.run(usersManagementSaga);
 sagaMiddleware.run(databaseSaga);
 sagaMiddleware.run(optionsSaga);
 sagaMiddleware.run(crmSaga);
+sagaMiddleware.run(analyticsSaga);
 
 
 export { store, persistor }

@@ -3,6 +3,8 @@ import styles from "./Analytics.module.less";
 
 import Header from "../../../../../components/Header/Header";
 import {Chart, Axis, Tooltip, Geom } from "bizcharts";
+import {analyticsActions} from "store/actions";
+import {connect} from 'react-redux';
 import NumberInfo from 'ant-design-pro/lib/NumberInfo';
 import {Icon, Spin} from 'antd';
 
@@ -27,7 +29,13 @@ class Analytics extends React.Component {
     componentDidMount() {
         const height = this.chartDiv.clientHeight;
         this.setState({height});
+        console.log(this.props)
     }
+    componentWillMount(){
+        const {assistant} = this.props.location.state;
+        this.props.dispatch(analyticsActions.fetchAnalytics(assistant.ID))
+    }
+
 
 
 
@@ -170,4 +178,14 @@ class Analytics extends React.Component {
     }
 }
 
-export default Analytics;
+const mapStateToProps = state =>  {
+    // const {analytics} = state;
+    console.log(state)
+    return {
+        options: state.options.options,
+    };
+};
+
+export default connect(mapStateToProps)(Analytics);
+// export default Analytics
+

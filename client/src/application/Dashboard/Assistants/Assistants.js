@@ -99,6 +99,7 @@ class Assistants extends Component {
 }
 
 function mapStateToProps(state) {
+    console.log(state)
     return {
         assistantList: state.assistant.assistantList,
         registerList: state.assistant.registerList,

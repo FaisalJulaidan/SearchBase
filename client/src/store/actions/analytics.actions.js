@@ -1,9 +1,10 @@
 import * as actionTypes from './actionTypes';
 
 
-const fetchAnalytics = () => {
+const fetchAnalytics = (assistantID) => {
     return {
-        type: actionTypes.FETCH_ANALYTICS_REQUEST
+        type: actionTypes.FETCH_ANALYTICS_REQUEST,
+        assistantID
     };
 };
 
@@ -22,10 +23,8 @@ const fetchAnalyticsFailure = (error) => {
 };
 
 
-export const assistantActions = {
+export const analyticsActions = {
     fetchAnalytics,
     fetchAnalyticsSuccess,
     fetchAnalyticsFailure,
-
-
 };

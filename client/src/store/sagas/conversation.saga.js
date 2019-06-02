@@ -3,6 +3,7 @@ import * as actionTypes from '../actions/actionTypes';
 import {conversationActions} from "../actions";
 import {http, successMessage, errorMessage, loadingMessage} from "helpers";
 
+
 function* fetchConversations({assistantID}) {
     try {
         const res = yield http.get(`/assistant/${assistantID}/conversations`);

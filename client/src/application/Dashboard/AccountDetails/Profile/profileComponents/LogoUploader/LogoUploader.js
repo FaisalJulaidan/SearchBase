@@ -4,15 +4,13 @@ import {croppedImg} from 'helpers/cropImage'
 import {Button, Card, Icon, Modal, Upload} from 'antd';
 import Cropper from 'react-easy-crop'
 import styles from './LogoUploader.module.less'
-import connect from "react-redux/es/connect/connect";
-import {assistantActions} from "store/actions";
+import {profileActions} from "store/actions";
 
 const Dragger = Upload.Dragger;
 
 class LogoUploader extends Component {
 
     state = {
-        assistant: {},
         mainFile: {},
         imageSrc: null,
         crop: {x: 0, y: 0},
@@ -26,11 +24,9 @@ class LogoUploader extends Component {
         timeStamp: new Date().getTime()
     };
 
-    componentDidMount() {
-    }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({assistant: nextProps.assistant, timeStamp: nextProps.msg});
+        this.setState({timeStamp: new Date().getTime()});
     }
 
 
@@ -46,7 +42,7 @@ class LogoUploader extends Component {
         const croppedImage = await croppedImg(this.state.imageSrc, this.state.croppedAreaPixels, this.state.mainFile.name);
         const formData = new FormData();
         formData.append('file', croppedImage);
-        this.props.dispatch(assistantActions.uploadLogo(this.state.assistant?.ID, formData));
+        this.props.uploadLogo(formData);
         this.setState({visible: false});
     };
 
@@ -63,7 +59,7 @@ class LogoUploader extends Component {
         }
     };
 
-    deleteLogo = () => this.props.dispatch(assistantActions.deleteLogo(this.state.assistant?.ID));
+    deleteLogo = () => this.props.deleteLogo();
 
     render() {
         // Warning: Auth leakage
@@ -79,13 +75,11 @@ class LogoUploader extends Component {
             accept: 'image/png',
             showUploadList: false
         };
-        const {assistant} = this.props;
-
+        const {profileData} = this.props;
         return (
             <div>
-
                 <div style={{width: 300}}>
-                    <h4>Logo uploader</h4>
+                    <h3>Logo uploader</h3>
                     <Dragger {...props}>
                         <p className="ant-upload-drag-icon">
                             <Icon type="inbox"/>
@@ -98,13 +92,13 @@ class LogoUploader extends Component {
                     </Dragger>
 
                     {
-                        assistant?.LogoName ?
+                        profileData?.company.LogoPath ?
                             <div>
-                                <h4>The current logo</h4>
+                                <h3>The current logo</h3>
                                 <Card hoverable
                                       style={{width: 300, textAlign: 'center'}}
                                       cover={<img alt="example"
-                                                  src={`${process.env.REACT_APP_ASSETS_PUBLIC_URL}${process.env.NODE_ENV}/company_logos/${assistant?.LogoName}?timestamp=${this.state.timeStamp}`}/>}
+                                                  src={`${process.env.REACT_APP_ASSETS_PUBLIC_URL}${process.env.NODE_ENV}/company_logos/${profileData?.company.LogoPath}?timestamp=${this.state.timeStamp}`}/>}
                                 >
                                     <Button type={'danger'} onClick={() => this.deleteLogo()}>Delete</Button>
                                 </Card>
@@ -131,7 +125,6 @@ class LogoUploader extends Component {
                         />
                     </div>
                 </Modal>
-
             </div>
         );
     }
@@ -146,7 +139,5 @@ function readFile(file) {
 }
 
 
-const mapStateToProps = (state) => ({
-    msg: state.assistant.successMsg,
-});
-export default connect(mapStateToProps)(LogoUploader);
+
+export default LogoUploader;

@@ -145,7 +145,6 @@ export const assistant = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
-
         case actionTypes.RESET_ASSISTANT_CRM_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
@@ -156,34 +155,6 @@ export const assistant = (state = initialState, action) => {
             return updateObject(state, {
                 errorMsg: action.error
             });
-
-        case actionTypes.UPLOAD_LOGO_REQUEST:
-            return updateObject(state, {
-                errorMsg: null,
-            });
-        case actionTypes.UPLOAD_LOGO_SUCCESS:
-            return updateObject(state, {
-                successMsg: action.msg
-            });
-        case actionTypes.UPLOAD_LOGO_FAILURE:
-            return updateObject(state, {
-                errorMsg: action.error
-            });
-
-        case actionTypes.DELETE_LOGO_REQUEST:
-            return updateObject(state, {
-                errorMsg: null,
-            });
-        case actionTypes.DELETE_LOGO_SUCCESS:
-            return updateObject(state, {
-                successMsg: action.msg
-            });
-        case actionTypes.DELETE_LOGO_FAILURE:
-            return updateObject(state, {
-                errorMsg: action.error
-            });
-
-
 
         default:
             return state

@@ -96,7 +96,7 @@ def uploadFile(file, filename, path, public=False):
                             aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
 
         # Upload file
-        s3.upload_fileobj(file, 'tsb', os.environ['UPLOAD_FOLDER'] + path + '/' + filename,
+        s3.upload_fileobj(file, 'tsb', UPLOAD_FOLDER + path + '/' + filename,
                           ExtraArgs=ExtraArgs)
         return Callback(True, "File uploaded successfully")
 

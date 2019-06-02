@@ -95,3 +95,27 @@ def change_password():
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
         return helpers.jsonResponse(True, 200, "Password updated successfully", callback.Data)
+
+
+@profile_router.route("/company/logo", methods=['POST', 'DELETE'])
+@jwt_required
+def company_logo():
+
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    callback: Callback = Callback(False, 'Error!', None)
+    # Upload the logo
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return helpers.jsonResponse(False, 404, "No file part")
+
+        callback: Callback = company_services.uploadLogo(request.files['file'], user['companyID'])
+
+    # Delete existing logo
+    if request.method == 'DELETE':
+        callback: Callback = company_services.deleteLogo(user['companyID'])
+
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message, None)
+    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)

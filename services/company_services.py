@@ -143,7 +143,7 @@ def uploadLogo(file, companyID):
 
         db.session.commit()
 
-        return Callback(True, 'Logo uploaded successfully.')
+        return Callback(True, 'Logo uploaded successfully.', filename)
 
     except Exception as exc:
         print("company_service.uploadLogo(): ", exc)

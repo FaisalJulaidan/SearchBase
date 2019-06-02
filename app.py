@@ -15,7 +15,7 @@ from services import auto_pilot_services, assistant_services
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router,\
-    database_router, options_router, crm_router, auto_pilot_router, company_router
+    database_router, options_router, crm_router, auto_pilot_router
 
 from routes.public.routers import public_router, resetPassword_router, chatbot_router, auth_router
 
@@ -23,7 +23,6 @@ app = Flask(__name__, static_folder='static')
 
 
 # Register Routes:
-app.register_blueprint(company_router, url_prefix='/api')
 app.register_blueprint(assistant_router, url_prefix='/api')
 app.register_blueprint(flow_router, url_prefix='/api')
 app.register_blueprint(crm_router, url_prefix='/api')

@@ -10,7 +10,9 @@ import {Route, Switch, withRouter} from 'react-router-dom';
 import {authActions, optionsActions} from "store/actions";
 import {store} from "store/store";
 import {connect} from 'react-redux';
+
 import {CSSTransition, TransitionGroup} from "react-transition-group";
+
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import CRM from "./Assistants/Assistant/CRM/CRM";
@@ -25,8 +27,9 @@ const Billing = lazy(() => import('./AccountDetails/Billing/Billing'));
 const UsersManagement = lazy(() => import('./AccountDetails/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
 const Integration = lazy(() => import('./Assistants/Assistant/Conversations/Conversations'));
-const Conversations = lazy(() => import('./Documentation/Documentation'));
+const Conversations = lazy(() => import('./Assistants/Assistant/Conversations/Conversations'));
 const Calendar = lazy(() => import('./Calendar/Calendar'));
+const AutoPilot = lazy(() => import('./AutoPilot/AutoPilot'));
 
 
 const {SubMenu} = Menu;
@@ -108,7 +111,7 @@ class Dashboard extends Component {
         }
         // End of User Information
 
-        const newLayoutRoutes = ["/dashboard/crmlist", "/dashboard/calendar"];
+        const newLayoutRoutes = ["/dashboard/crmlist", "/dashboard/calendar", "/dashboard/auto_pilot"];
         const isNewLyaout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
             <Layout style={{height: '100%'}}>
@@ -175,6 +178,11 @@ class Dashboard extends Component {
                             <span>Calendar</span>
                         </Menu.Item>
 
+                        <Menu.Item key="auto_pilot">
+                            <Icon type="api"/>
+                            <span>Auto Pilot</span>
+                        </Menu.Item>
+
                         <Divider/>
 
                         <SubMenu key="sub2" title={<span><Icon type="user"/><span>Account Details</span></span>}>
@@ -182,11 +190,13 @@ class Dashboard extends Component {
                                 <Icon type="profile"/>
                                 Profile
                             </Menu.Item>
+
                             {/*<Menu.Item key="billing">*/}
                             {/*<Icon type="pound"/>*/}
                             {/*Billing*/}
                             {/*</Menu.Item>*/}
-                            <Menu.Item key="users-management" style={{fontSize: '9pt'}}>
+
+                            <Menu.Item key="users_management" style={{fontSize: '9pt'}}>
                                 <Icon type="usergroup-add"/>
                                 Users Management
                             </Menu.Item>
@@ -251,7 +261,8 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/calendar`} component={Calendar} exact/>
                                             <Route path={`${match.path}/profile`} component={Profile} exact/>
                                             <Route path={`${match.path}/billing`} component={Billing} exact/>
-                                            <Route path={`${match.path}/users-management`} component={UsersManagement}
+                                            <Route path={`${match.path}/auto_pilot`} component={AutoPilot} exact/>
+                                            <Route path={`${match.path}/users_management`} component={UsersManagement}
                                                    exact/>
                                             <Route path={`${match.path}/documentation`} component={Documentation}
                                                    exact/>

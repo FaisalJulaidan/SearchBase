@@ -1,4 +1,4 @@
-import {all, put, takeEvery} from 'redux-saga/effects'
+import {all, put, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {assistantActions, autoPilotActions} from "../actions";
 import {destroyMessage, errorHandler, errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
@@ -19,7 +19,7 @@ function* fetchAutoPilots() {
 }
 
 function* watchFetchAutoPilots() {
-    yield takeEvery(actionTypes.FETCH_AUTOPILOTS_REQUEST, fetchAutoPilots)
+    yield takeLatest(actionTypes.FETCH_AUTOPILOTS_REQUEST, fetchAutoPilots)
 }
 
 function* addAutoPilot({type, newAutoPilot}) {
@@ -38,7 +38,7 @@ function* addAutoPilot({type, newAutoPilot}) {
 }
 
 function* watchAddAutoPilot() {
-    yield takeEvery(actionTypes.ADD_AUTOPILOT_REQUEST, addAutoPilot)
+    yield takeLatest(actionTypes.ADD_AUTOPILOT_REQUEST, addAutoPilot)
 }
 
 function* updateAutoPilot({authPilotID, updatedValues}) {
@@ -55,7 +55,7 @@ function* updateAutoPilot({authPilotID, updatedValues}) {
 }
 
 function* watchUpdateAutoPilot() {
-    yield takeEvery(actionTypes.UPDATE_AUTOPILOT_REQUEST, updateAutoPilot)
+    yield takeLatest(actionTypes.UPDATE_AUTOPILOT_REQUEST, updateAutoPilot)
 }
 
 
@@ -75,7 +75,7 @@ function* deleteAutoPilot({authPilotID}) {
 
 
 function* watchDeleteAutoPilot() {
-    yield takeEvery(actionTypes.DELETE_AUTOPILOT_REQUEST, deleteAutoPilot)
+    yield takeLatest(actionTypes.DELETE_AUTOPILOT_REQUEST, deleteAutoPilot)
 }
 
 function* updateStatus({status, autoPilotID}) {

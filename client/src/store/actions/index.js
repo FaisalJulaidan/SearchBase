@@ -6,5 +6,5 @@ export * from "./conversationActions";
 export * from "./usersManagement.actions";
 export * from "./options.actions";
 export * from "./crm.actions";
-
+export * from "./analytics.actions";
 

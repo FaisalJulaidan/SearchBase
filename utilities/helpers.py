@@ -12,6 +12,11 @@ from jsonschema import validate
 from utilities import json_schemas
 import enums, re, os, stripe, gzip, functools, logging, geoip2.webservice
 
+# will merge with the previous imports if the code is kept - batu
+from models import Callback
+from services import assistant_services
+from flask_jwt_extended import get_jwt_identity
+
 
 # GeoIP Client
 geoIP = geoip2.webservice.Client(140914, 'cKrqAZ675SPb')
@@ -454,3 +459,15 @@ def gzipped(f):
         return f(*args, **kwargs)
 
     return view_func
+
+
+# messing around saving space
+def validAssistant(func):
+    def wrapperValidAssistant(assistantID):
+        user = get_jwt_identity()['user']
+        callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
+        if not callback.Success:
+            return jsonResponse(False, 404, "Assistant not found.", None)
+        assistant: Assistant = callback.Data
+        func(assistant)
+    return wrapperValidAssistant

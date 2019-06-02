@@ -6,6 +6,9 @@ profile_router: Blueprint = profile_router
 from .account.users import users_router
 users_router: Blueprint = users_router
 
+from .account.company import company_router
+company_router: Blueprint = company_router
+
 from .subscription.sub import sub_router
 sub_router: Blueprint = sub_router
 

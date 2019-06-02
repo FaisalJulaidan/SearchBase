@@ -54,6 +54,7 @@ class Company(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(80), nullable=False)
     URL = db.Column(db.String(250), nullable=False)
+    LogoPath = db.Column(db.String(64), nullable=True)
     StripeID = db.Column(db.String(68), unique=True, nullable=False, )
     SubID = db.Column(db.String(68), unique=True, default=None)
 

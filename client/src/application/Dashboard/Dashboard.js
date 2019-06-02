@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, lazy} from 'react';
 
 import {Avatar, Dropdown, Icon, Layout, Menu} from 'antd';
 import "./Dashboard.less"
@@ -7,27 +7,27 @@ import Assistants from './Assistants/Assistants';
 import Databases from './Databases/Databases';
 import {getUser, history} from "helpers";
 import {Route, Switch, withRouter} from 'react-router-dom';
-import Flow from "./Assistants/Assistant/Flow/Flow";
-import Profile from "./AccountDetails/Profile/Profile";
-import Billing from "./AccountDetails/Billing/Billing";
-import UsersManagement from "./AccountDetails/UsersManagement/UsersManagement";
-import Documentation from "./Documentation/Documentation";
-import Integration from "./Assistants/Assistant/Integration/Integration";
-import Conversations from "./Assistants/Assistant/Conversations/Conversations";
-import Calendar from './Calendar/Calendar'
-import Home from "./Home/Home";
-import Analytics from "./Assistants/Assistant/Analytics/Analytics";
 import {authActions, optionsActions} from "store/actions";
 import {store} from "store/store";
 import {connect} from 'react-redux';
-
 import {CSSTransition, TransitionGroup} from "react-transition-group";
-
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import CRM from "./Assistants/Assistant/CRM/CRM";
 import CrmView from "./CrmList/CrmView/CrmView";
 import CrmList from "./CrmList/CrmList";
+
+const Home = lazy(() => import('./Home/Home'));
+const Analytics = lazy(() => import('./Assistants/Assistant/Analytics/Analytics'));
+const Flow = lazy(() => import('./Assistants/Assistant/Flow/Flow'));
+const Profile = lazy(() => import('./AccountDetails/Profile/Profile'));
+const Billing = lazy(() => import('./AccountDetails/Billing/Billing'));
+const UsersManagement = lazy(() => import('./AccountDetails/UsersManagement/UsersManagement'));
+const Documentation = lazy(() => import('./Documentation/Documentation'));
+const Integration = lazy(() => import('./Assistants/Assistant/Conversations/Conversations'));
+const Conversations = lazy(() => import('./Documentation/Documentation'));
+const Calendar = lazy(() => import('./Calendar/Calendar'));
+
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;

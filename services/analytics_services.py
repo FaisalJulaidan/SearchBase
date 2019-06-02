@@ -7,7 +7,7 @@ from utilities import helpers
 from datetime import timedelta
 
 from monthdelta import monthdelta
-from sqlalchemy.sql import between
+from sqlalchemy.sql import between, func
 
 from models import db, Callback, Conversation
 
@@ -16,13 +16,18 @@ from models import db, Callback, Conversation
 def getAnalytics(assistant=1, startDate=datetime.now() - timedelta(days=365), endDate=datetime.now()):
     """ Gets analytics for the provided assistant """
     """ startDate defaults to a year ago, and the end date defaults to now, gathering all data for the past year """
+    """ currently only gathers amount of conversations held, split up by month """
     id = assistant
     print(startDate)
     print(endDate)
     try:
-        convo = db.session  .query(Conversation.ID, Conversation.DateTime, Conversation.TimeSpent)\
-                            .filter(between(Conversation.DateTime, startDate, endDate)).all()
-        return Callback(True, 'Analytics successfully gathered', convo)
+        monthlyUses = db.session  .query(func.count(Conversation.ID).label('count'), Conversation.DateTime)\
+                            .filter(between(Conversation.DateTime, startDate, endDate))\
+                            .group_by(func.month(Conversation.DateTime))\
+                            .all()
+
+
+        return Callback(True, 'Analytics successfully gathered', monthlyUses)
     except Exception as e:
         print(e)
         return Callback(False, 'Analytics could not be gathered')

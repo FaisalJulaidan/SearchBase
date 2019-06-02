@@ -205,6 +205,7 @@ class AutoPilot(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
+    Description = db.Column(db.String(260), nullable=True)
     Active = db.Column(db.Boolean, nullable=False, default=True)
     AcceptApplications = db.Column(db.Boolean, nullable=False, default=False)
     AcceptanceScore = db.Column(db.Float(), nullable=False, default=1)

@@ -21,7 +21,9 @@ def auto_pilots():
         callback: Callback = auto_pilot_services.fetchAll(user['companyID'])
 
     if request.method == "POST":
-        callback: Callback = auto_pilot_services.create(request.json.get('name'), user['companyID'])
+        callback: Callback = auto_pilot_services.create(request.json.get('name'),
+                                                        request.json.get('description'),
+                                                        user['companyID'])
 
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)
@@ -42,6 +44,7 @@ def auto_pilot(autoPilotID):
         callback: Callback = auto_pilot_services\
             .update(autoPilotID,
                     data.get('name'),
+                    request.json.get('description'),
                     data.get('active'),
                     data.get('acceptApplications'),
                     data.get('acceptanceScore'),

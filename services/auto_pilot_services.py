@@ -51,7 +51,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
 
 # The new AutoPilot will be returned parsed
-def create(name, companyID: int) -> Callback:
+def create(name, desc, companyID: int) -> Callback:
     try:
 
         autoPilot= AutoPilot(Name=name, CompanyID=companyID) # Create new AutoPilot
@@ -109,7 +109,7 @@ def fetchAll(companyID) -> Callback:
 
 
 # ----- Updaters ----- #
-def update(id, name, active, acceptApplications, acceptanceScore, rejectApplications,
+def update(id, name, desc, active, acceptApplications, acceptanceScore, rejectApplications,
            rejectionScore, SendCandidatesAppointments, companyID: int) -> Callback:
     try:
 
@@ -123,6 +123,7 @@ def update(id, name, active, acceptApplications, acceptanceScore, rejectApplicat
         autoPilot = autoPilot_callback.Data
 
         # Update the autoPilot
+        autoPilot.Name = name
         autoPilot.Name = name
         autoPilot.Active = active
         autoPilot.AcceptApplication = acceptApplications

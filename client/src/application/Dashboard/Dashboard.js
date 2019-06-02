@@ -1,4 +1,4 @@
-import React, {Component, lazy} from 'react';
+import React, {Component, lazy, Suspense} from 'react';
 
 import {Avatar, Dropdown, Icon, Layout, Menu} from 'antd';
 import "./Dashboard.less"
@@ -234,28 +234,30 @@ class Dashboard extends Component {
                         <Route render={() =>
                             <TransitionGroup style={{height: '100%'}}>
                                 <CSSTransition key={location.key} classNames="fade" timeout={550}>
-                                    <Switch location={location} style={{height: '100%'}}>
-                                        <Route path={`${match.path}/assistants/:id/script`} component={Flow}/>
-                                        <Route path={`${match.path}/assistants/:id/integration`}
-                                               component={Integration}/>
-                                        <Route path={`${match.path}/assistants/:id/conversations`} component={Conversations}/>
-                                        <Route path={`${match.path}/assistants/:id/analytics`}
-                                               component={Analytics}/>
-                                        <Route path={`${match.path}/assistants/:id/CRMIntegration`}
-                                               component={CRM}/>
-                                        <Route path={`${match.path}/assistants`} component={Assistants} exact/>
-                                        <Route path={`${match.path}/crmlist`} component={CrmList} exact/>
-                                        <Route path={`${match.path}/crmlist/:crm`} component={CrmView} exact/>
-                                        <Route path={`${match.path}/databases`} component={Databases} exact/>
-                                        <Route path={`${match.path}/calendar`} component={Calendar} exact/>
-                                        <Route path={`${match.path}/profile`} component={Profile} exact/>
-                                        <Route path={`${match.path}/billing`} component={Billing} exact/>
-                                        <Route path={`${match.path}/users-management`} component={UsersManagement}
-                                               exact/>
-                                        <Route path={`${match.path}/documentation`} component={Documentation}
-                                               exact/>
-                                        <Route path="/dashboard" component={Home}/>
-                                    </Switch>
+                                    <Suspense fallback={<div> Loading...</div>}>
+                                        <Switch location={location} style={{height: '100%'}}>
+                                            <Route path={`${match.path}/assistants/:id/script`} component={Flow}/>
+                                            <Route path={`${match.path}/assistants/:id/integration`}
+                                                   component={Integration}/>
+                                            <Route path={`${match.path}/assistants/:id/conversations`} component={Conversations}/>
+                                            <Route path={`${match.path}/assistants/:id/analytics`}
+                                                   component={Analytics}/>
+                                            <Route path={`${match.path}/assistants/:id/CRMIntegration`}
+                                                   component={CRM}/>
+                                            <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+                                            <Route path={`${match.path}/crmlist`} component={CrmList} exact/>
+                                            <Route path={`${match.path}/crmlist/:crm`} component={CrmView} exact/>
+                                            <Route path={`${match.path}/databases`} component={Databases} exact/>
+                                            <Route path={`${match.path}/calendar`} component={Calendar} exact/>
+                                            <Route path={`${match.path}/profile`} component={Profile} exact/>
+                                            <Route path={`${match.path}/billing`} component={Billing} exact/>
+                                            <Route path={`${match.path}/users-management`} component={UsersManagement}
+                                                   exact/>
+                                            <Route path={`${match.path}/documentation`} component={Documentation}
+                                                   exact/>
+                                            <Route path="/dashboard" component={Home}/>
+                                        </Switch>
+                                    </Suspense>
                                 </CSSTransition>
                             </TransitionGroup>
                         }/>

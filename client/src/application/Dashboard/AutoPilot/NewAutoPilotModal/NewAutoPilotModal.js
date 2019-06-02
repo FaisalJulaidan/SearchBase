@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {Form, Input, Modal} from "antd";
 import {autoPilotActions} from "store/actions";
 import {store} from "store/store";
+import PropTypes from 'prop-types';
+import 'types/TimeSlots_Types'
 
 const FormItem = Form.Item;
 
@@ -38,7 +40,16 @@ class NewAutoPilotModal extends Component {
                         {getFieldDecorator('name', {
                             rules: [{
                                 required: true,
-                                message: "Please add name",
+                                message: "Please add name or the name you entered is duplicated",
+                                validator: (_, value, callback) => {
+                                    // check if the value equalls any of the name from
+                                    // this.props.autoPilotsSlots
+                                    // if there is an error retrun the callback with the message
+
+                                    const { /**@type AutoPilot[]*/ autoPilotsList} = this.props;
+                                    if (autoPilotsList.some(autoPilot => autoPilot.Name === value))
+                                        return callback(value + ' is duplicated')
+                                }
                             }],
                         })(
                             <Input type="text" placeholder="Name of the auto pilot"/>
@@ -61,5 +72,8 @@ class NewAutoPilotModal extends Component {
     }
 }
 
+NewAutoPilotModal.propTypes = {
+    autoPilotsList: PropTypes.array,
+};
 export default Form.create()(NewAutoPilotModal);
 

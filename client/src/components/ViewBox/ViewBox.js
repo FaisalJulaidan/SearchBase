@@ -3,7 +3,6 @@ import React from 'react';
 import {Typography} from 'antd';
 import styles from "components/ViewBox/ViewBox.module.less";
 import PropTypes from 'prop-types';
-import {AutoPilotIcon} from 'components/SVGs'
 
 const {Paragraph} = Typography;
 
@@ -31,9 +30,9 @@ const ViewBox = (props) => {
 };
 
 ViewBox.propTypes = {
-    icon: PropTypes.string.isRequired,
+    // icon: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
-    text: PropTypes.string.isRequired,
+    text: PropTypes.string,
 };
 
 export default ViewBox

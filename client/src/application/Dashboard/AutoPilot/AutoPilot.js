@@ -39,7 +39,12 @@ class AutoPilot extends React.Component {
 
                         {
                             this.props.autoPilotsList.map(autoPilot =>
-                                <ViewBox text={'hey'} title={'this is title'} icon={<AutoPilotIcon/>}/>
+                                <ViewBox title={'This is title'}
+                                         text={'this is a description'}
+                                         icon={<AutoPilotIcon/>}
+                                         iconTop={175}
+                                         iconRight={15}
+                                />
                             )
                         }
 

@@ -8,10 +8,11 @@ import {AutoPilotIcon} from 'components/SVGs'
 const {Paragraph} = Typography;
 
 const ViewBox = (props) => {
+    console.log(props);
     return (
         <div className={styles.Box}>
             <div className={styles.Body}>
-                <div className={styles.Icon}>
+                <div className={styles.Icon} style={{top: props.iconTop, right: props.iconRight}}>
                     {props.icon}
                 </div>
 
@@ -19,7 +20,7 @@ const ViewBox = (props) => {
                     {props.title}
                 </Paragraph>
 
-                <Paragraph type="secondary" ellipsis={{rows: 2, expandable: true}} style={{overflowWrap: 'break-word'}}>
+                <Paragraph type="secondary" ellipsis={{rows: 3, expandable: true}} style={{overflowWrap: 'break-word'}}>
                     {props.text}
                 </Paragraph>
             </div>

@@ -1,6 +1,6 @@
 import {all, put, takeEvery} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
-import {autoPilotActions} from "../actions";
+import {assistantActions, autoPilotActions} from "../actions";
 import {destroyMessage, errorHandler, errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
 
 function* fetchAutoPilots() {
@@ -78,11 +78,31 @@ function* watchDeleteAutoPilot() {
     yield takeEvery(actionTypes.DELETE_AUTOPILOT_REQUEST, deleteAutoPilot)
 }
 
+function* updateStatus({status, autoPilotID}) {
+    try {
+        loadingMessage('Updating Status', 0);
+        const res = yield http.put(`/auto_pilot/${autoPilotID}/status`, {status});
+        yield put(autoPilotActions.updateAutoPilotSuccess('Status updated successfully', status, autoPilotID));
+        yield successMessage('Status updated');
+
+    } catch (error) {
+        console.error(error);
+        const msg = "Couldn't update assistant's status";
+        yield put(autoPilotActions.updateAutoPilotFailure(msg));
+        errorMessage(msg);
+    }
+}
+
+function* watchUpdateStatus() {
+    yield takeLatest(actionTypes.UPDATE_AUTOPILOT_STATUS_REQUEST, updateStatus)
+}
+
 export function* autoPilotSaga() {
     yield all([
         watchFetchAutoPilots(),
         watchAddAutoPilot(),
         watchUpdateAutoPilot(),
         watchDeleteAutoPilot(),
+        watchUpdateStatus(),
     ])
 }

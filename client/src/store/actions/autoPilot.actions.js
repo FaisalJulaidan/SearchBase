@@ -96,7 +96,29 @@ const deleteAutoPilotFailure = (errorMsg) => {
 };
 
 
+const updateStatus = (status, autoPilotID) => {
+    return {
+        type: actionTypes.UPDATE_AUTOPILOT_STATUS_REQUEST,
+        autoPilotID,
+        status
+    };
+};
 
+const updateStatusSuccess = (successMsg, status, autoPilotID) => {
+    return {
+        type: actionTypes.UPDATE_AUTOPILOT_STATUS_SUCCESS,
+        successMsg,
+        status,
+        autoPilotID
+    };
+};
+
+const updateStatusFailure = (errorMsg) => {
+    return {
+        type: actionTypes.UPDATE_AUTOPILOT_STATUS_FAILURE,
+        errorMsg
+    };
+};
 
 export const autoPilotActions = {
     fetchAutoPilots,
@@ -114,4 +136,8 @@ export const autoPilotActions = {
     deleteAutoPilot,
     deleteAutoPilotSuccess,
     deleteAutoPilotFailure,
+
+    updateStatus,
+    updateStatusSuccess,
+    updateStatusFailure,
 };

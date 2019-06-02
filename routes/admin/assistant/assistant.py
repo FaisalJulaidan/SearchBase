@@ -86,7 +86,7 @@ def assistant_status(assistantID):
     # Update assistant status
     if request.method == "PUT":
         data = request.json
-        callback: Callback = assistant_services.changeStatus(assistantID, data.get('status'), user['companyID'])
+        callback: Callback = assistant_services.updateStatus(assistantID, data.get('status'), user['companyID'])
 
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)

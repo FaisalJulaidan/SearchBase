@@ -72,19 +72,47 @@ export const autoPilot = (state = initialState, action) => {
                 errorMsg: null,
                 isDeleting: true
             });
-        case actionTypes.DELETE_AUTOPILOT_SUCCESS:
 
+        case actionTypes.DELETE_AUTOPILOT_SUCCESS:
             let autoPilotsList = [...state.autoPilotsList].filter(autoPilot => autoPilot.ID !== action.autoPilotID);
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isDeleting: false,
                 autoPilotList: autoPilotsList
             });
+
         case actionTypes.DELETE_AUTOPILOT_FAILURE:
             return updateObject(state, {
                 isDeleting: false,
                 errorMsg: action.errorMsg
             });
+
+        // Update Status
+        case actionTypes.UPDATE_AUTOPILOT_STATUS_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isStatusChanging: true
+            });
+
+        case actionTypes.UPDATE_AUTOPILOT_STATUS_SUCCESS:
+            let newAutoPilotStatus = [...state.autoPilotsList].map(autoPilot => {
+                if(autoPilot.ID === action.autoPilotID)
+                    autoPilot.Active = action.status;
+                return autoPilot
+            });
+
+            return updateObject(state, {
+                successMsg: action.successMsg,
+                isStatusChanging: false,
+                autoPilotsList: newAutoPilotStatus
+            });
+
+        case actionTypes.UPDATE_AUTOPILOT_STATUS_FAILURE:
+            return updateObject(state, {
+                isStatusChanging: false,
+                errorMsg: action.error
+            });
+
         default:
             return state
     }

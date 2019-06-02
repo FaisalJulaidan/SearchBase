@@ -151,6 +151,22 @@ def update(id, name, desc, active, acceptApplications, acceptanceScore, rejectAp
         db.session.rollback()
         return Callback(False, 'Could update the AutoPilot.')
 
+def updateStatus(autoPilotID, newStatus, companyID):
+    try:
+
+        if not newStatus: raise Exception("Please provide the new status true/false")
+        db.session.query(AutoPilot).filter(and_(AutoPilot.ID == autoPilotID, AutoPilot.CompanyID == companyID)) \
+            .update({"Active": newStatus})
+
+        db.session.commit()
+        return Callback(True, 'AutoPilot status has been changed.')
+
+    except Exception as exc:
+        print("Error in auto_pilot.changeStatus(): ", exc)
+        logging.error("auto_pilot.changeStatus(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Could not change the AutoPilot's status.")
+
 
 def removeByID(id, companyID):
     try:

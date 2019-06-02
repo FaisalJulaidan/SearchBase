@@ -155,7 +155,7 @@ def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPe
                         "Couldn't update assistant " + str(id))
 
 
-def changeStatus(assistantID, newStatus, companyID):
+def updateStatus(assistantID, newStatus, companyID):
     try:
 
         if not newStatus: raise Exception("Please provide the new status")

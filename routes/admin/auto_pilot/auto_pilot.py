@@ -30,7 +30,7 @@ def auto_pilots():
     return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
-# Get all AutoPilots & create new AutoPilot
+# Update & Delete auto pilots
 @auto_pilot_router.route("/auto_pilot/<int:autoPilotID>", methods=['DELETE', 'PUT'])
 @jwt_required
 def auto_pilot(autoPilotID):
@@ -63,3 +63,19 @@ def auto_pilot(autoPilotID):
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+
+
+@auto_pilot_router.route("/auto_pilot/<int:autoPilotID>/status", methods=['PUT'])
+@jwt_required
+def auto_pilot_status(autoPilotID):
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    # Update AutoPilot status
+    if request.method == "PUT":
+        data = request.json
+        callback: Callback = auto_pilot_services.updateStatus(autoPilotID, data.get('status'), user['companyID'])
+
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+        return helpers.jsonResponse(True, 200, callback.Message, None)

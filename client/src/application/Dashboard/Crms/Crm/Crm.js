@@ -1,7 +1,7 @@
 import React from 'react'
 import {history} from "helpers";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Avatar, Breadcrumb, Form, Modal, Tabs, Typography} from 'antd';
+import {Avatar, Breadcrumb, Button, Form, Modal, Tabs, Typography} from 'antd';
 import styles from './Crm.module.less'
 import 'types/CRM_Types';
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./CrmForms/Adapt";
@@ -34,7 +34,10 @@ class Crm extends React.Component {
             // if there is a crm, check if it is failed or connected
             // and add the ID
             crm.status = nextProps.CRMsList[index].Status ? "CONNECTED" : "FAILED";
-            crm.ID = nextProps.CRMsList[index].ID
+            crm.ID = nextProps.CRMsList[index].ID;
+        }
+        if(nextProps.exportData){
+            crm.exportData = nextProps.exportData
         }
     }
 
@@ -67,6 +70,12 @@ class Crm extends React.Component {
     disconnectCRM = () => {
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         this.props.dispatch(crmActions.disconnectCrm({ID: crm.ID}))
+    };
+
+    exportRecruiterValueReport = () => {
+        const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
+        console.log("crm.exportData", crm.exportData)
+        this.props.dispatch(crmActions.exportRecruiterValueReport({Name: crm.type}))
     };
 
     render() {
@@ -103,6 +112,12 @@ class Crm extends React.Component {
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>{crm.type}</Breadcrumb.Item>
                     </Breadcrumb>
+
+                    {crm.type === "Bullhorn" ? <><br/><Button
+                        type="primary" icon="solution"
+                        onClick={this.exportRecruiterValueReport}>
+                        Export Recruiter-Value Data
+                    </Button></> : <></>}
 
                     <br/>
 
@@ -187,6 +202,8 @@ function mapStateToProps(state) {
         isConnecting: state.crm.isConnecting,
         isTesting: state.crm.isTesting,
         isDisconnecting: state.crm.isDisconnecting,
+        isLoading: state.crm.isLoading,
+        exportData: state.crm.exportData
     };
 }
 

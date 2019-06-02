@@ -1,6 +1,6 @@
 import React from 'react'
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Avatar, Breadcrumb, Form, Modal, Tabs, Typography} from 'antd';
+import {Avatar, Breadcrumb, Form, Modal, Tabs, Typography, Button} from 'antd';
 import styles from './CrmView.module.less'
 import {history} from "helpers";
 import 'types/CRM_Types';
@@ -94,7 +94,6 @@ class CrmView extends React.Component {
             }
         });
     };
-
 
     render() {
         const {getFieldDecorator} = this.props.form;

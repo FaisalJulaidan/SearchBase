@@ -9,6 +9,7 @@ from sqlalchemy import and_
 from enums import DataType as DT
 from models import Callback, Conversation, db, CRM, StoredFile
 from services import databases_services, stored_file_services
+from datetime import datetime
 # login requires: username, password
 
 
@@ -148,8 +149,6 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # test the BhRestToken (rest_token)
         r = sendRequest(url, method, headers, json.dumps(body))
-        print(r.status_code)
-        print(r.text)
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
@@ -492,6 +491,7 @@ def checkFilter(keywords, filter, string, query):
 
 def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
     try:
+
         if not fields:
             fields = "fields=id,title,publicDescription,address,employmentType,salary,skills,yearsRequired,startDate,dateEnd"
 
@@ -551,24 +551,57 @@ def getAllJobs(auth, companyID, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def produceRecruitmentValueReport(companyID) -> Callback:
+def produceRecruiterValueReport(crm: CRM, companyID) -> Callback:
     try:
-        crm = db.session.query(CRM) \
-            .filter(and_(CRM.CompanyID == companyID, CRM.Type == "Bullhorn")).first()
-        if not crm:
-            raise Exception("CRM not found")
 
         getJobs_callback: Callback = searchJobsCustomQuery(
             crm.Auth, companyID,
-            "query=employmentType:\"permanent\" AND status:\"accepting candidates\""
-            "fields=dateAdded,title,clientCorporation,salary,feeArrangement")
+            "query=employmentType:\"permanent\" AND status:\"accepting candidates\"",
+            "fields=dateAdded,title,clientCorporation,salary,feeArrangement,owner")
         if not getJobs_callback.Success:
             raise Exception("Jobs could not be retrieved")
 
-        return_body = getJobs_callback.Data
+        def extractName(json):
+            return int(json["owner"]["id"])
 
-        return Callback(True, "Report information has been retrieved", return_body)
+        return_body = getJobs_callback.Data["data"]
+        return_body.sort(key=extractName, reverse=True)
+
+        def getTotalPipeline(result, previousUser):
+            if len(result.keys()) > 1:
+                totalPipeline = 0
+                for pRecord in result[previousUser]:
+                    totalPipeline += float(pRecord[-1])
+                result[previousUser].append(["", "", "", "", "", previousUser + " Total Pipeline Value",
+                                             totalPipeline])
+            return result
+
+        result = {"start": [["User Assigned", "Date Added", "Title", "Client Corporation", "Salary", "Fee Arrangement",
+                             "Pipeline Value"]]}
+
+        previousUser = None
+        for record in return_body:
+            tempRecord = result.get(record["owner"]["firstName"] + " " + record["owner"]["lastName"])
+            if not tempRecord:
+                tempRecord = []
+                result = getTotalPipeline(result, previousUser)
+
+            tempRecord.append([
+                record["owner"]["firstName"] + " " + record["owner"]["lastName"],
+                datetime.fromtimestamp(int(str(record["dateAdded"])[:-3])),
+                record["title"],
+                record["clientCorporation"].get("name"),
+                record["salary"],
+                str(record["feeArrangement"]) + "%",
+                float(record["salary"]) * float(record["feeArrangement"]) / 100
+            ])
+            previousUser = record["owner"]["firstName"] + " " + record["owner"]["lastName"]
+
+            result[previousUser] = tempRecord
+
+        result = getTotalPipeline(result, previousUser)
+        return Callback(True, "Report information has been retrieved", result)
 
     except Exception as exc:
-        logging.error("CRM.Bullhorn.getAllJobs() ERROR: " + str(exc))
-        return Callback(False, str(exc))
+        logging.error("CRM.Bullhorn.produceRecruiterValueReport() ERROR: " + str(exc))
+        return Callback(False, "Error in creating report")

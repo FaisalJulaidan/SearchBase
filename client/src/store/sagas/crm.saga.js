@@ -76,6 +76,22 @@ function* disconnectCrm({disconnectedCRMID}) {
     }
 }
 
+function* exportRecruiterValueReport({connectedCRM_Type}) {
+    let msg = "Could not fetch the export data";
+    try {
+        loadingMessage('Exporting recruiter information from ' + connectedCRM_Type.Name, 0);
+        const res = yield http.post(`/crm/recruiter_value_report`, {crm_type: connectedCRM_Type.Name});
+        destroyMessage();
+        successMessage(res.data?.msg || msg);
+        yield put(crmActions.exportRecruiterValueReportSuccess(res.data.data));
+    } catch (error) {
+        let data = error.response?.data;
+        errorMessage(data.msg || msg);
+        yield put(crmActions.exportRecruiterValueReportFailure(data.msg || msg));
+        if (!data.msg) errorHandler(error)
+    }
+}
+
 function* watchFetchCRMs() {
     yield takeEvery(actionTypes.GET_CONNECTED_CRMS_REQUEST, fetchCRMs)
 }
@@ -92,13 +108,18 @@ function* watchDisconnectCrm() {
     yield takeEvery(actionTypes.DISCONNECT_CRM_REQUEST, disconnectCrm)
 }
 
+function* watchExportRecruiterValueReport() {
+    yield takeEvery(actionTypes.EXPORT_RECRUITER_VALUE_REPORT_REQUEST, exportRecruiterValueReport)
+}
+
 
 export function* crmSaga() {
     yield all([
         watchFetchCRMs(),
         watchConnectCrm(),
         watchTestCrm(),
-        watchDisconnectCrm()
+        watchDisconnectCrm(),
+        watchExportRecruiterValueReport()
 
     ])
 }

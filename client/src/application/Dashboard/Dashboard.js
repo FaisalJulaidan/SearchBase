@@ -16,8 +16,8 @@ import {CSSTransition, TransitionGroup} from "react-transition-group";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import CRM from "./Assistants/Assistant/CRM/CRM";
-import CrmView from "./CrmList/CrmView/CrmView";
-import CrmList from "./CrmList/CrmList";
+import Crms from "./Crms/Crms";
+import Crm from "./Crms/Crm/Crm";
 
 const Home = lazy(() => import('./Home/Home'));
 const Analytics = lazy(() => import('./Assistants/Assistant/Analytics/Analytics'));
@@ -255,8 +255,8 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/assistants/:id/CRMIntegration`}
                                                    component={CRM}/>
                                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
-                                            <Route path={`${match.path}/crmlist`} component={CrmList} exact/>
-                                            <Route path={`${match.path}/crmlist/:crm`} component={CrmView} exact/>
+                                            <Route path={`${match.path}/crmlist`} component={Crms} exact/>
+                                            <Route path={`${match.path}/crmlist/:crm`} component={Crm} exact/>
                                             <Route path={`${match.path}/databases`} component={Databases} exact/>
                                             <Route path={`${match.path}/calendar`} component={Calendar} exact/>
                                             <Route path={`${match.path}/profile`} component={Profile} exact/>

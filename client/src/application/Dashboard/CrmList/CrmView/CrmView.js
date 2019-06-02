@@ -1,6 +1,6 @@
 import React from 'react'
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Avatar, Breadcrumb, Form, Modal, Tabs, Typography} from 'antd';
+import {Avatar, Breadcrumb, Form, Modal, Tabs, Typography, Button} from 'antd';
 import styles from './CrmView.module.less'
 import {history} from "helpers";
 import 'types/CRM_Types';
@@ -95,7 +95,6 @@ class CrmView extends React.Component {
         });
     };
 
-
     render() {
         const {getFieldDecorator} = this.props.form;
         const layout = {
@@ -107,88 +106,31 @@ class CrmView extends React.Component {
         return (
             <NoHeaderPanel>
                 <div className={styles.Title}>
-                    <Avatar shape="square"
-                            src={this.state.CRM.image}
-                            className={styles.Avatar}/>
+                    <Avatar shape="square" src={this.state.CRM.image} className={styles.Avatar}/>
                     <div className={styles.DetailsWithAvatar}>
                         <Title level={2}>{this.state.CRM?.type}</Title>
-                        <Paragraph type="secondary">
-                            Bond Adapt, specialist portfolio of recruitment software applications has earned a
-                            reputation for increasing business growth and profitability throughout the global staffing
-                            market. 100% configurable and fully scalable, Adapt manages the entire placement cycle and
-                            is chosen by leading recruitment organisations including Hays,
-                            Adecco and Michael Page.
-                        </Paragraph>
+                        {
+                            CRM.type === "Adapt" &&
+                            <AdaptHeader/>
+                        }
                     </div>
                 </div>
 
                 <div className={styles.Body}>
                     <Breadcrumb>
                         <Breadcrumb.Item>
-                            <a href={"javascript:void(0);"}
-                               onClick={() => history.push('/dashboard/crmlist')}>
+                            <a href={"javascript:void(0);"} onClick={() => history.push('/dashboard/crmlist')}>
                                 CRMs List
                             </a>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>{CRM.type}</Breadcrumb.Item>
                     </Breadcrumb>
+
                     <br/>
+
                     <Tabs defaultActiveKey="1">
                         <TabPane tab="Feature" key="1">
-                            <Typography style={{padding: '0 60px'}}>
-                                <Title>Introduction</Title>
-                                <Paragraph>
-                                    Adapt users can very simply benefit from using their systems directly by logging in
-                                    through our software to connect their CRM to our platform.
-                                </Paragraph>
-                                <Paragraph>
-                                    Once you have the required information and have successfully logged in – you are all
-                                    done.
-                                </Paragraph>
-                                <Paragraph>
-                                    What you’ll need:
-                                    <ul>
-                                        <li>
-                                            Adapt Domain
-                                        </li>
-                                        <li>
-                                            Username
-                                        </li>
-                                        <li>
-                                            Password
-                                        </li>
-                                        <li>
-                                            Profile
-                                        </li>
-                                        <li>
-                                            Locale
-                                        </li>
-                                        <li>
-                                            (Location e.g. en_GB, en_US)
-                                        </li>
-                                        <li>
-                                            Timezone (e.g. GMT)
-                                        </li>
-                                    </ul>
-                                </Paragraph>
-                                <Paragraph>
-                                    We can start using your data to connect to the chatbots and help you with the
-                                    automation of your tasks.
-                                </Paragraph>
-                                <Title level={2}>Guidelines and Resources</Title>
-                                <Paragraph>
-                                    From the list below, choose your CRM or ATS for your account to be directly
-                                    connected.
-                                    If you need help with the setup or wish to contact us to arrange an integration with
-                                    your
-                                    provider,
-                                    please contact us at:
-                                    <Text code><a target={'_blank'}
-                                                  href={"mailto:info@thesearchbase.com"}>
-                                        info@thesearchbase.com
-                                    </a></Text>.
-                                </Paragraph>
-                            </Typography>
+
                         </TabPane>
 
                         <TabPane tab="Connection" key="2" style={{

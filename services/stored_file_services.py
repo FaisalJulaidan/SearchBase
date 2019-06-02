@@ -43,7 +43,7 @@ def getAll():
         # Get result and check if None then raise exception
         result = db.session.query(StoredFile).all()
         return Callback(True, 'StoredFiles were successfully retrieved', result)
-    
+
     except Exception as exc:
         print("stored_file_services.getAll() ERROR: ", exc)
         logging.error("stored_file_services.getAll(): " + str(exc))
@@ -65,13 +65,13 @@ def createRef(filePath, conversation) -> StoredFile or None:
         logging.error("stored_file_services.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Couldn't create a storedFile entity.")
-    
+
 
 def removeByID(id):
     try:
         db.session.query(StoredFile).filter(StoredFile.ID == id).first().delete()
         db.session.commit()
-        
+
         return Callback(True, "StoredFile has been deleted")
     except Exception as exc:
         print("stored_file_services.removeByID() ERROR: ", exc)
@@ -123,9 +123,7 @@ def downloadFile(filename, path):
         except botocore.exceptions.ClientError as e:
             return Callback(False, "File not found")
 
-
         return Callback(True, "File downloaded successfully", file)
-
 
     except Exception as exc:
         print("stored_file_services.downloadFile() ERROR: ", exc)

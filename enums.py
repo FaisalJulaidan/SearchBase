@@ -1,6 +1,7 @@
 from enum import Enum, unique
 from typing import List
 
+
 # ===============================================================================================
 # IMPORTANT: don't forget to  migrate database tables where necessary e.g. ChatbotSession, Block
 # You know just ask Faisal Julaidan before making any changes.
@@ -16,6 +17,9 @@ from typing import List
 class CRM(Enum):
     Adapt = 'Adapt'
     Bullhorn = 'Bullhorn'
+    Vincere = 'Vincere'
+    Greenhouse = 'Greenhouse'
+
 
 @unique
 class ApplicationStatus(Enum):
@@ -33,7 +37,6 @@ class BlockType(Enum):
 
 @unique
 class BlockAction(Enum):
-
     GoToNextBlock = 'Go To Next Block'
     GoToSpecificBlock = 'Go To Specific Block'
     GoToGroup = 'Go To Group'
@@ -48,8 +51,8 @@ class UserType(Enum):
 @unique
 class DatabaseType(Enum):
     # multiplying userTypes by 3 will help detect the user type in the chatbot
-    Candidates = {'enumName': 'Candidates', 'name': 'Candidates', 'userTypes':[UserType.Client.value] * 5}
-    Jobs = {'enumName': 'Jobs', 'name': 'Jobs', 'userTypes':[UserType.Candidate.value] * 5}
+    Candidates = {'enumName': 'Candidates', 'name': 'Candidates', 'userTypes': [UserType.Client.value] * 5}
+    Jobs = {'enumName': 'Jobs', 'name': 'Jobs', 'userTypes': [UserType.Candidate.value] * 5}
 
 
 @unique
@@ -59,6 +62,7 @@ class DataTypeSection(Enum):
     Company = 'Company'
     Candidate = 'Candidate'
     Job = 'Job'
+
 
 @unique
 class ValidationType(Enum):
@@ -72,8 +76,10 @@ class ValidationType(Enum):
     Date = 'Date'
     DateTime = 'DateTime'
 
+
 # === Data Types Stuff === #
-def dataTypeCreator(name: str, enumName: str , validation: ValidationType, section: DataTypeSection, userTypes: List[UserType]):
+def dataTypeCreator(name: str, enumName: str, validation: ValidationType, section: DataTypeSection,
+                    userTypes: List[UserType]):
     return {'name': name,
             'enumName': enumName,
             'validation': validation.value,
@@ -81,15 +87,15 @@ def dataTypeCreator(name: str, enumName: str , validation: ValidationType, secti
             'userTypes': [ut.value for ut in userTypes],
             }
 
+
 @unique
 class DataType(Enum):
-
     NoType = dataTypeCreator(
         'No Type',
         'NoType',
         ValidationType.Ignore,
         DataTypeSection.NoType, [
-        UserType.Unknown])
+            UserType.Unknown])
 
     # Candidate
     CandidateName = dataTypeCreator(
@@ -126,7 +132,6 @@ class DataType(Enum):
         ValidationType.Ignore,
         DataTypeSection.Candidate,
         [UserType.Candidate])
-
 
     CandidateAvailability = dataTypeCreator(
         'Candidate Availability',
@@ -177,7 +182,6 @@ class DataType(Enum):
         DataTypeSection.Candidate,
         [UserType.Candidate])
 
-
     CompanyName = dataTypeCreator(
         'Company Name',
         'CompanyName',
@@ -218,8 +222,6 @@ class DataType(Enum):
         ValidationType.String,
         DataTypeSection.Client,
         [UserType.Client] * 6)
-
-
 
     # ======================================================================
     # Job
@@ -262,9 +264,9 @@ class DataType(Enum):
     JobDesiredSkills = dataTypeCreator(
         'Job Desired Skills',
         'JobDesiredSkills',
-         ValidationType.String,
-         DataTypeSection.Job,
-         [UserType.Candidate, UserType.Client])
+        ValidationType.String,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])
 
     JobLinkURL = dataTypeCreator(
         'Job Link URL',
@@ -276,9 +278,9 @@ class DataType(Enum):
     JobEndDate = dataTypeCreator(
         'Job End Date',
         'JobEndDate',
-         ValidationType.DateTime,
-         DataTypeSection.Job,
-         [UserType.Candidate, UserType.Client])
+        ValidationType.DateTime,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])
 
     JobStartDate = dataTypeCreator(
         'Job Start Date',
@@ -286,7 +288,6 @@ class DataType(Enum):
         ValidationType.DateTime,
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])
-
 
     JobYearsRequired = dataTypeCreator(
         'Job Years Required',

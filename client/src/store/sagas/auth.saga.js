@@ -1,13 +1,13 @@
 import * as actionTypes from '../actions/actionTypes';
-import { put, takeLatest, all } from 'redux-saga/effects'
+import {all, put, takeLatest} from 'redux-saga/effects'
 import {authActions} from "../actions";
 import {history, successMessage} from "helpers";
-import {loadingMessage, errorMessage, warningMessage} from "helpers/alert";
+import {errorMessage, loadingMessage, warningMessage} from "helpers/alert";
 import axios from 'axios';
 
 
 // Login
-function* login({email, password}) {
+function* login({email, password, prevPath}) {
     try {
         loadingMessage('Logging you in...');
         const res = yield axios.post(`/api/auth`, {email, password}, {
@@ -25,7 +25,7 @@ function* login({email, password}) {
         yield put(authActions.loginSuccess(user));
 
         // Redirect to dashboard page
-        yield history.push('/dashboard');
+        yield history.push(prevPath || '/dashboard');
 
     } catch (error) {
         console.log(error);

@@ -66,7 +66,7 @@ function* updateConversationStatus({newStatus, conversationID, assistantID}) {
         successMessage('Application status updated');
     } catch (error) {
         console.log(error);
-        const msg = "Couldn't update status";
+        const msg = "Couldn't update application status";
         yield put(conversationActions.updateConversationStatusFailure(msg));
         errorMessage(msg);
     }

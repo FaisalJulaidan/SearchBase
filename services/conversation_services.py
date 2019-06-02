@@ -43,9 +43,9 @@ def processConversation(assistantHashID, data: dict) -> Callback:
             raise Exception("Score is corrupted")
 
         # collectedData is an array, and timeSpent is in seconds.
-        conversation = Conversation(Data= conversationData,
+        conversation = Conversation(Data=conversationData,
                                       TimeSpent=data['timeSpent'],
-                                      Completed=data['isConversationCompleted'],
+                                      Completed=data['isSessionCompleted'],  # isSessionCompleted -> isConversationCompleted
                                       SolutionsReturned=data['solutionsReturned'],
                                       QuestionsAnswered=len(collectedData),
                                       UserType=UserType[data['userType'].replace(" ", "")],
@@ -63,11 +63,11 @@ def processConversation(assistantHashID, data: dict) -> Callback:
 
 
         # CRM integration
-        # if assistant.CRM:
-        #     crm_callback: Callback = crm_services.processConversation(assistant, conversation)
-        #     if crm_callback.Success:
-        #         conversation.CRMSynced = True
-        #     conversation.CRMResponse = crm_callback.Message
+        if assistant.CRM:
+            crm_callback: Callback = crm_services.processConversation(assistant, conversation)
+            if crm_callback.Success:
+                conversation.CRMSynced = True
+            conversation.CRMResponse = crm_callback.Message
 
 
         db.session.add(conversation)

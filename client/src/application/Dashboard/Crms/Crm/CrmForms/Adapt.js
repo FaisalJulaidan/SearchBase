@@ -1,21 +1,23 @@
 import React from 'react';
-import {Button, Col, Icon, Input, Select, Typography} from "antd";
-import styles from "../CrmView.module.less";
+import {Button, Col, Icon, Input, Popconfirm, Select, Typography} from "antd";
+import styles from "../Crm.module.less";
 import {getLink} from "helpers";
 
 const {Option} = Select;
-const {Title, Paragraph} = Typography;
+const {Title, Paragraph, Text} = Typography;
 
-
-const AdaptFormItems = ({
-                            FormItem,
-                            layout,
-                            getFieldDecorator,
-                            CRM,
-                            disconnectCRM,
-                            connectCRM,
-                            testCRM
-                        }) =>
+export const AdaptFormItems = ({
+                                   FormItem,
+                                   layout,
+                                   getFieldDecorator,
+                                   CRM,
+                                   disconnectCRM,
+                                   connectCRM,
+                                   testCRM,
+                                   isConnecting,
+                                   isTesting,
+                                   isDisconnecting
+                               }) =>
     <div>
         {
             CRM.status !== "CONNECTED" &&
@@ -166,15 +168,23 @@ const AdaptFormItems = ({
                 {
                     (CRM.status === "CONNECTED" || CRM.status === "FAILED")
                     &&
-                    <Button type="danger" onClick={disconnectCRM}>Disconnect</Button>
+                    <Popconfirm
+                        title="Chatbot conversations will no longer be synced with Adapt account"
+                        onConfirm={disconnectCRM}
+                        okType={'danger'}
+                        okText="Disconnect"
+                        cancelText="No"
+                    >
+                        <Button type="danger" disabled={isDisconnecting}>Disconnect</Button>
+                    </Popconfirm>
                 }
 
                 {
                     CRM.status === "NOT_CONNECTED" &&
                     <>
-                        <Button type="primary"
+                        <Button type="primary" disabled={isConnecting || isTesting}
                                 onClick={connectCRM}>Connect</Button>
-                        <Button onClick={testCRM}>Test</Button>
+                        <Button onClick={testCRM} disabled={isConnecting || isTesting}>Test</Button>
                     </>
                 }
             </div>
@@ -182,4 +192,53 @@ const AdaptFormItems = ({
 
     </div>;
 
-export default AdaptFormItems
+export const AdaptFeatures = ({}) =>
+    <Typography style={{padding: '0 60px'}}>
+        <Title>Introduction</Title>
+        <Paragraph>
+            Adapt users can very simply benefit from using their systems directly by logging in
+            through our software to connect their CRM to our platform.
+        </Paragraph>
+        <Paragraph>
+            Once you have the required information and have successfully logged in – you are all
+            done.
+        </Paragraph>
+        <Paragraph>
+            What you’ll need:
+            <ul>
+                <li>Adapt Domain</li>
+                <li>Username</li>
+                <li>Password</li>
+                <li>Profile</li>
+                <li>Locale</li>
+                <li>(Location e.g. en_GB, en_US)</li>
+                <li>Timezone (e.g. GMT)</li>
+            </ul>
+        </Paragraph>
+        <Paragraph>
+            We can start using your data to connect to the chatbots and help you with the
+            automation of your tasks.
+        </Paragraph>
+        <Title level={2}>Guidelines and Resources</Title>
+        <Paragraph>
+            From the list below, choose your CRM or ATS for your account to be directly
+            connected.
+            If you need help with the setup or wish to contact us to arrange an integration with
+            your
+            provider,
+            please contact us at:
+            <Text code><a target={'_blank'}
+                          href={"mailto:info@thesearchbase.com"}>
+                info@thesearchbase.com
+            </a></Text>.
+        </Paragraph>
+    </Typography>;
+
+export const AdaptHeader = () =>
+    <Paragraph type="secondary">
+        Bond Adapt, specialist portfolio of recruitment software applications has earned a
+        reputation for increasing business growth and profitability throughout the global staffing
+        market. 100% configurable and fully scalable, Adapt manages the entire placement cycle and
+        is chosen by leading recruitment organisations including Hays,
+        Adecco and Michael Page.
+    </Paragraph>;

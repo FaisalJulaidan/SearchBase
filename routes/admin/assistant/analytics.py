@@ -26,3 +26,6 @@ def admin_analytics_data(assistantID):
             return helpers.jsonResponse(False, 404, callback.Message, callback.Data)
 
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+
+
+

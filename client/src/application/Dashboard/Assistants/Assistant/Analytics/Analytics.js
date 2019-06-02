@@ -2,7 +2,7 @@ import React from 'react';
 import styles from "./Analytics.module.less";
 
 import Header from "../../../../../components/Header/Header";
-import {Bar, MiniProgress} from "ant-design-pro/lib/Charts";
+import {Chart, Axis, Tooltip, Geom } from "bizcharts";
 import NumberInfo from 'ant-design-pro/lib/NumberInfo';
 import {Icon, Spin} from 'antd';
 
@@ -29,7 +29,55 @@ class Analytics extends React.Component {
         this.setState({height});
     }
 
+
+
     render() {
+        const data = [
+            {
+                year: "1991",
+                value: 3
+            },
+            {
+                year: "1992",
+                value: 4
+            },
+            {
+                year: "1993",
+                value: 3.5
+            },
+            {
+                year: "1994",
+                value: 5
+            },
+            {
+                year: "1995",
+                value: 4.9
+            },
+            {
+                year: "1996",
+                value: 6
+            },
+            {
+                year: "1997",
+                value: 7
+            },
+            {
+                year: "1998",
+                value: 9
+            },
+            {
+                year: "1999",
+                value: 13
+            }
+        ];
+        const cols = {
+            value: {
+                min: 0
+            },
+            year: {
+                range: [0, 1]
+            }
+        };
         return (
             <div style={{height: '100%'}}>
                 <div style={{padding: '0 5px'}}>
@@ -49,12 +97,26 @@ class Analytics extends React.Component {
 
                                 <div className={styles.Panel_Body}
                                      ref={chartDiv => this.chartDiv = chartDiv}>
-                                    <MiniProgress
-                                        color={"#9254de"}
-                                        height={this.state.height - 30}
-                                        title="Users Over Date"
-                                        data={visitData}
-                                    />
+                                    <Chart height={500} data={data} scale={cols} forceFit>
+                                        <Axis name="year" />
+                                        <Axis name="value" />
+                                        <Tooltip
+                                            crosshairs={{
+                                                type: "y"
+                                            }}
+                                        />
+                                        <Geom type="line" position="year*value" size={2} />
+                                        <Geom
+                                            type="point"
+                                            position="year*value"
+                                            size={4}
+                                            shape={"square"}
+                                            style={{
+                                                stroke: "#fff",
+                                                lineWidth: 1
+                                            }}
+                                        />
+                                    </Chart>
                                 </div>
                         </div>
                     </div>

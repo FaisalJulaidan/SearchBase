@@ -7,7 +7,17 @@ from sqlalchemy.sql import func, extract
 from models import db, Callback, Conversation
 
 
-def getAnalytics(assistant, periodSpace: int, topSolustions: int):
+
+
+
+
+
+
+
+
+
+
+def getAnalyticsOld(assistant, periodSpace: int, topSolustions: int):
     id = assistant.ID
     try:
         # result = {

@@ -1,20 +1,23 @@
 # from models import db, Callback, Conversation
 from datetime import datetime, timedelta
 from models import db, Conversation, Callback
+from pprint import pprint
+from utilities import helpers
 
 from monthdelta import monthdelta
 from sqlalchemy.sql import func, extract
 
 from models import db, Callback, Conversation
 
-def getAnalytics(assistant, startDate, endDate):
-    id = assistant.id
+def getAnalytics(assistant=1):
+    # id = assistant.ID
+    id = assistant
     try:
-        convo = db.session.query(Conversation)
-        return Callback(True, 'Conversation table gathered', convo)
+        convo = db.session.query(Conversation.ID, Conversation.DateTime, Conversation.TimeSpent).all()
+        return Callback(True, 'Analytics successfully gathered', convo)
     except Exception as e:
         print(e)
-
+        return Callback(False, 'Analytics could not be gathered')
 
 
 

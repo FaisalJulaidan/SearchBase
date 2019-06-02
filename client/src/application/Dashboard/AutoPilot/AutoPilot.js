@@ -27,9 +27,9 @@ class AutoPilot extends React.Component {
                 <NoHeaderPanel>
                     <div className={styles.Title}>
                         <div className={styles.Details}>
-                            <Title> <Icon type="interation"/> Auto Pilots</Title>
+                            <Title>Auto Pilots</Title>
                             <Paragraph type="secondary">
-                                TODO
+                                Automate your assistants using auto pilots
                             </Paragraph>
                         </div>
                     </div>

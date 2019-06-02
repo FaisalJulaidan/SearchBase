@@ -2,13 +2,14 @@ from flask import json, after_this_request, request
 from models import db, Role, Company, Assistant, Plan, Conversation, Database, Candidate, Job, CRM,\
     OpenTimeSlot, AutoPilot, Appointment
 from services import user_services, flow_services, auto_pilot_services
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from enum import Enum
 from hashids import Hashids
 from config import BaseConfig
 from io import BytesIO
 from itsdangerous import URLSafeTimedSerializer
 from cryptography.fernet import Fernet
+from sqlalchemy_utils import Currency
 
 import enums, re, os, stripe, gzip, functools, logging, geoip2.webservice
 
@@ -330,8 +331,10 @@ def gen_dummy_data():
     reader_a.AutoPilot = auto_pilot_services.getByID(1,1).Data
 
     # Add Appointment
-    db.session.add(Appointment(DateTime=datetime.now() + timedelta(days=5),
-                               Conversation=conversation1, Assistant=reader_a))
+    a = Appointment(DateTime=datetime.now() + timedelta(days=5),
+                    Conversation=conversation1, Assistant=reader_a)
+
+    db.session.add(a)
 
 
     seed() # will save changes as well
@@ -345,7 +348,9 @@ def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
                      CandidateJobTitle=jobTitle,
                      CandidateSkills =skills,
                      CandidateYearsExperience = exp,
-                     CandidateLocation = location)
+                     CandidateLocation = location,
+                     Currency= Currency('USD'))
+
 
 
 def seed():
@@ -405,13 +410,16 @@ def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
         key = attr.name
         if key not in ['Password']:
             dict[key] = getattr(obj, key)
-            if isinstance(dict[attr.name], Enum): # Convert Enums
+            if isinstance(dict[key], Enum): # Convert Enums
                 dict[key] = dict[key].value
 
-            if key == Candidate.Currency.name and dict[key]: # Convert Currency
+            if isinstance(dict[key], time): # Convert Times
+                dict[key] = str(dict[key])
+
+            if isinstance(dict[key], Currency): # Convert Currencies
                 dict[key] = dict[key].code
 
-            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and dict[key]: # Convert Datetime
+            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and dict[key]: # Convert Datetime only for Jobs
                 dict[key] = '/'.join(map(str, [dict[key].year, dict[key].month, dict[key].day]))
 
             if key == Assistant.Flow.name and dict[key]: # Parse Flow !!

@@ -3,8 +3,7 @@ import React, {Component, lazy, Suspense} from 'react';
 import {Avatar, Dropdown, Icon, Layout, Menu} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
-import Assistants from './Assistants/Assistants';
-import Databases from './Databases/Databases';
+
 import {getUser, history} from "helpers";
 import {Route, Switch, withRouter} from 'react-router-dom';
 import {authActions, optionsActions} from "store/actions";
@@ -15,11 +14,12 @@ import {CSSTransition, TransitionGroup} from "react-transition-group";
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
-import CRM from "./Assistants/Assistant/CRM/CRM";
-import Crms from "./Crms/Crms";
-import Crm from "./Crms/Crm/Crm";
+
 
 const Home = lazy(() => import('./Home/Home'));
+const Assistants = lazy(() => import('./Assistants/Assistants'));
+const AssistantCRM = lazy(() => import('./Assistants/Assistant/CRM/CRM'));
+const Databases = lazy(() => import('./Databases/Databases'));
 const Analytics = lazy(() => import('./Assistants/Assistant/Analytics/Analytics'));
 const Flow = lazy(() => import('./Assistants/Assistant/Flow/Flow'));
 const Profile = lazy(() => import('./AccountDetails/Profile/Profile'));
@@ -30,6 +30,8 @@ const Integration = lazy(() => import('./Assistants/Assistant/Conversations/Conv
 const Conversations = lazy(() => import('./Assistants/Assistant/Conversations/Conversations'));
 const Calendar = lazy(() => import('./Calendar/Calendar'));
 const AutoPilot = lazy(() => import('./AutoPilot/AutoPilot'));
+const Crms = lazy(() => import('./Crms/Crms'));
+const Crm = lazy(() => import('./Crms/Crm/Crm'));
 
 
 const {SubMenu} = Menu;
@@ -253,7 +255,7 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/assistants/:id/analytics`}
                                                    component={Analytics}/>
                                             <Route path={`${match.path}/assistants/:id/CRMIntegration`}
-                                                   component={CRM}/>
+                                                   component={AssistantCRM}/>
                                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                                             <Route path={`${match.path}/crmlist`} component={Crms} exact/>
                                             <Route path={`${match.path}/crmlist/:crm`} component={Crm} exact/>

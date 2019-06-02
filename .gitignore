@@ -539,3 +539,4 @@ virtual
 venv
 /Development.db-journal
 #static/react_app/*
+package-lock

@@ -70,7 +70,7 @@
     "react-easy-crop": "^1.12.0",
     "react-json-view": "^1.19.1",
     "react-redux": "^5.1.1",
-    "react-router-dom": "^4.3.1",
+    "react-router-dom": "^5.0.0",
     "react-sortable-hoc": "^0.8.4",
     "react-transition-group": "^2.5.3",
     "react-trello": "^2.0.5",

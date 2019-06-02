@@ -1,11 +1,10 @@
-import React, {Component, Suspense, lazy} from 'react';
+import React, {Component, lazy, Suspense} from 'react';
 import {Redirect, Route, Switch, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {history} from './helpers';
 import {PrivateRoute} from './hoc';
 import {destroyMessage} from './helpers/alert';
 import SentryBoundary from "components/SentryBoundary/SentryBoundary";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import styles from "./components/LoadingSpinner/LoadingSpinner.module.less";
 
 

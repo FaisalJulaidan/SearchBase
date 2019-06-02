@@ -23,6 +23,7 @@ def getAnalytics(assistant=1, startDate=datetime.now() - timedelta(days=365), en
     try:
         monthlyUses = db.session  .query(func.count(Conversation.ID).label('count'), Conversation.DateTime)\
                             .filter(between(Conversation.DateTime, startDate, endDate))\
+                            .order_by(Conversation.DateTime.asc())\
                             .group_by(func.month(Conversation.DateTime))\
                             .all()
 

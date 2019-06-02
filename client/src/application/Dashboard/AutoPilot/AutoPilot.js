@@ -2,12 +2,14 @@ import React from 'react'
 import {connect} from 'react-redux';
 import styles from "./AutoPilot.module.less";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Icon, Typography} from 'antd';
+import {Typography} from 'antd';
 import CreateNewBox from "components/CreateNewBox/CreateNewBox";
 import ViewBox from "components/ViewBox/ViewBox";
 import {AutoPilotIcon} from "components/SVGs";
 import NewAutoPilotModal from './NewAutoPilotModal/NewAutoPilotModal'
 import {autoPilotActions} from "store/actions";
+import 'types/TimeSlots_Types'
+import {history} from "helpers";
 
 const {Title, Paragraph} = Typography;
 
@@ -38,13 +40,17 @@ class AutoPilot extends React.Component {
                         <CreateNewBox text={'Add Auto Pilot'} onClick={this.showModal}/>
 
                         {
-                            this.props.autoPilotsList.map(autoPilot =>
-                                <ViewBox title={'This is title'}
-                                         text={'this is a description'}
-                                         icon={<AutoPilotIcon/>}
-                                         iconTop={175}
-                                         iconRight={15}
-                                />
+                            this.props.autoPilotsList.map(
+                                (/**@type AutoPilot*/ autoPilot, i) =>
+                                    <ViewBox
+                                        onClick={() => history.push('/dashboard/auto_pilot/configs', {autoPilot: autoPilot})}
+                                        key={i}
+                                        title={autoPilot.Name}
+                                        text={autoPilot.Description}
+                                        icon={<AutoPilotIcon/>}
+                                        iconTop={175}
+                                        iconRight={15}
+                                    />
                             )
                         }
 
@@ -52,13 +58,12 @@ class AutoPilot extends React.Component {
                 </NoHeaderPanel>
 
                 <NewAutoPilotModal
+                    autoPilotsList={this.props.autoPilotsList}
                     visible={this.state.visible}
                     showModal={this.showModal}
                     closeModal={this.closeModal}
                 />
-
             </>
-
         )
     }
 }

@@ -3,14 +3,13 @@ import React from 'react';
 import {Typography} from 'antd';
 import styles from "components/ViewBox/ViewBox.module.less";
 import PropTypes from 'prop-types';
-import {AutoPilotIcon} from 'components/SVGs'
 
 const {Paragraph} = Typography;
 
 const ViewBox = (props) => {
     console.log(props);
     return (
-        <div className={styles.Box}>
+        <div className={styles.Box} onClick={() => props.onClick()}>
             <div className={styles.Body}>
                 <div className={styles.Icon} style={{top: props.iconTop, right: props.iconRight}}>
                     {props.icon}
@@ -32,9 +31,9 @@ const ViewBox = (props) => {
 };
 
 ViewBox.propTypes = {
-    icon: PropTypes.string.isRequired,
+    // icon: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
-    text: PropTypes.string.isRequired,
+    text: PropTypes.string,
 };
 
 export default ViewBox

@@ -275,7 +275,7 @@ def uploadLogo(assistantID, file, companyID):
         # Upload file to cloud Space
         upload_callback : Callback = stored_file_services.uploadFile(file,
                                                                      filename,
-                                                                     stored_file_services.COMPANIES_LOGOS_PATH,
+                                                                     stored_file_services.COMPANY_LOGOS_PATH,
                                                                      public=True)
         if not upload_callback.Success:
             raise Exception(upload_callback.Message)
@@ -304,7 +304,7 @@ def deleteLogo(assistantID, companyID):
         # Delete file from cloud Space and reference from database
         assistant.LogoName = None
         delete_callback : Callback = stored_file_services.deleteFile(logoName,
-                                                                     stored_file_services.COMPANIES_LOGOS_PATH)
+                                                                     stored_file_services.COMPANY_LOGOS_PATH)
         if not delete_callback.Success:
             raise Exception(delete_callback.Message)
 

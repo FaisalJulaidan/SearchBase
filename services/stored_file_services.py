@@ -2,8 +2,9 @@ from models import db, Callback, StoredFile, Conversation
 import logging, boto3, botocore, os
 
 PUBLIC_URL = "https://tsb.ams3.digitaloceanspaces.com/"
-UPLOAD_FOLDER = os.environ['UPLOAD_FOLDER']
-COMPANIES_LOGOS_PATH = '/companies_logo'
+UPLOAD_FOLDER = os.environ['FLASK_ENV']
+COMPANY_LOGOS_PATH = '/company_logos'
+USER_FILES_PATH = '/user_files'
 
 def getByID(id) -> StoredFile or None:
     try:

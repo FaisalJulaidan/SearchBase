@@ -104,7 +104,7 @@ class LogoUploader extends Component {
                                 <Card hoverable
                                       style={{width: 300, textAlign: 'center'}}
                                       cover={<img alt="example"
-                                                  src={`https://tsb.ams3.digitaloceanspaces.com/testing/companies_logo/${assistant?.LogoName}?timestamp=${this.state.timeStamp}`}/>}
+                                                  src={`${process.env.REACT_APP_ASSETS_PUBLIC_URL}${process.env.NODE_ENV}/company_logos/${assistant?.LogoName}?timestamp=${this.state.timeStamp}`}/>}
                                 >
                                     <Button type={'danger'} onClick={() => this.deleteLogo()}>Delete</Button>
                                 </Card>

@@ -1,0 +1,68 @@
+import React from 'react'
+import {connect} from 'react-redux';
+import styles from "./AutoPilot.module.less";
+import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
+import {Icon, Typography} from 'antd';
+import CreateNewBox from "components/CreateNewBox/CreateNewBox";
+import ViewBox from "components/ViewBox/ViewBox";
+import {AutoPilotIcon} from "components/SVGs";
+import NewAutoPilotModal from './NewAutoPilotModal/NewAutoPilotModal'
+import {autoPilotActions} from "store/actions";
+
+const {Title, Paragraph} = Typography;
+
+class AutoPilot extends React.Component {
+    state = {visible: false};
+
+    componentDidMount() {
+        this.props.dispatch(autoPilotActions.fetchAutoPilots())
+    }
+
+    showModal = () => this.setState({visible: true});
+    closeModal = () => this.setState({visible: false,});
+
+    render() {
+        return (
+            <>
+                <NoHeaderPanel>
+                    <div className={styles.Title}>
+                        <div className={styles.Details}>
+                            <Title> <Icon type="interation"/> Auto Pilots</Title>
+                            <Paragraph type="secondary">
+                                TODO
+                            </Paragraph>
+                        </div>
+                    </div>
+
+                    <div className={styles.Body}>
+                        <CreateNewBox text={'Add Auto Pilot'} onClick={this.showModal}/>
+
+                        {
+                            this.props.autoPilotsList.map(autoPilot =>
+                                <ViewBox text={'hey'} title={'this is title'} icon={<AutoPilotIcon/>}/>
+                            )
+                        }
+
+                    </div>
+                </NoHeaderPanel>
+
+                <NewAutoPilotModal
+                    visible={this.state.visible}
+                    showModal={this.showModal}
+                    closeModal={this.closeModal}
+                />
+
+            </>
+
+        )
+    }
+}
+
+function mapStateToProps(state) {
+    return {
+        autoPilotsList: state.autoPilot.autoPilotsList
+    };
+}
+
+export default connect(mapStateToProps)(AutoPilot);
+

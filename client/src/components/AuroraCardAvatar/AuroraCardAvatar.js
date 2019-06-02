@@ -14,7 +14,7 @@ class AuroraCardAvatar extends React.Component {
                 case 'NOT_CONNECTED':
                     return <Tag>Not Connected</Tag>;
                 case 'FAILED':
-                    return <Tag color={'#f50'}><Icon type="disconnect"/> Faild</Tag>;
+                    return <Tag color={'#f50'}><Icon type="disconnect"/> Failed</Tag>;
                 default:
                     return null
             }

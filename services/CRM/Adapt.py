@@ -2,18 +2,21 @@ import requests
 from models import Callback, Conversation
 import json
 import logging
+
+import requests
+
 from enums import DataType as DT
 
 
 def login(auth):
     try:
-        authCopy = dict(auth) # we took copy to delete domain later only from the copy
-        url =  "https://developerconnection.adaptondemand.com/WebApp/api/domains/" \
-               + auth.get('domain', 'Unknown') + "/logon"
+        authCopy = dict(auth)  # we took copy to delete domain later only from the copy
+        url = "https://developerconnection.adaptondemand.com/WebApp/api/domains/" \
+              + auth.get('domain', 'Unknown') + "/logon"
         headers = {'Content-Type': 'application/json'}
 
         # Send request
-        authCopy.pop('domain', '') # because Adapt doesn't require this in the auth POST request
+        authCopy.pop('domain', '')  # because Adapt doesn't require this in the auth POST request
         r = requests.post(url, headers=headers, data=json.dumps(authCopy))
 
         # When not ok
@@ -53,7 +56,7 @@ def insertCandidate(auth, session: Conversation) -> Callback:
                 {
                     "OCC_ID": "Home",
                     "EMAIL_ADD": session.Data.get('keywordsByDataType')
-                                     .get(DT.CandidateEmail.value['name'], ["Unavailable@TSB.com"])[0]
+                        .get(DT.CandidateEmail.value['name'], ["Unavailable@TSB.com"])[0]
                 }
             ],
             "TELEPHONE": [
@@ -71,7 +74,7 @@ def insertCandidate(auth, session: Conversation) -> Callback:
         }
 
         # Send request
-        r = requests.post(url, headers=headers, data= json.dumps(body))
+        r = requests.post(url, headers=headers, data=json.dumps(body))
 
         # When not ok
         if not r.ok: raise Exception(r.json().get('ERROR_MSG', r.text))
@@ -91,15 +94,15 @@ def insertClient(auth, session: Conversation) -> Callback:
         if not callback.Success:
             return callback
 
-        url =  "https://developerconnection.adaptondemand.com/WebApp/api/v1/companies"
-        headers = {'Content-Type': 'application/json', 'x-adapt-sid': callback.Data }
+        url = "https://developerconnection.adaptondemand.com/WebApp/api/v1/companies"
+        headers = {'Content-Type': 'application/json', 'x-adapt-sid': callback.Data}
 
         # New candidate details
         body = {
             "CLIENT_GEN": {
                 "CLIENT_TYPE": 8252178,
-                "NAME":" ".join(session.Data.get('keywordsByDataType')
-                                .get(DT.ClientName.value['name'], "Unavailable - TSB"))
+                "NAME": " ".join(session.Data.get('keywordsByDataType')
+                                 .get(DT.ClientName.value['name'], "Unavailable - TSB"))
             },
             "TELEPHONE": [
                 {
@@ -114,11 +117,11 @@ def insertClient(auth, session: Conversation) -> Callback:
                                     .get(DT.ClientLocation.value['name'], "Unavailable - TSB")),
             }],
             "NOTES": " ".join(session.Data.get('keywordsByDataType')
-                             .get(DT.ClientEmail.value['name'], "Unavailable - TSB")),
+                              .get(DT.ClientEmail.value['name'], "Unavailable - TSB")),
         }
 
         # Send request
-        r = requests.post(url, headers=headers, data= json.dumps(body))
+        r = requests.post(url, headers=headers, data=json.dumps(body))
 
         # When not ok
         if not r.ok: raise Exception(r.json().get('ERROR_MSG', r.text))

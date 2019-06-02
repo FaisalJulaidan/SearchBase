@@ -28,10 +28,10 @@ const connectCrm = (connectedCRM) => {
     };
 };
 
-const connectCrmSuccess = (connectedCRM_ID, msg) => {
+const connectCrmSuccess = (connectedCRM, msg) => {
     return {
         type: actionTypes.CONNECT_CRM_SUCCESS,
-        connectedCRM_ID,
+        connectedCRM,
         msg
     };
 };
@@ -63,10 +63,10 @@ const testCrmFailure = (error) => {
     };
 };
 
-const disconnectCrm = (disconnectedCRM) => {
+const disconnectCrm = (disconnectedCRMID) => {
     return {
         type: actionTypes.DISCONNECT_CRM_REQUEST,
-        disconnectedCRM
+        disconnectedCRMID
     };
 };
 
@@ -81,6 +81,27 @@ const disconnectCrmSuccess = (connectedCRM_ID, msg) => {
 const disconnectCrmFailure = (error) => {
     return {
         type: actionTypes.DISCONNECT_CRM_FAILURE,
+        error
+    };
+};
+
+const exportRecruiterValueReport = (connectedCRM_Type) => {
+    return {
+        type: actionTypes.EXPORT_RECRUITER_VALUE_REPORT_REQUEST,
+        connectedCRM_Type
+    };
+};
+
+const exportRecruiterValueReportSuccess = (exportData) => {
+    return {
+        type: actionTypes.EXPORT_RECRUITER_VALUE_REPORT_SUCCESS,
+        exportData
+    };
+};
+
+const exportRecruiterValueReportFailure = (error) => {
+    return {
+        type: actionTypes.EXPORT_RECRUITER_VALUE_REPORT_FAILURE,
         error
     };
 };
@@ -103,5 +124,8 @@ export const crmActions = {
     disconnectCrmSuccess,
     disconnectCrmFailure,
 
+    exportRecruiterValueReport,
+    exportRecruiterValueReportSuccess,
+    exportRecruiterValueReportFailure
 
 };

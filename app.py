@@ -1,7 +1,7 @@
 #/usr/bin/python3.5
 import os
 import config
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_api import status
 from models import db, AutoPilot, Assistant
 from services.mail_services import mail
@@ -56,6 +56,11 @@ def page_not_found(e):
         print("Error without description")
         return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
 
+
+@crm_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
+def test_crm_123():
+    print("got something here", request)
+    return request
 
 
 # Server Setup

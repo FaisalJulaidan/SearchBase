@@ -2,7 +2,7 @@ import React from 'react';
 import styles from "./Analytics.module.less";
 
 import Header from "../../../../../components/Header/Header";
-import {Bar} from "ant-design-pro/lib/Charts";
+import {Bar, MiniProgress} from "ant-design-pro/lib/Charts";
 import NumberInfo from 'ant-design-pro/lib/NumberInfo';
 import {Icon, Spin} from 'antd';
 
@@ -41,7 +41,6 @@ class Analytics extends React.Component {
                 <div style={{height: 'calc(100% - 66px)', width: '100%', display: 'flex'}}>
                     <div style={{margin: 5, width: '70%'}}>
                         <div className={styles.Panel}>
-                            <Spin size="large" tip="Coming Soon">
                                 <div className={styles.Panel_Header}>
                                     <h3>
                                         <Icon type="fund" theme="twoTone" twoToneColor={"#9254de"}/> Monthly Records
@@ -50,14 +49,13 @@ class Analytics extends React.Component {
 
                                 <div className={styles.Panel_Body}
                                      ref={chartDiv => this.chartDiv = chartDiv}>
-                                    <Bar
+                                    <MiniProgress
                                         color={"#9254de"}
                                         height={this.state.height - 30}
                                         title="Users Over Date"
                                         data={visitData}
                                     />
                                 </div>
-                            </Spin>
                         </div>
                     </div>
 

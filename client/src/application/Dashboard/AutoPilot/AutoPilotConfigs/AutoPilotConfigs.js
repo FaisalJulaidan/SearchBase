@@ -53,7 +53,20 @@ class AutoPilotConfigs extends React.Component {
                                 {...layout}>
                                 {getFieldDecorator('name', {
                                     initialValue: autoPilot.Name,
-                                    rules: [{}],
+                                    rules: [{
+                                        required: true,
+                                        message: "Please add name or the name you entered is duplicated",
+                                        validator: (_, value, callback) => {
+                                            // check if the value equalls any of the name from
+                                            // this.props.autoPilotsSlots
+                                            // if there is an error retrun the callback with the message
+                                            const { /**@type AutoPilot[]*/ autoPilotsList} = this.props;
+                                            if (autoPilotsList.some(autoPilot => autoPilot.Name === value))
+                                                return callback(value + ' is duplicated');
+                                            else
+                                                return callback()
+                                        }
+                                    }],
                                 })(
                                     <Input placeholder="Auto Pilot Name"/>
                                 )}

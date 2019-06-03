@@ -4,24 +4,28 @@ import {autoPilotActions} from "store/actions";
 import {store} from "store/store";
 import PropTypes from 'prop-types';
 import 'types/TimeSlots_Types'
+import {connect} from 'react-redux';
 
 const FormItem = Form.Item;
 
 class NewAutoPilotModal extends Component {
 
 
-    onSubmit = () => this.props.form.validateFields((err, values) => {
-        if (!err) {
-            store.dispatch(
-                autoPilotActions.addAutoPilot({
-                        name: values.name,
-                        description: values.description || ''
-                    }
-                )
-            );
-        }
-        this.props.closeModal()
-    });
+    onSubmit = () => {
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+                store.dispatch(
+                    autoPilotActions.addAutoPilot({
+                            name: values.name,
+                            description: values.description || ''
+                        }
+                    )
+                );
+                this.props.closeModal()
+            }
+
+        });
+    }
 
 
     render() {
@@ -45,10 +49,11 @@ class NewAutoPilotModal extends Component {
                                     // check if the value equalls any of the name from
                                     // this.props.autoPilotsSlots
                                     // if there is an error retrun the callback with the message
-
                                     const { /**@type AutoPilot[]*/ autoPilotsList} = this.props;
                                     if (autoPilotsList.some(autoPilot => autoPilot.Name === value))
-                                        return callback(value + ' is duplicated')
+                                        return callback(value + ' is duplicated');
+                                    else
+                                        return callback()
                                 }
                             }],
                         })(
@@ -75,5 +80,13 @@ class NewAutoPilotModal extends Component {
 NewAutoPilotModal.propTypes = {
     autoPilotsList: PropTypes.array,
 };
-export default Form.create()(NewAutoPilotModal);
+
+function mapStateToProps(state) {
+    return {
+        autoPilotsList: state.autoPilot.autoPilotsList
+    };
+}
+
+export default connect(mapStateToProps)(Form.create()(NewAutoPilotModal));
+
 

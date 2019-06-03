@@ -3,8 +3,8 @@
  @typedef AutoPilot
  @type {Object}
 
- @property {boolean} AcceptApplications
  @property {boolean} Active
+ @property {boolean} AcceptApplications
  @property {boolean} RejectApplications
  @property {boolean} SendCandidatesAppointments
  @property {number} AcceptanceScore

@@ -24,8 +24,8 @@ class AutoPilotConfigs extends React.Component {
     }
 
     onRejectChange = (checked) => this.setState({showRejectionSlide: checked});
-    onAcceptCahnge = (checked) => this.setState({showAcceptSlide: checked});
-    onAppointmentCahnge = (checked) => this.setState({showSetAppointment: checked});
+    onAcceptChange = (checked) => this.setState({showAcceptSlide: checked});
+    onAppointmentChange = (checked) => this.setState({showSetAppointment: checked});
 
     render() {
         const /**@type AutoPilot*/ autoPilot = this.props.location.state?.autoPilot || {};
@@ -47,19 +47,20 @@ class AutoPilotConfigs extends React.Component {
                     </div>
 
                     <div className={styles.Body}>
-                        <Form layout='horizontal' style={{width: '100%'}}>
+                        <Form layout='vertical' style={{width: '100%'}}>
                             <FormItem
                                 label="Auto Pilot Name"
-                                {...layout}>
+                                wrapperCol = {{span: 12}}
+                                >
                                 {getFieldDecorator('name', {
                                     initialValue: autoPilot.Name,
                                     rules: [{
                                         required: true,
                                         message: "Please add name or the name you entered is duplicated",
                                         validator: (_, value, callback) => {
-                                            // check if the value equalls any of the name from
+                                            // check if the value equals any of the name from
                                             // this.props.autoPilotsSlots
-                                            // if there is an error retrun the callback with the message
+                                            // if there is an error return the callback with the message
                                             const { /**@type AutoPilot[]*/ autoPilotsList} = this.props;
                                             if (autoPilotsList.some(autoPilot => autoPilot.Name === value))
                                                 return callback(value + ' is duplicated');
@@ -74,7 +75,8 @@ class AutoPilotConfigs extends React.Component {
 
                             <FormItem
                                 label="Auto Pilot Description"
-                                {...layout}>
+                                wrapperCol = {{span: 12}}
+                            >
                                 {getFieldDecorator('description', {
                                     initialValue: autoPilot.Description,
                                     rules: [{}],
@@ -86,7 +88,7 @@ class AutoPilotConfigs extends React.Component {
                             <FormItem
                                 label="Auto Reject Applicants "
                                 extra="Select the percentage to auto reject the applicants"
-                                {...layout}>
+                            >
                                 {getFieldDecorator('reject', {
                                     initialValue: autoPilot.RejectApplications,
                                     rules: [{}],
@@ -106,13 +108,13 @@ class AutoPilotConfigs extends React.Component {
                             <FormItem
                                 label="Auto Accept Applicants "
                                 extra="Select the percentage to auto accept the applicants"
-                                {...layout}>
+                            >
                                 {getFieldDecorator('accept', {
                                     initialValue: autoPilot.AcceptApplications,
                                     rules: [{}],
                                 })(
                                     <div style={{marginLeft: 3}}>
-                                        <Switch onChange={this.onAcceptCahnge} style={{marginRight: 15}}/>
+                                        <Switch onChange={this.onAcceptChange} style={{marginRight: 15}}/>
                                         Greater Than
                                         <InputNumber min={1} max={100}
                                                      defaultValue={autoPilot.AcceptanceScore}
@@ -126,13 +128,13 @@ class AutoPilotConfigs extends React.Component {
                             {/*TODO: ADD INITIAL VALUE*/}
                             <FormItem
                                 label="Auto Set Appointment"
-                                {...layout}>
+                            >
                                 {getFieldDecorator('appointment', {
                                     initialValue: autoPilot.SendCandidatesAppointments,
                                     rules: [],
                                 })(
                                     <div style={{marginLeft: 3}}>
-                                        <Switch onChange={this.onAppointmentCahnge}
+                                        <Switch onChange={this.onAppointmentChange}
                                                 checked={this.state.showSetAppointment}/>
                                     </div>
                                 )}

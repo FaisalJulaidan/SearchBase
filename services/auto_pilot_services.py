@@ -54,7 +54,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 def create(name, desc, companyID: int) -> Callback:
     try:
 
-        autoPilot= AutoPilot(Name=name, CompanyID=companyID) # Create new AutoPilot
+        autoPilot= AutoPilot(Name=name, Description=desc, CompanyID=companyID) # Create new AutoPilot
 
         # Create the AutoPilot with default open time slots
         default = {"From": time(8,30), "To": time(12,0), "Duration": 30, "AutoPilot": autoPilot, "Active": False}
@@ -110,7 +110,7 @@ def fetchAll(companyID) -> Callback:
 
 # ----- Updaters ----- #
 def update(id, name, desc, active, acceptApplications, acceptanceScore, rejectApplications,
-           rejectionScore, SendCandidatesAppointments, companyID: int) -> Callback:
+           rejectionScore, SendCandidatesAppointments, openTimeSlots, companyID: int) -> Callback:
     try:
 
         # TODO OpenTimeSlots & Appointments Feature
@@ -124,7 +124,7 @@ def update(id, name, desc, active, acceptApplications, acceptanceScore, rejectAp
 
         # Update the autoPilot
         autoPilot.Name = name
-        autoPilot.Name = name
+        autoPilot.Description = desc
         autoPilot.Active = active
         autoPilot.AcceptApplication = acceptApplications
         autoPilot.AcceptanceScore = acceptanceScore
@@ -134,12 +134,12 @@ def update(id, name, desc, active, acceptApplications, acceptanceScore, rejectAp
 
         # TODO OpenTimeSlots & Appointments Feature
         # Update the openTimeSlots
-        # for (oldSlot, newSlot) in zip(AutoPilot.OpenTimeSlots, openTimeSlots):
-        #     if oldSlot.Day == newSlot['day']:
-        #         oldSlot.Active = newSlot['active']
-        #         oldSlot.From = time(newSlot['from'][0], newSlot['from'][1])
-        #         oldSlot.To = time(newSlot['to'][0], newSlot['to'][1])
-        #         oldSlot.Duration = newSlot['duration']
+        for (oldSlot, newSlot) in zip(AutoPilot.OpenTimeSlots, openTimeSlots):
+            if oldSlot.Day == newSlot['day']:
+                oldSlot.Active = newSlot['active']
+                oldSlot.From = time(newSlot['from'][0], newSlot['from'][1])
+                oldSlot.To = time(newSlot['to'][0], newSlot['to'][1])
+                oldSlot.Duration = newSlot['duration']
 
         # Save all changes
         db.session.commit()

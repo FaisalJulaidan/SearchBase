@@ -5,6 +5,8 @@ import {Button, Col, Form, Input, InputNumber, Switch, Typography} from 'antd';
 import 'types/TimeSlots_Types'
 import {history} from "helpers";
 import TimeSlots from "./TimeSlots/TimeSlots";
+import {autoPilotActions} from "store/actions";
+import {store} from "store/store";
 
 const FormItem = Form.Item;
 
@@ -12,20 +14,66 @@ const {Title, Paragraph} = Typography;
 
 class AutoPilotConfigs extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.TimeSlotsRef = React.createRef();
+    }
     state = {
-        showRejectionSlide: false,
-        showAcceptSlide: false,
-        showSetAppointment: false,
+        rejectApplications: false,
+        acceptApplications: false,
+        SendCandidatesAppointments: false,
+
+        acceptanceScore: 0,
+        rejectionScore: 0
     };
 
     componentDidMount() {
         if (!this.props.location.state)
-            return history.push('/dashboard/auto_pilot')
+            return history.push('/dashboard/auto_pilot');
+
+        const /**@type AutoPilot*/ autoPilot = this.props.location.state?.autoPilot || {};
+        this.changeScore(autoPilot.AcceptanceScore * 100, 'acceptanceScore');
+        this.changeScore(autoPilot.RejectionScore * 100, 'rejectionScore')
     }
 
-    onRejectChange = (checked) => this.setState({showRejectionSlide: checked});
-    onAcceptChange = (checked) => this.setState({showAcceptSlide: checked});
-    onAppointmentChange = (checked) => this.setState({showSetAppointment: checked});
+    onRejectChange = (checked) => this.setState({rejectApplications: checked});
+    onAcceptChange = (checked) => this.setState({acceptApplications: checked});
+    onAppointmentChange = (checked) => this.setState({SendCandidatesAppointments: checked});
+
+    changeScore = (value, stateName) => this.setState(state => state[stateName] = value);
+
+    onSubmit = () => this.props.form.validateFields((err, values) => {
+        const /**@type AutoPilot*/ autoPilot = this.props.location.state?.autoPilot || {};
+        const {state, TimeSlotsRef} = this;
+        const timeSlots = TimeSlotsRef.current.state.weekDays;
+
+        let weekDays = [];
+        for (let i = 0; i < 7; i++) {
+            weekDays.push({
+                day: i,
+                from: [timeSlots[i].from.hours(), timeSlots[i].from.minutes()],
+                to: [timeSlots[i].to.hours(), timeSlots[i].to.minutes()],
+                duration: TimeSlotsRef.current.state.duration,
+                active: timeSlots[i].active
+            })
+        }
+
+        let payload = {
+            active: autoPilot.Active,
+            name: values.name,
+            description: values.description,
+            acceptApplications: state.acceptApplications,
+            rejectApplications: state.rejectApplications,
+            acceptanceScore: state.acceptanceScore / 100,
+            rejectionScore: state.rejectionScore / 100,
+            SendCandidatesAppointments: state.SendCandidatesAppointments,
+
+            openTimeSlots: weekDays
+        };
+
+        console.log(autoPilot)
+        store.dispatch(autoPilotActions.updateAutoPilot(autoPilot.ID, payload));
+    });
 
     render() {
         const /**@type AutoPilot*/ autoPilot = this.props.location.state?.autoPilot || {};
@@ -62,7 +110,7 @@ class AutoPilotConfigs extends React.Component {
                                             // this.props.autoPilotsSlots
                                             // if there is an error return the callback with the message
                                             const { /**@type AutoPilot[]*/ autoPilotsList} = this.props;
-                                            if (autoPilotsList.some(autoPilot => autoPilot.Name === value))
+                                            if (autoPilotsList?.some(autoPilot => autoPilot.Name === value))
                                                 return callback(value + ' is duplicated');
                                             else
                                                 return callback()
@@ -85,69 +133,66 @@ class AutoPilotConfigs extends React.Component {
                                 )}
                             </FormItem>
 
-                            <FormItem
-                                label="Auto Reject Applicants "
-                                extra="Select the percentage to auto reject the applicants"
-                            >
-                                {getFieldDecorator('reject', {
-                                    initialValue: autoPilot.RejectApplications,
-                                    rules: [{}],
+                            <Form.Item label="Auto Reject Applicants "
+                                       extra="Select the percentage to auto reject the applicants">
+                                {getFieldDecorator('rejectApplications', {
+                                    valuePropName: 'checked',
+                                    initialValue: autoPilot.RejectApplications
                                 })(
-                                    <div style={{marginLeft: 3}}>
+                                    <>
                                         <Switch onChange={this.onRejectChange} style={{marginRight: 15}}/>
                                         Less Than
                                         <InputNumber min={1} max={100}
+                                                     onChange={value => this.changeScore(value, 'rejectionScore')}
                                                      formatter={value => `${value}%`}
-                                                     defaultValue={autoPilot.RejectionScore}
+                                                     value={this.state.rejectionScore}
                                                      style={{marginLeft: 15}}
-                                                     disabled={!this.state.showRejectionSlide}/>
-                                    </div>
+                                                     disabled={!this.state.rejectApplications}/>
+                                    </>
                                 )}
-                            </FormItem>
+                            </Form.Item>
 
-                            <FormItem
-                                label="Auto Accept Applicants "
-                                extra="Select the percentage to auto accept the applicants"
-                            >
-                                {getFieldDecorator('accept', {
+                            <FormItem label="Auto Accept Applicants "
+                                      extra="Select the percentage to auto accept the applicants">
+                                {getFieldDecorator('acceptApplications', {
+                                    valuePropName: 'checked',
                                     initialValue: autoPilot.AcceptApplications,
-                                    rules: [{}],
                                 })(
-                                    <div style={{marginLeft: 3}}>
+                                    <>
                                         <Switch onChange={this.onAcceptChange} style={{marginRight: 15}}/>
                                         Greater Than
                                         <InputNumber min={1} max={100}
-                                                     defaultValue={autoPilot.AcceptanceScore}
+                                                     onChange={value => this.changeScore(value, 'acceptApplications')}
+                                                     value={this.state.acceptanceScore}
                                                      formatter={value => `${value}%`}
                                                      style={{marginLeft: 15}}
-                                                     disabled={!this.state.showAcceptSlide}/>
-                                    </div>
+                                                     disabled={!this.state.acceptApplications}/>
+                                    </>
                                 )}
                             </FormItem>
 
-                            <FormItem
-                                label="Auto Set Appointment"
-                            >
-                                {getFieldDecorator('appointment', {
+                            <FormItem label="Auto Set Appointment">
+                                {getFieldDecorator('SendCandidatesAppointments', {
                                     initialValue: autoPilot.SendCandidatesAppointments,
                                     rules: [],
                                 })(
                                     <div style={{marginLeft: 3}}>
                                         <Switch onChange={this.onAppointmentChange}
-                                                checked={this.state.showSetAppointment}/>
+                                                checked={this.state.SendCandidatesAppointments}/>
                                     </div>
                                 )}
                             </FormItem>
 
-                            <TimeSlots getFieldDecorator={getFieldDecorator}
+                            <TimeSlots ref={this.TimeSlotsRef}
+                                       getFieldDecorator={getFieldDecorator}
                                        autoPilot={autoPilot}
                                        layout={layout}
-                                       showSetAppointment={this.state.showSetAppointment}/>
+                                       showSetAppointment={this.state.SendCandidatesAppointments}/>
 
                             <br/>
 
                             <Col span={16} offset={4}>
-                                <Button type={'primary'}>Update Auto Pilot</Button>
+                                <Button type={'primary'} onClick={this.onSubmit}>Update Auto Pilot</Button>
                             </Col>
 
 

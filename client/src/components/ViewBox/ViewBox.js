@@ -7,7 +7,6 @@ import PropTypes from 'prop-types';
 const {Paragraph} = Typography;
 
 const ViewBox = (props) => {
-    console.log(props);
     return (
         <div className={styles.Box} onClick={() => props.onClick()}>
             <div className={styles.Body}>

@@ -41,10 +41,11 @@ function* watchAddAutoPilot() {
     yield takeLatest(actionTypes.ADD_AUTOPILOT_REQUEST, addAutoPilot)
 }
 
-function* updateAutoPilot({authPilotID, updatedValues}) {
+function* updateAutoPilot({autoPilotID, updatedValues}) {
     try {
-        const res = yield http.put(`auto_pilot/${authPilotID}`, updatedValues);
-        yield put(autoPilotActions.updateAutoPilotSuccess(authPilotID, res.data?.data, res.data?.msg));
+        console.log(autoPilotID)
+        const res = yield http.put(`auto_pilot/${autoPilotID}`, updatedValues);
+        yield put(autoPilotActions.updateAutoPilotSuccess(autoPilotID, res.data?.data, res.data?.msg));
         successMessage('Auto pilot updated');
     } catch (error) {
         console.error(error);
@@ -59,11 +60,11 @@ function* watchUpdateAutoPilot() {
 }
 
 
-function* deleteAutoPilot({authPilotID}) {
+function* deleteAutoPilot({autoPilotID}) {
     try {
         loadingMessage('Removing auto pilot...', 0);
-        const res = yield http.delete(`/auto_pilot/${authPilotID}`);
-        yield put(autoPilotActions.deleteAutoPilotSuccess(authPilotID, res.data?.msg));
+        const res = yield http.delete(`/auto_pilot/${autoPilotID}`);
+        yield put(autoPilotActions.deleteAutoPilotSuccess(autoPilotID, res.data?.msg));
         successMessage('AutoPilot deleted');
     } catch (error) {
         console.error(error);

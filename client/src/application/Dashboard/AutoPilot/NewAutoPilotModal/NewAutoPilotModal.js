@@ -4,15 +4,13 @@ import {autoPilotActions} from "store/actions";
 import {store} from "store/store";
 import PropTypes from 'prop-types';
 import 'types/TimeSlots_Types'
-import {connect} from 'react-redux';
 
 const FormItem = Form.Item;
 
 class NewAutoPilotModal extends Component {
 
 
-    onSubmit = () => {
-        this.props.form.validateFields((err, values) => {
+    onSubmit = () => this.props.form.validateFields((err, values) => {
             if (!err) {
                 store.dispatch(
                     autoPilotActions.addAutoPilot({
@@ -25,7 +23,6 @@ class NewAutoPilotModal extends Component {
             }
 
         });
-    }
 
 
     render() {
@@ -80,13 +77,6 @@ class NewAutoPilotModal extends Component {
 NewAutoPilotModal.propTypes = {
     autoPilotsList: PropTypes.array,
 };
-
-function mapStateToProps(state) {
-    return {
-        autoPilotsList: state.autoPilot.autoPilotsList
-    };
-}
-
-export default connect(mapStateToProps)(Form.create()(NewAutoPilotModal));
+export default Form.create()(NewAutoPilotModal);
 
 

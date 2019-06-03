@@ -4,9 +4,9 @@ import {analyticsActions} from "../actions";
 import {destroyMessage, errorHandler, errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
 // import * as Sentry from '@sentry/browser';
 
-function* fetchAnalytics({assistantID}) {
+function* fetchAnalytics({assistantID, split}) {
     try {
-        const res = yield http.get(`/assistant/${assistantID}/analytics`);
+        const res = yield http.get(`/assistant/${assistantID}/analytics?split=${split}`);
 
         yield put(analyticsActions.fetchAnalyticsSuccess(res.data?.data));
     } catch (error) {

@@ -10,7 +10,7 @@ import {Icon, Spin, Button} from 'antd';
 
 import moment from 'moment';
 
-const splits = {yearly: "YY", monthly: "MMMM", daily: "DDDD", hourly: "HHH"}
+const splits = {yearly: "YYYY", monthly: "MMM", daily: "ddd", hourly: "HH"}
 
 const visitData = [];
 const beginDay = new Date().getTime();
@@ -24,10 +24,15 @@ for (let i = 0; i < 10; i += 1) {
 
 class Analytics extends React.Component {
     //split can  be yearly/monthly/daily/hourly
-    state = {
-        height: 100,
-        split: "yearly"
-    };
+    constructor(props){
+        super(props)
+        this.state = {
+            height: 100,
+            split: "yearly"
+        };
+        this.changeSplit = this.changeSplit.bind(this)
+    }
+
     chartDiv;
 
     componentDidMount() {
@@ -35,19 +40,29 @@ class Analytics extends React.Component {
         this.setState({height});
     }
     componentWillMount(){
-        const {assistant} = this.props.location.state;
-        this.props.dispatch(analyticsActions.fetchAnalytics(assistant.ID))
+        this.refreshData()
     }
+    changeSplit(split){
+        if(split !== this.state.split){
+            this.setState({split}, () => {this.refreshData()})
+        }
+    }
+    refreshData(){
+        const {assistant} = this.props.location.state;
+        this.props.dispatch(analyticsActions.fetchAnalytics(assistant.ID, this.state.split))
+    }
+
+
 
     render() {
         const {analytics} = this.props.analytics
         const {split} = this.state;
-        const data = this.props.analytics.isLoading ? null : analytics.map(a => ({time: moment(a.DateTime).format("MMMM") , chats: a.count}));
+        const data = this.props.analytics.isLoading ? null : analytics.map(a => ({time: moment(a.DateTime).format(splits[this.state.split]) , chats: a.count}));
         const cols = {
             chats: {
                 min: 0
             },
-            month: {
+            time: {
                 range: [0, 1]
             }
         };
@@ -71,22 +86,22 @@ class Analytics extends React.Component {
 
                                 <div className={styles.Panel_Body}
                                      ref={chartDiv => this.chartDiv = chartDiv}>
-                                    <Button type="primary">Yearly</Button>
-                                    <Button>Monthly</Button>
-                                    <Button>Daily</Button>
-                                    <Button>Hourly</Button>
+                                    <Button onClick={() => this.changeSplit('yearly')} type="primary">Yearly</Button>
+                                    <Button onClick={() => this.changeSplit('monthly')}>Monthly</Button>
+                                    <Button onClick={() => this.changeSplit('daily')}>Daily</Button>
+                                    <Button onClick={() => this.changeSplit('hourly')}>Hourly</Button>
                                     <Chart height={500} data={data} scale={cols} forceFit>
-                                        <Axis name="month" />
+                                        <Axis name="time    " />
                                         <Axis name="chats" />
                                         <Tooltip
                                             crosshairs={{
                                                 type: "y"
                                             }}
                                         />
-                                        <Geom type="line" position="month*chats" size={2} />
+                                        <Geom type="line" position="time*chats" size={2} />
                                         <Geom
                                             type="point"
-                                            position="month*chats"
+                                            position="time*chats"
                                             size={4}
                                             shape={"square"}
                                             style={{

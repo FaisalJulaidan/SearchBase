@@ -13,7 +13,7 @@ from models import db, Callback, Conversation
 
 #fix datetime
 
-def getAnalytics(request, assistant, startDate=datetime.now() - timedelta(days=365), endDate=datetime.now()):
+def getAnalytics(request, assistantID, startDate=datetime.now() - timedelta(days=365), endDate=datetime.now()):
     """ Gets analytics for the provided assistant """
     """ startDate defaults to a year ago, and the end date defaults to now, gathering all data for the past year """
     """ currently only gathers amount of conversations held, split up by month """
@@ -27,15 +27,13 @@ def getAnalytics(request, assistant, startDate=datetime.now() - timedelta(days=3
         'hourly': '%Y-%m %D %l'
     }
 
-
-    id = assistant
     try:
         if split not in splitTypes:
             raise Exception("Supplied splitter {} is not allowed".format(split))
 
         monthlyUses = db.session    .query(func.count(Conversation.ID).label('count'), func.min(Conversation.DateTime).label('DateTime'))\
                                     .filter(between(Conversation.DateTime, startDate, endDate))\
-                                    .filter(Conversation.AssistantID == assistant)\
+                                    .filter(Conversation.AssistantID == assistantID)\
                                     .group_by(func.date_format(Conversation.DateTime, splitTypes[split]))\
                                     .order_by(func.date_format(Conversation.DateTime, splitTypes[split]))\
                                     .all()

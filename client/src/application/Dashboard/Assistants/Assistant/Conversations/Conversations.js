@@ -409,6 +409,7 @@ class Conversations extends React.Component {
 
                     <div className={styles.Panel_Body}>
                         <Table columns={columns}
+                               rowKey={record => record.ID}
                                dataSource={conversations.conversationsList}
                                onChange={this.handleFilter}
                                loading={this.props.isLoading}

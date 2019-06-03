@@ -29,18 +29,22 @@ class NoHeaderPanel extends Component {
     }
 
     render() {
+        console.log(this.props);
         const TitleElement = React.Children.only(this.props.children[0]);
         const BodyElement = React.Children.only(this.props.children[1]);
 
         return (
-            <div style={{height: '100%'}}>
-                <div className={styles.Panel}>
-                    <div className={styles.Panel_Body}>
-                        {React.cloneElement(TitleElement, {ref: el => this.TitleElementRef = el})}
-                        {React.cloneElement(BodyElement, {ref: el => this.BodyElementRef = el})}
+            this.props.loading ?
+                null
+                :
+                <div style={{height: '100%'}}>
+                    <div className={styles.Panel}>
+                        <div className={styles.Panel_Body}>
+                            {React.cloneElement(TitleElement, {ref: el => this.TitleElementRef = el})}
+                            {React.cloneElement(BodyElement, {ref: el => this.BodyElementRef = el})}
+                        </div>
                     </div>
                 </div>
-            </div>
         );
     }
 }

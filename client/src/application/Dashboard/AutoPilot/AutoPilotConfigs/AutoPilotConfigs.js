@@ -141,7 +141,6 @@ class AutoPilotConfigs extends React.Component {
 
                             <TimeSlots getFieldDecorator={getFieldDecorator}
                                        autoPilot={autoPilot}
-                                       layout={layout}
                                        showSetAppointment={this.state.showSetAppointment}/>
 
                             <br/>

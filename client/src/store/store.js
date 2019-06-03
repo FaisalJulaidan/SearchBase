@@ -1,8 +1,10 @@
 import {createStore, applyMiddleware, compose} from 'redux';
+import thunk from 'redux-thunk'
 import createSagaMiddleware from 'redux-saga';
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import rootReducer from './reducers';
+import { middleware as thunkMiddleware } from 'redux-saga-thunk'
 import {
     assistantSaga,
     authSaga,
@@ -28,7 +30,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = createStore(
     persistedReducer,
-    composeEnhancers(applyMiddleware(sagaMiddleware))
+    composeEnhancers(applyMiddleware(thunkMiddleware, sagaMiddleware))
 );
 
 const persistor = persistStore(store);

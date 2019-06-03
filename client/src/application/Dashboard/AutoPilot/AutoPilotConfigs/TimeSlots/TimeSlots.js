@@ -118,7 +118,7 @@ class TimeSlots extends React.Component {
                 <FormItem
                     label="Appointment Duration"
                     extra="This is will change the number of appointment slots per day"
-                    {...this.props.layout}>
+                    >
                     {this.props.getFieldDecorator('appointmentDuration', {
                         initialValue: this.state.duration,
                         onChange: (e) => this.setState({duration: e.target.value}),
@@ -131,16 +131,13 @@ class TimeSlots extends React.Component {
                     )}
                 </FormItem>
 
-                <div style={{
-                    paddingLeft: '16.66666667%',
-                    width: 850
-                }}>
+                <div>
                     {
                         <List bordered
                               dataSource={this.state.weekDays}
                               renderItem={weekDay => (
                                   <List.Item>
-                                      <Col span={6}>
+                                      <Col span={5}>
                                           {CheckBox(weekDay.day, weekDay.active)}
                                           <Tag style={{marginTop: 6}}
                                                color={weekDay.active ? 'purple' : 'grey'}>
@@ -148,13 +145,13 @@ class TimeSlots extends React.Component {
                                           </Tag>
                                       </Col>
 
-                                      <Col span={12}>
+                                      <Col span={9}>
                                           {TimeRange(weekDay)}
                                       </Col>
 
-                                      <Col span={6}>
+                                      <Col span={10} offset={7}>
                                           {
-                                              weekDay.to && weekDay.from && weekDay.active &&
+                                              // weekDay.to && weekDay.from && weekDay.active &&
                                               <div style={{display: 'flex'}}>
                                                   <p style={{margin: 0}}>Total slots: </p>
                                                   <Badge count={TotalSlots(weekDay.from, weekDay.to)}

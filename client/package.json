@@ -78,6 +78,7 @@
     "redux-logger": "^3.0.6",
     "redux-persist": "^5.10.0",
     "redux-saga": "^0.16.2",
+    "redux-saga-thunk": "^0.7.3",
     "redux-thunk": "^2.3.0",
     "reqwest": "^2.0.5",
     "resolve": "1.8.1",

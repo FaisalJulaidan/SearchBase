@@ -1,7 +1,7 @@
 import {Button, Divider, Modal, Steps, Spin, message} from 'antd';
 
 import React, {Component} from 'react';
-import styles from "./NewDatabaseModal.module.less"
+import styles from "./UploadModal.module.less"
 
 import UploadDatabaseStep from './NewDatabaseSteps/UploadDatabaseStep/UploadDatabaseStep'
 import ConfigureDatabaseStep from "./NewDatabaseSteps/ConfigureDatabaseStep";
@@ -11,7 +11,7 @@ import ConfirmStep from "./NewDatabaseSteps/ConfirmStep";
 
 const Step = Steps.Step;
 
-class NewDatabaseModal extends Component {
+class UploadModal extends Component {
 
     constructor(props) {
         super(props);
@@ -194,4 +194,4 @@ class NewDatabaseModal extends Component {
     }
 }
 
-export default NewDatabaseModal;
+export default UploadModal;

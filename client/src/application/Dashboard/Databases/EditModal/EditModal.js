@@ -5,14 +5,14 @@ import React, {Component} from 'react';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-class DatabaseDetailsModal extends Component {
+class EditModal extends Component {
 
     constructor(props) {
         super(props);
     }
 
     checkName = (rule, value, callback) => {
-        if (!this.props.isDatabaseNameValid(value) && this.props.databaseInfo.Name !== value) {
+        if (!this.props.isDatabaseNameValid(value) && this.props.database.Name !== value) {
             callback('Database name already exists. Choose another one, please!');
         } else {
             callback();
@@ -20,17 +20,17 @@ class DatabaseDetailsModal extends Component {
     };
 
     handleSave = () => this.props.form.validateFields((errors, values) => {
-        const {databaseInfo, updateDatabase, hideModal} = this.props;
+        const {database, updateDatabase, hideModal} = this.props;
         if (!errors){
             hideModal();
-            return updateDatabase(values, databaseInfo.ID)
+            return updateDatabase(values, database.ID)
         }
 
     });
 
     render() {
         const {getFieldDecorator} = this.props.form;
-        const {databaseInfo, databaseOptions} = this.props;
+        const {database, databaseOptions, hideModal, visible} = this.props;
         const formItemLayout = {
             labelCol: {span: 6},
             wrapperCol: {span: 14},
@@ -39,11 +39,11 @@ class DatabaseDetailsModal extends Component {
         return (
             <Modal width={"60%"}
                    title="Update Database"
-                   visible={this.props.visible}
-                   onCancel={this.props.hideModal}
+                   visible={visible}
+                   onCancel={hideModal}
                    destroyOnClose={true}
                    footer={[
-                       <Button key="cancel" onClick={this.props.hideModal}>Cancel</Button>,
+                       <Button key="cancel" onClick={hideModal}>Cancel</Button>,
                        <Button key="submit" type="primary" onClick={this.handleSave}>Save</Button>,
                    ]}>
                 <Form layout='horizontal'>
@@ -53,7 +53,7 @@ class DatabaseDetailsModal extends Component {
                         {...formItemLayout}>
                         {
                             getFieldDecorator('databaseName', {
-                                initialValue: databaseInfo?.Name,
+                                initialValue: database?.Name,
                                 rules: [
                                     {required: true, message: 'Please input your database name'},
                                     {validator: this.checkName},
@@ -66,7 +66,7 @@ class DatabaseDetailsModal extends Component {
                     <FormItem label="Database Type" extra="Select one of the supported types"
                               {...formItemLayout}>
                         {getFieldDecorator('databaseType', {
-                            initialValue: databaseInfo?.Type?.name,
+                            initialValue: database?.Type?.name,
                             rules: [{
                                 required: false,
                             }],
@@ -88,4 +88,4 @@ class DatabaseDetailsModal extends Component {
     }
 }
 
-export default Form.create()(DatabaseDetailsModal);
+export default Form.create()(EditModal);

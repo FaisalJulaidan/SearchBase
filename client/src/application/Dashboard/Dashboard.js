@@ -15,11 +15,11 @@ import {CSSTransition, TransitionGroup} from "react-transition-group";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 
-
 const Home = lazy(() => import('./Home/Home'));
 const Assistants = lazy(() => import('./Assistants/Assistants'));
 const AssistantCRM = lazy(() => import('./Assistants/Assistant/CRM/CRM'));
 const Databases = lazy(() => import('./Databases/Databases'));
+const DatabasesConfigs = lazy(() => import('./Databases/Database/Database'));
 const Analytics = lazy(() => import('./Assistants/Assistant/Analytics/Analytics'));
 const Flow = lazy(() => import('./Assistants/Assistant/Flow/Flow'));
 const Profile = lazy(() => import('./AccountDetails/Profile/Profile'));
@@ -114,7 +114,7 @@ class Dashboard extends Component {
         }
         // End of User Information
 
-        const newLayoutRoutes = ["/dashboard/crmlist", "/dashboard/calendar", "/dashboard/auto_pilot"];
+        const newLayoutRoutes = ["/dashboard/crmlist", "/dashboard/calendar", "/dashboard/auto_pilot", "/dashboard/databases"];
         const isNewLyaout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
             <Layout style={{height: '100%'}}>
@@ -249,6 +249,7 @@ class Dashboard extends Component {
                                 <CSSTransition key={location.key} classNames="fade" timeout={550}>
                                     <Suspense fallback={<div> Loading...</div>}>
                                         <Switch location={location} style={{height: '100%'}}>
+
                                             <Route path={`${match.path}/assistants/:id/script`} component={Flow}/>
                                             <Route path={`${match.path}/assistants/:id/integration`}
                                                    component={Integration}/>
@@ -258,16 +259,23 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/assistants/:id/CRMIntegration`}
                                                    component={AssistantCRM}/>
                                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+
                                             <Route path={`${match.path}/crmlist`} component={Crms} exact/>
                                             <Route path={`${match.path}/crmlist/:crm`} component={Crm} exact/>
+
                                             <Route path={`${match.path}/databases`} component={Databases} exact/>
+                                            <Route path={`${match.path}/databases/:id`}
+                                                   component={DatabasesConfigs} exact/>
+
                                             <Route path={`${match.path}/calendar`} component={Calendar} exact/>
                                             <Route path={`${match.path}/profile`} component={Profile} exact/>
                                             <Route path={`${match.path}/billing`} component={Billing} exact/>
+
                                             <Route path={`${match.path}/auto_pilot`} component={AutoPilot} exact/>
                                             <Route path={`${match.path}/auto_pilot/configs`}
                                                    component={AutoPilotConfigs}
                                                    exact/>
+
                                             <Route path={`${match.path}/users_management`} component={UsersManagement}
                                                    exact/>
                                             <Route path={`${match.path}/documentation`} component={Documentation}

@@ -179,7 +179,7 @@ def getAllCandidates(dbID, page) -> dict:
     try:
         result = db.session.query(Candidate) \
             .filter(Candidate.DatabaseID == dbID) \
-            .paginate(page=page, error_out=False, per_page=100)
+            .paginate(page=page, error_out=False, per_page=20)
 
         data = {
             'records': helpers.getListFromSQLAlchemyList(result.items),
@@ -200,7 +200,7 @@ def getAllJobs(dbID, page) -> dict:
     try:
         result = db.session.query(Job) \
             .filter(Job.DatabaseID == dbID) \
-            .paginate(page=page, error_out=False, per_page=100)
+            .paginate(page=page, error_out=False, per_page=20)
 
         data = {
             'records': helpers.getListFromSQLAlchemyList(result.items),

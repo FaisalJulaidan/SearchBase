@@ -311,6 +311,9 @@ def gen_dummy_data():
     db.session.add(addCandidate(db2, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
                                 2, "Cardiff"))
 
+    for i in list(range(120)):
+        db.session.add(addCandidate(db1, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
+                                    2, "Cardiff"))
 
     # Add CRM conncetion for aramco company
     db.session.add(CRM(Type=enums.CRM.Adapt, Company=aramco, Auth={

@@ -6,9 +6,11 @@ import {Chart, Axis, Tooltip, Geom } from "bizcharts";
 import {analyticsActions} from "store/actions";
 import {connect} from 'react-redux';
 import NumberInfo from 'ant-design-pro/lib/NumberInfo';
-import {Icon, Spin} from 'antd';
+import {Icon, Spin, Button} from 'antd';
 
 import moment from 'moment';
+
+const splits = {yearly: "YY", monthly: "MMMM", daily: "DDDD", hourly: "HHH"}
 
 const visitData = [];
 const beginDay = new Date().getTime();
@@ -21,8 +23,10 @@ for (let i = 0; i < 10; i += 1) {
 }
 
 class Analytics extends React.Component {
+    //split can  be yearly/monthly/daily/hourly
     state = {
-        height: 100
+        height: 100,
+        split: "yearly"
     };
     chartDiv;
 
@@ -37,7 +41,8 @@ class Analytics extends React.Component {
 
     render() {
         const {analytics} = this.props.analytics
-        const data = this.props.analytics.isLoading ? null : analytics.map(a => ({month: moment(a.DateTime).format("MMMM") , chats: a.count}));
+        const {split} = this.state;
+        const data = this.props.analytics.isLoading ? null : analytics.map(a => ({time: moment(a.DateTime).format("MMMM") , chats: a.count}));
         const cols = {
             chats: {
                 min: 0
@@ -46,8 +51,7 @@ class Analytics extends React.Component {
                 range: [0, 1]
             }
         };
-        console.log(data)
-        console.log(data)
+
         return (
             <div style={{height: '100%'}}>
                 <div style={{padding: '0 5px'}}>
@@ -67,6 +71,10 @@ class Analytics extends React.Component {
 
                                 <div className={styles.Panel_Body}
                                      ref={chartDiv => this.chartDiv = chartDiv}>
+                                    <Button type="primary">Yearly</Button>
+                                    <Button>Monthly</Button>
+                                    <Button>Daily</Button>
+                                    <Button>Hourly</Button>
                                     <Chart height={500} data={data} scale={cols} forceFit>
                                         <Axis name="month" />
                                         <Axis name="chats" />

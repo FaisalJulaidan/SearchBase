@@ -13,23 +13,36 @@ from models import db, Callback, Conversation
 
 #fix datetime
 
-def getAnalytics(assistant=1, startDate=datetime.now() - timedelta(days=365), endDate=datetime.now()):
+def getAnalytics(request, assistant, startDate=datetime.now() - timedelta(days=365), endDate=datetime.now()):
     """ Gets analytics for the provided assistant """
     """ startDate defaults to a year ago, and the end date defaults to now, gathering all data for the past year """
     """ currently only gathers amount of conversations held, split up by month """
+
+    split = request.args.get("split") if request.args.get("split") != None else "monthly"
+
+    splitTypes = {
+        'yearly': '%Y',
+        'monthly': '%Y-%m',
+        'daily': '%Y-%m %D',
+        'hourly': '%Y-%m %D %l'
+    }
+
+
     id = assistant
-    print(startDate)
-    print(endDate)
     try:
-        #works but slightly iffy fix
-        monthlyUses = db.session  .query(func.count(Conversation.ID).label('count'), func.min(Conversation.DateTime).label('DateTime'))\
-                            .filter(between(Conversation.DateTime, startDate, endDate))\
-                            .group_by(func.date_format(Conversation.DateTime, '%Y-%m'))\
-                            .order_by(func.date_format(Conversation.DateTime, '%Y-%m'))\
-                            .all()
+        if split not in splitTypes:
+            raise Exception("Supplied splitter {} is not allowed".format(split))
+
+        monthlyUses = db.session    .query(func.count(Conversation.ID).label('count'), func.min(Conversation.DateTime).label('DateTime'))\
+                                    .filter(between(Conversation.DateTime, startDate, endDate))\
+                                    .filter(Conversation.AssistantID == assistant)\
+                                    .group_by(func.date_format(Conversation.DateTime, splitTypes[split]))\
+                                    .order_by(func.date_format(Conversation.DateTime, splitTypes[split]))\
+                                    .all()
+
+
         return Callback(True, 'Analytics successfully gathered', monthlyUses)
     except Exception as e:
-        print(e)
         return Callback(False, 'Analytics could not be gathered')
 
 

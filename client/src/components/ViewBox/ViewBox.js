@@ -8,7 +8,9 @@ const {Paragraph} = Typography;
 
 const ViewBox = (props) => {
     return (
-        <div className={styles.Box} onClick={() => props.onClick()}>
+        <div className={styles.Box} onClick={() => {
+            if (props.onClick) props.onClick()
+        }}>
             <div className={styles.Body}>
                 <div className={styles.Icon}
                      style={{top: props.iconTop,
@@ -19,6 +21,20 @@ const ViewBox = (props) => {
                 >
                     {props.icon}
                 </div>
+
+                {
+                    props.icon2 &&
+                    <div className={styles.Icon}
+                         style={{
+                             top: props.iconTop - 10,
+                             right: props.iconRight + 170,
+                             width: props.iconWidth,
+                             height: props.iconHeight
+                         }}
+                    >
+                        {props.icon2}
+                    </div>
+                }
 
                 <Paragraph level={3} className={styles.Title}>
                     {props.title}

@@ -1,7 +1,7 @@
 import {all, put, takeEvery, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {assistantActions, crmActions, flowActions} from "../actions";
-import {destroyMessage, errorHandler, errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
+import {errorHandler, errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
 import * as Sentry from '@sentry/browser';
 
 function* fetchAssistants() {
@@ -145,6 +145,45 @@ function* resetAssistantCRM({assistantID}) {
     }
 }
 
+
+function* selectAutoPilot({assistantID, autoPilotID}) {
+    try {
+        const res = yield http.post(`/assistant/${assistantID}/auto_pilot`, {AutoPilotID: autoPilotID});
+        successMessage(res.data?.msg || 'Selected Auto Pilot Successfuly');
+        yield put(assistantActions.selectAutoPilotSuccess(assistantID, autoPilotID));
+    } catch (error) {
+        const defaultMsg = "CHANGE THIS";
+        let data = error.response?.data;
+        errorMessage(data.msg || defaultMsg);
+        yield put(assistantActions.selectAutoPilotFailure(data.msg || defaultMsg));
+        if (!data.msg) errorHandler(error)
+    }
+}
+
+function* disconnectAutoPilot({assistantID, autoPilotID}) {
+    try {
+        const res = yield http.delete(`/assistant/${assistantID}/auto_pilot`, {AutoPilotID: autoPilotID});
+        successMessage(res.data?.msg || "Disconnected from auto pilot successfuly");
+        yield put(assistantActions.disconnectAutoPilotSuccess(assistantID, autoPilotID));
+    } catch (error) {
+        const defaultMsg = "CHANGE THIS";
+        let data = error.response?.data;
+        errorMessage(data.msg || defaultMsg);
+        yield put(assistantActions.disconnectAutoPilotFailure(data.msg || defaultMsg));
+        if (!data.msg) errorHandler(error)
+    }
+}
+
+function* watchDisconnectAutoPilot() {
+    yield takeEvery(actionTypes.DISCONNECT_AUTO_PILOT_REQUEST, disconnectAutoPilot)
+}
+
+
+function* watchSelectAutoPilot() {
+    yield takeEvery(actionTypes.SELECT_AUTO_PILOT_REQUEST, selectAutoPilot)
+}
+
+
 function* watchResetAssistantCrm() {
     yield takeEvery(actionTypes.RESET_ASSISTANT_CRM_REQUEST, resetAssistantCRM)
 }
@@ -188,5 +227,9 @@ export function* assistantSaga() {
         watchUpdateStatus(),
         watchSelectAssistantCrm(),
         watchResetAssistantCrm(),
+        watchSelectAutoPilot(),
+        watchDisconnectAutoPilot()
+
+
     ])
 }

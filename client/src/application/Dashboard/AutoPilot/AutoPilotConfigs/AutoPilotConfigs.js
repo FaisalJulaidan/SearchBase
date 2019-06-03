@@ -76,7 +76,6 @@ class AutoPilotConfigs extends React.Component {
             openTimeSlots: weekDays
         };
 
-        console.log(payload)
         store.dispatch(autoPilotActions.updateAutoPilot(autoPilot.ID, payload));
     });
 
@@ -159,7 +158,6 @@ class AutoPilotConfigs extends React.Component {
                                 )}
                             </Form.Item>
 
-                            {console.log(this.state.acceptanceScore)}
                             <FormItem label="Auto Accept Applicants "
                                       extra="Select the percentage to auto accept the applicants">
                                 {getFieldDecorator('acceptApplications', {

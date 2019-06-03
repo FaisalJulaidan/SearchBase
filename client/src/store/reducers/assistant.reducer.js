@@ -5,6 +5,9 @@ import {deepClone} from "helpers";
 const initialState = {assistantList: [], isLoading: false, errorMsg: null, isUpdatingFlow: false};
 
 export const assistant = (state = initialState, action) => {
+    let assistantsCopy;
+    let index;
+
     switch (action.type) {
         case actionTypes.FETCH_ASSISTANTS_REQUEST:
             return updateObject(state, {
@@ -52,7 +55,7 @@ export const assistant = (state = initialState, action) => {
                 isLoading: true
             });
         case actionTypes.UPDATE_ASSISTANT_SUCCESS:
-            const assistantsCopy = state.assistantList
+            assistantsCopy = state.assistantList
                 .map(a => a.ID === action.assistantID ? {...action.updatedAssistant}: a);
 
             return updateObject(state, {
@@ -155,6 +158,45 @@ export const assistant = (state = initialState, action) => {
             return updateObject(state, {
                 errorMsg: action.error
             });
+
+        case actionTypes.SELECT_AUTO_PILOT_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+            });
+        case actionTypes.SELECT_AUTO_PILOT_SUCCESS:
+
+            assistantsCopy = deepClone(state.assistantList);
+            index = assistantsCopy.findIndex(x => x.ID === action.assistantID);
+            assistantsCopy[index].AutoPilotID = action.autoPilotID;
+
+            return updateObject(state, {
+                assistantList: assistantsCopy
+            });
+        case actionTypes.SELECT_AUTO_PILOT_FAILURE:
+            return updateObject(state, {
+                errorMsg: action.error,
+            });
+
+
+        case actionTypes.DISCONNECT_AUTO_PILOT_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+            });
+        case actionTypes.DISCONNECT_AUTO_PILOT_SUCCESS:
+
+            assistantsCopy = deepClone(state.assistantList);
+            index = assistantsCopy.findIndex(x => x.ID === action.assistantID);
+            assistantsCopy[index].AutoPilotID = null;
+
+            return updateObject(state, {
+                assistantList: assistantsCopy
+            });
+        case actionTypes.DISCONNECT_AUTO_PILOT_FAILURE:
+            return updateObject(state, {
+                errorMsg: action.error
+            });
+
+
 
         default:
             return state

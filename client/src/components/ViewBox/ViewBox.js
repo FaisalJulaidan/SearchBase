@@ -40,6 +40,20 @@ const ViewBox = (props) => {
                     {props.icon}
                 </div>
 
+                {
+                    props.icon2 &&
+                    <div className={styles.Icon}
+                         style={{
+                             top: props.iconTop - 10,
+                             right: props.iconRight + 170,
+                             width: props.iconWidth,
+                             height: props.iconHeight
+                         }}
+                    >
+                        {props.icon2}
+                    </div>
+                }
+
                 <Paragraph level={3} className={styles.Title}>
                     {props.title}
                 </Paragraph>
@@ -48,6 +62,8 @@ const ViewBox = (props) => {
                     {props.text}
                 </Paragraph>
             </div>
+
+
         </div>
     )
 

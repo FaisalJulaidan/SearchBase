@@ -5,7 +5,7 @@ import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {Typography} from 'antd';
 import CreateNewBox from "components/CreateNewBox/CreateNewBox";
 import ViewBox from "components/ViewBox/ViewBox";
-import {AutoPilotIcon, DatabaseIcon, RobotIcon} from "components/SVGs";
+import {AutoPilotIcon} from "components/SVGs";
 import NewAutoPilotModal from './NewAutoPilotModal/NewAutoPilotModal'
 import {autoPilotActions} from "store/actions";
 import 'types/TimeSlots_Types'
@@ -38,7 +38,6 @@ class AutoPilot extends React.Component {
 
                     <div className={styles.Body}>
                         <CreateNewBox text={'Add Auto Pilot'} onClick={this.showModal}/>
-
                         {
                             this.props.autoPilotsList.map(
                                 (/**@type AutoPilot*/ autoPilot, i) =>

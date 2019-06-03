@@ -94,7 +94,8 @@ class TimeSlots extends React.Component {
                 </>
             );
         };
-        const CheckBox = (day, active) => <Checkbox className={styles.CheckBox} checked={active}
+        const CheckBox = (day, active) => <Checkbox className={styles.CheckBox}
+                                                    checked={active}
                                                     onChange={event => this.handleActivateDay(event, day)}/>;
         const TotalSlots = (From, To) => {
             if (From && To) {
@@ -118,7 +119,7 @@ class TimeSlots extends React.Component {
                 <FormItem
                     label="Appointment Duration"
                     extra="This is will change the number of appointment slots per day"
-                    >
+                    {...this.props.layout}>
                     {this.props.getFieldDecorator('appointmentDuration', {
                         initialValue: this.state.duration,
                         onChange: (e) => this.setState({duration: e.target.value}),
@@ -131,13 +132,13 @@ class TimeSlots extends React.Component {
                     )}
                 </FormItem>
 
-                <div>
+                <div style={{paddingLeft: '16.66666667%', width: 850}}>
                     {
                         <List bordered
                               dataSource={this.state.weekDays}
                               renderItem={weekDay => (
                                   <List.Item>
-                                      <Col span={5}>
+                                      <Col span={6}>
                                           {CheckBox(weekDay.day, weekDay.active)}
                                           <Tag style={{marginTop: 6}}
                                                color={weekDay.active ? 'purple' : 'grey'}>
@@ -145,13 +146,13 @@ class TimeSlots extends React.Component {
                                           </Tag>
                                       </Col>
 
-                                      <Col span={9}>
+                                      <Col span={12}>
                                           {TimeRange(weekDay)}
                                       </Col>
 
-                                      <Col span={10} offset={7}>
+                                      <Col span={6}>
                                           {
-                                              // weekDay.to && weekDay.from && weekDay.active &&
+                                              weekDay.to && weekDay.from && weekDay.active &&
                                               <div style={{display: 'flex'}}>
                                                   <p style={{margin: 0}}>Total slots: </p>
                                                   <Badge count={TotalSlots(weekDay.from, weekDay.to)}

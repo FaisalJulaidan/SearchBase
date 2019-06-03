@@ -46,13 +46,13 @@ def processConversation(assistantHashID, data: dict) -> Callback:
     try:
         # collectedData is an array, and timeSpent is in seconds.
         conversation = Conversation(Data=conversationData,
-                                      TimeSpent=data['timeSpent'],
-                                      Completed=data['isSessionCompleted'],  # isSessionCompleted -> isConversationCompleted
-                                      SolutionsReturned=data['solutionsReturned'],
-                                      QuestionsAnswered=len(collectedData),
-                                      UserType=UserType[data['userType'].replace(" ", "")],
-                                      Score=data['score'],
-                                      Assistant=assistant)
+                                    TimeSpent=data['timeSpent'],
+                                    Completed=data.get('isSessionCompleted'),  # isSessionCompleted -> isConversationCompleted
+                                    SolutionsReturned=data['solutionsReturned'],
+                                    QuestionsAnswered=len(collectedData),
+                                    UserType=UserType[data['userType'].replace(" ", "")],
+                                    Score=data.get('score'),
+                                    Assistant=assistant)
         # CRM integration
         if assistant.CRM:
             crm_callback: Callback = crm_services.processConversation(assistant, conversation)

@@ -91,7 +91,7 @@ def getAllJobs(assistant: Assistant):
 def produceRecruiterValueReport(companyID, crmName):
     crm_callback: Callback = getCRMByType(crmName, companyID)
     if not crm_callback.Success:
-        raise Callback(False, "CRM not found")
+        return Callback(False, "CRM not found")
     # Check CRM type
     if crmName == CRM.Bullhorn.name:
         return Bullhorn.produceRecruiterValueReport(crm_callback.Data, companyID)

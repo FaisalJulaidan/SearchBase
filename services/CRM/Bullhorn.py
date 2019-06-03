@@ -602,7 +602,7 @@ def produceRecruiterValueReport(crm: CRM, companyID) -> Callback:
 
             data[previousUser] = tempRecord
         data = getTotalPipeline(data, previousUser)
-        
+
         nestedList = [titles]
 
         totalPipelineValue = 0

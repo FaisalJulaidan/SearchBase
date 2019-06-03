@@ -125,7 +125,6 @@ class AutoPilotConfigs extends React.Component {
                                 )}
                             </FormItem>
 
-                            {/*TODO: ADD INITIAL VALUE*/}
                             <FormItem
                                 label="Auto Set Appointment"
                             >

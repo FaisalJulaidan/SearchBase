@@ -11,7 +11,13 @@ const ViewBox = (props) => {
     return (
         <div className={styles.Box} onClick={() => props.onClick()}>
             <div className={styles.Body}>
-                <div className={styles.Icon} style={{top: props.iconTop, right: props.iconRight}}>
+                <div className={styles.Icon}
+                     style={{top: props.iconTop,
+                            right: props.iconRight,
+                            width: props.iconWidth,
+                            height: props.iconHeight
+                     }}
+                >
                     {props.icon}
                 </div>
 

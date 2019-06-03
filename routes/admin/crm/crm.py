@@ -88,7 +88,6 @@ def recruiter_value_report():
     user = get_jwt_identity()['user']
 
     if request.method == "POST":
-        print("json: ", request.json)
         data_callback: Callback = crm_services.produceRecruiterValueReport(user.get("companyID"),
                                                                            request.json.get("crm_type"))
         if not data_callback.Success:
